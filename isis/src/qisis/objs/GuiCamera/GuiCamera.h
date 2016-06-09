@@ -24,39 +24,44 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+
+#include <vector>
+
+
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
 
-//#include "Angle.h"
-//#include "Distance.h"
-#include "XmlStackedHandler.h"
-
-#include <vector>
-
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
+
+
+#include "XmlStackedHandler.h"
+
+
+
+
 
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
-  //class Distance;
-  class FileName;
-  class Project;  // TODO: does xml stuff need project???
-  class PvlObject;
+
   class Camera;
+  class FileName;
   class GuiCameraDisplayProperties;
+  class Project;  // TODO: does xml stuff need project???
+  class PvlObject;  
   class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for GuiCamera.
    *
    * This class represents a camera in a project-based GUI interface. It encapsulates ideas
-   *   about a camera such as it's display name, how it should be viewed, where it is on disk, etc.
+   * about a camera such as it's display name, how it should be viewed, where it is on disk, etc.
    *
    *  
    * @ingroup qisis
@@ -67,6 +72,9 @@ namespace Isis {
    *   @history 2015-06-23 Ken Edmundson - Original version.
    *   @history 2015-10-14 Jeffrey Covington - Declared GuiCameraQsp as a Qt
    *                           metatype for use with QVariant.
+   *   @history 2016-06-08 Tyler Wilson - Added documentation to some functions
+   *                           and corrected the formatting.  Fixes #3997.
+   *
    *  
    */
   class GuiCamera : public QObject {
@@ -79,12 +87,12 @@ namespace Isis {
 
       bool operator==(const GuiCamera &srcGuiCamera) const;
 
-      GuiCameraDisplayProperties *displayProperties();
+      //GuiCameraDisplayProperties *displayProperties();
       const GuiCameraDisplayProperties *displayProperties() const;
 
       QString id() const;
 
-//      Camera *camera();
+//    Camera *camera();
 
       QString instrumentNameShort();
       QString instrumentNameLong();
@@ -103,8 +111,10 @@ namespace Isis {
 //      Distance sigmaRadiusC() const;
 //      Distance sigmaMeanRadius() const;
 
-//      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  // TODO: does xml stuff need project and newRoot???
-//      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
+//      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+//      TODO: does xml stuff need project and newRoot???
+//      void save(QXmlStreamWriter &stream, const Project *project) const;
+//      TODO: does xml stuff need project???
 
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
@@ -169,6 +179,13 @@ namespace Isis {
       QString m_instrumentNameShort;
       QString m_instrumentNameLong;
   };
+
+  /**
+   * @description GuiCameraQsp  Represents a smart pointer to a GuiCamera object.
+   * It behaves exactly like a normal pointer, but it is thread-safe and it will delete the pointer
+   *  it is holding when it goes out of scope, provided no other QSharedPointer objects
+   * are referencing it.
+   */
 
   typedef QSharedPointer<GuiCamera> GuiCameraQsp;
 

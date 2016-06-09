@@ -16,10 +16,8 @@
 
 namespace Isis {
   /**
-   * GuiCameraDisplayProperties constructor. This sets default values and
-   *   constructs the object *.
-   *
-   *
+   * @brief GuiCameraDisplayProperties constructor. This sets default values and
+   * constructs the object pointer.
    * @param displayName The filename (fully expanded) of the object.
    * @param parent Qt parent object (this is destroyed when parent is destroyed)
    */
@@ -37,6 +35,12 @@ namespace Isis {
     setValue(Color, QVariant::fromValue(randomColor()));
   }
 
+
+  /**
+   * @brief GuiCameraDisplayProperties constructor
+   * @param xmlReader  XML reader class for loading the Gui Camera Display Properties
+   * @param parent
+   */
 
   GuiCameraDisplayProperties::GuiCameraDisplayProperties(XmlStackedHandlerReader *xmlReader,
       QObject *parent) : DisplayProperties("", parent) {
@@ -86,8 +90,8 @@ namespace Isis {
 
 
   /**
-   * Call this with every property you support, otherwise they will not
-   *   communicate properly between widgets.
+   * @brief Call this with every property you support, otherwise they will not
+   * communicate properly between widgets.
    *
    * @param prop The property you are adding support for
    */
@@ -100,10 +104,10 @@ namespace Isis {
 
 
   /**
-   * Support may come later, please make sure you are connected to the
-   *   supportAdded signal.
+   * @brief Support may come later, please make sure you are connected to the
+   *  supportAdded signal.
    *
-   * @returns True if the property has support, false otherwise
+   * @return @b bool Returns true if the property has support, false otherwise.
    */
   bool GuiCameraDisplayProperties::supports(Property prop) {
     return (m_propertiesUsed & prop) == prop;
@@ -111,9 +115,9 @@ namespace Isis {
 
 
   /**
-   * Get a property's associated data.
-   *
+   * @brief Get a property's associated data.
    * @param prop The property
+   * @return @b QVariant Returns the value of the property.
    */
   QVariant GuiCameraDisplayProperties::getValue(Property prop) const {
     return (*m_propertyValues)[prop];
@@ -121,8 +125,9 @@ namespace Isis {
 
 
   /**
-   * Creates and returns  a random color for the intial color of
+   * @brief Creates and returns a random color for the intial color of
    * the footprint polygon.
+   * @return @b QColor  Returns a random color.
    */
   QColor GuiCameraDisplayProperties::randomColor() {
     // Gives a random number between 0 and 255
@@ -141,6 +146,12 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Write the Gui Camera Display Properties out to an XML file.
+   * @param stream  The output data stream.
+   * @param project Not used in this function.
+   * @param newProjectRoot Not used in this function.
+   */
   void GuiCameraDisplayProperties::save(QXmlStreamWriter &stream, const Project *project,
                                       FileName newProjectRoot) const {
     stream.writeStartElement("displayProperties");
@@ -161,7 +172,8 @@ namespace Isis {
 
 
   /**
-   * Change the color associated with this target.
+   * @brief Change the color associated with this target.
+   * @param newColor is the color to associate with this target.
    */
   void GuiCameraDisplayProperties::setColor(QColor newColor) {
     setValue(Color, QVariant::fromValue(newColor));
@@ -169,7 +181,8 @@ namespace Isis {
 
 
   /**
-   * Change the selected state associated with this target.
+   * @brief Change the selected state associated with this target.
+   * @param newValue is the new state associated with this target.
    */
   void GuiCameraDisplayProperties::setSelected(bool newValue) {
     setValue(Selected, newValue);
@@ -177,7 +190,8 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the display name associated with this target.
+   * @brief Change the visibility of the display name associated with this target.
+   * @param newValue  Shows/hides the display name of the associated target.
    */
   void GuiCameraDisplayProperties::setShowLabel(bool newValue) {
     setValue(ShowLabel, newValue);
@@ -185,9 +199,9 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the display name. This should only be connected to
-   *   by an action with a list of displays as its data. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * @brief Change the visibility of the display name. This should only be connected to
+   *  by an action with a list of displays as its data. This synchronizes all
+   *  of the values where at least one is guaranteed to be toggled.
    */
   void GuiCameraDisplayProperties::toggleShowLabel() {
     QList<GuiCameraDisplayProperties *> displays = senderToData(sender());
@@ -202,11 +216,30 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Sets the GuiCameraDisplayProperties variable pointer.
+   * @param displayProperties  The new pointer.
+   */
+
   GuiCameraDisplayProperties::XmlHandler::XmlHandler(GuiCameraDisplayProperties *displayProperties) {
     m_displayProperties = displayProperties;
   }
 
 
+  /**
+   * @description The XML reader invokes this method at the start of every element in the
+   *        XML document.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
+   *
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   *
+   */
   bool GuiCameraDisplayProperties::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
@@ -223,6 +256,16 @@ namespace Isis {
   }
 
 
+  /**
+   * @description This implementation of a virtual function calls
+   * QXmlDefaultHandler::characters(QString &ch)
+   * which in turn calls QXmlContentHandler::characters(QString &ch) which
+   * is called when the XML processor has parsed a chunk of character data.
+   * @see XmlStackedHandler, QXmlDefaultHandler,QXmlContentHandler
+   * @param ch The character data.
+   * @return @b boo Returns True if there were no problems with the character processing.
+   * It returns False if there was a problem, and the XML reader stops.
+   */
   bool GuiCameraDisplayProperties::XmlHandler::characters(const QString &ch) {
     m_hexData += ch;
 
@@ -230,6 +273,17 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief The XML reader invokes this method at the start of every element in the
+   *        XML document.
+   * @param namespaceURI  The Uniform Resource Identifier of the namespace (eg. "xmlns")
+   * @param localName The local name string (eg. "xhtml")
+   * @param qName The XML qualified string (eg.  "xmlns:xhtml"). This can be empty if
+   *        QNames are not available.
+   * @return @b bool If this function returns True, then a signal is sent to the reader indicating
+   * the end of the element.  If this function returns False, something bad
+   * happened and processing stops.
+   */
   bool GuiCameraDisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
       const QString &localName, const QString &qName) {
     if (localName == "displayProperties") {
@@ -243,8 +297,10 @@ namespace Isis {
 
 
   /**
-   * This is the generic mutator for properties. Given a value, this will
-   *   change it and emit propertyChanged if its different and supported.
+   * @description This is the generic mutator for properties. Given a value, this will
+   * change it and emit propertyChanged if its different and supported.
+   * @param prop The key into the m_propertyValues QMap <int, QVariant>
+   * @param value The value we want to change to.
    */
   void GuiCameraDisplayProperties::setValue(Property prop, QVariant value) {
     if ((*m_propertyValues)[prop] != value) {
@@ -258,8 +314,9 @@ namespace Isis {
 
 
   /**
-   * This is for the slots that have a list of display properties as associated
-   *   data. This gets that list out of the data.
+   * @description This is for the slots that have a list of display properties as associated
+   * data. This gets that list out of the data.
+   * @param senderObj  The caller object containing a list of the display properties.
    */
   QList<GuiCameraDisplayProperties *> GuiCameraDisplayProperties::senderToData(
       QObject *senderObj) {

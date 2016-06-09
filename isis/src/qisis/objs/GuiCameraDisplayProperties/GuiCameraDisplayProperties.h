@@ -69,6 +69,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-05-27 Ken Edmundson - Creation.
+   *   @history 2016-06-08 Tyler Wilson - Added documentation to many of the
+   *                           member functions, and cleaned up the formatting.
+   *                           Fixes #3997.
    */
   class GuiCameraDisplayProperties : public DisplayProperties {
       Q_OBJECT
@@ -118,9 +121,9 @@ namespace Isis {
 
     private:
       /**
-       * @author 2012-??-?? ???
-       *
-       * @internal
+       * @description  Child class for XmlStackedHandler which is used to process XML in
+       * a stack-oriented way.  It's been modified to process a GuiCameraDisplayProperties
+       * object.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
@@ -137,7 +140,15 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
+          /**
+           * An internal pointer to GuiCameraDisplayProperties object.
+           */
           GuiCameraDisplayProperties *m_displayProperties;
+
+          /**
+           * An internal QString variable used to store character data found in the
+           * content of XML elements.
+           */
           QString m_hexData;
       };
 
@@ -149,7 +160,7 @@ namespace Isis {
       static QList<GuiCameraDisplayProperties *> senderToData(QObject *sender);
 
       /**
-       * This indicated whether any widgets with this DisplayProperties
+       * This indicates whether any widgets with this DisplayProperties
        *   is using a particular property. This helps others who can set
        *   but not display know whether they should give the option to set.
        */

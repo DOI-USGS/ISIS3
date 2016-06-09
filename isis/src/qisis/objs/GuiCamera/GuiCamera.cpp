@@ -8,18 +8,24 @@
 
 #include <hdf5.h>
 #include <hdf5_hl.h> // in the hdf5 library
-#include <hdf5.h>
 
-//#include "Distance.h"
+
+#include "Camera.h"
+#include "GuiCameraDisplayProperties.h"
 #include "IString.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "Camera.h"
-#include "GuiCameraDisplayProperties.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
+
+
+/**
+   * @brief The constructor for this class.
+   * @param camera  A traditional Isis::Camera object which we are wrapping in this class.
+   * @param parent  A pointer to the object instantiating this object.
+   */
 
   GuiCamera::GuiCamera(Camera *camera, QObject *parent) : QObject(parent) {
     m_id = NULL;
@@ -39,8 +45,7 @@ namespace Isis {
 
     QString displayStr = m_spacecraftNameShort + "/" + m_instrumentNameShort;
 
-    m_displayProperties
-        = new GuiCameraDisplayProperties(displayStr, this);
+    m_displayProperties = new GuiCameraDisplayProperties(displayStr, this);
 
     m_id = new QUuid(QUuid::createUuid());
   }
@@ -48,9 +53,9 @@ namespace Isis {
 
 
 //  GuiCamera::GuiCamera(Project *project, XmlStackedHandlerReader *xmlReader,
-//                         QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
+//                         QObject *parent) : QObject(parent) {
+// TODO: does xml stuff need project???
 //    m_id = NULL;
-
 //    xmlReader->pushContentHandler(new XmlHandler(this, project));
 //    xmlReader->setErrorHandler(new XmlHandler(this, project));
 //  }
@@ -63,7 +68,8 @@ namespace Isis {
 //    m_bodyCode = new SpiceInt(*src.m_bodyCode);
 //
 //    m_radii.resize(3, Distance());
-//    m_sigmaRadii.resize(3, Distance(3.0, Distance::Kilometers)); // TODO - radii sigma fudged for now
+//    m_sigmaRadii.resize(3, Distance(3.0, Distance::Kilometers));
+// TODO - radii sigma fudged for now
 //
 //    for (int i = 0; i < 3; i++) {
 //      m_radii[i] = src.m_radii[i];
@@ -79,6 +85,10 @@ namespace Isis {
 
 
 
+  /**
+   * @brief The Destructor
+   */
+
   GuiCamera::~GuiCamera() {
     delete m_id;
     m_id = NULL;
@@ -86,29 +96,22 @@ namespace Isis {
 
   
 //  GuiCamera &GuiCamera::operator=(const GuiCamera &src) {
-
 //    if (&src != this) {
-
 //      delete m_id;
 //      m_id = NULL;
 //      m_id = new QUuid(src.m_id->toString());
 //    }
-
 //    return *this;
 //  }
-
-
 //  Camera *GuiCamera::camera() {
 //      return m_camera;
 //  }
 
 
   /**
-   * Compares two Target Body objects to see if they are equal
-   *
+   * @brief Compares two Target Body objects to see if they are equal
    * @param srcGuiCamera GuiCamera object to compare against
-   *
-   * @return bool Returns true if the objects are equal, false if not
+   * @return @b bool Returns True if the objects are equal, False if not.
    */
   bool GuiCamera::operator== (const GuiCamera &srcGuiCamera) const {
 
@@ -119,11 +122,17 @@ namespace Isis {
   }
 
 
+
+  /*
   GuiCameraDisplayProperties *GuiCamera::displayProperties() {
     return m_displayProperties;
   }
+  */
 
-
+  /**
+   * @brief Retrieves the display properties of the camera.
+   * @return GuiCameraDisplayProperties
+   */
   const GuiCameraDisplayProperties *GuiCamera::displayProperties() const {
     return m_displayProperties;
   }
@@ -346,7 +355,8 @@ namespace Isis {
 //      else if (localName == "bundleResults") {
 //        delete m_xmlHandlerBundleResults;
 //        m_xmlHandlerBundleResults = NULL;
-//        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader()); //TODO: need to add constructor for this???
+//        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
+//TODO: need to add constructor for this???
 //      }
 //      else if (localName == "imageList") {
 //        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
@@ -396,30 +406,41 @@ namespace Isis {
 
 
   /**
-   * Get a unique, identifying string associated with this GuiCamera object.
-   *
-   * @return A unique ID for this GuiCamera object
+   * @brief Retrieves a unique, identifying string associated with this GuiCamera object.
+   * @return @b QString returns m_id
    */
   QString GuiCamera::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
 
-
+  /**
+   * @brief Retrieves an abbreviated version for the name of the instrument.
+   * @return @b QString Returns m_instrumentNameShort.
+   */
   QString GuiCamera::instrumentNameShort() {
     return m_instrumentNameShort;
   }
 
-
+  /**
+   * @brief Retrieves a long version for the name of the instrument.
+   * @return @b QString Returns m_instrumentNameLong.
+   */
   QString GuiCamera::instrumentNameLong() {
     return m_instrumentNameLong;
   }
 
-
+  /**
+   * @brief Retrieves an abbbreviated name for the spacecraft.
+   * @return @b QString Returns m_spacecraftNameShort.
+   */
   QString GuiCamera::spacecraftNameShort() {
     return m_spacecraftNameShort;
   }
 
-
+  /**
+   * @brief Retrieves the full name of the spacecraft.
+   * @return @b QString Returns m_spacecraftNameLong.
+   */
   QString GuiCamera::spacecraftNameLong() {
     return m_spacecraftNameLong;
   }
@@ -462,9 +483,8 @@ namespace Isis {
 
 
 //  void GuiCamera::savehdf5(FileName outputfilename) const {
-//    const H5std_string  hdfFileName(outputfilename.expanded().toStdString()); //Is this the right way to have a dynamic file name?  What about PATH?
-    
-    
+//    const H5std_string  hdfFileName(outputfilename.expanded().toStdString());
+//Is this the right way to have a dynamic file name?  What about PATH?
 //    // Try block to detect exceptions raised by any of the calls inside it
 //    try {
 //      /*
@@ -485,10 +505,12 @@ namespace Isis {
 //      H5LTset_attribute_string(fileId, objectName.toLatin1(), "controlNetworkFileName",
 //                               m_controlNetworkFileName->expanded().toLatin1());
 
-//      //??? H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/GuiCamera/BundleSettings"));//???
+//      //??? H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/GuiCamera/BundleSettings"));
+//        ???
 //      //???H5::Group settingsGroup = hdfFile.createGroup("/GuiCamera/BundleSettings");
 //      QString groupName = objectName + "/BundleSettings";
-//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(), H5P_DEFAULT, H5P_DEFAULT,
+//      H5P_DEFAULT);
 //      m_settings->savehdf5(groupId, groupName.toLatin1());
 //      groupName = objectName + "/BundleResults";
 //      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toLatin1()));

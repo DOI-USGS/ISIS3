@@ -63,7 +63,7 @@ namespace Isis {
    *                           There was also an issue with a QMap data structure not being
    *                           initialized, resulting in a segmentation fault.  Also added
    *                           testing for exceptions being thrown in this constructor,
-   *                           as well as the function computeCorrelationMatrix. Fixes #3999.
+   *                           as well as the function computeCorrelationMatrix. Fixes #3997,3999.
    */
   class CorrelationMatrix {
     public:
