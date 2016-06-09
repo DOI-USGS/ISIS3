@@ -43,17 +43,30 @@ namespace Isis {
    *
    * End_Object
    *
+   * @param storedMatrixData  A PvlObject containing data about the
+   * covariance/correlation matrix.
+   *
+   * @throws IException::User "This Pvl Object does not have the correct correlation information.
+   * The Object you are looking for is called CorrelationMatrixData"
+   *
+   * @throws IException::User "Could not find the Covariance Matrix .dat file name."
+   *
+   * @throws IException::User "Could not find the Correlation Matrix .dat file name."
+   *
+   * @throws IExceptoin::User"Could not get Images and Parameters from ImagesAndParameters group."
+   *
    */
   CorrelationMatrix::CorrelationMatrix(PvlObject storedMatrixData) {
-    m_imagesAndParameters = NULL;
-    m_covarianceFileName = NULL;
-    m_correlationFileName = NULL;
+    //m_imagesAndParameters = NULL;
+    m_imagesAndParameters = new QMap<QString, QStringList>();
+    m_covarianceFileName = new FileName("");
+    m_correlationFileName = new FileName("");
     m_diagonals = NULL;
     m_visibleBlocks = NULL;
 
     if (storedMatrixData.name() != "CorrelationMatrixData") {
       QString msg = "This Pvl Object does not have the correct correlation information. The Object "
-                    "you are looking for is called CorrelationMatrixData";
+                    "you are looking for is called CorrelationMatrixData.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -81,10 +94,12 @@ namespace Isis {
     }
 
     try {
-      PvlObject::PvlKeywordIterator imgsIt = storedMatrixData.findGroup("ImagesAndParameters").begin();
+      PvlObject::PvlKeywordIterator
+          imgsIt = storedMatrixData.findGroup("ImagesAndParameters").begin();
       while ( imgsIt != storedMatrixData.findGroup("ImagesAndParameters").end() ) {
         QStringList params = (*imgsIt)[0].split(",");
         m_imagesAndParameters->insert(imgsIt->name(), params);
+        imgsIt++;
       }
     }
     catch (IException &e) {
@@ -170,11 +185,14 @@ namespace Isis {
   }
 
 
-
   /**
-  * This mehtod reads the covariance matrix in from a file, one SparseBlockColumnMatrix at a time.
-  * It then stores the diagonal values from that column and computes the correlation values. The
-  * resulting SparseBlockMatrix is written to a new file, one SparseBlockColumnMatrix at a time.
+  * @brief This mehtod reads the covariance matrix in from a file,
+  * one SparseBlockColumnMatrix at a time.  It then stores the diagonal values from that column
+  * and computes the correlation values. The resulting SparseBlockMatrix is written to a
+  * new file, one SparseBlockColumnMatrix at a time.
+  *
+  * @throws IException::Progammer  "Cannot compute correlation matrix without a specified
+  * file name.  Use setCorrelationFileName(FileName) before calling computeCorrelationMatrix()."
   */
   void CorrelationMatrix::computeCorrelationMatrix() {
 
@@ -288,13 +306,16 @@ namespace Isis {
 
 
   /**
-   * See if the correlation matrix has already been calculated by checking to see if
+   * @brief See if the correlation matrix has already been calculated by checking to see if
    *   the correlation matrix file has been created.
    *
    * @return true if the correlation matrix has already been set.
    */
   bool CorrelationMatrix::isValid() {
-    return !(m_correlationFileName->name() == "" || m_covarianceFileName->name() == "");
+
+      return !(m_correlationFileName->name() == "" || m_covarianceFileName->name() == "");
+
+
   }
 
 
@@ -315,9 +336,9 @@ namespace Isis {
 
   // Set Methods
   /**
-   *Set the qmap of images and parameters.
+   * Set the qmap of images and parameters.
    *
-   * @param
+   * @param correlationFileName The FileName of the stored correlation matrix data.
    */
   void CorrelationMatrix::setCorrelationFileName(FileName correlationFileName) {
     if (m_correlationFileName == NULL) {
@@ -333,7 +354,7 @@ namespace Isis {
   /**
    *Set the qmap of images and parameters.
    *
-   * @param
+   * @param  covarianceFileName  The FileName of the stored covariance matrix data.
    */
   void CorrelationMatrix::setCovarianceFileName(FileName covarianceFileName) {
     if (m_covarianceFileName == NULL) {
@@ -353,9 +374,10 @@ namespace Isis {
 
 
   /**
-   * Set the qmap of images and parameters.
+   * @brief Set the qmap of images and parameters.
    *
-   * @param
+   * @param imagesAndParameters a QMap structure indexed by image keys, with an arbitrary set of
+   * parameters for each image.
    */
   void CorrelationMatrix::setImagesAndParameters(QMap<QString, QStringList> imagesAndParameters) {
     if (m_imagesAndParameters == NULL) {
@@ -369,9 +391,9 @@ namespace Isis {
 
 
   /**
-   * Public access for the correlation matrix file name.
+   * @brief Public access for the correlation matrix file name.
    *
-   * @return
+   * @return A pointer to the FileName of the correlation matrix data file.
    */
   FileName CorrelationMatrix::correlationFileName() {
     return *m_correlationFileName;
@@ -382,7 +404,7 @@ namespace Isis {
   /**
    * Public access for the covariance matrix file name.
    *
-   * @return
+   * @return A pointer to the FileName of the covariance data file.
    */
   FileName CorrelationMatrix::covarianceFileName() {
     return *m_covarianceFileName;
@@ -393,7 +415,8 @@ namespace Isis {
   /**
    * Public access for the qmap of images and parameters.
    *
-   * @return
+   * @return  A pointer to the QMap containing a list of images (the keys) and their
+   * associated parameter values.
    */
   QMap<QString, QStringList> *CorrelationMatrix::imagesAndParameters() {
     return m_imagesAndParameters;
@@ -431,7 +454,8 @@ namespace Isis {
 
 
   /**
-   * Get the visible part of the matrix.
+   * @brief Get the visible part of the matrix.
+   * @return Returns a QList of the non-empty diagonal blocks of the correlation matrix.
    */
   QList<SparseBlockColumnMatrix> *CorrelationMatrix::visibleBlocks() {
     return m_visibleBlocks;
@@ -440,7 +464,7 @@ namespace Isis {
 
 
   /**
-   * This method creates a pvl group with the information necessary to recreate this correlation
+   * @brief This method creates a pvl group with the information necessary to recreate this correlation
    * matrix.
    *
    * Object = CorrelationMatrixData
@@ -473,6 +497,13 @@ namespace Isis {
     return corrMatInfo;
   }
 
+  /**
+   * @brief Writes CorrelationMatrix data to the output stream and returns this stream
+   * to the user.
+   * @param stream  The input stream containing the data.
+   * @return The same stream but now containing the matrix data.
+   */
+
 
 
   QDataStream &CorrelationMatrix::write(QDataStream &stream) const {
@@ -484,6 +515,14 @@ namespace Isis {
     stream << *m_diagonals << *m_visibleBlocks;
     return stream;
   }
+
+
+  /**
+   * @brief Reads CorrelationMatrix data from the input stream and places the data
+   * in member variables.
+   * @param stream  The input input stream containing the data.
+   * @return Also the input stream which is returned back to the user should they need it.
+   */
 
 
 
@@ -524,12 +563,24 @@ namespace Isis {
     return stream;
   }
 
+  /**
+   * @brief operator <<
+   * @param stream The output stream upon which the matrix data is written
+   * @param matrix The CorrelationMatrix containing the data.
+   * @return The output stream containing the matrix data.
+   */
 
 
   QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix) {
     return matrix.write(stream);
   }
 
+  /**
+   * @brief operator >>
+   * @param stream  The input stream containing the CorrelationMatrix data.
+   * @param matrix  The matrix which is going to be overwritten by the input stream.
+   * @return  The output stream containing the matrix data.
+   */
 
 
   QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix) {

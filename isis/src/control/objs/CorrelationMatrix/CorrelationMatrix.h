@@ -38,6 +38,8 @@ namespace Isis {
   class MosaicSceneWidget;
   class PvlObject;
   class SparseBlockColumnMatrix;
+
+
   /**
    * @brief This is a container for the correlation matrix that comes from a bundle adjust
    *
@@ -56,6 +58,12 @@ namespace Isis {
    *                           copy constructor and operator= methods.
    *   @history 2015-10-14 Jeffrey Covington - Declared CorrelationMatrix as a
    *                           Qt metatype for use with QVariant.
+   *   @history 2016-06-06 Tyler Wilson - Fixed a problem with a PvlKeywordIterator not
+   *                           being incremented in the constructor which accepts a PvlObject.
+   *                           There was also an issue with a QMap data structure not being
+   *                           initialized, resulting in a segmentation fault.  Also added
+   *                           testing for exceptions being thrown in this constructor,
+   *                           as well as the function computeCorrelationMatrix. Fixes #3999.
    */
   class CorrelationMatrix {
     public:
@@ -71,7 +79,7 @@ namespace Isis {
 
       bool isValid();
       bool hasCovMat();
-//       const bool hasCovMat() const;
+     //const bool hasCovMat() const;
 
       void setCorrelationFileName(FileName correlationFileName);
       void setCovarianceFileName(FileName covarianceFileName);

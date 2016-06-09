@@ -51,7 +51,11 @@ int main() {
   FileName covFile = "covMat.dat";
 
   corrMat.setCorrelationFileName(corrFile);
+  qDebug() << "Does the Correlation Matrix have a covariance matrix? "  <<  corrMat.hasCovMat();
   corrMat.setCovarianceFileName(covFile);
+  qDebug() << "Does the Correlation Matrix have a covariance matrix now that it has been set? "
+           <<  corrMat.hasCovMat();
+
 
   // Make Dummy Covariance Matrix
   SparseBlockMatrix tmpMat;
@@ -85,6 +89,17 @@ int main() {
 
   qDebug() << "Testing Compute Correlation Matrix Method.";
   corrMat.computeCorrelationMatrix();
+  qDebug() << "Tesing Exception in Compute Correlation Matrix Method";
+
+  CorrelationMatrix  cm;
+  try {
+    cm.computeCorrelationMatrix();
+  }
+  catch (IException &e) {
+    qDebug() << "Exception 1:";
+    qDebug() << e.toString();
+
+  }
 
   qDebug() << "Correlation Matrix:";
   foreach( SparseBlockColumnMatrix sbcm, *corrMat.visibleBlocks() ) {
@@ -120,38 +135,92 @@ int main() {
     }
   }
 
-//   qDebug() << "Testing pvlObject()";
-// 
-//   PvlObject corrMatObject( corrMat.pvlObject() );
-//   Pvl tester;
-//   tester += corrMatObject;
-//   cout << tester;
-// 
-//   qDebug() << "Testing constructor that takes a pvlObject";
-// 
-//   try {
-//     CorrelationMatrix corrMat4(corrMatObject);
-// 
-//     qDebug() << "";
-//     qDebug() << "***Correlation Matrix Information***";
-//     qDebug() << "";
-//     qDebug() << "Covariance File Name:" << corrMat4.correlationFileName().expanded();
-//     qDebug() << "Correlation File Name:" << corrMat4.correlationFileName().expanded();
-//     qDebug() << "Images and Parameters:";
-//   //   QMapIterator<QString, QStringList> imgIt( *corrMat4.imagesAndParameters() );
-//     imgIt.toFront();
-//     while ( imgIt.hasNext() ) {
-//       imgIt.next();
-//       qDebug() << "\t" << imgIt.key();
-//       foreach ( QString param, imgIt.value() ) {
-//         qDebug() << "\t\t" << param;
-//       }
-//     }
-//   }
-//   catch(IException &e) {
-//     QString msg = "Failed to create object using CorrelationMatrix(PvlObject).";
-//     throw(e, IException::Programmer, msg, _FILEINFO_);
-//   }
+   qDebug() << "Testing pvlObject()";
+
+   PvlObject corrMatObject( corrMat.pvlObject() );
+   Pvl tester;
+   tester += corrMatObject;
+   cout << tester;
+
+   qDebug() << "Testing constructor that takes a pvlObject";
+
+   try {
+     CorrelationMatrix corrMat4(corrMatObject);
+
+     qDebug() << "";
+     qDebug() << "***Correlation Matrix Information***";
+     qDebug() << "";
+     qDebug() << "Covariance File Name:" << corrMat4.correlationFileName().expanded();
+     qDebug() << "Correlation File Name:" << corrMat4.correlationFileName().expanded();
+     qDebug() << "Images and Parameters:";
+       QMapIterator<QString, QStringList> imgIt( *corrMat4.imagesAndParameters() );
+     imgIt.toFront();
+     while ( imgIt.hasNext() ) {
+       imgIt.next();
+       qDebug() << "\t" << imgIt.key();
+       foreach ( QString param, imgIt.value() ) {
+         qDebug() << "\t\t" << param;
+       }
+     }
+   }
+   catch(IException &e) {
+     QString msg = "Failed to create object using CorrelationMatrix(PvlObject).";
+     throw(e, IException::Programmer, msg, _FILEINFO_);
+   }
+
+
+   qDebug() << "Testing CorrelationMatrix(PvlObject storedMatrixData)";
+
+
+   PvlObject exception1("EmptyObject");
+   PvlObject exception2("CorrelationMatrixData");
+
+
+   PvlObject exception3("CorrelationMatrixData");
+   exception3 += PvlKeyword("CovarianceMatrixFileName","CovMatFileName");
+
+   PvlObject exception4("CorrelationMatrixData");
+   exception4 += PvlKeyword("CovarianceMatrixFileName","CovMatFileName");
+   exception4 += PvlKeyword("CorrelationMatrixFileName","CorrMatFileName");
+
+
+   try {
+      CorrelationMatrix except1(exception1);
+   }
+
+   catch(IException &e) {
+     qDebug() << "Exception 1";
+     qDebug() << e.toString();
+   }
+
+   try {
+      CorrelationMatrix except2(exception2);
+   }
+
+   catch(IException &e) {
+     qDebug() << "Exception 2";
+     qDebug() << e.toString();
+   }
+
+   try {
+      CorrelationMatrix except3(exception3);
+   }
+
+   catch(IException &e) {
+     qDebug() << "Exception 3";
+     qDebug() << e.toString();
+   }
+
+   try {
+      CorrelationMatrix except4(exception4);
+   }
+
+   catch(IException &e) {
+     qDebug() << "Exception 4";
+     qDebug() << e.toString();
+   }
+
+
     
   //delete mat files
   covQFile.remove();
