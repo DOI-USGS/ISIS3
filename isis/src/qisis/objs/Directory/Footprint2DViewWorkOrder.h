@@ -32,6 +32,9 @@ namespace Isis {
    * @author 2012-??-?? ???
    *
    * @internal
+   *   @history 2016-01-08 Jeffrey Covington - Updated for new Footprint2DView, syncUndo() 
+   *                          was removed, and execute now uses WorkOrder's execute() method
+   *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3954.
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT

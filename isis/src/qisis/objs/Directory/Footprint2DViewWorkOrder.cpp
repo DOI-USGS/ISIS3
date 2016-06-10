@@ -34,29 +34,47 @@
 #include "Project.h"
 
 namespace Isis {
-
+  
+  /** 
+   * Constrictor. This method sets the text of the project to View Footprints.
+   * 
+   * @param project Current project
+   */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View &Footprints..."));
   }
 
-
+  /**
+   * This method has not been implemented.
+   */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
   }
 
-
+  /**
+   * Destructor
+   */
   Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
   }
 
-
+  /**
+   * This method clones the current Footprint2DViewWorkOrder and returns it.
+   * 
+   * @return @b Footprint2DViewWorkOrder that was cloned
+   */
   Footprint2DViewWorkOrder *Footprint2DViewWorkOrder::clone() const {
 
     return new Footprint2DViewWorkOrder(*this);
-
   }
-
-
+  
+  /**
+   * This method returns true if one of an image in ImageList images isFootprintable.
+   * 
+   * @param images ImageList of images
+   * 
+   * @return @b bool True if one of the images in ImagesList images isFootprintable
+   */
   bool Footprint2DViewWorkOrder::isExecutable(ImageList *images) {
     bool result = false;
 
@@ -67,7 +85,11 @@ namespace Isis {
     return result;
   }
 
-
+  /**
+   * This method calls WorkOrder's execute.
+   * 
+   * @return @b bool True if WorkOrder::execute() returns true.
+   */
   bool Footprint2DViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
@@ -162,13 +184,22 @@ namespace Isis {
     return success;
   }
 
-
+  /**
+   * This method returns whether or not other depends on a Footprint2DViewWorkOrder.
+   * 
+   * @param other WorkOrder that we are checking for dependencies
+   * 
+   * @return @b bool True if other depends on a Footprint2DViewWorkOrder
+   */
   bool Footprint2DViewWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<Footprint2DViewWorkOrder *>(other);
   }
 
-
+  /**
+   * This methods adds the current item to Footprint2DView.
+   * 
+   */
   void Footprint2DViewWorkOrder::syncRedo() {
     int viewToUse = internalData().first().toInt();
 
