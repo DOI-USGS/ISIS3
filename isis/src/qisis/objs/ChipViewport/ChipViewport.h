@@ -23,23 +23,18 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QWidget>
 #include <QPaintEvent>
 #include <QResizeEvent>
+#include <QWidget>
 
 #include "Chip.h"
-#include "Stretch.h"
-#include "IException.h"
 #include "Histogram.h"
-
-
-namespace Isis {
-  class ControlNet;
-}
+#include "Stretch.h"
 
 class QImage;
 
 namespace Isis {
+  class ControlNet;
   class CubeViewport;
 
   /**
@@ -73,7 +68,7 @@ namespace Isis {
    *                           simply loading a new chip, or geoming the chip.
    *   @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to 
    *                           userMovedTackPoint.
-   *                           TODO:  Could not use tackPointChanged signal
+   *                           //TODO  Could not use tackPointChanged signal
    *                           because that signal is emitted whenever the
    *                           measure is loaded not just when the user
    *                           initiates the move.  This should be cleaned up.
@@ -81,6 +76,10 @@ namespace Isis {
    *                           whether control points are drawn.
    *   @history 2012-07-26 Tracie Sucharski - Added method to return zoom factor and
    *                           slot to zoom to a specific zoom factor.
+   *   @history 2014-09-05 Kim Oyama - Added default initialization of Image to ChipViewport
+   *                           construtor.
+   *   @history 2015-12-08 Jeannie Backer - Fixed whitespace per ISIS coding standards.
+   *   @history 2016-06-07 Ian Humphrey - Updated documentation and coding standards. Fixes #3958.
    */
   class ChipViewport : public QWidget {
       Q_OBJECT
@@ -100,22 +99,22 @@ namespace Isis {
 
       //!  Return chip
       Chip *chip() const {
-        return p_chip;
+        return m_chip;
       };
 
       //! Return the number of samples in the chip
       int chipSamples() const {
-        return p_chip->Samples();
+        return m_chip->Samples();
       };
 
       //! Return the number of lines in the chip
       int chipLines() const {
-        return p_chip->Lines();
+        return m_chip->Lines();
       };
 
       //! Return the gray band currently viewed
       int grayBand() const {
-        return p_gray.band;
+        return m_gray.band;
       };
 
       //!  Return the position of cube under cross hair
@@ -128,11 +127,11 @@ namespace Isis {
       //!  Draw X on point
       //void markPoint (double sample, double line);
 
-
       //! Return the gray band stretch
       Stretch grayStretch() const {
-        return p_gray.stretch;
+        return m_gray.stretch;
       };
+
 
     signals:
       //!< Signal sent when tack point changes
@@ -143,8 +142,8 @@ namespace Isis {
       //   to only emit if user moves the tack point???
       void userMovedTackPoint();
 
-    public slots:
 
+    public slots:
       void autoStretch();
       void stretchFromCubeViewport(Stretch *, CubeViewport *);
       void changeStretchLock(int);
@@ -175,9 +174,8 @@ namespace Isis {
        * @param newControlNet The new ControlNet to be used
        */
       void setControlNet(ControlNet *newControlNet) {
-        p_controlNet = newControlNet;
+        m_controlNet = newControlNet;
       }
-
 
 
     protected:
@@ -186,7 +184,6 @@ namespace Isis {
       void keyPressEvent(QKeyEvent *e);
       void mousePressEvent(QMouseEvent *event);
 
-    protected slots:
 
     private:
       void reloadChip(double tackSample = 0., double tackLine = 0.);
@@ -195,14 +192,17 @@ namespace Isis {
       void paintImage();
 
       /**
+       * Sets the mapping for gray band stretch
+       *
        * @author ????-??-?? Unknown
        *
        * @internal
        */
       class BandInfo {
         public:
-          int band;
-          Stretch stretch;
+          int band;         //!< The gray band
+          Stretch stretch;  //!< Stretch for the band
+          //! BandInfo constructor
           BandInfo() {
             band = 1;
             stretch.SetNull(0.0);
@@ -213,40 +213,40 @@ namespace Isis {
           };
       };
 
-      BandInfo p_gray;//!< info for the gray bands.
-      Chip *p_chip;  //!< The chip
-      Cube *p_chipCube;  //!< The chip's cube
+      BandInfo m_gray;   //!< Info for the gray bands.
+      Chip *m_chip;      //!< The chip
+      Cube *m_chipCube;  //!< The chip's cube
 
-      int p_width;//!< Chip width
-      int p_height;//!< Chip height
+      int m_width;  //!< Chip width
+      int m_height; //!< Chip height
 
-      bool p_geomIt;//!< geomIt?
-      Chip *p_matchChip;  //!< The matching chip.
-      Cube *p_matchChipCube;  //!< The matching chip's cube
+      bool m_geomIt;         //!< geomIt?
+      Chip *m_matchChip;     //!< The matching chip.
+      Cube *m_matchChipCube; //!< The matching chip's cube
 
-      double p_zoomFactor;//!< Zoom Factor
-      int p_rotation;//!< Rotation
+      double m_zoomFactor; //!< Zoom Factor
+      int m_rotation;      //!< Rotation
 
-      QImage *p_image;  //!< The image
-      bool p_paintImage;//!< Paint Image?
-      bool p_showPoints;//!< Draw control points
-      bool p_cross;//!< Draw crosshair
-      bool p_circle;//!< Draw circle
-      int p_circleSize;//!<Circle size
+      QImage *m_image;   //!< The image
+      bool m_paintImage; //!< Paint Image?
+      bool m_showPoints; //!< Draw control points
+      bool m_cross;      //!< Draw crosshair
+      bool m_circle;     //!< Draw circle
+      int m_circleSize;  //!< Circle size
 
-      ChipViewport *p_tempView;  //!< Temporary viewport
+      ChipViewport *m_tempView;  //!< Temporary viewport
 
       // The ControlNet pointed to by this pointer is not owned by this class!
-      // It is ok for p_controlNet to be NULL any time.  If it is not NULL then
+      // It is ok for m_controlNet to be NULL any time.  If it is not NULL then
       // it is used to paint measures in the viewport.
       //
       // After construction, it is the responsibility of the user of this class
       // to maintain this pointer with the setControlNet method (to make sure
       // that either NULL or a valid ControlNet is being pointed to).
-      ControlNet *p_controlNet;
+      ControlNet *m_controlNet;
 
-      bool p_stretchLocked;
-      Stretch *p_stretch;
+      bool m_stretchLocked; //!< Whether or not to lock the stretch when transforming 
+      Stretch *m_stretch;   //!< Current stretch on the chip viewport
   };
 };
 
