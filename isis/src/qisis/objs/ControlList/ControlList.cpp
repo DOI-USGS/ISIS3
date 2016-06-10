@@ -37,7 +37,6 @@
 #include "Color.h"
 #include "FileName.h"
 #include "IException.h"
-#include "IString.h"
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -103,6 +102,8 @@ namespace Isis {
   /**
    * Create an control list from a list of control net file names. This is slow (serial) and not 
    * recommended.
+   *
+   * @param fileNames Control net file names
    */
   ControlList::ControlList(QStringList &fileNames) {
     foreach (QString fileName, fileNames) {
@@ -125,15 +126,23 @@ namespace Isis {
 
 
   /**
+   * Appends a control pointer to the control list
+   *
+   * @param value The control pointer to append
+   *
    * @see QList<Control *>::append()
    */
-  void ControlList::append(Control * const & value) {
+  void ControlList::append(Control * const &value) {
     QList<Control *>::append(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Appends a list of control pointers to the control list
+   *
+   * @param value The list of control pointers to append
+   *
    * @see QList<Control *>::append()
    */
   void ControlList::append(const QList<Control *> &value) {
@@ -143,6 +152,8 @@ namespace Isis {
 
 
   /**
+   * Clears the control list
+   * 
    * @see QList<Control *>::clear()
    */
   void ControlList::clear() {
@@ -155,6 +166,12 @@ namespace Isis {
 
 
   /**
+   * Erases a control pointer from the control list at the specified position
+   *
+   * @param pos The position to erase at
+   *
+   * @return @b QList<Control *>::iterator Iterator to the next item in the list
+   *
    * @see QList<Control *>::erase()
    */
   QList<Control *>::iterator ControlList::erase(iterator pos) {
@@ -165,6 +182,13 @@ namespace Isis {
 
 
   /**
+   * Erases all control pointers starting at "begin" up to (but not including) end
+   *
+   * @param begin Iterator to the first control pointer to erase from the list
+   * @param end Iterator to the end control pointer (which will not be erased)
+   *
+   * @return @b QList<Control *>::iterator Iterator to the end control pointer
+   *
    * @see QList<Control *>::erase()
    */
   QList<Control *>::iterator ControlList::erase(iterator begin, iterator end) {
@@ -175,9 +199,14 @@ namespace Isis {
 
 
   /**
+   * Inserts a control pointer at the specified position in the control list
+   *
+   * @param i The index to insert at
+   * @param value The control pointer to insert
+   *
    * @see QList<Control *>::insert()
    */
-  void ControlList::insert(int i, Control * const & value) {
+  void ControlList::insert(int i, Control * const &value) {
     QList<Control *>::insert(i, value);
 
     emit countChanged(count());
@@ -185,9 +214,16 @@ namespace Isis {
 
 
   /**
+   * Inserts a control pointer before the specified iterator position
+   *
+   * @param before Iterator to the item to insert the control pointer before
+   * @param value The control pointer to insert
+   *
+   * @return @b QList<Control *>::iterator Iterator to the inserted control pointer
+   *
    * @see QList<Control *>::insert()
    */
-  QList<Control *>::iterator ControlList::insert(iterator before, Control * const & value) {
+  QList<Control *>::iterator ControlList::insert(iterator before, Control * const &value) {
     iterator result = QList<Control *>::insert(before, value);
     emit countChanged(count());
     return result;
@@ -195,36 +231,56 @@ namespace Isis {
 
 
   /**
+   * Prepends a control pointer to the control list
+   *
+   * @param value The control pointer to prepend to the control list
+   *
    * @see QList<Control *>::prepend()
    */
-  void ControlList::prepend(Control * const & value) {
+  void ControlList::prepend(Control * const &value) {
     QList<Control *>::prepend(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Equivalent to append(value) 
+   *
+   * @param value The control pointer to append to the control list
+   * 
+   * @see ControlList::append(Control * const &value)
    * @see QList<Control *>::push_back()
    */
-  void ControlList::push_back(Control * const & value) {
+  void ControlList::push_back(Control * const &value) {
     QList<Control *>::push_back(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Equivalent to prepend(value)
+   *
+   * @param value The control pointer to prepend to the control list
+   *
+   * @see ControlList::prepend(Control * const &value)
    * @see QList<Control *>::push_front()
    */
-  void ControlList::push_front(Control * const & value) {
+  void ControlList::push_front(Control * const &value) {
     QList<Control *>::push_front(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Removes all occurences of the control pointer in the control list
+   * 
+   * @param value The control pointer value to remove
+   *
+   * @return @b int The number of control pointers removed
+   * 
    * @see QList<Control *>::removeAll()
    */
-  int ControlList::removeAll(Control * const & value) {
+  int ControlList::removeAll(Control * const &value) {
     int result = QList<Control *>::removeAll(value);
 
     if (result != 0) {
@@ -236,6 +292,10 @@ namespace Isis {
 
 
   /**
+   * Removes the control pointer at the specified index
+   *
+   * @param i The index of the control pointer to remove
+   * 
    * @see QList<Control *>::removeAt()
    */
   void ControlList::removeAt(int i) {
@@ -245,6 +305,8 @@ namespace Isis {
 
 
   /**
+   * Removes the first control pointer from the control list
+   *
    * @see QList<Control *>::removeFirst()
    */
   void ControlList::removeFirst() {
@@ -254,6 +316,8 @@ namespace Isis {
 
 
   /**
+   * Removes the last control pointer from the control list 
+   *
    * @see QList<Control *>::removeLast()
    */
   void ControlList::removeLast() {
@@ -263,9 +327,15 @@ namespace Isis {
 
 
   /**
+   * Removes the first occurence of the control pointer from the control list
+   *
+   * @param value The control pointer to remove
+   *
+   * @return @b bool True if a control pointer was removed; otherwise false
+   * 
    * @see QList<Control *>::removeOne()
    */
-  bool ControlList::removeOne(Control * const & value) {
+  bool ControlList::removeOne(Control * const &value) {
     bool result = QList<Control *>::removeOne(value);
 
     if (result) {
@@ -277,6 +347,10 @@ namespace Isis {
 
 
   /**
+   * Swaps this control list's control pointers with the other list of control pointers
+   *
+   * @param other The list of control pointers to swap
+   *
    * @see QList<Control *>::swap()
    */
   void ControlList::swap(QList<Control *> &other) {
@@ -289,6 +363,12 @@ namespace Isis {
 
 
   /**
+   * Remove the control pointer at the specified index and returns it
+   *
+   * @param i The index of the control pointer to take
+   *
+   * @return @b Contol * The removed control pointer
+   *
    * @see QList<Control *>::takeAt()
    */
   Control *ControlList::takeAt(int i) {
@@ -299,6 +379,10 @@ namespace Isis {
 
 
   /**
+   * Removes the first control pointer from the control list and returns it
+   *
+   * @return @b Control * The first control pointer in the control list
+   *
    * @see QList<Control *>::takeFirst()
    */
   Control *ControlList::takeFirst() {
@@ -309,6 +393,10 @@ namespace Isis {
 
 
   /**
+   * Removes the last control pointer from the control list and returns it
+   *
+   * @return @b Control * The last control pointer in the control list
+   *
    * @see QList<Control *>::takeLast()
    */
   Control *ControlList::takeLast() {
@@ -319,6 +407,12 @@ namespace Isis {
 
 
   /**
+   * Appends control pointers from the other list to this control list
+   *
+   * @param The list of other control pointers to append
+   *
+   * @return @b ControlList & Reference to this control list
+   * 
    * @see QList<Control *>::operator+=()
    */
   ControlList &ControlList::operator+=(const QList<Control *> &other) {
@@ -333,6 +427,12 @@ namespace Isis {
 
 
   /**
+   * Appends a control pointer to this control list
+   *
+   * @param other The control pointer to append
+   *
+   * @return @b ControlList & Reference to this control list 
+   *
    * @see QList<Control *>::operator+=()
    */
   ControlList &ControlList::operator+=(Control * const &other) {
@@ -343,6 +443,12 @@ namespace Isis {
 
 
   /**
+   * Appends a list of other control pointers to this control list
+   *
+   * @param other The list of other control pointers to append
+   *
+   * @return @b ControlList & Reference to this control list
+   *
    * @see QList<Control *>::operator<<()
    */
   ControlList &ControlList::operator<<(const QList<Control *> &other) {
@@ -357,6 +463,12 @@ namespace Isis {
 
 
   /**
+   * Appends a control pointer to this control list 
+   *
+   * @param other The control pointer to append
+   * 
+   * @return @b ControlList & Reference to this control list 
+   * 
    * @see QList<Control *>::operator<<()
    */
   ControlList &ControlList::operator<<(Control * const &other) {
@@ -367,6 +479,12 @@ namespace Isis {
 
 
   /**
+   * Assigns another list of control pointers to this control list
+   *
+   * @param rhs The other list of control pointers to assign
+   * 
+   * @return @b ControlList & Reference to this control list 
+   * 
    * @see QList<Control *>::operator=()
    */
   ControlList &ControlList::operator=(const QList<Control *> &rhs) {
@@ -385,7 +503,10 @@ namespace Isis {
    * Assignment operator
    *
    * @param rhs The right hand side of the '=' operator
-   * @return *this
+   *
+   * @return @b ControlList & Reference to this ControlList
+   *
+   * @see ControlList::operator=(const QList<Control *> &rhs)
    */
   ControlList &ControlList::operator=(const ControlList &rhs) {
     bool countChanging = (rhs.count() != count());
@@ -404,7 +525,7 @@ namespace Isis {
 
   /**
    * Set the human-readable name of this control list. This is really only useful for project
-   *   control lists (not anonymous temporary ones).
+   * control lists (not anonymous temporary ones).
    *
    * @param newName The name to give this control list
    */
@@ -415,7 +536,7 @@ namespace Isis {
 
   /**
    * Set the relative path (from the project root) to this control list's folder. This is really
-   *   only useful for project control lists (not anonymous temporary ones).
+   * only useful for project control lists (not anonymous temporary ones).
    *
    * @param newPath The path to the controls in this control list
    */
@@ -427,7 +548,7 @@ namespace Isis {
   /**
    * Get the human-readable name of this control list
    *
-   * @return The name of the control list (or an empty string if anonymous).
+   * @return @b QString The name of the control list (or an empty string if anonymous).
    */
   QString ControlList::name() const {
     return m_name;
@@ -436,9 +557,9 @@ namespace Isis {
 
   /**
    * Get the path to these controls in the control list (relative to project root). This only
-   *   applies to a control list from the project.
+   * applies to a control list from the project.
    *
-   * @return The path to the controls in the control list (or an empty string if unknown).
+   * @return @b QString The path to the controls in the control list (or an empty string if unknown).
    */
   QString ControlList::path() const {
     return m_path;
@@ -446,7 +567,11 @@ namespace Isis {
 
 
   /**
-   * Delete all of the contained Controls from disk (see Control::deleteFromDisk())
+   * Delete all of the contained Controls from disk 
+   *
+   * @param project Project to delete controls from
+   *
+   * @see Control::deleteFromDisk()
    */
   void ControlList::deleteFromDisk(Project *project) {
     foreach (Control *control, *this) {
@@ -477,6 +602,13 @@ namespace Isis {
    *     ...
    *   </controls>
    * </pre>
+   *
+   * @param stream XML stream that contains the control list data
+   * @param project Project to save control list from
+   * @param newProjectRoot Filename root to save control list to
+   *
+   * @throws IException::Io "Unable Failed to create directory"
+   * @throws IException::Io "Unable to save control information, could not be opened for writing"
    */
   void ControlList::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
       const {
@@ -550,6 +682,12 @@ namespace Isis {
   }
 
 
+  /**
+   * CopyControlDataFunctor constructor.
+   *
+   * @param project Project to copy from
+   * @param newProjectRoot Project to copy to
+   */
   ControlList::CopyControlDataFunctor::CopyControlDataFunctor(const Project *project,
                                                               FileName newProjectRoot) {
     m_project = project;
@@ -557,22 +695,42 @@ namespace Isis {
   }
 
 
+  /**
+   * CopyControlDataFunctor copy constructor.
+   * 
+   * @param other The other CopyControlDataFunctor to initialize data from 
+   */
   ControlList::CopyControlDataFunctor::CopyControlDataFunctor(const CopyControlDataFunctor &other) {
     m_project = other.m_project;
     m_newProjectRoot = other.m_newProjectRoot;
   }
 
 
+  /**
+   * CopyControlDataFunctor destructor
+   */
   ControlList::CopyControlDataFunctor::~CopyControlDataFunctor() {
   }
 
 
+  /**
+   * Copies the Control from one project to another.
+   *
+   * @param controlToCopy The Control to copy
+   */
   void *ControlList::CopyControlDataFunctor::operator()(Control * const &controlToCopy) {
     controlToCopy->copyToNewProjectRoot(m_project, m_newProjectRoot);
     return NULL;
   }
 
 
+  /**
+   * CopyControlDataFunctor assignment operator.
+   * 
+   * @param rhs The other CopyControlDataFunctor to copy from
+   *
+   * @return @b ControlList::CopyControlDataFunctor The new copy
+   */
   ControlList::CopyControlDataFunctor &ControlList::CopyControlDataFunctor::operator=(
       const CopyControlDataFunctor &rhs) {
     m_project = rhs.m_project;
@@ -582,8 +740,8 @@ namespace Isis {
 
 
   /**
-   * Create an XML Handler (reader) that can populate the ControlList class data. See
-   *   ControlList::save() for the expected format.
+   * Create an XML Handler (reader/writer) that can populate the ControlList class data. See
+   * ControlList::save() for the expected format.
    *
    * @param controlList The control list we're going to be initializing
    * @param project The project that contains the control list
@@ -596,9 +754,14 @@ namespace Isis {
 
   /**
    * Handle an XML start element. This expects <controlList/> and <control/> elements (it reads both
-   *   the project XML and the controls.xml file).
+   * the project XML and the controls.xml file).
    *
-   * @return If we should continue reading the XML (usually true).
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML
+   * @param qName ???
+   * @param atts The attribute containing the keyword value given for the given localName
+   *
+   * @return @b bool If we should continue reading the XML (usually true).
    */
   bool ControlList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
@@ -627,9 +790,16 @@ namespace Isis {
 
   /**
    * Handle an XML end element. This handles <controlList /> by opening and reading the controls.xml
-   *   file.
+   * file.
    *
-   * @return If we should continue reading the XML (usually true).
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML
+   * @param qName ???
+   * 
+   * @return @b bool If we should continue reading the XML (usually true).
+   *
+   * @throws IException::Io "Unable to open with read access"
+   * @throws IException::Io "Failed to open control list XML"
    */
   bool ControlList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName) {
