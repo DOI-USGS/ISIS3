@@ -47,7 +47,6 @@
 #include "ControlPointEditWidget.h"
 #include "CubeDnView.h"
 #include "CubeDnViewWorkOrder.h"
-#include "CubeViewportViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
 #include "FileName.h"
@@ -125,7 +124,6 @@ namespace Isis {
 
     try {
       createWorkOrder<CnetEditorViewWorkOrder>();
-      //createWorkOrder<CubeViewportViewWorkOrder>();
       createWorkOrder<CubeDnViewWorkOrder>();
       createWorkOrder<Footprint2DViewWorkOrder>();
       createWorkOrder<MatrixViewWorkOrder>();
