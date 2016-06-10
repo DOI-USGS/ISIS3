@@ -8,11 +8,13 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QMenu>
+#include <QPoint>
 #include <QScrollArea>
 #include <QSettings>
+#include <QSize>
+#include <QVBoxLayout>
 #include <QXmlStreamWriter>
 
 #include "Directory.h"
@@ -20,6 +22,7 @@
 #include "IException.h"
 #include "ImageTreeWidget.h"
 #include "ImageTreeWidgetItem.h"
+#include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "PvlObject.h"
@@ -27,6 +30,14 @@
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
+  
+  /**
+   * Constructor. This method sets up the QWidget to show the ImageTreeWidget that is created
+   * using directory.
+   * 
+   * @param directory The directory where you want the ImageTreeWidget to be made
+   * @param parent The QWidget parent
+   */
   ImageFileListWidget::ImageFileListWidget(Directory *directory,
                                            QWidget *parent) : QWidget(parent) {
     m_directory = directory;
@@ -50,31 +61,43 @@ namespace Isis {
     m_progress->setVisible(false);
   }
 
-
+  /**
+   * Destructor
+   */
   ImageFileListWidget::~ImageFileListWidget() {
     delete m_progress;
     m_directory = NULL;
   }
 
-
+  /**
+   * This method returns the progress bar.
+   * 
+   * @return @b QProgressBar * Returns the ProgressBar
+   */
   QProgressBar *ImageFileListWidget::getProgress() {
     return m_progress;
   }
 
-
+  /**
+   * This method loads the state of this class from the pvl.
+   * 
+   * @param pvl The pvl that we are reading the state from.
+   * 
+   * @throws IException::Io "Unable to read image file's list widget settings from Pvl"
+   */
   void ImageFileListWidget::fromPvl(PvlObject &pvl) {
-    if(pvl.name() == "ImageFileList") {
+    if (pvl.name() == "ImageFileList") {
       m_serialized.reset(new PvlObject(pvl));
       ImageTreeWidgetItem::TreeColumn col =
           ImageTreeWidgetItem::FootprintColumn;
-      while(col < ImageTreeWidgetItem::BlankColumn) {
+      while (col < ImageTreeWidgetItem::BlankColumn) {
         IString key = ImageTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
         if (pvl.hasKeyword(key.ToQt())) {
           bool visible = toBool(pvl[key.ToQt()][0]);
 
-          if(visible) {
+          if (visible) {
             m_tree->showColumn(col);
           }
           else {
@@ -91,7 +114,7 @@ namespace Isis {
       QList<QTreeWidgetItem *> allCubes;
 
       // Take all of the cubes out of the tree
-      while(m_tree->topLevelItemCount() > 0) {
+      while (m_tree->topLevelItemCount() > 0) {
         QTreeWidgetItem *group = m_tree->takeTopLevelItem(0);
         allCubes.append(group->takeChildren());
 
@@ -100,7 +123,7 @@ namespace Isis {
       }
 
       // Now re-build the tree items
-      for(int cubeGrp = 0; cubeGrp < pvl.objects(); cubeGrp ++) {
+      for (int cubeGrp = 0; cubeGrp < pvl.objects(); cubeGrp ++) {
         PvlObject &cubes = pvl.object(cubeGrp);
 
         QTreeWidgetItem *newCubeGrp = m_tree->addGroup("", cubes.name());
@@ -111,7 +134,7 @@ namespace Isis {
         }
       }
 
-      if(allCubes.size()) {
+      if (allCubes.size()) {
         m_tree->addGroup("", "Unknown")->addChildren(allCubes);
       }
     }
@@ -121,13 +144,17 @@ namespace Isis {
     }
   }
 
-
+  /**
+   * This method writes the state of this class to a pvl.
+   * 
+   * @return @b PvlObject The pvl that we are writing too.
+   */
   PvlObject ImageFileListWidget::toPvl() const {
     PvlObject output("ImageFileList");
 
     ImageTreeWidgetItem::TreeColumn col =
         ImageTreeWidgetItem::FootprintColumn;
-    while(col < ImageTreeWidgetItem::BlankColumn) {
+    while (col < ImageTreeWidgetItem::BlankColumn) {
       IString key = ImageTreeWidgetItem::treeColumnToString(col) + "Visible";
       key = key.Convert(" ", '_');
       bool visible = !m_tree->isColumnHidden(col);
@@ -139,16 +166,16 @@ namespace Isis {
     output += PvlKeyword("SortColumn", toString(m_tree->sortColumn()));
 
     // Now store groups and the cubes that are in those groups
-    for(int i = 0; i < m_tree->topLevelItemCount(); i++) {
+    for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
       QTreeWidgetItem *group = m_tree->topLevelItem(i);
       PvlObject cubeGroup(
           group->text(ImageTreeWidgetItem::NameColumn));
       cubeGroup += PvlKeyword("Expanded", group->isExpanded() ? "Yes" : "No");
 
-      for(int j = 0; j < group->childCount(); j++) {
+      for (int j = 0; j < group->childCount(); j++) {
         QTreeWidgetItem *item = group->child(j);
 
-        if(item->type() == QTreeWidgetItem::UserType) {
+        if (item->type() == QTreeWidgetItem::UserType) {
           ImageTreeWidgetItem *cubeItem = (ImageTreeWidgetItem *)item;
 
           cubeGroup += PvlKeyword("Image", cubeItem->image()->id());
@@ -161,63 +188,62 @@ namespace Isis {
     return output;
   }
 
-
+  /**
+   * This method pushes a new XmlHandler into the parser stack.
+   * 
+   * @param xmlReader This is the parser stack.
+   */
   void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
     xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
-
-  void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
-                                 FileName newProjectRoot) const {
-    stream.writeStartElement("imageFileList");
-
-    ImageTreeWidgetItem::TreeColumn col =
-        ImageTreeWidgetItem::FootprintColumn;
-    while(col < ImageTreeWidgetItem::BlankColumn) {
-      bool visible = !m_tree->isColumnHidden(col);
-      bool sorted = (m_tree->sortColumn() == col);
-
-      stream.writeStartElement("column");
-      stream.writeAttribute("name", ImageTreeWidgetItem::treeColumnToString(col));
-      stream.writeAttribute("visible", (visible? "true" : "false"));
-      stream.writeAttribute("sorted", (sorted? "true" : "false"));
-      stream.writeEndElement();
-
-      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
-    }
-
-    // Now store groups and the cubes that are in those groups
-    save(stream, NULL);
-
-    stream.writeEndElement();
-  }
-
-
+  /**
+   * This method calls ImageTreeWidget::actions() which sets up a QAction
+   * that sets a default for the file list columns and returns a QList of
+   * QPointers that point to the QAction.
+   * 
+   * @return @b QList<QAction *> The QList of QPointers that point to the QAction set up by 
+   *            ImageTreeWidget::actions().
+   */
   QList<QAction *> ImageFileListWidget::actions() {
     return m_tree->actions();
   }
 
-
+  /**
+   * This method calls ImageTreeWidget::getViewActions() which returns a 
+   * list of FootprintColumns.
+   * 
+   * @return @b QList<QAction *> The QList of FootprintColumns.
+   */
   QList<QAction *> ImageFileListWidget::getViewActions() {
     return m_tree->getViewActions();
   }
 
-
+  /**
+   * This method creates a new QAction which is connected and when triggered
+   * will save the cube list.
+   * 
+   * @return @b QList<QAction *> The QList of the new QAction.
+   */
   QList<QAction *> ImageFileListWidget::getExportActions() {
     QList<QAction *> exportActs;
 
     QAction *saveList = new QAction(this);
     saveList->setText(
         "Save Entire Cube List (ordered by &file list/groups)...");
-    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+    connect(saveList, SIGNAL(triggered()), this, SLOT(saveList()));
 
     exportActs.append(saveList);
 
     return exportActs;
   }
 
-
-  QWidget * ImageFileListWidget::getLongHelp(QWidget * fileListContainer) {
+  /**
+   * This method creates a QWidget that displays a long help message explaining the tool.
+   * 
+   * @return @b QWidget Returns the message QWidget that was made.
+   */
+  QWidget *ImageFileListWidget::getLongHelp(QWidget *fileListContainer) {
     QScrollArea *longHelpWidgetScrollArea = new QScrollArea;
 
     QWidget *longHelpWidget = new QWidget;
@@ -232,10 +258,14 @@ namespace Isis {
 
     QPixmap preview;
     if (!fileListContainer) {
-      QWeakPointer<ImageFileListWidget> tmp = new ImageFileListWidget;
-      tmp.data()->resize(QSize(500, 200));
-      preview = QPixmap::grabWidget(tmp.data());
-      delete tmp.data();
+//      QWeakPointer<ImageFileListWidget> tmp = new ImageFileListWidget;
+//      tmp.data()->resize(QSize(500, 200));
+//      preview = QPixmap::grabWidget(tmp.data());
+//      delete tmp.data();
+      ImageFileListWidget *tmp = new ImageFileListWidget;
+      tmp->resize(QSize(500, 200));
+      preview = QPixmap::grabWidget(tmp);
+      delete tmp;
     }
     else {
       QPixmap previewPixmap = QPixmap::grabWidget(fileListContainer).scaled(
@@ -282,7 +312,11 @@ namespace Isis {
     return longHelpWidgetScrollArea;
   }
 
-
+  /** 
+   * This method adds the new images to the tree.
+   * 
+   * @param images ImageList containing all of the images that need to be added to the tree.
+   */
   void ImageFileListWidget::addImages(ImageList *images) {
     m_progress->setText("Loading file list");
     m_progress->setRange(0, images->size() - 1);
@@ -381,7 +415,12 @@ namespace Isis {
     m_progress->setVisible(false);
   }
 
-
+  /**
+   * This method takes an event and gets all of the FootprintColumns, adds them to
+   * the menu, then it pops up the menu at the location of event.
+   * 
+   * @param event A QContextMenuEvent that is used to find the position of the mouse.
+   */
   void ImageFileListWidget::contextMenuEvent(QContextMenuEvent *event) {
     QMenu menu;
 
@@ -399,24 +438,26 @@ namespace Isis {
     menu.exec(event->globalPos());
   }
 
-
+  /**
+   * This method saves the list to the choosen output file.
+   */
   void ImageFileListWidget::saveList() {
     QString output =
         QFileDialog::getSaveFileName((QWidget *)parent(),
           "Choose output file",
           QDir::currentPath() + "/files.lis",
           QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
-    if(output.isEmpty()) return;
+    if (output.isEmpty()) return;
 
     TextFile file(output, "overwrite");
 
-    for(int i = 0; i < m_tree->topLevelItemCount(); i++) {
+    for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
       QTreeWidgetItem *group = m_tree->topLevelItem(i);
 
-      for(int j = 0; j < group->childCount(); j++) {
+      for (int j = 0; j < group->childCount(); j++) {
         QTreeWidgetItem *item = group->child(j);
 
-        if(item->type() == QTreeWidgetItem::UserType) {
+        if (item->type() == QTreeWidgetItem::UserType) {
           ImageTreeWidgetItem *cubeItem = (ImageTreeWidgetItem *)item;
           file.PutLine(cubeItem->image()->fileName());
         }
@@ -424,7 +465,163 @@ namespace Isis {
     }
   }
 
+  /** 
+   * This method takes an image and finds it's position.
+   * 
+   * @param image The image we are trying to find.
+   * 
+   * @return @b ImageTreeWidget::ImagePosition The position of the image.
+   */
+  ImageTreeWidget::ImagePosition ImageFileListWidget::find(const Image *image) const {
+    QString id = image->id();
 
+    ImageTreeWidget::ImagePosition result;
+    for (int objIndex = 0; !result.isValid() && objIndex < m_serialized->objects(); objIndex++) {
+      PvlObject &obj = m_serialized->object(objIndex);
+
+      int imageKeyOffset = 0;
+      for (int fileKeyIndex = 0;
+           !result.isValid() && fileKeyIndex < obj.keywords();
+           fileKeyIndex++) {
+        PvlKeyword &key = obj[fileKeyIndex];
+
+        if (key.isNamed("Image")) {
+          if (key[0] == id) {
+            result = ImageTreeWidget::ImagePosition(objIndex, imageKeyOffset);
+          }
+          else {
+            imageKeyOffset++;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * This method returns the QTreeWidgetItem to it's expanded state.
+   * 
+   * @param expandedStates The expanded state that needs to be restored.
+   * @param item The QTreeWidgetItem that will be restored to it's expanded state.
+   */
+  void ImageFileListWidget::restoreExpandedStates(QVariant expandedStates, QTreeWidgetItem *item) {
+    QMap<QString, QVariant> states = expandedStates.toMap();
+
+    if (states.contains("Expanded")) {
+      item->setExpanded(states["Expanded"].toBool());
+    }
+    else {
+      item->setExpanded(true);
+    }
+
+    QList<QVariant> childrenStates = states["Children"].toList();
+
+    int i = 0;
+    while (i < item->childCount() && i < childrenStates.count()) {
+      restoreExpandedStates(childrenStates[i], item->child(i));
+      i++;
+    }
+
+    while (i < item->childCount()) {
+      restoreExpandedStates(QVariant(), item->child(i));
+      i++;
+    }
+  }
+
+  /**
+   * This method saves the the expanded state of item.
+   * 
+   * @param item The QTreeWidgetItem that we will save the expanded state of.
+   * 
+   * @return @b QVariant The expanded state of item.
+   */
+  QVariant ImageFileListWidget::saveExpandedStates(QTreeWidgetItem *item) {
+    QMap<QString, QVariant> result;
+
+    result["Expanded"] = item->isExpanded();
+
+    if (item->childCount()) {
+      QList<QVariant> childrenStates;
+
+      for (int i = 0; i < item->childCount(); i++) {
+        childrenStates.append(saveExpandedStates(item->child(i)));
+      }
+
+      result["Children"] = childrenStates;
+    }
+
+    return result;
+  }
+
+  /**
+   * This method saves the FootprintColumns in the project and the settings associated 
+   * with every column.
+   * 
+   * @param stream The QXmlStreamWriter that saves the FootprintColumns.
+   * @param project The current project being saved.
+   * @param newProjectRoot This is not used.
+   */
+  void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
+                                 FileName newProjectRoot) const {
+    stream.writeStartElement("imageFileList");
+
+    // Write QSettings
+    stream.writeStartElement("widgetGeometry");
+//  QString geom = saveGeometry();
+//  //qDebug()<<"ImageFileListWidget::save   geometry = "<<geom;
+//  stream.writeAttribute("value", saveGeometry());
+//  stream.writeEndElement();
+
+//  stream.writeStartElement("geometry");
+//  //qDebug()<<"ImageFileListWidget::save   Geometry = "<<geometry();
+//  //qDebug()<<"ImageFileListWidget::save   saveGeometry = "<<saveGeometry();
+//  stream.writeAttribute("x", QString::number(pos().x()));
+//  stream.writeAttribute("y", QString::number(pos().y()));
+//  stream.writeEndElement();
+//
+//  stream.writeStartElement("position");
+//  //qDebug()<<"ImageFileListWidget::save   Position = "<<QVariant(pos()).toString();
+//  stream.writeAttribute("x", QString::number(pos().x()));
+//  stream.writeAttribute("y", QString::number(pos().y()));
+//  stream.writeEndElement();
+//
+//  stream.writeStartElement("size");
+//  //qDebug()<<"ImageFileListWidget::save   Size = "<<size();
+//  stream.writeAttribute("width", QString::number(size().width()));
+//  stream.writeAttribute("height", QString::number(size().height()));
+//  stream.writeEndElement();
+//  stream.writeEndElement();
+
+
+    ImageTreeWidgetItem::TreeColumn col =
+        ImageTreeWidgetItem::FootprintColumn;
+    while (col < ImageTreeWidgetItem::BlankColumn) {
+      bool visible = !m_tree->isColumnHidden(col);
+      bool sorted = (m_tree->sortColumn() == col);
+
+      stream.writeStartElement("column");
+      stream.writeAttribute("name", ImageTreeWidgetItem::treeColumnToString(col));
+      stream.writeAttribute("visible", (visible? "true" : "false"));
+      stream.writeAttribute("sorted", (sorted? "true" : "false"));
+      stream.writeEndElement();
+
+      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
+    }
+
+    // Now store groups and the cubes that are in those groups
+    save(stream, NULL);
+
+    stream.writeEndElement();
+  }
+
+  /**
+   * This method saves the QTreeWidgetItem and the settings associated with the QTreeWidgetItem 
+   * to the stream.
+   * 
+   * @param stream The stream that is saving the QTreeWidgetItem and the settings.
+   * @param itemToWrite The QTreeWidgetItem that is being saved.
+   */
   void ImageFileListWidget::save(QXmlStreamWriter &stream, QTreeWidgetItem *itemToWrite) const {
     bool done = false;
 
@@ -432,7 +629,7 @@ namespace Isis {
     if (!itemToWrite) {
       stream.writeStartElement("treeLayout");
     }
-    else if(itemToWrite->type() == QTreeWidgetItem::UserType) {
+    else if (itemToWrite->type() == QTreeWidgetItem::UserType) {
       ImageTreeWidgetItem *imageItemToWrite = (ImageTreeWidgetItem *)itemToWrite;
 
       stream.writeStartElement("image");
@@ -472,79 +669,11 @@ namespace Isis {
     stream.writeEndElement();
   }
 
-
-  ImageTreeWidget::ImagePosition ImageFileListWidget::find(const Image *image) const {
-    QString id = image->id();
-
-    ImageTreeWidget::ImagePosition result;
-    for (int objIndex = 0; !result.isValid() && objIndex < m_serialized->objects(); objIndex++) {
-      PvlObject &obj = m_serialized->object(objIndex);
-
-      int imageKeyOffset = 0;
-      for (int fileKeyIndex = 0;
-           !result.isValid() && fileKeyIndex < obj.keywords();
-           fileKeyIndex++) {
-        PvlKeyword &key = obj[fileKeyIndex];
-
-        if (key.isNamed("Image")) {
-          if (key[0] == id) {
-            result = ImageTreeWidget::ImagePosition(objIndex, imageKeyOffset);
-          }
-          else {
-            imageKeyOffset++;
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-
-  void ImageFileListWidget::restoreExpandedStates(QVariant expandedStates, QTreeWidgetItem *item) {
-    QMap<QString, QVariant> states = expandedStates.toMap();
-
-    if (states.contains("Expanded")) {
-      item->setExpanded(states["Expanded"].toBool());
-    }
-    else {
-      item->setExpanded(true);
-    }
-
-    QList<QVariant> childrenStates = states["Children"].toList();
-
-    int i = 0;
-    while (i < item->childCount() && i < childrenStates.count()) {
-      restoreExpandedStates(childrenStates[i], item->child(i));
-      i++;
-    }
-
-    while (i < item->childCount()) {
-      restoreExpandedStates(QVariant(), item->child(i));
-      i++;
-    }
-  }
-
-
-  QVariant ImageFileListWidget::saveExpandedStates(QTreeWidgetItem *item) {
-    QMap<QString, QVariant> result;
-
-    result["Expanded"] = item->isExpanded();
-
-    if (item->childCount()) {
-      QList<QVariant> childrenStates;
-
-      for (int i = 0; i < item->childCount(); i++) {
-        childrenStates.append(saveExpandedStates(item->child(i)));
-      }
-
-      result["Children"] = childrenStates;
-    }
-
-    return result;
-  }
-
-
+  /**
+   * Creates a XmlHandler for fileList
+   * 
+   * @param fileList The image file list we are handling
+   */
   ImageFileListWidget::XmlHandler::XmlHandler(ImageFileListWidget *fileList) {
     m_fileList = fileList;
     m_currentImageList = NULL;
@@ -552,17 +681,45 @@ namespace Isis {
     m_currentGroup = NULL;
   }
 
-
+  /**
+   * Destructor
+   */
   ImageFileListWidget::XmlHandler::~XmlHandler() {
   }
 
-
+  /**
+   * This method calls XmlStackedHandler's startElement() and retrieves attributes from
+   * atts according to what localName is and stores that in m_fileList.
+   * 
+   * @param namespaceURI ???
+   * @param localName Determines what attributes to retrieve from atts.
+   * @param qName ???
+   * @param atts Stores the attributes.
+   * 
+   * @return @b bool The result of XmlStackedHandler's startElement() method.
+   */
   bool ImageFileListWidget::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
 
     if (result) {
-      if (localName == "column") {
+
+//    if (localName == "geometry") {
+//      QByteArray
+//      restoreGeometry(atts.value("value").toLatin1());
+//    }
+
+      if (localName == "position") {
+        QPoint pos = QPoint(atts.value("x").toInt(), atts.value("y").toInt());
+        //qDebug()<<"     ::startElement  pos = "<<pos;
+        m_fileList->move(pos);
+      }
+      else if (localName == "size") {
+        QSize size = QSize(atts.value("width").toInt(), atts.value("height").toInt());
+        //qDebug()<<"     ::startElement  size = "<<size;
+        m_fileList->resize(size);
+      }
+      else if (localName == "column") {
         QString colName = atts.value("name");
         QString colVisibleStr = atts.value("visible");
         QString colSortedStr = atts.value("sorted");
@@ -570,7 +727,7 @@ namespace Isis {
 
         ImageTreeWidgetItem::TreeColumn col =
             ImageTreeWidgetItem::NameColumn;
-        while(col < ImageTreeWidgetItem::BlankColumn) {
+        while (col < ImageTreeWidgetItem::BlankColumn) {
           QString curColName = ImageTreeWidgetItem::treeColumnToString(col);
 
           if (curColName == colName) {
@@ -616,7 +773,16 @@ namespace Isis {
     return result;
   }
 
-
+  /**
+   * This method calls XmlStackedHandler's endElement() and dereferences pointers according to
+   * the value of localName.
+   * 
+   * @param namespaceURI ???
+   * @param localName Determines which pointers to dereference.
+   * @param qName ???
+   * 
+   * @return @b bool The result of XmlStackedHandler's endElement() method.
+   */
   bool ImageFileListWidget::XmlHandler::endElement(const QString &namespaceURI,
       const QString &localName, const QString &qName) {
     bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
