@@ -1,5 +1,9 @@
-size   = 4
-hasXYZ = 0
+size             = 4
+observationSize  = 4
+has XYZ          = 0
+has LO3/HRC/3133 = 1
+observationIndex for LO3/HRC/3133 = 2
+
 ab102401.cub = MGS/561812335:32/MOC-WA
 m0402852.cub = MGS/619971158:28/MOC-NA
 3133_h1.cub = LO3/HRC/3133
@@ -14,5 +18,49 @@ SN->File (1): m0402852.cub
 SN->File (2): 3133_h1.cub
 
 [NotAnObservation] is not an existing ObservationNumber
+
+
+Removing a SerialNumberList that doesn't have any SNs in the ObservationNumberList
+size            = 4
+observationSize = 4
+
+Removing a SerialNumberList with one SN that exists in the ObservationNumberList
+size            = 4
+observationSize = 3
+
+
+Creating an observation list with two observations and three SNs
+size            = 3
+observationSize = 2
+observationIndex for I008... = 0
+observationIndex for 5106_h1 = 1
+observationIndex for 5106_h2 = 1
+
+Adding 5106_h3 to the list
+size            = 3
+observationSize = 2
+observationIndex for 5106_h3 = 1
+
+Removing 5106_h2 SN from the list
+size            = 3
+observationSize = 2
+
+
+**USER ERROR** Serial number list is empty.
+
+
+**USER ERROR** Cannot remove, serial number list is empty.
+
+
+**PROGRAMMER ERROR** Serial Number Index [-1] is invalid.
+
+
+**PROGRAMMER ERROR** Requested filename [.../I00824006RDR.lev2.cub] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Index [5] is invalid.
+
+
+**PROGRAMMER ERROR** Requested observation number [DNE] does not exist in the list.
 
 

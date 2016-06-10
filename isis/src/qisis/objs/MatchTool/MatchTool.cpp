@@ -31,6 +31,7 @@
 #include "MatchToolDeletePointDialog.h"
 #include "MatchToolNewPointDialog.h"
 #include "MdiCubeViewport.h"
+#include "Progress.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
 #include "SerialNumber.h"

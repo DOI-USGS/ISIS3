@@ -5,18 +5,21 @@
 #include "IException.h"
 #include "FileList.h"
 #include "FileName.h"
-#include "SerialNumber.h"
 #include "ObservationNumber.h"
-#include "IString.h"
+#include "Progress.h"
 #include "Pvl.h"
+#include "SerialNumber.h"
 
 namespace Isis {
   /**
    * Creates an empty SerialNumberList
+   *
+   * @param checkTarget Specifies whether or not to check to make sure the target names
+   *                    match between files added to the serialnumber list
    */
   SerialNumberList::SerialNumberList(bool checkTarget) {
-    p_checkTarget = checkTarget;
-    p_target.clear();
+    m_checkTarget = checkTarget;
+    m_target.clear();
   }
 
 
@@ -24,19 +27,22 @@ namespace Isis {
    * Creates a SerialNumberList from a list of filenames
    *
    * @param listfile The list of files to be given serial numbers
-   * @param checkTarget Boolean value that specifies whether or not to check
-   *                    to make sure the target names match between files added
-   *                    to the serialnumber list
+   * @param checkTarget Specifies whether or not to check to make sure the target names
+   *                    match between files added to the serialnumber list
+   * @param progress Monitors progress of serial number creation
+   *
+   * @throws IException::User "Can't open or invalid file list"
+   *
    * @internal
    *   @history 2009-10-20 Jeannie Walldren - Added Progress flag
-   *   @history 2009-11-05 Jeannie Walldren - Modified number
-   *                          of maximum steps for Progress flag
+   *   @history 2009-11-05 Jeannie Walldren - Modified number of maximum steps for Progress flag
    */
   SerialNumberList::SerialNumberList(const QString &listfile, 
                                      bool checkTarget, 
                                      Progress *progress) {
-    p_checkTarget = checkTarget;
-    p_target.clear();
+    m_checkTarget = checkTarget;
+    m_target.clear();
+
     try {
       FileList flist(listfile);
       if (progress != NULL) {
@@ -55,7 +61,9 @@ namespace Isis {
       QString msg = "Can't open or invalid file list [" + listfile + "].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
+
   }
+
 
   /**
    * Destructor
@@ -65,50 +73,53 @@ namespace Isis {
 
 
   /**
-   * Delete a serial number off of the list given the Serial Number
+   * Remove the specified serial number from the list
    *
-   * @author Sharmila Prasad (9/9/2010)
+   * @author 2010-09-09 Sharmila Prasad
    *
-   * @param sn - serial number
+   * @param sn Name of serial number to remove
    */
   void SerialNumberList::Delete(const QString &sn) {
     int index = serialNumberIndex(sn);
     QString sFileName = fileName(sn);
 
-    // Delete the reference to this serial number in the
-    // vector and the maps
-    p_pairs.erase(p_pairs.begin() + index);
-    p_serialMap.erase(sn);
-    p_fileMap.erase(sFileName);
+    // Delete the reference to this serial number in the vector and the maps
+    m_pairs.erase(m_pairs.begin() + index);
+    m_serialMap.erase(sn);
+    m_fileMap.erase(sFileName);
   }
 
 
-
   /**
-   * Adds a new filename / serial number pair to the
-   * SerialNumberList
+   * Adds a new filename / serial number pair to the SerialNumberList
    *
-   * @param filename the filename to be added
-   * @param def2filename If a serial number could not be found, try to return the
-   *                     filename
+   * @param filename The filename to be added
+   * @param def2filename If a serial number could not be found, try to return the filename
+   *
+   * @throws IException::User "Unable to find Instrument or Mapping group for comparing target."
+   * @throws IException::User "Unable to find Instrument group for comparing target."
+   * @throws IException::User "Target name from file does not match."
+   * @throws IException::User "Invalid serial number [Unknown] from file."
+   * @throws IException::User "Duplicate serial number from files [file1] and [file2]."
+   * @throws IException::User "FileName cannot be added to serial number list."
    *
    * @internal
-   * @history 2007-06-04 Tracie Sucharski - Expand filename to include full
-   *                        path before adding to list.
-   * @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter.
-   *                        This will allow level 2 images to be added to a
-   *                        serial number list.
-   * @history 2010-11-29 Tracie Sucharski - Only read the Instrument group
-   *                        if p_checkTarget is True.  If def2filename is True,
-   *                        check for Mapping group if Target does not exist.
+   *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before adding
+   *                           to list.
+   *   @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter. This will allow 
+   *                           level 2 images to be added to a serial number list.
+   *   @history 2010-11-29 Tracie Sucharski - Only read the Instrument group if m_checkTarget is
+   *                           True.  If def2filename is True, check for Mapping group if Target 
+   *                           does not exist.
    */
   void SerialNumberList::add(const QString &filename, bool def2filename) {
-
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
+
     try {
+
       // Test the target name if desired
-      if (p_checkTarget) {
+      if (m_checkTarget) {
         QString target;
         PvlGroup targetGroup;
         if (cubeObj.hasGroup("Instrument")) {
@@ -134,12 +145,12 @@ namespace Isis {
 
         target = targetGroup["TargetName"][0];
         target = target.toUpper();
-        if (p_target.isEmpty()) {
-          p_target = target;
+        if (m_target.isEmpty()) {
+          m_target = target;
         }
-        else if (p_target != target) {
+        else if (m_target != target) {
           QString msg = "Target name of [" + target + "] from file ["
-                        + filename + "] does not match [" + p_target + "].";
+                        + filename + "] does not match [" + m_target + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -154,7 +165,7 @@ namespace Isis {
       }
       else if (hasSerialNumber(sn)) {
         int index = serialNumberIndex(sn);
-        QString msg = "Duplicate, serial number [" + sn + "] from files ["
+        QString msg = "Duplicate serial number [" + sn + "] from files ["
                       + SerialNumberList::fileName(sn) + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -174,27 +185,30 @@ namespace Isis {
         }
       }
 
-      p_pairs.push_back(nextpair);
-      p_serialMap.insert(std::pair<QString, int>(sn, (int)(p_pairs.size() - 1)));
-      p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
+      m_pairs.push_back(nextpair);
+      m_serialMap.insert(std::pair<QString, int>(sn, (int)(m_pairs.size() - 1)));
+      m_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(m_pairs.size() - 1)));
     }
     catch (IException &e) {
       QString msg = "FileName [" + Isis::FileName(filename).expanded() +
                         "] can not be added to serial number list.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
+
   }
 
 
   /**
-   * 
-   * @param serialNumber 
-   * @param filename 
+   * @brief Overloaded add method that takes char * parameters
+   *
+   * @description Adds a new filename / serial number pair to the SerialNumberList
+   *
+   * @param serialNumber The serial number to be added
+   * @param filename The filename to be added
    * 
    * @see add(QString, QString)
    */
   void SerialNumberList::add(const char *serialNumber, const char *filename) {
-
     add((QString)serialNumber, (QString)filename);
   }
 
@@ -204,18 +218,28 @@ namespace Isis {
    *
    * @param serialNumber the serial number to be added
    * @param filename the filename to be added
+   *
+   * @throws IException::User "Unable to find Instrument or Mapping group for comparing target."
+   * @throws IException::User "Target name from file does not match."
+   * @throws IException::User "Invalid serial number [Unknown] from file."
+   * @throws IException::User "Duplicate serial number from files [file1] and [file2]."
+   * @throws IException::User "Unable to find Instrument group need for performing bundle
+   *                           adjustment."
+   * @throws IException::User "Unable to find Spacecraftname or InstrumentId keywords needed for 
+   *                           performing bundle adjustment."
+   * @throws IException::User "[SerialNumber, FileName] can not be added to serial number list."
    *  
    * @author 2012-07-12 Tracie Sucharski 
    *  
-   * @internal
    */
   void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
-
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
+
     try {
+
       // Test the target name if desired
-      if (p_checkTarget) {
+      if (m_checkTarget) {
         QString target;
         PvlGroup targetGroup;
         if (cubeObj.hasGroup("Instrument")) {
@@ -233,12 +257,12 @@ namespace Isis {
 
         target = targetGroup["TargetName"][0];
         target = target.toUpper();
-        if (p_target.isEmpty()) {
-          p_target = target;
+        if (m_target.isEmpty()) {
+          m_target = target;
         }
-        else if (p_target != target) {
+        else if (m_target != target) {
           QString msg = "Target name of [" + target + "] from file ["
-                        + filename + "] does not match [" + p_target + "].";
+                        + filename + "] does not match [" + m_target + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -286,9 +310,9 @@ namespace Isis {
         }
       }
 
-      p_pairs.push_back(nextpair);
-      p_serialMap.insert(std::pair<QString, int>(serialNumber, (int)(p_pairs.size() - 1)));
-      p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
+      m_pairs.push_back(nextpair);
+      m_serialMap.insert(std::pair<QString, int>(serialNumber, (int)(m_pairs.size() - 1)));
+      m_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(m_pairs.size() - 1)));
     }
     catch (IException &e) {
       QString msg = "[SerialNumber, FileName] = [" + serialNumber + ", " 
@@ -296,19 +320,19 @@ namespace Isis {
                     + "] can not be added to serial number list.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
+
   }
 
 
   /**
-   * Determines whether or not the requested serial number exists
-   * in the list
+   * Determines whether or not the requested serial number exists in the list
    *
    * @param sn The serial number to be checked for
    *
-   * @return bool
+   * @return @b bool
    */
   bool SerialNumberList::hasSerialNumber(QString sn) {
-    if (p_serialMap.find(sn) == p_serialMap.end()) return false;
+    if (m_serialMap.find(sn) == m_serialMap.end()) return false;
     return true;
   }
 
@@ -316,25 +340,27 @@ namespace Isis {
   /**
    * How many serial number / filename combos are in the list
    *
-   * @return int Returns number of serial numbers current in the list
+   * @return @b int Returns number of serial numbers current in the list
    */
   int SerialNumberList::size() const {
-    return p_pairs.size();
+    return m_pairs.size();
   }
 
 
   /**
    * Return a filename given a serial number
    *
-   * @param sn  The serial number of the desired filename
+   * @param sn The serial number of the desired filename
    *
-   * @return QString The filename matching the input serial
-   *         number
+   * @throws IException::Programmer "Unable to get the FileName. The given serial number does not
+   *                                 exist in the list."
+   *
+   * @return @b QString The filename matching the input serial number
    */
   QString SerialNumberList::fileName(const QString &sn) {
     if (hasSerialNumber(sn)) {
-      int index = p_serialMap.find(sn)->second;
-      return p_pairs[index].filename;
+      int index = m_serialMap.find(sn)->second;
+      return m_pairs[index].filename;
     }
     else {
       QString msg = "Unable to get the FileName. The given serial number ["
@@ -343,38 +369,44 @@ namespace Isis {
     }
   }
 
+
   /**
-   * return a serial number given a filename
+   * Return a serial number given a filename
    *
    * @param filename The filename to be matched
    *
-   * @return QString The serial number corresponding to the
-   *         input filename
+   * @throws IException::Programmer "Unable to get the SerialNumber. The given file name does not
+   *                                 exist in the list."
+   *
+   * @return @b QString The serial number corresponding to the input filename
    *
    * @internal
-   * @history 2007-06-04 Tracie Sucharski - Expand filename to include full
-   *                        path before searching list.
+   *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before searching 
+   *                           list.
    */
   QString SerialNumberList::serialNumber(const QString &filename) {
-    if (p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
+    if (m_fileMap.find(Isis::FileName(filename).expanded()) == m_fileMap.end()) {
       QString msg = "Unable to get the SerialNumber. The given file name ["
                     + Isis::FileName(filename).expanded() + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     int index = fileNameIndex(filename);
-    return p_pairs[index].serialNumber;
+    return m_pairs[index].serialNumber;
   }
+
 
   /**
    * Return a serial number given an index
    *
    * @param index The index of the desired serial number
    *
-   * @return QString The serial number returned
+   * @throws IException::Programmer "Unable to get the SerialNumber. The given index is invalid."
+   *
+   * @return @b QString The serial number returned
    */
   QString SerialNumberList::serialNumber(int index) {
-    if (index >= 0 && index < (int) p_pairs.size()) {
-      return p_pairs[index].serialNumber;
+    if (index >= 0 && index < (int) m_pairs.size()) {
+      return m_pairs[index].serialNumber;
     }
     else {
       QString msg = "Unable to get the SerialNumber. The given index [" 
@@ -383,16 +415,20 @@ namespace Isis {
     }
   }
 
+
   /**
    * Return a observation number given an index
    *
    * @param index The index of the desired observation number
    *
-   * @return QString The observation number returned
+   * @throws IException::Programmer "Unable to get the ObservationNumber. The given index is
+   *                                 invalid."
+   *
+   * @return @b QString The observation number returned
    */
   QString SerialNumberList::observationNumber(int index) {
-    if (index >= 0 && index < (int) p_pairs.size()) {
-      return p_pairs[index].observationNumber;
+    if (index >= 0 && index < (int) m_pairs.size()) {
+      return m_pairs[index].observationNumber;
     }
     else {
       QString msg = "Unable to get the ObservationNumber. The given index [" 
@@ -401,16 +437,20 @@ namespace Isis {
     }
   }
 
+
   /**
-   * return a list index given a serial number
+   * Return a list index given a serial number
    *
    * @param sn The serial number searched for
    *
-   * @return int The index of the serial number
+   * @throws IException::Programmer "Unable to get the SerialNumber index. The given serial number
+   *                                 does not exist in the list."
+   *
+   * @return @b int The index of the serial number
    */
   int SerialNumberList::serialNumberIndex(const QString &sn) {
     if (hasSerialNumber(sn)) {
-      return p_serialMap.find(sn)->second;
+      return m_serialMap.find(sn)->second;
     }
     else {
       QString msg = "Unable to get the SerialNumber index. The given serial number [" 
@@ -419,22 +459,25 @@ namespace Isis {
     }
   }
 
+
   /**
    * Return a list index given a filename
    *
    * @param filename The filename to be searched for
    *
-   * @return int The index of the input filename
+   * @throws IException::Programmer "Unable to get the FileName index. The given file name does not
+   *                                 exist in the list."
    *
-   *  @internal @history 2007-06-04 Tracie Sucharski - Expand filename to include
-   *                        full path before searching list.
-   *  @internal @history 2007-07-11 Stuart Sides - Fixed bug where
-   *                        the correct index was not returned.
+   * @return @b int The index of the input filename
+   *
+   * @internal 
+   *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before
+   *                           searching list.
+   *   @history 2007-07-11 Stuart Sides - Fixed bug where the correct index was not returned.
    */
   int SerialNumberList::fileNameIndex(const QString &filename) {
-
-    std::map<QString, int>::iterator  pos;
-    if ((pos = p_fileMap.find(Isis::FileName(filename).expanded())) == p_fileMap.end()) {
+    std::map<QString, int>::iterator pos;
+    if ((pos = m_fileMap.find(Isis::FileName(filename).expanded())) == m_fileMap.end()) {
       QString msg = "Unable to get the FileName index. The given file name ["
                     + Isis::FileName(filename).expanded() + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -442,16 +485,19 @@ namespace Isis {
     return pos->second;
   }
 
+
   /**
    * Return the filename at the given index
    *
    * @param index The index of the desired filename
    *
-   * @return QString The filename at the given index
+   * @throws IException::Programmer "Unable to get the FileName. The given index is invalid."
+   *
+   * @return @b QString The filename at the given index
    */
   QString SerialNumberList::fileName(int index) {
-    if (index >= 0 && index < (int) p_pairs.size()) {
-      return p_pairs[index].filename;
+    if (index >= 0 && index < (int) m_pairs.size()) {
+      return m_pairs[index].filename;
     }
     else {
       QString msg = "Unable to get the FileName. The given index [" 
@@ -460,16 +506,20 @@ namespace Isis {
     }
   }
 
+
   /**
    * Return the spacecraftname/instrumentid at the given index
    *
    * @param index The index of the desired spacecraftname/instrumentid
    *
-   * @return QString The spacecraftname/instrumentid at the given index
+   * @throws IException::Programmer "Unable to get the Spacecraft InstrumentId. The given index is
+   *                                 invalid."
+   *
+   * @return @b QString The spacecraftname/instrumentid at the given index
    */
   QString SerialNumberList::spacecraftInstrumentId(int index) {
-    if (index >= 0 && index < (int) p_pairs.size()) {
-      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+    if (index >= 0 && index < (int) m_pairs.size()) {
+      QString scid = (m_pairs[index].spacecraftName + "/" + m_pairs[index].instrumentId).toUpper();
       scid.simplified();
       return scid.replace(" ","");
     }
@@ -480,18 +530,21 @@ namespace Isis {
     }
   }
 
+
   /**
    * Return the spacecraftname/instrumentid given a serial number
    *
-   * @param sn  The serial number of the desired spacecraftname/instrumentid 
+   * @param sn The serial number of the desired spacecraftname/instrumentid 
    *
-   * @return QString The spacecraftname/instrumentid matching the input serial
-   *         number
+   * @throws IException::Programmer "Unable to get the Spacecraft InstrumentId. The given serial
+   *                                 number does not exist in the list."
+   *
+   * @return @b QString The spacecraftname/instrumentid matching the input serial number
    */
   QString SerialNumberList::spacecraftInstrumentId(const QString &sn) {
     if (hasSerialNumber(sn)) {
-      int index = p_serialMap.find(sn)->second;
-      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+      int index = m_serialMap.find(sn)->second;
+      QString scid = (m_pairs[index].spacecraftName + "/" + m_pairs[index].instrumentId).toUpper();
       scid.simplified();
       return scid.replace(" ","");
     }
@@ -506,17 +559,19 @@ namespace Isis {
   /**
    * Return possible serial numbers given an observation number
    *
-   * @param on  The observation number of the possible serial
-   *            number
+   * @param on The observation number of the possible serial number
    *
-   * @return vector<QString> The list of possible serial
-   *         numbers matching the input observation number
+   * @throws IException::Programmer "Unable to get the possible serial numbers. The given
+   *                                 observation number does not exist in the list."
+   *
+   * @return @b vector<QString> The list of possible serial numbers matching the input observation 
+   *                         number
    */
   std::vector<QString> SerialNumberList::possibleSerialNumbers(const QString &on) {
     std::vector<QString> numbers;
-    for (unsigned index = 0; index < p_pairs.size(); index++) {
-      if (p_pairs[index].observationNumber == on) {
-        numbers.push_back(p_pairs[index].serialNumber);
+    for (unsigned index = 0; index < m_pairs.size(); index++) {
+      if (m_pairs[index].observationNumber == on) {
+        numbers.push_back(m_pairs[index].serialNumber);
       }
     }
     if (numbers.size() > 0) {
