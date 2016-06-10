@@ -78,9 +78,9 @@ testing point deletion.................................
 ******* Done testing cube graph ***************
 
 
-testing GetCubeSerials...
-  DELTA
+testing GetCubeSerials... (NOTE: unittest sorts the results)
   ALPHA
+  DELTA
 
 testing set target.................................
 Set target/radii directly. Invalid radii.
@@ -365,8 +365,8 @@ Reading ControlNet from temp2.bin
 Diffing temp.bin and temp2.bin
 Read/Write of binary files OK.
 Testing GetCubeGraphNodes
-    DELTA
     ALPHA
+    DELTA
 
 Testing getGraphNode: ALPHA
 

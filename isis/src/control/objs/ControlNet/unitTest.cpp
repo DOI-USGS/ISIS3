@@ -278,10 +278,15 @@ int main() {
 
   cout << "******* Done testing cube graph ***************\n\n\n";
 
-  cout << "testing GetCubeSerials...\n";
+  cout << "testing GetCubeSerials... (NOTE: unittest sorts the results)\n";
   QList< QString > serials = net.GetCubeSerials();
-  for (int i = 0; i < serials.size(); i++)
-    cout << "  " << qPrintable(serials[i]) << "\n";
+  
+  // Let's sort the data since GetCubeSerials relies on a QHash 
+  QStringList sortedSerials(serials);
+  sortedSerials.sort();
+
+  for (int i = 0; i < sortedSerials.size(); i++)
+    cout << "  " << qPrintable(sortedSerials[i]) << "\n";
   cout << "\n";
 
 
@@ -529,8 +534,14 @@ int main() {
   cout << "Testing GetCubeGraphNodes\n";
 
   QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
+  // Use this to sort the output
+  QList<QString> sortedSNs;
   foreach ( ControlCubeGraphNode * node, graphnodes ) {
-    cout << "    " << node->getSerialNumber() << "\n";
+    sortedSNs.append(node->getSerialNumber());
+  }
+  sort(sortedSNs.begin(), sortedSNs.end());
+  foreach ( QString sn, sortedSNs ) {
+    cout << "    " << sn << "\n";
   }
   
   cout << "\nTesting getGraphNode: "

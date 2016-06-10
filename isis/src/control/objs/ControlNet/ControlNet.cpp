@@ -290,12 +290,12 @@ namespace Isis {
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
 
-    header.set_networkid(p_networkId.toAscii().data());
-    header.set_targetname(p_targetName.toAscii().data());
-    header.set_username(p_userName.toAscii().data());
-    header.set_created(p_created.toAscii().data());
-    header.set_lastmodified(p_modified.toAscii().data());
-    header.set_description(p_description.toAscii().data());
+    header.set_networkid(p_networkId.toLatin1().data());
+    header.set_targetname(p_targetName.toLatin1().data());
+    header.set_username(p_userName.toLatin1().data());
+    header.set_created(p_created.toLatin1().data());
+    header.set_lastmodified(p_modified.toLatin1().data());
+    header.set_description(p_description.toLatin1().data());
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
       fileData->GetNetworkPoints();

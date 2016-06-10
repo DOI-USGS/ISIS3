@@ -25,8 +25,8 @@
 
 // This is needed for the QVariant macro
 #include <QMetaType>
-
 #include <QObject> // parent class
+#include <QSharedPointer>
 
 #include <map>
 #include <vector>
@@ -185,6 +185,7 @@ namespace Isis {
    *                           method to GetNumberOfValidMeasuresInImage and the private
    *                           variable p_cameraMeasuresMap to p_cameraValidMeasuresMap. References
    *                           #1603.
+   *   @history 2015-09-05 Ken Edmundson - Added QSharedPointer and typedef for later use.
    *   @history 2016-02-15 Kris Becker - Added feature to take ownership of
    *                           points from ControlNet. To support this option,
    *                           added clear() and take() methods.
@@ -194,8 +195,10 @@ namespace Isis {
    *                           now set to Isis:Null. Added SetTarget(Pvl), SetTarget(ControlNet),
    *                           and SetTarget(QString, vector) methods to attempt to read radii from
    *                           various sources, if not found using the TargetName. References #3892
+   *   @history 2016-04-28 Tracie Sucharski - Updated toAscii() calls to toLatin1() for QT 5 upgrade.
    *   @history 2016-05-10 Jeannie Backer - Replaced calls to TProjection::TargetRadii() with calls
    *                           to Target::radiiGroup(). References #3934
+   *   @history 2016-06-08 Jesse Mapel - Merged changes from IPCE to ISIS.  Fixes #3948.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -434,6 +437,9 @@ namespace Isis {
       bool p_invalid;  //!< If the Control Network is currently invalid
       bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
   };
+
+  //! This typedef is for future implementation of target body
+  typedef QSharedPointer<ControlNet> ControlNetQsp;
 }
 
 //! This allows ControlNet *'s to be stored in a QVariant.
