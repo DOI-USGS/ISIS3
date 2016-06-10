@@ -35,6 +35,11 @@
 
 namespace Isis {
 
+  /**
+   * Constructs an OpenProjectWorkOrder
+   *
+   * @param project The project 
+   */
   OpenProjectWorkOrder::OpenProjectWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Open Project"));
@@ -51,21 +56,39 @@ namespace Isis {
   }
 
 
+  /**
+   * Copy constructor
+   *
+   * @param other The other OpenProjectWorkOrder to initialize from
+   */
   OpenProjectWorkOrder::OpenProjectWorkOrder(const OpenProjectWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * Destructor
+   */
   OpenProjectWorkOrder::~OpenProjectWorkOrder() {
 
   }
 
 
+  /**
+   * Clones the current OpenProjectWorkOrder
+   *
+   * @return @b OpenProjectWorkOrder * The OpenProjectWorkOrder clone
+   */
   OpenProjectWorkOrder *OpenProjectWorkOrder::clone() const {
     return new OpenProjectWorkOrder(*this);
   }
 
 
+  /**
+   * Executes the OpenProjectWorkOrder
+   *
+   * @return @b bool true if the successfully executed
+   */
   bool OpenProjectWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
