@@ -705,7 +705,10 @@ namespace Isis {
     int useEntry = entries - p_historyEntry - 1;
 
     try {
-      Isis::PvlGroup &up = hist.group(useEntry);
+      //When defaults are used they do not get rewritten because they do not
+      //exist in the history file to be written over. Must reset parameters first.
+      ResetParameters();
+      Isis::PvlGroup &up = hist.group(useEntry); 
       for(int k = 0; k < up.keywords(); k++) {
         QString key = up[k].name();
         QString val = up[k];
