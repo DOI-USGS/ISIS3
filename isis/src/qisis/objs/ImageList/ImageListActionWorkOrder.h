@@ -52,20 +52,24 @@ namespace Isis {
    *                           They cannot undo, but they redo just fine right now.
    *   @history 2012-09-17 Steven Lambright - Added warning to show labels
    *   @history 2012-10-02 Stuart Sides and Steven Lambright - Removed ZoomFit Action
+   *   @history 2016-06-08 Jesse Mapel - Added documentation.  Fixes #3995.
    */
   class ImageListActionWorkOrder : public WorkOrder {
     Q_OBJECT
 
     public:
+      /**
+       * Type of action to be performed by the work order
+       */
       enum Action {
-        UnknownAction = 0,
-        ChangeTransparency,
-        ChangeColor,
-        RandomizeColor,
-        ToggleShowLabel,
-        ToggleShowFilled,
-        ToggleShowCubeData,
-        ToggleShowOutline
+        UnknownAction = 0,  //!< Unkown action
+        ChangeTransparency, //!< Change the alpha values of the image list
+        ChangeColor,        //!< Change the color values of the image list
+        RandomizeColor,     //!< Set each image in the list to a random color
+        ToggleShowLabel,    //!< Show or hide each image's display name
+        ToggleShowFilled,   //!< Show or hide each image's fill area
+        ToggleShowCubeData, //!< Show or hide each image's DNs
+        ToggleShowOutline   //!< Show or hide each image's outline
       };
 
       ImageListActionWorkOrder(Project *project);

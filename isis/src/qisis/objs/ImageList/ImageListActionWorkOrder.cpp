@@ -7,11 +7,23 @@
 #include "Project.h"
 
 namespace Isis {
+  
+  /**
+   * Construct a work order for the given project.
+   * 
+   * @param project The project that the work order is for
+   */
   ImageListActionWorkOrder::ImageListActionWorkOrder(Project *project) :
       WorkOrder(project) {
   }
 
 
+  /**
+   * Construct a work order for the given project and action.
+   * 
+   * @param action The action that the work order will perform
+   * @param project The project that the work order is for
+   */
   ImageListActionWorkOrder::ImageListActionWorkOrder(Action action, Project *project) :
       WorkOrder(project) {
     QAction::setText(toString(action));
@@ -23,6 +35,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Copy constructor.
+   * 
+   * @param other The work order to be copied from
+   */
   ImageListActionWorkOrder::ImageListActionWorkOrder(
       const ImageListActionWorkOrder &other) : WorkOrder(other) {
     foreach (const Image *image, *other.imageList()) {
@@ -31,12 +48,17 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor.
+   */
   ImageListActionWorkOrder::~ImageListActionWorkOrder() {
   }
 
 
   /**
-   * Clone the current work order
+   * Clone the current work order.
+   * 
+   * @return @b ImageListActionWorkOrder * A pointer to a copy of the work order
    */
   ImageListActionWorkOrder *ImageListActionWorkOrder::clone() const {
     return new ImageListActionWorkOrder(*this);
@@ -44,7 +66,12 @@ namespace Isis {
 
 
   /**
+   * Check if the work order can run on a given image list.
    * This work order can be run on any non-empty image list.
+   * 
+   * @param images The image list to be checked
+   * 
+   * @return @b bool If the work order can run on the given ImageList.
    */
   bool ImageListActionWorkOrder::isExecutable(ImageList *images) {
     return !images->isEmpty();
@@ -52,7 +79,10 @@ namespace Isis {
 
 
   /**
+   * Assign an image list to the work order.
    * When this work order is assigned an image list, update the undo command text.
+   * 
+   * @param images The image list to be assigned to the work order
    */
   void ImageListActionWorkOrder::setData(ImageList *images) {
     WorkOrder::setData(images);
@@ -72,7 +102,10 @@ namespace Isis {
 
 
   /**
-   * Prompt the user for input, if necessary, and remember the answers.
+   * If needed, prompt the user for input and save it.  ChangeTransparency, ChangeColor,
+   * and potentially ToggleShowLabel will prompt for input from the user.
+   * 
+   * @return @b bool If the work order successfully set the needed the information.
    */
   bool ImageListActionWorkOrder::execute() {
     bool result = WorkOrder::execute() && !internalData().isEmpty();
@@ -145,7 +178,16 @@ namespace Isis {
 
 
   /**
-   * Perform the action.
+   * Perform the action stored in the work order and update the work order's
+   * internal data with the restuls of the action.
+   * 
+   * @see ImageList::saveAndApplyAlpha
+   * @see ImageList::saveAndApplyColor
+   * @see ImageList::saveAndApplyRandomColor
+   * @see ImageList::saveAndToggleShowLabel
+   * @see ImageList::saveAndToggleShowFill
+   * @see ImageList::saveAndToggleShowDNs
+   * @see ImageList::saveAndToggleShowOutline
    */
   void ImageListActionWorkOrder::syncRedo() {
     QStringList state = internalData();
@@ -200,6 +242,17 @@ namespace Isis {
   }
 
 
+  /**
+   * Undo the action stored in the work order and update the work order's
+   * internal data with the results of the undo.
+   * 
+   * @see ImageList::applyAlphas
+   * @see ImageList::applyColors
+   * @see ImageList::applyShowLabel
+   * @see ImageList::applyShowFill
+   * @see ImageList::applyShowDNs
+   * @see ImageList::applyShowOutline
+   */
   void ImageListActionWorkOrder::syncUndo() {
     QStringList state = internalData();
     QString actionString = internalData()[0];
@@ -242,6 +295,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Determine whether a toggle action should show or hide.
+   * 
+   * @param unqualifiedString The action string.
+   * @param imageList The image list that the action will be performed on.
+   * 
+   * @return @b QString The qualified action string
+   */
   QString ImageListActionWorkOrder::qualifyString(QString unqualifiedString,
                                                   ImageList *imageList) {
     QString result = unqualifiedString;
@@ -291,6 +352,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert an action to a string.
+   * 
+   * @param action The action to be converted
+   * 
+   * @return @b QString The string converted from an action
+   */
   QString ImageListActionWorkOrder::toString(Action action) {
     QString result;
 
@@ -332,6 +400,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert a string to an action.
+   * 
+   * @param actionString The string to be converted
+   * 
+   * @return @b action The action converted from the actionString
+   */
   ImageListActionWorkOrder::Action ImageListActionWorkOrder::fromActionString(
       QString actionString) {
     Action result = UnknownAction;
