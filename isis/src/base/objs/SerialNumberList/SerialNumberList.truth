@@ -74,8 +74,62 @@ Possible SerialNumbers for Observation Number: Unknown
   m0402852.cub
 
 
+Creating SerialNumberList(QString, bool, Progress)
+Creating Isis 3 serial numbers from list file.
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed1
+  FileName from index                  = ab102401.cub
+  FileName from SerialNumber           = ab102401.cub
+  FileName index from FileName         = 0
+  SerialNumber from index              = MGS/561812335:32/MOC-WA/RED
+  SerialNumber from FileName           = MGS/561812335:32/MOC-WA/RED
+  SerialNumber index from SerialNumber = 0
+  Observation number from index        = MGS/561812335:32/MOC-WA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-WA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-WA
+2
+  FileName from index                  = m0402852.cub
+  FileName from SerialNumber           = m0402852.cub
+  FileName index from FileName         = 1
+  SerialNumber from index              = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber from FileName           = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber index from SerialNumber = 1
+  Observation number from index        = MGS/619971158:28/MOC-NA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-NA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-NA
+
+Creating SerialNumberList(QString, bool, Progress=NULL)
+1
+  FileName from index                  = ab102401.cub
+  FileName from SerialNumber           = ab102401.cub
+  FileName index from FileName         = 0
+  SerialNumber from index              = MGS/561812335:32/MOC-WA/RED
+  SerialNumber from FileName           = MGS/561812335:32/MOC-WA/RED
+  SerialNumber index from SerialNumber = 0
+  Observation number from index        = MGS/561812335:32/MOC-WA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-WA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-WA
+2
+  FileName from index                  = m0402852.cub
+  FileName from SerialNumber           = m0402852.cub
+  FileName index from FileName         = 1
+  SerialNumber from index              = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber from FileName           = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber index from SerialNumber = 1
+  Observation number from index        = MGS/619971158:28/MOC-NA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-NA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-NA
+
+
+**USER ERROR** Can't open or invalid file list [DNEFile].
+**I/O ERROR** Unable to open [DNEFile].
+
+
 **USER ERROR** FileName [.../blobTruth.cub] can not be added to serial number list.
 **USER ERROR** Target name of [SKY] from file [.../blobTruth.cub] does not match [MARS].
+
+
+**USER ERROR** FileName [.../ab102401.cub] can not be added to serial number list.
+**USER ERROR** Duplicate serial number [.../RED] from files [.../ab102401.cub] and [.../ab102401.cub].
 
 
 **USER ERROR** FileName [.../isisTruth.cub] can not be added to serial number list.
@@ -92,6 +146,26 @@ Possible SerialNumbers for Observation Number: Unknown
 
 **USER ERROR** [SerialNumber, FileName] = [.../isisTruth.cub] can not be added to serial number list.
 **USER ERROR** Unable to find Instrument or Mapping group in $base/testData/isisTruth.cub for comparing target.
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../blobTruth.cub] can not be added to serial number list.
+**USER ERROR** Invalid serial number [Unknown] from file [.../blobTruth.cub].
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../blobTruth.cub] can not be added to serial number list.
+**USER ERROR** Duplicate, serial number [.../RED] from files [.../ab102401.cub] and [.../ab102401.cub].
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../isisTruth.cub] can not be added to serial number list.
+**USER ERROR** Unable to find Instrument group in $base/testData/isisTruth.cub needed for performing bundle adjustment.
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../isisTruthNoSpacecraftName.cub] can not be added to serial number list.
+**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $base/testData/isisTruthNoSpacecraftName.cub needed for performing bundle adjustment.
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../isisTruthNoInstrumentId.cub] can not be added to serial number list.
+**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $base/testData/isisTruthNoInstrumentId.cub needed for performing bundle adjustment.
 
 
 **PROGRAMMER ERROR** Unable to get the FileName. The given serial number [Nonsense] does not exist in the list.
