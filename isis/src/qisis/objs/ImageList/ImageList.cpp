@@ -43,11 +43,11 @@
 
 namespace Isis {
   /**
-   * Create an image list from an image list name and path (does not read Images).
+   * Creates an image list from an image list name and path (does not read Images).
    *
-   * @param name The ImageList's name (i.e. import1, import2, ...)
-   * @param path The ImageList's folder name (i.e. import1, import2, ...)
-   * @param parent The Qt-relationship parent
+   * @param name The ImageList's name (i.e. import1, import2, ...).
+   * @param path The ImageList's folder name (i.e. import1, import2, ...).
+   * @param parent The Qt-relationship parent.
    */
   ImageList::ImageList(QString name, QString path, QObject *parent) : QObject(parent) {
     m_name = name;
@@ -56,19 +56,19 @@ namespace Isis {
 
 
   /**
-   * Create a blank image list.
+   * Creates a blank image list.
    *
-   * @param parent The Qt-relationship parent
+   * @param parent The Qt-relationship parent.
    */
   ImageList::ImageList(QObject *parent) : QObject(parent) {
   }
 
 
   /**
-   * Create an image list from a list of images
+   * Creates an image list from a list of images.
    *
-   * @param images The list of images
-   * @param parent The Qt-relationship parent
+   * @param images The list of images.
+   * @param parent The Qt-relationship parent.
    */
   ImageList::ImageList(QList<Image *> images, QObject *parent) : QObject(parent) {
     append(images);
@@ -76,11 +76,11 @@ namespace Isis {
 
 
   /**
-   * Create an image list from XML
+   * Creates an image list from XML.
    *
-   * @param project The project with the image list
+   * @param project The project with the image list.
    * @param xmlReader The XML reader currently at an <imageList /> tag.
-   * @param parent The Qt-relationship parent
+   * @param parent The Qt-relationship parent.
    */
   ImageList::ImageList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
       QObject(parent) {
@@ -91,7 +91,7 @@ namespace Isis {
   /**
    * Copy constructor.
    *
-   * @param other The ImageList to copy
+   * @param other The image list to copy.
    */
   ImageList::ImageList(const ImageList &other) :
       QList<Image *>(other) {
@@ -101,7 +101,9 @@ namespace Isis {
 
 
   /**
-   * Create an image list from a list of cube file names. This is slow (serial) and not recommended.
+   * Creates an image list from a list of cube file names. This is slow (serial) and not recommended.
+   * 
+   * @param fileNames The list of cube fileNames.
    */
   ImageList::ImageList(QStringList &fileNames) {
     foreach (QString fileName, fileNames) {
@@ -123,16 +125,40 @@ namespace Isis {
 
 
   /**
-   * @see QList<Image *>::append()
+   * Creates a SerialNumberList from the image list.
+   * 
+   * @return @b SerialNumberList The list of serial numbers for the cubes in the ImageList.
    */
-  void ImageList::append(Image * const & value) {
+  SerialNumberList ImageList::serialNumberList() {
+
+    SerialNumberList result;
+
+    for (int i = 0; i < count(); i++) {
+      result.add((*this)[i]->fileName());
+    }
+    return result;
+  }
+
+
+  /**
+   * Appends an image to the image list.
+   * 
+   * @param value The image to be appended.
+   * 
+   * @see QList<Image *>::append().
+   */
+  void ImageList::append(Image * const &value) {
     QList<Image *>::append(value);
     emit countChanged(count());
   }
 
 
   /**
-   * @see QList<Image *>::append()
+   * Appends a list of images to the image list.
+   * 
+   * @param value the list of images to be appened.
+   * 
+   * @see QList<Image *>::append().
    */
   void ImageList::append(const QList<Image *> &value) {
     QList<Image *>::append(value);
@@ -141,7 +167,9 @@ namespace Isis {
 
 
   /**
-   * @see QList<Image *>::clear()
+   * Clears the image list.
+   * 
+   * @see QList<Image *>::clear().
    */
   void ImageList::clear() {
     bool countChanging = count();
@@ -153,6 +181,12 @@ namespace Isis {
 
 
   /**
+   * Erases a single image from the image list.
+   * 
+   * @param pos An iterator pointing to the image to be erased.
+   * 
+   * @return @b QList::iterator An iterator pointing to the image after the image that was removed.
+   * 
    * @see QList<Image *>::erase()
    */
   QList<Image *>::iterator ImageList::erase(iterator pos) {
@@ -163,6 +197,15 @@ namespace Isis {
 
 
   /**
+   * Erases a range of images from the image list.
+   * Erases all images from begin up to (but not including) end.
+   * 
+   * @param begin An iterator pointing to the first image to be erased.
+   * @param end An iterator pointing to the image just after the last image to be erased.
+   *                Will be invalid after the call.
+   * 
+   * @return @b QList::iterator An iterator pointing to the image end refered to before the call.
+   * 
    * @see QList<Image *>::erase()
    */
   QList<Image *>::iterator ImageList::erase(iterator begin, iterator end) {
@@ -173,9 +216,14 @@ namespace Isis {
 
 
   /**
+   * Inserts an image into the image list at an index
+   * 
+   * @param i The index at which to insert the image.
+   * @param value the image to be inserted.
+   * 
    * @see QList<Image *>::insert()
    */
-  void ImageList::insert(int i, Image * const & value) {
+  void ImageList::insert(int i, Image * const &value) {
     QList<Image *>::insert(i, value);
 
     emit countChanged(count());
@@ -183,9 +231,16 @@ namespace Isis {
 
 
   /**
+   * Inserts an image into the image list after an iterator.
+   * 
+   * @param before An iterator pointing to the image that value will be inserted after
+   * @param value The image to be inserted.
+   * 
+   * @return @b QList::iterator An iterator pointing to the inserted image.
+   * 
    * @see QList<Image *>::insert()
    */
-  QList<Image *>::iterator ImageList::insert(iterator before, Image * const & value) {
+  QList<Image *>::iterator ImageList::insert(iterator before, Image * const &value) {
     iterator result = QList<Image *>::insert(before, value);
     emit countChanged(count());
     return result;
@@ -193,36 +248,56 @@ namespace Isis {
 
 
   /**
+   * Inserts an image at the beginning of the image list.
+   * 
+   * @param value The image to be inserted.
+   * 
    * @see QList<Image *>::prepend()
    */
-  void ImageList::prepend(Image * const & value) {
+  void ImageList::prepend(Image * const &value) {
     QList<Image *>::prepend(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Appends an image to the end of the image list.
+   * Equivalent to append().
+   * 
+   * @param value The image to be appended.
+   * 
    * @see QList<Image *>::push_back()
    */
-  void ImageList::push_back(Image * const & value) {
+  void ImageList::push_back(Image * const &value) {
     QList<Image *>::push_back(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Prepends an image to the beginning of the image list.
+   * Equivalent to prepend().
+   * 
+   * @param value The image to be appended.
+   * 
    * @see QList<Image *>::push_front()
    */
-  void ImageList::push_front(Image * const & value) {
+  void ImageList::push_front(Image * const &value) {
     QList<Image *>::push_front(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Removes all occurances of an image.
+   * 
+   * @param value The image to be removed.
+   * 
+   * @return @b int The number of occurances of the image.
+   * 
    * @see QList<Image *>::removeAll()
    */
-  int ImageList::removeAll(Image * const & value) {
+  int ImageList::removeAll(Image * const &value) {
     int result = QList<Image *>::removeAll(value);
 
     if (result != 0) {
@@ -234,6 +309,10 @@ namespace Isis {
 
 
   /**
+   * Removes the image at an index.
+   * 
+   * @param i The index of the image to be removed.
+   * 
    * @see QList<Image *>::removeAt()
    */
   void ImageList::removeAt(int i) {
@@ -243,6 +322,8 @@ namespace Isis {
 
 
   /**
+   * Removes the image at the front of the image list.
+   * 
    * @see QList<Image *>::removeFirst()
    */
   void ImageList::removeFirst() {
@@ -252,6 +333,8 @@ namespace Isis {
 
 
   /**
+   * Removes the image at the end of the image list.
+   * 
    * @see QList<Image *>::removeLast()
    */
   void ImageList::removeLast() {
@@ -261,9 +344,15 @@ namespace Isis {
 
 
   /**
+   * Removes the first occurance of an image.
+   * 
+   * @param value The image to be removed.
+   * 
+   * @return @b bool True if successful, otherwise false.
+   * 
    * @see QList<Image *>::removeOne()
    */
-  bool ImageList::removeOne(Image * const & value) {
+  bool ImageList::removeOne(Image * const &value) {
     bool result = QList<Image *>::removeOne(value);
 
     if (result) {
@@ -275,6 +364,10 @@ namespace Isis {
 
 
   /**
+   * Swaps the image list with another list of images.
+   * 
+   * @param other The list of images to swapped with.
+   * 
    * @see QList<Image *>::swap()
    */
   void ImageList::swap(QList<Image *> &other) {
@@ -287,6 +380,12 @@ namespace Isis {
 
 
   /**
+   * Removes the image at an index and returns it.
+   * 
+   * @param i The index of the image to be removed and returned.
+   * 
+   * @return @b Image * The removed image.
+   * 
    * @see QList<Image *>::takeAt()
    */
   Image *ImageList::takeAt(int i) {
@@ -297,6 +396,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the first image.
+   * 
+   * @return @b Image * The first image.
+   * 
    * @see QList<Image *>::takeFirst()
    */
   Image *ImageList::takeFirst() {
@@ -307,6 +410,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the last image.
+   * 
+   * @return @b Image * The last image.
+   * 
    * @see QList<Image *>::takeLast()
    */
   Image *ImageList::takeLast() {
@@ -317,6 +424,13 @@ namespace Isis {
 
 
   /**
+   * Appends a list of images to the end of the image list.
+   * 
+   * @param other The list of images to be appended.
+   * 
+   * @return @b ImageList & A reference to the imageList.
+   * 
+   * @see append()
    * @see QList<Image *>::operator+=()
    */
   ImageList &ImageList::operator+=(const QList<Image *> &other) {
@@ -331,6 +445,13 @@ namespace Isis {
 
 
   /**
+   * Appends a single image to the end of the image list.
+   * 
+   * @param other The image to be appended.
+   * 
+   * @return @b ImageList & A reference to the imageList.
+   * 
+   * @see append()
    * @see QList<Image *>::operator+=()
    */
   ImageList &ImageList::operator+=(Image * const &other) {
@@ -341,6 +462,13 @@ namespace Isis {
 
 
   /**
+   * Appends a list of images to the end of the image list.
+   * 
+   * @param other The list of images to be appended.
+   * 
+   * @return @b ImageList & A reference to the imageList.
+   * 
+   * @see append()
    * @see QList<Image *>::operator<<()
    */
   ImageList &ImageList::operator<<(const QList<Image *> &other) {
@@ -355,6 +483,13 @@ namespace Isis {
 
 
   /**
+   * Appends a single image to the end of the image list.
+   * 
+   * @param other The image to be appended.
+   * 
+   * @return @b ImageList & A reference to the imageList.
+   * 
+   * @see append()
    * @see QList<Image *>::operator<<()
    */
   ImageList &ImageList::operator<<(Image * const &other) {
@@ -365,6 +500,12 @@ namespace Isis {
 
 
   /**
+   * Assigns another list of images to the image list.
+   * 
+   * @param rhs The list of images that imageList will become a copy of.
+   * 
+   * @return @b ImageList & A reference to the imageList.
+   * 
    * @see QList<Image *>::operator=()
    */
   ImageList &ImageList::operator=(const QList<Image *> &rhs) {
@@ -383,7 +524,8 @@ namespace Isis {
    * Assignment operator
    *
    * @param rhs The right hand side of the '=' operator
-   * @return *this
+   * 
+   * @return @b ImageList & This image list.
    */
   ImageList &ImageList::operator=(const ImageList &rhs) {
     bool countChanging = (rhs.count() != count());
@@ -401,8 +543,16 @@ namespace Isis {
 
 
   /**
-   * Gets a list of pre-connected actions that have to do with display,
-   *   such as color, alpha, outline, fill, etc.
+   * Gets a list of pre-connected actions that have to do with display.  If any image
+   * does not support a given set of actions, then those will actions will be skipped for
+   * all images.
+   * 
+   * @param project The project that owns the images in the imageList.
+   * 
+   * @return @b QList<QAction *> A list of connected actions.  The actions are as follows:
+   *                                 ChangeTransparency, ChangeColor, RandomColor,
+   *                                 ToggleShowLabel, ToggleShowFilled, ToggleShowCubeData,
+   *                                 ToggleShowOutline.
    */
   QList<QAction *> ImageList::supportedActions(Project *project) {
     QList<QAction *> actions;
@@ -519,10 +669,12 @@ namespace Isis {
 
 
   /**
-   * Returns true if all of the given displays support the property
+   * Check if all images in the image list support a display property.
    *
    * @param prop The property we're testing for support for
-   * @param displays The displays we're doing the test on
+   * 
+   * @return @b bool True if all images in the Image List support the property.
+   *                     Otherwise, false.
    */
   bool ImageList::allSupport(ImageDisplayProperties::Property prop) {
     if (isEmpty())
@@ -539,7 +691,7 @@ namespace Isis {
 
   /**
    * Set the human-readable name of this image list. This is really only useful for project
-   *   image lists (not anonymous temporary ones).
+   * image lists (not anonymous temporary ones).
    *
    * @param newName The name to give this image list
    */
@@ -550,7 +702,7 @@ namespace Isis {
 
   /**
    * Set the relative path (from the project root) to this image list's folder. This is really only
-   *   useful for project image lists (not anonymous temporary ones).
+   * useful for project image lists (not anonymous temporary ones).
    *
    * @param newPath The path to the images in this image list
    */
@@ -562,7 +714,7 @@ namespace Isis {
   /**
    * Get the human-readable name of this image list
    *
-   * @return The name of the image list (or an empty string if anonymous).
+   * @return @b Qstring The name of the image list (or an empty string if anonymous).
    */
   QString ImageList::name() const {
     return m_name;
@@ -570,10 +722,10 @@ namespace Isis {
 
 
   /**
-   * Get the path to these images in the image list (relative to project root). This only applies to
-   *   an image list from the project.
+   * Get the path to the images in the image list (relative to project root). This only applies to
+   * an image list from the project.
    *
-   * @return The path to the images in the image list (or an empty string if unknown).
+   * @return @b QString The path to the images in the image list (or an empty string if unknown).
    */
   QString ImageList::path() const {
     return m_path;
@@ -581,7 +733,11 @@ namespace Isis {
 
 
   /**
-   * Delete all of the contained Images from disk (see Image::deleteFromDisk())
+   * Delete all of the contained Images from disk.
+   * 
+   * @param project The project the images in the image list belong to.
+   * 
+   * @see Image::deleteFromDisk()
    */
   void ImageList::deleteFromDisk(Project *project) {
     foreach (Image *image, *this) {
@@ -612,6 +768,13 @@ namespace Isis {
    *     ...
    *   </images>
    * </pre>
+   * 
+   * @param stream XmlStream to write out the document.
+   * @param project The project the image list will be saved to.
+   * @param newProjectRoot The path to the root directory for the new project.
+   * 
+   * @throws iException::Io "Failed to create directory"
+   * @throws iException::Io "Unable to save image information because new file could not be opened for writing"
    */
   void ImageList::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
       const {
@@ -685,6 +848,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Constructor for CopyImageDataFunctor.
+   * 
+   * @param project The project that the image data will be saved to when the functor is used
+   * @param newProjectRoot The path to the project root
+   */
   ImageList::CopyImageDataFunctor::CopyImageDataFunctor(const Project *project,
                                                         FileName newProjectRoot) {
     m_project = project;
@@ -692,22 +861,45 @@ namespace Isis {
   }
 
 
+  /**
+   * Copy constructor for CopyImageDataFunctor.
+   * 
+   * @param other The functor to copy from
+   */
   ImageList::CopyImageDataFunctor::CopyImageDataFunctor(const CopyImageDataFunctor &other) {
     m_project = other.m_project;
     m_newProjectRoot = other.m_newProjectRoot;
   }
 
 
+  /**
+   * Destructor for CopyImageDataFunctor.
+   */
   ImageList::CopyImageDataFunctor::~CopyImageDataFunctor() {
   }
 
 
+  /**
+   * Copies the cub/ecub files for an image into m_project.
+   * Used by save to copy the imageList into a new project.
+   * 
+   * @param imageToCopy The image to copy into m_project.
+   * 
+   * @see save
+   */
   void *ImageList::CopyImageDataFunctor::operator()(Image * const &imageToCopy) {
     imageToCopy->copyToNewProjectRoot(m_project, m_newProjectRoot);
     return NULL;
   }
 
 
+  /**
+   * Assignment operator for CopyImageDataFunctor.
+   * 
+   * @param rhs The functor to assign from
+   * 
+   * @return @b ImageList::CopyImageDataFunctor & A reference to a copy of the functor
+   */
   ImageList::CopyImageDataFunctor &ImageList::CopyImageDataFunctor::operator=(
       const CopyImageDataFunctor &rhs) {
     m_project = rhs.m_project;
@@ -716,6 +908,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the alpha values of the images based on a list of values.
+   * The alpha value of the first image in the image list will be set to the first value in alphaValues,
+   * the alpha value of the second image will be set to the second value, etc.
+   * 
+   * @param alphaValues The list of alpha values to be applied.
+   *                        
+   */
   void ImageList::applyAlphas(QStringList alphaValues) {
     if (count() == alphaValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -728,6 +928,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the colors values of the images based on a list of values.
+   * The color values of the first image in the image list will be set to the values in the first element of
+   * colorValues, the color values of the second image will be set to the values in the second element, etc.
+   * 
+   * @param colorValues The list of color values to be applies. Color values should be formated as RGBA 
+   *                        with each value separated by " ".
+   * @param column The number of entries in each color value.   Usually 4, R G B A.
+   */
   void ImageList::applyColors(QStringList colorValues, int column) {
     if (count() == colorValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -738,6 +947,16 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the visibility of the display names of the images in the image list based on a list of values.
+   * The visibility of the display name of the first image in the image list will be set based on the
+   * first value in showLabelValues, The visibility of the display name of the second image will be set
+   * based on the second value, etc.
+   * 
+   * @param showLabelValues The list of values to determine which image display names will be shown.
+   *                            If a value in showLabelValues is "shown", then the display name of the
+   *                            associated image will be shown.  Otherwise it will not be shown.
+   */
   void ImageList::applyShowLabel(QStringList showLabelValues) {
     if (count() == showLabelValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -748,6 +967,16 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the visibility of the fill areas of the images in the image list based on a list of values.
+   * The visibility of the fill area of the first image in the image list will be set based on the first
+   * value in showFillValues, the visibility of the fill area of the second image will be set based on the
+   * second value, etc.
+   * 
+   * @param showFillValues The list of values to determine which image fill areas will be shown.
+   *                           If a value in showFillValues is "shown", then the fill area of the
+   *                           associated image will be shown.  Otherwise it will not be shown.
+   */
   void ImageList::applyShowFill(QStringList showFillValues) {
     if (count() == showFillValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -758,6 +987,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the visibility of the DNs of the images in the image list based on a list of values.
+   * The visibility of the DNs of the first image in the image list will be set based on the first value in
+   * showDNsValues, the visibility of the DNs of the second image will be set based on the second value, etc.
+   * 
+   * @param showDNsValues The list of values to determine which image DNs will be shown.
+   *                          If a value in showDNsValues is "shown", then the fill area of the
+   *                          associated image will be shown.  Otherwise it will not be shown.
+   */
   void ImageList::applyShowDNs(QStringList showDNsValues) {
     if (count() == showDNsValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -768,6 +1006,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the visibility of the outlines of the images in the image list based on a list of values.
+   * The visibility of the outline of the first image in the image list will be set based on the first value in
+   * showOutlineValues, the visibility of the outline of the second image will be set based on the second value, etc.
+   * 
+   * @param showOutlineValues The list of values to determine which image outlines will be shown.
+   *                              If a value in showOutlineValues is "shown", then the outline of the associated
+   *                              image will be shown.  Otherwise it will not be shown.
+   */
   void ImageList::applyShowOutline(QStringList showOutlineValues) {
     if (count() == showOutlineValues.count()) {
       for (int i = 0; i < count(); i++) {
@@ -779,8 +1026,17 @@ namespace Isis {
 
 
   /**
-   * Prompt the user for a new alpha value. If the user selects
-   *   a new alpha then this sets alphaResult and returns true.
+   * Prompts the user for an alpha value. If the user selects
+   * an alpha then this sets alphaResult and returns true.  Does
+   * not modify the image list.
+   * 
+   * @param alphaResult The alpha value input by the user
+   * 
+   * @return @b bool True if the user input an alpha value.
+   *                     Otherwise false.
+   * 
+   * @see ImageList::askAndUpdateAlpha
+   * @see ImageListActionWorkOrder::execute
    */
   bool ImageList::askAlpha(int *alphaResult) const {
     bool result = false;
@@ -797,6 +1053,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Prompts the user for color values.  If the user selects color
+   * values then this sets colorResult and returns true.  Does no
+   * modify the image list.
+   * 
+   * @param colorResult The color values input by the user
+   * 
+   * @return @b bool True if the user input a color value.
+   *                     Otherwise false.
+   * 
+   * @see ImageList::askAndUpdateColor
+   * @see ImageListActionWorkOrder::execute
+   */
   bool ImageList::askNewColor(QColor *colorResult) const {
     *colorResult = QColor();
 
@@ -812,6 +1081,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the alpha value of every image in the image list to a specificed value.
+   * Saves and returns the old alpha values.
+   * 
+   * @param newAlpha The alpha value which every image's alpha values will be set to.
+   * 
+   * @return @b QStringList A list of all the old alpha values.
+   */
   QStringList ImageList::saveAndApplyAlpha(int newAlpha) {
     QStringList results;
     foreach (Image *image, *this) {
@@ -830,6 +1107,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets the color values of every image to a specificed set of values.
+   * Saves and returns the old color values for each image.
+   * 
+   * @param newColor The colro values which every image's color values will be set to.
+   * 
+   * @return @b QStringList A list of all the old color values.  Every image's old color values are
+   *                            listed as R G B A, separated with " ".
+   */
   QStringList ImageList::saveAndApplyColor(QColor newColor) {
     QStringList results;
 
@@ -850,6 +1136,13 @@ namespace Isis {
   }
 
 
+  /** 
+   * Sets the color values of every image to a random color.
+   * Preserves the alpha values of each individual image.
+   * 
+   * @return @b QStringList A list of all the old color values and all the new color values
+   *                            in rgba format.
+   */
   QStringList ImageList::saveAndApplyRandomColor() {
     QStringList results;
 
@@ -877,9 +1170,8 @@ namespace Isis {
 
 
   /**
-   * Prompt the user for a new alpha value. If the user selects
-   *   a new alpha then every image's display properties is
-   *   updated.
+   * Prompt the user for a new alpha value. If the user selects a new 
+   * alpha then every image's display properties is updated.
    */
   void ImageList::askAndUpdateAlpha() {
     int newAlpha = 255;
@@ -891,9 +1183,8 @@ namespace Isis {
 
 
   /**
-   * Prompt the user for a new color. If the user selects
-   *   a new color then every image's display properties is
-   *   updated.
+   * Prompt the user for a new color. If the user selects a new color
+   * then every image's display properties is updated.
    */
   void ImageList::askAndUpdateColor() {
     QColor newColor;
@@ -903,8 +1194,8 @@ namespace Isis {
 
 
   /**
-   * This applies a new semi-random color to every image's display property for every image in this
-   *   image list.
+   * This applies a new semi-random color to every image's display 
+   * property for every image in this image list.
    */
   void ImageList::showRandomColor() {
     foreach (Image *image, *this) {
@@ -915,8 +1206,10 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of DNs. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * Changes the visibility of the DNs of the first image in the image list and synchronizes the
+   * visibility of the DNs of every other image with the visibility of the DNs of the first image.
+   * 
+   * @return @b QStringList A list containing the original visibility of every image's DNs.
    */
   QStringList ImageList::saveAndToggleShowDNs() {
     QStringList results;
@@ -940,8 +1233,11 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the fill area. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * Changes the visibility of the fill area of the first image in the image list and synchronizes
+   * the visibility of the fill areas of every other image with the visibility of fill area of the
+   * first image.
+   * 
+   * @return @b QStringList A list containing the original visibility of every image's fill area.
    */
   QStringList ImageList::saveAndToggleShowFill() {
     QStringList results;
@@ -965,8 +1261,11 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the display name. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * Changes the visibility of the display name of the first image in the image list and synchronizes
+   * the visibility of the display names of every other image with the visibility of the display name
+   * of the first image.
+   * 
+   * @return @b QStringList A list containing the original visibility of every image's display name.
    */
   QStringList ImageList::saveAndToggleShowLabel() {
     QStringList results;
@@ -990,8 +1289,11 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the outline. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * Changes the visibility of the outline of the first image in the image list and synchronizes the
+   * visibility of the outlines of every other image with the visibility of the outline of the
+   * first image.
+   * 
+   * @return @b QStringList A list returning the original visibility of every image's outline.
    */
   QStringList ImageList::saveAndToggleShowOutline() {
     QStringList results;
@@ -1015,11 +1317,12 @@ namespace Isis {
 
 
   /**
-   * Create an XML Handler (reader) that can populate the ImageList class data. See
-   *   ImageList::save() for the expected format.
+   * Create an XML Handler (reader) that can populate the Image list class data.
    *
    * @param imageList The image list we're going to be initializing
    * @param project The project that contains the image list
+   * 
+   * @see ImageList::save()
    */
   ImageList::XmlHandler::XmlHandler(ImageList *imageList, Project *project) {
     m_imageList = imageList;
@@ -1029,9 +1332,9 @@ namespace Isis {
 
   /**
    * Handle an XML start element. This expects <imageList/> and <image/> elements (it reads both
-   *   the project XML and the images.xml file).
+   * the project XML and the images.xml file).
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
    */
   bool ImageList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
@@ -1060,9 +1363,12 @@ namespace Isis {
 
   /**
    * Handle an XML end element. This handles <imageList /> by opening and reading the images.xml
-   *   file.
+   * file.
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
+   * 
+   * @throws IException::Io "Unable to open with read access"
+   * @throws IException::Io "Failed to open image list XML"
    */
   bool ImageList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                          const QString &qName) {

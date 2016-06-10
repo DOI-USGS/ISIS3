@@ -9,6 +9,7 @@
 #include "Image.h"
 #include "ImageDisplayProperties.h"
 #include "ImageListActionWorkOrder.h"
+#include "SerialNumberList.h"
 #include "WorkOrder.h"
 #include "XmlStackedHandler.h"
 
@@ -20,11 +21,20 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
+   * @brief Internalizes a list of images and allows for operations on the entire list
+   * 
+   * @description This class reads a list of images from an images.xml file and internalizes them
+   * as aQList of images.  It also allows for modifications to the entire list of
+   * images and storing the image list as an images.xml file.
+   * 
    * @author 2012-??-?? ???
    *
    * @internal 
    * @history 2014-01-08 Tracie Sucharski - Added layer re-ordering connections to all images 
-   *                         in list instead of just the first image.  Fixes #1755. 
+   *                         in list instead of just the first image.  Fixes #1755.
+   * @history 2014-06-13 Tracie Sucharski - Added serialNumberList method.
+   * @history 2016-06-08 Jesse Mapel - Updated documentation and merged from IPCE to ISIS branch.
+   *                         Fixes #3961.
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT
@@ -40,6 +50,8 @@ namespace Isis {
       explicit ImageList(QStringList &);
       ImageList(const ImageList &);
       ~ImageList();
+
+      SerialNumberList serialNumberList();
 
       // These are overridden (-ish) in order to add notifications to the list changing
       void append(Image * const & value);
@@ -96,6 +108,8 @@ namespace Isis {
 
     private:
       /**
+       * This class is used to read an images.xml file into an image list
+       * 
        * @author 2012-07-01 Steven Lambright
        *
        * @internal
@@ -112,7 +126,13 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
+          /**
+           * This stores a pointer to the image list that will be read into
+           */
           ImageList *m_imageList;
+          /**
+           * This stores a pointer to the project that the images in the image list will be a part of
+           */
           Project *m_project;
       };
 
@@ -137,11 +157,25 @@ namespace Isis {
           CopyImageDataFunctor &operator=(const CopyImageDataFunctor &rhs);
 
         private:
+          /**
+           * This stores the name of the project that is going to be copied to.
+           */
           const Project *m_project;
+          /**
+           * This stores the path to the root of the project that is going to be copied to.
+           */
           FileName m_newProjectRoot;
       };
 
     private:
+      /**
+       * Creates an ImageListActionWorkOrder and sets the image list as the data for the work order.
+       * 
+       * @param project The project the work order is for
+       * @param action The action the work order performs
+       * 
+       * @return @b QAction * The created work order
+       */
       QAction *createWorkOrder(Project *project, ImageListActionWorkOrder::Action action) {
         QAction *result = NULL;
 
@@ -181,6 +215,9 @@ namespace Isis {
       QStringList saveAndToggleShowOutline();
 
     private:
+      /**
+       * This stores the image list's name
+       */
       QString m_name;
 
       /**
@@ -195,6 +232,7 @@ namespace Isis {
        */
       QString m_path;
   };
+  // TODO: add QDataStream >> and << ???
 }
 
 Q_DECLARE_METATYPE(Isis::ImageList *);
