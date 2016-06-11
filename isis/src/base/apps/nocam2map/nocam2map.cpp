@@ -21,9 +21,9 @@
 #include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
 #include "Statistics.h"
-#include "Target.h"
 #include "TextFile.h"
 #include "TProjection.h"
+#include "NaifStatus.h"
 
 using namespace std;
 using namespace Isis;
@@ -62,16 +62,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   //Set the sample and line increments
-  int sinc = (int)(inCube->sampleCount() * 0.10);
+  float sinc = (inCube->sampleCount() * 0.10);
   if (ui.WasEntered("SINC")) {
     sinc = ui.GetInteger("SINC");
   }
 
-  int linc = (int)(inCube->lineCount() * 0.10);
+  float linc = (inCube->lineCount() * 0.10);
   if (ui.WasEntered("LINC")) {
     linc = ui.GetInteger("LINC");
   }
-
   //Set the degree of the polynomial to use in our functions
   int degree = ui.GetInteger("DEGREE");
 
@@ -83,6 +82,7 @@ void IsisMain() {
   LeastSquares sampSol(sampFunct);
   LeastSquares lineSol(lineFunct);
 
+
   //Setup the variables for solving the stereographic projection
   //x = cos(latitude) * sin(longitude - lon_center)
   //y = cos(lat_center) * sin(latitude) - sin(lat_center) * cos(latitude) * cos(longitude - lon_center)
@@ -90,22 +90,20 @@ void IsisMain() {
   //Get the center lat and long from the input cubes
   double lat_center = latCube->statistics()->Average() * PI / 180.0;
   double lon_center = lonCube->statistics()->Average() * PI / 180.0;
-
-
   /**
    * Loop through lines and samples projecting the latitude and longitude at those
    * points to stereographic x and y and adding these points to the LeastSquares
    * matrix.
    */
-  for (int i = 1; i <= inCube->lineCount(); i += linc) {
-    for (int j = 1; j <= inCube->sampleCount(); j += sinc) {
+  for (float i = 1; i <= inCube->lineCount(); i += linc) {
+    for (float j = 1; j <= inCube->sampleCount(); j += sinc) {
       latBrick.SetBasePosition(j, i, 1);
       latCube->read(latBrick);
-      if (IsSpecial(latBrick.at(0))) continue;
+      if(IsSpecial(latBrick.at(0))) continue;
       double lat = latBrick.at(0) * PI / 180.0;
       lonBrick.SetBasePosition(j, i, 1);
       lonCube->read(lonBrick);
-      if (IsSpecial(lonBrick.at(0))) continue;
+      if(IsSpecial(lonBrick.at(0))) continue;
       double lon = lonBrick.at(0) * PI / 180.0;
 
       //Project lat and lon to x and y using a stereographic projection
@@ -134,8 +132,15 @@ void IsisMain() {
   }
 
   //Solve the least squares functions using QR Decomposition
-  sampSol.Solve(LeastSquares::QRD);
-  lineSol.Solve(LeastSquares::QRD);
+  try {
+    sampSol.Solve(LeastSquares::QRD);
+    lineSol.Solve(LeastSquares::QRD);
+  }
+  catch (IException &e) {
+    FileName inFile = ui.GetFileName("FROM");  
+    QString msg = "Unable to calculate transformation of projection for [" + inFile.expanded() + "].";
+    throw IException(e, IException::Unknown, msg, _FILEINFO_);
+  }
 
   //If the user wants to save the residuals to a file, create a file and write
   //the column titles to it.
@@ -144,7 +149,6 @@ void IsisMain() {
     oFile.Open(ui.GetFileName("RESIDUALS"), "overwrite");
     oFile.PutLine("Sample,\tLine,\tX,\tY,\tSample Error,\tLine Error\n");
   }
-
   //Gather the statistics for the residuals from the least squares solutions
   Statistics sampErr;
   Statistics lineErr;
@@ -226,6 +230,8 @@ void IsisMain() {
 
     PvlKeyword equRadius;
     PvlKeyword polRadius;
+
+
     //If the user entered the equatorial and polar radii
     if (ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
       equRadius = PvlKeyword("EquatorialRadius", toString(ui.GetDouble("EQURADIUS")));
@@ -233,17 +239,43 @@ void IsisMain() {
     }
     //Else read them from the pck
     else {
-      PvlGroup radii = Target::radiiGroup(targetName[0]);
-      equRadius = radii["EquatorialRadius"];
-      polRadius = radii["PolarRadius"];
+      FileName pckFile("$base/kernels/pck/pck?????.tpc");
+      pckFile = pckFile.highestVersion();
+
+      QString pckFileName = pckFile.expanded();
+
+      NaifStatus::CheckErrors();
+      furnsh_c(pckFileName.toAscii().data());
+
+      QString target = targetName[0];
+      SpiceInt code;
+      SpiceBoolean found;
+
+      bodn2c_c(target.toAscii().data(), &code, &found);
+      NaifStatus::CheckErrors();
+
+      if (!found) {
+        QString msg = "Could not convert Target [" + target +
+                     "] to NAIF code";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      SpiceInt n;
+      SpiceDouble radii[3];
+
+      bodvar_c(code, "RADII", &n, radii);
+
+      equRadius = PvlKeyword("EquatorialRadius", toString(radii[0] * 1000));
+      polRadius = PvlKeyword("PolarRadius", toString(radii[2] * 1000));
     }
+
     mapGrp.addKeyword(equRadius, Pvl::Replace);
     mapGrp.addKeyword(polRadius, Pvl::Replace);
 
 
     //If the latitude type is not in the mapping group, copy it from the input
     if (!mapGrp.hasKeyword("LatitudeType")) {
-      if (ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
+      if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
         mapGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
       }
       else {
@@ -523,7 +555,7 @@ bool nocam2map::Xform(double &inSample, double &inLine,
   double lat_known, lon_known;
 
   if (p_outmap->IsPlanetocentric()) {
-    if (!p_isOcentric) lat_known = p_outmap->ToPlanetographic(p_outmap->Latitude());
+    if(!p_isOcentric) lat_known = p_outmap->ToPlanetographic(p_outmap->Latitude());
     else lat_known = p_outmap->Latitude();
   }
   else {
@@ -532,7 +564,7 @@ bool nocam2map::Xform(double &inSample, double &inLine,
   }
 
   if (p_outmap->IsPositiveEast()) {
-    if (!p_isPosEast) lon_known = p_outmap->ToPositiveWest(p_outmap->Longitude(), 360);
+    if(!p_isPosEast) lon_known = p_outmap->ToPositiveWest(p_outmap->Longitude(), 360);
     else lon_known = p_outmap->Longitude();
   }
   else {
@@ -601,7 +633,7 @@ bool nocam2map::Xform(double &inSample, double &inLine,
 
   //If the difference is above the tolerance, correct it until it is below the tolerance or we have iterated through a set amount of times
   int iteration = 0;
-  while(x_diff > p_tolerance || y_diff > p_tolerance) {
+  while (x_diff > p_tolerance || y_diff > p_tolerance) {
     if (iteration++ >= p_iterations) return false;
 
     //Create a 1st order polynomial function
@@ -734,7 +766,7 @@ void DeleteTables(Pvl *label, PvlGroup kernels) {
     PvlObject &currentObject=(*label).object(k);
     if (currentObject.name() == tableStr) {
       PvlKeyword &nameKeyword = currentObject.findKeyword(nameStr);
-      for (int l=0; l < tablesToDeleteSize; l++) {
+      for(int l=0; l < tablesToDeleteSize; l++) {
         if ( nameKeyword[0] == tablesToDelete[l] ) {
           indecesToDelete.push_back(k-indecesToDeleteSize);
           indecesToDeleteSize++;
@@ -877,6 +909,14 @@ void ComputeInputRange() {
     }
     //Else read them from the pck
     else {
+      FileName pckFile("$base/kernels/pck/pck?????.tpc");
+      pckFile = pckFile.highestVersion();
+
+      QString pckFileName = pckFile.expanded();
+
+      NaifStatus::CheckErrors();
+      furnsh_c(pckFileName.toAscii().data());
+
       QString target;
 
       //If user entered target
@@ -890,9 +930,25 @@ void ComputeInputRange() {
         target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 
-      PvlGroup radii = Target::radiiGroup(target);
-      equRadius = double(radii["EquatorialRadius"]);
-      polRadius = double(radii["PolarRadius"]);
+      SpiceInt code;
+      SpiceBoolean found;
+
+      bodn2c_c(target.toAscii().data(), &code, &found);
+      NaifStatus::CheckErrors();
+
+      if (!found) {
+        QString msg = "Could not convert Target [" + target +
+                     "] to NAIF code";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      SpiceInt n;
+      SpiceDouble radii[3];
+
+      bodvar_c(code, "RADII", &n, radii);
+
+      equRadius = radii[0] * 1000;
+      polRadius = radii[2] * 1000;
     }
 
     if (isOcentric) {
@@ -913,7 +969,7 @@ void ComputeInputRange() {
     bool isPosEast = ((QString)userGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
     if (isPosEast) {
-      if (ui.GetString("LONDIR") != "POSITIVEEAST") {
+      if(ui.GetString("LONDIR") != "POSITIVEEAST") {
         minLon = TProjection::ToPositiveEast(minLon, lonDomain);
         maxLon = TProjection::ToPositiveEast(maxLon, lonDomain);
 
