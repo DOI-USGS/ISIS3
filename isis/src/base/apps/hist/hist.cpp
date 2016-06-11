@@ -23,8 +23,13 @@ void IsisMain() {
   Process p;
   Cube *icube = p.SetInputCube("FROM");
 
-  // Setup the histogram
   UserInterface &ui = Application::GetUserInterface();
+  if(!ui.WasEntered("TO") && !ui.IsInteractive()) {
+    QString msg = "The [TO] parameter must be entered";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  
+  // Setup the histogram
   Histogram hist(*icube, 1, p.Progress() );
   if(ui.WasEntered("MINIMUM") ) {
     hist.SetValidRange(ui.GetDouble("MINIMUM"),ui.GetDouble("MAXIMUM") );     
@@ -49,11 +54,6 @@ void IsisMain() {
 
   if(!ui.IsInteractive() || ui.WasEntered("TO") ) {
     // Write the results
-
-    if(!ui.WasEntered("TO") ) {
-      QString msg = "The [TO] parameter must be entered";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
     QString outfile = ui.GetFileName("TO");
     ofstream fout;
     fout.open(outfile.toAscii().data() );
