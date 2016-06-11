@@ -290,8 +290,8 @@ namespace Isis {
     function2.SetCoefficients(p_ang2Coefficients);
 
     // Compute polynomial approximations to angles, pangle1 and pangle2
-    std::vector<double> rtime;
-    rtime.push_back((et - p_baseTime) / p_timeScale);
+    double rtime;
+    rtime = (et - p_baseTime) / p_timeScale;
     double pangle1 = p_sampOff + p_sampScale * function1.Evaluate(rtime);
     double pangle2 = p_lineOff + p_lineScale * function2.Evaluate(rtime);
 

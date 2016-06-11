@@ -214,18 +214,17 @@ namespace Isis {
 
     double CI[3][3];
     double IJ[3][3];
-    std::vector<double> rtime;
+    double rtime;
     SpiceRotation *prot = p_spi->bodyRotation();
     std::vector<double> CJ;
     CJ.resize(9);
 
     for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
       double et = p_cacheTime.at(pos);
-      rtime.push_back((et - GetBaseTime()) / GetTimeScale());
+      rtime = (et - GetBaseTime()) / GetTimeScale();
       double angle1 = function1.Evaluate(rtime);
       double angle2 = function2.Evaluate(rtime);
       double angle3 = function3.Evaluate(rtime);
-      rtime.clear();
 
 // Get the first angle back into the range Naif expects [180.,180.]
       if(angle1 < -1 * pi_c()) {

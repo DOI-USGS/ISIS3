@@ -2179,8 +2179,8 @@ namespace Isis {
    function2.SetCoefficients(p_coefficients[1]);
    function3.SetCoefficients(p_coefficients[2]);
 
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
+   double rtime;
+   rtime = (p_et - p_baseTime) / p_timeScale;
    std::vector<double> angles;
    angles.push_back(function1.Evaluate(rtime));
    angles.push_back(function2.Evaluate(rtime));
@@ -2209,8 +2209,8 @@ namespace Isis {
    function2.SetCoefficients(p_coefficients[1]);
    function3.SetCoefficients(p_coefficients[2]);
 
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
+   double rtime;
+   rtime = (p_et - p_baseTime) / p_timeScale;
    double angle1 = function1.Evaluate(rtime);
    double angle2 = function2.Evaluate(rtime);
    double angle3 = function3.Evaluate(rtime);

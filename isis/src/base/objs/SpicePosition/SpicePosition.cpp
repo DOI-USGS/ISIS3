@@ -823,8 +823,8 @@ namespace Isis {
     // add positions and velocities for these times
     for(int i = 0; i < (int) p_cacheTime.size(); i++) {
       // x,y,z positions
-      std::vector <double> time;
-      time.push_back(p_cacheTime[i] - p_baseTime);
+      double time;
+      time = p_cacheTime[i] - p_baseTime;
       p_coordinate[0] = function1.Evaluate(time);
       p_coordinate[1] = function2.Evaluate(time);
       p_coordinate[2] = function3.Evaluate(time);
@@ -1378,8 +1378,8 @@ namespace Isis {
     functionZ.SetCoefficients(p_coefficients[2]);
 
     // Normalize the time
-    std::vector<double> rtime;
-    rtime.push_back((p_et - p_baseTime) / p_timeScale);
+    double rtime;
+    rtime = (p_et - p_baseTime) / p_timeScale;
 
     // Evaluate the polynomials at current et to get position;
     p_coordinate[0] = functionX.Evaluate(rtime);
@@ -1395,9 +1395,9 @@ namespace Isis {
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
 
-//         p_velocity[0] = functionX.DerivativeVar(rtime[0]);
-//         p_velocity[1] = functionY.DerivativeVar(rtime[0]);
-//         p_velocity[2] = functionZ.DerivativeVar(rtime[0]);
+//         p_velocity[0] = functionX.DerivativeVar(rtime);
+//         p_velocity[1] = functionY.DerivativeVar(rtime);
+//         p_velocity[2] = functionZ.DerivativeVar(rtime);
     }
   }
 
