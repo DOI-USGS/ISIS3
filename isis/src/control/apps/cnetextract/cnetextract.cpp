@@ -21,6 +21,7 @@
 #include "Longitude.h"
 #include "Latitude.h"
 #include "TProjection.h"
+#include "Progress.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "SerialNumber.h"

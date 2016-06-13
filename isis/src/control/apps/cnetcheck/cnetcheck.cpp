@@ -31,6 +31,7 @@
 #include "FileList.h"
 #include "FileName.h"
 #include "IString.h"
+#include "Progress.h"
 #include "ProjectionFactory.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
