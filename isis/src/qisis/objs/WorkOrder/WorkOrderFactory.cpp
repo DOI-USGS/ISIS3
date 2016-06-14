@@ -1,7 +1,6 @@
 #include "WorkOrderFactory.h"
 
 #include "CnetEditorViewWorkOrder.h"
-#include "CubeViewportViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
 #include "Footprint2DViewWorkOrder.h"
@@ -38,7 +37,6 @@ namespace Isis {
     WorkOrder *result = NULL;
 
     tryType<CnetEditorViewWorkOrder>(type, project, result);
-    tryType<CubeViewportViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);
     tryType<ExportControlNetWorkOrder>(type, project, result);
     tryType<Footprint2DViewWorkOrder>(type, project, result);

@@ -44,6 +44,8 @@ namespace Isis {
    *                         mistakes and to reduce duplicate code.
    *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
    *   @history 2015-08-14 Jeannie Backer - Added jigsaw work order.
+   *   @history 2016-06-14 Jesse Mapel - Removed include and tryType for CubeViewportViewWorkOrder.
+   *                           Fixes #3953.
    */
   class WorkOrderFactory {
     public:
