@@ -26,7 +26,6 @@ namespace Isis {
    * @param camera  A traditional Isis::Camera object which we are wrapping in this class.
    * @param parent  A pointer to the object instantiating this object.
    */
-
   GuiCamera::GuiCamera(Camera *camera, QObject *parent) : QObject(parent) {
     m_id = NULL;
 

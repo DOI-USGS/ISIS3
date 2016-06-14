@@ -165,7 +165,7 @@ int main() {
    }
    catch(IException &e) {
      QString msg = "Failed to create object using CorrelationMatrix(PvlObject).";
-     throw(e, IException::Programmer, msg, _FILEINFO_);
+     throw IException(e, IException::Programmer, msg, _FILEINFO_);
    }
 
 

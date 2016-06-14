@@ -22,10 +22,10 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
+#include <QColor> // This is required since QColor is in a slot
 #include <QObject>
 #include <QMetaType> // required since we're adding to QVariant
-#include <QColor> // This is required since QColor is in a slot
+
 
 #include "DisplayProperties.h"
 #include "XmlStackedHandler.h"

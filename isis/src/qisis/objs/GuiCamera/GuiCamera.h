@@ -24,25 +24,15 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-
 #include <vector>
-
-
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
-
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-
-
 #include "XmlStackedHandler.h"
-
-
-
-
 
 class QDataStream;
 class QUuid;
@@ -173,11 +163,19 @@ namespace Isis {
        * The GUI information for how this camera will be displayed.
        */
       GuiCameraDisplayProperties *m_displayProperties;
+      
+      
 
-      QString m_spacecraftNameShort;
-      QString m_spacecraftNameLong;
-      QString m_instrumentNameShort;
-      QString m_instrumentNameLong;
+      QString m_spacecraftNameShort; //!< An abbreviated name for the spacecraft.
+
+
+      QString m_spacecraftNameLong; //!< The full spacecraft name
+
+
+      QString m_instrumentNameShort; //!< The abbreviated instrument name
+
+
+      QString m_instrumentNameLong; //!< The full instrument name
   };
 
   /**

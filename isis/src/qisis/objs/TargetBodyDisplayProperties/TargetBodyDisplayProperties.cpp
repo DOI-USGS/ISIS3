@@ -16,10 +16,8 @@
 
 namespace Isis {
   /**
-   * TargetBodyDisplayProperties constructor. This sets default values and
-   *   constructs the object *.
-   *
-   *
+   * @brief TargetBodyDisplayProperties constructor. This sets default values and
+   * constructs the object *.
    * @param displayName The filename (fully expanded) of the object.
    * @param parent Qt parent object (this is destroyed when parent is destroyed)
    */
@@ -37,7 +35,11 @@ namespace Isis {
     setValue(Color, QVariant::fromValue(randomColor()));
   }
 
-
+  /**
+   * @brief TargetBodyDisplayProperties constructor
+   * @param xmlReader The XML reader parsing the XML file containing the display properties.
+   * @param parent The Qt parent object (this is destroyed when the parent is destroyed).
+   */
   TargetBodyDisplayProperties::TargetBodyDisplayProperties(XmlStackedHandlerReader *xmlReader,
       QObject *parent) : DisplayProperties("", parent) {
     m_propertiesUsed = None;
@@ -48,7 +50,7 @@ namespace Isis {
 
 
   /**
-   * destructor
+   * @brief The destructor.
    */
   TargetBodyDisplayProperties::~TargetBodyDisplayProperties() {
   }
@@ -86,9 +88,8 @@ namespace Isis {
 
 
   /**
-   * Call this with every property you support, otherwise they will not
-   *   communicate properly between widgets.
-   *
+   * @brief Call this with every property you support, otherwise they will not
+   *  communicate properly between widgets.
    * @param prop The property you are adding support for
    */
   void TargetBodyDisplayProperties::addSupport(Property prop) {
@@ -100,10 +101,9 @@ namespace Isis {
 
 
   /**
-   * Support may come later, please make sure you are connected to the
-   *   supportAdded signal.
-   *
-   * @returns True if the property has support, false otherwise
+   * @brief Support for this may come later. Please make sure you are connected to the
+   *  supportAdded signal.
+   * @return @b bool True if the property has support, false otherwise.
    */
   bool TargetBodyDisplayProperties::supports(Property prop) {
     return (m_propertiesUsed & prop) == prop;
@@ -111,9 +111,10 @@ namespace Isis {
 
 
   /**
-   * Get a property's associated data.
+   * @brief Get a property's associated data.
    *
    * @param prop The property
+   * @return @b QVariant The data associated with the property.
    */
   QVariant TargetBodyDisplayProperties::getValue(Property prop) const {
     return (*m_propertyValues)[prop];
@@ -121,8 +122,9 @@ namespace Isis {
 
 
   /**
-   * Creates and returns  a random color for the intial color of
+   * @brief Creates and returns a random color for the initial color of
    * the footprint polygon.
+   * @return @b QColor The color for the initial footprint polygon.
    */
   QColor TargetBodyDisplayProperties::randomColor() {
     // Gives a random number between 0 and 255
@@ -131,7 +133,7 @@ namespace Isis {
     int blue = 0;
 
     // Generate dark
-    while(red + green + blue < 300) {
+    while (red + green + blue < 300) {
       red   = rand() % 256;
       green = rand() % 256;
       blue  = rand() % 256;
@@ -140,7 +142,12 @@ namespace Isis {
     return QColor(red, green, blue, 60);
   }
 
-
+  /**
+   * @brief Saves this object to an XML file.
+   * @param stream  The XML stream writer write to.
+   * @param project The project this object is attached to (not used).
+   * @param newProjectRoot FileName of the project?  (not used).
+   */
   void TargetBodyDisplayProperties::save(QXmlStreamWriter &stream, const Project *project,
                                       FileName newProjectRoot) const {
     stream.writeStartElement("displayProperties");
@@ -161,7 +168,8 @@ namespace Isis {
 
 
   /**
-   * Change the color associated with this target.
+   * @brief Change the color associated with this target.
+   * @param newColor  The new color associated with this target.
    */
   void TargetBodyDisplayProperties::setColor(QColor newColor) {
     setValue(Color, QVariant::fromValue(newColor));
@@ -169,7 +177,8 @@ namespace Isis {
 
 
   /**
-   * Change the selected state associated with this target.
+   * @brief Change the selected state associated with this target.
+   * @param The new state associated with this target.
    */
   void TargetBodyDisplayProperties::setSelected(bool newValue) {
     setValue(Selected, newValue);
@@ -177,7 +186,8 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the display name associated with this target.
+   * @brief Change the visibility of the display name associated with this target.
+   * @param newValue The visibiliy of the display name for this target.
    */
   void TargetBodyDisplayProperties::setShowLabel(bool newValue) {
     setValue(ShowLabel, newValue);
@@ -185,9 +195,9 @@ namespace Isis {
 
 
   /**
-   * Change the visibility of the display name. This should only be connected to
-   *   by an action with a list of displays as its data. This synchronizes all
-   *   of the values where at least one is guaranteed to be toggled.
+   * @description. Change the visibility of the display name. This should only be connected to
+   * by an action with a list of displays as its data. This synchronizes all
+   * of the values where at least one is guaranteed to be toggled.
    */
   void TargetBodyDisplayProperties::toggleShowLabel() {
     QList<TargetBodyDisplayProperties *> displays = senderToData(sender());
@@ -196,17 +206,32 @@ namespace Isis {
     value = !value;
 
     TargetBodyDisplayProperties *display;
-    foreach(display, displays) {
+    foreach (display, displays) {
       display->setShowLabel(value);
     }
   }
 
 
+  /**
+   * @description Constructor for the XmlHandler class.  This is a child class of XmlStackedHandler,
+   * which is used by XmlStackedHandlerReader to parse an XML file.
+   * @param displayProperties Pointer to a TargetBodyDisplayProperties object.
+   */
   TargetBodyDisplayProperties::XmlHandler::XmlHandler(TargetBodyDisplayProperties *displayProperties) {
     m_displayProperties = displayProperties;
   }
 
 
+  /**
+   * @brief This overrides the parent startElement function in XmlStackedHandler so the parser can
+   * handle an XML file containing TargetBodyDisplayProperties information.
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   */
   bool TargetBodyDisplayProperties::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
@@ -223,6 +248,16 @@ namespace Isis {
   }
 
 
+  /**
+   * @description This implementation of a virtual function calls
+   * QXmlDefaultHandler::characters(QString &ch)
+   * which in turn calls QXmlContentHandler::characters(QString &ch) which
+   * is called when the XML processor has parsed a chunk of character data.
+   * @see XmlStackedHandler, QXmlDefaultHandler,QXmlContentHandler
+   * @param ch The character data.
+   * @return @b bool Returns True if there were no problems with the character processing.
+   * It returns False if there was a problem, and the XML reader stops.
+   */
   bool TargetBodyDisplayProperties::XmlHandler::characters(const QString &ch) {
     m_hexData += ch;
 
@@ -230,6 +265,18 @@ namespace Isis {
   }
 
 
+
+  /**
+   * @brief The XML reader invokes this method at the end of every element in the
+   *        XML document.
+   * @param namespaceURI  The Uniform Resource Identifier of the namespace (eg. "xmlns")
+   * @param localName The local name string (eg. "xhtml")
+   * @param qName The XML qualified string (eg.  "xmlns:xhtml"). This can be empty if
+   *        QNames are not available.
+   * @return @b bool If this function returns True, then a signal is sent to the reader indicating
+   * the end of the element.  If this function returns False, something bad
+   * happened and processing stops.
+   */
   bool TargetBodyDisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
       const QString &localName, const QString &qName) {
     if (localName == "displayProperties") {
@@ -242,9 +289,12 @@ namespace Isis {
   }
 
 
+
   /**
-   * This is the generic mutator for properties. Given a value, this will
-   *   change it and emit propertyChanged if its different and supported.
+   * @description This is the generic mutator for properties. Given a value, this will
+   * change it and emit propertyChanged if its different and supported.
+   * @param prop The key into the m_propertyValues QMap <int, QVariant>
+   * @param value The value we want to change to.
    */
   void TargetBodyDisplayProperties::setValue(Property prop, QVariant value) {
     if ((*m_propertyValues)[prop] != value) {
@@ -258,8 +308,11 @@ namespace Isis {
 
 
   /**
-   * This is for the slots that have a list of display properties as associated
-   *   data. This gets that list out of the data.
+   * @description This is for the slots that have a list of display properties as associated
+   * data. This gets that list out of the data.
+   * @param The object requesting the data.
+   * @return @b QList<TargetBodyDisplayProperties *> A list of pointers to
+   * TargetBodyDisplayProperties objects.
    */
   QList<TargetBodyDisplayProperties *> TargetBodyDisplayProperties::senderToData(
       QObject *senderObj) {

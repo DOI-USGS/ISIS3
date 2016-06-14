@@ -7,21 +7,24 @@
 #include <QXmlStreamWriter>
 
 #include <hdf5.h>
-#include <hdf5_hl.h> // in the hdf5 library
-#include <hdf5.h>
+#include <hdf5_hl.h>
+
 
 #include "Distance.h"
 #include "IString.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-//#include "Target.h"
 #include "TargetBodyDisplayProperties.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
-
-  TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
+/**
+   * @brief The first constructor for this class.
+   * @param target A traditional: Isis::Target object.
+   * @param parent A pointer to the object instantiating this object.
+   */
+TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
     m_id = NULL;
 
     m_radii.resize(3, Distance());
@@ -59,8 +62,14 @@ namespace Isis {
   }
 
 
-
-  TargetBody::TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent) : QObject(parent) {
+/**
+   * @brief The second constructor for this class.
+   * @param bundleTargetBody A QSharedPointer to a BundleTarget object.
+   * @param parent A pointer to the object instantiating this object.
+   */
+/*
+  TargetBody::TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent) : QObject(parent)
+  {
     m_id = NULL;
 
     m_radii.resize(3, Distance());
@@ -93,10 +102,11 @@ namespace Isis {
 
     m_id = new QUuid(QUuid::createUuid());
   }
+*/
 
-
-  //  TargetBody::TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
-//                         QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
+//  TargetBody::TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
+//                         QObject *parent) : QObject(parent) {
+// TODO: does xml stuff need project???
 //    m_id = NULL;
 
 //    xmlReader->pushContentHandler(new XmlHandler(this, project));
@@ -111,7 +121,8 @@ namespace Isis {
 //    m_bodyCode = new SpiceInt(*src.m_bodyCode);
 //
 //    m_radii.resize(3, Distance());
-//    m_sigmaRadii.resize(3, Distance(3.0, Distance::Kilometers)); // TODO - radii sigma fudged for now
+//    m_sigmaRadii.resize(3, Distance(3.0, Distance::Kilometers));
+// TODO - radii sigma fudged for now
 //
 //    for (int i = 0; i < 3; i++) {
 //      m_radii[i] = src.m_radii[i];
@@ -126,7 +137,9 @@ namespace Isis {
 //  }
 
 
-
+  /**
+   * @brief The destructor
+   */
   TargetBody::~TargetBody() {
     delete m_id;
     m_id = NULL;
@@ -139,7 +152,6 @@ namespace Isis {
   }
 
 
-  
 //  TargetBody &TargetBody::operator=(const TargetBody &src) {
 
 //    if (&src != this) {
@@ -154,13 +166,13 @@ namespace Isis {
 
 
   /**
-   * Compares two Target Body objects to see if they are equal
+   * @brief Compares two Target Body objects to see if they are equal
    *
    * @param src TargetBody object to compare against
    *
-   * @return bool Returns true if the objects are equal, false if not
+   * @return @b bool Returns true if the objects are equal, false if not.
    */
-  bool TargetBody::operator== (const TargetBody &src) const {
+  bool TargetBody::operator==(const TargetBody &src) const {
 
     TargetBody *rtargetBody = (TargetBody *) &src;
 
@@ -177,11 +189,21 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Gets TargetBodyDisplayProperties.
+   * @return @b TargetBodyDisplayProperties * A pointer to the display properties for the
+   * TargetBody.
+   */
   TargetBodyDisplayProperties *TargetBody::displayProperties() {
     return m_displayProperties;
   }
 
 
+  /**
+   * @brief TargetBody::displayProperties
+   * @return @b TargetBodyDisplayProperties * A pointer to the display properties for the
+   * TargetBody.
+   */
   const TargetBodyDisplayProperties *TargetBody::displayProperties() const {
     return m_displayProperties;
   }
@@ -201,54 +223,88 @@ namespace Isis {
 
 //  }
 
-
+  /**
+   * @brief Returns the frame type.
+   * @return @b
+   */
   int TargetBody::frameType() {
     return m_frametype;
   }
 
 
+  /**
+   * @brief TargetBody::poleRaCoefs
+   * @return std::vector<Angle>
+   */
   std::vector<Angle> TargetBody::poleRaCoefs() {
     return m_raPole;
   }
 
 
+  /**
+   * @brief Returns coefficients of a quadratic polynomial fitting pole dec
+   * @return @b std::vector<Angle>
+   */
   std::vector<Angle> TargetBody::poleDecCoefs() {
     return m_decPole;
   }
 
 
+  /**
+   * @brief Returns coefficients of a quadratic polynomial fitting pole pm.
+   * @return @b std::vector<Angle>
+   */
   std::vector<Angle> TargetBody::pmCoefs() {
     return m_pm;
   }
 
 
+  /**
+   * @brief Returns coefficients of pole right ascension nut/prec terms.
+   * @return @b std::vector<double>
+   */
   std::vector<double> TargetBody::poleRaNutPrecCoefs() {
     return m_raNutPrec;
   }
 
 
+  /**
+   * @brief TargetBody::poleDecNutPrecCoefs
+   * @return @b std::vector<double>
+   */
   std::vector<double> TargetBody::poleDecNutPrecCoefs() {
     return m_decNutPrec;
   }
 
 
+  /**
+   * @brief Returns coefficients of the prime meridian nut/prec terms.
+   * @return @b std::vector<double>
+   */
   std::vector<double> TargetBody::pmNutPrecCoefs() {
     return m_pmNutPrec;
   }
 
 
+  /**
+   * @brief Returns constants of planetary system nut/prec periods.
+   * @return @b std::vector<Angle>
+   */
   std::vector<Angle> TargetBody::sysNutPrecConstants() {
     return m_sysNutPrec0;
   }
 
-
+  /**
+   * @brief Returns Linear terms of planetary system nut/prec periods.
+   * @return @b std::vector<Angle>
+   */
   std::vector<Angle> TargetBody::sysNutPrecCoefs() {
     return m_sysNutPrec1;
   }
 
 
   /**
-   * This returns the NAIF body code of the target
+   * @brief This returns the NAIF body code of the target.
    *
    * @return @b SpiceInt NAIF body code
    *
@@ -259,9 +315,9 @@ namespace Isis {
 
 
   /**
-   * This returns the NAIF body code of the target's planet system
+   * @brief This returns the NAIF body code of the target's planet system
    *
-   * @return @b SpiceInt NAIF body code of target's planet system
+   * @return @b SpiceInt NAIF body code of target's planet system.
    *
    */
   SpiceInt TargetBody::naifPlanetSystemCode() const {
@@ -270,9 +326,9 @@ namespace Isis {
 
 
   /**
-   * This returns the body name of the target's planet system
+   * @brief This returns the body name of the target's planet system
    *
-   * @return @b QString body name of target's planet system
+   * @return @b QString The body name of target's planet system.
    *
    */
   QString TargetBody::naifPlanetSystemName() const {
@@ -281,9 +337,9 @@ namespace Isis {
 
 
   /**
-   * returns "a" radius
+   * @brief Returns "a" radius
    *
-   * @return Distance value of body radius "a"
+   * @return @b Distance The value of body radius "a"
    */
   Distance TargetBody::radiusA() const {
     return m_radii[0];
@@ -291,18 +347,19 @@ namespace Isis {
 
 
   /**
-   * returns "a" radius sigma
+   * @brief Returns "a" radius sigma.
    *
-   * @return Distance value of body radius "a" sigma
+   * @return @b Distance value of body radius "a" sigma
    */
   Distance TargetBody::sigmaRadiusA() const {
     return m_sigmaRadii[0];
   }
 
+
   /**
-   * returns "b" radius
+   * @brief Returns "b" radius.
    *
-   * @return Distance value of body radius "b"
+   * @return @b Distance value of body radius "b".
    */
   Distance TargetBody::radiusB() const {
     return m_radii[1];
@@ -310,9 +367,9 @@ namespace Isis {
 
 
   /**
-   * returns "b" radius sigma
+   * @brief Returns "b" radius sigma.
    *
-   * @return Distance value of body radius "b" sigma
+   * @return @b Distance The value of body radius "b" sigma.
    */
   Distance TargetBody::sigmaRadiusB() const {
     return m_sigmaRadii[1];
@@ -320,9 +377,9 @@ namespace Isis {
 
 
   /**
-   * returns "c" radius
+   * @brief Returns the "c" radius
    *
-   * @return Distance value of body radius "c"
+   * @return @b Distance value of body radius "c".
    */
   Distance TargetBody::radiusC() const {
     return m_radii[2];
@@ -330,9 +387,9 @@ namespace Isis {
 
 
   /**
-   * returns "c" radius sigma
+   * @brief Returns the "c" radius sigma
    *
-   * @return Distance value of body radius "c" sigma
+   * @return @b Distance value of body radius "c" sigma
    */
   Distance TargetBody::sigmaRadiusC() const {
     return m_sigmaRadii[2];
@@ -340,9 +397,9 @@ namespace Isis {
 
 
   /**
-   * returns mean radius
+   * @brief Returns the mean radius.
    *
-   * @return Distance value of body mean radius
+   * @return @b Distance value of body mean radius.
    */
   Distance TargetBody::meanRadius() const {
     Distance meanRadius = m_radii[0] + m_radii[1] + m_radii[2];
@@ -354,9 +411,9 @@ namespace Isis {
 
 
   /**
-   * returns mean radius sigma
+   * @brief Returns the mean radius sigma.
    *
-   * @return Distance value of body mean radius
+   * @return @b Distance value of body mean radius
    */
   Distance TargetBody::sigmaMeanRadius() const {
     Distance sigmaMeanRadius = m_sigmaRadii[0] + m_sigmaRadii[1] + m_sigmaRadii[2];
@@ -471,7 +528,8 @@ namespace Isis {
 //      else if (localName == "bundleResults") {
 //        delete m_xmlHandlerBundleResults;
 //        m_xmlHandlerBundleResults = NULL;
-//        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader()); //TODO: need to add constructor for this???
+//        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
+//TODO: need to add constructor for this???
 //      }
 //      else if (localName == "imageList") {
 //        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
@@ -522,20 +580,19 @@ namespace Isis {
 
 
   /**
-   * Get a unique, identifying string associated with this TargetBody object.
+   * @brief Get a unique, identifying string associated with this TargetBody object.
    *
-   * @return A unique ID for this TargetBody object
+   * @return @b A unique ID for this TargetBody object.
    */
   QString TargetBody::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
 
 
-
 //  QDataStream &TargetBody::write(QDataStream &stream) const {
 //    stream << m_id->toString()
 //           << m_runTime;
-
+//
 //    return stream;
 //  }
 
@@ -569,7 +626,8 @@ namespace Isis {
 
 
 //  void TargetBody::savehdf5(FileName outputfilename) const {
-//    const H5std_string  hdfFileName(outputfilename.expanded().toStdString()); //Is this the right way to have a dynamic file name?  What about PATH?
+//    const H5std_string  hdfFileName(outputfilename.expanded().toStdString());
+//Is this the right way to have a dynamic file name?  What about PATH?
     
     
 //    // Try block to detect exceptions raised by any of the calls inside it
@@ -586,21 +644,24 @@ namespace Isis {
 //       */
 //      H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_EXCL );
 //      hid_t fileId = hdfFile.getId();
-
+//
 //      QString objectName = "/TargetBody";
 //      H5LTset_attribute_string(fileId, objectName.toLatin1(), "runTime", m_runTime.toAscii());
 //      H5LTset_attribute_string(fileId, objectName.toLatin1(), "controlNetworkFileName",
 //                               m_controlNetworkFileName->expanded().toLatin1());
-
-//      //??? H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/TargetBody/BundleSettings"));//???
+//
+//      //??? H5::Group settingsGroup = H5::Group(hdfFile.
+//                     createGroup("/TargetBody/BundleSettings"));
+//        //???
 //      //???H5::Group settingsGroup = hdfFile.createGroup("/TargetBody/BundleSettings");
 //      QString groupName = objectName + "/BundleSettings";
-//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(),
+//           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 //      m_settings->savehdf5(groupId, groupName.toLatin1());
 //      groupName = objectName + "/BundleResults";
 //      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toLatin1()));
 //      m_statisticsResults->savehdf5(fileId, resultsGroup);
-      
+//
 //    }
 //    catch (H5::FileIException error) {
 //      QString msg = QString(error.getCDetailMsg());

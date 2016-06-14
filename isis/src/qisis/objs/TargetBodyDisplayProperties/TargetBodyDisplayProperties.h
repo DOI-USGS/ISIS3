@@ -23,9 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QObject>
-#include <QMetaType> // required since we're adding to QVariant
 #include <QColor> // This is required since QColor is in a slot
+#include <QMetaType> // required since we're adding to QVariant
+#include <QObject>
 
 #include "DisplayProperties.h"
 #include "XmlStackedHandler.h"
@@ -69,12 +69,16 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-05-27 Ken Edmundson - Creation.
+   *   @hsitory 21016-06-14 Tyler Wilson - Added documentation to member functions/variables
+   *                           and corrected some formatting to bring the the code in line
+   *                           with ISIS3 coding standards.  Fixes #3997.
+   *
    */
   class TargetBodyDisplayProperties : public DisplayProperties {
       Q_OBJECT
     public:
         /**
-         * This is a list of properties and actions that are possible.
+         * @brief This is a list of properties and actions that are possible.
          */
         enum Property {
           //! Null display property for bit-flag purposes
@@ -118,7 +122,10 @@ namespace Isis {
 
     private:
       /**
-       * @author 2012-??-?? ???
+       * @description This class is used for processing an XML file containing information
+       * about a WorkOrder.
+       *
+       * @author 2012-??-?? Steven Lambright
        *
        * @internal
        */

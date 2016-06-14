@@ -263,7 +263,7 @@ namespace Isis {
    * is called when the XML processor has parsed a chunk of character data.
    * @see XmlStackedHandler, QXmlDefaultHandler,QXmlContentHandler
    * @param ch The character data.
-   * @return @b boo Returns True if there were no problems with the character processing.
+   * @return @b bool Returns True if there were no problems with the character processing.
    * It returns False if there was a problem, and the XML reader stops.
    */
   bool GuiCameraDisplayProperties::XmlHandler::characters(const QString &ch) {
@@ -274,7 +274,7 @@ namespace Isis {
 
 
   /**
-   * @brief The XML reader invokes this method at the start of every element in the
+   * @brief The XML reader invokes this method at the end of every element in the
    *        XML document.
    * @param namespaceURI  The Uniform Resource Identifier of the namespace (eg. "xmlns")
    * @param localName The local name string (eg. "xhtml")

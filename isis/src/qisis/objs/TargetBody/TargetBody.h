@@ -24,22 +24,23 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <vector>
+
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
 
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 #include "Angle.h"
-#include "BundleTargetBody.h"
+//#include "BundleTargetBody.h"
 #include "Distance.h"
 #include "Target.h"
 #include "XmlStackedHandler.h"
 
-#include <vector>
-
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
 
 class QDataStream;
 class QUuid;
@@ -68,6 +69,9 @@ namespace Isis {
    *   @history 2015-06-08 Ken Edmundson - Original version.
    *   @history 2015-10-14 Jeffrey Covington - Declared TargetBodyQsp as a Qt
    *                           metatype for use with QVariant.
+   *   @history 2016-06-13 Tyler Wilson - Added new documentation and corrected
+   *                          formatting to be consisten with ISIS3 coding standards.
+   *                          Fixes #3997 and #4018.
    *  
    */
   class TargetBody : public QObject {
@@ -76,7 +80,7 @@ namespace Isis {
 
     public:
       TargetBody(Target *target, QObject *parent = 0);
-      TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent = 0);
+      //TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent = 0);
 //      TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
 //                 QObject *parent = 0);  // TODO: does xml stuff need project???
       ~TargetBody();
@@ -115,12 +119,14 @@ namespace Isis {
       Distance sigmaRadiusC() const;
       Distance sigmaMeanRadius() const;
 
-//      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  // TODO: does xml stuff need project and newRoot???
-//      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
-
+//      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+//      TODO: does xml stuff need project and newRoot???
+//      void save(QXmlStreamWriter &stream, const Project *project) const;
+//      TODO: does xml stuff need project???
+//
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
-
+//
 //      void savehdf5(FileName outputfilename) const;
 
     private:
@@ -132,18 +138,19 @@ namespace Isis {
        */
 //      class XmlHandler : public XmlStackedHandler {
 //        public:
-//          XmlHandler(TargetBody *TargetBody, Project *project);  // TODO: does xml stuff need project???
+//          XmlHandler(TargetBody *TargetBody, Project *project);
+//      TODO: does xml stuff need project???
 //          ~XmlHandler();
-
+//
 //          virtual bool startElement(const QString &namespaceURI, const QString &localName,
 //                                    const QString &qName, const QXmlAttributes &atts);
 //          virtual bool characters(const QString &ch);
 //          virtual bool endElement(const QString &namespaceURI, const QString &localName,
 //                                    const QString &qName);
-
+//
 //        private:
 //          Q_DISABLE_COPY(XmlHandler);
-
+//
 //          TargetBody *m_xmlHandlerTargetBody;
 //          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
 //          QString m_xmlHandlerCharacters;
@@ -195,7 +202,7 @@ namespace Isis {
        */
       TargetBodyDisplayProperties *m_displayProperties;
 
-      int m_frametype;
+      int m_frametype;  //!< Fill this in when Debbie or Ken tell me what it is returning.
 
       // The next three vectors will have length 3 (for a quadratic polynomial) if used.
       std::vector<Angle> m_raPole;      //!< Coefficients of a quadratic polynomial fitting pole ra
@@ -214,7 +221,9 @@ namespace Isis {
       std::vector<Angle> m_sysNutPrec1; //!< Linear terms of planetary system nut/prec periods
   };
 
-  typedef QSharedPointer<TargetBody> TargetBodyQsp;
+  typedef QSharedPointer<TargetBody> TargetBodyQsp;//!< Defines A smart pointer to a TargetBody obj
+
+  //
 
   // operators to read/write TargetBody to/from binary data
   QDataStream &operator<<(QDataStream &stream, const TargetBody &TargetBody);
