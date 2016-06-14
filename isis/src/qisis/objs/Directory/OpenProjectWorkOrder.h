@@ -24,9 +24,12 @@
  */
 #include "WorkOrder.h"
 
+#include "FileName.h"
+
 class QString;
 
 namespace Isis {
+  class FileName;
 
   /**
    * This opens a project that's saved on disk.
@@ -34,10 +37,6 @@ namespace Isis {
    * @author 2012-??-?? ???
    *
    * @internal
-   *   @history 2014-09-05 Kim Oyama - Removed the connection for opening a project from the
-   *                           command line.
-   *   @history 2016-06-10 Ian Humphrey - Minor updates to documentation and coding standards.
-   *                           Fixes #3952.
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT
