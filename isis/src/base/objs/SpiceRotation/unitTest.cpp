@@ -29,15 +29,15 @@ int main(int argc, char *argv[]) {
   QString pck(dir + "pck00006.tpc");
   //QString mocadd(dir+"mocAddendum.ti");
   QString mocspice(dir + "mocSpiceRotationUnitTest.ti");
-  furnsh_c(naif.toAscii().data());
-  furnsh_c(mgs.toAscii().data());
-  furnsh_c(mocti.toAscii().data());
-  furnsh_c(mocbc.toAscii().data());
-  furnsh_c(mocbsp.toAscii().data());
-  furnsh_c(de.toAscii().data());
-  furnsh_c(pck.toAscii().data());
-//  furnsh_c(mocadd.toAscii().data());
-  furnsh_c(mocspice.toAscii().data());
+  furnsh_c(naif.toLatin1().data());
+  furnsh_c(mgs.toLatin1().data());
+  furnsh_c(mocti.toLatin1().data());
+  furnsh_c(mocbc.toLatin1().data());
+  furnsh_c(mocbsp.toLatin1().data());
+  furnsh_c(de.toLatin1().data());
+  furnsh_c(pck.toLatin1().data());
+//  furnsh_c(mocadd.toLatin1().data());
+  furnsh_c(mocspice.toLatin1().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;
