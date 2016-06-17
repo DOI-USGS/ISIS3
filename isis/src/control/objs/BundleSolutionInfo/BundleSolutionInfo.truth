@@ -452,6 +452,9 @@ End_Object
 Testing accessor methods...
 runTime =  "xxx"
 
+Because we cannot create a Directory with a null parent, 
+we cannot test updateFileName().
+
 Testing error throws...
 
 Testing XML write/read...

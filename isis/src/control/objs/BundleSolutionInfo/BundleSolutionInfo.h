@@ -40,7 +40,7 @@ namespace Isis {
   class BundleResults;
   class FileName;
   class ImageList;
-  class Project;  // TODO: does xml stuff need project???
+  class Project;  //TODO does xml stuff need project???
   class PvlObject;
   class XmlStackedHandlerReader;
 
@@ -61,6 +61,8 @@ namespace Isis {
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
    *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as 
    *                           a Qt metatype for use with QVariant.
+   *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
+   *                           Fixes #2298.
    *  
    */
   class BundleSolutionInfo : public QObject {
@@ -72,7 +74,7 @@ namespace Isis {
                     QObject *parent = 0);
       BundleSolutionInfo(Project *project, 
                     XmlStackedHandlerReader *xmlReader, 
-                    QObject *parent = 0);  // TODO: does xml stuff need project???
+                    QObject *parent = 0);  //TODO does xml stuff need project???
       BundleSolutionInfo(FileName bundleSolutionInfoFile);
       BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
@@ -90,9 +92,12 @@ namespace Isis {
       PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
                           QString settingsName = "InputSettings",
                           QString statisticsName = "StatisticsResults");
-
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  // TODO: does xml stuff need project and newRoot???
-      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
+       
+      //TODO does xml stuff need project and newRoot???
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  
+      
+      //TODO does xml stuff need project???
+      void save(QXmlStreamWriter &stream, const Project *project) const;  
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -103,17 +108,25 @@ namespace Isis {
       void createH5File(FileName outputFileName) const;
       void openH5File(FileName outputFileName);
 //      BundleSolutionInfo(FileName bundleSolutionInfoFile);
+      
+      public slots:
+      void updateFileName(Project *);
 
     private:
       /**
-       *
+       * This class is used to read an images.xml file into an image list
+       * 
+       * @see QXmlDefaultHandler documentation
        * @author 2014-07-21 Ken Edmundson
        *
        * @internal
+       *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
+       *                           Fixes #2298.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);  // TODO: does xml stuff need project???
+          //TODO does xml stuff need project???
+          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);  
           ~XmlHandler();
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -125,27 +138,25 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo;
-          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          QList<ImageList *> *m_xmlHandlerImages;
-          BundleSettingsQsp m_xmlHandlerBundleSettings;
-          BundleResults *m_xmlHandlerBundleResults;
+          BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
+          Project *m_xmlHandlerProject;  //TODO does xml stuff need project???
+          QString m_xmlHandlerCharacters; //!< List of characters that have been handled
+          QList<ImageList *> *m_xmlHandlerImages; //!< List of pointers to images
+          BundleSettingsQsp m_xmlHandlerBundleSettings; //!< Settings used to run the bundle adjust
+          BundleResults *m_xmlHandlerBundleResults; //!< Results from the bundle adjust
       };
 
     private:
       BundleSolutionInfo();
 
-      /**
-       * A unique ID for this BundleSolutionInfo object (useful for others to reference this object
-       *   when saving to disk).
-       */
+      //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
+      //! object when saving to disk).
       QUuid              *m_id;
-      QString             m_runTime;
-      FileName           *m_controlNetworkFileName;
-      BundleSettingsQsp   m_settings;
-      BundleResults      *m_statisticsResults;
-      QList<ImageList *> *m_images;
+      QString             m_runTime; //!< The run time of the bundle adjust
+      FileName           *m_controlNetworkFileName; //!< The name of the control network
+      BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
+      BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
+      QList<ImageList *> *m_images; //!< The list of images that were adjusted
   }; // end BundleSolutionInfo class
 
   // operators to read/write BundleSolutionInfo to/from binary data

@@ -121,8 +121,13 @@ int main(int argc, char *argv[]) {
     qDebug() << "runTime = " << results.runTime();
     qDebug() << "";
 
+    qDebug() << "Because we cannot create a Directory with a null parent, ";
+    qDebug() << "we cannot test updateFileName().";
+    qDebug() << "";
+
     qDebug() << "Testing error throws...";
     try {
+      // bundleResults exception cannot be tested because the BundleResults cnnot be NULL
     }
     catch (IException &e) {
       e.print();
