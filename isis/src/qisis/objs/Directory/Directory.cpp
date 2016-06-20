@@ -22,9 +22,6 @@
  */
 #include "Directory.h"
 
-#include <QtDebug>
-
-#include <QMessageBox>
 
 #include <QAction>
 #include <QApplication>
@@ -36,6 +33,10 @@
 #include <QSplitter>
 #include <QStringList>
 #include <QXmlStreamWriter>
+
+#include <QtDebug>
+#include <QMessageBox>
+
 
 #include "CloseProjectWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
@@ -69,7 +70,6 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemTreeView.h"
-#include "ProjectTreeWidget.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
@@ -86,7 +86,10 @@
 namespace Isis {
 
   /**
-   * Constructor
+   * @brief The Constructor
+   * @throws IException::Programmer To handle the event that a Project cannot be created.
+   * @throws IException::Programmer To handle the event that a Directory cannot be created
+   * because the WorkOrders we are attempting to add to the Directory are corrupt.
    */
   Directory::Directory(QObject *parent) : QObject(parent) {
     //qDebug()<<"Directory::Directory";
@@ -102,14 +105,14 @@ namespace Isis {
           _FILEINFO_);
     }
 
-    connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
-             this, SLOT(imagesAddedToProject(ImageList *) ) );
+    //connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
+             //this, SLOT(imagesAddedToProject(ImageList *) ) );
 
-    connect( m_project, SIGNAL(targetsAdded(TargetBodyList *) ),
-             this, SLOT(targetsAddedToProject(TargetBodyList *) ) );
+    //connect( m_project, SIGNAL(targetsAdded(TargetBodyList *) ),
+             //this, SLOT(targetsAddedToProject(TargetBodyList *) ) );
 
-    connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
-             this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
+    //connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
+             //this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
 
     // <<<<<<< .mine
 // =======
@@ -117,7 +120,6 @@ namespace Isis {
 //              this, SLOT(updateRecentProjects(Project *) ) );
 // 
 // >>>>>>> .r5959
-    m_projectTreeWidget = new ProjectTreeWidget(this);
 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
@@ -150,18 +152,17 @@ namespace Isis {
     }
 
     initializeActions();
-    //qDebug()<<"Directory::Directory    End";
 
   }
 
 
-  
   /**
-   * destructor
+   * @brief The Destructor.
    */
   Directory::~Directory() {
-    delete m_projectTreeWidget;
+
     delete m_project;
+    m_project = NULL;
 
     foreach (WorkOrder *workOrder, m_workOrders) {
       delete workOrder;
@@ -172,7 +173,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the file menu.
+   * @return @b QList<QAction *> Returns a list of file menu actions.
    */
   QList<QAction *> Directory::fileMenuActions() {
     return m_fileMenuActions;
@@ -180,7 +182,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the project menu.
+   * @return @b QList<QAction *> Returns a list of project menu actions.
    */
   QList<QAction *> Directory::projectMenuActions() {
     return m_projectMenuActions;
@@ -188,7 +191,8 @@ namespace Isis {
 
   
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the edit menu.
+   * @return @b QList<QAction *> Returns a list of edit menu actions.
    */
   QList<QAction *> Directory::editMenuActions() {
     return m_editMenuActions;
@@ -196,7 +200,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the view menu.
+   * @return @b QList<QAction *>  Returns a list of view menu actions.
    */
   QList<QAction *> Directory::viewMenuActions() {
     return m_viewMenuActions;
@@ -204,7 +209,8 @@ namespace Isis {
 
   
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the settings menu.
+   * @return @b QList<QAction *>  Returns a list of menu actions for the settings.
    */
   QList<QAction *> Directory::settingsMenuActions() {
     return m_settingsMenuActions;
@@ -212,7 +218,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the help menu.
+   * @return @b QList<QAction *> Returns a list of help menu actions.
    */
   QList<QAction *> Directory::helpMenuActions() {
     return m_helpMenuActions;
@@ -220,7 +227,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the permanent Tool Bar.
+   * @return @b QList<QAction *> Returns a list of permanent tool bar menu actions.
    */
   QList<QAction *> Directory::permToolBarActions() {
     return m_permToolBarActions;
@@ -228,7 +236,8 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the active Tool Bar.
+   * @return @b QList<QAction *>  Returns a list of active Tool Bar actions.
    */
   QList<QAction *> Directory::activeToolBarActions() {
     return m_activeToolBarActions;
@@ -236,7 +245,8 @@ namespace Isis {
 
   
   /**
-   *
+   * @brief Get the list of actions that the Directory can provide for the Tool Pad.
+   * @return @b QList<QAction *>  Returns a list of Tool Pad actions.
    */
   QList<QAction *> Directory::toolPadActions() {
     return m_toolPadActions;
@@ -244,7 +254,7 @@ namespace Isis {
 
   
   /**
-   * Initializes the actions that the Directory can provide to a main window.
+   * @description Initializes the actions that the Directory can provide to a main window.
    */
   void Directory::initializeActions() {
     // Menus are created temporarily to convinently organize the actions.
@@ -259,7 +269,7 @@ namespace Isis {
 
     m_permToolBarActions.append(openProjectAction);
 
-    QMenu *recentProjectsMenu = fileMenu->addMenu("Recent P&rojects");
+    QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
     int nRecentProjects = m_recentProjects.size();
 
     for (int i = 0; i < nRecentProjects; i++) {
@@ -272,7 +282,8 @@ namespace Isis {
       openRecentProjectAction->setData(m_recentProjects.at(i) );
       openRecentProjectAction->setText(m_recentProjects.at(i) );
 
-      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )->isExecutable(m_recentProjects.at(i) ) )
+      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
+           ->isExecutable(m_recentProjects.at(i) ) )
         continue;
 
       recentProjectsMenu->addAction(openRecentProjectAction);
@@ -284,7 +295,7 @@ namespace Isis {
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
     saveAction->setIcon( QIcon(":save") );
     connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
-               saveAction, SLOT( setDisabled(bool) ) );
+             saveAction, SLOT( setDisabled(bool) ) );
     fileMenu->addAction(saveAction);
     m_permToolBarActions.append(saveAction);
 
@@ -294,9 +305,6 @@ namespace Isis {
     m_permToolBarActions.append(saveAsAction);
 
     fileMenu->addSeparator();
-
-    //fileMenu->addAction(m_exportControlNetWorkOrder->clone());
-    //fileMenu->addAction(m_exportImagesWorkOrder->clone());
 
     QMenu *importMenu = fileMenu->addMenu("&Import");
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
@@ -327,8 +335,7 @@ namespace Isis {
 
   
   /**
-   * This method sets up the main menu at the top of the window (File, Settings, ...)
-   *
+   * @description This method sets up the main menu at the top of the window (File, Settings, ...)
    * @param menuBar The menu area to populate.
    */
   void Directory::populateMainMenu(QMenuBar *menuBar) {
@@ -352,7 +359,8 @@ namespace Isis {
         openRecentProjectAction->setData(m_recentProjects.at(i) );
         openRecentProjectAction->setText(m_recentProjects.at(i) );
 
-        if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )->isExecutable(m_recentProjects.at(i) ) )
+        if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
+             ->isExecutable(m_recentProjects.at(i) ) )
           continue;
 
         recentProjectsMenu->addAction(openRecentProjectAction);
@@ -404,10 +412,8 @@ namespace Isis {
   }
 
 
-
   /**
-   * Set up the history info in the history dockable widget.
-   * 
+   * @brief Set up the history info in the history dockable widget.
    * @param historyContainer The widget to fill.
    */
   void Directory::setHistoryContainer(QDockWidget *historyContainer) {
@@ -419,8 +425,7 @@ namespace Isis {
 
 
   /**
-   * Set up the warning info in the warning dockable widget.
-   * 
+   * @brief Set up the warning info in the warning dockable widget.
    * @param warningContainer The widget to fill.
    */
   void Directory::setWarningContainer(QDockWidget *warningContainer) {
@@ -432,8 +437,7 @@ namespace Isis {
   
 
   /**
-   * Add recent projects to the recent projects list.
-   * 
+   * @brief Add recent projects to the recent projects list.
    * @param recentProjects List of projects to add to list.
    */
   void Directory::setRecentProjectsList(QStringList recentProjects) {
@@ -442,9 +446,8 @@ namespace Isis {
 
 
   /**
-   * Public accessor for the list of recent projects.
-   * 
-   * @return QStringList List of recent projects.
+   * @brief Public accessor for the list of recent projects.
+   * @return @b QStringList List of recent projects.
    */
    QStringList Directory::recentProjectsList() {
      return m_recentProjects;
@@ -452,11 +455,9 @@ namespace Isis {
 
   
   /**
-   * Add the widget for the cnet editor view to the window.
-   * 
+   * @brief Add the widget for the cnet editor view to the window.
    * @param network Control net to edit.
-   *
-   * @return CnetEditorWidget The view to add to the window.
+   * @return @b (CnetEditorWidget *) The view to add to the window.
    */
   CnetEditorWidget *Directory::addCnetEditorView(Control *network) {
     QString title = tr("Cnet Editor View %1").arg( network->displayProperties()->displayName() );
@@ -548,9 +549,8 @@ namespace Isis {
 
 
   /**
-   * Add the qview workspace to the window.
-   *
-   * @return (CubeDnView*) The work space to display.
+   * @brief Add the qview workspace to the window.
+   * @return @b (CubeDnView*) The work space to display.
    */
   CubeDnView *Directory::addCubeDnView() {
     CubeDnView *result = new CubeDnView();
@@ -568,9 +568,8 @@ namespace Isis {
 
 
   /**
-   * Add the qmos view widget to the window
-   *
-   * @return MosaicSceneWidget The view to display.
+   * @brief Add the qmos view widget to the window.
+   * @return @b (Footprint2DView*) A pointer to the Footprint2DView to display.
    */
   Footprint2DView *Directory::addFootprint2DView() {
     Footprint2DView *result = new Footprint2DView();
@@ -604,11 +603,9 @@ namespace Isis {
   }
 
 
-
   /**
-   * Add the matrix view widget to the window.
-   *
-   * @return MatrixSceneWidget The widget to view.
+   * @brief Add the matrix view widget to the window.
+   * @return @b (MatrixSceneWidget*) The widget to view.
    */
   MatrixSceneWidget *Directory::addMatrixView() {
     MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
@@ -628,9 +625,8 @@ namespace Isis {
 
 
   /**
-   * Add target body data view widget to the window.
-   *
-   * @return TargetInfoWidget* The widget to view.
+   * @brief Add target body data view widget to the window.
+   * @return (TargetInfoWidget*) The widget to view.
    */
   TargetInfoWidget *Directory::addTargetInfoView(TargetBodyQsp target) {
     TargetInfoWidget *result = new TargetInfoWidget(target.data(), this);
@@ -650,9 +646,8 @@ namespace Isis {
 
 
   /**
-   * Add sensor data view widget to the window.
-   *
-   * @return SensorInfoWidget* The widget to view.
+   * @brief Add sensor data view widget to the window.
+   * @return @b (SensorInfoWidget*) The widget to view.
    */
   SensorInfoWidget *Directory::addSensorInfoView(GuiCameraQsp camera) {
     SensorInfoWidget *result = new SensorInfoWidget(camera.data(), this);
@@ -672,9 +667,8 @@ namespace Isis {
 
 
   /**
-   * Add an imageFileList widget to the window.
-   *
-   * @return ImageFileListWidget The widget to add to the window.
+   * @brief Add an imageFileList widget to the window.
+   * @return @b (ImageFileListWidget *) A pointer to the widget to add to the window.
    */
   ImageFileListWidget *Directory::addImageFileListView() {
     //qDebug()<<"Directory::addImageFileListView";
@@ -694,6 +688,11 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief  Adds a control net editor to the window.
+   * @param cnet A pointer to a control network to pass to the control point edit widget.
+   * @param The name of the control network.
+   */
   void Directory::addControlPointEditor(ControlNet *cnet, QString cnetFilename) {
 
     if (m_controlPointEditWidget == NULL) {
@@ -726,9 +725,8 @@ namespace Isis {
 
 
   /**
-   * Adds a ProjectItemTreeView.
-   *
-   * @return (ProjectItemTreeView *) The added view.
+   * @brief Adds a ProjectItemTreeView to the window.
+   * @return @b (ProjectItemTreeView *) The added view.
    */
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView(); 
@@ -738,91 +736,114 @@ namespace Isis {
   }
   
 
+  /**
+   * @brief Gets the ProjectItemModel for this directory.
+   * @return @b (ProjectItemModel *) Returns a pointer to the ProjectItemModel.
+   */
   ProjectItemModel *Directory::model() {
     return m_projectItemModel;
   }
 
 
+  /**
+   * @brief Returns a pointer to the warning widget.
+   * @return @b (QWidget *)  The WarningTreeWidget pointer.
+   */
   QWidget *Directory::warningWidget() {
     return m_warningTreeWidget;
   }
 
 
-  QWidget *Directory::projectTreeWidget() {
-    return m_projectTreeWidget;
-  }
-
-
+  /**
+   * @brief Removes pointers to deleted CnetEditorWidget objects.
+   */
   void Directory::cleanupCnetEditorViewWidgets() {
     m_cnetEditorViewWidgets.removeAll(NULL);
   }
 
 
+  /**
+   * @brief Removes pointers to deleted CubeDnView objects.
+   */
   void Directory::cleanupCubeDnViewWidgets() {
     m_cubeDnViewWidgets.removeAll(NULL);
   }
 
 
+  /**
+   * @brief Reomoves pointers to deleted ImageFileListWidget objects.
+   */
   void Directory::cleanupFileListWidgets() {
-    int numRemoved = m_fileListWidgets.removeAll(NULL);
-    if (numRemoved < 0) {
-      // why do we need this variable??? just for the print statement???
-    }
-    //qDebug()<<"Directory::cleanupFileListWidgets  numRemoved = "<<numRemoved;
+    m_fileListWidgets.removeAll(NULL);
+
   }
 
 
+  /**
+   * @brief Removes pointers to deleted Footprint2DView objects.
+   */
   void Directory::cleanupFootprint2DViewWidgets() {
     m_footprint2DViewWidgets.removeAll(NULL);
   }
 
 
+  /**
+   * @brief Delete the ControlPointEditWidget and set it's pointer to NULL.
+   */
   void Directory::cleanupControlPointEditorWidget() {
     delete m_controlPointEditWidget;
     m_controlPointEditWidget = NULL;
   }
 
 
+  /**
+   * @brief Removes pointers to deleted MatrixSceneWidget objects.
+   */
   void Directory::cleanupMatrixViewWidgets() {
     m_matrixViewWidgets.removeAll(NULL);
   }
 
 
+  /**
+   * @brief Removes pointers to deleted SensorInfoWidget objects.
+   */
   void Directory::cleanupSensorInfoWidgets() {
     m_sensorInfoWidgets.removeAll(NULL);
   }
 
 
+  /**
+   * @brief Removes pointers to deleted TargetInfoWidget objects.
+   */
   void Directory::cleanupTargetInfoWidgets() {
     m_targetInfoWidgets.removeAll(NULL);
   }
 
 
-  void Directory::imagesAddedToProject(ImageList *imageList) {
-    m_projectTreeWidget->addImageGroup(imageList);
-  }
-
-  void Directory::targetsAddedToProject(TargetBodyList *targets) {
-    m_projectTreeWidget->addTargets(targets);
-  }
-
-
-  void Directory::guiCamerasAddedToProject(GuiCameraList *guiCameras) {
-    m_projectTreeWidget->addGuiCameras(guiCameras);
-  }
-
-
+  /**
+   * @brief  Adds a new Project object to the list of recent projects if it has not
+   * already been added.
+   * @param project A pointer to the Project to add.
+   */
   void Directory::updateRecentProjects(Project *project) {
     if ( !m_recentProjects.contains( project->projectRoot() ) )
       m_recentProjects.insert( 0, project->projectRoot() );
   }
 
 
+  /**
+   * @brief Gets the Project for this directory.
+   * @return @b (Project *) Returns a pointer to the Project.
+   */
   Project *Directory::project() const {
     return m_project;
   }
 
 
+  /**
+   * @brief Returns a list of all the control network views for this directory.
+   * @return @b QList<CnetEditorWidget *> A pointer list of all the CnetEditorWidget objects.
+   */
   QList<CnetEditorWidget *> Directory::cnetEditorViews() {
     QList<CnetEditorWidget *> results;
 
@@ -835,9 +856,8 @@ namespace Isis {
 
 
   /**
-   * Accessor for the list of CubeDnViews currently available.
-   *
-   * @return QList<CubeDnView *> The list of Workspaces.
+   * @brief Accessor for the list of CubeDnViews currently available.
+   * @return @b QList<CubeDnView *> The list CubeDnView objects.
    */
   QList<CubeDnView *> Directory::cubeDnViews() {
     QList<CubeDnView *> results;
@@ -850,11 +870,9 @@ namespace Isis {
   }
 
 
-
   /**
-   * Accessor for the list of MatrixSceneWidgets currently available.
-   *
-   * @return QList<MatrixSceneWidget *> The list of MatrixSceneWidgets.
+   * @brief Accessor for the list of MatrixSceneWidgets currently available.
+   * @return @b QList<MatrixSceneWidget *> The list of MatrixSceneWidget objects.
    */
   QList<MatrixSceneWidget *> Directory::matrixViews() {
     QList<MatrixSceneWidget *> results;
@@ -867,11 +885,9 @@ namespace Isis {
   }
 
   
-
   /**
-   * Accessor for the list of SensorInfoWidgets currently available.
-   *
-   * @return QList<SensorInfoWidget *> The list of SensorInfoWidgets.
+   * @brief Accessor for the list of SensorInfoWidgets currently available.
+   * @return QList<SensorInfoWidget *> The list of SensorInfoWidget objects.
    */
   QList<SensorInfoWidget *> Directory::sensorInfoViews() {
     QList<SensorInfoWidget *> results;
@@ -885,9 +901,8 @@ namespace Isis {
 
 
   /**
-   * Accessor for the list of TargetInfoWidgets currently available.
-   *
-   * @return QList<TargetInfoWidget *> The list of TargetInfoWidgets.
+   * @brief Accessor for the list of TargetInfoWidgets currently available.
+   * @return @b QList<TargetInfoWidget *> The list of TargetInfoWidget objects.
    */
   QList<TargetInfoWidget *> Directory::targetInfoViews() {
     QList<TargetInfoWidget *> results;
@@ -900,11 +915,9 @@ namespace Isis {
   }
 
 
-
   /**
-   * Accessor for the list of Footprint2DViews currently available.
-   *
-   * @return QList<Footprint2DView *> The list of MosaicSceneWidgets.
+   * @brief Accessor for the list of Footprint2DViews currently available.
+   * @return QList<Footprint2DView *> The list of MosaicSceneWidget objects.
    */
   QList<Footprint2DView *> Directory::footprint2DViews() {
     QList<Footprint2DView *> results;
@@ -917,10 +930,8 @@ namespace Isis {
   }
 
 
-
   /**
-   * Accessor for the list of ImageFileListWidgets currently available.
-   *
+   * @brief Accessor for the list of ImageFileListWidgets currently available.
    * @return QList<ImageFileListWidget *> The list of ImageFileListWidgets.
    */
   QList<ImageFileListWidget *> Directory::imageFileListViews() {
@@ -933,44 +944,76 @@ namespace Isis {
     return results;
   }
 
-
+  /**
+   * @brief Gets the ControlPointEditWidget associated with the Directory.
+   * @return @b (ControlPointEditWidget *) Returns a pointer to the ControlPointEditWidget.
+   */
   ControlPointEditWidget *Directory::controlPointEditorView() {
 
     return m_controlPointEditWidget;
   }
 
+
+  /**
+   * @brief Gets the ControlNetEditor associated with this the Directory.
+   * @return @b (ControlNetEditor *) Returns a pointer to the ControlNetEditor.
+   */
   ControlNetEditor *Directory::controlNetEditor() {
     return m_cnetEditor;
   }
 
 
+  /**
+   * @brief Returns a list of progress bars associated with this Directory.
+   * @return @b QList<QProgressBar *>
+   */
   QList<QProgressBar *> Directory::progressBars() {
     QList<QProgressBar *> result;
     return result;
   }
 
 
-
+  /**
+   * @brief Displays a Warning
+   * @param text The text to be displayed as a warning.
+   */
   void Directory::showWarning(QString text) {
     m_warningTreeWidget->showWarning(text);
   }
 
 
+  /**
+   * @brief Creates an Action to redo the last action.
+   * @return @b (QAction *) Returns an action pointer to redo the last action.
+   */
   QAction *Directory::redoAction() {
     return project()->undoStack()->createRedoAction(this);
   }
 
 
+  /**
+   * @brief Creates an Action to undo the last action.
+   * @return @b (QAction *) Returns an action pointer to undo the last action.
+   */
   QAction *Directory::undoAction() {
     return project()->undoStack()->createUndoAction(this);
   }
 
 
+  /**
+   * @brief Loads the Directory from an XML file.
+   * @param xmlReader  The reader that takes in and parses the XML file.
+   */
   void Directory::load(XmlStackedHandlerReader *xmlReader) {
     xmlReader->pushContentHandler( new XmlHandler(this) );
   }
 
 
+  /**
+   * @brief Save the directory to an XML file.
+   * @param stream  The XML stream writer
+   * @param newProjectRoot The FileName of the project this Directory is attached to.
+   */
   void Directory::save(QXmlStreamWriter &stream, FileName newProjectRoot) const {
     stream.writeStartElement("directory");
 
@@ -983,7 +1026,6 @@ namespace Isis {
 
       stream.writeEndElement();
     }
-
 
     //if ( !m_footprint2DViewWidgets.isEmpty() ) {
     //  //qDebug()<<"Writing footprints";
@@ -1000,15 +1042,37 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief This function sets the Directory pointer for the Directory::XmlHandler class
+   * @param directory The new directory we are setting XmlHandler's member variable to.
+   */
   Directory::XmlHandler::XmlHandler(Directory *directory) {
     m_directory = directory;
   }
 
 
+  /**
+   * @brief The Destructor for Directory::XmlHandler
+   */
   Directory::XmlHandler::~XmlHandler() {
   }
 
 
+  /**
+   * @description The XML reader invokes this method at the start of every element in the
+   * XML document.  This method expects <footprint2DView/> and <imageFileList/>
+   * elements.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
+   *
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   *
+   */
   bool Directory::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
@@ -1027,7 +1091,7 @@ namespace Isis {
 
 
   /**
-   * Reformat actionPairings to be user friendly for use in menus.
+   * @description Reformat actionPairings to be user friendly for use in menus.
    *
    * actionPairings is:
    *    Widget A ->
@@ -1081,6 +1145,9 @@ namespace Isis {
    *   action text. If the action text is NULL (we saw a separator in the input), we add a NULL
    *   (separator) to the resulting list of actions. If it isn't NULL, we create a menu or utilize
    *   the action directly depending on if there are multiple actions with the same text.
+   *
+   * @param actionPairings A list of action pairings.
+   * @return @b QList<QAction *> A list of actions that can be added to a menu.
    *
    */
   QList<QAction *> Directory::restructureActions(
@@ -1174,12 +1241,24 @@ namespace Isis {
     return results;
   }
 
-  
+
+  /**
+   * @brief This is for determining the ordering of the descriptive text of
+   * for the actions.
+   * @param lhs  The first QAction argument.
+   * @param rhs  The second QAction argument.
+   * @return @b bool Returns True if the text for the lhs QAction is less than
+   * the text for the rhs QAction.  Returns False otherwise.
+   */
   bool Directory::actionTextLessThan(QAction *lhs, QAction *rhs) {
     return lhs->text().localeAwareCompare( rhs->text() ) < 0;
+
   }
 
 
+  /**
+   * @description Updates the SIGNAL/SLOT connections for the cotrol net editor.
+   */
   void Directory::updateControlNetEditConnections() {
     if (m_controlPointEditWidget && m_footprint2DViewWidgets.size() == 1) {
 //    connect(m_footprint2DViewWidgets.at(0), SIGNAL(controlPointSelected(ControlPoint *)),

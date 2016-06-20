@@ -43,10 +43,11 @@
 
 namespace Isis {
   /**
-   * Create a work order that will work with the given project.
-   *
+   * @brief Create a work order that will work with the given project.
    * @param project The Project that this work order should be interacting with
    * @param parent The Qt-relationship parent
+   * @throws IException::Programmer This exception is thrown if the WorkOrder is
+   * not attached to a Project.
    */
   WorkOrder::WorkOrder(Project *project) : QAction(project) {
     m_project = project;
@@ -87,6 +88,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief The Destructor
+   */
   WorkOrder::~WorkOrder() {
     delete m_imageList;
     delete m_futureWatcher;
@@ -103,18 +107,17 @@ namespace Isis {
 
 
   /**
-   * Copy the work order 'other' into this (new) instance.
-   *
-   * @param other The work order being copied
+   * @brief Copy the work order 'other' into this (new) instance.
+   * @param other The work order being copied.
+   * @throws IException::Unknown  This Excecption is thrown if the WorkOrder being copies
+   * is currently running.
    */
   WorkOrder::WorkOrder(const WorkOrder &other) :
       QAction(other.icon(), ((QAction &)other).text(), other.parentWidget()),
       QUndoCommand(((QUndoCommand &)other).text()) {
     m_transparentConstMutex = NULL;
     m_elapsedTimer = NULL;
-
     m_project = other.project();
-
     m_context = other.m_context;
     m_imageIds = other.m_imageIds;
     m_imageList = new ImageList(*other.m_imageList);
@@ -158,30 +161,40 @@ namespace Isis {
 
 
   /**
-   * Re-implement this method if your work order utilizes controls for data in order to operate. For
-   *   example, "CnetEditorViewWorkOrder" works sometimes on controls - the logic in side of
-   *   CnetEditorViewWorkOrder::isExecutable() determines whethere or not a user is
-   *   prompted with this work order as a possibility.
+   * @description Re-implement this method if your work order utilizes controls for data
+   * in order to operate. For example, "CnetEditorViewWorkOrder" works sometimes on controls
+   * - the logic in side of CnetEditorViewWorkOrder::isExecutable() determines whethere or not a
+   * user is prompted with this work order as a possibility.
+   * @param context This is an enum variable with two values:   NoContext,ProjectContext.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
   bool WorkOrder::isExecutable(Context context) {
     return false;
   }
 
+
   /**
-   * Re-implement this method if your work order utilizes images for data in order to operate. For
-   *   example, "Footprint2DViewWorkOrder" works sometimes on images - the logic in side of
-   *   Footprint2DViewWorkOrder::isExecutable(ImageList) determines whethere or not a user is
-   *   prompted with this work order as a possibility.
-   *
+   * @brief Re-implement this method if your work order utilizes images for data in order to
+   *  operate. For example, "Footprint2DViewWorkOrder" works sometimes on images - the logic
+   * in side of Footprint2DViewWorkOrder::isExecutable(ImageList) determines whethere or not a user
+   * is prompted with this work order as a possibility.
    * @param images An image list that this work order should execute on
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
   bool WorkOrder::isExecutable(ImageList *images) {
     return false;
   }
 
-  
+
+
   /**
-   *
+   * @brief Re-implement this method if your work order utilizes a control list (a list of control
+   * networks) for data in order to operate.
+   * @param controls A list of control networks.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
   bool WorkOrder::isExecutable(ControlList *controls) {
     return false;
@@ -189,15 +202,184 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Re-implement this method if your work order utilizes a control list (a list of control
+   * networks) for data in order to operate.
+   * @param controls A list of control networks.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
-  bool WorkOrder::isExecutable(CorrelationMatrix) {
+  //bool WorkOrder::isExecutable(CorrelationMatrix * correlationMatrix) {
+  //  return false;
+  //}
+
+
+  /**
+   * @brief Re-implement this method if your work order utilizes a TargetBody.
+   * @param targetBody A pointer to a TargetBody object.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
+   */
+  //bool WorkOrder::isExecutable(TargetBody * targetBody) {
+  //  return false;
+  //}
+
+
+  /**
+   * @brief Sets the TargetBody data for this WorkOrder.
+   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
+   */
+  //void WorkOrder::setData(TargetBody * targetBody) {
+
+  //}
+
+  /**
+   * @brief Sets the TargetBody data for this WorkOrder.
+   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
+   */
+  //void WorkOrder::setData(QList<Control *> controls) {
+
+  //}
+
+
+  /**
+   * @brief Sets the TargetBody data for this WorkOrder.
+   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
+   */
+  //void WorkOrder::setData(GuiCamera * guiCamera) {
+
+  //}
+
+
+  bool WorkOrder::isExecutable(CorrelationMatrix correlationMatrix) {
     return false;
+  }
+
+  //bool WorkOrder::isExecutable(GuiCamera * guiCamera) {
+  //  return false;
+  //}
+
+
+  //bool WorkOrder::isExecutable(QList<Control *> controls) {
+  //  return false;
+  //}
+
+
+  /**
+   * @brief Sets the correlation matrix for this WorkOrder.
+   * @param correlationMatrix A pointer to the correlation matrix.
+   */
+  //void WorkOrder::setData(CorrelationMatrix * correlationMatrix) {
+
+  //}
+
+  /**
+   * @brief Sets the context data for this WorkOrder
+   * @param context This is an enum variable with two values:   NoContext,ProjectContext.
+   */
+  void WorkOrder::setData(Context context) {
+    m_context = context;
   }
 
 
   /**
-   *
+   * @brief Sets the ImageList data for this WorkOrder
+   * @param Imagelist * images A pointer to the updated ImageList.
+   */
+  void WorkOrder::setData(ImageList *images) {
+    m_imageIds.clear();
+    delete m_imageList;
+
+    m_imageList = new ImageList(*images);
+    listenForImageDestruction();
+  }
+
+
+  /**
+   * @brief Sets the ControlList data for this WorkOrder
+   * @param ControlList * controls.  A pointer to the ControlList (which is a list of control
+   * networks).
+   */
+  void WorkOrder::setData(ControlList *controls) {
+    m_controlList = controls;
+  }
+
+
+  /**
+   * @brief Sets the CorrelationMatrix data for this WorkOrder.
+   * @param CorrelationMatrix correlationMatrix The matrix data.
+   */
+  void WorkOrder::setData(CorrelationMatrix correlationMatrix) {
+    m_correlationMatrix = correlationMatrix;
+  }
+
+
+
+
+  /**
+   * @brief Sets the TargetBody data for this WorkOrder.
+   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
+   */
+  void WorkOrder::setData(TargetBodyQsp targetBody) {
+    m_targetBody = targetBody;
+  }
+
+
+  /**
+   * @brief Sets the GuiCamera data for this WorkOrder.
+   * @param GuiCameraQsp guiCamera A QSharedPointer to the GuiCamera.
+   */
+  void WorkOrder::setData(GuiCameraQsp guiCamera) {
+    m_guiCamera = guiCamera;
+  }
+
+
+  /**
+   * @brief Sets the internal data to the data stored in a ProjectItem.
+   * @param (ProjectItem *) item The item containing the data.
+   */
+  void WorkOrder::setData(ProjectItem *item) {
+    if ( item->isProject() ) {
+      setData( ProjectContext );
+    }
+    else if ( item->isImageList() ) {
+      setData( item->imageList() );
+    }
+    else if ( item->isImage() ) {
+      ImageList *imageList = new ImageList(this);
+      imageList->append( item->image() );
+      setData(imageList);
+    }
+    else if ( item->isControlList() ) {
+      setData( item->controlList() );
+      //setData( *item->controlList() );
+    }
+    else if ( item->isControl() ) {
+      ControlList *controlList = new ControlList(this);
+      controlList->append( item->control() );
+      setData(controlList);
+      //setData(*controlList);
+    }
+    else if ( item->isCorrelationMatrix() ) {
+      setData( item->correlationMatrix() );
+    }
+    else if ( item->isTargetBody() ) {
+      setData( item->targetBody() );
+    }
+    else if ( item->isGuiCamera() ) {
+      setData( item->guiCamera() );
+    }
+  }
+
+
+
+
+
+  /**
+   * @brief Re-implement this method if your work order utilizes a control list (a list of control
+   * networks) for data in order to operate.
+   * @param controls A list of control networks.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
   bool WorkOrder::isExecutable(TargetBodyQsp targetBody) {
     return false;
@@ -205,7 +387,11 @@ namespace Isis {
 
 
   /**
-   *
+   * @brief Re-implement this method if your WorkOrder utilizes GuiCameraQsp (a QSharedPointer to a
+   * GuiCamera object) for data in order to operate.
+   * @param GuiCameraQsp
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
    */
   bool WorkOrder::isExecutable(GuiCameraQsp guiCamera) {
     return false;
@@ -213,12 +399,11 @@ namespace Isis {
 
 
   /**
-   * Returns if the WorkOrder is execuatable on the data stored in
+   * @brief Determines if the WorkOrder is execuatable on the data stored in
    * a ProjectItem.
-   *
-   * @param[in] item (ProjectItem *) The item containing the data.
-   *
-   * @return (bool) Whether the WorkOrder is executable on the data.
+   * @param item (ProjectItem *) The item containing the data.
+   * @return @b bool Returns True if the WorkOrder is executable on data
+   * stored in a ProjectItem.
    */
   bool WorkOrder::isExecutable(ProjectItem *item) {
     if ( !item ) {
@@ -238,12 +423,13 @@ namespace Isis {
       return ret;
     }
     else if ( item->isControlList() ) {
-      return isExecutable( item->controlList() ) || isExecutable( *item->controlList() );
+      //return isExecutable( item->controlList() ) || isExecutable( *item->controlList() );
+        return isExecutable (item -> controlList() );
     }
     else if ( item->isControl() ) {
       ControlList *controlList = new ControlList();
       controlList->append( item->control() );
-      bool ret = isExecutable(*controlList);
+      bool ret = isExecutable(controlList);
       controlList->deleteLater();
       return ret;
     }
@@ -251,10 +437,12 @@ namespace Isis {
       return isExecutable( item->correlationMatrix() );
     }
     else if ( item->isTargetBody() ) {
-      return isExecutable( item->targetBody() ) || isExecutable( item->targetBody().data() );
+      //return isExecutable( item->targetBody() ) || isExecutable( item->targetBody().data() );
+        return isExecutable(item->targetBody());
     }
     else if ( item->isGuiCamera() ) {
-      return isExecutable( item->guiCamera() ) || isExecutable( item->guiCamera().data() );
+      //return isExecutable( item->guiCamera() ) || isExecutable( item->guiCamera().data() );
+      return isExecutable( item->guiCamera() );
     }
  
     return false;
@@ -262,51 +450,7 @@ namespace Isis {
 
 
   /**
-   * Deprecated.
-   *
-   * Re-implement this method if your work order utilizes controls for data in order to operate. For
-   *   example, "CnetEditorViewWorkOrder" works sometimes on controls - the logic in side of
-   *   CnetEditorViewWorkOrder::isExecutable() determines whethere or not a user is
-   *   prompted with this work order as a possibility.
-   *
-   */
-  bool WorkOrder::isExecutable(QList<Control *> controls) {
-    return false;
-  }
-
-
-  /**
-   * Deprecated.
-   *
-   * @param 
-   */
-  bool WorkOrder::isExecutable(CorrelationMatrix *correlationMatrix) {
-    return false;
-  }
-
-
-  /**
-   * Deprecated.
-   *
-   * @param
-   */
-  bool WorkOrder::isExecutable(GuiCamera *guiCamera) {
-    return false;
-  }
-
-
-  /**
-   * Deprecated.
-   *
-   * @param
-   */
-  bool WorkOrder::isExecutable(TargetBody *targetBody) {
-    return false;
-  }
-
-
-  /**
-   * Read this work order's data from disk.
+   * @brief Read this work order's data from disk.
    */
   void WorkOrder::read(XmlStackedHandlerReader *xmlReader) {
     xmlReader->pushContentHandler(new XmlHandler(this));
@@ -314,7 +458,8 @@ namespace Isis {
 
 
   /**
-   * Output XML format:
+   * @description:  Saves a WorkOrder to a data stream.
+   * The XML output format looks like this:
    *
    * <pre>
    *   <workOrder actionText="..." undoText="..." type="..." status="...">
@@ -327,10 +472,13 @@ namespace Isis {
    *     </internalDataValues>
    *   </workOrder>
    * </pre>
+   * @param @b QXmlStreamWriter stream The data stream we are saving the WorkOrder to.
+   * @throws IException::Unknown  This exception is thrown if save is called while the
+   * WorkOrder is currently running.
    */
   void WorkOrder::save(QXmlStreamWriter &stream) const {
     if (!isInStableState()) {
-      throw IException(IException::Unknown,
+      throw IException(IException::Programmer,
                        tr("Can not store an unstable work order. The work order [%1] is currently "
                           "working").arg(bestText()),
                        _FILEINFO_);
@@ -381,139 +529,30 @@ namespace Isis {
   }
 
 
-  /**
-   *
-   */
-  void WorkOrder::setData(Context context) {
-    m_context = context;
-  }
 
 
   /**
-   *
+   * @brief Sets the next WorkOrder in the sequence.
+   * @param nextWorkOrder The next WorkOrder.
    */
-  void WorkOrder::setData(ImageList *images) {
-    m_imageIds.clear();
-    delete m_imageList;
-
-    m_imageList = new ImageList(*images);
-    listenForImageDestruction();
-  }
-
-
-  /**
-   *
-   */
-  void WorkOrder::setData(ControlList *controls) {
-    m_controlList = controls;
-  }
-
-
-  /**
-   *
-   */
-  void WorkOrder::setData(CorrelationMatrix correlationMatrix) {
-    m_correlationMatrix = correlationMatrix;
-  }
-
-
-  /**
-   *
-   */
-  void WorkOrder::setData(TargetBodyQsp targetBody) {
-    m_targetBody = targetBody;
-  }
-
-
-  /**
-   *
-   */
-  void WorkOrder::setData(GuiCameraQsp guiCamera) {
-    m_guiCamera = guiCamera;
-  }
-
-
-  /**
-   * Sets the internal data to the data stored in a ProjectItem.
-   *
-   * @param item (ProjectItem *) The item containing the data.
-   */
-  void WorkOrder::setData(ProjectItem *item) {
-    if ( item->isProject() ) {
-      setData( ProjectContext );
-    }
-    else if ( item->isImageList() ) {
-      setData( item->imageList() );
-    }
-    else if ( item->isImage() ) {
-      ImageList *imageList = new ImageList(this);
-      imageList->append( item->image() );
-      setData(imageList);
-    }
-    else if ( item->isControlList() ) {
-      setData( item->controlList() );
-      setData( *item->controlList() );
-    }
-    else if ( item->isControl() ) {
-      ControlList *controlList = new ControlList(this);
-      controlList->append( item->control() );
-      setData(controlList);
-      setData(*controlList);
-    }
-    else if ( item->isCorrelationMatrix() ) {
-      setData( item->correlationMatrix() );
-    }
-    else if ( item->isTargetBody() ) {
-      setData( item->targetBody() );
-    }
-    else if ( item->isGuiCamera() ) {
-      setData( item->guiCamera() );
-    }
-  }
-
-
-  /**
-   * Deprecated.
-   */
-  void WorkOrder::setData(QList<Control *> controls) {
-    m_controls = controls;
-  }
-
-
-  /**
-   * Deprecated.
-   */
-  void WorkOrder::setData(CorrelationMatrix *correlationMatrix) {
-    m_correlationMatrix = *correlationMatrix;
-  }
-
-
-  /**
-   * Deprecated.
-   */
-  void WorkOrder::setData(GuiCamera *guiCamera) {
-    m_guiCamera = GuiCameraQsp(guiCamera);
-  }
-
-
-  /**
-   * Deprecated.
-   */
-  void WorkOrder::setData(TargetBody *targetBody) {
-    m_targetBody = TargetBodyQsp(targetBody);
-  }
-
-
   void WorkOrder::setNext(WorkOrder *nextWorkOrder) {
     m_nextWorkOrder = nextWorkOrder;
   }
 
 
+  /**
+   * @brief Sets the previous WorkOrder in the sequence.
+   * @param previousWorkOrder The previous WorkOrder.
+   */
   void WorkOrder::setPrevious(WorkOrder *previousWorkOrder) {
     m_previousWorkOrder = previousWorkOrder;
   }
 
 
+  /**
+   * @briefReturns a pointer to the ImageList for this WorkOrder.
+   * @return @b (ImageList*) A pointer to the ImageList.
+   */
   ImageList *WorkOrder::imageList() {
     if (!m_imageList) {
       bool anyImagesAreNull = false;
@@ -541,111 +580,184 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Returns the CorrleationMatrix for this WorkOrder
+   * @return A CorrelationMatrix.
+   */
   CorrelationMatrix WorkOrder::correlationMatrix() {
     return m_correlationMatrix;
   }
 
 
+  /**
+   * @brief Returns the Control List for this WorkOrder (a list of control networks).
+   * @return The ControlList.
+   */
   QList<Control *> WorkOrder::controlList() {
     return m_controls;
   }
 
 
+  /**
+   * @brief A thread-safe method for retrieving a point to the imageList.
+   * @return @b (ImageList *) A pointer to the image list for this WorkOrder.
+   */
   const ImageList *WorkOrder::imageList() const {
     QMutexLocker lock(m_transparentConstMutex);
     return const_cast<WorkOrder *>(this)->imageList();
   }
 
 
+  /**
+   * @brief WorkOrder::targetBody
+   * @return @b QSharedPointer Returns a shared pointer to the TargetBody.
+   */
   TargetBodyQsp WorkOrder::targetBody() {
     return m_targetBody;
   }
 
 
+  /**
+   * @brief WorkOrder::guiCamera
+   * @return @b QSharedPointer Returns a shared pointer to the guiCamera.
+   */
   GuiCameraQsp WorkOrder::guiCamera() {
     return m_guiCamera;
   }
 
 
+  /**
+   * @brief This is a virtual function whose role in child classes is to determine
+   * if this WorkOrder deppends on the WorkOrder passed in as an argument.
+   * @param WorkOrder * The WorkOrder we are checking for dependency with this one.
+   * @return @b bool Returns True if there is a dependency, and False if there is no
+   * dependency.
+   *
+   */
   bool WorkOrder::dependsOn(WorkOrder *) const {
     return true;
   }
 
 
-
+  /**
+   * @description We don't use action text anymore because Directory likes to rename our actions.
+   * It converts a set of actions that have the same text, like Zoom Fit, to be in a menu named
+   * Zoom Fit with items that name their widgets. Widget names are unhelpful as a description
+   * of the action.
+   * @see Directory::restructureActions
+   * @return @b QString A textual description of the action.
+   */
   QString WorkOrder::bestText() const {
     QString result = QUndoCommand::text().remove("&").remove("...");
-
-    // We don't use action text anymore because Directory likes to rename our actions... it
-    //   converts a set of actions that have the same text, like Zoom Fit, to be in a menu named
-    //   Zoom Fit with items that name their widgets. Widget names are unhelpful as a description
-    //   of the action.
-    //
-    // See Directory::restructureActions
-    //
 
     // if the QUndoCommand has no text, create a warning
     if (result.isEmpty()) {
       // get the name of the work order
       result = QString(metaObject()->className()).remove("Isis::").remove("WorkOrder")
                    .replace(QRegExp("([a-z0-9])([A-Z])"), "\\1 \\2");
-      qWarning() << QString("WorkOrder::bestText(): Work order [%1] has no QUndoCommand text").arg(result);
+      qWarning() << QString("WorkOrder::bestText(): Work order [%1] has no QUndoCommand text")
+                    .arg(result);
     }
 
     return result;
   }
 
 
+  /**
+   * @brief Returns the CleanState status (whether the Project has been saved to disk or not).
+   * @return @b Returns True if the Project has been saved to disk.  False if it has not.
+   */
   bool WorkOrder::createsCleanState() const {
     return m_createsCleanState;
   }
 
 
+  /**
+   * @brief Gets the execution time of this WorkOrder.
+   * @return @b QDateTime Returns the execution time.
+   */
   QDateTime WorkOrder::executionTime() const {
     return m_executionTime;
   }
 
 
+  /**
+   * @brief Returns the finished state of this WorkOrder.
+   * @return @b bool Returns True if the WorkOrder is finished, False otherwise.
+   */
   bool WorkOrder::isFinished() const {
     return m_status == WorkOrderFinished;
   }
 
 
+  /**
+   * @brief  Returns the Redoing status of this WorkOrder.
+   * @return @b bool Returns True if the WorkOrder is executing a redo.  Returns False if it is not.
+   */
   bool WorkOrder::isRedoing() const {
     return m_status == WorkOrderRedoing;
   }
 
 
+  /**
+   * @brief Returns the WorkOrder redone status.
+   * @return @b bool Returns True if the WorkOrder has completed a Redo.  False if it has not.
+   */
   bool WorkOrder::isRedone() const {
     return m_status == WorkOrderRedone;
   }
 
 
+  /**
+   * @brief Returns the WorkOrderUndoing state.
+   * @return @b bool Returns True if the current status is WorkOrderUndoing, False otherwise.
+   */
   bool WorkOrder::isUndoing() const {
     return m_status == WorkOrderUndoing;
   }
 
 
+  /**
+   * @brief Returns the WorkOrder undo status.
+   * @return @b bool Returns True if the WorkOrder has been undone.  False if it has not.
+   */
   bool WorkOrder::isUndone() const {
     return m_status == WorkOrderUndone;
   }
 
 
+  /**
+   * @brief Returns the modified disk state.
+   * @return @b Returns True if the WorkOrder has modified the Project on disk to perform
+   * it's actions.  Returns False if it has not.
+   */
   bool WorkOrder::modifiesDiskState() const {
     return m_modifiesDiskState;
   }
 
 
+  /**
+   * @brief Gets the next WorkOrder.
+   * @return @b QPointer pointing to the next WorkOrder.
+   */
   WorkOrder *WorkOrder::next() const {
     return m_nextWorkOrder;
   }
 
 
+  /**
+   * @brief Gets the previous WorkOrder.
+   * @return @b QPointer pointing to the previous WorkOrder.
+   */
   WorkOrder *WorkOrder::previous() const {
     return m_previousWorkOrder;
   }
 
 
+  /**
+   * @brief WorkOrder::statusText
+   * @return @b QString A string representation of the current WorkOrder status.
+   */
   QString WorkOrder::statusText() const {
     QString result = toString(m_status);
 
@@ -662,11 +774,22 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Returns the ProgressBar.
+   * @return A QPointer to the ProgessBar.
+   */
   ProgressBar *WorkOrder::progressBar() {
     return m_progressBar;
   }
 
 
+  /**
+   * @description Attempts to query the current status of the WorkOrder.
+   * @param statusString The status we want information about.
+   * @return @b WorkOrderStatus Returns WorkOrderUnknownStatus if the statusString
+   * does not match the current status.  If there is a result, then it returns
+   * the status which matches the statusString.
+   */
   WorkOrder::WorkOrderStatus WorkOrder::fromStatusString(QString statusString) {
     statusString = statusString.toUpper();
     WorkOrderStatus result = WorkOrderUnknownStatus;
@@ -683,6 +806,11 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Gets the current status of the WorkOrder.
+   * @param status An enumeration of all possible WorkOrder states
+   * @return @b QString Returns a string representation of the current status of the WorkOrder.
+   */
   QString WorkOrder::toString(WorkOrderStatus status) {
     QString result;
 
@@ -715,7 +843,8 @@ namespace Isis {
 
 
   /**
-   * Starts (or enqueues) a redo. This should not be re-implemented by children.
+   * @description Starts (or enqueues) a redo. This should not be re-implemented by children.
+   * TODO:  (Then why is it declared virtual?)
    */
   void WorkOrder::redo() {
     if (!isInStableState()) {
@@ -799,7 +928,8 @@ namespace Isis {
 
 
   /**
-   * Starts (or enqueues) an undo. This should not be re-implemented by children.
+   * @brief Starts (or enqueues) an undo. This should not be re-implemented by children.
+   * (Why virtual then?)
    */
   void WorkOrder::undo() {
     if (!isInStableState()) {
@@ -861,9 +991,9 @@ namespace Isis {
 
 
   /**
-   * This method is designed to be implemented by children work orders, but they need to call this
-   *   version inside of their execute (at the beginning). The order of execution for
-   *     work orders is:
+   * @descriptionThis method is designed to be implemented by children work orders, but they need
+   * to call this version inside of their execute (at the beginning). The order of execution for
+   * work orders is:
    *   execute() - GUI thread, can ask user for input*
    *   syncRedo() - GUI thread, should not prompt the user for input
    *   asyncRedo() - Pooled thread
@@ -882,6 +1012,8 @@ namespace Isis {
    * State should only be set in the parent WorkOrder class in this method. You can set arbitrary
    *   state using setInternalData(). This method is always executed in the GUI thread and is the
    *   only place to ask the user questions.
+   *
+   * @return @b bool Returns True upon successful execution of the WorkOrder, False otherwise.
    */
   bool WorkOrder::execute() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
@@ -907,11 +1039,20 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Returns the Directory object of the Project this WorkOrder is attached to.
+   * @return @b (Directory *) A pointer to the Directory.
+   */
   Directory *WorkOrder::directory() const {
     return project()->directory();
   }
 
 
+  /**
+   * @brief Returns the Project this WorkOrder is attached to.
+   * @return  @b (Project *) A pointer to the Project.
+   * @throws  IException::Programmer "This work order no longer has a project."
+   */
   Project *WorkOrder::project() const {
     if (!m_project) {
       throw IException(IException::Programmer,
@@ -922,44 +1063,74 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Sets the internal data for this WorkOrder.
+   * @param data The data to set the internal data to.
+   */
   void WorkOrder::setInternalData(QStringList data) {
     m_internalData = data;
   }
 
 
+  /**
+   * @brief Gets the minimum value of the progress range of the WorkOrder.
+   * @return @b int The minimum value.
+   */
   int WorkOrder::progressMin() const {
     return m_progressRangeMinValue;
   }
 
 
+  /**
+   * @brief Gets the maximum value of the progress range of the WorkOrder.
+   * @return @b int The maximum value.
+   */
   int WorkOrder::progressMax() const {
     return m_progressRangeMaxValue;
   }
 
 
+  /**
+   * @brief Gets the current progress value of the WorkOrder.
+   * @return @b int Returns the current progress value.
+   */
   int WorkOrder::progressValue() const {
     return m_progressValue;
   }
 
 
+  /**
+   * @brief Sets the progress range of the WorkOrder.
+   * @param minValue The progress range minimum value.
+   * @param maxValue The progress range maximum value.
+   */
   void WorkOrder::setProgressRange(int minValue, int maxValue) {
     m_progressRangeMinValue = minValue;
     m_progressRangeMaxValue = maxValue;
   }
 
 
+  /**
+   * @brief Sets the current progress value for the WorkOrder.
+   * @param int value The value to set the current progress to.
+   */
   void WorkOrder::setProgressValue(int value) {
     m_progressValue = value;
   }
 
 
+  /**
+   * @brief Gets the internal data for this WorkOrder.
+   * @return @b QStringList Returns the internal data object.
+   */
   QStringList WorkOrder::internalData() const {
     return m_internalData;
   }
 
 
   /**
-   * This method is designed to be implemented by children work orders. The order of execution for
+   * @description This method is designed to be implemented by children work orders.
+   * The order of execution for
    *     redo is:
    *   syncRedo() - GUI thread*
    *   asyncRedo() - Pooled thread
@@ -974,7 +1145,8 @@ namespace Isis {
 
 
   /**
-   * This method is designed to be implemented by children work orders. The order of execution for
+   * @description This method is designed to be implemented by children work orders.
+   * The order of execution for
    *     redo is:
    *   syncRedo() - GUI thread
    *   asyncRedo() - Pooled thread*
@@ -992,7 +1164,8 @@ namespace Isis {
 
 
   /**
-   * This method is designed to be implemented by children work orders. The order of execution for
+   * @description This method is designed to be implemented by children work orders.
+   * The order of execution for
    *     redo is:
    *   syncRedo() - GUI thread
    *   asyncRedo() - Pooled thread
@@ -1007,7 +1180,8 @@ namespace Isis {
 
 
   /**
-   * This method is designed to be implemented by children work orders. The order of execution for
+   * This method is designed to be implemented by children work orders.
+   * The order of execution for
    *     undo is:
    *   syncUndo() - GUI thread*
    *   asyncUndo() - Pooled thread
@@ -1023,7 +1197,7 @@ namespace Isis {
 
   /**
    * This method is designed to be implemented by children work orders. The order of execution for
-   *     undo is:
+   * undo is:
    *   syncUndo() - GUI thread
    *   asyncUndo() - Pooled thread*
    *   postSyncUndo() - GUI thread
@@ -1039,7 +1213,8 @@ namespace Isis {
 
 
   /**
-   * This method is designed to be implemented by children work orders. The order of execution for
+   * @description This method is designed to be implemented by children work orders.
+   * The order of execution for
    *     undo is:
    *   syncUndo() - GUI thread
    *   asyncUndo() - Pooled thread
@@ -1053,6 +1228,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @description  Runs a copy of the current WorkOrder and stores it in the project.
+   */
   void WorkOrder::addCloneToProject() {
     if (project()) {
       project()->addToProject(clone());
@@ -1060,6 +1238,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Determines if the WorkOrder is in a stable state, or if it's busy doing something.
+   * @return @b bool Returns True if the WorkOrder is in a stable state, and False if it is not.
+   */
   bool WorkOrder::isInStableState() const {
     bool result = true;
 
@@ -1071,6 +1253,11 @@ namespace Isis {
   }
 
 
+  /**
+   * @description Checks to see if we have lost any images in the ImageList.  If we have, then
+   * destroy the entire list.  This will send a signal that the list needs to be rebuilt if
+   * requested.
+   */
   void WorkOrder::listenForImageDestruction() {
     m_imageIds.clear();
     foreach (Image *image, *m_imageList) {
@@ -1086,6 +1273,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Resets the ProgressBar
+   */
   void WorkOrder::resetProgressBar() {
     delete m_progressBarDeletionTimer;
 
@@ -1107,6 +1297,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Sets the ProgressBar to display the final status of the operation.
+   */
   void WorkOrder::setProgressToFinalText() {
     if (m_progressBar) {
       if (isRedone()) {
@@ -1137,6 +1330,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Attempts to execute an action on the action action queue.
+   */
   void WorkOrder::attemptQueuedAction() {
     QueuedWorkOrderAction queued = m_queuedAction;
     m_queuedAction = NoQueuedAction;
@@ -1150,6 +1346,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Signals the Project that the WorkOrder is finished, deletes
+   * the update time for the Progress bar, and sets the finished status.
+   */
   void WorkOrder::asyncFinished() {
     delete m_progressBarUpdateTimer;
 
@@ -1178,11 +1378,17 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Clears the list of images.
+   */
   void WorkOrder::clearImageList() {
     delete m_imageList;
   }
 
 
+  /**
+   * @brief Deletes the progress bar.
+   */
   void WorkOrder::deleteProgress() {
     ProgressBar *progress = m_progressBar;
 
@@ -1194,6 +1400,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Updates the progress bar.
+   */
   void WorkOrder::updateProgress() {
     if (m_progressBar && (isRedoing() || isUndoing())) {
       m_progressBar->setRange(m_progressRangeMinValue, m_progressRangeMaxValue);
@@ -1202,36 +1411,60 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief WorkOrder::startRedo  This function is currently empty.
+   */
   void WorkOrder::startRedo() {
   }
 
 
   /**
-   * Declare that this work order is saving the project. This makes the work order not appear in
-   *   the undo stack (cannot undo/redo), and instead is marked as a 'clean' state of the project.
-   *   The QUndoCommand undo/redo will never be called. The default for createsCleanState is false.
-   *
-   * @param createsCleanState True if this work order is going to save the project to disk
+   * @description Declare that this work order is saving the project.
+   * This makes the work order not appear in the undo stack (cannot undo/redo), and instead is
+   * marked as a 'clean' state of the project. The QUndoCommand undo/redo will never be called.
+   * The default for createsCleanState is false.
+   * @param createsCleanState True if this work order is going to save the project to disk,
+   * False othersise.
    */
   void WorkOrder::setCreatesCleanState(bool createsCleanState) {
     m_createsCleanState = createsCleanState;
   }
 
 
+  /**
+   * @description.  By defualt, m_modifiesDiskState is False.  If a WorkOrder modifies the Project
+   * on disk as a result of it's action, this should be set to true.
+   * @param changesProjectOnDisk True if this WorkOrder modifies the Project on disk.  False
+   * if it does not.
+   */
   void WorkOrder::setModifiesDiskState(bool changesProjectOnDisk) {
     m_modifiesDiskState = changesProjectOnDisk;
   }
 
 
+  /**
+   * @brief Passes a pointer to a WorkOrder to the WorkOrder::XmlHandler class.
+   * @param workOrder.  A pointer to a WorkOrder.
+   */
   WorkOrder::XmlHandler::XmlHandler(WorkOrder *workOrder) {
     m_workOrder = workOrder;
   }
 
 
+
   /**
-   * Handle an XML start element. This expects <workOrder/> and <dataValue/> elements.
+   * @description The XML reader invokes this method at the start of every element in the
+   *        XML document.  This expects <workOrder/> and <dataValue/> elements.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
    *
-   * @return If we should continue reading the XML (usually true).
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   *
    */
   bool WorkOrder::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {

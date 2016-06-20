@@ -22,16 +22,17 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <QtDebug>
 
 #include <QObject>
 #include <QPointer>
 #include <QString>
+#include <QtDebug>
+
 
 #include "GuiCameraList.h"
 #include "ImageList.h"
-#include "TargetBodyList.h"
 #include "MosaicSceneWidget.h"
+#include "TargetBodyList.h"
 #include "WorkOrder.h"
 
 class QAction;
@@ -47,13 +48,12 @@ namespace Isis {
   class ControlNetEditor;
   class ControlPointEditWidget;
   class CubeDnView;
-  class HistoryTreeWidget;
-  class ImageFileListWidget;
   class Footprint2DView;
+  class HistoryTreeWidget;
+  class ImageFileListWidget; 
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
-  class ProjectTreeWidget;
   class ProjectItem;
   class ProjectItemModel;
   class ProjectItemTreeView;
@@ -92,6 +92,7 @@ namespace Isis {
    *                           supporting Qt's model-view framework.
    *   @history 2016-01-04 Jeffrey Covington - Added support for CubeDnView and
    *                           Footprint2DView, replacing old classes.
+   *   @history 2016-06-17 Tyler Wilson - Added documentation for member functions/variables.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -113,7 +114,7 @@ namespace Isis {
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
       ImageFileListWidget *addImageFileListView();
       void addControlPointEditor(ControlNet *cnet, QString cnetFilename);
-      QWidget *projectTreeWidget();
+
 
       ProjectItemTreeView *addProjectItemTreeView();
 
@@ -143,6 +144,13 @@ namespace Isis {
       ControlPointEditWidget *controlPointEditorView();
       ControlNetEditor *controlNetEditor();
 
+
+
+      /**
+       * @brief Returns a list of supported actions for a WorkOrder
+       * @param data The WorkOrder type we are using.
+       * @return @b QList<QAction *> A list of supported actions.
+       */
       template <typename DataType>
       QList<QAction *> supportedActions(DataType data) {
         QList<QAction *> results;
@@ -173,9 +181,15 @@ namespace Isis {
 
       void showWarning(QString text);
 
+
+      /**
+       * @brief Shows warning text for a Widget.
+       * @param text The warning text.
+       * @param Data The Widget object we are passing the warning to.
+       */
       template <typename Data>
       void showWarning(QString text, Data data) {
-//        m_warningTreeWidget->showWarning(text, data);
+        //m_warningTreeWidget->showWarning(text, data);
       }
 
       QWidget *warningWidget();
@@ -198,9 +212,7 @@ namespace Isis {
       void cleanupMatrixViewWidgets();
       void cleanupSensorInfoWidgets();
       void cleanupTargetInfoWidgets();
-      void imagesAddedToProject(ImageList *images);
-      void targetsAddedToProject(TargetBodyList *targets);
-      void guiCamerasAddedToProject(GuiCameraList *guiCameras);
+      //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
       void updateRecentProjects(Project *project);
@@ -222,7 +234,7 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          Directory *m_directory;
+          Directory *m_directory;  //!< Pointer to a Directory which is set by the XmlHandler class.
       };
 
     private:
@@ -230,12 +242,12 @@ namespace Isis {
       Directory &operator=(const Directory &rhs);
 
       /**
-       * Create a work order, append it to m_workOrders, and return it.
+       * @description Create a work order, append it to m_workOrders, and return it.
        *
        * Example:
        *   createWorkOrder<ImageFileListViewWorkOrder>();
        *   This will create a new ImageFileListViewWorkOrder and append it to m_workOrders.
-       *
+       * @return @b A pointer to the WorkOrder created by this function.
        */
       template <typename WorkOrderType>
       WorkOrderType *createWorkOrder() {
@@ -249,56 +261,57 @@ namespace Isis {
 
       void initializeActions(); 
       
-      QPointer<ProjectItemModel> m_projectItemModel;
+      QPointer<ProjectItemModel> m_projectItemModel; //!< Pointer to the ProjectItemModel.
 
-      QPointer<ProjectTreeWidget> m_projectTreeWidget;
-      QPointer<HistoryTreeWidget> m_historyTreeWidget;
-      QPointer<Project> m_project;
-      QPointer<WarningTreeWidget> m_warningTreeWidget;
 
-      QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;
-      QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;
-      QList< QPointer<ImageFileListWidget> > m_fileListWidgets;
-      QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets;
-      QPointer<ControlPointEditWidget> m_controlPointEditWidget;
-      QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets;
-      QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets;
-      QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets;
+      QPointer<HistoryTreeWidget> m_historyTreeWidget;  //!< Pointer to the HistoryTreeWidget.
+      QPointer<Project> m_project;                      //!< Pointer to the Project.
+      QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
 
-      QList< QPointer<WorkOrder> > m_workOrders;
+      QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;  //!< List of CnetEditorWidgets
+      QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
+      QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
+      QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
+      QPointer<ControlPointEditWidget> m_controlPointEditWidget; //!< Pointer to a
+                                                                 //!< ControlPointEditWidget.
+
+      QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
+      QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets; //!< List of SensorInfoWidgets
+      QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets
+
+      QList< QPointer<WorkOrder> > m_workOrders; //!< List of WorkOrders
       
-      QStringList m_recentProjects;
+      QStringList m_recentProjects;  //!< List of the names of recent projects
 
       // We only need to store the work orders that go into menus uniquely... all work orders
       //   (including these) should be stored in m_workOrders
-      QPointer<WorkOrder> m_exportControlNetWorkOrder;
-      QPointer<WorkOrder> m_exportImagesWorkOrder;
-      QPointer<WorkOrder> m_importControlNetWorkOrder;
-      QPointer<WorkOrder> m_importImagesWorkOrder;
-      QPointer<WorkOrder> m_openProjectWorkOrder;
-      QPointer<WorkOrder> m_saveProjectWorkOrder;
-      QPointer<WorkOrder> m_saveProjectAsWorkOrder;
-      QPointer<WorkOrder> m_openRecentProjectWorkOrder;
-      QPointer<WorkOrder> m_closeProjectWorkOrder;
+      QPointer<WorkOrder> m_exportControlNetWorkOrder;  //!< The export ControlNetwork WorkOrder.
+      QPointer<WorkOrder> m_exportImagesWorkOrder; //!< The export images WorkOrder.
+      QPointer<WorkOrder> m_importControlNetWorkOrder; //!< The import ControlNetwork WorkOrder.
+      QPointer<WorkOrder> m_importImagesWorkOrder; //!< The import images WorkOrder.
+      QPointer<WorkOrder> m_openProjectWorkOrder; //!< The Open Project WorkOrder.
+      QPointer<WorkOrder> m_saveProjectWorkOrder; //!< The Save Project WorkOrder.
+      QPointer<WorkOrder> m_saveProjectAsWorkOrder; //!< The Save Project As WorkOrder.
+      QPointer<WorkOrder> m_openRecentProjectWorkOrder; //!< The Open Recent Project WorkOrder.
+      QPointer<WorkOrder> m_closeProjectWorkOrder; //!< The Close Project WorkOrder
 
-      QPointer<WorkOrder> m_runJigsawWorkOrder;
-      QPointer<WorkOrder> m_renameProjectWorkOrder;
+      QPointer<WorkOrder> m_runJigsawWorkOrder; //!< The Run Jigsaw WorkOrder
+      QPointer<WorkOrder> m_renameProjectWorkOrder; //!< The Rename Project WorkOrder
 
 
-      ////////// TODO: This is test code. It will be deleted.
-//    void testControlNetEditor();
-      QPointer<ControlNetEditor> m_cnetEditor;
 
-      QList<QAction *> m_fileMenuActions;
-      QList<QAction *> m_projectMenuActions;
-      QList<QAction *> m_editMenuActions;
-      QList<QAction *> m_viewMenuActions;
-      QList<QAction *> m_settingsMenuActions;
-      QList<QAction *> m_helpMenuActions;
+      QPointer<ControlNetEditor> m_cnetEditor;  //!< Pointer to the ControlNetEditor
 
-      QList<QAction *> m_permToolBarActions;
-      QList<QAction *> m_activeToolBarActions;
-      QList<QAction *> m_toolPadActions;
+      QList<QAction *> m_fileMenuActions;  //!< List of file menu actions.
+      QList<QAction *> m_projectMenuActions; //!< List of project menu actions.
+      QList<QAction *> m_editMenuActions; //!< List of edit menu actions.
+      QList<QAction *> m_viewMenuActions; //!< List of view menu actions.
+      QList<QAction *> m_settingsMenuActions; //!< List of menu settings actions
+      QList<QAction *> m_helpMenuActions; //!< List of help menu actions
+
+      QList<QAction *> m_permToolBarActions; //!< List of perm ToolBar actions
+      QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
+      QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
   };
 }
 

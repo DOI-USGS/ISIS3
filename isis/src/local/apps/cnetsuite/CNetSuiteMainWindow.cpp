@@ -36,7 +36,7 @@
 #include "Project.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemTreeView.h"
-#include "ProjectTreeWidget.h"
+//#include "ProjectTreeWidget.h"
 #include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
 
