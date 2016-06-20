@@ -56,6 +56,7 @@ namespace Isis {
    *           SetVicarFile's buf
    *  @history 2011-01-27 Jai Rideout - Fixed to handle VICAR files that
    *           have end labels
+   *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *
    */
 

@@ -147,6 +147,7 @@ namespace Isis {
    *                                           functions to ensure successful 
    *                                           inheritance between Process and its
    *                                           child classes.  Fixes #2215.
+   *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    */
   class Process {
     protected:

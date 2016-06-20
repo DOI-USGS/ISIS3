@@ -544,7 +544,8 @@ namespace Isis {
         }
         else if ((ocube->pixelType() != Real) &&
                 (ocube->pixelType() != UnsignedByte) &&
-                (ocube->pixelType() != SignedWord)) {
+                (ocube->pixelType() != SignedWord) &&
+                (ocube->pixelType() != UnsignedWord)) {
           QString msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);

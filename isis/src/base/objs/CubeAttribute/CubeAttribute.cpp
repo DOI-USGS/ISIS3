@@ -385,6 +385,9 @@ namespace Isis {
       else if(pixelTypeAtt == "16BIT" || pixelTypeAtt == "16-BIT" || pixelTypeAtt == "SIGNEDWORD") {
         result = SignedWord;
       }
+      else if(pixelTypeAtt == "16UBIT" || pixelTypeAtt == "16-UBIT" || pixelTypeAtt == "UNSIGNEDWORD") {
+        result = UnsignedWord;
+      }
       else if(pixelTypeAtt == "32BIT" || pixelTypeAtt == "32-BIT" || pixelTypeAtt == "REAL") {
         result = Real;
       }
@@ -437,7 +440,7 @@ namespace Isis {
 
 
   bool CubeAttributeOutput::isPixelType(QString attribute) const {
-    return QRegExp("(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|REAL)").exactMatch(attribute);
+    return QRegExp("(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|UNSIGNEDWORD|REAL)").exactMatch(attribute);
   }
 
 

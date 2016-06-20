@@ -1251,8 +1251,7 @@ namespace Isis {
       if ((p_base.size() > 1) || (p_mult.size() > 1)) {
         att.setPixelType(Isis::Real);
       }
-      else if (p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::Double ||
-               p_pixelType == Isis::SignedInteger) {
+      else if (p_pixelType == Isis::Double || p_pixelType == Isis::SignedInteger) {
         att.setPixelType(Isis::Real);
       }
       else {

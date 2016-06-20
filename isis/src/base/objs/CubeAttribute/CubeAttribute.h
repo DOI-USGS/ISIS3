@@ -129,6 +129,7 @@ namespace Isis {
    *                           code duplication. Updated to match current coding standards.
    *                           Added safety check capabilities for unrecognized attributes.
    *                           References #961.
+   *   @history 2016-04-21 Makayla Shepherd - Added cases for UnsignedWord pixel type
    */
   template<typename ChildClass> class CubeAttribute {
     public:

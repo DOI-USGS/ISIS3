@@ -72,6 +72,7 @@ namespace Isis {
    *                        set the bin range as well as the statistical range 
    *                        for the data.  The function Histogram::SetBinRange
    *                        has been removed from this class.  
+   *   @history 2016-04-20 Makayla Shepherd - Added UnsignedWord pixel type handling.
    */
   
   class Histogram : public Statistics {

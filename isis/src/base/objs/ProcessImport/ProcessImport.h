@@ -148,6 +148,7 @@ namespace Isis {
    *                           band data from NIMS cubes. References #2368.
    *   @history 2016-04-20 Jeannie Backer - Merged Janet Barret's changes to handle SignedInteger
    *                           imports. Brought code closer to coding standards.
+   *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *
    *
    */
