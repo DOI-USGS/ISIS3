@@ -34,6 +34,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Adapted from Mosaic2DViewWorkOrder.
+   *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
    */
   class MatrixViewWorkOrder : public WorkOrder {
       Q_OBJECT

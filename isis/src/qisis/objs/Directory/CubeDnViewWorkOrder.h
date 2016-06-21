@@ -32,6 +32,9 @@ namespace Isis {
    * @author 2012-09-19 Steven Lambright
    *
    * @internal
+   *   @history 2016-01-13 Jeffrey Covington - Redesigned CNetSuiteMainWindow. Added CubeDNView
+   *                          and Footprint2DView.
+   *   @history 2016-06-06 Makayla Shepherd - Update documentation. Fixes #3993.
    */
   class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT

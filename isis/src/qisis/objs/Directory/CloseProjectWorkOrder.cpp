@@ -31,6 +31,12 @@
 
 namespace Isis {
 
+  /**
+   * This method sets the text of the work order to Close Project and 
+   * sets setCreatesCleanState to true
+   * 
+   * @param project The Project that we are going to open
+   */
   CloseProjectWorkOrder::CloseProjectWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Close Project"));
@@ -38,36 +44,52 @@ namespace Isis {
     setCreatesCleanState(true);
   }
 
-
+  /**
+   * As of 06/06/2016 this method is not implemented.
+   */
   CloseProjectWorkOrder::CloseProjectWorkOrder(const CloseProjectWorkOrder &other) :
       WorkOrder(other) {
   }
 
-
+  /**
+   * Destructor
+   */
   CloseProjectWorkOrder::~CloseProjectWorkOrder() {
 
   }
 
-
+  /**
+   * This method clones the CloseProjectWorkOrder
+   * 
+   * @return @b CloseProjectWorkOrder Returns a clone of the CloseProjectWorkOrder
+   */
   CloseProjectWorkOrder *CloseProjectWorkOrder::clone() const {
     return new CloseProjectWorkOrder(*this);
   }
 
-
+  /**
+   * This method will always return true
+   * 
+   * @return @b bool True always
+   */
   bool CloseProjectWorkOrder::isExecutable() {
 //  return (project());
     return true;
   }
 
-
+  /**
+   * If WorkOrder::execute() returns true, then this method returns true.
+   * 
+   * @return @b bool True if WorkOrder::execute() returns true.
+   */
   bool CloseProjectWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
 //    // If more than this work order is in the history, don't allow this operation
 //    if (success && project()->workOrderHistory().count()) {
 //      QMessageBox::critical(NULL, tr("Unable To Open a Project"),
-//                            tr("If you have modified your current project, you cannot open a new "
-//                               "project because this is not yet implemented"));
+//                            tr("If you have modified your current project, you cannot open a new"
+//                               " project because this is not yet implemented"));
 //      success = false;
 //    }
 //    else if (success) {

@@ -35,22 +35,38 @@
 
 namespace Isis {
 
+  /**
+   * This method sets the text of the work order.
+   * 
+   * @param project The Project that we are going to find the correlation matrix of.
+   * 
+   */
   MatrixViewWorkOrder::MatrixViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText( tr("View Correlation &Matrix...") );
   }
 
-
+  /**
+   * This method is for debugging.
+   * 
+   *  @param other The MatrixViewWorkOrder being debugged.
+   */
   MatrixViewWorkOrder::MatrixViewWorkOrder(const MatrixViewWorkOrder &other) :
       WorkOrder(other) {
         qDebug() << "matrix good?";
   }
 
-
+  /**
+   * Destructor
+   */
   MatrixViewWorkOrder::~MatrixViewWorkOrder() {
   }
 
-
+  /**
+   * This method clones the MatrixViewWorkOrder
+   * 
+   * @return @b MatrixViewWorkOrder Returns a clone of the MatrixViewWorkOrder
+   */
   MatrixViewWorkOrder *MatrixViewWorkOrder::clone() const {
     return new MatrixViewWorkOrder(*this);
   }
@@ -61,8 +77,8 @@ namespace Isis {
    *
    * @param matrix The correlation matrix that we want to view.
    *
-   * @return bool True if data (passed to this method as the matrix parameter by supportedActions)
-   *         is of type CorrelationMatrix.
+   * @return @b bool True if data (passed to this method as the matrix parameter by 
+   *                 supportedActions) is of type CorrelationMatrix.
    */
   bool MatrixViewWorkOrder::isExecutable(CorrelationMatrix *matrix) {
     return matrix->isValid();
@@ -70,9 +86,9 @@ namespace Isis {
 
 
   /**
-   * This will create open the MatrixSceneWidgets QGraphicsView
+   * If WorkOrder::execute() returns true, a new matrix view is created.
    *
-   *
+   * @return @b bool True if WorkOrder::execute() returns true.
    */
   bool MatrixViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
@@ -130,14 +146,23 @@ namespace Isis {
   }
 
   
-
+  /**
+   * This method returns true if other depends on a MatrixViewWorkOrder
+   * 
+   * @param other we want to check for dependancies
+   * 
+   * @return @b bool True if WorkOrder depends on a MatrixViewWorkOrder 
+   * 
+   */
   bool MatrixViewWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<MatrixViewWorkOrder *>(other);
   }
   
 
-
+  /**
+   * This method computes and displays the correlation matrix.
+   */
   void MatrixViewWorkOrder::syncRedo() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
     CorrelationMatrix corrMat = correlationMatrix();
@@ -156,7 +181,9 @@ namespace Isis {
   }
 
   
-
+  /**
+   * This method deletes the last matrix viewed
+   */
   void MatrixViewWorkOrder::syncUndo() {
     if (internalData()[1] == "new view") {
       delete project()->directory()->matrixViews().last();

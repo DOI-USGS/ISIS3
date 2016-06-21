@@ -31,6 +31,9 @@ namespace Isis {
    * @author 2014-04-03 Ken Edmundson
    *
    * @internal
+   *   @history 2014-06-04 Jeannie Backer - Fixed JigsawWorkOrder error.
+   *   @history 2015-09-05 Ken Edmundson - Added preliminary target body functionality to IPCE.
+   *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT

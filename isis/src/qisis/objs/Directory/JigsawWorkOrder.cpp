@@ -36,32 +36,55 @@
 
 namespace Isis {
 
+  /**
+   * This method sets the text of the work order.
+   * 
+   * @param project The Project that we are going to Bundle Adjust
+   * 
+   */
   JigsawWorkOrder::JigsawWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Bundle Adjustment..."));
     QUndoCommand::setText("&Bundle Adjustment...");
   }
 
-
+  /**
+   * As of 06/06/2016 this method is not implemented.
+   */
   JigsawWorkOrder::JigsawWorkOrder(const JigsawWorkOrder &other) :
       WorkOrder(other) {
   }
 
-
+  /**
+   * Destructor
+   */
   JigsawWorkOrder::~JigsawWorkOrder() {
   }
 
-
+  /**
+   * This method clones the JigsawViewWorkOrder
+   * 
+   * @return @b JigsawWorkOrder Returns a clone of the JigsawWorkOrder
+   */
   JigsawWorkOrder *JigsawWorkOrder::clone() const {
     return new JigsawWorkOrder(*this);
   }
 
-
+  /**
+   * This check is used by Directory::supportedActions(DataType data).
+   *
+   * @return @b bool True if the number of project controls and the number of project images
+   *         is greater than 0.
+   */
   bool JigsawWorkOrder::isExecutable() {
     return (project()->controls().size() > 0 && project()->images().size() > 0);
   }
 
-
+  /**
+   * If WorkOrder::execute() returns true, this method creates a JigsawDialog.
+   * 
+   * @return @b bool True if WorkOrder::execute() returns true.
+   */
   bool JigsawWorkOrder::execute() {
     bool success = WorkOrder::execute();
 /*
@@ -88,13 +111,23 @@ namespace Isis {
     return success;
   }
 
-
+  /**
+  * This method returns true if other depends on a JigsawViewWorkOrder
+  * 
+  * @param order the WorkOrder we want to check for dependancies
+  * 
+  * @return @b bool True if WorkOrder depends on a JigsawViewWorkOrder
+  * 
+  */
   bool JigsawWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<JigsawWorkOrder *>(other);
   }
 
-
+  /**
+   * As of 06/06/2016 this method is not implemented as the contents are commented out.
+   * 
+   */
   void JigsawWorkOrder::syncRedo() {
 //    TargetInfoWidget *targetInfoWidget =
 //        project()->directory()->addTargetInfoView(targetBody());
@@ -106,7 +139,10 @@ namespace Isis {
 //    }
   }
 
-
+  /**
+   * As of 06/06/2016 this method is not implemented as the contents are commented out.
+   * 
+   */
   void JigsawWorkOrder::syncUndo() {
     //delete project()->directory()->cnetEditorViews().last();
   }
