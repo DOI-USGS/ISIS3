@@ -2,9 +2,9 @@
 #define GuiCameraList_H
 
 #include <QDebug>
-#include <QObject>
 #include <QList>
 #include <QMetaType>
+#include <QObject>
 
 #include "GuiCamera.h"
 #include "GuiCameraDisplayProperties.h"
@@ -20,10 +20,17 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
+   * List of GuiCameras saved as QSharedPointers.  Overrides many QList methods in order to
+   * emit signals about that status of the list.
+   * 
+   * @brief List of GuiCameras.
+   * 
    * @author 2015-06-11 Ken Edmundson
    *
    * @internal 
-   * @history 2015-06-11 Ken Edmundson - original version
+   *   @history 2015-06-11 Ken Edmundson - original version
+   *   @history 2016-06-15 Jesse Mapel - Added documentation in preparation for merge from IPCE
+   *                           to ISIS.  Fixes #4005.
    */
   class GuiCameraList : public QObject, public QList<GuiCameraQsp> {
     Q_OBJECT
@@ -91,10 +98,18 @@ namespace Isis {
 
 
     signals:
+      /**
+       * Emitted when the number of GuiCameras in the list changes.
+       * Not currently connected to anything.
+       */
       void countChanged(int newCount);
 
     private:
       /**
+       * XmlHandler used to save to xml files.
+       * 
+       * JAM - The save() method that uses this is currently not implemented.
+       * 
        * @author 2012-07-01 Steven Lambright
        *
        * @internal
@@ -120,6 +135,9 @@ namespace Isis {
        * This functor is used for copying the GuiCamera objects between two projects quickly. This is designed
        *   to work with QtConcurrentMap, though the results are all NULL (QtConcurrentMap is much
        *   faster than many QtConcurrentRun calls).
+       * 
+       * JAM - This appears to have been copied from TargetBodyList.  Is this functionality needed?
+       *           Is this going to be implemented at a later date?
        *
        * @author 2015-06-11 Ken Edmundson (after Steven Lambright)
        *
@@ -180,7 +198,7 @@ namespace Isis {
 //      QStringList saveAndToggleShowOutline();
 
     private:
-      QString m_name;
+      QString m_name; //!< The disply name of the GuiCameraList.  Not used by anonymous lists.
 
       /**
        * This stores the directory name that contains the GuiCamera objects in this list.

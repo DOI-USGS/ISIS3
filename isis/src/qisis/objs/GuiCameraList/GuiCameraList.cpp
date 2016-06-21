@@ -34,10 +34,10 @@
 #include <QXmlStreamWriter>
 
 #include "FileName.h"
+#include "GuiCamera.h"
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "GuiCamera.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -124,15 +124,23 @@ namespace Isis {
 
 
   /**
+   * Appends a single GuiCamera to the list.
+   * 
+   * @param value The GuiCamera to be appened
+   * 
    * @see QList<GuiCameraQsp>::append()
    */
-  void GuiCameraList::append(GuiCameraQsp const & value) {
+  void GuiCameraList::append(GuiCameraQsp const &value) {
     QList<GuiCameraQsp>::append(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Appends another GuiCameraList to the list.
+   * 
+   * @param value The GuiCameraList to be appened
+   * 
    * @see QList<GuiCameraQsp>::append()
    */
   void GuiCameraList::append(const QList<GuiCameraQsp> &value) {
@@ -142,6 +150,8 @@ namespace Isis {
 
 
   /**
+   * Clears the list.
+   * 
    * @see QList<GuiCameraQsp>::clear()
    */
   void GuiCameraList::clear() {
@@ -154,6 +164,13 @@ namespace Isis {
 
 
   /**
+   * Removes the GuiCamera associated with an iterator.
+   * Returns an iterator associated with the next GuiCamera in the list.
+   * 
+   * @param pos An iterator associated with the GuiCamera to be erased
+   * 
+   * @return @b QList<GuiCameraQsq>::iteraror Iterator associated with the next GuiCamera
+   * 
    * @see QList<GuiCameraQsp>::erase()
    */
   QList<GuiCameraQsp>::iterator GuiCameraList::erase(iterator pos) {
@@ -164,6 +181,15 @@ namespace Isis {
 
 
   /**
+   * Removes all GuiCameras from begin up to, but not inclusing end.
+   * Returns an iterator associated with GuiCamera that was associated with end.
+   * 
+   * @param begin An iterator associated with the first GuiCamera to be removed
+   * @param end An iterator associated with the GuiCamera after the last GuiCamera to be removed
+   * 
+   * @return @b QList<GuiCameraQsp>::iteraror Iterator associated with the GuiCamera that was
+   *                                              associated with end.
+   * 
    * @see QList<GuiCameraQsp>::erase()
    */
   QList<GuiCameraQsp>::iterator GuiCameraList::erase(iterator begin, iterator end) {
@@ -174,9 +200,14 @@ namespace Isis {
 
 
   /**
+   * Inserts a GuiCamera into the list at a given index.
+   * 
+   * @param i The index the GuiCamera will be inserted at
+   * @param value The GuiCamera to be inserted
+   * 
    * @see QList<GuiCameraQsp>::insert()
    */
-  void GuiCameraList::insert(int i, GuiCameraQsp const & value) {
+  void GuiCameraList::insert(int i, GuiCameraQsp const &value) {
     QList<GuiCameraQsp>::insert(i, value);
 
     emit countChanged(count());
@@ -184,6 +215,14 @@ namespace Isis {
 
 
   /**
+   * Inserts a GuiCamera in front of the GuiCamera associated with an iterator.
+   * Returns an iterator associated with the inserted GuiCamera.
+   * 
+   * @param before An iterator associated with the GuiCamera that value will be inserted in front of
+   * @param value The GuiCamera to be inserted.
+   * 
+   * @return @b QList<GuiCameraQsp>::iterator Iterator associated with the inserted GuiCamera
+   * 
    * @see QList<GuiCameraQsp>::insert()
    */
   QList<GuiCameraQsp>::iterator GuiCameraList::insert(iterator before, GuiCameraQsp const & value) {
@@ -194,36 +233,57 @@ namespace Isis {
 
 
   /**
+   * Inserts a GuiCamera at the beginning of the list.
+   * 
+   * @param value The GuiCamera to be inserted.
+   * 
    * @see QList<GuiCameraQsp>::prepend()
    */
-  void GuiCameraList::prepend(GuiCameraQsp const & value) {
+  void GuiCameraList::prepend(GuiCameraQsp const &value) {
     QList<GuiCameraQsp>::prepend(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Inserts a GuiCamera at the end of the list.
+   * Equivalent to append.
+   * 
+   * @param value The GuiCamera to be inserted.
+   * 
    * @see QList<GuiCameraQsp>::push_back()
    */
-  void GuiCameraList::push_back(GuiCameraQsp const & value) {
+  void GuiCameraList::push_back(GuiCameraQsp const &value) {
     QList<GuiCameraQsp>::push_back(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Inserts a GuiCamera at the front of the list.
+   * Equivalent to prepend.
+   * 
+   * @param value The GuiCamera to be inserted.
+   * 
    * @see QList<GuiCameraQsp>::push_front()
    */
-  void GuiCameraList::push_front(GuiCameraQsp const & value) {
+  void GuiCameraList::push_front(GuiCameraQsp const &value) {
     QList<GuiCameraQsp>::push_front(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Removes all occurances of a GuiCamera from the list.
+   * Returns the number removed.
+   * 
+   * @param value The GuiCamera to be removed
+   * 
+   * @return @b int The number of GuiCameras removed
+   * 
    * @see QList<GuiCameraQsp>::removeAll()
    */
-  int GuiCameraList::removeAll(GuiCameraQsp const & value) {
+  int GuiCameraList::removeAll(GuiCameraQsp const &value) {
     int result = QList<GuiCameraQsp>::removeAll(value);
 
     if (result != 0) {
@@ -235,6 +295,10 @@ namespace Isis {
 
 
   /**
+   * Removes the GuiCamera at a specific index.
+   * 
+   * @param i The index of the GuiCamera to be removed
+   * 
    * @see QList<GuiCameraQsp>::removeAt()
    */
   void GuiCameraList::removeAt(int i) {
@@ -244,6 +308,8 @@ namespace Isis {
 
 
   /**
+   * Removes the first GuiCamera in the list.
+   * 
    * @see QList<GuiCameraQsp>::removeFirst()
    */
   void GuiCameraList::removeFirst() {
@@ -253,6 +319,8 @@ namespace Isis {
 
 
   /**
+   * Removes the last GuiCamera in the list.
+   * 
    * @see QList<GuiCameraQsp>::removeLast()
    */
   void GuiCameraList::removeLast() {
@@ -262,9 +330,16 @@ namespace Isis {
 
 
   /**
+   * Removes the first occurance of a GuiCamera from the list.
+   * Returns whether or not it succeeded.
+   * 
+   * @param value The GuiCamera to be removed
+   * 
+   * @return @b bool True if successful
+   * 
    * @see QList<GuiCameraQsp>::removeOne()
    */
-  bool GuiCameraList::removeOne(GuiCameraQsp const & value) {
+  bool GuiCameraList::removeOne(GuiCameraQsp const &value) {
     bool result = QList<GuiCameraQsp>::removeOne(value);
 
     if (result) {
@@ -276,6 +351,10 @@ namespace Isis {
 
 
   /**
+   * Swaps the list with another GuiCameraList.
+   * 
+   * @param other The GuiCameraList to swap with
+   * 
    * @see QList<GuiCameraQsp>::swap()
    */
   void GuiCameraList::swap(QList<GuiCameraQsp> &other) {
@@ -288,6 +367,12 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the GuiCamera at a specific index.
+   * 
+   * @param i The index of GuiCamera to be removed
+   * 
+   * @return @b QuiCameraQsp The GuiCamera removed
+   * 
    * @see QList<GuiCameraQsp>::takeAt()
    */
   GuiCameraQsp GuiCameraList::takeAt(int i) {
@@ -298,6 +383,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the first GuiCamera in the list.
+   * 
+   * @return @b GuiCameraQsp The GuiCamera removed
+   * 
    * @see QList<GuiCameraQsp>::takeFirst()
    */
   GuiCameraQsp GuiCameraList::takeFirst() {
@@ -308,6 +397,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the last GuiCamera in the list.
+   * 
+   * @return @b GuiCameraQsp The GuiCamera removed
+   * 
    * @see QList<GuiCameraQsp>::takeLast()
    */
   GuiCameraQsp GuiCameraList::takeLast() {
@@ -318,6 +411,12 @@ namespace Isis {
 
 
   /**
+   * Appends another GuiCameraList to the list and returns a reference to this.
+   * 
+   * @param other The GuiCameraList to be appended
+   * 
+   * @return @b QuiCameraList & A reference to this
+   * 
    * @see QList<GuiCameraQsp>::operator+=()
    */
   GuiCameraList &GuiCameraList::operator+=(const QList<GuiCameraQsp> &other) {
@@ -332,6 +431,12 @@ namespace Isis {
 
 
   /**
+   * Appends a GuiCamera to the list and returns a reference to this.
+   * 
+   * @param other The GuiCamera to be appended
+   * 
+   * @return @b GuiCameraList & A reference to this
+   * 
    * @see QList<GuiCameraQsp>::operator+=()
    */
   GuiCameraList &GuiCameraList::operator+=(GuiCameraQsp const &other) {
@@ -342,6 +447,12 @@ namespace Isis {
 
 
   /**
+   * Appends another GuiVameraList to the list and returns a reference to this.
+   * 
+   * @param other The GuiCameraList to be appened
+   * 
+   * @return @b GuiCameraList & A reference to this
+   * 
    * @see QList<GuiCameraQsp>::operator<<()
    */
   GuiCameraList &GuiCameraList::operator<<(const QList<GuiCameraQsp> &other) {
@@ -356,6 +467,12 @@ namespace Isis {
 
 
   /**
+   * Appends a GuiCamera to the list and returns a reference to this.
+   * 
+   * @param other The GuiCamera to be appended
+   * 
+   * @return @b GuiCameraList & A reference to this
+   * 
    * @see QList<GuiCameraQsp>::operator<<()
    */
   GuiCameraList &GuiCameraList::operator<<(GuiCameraQsp const &other) {
@@ -366,6 +483,13 @@ namespace Isis {
 
 
   /**
+   * Assigns a list of GuiCameras to the list.
+   * Does not modify m_name or m_path.
+   * 
+   * @param rhs the list being assigned from
+   * 
+   * @returns @b GuiCameraList & A reference to this
+   * 
    * @see QList<GuiCameraQsp>::operator=()
    */
   GuiCameraList &GuiCameraList::operator=(const QList<GuiCameraQsp> &rhs) {
@@ -384,7 +508,8 @@ namespace Isis {
    * Assignment operator
    *
    * @param rhs The right hand side of the '=' operator
-   * @return *this
+   * 
+   * @return @b GuiCameraList & A reference to this
    */
   GuiCameraList &GuiCameraList::operator=(const GuiCameraList &rhs) {
     bool countChanging = (rhs.count() != count());
@@ -553,7 +678,7 @@ namespace Isis {
    * Set the relative path (from the project root) to this gui camera list's folder. This is really
    *  only useful for project gui camera lists (not anonymous temporary ones).
    *
-   * @param newPath The path to the gui camera objects in this gui cameray list
+   * @param newPath The path to the gui camera objects in this gui camera list
    */
   void GuiCameraList::setPath(QString newPath) {
     m_path = newPath;
@@ -563,7 +688,7 @@ namespace Isis {
   /**
    * Get the human-readable name of this gui cameray list
    *
-   * @return The name of the gui camera list (or an empty string if anonymous).
+   * @return @b QString The name of the gui camera list (or an empty string if anonymous).
    */
   QString GuiCameraList::name() const {
     return m_name;
@@ -574,7 +699,7 @@ namespace Isis {
    * Get the path to these gui camera objects in the list (relative to project root). This only
    *  applies to a gui camera list from the project.
    *
-   * @return The path to the gui camera objects in the list (or an empty string if unknown).
+   * @return @b Qstring The path to the gui camera objects in the list (or an empty string if unknown).
    */
   QString GuiCameraList::path() const {
     return m_path;
@@ -600,6 +725,7 @@ namespace Isis {
 
   /**
    * Convert this gui camera list into XML format for saving/restoring capabilities.
+   * Not currently implemented
    *
    * This writes:
    * <pre>
@@ -759,11 +885,16 @@ namespace Isis {
   /**
    * Handle an XML start element. This expects <GuiCameraList/> and <target/> elements (it reads both
    *   the project XML and the targets.xml file).
+   * 
+   * @param namespaceURI ???
+   * @param localName The name of the element the XmlHandler is at
+   * @param qName ???
+   * @param atts The attributes of the element the XmlHanler is at
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
    */
   bool GuiCameraList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
+                                               const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "GuiCameraList") {
         QString name = atts.value("name");
@@ -790,11 +921,18 @@ namespace Isis {
   /**
    * Handle an XML end element. This handles <GuiCameraList /> by opening and reading the images.xml
    *   file.
+   * 
+   * @param namespaceURI ???
+   * @param localName The name of the element the XmlHandler is at
+   * @param qName ???
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
+   * 
+   * @throws IException::Io "Unable to open with read access"
+   * @throws IException::Io "Failed to open target body list XML"
    */
   bool GuiCameraList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName) {
+                                             const QString &qName) {
     if (localName == "GuiCameraList") {
       XmlHandler handler(m_GuiCameraList, m_project);
 
