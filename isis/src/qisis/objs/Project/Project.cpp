@@ -657,6 +657,24 @@ namespace Isis {
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
+  
+  /**
+   * Appends the root directory name 'targets' to the project .
+   *
+   * @return The path to the root directory of the target body data.
+   */
+  QString Project::targetBodyRoot(QString projectRoot) {
+    return projectRoot + "/targets";
+  }
+  
+  /**
+   * Accessor for the root directory of the target body data.
+   *
+   * @return The path to the root directory of the target body data.
+   */
+  QString Project::targetBodyRoot() const {
+    return targetBodyRoot( m_projectRoot->path() );
+  }
 
 
   WorkOrder *Project::lastNotUndoneWorkOrder() {

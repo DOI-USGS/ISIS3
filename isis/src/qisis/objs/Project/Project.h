@@ -95,6 +95,8 @@ namespace Isis {
       Image *image(QString id);
       ImageList *imageList(QString name);
       bool isTemporaryProject() const;
+      static QString targetBodyRoot(QString projectRoot);
+      QString targetBodyRoot() const;
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
