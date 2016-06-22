@@ -131,6 +131,7 @@ namespace Isis {
        *  @history 2016-06-08 Tyler Wilson - Added documentation to many of the
        *                           member functions, and cleaned up the formatting.
        *                           Fixes #3997.
+       *  @internal 
        *
        */
       class XmlHandler : public XmlStackedHandler {
