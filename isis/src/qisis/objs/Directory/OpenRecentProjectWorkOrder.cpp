@@ -31,43 +31,68 @@
 
 namespace Isis {
 
+/**
+ * @brief Constructor which creates a WorkOrder that will open a recent project.
+ * @param project The Project that this work order should be interacting with
+ *
+ */
   OpenRecentProjectWorkOrder::OpenRecentProjectWorkOrder(Project *project) :
-      WorkOrder(project) {
-    QAction::setText(tr("Open &Recent Project"));
-
+  WorkOrder(project) {
+    QAction::setText(tr("Open &Recent Project") );
     setCreatesCleanState(true);
   }
 
 
+  /**
+   * @brief Copies the OpenRecentProjectWorkOrder 'other' into this new instance.
+   * @param other The WorkOrder being copied.
+   *
+   */
   OpenRecentProjectWorkOrder::OpenRecentProjectWorkOrder(const OpenRecentProjectWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * @brief The Destructor.
+   */
   OpenRecentProjectWorkOrder::~OpenRecentProjectWorkOrder() {
 
   }
 
 
+  /**
+   * @brief Returns a copy of this OpenRecentProjectWorkOrder instance.
+   * @return @b ( OpenRecentWorkOrder *) A pointer to a copy of this object.
+   */
   OpenRecentProjectWorkOrder *OpenRecentProjectWorkOrder::clone() const {
     return new OpenRecentProjectWorkOrder(*this);
   }
 
 
+  /**
+   * @brief This function determines if the given project file name can be opened.
+   * @param projectFileName  The path to the project file.
+   * @return @b bool True if the file exists, False otherwise.
+   */
   bool OpenRecentProjectWorkOrder::isExecutable(QString projectFileName) {
     FileName fname = projectFileName;
-    if (!fname.fileExists())
+    if (!fname.fileExists() )
       return false;
 
     return true;
   }
 
 
+  /**
+   * @brief Attempts to open the recent project.
+   * @return  @b bool True if successful, False if not.
+   */
   bool OpenRecentProjectWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
     // We dislike the progress bar
-    //delete progressBar();
+    // delete progressBar();
 
     // If more than this work order is in the history, don't allow this operation
     if (success && project()->workOrderHistory().count()) {
@@ -79,7 +104,7 @@ namespace Isis {
     else if (success) {
       QString projectName = QAction::text();
 
-      if (!projectName.isEmpty()) {
+      if (!projectName.isEmpty() ) {
         project()->open(projectName);
       }
       else {

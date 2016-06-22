@@ -28,11 +28,16 @@ namespace Isis {
   class TargetBody;
 
   /**
-   * This work order allows the user to view target body info.
+   * @brief  This is a child of class WorkOrder which is used for anything that performs
+   *  an action in a Project.  This work order allows the user to view target body info.
    *
    * @author 2015-06-12 Ken Edmundson
    *
    * @internal
+   *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
+   *              brought the code into compliance with ISIS3 coding standards.
+   *              References #3944.
+   *
    */
 
   class TargetGetInfoWorkOrder : public WorkOrder {

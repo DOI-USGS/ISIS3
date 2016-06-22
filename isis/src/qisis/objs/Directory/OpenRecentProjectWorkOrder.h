@@ -22,24 +22,29 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include "WorkOrder.h"
-//#include "FileName.h"
-
-//#include <functional>
-
-//#include <QDir>
 
 class QString;
 
 namespace Isis {
 
+
   /**
-   * Shows recently opened projects
+   *  @brief  This is a child of class WorkOrder which is used for anything that performs
+   *  an action in a Project.  This class opens and displays a recent
+   *  project.
    *
    * @author 2014-04-13 Ken Edmundson
    *
+   *
    * @internal
+   *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
+   *              brought the code into compliance with ISIS3 coding standards.
+   *              References #3944.
    */
+
+
   class OpenRecentProjectWorkOrder : public WorkOrder {
       Q_OBJECT
     public:

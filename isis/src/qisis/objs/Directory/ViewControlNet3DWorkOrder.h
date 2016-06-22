@@ -26,11 +26,16 @@
 
 namespace Isis {
   /**
-   * This work order shows a controlnet in 3D in an opengl view.
+   * @brief  This is a child of class WorkOrder which is used for anything that performs
+   *  an action in a Project.  This work order displays a control network in 3D in
+   *  an OpenGL view.
    *
    * @author 2014-04-04 Ken Edmundson
    *
    * @internal
+   *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
+   *              brought the code into compliance with ISIS3 coding standards.
+   *              References #3944.
    */
   class ViewControlNet3DWorkOrder : public WorkOrder {
       Q_OBJECT

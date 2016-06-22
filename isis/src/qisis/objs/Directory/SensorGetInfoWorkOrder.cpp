@@ -35,26 +35,51 @@
 
 namespace Isis {
 
+  /**
+  * @brief Constructor that creates a WorkOrder that will retrieve target body info.
+  * @param project The Project that this WorkOrder should be interacting with.
+  *
+  */
   SensorGetInfoWorkOrder::SensorGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
-    QAction::setText(tr("Get Info..."));
+    QAction::setText(tr("Get Info...") );
   }
 
 
+  /**
+   * @brief Copies the WorkOrder 'other' into this new instance.
+   * @param other The WorkOrder being copied.
+   */
   SensorGetInfoWorkOrder::SensorGetInfoWorkOrder(const SensorGetInfoWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * @brief The Destructor.
+   */
   SensorGetInfoWorkOrder::~SensorGetInfoWorkOrder() {
   }
 
 
+  /**
+   * @brief Returns a copy of the current instance of this WorkOrder.
+   * @return  @b (SensorGetInfoWorkOrder *) A copy of this object.
+   */
   SensorGetInfoWorkOrder *SensorGetInfoWorkOrder::clone() const {
     return new SensorGetInfoWorkOrder(*this);
   }
 
 
+  /**
+   * @brief Determines if this WorkOrder can be executed. It does this by determining
+   * if we already have a view for this camera.  If we do, then do not
+   * redisplay the view, and return false.
+   *
+   * @param guiCamera  A Camera object contained within a Project.
+   * @return @b bool Return True if we we already have a view for the guiCamera object.
+   * Return False otherwise.
+   */
   bool SensorGetInfoWorkOrder::isExecutable(GuiCamera *guiCamera) {
     if (!guiCamera)
       return false;
@@ -62,7 +87,7 @@ namespace Isis {
     // if we already have a view for this camera, don't redisplay
     QList<SensorInfoWidget *> existingViews = project()->directory()->sensorInfoViews();
     for (int i = 0; i < existingViews.size(); i++) {
-      if (existingViews.at(i)->objectName() == guiCamera->displayProperties()->displayName())
+      if (existingViews.at(i)->objectName() == guiCamera->displayProperties()->displayName() )
         return false;
     }
 
@@ -70,12 +95,17 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Attempts to retrieve target body info from the camera and display it
+   * in a view.
+   * @return  @b bool True if successful, False if not.
+   */
   bool SensorGetInfoWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
     if (success) {
       QString sensorDisplayName = guiCamera()->displayProperties()->displayName();
-      QUndoCommand::setText(tr("Get %1 sensor info").arg(sensorDisplayName));
+      QUndoCommand::setText(tr("Get %1 sensor info").arg(sensorDisplayName) );
 
       QStringList internalData;
       internalData.append(sensorDisplayName);
@@ -86,15 +116,23 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Determines whether a WorkOrder depends upon SensorGetInfoWorkerOrder
+   * @param other  The work order being checked for dependency.
+   * @return @b bool True if dependent, False if not
+   */
   bool SensorGetInfoWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<SensorGetInfoWorkOrder *>(other);
   }
 
 
+  /**
+   * @brief  Redisplays the sensor view.
+   */
   void SensorGetInfoWorkOrder::syncRedo() {
     SensorInfoWidget *sensorInfoWidget =
-        project()->directory()->addSensorInfoView(guiCamera());
+        project()->directory()->addSensorInfoView(guiCamera() );
 
 
     if (!sensorInfoWidget) {
@@ -104,6 +142,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief  Deletes the last view.  Currently this function is not implemented.
+   */
   void SensorGetInfoWorkOrder::syncUndo() {
     //delete project()->directory()->cnetEditorViews().last();
   }

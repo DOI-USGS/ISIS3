@@ -22,10 +22,9 @@
  */
 #include "TargetGetInfoWorkOrder.h"
 
-#include <QtDebug>
-
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QtDebug>
 
 #include "Directory.h"
 #include "IException.h"
@@ -35,26 +34,47 @@
 
 namespace Isis {
 
+/**
+   * @brief Creates a WorkOrder that will retrieve Target info.
+   * @param project  The Project that this work order should be interacting with.
+   */
   TargetGetInfoWorkOrder::TargetGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
-    QAction::setText(tr("Get Info..."));
+    QAction::setText(tr("Get Info...") );
   }
 
 
+  /**
+   * @brief Copies the 'other' WorkOrdeer instance into this new instance.
+   * @param other The WorkOrder being copied.
+   */
   TargetGetInfoWorkOrder::TargetGetInfoWorkOrder(const TargetGetInfoWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * @brief The Destructor.
+   */
   TargetGetInfoWorkOrder::~TargetGetInfoWorkOrder() {
   }
 
 
+  /**
+   * @brief Returns a copy of this TargetGetInfoWorkOrder instance.
+   * @return @b (TargetGetInfoWorkOrder *) A pointer to a copy of this WorkOrder.
+   */
   TargetGetInfoWorkOrder *TargetGetInfoWorkOrder::clone() const {
     return new TargetGetInfoWorkOrder(*this);
   }
 
 
+  /**
+   * @brief Determines if we already have a view for the target.  If we do, then we
+   * do not need to redisplay the object.
+   * @param targetBody
+   * @return  @b bool True if a view already exists, False otherwise.
+   */
   bool TargetGetInfoWorkOrder::isExecutable(TargetBody *targetBody) {
     if (!targetBody)
       return false;
@@ -62,7 +82,7 @@ namespace Isis {
     // if we already have a view for this target, don't redisplay
     QList<TargetInfoWidget *> existingViews = project()->directory()->targetInfoViews();
     for (int i = 0; i < existingViews.size(); i++) {
-      if (existingViews.at(i)->objectName() == targetBody->displayProperties()->displayName())
+      if (existingViews.at(i)->objectName() == targetBody->displayProperties()->displayName() )
         return false;
     }
 
@@ -70,6 +90,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Attempt to retrieve the Target info and view it.
+   * @return @b bool True if successful, False otherwise.
+   */
   bool TargetGetInfoWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
@@ -86,12 +110,20 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Determines whether another WorkOrder depends upon TargetGetInfoWorkOrder.
+   * @param other  The WorkOrder being checked for dependency.
+   * @return @b bool  True if there is a dependency, False otherwise.
+   */
   bool TargetGetInfoWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<TargetGetInfoWorkOrder *>(other);
   }
 
 
+  /**
+   * @brief  Redisplays the Target info.
+   */
   void TargetGetInfoWorkOrder::syncRedo() {
     TargetInfoWidget *targetInfoWidget =
         project()->directory()->addTargetInfoView(targetBody());
@@ -104,6 +136,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Deletes the last view. Currently this function is not implemented.
+   */
   void TargetGetInfoWorkOrder::syncUndo() {
     //delete project()->directory()->cnetEditorViews().last();
   }
