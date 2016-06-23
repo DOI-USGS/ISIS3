@@ -124,15 +124,23 @@ namespace Isis {
 
 
   /**
+   * Appends a TargetBody to the list.
+   * 
+   * @param value The TargetBody to append
+   * 
    * @see QList<TargetBodyQsp>::append()
    */
-  void TargetBodyList::append(TargetBodyQsp const & value) {
+  void TargetBodyList::append(TargetBodyQsp const &value) {
     QList<TargetBodyQsp>::append(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Appends a TargetBodyList to the list.
+   * 
+   * @param value the TargetBodyList to append
+   * 
    * @see QList<TargetBodyQsp>::append()
    */
   void TargetBodyList::append(const QList<TargetBodyQsp> &value) {
@@ -142,6 +150,8 @@ namespace Isis {
 
 
   /**
+   * clears the list.
+   * 
    * @see QList<TargetBodyQsp>::clear()
    */
   void TargetBodyList::clear() {
@@ -154,6 +164,10 @@ namespace Isis {
 
 
   /**
+   * Erases the TargetBody associated with an iterator.
+   * 
+   * @param pos An iterator associated with the TaretBody to be erased
+   * 
    * @see QList<TargetBodyQsp>::erase()
    */
   QList<TargetBodyQsp>::iterator TargetBodyList::erase(iterator pos) {
@@ -164,6 +178,15 @@ namespace Isis {
 
 
   /**
+   * Erases all TargetBodies starting with the TargetBody associated with begin up to,
+   * but not including, the TargetBody associated with end.
+   * 
+   * @param begin An iterator associated with the first TargetBody to be erased.
+   * @param end An iterator associated with the TargetBody after the last TargetBody to be erased
+   * 
+   * @return @b QList<TargetBodyQsp>::iterator An iterator associated with the TargetBody
+   *                                               end was associated with before erasing.
+   * 
    * @see QList<TargetBodyQsp>::erase()
    */
   QList<TargetBodyQsp>::iterator TargetBodyList::erase(iterator begin, iterator end) {
@@ -174,9 +197,14 @@ namespace Isis {
 
 
   /**
+   * Inserts a TargetBody at a specific index.
+   * 
+   * @param i The index at which to insert the TargetBody
+   * @param value The TargetBody to insert
+   * 
    * @see QList<TargetBodyQsp>::insert()
    */
-  void TargetBodyList::insert(int i, TargetBodyQsp const & value) {
+  void TargetBodyList::insert(int i, TargetBodyQsp const &value) {
     QList<TargetBodyQsp>::insert(i, value);
 
     emit countChanged(count());
@@ -184,9 +212,17 @@ namespace Isis {
 
 
   /**
+   * Inserts a TargetBody after the TargetBody associated with an iterator.
+   * 
+   * @param before An iterator associated with the TargetBody that will be before
+   *                   the inserted TargetBody
+   * @param value The TargetBody to be inserted
+   * 
+   * @return @b QList<TargetBodyQsp>::iterator An iterator associated with the inserted TargetBody
+   * 
    * @see QList<TargetBodyQsp>::insert()
    */
-  QList<TargetBodyQsp>::iterator TargetBodyList::insert(iterator before, TargetBodyQsp const & value) {
+  QList<TargetBodyQsp>::iterator TargetBodyList::insert(iterator before, TargetBodyQsp const &value) {
     iterator result = QList<TargetBodyQsp>::insert(before, value);
     emit countChanged(count());
     return result;
@@ -194,36 +230,54 @@ namespace Isis {
 
 
   /**
+   * Inserts a TargetBody at the front of the list
+   * 
+   * @param value the TargetBody to be inserted
+   * 
    * @see QList<TargetBodyQsp>::prepend()
    */
-  void TargetBodyList::prepend(TargetBodyQsp const & value) {
+  void TargetBodyList::prepend(TargetBodyQsp const &value) {
     QList<TargetBodyQsp>::prepend(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Appends a TargetBody to the end of the list
+   * 
+   * @param value The TargetBody to be append
+   * 
    * @see QList<TargetBodyQsp>::push_back()
    */
-  void TargetBodyList::push_back(TargetBodyQsp const & value) {
+  void TargetBodyList::push_back(TargetBodyQsp const &value) {
     QList<TargetBodyQsp>::push_back(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Insertes a TargetBody at the front of the list
+   * 
+   * @param value The TargetBody to be prepend
+   * 
    * @see QList<TargetBodyQsp>::push_front()
    */
-  void TargetBodyList::push_front(TargetBodyQsp const & value) {
+  void TargetBodyList::push_front(TargetBodyQsp const &value) {
     QList<TargetBodyQsp>::push_front(value);
     emit countChanged(count());
   }
 
 
   /**
+   * Removes all occurrences of a TargetBody and returns the number removed.
+   * 
+   * @param value The TargetBody to be removed.
+   * 
+   * @return @b int The Number of TargetBodies removed.
+   * 
    * @see QList<TargetBodyQsp>::removeAll()
    */
-  int TargetBodyList::removeAll(TargetBodyQsp const & value) {
+  int TargetBodyList::removeAll(TargetBodyQsp const &value) {
     int result = QList<TargetBodyQsp>::removeAll(value);
 
     if (result != 0) {
@@ -235,6 +289,10 @@ namespace Isis {
 
 
   /**
+   * Removes the TargetBody at a specific index.
+   * 
+   * @param i The index of the TargetBody to be removed
+   * 
    * @see QList<TargetBodyQsp>::removeAt()
    */
   void TargetBodyList::removeAt(int i) {
@@ -244,6 +302,8 @@ namespace Isis {
 
 
   /**
+   * Removes the first TargetBody from the list.
+   * 
    * @see QList<TargetBodyQsp>::removeFirst()
    */
   void TargetBodyList::removeFirst() {
@@ -253,6 +313,8 @@ namespace Isis {
 
 
   /**
+   * Removes the last TargetBody from the list.
+   * 
    * @see QList<TargetBodyQsp>::removeLast()
    */
   void TargetBodyList::removeLast() {
@@ -262,9 +324,15 @@ namespace Isis {
 
 
   /**
+   * Removes the first occurrence of a TargetBody from the list.
+   * 
+   * @param value the TargetBody to be removed
+   * 
+   * @return @b bool If the removal was successful
+   * 
    * @see QList<TargetBodyQsp>::removeOne()
    */
-  bool TargetBodyList::removeOne(TargetBodyQsp const & value) {
+  bool TargetBodyList::removeOne(TargetBodyQsp const &value) {
     bool result = QList<TargetBodyQsp>::removeOne(value);
 
     if (result) {
@@ -276,6 +344,10 @@ namespace Isis {
 
 
   /**
+   * Swaps the list with another TargetBodyList.
+   * 
+   * @param other The TargetBodyList to swap with
+   * 
    * @see QList<TargetBodyQsp>::swap()
    */
   void TargetBodyList::swap(QList<TargetBodyQsp> &other) {
@@ -288,6 +360,12 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the TargetBody at a specific index.
+   * 
+   * @param i The index of the TargetBody to takeAt
+   * 
+   * @return @b TargetBodyQsp The removed TargetBody
+   * 
    * @see QList<TargetBodyQsp>::takeAt()
    */
   TargetBodyQsp TargetBodyList::takeAt(int i) {
@@ -298,6 +376,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the first TargetBody in the list.
+   * 
+   * @return @b TargetBodyQsp The first TargetBody in the list
+   * 
    * @see QList<TargetBodyQsp>::takeFirst()
    */
   TargetBodyQsp TargetBodyList::takeFirst() {
@@ -308,6 +390,10 @@ namespace Isis {
 
 
   /**
+   * Removes and returns the last TargetBody in the list.
+   * 
+   * @return @b TargetBodyQsp The last TargetBody in the list.
+   * 
    * @see QList<TargetBodyQsp>::takeLast()
    */
   TargetBodyQsp TargetBodyList::takeLast() {
@@ -318,6 +404,12 @@ namespace Isis {
 
 
   /**
+   * Appends another TargetBodyList to the list.
+   * 
+   * @param other The TargetBodyList to be appended
+   * 
+   * @return @b TargetBodyList & A reference to this list.
+   * 
    * @see QList<TargetBodyQsp>::operator+=()
    */
   TargetBodyList &TargetBodyList::operator+=(const QList<TargetBodyQsp> &other) {
@@ -332,6 +424,12 @@ namespace Isis {
 
 
   /**
+   * Appends a TargetBody to the list.
+   * 
+   * @param other The TargetBody to be appended
+   * 
+   * @return @b TargetBodyList & A reference to this list.
+   * 
    * @see QList<TargetBodyQsp>::operator+=()
    */
   TargetBodyList &TargetBodyList::operator+=(TargetBodyQsp const &other) {
@@ -342,6 +440,12 @@ namespace Isis {
 
 
   /**
+   * Appends another TargetBodyList to the list.
+   * 
+   * @param other The TargetBodyList to be appended
+   * 
+   * @return @b TargetBodyList & A reference to this list.
+   * 
    * @see QList<TargetBodyQsp>::operator<<()
    */
   TargetBodyList &TargetBodyList::operator<<(const QList<TargetBodyQsp> &other) {
@@ -356,6 +460,12 @@ namespace Isis {
 
 
   /**
+   * Appends a TargetBody to the list.
+   * 
+   * @param other The TargetBody to be appended
+   * 
+   * @return @b TargetBodyList & A reference to this list.
+   * 
    * @see QList<TargetBodyQsp>::operator<<()
    */
   TargetBodyList &TargetBodyList::operator<<(TargetBodyQsp const &other) {
@@ -366,6 +476,12 @@ namespace Isis {
 
 
   /**
+   * Assignment operator for a QList of TargetBodyQsp
+   * 
+   * @param rhs The right hand side of the '=' operator
+   * 
+   * @return @b TargetBodyList & A reference to this list
+   * 
    * @see QList<TargetBodyQsp>::operator=()
    */
   TargetBodyList &TargetBodyList::operator=(const QList<TargetBodyQsp> &rhs) {
@@ -384,7 +500,8 @@ namespace Isis {
    * Assignment operator
    *
    * @param rhs The right hand side of the '=' operator
-   * @return *this
+   * 
+   * @return @b TargetBodyList & A reference to this list
    */
   TargetBodyList &TargetBodyList::operator=(const TargetBodyList &rhs) {
     bool countChanging = (rhs.count() != count());
@@ -563,7 +680,7 @@ namespace Isis {
   /**
    * Get the human-readable name of this target body list
    *
-   * @return The name of the target body list (or an empty string if anonymous).
+   * @return @b QString The name of the target body list (or an empty string if anonymous).
    */
   QString TargetBodyList::name() const {
     return m_name;
@@ -574,7 +691,8 @@ namespace Isis {
    * Get the path to these target body objects in the list (relative to project root). This only
    *  applies to a target body list from the project.
    *
-   * @return The path to the target body objects in the list (or an empty string if unknown).
+   * @return @b QString The path to the target body objects in the list
+   *                        (or an empty string if unknown).
    */
   QString TargetBodyList::path() const {
     return m_path;
@@ -614,6 +732,10 @@ namespace Isis {
    *     ...
    *   </targets>
    * </pre>
+   * 
+   * @param stream The QXmlStreamWriter that will be used to convert the TargetBodyList
+   * @param project The Project the TargetBodyList belongs to
+   * @param newProjectRoot The root of the project folder where the TargetBodyList will be saved
    */
   void TargetBodyList::save(QXmlStreamWriter &stream, const Project *project,
                             FileName newProjectRoot) const {
@@ -694,7 +816,8 @@ namespace Isis {
 //  }
 
 
-//  TargetBodyList::CopyTargetBodyDataFunctor::CopyTargetBodyDataFunctor(const CopyTargetBodyDataFunctor &other) {
+//  TargetBodyList::CopyTargetBodyDataFunctor::CopyTargetBodyDataFunctor(
+//                  const CopyTargetBodyDataFunctor &other) {
 //    m_project = other.m_project;
 //    m_newProjectRoot = other.m_newProjectRoot;
 //  }
@@ -757,13 +880,20 @@ namespace Isis {
 
 
   /**
-   * Handle an XML start element. This expects <TargetBodyList/> and <target/> elements (it reads both
-   *   the project XML and the targets.xml file).
+   * Handle an XML start element. This expects <TargetBodyList/> and <target/> elements
+   *   (it reads both the project XML and the targets.xml file).
+   * 
+   * @param namespaceURI ???
+   * @param localName The name of the element the XmlReader is at
+   * @param qName ???
+   * @param atts The attributes of the element the XmlReader is at
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
    */
-  bool TargetBodyList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
+  bool TargetBodyList::XmlHandler::startElement(const QString &namespaceURI,
+                                                const QString &localName,
+                                                const QString &qName,
+                                                const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "TargetBodyList") {
         QString name = atts.value("name");
@@ -778,7 +908,8 @@ namespace Isis {
         }
       }
       else if (localName == "target") {
-//        m_TargetBodyList->append(TargetBodyQsp(new TargetBody(m_project->targetBodyRoot() + "/" + m_TargetBodyList->path(),
+//        m_TargetBodyList->append(TargetBodyQsp(new TargetBody(m_project->targetBodyRoot()
+//                                           + "/" + m_TargetBodyList->path(),
 //                                           reader())));
       }
     }
@@ -788,13 +919,21 @@ namespace Isis {
 
 
   /**
-   * Handle an XML end element. This handles <TargetBodyList /> by opening and reading the images.xml
-   *   file.
+   * Handle an XML end element. This handles <TargetBodyList /> by opening and reading the
+   *   images.xml file.
+   * 
+   * @param namespaceURI ???
+   * @param localName The name of the element the XmlReader is at
+   * @param qName ???
    *
-   * @return If we should continue reading the XML (usually true).
+   * @return @b bool If we should continue reading the XML (usually true).
+   * 
+   * @throws IException::Io "Unable to open with read access"
+   * @throws IException::Io "Failed to open target body list XML"
    */
-  bool TargetBodyList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName) {
+  bool TargetBodyList::XmlHandler::endElement(const QString &namespaceURI,
+                                              const QString &localName,
+                                              const QString &qName) {
     if (localName == "TargetBodyList") {
       XmlHandler handler(m_TargetBodyList, m_project);
 
@@ -802,8 +941,8 @@ namespace Isis {
       reader.pushContentHandler(&handler);
       reader.setErrorHandler(&handler);
 
-      QString TargetBodyListXmlPath = m_project->targetBodyRoot() + "/" + m_TargetBodyList->path() +
-                                 "/targets.xml";
+      QString TargetBodyListXmlPath = m_project->targetBodyRoot() + "/" + 
+                                m_TargetBodyList->path() + "/targets.xml";
       QFile file(TargetBodyListXmlPath);
 
       if (!file.open(QFile::ReadOnly)) {

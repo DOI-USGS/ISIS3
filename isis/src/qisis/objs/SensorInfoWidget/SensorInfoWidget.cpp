@@ -11,6 +11,13 @@
 
 namespace Isis {
 
+  /**
+   * Constructor
+   * 
+   * @param camera The camera whose information is being displayed
+   * @param directory unused
+   * @param parent The parent widget
+   */
   SensorInfoWidget::SensorInfoWidget(GuiCamera* camera, Directory *directory,
                                      QWidget *parent) : m_ui(new Ui::SensorInfoWidget) {
     m_ui->setupUi(this);
@@ -59,6 +66,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   SensorInfoWidget::~SensorInfoWidget() {
     delete m_ui;
   }

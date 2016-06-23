@@ -20,10 +20,15 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
+   * List for holding TargetBodies.  Overrides several QList methods in order to emit
+   * signals about the list changing.  TargetBodies are stored as QSharedPointer<TargetBody>.
+   * 
    * @author 2015-06-11 Ken Edmundson
    *
    * @internal 
-   * @history 2015-06-11 Ken Edmundson - original version
+   *   @history 2015-06-11 Ken Edmundson - original version
+   *   @history 2016-06-17 Jesse Mapel - Updated documentation before merging from IPCE into ISIS.
+   *                           Fixes #4007.
    */
   class TargetBodyList : public QObject, public QList<TargetBodyQsp> {
     Q_OBJECT
@@ -35,13 +40,13 @@ namespace Isis {
       explicit TargetBodyList(QObject *parent = NULL);
       explicit TargetBodyList(QList<TargetBodyQsp>, QObject *parent = NULL);
       explicit TargetBodyList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
+          XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
 //    explicit TargetBodyList(QStringList &);
       TargetBodyList(const TargetBodyList &);
       ~TargetBodyList();
 
       // These are overridden (-ish) in order to add notifications to the list changing
-      void append(TargetBodyQsp const & value);
+      void append(TargetBodyQsp const &value);
       void append(const QList<TargetBodyQsp> &value);
 
       void clear();
@@ -49,17 +54,17 @@ namespace Isis {
       iterator erase(iterator pos);
       iterator erase(iterator begin, iterator end);
 
-      void insert(int i, TargetBodyQsp const & value);
-      iterator insert(iterator before, TargetBodyQsp const & value);
+      void insert(int i, TargetBodyQsp const &value);
+      iterator insert(iterator before, TargetBodyQsp const &value);
 
-      void prepend(TargetBodyQsp const & value);
-      void push_back(TargetBodyQsp const & value);
-      void push_front(TargetBodyQsp const & value);
-      int removeAll(TargetBodyQsp const & value);
+      void prepend(TargetBodyQsp const &value);
+      void push_back(TargetBodyQsp const &value);
+      void push_front(TargetBodyQsp const &value);
+      int removeAll(TargetBodyQsp const &value);
       void removeAt(int i);
       void removeFirst();
       void removeLast();
-      bool removeOne(TargetBodyQsp const & value);
+      bool removeOne(TargetBodyQsp const &value);
       void swap(QList<TargetBodyQsp> &other);
       TargetBodyQsp takeAt(int i);
       TargetBodyQsp takeFirst();
@@ -95,6 +100,8 @@ namespace Isis {
 
     private:
       /**
+       * XmlReader for working with TargetBody XML files
+       * 
        * @author 2012-07-01 Steven Lambright
        *
        * @internal
@@ -111,15 +118,15 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          TargetBodyList *m_TargetBodyList;
-          Project *m_project;
+          TargetBodyList *m_TargetBodyList; //!< The TargetBodyList to read into/save from
+          Project *m_project; //!< The project that contains the TargetBodies
       };
 
 
       /**
-       * This functor is used for copying the TargetBody objects between two projects quickly. This is designed
-       *   to work with QtConcurrentMap, though the results are all NULL (QtConcurrentMap is much
-       *   faster than many QtConcurrentRun calls).
+       * This functor is used for copying the TargetBody objects between two projects quickly. This
+       *   is designed to work with QtConcurrentMap, though the results are all NULL 
+       *   (QtConcurrentMap is much faster than many QtConcurrentRun calls).
        *
        * @author 2015-06-11 Ken Edmundson (after Steven Lambright)
        *
@@ -180,7 +187,7 @@ namespace Isis {
 //      QStringList saveAndToggleShowOutline();
 
     private:
-      QString m_name;
+      QString m_name; //!< The display name of the TaregetBodyList
 
       /**
        * This stores the directory name that contains the TargetBody objects in this list.

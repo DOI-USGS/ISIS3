@@ -12,7 +12,7 @@ namespace Isis {
   class Directory;
 
   /**
-   * @brief
+   * @brief Widget for displaying information about a target
    *
    * @ingroup ControlNetworks
    *
@@ -31,14 +31,14 @@ namespace Isis {
       ~TargetInfoWidget();
 
     private:
-      Ui::TargetInfoWidget *m_ui;
+      Ui::TargetInfoWidget *m_ui; //!< The widget's ui
 
       QString formatPoleRaString();
       QString formatPoleDecString();
       QString formatPmString();
 
-      Directory *m_directory;
-      TargetBody *m_target;
+      Directory *m_directory; //!< Unused
+      TargetBody *m_target; //!< The target whose information is being displayed
   };
 }
 

@@ -12,7 +12,7 @@ namespace Isis {
   class Directory;
 
   /**
-   * @brief
+   * @brief Widget for displaying information about a sensor
    *
    * @ingroup ControlNetworks
    *
@@ -31,14 +31,14 @@ namespace Isis {
       ~SensorInfoWidget();
 
     private:
-      Ui::SensorInfoWidget *m_ui;
+      Ui::SensorInfoWidget *m_ui; //!< The widget ui
 
 //      QString formatPoleRaString();
 //      QString formatPoleDecString();
 //      QString formatPmString();
 
-      Directory *m_directory;
-      GuiCamera *m_camera;
+      Directory *m_directory; //!< Unused
+      GuiCamera *m_camera; //!< The sensor whose information is being displayed
   };
 }
 

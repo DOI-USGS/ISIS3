@@ -10,6 +10,13 @@
 
 namespace Isis {
 
+  /**
+   * Constructor.  Sets up the widget based on the target.
+   * 
+   * @param target The target whose information will be displayed
+   * @param directory Currently unused
+   * @param parent The parent widget
+   */
   TargetInfoWidget::TargetInfoWidget(TargetBody* target, Directory *directory,
                                      QWidget *parent) : m_ui(new Ui::TargetInfoWidget) {
     m_ui->setupUi(this);
@@ -71,11 +78,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   TargetInfoWidget::~TargetInfoWidget() {
     delete m_ui;
   }
 
 
+  /**
+   * Make the poleRightAscensionLabel text using information from the target.
+   * 
+   * @return @b QString The poleRightAscensionLabel text
+   */
   QString TargetInfoWidget::formatPoleRaString() {
     std::vector<Angle> poleRaCoefs = m_target->poleRaCoefs();
     std::vector<double> poleRaNutPrecCoefs = m_target->poleRaNutPrecCoefs();
@@ -84,12 +99,14 @@ namespace Isis {
     QString poleRaString = "";
     QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (poleRaCoefs[1].degrees() < 0.0 )
+    if (poleRaCoefs[1].degrees() < 0.0 ) {
       poleRaString.append(tr("%1%3 - %2T").arg(poleRaCoefs[0].degrees()).arg(-poleRaCoefs[1]
           .degrees()).arg(degChar));
-    else
+    }
+    else {
       poleRaString.append(tr("%1%3 + %2T").arg(poleRaCoefs[0].degrees()).arg(poleRaCoefs[1]
           .degrees()).arg(degChar));
+    }
 
     QString tmp;
     int nCoefs = poleRaNutPrecCoefs.size();;
@@ -110,6 +127,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Make the poleDeclinationLabel text using information from the target.
+   * 
+   * @return @b QString The poleDeclinationLabel text
+   */
   QString TargetInfoWidget::formatPoleDecString() {
     std::vector<Angle> poleDecCoefs = m_target->poleDecCoefs();
     std::vector<double> poleDecNutPrecCoefs = m_target->poleDecNutPrecCoefs();
@@ -118,12 +140,14 @@ namespace Isis {
     QString poleDecString = "";
     QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (poleDecCoefs[1].degrees() < 0.0 )
+    if (poleDecCoefs[1].degrees() < 0.0 ) {
       poleDecString.append(tr("%1%3 - %2T").arg(poleDecCoefs[0].degrees()).arg(-poleDecCoefs[1]
           .degrees()).arg(degChar));
-    else
+    }
+    else {
       poleDecString.append(tr("%1%3 + %2T").arg(poleDecCoefs[0].degrees()).arg(poleDecCoefs[1]
           .degrees()).arg(degChar));
+    }
 
     QString tmp;
     int nCoefs = poleDecNutPrecCoefs.size();;
@@ -144,6 +168,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Make the polePMOffsetLabel text using information from the target.
+   * 
+   * @return @b QString The polePMOffsetLabel text
+   */
   QString TargetInfoWidget::formatPmString() {
     std::vector<Angle> pmCoefs = m_target->pmCoefs();
     std::vector<double> pmNutPrecCoefs = m_target->pmNutPrecCoefs();
@@ -152,17 +181,21 @@ namespace Isis {
     QString pmString = "";
     QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (pmCoefs[1].degrees() < 0.0 )
+    if (pmCoefs[1].degrees() < 0.0 ) {
       pmString.append(tr("%1%3 - %2d").arg(pmCoefs[0].degrees()).arg(-pmCoefs[1].degrees())
           .arg(degChar));
-    else if (pmCoefs[1].degrees() > 0.0 )
+    }
+    else if (pmCoefs[1].degrees() > 0.0 ) {
       pmString.append(tr("%1%3 + %2d").arg(pmCoefs[0].degrees()).arg(pmCoefs[1].degrees())
           .arg(degChar));
+    }
 
-    if (pmCoefs[2].degrees() < 0.0 )
+    if (pmCoefs[2].degrees() < 0.0 ) {
       pmString.append(tr(" - %2d^2").arg(-pmCoefs[2].degrees()));
-    else if (pmCoefs[2].degrees() > 0.0 )
+    }
+    else if (pmCoefs[2].degrees() > 0.0 ) {
       pmString.append(tr(" + %2d^2").arg(pmCoefs[2].degrees()));
+    }
 
 
     QString tmp;
