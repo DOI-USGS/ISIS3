@@ -48,25 +48,25 @@ using namespace Isis;
  * @internal
  *   @history 2015-05-04 Jeannie Backer - Added test for isDEM() and improved
  *                           overall test coverage.
- *  
+ *
  *   testcoverage 2015-04-30 - 78.947% scope, 91.057% line, 96.154% function
  *   testcoverage 2015-05-04 - 94.737% scope, 100% line, 100% function
  */
 class MyShape : public ShapeModel {
   public:
-  MyShape(Target *target, Pvl &lab) : ShapeModel (target, lab) {
+  MyShape(Target *target) : ShapeModel (target) {
     setName("Test");
   }
 
   bool intersectSurface(std::vector<double> observerPos,
                                    std::vector<double> lookDirection)  {
-    cout << "    intersectSurface called with observer position = " << 
+    cout << "    intersectSurface called with observer position = " <<
       observerPos[0] << ", " << observerPos[1] << ", " <<
       observerPos[2] << endl << "                                 lookDirection = " <<
       lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
     intersectEllipsoid(observerPos, lookDirection);
     SpiceDouble intersectionPoint[3] = {-2123.362258286, -2380.3717812236, 1194.6783966636};
-    
+
     surfaceIntersection()->FromNaifArray(intersectionPoint);
     setHasIntersection(true);
     return true;
@@ -92,7 +92,7 @@ class MyShape : public ShapeModel {
     setNormal(myNormal);
     setHasNormal(true);
   }
-      
+
   virtual void calculateSurfaceNormal() {
     setNormal( -0.623384,
                -0.698838,
@@ -104,13 +104,13 @@ class MyShape : public ShapeModel {
     double a = 6378.14;
     double b = 6378.14;
     double c = 6356.75;
-    
+
     double rlat = lat.degrees();
     double rlon = lon.degrees();
-    
+
     double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
                       pow(a * sin(rlon), 2));
-    
+
     const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
                            pow(xyradius * sin(rlat), 2));
 
@@ -156,7 +156,7 @@ class MyEllipse : public ShapeModel {
 
   bool intersectSurface(std::vector<double> observerPos,
                                     std::vector<double> lookDirection)  {
-    cout << "    intersectSurface called with observer position = " << 
+    cout << "    intersectSurface called with observer position = " <<
       observerPos[0] << ", " << observerPos[1] << ", " <<
       observerPos[2] << endl << "                                 lookDirection = " <<
       lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
@@ -170,7 +170,7 @@ class MyEllipse : public ShapeModel {
   virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
     calculateEllipsoidalSurfaceNormal();
   }
-      
+
   virtual void calculateSurfaceNormal() {
     std::vector<Distance> radii = targetRadii();
     std::vector<double> normal(3, 0.);
@@ -191,13 +191,13 @@ class MyEllipse : public ShapeModel {
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
-    
+
     double rlat = lat.degrees();
     double rlon = lon.degrees();
-    
+
     double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
                       pow(a * sin(rlon), 2));
-    
+
     const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
                            pow(xyradius * sin(rlat), 2));
 
@@ -230,7 +230,7 @@ int main() {
 
     cout << "Begin testing Shape Model base class...." << endl;
 
-    MyShape shape(&targ, pvl);
+    MyShape shape(&targ);
 
     cout << endl << "  Shape name is " << shape.name() << endl;
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
@@ -277,8 +277,8 @@ int main() {
       Incidence                  = 85.341094499768
       Emission                   = 46.966269013795
     */
-    cout << endl << "    Testing pure virtual method intersectSurface..." << endl; 
-    if (!shape.intersectSurface(sB, lookB)) { 
+    cout << endl << "    Testing pure virtual method intersectSurface..." << endl;
+    if (!shape.intersectSurface(sB, lookB)) {
       cout << "    ...  intersectSurface method failed" << endl;
       return -1;
     }
@@ -292,7 +292,7 @@ int main() {
       e.print();
     }
     SurfacePoint *sp = shape.surfaceIntersection();
-    cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
+    cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
     try {
@@ -303,7 +303,7 @@ int main() {
     catch(Isis::IException &e) {
       e.print();
     }
-    
+
     cout << endl << "  Testing photometric angle calculations before normal computation..." << endl;
     cout << "    Do we have a normal? " << shape.normalStatus() << endl;
     double emission  = shape.emissionAngle(sB);
@@ -320,7 +320,7 @@ int main() {
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal(); 
+    shape.calculateSurfaceNormal();
     myNormal = shape.normal();
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
@@ -381,11 +381,11 @@ int main() {
       cout << "    Test resolution() error message when there is no intersection:" << endl;
       e.print();
     }
-    cout << "     surface point = (" << sp->GetX().kilometers() << ", " << 
+    cout << "     surface point = (" << sp->GetX().kilometers() << ", " <<
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
-    
+
     // Test ellipse methods in base class
-    MyEllipse eshape(&targ); 
+    MyEllipse eshape(&targ);
     try {
       cout << endl << "  Testing ellipsoid methods in base class" << endl;
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
@@ -398,12 +398,12 @@ int main() {
       }
       cout << endl << "    Testing  failing of method intersectEllipsoid..." << endl;
       std::vector<double> badlook(3,1.);
-      badlook[0] = -1.; 
+      badlook[0] = -1.;
 
       if (!eshape.intersectSurface(sB, badlook)) {
         cout << "    ...  intersectSurface method failed -- no intersection" << endl;
       }
-      
+
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
         cout << "    Get the resolution:         " << eshape.resolution() << endl;
@@ -412,17 +412,17 @@ int main() {
         cout << "    Test resolution() error message when there is no intersection:" << endl;
         e.print();
       }
-      cout << endl << "    Testing  method intersectEllipsoid..." << endl; 
+      cout << endl << "    Testing  method intersectEllipsoid..." << endl;
 
-      if (eshape.intersectSurface(sB, lookB)) { 
+      if (eshape.intersectSurface(sB, lookB)) {
         SurfacePoint *sp = eshape.surfaceIntersection();
-        cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
+        cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
           sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
       }
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       cout << "    Get the resolution:         " << eshape.resolution() << endl;
       SurfacePoint *sp = eshape.surfaceIntersection();
-      cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
+      cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
         sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
       try {
@@ -437,7 +437,7 @@ int main() {
       }
 
       cout << endl << "    Testing  method setHasIntersection false..." << endl;
-      eshape.setHasIntersection(false); 
+      eshape.setHasIntersection(false);
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
         cout << "    Get the resolution:         " << eshape.resolution() << endl;
@@ -453,23 +453,25 @@ int main() {
       catch(Isis::IException &e) {
         e.print();
       }
-      cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with valid intersection..." << endl; 
+      cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with valid intersection..." << endl;
       if (eshape.intersectSurface(sB, lookB)) cout << "    Intersection set" << endl;
       cout << "      Do we have a normal? " << eshape.normalStatus() << endl;
       eshape.calculateLocalNormal(notUsed);
       cout << "      Do we have a normal? " << eshape.normalStatus() << endl;
       myNormal = eshape.normal();
       cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
-      cout << endl << "    Testing  method targetRadii..." << endl;
-      eshape.calculateSurfaceNormal(); 
+      eshape.calculateSurfaceNormal();
       myNormal = eshape.normal();
+      cout << endl << "    Testing  method targetRadii..." << endl;
       cout << "      true normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
+
+
     }
     catch(Isis::IException &e) {
       IException(e, IException::Unknown, "Test ellipse methods failed.", _FILEINFO_).print();
     }
-   
-    // Test 
+
+    // Test
     MyEllipse defaultShape;
     cout << endl << "  Testing default constructor..." << endl;
     cout << "    Shape is " << defaultShape.name() << endl;
