@@ -71,11 +71,15 @@
     <change name="Noah Hilt" date="2008-08-01">
       Changed the plot window to the new HistogramToolWindow
     </change>
-   <change name="Tyler Wilson" date="2015-09-01">
+    <change name="Tyler Wilson" date="2015-09-01">
       Changed SetValidRange call to SetBinRange so correct number
       of user-specified bins displayed in grapical/text output.
       See Ref #2188.
-   </change>	
+    </change>
+    <change name="Curtis Rose" date="2016-06-10">
+     Changed the application to fail immediately if the TO argument is not
+     entered from the commandline. Fixes #3914.
+    </change>	
   </history>
 
   <oldName>

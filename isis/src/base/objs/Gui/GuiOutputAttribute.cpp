@@ -72,6 +72,8 @@ namespace Isis {
     p_unsignedByte->setToolTip("Unsigned 8-bit pixels");
     p_signedWord = new QRadioButton("&Signed Word");
     p_signedWord->setToolTip("Signed 16-bit pixels");
+    p_unsignedWord = new QRadioButton("Unsigned Word");
+    p_unsignedWord->setToolTip("Unsigned 16-bit pixels");
     p_real = new QRadioButton("&Real");
     p_real->setToolTip("Floating point 32-bit pixels");
 
@@ -79,6 +81,7 @@ namespace Isis {
     buttonGroup->addButton(p_propagate);
     buttonGroup->addButton(p_unsignedByte);
     buttonGroup->addButton(p_signedWord);
+    buttonGroup->addButton(p_unsignedWord);
     buttonGroup->addButton(p_real);
     buttonGroup->setExclusive(true);
 
@@ -92,6 +95,8 @@ namespace Isis {
     connect(p_unsignedByte, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
     connect(p_signedWord, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
     connect(p_signedWord, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
+    connect(p_unsignedWord, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
+    connect(p_unsignedWord, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
     p_minEdit->setValidator(new QDoubleValidator(p_minEdit));
@@ -101,7 +106,8 @@ namespace Isis {
     gridLayout->addWidget(p_propagate, 0, 0);
     gridLayout->addWidget(p_unsignedByte, 1, 0);
     gridLayout->addWidget(p_signedWord, 2, 0);
-    gridLayout->addWidget(p_real, 3, 0);
+    gridLayout->addWidget(p_unsignedWord, 3, 0);
+    gridLayout->addWidget(p_real, 4, 0);
     gridLayout->addWidget(minLabel, 0, 1);
     gridLayout->addWidget(p_minEdit, 1, 1);
     gridLayout->addWidget(maxLabel, 2, 1);
@@ -206,8 +212,9 @@ namespace Isis {
     if(p_real->isChecked()) att += "+Real";
     if(p_unsignedByte->isChecked()) att += "+UnsignedByte";
     if(p_signedWord->isChecked()) att += "+SignedWord";
+    if(p_unsignedWord->isChecked()) att += "+UnsignedWord";
 
-    if(p_unsignedByte->isChecked() || p_signedWord->isChecked()) {
+    if(p_unsignedByte->isChecked() || p_signedWord->isChecked() || p_unsignedWord->isChecked()) {
       if((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
         att += "+";
         att += p_minEdit->text();
@@ -253,6 +260,9 @@ namespace Isis {
     }
     else if(att.pixelType() == Isis::SignedWord) {
       p_signedWord->setChecked(true);
+    }
+    else if(att.pixelType() == Isis::UnsignedWord) {
+      p_unsignedWord->setChecked(true);
     }
     else {
       p_real->setChecked(true);

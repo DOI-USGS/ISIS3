@@ -43,26 +43,31 @@ namespace Isis {
    * has three coefficients: C1, C2 & C3.
    */
   BasisFunction::BasisFunction(const QString &name, int numVars, int numCoefs) {
+    
     p_name = name;
     p_numVars = numVars;
     p_numCoefs = numCoefs;
   }
 
+  
   /**
    * Set the coefficients for the equation.
    *
    * @param coefs A vector of coefficients for the equation.
    */
   void BasisFunction::SetCoefficients(const std::vector<double> &coefs) {
-    if((int)coefs.size() != p_numCoefs) {
+    
+    if ( (int)coefs.size() != p_numCoefs ) {
       QString msg = "Unable to set coefficients vector. The size of the given vector [" 
                     + toString((int)coefs.size()) + "] does not match number of coefficients "
                     "in the basis equation [" + toString(p_numCoefs) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    
     p_coefs = coefs;
   }
 
+  
   /**
    * Compute the equation using the input variables.
    *
@@ -73,7 +78,8 @@ namespace Isis {
    * @return The output value.
    */
   double BasisFunction::Evaluate(const std::vector<double> &vars) {
-    if((int)vars.size() != p_numVars) {
+    
+    if ( (int)vars.size() != p_numVars ) {
       QString msg = "Unable to evaluate function for the given vector of values. "
                     "The size of the given vector [" 
                     + toString((int)vars.size()) + "] does not match number of variables "
@@ -82,21 +88,40 @@ namespace Isis {
     }
 
     Expand(vars);
-    if((int)p_terms.size() != p_numCoefs) {
+    
+    if ( (int)p_terms.size() != p_numCoefs ) {
       QString msg = "Unable to evaluate function for the given vector of values. "
                     "The number of terms in the expansion [" 
-                    + toString((int)p_terms.size()) + "] does not match number of coefficients "
+                    + toString( (int)p_terms.size() ) + "] does not match number of coefficients "
                     "in the basis equation [" + toString(p_numCoefs) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     double result = 0.0;
-    for(int i = 0; i < p_numCoefs; i++) {
+    
+    for (int i = 0; i < p_numCoefs; i++) {
       result += p_coefs[i] * p_terms[i];
     }
+    
     return result;
   }
+  
+  
+  /**
+   * Compute the equation using the input variable.
+   *
+   * @param var A single double value to use for the equation.
+   *
+   * @return The output double value resulting from the equation.
+   */
+  double BasisFunction::Evaluate(const double &var) {
+    
+    std::vector<double> vars;
+    vars.push_back(var);
+    return BasisFunction::Evaluate(vars);
+  }
 
+  
   /**
    * This is the function you should replace depending on your needs. It will
    * expand the variables into the terms of the equation. For example,

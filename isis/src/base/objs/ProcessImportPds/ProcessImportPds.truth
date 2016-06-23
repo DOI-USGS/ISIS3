@@ -1095,7 +1095,7 @@ Object = IsisCube
   Object = Core
     StartByte   = Null
     Format      = Tile
-    TileSamples = 500
+    TileSamples = 1000
     TileLines   = 10
 
     Group = Dimensions
@@ -1105,10 +1105,10 @@ Object = IsisCube
     End_Group
 
     Group = Pixels
-      Type       = Real
+      Type       = UnsignedWord
       ByteOrder  = Lsb
-      Base       = 0.0
-      Multiplier = 1.0
+      Base       = 0.096609231570811
+      Multiplier = 1.32153376269236e-06
     End_Group
   End_Object
 End_Object

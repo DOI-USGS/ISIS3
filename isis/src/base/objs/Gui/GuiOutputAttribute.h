@@ -40,6 +40,7 @@ namespace Isis {
    *                           was also invalid - didn't match any attributes, but was
    *                           the default so there were no symptoms of a bug. This has
    *                           been fixed. References #961.
+   *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord handling.
    */
   class GuiOutputAttribute : public QDialog {
       Q_OBJECT
@@ -65,6 +66,7 @@ namespace Isis {
       QRadioButton *p_propagate;
       QRadioButton *p_unsignedByte;
       QRadioButton *p_signedWord;
+      QRadioButton *p_unsignedWord;
       QRadioButton *p_real;
       QLineEdit *p_minEdit;
       QLineEdit *p_maxEdit;

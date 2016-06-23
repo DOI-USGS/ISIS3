@@ -188,9 +188,8 @@ namespace Isis {
    *
    * @param buf Input unsigned short integer value to swap.
    */
-  unsigned short int EndianSwapper::UnsignedShortInt(unsigned short int *buf) {
+  unsigned short int EndianSwapper::UnsignedShortInt(void *buf) {
     unsigned short int result = *(unsigned short int *)buf;
-
     if(p_needSwap) {
       char *ptr = (char *)buf + (sizeof(unsigned short int) - 1) * p_needSwap;
 
@@ -201,7 +200,6 @@ namespace Isis {
 
       result = p_swapper.p_uShortInt;
     }
-
     return result;
   }
 }

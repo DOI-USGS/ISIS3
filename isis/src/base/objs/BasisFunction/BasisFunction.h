@@ -57,7 +57,9 @@ namespace Isis {
    *   @todo Add coded example
    *   @history 2005-03-16 Leah Dahmer - modified file to support Doxygen documentation.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
-   *   
+   *   @history 2016-06-10 Marjorie Hahn - Added new signature for Evaluate() that only takes in a 
+   *                           single value. Fixes #1679
+   * 
    */
   class BasisFunction {
     public:
@@ -67,6 +69,7 @@ namespace Isis {
 
       void SetCoefficients(const std::vector<double> &coefs);
       double Evaluate(const std::vector<double> &vars);
+      double Evaluate(const double &var);
       virtual void Expand(const std::vector<double> &vars);
 
       /**

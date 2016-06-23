@@ -294,6 +294,13 @@ namespace Isis {
         nbins = 256;
       }
     }
+    else if (cube.pixelType() == UnsignedWord) {
+      if (nbins == 0) {
+        minDnValue = 0.0 * cube.multiplier() + cube.base();
+        maxDnValue = 65535.0 * cube.multiplier() + cube.base();
+        nbins = 65536;
+      }
+    }
     else if (cube.pixelType() == SignedWord) {
       if (nbins == 0) {
         minDnValue = -32768.0 * cube.multiplier() + cube.base();

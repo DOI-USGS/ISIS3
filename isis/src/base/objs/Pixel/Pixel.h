@@ -58,6 +58,7 @@ namespace Isis {
    *  @history 2015-08-05 Kristin Berry - Added empty constructor, copy constructor, copy assignement
    *                          operator, and virutal destructor. Also updated to comply with Isiscoding
    *                          standards.
+   *  @history 2016-04-20 Makayla Shepherd - Added methods to handle UnsignedWord pixel type.
    */
   class Pixel {
     public:
@@ -77,16 +78,20 @@ namespace Isis {
       unsigned char To8Bit();
       static short int To16Bit(const double d);
       short int To16Bit();
+      static short unsigned int To16UBit(const double d);
+      short unsigned int To16Ubit();
       static float To32Bit(const double d);
       float To32Bit();
 
       static double ToDouble(const unsigned char t);
       static double ToDouble(const short int t);
+      static double ToDouble(const short unsigned int t);
       static double ToDouble(const float t);
       double ToDouble(); 
 
       static float ToFloat(const unsigned char d);
       static float ToFloat(const short int d);
+      static float ToFloat(const short unsigned int d);
       static float ToFloat(const double d);
       float ToFloat();
 

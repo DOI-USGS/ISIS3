@@ -200,6 +200,53 @@ namespace Isis {
     return To16Bit(m_DN); 
   }
 
+  /**
+   * Converts double pixels to short unsigned int pixels with special pixel translations
+   *
+   * @param d Double pixel value to be converted to a double
+   *
+   * @return short unsigned int The short int pixel value
+   */
+  short unsigned int Pixel::To16UBit(const double d) {
+    if(d < VALID_MIN8) {
+      if(d == NULL8)                return NULLU2;
+      else if(d == LOW_INSTR_SAT8)  return LOW_INSTR_SATU2;
+      else if(d == LOW_REPR_SAT8)   return LOW_REPR_SATU2;
+      else if(d == HIGH_INSTR_SAT8) return HIGH_INSTR_SATU2;
+      else if(d == HIGH_REPR_SAT8)  return HIGH_REPR_SATU2;
+      else                           return LOW_REPR_SATU2;
+    }
+    else {
+      if(d < VALID_MIN2 - 0.5)      return LOW_REPR_SATU2;
+      else if(d > VALID_MAX2 + 0.5) return HIGH_REPR_SATU2;
+
+      else {
+        int itemp;
+        if(d < 0.0) {
+          itemp = (int)(d - 0.5);
+        }
+        else {
+          itemp = (int)(d + 0.5);
+        }
+
+        if(itemp < VALID_MIN2)      return LOW_REPR_SATU2;
+        else if(itemp > VALID_MAX2) return HIGH_REPR_SATU2;
+        else if(d < 0.0)            return (short)(d - 0.5);
+        else                         return (short)(d + 0.5);
+      }
+    }
+  }
+
+
+  /**
+   * Converts internal pixel value to a short int pixel with 
+   * special pixel translations 
+   *  
+   * @return short unsigned int The short int pixel value
+   */
+  short unsigned int Pixel::To16Ubit() {
+    return To16UBit(m_DN); 
+  }
 
   /**
    * Converts double pixels to float pixels with special pixel translations
@@ -268,6 +315,25 @@ namespace Isis {
       else if(d == LOW_INSTR_SAT2)   return(LOW_INSTR_SAT8);
       else if(d == HIGH_REPR_SAT2)   return(HIGH_REPR_SAT8);
       else if(d == HIGH_INSTR_SAT2)  return(HIGH_INSTR_SAT8);
+      else                            return(LOW_REPR_SAT8);
+    }
+    else                              return((double) d);
+  }
+  
+  /**
+   * Converts short unsigned int pixels to double pixels with special pixel translations
+   *
+   * @param d Short unsigned int pixel value to be converted to a double
+   *
+   * @return double The double pixel value
+   */
+  double Pixel::ToDouble(const short unsigned int d) {
+    if(d < VALID_MINU2) {
+      if(d == NULLU2)                 return(NULL8);
+      else if(d == LOW_REPR_SATU2)    return(LOW_REPR_SAT8);
+      else if(d == LOW_INSTR_SATU2)   return(LOW_INSTR_SAT8);
+      else if(d == HIGH_REPR_SATU2)   return(HIGH_REPR_SAT8);
+      else if(d == HIGH_INSTR_SATU2)  return(HIGH_INSTR_SAT8);
       else                            return(LOW_REPR_SAT8);
     }
     else                              return((double) d);
@@ -346,6 +412,27 @@ namespace Isis {
       else                            return(LOW_REPR_SAT4);
     }
     else if(t > (double) VALID_MAX2) return(HIGH_REPR_SAT8);
+    else                              return((float) t);
+  }
+  
+  /**
+   * Converts short unsigned int to float with pixel translations and
+   * care for overflows (underflows are assumed to cast to 0!)
+   *
+   * @param t Short unsigned int pixel value to be converted to a float
+   *
+   * @return float The float pixel value
+   */
+  float Pixel::ToFloat(const short unsigned int t) {
+    if(t < (double) VALID_MINU2) {
+      if(t == NULLU2)                 return(NULL4);
+      else if(t == LOW_REPR_SATU2)    return(LOW_REPR_SAT4);
+      else if(t == LOW_INSTR_SATU2)   return(LOW_INSTR_SAT4);
+      else if(t == HIGH_INSTR_SATU2)  return(HIGH_INSTR_SAT4);
+      else if(t == HIGH_REPR_SATU2)   return(HIGH_REPR_SAT4);
+      else                            return(LOW_REPR_SAT4);
+    }
+    else if(t > (double) VALID_MAXU2) return(HIGH_REPR_SAT8);
     else                              return((float) t);
   }
 

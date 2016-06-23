@@ -80,6 +80,7 @@ namespace Isis {
       QString pixType = vLab["FORMAT"];
       Isis::PixelType pixelType = None;
       if(pixType == "BYTE") pixelType = UnsignedByte;
+      if(pixType == "WORD") pixelType = UnsignedWord;
       if(pixType == "HALF") pixelType = SignedWord;
       if(pixType == "REAL") pixelType = Real;
       if(pixelType == None) {

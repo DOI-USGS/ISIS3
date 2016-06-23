@@ -843,7 +843,7 @@ namespace Isis {
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
-
+  
 
   WorkOrder *Project::lastNotUndoneWorkOrder() {
     WorkOrder *result = NULL;

@@ -110,6 +110,7 @@ namespace Isis {
    *                           when cube dimensions and buffer shape are same size. Fixes #1689.
    *   @history 2015-01-30 Ian Humphrey - Modified destructor to free m_writThreadMutex to 
    *                           prevent memory leaks upon destruction. Fixes #2082.
+   *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *
    */
   class CubeIoHandler {

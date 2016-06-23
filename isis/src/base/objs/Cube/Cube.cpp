@@ -859,6 +859,12 @@ namespace Isis {
       m_multiplier = (max - min) / (x2 - x1);
       m_base = min - m_multiplier * x1;
     }
+    else if (m_pixelType == UnsignedWord) {
+      x1 = VALID_MINU2;
+      x2 = VALID_MAXU2;
+      m_multiplier = (max - min) / (x2 - x1);
+      m_base = min - m_multiplier * x1;
+    }
   }
 
 

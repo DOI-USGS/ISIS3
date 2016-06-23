@@ -49,6 +49,7 @@ namespace Isis {
    *   @history 2009-04-16 Steven Lambright - Added Int and LongLongInt. Long was
    *            not added because it is 4 bytes on 32-bit linux and 8 bytes on
    *            64-bit linux.
+   *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    */
   class EndianSwapper {
     private:
@@ -94,7 +95,7 @@ namespace Isis {
       int Int(void *buf);
       long long int LongLongInt(void *buf);
       short int ShortInt(void *buf);
-      unsigned short int UnsignedShortInt(unsigned short int *buf);
+      unsigned short int UnsignedShortInt(void *buf);
       bool willSwap() const {
         return p_needSwap;
       }

@@ -8,6 +8,7 @@
 
 #include "CorrelationMatrix.h"
 #include "IException.h"
+#include "Preference.h"
 #include "PvlObject.h"
 #include "Pvl.h"
 #include "SparseBlockMatrix.h"
@@ -17,7 +18,7 @@ using namespace boost::numeric::ublas;
 using namespace Isis;
 
 int main() {
-  
+  Preference::Preferences(true);  
   qDebug() << "Test Default Constructor";
   
   CorrelationMatrix corrMat;

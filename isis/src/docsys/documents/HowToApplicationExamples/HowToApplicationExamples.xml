@@ -287,14 +287,14 @@
         <h5>What sizes should my images be?</h5>
 
         <p>
-          Images should fit comfortably on a monitor set to 800x600 resolution. Thumbnails are used as clickable icons
+          Images should fit comfortably on a monitor set to 1920x1080 resolution. Thumbnails are used as clickable icons
           that represent the larger image. Thumbnails should be small enough
           to load on a web page quickly and take up minimal space on a web page, yet be large enough to give your
           audience a sense of what they will see if they choose to view the full sized image.
         </p>
 
         <ul>
-          <li><b>Images:</b> no larger than 750 pixels wide and 550 pixels tall</li>
+          <li><b>Images:</b> no larger than 1760 pixels wide and 990 pixels tall</li>
           <li><b>Thumbnails:</b> no larger than 200 pixels wide or high, and no more than 32 KB file size</li>
         </ul>
 

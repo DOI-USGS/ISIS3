@@ -45,6 +45,7 @@ namespace Isis {
    *   @history  2013-01-17 Tracie Sucharski - Fixed some round-off errors when calculating
    *                            output lines/samples.  Fixed printing of Results pvl group where
    *                            samples and lines were swapped.  References #1385.
+   *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    */
   class FileTool : public Tool {
       Q_OBJECT

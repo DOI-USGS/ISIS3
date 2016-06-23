@@ -97,15 +97,16 @@ namespace Isis {
    *  @history 2010-02-24 Janet Barrett - Added code to support JPEG2000
    *  @history 2012-10-04 Jeannie Backer - Added documentation and fixed
    *                          indentation of history entries. No mantis ticket.
-   *   @history 2013-06-05 Jeannie Backer - Replaced redundant code in
+   *  @history 2013-06-05 Jeannie Backer - Replaced redundant code in
    *                           InitProcess() with accessor methods for
    *                           OutputNull(), et al. Changed local variable names
    *                           in ProcessCubes for clarity. References #1380.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
    *                                            functions to ensure successful 
    *                                            inheritance between Process and its
    *                                            child classes.  Added virtual keyword
    *                                            to destructor.  References #2215. 
+   *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *  
    *  
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
@@ -277,6 +278,10 @@ namespace Isis {
       /**Method for writing 32-bit signed floating point pixels data to a
       file stream*/
       void isisOut32(Buffer &in, std::ofstream &fout);
+      
+      /**Method for writing 64-bit signed double precision floating point pixels 
+      data to a file stream*/
+      void isisOut64(Buffer &in, std::ofstream &fout);
 
       /** Convenience method that checks to make sure the user is only using
       valid input to the StartProcess method. Also sets the cube up to be

@@ -1168,7 +1168,6 @@ namespace Isis {
     return;
   }
 
-
   /**
   * @brief Create a standard world file for the input cube
   *
