@@ -75,7 +75,7 @@ namespace Isis {
    * @param targetBody
    * @return  @b bool True if a view already exists, False otherwise.
    */
-  bool TargetGetInfoWorkOrder::isExecutable(TargetBody *targetBody) {
+  bool TargetGetInfoWorkOrder::isExecutable(TargetBodyQsp targetBody) {
     if (!targetBody)
       return false;
 

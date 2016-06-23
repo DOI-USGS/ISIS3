@@ -41,7 +41,7 @@ namespace Isis {
 
       virtual CnetEditorViewWorkOrder *clone() const;
 
-      virtual bool isExecutable(QList<Control *> controls);
+      virtual bool isExecutable(ControlList *controls);
       bool execute();
 
     protected:

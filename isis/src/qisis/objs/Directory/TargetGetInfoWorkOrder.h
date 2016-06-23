@@ -49,7 +49,7 @@ namespace Isis {
 
       virtual TargetGetInfoWorkOrder *clone() const;
 
-      virtual bool isExecutable(TargetBody *target);
+      virtual bool isExecutable(TargetBodyQsp targetBody);
       bool execute();
 
     protected:

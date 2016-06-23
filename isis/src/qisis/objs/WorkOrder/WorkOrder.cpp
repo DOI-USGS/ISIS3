@@ -59,7 +59,6 @@ namespace Isis {
     m_guiCamera = GuiCameraQsp();
     m_targetBody = TargetBodyQsp();
 
-
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
@@ -122,7 +121,7 @@ namespace Isis {
     m_imageIds = other.m_imageIds;
     m_imageList = new ImageList(*other.m_imageList);
     m_correlationMatrix = other.m_correlationMatrix;
-    m_controls = other.m_controls;
+    m_controlList = other.m_controlList;
     m_guiCamera = other.m_guiCamera;
     m_targetBody = other.m_targetBody;
     m_internalData = other.m_internalData;
@@ -188,7 +187,6 @@ namespace Isis {
   }
 
 
-
   /**
    * @brief Re-implement this method if your work order utilizes a control list (a list of control
    * networks) for data in order to operate.
@@ -201,76 +199,10 @@ namespace Isis {
   }
 
 
-  /**
-   * @brief Re-implement this method if your work order utilizes a control list (a list of control
-   * networks) for data in order to operate.
-   * @param controls A list of control networks.
-   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
-   * if it is not.
-   */
-  //bool WorkOrder::isExecutable(CorrelationMatrix * correlationMatrix) {
-  //  return false;
-  //}
-
-
-  /**
-   * @brief Re-implement this method if your work order utilizes a TargetBody.
-   * @param targetBody A pointer to a TargetBody object.
-   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
-   * if it is not.
-   */
-  //bool WorkOrder::isExecutable(TargetBody * targetBody) {
-  //  return false;
-  //}
-
-
-  /**
-   * @brief Sets the TargetBody data for this WorkOrder.
-   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
-   */
-  //void WorkOrder::setData(TargetBody * targetBody) {
-
-  //}
-
-  /**
-   * @brief Sets the TargetBody data for this WorkOrder.
-   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
-   */
-  //void WorkOrder::setData(QList<Control *> controls) {
-
-  //}
-
-
-  /**
-   * @brief Sets the TargetBody data for this WorkOrder.
-   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
-   */
-  //void WorkOrder::setData(GuiCamera * guiCamera) {
-
-  //}
-
-
   bool WorkOrder::isExecutable(CorrelationMatrix correlationMatrix) {
     return false;
   }
 
-  //bool WorkOrder::isExecutable(GuiCamera * guiCamera) {
-  //  return false;
-  //}
-
-
-  //bool WorkOrder::isExecutable(QList<Control *> controls) {
-  //  return false;
-  //}
-
-
-  /**
-   * @brief Sets the correlation matrix for this WorkOrder.
-   * @param correlationMatrix A pointer to the correlation matrix.
-   */
-  //void WorkOrder::setData(CorrelationMatrix * correlationMatrix) {
-
-  //}
 
   /**
    * @brief Sets the context data for this WorkOrder
@@ -283,7 +215,7 @@ namespace Isis {
 
   /**
    * @brief Sets the ImageList data for this WorkOrder
-   * @param Imagelist * images A pointer to the updated ImageList.
+   * @param images A pointer to the updated ImageList.
    */
   void WorkOrder::setData(ImageList *images) {
     m_imageIds.clear();
@@ -295,8 +227,8 @@ namespace Isis {
 
 
   /**
-   * @brief Sets the ControlList data for this WorkOrder
-   * @param ControlList * controls.  A pointer to the ControlList (which is a list of control
+   * @brief Sets the ControlList data for this WorkOrder.
+   * @param controls.  A pointer to the ControlList (which is a list of control
    * networks).
    */
   void WorkOrder::setData(ControlList *controls) {
@@ -306,18 +238,16 @@ namespace Isis {
 
   /**
    * @brief Sets the CorrelationMatrix data for this WorkOrder.
-   * @param CorrelationMatrix correlationMatrix The matrix data.
+   * @param correlationMatrix The matrix data.
    */
   void WorkOrder::setData(CorrelationMatrix correlationMatrix) {
     m_correlationMatrix = correlationMatrix;
   }
 
 
-
-
   /**
    * @brief Sets the TargetBody data for this WorkOrder.
-   * @param TargetBody targetBody A QSharedPointer to the TargetBody.
+   * @param targetBody A QSharedPointer to the TargetBody.
    */
   void WorkOrder::setData(TargetBodyQsp targetBody) {
     m_targetBody = targetBody;
@@ -326,7 +256,7 @@ namespace Isis {
 
   /**
    * @brief Sets the GuiCamera data for this WorkOrder.
-   * @param GuiCameraQsp guiCamera A QSharedPointer to the GuiCamera.
+   * @param guiCamera A QSharedPointer to the GuiCamera.
    */
   void WorkOrder::setData(GuiCameraQsp guiCamera) {
     m_guiCamera = guiCamera;
@@ -335,7 +265,7 @@ namespace Isis {
 
   /**
    * @brief Sets the internal data to the data stored in a ProjectItem.
-   * @param (ProjectItem *) item The item containing the data.
+   * @param item The item containing the data.
    */
   void WorkOrder::setData(ProjectItem *item) {
     if ( item->isProject() ) {
@@ -369,9 +299,6 @@ namespace Isis {
       setData( item->guiCamera() );
     }
   }
-
-
-
 
 
   /**
@@ -529,8 +456,6 @@ namespace Isis {
   }
 
 
-
-
   /**
    * @brief Sets the next WorkOrder in the sequence.
    * @param nextWorkOrder The next WorkOrder.
@@ -591,15 +516,15 @@ namespace Isis {
 
   /**
    * @brief Returns the Control List for this WorkOrder (a list of control networks).
-   * @return The ControlList.
+   * @return QPointer<ControlList>  Returns m_controlList.
    */
-  QList<Control *> WorkOrder::controlList() {
-    return m_controls;
+  QPointer<ControlList> WorkOrder::controlList() {
+    return m_controlList;
   }
 
 
   /**
-   * @brief A thread-safe method for retrieving a point to the imageList.
+   * @brief A thread-safe method for retrieving a pointer to the imageList.
    * @return @b (ImageList *) A pointer to the image list for this WorkOrder.
    */
   const ImageList *WorkOrder::imageList() const {
@@ -674,7 +599,7 @@ namespace Isis {
 
   /**
    * @brief Gets the execution time of this WorkOrder.
-   * @return @b QDateTime Returns the execution time.
+   * @return @b QDateTime The execution time.
    */
   QDateTime WorkOrder::executionTime() const {
     return m_executionTime;
@@ -691,7 +616,7 @@ namespace Isis {
 
 
   /**
-   * @brief  Returns the Redoing status of this WorkOrder.
+   * @brief  Returns the redoing status of this WorkOrder.
    * @return @b bool Returns True if the WorkOrder is executing a redo.  Returns False if it is not.
    */
   bool WorkOrder::isRedoing() const {
@@ -808,7 +733,7 @@ namespace Isis {
 
   /**
    * @brief Gets the current status of the WorkOrder.
-   * @param status An enumeration of all possible WorkOrder states
+   * @param status An enumeration of all possible WorkOrder states.
    * @return @b QString Returns a string representation of the current status of the WorkOrder.
    */
   QString WorkOrder::toString(WorkOrderStatus status) {
@@ -991,7 +916,7 @@ namespace Isis {
 
 
   /**
-   * @descriptionThis method is designed to be implemented by children work orders, but they need
+   * @description This method is designed to be implemented by children work orders, but they need
    * to call this version inside of their execute (at the beginning). The order of execution for
    * work orders is:
    *   execute() - GUI thread, can ask user for input*
@@ -1131,14 +1056,14 @@ namespace Isis {
   /**
    * @description This method is designed to be implemented by children work orders.
    * The order of execution for
-   *     redo is:
+   * redo is:
    *   syncRedo() - GUI thread*
    *   asyncRedo() - Pooled thread
    *   postSyncRedo() - GUI thread
    *
    * State should only be read from the parent WorkOrder class in this method. You can set state to
-   *   be used in asyncRedo() and postSyncRedo() safely. This method is always executed in the GUI
-   *   thread and has no progress.
+   * be used in asyncRedo() and postSyncRedo() safely. This method is always executed in the GUI
+   * thread and has no progress.
    */
   void WorkOrder::syncRedo() {
   }
@@ -1147,7 +1072,7 @@ namespace Isis {
   /**
    * @description This method is designed to be implemented by children work orders.
    * The order of execution for
-   *     redo is:
+   * redo is:
    *   syncRedo() - GUI thread
    *   asyncRedo() - Pooled thread*
    *   postSyncRedo() - GUI thread
@@ -1215,7 +1140,7 @@ namespace Isis {
   /**
    * @description This method is designed to be implemented by children work orders.
    * The order of execution for
-   *     undo is:
+   * undo is:
    *   syncUndo() - GUI thread
    *   asyncUndo() - Pooled thread
    *   postSyncUndo() - GUI thread*
@@ -1420,11 +1345,11 @@ namespace Isis {
 
   /**
    * @description Declare that this work order is saving the project.
-   * This makes the work order not appear in the undo stack (cannot undo/redo), and instead is
+   * This makes the work order not appear in the undo stack (cannot undo/redo), and instead it is
    * marked as a 'clean' state of the project. The QUndoCommand undo/redo will never be called.
    * The default for createsCleanState is false.
    * @param createsCleanState True if this work order is going to save the project to disk,
-   * False othersise.
+   * False otherwise.
    */
   void WorkOrder::setCreatesCleanState(bool createsCleanState) {
     m_createsCleanState = createsCleanState;
@@ -1432,7 +1357,7 @@ namespace Isis {
 
 
   /**
-   * @description.  By defualt, m_modifiesDiskState is False.  If a WorkOrder modifies the Project
+   * @description.  By default, m_modifiesDiskState is False.  If a WorkOrder modifies the Project
    * on disk as a result of it's action, this should be set to true.
    * @param changesProjectOnDisk True if this WorkOrder modifies the Project on disk.  False
    * if it does not.
@@ -1449,7 +1374,6 @@ namespace Isis {
   WorkOrder::XmlHandler::XmlHandler(WorkOrder *workOrder) {
     m_workOrder = workOrder;
   }
-
 
 
   /**

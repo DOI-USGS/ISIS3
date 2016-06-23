@@ -46,7 +46,8 @@ namespace Isis {
 
       virtual ViewControlNet3DWorkOrder *clone() const;
 
-      virtual bool isExecutable(QList<Control *> controls);
+      //virtual bool isExecutable(QList<Control *> controls);
+      virtual bool isExecutable(ControlList *controls);
       bool execute();
 
     protected:

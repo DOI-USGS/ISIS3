@@ -94,8 +94,10 @@ namespace Isis {
    *                           Added new methods to support the types used by
    *                           ProjectItem. Marked old methods as deprecated.
    *   @history 2016-01-04 Jeffrey Covington - Improved support for ProjectItem.
-   *   @history 2016-01-13 Tyler Wilson - Added documentation to many of the member functions
+   *   @history 2016-06-13 Tyler Wilson - Added documentation to many of the member functions
    *                          in this class.  Fixes #3956.
+   *   @history 2016-06-22  Tyler Wilson - Removed all references to deprecated functions/member
+   *                          variables.  Fixes #4052.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -235,7 +237,7 @@ namespace Isis {
 
       CorrelationMatrix correlationMatrix();
       
-      QList<Control *> controlList();
+      QPointer<ControlList> controlList();
 
       TargetBodyQsp targetBody();
 
@@ -367,8 +369,6 @@ namespace Isis {
        */
       TargetBodyQsp m_targetBody;
 
-      //Deprecated.
-      QList<Control *> m_controls;
 
       /**
        * A QStringList of unique image identifiers for all of the images this WorkOrder is dealing

@@ -48,7 +48,7 @@ namespace Isis {
 
       virtual SensorGetInfoWorkOrder *clone() const;
 
-      virtual bool isExecutable(GuiCamera *camera);
+      virtual bool isExecutable(GuiCameraQsp camera);
       bool execute();
 
     protected:

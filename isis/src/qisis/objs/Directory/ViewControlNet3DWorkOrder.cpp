@@ -28,6 +28,7 @@
 #include <QtDebug>
 
 #include "Control.h"
+#include "ControlList.h"
 #include "Directory.h"
 #include "Project.h"
 
@@ -74,8 +75,9 @@ namespace Isis {
    * @return @b bool Returns True if there is exactly one control network to display,
    * False otherwise.
    */
-  bool ViewControlNet3DWorkOrder::isExecutable(QList<Control *> controls) {
-    return (controls.count() == 1);
+  //tjw 3956
+  bool ViewControlNet3DWorkOrder::isExecutable(ControlList *controls) {
+    return (controls->count() == 1);
   }
 
 

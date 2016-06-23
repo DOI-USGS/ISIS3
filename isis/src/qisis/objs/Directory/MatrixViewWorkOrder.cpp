@@ -80,8 +80,8 @@ namespace Isis {
    * @return @b bool True if data (passed to this method as the matrix parameter by 
    *                 supportedActions) is of type CorrelationMatrix.
    */
-  bool MatrixViewWorkOrder::isExecutable(CorrelationMatrix *matrix) {
-    return matrix->isValid();
+  bool MatrixViewWorkOrder::isExecutable(CorrelationMatrix matrix) {
+    return matrix.isValid();
   }
 
 

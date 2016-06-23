@@ -80,7 +80,7 @@ namespace Isis {
    * @return @b bool Return True if we we already have a view for the guiCamera object.
    * Return False otherwise.
    */
-  bool SensorGetInfoWorkOrder::isExecutable(GuiCamera *guiCamera) {
+  bool SensorGetInfoWorkOrder::isExecutable(GuiCameraQsp guiCamera) {
     if (!guiCamera)
       return false;
 
