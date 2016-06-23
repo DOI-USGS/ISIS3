@@ -98,7 +98,7 @@ int main() {
   }
   catch (IException &e) {
     qDebug() << "Exception 1:";
-    qDebug() << e.toString();
+    qDebug().noquote() << e.toString();
 
   }
 
@@ -191,7 +191,7 @@ int main() {
 
    catch (IException &e) {
      qDebug() << "Exception 1";
-     qDebug() << e.toString();
+     qDebug().noquote() << e.toString();
    }
 
    try {
@@ -200,7 +200,7 @@ int main() {
 
    catch (IException &e) {
      qDebug() << "Exception 2";
-     qDebug() << e.toString();
+     qDebug().noquote() << e.toString();
    }
 
    try {
@@ -209,7 +209,7 @@ int main() {
 
    catch (IException &e) {
      qDebug() << "Exception 3";
-     qDebug() << e.toString();
+     qDebug().noquote() << e.toString();
    }
 
    try {
@@ -218,7 +218,7 @@ int main() {
 
    catch (IException &e) {
      qDebug() << "Exception 4";
-     qDebug() << e.toString();
+     qDebug().noquote() << e.toString();
    }
 
 

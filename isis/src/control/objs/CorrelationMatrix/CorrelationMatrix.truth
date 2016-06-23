@@ -21,7 +21,7 @@ Covariance Matrix:
 Testing Compute Correlation Matrix Method.
 Tesing Exception in Compute Correlation Matrix Method
 Exception 1:
-"**PROGRAMMER ERROR** Cannot compute correlation matrix without a specified file name. Use setCorrelationFileName(FileName) before calling computeCorrelationMatrix()."
+**PROGRAMMER ERROR** Cannot compute correlation matrix without a specified file name. Use setCorrelationFileName(FileName) before calling computeCorrelationMatrix().
 Correlation Matrix:
  New Block 
        1           1           
@@ -65,13 +65,16 @@ Images and Parameters:
 		 "Y"
 Testing CorrelationMatrix(PvlObject storedMatrixData)
 Exception 1
-"**USER ERROR** This Pvl Object does not have the correct correlation information. The Object you are looking for is called CorrelationMatrixData."
+**USER ERROR** This Pvl Object does not have the correct correlation information. The Object you are looking for is called CorrelationMatrixData.
 Exception 2
-"**USER ERROR** Could not find the Covariance Matrix .dat file name.\n**ERROR** PVL Keyword [CovarianceMatrixFileName] does not exist in [Object = CorrelationMatrixData]."
+**USER ERROR** Could not find the Covariance Matrix .dat file name.
+**ERROR** PVL Keyword [CovarianceMatrixFileName] does not exist in [Object = CorrelationMatrixData].
 Exception 3
-"**USER ERROR** Could not find the Correlation Matrix .dat file name.\n**ERROR** PVL Keyword [CorrelationMatrixFileName] does not exist in [Object = CorrelationMatrixData]."
+**USER ERROR** Could not find the Correlation Matrix .dat file name.
+**ERROR** PVL Keyword [CorrelationMatrixFileName] does not exist in [Object = CorrelationMatrixData].
 Exception 4
-"**USER ERROR** Could not get Images and Parameters from ImagesAndParameters group.\n**ERROR** Unable to find PVL group [ImagesAndParameters]."
+**USER ERROR** Could not get Images and Parameters from ImagesAndParameters group.
+**ERROR** Unable to find PVL group [ImagesAndParameters].
 Object = CorrelationMatrixData
   CovarianceMatrixFileName  = covMat.dat
   CorrelationMatrixFileName = corrMat.dat
