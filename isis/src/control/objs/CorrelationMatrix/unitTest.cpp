@@ -28,7 +28,7 @@ int main() {
   try {
     CorrelationMatrix corrMat2(corrMat);
   }
-  catch(IException &e) {
+  catch (IException &e) {
     throw IException(IException::Unknown,
                      "Failed to create object with copy constructor",
                      _FILEINFO_);
@@ -39,7 +39,7 @@ int main() {
   try {
     CorrelationMatrix corrMat3 = corrMat;
   }
-  catch(IException &e) {
+  catch (IException &e) {
     throw IException(IException::Unknown,
                      "Failed to copy object using equal operator",
                      _FILEINFO_);
@@ -164,7 +164,7 @@ int main() {
        }
      }
    }
-   catch(IException &e) {
+   catch (IException &e) {
      QString msg = "Failed to create object using CorrelationMatrix(PvlObject).";
      throw IException(e, IException::Programmer, msg, _FILEINFO_);
    }
@@ -189,7 +189,7 @@ int main() {
       CorrelationMatrix except1(exception1);
    }
 
-   catch(IException &e) {
+   catch (IException &e) {
      qDebug() << "Exception 1";
      qDebug() << e.toString();
    }
@@ -198,7 +198,7 @@ int main() {
       CorrelationMatrix except2(exception2);
    }
 
-   catch(IException &e) {
+   catch (IException &e) {
      qDebug() << "Exception 2";
      qDebug() << e.toString();
    }
@@ -207,7 +207,7 @@ int main() {
       CorrelationMatrix except3(exception3);
    }
 
-   catch(IException &e) {
+   catch (IException &e) {
      qDebug() << "Exception 3";
      qDebug() << e.toString();
    }
@@ -216,7 +216,7 @@ int main() {
       CorrelationMatrix except4(exception4);
    }
 
-   catch(IException &e) {
+   catch (IException &e) {
      qDebug() << "Exception 4";
      qDebug() << e.toString();
    }
