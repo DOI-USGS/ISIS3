@@ -36,21 +36,22 @@ namespace Isis {
    * provide utilities to retrieve radii and photometric information.
    *
    *
-   * @ingroup 
+   * @ingroup
    *
    * @author 2010-08-02 Debbie A. Cook
    *
    * @internal
-   *   @history 2012-12-21 - Debbie A. Cook - Cleaned up intersectSurface method to
-   *                             reflect changes made to ShapeModel class.  References #1343.
+   *   @history 2012-12-21 Debbie A. Cook - Cleaned up intersectSurface method to
+   *                           reflect changes made to ShapeModel class.  References #1343.
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
-   *                             were signaled. References #2248.
+   *                           were signaled. References #2248.
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor 
+   *                           EllipsoidShape(Target, Pvl). References #2214
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:
       //! Constructors
-      EllipsoidShape(Target *target, Isis::Pvl &pvl);
       EllipsoidShape(Target *target);
       EllipsoidShape();
 
@@ -62,16 +63,16 @@ namespace Isis {
                             std::vector<double> lookDirection);
 
       //! Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal(); 
+      virtual void calculateDefaultNormal();
 
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
 
       //! Calculate the local surface normal of the current intersection point
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints); 
+      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
 
       //! Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal(); 
+      void calculateSurfaceNormal();
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);
@@ -81,4 +82,3 @@ namespace Isis {
 };
 
 #endif
-

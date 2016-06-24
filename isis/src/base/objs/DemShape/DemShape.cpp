@@ -41,11 +41,11 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Construct a DemShape object. This method creates a ShapeModel object named 
-   * "DemShape". The member variables are set to Null. 
+   * Construct a DemShape object. This method creates a ShapeModel object named
+   * "DemShape". The member variables are set to Null.
    *
    */
-  DemShape::DemShape() : ShapeModel () {
+  DemShape::DemShape() : ShapeModel() {
     setName("DemShape");
     m_demProj = NULL;
     m_demCube = NULL;
@@ -55,14 +55,14 @@ namespace Isis {
 
 
   /**
-   * Construct a DemShape object. This method creates a ShapeModel object 
-   * named "DemShape" and initializes member variables from the projection 
-   * shape model using the given Target and Pvl. 
+   * Construct a DemShape object. This method creates a ShapeModel object
+   * named "DemShape" and initializes member variables from the projection
+   * shape model using the given Target and Pvl.
    *
    * @param target Pointer to a valid target.
    * @param pvl Valid ISIS cube label.
    */
-  DemShape::DemShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
+  DemShape::DemShape(Target *target, Pvl &pvl) : ShapeModel(target) {
     setName("DemShape");
     m_demProj = NULL;
     m_demCube = NULL;
@@ -80,7 +80,7 @@ namespace Isis {
     }
 
     m_demCube = CubeManager::Open(demCubeFile);
- 
+
     // This caching algorithm works much better for DEMs than the default,
     //   regional. This is because the uniqueIOCachingAlgorithm keeps track
     //   of a history, which for something that isn't linearly processing a
@@ -117,9 +117,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Find the intersection point with the DEM
-   * 
+   *
    * TIDBIT:  From the code below we have historically tested to see if we can
    * first intersect the ellipsoid. If not then we assumed that we could not
    * intersect the DEM. This of course isn't always true as the DEM could be
@@ -127,19 +127,19 @@ namespace Isis {
    * notice. It has recently (Aug 2011) come into play trying to intersect
    * images containing a limb and spiceinit'ed with a DEM (e.g., Vesta and soon
    * Mercury). This implies that info at the limb will not always be computed.
-   * In the future we may want to do a better job handling this special case. 
-   *  
+   * In the future we may want to do a better job handling this special case.
+   *
    * @param observerPos
    * @param lookDirection
-   *  
+   *
    * @return @b bool Indicates whether the intersection was found.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
                                   vector<double> lookDirection) {
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
-    // (this method is in the ShapeModel base class) 
-   
+    // (this method is in the ShapeModel base class)
+
     bool ellipseIntersected = intersectEllipsoid(observerPos, lookDirection);
     if (!ellipseIntersected) {
       return false;
@@ -150,10 +150,10 @@ namespace Isis {
     int it = 1;
     double dX, dY, dZ, dist2;
     bool done = false;
-    
+
     // latitude, longitude in Decimal Degrees
     double latDD, lonDD;
-    
+
     // in each iteration, the current surface intersect point is saved for
     // comparison with the new, updated surface intersect point
     SpiceDouble currentIntersectPt[3];
@@ -169,7 +169,7 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
     while (!done) {
-        
+
       if (it > maxit) {
         setHasIntersection(false);
         done = true;
@@ -181,16 +181,16 @@ namespace Isis {
       // is a 24% slowdown (which is significant in this very tightly looped call).
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
-      
+
       latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
       lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
-       
+
       if (lonDD < 0) {
         lonDD += 360;
       }
 
-      // Previous Sensor version used local version of this method with lat and lon doubles. 
-      // Steven made the change to improve speed.  He said the difference was negilgible.  
+      // Previous Sensor version used local version of this method with lat and lon doubles.
+      // Steven made the change to improve speed.  He said the difference was negilgible.
       Distance radiusKm = localRadius(Latitude(latDD, Angle::Degrees),
                                       Longitude(lonDD, Angle::Degrees));
 
@@ -202,17 +202,17 @@ namespace Isis {
       // save current surface intersect point for comparison with new, updated
       // surface intersect point
       memcpy(currentIntersectPt, newIntersectPt, 3 * sizeof(double));
-      
+
       double r = radiusKm.kilometers();
       bool status;
       surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
                (SpiceBoolean*) &status);
 
-      // LinearAlgebra::Vector point = LinearAlgebra::vector(observerPos[0], 
-      //                                                     observerPos[1], 
+      // LinearAlgebra::Vector point = LinearAlgebra::vector(observerPos[0],
+      //                                                     observerPos[1],
       //                                                     observerPos[2]);
-      // LinearAlgebra::Vector direction = LinearAlgebra::vector(lookDirection[0], 
-      //                                                         lookDirection[1], 
+      // LinearAlgebra::Vector direction = LinearAlgebra::vector(lookDirection[0],
+      //                                                         lookDirection[1],
       //                                                         lookDirection[2]);
       // QList<double> ellipsoidRadii;
       // ellipsoidRadii << r << r << r;
@@ -249,20 +249,20 @@ namespace Isis {
 
   /**
    * Gets the radius from the DEM, if we have one.
-   *  
+   *
    * @param lat Latitude
    * @param lon Longitude
-   *  
+   *
    * @return @b Distance Local radius from the DEM
    */
   Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
-    
+
     Distance distance=Distance();
 
     if (lat.isValid() && lon.isValid()) {
       m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-    
-      // The next if statement attempts to do the same as the previous one, but not as well so 
+
+      // The next if statement attempts to do the same as the previous one, but not as well so
       // it was replaced.
       // if (!m_demProj->IsGood())
       //   return Distance();
@@ -281,9 +281,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Return the scale of the DEM shape, in pixels per degree.
-   *  
+   *
    * @return @b double The scale of the DEM.
    */
   double DemShape::demScale() {
@@ -291,18 +291,18 @@ namespace Isis {
   }
 
 
-  /** 
-   * This method calculates the default normal (Ellipsoid for backwards 
-   * compatability) for the DemShape. 
+  /**
+   * This method calculates the default normal (Ellipsoid for backwards
+   * compatability) for the DemShape.
    */
   void DemShape::calculateDefaultNormal() {
     calculateEllipsoidalSurfaceNormal();
   }
 
 
-  /** 
+  /**
    * Returns the DEM Cube object.
-   *  
+   *
    * @return @b Cube* A pointer to the DEM cube associated with this shape model.
    */
   Cube *DemShape::demCube() {
@@ -310,24 +310,24 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Indicates that this shape model is from a DEM. Since this method returns
-   * true for this class, the Camera class will calculate the local normal 
-   * using neighbor points. This method is pure virtual and must be 
-   * implemented by all DemShape classes. This parent implementation returns 
-   * true. 
-   *  
-   * @return @b bool Indicates that this is a DEM shape model. 
-   */ 
-  bool DemShape::isDEM() const { 
+   * true for this class, the Camera class will calculate the local normal
+   * using neighbor points. This method is pure virtual and must be
+   * implemented by all DemShape classes. This parent implementation returns
+   * true.
+   *
+   * @return @b bool Indicates that this is a DEM shape model.
+   */
+  bool DemShape::isDEM() const {
     return true;
   }
 
 
-  /** 
-   * This method calculates the local surface normal of the current intersection 
-   * point. 
-   *  
+  /**
+   * This method calculates the local surface normal of the current intersection
+   * point.
+   *
    * @param neighborPoints
    */
   void DemShape::calculateLocalNormal(QVector<double *> neighborPoints) {
@@ -361,7 +361,7 @@ namespace Isis {
    }
     else {
       setHasNormal(true);
-    } 
+    }
 
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and
@@ -375,14 +375,14 @@ namespace Isis {
     if (dotprod < 0.0) {
       vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
     }
-  
+
     setNormal(normal);
   }
 
 
-  /** 
-   * This method calculates the surface normal of the current intersection 
-   * point. 
+  /**
+   * This method calculates the surface normal of the current intersection
+   * point.
    */
   void DemShape::calculateSurfaceNormal() {
     calculateEllipsoidalSurfaceNormal();

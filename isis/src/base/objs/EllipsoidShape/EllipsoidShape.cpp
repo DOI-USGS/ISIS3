@@ -18,22 +18,12 @@
 using namespace std;
 
 namespace Isis {
-  /**
-   * Initialize the EllipsoidShape.
-   *
-   * @param pvl Valid Isis3 cube label.
-   */
-  EllipsoidShape::EllipsoidShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
-    setName("Ellipsoid");
-  }
-
 
   /**
    * Initialize the EllipsoidShape.
    *
    * @param pvl Valid Isis3 cube label.
    */
-  // EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
   EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
     setName("Ellipsoid");
   }
@@ -44,18 +34,17 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  // EllipsoidShape::EllipsoidShape() : ShapeModel () {
   EllipsoidShape::EllipsoidShape() : ShapeModel () {
     setName("Ellipsoid");
   }
-  
-  
+
+
   /** Find the intersection point
    *
    */
   bool EllipsoidShape::intersectSurface (std::vector<double> observerPos,
                                          std::vector<double> lookDirection) {
-    
+
     return (intersectEllipsoid(observerPos, lookDirection));
   }
 
@@ -76,14 +65,14 @@ namespace Isis {
   }
 
 
-  /** 
-   * Indicates that this shape model is not from a DEM. Since this method 
-   * returns false for this class, the Camera class will not calculate the 
-   * local normal using neighbor points. 
-   *  
-   * @return bool Indicates that this is not a DEM shape model. 
-   */ 
-  bool EllipsoidShape::isDEM() const { 
+  /**
+   * Indicates that this shape model is not from a DEM. Since this method
+   * returns false for this class, the Camera class will not calculate the
+   * local normal using neighbor points.
+   *
+   * @return bool Indicates that this is not a DEM shape model.
+   */
+  bool EllipsoidShape::isDEM() const {
     return false;
   }
 
@@ -121,24 +110,24 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Gets the local radius for the given latitude/longitude coordinate.
-   * 
+   *
    * @return Distance The distance from the center of the ellipsoid to its
    *         surface at the given lat/lon location.
    *
    */
   Distance EllipsoidShape::localRadius(const Latitude &lat, const Longitude &lon) {
-    
+
     std::vector<Distance> radii = targetRadii();
-    
+
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
-    
+
     double rlat = lat.radians();
     double rlon = lon.radians();
-    
+
     double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
                       pow(a * sin(rlon), 2));
     const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +

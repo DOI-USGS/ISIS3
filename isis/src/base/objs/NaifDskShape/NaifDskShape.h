@@ -39,7 +39,7 @@ namespace Isis {
    *
    * @author 2014-02-07 Kris Becker
    *
-   * @internal 
+   * @internal
    *   @history 20104-02-07 - Kris Becker - Original Version
    *   @history 2015-03-08 Jeannie Backer - Changed name from  NaifDskShapeModel to match other
    *                           classes derived from ShapeModel. Added documentation and test.
@@ -48,7 +48,8 @@ namespace Isis {
    *                           setLocalNormalFromIntercept() rather than trying to
    *                           interpolate based on the neighbor values. References #2035
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
-   *  
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
+   *                           References #2214
    *   @todo Remove Model from name to match other derived classes
    */
   class NaifDskShape : public ShapeModel {
@@ -66,14 +67,14 @@ namespace Isis {
                             std::vector<double> lookDirection);
 
       // Calculate the default normal of the current intersection point
-      void calculateDefaultNormal(); 
+      void calculateDefaultNormal();
 
       bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints); 
-      void calculateSurfaceNormal(); 
+      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
+      void calculateSurfaceNormal();
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
@@ -95,4 +96,3 @@ namespace Isis {
 }
 
 #endif
-
