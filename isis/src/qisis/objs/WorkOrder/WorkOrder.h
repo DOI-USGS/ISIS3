@@ -25,13 +25,16 @@
 
 #include <QAction>
 #include <QDateTime>
-#include <QUndoCommand>
-
-#include <QPointer>
-
 // This is needed for the QVariant macro
 #include <QMetaType>
+#include <QPointer>
+#include <QUndoCommand>
 
+
+
+#include "CorrelationMatrix.h"
+#include "GuiCamera.h"
+#include "TargetBody.h"
 #include "XmlStackedHandler.h"
 
 template<typename T> class QFutureWatcher;
@@ -40,18 +43,20 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class Control;
+  class ControlList;
   class Directory;
   class ImageList;
   class ProgressBar;
   class Project;
+  class ProjectItem;
   class XmlStackedHandlerReader;
 
   /**
    * @brief Parent class for anything that performs an action in Project
    *
    * This class should be used for any operation that affects a Project. This provides history,
-   *   undo/redo capabilities (which need implemented correctly), and the ability for the project to
-   *   guarantee a good state on disk.
+   *   undo/redo capabilities (which need to be implemented correctly), and the ability for the
+   *   project to guarantee a good state on disk.
    *
    * State between the end of execute() and the beginning of the redo methods must be saved via
    *   the parent (WorkOrder) class. This is to ensure serializability. State between the redo
@@ -83,11 +88,27 @@ namespace Isis {
    *                           Added listenForImageDestruction() and clearImageList().
    *   @history 2013-04-25 Jeannie Backer - Modified call to qWarning() to prevent compile warnings
    *                           on MAC OS 10.8.2
-   *
+   *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
+   *   @history 2015-06-12 Ken Edmundson - Added support for target body.
+   *   @history 2015-10-05 Jeffrey Covington - Added support for ProjectItem.
+   *                           Added new methods to support the types used by
+   *                           ProjectItem. Marked old methods as deprecated.
+   *   @history 2016-01-04 Jeffrey Covington - Improved support for ProjectItem.
+   *   @history 2016-06-13 Tyler Wilson - Added documentation to many of the member functions
+   *                          in this class.  Fixes #3956.
+   *   @history 2016-06-22  Tyler Wilson - Removed all references to deprecated functions/member
+   *                          variables.  Fixes #4052.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
     public:
+
+
+
+    /**
+       * @brief This enumeration is used by other functions to set and retrieve the
+       * current state of the WorkOrder.
+       */
       enum WorkOrderStatus {
         WorkOrderUnknownStatus = 0,
         WorkOrderNotStarted,
@@ -102,7 +123,10 @@ namespace Isis {
         WorkOrderLastStatus = WorkOrderFinished
       };
 
-
+      /**
+       * @brief This enumeration is for recording the context of the current Workorder (whether
+       * it is part of a project or not).
+       */
       enum Context {
         NoContext,
         ProjectContext
@@ -112,14 +136,41 @@ namespace Isis {
       virtual ~WorkOrder();
 
       virtual WorkOrder *clone() const = 0;
+
       virtual bool isExecutable(Context);
-      virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ImageList *images);
+      virtual bool isExecutable(ControlList *controls);
+      virtual bool isExecutable(CorrelationMatrix);
+      virtual bool isExecutable(TargetBodyQsp targetBody);
+      virtual bool isExecutable(GuiCameraQsp guiCamera);
+      virtual bool isExecutable(ProjectItem *item);
+
+      //Deprecated
+      //virtual bool isExecutable(QList<Control *> controls);
+      //virtual bool isExecutable(CorrelationMatrix *correlationMatrix);
+      //virtual bool isExecutable(GuiCamera* guiCamera);
+      //virtual bool isExecutable(TargetBody* targetBody);
+
+
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
+
       virtual void setData(Context);
       virtual void setData(ImageList *images);
-      virtual void setData(QList<Control *> controls);
+      virtual void setData(ControlList *controls);
+      virtual void setData(CorrelationMatrix);
+      virtual void setData(TargetBodyQsp targetBody);
+      virtual void setData(GuiCameraQsp guiCamera);
+      virtual void setData(ProjectItem *item);
+
+      //Deprecated
+      //virtual void setData(QList<Control *> controls);
+      //virtual void setData(CorrelationMatrix *correlationMatrix);
+      //virtual void setData(GuiCamera *camera);
+      //virtual void setData(TargetBody *targetBody);
+
+
+
       void setNext(WorkOrder *nextWorkOrder);
       void setPrevious(WorkOrder *previousWorkOrder);
 
@@ -184,7 +235,13 @@ namespace Isis {
       ImageList *imageList();
       const ImageList *imageList() const;
 
-      QList<Control *> controlList();
+      CorrelationMatrix correlationMatrix();
+      
+      QPointer<ControlList> controlList();
+
+      TargetBodyQsp targetBody();
+
+      GuiCameraQsp guiCamera();
 
       virtual bool dependsOn(WorkOrder *other) const;
 
@@ -227,13 +284,19 @@ namespace Isis {
       void startRedo();
 
     private:
+      /**
+       * @brief This enum describes the current state of a Queued WorkOrder.
+       */
       enum QueuedWorkOrderAction {
         NoQueuedAction,
         RedoQueuedAction,
         UndoQueuedAction
       };
 
-      /**
+      /**        
+       * @description This class is used for processing an XML file containing information
+       * about a WorkOrder.
+       *
        * @author 2012-??-?? Steven Lambright
        *
        * @internal
@@ -248,6 +311,10 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
+          /**
+           * @brief This is a pointer to the WorkOrder the XmlHandler is filling
+           * with information it parses from an XML file.
+           */
           WorkOrder *m_workOrder;
       };
 
@@ -263,28 +330,76 @@ namespace Isis {
       bool m_createsCleanState;
 
       /**
-       * This is defaulted to false. If a work order modifies the project on disk to perform its
-       *   actions (for example, an import work order), the work order should call
-       *   setModifiesDiskState(true) in its constructor.
+       * This is defaulted to false. If a WorkOrder modifies the project on disk to perform its
+       * actions (for example, an import WorkOrder), the WorkOrder should call
+       * setModifiesDiskState(true) in its constructor.
        */
       bool m_modifiesDiskState;
 
       WorkOrderStatus m_status;
       QueuedWorkOrderAction m_queuedAction;
 
+      /**
+       * The miniumum value of the Progess Bar.
+       */
       int m_progressRangeMinValue;
+      /**
+       * The maximum value of the Progess Bar.
+       */
       int m_progressRangeMaxValue;
+      /**
+       * The current value of the Progress Bar.
+       */
       int m_progressValue;
 
       Context m_context;
+      QPointer<ImageList> m_imageList;
+      QPointer<ControlList> m_controlList;
+      CorrelationMatrix m_correlationMatrix;
+      /**
+       * A QSharedPointer to the GuiCamera (the Camera object but encapsulated within a Gui
+       * framework
+       */
+      GuiCameraQsp m_guiCamera;
+
+
+      /**
+       * A QSharedPointer to the TargetBody (A Target object but encapsulated within a Gui
+       * framework.
+       */
+      TargetBodyQsp m_targetBody;
+
+
+      /**
+       * A QStringList of unique image identifiers for all of the images this WorkOrder is dealing
+       * with.
+       */
       QStringList m_imageIds;
-      QPointer<ImageList> m_images;
-      QList<Control *> m_controls;
+
+      /**
+       * @brief A QStringList of internal properties for this WorkOrder.
+       */
       QStringList m_internalData;
+
+      /**
+       * A pointer to the next WorkOrder in the queue.
+       */
       QPointer<WorkOrder> m_nextWorkOrder;
+
+      /**
+       * A pointer to the previous WorkOrder in the queue.
+       */
       QPointer<WorkOrder> m_previousWorkOrder;
+
+      /**
+       * A pointer to the Project this WorkOrder is attached to.
+       */
       QPointer<Project> m_project;
 
+      /**
+       * This is used to protect the integrity of data the WorkOrder is working on so that only
+       * one thread at a time cann access it.
+       */
       QMutex *m_transparentConstMutex;
 
       /**
@@ -292,14 +407,39 @@ namespace Isis {
        */
       QDateTime m_executionTime;
 
+      /**
+       * @brief A pointer to a QFutureWatcher object which monitors a QFuture
+       * object using signals and slots.  A QFuture object represents the results of an
+       * asynchrounous operation.
+       */
       QPointer< QFutureWatcher<void> > m_futureWatcher;
 
+
+
+      /**
+       * @brief A pointer to the ProgressBar.
+       */
       QPointer<ProgressBar> m_progressBar;
 
+      /**
+       * @brief A pointer to the QTimer which updates the ProgressBar.
+       */
       QPointer<QTimer> m_progressBarUpdateTimer;
+
+      /**
+       * @brief A pointer to the ProgressBar deletion timer.
+       */
       QPointer<QTimer> m_progressBarDeletionTimer;
 
+
+      /**
+       * A QTime object holding the excecution time of the WorkOrder.
+       */
       QTime *m_elapsedTimer;
+
+      /**
+       * @brief The seconds that have elapsed since the WorkOrder started executing.
+       */
       double m_secondsElapsed;
   };
 }
