@@ -29,6 +29,10 @@ namespace Isis {
    *
    * @param project The project to give to the work order constructor
    * @param type The work order type (class name) - for example "Isis::ImportImagesWorkOrder"
+   * 
+   * @throws IException::Unknown "Could not create the work order through WorkOrderFactory"
+   * 
+   * @return @b WorkOrder Returns the instantiated WorkOrder
    */
   WorkOrder *WorkOrderFactory::create(Project *project, QString type) {
     WorkOrder *result = NULL;
