@@ -59,8 +59,8 @@ namespace Isis {
   /**
    * Constructs an item from a BundleResults.
    *
-   * @param[in] bundleResults (BundleResults *) The BundleResults to
-   *                                            construct from.
+   * @param[in] bundleResults (BundleResults) The BundleResults to
+   *                                          construct from.
    */
   ProjectItem::ProjectItem(BundleResults bundleResults) {
     setBundleResults(bundleResults);
@@ -71,8 +71,8 @@ namespace Isis {
   /**
    * Constructs an item from a BundleSettings.
    *
-   * @param[in] bundleSettings (BundleSettings *) The BundleSettings to
-   *                                              construct from.
+   * @param[in] bundleSettings (BundleSettingsQsp) The BundleSettings to
+   *                                               construct from.
    */
   ProjectItem::ProjectItem(BundleSettingsQsp bundleSettings) {
     setBundleSettings(bundleSettings);
@@ -136,8 +136,8 @@ namespace Isis {
   /**
    * Constructs an item from a CorrelationMatrix.
    *
-   * @param[in] correlationMatrix (CorrelationMatrix *) The CorrelationMatrix to
-   *                                                    construct from.
+   * @param[in] correlationMatrix (CorrelationMatrix) The CorrelationMatrix to
+   *                                                  construct from.
    */
   ProjectItem::ProjectItem(CorrelationMatrix correlationMatrix) {
     setCorrelationMatrix(correlationMatrix);
@@ -272,7 +272,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Destructs a ProjectItem.
    */
@@ -282,7 +281,7 @@ namespace Isis {
   /**
    * Returns the BundleResults stored in the data of the item.
    *
-   * @return (BundleResults *) The BundleResults of the item.
+   * @return @b BundleResults The BundleResults of the item.
    */
   BundleResults ProjectItem::bundleResults() const {
     return data().value<BundleResults>();
@@ -292,7 +291,7 @@ namespace Isis {
   /**
    * Returns the BundleSettings stored in the data of the item.
    *
-   * @return (BundleSettings *) The BundleSettings of the item.
+   * @return @b BundleSettings* The BundleSettings of the item.
    */
   BundleSettingsQsp ProjectItem::bundleSettings() const {
     return data().value<BundleSettingsQsp>();
@@ -302,7 +301,7 @@ namespace Isis {
   /**
    * Returns the BundleSolutionInfo stored in the data of the item.
    *
-   * @return (BundleSolutionInfo *) The BundleSolutionInfo of the item.
+   * @return @b BundleSolutionInfo* The BundleSolutionInfo of the item.
    */
   BundleSolutionInfo *ProjectItem::bundleSolutionInfo() const {
     return data().value<BundleSolutionInfo *>();
@@ -312,7 +311,7 @@ namespace Isis {
   /**
    * Returns the Image stored in the data of the item.
    *
-   * @return (Image *) The Image of the item.
+   * @return @b Image* The Image of the item.
    */
   Image *ProjectItem::image() const {
     return data().value<Image *>();
@@ -322,7 +321,7 @@ namespace Isis {
   /**
    * Returns the ImageList stored in the data of the item.
    *
-   * @return (ImageList *) The ImageList of the item.
+   * @return @b ImageList* The ImageList of the item.
    */
   ImageList *ProjectItem::imageList() const {
     return data().value<ImageList *>();
@@ -332,7 +331,7 @@ namespace Isis {
   /**
    * Returns the Control stored in the data of the item.
    *
-   * @return (Control *) The Control of the item.
+   * @return @b Control* The Control of the item.
    */
   Control *ProjectItem::control() const {
     return data().value<Control *>();
@@ -342,7 +341,7 @@ namespace Isis {
   /**
    * Returns the ControlList stored in the data of the item.
    *
-   * @return (ControlList *) The ControlList of the item.
+   * @return @b ControlList* The ControlList of the item.
    */
   ControlList *ProjectItem::controlList() const {
     return data().value<ControlList *>();
@@ -352,7 +351,7 @@ namespace Isis {
   /**
    * Returns the CorrelationMatrix stored the item.
    *
-   * @return (CorrelationMatrix *) The CorrelationMatrix of the item.
+   * @return @b CorrelationMatrix* The CorrelationMatrix of the item.
    */
   CorrelationMatrix ProjectItem::correlationMatrix() const {
     return data().value<CorrelationMatrix>();
@@ -362,7 +361,7 @@ namespace Isis {
   /**
    * Returns the Project stored in the data of the item.
    *
-   * @return (Project *) The Project of the item.
+   * @return @b Project* The Project of the item.
    */
   Project *ProjectItem::project() const {
     return data().value<Project *>();
@@ -372,7 +371,7 @@ namespace Isis {
   /**
    * Returns the GuiCameraQsp stored in the data of the item.
    *
-   * @return (GuiCameraQsp) The camera stored in the item.
+   * @return @b GuiCameraQsp The camera stored in the item.
    */
   GuiCameraQsp ProjectItem::guiCamera() const {
     return data().value<GuiCameraQsp>();
@@ -383,7 +382,7 @@ namespace Isis {
   /**
    * Returns the TargetBodyQsp stored in the data of the item.
    * 
-   * @return (TargetBodyQsp) The target body stored in the item.
+   * @return @b TargetBodyQsp The target body stored in the item.
    */
   TargetBodyQsp ProjectItem::targetBody() const {
     return data().value<TargetBodyQsp>();
@@ -394,7 +393,7 @@ namespace Isis {
    * Returns true if BundleResults are stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If BundleResults are stored in the data of the item or not.
+   * @return @b bool If BundleResults are stored in the data of the item or not.
    */
   bool ProjectItem::isBundleResults() const {
     return data().canConvert<BundleResults>();
@@ -405,7 +404,7 @@ namespace Isis {
    * Returns true if BundleSettings are stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If BundleSettings are stored in the data of the item or not.
+   * @return @b bool If BundleSettings are stored in the data of the item or not.
    */
   bool ProjectItem::isBundleSettings() const {
     return data().canConvert<BundleSettingsQsp>();
@@ -416,7 +415,7 @@ namespace Isis {
    * Returns true if a BundleSolutionInfo is stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If a BundleSolutionInfo is stored in the data of the item or not.
+   * @return @b bool If a BundleSolutionInfo is stored in the data of the item or not.
    */
   bool ProjectItem::isBundleSolutionInfo() const {
     return data().canConvert<BundleSolutionInfo *>();
@@ -427,7 +426,7 @@ namespace Isis {
    * Returns true if an Image is stored in the data of the item. Returns false
    * otherwise.
    *
-   * @return (bool) If an Image is stored in the data of the item or not.
+   * @return @b bool If an Image is stored in the data of the item or not.
    */
   bool ProjectItem::isImage() const {
     return data().canConvert<Image *>();
@@ -438,7 +437,7 @@ namespace Isis {
    * Returns true if an ImageList is stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If an ImageList is stored in the data of the item or not.
+   * @return @b bool If an ImageList is stored in the data of the item or not.
    */
   bool ProjectItem::isImageList() const {
     return data().canConvert<ImageList *>();
@@ -449,7 +448,7 @@ namespace Isis {
    * Returns true if a Control is stored in the data of the item. Returns false
    * otherwise.
    *
-   * @return (bool) If a Control is stored in the data of the item or not.
+   * @return @b bool If a Control is stored in the data of the item or not.
    */
   bool ProjectItem::isControl() const { 
     return data().canConvert<Control *>();
@@ -461,7 +460,7 @@ namespace Isis {
    * Returns false
    * otherwise.
    *
-   * @return (bool) If a ControlList is stored in the data of the item or not.
+   * @return @b bool If a ControlList is stored in the data of the item or not.
    */
   bool ProjectItem::isControlList() const {
     return data().canConvert<ControlList *>();
@@ -472,7 +471,7 @@ namespace Isis {
    * Returns true if a CorrelationMatrix is stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If a CorrelationMatrix is stored in the data of the item or not.
+   * @return @b bool If a CorrelationMatrix is stored in the data of the item or not.
    */
   bool ProjectItem::isCorrelationMatrix() const {
     return data().canConvert<CorrelationMatrix>();
@@ -483,7 +482,7 @@ namespace Isis {
    * Returns true if a Project is stored in the data of the item. Returns false
    * otherwise.
    *
-   * @return (bool) If a Project is stored in the data of the item or not.
+   * @return @b bool If a Project is stored in the data of the item or not.
    */
   bool ProjectItem::isProject() const { 
     return data().canConvert<Project *>();
@@ -494,7 +493,7 @@ namespace Isis {
    * Returns true if a GuiCameraQsp is stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If a GuiCameraQsp is stored in the item or not.
+   * @return @b bool If a GuiCameraQsp is stored in the item or not.
    */
   bool ProjectItem::isGuiCamera() const {     
     return data().canConvert<GuiCameraQsp>();
@@ -505,7 +504,7 @@ namespace Isis {
    * Returns true if a TargetBodyQsp is stored in the data of the item.
    * Returns false otherwise.
    *
-   * @return (bool) If a TargetBodyQsp is stored in the item or not.
+   * @return @b bool If a TargetBodyQsp is stored in the item or not.
    */
   bool ProjectItem::isTargetBody() const { 
     return data().canConvert<TargetBodyQsp>();
@@ -527,7 +526,7 @@ namespace Isis {
   /**
    * Sets the text, icon, and data corresponding to BundleResults.
    *
-   * @param[in] bundleResults (BundleResults *) The BundleResults.
+   * @param[in] bundleResults (BundleResults) The BundleResults.
    */
   void ProjectItem::setBundleResults(BundleResults bundleResults) {
     setText("Results");
@@ -631,7 +630,7 @@ namespace Isis {
   /**
    * Sets the text, icon, and data corresponding to a CorrelationMatrix.
    *
-   * @param[in] correlationMatrix (CorrelationMatrix *) The CorrelationMatrix.
+   * @param[in] correlationMatrix (CorrelationMatrix) The CorrelationMatrix.
    */
   void ProjectItem::setCorrelationMatrix(CorrelationMatrix correlationMatrix) {
     setText("Correlation Matrix");
@@ -706,6 +705,8 @@ namespace Isis {
 
   /**
    * Sets the text, icon, and data corresponding to a TargetBodyQsp.
+   *
+   * @param targetBody Target body to set data from
    */
   void ProjectItem::setTargetBody(TargetBodyQsp targetBody) {
     setText( targetBody->displayProperties()->displayName() );
@@ -739,6 +740,8 @@ namespace Isis {
    *
    * @param[in] value (const QVariant &) The data.
    * @param[in] role (int) The role.
+   *
+   * @return @b ProjectItem* The found item.
    */
   ProjectItem *ProjectItem::findItemData(const QVariant &value, int role) {
     if ( data(role) == value ) {
@@ -771,7 +774,7 @@ namespace Isis {
    *
    * @param[in] row (int) The row.
    *
-   * @return (ProjectItem *) The child item.
+   * @return @b ProjectItem* The child item.
    */
   ProjectItem *ProjectItem::child(int row) const {
     return static_cast<ProjectItem *>( QStandardItem::child(row) );
@@ -792,7 +795,7 @@ namespace Isis {
   /**
    * Returns the ProjectItemModel associated with this item.
    *
-   * @return (ProjectItemModel *) The model.
+   * @return @b ProjectItemModel* The model.
    */
   ProjectItemModel *ProjectItem::model() const {
     return static_cast<ProjectItemModel *>( QStandardItem::model() );
@@ -802,7 +805,7 @@ namespace Isis {
   /**
    * Returns the parent item of this item.
    *
-   * @return (ProjectItem *) The parent item.
+   * @return @b ProjectItem* The parent item.
    */
   ProjectItem *ProjectItem::parent() const {
     return static_cast<ProjectItem *>( QStandardItem::parent() );
@@ -825,7 +828,7 @@ namespace Isis {
    *
    * @param[in] row (int) The row.
    *
-   * @return (ProjectItem *) The item.
+   * @return @b ProjectItem* The item.
    */
   ProjectItem *ProjectItem::takeChild(int row) {
     QList<QStandardItem *> items = QStandardItem::takeRow(row);

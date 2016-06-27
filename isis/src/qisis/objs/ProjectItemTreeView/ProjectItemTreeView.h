@@ -33,9 +33,17 @@ namespace Isis {
    * A ProjectItemTreeView displays items from a ProjectItemProxyModel
    * in a tree structure. The view can display the contents of the
    * model directly without adding items to the model using the
-   * setSourceModel() method instead of setModel().
+   * setInternalModel() method instead of setModel().
    *
-   * @author Jeffrey Covington
+   * @internal
+   *   @author Jeffrey Covington
+   *
+   *   @history 2015-10-21 Jeffrey Covington - Original version.
+   *   @history 2016-01-13 Jeffrey Covington - Added destructor and treeView() methods. Added 
+   *                           onItemAdded() slot. Replaced setSourceModel() with
+   *                           setInternalModel() method.
+   *   @history 2016-06-27 Ian Humphrey - Added documentation (treeView() and onItemAdded()), 
+   *                           checked coding standards. Fixes #4006.
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 
@@ -55,7 +63,7 @@ namespace Isis {
       void onItemAdded(ProjectItem *item);  
 
     private:
-      QTreeView *m_treeView;
+      QTreeView *m_treeView; //!< The tree view (widget)
   };
 }
 

@@ -89,7 +89,11 @@ namespace Isis {
    * model->appendRow(item);
    * @endcode
    *
-   * @author Jeffrey Covington
+   * @internal
+   *   @author Jeffrey Covington
+   *
+   *     @history 2015-10-21 Jeffrey Covington - Original version.
+   *     @history 2016-06-27 Ian Humphrey - Minor documentation updates. Fixes #4006.
    */
   class ProjectItem : public QStandardItem {
     public:

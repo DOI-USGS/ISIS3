@@ -56,7 +56,9 @@ namespace Isis {
 
 
   /**
+   * Returns the tree view.
    *
+   * @return @b QTreeView* The tree view.
    */
   QTreeView *ProjectItemTreeView::treeView() {
     return m_treeView;
@@ -84,7 +86,9 @@ namespace Isis {
 
 
   /**
+   * Expands the parent project item in the tree view to show the added item.
    *
+   * @param[in] item (ProjectItem *) The added project item.
    */
   void ProjectItemTreeView::onItemAdded(ProjectItem *item) {
     ProjectItem *parent = item->parent();
@@ -103,6 +107,8 @@ namespace Isis {
    *
    * @param[in] watched (QObject *) The object being filtered.
    * @param[in] event (QEvent *) The event passed to the object.
+   *
+   * @return @b bool True if the event is filtered by the project item tree view
    */
   bool ProjectItemTreeView::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::DragEnter) {

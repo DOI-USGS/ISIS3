@@ -57,7 +57,17 @@ namespace Isis {
 
   
   /**
+   * You cannot drop mime data into the ProjectItemModel. 
    *
+   * @see ProjectItemProxyModel
+   *
+   * @param data (const QMimeData *) The data to drop
+   * @param action (Qt::DropAction) The drop action
+   * @param row (int) ???
+   * @param column (int) ???
+   * @param parent (const QModelIndex &) The index of the data's parent
+   *
+   * @return @b bool False
    */
   bool ProjectItemModel::canDropMimeData(const QMimeData *data,
                                          Qt::DropAction action,
@@ -70,7 +80,7 @@ namespace Isis {
   /**
    * Returns the internal selection model.
    *
-   * @return (QItemSelectionModel *) The selection model.
+   * @return @b QItemSelectionModel* The selection model.
    */
   QItemSelectionModel *ProjectItemModel::selectionModel() {
     return m_selectionModel;
@@ -84,7 +94,7 @@ namespace Isis {
    *
    * @param[in] project (Project *) The Project to be added.
    *
-   * @return (ProjectItem *) The new item that corresponds to the Project.
+   * @return @b ProjectItem* The new item that corresponds to the Project.
    */
   ProjectItem *ProjectItemModel::addProject(Project *project) {
 
@@ -112,7 +122,7 @@ namespace Isis {
   /**
    * Returns the current item of the internal selection model.
    *
-   * @return (ProjectItem *) The current item.
+   * @return @b ProjectItem* The current item.
    */
   ProjectItem *ProjectItemModel::currentItem() {
     return itemFromIndex( selectionModel()->currentIndex() );
@@ -122,7 +132,7 @@ namespace Isis {
   /**
    * Returns a list of the selected items of the internal selection model.
    *
-   * @return (QList<ProjectItem *>) The list of selected items.
+   * @return @b QList<ProjectItem*> The list of selected items.
    */
   QList<ProjectItem *> ProjectItemModel::selectedItems() {
     QItemSelection selection = selectionModel()->selection();
@@ -143,6 +153,8 @@ namespace Isis {
    * @param data (const QVariant &) The data contained in the item.
    *
    * @param data (int) The role of the data (see Qt::ItemDataRole).
+   *
+   * @return @b ProjectItem* First project item found.
    */
   ProjectItem *ProjectItemModel::findItemData(const QVariant &data, int role) {
     for (int i=0; i<rowCount(); i++) {
@@ -202,7 +214,7 @@ namespace Isis {
    *
    * @param[in] item (const ProjectItem *) The item.
    *
-   * @return (QModelIndex) The index of the item.
+   * @return @b QModelIndex The index of the item.
    */
   QModelIndex ProjectItemModel::indexFromItem(const ProjectItem *item) {
     return QStandardItemModel::indexFromItem(item);
@@ -225,7 +237,7 @@ namespace Isis {
    *
    * @param[in] row (int) The row of the item.
    *
-   * @return (ProjectItem *) The item at the row.
+   * @return @b ProjectItem* The item at the row.
    */
   ProjectItem *ProjectItemModel::item(int row) {
     return static_cast<ProjectItem *>( QStandardItemModel::item(row) );
@@ -237,7 +249,7 @@ namespace Isis {
    *
    * @param[in] index (const QModelIndex &) The index of the item.
    *
-   * @return (ProjectItem *) The item.
+   * @return @b ProjectItem* The item.
    */
   ProjectItem *ProjectItemModel::itemFromIndex(const QModelIndex &index) {
     return static_cast<ProjectItem *>( QStandardItemModel::itemFromIndex(index) );
@@ -260,7 +272,7 @@ namespace Isis {
    *
    * @param[in] row (int) The row of the item to remove.
    *
-   * @return (ProjectItem *) The removed item.
+   * @return @b ProjectItem* The removed item.
    */
   ProjectItem *ProjectItemModel::takeItem(int row) {
     QList<QStandardItem *> items = QStandardItemModel::takeRow(row);

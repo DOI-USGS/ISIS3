@@ -64,7 +64,13 @@ namespace Isis {
    * }
    * @endcode
    *
-   * @author Jeffrey Covington
+   * @internal
+   *   @author Jeffrey Covington
+   *
+   *   @history 2015-10-21 Jeffrey Covington - Original version.
+   *   @history 2016-01-13 Jeffrey Covington - Added canDropMimeData() and dropMimeData() methods.
+   *   @history 2016-06-27 Ian Humphrey - Added documentation to the canDropMimeData() and 
+   *                           dropMimeData() methods. Checked coding standards. Fixes #4006.
    */
   class ProjectItemProxyModel : public ProjectItemModel {
 
@@ -88,9 +94,9 @@ namespace Isis {
     ProjectItemModel *sourceModel();
 
     virtual bool canDropMimeData(const QMimeData * data, Qt::DropAction action,
-                      int row, int column, const QModelIndex & parent) const;
+                                 int row, int column, const QModelIndex & parent) const;
     virtual bool dropMimeData(const QMimeData * data, Qt::DropAction action,
-                      int row, int column, const QModelIndex & parent);
+                                 int row, int column, const QModelIndex & parent);
   
   public slots:
     ProjectItem *addItem(ProjectItem *sourceItem);
