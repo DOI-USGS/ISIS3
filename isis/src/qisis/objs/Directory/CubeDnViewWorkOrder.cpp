@@ -27,8 +27,8 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-
-#include "CubeDnView.h"
+//tjw
+//#include "CubeDnView.h"
 #include "Directory.h"
 #include "MdiCubeViewport.h"
 #include "Project.h"
@@ -108,9 +108,10 @@ namespace Isis {
    * that. 
    */
   void CubeDnViewWorkOrder::syncRedo() {
-    ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    CubeDnView *view = project()->directory()->addCubeDnView();
-    view->addItem( currentItem );
+    // tjw
+    //ProjectItem *currentItem = project()->directory()->model()->currentItem();
+    //CubeDnView *view = project()->directory()->addCubeDnView();
+    //view->addItem( currentItem );
   }
 }
 

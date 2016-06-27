@@ -63,6 +63,8 @@ namespace Isis {
   bool CubeViewportViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
+    //tjw
+    /*
     int maxRecommendedViewports = 10;
     if (success && imageList()->count() > maxRecommendedViewports) {
       QMessageBox::StandardButton selectedOpt = QMessageBox::warning(NULL,
@@ -80,7 +82,8 @@ namespace Isis {
     if (success) {
       QStringList viewOptions;
 
-      QList<Workspace *> existingViews = project()->directory()->cubeDnViews();
+
+      //QList<Workspace *> existingViews = project()->directory()->cubeDnViews();
       int viewToUse = -1;
 
       if (existingViews.count()) {
@@ -130,7 +133,7 @@ namespace Isis {
       internalData.append(newView? "new view" : "existing view");
       setInternalData(internalData);
     }
-
+    */
     return success;
   }
 
@@ -142,6 +145,8 @@ namespace Isis {
 
 
   void CubeViewportViewWorkOrder::syncRedo() {
+    //tjw
+    /*
     int viewToUse = internalData().first().toInt();
 
     Workspace *cubeDnViewToUse = NULL;
@@ -153,10 +158,13 @@ namespace Isis {
     }
 
     cubeDnViewToUse->addImages(imageList());
+    */
   }
 
 
   void CubeViewportViewWorkOrder::syncUndo() {
+    //tjw
+    /*
     int viewToUse = internalData().first().toInt();
 
     if (internalData()[1] == "new view") {
@@ -173,6 +181,6 @@ namespace Isis {
           cubeDnView->imageToMdiWidget(imageToRemoveFromView)->close();
       }
     }
-  }
+  */}
 }
 

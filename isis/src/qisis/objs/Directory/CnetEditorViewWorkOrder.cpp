@@ -68,7 +68,10 @@ namespace Isis {
 
     if (success) {
       QUndoCommand::setText(tr("View control network [%1] in new cnet editor view")
-          .arg(controlList().first()->displayProperties()->displayName()));
+             //tjw
+            .arg(controlList()->first()->displayProperties()->displayName()));
+          //.arg(controlList().first()->displayProperties()->displayName()));
+
     }
 
     return success;
@@ -82,7 +85,9 @@ namespace Isis {
 
 
   void CnetEditorViewWorkOrder::syncRedo() {
-    project()->directory()->addCnetEditorView(controlList().first());
+    //project()->directory()->addCnetEditorView(controlList().first());
+    project()->directory()->addCnetEditorView(controlList()->first());
+
   }
 
 
