@@ -46,6 +46,7 @@ namespace Isis {
    *   @history 2014-07-14 Kimberly Oyama - Original Version
    *   @history 2014-07-21 Kimberly Oyama - Added matrix options dialog. Color options are
    *                           functional.
+   *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4006.
    */
   class MatrixSceneWidget : public QWidget {
       Q_OBJECT
@@ -83,6 +84,10 @@ namespace Isis {
 
       /**
        * Return an empty list of actions for unknown data types
+       *
+       * @param DataType The type of data we want to get actions for
+       *
+       * @return @b QList<QAction*> Empty list of actions (currently)
        */
       template <typename DataType>
       QList<QAction *> supportedActions(DataType) {
@@ -91,19 +96,21 @@ namespace Isis {
 
     signals:
 // add roll over?
-      void mouseEnter();
-      void mouseMove(QPointF);
-      void mouseLeave();
-      void mouseDoubleClick(QPointF);
-      void mouseButtonPress(QPointF, Qt::MouseButton s);
-      void mouseButtonRelease(QPointF, Qt::MouseButton s);
-      void mouseWheel(QPointF, int delta);
+      // Not all these signals are used, descriptions show possible intended use
+      void mouseEnter(); //!< Emitted when mouse enters widget focus
+      void mouseMove(QPointF); //!< Emitted when mouse moves in widget
+      void mouseLeave(); //!< Emitted when mouse leaves widget focus
+      void mouseDoubleClick(QPointF); //!< Emitted when handling a mouse double-click
+      void mouseButtonPress(QPointF, Qt::MouseButton s); //!< Emitted when mouse is pressed
+      void mouseButtonRelease(QPointF, Qt::MouseButton s); //!< Emitted when mouse button released
+      void mouseWheel(QPointF, int delta); //!< Emitted when mouse wheel is activated
+      //! Emitted when rubber band selection is complete
       void rubberBandComplete(QRectF r, Qt::MouseButton s);
-      void visibleRectChanged(QRectF);
-      void elementsChanged();
-      void queueSelectionChanged();
+      void visibleRectChanged(QRectF); //!< Emitted when the visible rectangle is changed
+      void elementsChanged(); //!< Emitted when an element of the widget is changed
+      void queueSelectionChanged(); //!< Emitted when selection is changed
 
-      void elementClicked(QString);
+      void elementClicked(QString); //!< Emitted when an element of the widget is clicked
 
     public slots:
       void redrawElements();
@@ -122,18 +129,18 @@ namespace Isis {
       QList<double> getSelectedElements() const;
 
       // member variables
-      Directory *m_directory;
+      Directory *m_directory; //!< The directory of the project
       
       QGraphicsScene *m_graphicsScene; //!< The graphics scene holds the scene items.
       MatrixGraphicsView *m_graphicsView; //!< The graphics view that displays the scene
 
       QGraphicsRectItem *m_outlineRect; //!< Rectangle outlining the area where the images go.
 
-      QAction *m_quickMapAction;
+      QAction *m_quickMapAction; //!< ??? (always NULL)
 
-      ProgressBar *m_progress;
+      ProgressBar *m_progress; //!< Progress bar
 
-      MatrixOptions *m_matrixOptions;
+      MatrixOptions *m_matrixOptions; //!< Options for the correlation matrix
   };
 }
 

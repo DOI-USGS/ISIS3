@@ -5,15 +5,15 @@
 #include <float.h>
 #include <sstream>
 
+#include <QGraphicsRectItem>
+#include <QGraphicsSceneMouseEvent>
+#include <QList>
+#include <QMap>
+#include <QPen>
 #include <QtCore>
 #include <QtWidgets>
 #include <QtXml>
-#include <QGraphicsSceneMouseEvent>
-#include <QList>
-#include <QPen>
-#include <QMap>
 #include <QTransform>
-#include <QGraphicsRectItem>
 
 #include "CorrelationMatrix.h"
 #include "Directory.h"
@@ -36,20 +36,20 @@
 #include "XmlStackedHandlerReader.h"
 
 #include <boost/numeric/ublas/fwd.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 using namespace boost::numeric::ublas;
 namespace Isis {
   /**
-   * Create a scene widget.
+   * Constructor, creates a matrix scene widget.
    *
-   * @param status
-   * @param showTools
-   * @param internalizeToolBarsAndProgress
-   * @param directory
-   * @param parent
+   * @param status Pointer to an existing status bar
+   * @param showTools Whether or not create a matrix scene or matrix world view
+   * @param internalizeToolBarsAndProgress Whether or not to show progress and status
+   * @param directory The directory of the current project
+   * @param parent QPointer to the parent widget
    */
   MatrixSceneWidget::MatrixSceneWidget(QStatusBar *status,
                                        bool showTools,
@@ -148,7 +148,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Default Destructor
    */
@@ -160,29 +159,29 @@ namespace Isis {
   /**
    * Accessor for the QGraphicsView
    *
-   * @return MatrixGraphicsView The matrix view.
+   * @return @b MatrixGraphicsView* The matrix view.
    */
   MatrixGraphicsView *MatrixSceneWidget::getView() const {
     return m_graphicsView;
   }
 
 
-  
   /**
    * Accessor for the QGraphicsScene
    *
-   * @return MatrixGraphicsScene The matrix scene.
+   * @return @b MatrixGraphicsScene* The matrix scene.
    */
   QGraphicsScene *MatrixSceneWidget::getScene() const {
     return m_graphicsScene;
   }
 
 
-
   /**
    * This is called by MatrixGraphicsScene::contextMenuEvent.
    *
-   * Return false if not handled, true if handled.
+   * @param event The context menu event
+   *
+   * @return @b bool false if not handled, true if handled.
    */
   bool MatrixSceneWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
     bool handled = false;
@@ -239,8 +238,11 @@ namespace Isis {
   }
 
 
-
-  
+  /**
+   * Accessor for the widget's progress bar
+   *
+   * @return @b QProgressBar* The progress bar
+   */
   QProgressBar *MatrixSceneWidget::getProgress() {
     return m_progress;
   }
@@ -252,6 +254,11 @@ namespace Isis {
 //   }
 
 
+  /**
+   * Returns the bounding rectangle for the images
+   *
+   * @return @b QRectF Bounding rectangle for image elements
+   */
   QRectF MatrixSceneWidget::elementsBoundingRect() const {
     QRectF boundingRect;
 
@@ -262,13 +269,21 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Accessor for the directory
+   *
+   * @return @b Directory* The directory
+   */
   Directory *MatrixSceneWidget::directory() const {
     return m_directory;
   }
 
 
-
+  /**
+   * Accessor for the view actions
+   *
+   * @return @b QList<QAction*> List of view actions
+   */
   QList<QAction *> MatrixSceneWidget::getViewActions() {
     QList<QAction *> viewActs;
 
@@ -281,19 +296,17 @@ namespace Isis {
   }
 
 
-  
   /**
    * Get a list of applicable actions for the elements in this scene.
    *
-   * @param
-   * @return
+   * @param matrix Pointer to the CorrelationMatrix that belongs to the project
+   * @return @b QList<QAction*> List of supported actions for the CorrelationMatrix elements
    */
   QList<QAction *> MatrixSceneWidget::supportedActions(CorrelationMatrix *matrix) {
     QList<QAction *> results;
 
     return results;
   }
-
 
 
   /**
@@ -314,16 +327,17 @@ namespace Isis {
 //   }
 
 
-
+  /**
+   * Update the visible bounding rectangle
+   */
   void MatrixSceneWidget::sendVisibleRectChanged() {
     QPointF topLeft = getView()->mapToScene(0, 0);
     QPointF bottomRight =
-                getView()->mapToScene( (int)getView()->width(), (int)getView()->height() );
+        getView()->mapToScene( (int)getView()->width(), (int)getView()->height() );
 
     QRectF visibleRect(topLeft, bottomRight);
     emit visibleRectChanged(visibleRect);
   }
-
 
 
   /**
@@ -331,17 +345,17 @@ namespace Isis {
    *
    * Mouse Events:
    * 
-   * Press - Add matrix value to list?
+   * Press - Emit elementClicked signal to update the options dialog
    * Release - nolowerColorValue?
    * Double-Click - same as press
    * Move - nolowerColorValue
    * Enter - change label to match current item.
    * Leave - clear label
    * 
-   * @param obj
-   * @param event
+   * @param obj Pointer to the target QObject to watch events on
+   * @param event The event to inspect
    *
-   * @return bool 
+   * @return @b bool True if the event is filter (stopping all future processing of the event) 
    */
   bool MatrixSceneWidget::eventFilter(QObject *obj, QEvent *event) {
     bool stopProcessingEvent = true;
@@ -360,7 +374,7 @@ namespace Isis {
 
       case QMouseEvent::GraphicsSceneMouseDoubleClick:
         emit mouseDoubleClick(
-              ((QGraphicsSceneMouseEvent *)event)->scenePos());
+            ((QGraphicsSceneMouseEvent *)event)->scenePos());
         m_graphicsView->fitInView(m_graphicsScene->itemsBoundingRect(), Qt::KeepAspectRatio);
         stopProcessingEvent = false;
         break;
@@ -373,7 +387,6 @@ namespace Isis {
     return stopProcessingEvent;
   }
 
-  
 
   /**
    * Redraws all the items in the view. Also makes sure to resize the view rectangle
@@ -501,8 +514,9 @@ namespace Isis {
               QString param1 = "Parameter 1: " + colIterator.value().at(column) + "\n";
               QString img2 = "Image 2       : " + rowIterator.key() + "\n";
               QString param2 = "Parameter 2: " + rowIterator.value().at(row);
-              QString toolTip = "Correlation  : " + QString::number( ( *block.value() )(row, column) )
-                                + "\n" + img1 + param1 + img2 + param2;
+              QString toolTip = "Correlation  : " 
+                  + QString::number( ( *block.value() )(row, column) )
+                  + "\n" + img1 + param1 + img2 + param2;
               rectangle->setToolTip(toolTip);
             }
             x += elementSize;
@@ -528,11 +542,10 @@ namespace Isis {
   }
 
 
-
   /**
    * Draw the lines that will show the columns and blocks for each image.
    *
-   * @param matrix 
+   * @param corrMatrix The matrix that belongs to the project
    */
   void MatrixSceneWidget::drawGrid(CorrelationMatrix corrMatrix) {
     int startVX = 20;
@@ -599,16 +612,12 @@ namespace Isis {
   }
 
 
-
   /**
-   * Redraw matrix when the focus is chagned.
-   *
-   * @param
+   * Redraw matrix when the focus is changed.
    */
   void MatrixSceneWidget::redrawElements() {
     drawElements( *m_matrixOptions->parentMatrix() );
   }
-
 
 
   /**
@@ -634,6 +643,11 @@ namespace Isis {
 //   }
 
 
+  /**
+   * Allows for changing the options on a CorrelationMatrix
+   *
+   * @param corrMat The matrix to set up options for
+   */
   void MatrixSceneWidget::setUpOptions(CorrelationMatrix corrMat) {
     m_matrixOptions = new MatrixOptions(corrMat, this);
     connect(m_matrixOptions, SIGNAL( optionsUpdated() ),
