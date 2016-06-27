@@ -143,7 +143,7 @@ namespace Isis {
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
-      virtual bool isExecutable(ProjectItem *item);
+      //virtual bool isExecutable(ProjectItem *item);  //tjw
 
       //Deprecated
       //virtual bool isExecutable(QList<Control *> controls);
@@ -161,7 +161,7 @@ namespace Isis {
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
-      virtual void setData(ProjectItem *item);
+      //virtual void setData(ProjectItem *item);  //tjw
 
       //Deprecated
       //virtual void setData(QList<Control *> controls);
