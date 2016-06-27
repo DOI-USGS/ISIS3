@@ -74,7 +74,7 @@ namespace Isis {
     projectDock->setObjectName("projectDock");
     projectDock->setFeatures(QDockWidget::DockWidgetMovable |
                               QDockWidget::DockWidgetFloatable);
-    projectDock->setWidget(m_directory->projectTreeWidget());
+    //projectDock->setWidget(m_directory->projectTreeWidget());
     addDockWidget(Qt::LeftDockWidgetArea, projectDock);
 
     QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
@@ -102,7 +102,7 @@ namespace Isis {
     progressDock->setFeatures(QDockWidget::DockWidgetClosable |
                          QDockWidget::DockWidgetMovable |
                          QDockWidget::DockWidgetFloatable);
-    //m_directory->setProgressContainer(progressDock);
+    //m_directory->setProgressContainer(progressDock);  //tjw
     addDockWidget(Qt::BottomDockWidgetArea, progressDock);
     tabifyDockWidget(historyDock, progressDock);
 
@@ -111,7 +111,7 @@ namespace Isis {
     readSettings();
 
     statusBar()->showMessage("Ready");
-    statusBar()->addWidget(m_directory->project()->progress());
+    //statusBar()->addWidget(m_directory->project()->progress());  //tjw
 
     foreach (QProgressBar *progressBar, m_directory->progressBars()) {
       statusBar()->addWidget(progressBar);
@@ -163,6 +163,7 @@ namespace Isis {
    * Create the main menus. This will ask the directory to populate the menu.
    */
   void CNetSuiteMainWindow::createMenus() {
+    /*
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->setObjectName("fileMenu");
 
@@ -208,6 +209,7 @@ namespace Isis {
             this, SLOT(enterWhatsThisMode()));
 
     helpMenu->addAction(activateWhatsThisAct);
+    */
   }
 
 
