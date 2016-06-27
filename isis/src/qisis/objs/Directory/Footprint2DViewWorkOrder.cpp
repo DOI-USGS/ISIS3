@@ -93,6 +93,7 @@ namespace Isis {
   bool Footprint2DViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
 
+    /*   //tjw
     int maxRecommendedFootprints = 50000;
     if (success && imageList()->count() > maxRecommendedFootprints) {
       QMessageBox::StandardButton selectedOpt = QMessageBox::warning(NULL,
@@ -109,6 +110,7 @@ namespace Isis {
     }
 
     if (success) {
+
       QStringList viewOptions;
 
       QList<MosaicSceneWidget *> existingViews = project()->directory()->footprint2DViews();
@@ -179,8 +181,10 @@ namespace Isis {
       internalData.append(QString::number(viewToUse));
       internalData.append(newView? "new view" : "existing view");
       setInternalData(internalData);
+
     }
 
+    */
     return success;
   }
 
@@ -201,6 +205,8 @@ namespace Isis {
    * 
    */
   void Footprint2DViewWorkOrder::syncRedo() {
+
+    /*  //tjw
     int viewToUse = internalData().first().toInt();
 
     MosaicSceneWidget *footprintViewToUse = NULL;
@@ -232,10 +238,12 @@ namespace Isis {
                         .arg(nonFootprintableImage->displayProperties()->displayName()));
 
     }
+    */
   }
 
 
   void Footprint2DViewWorkOrder::syncUndo() {
+    /*  //tjw
     int viewToUse = internalData().first().toInt();
 
     if (internalData()[1] == "new view") {
@@ -250,6 +258,7 @@ namespace Isis {
         delete footprintView->cubeToMosaic(imageToRemoveFromView);
       }
     }
+   */
   }
 }
 

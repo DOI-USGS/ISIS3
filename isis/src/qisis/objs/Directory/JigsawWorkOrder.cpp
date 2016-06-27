@@ -31,7 +31,7 @@
 
 #include "Control.h"
 #include "Directory.h"
-#include "JigsawDialog.h"
+//#include "JigsawDialog.h"  //tjw
 #include "Project.h"
 
 namespace Isis {
@@ -87,27 +87,22 @@ namespace Isis {
    */
   bool JigsawWorkOrder::execute() {
     bool success = WorkOrder::execute();
-/*
+
+    /*  //tjw
     if (success) {
-        JigsawDialog* bundledlg = new JigsawDialog(project());
-        bundledlg->setAttribute(Qt::WA_DeleteOnClose);
-        bundledlg->show();
-//      QUndoCommand::setText(tr("&Bundle Adjustment")
-//          .arg(controlList().first()->displayProperties()->displayName()));
-    }
-*/
-    if (success) {
+
+
 //      QDockWidget* dock = new QDockWidget();
 //      dock->setMinimumWidth(525);
 //      dock->setMinimumHeight(325);
 //      dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-      JigsawDialog* bundledlg = new JigsawDialog(project());
-      bundledlg->setAttribute(Qt::WA_DeleteOnClose);
-      bundledlg->show();
+        JigsawDialog* bundledlg = new JigsawDialog(project());
+        bundledlg->setAttribute(Qt::WA_DeleteOnClose);
+        bundledlg->show();
 //      dock->setWidget(bundledlg);
 //      dock->show();
     }
-
+    */
     return success;
   }
 

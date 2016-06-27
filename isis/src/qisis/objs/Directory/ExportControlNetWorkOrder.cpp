@@ -84,7 +84,7 @@ namespace Isis {
       QStringList internalData;
 
       Control *control = NULL;
-      if (controlList().isEmpty()) {
+      if (controlList()->isEmpty()) {
         QMap<Control *, QString> cnetChoices;
         foreach (ControlList *list, project()->controls()) {
           foreach (Control *control, *list) {
@@ -103,7 +103,7 @@ namespace Isis {
         internalData.append(control->id());
       }
       else {
-        control = controlList().first();
+        control = controlList()->first();
       }
 
       QString destination =
@@ -130,7 +130,7 @@ namespace Isis {
     QString destination;
     Control *control = NULL;
 
-    if (controlList().isEmpty()) {
+    if (controlList()->isEmpty()) {
       destination = internalData()[1];
 
       QString controlId = internalData()[0];
@@ -138,7 +138,7 @@ namespace Isis {
     }
     else {
       destination = internalData()[0];
-      control = controlList().first();
+      control = controlList()->first();
     }
 
     try {

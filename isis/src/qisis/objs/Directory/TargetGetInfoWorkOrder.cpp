@@ -30,7 +30,7 @@
 #include "IException.h"
 #include "Project.h"
 #include "TargetBody.h"
-#include "TargetInfoWidget.h"
+//#include "TargetInfoWidget.h"
 
 namespace Isis {
 
@@ -76,6 +76,7 @@ namespace Isis {
    * @return  @b bool True if a view already exists, False otherwise.
    */
   bool TargetGetInfoWorkOrder::isExecutable(TargetBodyQsp targetBody) {
+    /*   //tjw
     if (!targetBody)
       return false;
 
@@ -85,7 +86,7 @@ namespace Isis {
       if (existingViews.at(i)->objectName() == targetBody->displayProperties()->displayName() )
         return false;
     }
-
+    */
     return true;
   }
 
@@ -125,6 +126,7 @@ namespace Isis {
    * @brief  Redisplays the Target info.
    */
   void TargetGetInfoWorkOrder::syncRedo() {
+    /*
     TargetInfoWidget *targetInfoWidget =
         project()->directory()->addTargetInfoView(targetBody());
 
@@ -133,6 +135,7 @@ namespace Isis {
       QString msg = "error displaying target info";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    */
   }
 
 

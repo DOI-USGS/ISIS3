@@ -30,7 +30,7 @@
 #include "CorrelationMatrix.h"
 #include "Directory.h"
 #include "IException.h"
-#include "MatrixSceneWidget.h"
+//#include "MatrixSceneWidget.h"  //tjw
 #include "Project.h"
 
 namespace Isis {
@@ -91,7 +91,9 @@ namespace Isis {
    * @return @b bool True if WorkOrder::execute() returns true.
    */
   bool MatrixViewWorkOrder::execute() {
+
     bool success = WorkOrder::execute();
+    /*  //tjw
 
     if (success) {
       QStringList viewOptions;
@@ -141,7 +143,7 @@ namespace Isis {
       internalData.append(newView? "new view" : "existing view");
       setInternalData(internalData);
     }
-
+    */
     return success;
   }
 
@@ -164,12 +166,13 @@ namespace Isis {
    * This method computes and displays the correlation matrix.
    */
   void MatrixViewWorkOrder::syncRedo() {
+    /*  //tjw
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
     CorrelationMatrix corrMat = correlationMatrix();
-    /*
-     * Since computing the correlation matrix is potentially time consuming we only want to
-     * do it if the user wants to see it.
-     */
+    //
+    // Since computing the correlation matrix is potentially time consuming we only want to
+    // do it if the user wants to see it.
+    //
     corrMat.computeCorrelationMatrix();
     matrixViewToUse->setUpOptions(corrMat);
     matrixViewToUse->drawElements(corrMat);
@@ -178,6 +181,7 @@ namespace Isis {
       QString msg = "The Correlation Matrix for this bundle could not be displayed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    */
   }
 
   
@@ -185,9 +189,11 @@ namespace Isis {
    * This method deletes the last matrix viewed
    */
   void MatrixViewWorkOrder::syncUndo() {
+    /*  //tjw
     if (internalData()[1] == "new view") {
       delete project()->directory()->matrixViews().last();
     }
+    */
   }
 }
 
