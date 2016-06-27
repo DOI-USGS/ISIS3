@@ -35,14 +35,16 @@ namespace Isis {
 
 
   MosaicSceneWidget *MosaicSceneWorkOrder::scene() {
+
     MosaicSceneWidget *result = NULL;
+    /*  //tjw
 
     foreach (MosaicSceneWidget *scene, directory()->footprint2DViews()) {
       if (internalData().first() == scene->windowTitle()) {
         result = scene;
       }
     }
-
+    */
     return result;
   }
 
