@@ -31,7 +31,7 @@
 #include "MosaicSceneWidget.h"
 #include "ProgressWidget.h"
 #include "Project.h"
-#include "ProjectTreeWidget.h"
+
 
 namespace Isis {
   /**
