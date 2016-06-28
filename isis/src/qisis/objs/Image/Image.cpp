@@ -19,22 +19,26 @@
 #include "CubeAttribute.h"
 #include "DisplayProperties.h"
 #include "Distance.h"
-#include "ImageDisplayProperties.h"
-#include "IString.h"
 #include "FileName.h"
+#include "ImageDisplayProperties.h"
 #include "ImagePolygon.h"
+#include "IString.h"
 #include "PolygonTools.h"
 #include "Project.h"
+#include "SerialNumber.h"
+#include "Target.h"
 #include "XmlStackedHandlerReader.h"
 
+
 namespace Isis {
+
   /**
-   * Create an image from a cube file on disk.
-   *
+   * @brief Create an image from a cube file on disk.
    * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub
    * @param parent The Qt-relationship parent
    */
   Image::Image(QString imageFileName, QObject *parent) : QObject(parent) {
+    m_bodyCode = NULL;
     m_cube = NULL;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -64,14 +68,14 @@ namespace Isis {
 
 
   /**
-   * Create an image from a cube file on disk.
-   *
+   * @brief Create an image from a cube file on disk.
    * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub
    * @param parent The Qt-relationship parent
    */
   Image::Image(Cube *imageCube, QObject *parent) : QObject(parent) {
     m_fileName = imageCube->fileName();
 
+    m_bodyCode = NULL;
     m_cube = imageCube;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -97,14 +101,14 @@ namespace Isis {
 
 
   /**
-   * Construct this image from XML.
-   *
+   * @brief Construct this image from XML.
    * @param imageFolder Where this image XML resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <image/> tag.
    * @param parent The Qt-relationship parent
    */
   Image::Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
       QObject(parent) {
+    m_bodyCode = NULL;
     m_cube = NULL;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -120,9 +124,12 @@ namespace Isis {
 
 
   /**
-   * Clean up this image. If you haven't saved this image, all of its settings will be lost.
+   * @brief Clean up this image. If you haven't saved this image, all of its settings will be lost.
    */
   Image::~Image() {
+    delete m_bodyCode;
+    m_bodyCode = NULL;
+
     delete m_cube;
     m_cube = NULL;
 
@@ -133,14 +140,14 @@ namespace Isis {
     m_id = NULL;
 
     //  Image is a "Qt" parent of display properties, so the Image QObject
-    //    destructor will take care of deleting the display props. See call to
-    //    DisplayProperties' constructor.
+    //  destructor will take care of deleting the display props. See call to
+    //  DisplayProperties' constructor.
     m_displayProperties = NULL;
   }
 
 
   /**
-   * Read the image settings from a Pvl.
+   * @description Read the image settings from a Pvl.  The Pvl file looks like this:
    *
    * <pre>
    *   Object = Image
@@ -150,6 +157,7 @@ namespace Isis {
    * </pre>
    *
    * @param pvl The PvlObject that contains image information.
+   * @throws IException::Unknown "Tried to load Image with properties/information"
    */
   void Image::fromPvl(const PvlObject &pvl) {
     QString pvlFileName = ((IString)pvl["FileName"][0]).ToQt();
@@ -163,7 +171,7 @@ namespace Isis {
     displayProperties()->fromPvl(pvl.findObject("DisplayProperties"));
 
     if (pvl.hasKeyword("ID")) {
-      QByteArray hexValues(pvl["ID"][0].toAscii());
+      QByteArray hexValues(pvl["ID"][0].toLatin1());
       QDataStream valuesStream(QByteArray::fromHex(hexValues));
       valuesStream >> *m_id;
     }
@@ -171,7 +179,7 @@ namespace Isis {
 
 
   /**
-   * Convert this Image to PVL.
+   * @description Convert this Image to PVL.
    *
    * The output looks like this:
    * <pre>
@@ -181,7 +189,7 @@ namespace Isis {
    *   EndObject
    * </pre>
    *
-   * @return A PvlObject that contains image information.
+   * @return @b PvlObject A PvlObject that contains image information.
    */
   PvlObject Image::toPvl() const {
     PvlObject output("Image");
@@ -206,8 +214,9 @@ namespace Isis {
 
 
   /**
-   * Test to see if it's possible to create a footprint from this image. This may not give an
-   *   accurate answer if the cube isn't open.
+   * @description Test to see if it's possible to create a footprint from this image.
+   * This may not give an accurate answer if the cube isn't open.
+   * @return @b bool Returns True if it is possible, False if it is not.
    */
   bool Image::isFootprintable() const {
     bool result = false;
@@ -237,12 +246,19 @@ namespace Isis {
 
 
   /**
-   * Get the Cube * associated with this display property. This will allocate
-   *   the Cube * if one is not already present.
+   * @description Get the Cube pointer associated with this display property. This will allocate
+   * the Cube pointer if one is not already present.
+   * @throws IException::Programmer "Cube cannot be created"
+   * @return @b (Cube *) A pointer to the image cube.
    */
   Cube *Image::cube() {
     if (!m_cube) {
-      m_cube = new Cube(m_fileName);
+      try {
+        m_cube = new Cube(m_fileName); 
+      }
+      catch (IException &e) {
+        throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
+      }
     }
 
     return m_cube;
@@ -250,8 +266,8 @@ namespace Isis {
 
 
   /**
-   * Cleans up the Cube *. You want to call this once you're sure you are done
-   *   with the Cube because the OS will limit how many of these we have open.
+   * @description Cleans up the Cube pointer. You want to call this once you are sure you are done
+   * with the Cube because the OS will limit how many of these we have open.
    */
   void Image::closeCube() {
     if (m_cube) {
@@ -262,9 +278,9 @@ namespace Isis {
 
 
   /**
-   * Get the display (GUI) properties (information) associated with this image.
-   *
-   * @return An ImageDisplayProperties that describes how to view this image.
+   * @brief Get the display (GUI) properties (information) associated with this image.
+   * @return @b (ImageDisplayProperties *) Returns a poniter to an ImageDisplayProperties
+   * that describes how to view this image.
    */
   ImageDisplayProperties *Image::displayProperties() {
     return m_displayProperties;
@@ -272,10 +288,10 @@ namespace Isis {
 
 
   /**
-   * Get a non-mutable (const) the display (GUI) properties (information) associated with this
-   *   image.
-   *
-   * @return A non-mutable ImageDisplayProperties that describes how to view this image.
+   * @brief Get a non-mutable (const) the display (GUI) properties (information)
+   * associated with this image.
+   * @return @b (ImageDisplayProperties *) A pointer to a non-mutable ImageDisplayProperties
+   * object that describes how to view this image.
    */
   const ImageDisplayProperties *Image::displayProperties() const {
     return m_displayProperties;
@@ -283,9 +299,8 @@ namespace Isis {
 
 
   /**
-   * Get the file name of the cube that this image represents.
-   *
-   * @return A string containing the path to the cube data associated with this image.
+   * @brief Get the file name of the cube that this image represents.
+   * @return @b QString A string containing the path to the cube data associated with this image.
    */
   QString Image::fileName() const {
     return m_fileName;
@@ -293,9 +308,18 @@ namespace Isis {
 
 
   /**
-   * Get the footprint of this image (if available).
-   *
-   * @return A lat/lon footprint of this image, or NULL if unavailable.
+   * @brief Returns the serial number of the Cube
+   * @return @b QString  A string representation of the serial number of the cube.
+   */
+  QString Image::serialNumber() {
+    return SerialNumber::Compose(*(cube()));
+  }
+
+
+  /**
+   * @brief Get the footprint of this image (if available).
+   * @return @b (geos::geom::MultiPolygon *) A pointer to a lat/lon footprint of this image,
+   * or NULL if unavailable.
    */
   geos::geom::MultiPolygon *Image::footprint() {
     return m_footprint;
@@ -303,7 +327,8 @@ namespace Isis {
 
 
   /**
-   * Override the automatically generated ID with the given ID.
+   * @brief Override the automatically generated ID with the given ID.
+   * @param id The id tjat overrides the automatically generated id.
    */
   void Image::setId(QString id) {
     *m_id = QUuid(QString("{%1}").arg(id));
@@ -311,9 +336,9 @@ namespace Isis {
 
 
   /**
-   * Get the non-mutable (const) footprint of this image (if available).
-   *
-   * @return A non-mutable (const) lat/lon footprint of this image, or NULL if unavailable.
+   * @brief Get the non-mutable (const) footprint of this image (if available).
+   * @return @b geos::geom::MultiPolygon A non-mutable (const) lat/lon footprint of this image,
+   * or NULL if unavailable.
    */
   const geos::geom::MultiPolygon *Image::footprint() const {
     return m_footprint;
@@ -321,8 +346,14 @@ namespace Isis {
 
 
   /**
-   * Calculate a footprint for this image. If the footprint is already stored inside the cube, that
-   *   will be used instead. If no footprint can be found, this throws an exception.
+   * @description Calculate a footprint for this image. If the footprint is already stored
+   * inside the cube, that will be used instead. If no footprint can be found, this throws
+   * an exception.
+   * @param cameraMutex A pointer to the camera mutex to lock the camera resource while a footprint
+   * is created.
+   * @throws IException::Io  "Could not read the footprint from cube [$cube].  Please make sure
+   * footprintinit has been run"
+   * @return @b bool Returns True if there is a footprint stored in the Cube, False otherwise.
    */
   bool Image::initFootprint(QMutex *cameraMutex) {
     if (!m_footprint) {
@@ -333,7 +364,7 @@ namespace Isis {
         try {
           m_footprint = createFootprint(cameraMutex);
         }
-        catch(IException &e) {
+        catch (IException &e) {
           IString msg = "Could not read the footprint from cube [" +
               displayProperties()->displayName() + "]. Please make "
               "sure footprintinit has been run";
@@ -348,9 +379,8 @@ namespace Isis {
 
 
   /**
-   * Get the aspect ratio of this image, as calculated and attached by camstats.
-   *
-   * @return The aspect ratio if available, otherwise Null
+   * @brief Get the aspect ratio of this image, as calculated and attached by camstats.
+   * @return @b double The aspect ratio if available, otherwise Null is returned.
    */
   double Image::aspectRatio() const {
     return m_aspectRatio;
@@ -358,9 +388,8 @@ namespace Isis {
 
 
   /**
-   * Get a unique, identifying string associated with this image.
-   *
-   * @return A unique ID for this image
+   * @brief Get a unique, identifying string associated with this image.
+   * @return @b QString A unique ID for this image.
    */
   QString Image::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
@@ -368,10 +397,9 @@ namespace Isis {
 
 
   /**
-   * Get the resolution of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The resolution if available, otherwise Null
+   * @description Get the resolution of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b double The resolution if available, otherwise Null is returned.
    */
   double Image::resolution() const {
     return m_resolution;
@@ -379,10 +407,9 @@ namespace Isis {
 
 
   /**
-   * Get the emission angle of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The emission angle if available, otherwise an invalid angle
+   * @description Get the emission angle of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b Angle The emission angle if available, otherwise an invalid angle is returned.
    */
   Angle Image::emissionAngle() const {
     return m_emissionAngle;
@@ -390,10 +417,9 @@ namespace Isis {
 
 
   /**
-   * Get the incidence angle of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The incidence angle if available, otherwise an invalid angle
+   * @description Get the incidence angle of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b Angle The incidence angle if available, otherwise an invalid angle is returned.
    */
   Angle Image::incidenceAngle() const {
     return m_incidenceAngle;
@@ -401,10 +427,9 @@ namespace Isis {
 
 
   /**
-   * Get the line resolution of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The line resolution if available, otherwise Null
+   * @description Get the line resolution of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b double The line resolution if available, otherwise Null.
    */
   double Image::lineResolution() const {
     return m_lineResolution;
@@ -412,10 +437,9 @@ namespace Isis {
 
 
   /**
-   * Get the local radius of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The local radius if available, otherwise an invalid Distance
+   * @description Get the local radius of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b The local radius if available, otherwise an invalid Distance.
    */
   Distance Image::localRadius() const {
     return m_localRadius;
@@ -423,10 +447,9 @@ namespace Isis {
 
 
   /**
-   * Get the north azimuth of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The north azimuth if available, otherwise an invalid angle
+   * @description Get the north azimuth of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b Angle The north azimuth if available, otherwise an invalid angle
    */
   Angle Image::northAzimuth() const {
     return m_northAzimuth;
@@ -434,10 +457,9 @@ namespace Isis {
 
 
   /**
-   * Get the phase angle of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The phase angle if available, otherwise an invalid angle
+   * @description Get the phase angle of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b Angle The phase angle if available, otherwise an invalid angle is returned.
    */
   Angle Image::phaseAngle() const {
     return m_phaseAngle;
@@ -445,10 +467,9 @@ namespace Isis {
 
 
   /**
-   * Get the sample resolution of this image, as calculated and attached by camstats. This is the
-   *   image-wide average.
-   *
-   * @return The sample resolution if available, otherwise Null
+   * @description Get the sample resolution of this image, as calculated and attached by camstats.
+   * This is the image-wide average.
+   * @return @b double The sample resolution if available, otherwise Null is returned.
    */
   double Image::sampleResolution() const {
     return m_sampleResolution;
@@ -456,7 +477,8 @@ namespace Isis {
 
 
   /**
-   * Copy the cub/ecub files associated with this image into the new project.
+   * @brief Copy the cub/ecub files associated with this image into the new project.
+   * @param newProjectRoot  The root directory where the project is stored.
    */
   void Image::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
     if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
@@ -470,7 +492,7 @@ namespace Isis {
 
       // If this is an ecub (it should be) and is pointing to a relative file name,
       //   then we want to copy the DN cube also.
-      if (!origImage.storesDnData()) {
+      if (!origImage.storesDnData() ) {
         if (origImage.externalCubeFileName().path() == ".") {
           Cube dnFile(
               FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
@@ -479,7 +501,6 @@ namespace Isis {
 
           QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
           newDnFile->close();
-
           newExternalLabel->relocateDnData(newDnFileName.name());
         }
         else {
@@ -491,8 +512,9 @@ namespace Isis {
 
 
   /**
-   * Delete the image data from disk. The cube() will no longer be accessible until you call
-   *   updateFileName().
+   * @description Delete the image data from disk. The cube() will no longer be accessible
+   * until you call updateFileName().
+   * @throws IException::Io "Could not remove file [$filename]"
    */
   void Image::deleteFromDisk() {
     bool deleteCubAlso = (cube()->externalCubeFileName().path() == ".");
@@ -506,7 +528,7 @@ namespace Isis {
 
     if (deleteCubAlso) {
       FileName cubFile = FileName(m_fileName).setExtension("cub");
-      if (!QFile::remove(cubFile.expanded())) {
+      if (!QFile::remove(cubFile.expanded() ) ) {
         throw IException(IException::Io,
                          tr("Could not remove file [%1]").arg(m_fileName),
                          _FILEINFO_);
@@ -520,6 +542,11 @@ namespace Isis {
 
 
   /**
+   * @description Write the Image properties out to an XML file.
+   * @param stream The output data stream.
+   * @param project The project this image is contained within.
+   * @param newProjectRoot The path/filename we are writing to.
+   *
    * Output format:
    *
    *
@@ -535,40 +562,42 @@ namespace Isis {
 
     stream.writeAttribute("id", m_id->toString());
     stream.writeAttribute("fileName", FileName(m_fileName).name());
+    stream.writeAttribute("instrumentId", m_instrumentId);
+    stream.writeAttribute("spacecraftName", m_spacecraftName);
 
-    if (!IsSpecial(m_aspectRatio)) {
+    if (!IsSpecial(m_aspectRatio) ) {
       stream.writeAttribute("aspectRatio", IString(m_aspectRatio).ToQt());
     }
 
-    if (!IsSpecial(m_resolution)) {
+    if (!IsSpecial(m_resolution) ) {
       stream.writeAttribute("resolution", IString(m_resolution).ToQt());
     }
 
-    if (m_emissionAngle.isValid()) {
+    if (m_emissionAngle.isValid() ) {
       stream.writeAttribute("emissionAngle", IString(m_emissionAngle.radians()).ToQt());
     }
 
-    if (m_incidenceAngle.isValid()) {
+    if (m_incidenceAngle.isValid() ) {
       stream.writeAttribute("incidenceAngle", IString(m_incidenceAngle.radians()).ToQt());
     }
 
-    if (!IsSpecial(m_lineResolution)) {
+    if (!IsSpecial(m_lineResolution) ) {
       stream.writeAttribute("lineResolution", IString(m_lineResolution).ToQt());
     }
 
-    if (m_localRadius.isValid()) {
+    if (m_localRadius.isValid() ) {
       stream.writeAttribute("localRadius", IString(m_localRadius.meters()).ToQt());
     }
 
-    if (m_northAzimuth.isValid()) {
+    if (m_northAzimuth.isValid() ) {
       stream.writeAttribute("northAzimuth", IString(m_northAzimuth.radians()).ToQt());
     }
 
-    if (m_phaseAngle.isValid()) {
+    if (m_phaseAngle.isValid() ) {
       stream.writeAttribute("phaseAngle", IString(m_phaseAngle.radians()).ToQt());
     }
 
-    if (!IsSpecial(m_sampleResolution)) {
+    if (!IsSpecial(m_sampleResolution) ) {
       stream.writeAttribute("sampleResolution", IString(m_sampleResolution).ToQt());
     }
 
@@ -588,10 +617,9 @@ namespace Isis {
 
 
   /**
-   * Change the on-disk file name for this cube to be where the image ought to be in the given
-   *   project.
-   *
-   * @param project The project that this image is stored in
+   * @description Change the on-disk file name for this cube to be where the image ought to be in
+   * the given project.
+   * @param project The project that this image is stored in.
    */
   void Image::updateFileName(Project *project) {
     closeCube();
@@ -604,10 +632,9 @@ namespace Isis {
 
 
   /**
-   * Calculate a footprint for an Image using the camera or projection information.
-   *
+   * @description  Calculates a footprint for an Image using the camera or projection information.
    * @param cameraMutex A mutex that guarantees us serial access to the camera/projection classes
-   * @return The resulting footprint
+   * @return @b (geos::geom::MultiPolygon *) The resulting footprint.
    */
   geos::geom::MultiPolygon *Image::createFootprint(QMutex *cameraMutex) {
     QMutexLocker lock(cameraMutex);
@@ -633,6 +660,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @description Checks to see if the Cube label contains Camera Statistics.  If it does,
+   * then we attempt to grab data from the label to populate the private members variables.
+   */
   void Image::initCamStats() {
     bool hasCamStats = false;
 
@@ -692,9 +723,30 @@ namespace Isis {
         }
       }
     }
+
+    for (int i = 0; i < label.objects(); i++) {
+      PvlObject &obj = label.object(i);
+      try {
+        if (obj.hasGroup("Instrument")) {
+          PvlGroup instGroup = obj.findGroup("Instrument");
+
+          if (instGroup.hasKeyword("SpacecraftName"))
+            m_spacecraftName = obj.findGroup("Instrument")["SpacecraftName"][0];
+
+          if (instGroup.hasKeyword("InstrumentId"))
+            m_instrumentId = obj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+      catch (IException &) {
+      }
+    }
   }
 
 
+  /**
+   * @brief Creates a default ImagePolygon option which is read into the Cube.
+   * @see Isis::ImagePolygon
+   */
   void Image::initQuickFootprint() {
     ImagePolygon poly;
     cube()->read(poly);
@@ -703,9 +755,8 @@ namespace Isis {
 
 
   /**
-   * Create an XML Handler (reader) that can populate the Image class data. See Image::save() for
-   *   the expected format.
-   *
+   * @description  Create an XML Handler (reader) that can populate the Image class data.
+   * @see Image::save() for the expected format.
    * @param image The image we're going to be initializing
    * @param imageFolder The folder that contains the Cube
    */
@@ -715,10 +766,19 @@ namespace Isis {
   }
 
 
+
   /**
-   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   * @description The XML reader invokes this method at the start of every element in the
+   *        XML document.  This expects <image/> and <displayProperties/> elements.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
    *
-   * @return If we should continue reading the XML (usually true).
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
    */
   bool Image::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName, const QXmlAttributes &atts) {
@@ -728,6 +788,8 @@ namespace Isis {
       if (localName == "image") {
         QString id = atts.value("id");
         QString fileName = atts.value("fileName");
+        QString instrumentId = atts.value("instrumentId");
+        QString spacecraftName = atts.value("spacecraftName");
 
         QString aspectRatioStr = atts.value("aspectRatio");
         QString resolutionStr = atts.value("resolution");
@@ -742,11 +804,19 @@ namespace Isis {
         if (!id.isEmpty()) {
           delete m_image->m_id;
           m_image->m_id = NULL;
-          m_image->m_id = new QUuid(id.toAscii());
+          m_image->m_id = new QUuid(id.toLatin1());
         }
 
         if (!fileName.isEmpty()) {
           m_image->m_fileName = m_imageFolder.expanded() + "/" + fileName;
+        }
+
+        if (!instrumentId.isEmpty()) {
+          m_image->m_instrumentId = m_imageFolder.expanded() + "/" + instrumentId;
+        }
+
+        if (!spacecraftName.isEmpty()) {
+          m_image->m_spacecraftName = m_imageFolder.expanded() + "/" + spacecraftName;
         }
 
         if (!aspectRatioStr.isEmpty()) {
@@ -794,7 +864,16 @@ namespace Isis {
   }
 
 
-
+  /**
+   * @description This implementation of a virtual function calls
+   * QXmlDefaultHandler::characters(QString &ch)
+   * which in turn calls QXmlContentHandler::characters(QString &ch) which
+   * is called when the XML processor has parsed a chunk of character data.
+   * @see XmlStackedHandler, QXmlDefaultHandler,QXmlContentHandler
+   * @param ch The character data.
+   * @return @b bool Returns True if there were no problems with the character processing.
+   * It returns False if there was a problem, and the XML reader stops.
+   */
   bool Image::XmlHandler::characters(const QString &ch) {
     m_characters += ch;
 
@@ -802,7 +881,17 @@ namespace Isis {
   }
 
 
-
+  /**
+   * @brief The XML reader invokes this method at the end of every element in the
+   *        XML document.  This expects <image/> and <footprint/> elements.
+   * @param namespaceURI  The Uniform Resource Identifier of the namespace (eg. "xmlns")
+   * @param localName The local name string (eg. "xhtml")
+   * @param qName The XML qualified string (eg.  "xmlns:xhtml"). This can be empty if
+   *        QNames are not available.
+   * @return @b bool If this function returns True, then a signal is sent to the reader indicating
+   * the end of the element.  If this function returns False, something bad
+   * happened and processing stops.
+   */
   bool Image::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
     if (localName == "footprint" && !m_characters.isEmpty()) {

@@ -32,6 +32,10 @@
 #include "FileName.h"
 #include "XmlStackedHandler.h"
 
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 class QUuid;
 class QMutex;
 class QXmlStreamWriter;
@@ -70,7 +74,20 @@ namespace Isis {
    *                           methods to lower camel case. Fixed history
    *                           entry indentation. Added padding to control
    *                           statements. References #1169.
+   *   @history 2015-10-14 Jeffrey Covington - Declared Image * as a Qt
+   *                           metatype for use with QVariant.
+   *   @history 2014-09-05 Kimberly Oyama - Added the serialNumber() function which returns
+   *                           the cube's serial number.
+   *   @history 2015-09-05 Kenneth Edmundson - Added preliminary target body information
+   *                           (re:  the member variables QString m_instrumentId (the instrument ID
+   *                           of the image), SpiceInt * m_bodyCode (the NaifBodyCode value if it
+   *                           exists in the labels), and QString m_spacecraftName
+   *                           (the Spacecraft name associated with this image).
+   *   @history 2016-06-22 Tyler Wilson - Added documentation to member functions/variables.
+   *                           Fixes #3950.
+   *
    */
+
   class Image : public QObject {
     Q_OBJECT
     public:
@@ -88,6 +105,7 @@ namespace Isis {
       ImageDisplayProperties *displayProperties();
       const ImageDisplayProperties *displayProperties() const;
       QString fileName() const;
+      QString serialNumber();
       geos::geom::MultiPolygon *footprint();
       const geos::geom::MultiPolygon *footprint() const;
       void setId(QString id);
@@ -117,10 +135,16 @@ namespace Isis {
       void initCamStats();
       void initQuickFootprint();
 
+
     private:
       /**
-       *
+       * @description  Child class for XmlStackedHandler which is used to process XML in
+       * a stack-oriented way.  It's been modified to process an Image object
+       * object.
        * @author 2012-??-?? Steven Lambright
+       *
+       * @history 2016-06-23 Tyler Wilson - Added documention to the member functions.
+       *                        Fixes #3950.
        *
        * @internal
        */
@@ -137,28 +161,49 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          Image *m_image;
-          FileName m_imageFolder;
-          QString m_characters;
+          Image *m_image;  //!< Pointer to the Image.
+          FileName m_imageFolder;  //!< The Name/path of the image.
+          QString m_characters;  //!< Character data storage found in the content of XML elements.
+
       };
 
     private:
       Image(const Image &other);
       Image &operator=(const Image &rhs);
 
+      SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
+                                    labels. Otherwise, if the target is sky,
+                                    it's the SPK code and if not sky then it's
+                                    calculated by the NaifBodyCode() method.*/
+      //    QString *m_name;   //!< Name of the target
+
+
       /**
        * The cube associated with this Image. This is usually NULL once the image is done
-       *   initializing because no more than a thousand of these should ever be open at once.
+       * initializing because no more than a thousand of these should ever be open at once.
        */
       Cube *m_cube;
+
       /**
        * The GUI information for how this Image ought to be displayed.
        */
       ImageDisplayProperties *m_displayProperties;
+
       /**
        * The on-disk file name of the cube associated with this Image.
        */
       QString m_fileName;
+
+      /**
+       * Instrument id associated with this Image.
+       */
+      QString m_instrumentId;
+
+      /**
+       * Spacecraft name associated with this Image.
+       */
+      QString m_spacecraftName;
+
       /**
        * A 0-360 ocentric lon,lat degrees footprint of this Image.
        */
@@ -168,16 +213,20 @@ namespace Isis {
        */
       QUuid *m_id;
 
-      double m_aspectRatio;
-      double m_resolution;
-      Angle m_emissionAngle;
-      Angle m_incidenceAngle;
-      double m_lineResolution;
-      Distance m_localRadius;
-      Angle m_northAzimuth;
-      Angle m_phaseAngle;
-      double m_sampleResolution;
+      double m_aspectRatio;         //!<  Aspect ratio of the image.
+      double m_resolution;          //!<  Resolution of the image.
+      Angle m_emissionAngle;        //!<  Emmission angle of the image.
+      Angle m_incidenceAngle;       //!<  Incidence angle of the image.
+      double m_lineResolution;      //!<  Line resolution of the image.
+      double m_sampleResolution;    //!<  Sample resolution of the image.
+      Distance m_localRadius;       //!<  Local radius of the image.
+      Angle m_northAzimuth;         //!<  North Azimuth for the image.
+      Angle m_phaseAngle;           //!<  Phase angle for the image.
+
   };
+  // TODO: add QDataStream >> and << ???
 }
+
+Q_DECLARE_METATYPE(Isis::Image *);
 
 #endif
