@@ -24,10 +24,15 @@
 
 #include "ProjectItemProxyModel.h"
 
+#include <QList>
+#include <QItemSelection>
+#include <QMap>
+#include <QMimeData>
+#include <QModelIndex>
+#include <QObject>
+
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
-
-#include <QMimeData>
 
 namespace Isis {
   /**

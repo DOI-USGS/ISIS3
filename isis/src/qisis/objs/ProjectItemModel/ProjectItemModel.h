@@ -23,13 +23,25 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QItemSelectionModel>
 #include <QStandardItemModel>
 
-#include "Project.h"
-#include "ProjectItem.h"
+class QItemSelection;
+class QItemSelectionModel;
+class QMimeData;
+class QModelIndex;
+class QString;
+class QVariant;
 
 namespace Isis {
+
+  class BundleSolutionInfo;
+  class Control;
+  class ControlList;
+  class GuiCameraList;
+  class ImageList;
+  class Project;
+  class ProjectItem;
+  class TargetBodyList;
 
   /**
    * Provides access to data stored in a Project through Qt's model-view
@@ -93,7 +105,7 @@ namespace Isis {
       virtual bool canDropMimeData(const QMimeData *data,
                                    Qt::DropAction action,
                                    int row, int column,
-                                   const QModelIndex& parent) const;
+                                   const QModelIndex &parent) const;
       
       virtual void removeItem(ProjectItem *item);
       virtual void removeItems(QList<ProjectItem *> items);

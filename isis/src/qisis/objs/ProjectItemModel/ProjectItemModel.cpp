@@ -24,7 +24,22 @@
 
 #include "ProjectItemModel.h"
 
+#include <QItemSelection>
+#include <QList>
+#include <QMimeData>
+#include <QModelIndex>
+#include <QObject>
+#include <QStandardItemModel>
+#include <QString>
+
+#include "BundleSolutionInfo.h"
+#include "Control.h"
+#include "ControlList.h"
+#include "GuiCameraList.h"
+#include "ImageList.h"
+#include "Project.h"
 #include "ProjectItem.h"
+#include "TargetBodyList.h"
 
 namespace Isis {
   /**

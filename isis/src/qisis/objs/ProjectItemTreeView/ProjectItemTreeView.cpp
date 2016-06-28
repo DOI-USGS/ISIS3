@@ -22,7 +22,14 @@
  */
 #include "ProjectItemTreeView.h"
 
-#include <QtWidgets>
+#include <QEvent>
+#include <QObject>
+#include <QTreeView>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
   /**

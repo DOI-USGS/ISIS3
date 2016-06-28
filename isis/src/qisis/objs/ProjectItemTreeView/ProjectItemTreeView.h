@@ -23,12 +23,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QTreeView>
-
 #include "AbstractProjectItemView.h"
-#include "ProjectItemProxyModel.h"
+
+class QEvent;
+class QTreeView;
+class QWidget;
 
 namespace Isis {
+
+  class ProjectItem;
+  class ProjectItemModel;
+
   /**
    * A ProjectItemTreeView displays items from a ProjectItemProxyModel
    * in a tree structure. The view can display the contents of the

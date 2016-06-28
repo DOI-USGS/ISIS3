@@ -30,6 +30,8 @@
 #include "GuiCamera.h"
 #include "TargetBody.h"
 
+class QVariant;
+
 namespace Isis {
   
   class BundleResults;
@@ -41,6 +43,7 @@ namespace Isis {
   class ImageList;
   class GuiCameraList;
   class Project;
+  class ProjectItem;
   class ProjectItemModel;
   class TargetBodyList;
 

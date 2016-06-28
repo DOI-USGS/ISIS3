@@ -23,6 +23,10 @@
 
 #include "ProjectItem.h"
 
+#include <QIcon>
+#include <QStandardItem>
+#include <QVariant>
+
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
@@ -32,6 +36,7 @@
 #include "Image.h"
 #include "ImageList.h"
 #include "Project.h"
+#include "ProjectItem.h"
 #include "ProjectItemModel.h"
 
 namespace Isis {

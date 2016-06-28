@@ -23,12 +23,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QIdentityProxyModel>
-#include <QItemSelection>
+#include <QList>
 #include <QMap>
 
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
+
+class QItemSelection;
+template <typename T> class QList;
+class QMimeData;
+class QModelIndex;
+class QStandardItem;
 
 namespace Isis {
   /**
@@ -93,10 +98,10 @@ namespace Isis {
     void setSourceModel(ProjectItemModel *sourceModel);
     ProjectItemModel *sourceModel();
 
-    virtual bool canDropMimeData(const QMimeData * data, Qt::DropAction action,
-                                 int row, int column, const QModelIndex & parent) const;
-    virtual bool dropMimeData(const QMimeData * data, Qt::DropAction action,
-                                 int row, int column, const QModelIndex & parent);
+    virtual bool canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                 int row, int column, const QModelIndex &parent) const;
+    virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action,
+                              int row, int column, const QModelIndex &parent);
   
   public slots:
     ProjectItem *addItem(ProjectItem *sourceItem);
