@@ -4,31 +4,23 @@
 
 #include "ControlPoint.h"
 
-#include <QCloseEvent>
-#include <QHideEvent>
 #include <QPalette>
 #include <QPointer>
-#include <QStatusBar>
+#include <QString>
 #include <QStringList>
 #include <QWidget>
 
 class QAction;
-class QBoxLayout;
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
 class QLabel;
 class QMainWindow;
 class QObject;
-class QPainter;
-class QPoint;
 class QPushButton;
 class QSplitter;
-class QStackedWidget;
-class QString;
 class QTableWidget;
 class QTextEdit;
-class QWidget;
 
 namespace Isis {
   class ControlMeasureEditWidget;
@@ -50,6 +42,7 @@ namespace Isis {
    * @author 2014-06-25 Tracie Sucharski
    *
    * @internal 
+   *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -58,7 +51,7 @@ namespace Isis {
       ControlPointEditWidget(QWidget *parent, bool addMeasures = false);
       virtual ~ControlPointEditWidget();
 
-      // measure column values
+      //! Measure column values for the measure table
       enum MeasureColumns{
         FILENAME,
         CUBESN,
@@ -77,6 +70,7 @@ namespace Isis {
         EDITLOCK,
         TYPE
       };
+      //! Number of entries (columns) in the measure table
       static const int NUMCOLUMNS = 16;
 
       QString measureColumnToString(MeasureColumns column);
@@ -162,88 +156,93 @@ namespace Isis {
 
     private:
 
-      QPointer<QWidget> m_parent;
-      bool m_addMeasuresButton;
+      QPointer<QWidget> m_parent; //!< Parent widget
+      bool m_addMeasuresButton;   //!< Indicates whether or not to add "Add Measures(s) to Point"
 
-      QString m_cnetFileName;
-      QPointer<QLabel> m_cnetFileNameLabel;
-      bool m_netChanged;
+      QString m_cnetFileName; //!< Filename of the control network that is being modified
+      QPointer<QLabel> m_cnetFileNameLabel; //!< Label with name of the control network file
+      bool m_netChanged; //!< Indicates if the control network has been modified
 
-      QPointer<QAction> m_closePointEditor;
+      QPointer<QAction> m_closePointEditor; //!< Action to close the point editor
 
-      QPointer<QAction> m_saveChips;
+      QPointer<QAction> m_saveChips; //!< Action to save the registration chips
+      //! Action to toggle visibility of the registration template editor
       QPointer<QAction> m_showHideTemplateEditor;
-      QPointer<QAction> m_openTemplateFile;
-      QPointer<QAction> m_saveTemplateFile;
-      QPointer<QAction> m_saveTemplateFileAs;
+      QPointer<QAction> m_openTemplateFile; //!< Action to open a registration template file to disk
+      QPointer<QAction> m_saveTemplateFile; //!< Action to save a registration template file to disk
+      QPointer<QAction> m_saveTemplateFileAs; //!< Action to save a new registration template
 
+      //! Pointer to control measure editor widget
       QPointer<ControlMeasureEditWidget> m_measureEditor;
 
-      QPointer<QPushButton> m_savePoint;
-      QPalette m_saveDefaultPalette;
+      QPointer<QPushButton> m_savePoint; //!< Button to save current point being edited
+      QPalette m_saveDefaultPalette; //!< Default color pallet of the "Save Point" button
 
-      QPointer<QPushButton> m_saveNet;
+      QPointer<QPushButton> m_saveNet; //!< Button to save the current control network
 
-      QPointer<QTextEdit> m_templateEditor;
-      QPointer<QWidget> m_templateEditorWidget;
-      bool m_templateModified;
+      QPointer<QTextEdit> m_templateEditor; //!< Text editor for editing the registration template
+      QPointer<QWidget> m_templateEditorWidget; //!< Template editor widget
+      bool m_templateModified; //!< Indicates if the registration template was edited
 
-      QPointer<QLabel> m_templateFileNameLabel;
-      QPointer<QLabel> m_ptIdValue;
-      QPointer<QComboBox> m_pointType;
-      QPointer<QLabel> m_numMeasures;
-      QPointer<QLabel> m_pointAprioriLatitude;
-      QPointer<QLabel> m_pointAprioriLongitude;
-      QPointer<QLabel> m_pointAprioriRadius;
+      QPointer<QLabel> m_templateFileNameLabel; //!< Label for the template filename
+      QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
+      QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
+      QPointer<QLabel> m_numMeasures; //!< Label for number of measures in the current point
+      QPointer<QLabel> m_pointAprioriLatitude; //!< Label for current point's apriori latitude
+      QPointer<QLabel> m_pointAprioriLongitude; //!< Label for current point's apriori longitude
+      QPointer<QLabel> m_pointAprioriRadius; //!< Label for current point's apriori radius
+      //! Label for current point's apriori latitude radius sigma
       QPointer<QLabel> m_pointAprioriLatitudeSigma;
+      //! Label for current point's apriori longitude sigma
       QPointer<QLabel> m_pointAprioriLongitudeSigma;
+      //! Label for current point's apriori radius sigma
       QPointer<QLabel> m_pointAprioriRadiusSigma;
-      QPointer<QLabel> m_pointLatitude;
-      QPointer<QLabel> m_pointLongitude;
-      QPointer<QLabel> m_pointRadius;
+      QPointer<QLabel> m_pointLatitude; //!< Label for current point's latitude
+      QPointer<QLabel> m_pointLongitude; //!< Label for current point's longitude
+      QPointer<QLabel> m_pointRadius; //!< Label for current point's radius
       
-      QPointer<QCheckBox> m_lockPoint;
-      QPointer<QCheckBox> m_ignorePoint;
-      QPointer<QLabel> m_leftReference;
-      QPointer<QLabel> m_leftMeasureType;
-      QPointer<QLabel> m_leftSampError;
-      QPointer<QLabel> m_leftLineError;
-      QPointer<QLabel> m_leftSampShift;
-      QPointer<QLabel> m_leftLineShift;
-      QPointer<QLabel> m_leftGoodness;
-      QPointer<QLabel> m_rightGoodness;
-      QPointer<QLabel> m_rightReference;
-      QPointer<QLabel> m_rightMeasureType;
-      QPointer<QLabel> m_rightSampError;
-      QPointer<QLabel> m_rightLineError;
-      QPointer<QLabel> m_rightSampShift;
-      QPointer<QLabel> m_rightLineShift;
-      QPointer<QCheckBox> m_lockLeftMeasure;
-      QPointer<QCheckBox> m_ignoreLeftMeasure;
-      QPointer<QCheckBox> m_lockRightMeasure;
-      QPointer<QCheckBox> m_ignoreRightMeasure;
+      QPointer<QCheckBox> m_lockPoint; //!< Checkbox that locks/unlocks the current point
+      QPointer<QCheckBox> m_ignorePoint; //!< Checkbox to ignore the current point
+      QPointer<QLabel> m_leftReference; //!< Label indicating if left measure is the reference
+      QPointer<QLabel> m_leftMeasureType; //!< Label for the left measure's adjustment type
+      QPointer<QLabel> m_leftSampError; //!< Label for left measure's sample residual
+      QPointer<QLabel> m_leftLineError; //!< Label for left measure's line residual
+      QPointer<QLabel> m_leftSampShift; //!< Label for left measure's sample shift
+      QPointer<QLabel> m_leftLineShift; //!< Label for left measure's line shift
+      QPointer<QLabel> m_leftGoodness;  //!< Label for left measure's goodness of fit
+      QPointer<QLabel> m_rightGoodness; //!< Label for right measure's goodness of fit
+      QPointer<QLabel> m_rightReference; //!< Label indicating if right measure is the reference
+      QPointer<QLabel> m_rightMeasureType; //!< Label for the right measure's adjustment type
+      QPointer<QLabel> m_rightSampError; //!< Label for right measure's sample residual
+      QPointer<QLabel> m_rightLineError; //!< Label for right measure's line residual
+      QPointer<QLabel> m_rightSampShift; //!< Label for right measure's sample shift
+      QPointer<QLabel> m_rightLineShift; //!< Label for right measure's line shift
+      QPointer<QCheckBox> m_lockLeftMeasure; //!< Checkbox to edit lock/unlock the left measure
+      QPointer<QCheckBox> m_ignoreLeftMeasure; //!< Checkbox to ignore the left measure
+      QPointer<QCheckBox> m_lockRightMeasure; //!< Checkbox to edit lock/unlock the right measure
+      QPointer<QCheckBox> m_ignoreRightMeasure; //!< Checkbox to ignore the right measure
 
-      QPointer<QComboBox> m_leftCombo;
-      QPointer<QComboBox> m_rightCombo;
+      QPointer<QComboBox> m_leftCombo; //!< Combobox to load left measure into left chip viewport
+      QPointer<QComboBox> m_rightCombo; //!< Combobox to load right measure into right chip viewport
 
-      QPointer<QMainWindow> m_measureWindow;
-      QPointer<QTableWidget> m_measureTable;
+      QPointer<QMainWindow> m_measureWindow; //!< Main window for the the measure table widget
+      QPointer<QTableWidget> m_measureTable; //!< Table widget for the measures
 
-      QPointer<ControlPoint> m_editPoint;
-      SerialNumberList *m_serialNumberList;
-      QPointer<ControlNet> m_controlNet;
+      QPointer<ControlPoint> m_editPoint; //!< The control point being edited
+      SerialNumberList *m_serialNumberList; //!< Serial number list for the loaded cubes
+      QPointer<ControlNet> m_controlNet; //!< Current control net
 
 //    QPointer<NewPointDialog> m_newPointDialog;
-      QPointer<ControlPoint> m_newPoint;
-      QString m_lastUsedPointId;
+      QPointer<ControlPoint> m_newPoint; //!< New control point
+      QString m_lastUsedPointId; //!< Point id of the last used control point
 
-      QStringList m_pointFiles;
+      QStringList m_pointFiles; //!< Associated files for current control point
 
-      QString m_leftFile;
-      QPointer<ControlMeasure> m_leftMeasure;
-      QPointer<ControlMeasure> m_rightMeasure;
-      QScopedPointer<Cube> m_leftCube;
-      QScopedPointer<Cube> m_rightCube;
+      QString m_leftFile; //<! Filename of left measure
+      QPointer<ControlMeasure> m_leftMeasure; //!< Left control measure
+      QPointer<ControlMeasure> m_rightMeasure; //!< Right control measure
+      QScopedPointer<Cube> m_leftCube; //!< Left cube
+      QScopedPointer<Cube> m_rightCube; //!< Right cube
 
   };
 };

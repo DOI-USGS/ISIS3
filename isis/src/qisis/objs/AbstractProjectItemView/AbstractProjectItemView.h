@@ -23,13 +23,16 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QItemSelectionModel>
+#include <QWidget>
 
-#include "ProjectItem.h"
-#include "ProjectItemModel.h"
-#include "ProjectItemProxyModel.h"
+class QAction;
+class QDragEnterEvent;
+template <typename T> class QList;
 
 namespace Isis {
+
+  class ProjectItem;
+  class ProjectItemModel;
   /**
    * AbstractProjectItemView is a base class for views of a
    * ProjectItemModel in Qt's model-view
@@ -49,8 +52,12 @@ namespace Isis {
    *
    * Note that AbstractProjectItemView does not inherit from QAbstractItemView.
    *
-   * @author Jeffrey Covington
+   * @internal
+   *   @author Jeffrey Covington
    *
+   *   @history 2015-10-21 Jeffrey Covington - Original version.
+   *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards. 
+   *                           Fixes #4004.
    */
   class AbstractProjectItemView : public QWidget {
 
@@ -90,7 +97,7 @@ namespace Isis {
       virtual void addItems(QList<ProjectItem *> items);
 
     private:
-      ProjectItemModel *m_internalModel;
+      ProjectItemModel *m_internalModel; //!< The internal model used by the view
   };
 
 }

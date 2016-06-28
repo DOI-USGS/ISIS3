@@ -33,6 +33,8 @@
 #include "MosaicSceneItem.h"
 #include "MosaicSceneWidget.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
   

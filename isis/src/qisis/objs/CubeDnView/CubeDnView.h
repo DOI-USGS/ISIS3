@@ -23,20 +23,34 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QMdiSubWindow>
+#include <QList>
+#include <QMap>
 #include <QWidgetAction>
 
 #include "AbstractProjectItemView.h"
-#include "MdiCubeViewport.h"
-#include "ProjectItemProxyModel.h"
-#include "ToolPad.h"
+
+class QAction;
+class QMenu;
+class QModelIndex;
+class QToolBar;
 
 namespace Isis {
+
+  class Cube;
+  class Image;
+  class MdiCubeViewport;
+  class ToolPad;
+  class Workspace;
   
   /**
    * View that displays cubes in a QView-like way. 
    *
    * @author Jeffrey Covington
+   * 
+   * @internal
+   *   @history 2016-01-13 Jeffrey Covington - Original version.
+   *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards.
+   *                           Fixes #4004.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -92,11 +106,6 @@ namespace Isis {
       QWidgetAction *m_activeToolBarAction; //!< Widget of the active tool
       QList<QAction *> m_toolPadActions; //!< The tool pad actions
   };
-
-
-
-
-
 
 }
 

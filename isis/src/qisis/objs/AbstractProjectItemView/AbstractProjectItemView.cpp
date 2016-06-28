@@ -22,7 +22,12 @@
  */
 #include "AbstractProjectItemView.h"
 
-#include <QtWidgets>
+#include <QAction>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QList>
+#include <QWidget>
 
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -59,7 +64,7 @@ namespace Isis {
    * Returns the model used by the view. If the internal model is a
    * proxy model, it returns the source model.
    *
-   * @return (ProjectItemModel *) The model.
+   * @return @b ProjectItemModel * The model.
    */
   ProjectItemModel *AbstractProjectItemView::model() {
     if (ProjectItemProxyModel *proxyModel = 
@@ -68,6 +73,7 @@ namespace Isis {
     }
     return internalModel();
   }
+
 
   /**
    * Accepts the drag enter event if the internal model can accept the
@@ -118,7 +124,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for the permanent tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::permToolBarActions() {
     return QList<QAction *>();
@@ -128,7 +134,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for the active tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::activeToolBarActions() {
     return QList<QAction *>();
@@ -138,7 +144,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for the tool pad.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::toolPadActions() {
     return QList<QAction *>();
@@ -148,7 +154,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a context menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::contextMenuActions() {
     return QList<QAction *>();
@@ -158,7 +164,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a file menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::fileMenuActions() {
     return QList<QAction *>();
@@ -168,7 +174,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a project menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::projectMenuActions() {
     return QList<QAction *>();
@@ -178,7 +184,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for an edit menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::editMenuActions() {
     return QList<QAction *>();
@@ -188,7 +194,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a view menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::viewMenuActions() {
     return QList<QAction *>();
@@ -198,7 +204,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a settings menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::settingsMenuActions() {
     return QList<QAction *>();
@@ -208,7 +214,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a help menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction *> The actions
    */
   QList<QAction *> AbstractProjectItemView::helpMenuActions() {
     return QList<QAction *>();
@@ -218,7 +224,7 @@ namespace Isis {
   /**
    * Returns the current item of the model.
    * 
-   * @return (ProjectItem *) The item
+   * @return @b ProjectItem * The item
    */
   ProjectItem *AbstractProjectItemView::currentItem() {
     return model()->currentItem();
@@ -228,7 +234,7 @@ namespace Isis {
   /**
    * Return the selected items of the model.
    *
-   * @return (QList<ProjectItem *>) The items
+   * @return @b QList<ProjectItem *> The items
    */
   QList<ProjectItem *> AbstractProjectItemView::selectedItems() {
     return model()->selectedItems();
@@ -267,7 +273,7 @@ namespace Isis {
    * Returns the internal model of the view. By default it is a proxy
    * model.
    *
-   * @return (ProjectItemModel *) The internal model
+   * @return @b ProjectItemModel * The internal model
    */
   ProjectItemModel *AbstractProjectItemView::internalModel() {
     return m_internalModel;

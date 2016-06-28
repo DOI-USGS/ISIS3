@@ -131,6 +131,8 @@ namespace Isis {
     *                           around the file names in case there are spaces or other special
     *                           characters in them. Fixes #1551.
     *   @history 2014-07-03 Tracie Sucharski - Renamed from ControlPointEdit. 
+    *
+    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
@@ -143,8 +145,13 @@ namespace Isis {
       ControlMeasureEditWidget(QWidget *parent = 0, bool allowLeftMouse = false,
                                bool useGeometry = true);
       ~ControlMeasureEditWidget();
+      /**
+       * Returns the template filename used for auto-registration.
+       * 
+       * @return @b QString Template filename
+       */
       QString templateFileName() {
-        return p_templateFileName;
+        return m_templateFileName;
       };
       bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
@@ -190,63 +197,63 @@ namespace Isis {
     private:
       void createMeasureEditor(QWidget *parent);
 
-      bool p_allowLeftMouse;
-      bool p_useGeometry;
+      bool m_allowLeftMouse; //!< Whether or not to allow mouse events on left chip viewport
+      bool m_useGeometry;    //!< Whether or not to allow geometry/rotation on right chip viewport
 
-      QString p_templateFileName;
-      QLabel *p_leftZoomFactor;
-      QLabel *p_rightZoomFactor;
-      QLabel *p_leftSampLinePosition;
-      QLabel *p_rightSampLinePosition;
-      QLabel *p_leftLatLonPosition;
-      QLabel *p_rightLatLonPosition;
-      QRadioButton *p_nogeom;
-      QRadioButton *p_geom;
-      QToolButton *p_rightZoomIn;
-      QToolButton *p_rightZoomOut;
-      QToolButton *p_rightZoom1;
+      QString m_templateFileName;      //!< Registration template filename
+      QLabel *m_leftZoomFactor;        //!< Label for left chip viewport's zoom factor
+      QLabel *m_rightZoomFactor;       //!< Label for right chip viewport's zoom factor
+      QLabel *m_leftSampLinePosition;  //!< Label for left chip viewport's current sample/line
+      QLabel *m_rightSampLinePosition; //!< Label for right chip viewport's current sample/line
+      QLabel *m_leftLatLonPosition;    //!< Label for left chip viewport's current lat/lon
+      QLabel *m_rightLatLonPosition;   //!< Label for right chip viewport's current lat/lon
+      QRadioButton *m_nogeom; //!< Radio button to remove geometry/rotation for right chip viewport
+      QRadioButton *m_geom; //!< Radio button to apply geometry/rotation to right chip viewport
+      QToolButton *m_rightZoomIn;      //!< Button for zooming in right chip viewport 
+      QToolButton *m_rightZoomOut;     //!< Button for zooming out right chip viewport
+      QToolButton *m_rightZoom1;       //!< Button for 1:1 zoom on right chip viewport
 
 
-      bool p_timerOn;
-      QTimer *p_timer;
-      std::vector<ChipViewport *> p_blinkList;
-      unsigned char p_blinkIndex;
+      bool m_timerOn;  //!< Indicates if the blink timer is on
+      QTimer *m_timer; //!< Timer on the blinking
+      std::vector<ChipViewport *> m_blinkList; //!< List of chip viewports to blink
+      unsigned char m_blinkIndex; //!< Index of the chip to load in the left chip viewport
 
-      QDial *p_dial;
-      QLCDNumber *p_dialNumber;
-      QDoubleSpinBox *p_blinkTimeBox;
+      QDial *m_dial;                  //!< Rotation dial 
+      QLCDNumber *m_dialNumber;       //!< The current amount of rotation (in degrees)
+      QDoubleSpinBox *m_blinkTimeBox; //!< The current blink step (in seconds)
 
-      bool p_circle;
-      QScrollBar *p_slider;
+      bool m_circle;        //!< Whether or not to draw circle in center of the right chip viewport
+      QScrollBar *m_slider; //!< Slider that controls the size of the center circle
 
-      QPushButton *p_autoReg;
-      QWidget *p_autoRegExtension;
-      QLabel *p_oldPosition;
-      QLabel *p_goodFit;
-      bool   p_autoRegShown;
-      bool   p_autoRegAttempted;
+      QPushButton *m_autoReg;      //!< Button to auto-register the measure
+      QWidget *m_autoRegExtension; //!< Widget that shows after registering a measure
+      QLabel *m_oldPosition;       //!< The old sample and line before registering
+      QLabel *m_goodFit;           //!< The goodness of fit value after registering
+      bool m_autoRegShown;         //!< Whether or not the auto-reg extension is shown
+      bool m_autoRegAttempted;     //!< Whether or not auto-registration has been attempted
 
-      QPushButton *p_saveMeasure;
-      QPalette p_saveDefaultPalette;
+      QPushButton *m_saveMeasure;    //!< Button to save the current measure
+      QPalette m_saveDefaultPalette; //!< Default color palette for the Save button 
 
-      ChipViewport *p_leftView;
-      ChipViewport *p_rightView;
+      ChipViewport *m_leftView;  //!< Left ChipViewport 
+      ChipViewport *m_rightView; //!< Right ChipViewport 
 
-      Cube *p_leftCube;
-      Cube *p_rightCube;
-      ControlMeasure *p_leftMeasure;
-      ControlMeasure *p_rightMeasure;
-      Chip *p_leftChip;
-      Chip *p_rightChip;
-      UniversalGroundMap *p_leftGroundMap;
-      UniversalGroundMap *p_rightGroundMap;
+      Cube *m_leftCube;  //!< Left chip viewport's Cube
+      Cube *m_rightCube; //!< Right chip viewport's Cube
+      ControlMeasure *m_leftMeasure;  //!< Left ControlMeasure
+      ControlMeasure *m_rightMeasure; //!< Right ControlMeasure
+      Chip *m_leftChip;  //!< Left Chip
+      Chip *m_rightChip; //!< Right Chip
+      UniversalGroundMap *m_leftGroundMap;  //!< UniversalGroundMap for left cube
+      UniversalGroundMap *m_rightGroundMap; //!< UniversalGroundMap for right cube
 
-      AutoReg *p_autoRegFact;
-      QString p_pointId;
+      AutoReg *m_autoRegFact; //!< Created AutoReg
+      QString m_pointId;      //!< Associated control point id of the right measure
 
-      int p_rotation;
-      bool p_geomIt;
-      bool p_linkZoom;
+      int m_rotation;  //!< Amount to rotate right chip viewport TODO Is this used??
+      bool m_geomIt;   //!< Apply geometry to the right chip viewport
+      bool m_linkZoom; //!< Link zoom factors between chip viewports 
   };
 };
 

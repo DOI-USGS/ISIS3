@@ -22,9 +22,18 @@
  */
 #include "CubeDnView.h"
 
-#include <QtWidgets>
-#include <QVBoxLayout>
+#include <QAction>
 #include <QHBoxLayout>
+#include <QMap>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QMenu>
+#include <QModelIndex>
+#include <QSize>
+#include <QSizePolicy>
+#include <QToolBar>
+#include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
@@ -46,6 +55,9 @@
 #include "MdiCubeViewport.h"
 #include "MeasureTool.h"
 #include "PanTool.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+#include "ProjectItemProxyModel.h"
 #include "RubberBandTool.h"
 #include "QnetFileTool.h"
 #include "QnetNavTool.h"
@@ -70,10 +82,11 @@ namespace Isis {
   /**
    * Constructs the view, initializing the tools. 
    *
-   * @param parent (QWidget *)
+   * @param parent (QWidget *) Pointer to parent widget
    */
   CubeDnView::CubeDnView(QWidget *parent) : AbstractProjectItemView(parent) {
-    connect( internalModel()->selectionModel(), SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
+    connect( internalModel()->selectionModel(), 
+        SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
              this, SLOT( onCurrentChanged(const QModelIndex &) ) );
 
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
@@ -219,6 +232,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   CubeDnView::~CubeDnView() {
     delete m_permToolBar;
     delete m_activeToolBar;
@@ -248,7 +264,7 @@ namespace Isis {
   /**
    * Returns the suggested size
    *
-   * @return (QSize) The size hint
+   * @return @b QSize The size hint
    */
   QSize CubeDnView::sizeHint() const {
     return QSize(800, 600);
@@ -258,7 +274,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a file menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::fileMenuActions() {
     return m_fileMenu->actions();
@@ -268,9 +284,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a project menu.
    *
-   * @return (QList<QAction *>) The actions
-   *
-   *
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::projectMenuActions() {
     return QList<QAction *>();
@@ -279,7 +293,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for an edit menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::editMenuActions() {
     return QList<QAction *>();
@@ -289,7 +303,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a view menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::viewMenuActions() {
     QList<QAction *> result;
@@ -303,7 +317,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a settings menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::settingsMenuActions() {
     return m_optionsMenu->actions();
@@ -313,7 +327,7 @@ namespace Isis {
   /**
    * Returns a list of actions appropriate for a help menu.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::helpMenuActions() {
     return m_helpMenu->actions();
@@ -323,7 +337,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the permanent tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::permToolBarActions() {
     return m_permToolBar->actions();
@@ -333,7 +347,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the active tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::activeToolBarActions() {
     QList<QAction *> actions;
@@ -345,7 +359,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the tool pad.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> CubeDnView::toolPadActions() {
     return m_toolPad->actions();
@@ -397,7 +411,8 @@ namespace Isis {
       return;
     }
 
-    internalModel()->selectionModel()->setCurrentIndex(item->index(), QItemSelectionModel::SelectCurrent);
+    internalModel()->selectionModel()->setCurrentIndex(item->index(), 
+                                                       QItemSelectionModel::SelectCurrent);
   }
 
 
@@ -427,7 +442,8 @@ namespace Isis {
       return;
     }
 
-    if ( ProjectItemProxyModel *proxyModel = qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+    if ( ProjectItemProxyModel *proxyModel = 
+             qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       proxyModel->removeItem( m_cubeItemMap.value( viewport->cube() ) );
     }
   }
@@ -459,7 +475,7 @@ namespace Isis {
    * Returns the cube of the active viewport in the Workspace, or a
    * null pointer if no viewports are active.
    *
-   * @return (Cube *) The active cube
+   * @return @b Cube* The active cube
    */
   Cube *CubeDnView::workspaceActiveCube() {
     QMdiArea *mdiArea = m_workspace->mdiArea();

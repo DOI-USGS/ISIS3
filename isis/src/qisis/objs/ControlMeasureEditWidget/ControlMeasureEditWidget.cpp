@@ -34,42 +34,47 @@
 
 namespace Isis {
 
+  //! Constant representing the length and width of the chip viewports
   const int VIEWSIZE = 301;
 
   /**
    * Constructs a ControlMeasureEditWidget widget
    *
-   * @param parent           Input  Parent of widget
-   * @param allowLeftMouse   Input  Allow/Disallow mouse events on Left
-   *                                    ChipViewport
+   * @param parent[in]         Parent of widget
+   * @param allowLeftMouse[in] Allow/Disallow mouse events on Left ChipViewport
+   * @param useGeometry[in]    Allow/Disallow geometry and rotation on right ChipViewport
+   *
+   * @throws IException::Io    "Cannot create AutoRegFactory. As a result, sub-pixel registration
+   *                            will not work."
    * @author Tracie Sucharski
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Added error
+   *   @history 2008-15-??  Jeannie Walldren - Added error
    *                            string to iException::Message before
    *                            creating QMessageBox
    */
   ControlMeasureEditWidget::ControlMeasureEditWidget(QWidget *parent,
-                                     bool allowLeftMouse, bool useGeometry) : QWidget(parent) {
+                                                     bool allowLeftMouse,
+                                                     bool useGeometry) : QWidget(parent) {
 
-    p_rotation = 0;
-    p_timerOn = false;
-    p_autoRegFact = NULL;
-    p_allowLeftMouse = allowLeftMouse;
-    p_useGeometry = useGeometry;
+    m_rotation = 0;
+    m_timerOn = false;
+    m_autoRegFact = NULL;
+    m_allowLeftMouse = allowLeftMouse;
+    m_useGeometry = useGeometry;
 
     //  Initialize some pointers
-    p_leftCube = 0;
-    p_rightCube = 0;
-    p_leftGroundMap = 0;
-    p_rightGroundMap = 0;
+    m_leftCube = 0;
+    m_rightCube = 0;
+    m_leftGroundMap = 0;
+    m_rightGroundMap = 0;
 
     try {
-      p_templateFileName = "$base/templates/autoreg/qnetReg.def";
-      Pvl pvl(p_templateFileName);
-      p_autoRegFact = AutoRegFactory::Create(pvl);
+      m_templateFileName = "$base/templates/autoreg/qnetReg.def";
+      Pvl pvl(m_templateFileName);
+      m_autoRegFact = AutoRegFactory::Create(pvl);
     }
     catch (IException &e) {
-      p_autoRegFact = NULL;
+      m_autoRegFact = NULL;
       IException fullError(e, IException::Io,
                            "Cannot create AutoRegFactory. As a result, "
                            "sub-pixel registration will not work.",
@@ -82,35 +87,38 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Destructor
+   */
   ControlMeasureEditWidget::~ControlMeasureEditWidget () {
 
-    delete p_leftChip;
-    p_leftChip = NULL;
-    delete p_rightChip;
-    p_rightChip = NULL;
+    delete m_leftChip;
+    m_leftChip = NULL;
+    delete m_rightChip;
+    m_rightChip = NULL;
   }
-
 
 
   /**
    * Design the MeasureEdit widget
    *
+   * @param parent The parent QWidget
+   *
    * @author  Tracie Sucharski
    * @internal
-   *   @history 2008-11-19  Tracie Sucharski - Added left pan buttons, but
+   *   @history 2008-11-19 Tracie Sucharski - Added left pan buttons, but
    *                           default to hidden.
-   *   @history 2008-12-02  Jeannie Walldren - Allow connection
+   *   @history 2008-12-02 Jeannie Walldren - Allow connection
    *                           between updateLeftView and refreshView for all
    *                           objects.  Previously this was only done if
    *                           allowLeftMouse = true.
-   *   @history 2008-12-02  Tracie Sucharski - Another bug fix due to change
+   *   @history 2008-12-02 Tracie Sucharski - Another bug fix due to change
    *                           on 2008-11-19, The leftView tackPointChanged
    *                           connection needs to always be made whether mouse
    *                           button events are allowed or not.
-   *   @history 2008-12-10  Jeannie Walldren - Set the default
+   *   @history 2008-12-10 Jeannie Walldren - Set the default
    *                           value of the new private variable,
-   *                           p_templateFileName, to the previously hard-coded
+   *                           m_templateFileName, to the previously hard-coded
    *                           template filename.
    */
   void ControlMeasureEditWidget::createMeasureEditor(QWidget *parent) {
@@ -153,7 +161,7 @@ namespace Isis {
     QToolButton *leftPanDown = 0;
     QToolButton *leftPanLeft = 0;
     QToolButton *leftPanRight = 0;
-    if ( p_allowLeftMouse ) {
+    if ( m_allowLeftMouse ) {
       //  Add arrows for panning
       leftPanUp = new QToolButton(parent);
       leftPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
@@ -196,29 +204,29 @@ namespace Isis {
     leftZoomPan->addStretch();
     gridLayout->addLayout(leftZoomPan, row, 0);
 
-    p_rightZoomIn = new QToolButton();
-    p_rightZoomIn->setIcon(QPixmap(toolIconDir + "/viewmag+.png"));
-    p_rightZoomIn->setIconSize(isize);
-    p_rightZoomIn->setToolTip("Zoom In 2x");
-    p_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
+    m_rightZoomIn = new QToolButton();
+    m_rightZoomIn->setIcon(QPixmap(toolIconDir + "/viewmag+.png"));
+    m_rightZoomIn->setIconSize(isize);
+    m_rightZoomIn->setToolTip("Zoom In 2x");
+    m_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
 
-    p_rightZoomOut = new QToolButton();
-    p_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
+    m_rightZoomOut = new QToolButton();
+    m_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
                                   expanded()));
-    p_rightZoomOut->setIconSize(isize);
-    p_rightZoomOut->setToolTip("Zoom Out 2x");
-    p_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
+    m_rightZoomOut->setIconSize(isize);
+    m_rightZoomOut->setToolTip("Zoom Out 2x");
+    m_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
 
-    p_rightZoom1 = new QToolButton();
-    p_rightZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
-    p_rightZoom1->setIconSize(isize);
-    p_rightZoom1->setToolTip("Zoom 1:1");
-    p_rightZoom1->setWhatsThis("Show right measure at full resolution.");
+    m_rightZoom1 = new QToolButton();
+    m_rightZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
+    m_rightZoom1->setIconSize(isize);
+    m_rightZoom1->setToolTip("Zoom 1:1");
+    m_rightZoom1->setWhatsThis("Show right measure at full resolution.");
 
     QHBoxLayout *rightZoomPan = new QHBoxLayout;
-    rightZoomPan->addWidget(p_rightZoomIn);
-    rightZoomPan->addWidget(p_rightZoomOut);
-    rightZoomPan->addWidget(p_rightZoom1);
+    rightZoomPan->addWidget(m_rightZoomIn);
+    rightZoomPan->addWidget(m_rightZoomOut);
+    rightZoomPan->addWidget(m_rightZoom1);
 
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
@@ -260,7 +268,7 @@ namespace Isis {
     gridLayout->addLayout(rightZoomPan, row++, 1);
 
     //  Add zoom factor label and stretch locking checkbox
-    p_leftZoomFactor = new QLabel();
+    m_leftZoomFactor = new QLabel();
     QCheckBox *leftLockStretch = new QCheckBox("lock stretch");
     // there are two "lock stretch" checkboxes (left and right)
     // use same whats this text for both
@@ -270,43 +278,43 @@ namespace Isis {
         "regardless of the state of this checkbox.";
     leftLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
     QHBoxLayout *leftzflsLayout = new QHBoxLayout;
-    leftzflsLayout->addWidget(p_leftZoomFactor);
+    leftzflsLayout->addWidget(m_leftZoomFactor);
     leftzflsLayout->addWidget(leftLockStretch);
     gridLayout->addLayout(leftzflsLayout, row, 0);
 
-    p_rightZoomFactor = new QLabel();
+    m_rightZoomFactor = new QLabel();
     QCheckBox *rightLockStretch = new QCheckBox("lock stretch");
     rightLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
     QHBoxLayout *rightzflsLayout = new QHBoxLayout;
-    rightzflsLayout->addWidget(p_rightZoomFactor);
+    rightzflsLayout->addWidget(m_rightZoomFactor);
     rightzflsLayout->addWidget(rightLockStretch);
     gridLayout->addLayout(rightzflsLayout, row++, 1);
 
 
-    p_leftView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
+    m_leftView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
     //  Do not want to accept mouse/keyboard events
-    if ( !p_allowLeftMouse ) p_leftView->setDisabled(true);
+    if ( !m_allowLeftMouse ) m_leftView->setDisabled(true);
 
-    gridLayout->addWidget(p_leftView, row, 0);
+    gridLayout->addWidget(m_leftView, row, 0);
 
     connect(this, SIGNAL(newControlNetwork(ControlNet *)),
-            p_leftView, SLOT(setControlNet(ControlNet *)));
+            m_leftView, SLOT(setControlNet(ControlNet *)));
 
     connect(this,
             SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
-            p_leftView,
+            m_leftView,
             SLOT(stretchFromCubeViewport(Stretch *, CubeViewport *)));
 
     connect(leftLockStretch, SIGNAL(stateChanged(int)),
-            p_leftView,
+            m_leftView,
             SLOT(changeStretchLock(int)));
     leftLockStretch->setChecked(false);
 
 
     //  Connect left zoom buttons to ChipViewport's zoom slots
-    connect(leftZoomIn, SIGNAL(clicked()), p_leftView, SLOT(zoomIn()));
-    connect(leftZoomOut, SIGNAL(clicked()), p_leftView, SLOT(zoomOut()));
-    connect(leftZoom1, SIGNAL(clicked()), p_leftView, SLOT(zoom1()));
+    connect(leftZoomIn, SIGNAL(clicked()), m_leftView, SLOT(zoomIn()));
+    connect(leftZoomOut, SIGNAL(clicked()), m_leftView, SLOT(zoomOut()));
+    connect(leftZoom1, SIGNAL(clicked()), m_leftView, SLOT(zoom1()));
 
     //  If zoom on left, need to re-geom right
     connect(leftZoomIn, SIGNAL(clicked()), this, SLOT(updateRightGeom()));
@@ -315,23 +323,23 @@ namespace Isis {
 
     //  Connect the ChipViewport tackPointChanged signal to
     //  the update sample/line label
-    connect(p_leftView, SIGNAL(tackPointChanged(double)),
+    connect(m_leftView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateLeftPositionLabel(double)));
     
     // we want to allow this connection so that if a changed point is saved
     // and the same image is showing in both viewports, the left will refresh.
     connect(this, SIGNAL(updateLeftView(double, double)),
-            p_leftView, SLOT(refreshView(double, double)));
+            m_leftView, SLOT(refreshView(double, double)));
 
-    connect (p_leftView, SIGNAL(userMovedTackPoint()),
+    connect(m_leftView, SIGNAL(userMovedTackPoint()),
              this, SLOT(colorizeSaveButton()));
 
-    if ( p_allowLeftMouse ) {
+    if ( m_allowLeftMouse ) {
       //  Connect pan buttons to ChipViewport
-      connect(leftPanUp, SIGNAL(clicked()), p_leftView, SLOT(panUp()));
-      connect(leftPanDown, SIGNAL(clicked()), p_leftView, SLOT(panDown()));
-      connect(leftPanLeft, SIGNAL(clicked()), p_leftView, SLOT(panLeft()));
-      connect(leftPanRight, SIGNAL(clicked()), p_leftView, SLOT(panRight()));
+      connect(leftPanUp, SIGNAL(clicked()), m_leftView, SLOT(panUp()));
+      connect(leftPanDown, SIGNAL(clicked()), m_leftView, SLOT(panDown()));
+      connect(leftPanLeft, SIGNAL(clicked()), m_leftView, SLOT(panLeft()));
+      connect(leftPanRight, SIGNAL(clicked()), m_leftView, SLOT(panRight()));
 
       connect(leftPanUp, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
       connect(leftPanDown, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
@@ -339,39 +347,39 @@ namespace Isis {
       connect(leftPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
     }
 
-    p_rightView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
-    gridLayout->addWidget(p_rightView, row, 1);
+    m_rightView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
+    gridLayout->addWidget(m_rightView, row, 1);
 
     connect(this, SIGNAL(newControlNetwork(ControlNet *)),
-            p_rightView, SLOT(setControlNet(ControlNet *)));
+            m_rightView, SLOT(setControlNet(ControlNet *)));
     connect(this,
             SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
-            p_rightView,
+            m_rightView,
             SLOT(stretchFromCubeViewport(Stretch *, CubeViewport *)));
     connect(rightLockStretch, SIGNAL(stateChanged(int)),
-            p_rightView,
+            m_rightView,
             SLOT(changeStretchLock(int)));
     rightLockStretch->setChecked(false);
 
     //  Connect the ChipViewport tackPointChanged signal to
     //  the update sample/line label
-    connect(p_rightView, SIGNAL(tackPointChanged(double)),
+    connect(m_rightView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateRightPositionLabel(double)));
     connect(this, SIGNAL(updateRightView(double, double)),
-            p_rightView, SLOT(refreshView(double, double)));
+            m_rightView, SLOT(refreshView(double, double)));
 
-    connect (p_rightView, SIGNAL(userMovedTackPoint()),
-             this, SLOT(colorizeSaveButton()));
+    connect(m_rightView, SIGNAL(userMovedTackPoint()),
+            this, SLOT(colorizeSaveButton()));
 
-    connect(p_rightZoomIn, SIGNAL(clicked()), p_rightView, SLOT(zoomIn()));
-    connect(p_rightZoomOut, SIGNAL(clicked()), p_rightView, SLOT(zoomOut()));
-    connect(p_rightZoom1, SIGNAL(clicked()), p_rightView, SLOT(zoom1()));
+    connect(m_rightZoomIn, SIGNAL(clicked()), m_rightView, SLOT(zoomIn()));
+    connect(m_rightZoomOut, SIGNAL(clicked()), m_rightView, SLOT(zoomOut()));
+    connect(m_rightZoom1, SIGNAL(clicked()), m_rightView, SLOT(zoom1()));
 
     //  Connect pan buttons to ChipViewport
-    connect(rightPanUp, SIGNAL(clicked()), p_rightView, SLOT(panUp()));
-    connect(rightPanDown, SIGNAL(clicked()), p_rightView, SLOT(panDown()));
-    connect(rightPanLeft, SIGNAL(clicked()), p_rightView, SLOT(panLeft()));
-    connect(rightPanRight, SIGNAL(clicked()), p_rightView, SLOT(panRight()));
+    connect(rightPanUp, SIGNAL(clicked()), m_rightView, SLOT(panUp()));
+    connect(rightPanDown, SIGNAL(clicked()), m_rightView, SLOT(panDown()));
+    connect(rightPanLeft, SIGNAL(clicked()), m_rightView, SLOT(panLeft()));
+    connect(rightPanRight, SIGNAL(clicked()), m_rightView, SLOT(panRight()));
 
     connect(rightPanUp, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
     connect(rightPanDown, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
@@ -379,28 +387,28 @@ namespace Isis {
     connect(rightPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
 
     //  Create chips for left and right
-    p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
-    p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
+    m_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
+    m_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
     
     QButtonGroup *bgroup = new QButtonGroup();
-    p_nogeom = new QRadioButton();
-    p_nogeom->setChecked(true);
-    connect(p_nogeom, SIGNAL(clicked()), this, SLOT(setNoGeom()));
+    m_nogeom = new QRadioButton();
+    m_nogeom->setChecked(true);
+    connect(m_nogeom, SIGNAL(clicked()), this, SLOT(setNoGeom()));
 
     QCheckBox *linkZoom = NULL;
-    if (p_useGeometry) {
-      p_nogeom->setText("No geom/rotate");
-      p_nogeom->setToolTip("Reset right measure to it's native geometry.");
-      p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
+    if (m_useGeometry) {
+      m_nogeom->setText("No geom/rotate");
+      m_nogeom->setToolTip("Reset right measure to it's native geometry.");
+      m_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
                              "If measure was rotated, set rotation back to 0.  "
                              "If measure was geomed to match the left measure, "
                              "reset the geometry back to it's native state.");
-      p_geom   = new QRadioButton("Geom");
-      p_geom->setToolTip("Geom right measure to match geometry of left measure.");
-      p_geom->setWhatsThis("Using an affine transform, geom the right measure to match the "
+      m_geom   = new QRadioButton("Geom");
+      m_geom->setToolTip("Geom right measure to match geometry of left measure.");
+      m_geom->setWhatsThis("Using an affine transform, geom the right measure to match the "
                            "geometry of the left measure.");
-      bgroup->addButton(p_geom);
-      connect(p_geom, SIGNAL(clicked()), this, SLOT(setGeom()));
+      bgroup->addButton(m_geom);
+      connect(m_geom, SIGNAL(clicked()), this, SLOT(setGeom()));
     }
     else {
       linkZoom = new QCheckBox("Link Zoom");
@@ -409,39 +417,39 @@ namespace Isis {
                              "be set to the same zoom factor as the left view.");
       connect(linkZoom, SIGNAL(toggled(bool)), this, SLOT(setZoomLink(bool)));
 
-      p_nogeom->setText("No rotate");
-      p_nogeom->setToolTip("Reset right measure to it's native geometry.");
-      p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
+      m_nogeom->setText("No rotate");
+      m_nogeom->setToolTip("Reset right measure to it's native geometry.");
+      m_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
                              "If measure was rotated, set rotation back to 0.");
     }
-    bgroup->addButton(p_nogeom);
+    bgroup->addButton(m_nogeom);
 
     QRadioButton *rotate = new QRadioButton("Rotate");
     bgroup->addButton(rotate);
-    //  TODO:  ?? Don't think we need this connection
+    //TODO ?? Don't think we need this connection
     connect(rotate, SIGNAL(clicked()), this, SLOT(setRotate()));
 
     //  Set some defaults
-    p_geomIt = false;
-    p_rotation = 0;
-    p_linkZoom = false;
+    m_geomIt = false;
+    m_rotation = 0;
+    m_linkZoom = false;
 
-    p_dial = new QDial();
-    p_dial->setRange(0, 360);
-    p_dial->setWrapping(false);
-    p_dial->setNotchesVisible(true);
-    p_dial->setNotchTarget(5.);
-    p_dial->setEnabled(false);
-    p_dial->setToolTip("Rotate right measure");
-    p_dial->setWhatsThis("Rotate the right measure by degrees.");
+    m_dial = new QDial();
+    m_dial->setRange(0, 360);
+    m_dial->setWrapping(false);
+    m_dial->setNotchesVisible(true);
+    m_dial->setNotchTarget(5.);
+    m_dial->setEnabled(false);
+    m_dial->setToolTip("Rotate right measure");
+    m_dial->setWhatsThis("Rotate the right measure by degrees.");
 
-    p_dialNumber = new QLCDNumber();
-    p_dialNumber->setEnabled(false);
-    p_dialNumber->setToolTip("Rotate right measure");
-    p_dialNumber->setWhatsThis("Rotate the right measure by given number"
+    m_dialNumber = new QLCDNumber();
+    m_dialNumber->setEnabled(false);
+    m_dialNumber->setToolTip("Rotate right measure");
+    m_dialNumber->setWhatsThis("Rotate the right measure by given number"
                                " of degrees.");
-    connect(p_dial, SIGNAL(valueChanged(int)), p_dialNumber, SLOT(display(int)));
-    connect(p_dial, SIGNAL(valueChanged(int)), p_rightView, SLOT(rotateChip(int)));
+    connect(m_dial, SIGNAL(valueChanged(int)), m_dialNumber, SLOT(display(int)));
+    connect(m_dial, SIGNAL(valueChanged(int)), m_rightView, SLOT(rotateChip(int)));
 
     QCheckBox *showPoints = new QCheckBox("Show control points");
     showPoints->setToolTip("Draw control point crosshairs");
@@ -449,13 +457,13 @@ namespace Isis {
                      " for the control points located within the measure''s"
                      " view.  For areas of dense measurements, turning this"
                      " off will allow easier viewing of features.");
-    connect(showPoints, SIGNAL(toggled(bool)), p_leftView, SLOT(setPoints(bool)));
-    connect(showPoints, SIGNAL(toggled(bool)), p_rightView, SLOT(setPoints(bool)));
+    connect(showPoints, SIGNAL(toggled(bool)), m_leftView, SLOT(setPoints(bool)));
+    connect(showPoints, SIGNAL(toggled(bool)), m_rightView, SLOT(setPoints(bool)));
     showPoints->setChecked(true);
 
     QCheckBox *cross = new QCheckBox("Show crosshair");
-    connect(cross, SIGNAL(toggled(bool)), p_leftView, SLOT(setCross(bool)));
-    connect(cross, SIGNAL(toggled(bool)), p_rightView, SLOT(setCross(bool)));
+    connect(cross, SIGNAL(toggled(bool)), m_leftView, SLOT(setCross(bool)));
+    connect(cross, SIGNAL(toggled(bool)), m_rightView, SLOT(setCross(bool)));
     cross->setChecked(true);
     cross->setToolTip("Show the red crosshair across measure view");
     cross->setWhatsThis("This will toggle whether the crosshair across the"
@@ -468,73 +476,73 @@ namespace Isis {
                          " centering a crater under the crosshair.");
     connect(circle, SIGNAL(toggled(bool)), this, SLOT(setCircle(bool)));
 
-    p_slider = new QScrollBar(Qt::Horizontal);
-    p_slider->setRange(1, 100);
-    p_slider->setSingleStep(1);
-    connect(p_slider, SIGNAL(valueChanged(int)), p_leftView, SLOT(setCircleSize(int)));
-    connect(p_slider, SIGNAL(valueChanged(int)), p_rightView, SLOT(setCircleSize(int)));
-    p_slider->setValue(20);
-    p_slider->setDisabled(true);
-    p_slider->hide();
-    p_slider->setToolTip("Adjust circle size");
-    p_slider->setWhatsThis("This allows the cirle size to be adjusted.");
+    m_slider = new QScrollBar(Qt::Horizontal);
+    m_slider->setRange(1, 100);
+    m_slider->setSingleStep(1);
+    connect(m_slider, SIGNAL(valueChanged(int)), m_leftView, SLOT(setCircleSize(int)));
+    connect(m_slider, SIGNAL(valueChanged(int)), m_rightView, SLOT(setCircleSize(int)));
+    m_slider->setValue(20);
+    m_slider->setDisabled(true);
+    m_slider->hide();
+    m_slider->setToolTip("Adjust circle size");
+    m_slider->setWhatsThis("This allows the cirle size to be adjusted.");
 
     QVBoxLayout *vlayout = new QVBoxLayout();
-    if (!p_useGeometry) {
+    if (!m_useGeometry) {
       vlayout->addWidget(linkZoom);
     }
-    vlayout->addWidget(p_nogeom);
-    if (p_useGeometry) {
-      vlayout->addWidget(p_geom);
+    vlayout->addWidget(m_nogeom);
+    if (m_useGeometry) {
+      vlayout->addWidget(m_geom);
     }
     vlayout->addWidget(rotate);
-    vlayout->addWidget(p_dial);
-    vlayout->addWidget(p_dialNumber);
+    vlayout->addWidget(m_dial);
+    vlayout->addWidget(m_dialNumber);
     vlayout->addWidget(showPoints);
     vlayout->addWidget(cross);
     vlayout->addWidget(circle);
-    vlayout->addWidget(p_slider);
+    vlayout->addWidget(m_slider);
     gridLayout->addLayout(vlayout, row++, 2);
 
     //  Show sample / line for measure of chips shown
-    p_leftSampLinePosition = new QLabel();
-    p_leftSampLinePosition->setToolTip("Sample/Line under the crosshair");
-    gridLayout->addWidget(p_leftSampLinePosition, row, 0);
-    p_rightSampLinePosition = new QLabel();
-    p_rightSampLinePosition->setToolTip("Sample/Line under the crosshair");
-    gridLayout->addWidget(p_rightSampLinePosition, row++, 1);
+    m_leftSampLinePosition = new QLabel();
+    m_leftSampLinePosition->setToolTip("Sample/Line under the crosshair");
+    gridLayout->addWidget(m_leftSampLinePosition, row, 0);
+    m_rightSampLinePosition = new QLabel();
+    m_rightSampLinePosition->setToolTip("Sample/Line under the crosshair");
+    gridLayout->addWidget(m_rightSampLinePosition, row++, 1);
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       //  Show lat / lon for measure of chips shown
-      p_leftLatLonPosition = new QLabel();
-      p_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
-      gridLayout->addWidget(p_leftLatLonPosition, row, 0);
-      p_rightLatLonPosition = new QLabel();
-      p_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
-      gridLayout->addWidget(p_rightLatLonPosition, row++, 1);
+      m_leftLatLonPosition = new QLabel();
+      m_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(m_leftLatLonPosition, row, 0);
+      m_rightLatLonPosition = new QLabel();
+      m_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(m_rightLatLonPosition, row++, 1);
     }
 
 
     //  Add auto registration extension
-    p_autoRegExtension = new QWidget;
-    p_oldPosition = new QLabel;
-    p_oldPosition->setToolTip("Measure Sample/Line before sub-pixel "
+    m_autoRegExtension = new QWidget;
+    m_oldPosition = new QLabel;
+    m_oldPosition->setToolTip("Measure Sample/Line before sub-pixel "
                               "registration");
-    p_oldPosition->setWhatsThis("Original Sample/Line of the right measure "
+    m_oldPosition->setWhatsThis("Original Sample/Line of the right measure "
             "before the sub-pixel registration.  If you select the \"Undo\" "
             "button, the measure will revert back to this Sample/Line.");
-    p_goodFit = new QLabel;
-    p_goodFit->setToolTip("Goodness of Fit result from sub-pixel registration.");
-    p_goodFit->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
+    m_goodFit = new QLabel;
+    m_goodFit->setToolTip("Goodness of Fit result from sub-pixel registration.");
+    m_goodFit->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
                               "registration.");
     QVBoxLayout *autoRegLayout = new QVBoxLayout;
     autoRegLayout->setMargin(0);
-    autoRegLayout->addWidget(p_oldPosition);
-    autoRegLayout->addWidget(p_goodFit);
-    p_autoRegExtension->setLayout(autoRegLayout);
-    p_autoRegShown = false;
-    p_autoRegAttempted = false;
-    gridLayout->addWidget(p_autoRegExtension, row++, 1);
+    autoRegLayout->addWidget(m_oldPosition);
+    autoRegLayout->addWidget(m_goodFit);
+    m_autoRegExtension->setLayout(autoRegLayout);
+    m_autoRegShown = false;
+    m_autoRegAttempted = false;
+    gridLayout->addWidget(m_autoRegExtension, row++, 1);
 
 
     QHBoxLayout *leftLayout = new QHBoxLayout();
@@ -555,25 +563,25 @@ namespace Isis {
     start->setWhatsThis(text);
     connect(start, SIGNAL(released()), this, SLOT(blinkStart()));
 
-    p_blinkTimeBox = new QDoubleSpinBox();
-    p_blinkTimeBox->setMinimum(0.1);
-    p_blinkTimeBox->setMaximum(5.0);
-    p_blinkTimeBox->setDecimals(1);
-    p_blinkTimeBox->setSingleStep(0.1);
-    p_blinkTimeBox->setValue(0.5);
-    p_blinkTimeBox->setToolTip("Blink Time Delay");
+    m_blinkTimeBox = new QDoubleSpinBox();
+    m_blinkTimeBox->setMinimum(0.1);
+    m_blinkTimeBox->setMaximum(5.0);
+    m_blinkTimeBox->setDecimals(1);
+    m_blinkTimeBox->setSingleStep(0.1);
+    m_blinkTimeBox->setValue(0.5);
+    m_blinkTimeBox->setToolTip("Blink Time Delay");
     text = "<b>Function:</b> Change automatic blink rate between " +
-           QString::number(p_blinkTimeBox->minimum()) + " and " +
-           QString::number(p_blinkTimeBox->maximum()) + " seconds";
-    p_blinkTimeBox->setWhatsThis(text);
-    connect(p_blinkTimeBox, SIGNAL(valueChanged(double)),
+           QString::number(m_blinkTimeBox->minimum()) + " and " +
+           QString::number(m_blinkTimeBox->maximum()) + " seconds";
+    m_blinkTimeBox->setWhatsThis(text);
+    connect(m_blinkTimeBox, SIGNAL(valueChanged(double)),
             this, SLOT(changeBlinkTime(double)));
 
     leftLayout->addWidget(stop);
     leftLayout->addWidget(start);
-    leftLayout->addWidget(p_blinkTimeBox);
+    leftLayout->addWidget(m_blinkTimeBox);
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       QPushButton *find = new QPushButton("Find");
       find->setToolTip("Move right measure to same Latitude/Longitude as left.");
       find->setWhatsThis("Find the Latitude/Longitude under the crosshair in the "
@@ -587,102 +595,101 @@ namespace Isis {
     gridLayout->addLayout(leftLayout, row, 0);
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
-    p_autoReg = new QPushButton("Register");
-    p_autoReg->setToolTip("Sub-pixel register the right measure to the left");
-    p_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
+    m_autoReg = new QPushButton("Register");
+    m_autoReg->setToolTip("Sub-pixel register the right measure to the left");
+    m_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
                        "and move the result under the crosshair.  After "
                        "viewing the results, the option exists to move the "
                        "measure back to the original position by selecting "
                        "<strong>\"Undo Registration\"</strong>.");
-    if (p_allowLeftMouse) {
-      p_saveMeasure = new QPushButton("Save Measures");
-      p_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
+    if (m_allowLeftMouse) {
+      m_saveMeasure = new QPushButton("Save Measures");
+      m_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
                                 "point (control point currently being edited). "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
                                 "<strong>\"Save Point\"</strong>");
     }
     else {
-      p_saveMeasure = new QPushButton("Save Measure");
-      p_saveMeasure->setToolTip("Save the right measure to the edit control "
+      m_saveMeasure = new QPushButton("Save Measure");
+      m_saveMeasure->setToolTip("Save the right measure to the edit control "
                                 "point (control point currently being edited). "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
                                 "<strong>\"Save Point\"</strong>");
     }
-    p_saveDefaultPalette = p_saveMeasure->palette();
+    m_saveDefaultPalette = m_saveMeasure->palette();
 
-    rightLayout->addWidget(p_autoReg);
-    rightLayout->addWidget(p_saveMeasure);
+    rightLayout->addWidget(m_autoReg);
+    rightLayout->addWidget(m_saveMeasure);
     rightLayout->addStretch();
     gridLayout->addLayout(rightLayout, row, 1);
 
-    connect(p_autoReg, SIGNAL(clicked()), this, SLOT(registerPoint()));
-    connect(p_saveMeasure, SIGNAL(clicked()), this, SLOT(saveMeasure()));
+    connect(m_autoReg, SIGNAL(clicked()), this, SLOT(registerPoint()));
+    connect(m_saveMeasure, SIGNAL(clicked()), this, SLOT(saveMeasure()));
 
     setLayout(gridLayout);
 
-    //p_pointEditor->setCentralWidget(cw);
-    p_autoRegExtension->hide();
+    //m_pointEditor->setCentralWidget(cw);
+    m_autoRegExtension->hide();
 
-    //p_pointEditor->setVisible(true);
-    //p_pointEditor->raise();
+    //m_pointEditor->setVisible(true);
+    //m_pointEditor->raise();
   }
-
-
 
 
   /**
    * Set the measure displayed in the left ChipViewport
    *
-   * @param leftMeasure  Input  Measure displayed in left ChipViewport
-   * @param leftCube     Input  Cube of measure displayed in left ChipViewport
+   * @param leftMeasure[in]  Measure displayed in left ChipViewport
+   * @param leftCube[in]     Cube of measure displayed in left ChipViewport
+   * @param pointId[in]      Control point id associated with the left measure
    *
    * @author Tracie Sucharski
    * @internal
-   *   @history 2008-11-19  Tracie Sucharski - If left cube changes, get new
+   *   @history 2008-11-19 Tracie Sucharski - If left cube changes, get new
    *                           universalGroundMap.
-   *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
+   *   @history 2012-04-17 Tracie Sucharski - If geom is turned on update the
    *                           right measure.
-   *   @history 2012-05-07  Tracie Sucharski - Last change introduced bug when
+   *   @history 2012-05-07 Tracie Sucharski - Last change introduced bug when
    *                           loading a different control point, so only
    *                           update the right chip if we're not loading a
    *                           different control point.
-   *   @history 2013-04-30  Tracie Sucharski - Fixed bug introduced by linking zooms between left
+   *   @history 2013-04-30 Tracie Sucharski - Fixed bug introduced by linking zooms between left
    *                           and right viewports.  Zoom factors were being passed into the
    *                           Chip::Load method as the second argument which should be the rotation
    *                           value.
    */
   void ControlMeasureEditWidget::setLeftMeasure(ControlMeasure *leftMeasure,
-                                        Cube *leftCube, QString pointId) {
+                                                Cube *leftCube, QString pointId) {
 
     //  Make sure registration is turned off
-    if ( p_autoRegShown ) {
+    if ( m_autoRegShown ) {
       //  Undo Registration
-      p_autoRegShown = false;
-      p_autoRegExtension->hide();
-      p_autoReg->setText("Register");
+      m_autoRegShown = false;
+      m_autoRegExtension->hide();
+      m_autoReg->setText("Register");
     }
 
-    p_leftMeasure = leftMeasure;
+    m_leftMeasure = leftMeasure;
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       //  get new ground map
-      if ( p_leftGroundMap != 0 ) delete p_leftGroundMap;
-      p_leftGroundMap = new UniversalGroundMap(*leftCube);
+      if ( m_leftGroundMap != 0 ) delete m_leftGroundMap;
+      m_leftGroundMap = new UniversalGroundMap(*leftCube);
     }
-    p_leftCube = leftCube;
+    m_leftCube = leftCube;
 
-    p_leftChip->TackCube(p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
-    p_leftChip->Load(*p_leftCube);
+    m_leftChip->TackCube(m_leftMeasure->GetSample(), m_leftMeasure->GetLine());
+    m_leftChip->Load(*m_leftCube);
 
     // Dump into left chipViewport
-    p_leftView->setChip(p_leftChip, p_leftCube);
+    m_leftView->setChip(m_leftChip, m_leftCube);
 
     // Only update right if not loading a new point.  If it's a new point, right measure
     // hasn't been loaded yet.
-    if (pointId == p_pointId && p_geomIt) updateRightGeom();
-    p_pointId = pointId;
+    if (pointId == m_pointId && m_geomIt) updateRightGeom();
+    m_pointId = pointId;
   }
 
 
@@ -690,14 +697,15 @@ namespace Isis {
    * Set the measure displayed in the right ChipViewport
    *
    *
-   * @param rightMeasure  Input  Measure displayed in right ChipViewport
-   * @param rightCube     Input  Cube of measure displayed in right ChipViewport
+   * @param rightMeasure[in]  Measure displayed in right ChipViewport
+   * @param rightCube[in]     Cube of measure displayed in right ChipViewport
+   * @param pointId[in]       Control point id associated with the measure 
    *
    * @author Tracie Sucharski
    * @internal
    *   @history 2008-11-19  Tracie Sucharski - If right cube changes, get new
    *                           universalGroundMap.
-   *   @history 2008-15-2008 Jeannie Walldren - Added error string to
+   *   @history 2008-15-?? Jeannie Walldren - Added error string to
    *                           iException::Message before
    *                           creating QMessageBox
    *   @history 2009-09-14  Tracie Sucharski - Call geomChip to make
@@ -712,57 +720,57 @@ namespace Isis {
    *
    */
   void ControlMeasureEditWidget::setRightMeasure(ControlMeasure *rightMeasure,
-                                         Cube *rightCube, QString pointId) {
+                                                 Cube *rightCube, QString pointId) {
 
     //  Make sure registration is turned off
-    if ( p_autoRegShown ) {
+    if ( m_autoRegShown ) {
       //  Undo Registration
-      p_autoRegShown = false;
-      p_autoRegExtension->hide();
-      p_autoReg->setText("Register");
+      m_autoRegShown = false;
+      m_autoRegExtension->hide();
+      m_autoReg->setText("Register");
     }
-    p_autoRegAttempted = false;
+    m_autoRegAttempted = false;
 
-    p_rightMeasure = rightMeasure;
-    p_pointId = pointId;
-    //qDebug() << "setright Measure:" << p_pointId;
+    m_rightMeasure = rightMeasure;
+    m_pointId = pointId;
+    //qDebug() << "setright Measure:" << m_pointId;
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       //  get new ground map
-      if ( p_rightGroundMap != 0 ) delete p_rightGroundMap;
-      p_rightGroundMap = new UniversalGroundMap(*rightCube);
+      if ( m_rightGroundMap != 0 ) delete m_rightGroundMap;
+      m_rightGroundMap = new UniversalGroundMap(*rightCube);
     }
-    p_rightCube = rightCube;
+    m_rightCube = rightCube;
 
-    p_rightChip->TackCube(p_rightMeasure->GetSample(),
-                          p_rightMeasure->GetLine());
-    if ( p_geomIt == false ) {
-      p_rightChip->Load(*p_rightCube);
+    m_rightChip->TackCube(m_rightMeasure->GetSample(),
+                          m_rightMeasure->GetLine());
+    if ( m_geomIt == false ) {
+      m_rightChip->Load(*m_rightCube);
     }
     else {
       try {
-        p_rightChip->Load(*p_rightCube, *p_leftChip, *p_leftCube);
+        m_rightChip->Load(*m_rightCube, *m_leftChip, *m_leftCube);
 
       }
       catch (IException &e) {
         IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
         QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
-        p_rightChip->Load(*p_rightCube);
-        p_geomIt = false;
-        p_nogeom->setChecked(true);
-        p_geom->setChecked(false);
+        m_rightChip->Load(*m_rightCube);
+        m_geomIt = false;
+        m_nogeom->setChecked(true);
+        m_geom->setChecked(false);
       }
     }
 
     // Dump into left chipViewport
-    p_rightView->setChip(p_rightChip, p_rightCube);
+    m_rightView->setChip(m_rightChip, m_rightCube);
 
     updateRightGeom();
-    //p_rightView->geomChip(p_leftChip,p_leftCube);
+    //m_rightView->geomChip(m_leftChip,m_leftCube);
 
     // New right measure, make sure Save Measure Button text is default
-    p_saveMeasure->setPalette(p_saveDefaultPalette);
+    m_saveMeasure->setPalette(m_saveDefaultPalette);
 
   }
 
@@ -770,38 +778,38 @@ namespace Isis {
   /**
    * Update sample/line, lat/lon and zoom factor of left measure
    *
-   * @param zoomFactor  Input  zoom factor
+   * @param zoomFactor[in]  zoom factor
    *
    * @author Tracie Sucharski 
    *  
    * @internal 
    *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
-   *                          right viewports.  TODO:  Re-think design, should this be put
+   *                          right viewports.  TODO  Re-think design, should this be put
    *                          somewhere else.  This was the fastest solution for now.
    */
   void ControlMeasureEditWidget::updateLeftPositionLabel(double zoomFactor) {
-    QString pos = "Sample: " + QString::number(p_leftView->tackSample()) +
-                  "    Line:  " + QString::number(p_leftView->tackLine());
-    p_leftSampLinePosition->setText(pos);
+    QString pos = "Sample: " + QString::number(m_leftView->tackSample()) +
+                  "    Line:  " + QString::number(m_leftView->tackLine());
+    m_leftSampLinePosition->setText(pos);
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       //  Get lat/lon from point in left
-      p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
-      double lat = p_leftGroundMap->UniversalLatitude();
-      double lon = p_leftGroundMap->UniversalLongitude();
+      m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine());
+      double lat = m_leftGroundMap->UniversalLatitude();
+      double lon = m_leftGroundMap->UniversalLongitude();
 
       pos = "Latitude: " + QString::number(lat) +
             "    Longitude:  " + QString::number(lon);
-      p_leftLatLonPosition->setText(pos);
+      m_leftLatLonPosition->setText(pos);
     }
 
     //  Print zoom scale factor
     pos = "Zoom Factor: " + QString::number(zoomFactor);
-    p_leftZoomFactor->setText(pos);
+    m_leftZoomFactor->setText(pos);
 
     //  If zooms are linked, make right match left
-    if (p_linkZoom) {
-      p_rightView->zoom(p_leftView->zoomFactor());
+    if (m_linkZoom) {
+      m_rightView->zoom(m_leftView->zoomFactor());
     }
 
   }
@@ -810,38 +818,38 @@ namespace Isis {
   /**
    * Update sample/line, lat/lon and zoom factor of right measure
    *
-   * @param zoomFactor  Input  zoom factor
+   * @param zoomFactor[in]  zoom factor
    *
    * @author Tracie Sucharski
    */
   void ControlMeasureEditWidget::updateRightPositionLabel(double zoomFactor) {
 
     // If registration Info is on, turn off
-    if ( p_autoRegShown ) {
+    if ( m_autoRegShown ) {
       //  Undo Registration
-      p_autoRegShown = false;
-      p_autoRegExtension->hide();
-      p_autoReg->setText("Register");
+      m_autoRegShown = false;
+      m_autoRegExtension->hide();
+      m_autoReg->setText("Register");
     }
 
-    QString pos = "Sample: " + QString::number(p_rightView->tackSample()) +
-                  "    Line:  " + QString::number(p_rightView->tackLine());
-    p_rightSampLinePosition->setText(pos);
+    QString pos = "Sample: " + QString::number(m_rightView->tackSample()) +
+                  "    Line:  " + QString::number(m_rightView->tackLine());
+    m_rightSampLinePosition->setText(pos);
 
-    if (p_useGeometry) {
+    if (m_useGeometry) {
       //  Get lat/lon from point in right
-      p_rightGroundMap->SetImage(p_rightView->tackSample(), p_rightView->tackLine());
-      double lat = p_rightGroundMap->UniversalLatitude();
-      double lon = p_rightGroundMap->UniversalLongitude();
+      m_rightGroundMap->SetImage(m_rightView->tackSample(), m_rightView->tackLine());
+      double lat = m_rightGroundMap->UniversalLatitude();
+      double lon = m_rightGroundMap->UniversalLongitude();
 
       pos = "Latitude: " + QString::number(lat) +
             "    Longitude:  " + QString::number(lon);
-      p_rightLatLonPosition->setText(pos);
+      m_rightLatLonPosition->setText(pos);
     }
 
     //  Print zoom scale factor
     pos = "Zoom Factor: " + QString::number(zoomFactor);
-    p_rightZoomFactor->setText(pos);
+    m_rightZoomFactor->setText(pos);
 
   }
 
@@ -854,37 +862,36 @@ namespace Isis {
   void ControlMeasureEditWidget::colorizeSaveButton() {
 
     QColor qc = Qt::red;
-    QPalette p = p_saveMeasure->palette();
+    QPalette p = m_saveMeasure->palette();
     p.setColor(QPalette::ButtonText,qc);
-    p_saveMeasure->setPalette(p);
+    m_saveMeasure->setPalette(p);
 
   }
-
 
 
   /**
    * Find point from left ChipViewport in the right ChipViewport
    *
-   * @author tsucharski (6/27/2011)
+   * @author Tracie Sucharski
    *
    * @history 2011-06-27 Tracie Sucharski - If measure moves to different
-   *                        samp/line than saved measure, change save button
-   *                        to red.
+   *                         samp/line than saved measure, change save button
+   *                         to red.
    */
   void ControlMeasureEditWidget::findPoint() {
 
     //  Get lat/lon from point in left
-    p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
-    double lat = p_leftGroundMap->UniversalLatitude();
-    double lon = p_leftGroundMap->UniversalLongitude();
+    m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine());
+    double lat = m_leftGroundMap->UniversalLatitude();
+    double lon = m_leftGroundMap->UniversalLongitude();
 
     //  Reload right chipViewport with this new tack point.
-    if ( p_rightGroundMap->SetUniversalGround(lat, lon) ) {
-      emit updateRightView(p_rightGroundMap->Sample(), p_rightGroundMap->Line());
+    if ( m_rightGroundMap->SetUniversalGround(lat, lon) ) {
+      emit updateRightView(m_rightGroundMap->Sample(), m_rightGroundMap->Line());
 
       //  If moving from saved measure, turn save button to red
-      if (p_rightGroundMap->Sample() != p_rightMeasure->GetSample() ||
-          p_rightGroundMap->Line() != p_rightMeasure->GetLine())
+      if (m_rightGroundMap->Sample() != m_rightMeasure->GetSample() ||
+          m_rightGroundMap->Line() != m_rightMeasure->GetLine())
         colorizeSaveButton();
     }
     else {
@@ -896,66 +903,66 @@ namespace Isis {
 
   }
 
+
   /**
-   * Sub-pixel register point in right chipViewport with point in
-   * left.
+   * Sub-pixel register point in right chipViewport with point in left.
+   *
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Throw and catch
-   *            error before creating QMessageBox
-   *   @history 2009-03-23  Tracie Sucharski - Added private p_autoRegAttempted
-   *                             for the SaveChips method.
-   *   @history 2010-02-16  Tracie Sucharski- If autoreg fails,
-   *                             print registration stats.
-   *   @history 2010-02-18  Tracie Sucharski - Registration stats wasn't the
-   *                             correct info to print.  Instead, check
-   *                             registrationStatus and print separate errors
-   *                             for each possibility.
-   *   @history 2010-02-22  Tracie Sucharski - Added more info for registration
-   *                             failures.
-   *   @history 2010-06-08  Jeannie Walldren - Catch error and
-   *                             warn user if unable to load
-   *                             pattern (left) or search (right)
-   *                             chip
-   *   @history 2010-10-12  Tracie Sucharski - Clean up try/catch blocks.
-   *   @history 2011-06-27  Tracie Sucharski - If un-doing registration, change
-   *                             save button back to black.  If registration
-   *                             successful, change save button to red.
-   *   @history 2011-10-21  Tracie Sucharski - Add try/catch around registration
-   *                             to catch errors thrown from autoreg class.
+   *   @history 2008-15-?? Jeannie Walldren - Throw and catch
+   *                           error before creating QMessageBox
+   *   @history 2009-03-23 Tracie Sucharski - Added private m_autoRegAttempted
+   *                           for the SaveChips method.
+   *   @history 2010-02-16 Tracie Sucharski- If autoreg fails,
+   *                           print registration stats.
+   *   @history 2010-02-18 Tracie Sucharski - Registration stats wasn't the
+   *                           correct info to print.  Instead, check
+   *                           registrationStatus and print separate errors
+   *                           for each possibility.
+   *   @history 2010-02-22 Tracie Sucharski - Added more info for registration
+   *                           failures.
+   *   @history 2010-06-08 Jeannie Walldren - Catch error and
+   *                           warn user if unable to load
+   *                           pattern (left) or search (right)
+   *                           chip
+   *   @history 2010-10-12 Tracie Sucharski - Clean up try/catch blocks.
+   *   @history 2011-06-27 Tracie Sucharski - If un-doing registration, change
+   *                           save button back to black.  If registration
+   *                           successful, change save button to red.
+   *   @history 2011-10-21 Tracie Sucharski - Add try/catch around registration
+   *                           to catch errors thrown from autoreg class.
    *
    */
-
   void ControlMeasureEditWidget::registerPoint() {
 
-    if ( p_autoRegShown ) {
+    if ( m_autoRegShown ) {
       //  Undo Registration
-      p_autoRegShown = false;
-      p_autoRegExtension->hide();
-      p_autoReg->setText("Register");
+      m_autoRegShown = false;
+      m_autoRegExtension->hide();
+      m_autoReg->setText("Register");
 
       //  Reload chip with original measure
-      emit updateRightView(p_rightMeasure->GetSample(),
-                           p_rightMeasure->GetLine());
+      emit updateRightView(m_rightMeasure->GetSample(),
+                           m_rightMeasure->GetLine());
       // Since un-doing registration, make sure save button not red
-      p_saveMeasure->setPalette(p_saveDefaultPalette);
+      m_saveMeasure->setPalette(m_saveDefaultPalette);
       return;
 
     }
-    p_autoRegAttempted = true;
+    m_autoRegAttempted = true;
 
     try {
-      p_autoRegFact->PatternChip()->TackCube(
-                          p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
-      p_autoRegFact->PatternChip()->Load(*p_leftCube);
-      p_autoRegFact->SearchChip()->TackCube(
-                          p_rightMeasure->GetSample(),
-                          p_rightMeasure->GetLine());
-      if (p_useGeometry) {
-        p_autoRegFact->SearchChip()->Load(*p_rightCube,
-                            *(p_autoRegFact->PatternChip()), *p_leftCube);
+      m_autoRegFact->PatternChip()->TackCube(
+                          m_leftMeasure->GetSample(), m_leftMeasure->GetLine());
+      m_autoRegFact->PatternChip()->Load(*m_leftCube);
+      m_autoRegFact->SearchChip()->TackCube(
+                          m_rightMeasure->GetSample(),
+                          m_rightMeasure->GetLine());
+      if (m_useGeometry) {
+        m_autoRegFact->SearchChip()->Load(*m_rightCube,
+                            *(m_autoRegFact->PatternChip()), *m_leftCube);
       }
       else {
-        p_autoRegFact->SearchChip()->Load(*p_rightCube);
+        m_autoRegFact->SearchChip()->Load(*m_rightCube);
       }
     }
     catch (IException &e) {
@@ -966,22 +973,22 @@ namespace Isis {
     }
 
     try {
-      AutoReg::RegisterStatus status = p_autoRegFact->Register();
-      if ( !p_autoRegFact->Success() ) {
+      AutoReg::RegisterStatus status = m_autoRegFact->Register();
+      if ( !m_autoRegFact->Success() ) {
         QString msg = "Cannot sub-pixel register this point.\n";
         if ( status == AutoReg::PatternChipNotEnoughValidData ) {
           msg += "\n\nNot enough valid data in Pattern Chip.\n";
           msg += "  PatternValidPercent = ";
-          msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
+          msg += QString::number(m_autoRegFact->PatternValidPercent()) + "%";
         }
         else if ( status == AutoReg::FitChipNoData ) {
           msg += "\n\nNo valid data in Fit Chip.";
         }
         else if ( status == AutoReg::FitChipToleranceNotMet ) {
           msg += "\n\nGoodness of Fit Tolerance not met.\n";
-          msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
+          msg += "\nGoodnessOfFit = " + QString::number(m_autoRegFact->GoodnessOfFit());
           msg += "\nGoodnessOfFitTolerance = ";
-          msg += QString::number(p_autoRegFact->Tolerance());
+          msg += QString::number(m_autoRegFact->Tolerance());
         }
         else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
           msg += "\n\nNot enough valid points in the fit chip window for sub-pixel ";
@@ -992,18 +999,18 @@ namespace Isis {
         }
         else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
           double sampDist, lineDist;
-          p_autoRegFact->Distance(sampDist, lineDist);
+          m_autoRegFact->Distance(sampDist, lineDist);
           msg += "\n\nSub pixel algorithm moves registration more than tolerance.\n";
           msg += "\nSampleMovement = " + QString::number(sampDist) +
                  "    LineMovement = " + QString::number(lineDist);
           msg += "\nDistanceTolerance = " +
-                 QString::number(p_autoRegFact->DistanceTolerance());
+                 QString::number(m_autoRegFact->DistanceTolerance());
         }
         else if ( status == AutoReg::PatternZScoreNotMet ) {
           double score1, score2;
-          p_autoRegFact->ZScores(score1, score2);
+          m_autoRegFact->ZScores(score1, score2);
           msg += "\n\nPattern data max or min does not pass z-score test.\n";
-          msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
+          msg += "\nMinimumZScore = " + QString::number(m_autoRegFact->MinimumZScore());
           msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
         }
         else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
@@ -1024,176 +1031,174 @@ namespace Isis {
       return;
     }
 
-
-
     //  Load chip with new registered point
-    emit updateRightView(p_autoRegFact->CubeSample(), p_autoRegFact->CubeLine());
+    emit updateRightView(m_autoRegFact->CubeSample(), m_autoRegFact->CubeLine());
     //  If registered pt different from measure, colorize the save button
-    if (p_autoRegFact->CubeSample() != p_rightMeasure->GetSample() ||
-        p_autoRegFact->CubeLine() != p_rightMeasure->GetLine()) {
+    if (m_autoRegFact->CubeSample() != m_rightMeasure->GetSample() ||
+        m_autoRegFact->CubeLine() != m_rightMeasure->GetLine()) {
       colorizeSaveButton();
     }
 
     QString oldPos = "Original Sample: " +
-                     QString::number(p_rightMeasure->GetSample()) + "   Original Line:  " +
-                     QString::number(p_rightMeasure->GetLine());
-    p_oldPosition->setText(oldPos);
+                     QString::number(m_rightMeasure->GetSample()) + "   Original Line:  " +
+                     QString::number(m_rightMeasure->GetLine());
+    m_oldPosition->setText(oldPos);
 
     QString goodFit = "Goodness of Fit:  " +
-                      QString::number(p_autoRegFact->GoodnessOfFit());
-    p_goodFit->setText(goodFit);
+                      QString::number(m_autoRegFact->GoodnessOfFit());
+    m_goodFit->setText(goodFit);
 
-    p_autoRegExtension->show();
-    p_autoRegShown = true;
-    p_autoReg->setText("Undo Registration");
+    m_autoRegExtension->show();
+    m_autoRegShown = true;
+    m_autoReg->setText("Undo Registration");
   }
+
 
   /**
    * Save control measure under the crosshair in right ChipViewport
+   *
    * @internal
    *   @history 2008-12-30 Jeannie Walldren - Modified to update
-   *                          user (chooser) name and date when
-   *                          point is saved
+   *                           user (chooser) name and date when
+   *                           point is saved
    *   @history 2010-11-19 Tracie Sucharski - Renamed from savePoint.
    *   @history 2011-03-04 Tracie Sucharski - If auto reg info is shown, save
-   *                          the GoodnessOfFit value to the right
-   *                          ControlMeasure log entry.  Changed the way
-   *                          the left viewport is updated if the left and
-   *                          right measure are the same.  Simply copy the
-   *                          right measure into the left and re-load the left
-   *                          measure.  If measure currently has type of
-   *                          subPixelRegistered, but the new position has
-   *                          not be sub-pixel registered, change measure type
-   *                          and get rid of goodness of fit.
+   *                           the GoodnessOfFit value to the right
+   *                           ControlMeasure log entry.  Changed the way
+   *                           the left viewport is updated if the left and
+   *                           right measure are the same.  Simply copy the
+   *                           right measure into the left and re-load the left
+   *                           measure.  If measure currently has type of
+   *                           subPixelRegistered, but the new position has
+   *                           not be sub-pixel registered, change measure type
+   *                           and get rid of goodness of fit.
    *   @history 2011-06-14 Tracie Sucharski - Change Save Measure button text
-   *                          back to black.
+   *                           back to black.
    *   @history 2011-07-19 Tracie Sucharski - Updated for new functionality
-   *                          of registration pixel shift.  ControlMeasure
-   *                          will now calculate based on aprioriSample/Line
-   *                          and current coordinate.  If autoreg has been
-   *                          calculated, save coordinate to apriori before
-   *                          updating to subpixel registered coordinate.
+   *                           of registration pixel shift.  ControlMeasure
+   *                           will now calculate based on aprioriSample/Line
+   *                           and current coordinate.  If autoreg has been
+   *                           calculated, save coordinate to apriori before
+   *                           updating to subpixel registered coordinate.
    *   @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
-   *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
-   *                          forces the edit lock check box to be unchecked before the measure
-   *                          can be saved.
+   *                           QnetTool::measureSaved to ::saveMeasure.  The error checking now
+   *                           forces the edit lock check box to be unchecked before the measure
+   *                           can be saved.
    *
    */
   void ControlMeasureEditWidget::saveMeasure() {
 
-    if ( p_rightMeasure != NULL ) {
+    if ( m_rightMeasure != NULL ) {
 
-      if (p_rightMeasure->IsEditLocked()) {
+      if (m_rightMeasure->IsEditLocked()) {
         QString message = "The right measure is locked.  You must first unlock the measure by ";
         message += "clicking the check box above labeled \"Edit Lock Measure\".";
         QMessageBox::warning((QWidget *)parent(),"Warning",message);
         return;
       }
 
-      if ( p_autoRegShown ) {
+      if ( m_autoRegShown ) {
         //  Reset AprioriSample/Line to the current coordinate, before the
         //  coordinate is updated with the registered coordinate.
-        p_rightMeasure->SetAprioriSample(p_rightMeasure->GetSample());
-        p_rightMeasure->SetAprioriLine(p_rightMeasure->GetLine());
+        m_rightMeasure->SetAprioriSample(m_rightMeasure->GetSample());
+        m_rightMeasure->SetAprioriLine(m_rightMeasure->GetLine());
 
-        p_rightMeasure->SetChooserName("Application qnet");
-        p_rightMeasure->SetType(ControlMeasure::RegisteredSubPixel);
+        m_rightMeasure->SetChooserName("Application qnet");
+        m_rightMeasure->SetType(ControlMeasure::RegisteredSubPixel);
         //  Save  autoreg parameters to the right measure log entry
         //  Eccentricity may be invalid, check before writing.
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
+        m_rightMeasure->SetLogData(ControlMeasureLogData(
                                ControlMeasureLogData::GoodnessOfFit,
-                               p_autoRegFact->GoodnessOfFit()));
+                               m_autoRegFact->GoodnessOfFit()));
         double minZScore, maxZScore;
-        p_autoRegFact->ZScores(minZScore,maxZScore);
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
+        m_autoRegFact->ZScores(minZScore,maxZScore);
+        m_rightMeasure->SetLogData(ControlMeasureLogData(
                                  ControlMeasureLogData::MinimumPixelZScore,
                                  minZScore));
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
+        m_rightMeasure->SetLogData(ControlMeasureLogData(
                                  ControlMeasureLogData::MaximumPixelZScore,
                                  maxZScore));
 
-        p_autoRegShown = false;
-        p_autoRegExtension->hide();
-        p_autoReg->setText("Register");
+        m_autoRegShown = false;
+        m_autoRegExtension->hide();
+        m_autoReg->setText("Register");
       }
       else {
-        p_rightMeasure->SetChooserName(Application::UserName());
-        p_rightMeasure->SetType(ControlMeasure::Manual);
-        p_rightMeasure->DeleteLogData(
+        m_rightMeasure->SetChooserName(Application::UserName());
+        m_rightMeasure->SetType(ControlMeasure::Manual);
+        m_rightMeasure->DeleteLogData(
                                ControlMeasureLogData::GoodnessOfFit);
-        p_rightMeasure->DeleteLogData(
+        m_rightMeasure->DeleteLogData(
                                ControlMeasureLogData::MinimumPixelZScore);
-        p_rightMeasure->DeleteLogData(
+        m_rightMeasure->DeleteLogData(
                                ControlMeasureLogData::MaximumPixelZScore);
       }
 
       //  Get cube position at right chipViewport crosshair
-      p_rightMeasure->SetCoordinate(p_rightView->tackSample(),
-                                    p_rightView->tackLine());
-      p_rightMeasure->SetDateTime();
+      m_rightMeasure->SetCoordinate(m_rightView->tackSample(),
+                                    m_rightView->tackLine());
+      m_rightMeasure->SetDateTime();
 
     }
 
-    if ( p_allowLeftMouse ) {
-      if ( p_leftMeasure != NULL ) {
-        if (p_leftMeasure->IsEditLocked()) {
+    if ( m_allowLeftMouse ) {
+      if ( m_leftMeasure != NULL ) {
+        if (m_leftMeasure->IsEditLocked()) {
           QString message = "The left measure is locked.  You must first unlock the measure by ";
           message += "clicking the check box above labeled \"Edit Lock Measure\".";
           QMessageBox::warning((QWidget *)parent(),"Warning",message);
           return;
         }
 
-        p_leftMeasure->SetCoordinate(p_leftView->tackSample(), p_leftView->tackLine());
-        p_leftMeasure->SetDateTime();
-        p_leftMeasure->SetChooserName(Application::UserName());
-        p_leftMeasure->SetType(ControlMeasure::Manual);
+        m_leftMeasure->SetCoordinate(m_leftView->tackSample(), m_leftView->tackLine());
+        m_leftMeasure->SetDateTime();
+        m_leftMeasure->SetChooserName(Application::UserName());
+        m_leftMeasure->SetType(ControlMeasure::Manual);
       }
     }
 
     //  If the right chip is the same as the left chip, copy right into left and
     //  re-load the left.
-    if ( p_rightMeasure->GetCubeSerialNumber() ==
-         p_leftMeasure->GetCubeSerialNumber() ) {
+    if ( m_rightMeasure->GetCubeSerialNumber() ==
+         m_leftMeasure->GetCubeSerialNumber() ) {
 
-      *p_leftMeasure = *p_rightMeasure;
-      setLeftMeasure(p_leftMeasure,p_leftCube,p_pointId);
+      *m_leftMeasure = *m_rightMeasure;
+      setLeftMeasure(m_leftMeasure,m_leftCube,m_pointId);
     }
 
     //  Change Save Measure button text back to default palette
-    p_saveMeasure->setPalette(p_saveDefaultPalette);
+    m_saveMeasure->setPalette(m_saveDefaultPalette);
 
     //  Redraw measures on viewports
     emit measureSaved();
   }
 
 
-
   /**
-   * Slot to update the geomed right ChipViewport for zoom
-   * operations
+   * Slot to update the geomed right ChipViewport for zoom operations
+   *
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Added error string to
-   *                            iException::Message before
-   *                            creating QMessageBox
+   *   @history 2008-15-?? Jeannie Walldren - Added error string to
+   *                           iException::Message before
+   *                           creating QMessageBox
    */
   void ControlMeasureEditWidget::updateRightGeom() {
 
-    if ( p_geomIt ) {
+    if ( m_geomIt ) {
       try {
-        p_rightView->geomChip(p_leftChip, p_leftCube);
+        m_rightView->geomChip(m_leftChip, m_leftCube);
 
       }
       catch (IException &e) {
         IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
         QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
-        p_geomIt = false;
-        p_nogeom->setChecked(true);
-        p_geom->setChecked(false);
+        m_geomIt = false;
+        m_nogeom->setChecked(true);
+        m_geom->setChecked(false);
       }
     }
   }
-
 
 
 ///**
@@ -1206,106 +1211,105 @@ namespace Isis {
 // */
 //void ControlMeasureEditWidget::updateRightZoom() {
 //
-//  if ( p_linkZoom ) {
+//  if ( m_linkZoom ) {
 //    try {
-//      p_rightView->geomChip(p_leftChip, p_leftCube);
+//      m_rightView->geomChip(m_leftChip, m_leftCube);
 //
 //    }
 //    catch (IException &e) {
 //      IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
 //      QString message = fullError.toString();
 //      QMessageBox::information((QWidget *)parent(), "Error", message);
-//      p_geomIt = false;
-//      p_nogeom->setChecked(true);
-//      p_geom->setChecked(false);
+//      m_geomIt = false;
+//      m_nogeom->setChecked(true);
+//      m_geom->setChecked(false);
 //    }
 //  }
 //}
 
 
-
   /**
    * Slot to enable the rotate dial
+   *
    * @internal 
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and reload chip
-  */
+   */
   void ControlMeasureEditWidget::setRotate() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     //  Text needs to be reset because it was changed to 
     //  indicate why it's greyed out
     QString text = "Zoom in 2X";
-    p_rightZoomIn->setEnabled(true);
-    p_rightZoomIn->setWhatsThis(text);
-    p_rightZoomIn->setToolTip("Zoom In");
+    m_rightZoomIn->setEnabled(true);
+    m_rightZoomIn->setWhatsThis(text);
+    m_rightZoomIn->setToolTip("Zoom In");
     text = "Zoom out 2X";
-    p_rightZoomOut->setEnabled(true);
-    p_rightZoomOut->setWhatsThis(text);
-    p_rightZoomOut->setToolTip("Zoom Out");
+    m_rightZoomOut->setEnabled(true);
+    m_rightZoomOut->setWhatsThis(text);
+    m_rightZoomOut->setToolTip("Zoom Out");
     text = "Zoom 1:1";
-    p_rightZoom1->setEnabled(true);
-    p_rightZoom1->setWhatsThis(text);
-    p_rightZoom1->setToolTip("Zoom 1:1");
+    m_rightZoom1->setEnabled(true);
+    m_rightZoom1->setWhatsThis(text);
+    m_rightZoom1->setToolTip("Zoom 1:1");
 
-    p_geomIt = false;
-    p_rightView->nogeomChip();
+    m_geomIt = false;
+    m_rightView->nogeomChip();
 
     QApplication::restoreOverrideCursor();
 
-    p_dial->setEnabled(true);
-    p_dialNumber->setEnabled(true);
-    p_dial->setNotchesVisible(true);
+    m_dial->setEnabled(true);
+    m_dialNumber->setEnabled(true);
+    m_dial->setNotchesVisible(true);
 
   }
-
 
 
   /**
    * Turn geom on
    *
    * @internal
-   *   @history  2007-06-15 Tracie Sucharski - Grey out zoom buttons
-   *   @history 2008-15-2008 Jeannie Walldren - Added error string to
-   *                            iException::Message before
-   *                            creating QMessageBox
-   **/
+   *   @history 2007-06-15 Tracie Sucharski - Grey out zoom buttons
+   *   @history 2008-15-?? Jeannie Walldren - Added error string to
+   *                           iException::Message before
+   *                           creating QMessageBox
+   */
   void ControlMeasureEditWidget::setGeom() {
 
-    if ( p_geomIt == true ) return;
+    if ( m_geomIt == true ) return;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     //  Grey right view zoom buttons
     QString text = "Zoom functions disabled when Geom is set";
-    p_rightZoomIn->setEnabled(false);
-    p_rightZoomIn->setWhatsThis(text);
-    p_rightZoomIn->setToolTip(text);
-    p_rightZoomOut->setEnabled(false);
-    p_rightZoomOut->setWhatsThis(text);
-    p_rightZoomOut->setToolTip(text);
-    p_rightZoom1->setEnabled(false);
-    p_rightZoom1->setWhatsThis(text);
-    p_rightZoom1->setToolTip(text);
+    m_rightZoomIn->setEnabled(false);
+    m_rightZoomIn->setWhatsThis(text);
+    m_rightZoomIn->setToolTip(text);
+    m_rightZoomOut->setEnabled(false);
+    m_rightZoomOut->setWhatsThis(text);
+    m_rightZoomOut->setToolTip(text);
+    m_rightZoom1->setEnabled(false);
+    m_rightZoom1->setWhatsThis(text);
+    m_rightZoom1->setToolTip(text);
 
 
     //  Reset dial to 0 before disabling
-    p_dial->setValue(0);
-    p_dial->setEnabled(false);
-    p_dialNumber->setEnabled(false);
+    m_dial->setValue(0);
+    m_dial->setEnabled(false);
+    m_dialNumber->setEnabled(false);
 
-    p_geomIt = true;
+    m_geomIt = true;
 
     try {
-      p_rightView->geomChip(p_leftChip, p_leftCube);
+      m_rightView->geomChip(m_leftChip, m_leftCube);
 
     }
     catch (IException &e) {
       IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
-      p_geomIt = false;
-      p_nogeom->setChecked(true);
-      p_geom->setChecked(false);
+      m_geomIt = false;
+      m_nogeom->setChecked(true);
+      m_geom->setChecked(false);
     }
 
     QApplication::restoreOverrideCursor();
@@ -1314,140 +1318,139 @@ namespace Isis {
 
   /**
    * Slot to turn off geom
+   *
    * @internal 
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and rotate dial, then reload chip
-  */
+   */
   void ControlMeasureEditWidget::setNoGeom() {
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     QString text = "Zoom in 2X";
-    p_rightZoomIn->setEnabled(true);
-    p_rightZoomIn->setWhatsThis(text);
-    p_rightZoomIn->setToolTip("Zoom In");
+    m_rightZoomIn->setEnabled(true);
+    m_rightZoomIn->setWhatsThis(text);
+    m_rightZoomIn->setToolTip("Zoom In");
     text = "Zoom out 2X";
-    p_rightZoomOut->setEnabled(true);
-    p_rightZoomOut->setWhatsThis(text);
-    p_rightZoomOut->setToolTip("Zoom Out");
+    m_rightZoomOut->setEnabled(true);
+    m_rightZoomOut->setWhatsThis(text);
+    m_rightZoomOut->setToolTip("Zoom Out");
     text = "Zoom 1:1";
-    p_rightZoom1->setEnabled(true);
-    p_rightZoom1->setWhatsThis(text);
-    p_rightZoom1->setToolTip("Zoom 1:1");
+    m_rightZoom1->setEnabled(true);
+    m_rightZoom1->setWhatsThis(text);
+    m_rightZoom1->setToolTip("Zoom 1:1");
 
     //  Reset dial to 0 before disabling
-    p_dial->setValue(0);
-    p_dial->setEnabled(false);
-    p_dialNumber->setEnabled(false);
+    m_dial->setValue(0);
+    m_dial->setEnabled(false);
+    m_dialNumber->setEnabled(false);
 
-    p_geomIt = false;
-    p_rightView->nogeomChip();
+    m_geomIt = false;
+    m_rightView->nogeomChip();
 
     QApplication::restoreOverrideCursor();
   }
 
 
-
-
   /**
    * Turn circle widgets on/off
    *
-   * @param checked   Input   Turn cirle on or off
+   * @param checked[in] Turn cirle on or off
    *
    * @author 2008-09-09 Tracie Sucharski
    */
   void ControlMeasureEditWidget::setCircle(bool checked) {
 
-    if ( checked == p_circle ) return;
+    if ( checked == m_circle ) return;
 
-    p_circle = checked;
-    if ( p_circle ) {
+    m_circle = checked;
+    if ( m_circle ) {
       // Turn on slider bar
-      p_slider->setDisabled(false);
-      p_slider->show();
-      p_slider->setValue(20);
-      p_leftView->setCircle(true);
-      p_rightView->setCircle(true);
+      m_slider->setDisabled(false);
+      m_slider->show();
+      m_slider->setValue(20);
+      m_leftView->setCircle(true);
+      m_rightView->setCircle(true);
     }
     else {
-      p_slider->setDisabled(true);
-      p_slider->hide();
-      p_leftView->setCircle(false);
-      p_rightView->setCircle(false);
+      m_slider->setDisabled(true);
+      m_slider->hide();
+      m_leftView->setCircle(false);
+      m_rightView->setCircle(false);
     }
 
-
   }
-
 
 
   /**
    * Turn linking of zoom on or off
    *
-   * @param checked   Input   Turn zoom linking on or off
+   * @param checked[in] Turn zoom linking on or off
    *
    * @author 2012-07-26 Tracie Sucharski
    */
   void ControlMeasureEditWidget::setZoomLink(bool checked) {
 
-    if ( checked == p_linkZoom ) return;
+    if ( checked == m_linkZoom ) return;
 
-    p_linkZoom = checked;
-    if ( p_linkZoom ) {
-      p_rightView->zoom(p_leftView->zoomFactor());
+    m_linkZoom = checked;
+    if ( m_linkZoom ) {
+      m_rightView->zoom(m_leftView->zoomFactor());
     }
   }
 
 
-
-  //!  Slot to start blink function
+  /**
+   * Slot to start blink function
+   */
   void ControlMeasureEditWidget::blinkStart() {
-    if ( p_timerOn ) return;
+    if ( m_timerOn ) return;
 
     //  Set up blink list
-    p_blinkList.push_back(p_leftView);
-    p_blinkList.push_back(p_rightView);
-    p_blinkIndex = 0;
+    m_blinkList.push_back(m_leftView);
+    m_blinkList.push_back(m_rightView);
+    m_blinkIndex = 0;
 
-    p_timerOn = true;
-    int msec = (int)(p_blinkTimeBox->value() * 1000.0);
-    p_timer = new QTimer(this);
-    connect(p_timer, SIGNAL(timeout()), this, SLOT(updateBlink()));
-    p_timer->start(msec);
+    m_timerOn = true;
+    int msec = (int)(m_blinkTimeBox->value() * 1000.0);
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateBlink()));
+    m_timer->start(msec);
   }
 
 
-  //!  Slot to stop blink function
+  /**
+   * Slot to stop blink function
+   */
   void ControlMeasureEditWidget::blinkStop() {
-    p_timer->stop();
-    p_timerOn = false;
-    p_blinkList.clear();
+    m_timer->stop();
+    m_timerOn = false;
+    m_blinkList.clear();
 
     //  Reload left chipViewport with original chip
-    p_leftView->repaint();
+    m_leftView->repaint();
 
   }
-
 
 
   /**
    * Set blink rate
    *
-   * @param interval   Input   Blink rate in seconds
-   * @author  Tracie Sucharski
+   * @param interval[in] Blink rate in seconds
+   * @author Tracie Sucharski
    */
   void ControlMeasureEditWidget::changeBlinkTime(double interval) {
-    if ( p_timerOn ) p_timer->setInterval((int)(interval * 1000.));
+    if ( m_timerOn ) m_timer->setInterval((int)(interval * 1000.));
   }
 
 
-  //!  Slot to cause the blink to happen coinciding with the timer
+  /**
+   * Slot to cause the blink to happen coinciding with the timer
+   */
   void ControlMeasureEditWidget::updateBlink() {
 
-    p_blinkIndex = !p_blinkIndex;
-    p_leftView->loadView(*(p_blinkList)[p_blinkIndex]);
+    m_blinkIndex = !m_blinkIndex;
+    m_leftView->loadView(*(m_blinkList)[m_blinkIndex]);
   }
-
-
 
 
   /**
@@ -1455,12 +1458,14 @@ namespace Isis {
    * from which to select a filename.  This file is then
    * registered and set as the new template.
    *
+   * @param fn Template filename 
+   *
    * @author Tracie Sucharski
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Changed name from
    *                          openTemplateFile() and added functionality to set
    *                          new template filename to the private variable,
-   *                          p_templateFileName
+   *                          m_templateFileName
    *   @history 2008-12-15 Jeannie Walldren - Modified code to
    *                          only allow the template file to be modified if
    *                          registration is successfull, otherwise the
@@ -1470,31 +1475,31 @@ namespace Isis {
 
     AutoReg *reg = NULL;
     // save original template filename
-    QString temp = p_templateFileName;
+    QString temp = m_templateFileName;
     try {
       // set template filename to user chosen pvl file
-      p_templateFileName = fn;
+      m_templateFileName = fn;
 
       // Create PVL object with this file
       Pvl pvl(fn);
 
       // try to register file
       reg = AutoRegFactory::Create(pvl);
-      if ( p_autoRegFact != NULL )
-        delete p_autoRegFact;
-      p_autoRegFact = reg;
+      if ( m_autoRegFact != NULL )
+        delete m_autoRegFact;
+      m_autoRegFact = reg;
 
-      p_templateFileName = fn;
+      m_templateFileName = fn;
       return true;
     }
     catch (IException &e) {
       // set templateFileName back to its original value
-      p_templateFileName = temp;
+      m_templateFileName = temp;
       IException fullError(e, IException::Io,
           "Cannot create AutoRegFactory for " +
           fn +
           ".  As a result, current template file will remain set to " +
-          p_templateFileName, _FILEINFO_);
+          m_templateFileName, _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       return false;
@@ -1505,23 +1510,24 @@ namespace Isis {
   /**
    * Set the option that allows mouse movements in the left ChipViewport.
    *
+   * @param allowMouse Whether or not to allow mouse event on left chip viewport
+   *
    * @author Tracie Sucharski
-   * @internal
    */
   void ControlMeasureEditWidget::allowLeftMouse(bool allowMouse) {
-    p_allowLeftMouse = allowMouse;
+    m_allowLeftMouse = allowMouse;
 
-    if (p_allowLeftMouse) {
-      p_saveMeasure = new QPushButton("Save Measures");
-      p_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
+    if (m_allowLeftMouse) {
+      m_saveMeasure = new QPushButton("Save Measures");
+      m_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
                                 "point (control point currently being edited). "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
                                 "<strong>\"Save Point\"</strong>");
     }
     else {
-      p_saveMeasure = new QPushButton("Save Measure");
-      p_saveMeasure->setToolTip("Save the right measure to the edit control "
+      m_saveMeasure = new QPushButton("Save Measure");
+      m_saveMeasure->setToolTip("Save the right measure to the edit control "
                                 "point (control point currently being edited). "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
@@ -1530,47 +1536,49 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Refresh the left and right chip viewports
+   */
   void ControlMeasureEditWidget::refreshChips() {
-    p_leftView->update();
-    p_rightView->update();
+    m_leftView->update();
+    m_rightView->update();
   }
-
 
 
   /**
    * Slot to save registration chips to files and fire off qview.
    *
-   * @author 2009-03-18  Tracie Sucharski
+   * @author 2009-03-18 Tracie Sucharski
+   *
    * @internal
-   * @history 2009-03-23 Tracie Sucharski - Use p_autoRegAttempted to see
-   *                        if chips exist.
+   *   @history 2009-03-23 Tracie Sucharski - Use m_autoRegAttempted to see
+   *                           if chips exist.
    */
   void ControlMeasureEditWidget::saveChips() {
 
-//    if (!p_autoRegShown) {
-    if ( !p_autoRegAttempted ) {
+//    if (!m_autoRegShown) {
+    if ( !m_autoRegAttempted ) {
       QString message = "Point must be Registered before chips can be saved.";
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       return;
     }
 
     //  Save chips - pattern, search and fit
-    QString baseFile = p_pointId.replace(" ", "_") + "_" +
-                           toString((int)(p_leftMeasure ->GetSample())) + "_" +
-                           toString((int)(p_leftMeasure ->GetLine()))   + "_" +
-                           toString((int)(p_rightMeasure->GetSample())) + "_" +
-                           toString((int)(p_rightMeasure->GetLine()))   + "_";
+    QString baseFile = m_pointId.replace(" ", "_") + "_" +
+                           toString((int)(m_leftMeasure ->GetSample())) + "_" +
+                           toString((int)(m_leftMeasure ->GetLine()))   + "_" +
+                           toString((int)(m_rightMeasure->GetSample())) + "_" +
+                           toString((int)(m_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
     //qDebug() << "in save chips fname:" << fname;
     QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
-    p_autoRegFact->RegistrationSearchChip()->Write(fname);
+    m_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
     command += " \'" + fname + "\'";
-    p_autoRegFact->RegistrationPatternChip()->Write(fname);
+    m_autoRegFact->RegistrationPatternChip()->Write(fname);
     fname = baseFile + "Fit.cub";
     command += " \'" + fname + "\' &";
-    p_autoRegFact->FitChip()->Write(fname);
+    m_autoRegFact->FitChip()->Write(fname);
     ProgramLauncher::RunSystemCommand(command);
   }
 }

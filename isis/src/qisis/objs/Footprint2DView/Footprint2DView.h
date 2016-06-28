@@ -22,19 +22,32 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <QToolBar>
-#include <QWidgetAction>
+#include <QList>
+#include <QMap>
+#include <QSize>
 
 #include "AbstractProjectItemView.h"
-#include "MosaicSceneWidget.h"
-#include "ToolPad.h"
+
+class QAction;
+class QEvent;
+class QToolBar;
+class QWidgetAction;
 
 namespace Isis {
   
+  class Image;
+  class MosaicSceneWidget;
+  class ToolPad;
+
   /**
    * View for displaying footprints of images in a QMos like way.
    *
    * @author Jeffrey Covington
+   * 
+   * @internal
+   *   @history 2016-01-13 Jeffrey Covington - Original version.
+   *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation, checked coding standards.
+   *                           Fixes #4004.
    */
   class Footprint2DView : public AbstractProjectItemView {
 

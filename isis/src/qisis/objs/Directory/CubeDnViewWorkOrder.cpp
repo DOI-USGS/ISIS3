@@ -32,6 +32,8 @@
 #include "Directory.h"
 #include "MdiCubeViewport.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 #include "Workspace.h"
 
 namespace Isis {

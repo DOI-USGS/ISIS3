@@ -23,14 +23,32 @@
 #include "IsisDebug.h"
 
 #include "Footprint2DView.h"
-#include "MosaicGraphicsView.h"
 
-#include <QtWidgets>
+#include <QAction>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QItemSelectionModel>
+#include <QList>
+#include <QSize>
+#include <QSizePolicy>
+#include <QToolBar>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <QWidgetAction>
+
+#include "Image.h"
+#include "MosaicGraphicsView.h"
+#include "MosaicSceneWidget.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+#include "ToolPad.h"
 
 namespace Isis {
   /**
    * Constructor.
+   * 
+   * @param parent Pointer to parent QWidget
    */
   Footprint2DView::Footprint2DView(QWidget *parent) : AbstractProjectItemView(parent) {
     m_sceneWidget = new MosaicSceneWidget(NULL, true, false, NULL, this);
@@ -100,7 +118,7 @@ namespace Isis {
   /**
    * Returns the suggested size for the widget.
    *
-   * @return (QSize) The size
+   * @return @b QSize The size
    */
   QSize Footprint2DView::sizeHint() const {
     return QSize(800, 600);
@@ -113,7 +131,7 @@ namespace Isis {
    * @param[in] watched (QObject *) The object being filtered
    * @param[in] event (QEvent *) The event
    *
-   * @return (bool) If the event was intercepted
+   * @return @b bool True if the event was intercepted
    */
   bool Footprint2DView::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::DragEnter) {
@@ -189,7 +207,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the permanent tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> Footprint2DView::permToolBarActions() {
     return m_permToolBar->actions();
@@ -199,7 +217,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the active tool bar.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> Footprint2DView::activeToolBarActions() {
     QList<QAction *> actions;
@@ -211,7 +229,7 @@ namespace Isis {
   /**
    * Returns a list of actions for the tool pad.
    *
-   * @return (QList<QAction *>) The actions
+   * @return @b QList<QAction*> The actions
    */
   QList<QAction *> Footprint2DView::toolPadActions() {
     return m_toolPad->actions();
