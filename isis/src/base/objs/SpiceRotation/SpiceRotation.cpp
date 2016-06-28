@@ -8,6 +8,11 @@
 #include <vector>
 
 #include <QDebug>
+#include <QString>
+
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "BasisFunction.h"
 #include "IException.h"
@@ -39,7 +44,7 @@ namespace Isis {
   /**
    * Construct an empty SpiceRotation class using a valid Naif frame code to
    * set up for getting rotation from Spice kernels.  See required reading
-   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/naif_ids.req
+   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/naif_ids.html
    *
    * @param frameCode Valid naif frame code.
    */
@@ -66,13 +71,16 @@ namespace Isis {
     m_tOrientationAvailable = false;
   }
 
+
   /**
    * Construct an empty SpiceRotation object using valid Naif frame code and.
    * body code to set up for computing nadir rotation.  See required reading
-   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/naif_ids.req
+   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/naif_ids.html
    *
    * @param frameCode Valid naif frame code.
    * @param targetCode Valid naif body code.
+   *
+   * @throws IException::Io "Cannot find [key] in text kernels"
    */
   SpiceRotation::SpiceRotation(int frameCode, int targetCode) {
     NaifStatus::CheckErrors();
@@ -123,6 +131,8 @@ namespace Isis {
 
   /**
    * Construct a SpiceRotation object by copying from an existing one.
+   *
+   * @param rotToCopy const reference to other SpiceRotation to copy
    */
   SpiceRotation::SpiceRotation(const SpiceRotation &rotToCopy) {
     p_cacheTime = rotToCopy.p_cacheTime;
@@ -173,28 +183,34 @@ namespace Isis {
   /** 
    * Destructor for SpiceRotation object.
    */ 
-  SpiceRotation::~SpiceRotation() { }
+  SpiceRotation::~SpiceRotation() { 
+  }
+
 
   /** 
    * Change the frame to the given frame code.  This method has no effect if
    * spice is cached. 
+   *
    * @param frameCode The integer-valued frame code 
    */ 
   void SpiceRotation::SetFrame(int frameCode) {
     p_constantFrames[0] = frameCode;
   }
 
+
   /** 
    * Accessor method that returns the frame code. This is the first value of the 
    * constant frames member variable. 
    *  
-   * @return An integer value indicating the frame code. 
+   * @return @b int An integer value indicating the frame code. 
    */ 
   int SpiceRotation::Frame() {
     return p_constantFrames[0];
   }
 
-  /** Apply a time bias when invoking SetEphemerisTime method.
+
+  /** 
+   * Apply a time bias when invoking SetEphemerisTime method.
    *
    * The bias is used only when reading from NAIF kernels.  It is added to the
    * ephermeris time passed into SetEphemerisTime and then the body
@@ -209,7 +225,9 @@ namespace Isis {
     p_timeBias = timeBias;
   }
 
-  /** Return the J2000 to reference frame quaternion at given time.
+
+  /** 
+   * Return the J2000 to reference frame quaternion at given time.
    *
    * This method returns the J2000 to reference frame rotational matrix at a
    * given et in seconds.  The quaternion is obtained from either valid NAIF ck
@@ -261,31 +279,39 @@ namespace Isis {
 //   p_quaternion.Set ( p_CJ );
   }
 
+
   /** 
    * Accessor method to get current ephemeris time.
-   * @return The current ephemeris time.
+   *
+   * @return @b double The current ephemeris time.
    */ 
   double SpiceRotation::EphemerisTime() const {
     return p_et;
   }
 
+
   /**
    * Checks if the cache is empty.
-   * @return  Indicates whether this rotation cached.
+   *
+   * @return @b bool Indicates whether this rotation is cached.
    */
   bool SpiceRotation::IsCached() const {
     return (p_cache.size() > 0);
   }
 
+
   /**
    * Set the downsize status to minimize cache. 
+   *
    * @param status The DownsizeStatus enumeration value. 
    */ 
   void SpiceRotation::MinimizeCache(DownsizeStatus status) {
     p_minimizeCache = status;
   }
 
-  /** Cache J2000 rotation quaternion over a time range.
+
+  /** 
+   * Cache J2000 rotation quaternion over a time range.
    *
    * This method will load an internal cache with frames over a time
    * range.  This prevents the NAIF kernels from being read over-and-over
@@ -297,6 +323,10 @@ namespace Isis {
    * @param endTime     Ending ephemeris time in seconds for the cache
    * @param size        Number of frames to keep in the cache
    *
+   * @throws IException::Programmer "Argument cacheSize must not be less than or equal to zero"
+   * @throws IException::Programmer "Argument startTime must be less than or equal to endTime"
+   * @throws IException::Programmer "Cache size must be more than 1 if startTime and endTime differ"
+   * @throws IException::Programmer "A SpiceRotation cache has already men
    */
   void SpiceRotation::LoadCache(double startTime, double endTime, int size) {
 
@@ -312,7 +342,7 @@ namespace Isis {
     }
 
     if ((startTime != endTime) && (size == 1)) {
-      QString msg = "Cache size must be more than 1 if startTime endTime differ";
+      QString msg = "Cache size must be more than 1 if startTime and endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -322,7 +352,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Save full cache parameterssetis
+    // Save full cache parameters
     p_fullCacheStartTime = startTime;
     p_fullCacheEndTime = endTime;
     p_fullCacheSize = size;
@@ -354,8 +384,8 @@ namespace Isis {
   }
 
 
-
-  /** Cache J2000 to frame rotation for a time.
+  /** 
+   * Cache J2000 to frame rotation for a time.
    *
    * This method will load an internal cache with a rotation for a single
    * time (e.g. useful for framing cameras). This prevents
@@ -366,13 +396,14 @@ namespace Isis {
    * time as both the starting and ending time with a size of 1.
    *
    * @param time   single ephemeris time in seconds to cache
-   *
    */
   void SpiceRotation::LoadCache(double time) {
     LoadCache(time, time, 1);
   }
 
-  /** Cache J2000 rotations using a table file.
+
+  /** 
+   * Cache J2000 rotations using a table file.
    *
    * This method will load either an internal cache with rotations (quaternions)
    * or coefficients (for 3 polynomials defining the camera angles) from an
@@ -391,6 +422,9 @@ namespace Isis {
    *
    * @param table   An ISIS table blob containing valid J2000 to reference
    *                quaternion/time values
+   *
+   * @throws IException::Programmer "Expecting either three, five, or eight fields in the 
+   *                                 SpiceRotation table"
    */
   void SpiceRotation::LoadCache(Table &table) {
     // Clear any existing cached data to make it reentrant (KJB 2011-07-20).
@@ -548,13 +582,14 @@ namespace Isis {
   }
 
 
-
-  /** Cache J2000 rotation over existing cached time range using polynomials
+  /** 
+   * Cache J2000 rotation over existing cached time range using polynomials
    *
    * This method will reload an internal cache with matrices
    * formed from rotation angles fit to functions over a time
    * range.
    *
+   * @throws IException::Programmer "The SpiceRotation has not yet been fit to a function"
    */
   void SpiceRotation::ReloadCache() {
     // Save current et
@@ -569,7 +604,7 @@ namespace Isis {
       // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated 
       //  for functions of degree 0 (framing cameras), so keep the original av.  It is better than
       //  nothing.
-      if (p_degree > 0  && p_cacheAv.size() > 1)  p_cacheAv.clear();
+      if (p_degree > 0 && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
       // Load the time cache first
       p_minimizeCache = No;
@@ -622,14 +657,19 @@ namespace Isis {
   }
 
 
-
-  /** Return a table with J2000 to reference rotations.
+  /** 
+   * Return a table with J2000 to reference rotations.
    *
    * Return a table containing the cached pointing with the given
-   * name. The table will have eight columns, quaternio, angular
+   * name. The table will have eight columns, quaternion, angular
    * velocity, and time of J2000 to reference frame rotation.
    *
    * @param tableName    Name of the table to create and return
+   *
+   * @throws IException::Programmer "Only cached rotations can be returned as a line cache of
+   *                                 quaternions and time"
+   * 
+   * @return @b Table Table with given name that contains the cached pointing
    */
   Table SpiceRotation::LineCache(const QString &tableName) {
 
@@ -637,7 +677,7 @@ namespace Isis {
     if (p_source >= PolyFunction)  ReloadCache();
 
     if (p_source != Memcache) {
-      QString msg = "Only cached rotations can be  returned as a line cache of quaternions and time";
+      QString msg = "Only cached rotations can be returned as a line cache of quaternions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
@@ -645,8 +685,8 @@ namespace Isis {
   }
 
 
-
-  /** Return a table with J2000 to reference rotations.
+  /** 
+   * Return a table with J2000 to reference rotations.
    *
    * Return a table containing the cached pointing with the given
    * name. The table will have either five columns (for a list cache)
@@ -661,6 +701,11 @@ namespace Isis {
    * from the polynomials.
    *
    * @param tableName    Name of the table to create and return
+   *
+   * @throws IException::Programmer "To create table source of data must be either Memcache or
+   *                                 PolyFunction" 
+   *
+   * @return @b Table Table with given name that contains the cached pointing
    */
   Table SpiceRotation::Cache(const QString &tableName) {
    // First handle conversion of PolyFunctionOverSpiceConstant
@@ -767,11 +812,12 @@ namespace Isis {
   }
 
 
-
-  /** Initialize planetary orientation constants from Spice PCK 
+  /** 
+   * Initialize planetary orientation constants from Spice PCK 
    *
    * Retrieve planetary orientation constants from a Spice PCK and store them in the class.
    *
+   * @param centerBody NAIF id for the planetary body to retrieve the PCK for
    */
   void SpiceRotation::loadPCFromSpice(int centerBody) {
     NaifStatus::CheckErrors();
@@ -878,12 +924,14 @@ namespace Isis {
   }
 
 
-  /** Initialize planetary orientation constants from an cube body rotation label
+  /** 
+   * Initialize planetary orientation constants from an cube body rotation label
    *
    * Retrieve planetary orientation constants from a cube body rotation label if they are present.
    *
+   * @param label const reference to the cube body rotation pvl label
    */
-  void SpiceRotation::loadPCFromTable(const PvlObject &Label) {
+  void SpiceRotation::loadPCFromTable(const PvlObject &label) {
     NaifStatus::CheckErrors();
 
     // First clear existing cached data
@@ -897,22 +945,22 @@ namespace Isis {
     int numLoaded = 0;
 
     // Load the PCK coeffcients if they are on the label
-    if (Label.hasKeyword("PoleRa")) {
-      PvlKeyword labelCoeffs = Label["PoleRa"];
+    if (label.hasKeyword("PoleRa")) {
+      PvlKeyword labelCoeffs = label["PoleRa"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_raPole.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
       }
       numLoaded += 1;
     }
-    if (Label.hasKeyword("PoleDec")) {
-      PvlKeyword labelCoeffs = Label["PoleDec"];
+    if (label.hasKeyword("PoleDec")) {
+      PvlKeyword labelCoeffs = label["PoleDec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_decPole.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
       }
       numLoaded += 1;
     }
-    if (Label.hasKeyword("PrimeMeridian")) {
-      PvlKeyword labelCoeffs = Label["PrimeMeridian"];
+    if (label.hasKeyword("PrimeMeridian")) {
+      PvlKeyword labelCoeffs = label["PrimeMeridian"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_pm.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
       }
@@ -920,32 +968,32 @@ namespace Isis {
     }
     if (numLoaded > 2) m_tOrientationAvailable = true;
 
-    if (Label.hasKeyword("PoleRaNutPrec")) {
-      PvlKeyword labelCoeffs = Label["PoleRaNutPrec"];
+    if (label.hasKeyword("PoleRaNutPrec")) {
+      PvlKeyword labelCoeffs = label["PoleRaNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_raNutPrec.push_back(toDouble(labelCoeffs[i]));
       }
     }
-    if (Label.hasKeyword("PoleDecNutPrec")) {
-      PvlKeyword labelCoeffs = Label["PoleDecNutPrec"];
+    if (label.hasKeyword("PoleDecNutPrec")) {
+      PvlKeyword labelCoeffs = label["PoleDecNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_decNutPrec.push_back(toDouble(labelCoeffs[i]));
       }
     }
-    if (Label.hasKeyword("PmNutPrec")) {
-      PvlKeyword labelCoeffs = Label["PmNutPrec"];
+    if (label.hasKeyword("PmNutPrec")) {
+      PvlKeyword labelCoeffs = label["PmNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_pmNutPrec.push_back(toDouble(labelCoeffs[i]));
       }
     }
-    if (Label.hasKeyword("SysNutPrec0")) {
-      PvlKeyword labelCoeffs = Label["SysNutPrec0"];
+    if (label.hasKeyword("SysNutPrec0")) {
+      PvlKeyword labelCoeffs = label["SysNutPrec0"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_sysNutPrec0.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
       }
     }
-    if (Label.hasKeyword("SysNutPrec1")) {
-      PvlKeyword labelCoeffs = Label["SysNutPrec1"];
+    if (label.hasKeyword("SysNutPrec1")) {
+      PvlKeyword labelCoeffs = label["SysNutPrec1"];
       for (int i = 0; i < labelCoeffs.size(); i++){
         m_sysNutPrec1.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
       }
@@ -955,7 +1003,8 @@ namespace Isis {
   }
 
 
-  /** Add labels to a SpiceRotation table.
+  /** 
+   * Add labels to a SpiceRotation table.
    *
    * Return a table containing the labels defining the rotation.
    *
@@ -1028,34 +1077,34 @@ namespace Isis {
 
       if (m_raNutPrec.size() > 0) {
         // Pole right ascension nutation precision coefficients to the trig terms
-         table.Label() += PvlKeyword("PoleRaNutPrec");
-         for (int i = 0; i < (int) m_raNutPrec.size(); i++) {
-           table.Label()["PoleRaNutPrec"].addValue(toString(m_raNutPrec[i]));
-         }
+        table.Label() += PvlKeyword("PoleRaNutPrec");
+        for (int i = 0; i < (int) m_raNutPrec.size(); i++) {
+          table.Label()["PoleRaNutPrec"].addValue(toString(m_raNutPrec[i]));
+        }
 
         // Pole declination nutation precision coefficients to the trig terms
-         table.Label() += PvlKeyword("PoleDecNutPrec");
-         for (int i = 0; i < (int) m_decNutPrec.size(); i++) {
-           table.Label()["PoleDecNutPrec"].addValue(toString(m_decNutPrec[i]));
-         }
+        table.Label() += PvlKeyword("PoleDecNutPrec");
+        for (int i = 0; i < (int) m_decNutPrec.size(); i++) {
+          table.Label()["PoleDecNutPrec"].addValue(toString(m_decNutPrec[i]));
+        }
 
         // Prime meridian nutation precision coefficients to the trig terms
-         table.Label() += PvlKeyword("PmNutPrec");
-         for (int i = 0; i < (int) m_pmNutPrec.size(); i++) {
-           table.Label()["PmNutPrec"].addValue(toString(m_pmNutPrec[i]));
-         }
+        table.Label() += PvlKeyword("PmNutPrec");
+        for (int i = 0; i < (int) m_pmNutPrec.size(); i++) {
+          table.Label()["PmNutPrec"].addValue(toString(m_pmNutPrec[i]));
+        }
 
         // System nutation precision constant terms of linear model of periods
-         table.Label() += PvlKeyword("SysNutPrec0");
-         for (int i = 0; i < (int) m_sysNutPrec0.size(); i++) {
-           table.Label()["SysNutPrec0"].addValue(toString(m_sysNutPrec0[i].degrees()));
-         }
+        table.Label() += PvlKeyword("SysNutPrec0");
+        for (int i = 0; i < (int) m_sysNutPrec0.size(); i++) {
+          table.Label()["SysNutPrec0"].addValue(toString(m_sysNutPrec0[i].degrees()));
+        }
 
         // System nutation precision linear terms of linear model of periods
-         table.Label() += PvlKeyword("SysNutPrec1");
-         for (int i = 0; i < (int) m_sysNutPrec1.size(); i++) {
-           table.Label()["SysNutPrec1"].addValue(toString(m_sysNutPrec1[i].degrees()));
-         }
+        table.Label() += PvlKeyword("SysNutPrec1");
+        for (int i = 0; i < (int) m_sysNutPrec1.size(); i++) {
+          table.Label()["SysNutPrec1"].addValue(toString(m_sysNutPrec1[i].degrees()));
+        }
       }
     }
  // End section added 06-20-2015 DAC
@@ -1066,6 +1115,8 @@ namespace Isis {
 
   /** 
    * Return the camera angles at the center time of the observation
+   *
+   * @return @b vector<double> Camera angles at center time
    */
   std::vector<double> SpiceRotation::GetCenterAngles() {
     // Compute the center time
@@ -1080,6 +1131,11 @@ namespace Isis {
    * Return the camera angles (right ascension, declination, and twist) for the 
    * time-based matrix CJ 
    *
+   * @param axis3 The rotation axis for the third angle
+   * @param axis2 The rotation axis for the second angle
+   * @param axis1 The rotation axis for the first angle
+   *
+   * @return @b vector<double> Camera angles (ra, dec, twist)
    */
   std::vector<double> SpiceRotation::Angles(int axis3, int axis2, int axis1) {
     NaifStatus::CheckErrors();
@@ -1103,11 +1159,10 @@ namespace Isis {
    * time-based matrix CJ. This method was created for unitTests and should not
    * be used otherwise.  It only works for cached data with a cache size of 1.
    *
-   * @param [in]  angles The angles defining the rotation (phi, delta, and w) in radians
-   * @param [in]  axis3    The rotation axis for the third angle
-   * @param [in]  axis2    The rotation axis for the second angle
-   * @param [in]  axis1    The rotation axis for the first angle
-   *
+   * @param[in]  angles The angles defining the rotation (phi, delta, and w) in radians
+   * @param[in]  axis3    The rotation axis for the third angle
+   * @param[in]  axis2    The rotation axis for the second angle
+   * @param[in]  axis1    The rotation axis for the first angle
    */
   void SpiceRotation::SetAngles(std::vector<double> angles, int axis3, int axis2, int axis1) {
     eul2m_c(angles[2], angles[1], angles[0], axis3, axis2, axis1, (SpiceDouble (*)[3]) &(p_CJ[0]));
@@ -1120,43 +1175,53 @@ namespace Isis {
 
   /** 
    * Accessor method to get the angular velocity 
+   *
+   * @return @b vector<double> Angular velocity
    */ 
   std::vector<double> SpiceRotation::AngularVelocity() {
     return p_av;
   }
 
+
   /** 
    * Accessor method to get the frame chain for the constant part of the 
    * rotation (ends in target) 
-   * @return The frame chain for the constant part of the rotation. 
+   *
+   * @return @b vector<int> The frame chain for the constant part of the rotation. 
    */ 
-  std::vector<int>  SpiceRotation::ConstantFrameChain() {
+  std::vector<int> SpiceRotation::ConstantFrameChain() {
     return p_constantFrames;
   }
 
+
   /** 
    * Accessor method to get the frame chain for the rotation (begins in J2000).
-   * @return The frame chain for the rotation.
+   * 
+   * @return @b vector<int> The frame chain for the rotation.
    */ 
-  std::vector<int>  SpiceRotation::TimeFrameChain() {
+  std::vector<int> SpiceRotation::TimeFrameChain() {
     return p_timeFrames;
   }
 
+
   /** 
    * Checks whether the rotation has angular velocities.  
-   * @return Indicates whether the rotation has angular velocities.
+   *
+   * @return @b bool Indicates whether the rotation has angular velocities.
    */ 
   bool SpiceRotation::HasAngularVelocity() {
     return p_hasAngularVelocity;
   }
 
-  /** Given a direction vector in the reference frame, return a J2000 direction.
+
+  /** 
+   * Given a direction vector in the reference frame, return a J2000 direction.
    *
-   * @param [in]  rVec A direction vector in the reference frame
+   * @param[in] rVec A direction vector in the reference frame
    *
-   * @return (vector<double>)   A direction vector in J2000 frame
+   * @return vector<double>  A direction vector in J2000 frame.
    */
-  std::vector<double> SpiceRotation::J2000Vector(const std::vector<double>& rVec) {
+  std::vector<double> SpiceRotation::J2000Vector(const std::vector<double> &rVec) {
     NaifStatus::CheckErrors();
     
     std::vector<double> jVec;
@@ -1192,7 +1257,8 @@ namespace Isis {
   }
 
 
-  /** Return the coefficients used to calculate the target body pole ra
+  /** 
+   * Return the coefficients used to calculate the target body pole ra
    *
    * Return the coefficients used to calculate the target body right
    * ascension without nutation/precession.  The model is a standard
@@ -1202,17 +1268,17 @@ namespace Isis {
    * the trignometric terms to account for nutation/precession need to
    * be added.
    * 
-   * pole ra = ra0 + ra1*T + ra2*T**2 +sum(racoef[i]i*sin(angle[i]))
+   * pole ra = ra0 + ra1*T + ra2*T**2 + sum(racoef[i]i*sin(angle[i]))
    *
-   * @return (vector<double>)   A vector of length 3 containing the 
-   *                                              pole ra coefficients
+   * @return @b vector<double> A vector of length 3 containing the pole ra coefficients
    */
   std::vector<Angle> SpiceRotation::poleRaCoefs() {
     return m_raPole;
   }
 
 
-  /** Return the coefficients used to calculate the target body pole dec
+  /** 
+   * Return the coefficients used to calculate the target body pole dec
    *
    * Return the coefficients used to calculate the target body declination
    * without nutation/precession.  The model is a standard quadratic
@@ -1222,17 +1288,17 @@ namespace Isis {
    * the trignometric terms to account for nutation/precession need to
    * be added.
    * 
-   * pole dec = dec0 + dec1*T + dec2*T**2 +sum(racoef[i]i*sin(angle[i]))
+   * pole dec = dec0 + dec1*T + dec2*T**2 + sum(racoef[i]i*sin(angle[i]))
    *
-   * @return (vector<double>)   A vector of length 3 containing the 
-   *                                              pole declination coefficients
+   * @return @b vector<double> A vector of length 3 containing the pole declination coefficients.
    */
   std::vector<Angle> SpiceRotation::poleDecCoefs() {
     return m_decPole;
   }
 
 
-  /** Return the coefficients used to calculate the target body prime meridian
+  /** 
+   * Return the coefficients used to calculate the target body prime meridian
    *
    * Return the coefficients used to calculate the target body prime
    * meridian without nutation/precession.  The model is a standard
@@ -1241,17 +1307,17 @@ namespace Isis {
    * the same as the most recent IAU Report) the trignometric terms
    * to account for nutation/precession need to be added.
    * 
-   * pm = pm0 + pm1*d + pm2*d**2 +sum(pmcoef[i]i*sin(angle[i]))
+   * pm = pm0 + pm1*d + pm2*d**2 + sum(pmcoef[i]i*sin(angle[i]))
    *
-   * @return (vector<double>)   A vector of length 3 containing the 
-   *                                              prime meridian coefficients
+   * @return @b vector<double> A vector of length 3 containing the prime meridian coefficients.
    */
   std::vector<Angle> SpiceRotation::pmCoefs() {
     return m_pm;
   }
 
 
-  /** Return the coefficients used to calculate the target body pole ra nut/prec coefficients
+  /** 
+   * Return the coefficients used to calculate the target body pole ra nut/prec coefficients
    *
    * Return the coefficients used to calculate the target body right
    * ascension nutation/precession contribution.  The model is the
@@ -1259,52 +1325,51 @@ namespace Isis {
    * with the sin of the corresponding angles associated with the
    * barycenter related to the target body.
    * 
-   * pole ra = ra0 + ra1*T + ra2*T**2 +sum(raCoef[i]i*sin(angle[i]))
+   * pole ra = ra0 + ra1*T + ra2*T**2 + sum(raCoef[i]i*sin(angle[i]))
    *
-   * @return (vector<Angle>)   A vector containing the pole ra nut/prec coefficients
+   * @return @b vector<double> A vector containing the pole ra nut/prec coefficients.
    */
   std::vector<double> SpiceRotation::poleRaNutPrecCoefs() {
     return m_raNutPrec;
   }
 
 
-  /** Return the coefficients used to calculate the target body pole dec nut/prec coefficients
+  /** 
+   * Return the coefficients used to calculate the target body pole dec nut/prec coefficients
    *
    * Return the coefficients used to calculate the target body declination
    * nutation/precession contribution.  The model is the sum of the products 
    * of the coefficients returned by this method with the sin of the corresponding 
    * angles associated with the barycenter related to the target body.
    * 
-   * 
-   * pole dec = dec0 + dec1*T + dec2*T**2 +sum(decCoef[i]i*sin(angle[i]))
+   * pole dec = dec0 + dec1*T + dec2*T**2 + sum(decCoef[i]i*sin(angle[i]))
    *
-   * @return (vector<double>)   A vector containing the pole dec nut/prec coeffcients
-   *              
+   * @return @b vector<double> A vector containing the pole dec nut/prec coeffcients.
    */
   std::vector<double> SpiceRotation::poleDecNutPrecCoefs() {
     return m_decNutPrec;
   }
 
 
-  /** Return the coefficients used to calculate the target body pm nut/prec coefficients
+  /** 
+   * Return the coefficients used to calculate the target body pm nut/prec coefficients
    *
    * Return the coefficients used to calculate the target body prime meridian
    * nutation/precession contribution.  The model is the sum of the products 
    * of the coefficients returned by this method with the sin of the corresponding 
    * angles associated with the barycenter related to the target body.
    * 
-   * 
-   * prime meridian = pm0 + pm1*T + pm2*d**2 +sum(pmCoef[i]i*sin(angle[i]))
+   * prime meridian = pm0 + pm1*T + pm2*d**2 + sum(pmCoef[i]i*sin(angle[i]))
    *
-   * @return (vector<double>)   A vector containing the pm nut/prec coeffcients
-   *              
+   * @return @b vector<double> A vector containing the pm nut/prec coeffcients.
    */
   std::vector<double> SpiceRotation::pmNutPrecCoefs() {
     return m_pmNutPrec;
   }
 
 
-  /** Return the constants used to calculate the target body system nut/prec angles
+  /** 
+   * Return the constants used to calculate the target body system nut/prec angles
    *
    * Return the constant terms used to calculate the target body system (barycenter)
    * nutation/precession angles (periods).  The model for the angles is linear in
@@ -1313,15 +1378,15 @@ namespace Isis {
    *  
    * angle[i] = constant[i] + coef[i]*T
    *
-   * @return (vector<double>)   A vector containing the system nut/prec constant terms
-   *              
+   * @return @b vector<Angle> A vector containing the system nut/prec constant terms.
    */
   std::vector<Angle> SpiceRotation::sysNutPrecConstants() {
     return m_sysNutPrec0;
   }
 
 
-  /** Return the coefficients used to calculate the target body system nut/prec angles
+  /** 
+   * Return the coefficients used to calculate the target body system nut/prec angles
    *
    * Return the linear coefficients used to calculate the target body system 
    * (barycenter) nutation/precession angles (periods).  The model for the 
@@ -1331,27 +1396,35 @@ namespace Isis {
    *  
    * angle[i] = constant[i] + coef[i]*T
    *
-   * @return (vector<double>)   A vector containing the system nut/prec linear coefficients
-   *              
+   * @return @b vector<Angle> A vector containing the system nut/prec linear coefficients.
    */
   std::vector<Angle> SpiceRotation::sysNutPrecCoefs() {
     return m_sysNutPrec1;
   }
 
 
-  /** Given a direction vector in the reference frame, compute the derivative
-   *  with respect to one of the coefficients in the angle polynomial fit 
-   *  equation of a vector rotated from the reference frame to J2000.
-   *  TODO - merge this method with ToReferencePartial
+  /** 
+   * Given a direction vector in the reference frame, compute the derivative
+   * with respect to one of the coefficients in the angle polynomial fit 
+   * equation of a vector rotated from the reference frame to J2000.
+   * TODO - merge this method with ToReferencePartial
    *
-   * @param [in]  lookT A direction vector in the targeted reference frame
-   * @param [in]  partialVar  Variable derivative is to be with respect to
-   * @param [in]  coeffIndex  Coefficient index in the polynomial fit to the variable (angle)
-   * @return (vector<double>)   A direction vector rotated by derivative 
-   *                             of reference to J2000 rotation
+   * @param[in]  lookT A direction vector in the targeted reference frame
+   * @param[in]  partialVar  Variable derivative is to be with respect to
+   * @param[in]  coeffIndex  Coefficient index in the polynomial fit to the variable (angle)
+   *
+   * @throws IException::User "Body rotation uses a binary PCK. Solutions for this model are not
+   *                           supported"
+   * @throws IException::User "Body rotation uses a PCK not referenced to J2000. Solutions for this
+   *                           model are not supported" 
+   * @throws IException::User "Solutions are not supported for this frame type."
+   *
+   * @return @b vector<double>   A direction vector rotated by derivative 
+   *                             of reference to J2000 rotation.
    */
-  std::vector<double> SpiceRotation::toJ2000Partial(const std::vector<double>& lookT, 
-                                    SpiceRotation::PartialType partialVar, int coeffIndex) {
+  std::vector<double> SpiceRotation::toJ2000Partial(const std::vector<double> &lookT, 
+                                                    SpiceRotation::PartialType partialVar, 
+                                                    int coeffIndex) {
     NaifStatus::CheckErrors();
 
     std::vector<double> jVec;
@@ -1372,7 +1445,7 @@ namespace Isis {
     // Get the derivative of the polynomial with respect to partialVar
     double dpoly = 0.;
     QString msg;
-    switch(m_frameType) {
+    switch (m_frameType) {
      case CK:
        dpoly = DPolynomial(coeffIndex);
        break;
@@ -1384,9 +1457,8 @@ namespace Isis {
        throw IException(IException::User, msg, _FILEINFO_);
        break;
      case NOTJ2000PCK:
-       msg =  "Body rotation uses a PCK not referenced to J2000. "
-                    "Solutions for this model are not supported";    
-         // "Body rotation uses a PCK not referenced to J2000.  Solutions for this model are not supported";
+       msg = "Body rotation uses a PCK not referenced to J2000. "
+             "Solutions for this model are not supported";    
        throw IException(IException::User, msg, _FILEINFO_);
        break;
      default:
@@ -1403,7 +1475,7 @@ namespace Isis {
 
     // Apply the other 2 angles and chain them all together to get J2000 to constant frame
     double dCJ[3][3];
-    switch(angleIndex) {
+    switch (angleIndex) {
       case 0:
         rotmat_c(dmatrix, angles[1], axes[1], dCJ);
         rotmat_c(dCJ, angles[2], axes[2], dCJ);
@@ -1435,15 +1507,14 @@ namespace Isis {
   }
 
 
-  /** Given a direction vector in J2000, return a reference frame direction.
+  /** 
+   * Given a direction vector in J2000, return a reference frame direction.
    *
-   * @param [in] jVec A direction vector in J2000
+   * @param[in] jVec A direction vector in J2000
    *
-   * @return (vector<double>)   A direction vector in reference
-   *         frame
+   * @return @b vector<double> A direction vector in reference frame.
    */
-  std::vector<double>
-  SpiceRotation::ReferenceVector(const std::vector<double>& jVec) {
+  std::vector<double> SpiceRotation::ReferenceVector(const std::vector<double> &jVec) {
     NaifStatus::CheckErrors();
 
     std::vector<double> rVec(3);
@@ -1471,13 +1542,16 @@ namespace Isis {
   }
 
 
-  /** Set the coefficients of a polynomial fit to each
+  /** 
+   * Set the coefficients of a polynomial fit to each
    * of the three camera angles for the time period covered by the
    * cache, angle = a + bt + ct**2, where t = (time - p_baseTime)/ p_timeScale.
    *
+   * @param type Rotation source type
+   *
    * @internal
-   *  @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types
-   *                                       beyond PolyFunction
+   *   @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types
+   *                           beyond PolyFunction.
    */
   void SpiceRotation::SetPolynomial(const Source type) {
     NaifStatus::CheckErrors();
@@ -1616,22 +1690,23 @@ namespace Isis {
   }
 
 
-
-  /** Set the coefficients of a polynomial fit to each of the
+  /** 
+   * Set the coefficients of a polynomial fit to each of the
    * three camera angles for the time period covered by the
    * cache, angle = c0 + c1*t + c2*t**2 + ... + cn*t**n,
    * where t = (time - p_baseTime) / p_timeScale, and n = p_degree.
    *
-   * @param [in] coeffAng1 Coefficients of fit to Angle 1
-   * @param [in] coeffAng2 Coefficients of fit to Angle 2
-   * @param [in] coeffAng3 Coefficients of fit to Angle 3
+   * @param[in] coeffAng1 Coefficients of fit to Angle 1
+   * @param[in] coeffAng2 Coefficients of fit to Angle 2
+   * @param[in] coeffAng3 Coefficients of fit to Angle 3
+   * @param[in] type Rotation source type
    *
    * @internal
-   *  @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types
+   *   @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types.
    */
-  void SpiceRotation::SetPolynomial(const std::vector<double>& coeffAng1,
-                                    const std::vector<double>& coeffAng2,
-                                    const std::vector<double>& coeffAng3,
+  void SpiceRotation::SetPolynomial(const std::vector<double> &coeffAng1,
+                                    const std::vector<double> &coeffAng2,
+                                    const std::vector<double> &coeffAng3,
                                     const Source type) {
 
     NaifStatus::CheckErrors();
@@ -1669,7 +1744,8 @@ namespace Isis {
   }
 
 
-  /** Set the coefficients of a polynomial fit to each
+  /** 
+   * Set the coefficients of a polynomial fit to each
    * of the three planet angles for the time period covered by the
    * cache, ra = ra0 + ra1*t + ra2*t**2 + raTrig, 
    *            dec = dec0 + dec1*t + dec2*t**2 + decTrig,
@@ -1680,8 +1756,10 @@ namespace Isis {
    * for ra and pm and sum(i = 0, numTerms) tcoef[i] * cos(constant[i] + lcoef[i]*t)
    * for dec.
    *
+   * @throws IException::User "Target body orientation information not available. Rerun spiceinit."
+   *
    * @internal
-   *  @history 2015-07-01 Debbie A. Cook - Original version
+   *   @history 2015-07-01 Debbie A. Cook - Original version.
    */
   void SpiceRotation::usePckPolynomial() {
 
@@ -1701,7 +1779,8 @@ namespace Isis {
     // Set the scales
     p_dscale =  0.000011574074074;   // seconds to days conversion
     p_tscale = 3.1688087814029D-10; // seconds to Julian centuries conversion
-    //Set the quadratic part of the equations  ****TODO**** consider just hard coding this part in evaluate
+    //Set the quadratic part of the equations  
+    //TODO consider just hard coding this part in evaluate
     Isis::PolynomialUnivariate functionRa(p_degree);  // Basis function fit to target body pole ra
     Isis::PolynomialUnivariate functionDec(p_degree);  // Basis function fit to target body pole dec
     Isis::PolynomialUnivariate functionPm(p_degree);  // Basis function fit to target body pm
@@ -1731,8 +1810,10 @@ namespace Isis {
     */
 
     // Set the flag indicating p_degree has been applied to the planet angles, the
-    // coefficients of the polynomials have been saved, and the cache reloaded from  ****TODO cache reloaded???
-    // the polynomials.  ****At least for the planet angles, I don't think we want to reload the cache until just 
+    // coefficients of the polynomials have been saved, and the cache reloaded from  
+    // TODO cache reloaded???
+    // the polynomials.  
+    // ****At least for the planet angles, I don't think we want to reload the cache until just
     // before we write out the table
     p_degreeApplied = true;
     p_hasAngularVelocity = true;
@@ -1741,7 +1822,8 @@ namespace Isis {
   }
 
 
-  /** Set the coefficients of a polynomial fit to each
+  /** 
+   * Set the coefficients of a polynomial fit to each
    * of the three planet angles for the time period covered by the
    * cache, ra = ra0 + ra1*t + ra2*t**2 + raTrig, 
    *            dec = dec0 + dec1*t + dec2*t**2 + decTrig,
@@ -1752,12 +1834,16 @@ namespace Isis {
    * for ra and pm and sum(i = 0, numTerms) tcoef[i] * cos(constant[i] + lcoef[i]*t)
    * for dec.
    *
+   * @param[in] raCoeff  pole ra coefficients to set
+   * @param[in] decCoeff pole dec coefficients to set
+   * @param[in] pmCoeff  pole pm coefficients to set
+   *
    * @internal
-   *  @history 2012-05-01 Debbie A. Cook - Original version
+   *   @history 2012-05-01 Debbie A. Cook - Original version.
    */
-  void SpiceRotation::setPckPolynomial(const std::vector<Angle>& raCoeff,
-                                       const std::vector<Angle>& decCoeff,
-                                       const std::vector<Angle>& pmCoeff) {
+  void SpiceRotation::setPckPolynomial(const std::vector<Angle> &raCoeff,
+                                       const std::vector<Angle> &decCoeff,
+                                       const std::vector<Angle> &pmCoeff) {
     // Just set the constants and let usePckPolynomial() do the rest
     m_raPole = raCoeff;
     m_decPole = decCoeff;
@@ -1769,19 +1855,18 @@ namespace Isis {
                                
 
   /**
-   *  Return the coefficients of a polynomial fit to each of the
-   *  three camera angles for the time period covered by the cache, angle =
-   *  c0 + c1*t + c2*t**2 + ... + cn*t**n, where t = (time - p_basetime) / p_timeScale
-   *  and n = p_degree.
+   * Return the coefficients of a polynomial fit to each of the
+   * three camera angles for the time period covered by the cache, angle =
+   * c0 + c1*t + c2*t**2 + ... + cn*t**n, where t = (time - p_basetime) / p_timeScale
+   * and n = p_degree.
    *
-   * @param [out] coeffAng1 Coefficients of fit to Angle 1
-   * @param [out] coeffAng2 Coefficients of fit to Angle 2
-   * @param [out] coeffAng3 Coefficients of fit to Angle 3
-   *
+   * @param[out] coeffAng1 Coefficients of fit to Angle 1
+   * @param[out] coeffAng2 Coefficients of fit to Angle 2
+   * @param[out] coeffAng3 Coefficients of fit to Angle 3
    */
-  void SpiceRotation::GetPolynomial(std::vector<double>& coeffAng1,
-                                    std::vector<double>& coeffAng2,
-                                    std::vector<double>& coeffAng3) {
+  void SpiceRotation::GetPolynomial(std::vector<double> &coeffAng1,
+                                    std::vector<double> &coeffAng2,
+                                    std::vector<double> &coeffAng3) {
     coeffAng1 = p_coefficients[0];
     coeffAng2 = p_coefficients[1];
     coeffAng3 = p_coefficients[2];
@@ -1791,21 +1876,20 @@ namespace Isis {
 
 
   /**
-   *  Return the coefficients of a polynomial fit to each of the
-   *  three planet angles.  See SetPckPolynomial() for more
-   *  information on the polynomial.
+   * Return the coefficients of a polynomial fit to each of the
+   * three planet angles.  See SetPckPolynomial() for more
+   * information on the polynomial.
    *
-   *  TODO??? Should the other coefficients be returned as well???
+   * TODO??? Should the other coefficients be returned as well???
    *
-   * @param [out] raCoeff Quadratic coefficients of fit to ra
-   * @param [out] decCoeff Quadratic coefficients of fit to dec
-   * @param [out] pmcoeff  Quadratic coefficients of fit to pm
-   *
+   * @param[out] raCoeff Quadratic coefficients of fit to ra
+   * @param[out] decCoeff Quadratic coefficients of fit to dec
+   * @param[out] pmcoeff  Quadratic coefficients of fit to pm
    */
-  void SpiceRotation::getPckPolynomial(std::vector<Angle>& raCoeff,
-                                    std::vector<Angle>& decCoeff,
-                                    std::vector<Angle>& pmCoeff) {
-    raCoeff = m_raPole;;
+  void SpiceRotation::getPckPolynomial(std::vector<Angle> &raCoeff,
+                                       std::vector<Angle> &decCoeff,
+                                       std::vector<Angle> &pmCoeff) {
+    raCoeff = m_raPole;
     decCoeff = m_decPole;
     pmCoeff = m_pm;
 
@@ -1813,7 +1897,9 @@ namespace Isis {
   }
 
 
-  //! Compute the base time using cached times
+  /**
+   * Compute the base time using cached times
+   */
   void SpiceRotation::ComputeBaseTime() {
     if (p_noOverride) {
       p_baseTime = (p_cacheTime.at(0) + p_cacheTime.at(p_cacheTime.size() - 1)) / 2.;
@@ -1834,7 +1920,8 @@ namespace Isis {
    * Set an override base time to be used with observations on scanners to allow all
    * images in an observation to use the save base time and polynomials for the angles.
    *
-   * @param [in] baseTime The baseTime to use and override the computed base time
+   * @param[in] baseTime The base time to use and override the computed base time
+   * @param[in] timeScale The time scale to use and override the computed time scale
    */
   void SpiceRotation::SetOverrideBaseTime(double baseTime, double timeScale) {
     p_overrideBaseTime = baseTime;
@@ -1845,13 +1932,17 @@ namespace Isis {
 
 
   /**
-   *  Evaluate the derivative of the fit polynomial defined by the
-   *  given coefficients with respect to the coefficient at the given index, at
-   *  the current time.
+   * Evaluate the derivative of the fit polynomial defined by the
+   * given coefficients with respect to the coefficient at the given index, at
+   * the current time.
    *
    * @param coeffIndex The index of the coefficient to differentiate
-   * @return The derivative evaluated at the current time
    *
+   * @throws IException::Programmer "Unable to evaluate the derivative of the SPICE rotation fit 
+   *                                 polynomial for the given coefficient index. Index is negative
+   *                                 or exceeds degree of polynomial"
+   *
+   * @return @b double The derivative evaluated at the current time.
    */
   double SpiceRotation::DPolynomial(const int coeffIndex) {
     double derivative;
@@ -1875,22 +1966,27 @@ namespace Isis {
 
 
   /**
-   *  Evaluate the derivative of the fit polynomial defined by the
-   *  given coefficients with respect to the coefficient at the given index, at
-   *  the current time.
+   * Evaluate the derivative of the fit polynomial defined by the
+   * given coefficients with respect to the coefficient at the given index, at
+   * the current time.
    *
+   * @param partialVar Variable derivative is to be with respect to
    * @param coeffIndex The index of the coefficient to differentiate
-   * @return The derivative evaluated at the current time
    *
+   * @throws IException::Programmer "Unable to evaluate the derivative of the SPICE rotation fit 
+   *                                 polynomial for the given coefficient index. Index is negative
+   *                                 or exceeds degree of polynomial"
+   *
+   * @return @b double The derivative evaluated at the current time.
    */
   double SpiceRotation::DPckPolynomial(SpiceRotation::PartialType partialVar,
-                                                                const int coeffIndex) {
+                                       const int coeffIndex) {
     const double p_dayScale = 86400; // number of seconds in a day
  // Number of 24 hour days in a Julian century = 36525    
     const double p_centScale = p_dayScale * 36525;
     double time = 0.;
 
-    switch(partialVar) {
+    switch (partialVar) {
      case WRT_RightAscension:
      case WRT_Declination:
        time = p_et / p_centScale;
@@ -1902,7 +1998,7 @@ namespace Isis {
 
     double derivative;
 
-    switch(coeffIndex) {
+    switch (coeffIndex) {
      case 0:
        derivative = 1;
        break;
@@ -1928,25 +2024,26 @@ namespace Isis {
   }
 
 
-
-  /** Compute the derivative with respect to one of the coefficients in the
-   *  angle polynomial fit equation of a vector rotated from J2000 to a
-   *  reference frame.  The polynomial equation is of the form
-   *  angle = c0 + c1*t + c2*t**2 + ... cn*t**n, where t = (time - p_basetime) / p_timeScale
-   *  and n = p_degree (the degree of the equation)
+  /**
+   * Compute the derivative with respect to one of the coefficients in the
+   * angle polynomial fit equation of a vector rotated from J2000 to a
+   * reference frame.  The polynomial equation is of the form
+   * angle = c0 + c1*t + c2*t**2 + ... cn*t**n, where t = (time - p_basetime) / p_timeScale
+   * and n = p_degree (the degree of the equation)
    *
-   * @param [in]  lookJ       Look vector in J2000 frame
-   * @param [in]  partialVar  Variable derivative is to be with respect to
-   * @param [in]  coeffIndex  Coefficient index in the polynomial fit to the variable (angle)
-   * @return Vector rotated by derivative of J2000 to
-   *                              reference rotation
+   * @param[in]  lookJ       Look vector in J2000 frame
+   * @param[in]  partialVar  Variable derivative is to be with respect to
+   * @param[in]  coeffIndex  Coefficient index in the polynomial fit to the variable (angle)
    *
+   * @throws IException::Programmer "Only CK and PCK partials can be calculated"
+   *
+   * @return @b vector<double> Vector rotated by derivative of J2000 to reference rotation.
    */
-  std::vector<double>
-  SpiceRotation::ToReferencePartial(std::vector<double>& lookJ,
-                                    SpiceRotation::PartialType partialVar, int coeffIndex) {
+  std::vector<double> SpiceRotation::ToReferencePartial(std::vector<double> &lookJ,
+                                                        SpiceRotation::PartialType partialVar,
+                                                        int coeffIndex) {
     NaifStatus::CheckErrors();
-    //**TODO** To save time possibly save partial matrices
+    //TODO** To save time possibly save partial matrices
 
     // Get the rotation angles and form the derivative matrix for the partialVar
     std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
@@ -1962,7 +2059,7 @@ namespace Isis {
 
     // Get the derivative of the polynomial with respect to partialVar
     double dpoly = 0.;
-    switch(m_frameType) {
+    switch (m_frameType) {
      case UNKNOWN:  // For now let everything go through for backward compatability
      case CK:
        dpoly = DPolynomial(coeffIndex);
@@ -1984,7 +2081,7 @@ namespace Isis {
 
     // Apply the other 2 angles and chain them all together
     double dCJ[3][3];
-    switch(angleIndex) {
+    switch (angleIndex) {
       case 0:
         rotmat_c(dmatrix, angles[1], axes[1], dCJ);
         rotmat_c(dCJ, angles[2], axes[2], dCJ);
@@ -2016,13 +2113,13 @@ namespace Isis {
   }
 
 
-  /** Wrap the input angle to keep it within 2pi radians of the
-   *  angle to compare.
+  /** 
+   * Wrap the input angle to keep it within 2pi radians of the angle to compare.
    *
-   * @param [in]  compareAngle Look vector in J2000 frame
-   * @param [in]  angle Angle to be wrapped if needed
-   * @return double Wrapped angle
+   * @param[in]  compareAngle Look vector in J2000 frame
+   * @param[in]  angle Angle to be wrapped if needed
    *
+   * @return @b double Wrapped angle.
    */
   double SpiceRotation::WrapAngle(double compareAngle, double angle) {
     NaifStatus::CheckErrors();
@@ -2040,16 +2137,17 @@ namespace Isis {
   }
 
 
-  /** Set the degree of the polynomials to be fit to the
+  /** 
+   * Set the degree of the polynomials to be fit to the
    * three camera angles for the time period covered by the
    * cache, angle = c0 + c1*t + c2*t**2 + ... + cn*t**n,
    * where t = (time - p_baseTime) / p_timeScale, and n = p_degree.
    *
-   * @param [in] degree Degree of the polynomial to be fit
+   * @param[in] degree Degree of the polynomial to be fit
    *
    * @internal
-   *  @history 2011-03-22 Debbie A. Cook - Fixed bug in second branch where existing
-   *                       degree is greater than new degree
+   *   @history 2011-03-22 Debbie A. Cook - Fixed bug in second branch where existing
+   *                           degree is greater than new degree.
    */
   void SpiceRotation::SetPolynomialDegree(int degree) {
     // Adjust the degree for the data
@@ -2094,24 +2192,30 @@ namespace Isis {
     }
   }
 
+
   /** 
    * Accessor method to get the rotation frame type. 
-   * @return The frame type of the rotation.
+   *
+   * @return @b SpiceRotation::FrameType The frame type of the rotation.
    */
   SpiceRotation::FrameType SpiceRotation::getFrameType() {
     return m_frameType;
   }
 
+
   /** 
    * Accessor method to get the rotation source. 
-   * @return The source of the rotation.
+   *
+   * @return @b SpiceRotation::Source The source of the rotation.
    */
   SpiceRotation::Source SpiceRotation::GetSource() {
     return p_source;
   }
 
+
   /**
    * Resets the source of the rotation to the given value. 
+   *
    * @param source The rotation source to be set.  
    */
   void SpiceRotation::SetSource(Source source) {
@@ -2119,30 +2223,38 @@ namespace Isis {
     return;
   }
 
+
   /**
    * Accessor method to get the rotation base time. 
-   * @return The base time for the rotation
+   *
+   * @return @b double The base time for the rotation.
    */
   double SpiceRotation::GetBaseTime() {
     return p_baseTime;
   }
 
+
   /**
    * Accessor method to get the rotation time scale. 
-   * @return The time scale for the rotation
+   *
+   * @return @b double The time scale for the rotation.
    */
   double SpiceRotation::GetTimeScale() {
     return p_timeScale;
   }
 
-  /** Set the axes of rotation for decomposition of a rotation
-   *  matrix into 3 angles.
+
+  /** 
+   * Set the axes of rotation for decomposition of a rotation
+   * matrix into 3 angles.
    *
-   * @param [in]  axis1 Axes of rotation of first angle applied (right rotation)
-   * @param [in]  axis2 Axes of rotation of second angle applied (center rotation)
-   * @param [in]  axis3 Axes of rotation of third angle applied (left rotation)
-   * @return double Wrapped angle
+   * @param[in]  axis1 Axes of rotation of first angle applied (right rotation)
+   * @param[in]  axis2 Axes of rotation of second angle applied (center rotation)
+   * @param[in]  axis3 Axes of rotation of third angle applied (left rotation)
    *
+   * @throws IException::Programmer "A rotation axis is outside the valid range of 1 to 3"
+   *
+   * @return @b double Wrapped angle.
    */
   void SpiceRotation::SetAxes(int axis1, int axis2, int axis3) {
     if (axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
@@ -2154,9 +2266,17 @@ namespace Isis {
     p_axis3 = axis3;
   }
 
-  /** Load the time cache.  This method should works with the LoadCache(startTime, endTime, size) 
-   *    method to load the time cache.
+
+  /** 
+   * Load the time cache.  This method should works with the LoadCache(startTime, endTime, size) 
+   * method to load the time cache.
    *
+   * @throws IException::Programmer "Full cache size does NOT match cache size in LoadTimeCache --
+   *                                 should never happen"
+   * @throws IException::Programmer "Observation crosses segment boundary--unable to interpolate 
+   *                                 pointing"
+   * @throws IException::User "No camera kernels loaded...Unable to determine time cache to 
+   *                           downsize"
    */
   void SpiceRotation::LoadTimeCache() {
     NaifStatus::CheckErrors();
@@ -2180,7 +2300,7 @@ namespace Isis {
 
       if (p_fullCacheSize != (int) p_cache.size()) {
 
-        Isis::IString msg =
+        QString msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -2367,8 +2487,13 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  /** Return full listing (cache) of original time coverage
-   * requested.
+
+  /** 
+   * Return full listing (cache) of original time coverage requested.
+   *
+   * @throws IException::User "Time cache not availabe -- rerun spiceinit"
+   *
+   * @return @b vector<double> Cache of original time coverage.
    */
   std::vector<double> SpiceRotation::GetFullCacheTime() {
 
@@ -2380,8 +2505,9 @@ namespace Isis {
 
     std::vector<double> fullCacheTime;
     double cacheSlope = 0.0;
-    if (p_fullCacheSize > 1)  cacheSlope =
-                       (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
+    if (p_fullCacheSize > 1) {
+      cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
+    }
 
     for (int i = 0; i < p_fullCacheSize; i++)
       fullCacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
@@ -2389,7 +2515,17 @@ namespace Isis {
     return fullCacheTime;
   }
 
-  /** Compute frame trace chain from target frame to J2000
+
+  /** 
+   * Compute frame trace chain from target frame to J2000
+   *
+   * @param et Ephemeris time
+   *
+   * @throws IException::Programmer "The frame is not supported by Naif"
+   * @throws IException::Programmer "The ck rotation from frame can not be found due to no pointing
+   *                                 available at request time or a problem with the frame"
+   * @throws IException::Programmer "The frame has a type not supported by your version of Naif
+   *                                 Spicelib. You need to update."
    */
   void SpiceRotation::FrameTrace(double et) {
     NaifStatus::CheckErrors();
@@ -2416,9 +2552,9 @@ namespace Isis {
       // do not exercise this option.  Should we ever use pck with a target body not referenced to
       // the J2000 frame and epoch, both this method and loadPCFromSpice will need to be modified.
       frinfo_c((SpiceInt) frameCodes[frmidx],
-                   (SpiceInt *) &center,
-                   (SpiceInt *) &type,
-                   (SpiceInt *) &typid, &found);
+               (SpiceInt *) &center,
+               (SpiceInt *) &type,
+               (SpiceInt *) &typid, &found);
 
       if (!found) {
 
@@ -2447,8 +2583,9 @@ namespace Isis {
             break;
           }
 
-          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + " can not be "
-               + "found due to no pointing available at requested time or a problem with the frame";
+          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + "can not "
+               + "be found due to no pointing available at requested time or a problem with the "
+               + "frame";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -2472,8 +2609,8 @@ namespace Isis {
 
       else {
         QString msg = "The frame " + toString(frameCodes[frmidx]) +
-              " has a type " + toString(type) + " not supported by your version of Naif Spicelib." +
-              "You need to update.";
+            " has a type " + toString(type) + " not supported by your version of Naif Spicelib." 
+            + "You need to update.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
 
       }
@@ -2511,7 +2648,9 @@ namespace Isis {
 
 
   /** 
-   *  Return the full rotation TJ as a matrix
+   * Return the full rotation TJ as a matrix
+   *
+   * @return @b vector<double> Returned matrix.
    */
   std::vector<double> SpiceRotation::Matrix() {
     NaifStatus::CheckErrors();
@@ -2522,10 +2661,11 @@ namespace Isis {
     return TJ;
   }
 
+
   /** 
-   *  Return the constant 3x3 rotation TC matrix as a quaternion.
+   * Return the constant 3x3 rotation TC matrix as a quaternion.
    *  
-   *  @return Constant rotation quaternion, TC
+   * @return @b vector<double> Constant rotation quaternion, TC.
    */
   std::vector<double> SpiceRotation::ConstantRotation() {
     NaifStatus::CheckErrors();
@@ -2536,19 +2676,21 @@ namespace Isis {
     return q;
   }
 
+
   /** 
-   *  Return the constant 3x3 rotation TC matrix as a vector of length 9.
+   * Return the constant 3x3 rotation TC matrix as a vector of length 9.
    *  
-   *  @return Constant rotation matrix, TC
+   * @return @b vector<double> Constant rotation matrix, TC.
    */
   std::vector<double> &SpiceRotation::ConstantMatrix() {
     return p_TC;
   }
 
+
   /** 
-   *  Set the constant 3x3 rotation TC matrix from a vector of length 9.
+   * Set the constant 3x3 rotation TC matrix from a vector of length 9.
    *  
-   *  @param constantMatrix Constant rotation matrix, TC.
+   * @param constantMatrix Constant rotation matrix, TC.
    */
   void SpiceRotation::SetConstantMatrix(std::vector<double> constantMatrix) {
     p_TC = constantMatrix;
@@ -2556,9 +2698,9 @@ namespace Isis {
   }
 
   /** 
-   *  Return time-based 3x3 rotation CJ matrix as a quaternion.
+   * Return time-based 3x3 rotation CJ matrix as a quaternion.
    *  
-   *  @return Time-based rotation quaternion, CJ
+   * @return @b vector<double> Time-based rotation quaternion, CJ.
    */
   std::vector<double> SpiceRotation::TimeBasedRotation() {
     NaifStatus::CheckErrors();
@@ -2569,27 +2711,32 @@ namespace Isis {
     return q;
   }
 
+
   /** 
-   *  Return time-based 3x3 rotation CJ matrix as a vector of length 9.
+   * Return time-based 3x3 rotation CJ matrix as a vector of length 9.
    *  
-   *  @return Time-based rotation matrix, CJ
+   * @return @b vector<double> Time-based rotation matrix, CJ.
    */
   std::vector<double> &SpiceRotation::TimeBasedMatrix() {
     return p_CJ;
   }
 
+
   /** 
-   *  Set the time-based 3x3 rotation CJ matrix from a vector of length 9.
+   * Set the time-based 3x3 rotation CJ matrix from a vector of length 9.
    *  
-   *  @param timeBasedMatrix Time-based rotation matrix, TC.
+   * @param timeBasedMatrix Time-based rotation matrix, TC.
    */
   void SpiceRotation::SetTimeBasedMatrix(std::vector<double> timeBasedMatrix) {
     p_CJ = timeBasedMatrix;
     return;
   }
 
+
   /** 
-   *  Initialize the constant rotation
+   * Initialize the constant rotation
+   *
+   * @param et Ephemeris time.
    */
   void SpiceRotation::InitConstantRotation(double et) {
     FrameTrace(et);
@@ -2603,10 +2750,10 @@ namespace Isis {
   }
 
 
-
-  /** Compute the angular velocity from the time-based functions fit to the pointing angles
-   *  This method computes omega = angular velocity matrix, and extracts the angular velocity.
-   *  See comments in the Naif Spicelib routine xf2rav_c.c.
+  /** 
+   * Compute the angular velocity from the time-based functions fit to the pointing angles
+   * This method computes omega = angular velocity matrix, and extracts the angular velocity.
+   * See comments in the Naif Spicelib routine xf2rav_c.c.
    *
    *            _                     _
    *           |                       |
@@ -2617,9 +2764,10 @@ namespace Isis {
    *           | -av[1]   av[0]   0    |
    *           |_                     _|
    *
-   *
-   *
-   *
+   * @throws IException::Programmer "The SpiceRotation pointing angles must be fit to polynomials
+   *                                 in order to compute angular velocity."
+   * @throws IException::Programmer "Planetary angular velocity must be fit computed with PCK
+   *                                 polynomials"
    */
   void SpiceRotation::ComputeAv() {
     NaifStatus::CheckErrors();
@@ -2631,13 +2779,13 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (p_source == PckPolyFunction) {
-      QString msg = "Planetary angular velocity must be fit computed with  PCK polynomials ";
+      QString msg = "Planetary angular velocity must be fit computed with PCK polynomials ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     std::vector<double> dCJdt;
     dCJdt.resize(9);
 
-    switch(m_frameType) {
+    switch (m_frameType) {
         // Treat all cases the same except for target body rotations
       case UNKNOWN:
       case INERTL:
@@ -2660,13 +2808,11 @@ namespace Isis {
   }
 
 
-  /** Compute the derivative of the rotation p_CJ with respect to time.
-   *  The derivative is computed based on p_CJ = [angle3]   [angle2]   [angle1]
-   *    p_CJ = [angle3]    [angle2]    [angle1]
-   *                  axis3       axis2       axis1
+  /** 
+   * Compute the derivative of the 3x3 rotation matrix CJ with respect to time.
+   * The derivative is computed based on p_CJ (J2000 to first constant frame).
    *
-   * @param [out]  dCJ       Derivative of p_CJ
-   *
+   * @param[out]  dCJ       Derivative of p_CJ
    */
   void SpiceRotation::DCJdt(std::vector<double> &dCJ) {
     NaifStatus::CheckErrors();
@@ -2701,7 +2847,7 @@ namespace Isis {
         }
       }
       // Apply the other 2 angles and chain them all together
-      switch(angleIndex) {
+      switch (angleIndex) {
         case 0:
           rotmat_c(dmatrix, angles[1], axes[1], dmatrix);
           rotmat_c(dmatrix, angles[2], axes[2], dmatrix);
@@ -2729,7 +2875,10 @@ namespace Isis {
   }
 
 
-  /** Compute & return the rotation matrix that rotates vectors from J2000 to the targeted frame.
+  /** 
+   * Compute & return the rotation matrix that rotates vectors from J2000 to the targeted frame.
+   *
+   * @return @b vector<double> Returned rotation matrix.
    */
   std::vector<double> SpiceRotation::StateTJ() {
     std::vector<double> stateTJ(36);
@@ -2764,14 +2913,15 @@ namespace Isis {
   }
 
 
-  /** Extrapolate pointing for a given time assuming a constant angular velocity.
-   *  The pointing and angular velocity at the current time will be used to
-   *  extrapolate pointing at the input time.  If angular velocity does not
-   *  exist, the value at the current time will be output.
+  /** 
+   * Extrapolate pointing for a given time assuming a constant angular velocity.
+   * The pointing and angular velocity at the current time will be used to
+   * extrapolate pointing at the input time.  If angular velocity does not
+   * exist, the value at the current time will be output.
    *
-   * @param [in]   timeEt    The time of the pointing to be extrapolated
-   * @param [out]            A quaternion defining the rotation at the input time
+   * @param[in]   timeEt    The time of the pointing to be extrapolated
    *
+   * @return @b vector<double> A quaternion defining the rotation at the input time.
    */
    std::vector<double> SpiceRotation::Extrapolate(double timeEt) {
     NaifStatus::CheckErrors();
@@ -2793,12 +2943,12 @@ namespace Isis {
    }
 
 
-   /** Set the full cache time parameters.
+   /** 
+    * Set the full cache time parameters.
     *
-    * @param [in]   startTime The earliest time of the full cache coverage
-    * @param [in]   endTime   The latest time of the full cache coverage
-    * @param [in]   cacheSize The number of epochs in the full (line) cache
-    *
+    * @param[in]   startTime The earliest time of the full cache coverage
+    * @param[in]   endTime   The latest time of the full cache coverage
+    * @param[in]   cacheSize The number of epochs in the full (line) cache
     */
    void SpiceRotation::SetFullCacheParameters(double startTime, double endTime, int cacheSize) {
      // Save full cache parameters
@@ -2808,14 +2958,13 @@ namespace Isis {
    }
 
 
-   /** Check loaded pck to see if any are binary and set frame type to indicate binary pck.
-    *
-    * This is strictly a local method to be called only when the source is Spice.  Its purpose is
-    * to check loaded PCK to see if any are binary.  If any loaded PCK is binary, the body rotation
-    * label keyword FrameTypeCode is set to BPC (6).
-    *
-    *
-    */
+  /** 
+   * Check loaded pck to see if any are binary and set frame type to indicate binary pck.
+   *
+   * This is strictly a local method to be called only when the source is Spice.  Its purpose is
+   * to check loaded PCK to see if any are binary.  If any loaded PCK is binary, the body rotation
+   * label keyword FrameTypeCode is set to BPC (6).
+   */
   void SpiceRotation::checkForBinaryPck() {
     // Get a count of all the loaded kernels
     SpiceInt count;
@@ -2845,13 +2994,13 @@ namespace Isis {
   }
   
 
-   /** Set the frame type (m_frameType).
-    *
-    * This is strictly a local method to be called only when the source is Spice.  Its purpose is
-    * to determine the frame type.  If the frame type is PCK, this method also loads the
-    * planetary constants.  See SpiceRotation.h to see the valid frame types.
-    *
-    */
+  /** 
+   * Set the frame type (m_frameType).
+   *
+   * This is strictly a local method to be called only when the source is Spice.  Its purpose is
+   * to determine the frame type.  If the frame type is PCK, this method also loads the
+   * planetary constants.  See SpiceRotation.h to see the valid frame types.
+   */
   void SpiceRotation::setFrameType() {
     SpiceInt frameCode = p_constantFrames[0];
     SpiceBoolean found;
@@ -2896,7 +3045,15 @@ namespace Isis {
   }
 
 
-void SpiceRotation::setEphemerisTimeMemcache() {
+  /**
+   * Updates rotation state based on the rotation cache
+   *
+   * When setting the ephemeris time, this method is used to update the rotation state by reading
+   * from the rotation cache
+   *
+   * @see SpiceRotation::SetEphemerisTime
+   */
+  void SpiceRotation::setEphemerisTimeMemcache() {
     // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
 
@@ -2954,9 +3111,14 @@ void SpiceRotation::setEphemerisTimeMemcache() {
       }
     }
     NaifStatus::CheckErrors();
-   }
+  }
 
 
+  /**
+   * When setting the ephemeris time, uses spacecraft nadir source to update the rotation state
+   *
+   * @see SpiceRotation::SetEphemerisTime
+   */
   void SpiceRotation::setEphemerisTimeNadir() {
    // TODO what about spk time bias and mission setting of light time corrections
    //      That information has only been passed to the SpicePosition class and
@@ -2971,7 +3133,7 @@ void SpiceRotation::setEphemerisTimeMemcache() {
     SpiceDouble lt;
     SpiceInt spkCode = p_constantFrames[0] / 1000;
     spkez_c((SpiceInt) spkCode, p_et, "J2000", "LT+S",
-           (SpiceInt) p_targetCode, stateJ, &lt);
+            (SpiceInt) p_targetCode, stateJ, &lt);
    // reverse the position to be relative to the spacecraft.  This may be
    // a mission dependent value and possibly the sense of the velocity as well.
     SpiceDouble sJ[3], svJ[3];
@@ -2986,6 +3148,16 @@ void SpiceRotation::setEphemerisTimeMemcache() {
   }
 
 
+  /**
+   * When setting the ephemeris time, updates the rotation state based on data read directly
+   * from NAIF kernels using NAIF Spice routines
+   *
+   * @throws IException::Io "[framecode] is an unrecognized reference frame code. Has the mission 
+   *                         frames kernel been loaded?"
+   * @throws IException::Io "No pointing is availabe at request time for frame code"
+   *
+   * @see SpiceRotation::SetEphemerisTime
+   */
   void SpiceRotation::setEphemerisTimeSpice() {
    NaifStatus::CheckErrors();
    SpiceInt j2000 = J2000Code;
@@ -3039,6 +3211,12 @@ void SpiceRotation::setEphemerisTimeMemcache() {
   }
 
 
+  /**
+   * Evaluate the polynomial fit function for the three pointing angles for the current
+   * ephemeris time.
+   *
+   * @return @b vector<double> Vector containing the three rotation angles.
+   */
   std::vector<double> SpiceRotation::EvaluatePolyFunction() {
    Isis::PolynomialUnivariate function1(p_degree);
    Isis::PolynomialUnivariate function2(p_degree);
@@ -3049,8 +3227,8 @@ void SpiceRotation::setEphemerisTimeMemcache() {
    function2.SetCoefficients(p_coefficients[1]);
    function3.SetCoefficients(p_coefficients[2]);
 
-   double rtime;
-   rtime = (p_et - p_baseTime) / p_timeScale;
+   std::vector<double> rtime;
+   rtime.push_back((p_et - p_baseTime) / p_timeScale);
    std::vector<double> angles;
    angles.push_back(function1.Evaluate(rtime));
    angles.push_back(function2.Evaluate(rtime));
@@ -3067,6 +3245,12 @@ void SpiceRotation::setEphemerisTimeMemcache() {
   }
 
 
+  /**
+   * When setting the ephemeris time, updates the rotation according to a polynomial
+   * that defines the three camera angles and angular velocity, if available.
+   *
+   * @see SpiceRotatation::SetEphemerisTime
+   */
   void SpiceRotation::setEphemerisTimePolyFunction() {
    NaifStatus::CheckErrors();
    Isis::PolynomialUnivariate function1(p_degree);
@@ -3078,8 +3262,8 @@ void SpiceRotation::setEphemerisTimeMemcache() {
    function2.SetCoefficients(p_coefficients[1]);
    function3.SetCoefficients(p_coefficients[2]);
 
-   double rtime;
-   rtime = (p_et - p_baseTime) / p_timeScale;
+   std::vector<double> rtime;
+   rtime.push_back((p_et - p_baseTime) / p_timeScale);
    double angle1 = function1.Evaluate(rtime);
    double angle2 = function2.Evaluate(rtime);
    double angle3 = function3.Evaluate(rtime);
@@ -3093,7 +3277,7 @@ void SpiceRotation::setEphemerisTimeMemcache() {
    }
 
    eul2m_c((SpiceDouble) angle3, (SpiceDouble) angle2, (SpiceDouble) angle1,
-           p_axis3,             p_axis2,              p_axis1,
+           p_axis3,              p_axis2,              p_axis1,
            (SpiceDouble( *)[3]) &p_CJ[0]);
 
    if (p_hasAngularVelocity) {
@@ -3106,6 +3290,12 @@ void SpiceRotation::setEphemerisTimeMemcache() {
   }
 
 
+  /**
+   * When setting the ephemeris time, updates the rotation state based on a polynomial fit
+   * over spice kernel data. 
+   *
+   * @see SpiceRotation::SetEphemerisTime
+   */
   void SpiceRotation::setEphemerisTimePolyFunctionOverSpice() {
     setEphemerisTimeMemcache();
     NaifStatus::CheckErrors();
@@ -3142,11 +3332,16 @@ void SpiceRotation::setEphemerisTimeMemcache() {
    }
 
    eul2m_c((SpiceDouble) angles[2], (SpiceDouble) angles[1], (SpiceDouble) angles[0],
-           p_axis3,             p_axis2,              p_axis1,
+           p_axis3,                 p_axis2,                 p_axis1,
            (SpiceDouble( *)[3]) &p_CJ[0]);
   }
 
 
+  /**
+   * When setting the ephemeris time, updates the rotation state based on the PcK polynomial
+   *
+   * @see SpiceRotation::SetEphemerisTime
+   */
   void SpiceRotation::setEphemerisTimePckPolyFunction() {
     // Set the scales
     double dTime =  p_et / 86400.;   // seconds to days conversion
@@ -3183,7 +3378,7 @@ void SpiceRotation::setEphemerisTimeMemcache() {
     }
 
     // Get pm in correct range
-      pm = Angle(fmod(pm.degrees(), 360), Angle::Degrees);  // Get pm back into the domain range
+    pm = Angle(fmod(pm.degrees(), 360), Angle::Degrees);  // Get pm back into the domain range
 
     if (ra.radians() < -1 * pi_c()) {
       ra += Angle(twopi_c(), Angle::Radians);

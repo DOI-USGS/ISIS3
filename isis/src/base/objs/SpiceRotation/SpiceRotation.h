@@ -25,14 +25,14 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+//#include <SpiceUsr.h>
+//#include <SpiceZfc.h>
+//#include <SpiceZmc.h>
 
 #include "Angle.h"
 #include "Table.h"
-#include "Quaternion.h"
 #include "PolynomialUnivariate.h"
+#include "Quaternion.h"
 
 #define J2000Code    1
 
@@ -49,7 +49,7 @@ namespace Isis {
    * loaded prior to using this class.  A position can be returned in either
    * the J2000 frame or the selected reference frame.  See NAIF required
    * reading for more information regarding this subject at
-   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/spk.req
+   * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/spk.html
    * <p>
    * An important functionality of this class is the ability to cache the
    * rotations so they do not have to be constantly read from the NAIF kernels
@@ -192,19 +192,20 @@ namespace Isis {
    *                           Added new methods 
    *                           loadPCFromSpice, loadPCFromTable, toJ2000Partial, poleRaCoefs,
    *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs, 
-   *                           mNutPrecCoefs, sysNutPrecConstants, sysNutPrecCoefs,
+   *                           pmNutPrecCoefs, sysNutPrecConstants, sysNutPrecCoefs,
    *                           usePckPolynomial, setPckPolynomial(raCoef, decCoef, pmCoef),
    *                           getPckPolynomial, setEphemerisTimePckPolyFunction, getFrameType
    *                           and members m_frameType, m_tOrientationAvailable, 
    *                           m_raPole, m_decPole, m_pm, m_raNutPrec, m_decNutPrec, m_pmNutPrec,
-   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request for 
+   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale to support request for 
    *                           solving for target body parameters.
    *                           Also added a new enumerated value for Source, PckPolyFunction, 
-   *                            and 
-   *                           PartialType, WRT_RotationRate.
+   *                           and PartialType, WRT_RotationRate.
    *   @history 2016-02-15 Debbie A. Cook - Programmer notes - Added private method
    *                           setFrameType to set the frame type.  It also loads the planetary 
    *                           constants for a PCK type. 
+   *   @history 2016-06-28 Ian Humphrey - Updated documentation and coding standards. Added new
+   *                           tests to unit test. Fixes #3972.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or 
@@ -245,43 +246,46 @@ namespace Isis {
        *       PckPolyFunction - The rotation is calculated using the IAU fit 
        *                  polynomials in one variable (time in Julian centuries and days).
        */
-      enum Source { Spice,                              //!< Directly from the kernels 
-                               Nadir,                   //!< Nadir pointing
-                               Memcache,                //!< From cached table
-                               PolyFunction,            //!< From nth degree polynomial
-                               PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
-                               PckPolyFunction          //!< Quadratic polynomial function with
-                                                        //   linear trignometric terms
-                  };            
+      enum Source {            
+        Spice,                   //!< Directly from the kernels 
+        Nadir,                   //!< Nadir pointing
+        Memcache,                //!< From cached table
+        PolyFunction,            //!< From nth degree polynomial
+        PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
+        PckPolyFunction          //!< Quadratic polynomial function with linear trignometric terms
+      };            
 
       /** 
        * This enumeration indicates whether the partial derivative is taken with 
        * respect to Right Ascension, Declination, or Twist (or Rotation). 
        */ 
-      enum PartialType { WRT_RightAscension, //!< With respect to Right Ascension
-                         WRT_Declination,    //!< With respect to Declination
-                         WRT_Twist          //!< With respect to Twist or Prime Meridian Rotation
-                       };
+      enum PartialType { 
+        WRT_RightAscension, //!< With respect to Right Ascension
+        WRT_Declination,    //!< With respect to Declination
+        WRT_Twist           //!< With respect to Twist or Prime Meridian Rotation
+      };
 
       /** 
-       *  
+       * Status of downsizing the cache
        */ 
-      enum DownsizeStatus { Yes,  //!< 
-                            Done, //!< 
-                            No    //!< 
-                          };
+      enum DownsizeStatus { 
+        Yes,  //!< Downsize the cache 
+        Done, //!< Cache is downsized
+        No    //!< Do not downsize the cache 
+      };
 
       /** 
-       *  
+       * Enumeration for the frame type of the rotation  
        */ 
-      enum FrameType {UNKNOWN = 0,  // Isis specific code for unknown frame type
-                           INERTL = 1,       //!< See Naif Frames.req document for 
-                           PCK  = 2,         //!< definitions
-                           CK = 3,           //!< 
-                           TK = 4,           //!< 
-                           DYN = 5,          //!<
-                           BPC = 6,          //!< Isis specific code for binary pck
-                           NOTJ2000PCK = 7   //!< PCK frame not referenced to J2000
+      enum FrameType {
+        UNKNOWN = 0,      //!< Isis specific code for unknown frame type
+        INERTL = 1,       //!< See Naif Frames.req document for 
+        PCK  = 2,         //!< definitions
+        CK = 3,           //!< 
+        TK = 4,           //!< 
+        DYN = 5,          //!<
+        BPC = 6,          //!< Isis specific code for binary pck
+        NOTJ2000PCK = 7   //!< PCK frame not referenced to J2000
       };                                   
 
       void SetEphemerisTime(double et);
@@ -302,7 +306,7 @@ namespace Isis {
       std::vector<double> &TimeBasedMatrix();
       void SetTimeBasedMatrix(std::vector<double> timeBasedMatrix);
 
-      std::vector<double> J2000Vector(const std::vector<double>& rVec);
+      std::vector<double> J2000Vector(const std::vector<double> &rVec);
 
       std::vector<Angle> poleRaCoefs();
 
@@ -320,7 +324,7 @@ namespace Isis {
 
       std::vector<Angle> sysNutPrecCoefs();
 
-      std::vector<double> ReferenceVector(const std::vector<double>& jVec);
+      std::vector<double> ReferenceVector(const std::vector<double> &jVec);
 
       std::vector<double> EvaluatePolyFunction();
 
@@ -351,23 +355,23 @@ namespace Isis {
 
       void SetPolynomial(const Source type=PolyFunction);
 
-      void SetPolynomial(const std::vector<double>& abcAng1,
-                         const std::vector<double>& abcAng2,
-                         const std::vector<double>& abcAng3,
+      void SetPolynomial(const std::vector<double> &abcAng1,
+                         const std::vector<double> &abcAng2,
+                         const std::vector<double> &abcAng3,
                          const Source type = PolyFunction);
 
       void usePckPolynomial();
-      void setPckPolynomial(const std::vector<Angle>& raCoeff,
-                            const std::vector<Angle>& decCoeff,
-                            const std::vector<Angle>& pmCoeff);
+      void setPckPolynomial(const std::vector<Angle> &raCoeff,
+                            const std::vector<Angle> &decCoeff,
+                            const std::vector<Angle> &pmCoeff);
 
-      void GetPolynomial(std::vector<double>& abcAng1,
-                         std::vector<double>& abcAng2,
-                         std::vector<double>& abcAng3);
+      void GetPolynomial(std::vector<double> &abcAng1,
+                         std::vector<double> &abcAng2,
+                         std::vector<double> &abcAng3);
 
-      void getPckPolynomial(std::vector<Angle>& raCoeff,
-                            std::vector<Angle>& decCoeff,
-                            std::vector<Angle>& pmCoeff);
+      void getPckPolynomial(std::vector<Angle> &raCoeff,
+                            std::vector<Angle> &decCoeff,
+                            std::vector<Angle> &pmCoeff);
 
       // Set the polynomial degree
       void SetPolynomialDegree(int degree);
@@ -384,9 +388,9 @@ namespace Isis {
       double DPolynomial(const int coeffIndex);
       double DPckPolynomial(PartialType partialVar, const int coeffIndex);
 
-      std::vector<double> toJ2000Partial(const std::vector<double>& lookT,
-                                             PartialType partialVar, int coeffIndex);
-      std::vector<double> ToReferencePartial(std::vector<double>& lookJ,
+      std::vector<double> toJ2000Partial(const std::vector<double> &lookT,
+                                         PartialType partialVar, int coeffIndex);
+      std::vector<double> ToReferencePartial(std::vector<double> &lookJ,
                                              PartialType partialVar, int coeffIndex);
       void DCJdt(std::vector<double> &dRJ);
 
@@ -470,8 +474,7 @@ namespace Isis {
                                           (after all time-based rotations in frame chain from
                                            J2000 to target) to the target frame*/
       std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant 
-                                               rotation after all the time-based rotations 
-                                               in frame chain from*/
+                                               rotation*/
       std::vector<std::vector<double> > p_cacheAv;
       //!< Cached angular velocities for corresponding rotactions in p_cache
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
@@ -489,30 +492,30 @@ namespace Isis {
       // raPole  =  raPole[0] + raPole[1]*Time  + raPole[2]*Time**2 + raNutPrec,
       //    where 
       //    raNutPrec  =  raNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
-      //                          raNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
-      //                          raNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
+      //                  raNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
+      //                  raNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
       // (optional for multiples of nutation precession angles)
-      //                          raNutPrec2[0]*sin(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                          raNutPrec2[1]*sin(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                          raNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) + 
-      //                          raNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                          raNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                          raNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
+      //                  raNutPrec2[0]*sin(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                  raNutPrec2[1]*sin(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                  raNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) + 
+      //                  raNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                  raNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                  raNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
       //
       // The general equation for the declination of the pole is
       //
       // decPole  =  p_decPole[0] + p_decPole[1]*Time  + p_decPole[2]*Time**2 + decNutPrec,
       //    where 
       //    decNutPrec  =  decNutPrec1[0]*cos(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
-      //                          decNutPrec1[1]*cos(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
-      //                          decNutPrec1[N-1]*cos(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
-      //                          decNutPrec2[0]*cos(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                          decNutPrec2[1]*cos(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                          decNutPrec2[N-1]*cos(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
+      //                   decNutPrec1[1]*cos(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
+      //                   decNutPrec1[N-1]*cos(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
+      //                   decNutPrec2[0]*cos(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                   decNutPrec2[1]*cos(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                   decNutPrec2[N-1]*cos(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
       // (optional for multiples of nutation precession angles)
-      //                          decNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                          decNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                          decNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
+      //                   decNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                   decNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                   decNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
       //
       //     and Time is julian centuries since J2000.
       //
@@ -521,22 +524,22 @@ namespace Isis {
       // pm  =  p_pm[0] + p_pm[1]*Dtime  + p_pm[2]*Dtime**2 + pmNutPrec,
       //    where 
       //    pmNutPrec  =  pmNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
-      //                            pmNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
-      //                            pmNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
+      //                  pmNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
+      //                  pmNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
       // (optional for multiples of nutation precession angles)
-      //                            pmNutPrec2[0]*sin(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                            pmNutPrec2[1]*sin(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                            pmNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
-      //                            pmNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
-      //                            pmNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                            pmNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
+      //                  pmNutPrec2[0]*sin(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                  pmNutPrec2[1]*sin(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                  pmNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
+      //                  pmNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
+      //                  pmNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
+      //                  pmNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
       //
       //     Time is interval in Julian centuries since the standard epoch, 
       //     dTime is interval in days from the standard epoch (J2000),
       //
       //     N is the number of nutation/precession terms for the planetary system of the target 
       //     body,  (possibly including multiple angles as unique terms, 
-      //                                                   ie. 2*sysNutPrec[0][0] + sysNutPrec[][1]*Time).
+      //             ie. 2*sysNutPrec[0][0] + sysNutPrec[][1]*Time).
       //
       //     Many of the constants in this equation are 0. for a given body.
       //
@@ -544,24 +547,24 @@ namespace Isis {
       //     of any of the nutation/precession angles included in the equations.
       //
       //     ***NOTE*** Currently Naif stores multiples (amplitudes) as if they were additional 
-      //                       nutation/precession terms (periods) in the equation.  This method works as 
-      //                       long as jigsaw does not solve for those values.  In order to solve for 
-      //                       those values, the multiples will need to be known so that the partial 
-      //                       derivatives can be correctly calculated.  Some possible ways of doing this
-      //                       are 1) Convince Naif to change their data format indicating the relation
-      //                             2) Make an Isis version of the PCK data and have Isis software to
-      //                                 calculate the rotation and partials.
-      //                             3) Have an Isis addendum file that identifies the repeated periods
-      //                                 and software to apply them when calculating the rotation and partials.
+      //                nutation/precession terms (periods) in the equation.  This method works as 
+      //                long as jigsaw does not solve for those values.  In order to solve for 
+      //                those values, the multiples will need to be known so that the partial 
+      //                derivatives can be correctly calculated.  Some possible ways of doing this
+      //                are 1) Convince Naif to change their data format indicating the relation
+      //                      2) Make an Isis version of the PCK data and have Isis software to
+      //                          calculate the rotation and partials.
+      //                      3) Have an Isis addendum file that identifies the repeated periods
+      //                          and software to apply them when calculating the rotation and partials.
       //
-      //                       For now this software will handle any terms with the same period and different
-      //                       amplitudes as unique terms in the equation (raNutPrec, decNutPrec, 
-      //                       and pmNutPrec).
+      //                For now this software will handle any terms with the same period and different
+      //                amplitudes as unique terms in the equation (raNutPrec, decNutPrec, 
+      //                and pmNutPrec).
       //
       // The next three vectors will have length 3 (for a quadratic polynomial) if used.
-      std::vector<Angle>m_raPole;        //!< Coefficients of a quadratic polynomial fitting pole ra
-      std::vector<Angle>m_decPole;      //!< Coefficients of a quadratic polynomial fitting pole dec
-      std::vector<Angle>m_pm ;             //!< Coefficients of a quadratic polynomial fitting pole pm
+      std::vector<Angle>m_raPole;       //!< Coefficients of a quadratic polynomial fitting pole ra.
+      std::vector<Angle>m_decPole;      //!< Coefficients of a quadratic polynomial fitting pole dec.
+      std::vector<Angle>m_pm ;          //!< Coefficients of a quadratic polynomial fitting pole pm.
       //
       // Currently multiples (terms with periods matching other terms but varying amplitudes) 
       // are handled as additional terms added to the end of the vector as Naif does (see 
@@ -574,10 +577,13 @@ namespace Isis {
       std::vector<Angle>m_sysNutPrec0; //!< Constants of planetary system nut/prec periods
       std::vector<Angle>m_sysNutPrec1; //!< Linear terms of planetary system nut/prec periods
 
-      // The following scalers are used in the IAU equations to convert p_et to the appropriate time
-      // units for calculating target body ra, dec, and w.  These need to be initialized in every constructor.
-      static const double m_centScale;   //!<  Seconds per Julian century for scaling time in seconds *** may need to put static in front of const
-      static const double m_dayScale;    //!< Seconds per day for scaling time in seconds to get target body w
+      // The following scalars are used in the IAU equations to convert p_et to the appropriate time
+      // units for calculating target body ra, dec, and w.  These need to be initialized in every 
+      // constructor.
+      //! Seconds per Julian century for scaling time in seconds
+      static const double m_centScale;
+      //! Seconds per day for scaling time in seconds to get target body w
+      static const double m_dayScale;
   };
 };
 
