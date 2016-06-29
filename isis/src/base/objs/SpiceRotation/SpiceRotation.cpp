@@ -2583,7 +2583,7 @@ namespace Isis {
             break;
           }
 
-          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + "can not "
+          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + " can not "
                + "be found due to no pointing available at requested time or a problem with the "
                + "frame";
           throw IException(IException::Programmer, msg, _FILEINFO_);
