@@ -279,6 +279,11 @@
         Brought code closer to ISIS coding standards. Added test to read NAIF body frame info from labels.
         References #3934
      </change>
+     <change name="Curtis Rose" date="2016-06-29">
+        Fixed an error when matchmap was true, the user could attempt to add a mapping file
+	with a targetname that did not match the targetname of the instrument group of
+	the cube file. Fixes #1952.
+     </change>
   </history>
 
   <oldName>

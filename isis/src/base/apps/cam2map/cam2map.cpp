@@ -47,7 +47,7 @@ void IsisMain() {
   Pvl userMap;
   userMap.read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
-
+  
   // Open the input cube and get the camera
   icube = p.SetInputCube("FROM");
   incam = icube->camera();
@@ -63,7 +63,6 @@ void IsisMain() {
   Pvl camMap;
   incam->BasicMapping(camMap);
   PvlGroup &camGrp = camMap.findGroup("Mapping");
-
 
   // Make the target info match the user mapfile
   double minlat, maxlat, minlon, maxlon;
@@ -83,6 +82,16 @@ void IsisMain() {
   TProjection *outmap = NULL;
   bool trim = ui.GetBoolean("TRIM");
 
+  // Make sure the target name of the input cube and map file match.
+  if (userGrp.hasKeyword("TargetName") && !icube->group("Instrument").findKeyword("TargetName").isNull()) {
+    if (!PvlKeyword::stringEqual(incam->target()->name(), userGrp.findKeyword("TargetName")[0])) {
+      QString msg = "The TargetName: [" + incam->target()->name() + "] of the input cube: [" + icube->fileName() + 
+                    "] does not match the TargetName: [" + userGrp.findKeyword("TargetName")[0] + "] of the map file: [" +
+                    ui.GetFileName("MAP") + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+  
   if ( !ui.GetBoolean("MATCHMAP") ) {
     if (ui.GetString("DEFAULTRANGE") == "MAP") {
       camGrp.deleteKeyword("MinimumLatitude");
