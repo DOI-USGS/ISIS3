@@ -85,7 +85,7 @@ void IsisMain() {
   // Make sure the target name of the input cube and map file match.
   if (userGrp.hasKeyword("TargetName") && !icube->group("Instrument").findKeyword("TargetName").isNull()) {
     if (!PvlKeyword::stringEqual(incam->target()->name(), userGrp.findKeyword("TargetName")[0])) {
-      QString msg = "The TargetName: [" + incam->target()->name() + "] of the input cube: [" + icube->fileName() + 
+      QString msg = "The TargetName: [" + incam->target()->name() + "] of the input cube: [" + icube->fileName() + "\n"
                     "] does not match the TargetName: [" + userGrp.findKeyword("TargetName")[0] + "] of the map file: [" +
                     ui.GetFileName("MAP") + "].";
       throw IException(IException::User, msg, _FILEINFO_);
