@@ -16,7 +16,7 @@ commands:
 	  true; \
 	fi;
 
-	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
+	$(SED) 's+\[/.*/\(input/.*\]\)\(.*\)\[/.*/\(input/.*\]\)+\[\1\2\[\3+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
 
 	$(RM) $(OUTPUT)/error_temp.txt;
 	$(RM) $(OUTPUT)/output.cub;
