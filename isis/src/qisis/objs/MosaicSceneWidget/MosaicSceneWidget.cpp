@@ -430,9 +430,7 @@ namespace Isis {
    */
   bool MosaicSceneWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
 
-
     bool handled = false;
-    /*  //tjw
 
     QList<QGraphicsItem *> selectedGraphicsItems = getScene()->selectedItems();
     QList<MosaicSceneItem *> selectedImageItems;
@@ -481,9 +479,7 @@ namespace Isis {
       menu.exec(event->screenPos());
     }
 
-     */
     return handled;
-
 
   }
 
@@ -764,8 +760,6 @@ namespace Isis {
    */
   QList<QAction *> MosaicSceneWidget::supportedActions(ImageList *images) {
     QList<QAction *> results;
-
-    /*   //tjw
     bool allImagesInView = !images->isEmpty();
 
     foreach (Image *image, *images) {
@@ -800,7 +794,6 @@ namespace Isis {
       connect(zoomFitAct, SIGNAL(triggered()), this, SLOT(fitInView()));
       results.append(zoomFitAct);
     }
-    */
     return results;
   }
 

@@ -68,7 +68,7 @@
 #include "OpenRecentProjectWorkOrder.h"
 
 
-//#include "Project.h"  //tjw
+#include "Project.h"
 //#include "ProjectItem.h"  //tjw
 //#include "ProjectItemModel.h"  //tjw
 //#include "ProjectItemTreeView.h"  //tjw
@@ -107,8 +107,8 @@ namespace Isis {
           _FILEINFO_);
     }
 
-    //connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
-             //this, SLOT(imagesAddedToProject(ImageList *) ) );
+    connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
+             this, SLOT(imagesAddedToProject(ImageList *) ) );
 
     //connect( m_project, SIGNAL(targetsAdded(TargetBodyList *) ),
              //this, SLOT(targetsAddedToProject(TargetBodyList *) ) );
@@ -165,8 +165,7 @@ namespace Isis {
    */
   Directory::~Directory() {
 
-    //delete m_project;  //tjw
-    //m_project = NULL;  //tjw
+    delete m_project;
 
     foreach (WorkOrder *workOrder, m_workOrders) {
       delete workOrder;
@@ -863,11 +862,9 @@ namespace Isis {
    * @return @b (Project *) Returns a pointer to the Project.
    */
 
-  /*
   Project *Directory::project() const {
     return m_project;
   }
-*/
 
   /**
    * @brief Returns a list of all the control network views for this directory.

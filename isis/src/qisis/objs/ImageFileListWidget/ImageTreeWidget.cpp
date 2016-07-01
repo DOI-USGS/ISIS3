@@ -613,7 +613,6 @@ namespace Isis {
 
 
   void ImageTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
-    /*
     ImageList selectedCubes = selectedDisplays();
 
     bool selectedGroup = groupInList(selectedItems());
@@ -689,7 +688,6 @@ namespace Isis {
     }
 
     menu.exec(event->globalPos());
-    */
   }
 
 

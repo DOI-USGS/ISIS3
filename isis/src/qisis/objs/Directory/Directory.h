@@ -120,7 +120,7 @@ namespace Isis {
 
       //ProjectItemModel *model();  //tjw
 
-      //Project *project() const;  //tjw
+      Project *project() const;
 
       QList<QAction *> fileMenuActions();
       QList<QAction *> projectMenuActions();
@@ -267,7 +267,7 @@ namespace Isis {
 
 
       QPointer<HistoryTreeWidget> m_historyTreeWidget;  //!< Pointer to the HistoryTreeWidget.
-      //QPointer<Project> m_project;   //tjw                   //!< Pointer to the Project.
+      QPointer<Project> m_project;                      //!< Pointer to the Project.
       QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
 
       QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;  //!< List of CnetEditorWidgets

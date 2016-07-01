@@ -488,7 +488,6 @@ namespace Isis {
    *
    */
   void MosaicControlNetTool::openControlNet() {
-    /*  //tjw
     if (!getWidget()->directory()) {
       // Bring up a file dialog for user to select their cnet file.
       QString netFile = FileDialog::getOpenFileName(getWidget(),
@@ -541,7 +540,6 @@ namespace Isis {
           m_displayControlNetButton->setChecked(true);
       }
     }
-    */
   }
 
 

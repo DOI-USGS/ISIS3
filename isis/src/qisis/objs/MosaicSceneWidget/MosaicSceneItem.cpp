@@ -25,6 +25,7 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "PolygonTools.h"
+#include "Project.h"
 #include "SerialNumber.h"
 #include "Statistics.h"
 #include "Stretch.h"
@@ -551,7 +552,6 @@ namespace Isis {
   void MosaicSceneItem::contextMenuEvent(
       QGraphicsSceneContextMenuEvent *event) {
 
-    /*  //tjw
     if(m_image) {
       QMenu menu;
 
@@ -590,7 +590,6 @@ namespace Isis {
       menu.exec(event->screenPos());
     }
 
-    */
   }
 
 
