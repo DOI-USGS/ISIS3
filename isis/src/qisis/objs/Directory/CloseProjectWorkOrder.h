@@ -29,7 +29,7 @@ namespace Isis {
   /**
    * This opens a project that's saved on disk.
    *
-   * @author Ken Edmundson 2014-04-15
+   * @author 2014-04-15 Ken Edmundson
    *
    * @internal
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.

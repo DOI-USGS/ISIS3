@@ -125,13 +125,14 @@ namespace Isis {
        * a stack-oriented way.  It's been modified to process a GuiCameraDisplayProperties
        * object.
        *
-       *  @author 2015-09-08 Ken Edmundson
+       * @author 2015-09-08 Ken Edmundson
        *
-       *  @history 2015-09-08 Ken Edmundson - Creation.
-       *  @history 2016-06-08 Tyler Wilson - Added documentation to many of the
+       * @internal 
+       *   @history 2015-09-08 Ken Edmundson - Creation.
+       *   @history 2016-06-08 Tyler Wilson - Added documentation to many of the
        *                           member functions, and cleaned up the formatting.
        *                           Fixes #3997.
-       *  @internal 
+       * 
        *
        */
       class XmlHandler : public XmlStackedHandler {
