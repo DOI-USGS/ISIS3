@@ -1972,9 +1972,9 @@ namespace Isis {
         reformatOldIsisLabel(m_labelFileName->expanded());
       }
       else {
+        QString msg = "Can not open [" + m_labelFileName->original() + "]"
+                      " because it is an ISIS2 cube.";
         cleanUp(false);
-        QString msg = "Can not open old cube file format with write access [" +
-                     m_labelFileName->original() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
