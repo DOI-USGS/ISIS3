@@ -22,6 +22,7 @@ namespace Isis {
   class CnetEditorWidget;
   class ProgressBar;
 
+  
   /**
    * This is the cneteditor program.
    *

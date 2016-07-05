@@ -35,12 +35,13 @@
 #include "CnetDisplayProperties.h"
 #include "CnetEditorWidget.h"
 
-
 using std::endl;
 
 namespace Isis {
+  
   CnetEditorFileDialog::CnetEditorFileDialog(QLayout *l,
       QWidget *parent) : QFileDialog(parent) {
+
     setAcceptMode(AcceptSave);
     setNameFilter("Control Network files (*.net *.bin);;All files (*)");
     QGridLayout *mainLayout = qobject_cast< QGridLayout * >(layout());
@@ -91,18 +92,41 @@ namespace Isis {
 
     QStringList args = QApplication::arguments();
     args.removeFirst();
-
-    foreach (QString arg, args) {
-      QString extension = QFileInfo(arg).suffix();
-
-      if (extension == "net")
-        load(arg);
-      else if (extension == "lis")
-        loadCubeList(arg);
-      else
-        QMessageBox::warning(this, tr("Unrecognized Argument"),
-            tr("Could not determine the type of file [%1]. Expected .net or "
-                ".lis.").arg(arg));
+    
+    // Can only load two file at a time
+    if (args.size() > 2) {
+      QString msg = tr("Cannot open more than one .net file and one .lis file at a time.");
+      std::cerr << msg << endl;
+      QMessageBox::warning(this, tr("Unable to Open Files"), msg);
+    }
+    else {
+      // Check for invalid file extensions
+      foreach (QString arg, args) {
+        QString extension = QFileInfo(arg).suffix(); 
+        if (extension.compare("net") != 0 && extension.compare("lis") != 0) {
+          args.removeAll(arg);
+          QString msg = tr("Invalid file extension [%1]. "
+                           "Expected .net or .lis.").arg(arg);
+          std::cerr << msg << endl;
+          QMessageBox::warning(this, tr("Invalid File Extension"), msg);
+        }
+      }
+      // Prevent multiple files of the same type from loading
+      if (args.size() == 2 && QFileInfo(args[0]).suffix() == QFileInfo(args[1]).suffix()) {
+        QString msg = tr("Cannot open two [%1] files.").arg(args[0]);
+        std::cerr << msg << endl;
+        QMessageBox::warning(this, tr("Unable to Open Files"), msg);
+      }
+      // Load file(s)
+      else if (args.size() != 0) {
+        foreach (QString arg, args) {
+          QString extension = QFileInfo(arg).suffix();
+            if (extension == "net")
+              load(arg);
+            else if (extension == "lis")
+              loadCubeList(arg);
+        }
+      }
     }
   }
 
@@ -346,6 +370,7 @@ namespace Isis {
 
 
   void CnetEditorWindow::readSettings() {
+    
     QSettings settings(FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
@@ -363,6 +388,7 @@ namespace Isis {
 
 
   void CnetEditorWindow::writeSettings() {
+    
     QSettings settings(FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
@@ -431,6 +457,7 @@ namespace Isis {
 
   void CnetEditorWindow::setFileState(CnetEditorWindow::FileState state,
       QString filename) {
+    
     switch (state) {
       case HasFile:
         centralWidget()->layout()->addWidget(editorWidget);
@@ -470,7 +497,8 @@ namespace Isis {
 
 
   void CnetEditorWindow::load(QString filename) {
-    try {
+        
+    try {      
       cnetReader = new ConcurrentControlNetReader;
 
       statusBar()->addWidget(cnetReader->progressBar());
@@ -478,34 +506,46 @@ namespace Isis {
 
       // call networkLoaded when the reading is complete
       connect(cnetReader, SIGNAL(networksReady(QList<Control *>)),
-          this, SLOT(networkLoaded(QList<Control *>)));
+              this, SLOT(networkLoaded(QList<Control *>)));
 
       cnetReader->read(filename);
+      
       setFileState(FileLoading, filename);
     }
-    catch (IException &) {
-      QMessageBox::critical(this, tr("cneteditor"),
-          tr("Failed to open the file provided"));
+    catch (IException &e) {
+      QString msg = tr("Failed to open the file [%1].").arg(filename);
+      std::cerr << msg << endl;
+      QMessageBox::critical(this, tr("cneteditor"), msg);
       setFileState(NoFile, "");
     }
   }
 
 
   void CnetEditorWindow::loadCubeList(QString filename) {
+    
+    try {
+ 
     ASSERT(displayProperties);
 
     connect(displayProperties, SIGNAL(composeProgressRangeChanged(int, int)),
-        cubeListProgressBar, SLOT(setRange(int, int)));
+            cubeListProgressBar, SLOT(setRange(int, int)));
     connect(displayProperties, SIGNAL(composeProgressChanged(int)),
-        cubeListProgressBar, SLOT(setValue(int)));
+            cubeListProgressBar, SLOT(setValue(int)));
     connect(displayProperties, SIGNAL(compositionFinished()),
-        this, SLOT(cubeListLoaded()));
+            this, SLOT(cubeListLoaded()));
 
     // Show the cube list progress bar and start loading the cube list.
     cubeListProgressBar->setValue(cubeListProgressBar->minimum());
     cubeListProgressBar->setVisible(true);
     displayProperties->setCubeList(filename);
     *cubeListFile = filename;
+    }
+    catch (IException &e) {
+      QString msg = tr("Failed to open the file [%1].").arg(filename);
+      std::cerr << msg << endl;
+      QMessageBox::critical(this, tr("cneteditor"), msg);
+      setFileState(NoFile, "");
+    }
   }
 
 
@@ -657,6 +697,7 @@ namespace Isis {
 
 
   void CnetEditorWindow::networkLoaded(ControlNet *net) {
+    
     cnet = net;
     editorWidget = new CnetEditorWidget(cnet, FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded());
@@ -693,6 +734,7 @@ namespace Isis {
 
 
   void CnetEditorWindow::populateMenus() {
+    
     QMap< QAction *, QList< QString > > actionMap;
     actionMap = editorWidget->menuActions();
     QMapIterator< QAction *, QList< QString > > i(actionMap);
@@ -741,6 +783,7 @@ namespace Isis {
 
   int CnetEditorWindow::indexOfActionList(QList< QAction * > actionList,
       QString actionText) {
+    
     int index = -1;
     for (int i = 0; index == -1 && i < actionList.size(); i++)
       if (actionList[i]->text() == actionText)
@@ -787,6 +830,7 @@ namespace Isis {
 
 
   int CnetEditorWindow::indexOfToolBar(QString objName) {
+    
     ASSERT(toolBars);
 
     int index = -1;

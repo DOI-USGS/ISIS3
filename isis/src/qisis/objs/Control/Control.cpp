@@ -69,6 +69,7 @@ namespace Isis {
    */
   Control::Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
       QObject(parent) {
+
     m_controlNet = NULL;
     m_displayProperties = NULL;
     m_id = NULL;
@@ -78,6 +79,7 @@ namespace Isis {
 
 
   Control::~Control() {
+    
     delete m_controlNet;
     m_controlNet = NULL;
 
@@ -92,22 +94,26 @@ namespace Isis {
 
 
   ControlNet *Control::controlNet() {
+    
     if (!m_controlNet) {
       openControlNet();
     }
 
     return m_controlNet;
   }
+  
+  
   /**
    * Get the ControlNet * associated with this display property. This will
    *   allocate the ControlNet * if one is not already present.
    */
   void Control::openControlNet() {
-    if(!m_controlNet) {
+    
+    if (!m_controlNet) {
       try {
         m_controlNet = new ControlNet(m_fileName);
       }
-      catch(IException &e) {
+      catch (IException &e) {
         throw IException(e, IException::Programmer, "Error opening control net.", _FILEINFO_);
       }
     }
@@ -120,6 +126,7 @@ namespace Isis {
     *  have open.
    */  
   void Control::closeControlNet() {
+    
     if (m_controlNet) {
       delete m_controlNet;
       m_controlNet = NULL;
@@ -128,6 +135,7 @@ namespace Isis {
 
 
   ControlDisplayProperties *Control::displayProperties() {
+    
     return m_displayProperties;
   }
 
@@ -135,28 +143,29 @@ namespace Isis {
   const ControlDisplayProperties *Control::displayProperties() const {
 
     return m_displayProperties;
-
   }
 
 
   QString Control::fileName() const {
+    
     return m_fileName;
   }
 
 
   QString Control::id() const {
+    
     return m_id->toString().remove(QRegExp("[{}]"));
   }
 
 
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
+    
     if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
-
+      
       FileName newCnetFileName(project->cnetRoot(newProjectRoot.toString()) + "/" +
           FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
       controlNet()->Write(newCnetFileName.toString());
     }
-
   }
 
 
@@ -185,6 +194,7 @@ namespace Isis {
    * @param project The project that this control is stored in
    */
   void Control::updateFileName(Project *project) {
+    
     closeControlNet();
 
     FileName original(m_fileName);
@@ -196,6 +206,7 @@ namespace Isis {
 
   void Control::save(QXmlStreamWriter &stream, const Project *project,
                      FileName newProjectRoot) const {
+
     stream.writeStartElement("controlNet");
     stream.writeAttribute("id", m_id->toString());
     //  Change filename to new path
@@ -208,6 +219,7 @@ namespace Isis {
 
 
   Control::XmlHandler::XmlHandler(Control *control, FileName cnetFolder) {
+    
     m_control = control;
     m_cnetFolder = cnetFolder;
   }
@@ -215,6 +227,7 @@ namespace Isis {
 
   bool Control::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                          const QString &qName, const QXmlAttributes &atts) {
+    
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "controlNet") {
         QString id = atts.value("id");

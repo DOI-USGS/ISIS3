@@ -63,37 +63,37 @@ int main(int argc, char *argv[]) {
 
   // Check to see if the user wants to force a new window
   int newWindow = -1;
-  for(int i = 1; i < argc; i++) {
-    if(IString(argv[i]).UpCase() == "-NEW") {
+  for (int i = 1; i < argc; i++) {
+    if (IString(argv[i]).UpCase() == "-NEW") {
       newWindow = i;
     }
   }
 
   QString p_socketFile = "/tmp/isis_qview_" + Application::UserName();
-  if(newWindow < 0) {
+  if (newWindow < 0) {
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.toAscii().data());
     int p_socket;
 
-    if(((FileName)p_socketFile).fileExists()) {
+    if (((FileName)p_socketFile).fileExists()) {
       // Create a socket
-      if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) >= 0) {
+      if ((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) >= 0) {
         // Try to connect to the socket
-        if((connect(p_socket, (struct sockaddr *)&p_socketName,
+        if ((connect(p_socket, (struct sockaddr *)&p_socketName,
                     sizeof(p_socketName))) >= 0) {
           QString temp;
           /*
            * We need a very uncommon token to use for parsing.
            */
           QChar escape(27);
-          for(int i = 1; i < argc; i++) {
+          for (int i = 1; i < argc; i++) {
             temp += QFileInfo(FileName(argv[i]).expanded()).absoluteFilePath();
             temp += QString(escape);
           }
           temp += "raise";
           // Try to send data to the socket
-          if(send(p_socket, temp.toAscii().data(), temp.size(), 0) >= 0) {
+          if (send(p_socket, temp.toAscii().data(), temp.size(), 0) >= 0) {
             // Success, the other qview will open this file.
             exit(0);
           }
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
   // check for forcing of gui style
   PvlGroup &uiPref = Preference::Preferences().findGroup(
                              "UserInterface");
-  if(uiPref.hasKeyword("GuiStyle")) {
+  if (uiPref.hasKeyword("GuiStyle")) {
     QString style = uiPref["GuiStyle"];
     QApplication::setStyle((QString) style);
   }
@@ -193,17 +193,17 @@ int main(int argc, char *argv[]) {
 
   bool openingAFileSucceeded = false;
   for(int i = 1; i < argc; i++) {
-    if(i != newWindow) {
+    if (i != newWindow) {
       try {
         vw->workspace()->addCubeViewport(QString(argv[i]));
         openingAFileSucceeded = true;
       }
-      catch(IException &e) {
+      catch (IException &e) {
         e.print();
 
         // If we're trying to open more later or have opened a file, allow
         //   qview to continue running. Otherwise (this if), crash.
-        if(i == argc - 1 && !openingAFileSucceeded) {
+        if (i == argc - 1 && !openingAFileSucceeded) {
           return 1;
         }
       }
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
   SocketThread *temp = NULL;
   // We don't want to start a thread if the user is forcing a new window
-  if(newWindow < 0) {
+  if (newWindow < 0) {
     temp = new SocketThread();
     temp->connect(temp, SIGNAL(newImage(const QString &)),
                   vw->workspace(), SLOT(addCubeViewport(const QString &)));
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
   int status = app->exec();
 
   // If we created a thread for listening to qview connections, then stop the thread and free its memory
-  if(temp) {
+  if (temp) {
     temp->stop();
     temp->wait(); // wait for the stop to finish
     delete temp;
