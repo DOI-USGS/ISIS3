@@ -30,7 +30,8 @@
 #include "SurfacePoint.h"
 
 namespace Isis {
-  /** Convert between undistorted focal plane and ground coordinates
+  /** 
+   * Convert between undistorted focal plane and ground coordinates
    *
    * This base class is used to convert between undistorted focal plane
    * coordinates (x/y) in millimeters and ground coordinates lat/lon.
@@ -44,37 +45,42 @@ namespace Isis {
    *
    * @internal
    *  @history 2005-11-16 Jeff Anderson  Fixed bug in SetGround not setting the
-   *          proper boolean return value
+   *                          proper boolean return value
    *  @history 2007-06-11 Debbie A. Cook - Added overloaded method SetGround that
-   *                     includes a radius argument and the method
-   *                     LookCtoFocalPlaneXY() to handle the common functionality
-   *                     between the SetGround methods
+   *                          includes a radius argument and the method
+   *                          LookCtoFocalPlaneXY() to handle the common functionality
+   *                          between the SetGround methods
    *  @history 2008-07-14 Steven Lambright Added NaifStatus calls
    *  @history 2009-10-14 Debbie A. Cook Added new virtual method GetXY(lat,lon,radius, lookJ)
-   *  @history 2009-11-27 Debbie A. Cook Modified virtual method GetXY(lat,lon,radius,lookJ,cudx,cudy)
+   *  @history 2009-11-27 Debbie A. Cook Modified virtual method 
+   *                          GetXY(lat,lon,radius,lookJ,cudx,cudy)
    *  @history 2010-03-19 Debbie A. Cook Modified virtual method to return cudx and cudy; added
-   *                       methods GetdXYdPosition, GetdXYdOrientation, GetdXYdPoint, PointPartial,
-   *                       and DQuotient; and added members PartialType (from BundleAdjust) and p_lookJ.
-   *  @history 2010-08-05 Debbie A. Cook Added another version of GetXY to support changes from binary
-   *                       control net upgrade
+   *                          methods GetdXYdPosition, GetdXYdOrientation, GetdXYdPoint, 
+   *                          PointPartial, and DQuotient; and added members PartialType 
+   *                          (from BundleAdjust) and p_lookJ.
+   *  @history 2010-08-05 Debbie A. Cook Added another version of GetXY to support changes from 
+   *                          binary control net upgrade
    *  @history 2010-11-22 Debbie A. Cook Moved PointPartial call out of GetdXYdPoint
-   *                       to allow BundleAdjust to avoid multiple calls for
-   *                       every measure.  The application must call PointPartial
-   *                       to get the body-fixed look vector derivative prior to
-   *                       calling this method.
+   *                          to allow BundleAdjust to avoid multiple calls for
+   *                          every measure.  The application must call PointPartial
+   *                          to get the body-fixed look vector derivative prior to
+   *                          calling this method.
    *  @history 2011-02-09 Steven Lambright SetGround now uses the Latitude,
-   *                       Longitude and SurfacePoint classes.
+   *                          Longitude and SurfacePoint classes.
    *  @history 2011-03-18 Debbie A. Cook Added reference to surface point in GetXY
-   *  @history 2012-07-06 Debbie A. Cook Updated Spice members to be more compliant with Isis 
-   *                       coding standards. References #972.
+   *  @history 2012-07-06 Debbie A. Cook Updated Spice members to be more 
+   *                          compliant with Isis coding standards. References #972.
    *  @history 2012-10-10 Debbie A. Cook Modified to use new Target class.
-   *                        References Mantis ticket #775 and #1114.
-   *  @history 2013-02-22 Debbie A. Cook Fixed LookCtoFocalPlaneXY method to properly handle
-   *                        instruments with a look direction along the negative z axis.
-   *                        Fixes Mantis ticket #1524
-   *   @history 2014-04-17 Jeannie Backer - Replaced local variable names with more
-   *                           descriptive names. References #1659.
-   *
+   *                          References Mantis ticket #775 and #1114.
+   *  @history 2013-02-22 Debbie A. Cook Fixed LookCtoFocalPlaneXY method 
+   *                          to properly handle instruments with a look direction along 
+   *                          the negative z axis.  Fixes Mantis ticket #1524
+   *  @history 2014-04-17 Jeannie Backer - Replaced local variable names with more
+   *                          descriptive names. References #1659.
+   *  @history 2015-07-24 Debbie A. Cook - Added new methods GetdXYdTOrientation(), 
+   *                          EllipsoidPartial() and MeanRadiusPartial() along with new member
+   *                          p_pB. References Mantis ticket TBD.
+   *  @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #3971.
    */
   class CameraGroundMap {
     public:
@@ -86,10 +92,17 @@ namespace Isis {
       virtual bool SetFocalPlane(const double ux, const double uy,
                                  const double uz);
 
+      /**
+       * Radius axes types to use when computing partials. When computing partials, this enum
+       * represents the "with respect to" variable in the computation. 
+       */
       enum PartialType {
         WRT_Latitude,
         WRT_Longitude,
-        WRT_Radius
+        WRT_Radius,
+        WRT_MajorAxis,
+        WRT_MinorAxis,
+        WRT_PolarAxis
       };
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
@@ -103,9 +116,14 @@ namespace Isis {
       virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType,
                                       int coefIndex,
                                       double *cudx, double *cudy);
+      virtual bool GetdXYdTOrientation(const SpiceRotation::PartialType varType,
+                                       int coefIndex,
+                                       double *cudx, double *cudy);
       virtual bool GetdXYdPoint(std::vector<double> d_lookB,
                                 double *cudx, double *cudy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
+      std::vector<double> EllipsoidPartial(SurfacePoint spoint, PartialType raxis);
+      std::vector<double> MeanRadiusPartial(SurfacePoint spoint, Distance meanRadius);
       double DQuotient(std::vector<double> &look, std::vector<double> &dlook,
                        int index);
 
@@ -120,13 +138,16 @@ namespace Isis {
       };
 
     protected:
-      Camera *p_camera;
-      double p_focalPlaneX;
-      double p_focalPlaneY;
+      Camera *p_camera;     //!< Camera
+      double p_focalPlaneX; //!< Camera's x focal plane coordinate
+      double p_focalPlaneY; //!< Camera's y focal plane coordinate
 
     private:
       void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
-      std::vector<double> p_lookJ;    //!< Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
+      //! Surface point calculated from ground coordinates in GetXY and used for partials
+      std::vector<double> m_pB;
+      //! Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
+      std::vector<double> m_lookJ;
   };
 };
 #endif
