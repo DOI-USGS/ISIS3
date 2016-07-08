@@ -19,12 +19,14 @@ commands:
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	  | $(SED) 's/\(Iterations:\).*/\1/' \
 	  > $(OUTPUT)/obsmode_cholmod_bundleout.txt
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
 	# 2. remove net filename paths
 	# 3. remove digits beyond the fifth decimal place of decimal numbers
 	# 4. remove date and time
+	# 5. remove number of iterations
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/obsmode_cholmod_residuals.csv
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
