@@ -457,6 +457,15 @@ we cannot test updateFileName().
 
 Testing error throws...
 
+**ERROR** Unable to read bundle solution information from the given HDF5 file [./dne.hdf].
+**I/O ERROR** No file with the given name was found.
+
+**ERROR** Unable to read bundle solution information from the given HDF5 file [./tempBundleSolutionInfo.hd].
+**I/O ERROR** The given file is unsupported for constructing BundleSolutionInfo objects. Supported file types include [hdf].
+
+**ERROR** Unable to save bundle solution information to an HDF5 file.
+**I/O ERROR** A file already exists with the given name [tempBundleSolutionInfo.hdf].
+
 Testing XML write/read...
 
 Testing HDF5 write/read...

@@ -11,10 +11,12 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
 #include "ImageList.h"
 #include "Preference.h"
+#include "Project.h"
 #include "PvlObject.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -23,18 +25,23 @@ using namespace std;
 using namespace Isis;
 
 
-/**
- * This class is needed to test the xml read/write methods.
- * @author 2015-??-?? Jeannie Backer
- *
- * @internal
- *   @history 2015-??-?? Jeannie Backer - Original version.
- */
+//TODO The Unknown H5Error exception in openH5File is untested
+//TODO XmlHandler and its methods are untested (would require use of a Project, which requires
+//     a non-Null Directory reference) 
+//TODO updateFileName slot untested (see above explanation)
+//TODO Constructor with 3 parameters untested
 namespace Isis {
+ /**
+  * This class is needed to test the xml read/write methods.
+  * @author 2015-??-?? Jeannie Backer
+  *
+  * @internal
+  *   @history 2015-??-?? Jeannie Backer - Original version.
+  */ 
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
       BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
-                                     FileName xmlFile) : BundleSolutionInfo(project, reader) {
+                                         FileName xmlFile) : BundleSolutionInfo(project, reader) {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -68,6 +75,8 @@ namespace Isis {
  * @internal
  *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
  *                           we will keep this code.
+ *   @history 2016-07-08 Ian Humphrey - Updated testing for some exceptions (H5 open/create...).
+ *                           Fixes #3974.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -121,19 +130,63 @@ int main(int argc, char *argv[]) {
     qDebug() << "runTime = " << results.runTime();
     qDebug() << "";
 
+    // controlNetworkFileName() is tested by pvlObject() (if BundleSolutionInfo constructed with
+    //     non-empty FileName parameter)
+
+    // bundleSettings() and bundleResults() tested by pvlObject()
+
     qDebug() << "Because we cannot create a Directory with a null parent, ";
     qDebug() << "we cannot test updateFileName().";
+    // updateFileName() requires a Project* as a param, Project requires Directory& in constructor
     qDebug() << "";
+
 
     qDebug() << "Testing error throws...";
     try {
-      // bundleResults exception cannot be tested because the BundleResults cnnot be NULL
+      // bundleResults exception cannot be tested because the BundleResults cannot be NULL
     }
     catch (IException &e) {
       e.print();
     }
     qDebug() << "";
 
+    try {
+      // openH5File, file does not exist
+      results.openH5File(FileName("./dne.hdf"));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug() << "";
+
+    // create a temporary h5 file for testing open/createH5 exceptions
+    FileName tempH5("$temporary/tempBundleSolutionInfo.hd");
+    QFile tempH5file(tempH5.expanded()); 
+    tempH5file.open(QIODevice::WriteOnly);
+    tempH5file.close();
+    
+    try {
+      // openH5File, file extension is not hdf
+      results.openH5File(tempH5);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug() << "";
+
+    try {
+      // createH5File, file already exists
+      // We'll rename it the .hd to a valid .hdf extended file, then try to create it
+      tempH5file.rename(tempH5.baseName() + ".hdf");
+      results.createH5File(FileName(tempH5file.fileName()));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug() << "";
+
+    // Cleanup temporary file
+    QFile::remove(tempH5file.fileName());
 
 
     Statistics rmsStats;
@@ -201,12 +254,6 @@ int main(int argc, char *argv[]) {
                                         rmsImageSampleResiduals,
                                         rmsImageResiduals);
     results.setOutputStatistics(statistics);
-
-
-
-
-
-
 
 
     qDebug() << "Testing XML write/read...";

@@ -70,11 +70,12 @@ namespace Isis {
     xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
 
+
   /**
    * Constructor. Creates a BundleSolutionInfo.
-   * 
-   * @param bundleSolutionInfo Filename of another BundleSolutionInfo and reads the settings and 
-   *        BundleResults from that.
+   *
+   * @param bundleSolutionInfo Filename of another BundleSolutionInfo and reads the settings, 
+   *        control network filename, and BundleResults from that.
    */
   BundleSolutionInfo::BundleSolutionInfo(FileName bundleSolutionInfoFile) {
     m_id = NULL;
@@ -91,23 +92,24 @@ namespace Isis {
     openH5File(bundleSolutionInfoFile);
   }
 
+
   /**
-   * Constructor. Creates a BundleSolutionInfo.
+   * Copy constructor. Creates a BundleSolutionInfo from another one.
    * 
-   * @param src BundleSolutionInfo where the settings and BundleResults are read from.
+   * @param other BundleSolutionInfo where the settings and BundleResults are read from.
    */
-  BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
-      : m_id(new QUuid(src.m_id->toString())),
-        m_runTime(src.m_runTime),
-        m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
-        m_settings(new BundleSettings(*src.m_settings)),
-        m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)) { // is this correct???
+  BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &other)
+      : m_id(new QUuid(other.m_id->toString())),
+        m_runTime(other.m_runTime),
+        m_controlNetworkFileName(new FileName(other.m_controlNetworkFileName->expanded())),
+        m_settings(new BundleSettings(*other.m_settings)),
+        m_statisticsResults(new BundleResults(*other.m_statisticsResults)),
+        m_images(new QList<ImageList *>(*other.m_images)) { // is this correct???
 
     // m_images = NULL;
     // m_images = new QList<ImageList *>;
-    // for (int i = 0; i < src.m_images->size(); i++) {
-    //   m_images->append(src.m_images->at(i));
+    // for (int i = 0; i < other.m_images->size(); i++) {
+    //   m_images->append(other.m_images->at(i));
     // }
 
   }
@@ -134,33 +136,33 @@ namespace Isis {
   /**
    * Creates an equal operator for BundleSolutionInfos.
    * 
-   * @param src the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
+   * @param other the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
    * 
-   * @return @b BundleSolutionInfo Reference to the current BundleSolutionInfo
+   * @return @b BundleSolutionInfo& Reference to the current BundleSolutionInfo
    */
-  BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &src) {
+  BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &other) {
 
-    if (&src != this) {
+    if (&other != this) {
 
       delete m_id;
       m_id = NULL;
-      m_id = new QUuid(src.m_id->toString());
+      m_id = new QUuid(other.m_id->toString());
 
-      m_runTime = src.m_runTime;
+      m_runTime = other.m_runTime;
 
       delete m_controlNetworkFileName;
       m_controlNetworkFileName = NULL;
-      m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
+      m_controlNetworkFileName = new FileName(other.m_controlNetworkFileName->expanded());
 
-      m_settings = src.m_settings;
+      m_settings = other.m_settings;
 
       delete m_statisticsResults;
       m_statisticsResults = NULL;
-      m_statisticsResults = new BundleResults(*src.m_statisticsResults);
+      m_statisticsResults = new BundleResults(*other.m_statisticsResults);
 
       delete m_images;
       m_images = NULL;
-      m_images = new QList<ImageList *>(*src.m_images);
+      m_images = new QList<ImageList *>(*other.m_images);
     }
     return *this;
   }
@@ -176,6 +178,7 @@ namespace Isis {
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults(statisticsResults);
   }
+
 
   /**
    * Writes the results from BundleAdjust to a Pvl.
@@ -201,56 +204,37 @@ namespace Isis {
   }
 
 
-
   /**
-   * Saves the BundleSolutionInfo to the project
+   * Saves the BundleSolutionInfo to the project.
    * 
    * Output format:
    *
-   *
-   * <image id="..." fileName="...">
+   * <bundleSolutionInfo>
+   *   <generalAttributes>
    *   ...
-   * </image>
+   *   </generalAttributes>
+   *   <imageList>
+   *   ...
+   *   </imageList>
+   * </bundleSolutionInfo>
    *
    * (fileName attribute is just the base name)
    * 
    * @param stream The stream to which the BundleSolutionInfo will be saved
    * @param project The project to which this BundleSolutionInfo will be saved
    * @param newProjectRoot The location of the project root directory. This is not used.
+   *
+   * @see BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project) const
    */
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
-
-    stream.writeStartElement("bundleSolutionInfo");
-    // save ID, cnet file name, and run time to stream
-    stream.writeStartElement("generalAttributes");
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeEndElement(); // end general attributes
-
-    // save settings to stream
-    m_settings->save(stream, project);
-
-    // save statistics to stream
-    m_statisticsResults->save(stream, project);
-
-    // save image lists to stream
-    if ( !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
-
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
-      }
-
-      stream.writeEndElement();
-    }
-    stream.writeEndElement(); //end bundleSolutionInfo
+    // This implementation was exactly the same as save(QXmlStreamWriter &, const Project *)
+    save(stream, project);
   }
 
 
   /**
-   * Saves the BundleSolutionInfo to the project
+   * Saves the BundleSolutionInfo to the project.
    * 
    * @param stream The stream to which the BundleSolutionInfo will be saved
    * @param project The project to which this BundleSolutionInfo will be saved
@@ -284,6 +268,7 @@ namespace Isis {
     stream.writeEndElement(); //end bundleSolutionInfo
   }
   
+
   /**
    * Change the on-disk file name for the control network used to be where the control network 
    * ought to be in the given project.
@@ -305,13 +290,14 @@ namespace Isis {
   }
 
 
-
   /**
    * Create an XML Handler (reader) that can populate the BundleSolutionInfo class data. See
-   *   BundleSolutionInfo::save() for the expected format.
+   * BundleSolutionInfo::save() for the expected format.
    *
    * @param bundleSolutionInfo The bundle solution we're going to be initializing
    * @param project The project we are working in
+   *
+   * @see BundleSolutionInfo::save
    */
   BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo, 
                                              Project *project) {
@@ -325,7 +311,7 @@ namespace Isis {
 
 
   /**
-   * Destructor
+   * BudleSolutionInfo's XmlHandler Destructor.
    */
   BundleSolutionInfo::XmlHandler::~XmlHandler() {
     // bundleSolutionInfo passed in is "this" delete+null will cause problems,no?
@@ -343,7 +329,6 @@ namespace Isis {
     delete m_xmlHandlerBundleResults;
     m_xmlHandlerBundleResults = NULL;
   }
-
 
 
   /**
@@ -384,7 +369,7 @@ namespace Isis {
 
 
   /**
-   * Adds characters to m_xmlHandlerCharacters
+   * Adds characters to m_xmlHandlerCharacters.
    * 
    * @param ch QString of characters to add
    * 
@@ -394,6 +379,7 @@ namespace Isis {
     m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
+
 
   /**
    * Handle an XML end element.
@@ -437,6 +423,7 @@ namespace Isis {
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
+
   /**
    * Get a unique, identifying string associated with this BundleSolutionInfo object.
    *
@@ -446,8 +433,9 @@ namespace Isis {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
 
+
   /**
-   * Sets the run time
+   * Sets the run time for the bundle adjust.
    * 
    * @param runTime The run time.
    */
@@ -464,6 +452,7 @@ namespace Isis {
     m_runTime = runTime;
   }
 
+
   /**
    * Returns the run time.
    * 
@@ -473,6 +462,7 @@ namespace Isis {
     return m_runTime;
   }
 
+
   /**
    * Returns the name of the control network.
    * 
@@ -481,15 +471,17 @@ namespace Isis {
   QString BundleSolutionInfo::controlNetworkFileName() const {
     return m_controlNetworkFileName->expanded();
   }
+
   
   /**
-   * Returns the bundle settings.
+   * Returns the bundle settings shared pointer.
    * 
-   * @return @b BundleSettingsQsp The bundle settings.
+   * @return @b BundleSettingsQsp The bundle settings shared pointer.
    */
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
     return m_settings;
   }
+
 
   /**
    * Returns the bundle results.
@@ -509,12 +501,13 @@ namespace Isis {
     }
   }
 
+
   /**
    * Writes the data to the stream.
    * 
    * @param stream The stream we are writing to and returning
    * 
-   * @return @b QDataStream The stream we wrote to
+   * @return @b QDataStream& The stream we wrote to
    */
   QDataStream &BundleSolutionInfo::write(QDataStream &stream) const {
     stream << m_id->toString()
@@ -526,13 +519,14 @@ namespace Isis {
   //          << *m_images;
     return stream;
   }
+
   
   /**
    * Reads the data from the stream
    * 
    * @param stream The stream we are reading from
    * 
-   * @return @b QDataStream The stream we read from
+   * @return @b QDataStream& The stream we read from
    */
   QDataStream &BundleSolutionInfo::read(QDataStream &stream) {
 
@@ -572,31 +566,33 @@ namespace Isis {
 
 
   /**
-   * Creates the write operator for BundleSolutionInfo
+   * Creates the write operator for BundleSolutionInfo.
    * 
    * @param stream The stream we are writing to
    * @param bundleSolutionInfo The BundleSolutionInfo we are writing
    * 
-   * @return @b QDataStream The stream we wrote to
+   * @return @b QDataStream& The stream we wrote to
    */
   QDataStream &operator<<(QDataStream &stream, const BundleSolutionInfo &bundleSolutionInfo) {
     return bundleSolutionInfo.write(stream);
   }
 
+
   /**
-   * Creates the read operator for BundleSolutionInfo
+   * Creates the read operator for BundleSolutionInfo.
    * 
    * @param stream The stream we are reading to
    * @param bundleSolutionInfo The BundleSolutionInfo we are reading
    * 
-   * @return @b QDataStream The stream we read from
+   * @return @b QDataStream& The stream we read from
    */
   QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo) {
     return bundleSolutionInfo.read(stream);
   }
 
+
   /**
-   * Reads the settings and results from another BundleSolutionInfo
+   * Reads the settings and results from another BundleSolutionInfo.
    * 
    * @throws IException::Io "No file with the given name was found."
    * @throws IException::Io "The given file is unsupported for constructing BundleSolutionInfo 
@@ -733,8 +729,9 @@ namespace Isis {
     }
   }
 
+
   /**
-   * Creates a new file using H5F_ACC_EXCL
+   * Creates a new file using H5F_ACC_EXCL.
    * 
    * @throws IException::Io "A file already exists with the given name ["
    * @throws IException::Unknown "H5 exception handler has detected an error when invoking the 
