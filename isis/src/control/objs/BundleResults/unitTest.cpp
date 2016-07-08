@@ -21,8 +21,22 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis {
+  /**
+   * This class is used to test BundleResults' XmlHandler class.
+   * 
+   * @author 2014-07-28 Jeannie Backer
+   * 
+   * @internal
+   */
   class BundleResultsXmlHandlerTester : public BundleResults {
     public:
+      /**
+       * Constructs the tester object from an xml file.
+       *
+       * @param project The project object the tester belongs to.
+       * @param reader The XmlStackedHandlerReader that reads the xml file.
+       * @param xmlFile The xml file to construct the tester from.
+       */
       BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
                                      FileName xmlFile) : BundleResults(project, reader) {
 
@@ -45,6 +59,9 @@ namespace Isis {
 
       }
 
+      /**
+       * Destroys the tester object
+       */
       ~BundleResultsXmlHandlerTester() {
       }
 
@@ -122,17 +139,17 @@ int main(int argc, char *argv[]) {
     rmsImageResiduals.push_back(s5);
     rmsImageResiduals.push_back(s6);
     results.setRmsImageResidualLists(rmsImageLineResiduals,
-                                        rmsImageSampleResiduals,
-                                        rmsImageResiduals);
+                                     rmsImageSampleResiduals,
+                                     rmsImageResiduals);
     results.setSigmaLatitudeRange(Distance(0.5, Distance::Meters), 
-                                     Distance(89.6, Distance::Meters),
-                                     "MinLatId", "MaxLatId");
+                                  Distance(89.6, Distance::Meters),
+                                  "MinLatId", "MaxLatId");
     results.setSigmaLongitudeRange(Distance(0.7, Distance::Meters), 
-                                      Distance(179.2, Distance::Meters),
-                                      "MinLonId", "MaxLonId");
+                                  Distance(179.2, Distance::Meters),
+                                  "MinLonId", "MaxLonId");
     results.setSigmaRadiusRange(Distance(0.9, Distance::Meters), 
-                                   Distance(354.4, Distance::Meters),
-                                   "MinRadId", "MaxRadId");
+                                Distance(354.4, Distance::Meters),
+                                "MinRadId", "MaxRadId");
     results.setRmsFromSigmaStatistics(0.123, 0.456, 0.789);
     results.setRmsXYResiduals(4.0, 5.0, 6.0);
     results.setRejectionLimit(7.0);
@@ -142,7 +159,9 @@ int main(int argc, char *argv[]) {
     results.resetNumberConstrainedPointParameters();
     results.incrementNumberConstrainedPointParameters(11);
     results.resetNumberConstrainedImageParameters();
-    results.incrementNumberConstrainedImageParameters(12);
+    results.incrementNumberConstrainedImageParameters(10);
+    results.resetNumberConstrainedTargetParameters();
+    results.incrementNumberConstrainedTargetParameters(2);
     results.setNumberUnknownParameters(13);
     results.setDegreesOfFreedom(14.0);
     results.setSigma0(15.0);
@@ -175,7 +194,8 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing accessor methods...";
     qDebug() << "maximum likelihood index = " << toString(results.maximumLikelihoodModelIndex());
-    qDebug() << "maximum likelihood median r2 residuals = " << toString(results.maximumLikelihoodMedianR2Residuals());
+    qDebug() << "maximum likelihood median r2 residuals = "
+             << toString(results.maximumLikelihoodMedianR2Residuals());
 
     for (int i = 0; i < results.numberMaximumLikelihoodModels(); i++) {
       qDebug() << "maximum likelihood index,model,quantile = [" << toString(i)
@@ -234,6 +254,7 @@ int main(int argc, char *argv[]) {
       results.setNumberObservations(0);
       results.resetNumberConstrainedPointParameters();
       results.resetNumberConstrainedImageParameters();
+      results.resetNumberConstrainedTargetParameters();
       results.setNumberUnknownParameters(1);
       results.computeSigma0(1.0, BundleSettings::Sigma0);
     } 
@@ -244,6 +265,7 @@ int main(int argc, char *argv[]) {
       results.setNumberObservations(1);
       results.resetNumberConstrainedPointParameters();
       results.resetNumberConstrainedImageParameters();
+      results.resetNumberConstrainedTargetParameters();
       results.setNumberUnknownParameters(1);
       results.computeSigma0(1.0, BundleSettings::Sigma0);
     } 
