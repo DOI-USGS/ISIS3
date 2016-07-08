@@ -1,12 +1,11 @@
 #include "MatrixOptionsDialog.h"
 
-#include <QDebug>
-#include <QVariant>
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QDebug>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -17,18 +16,17 @@
 #include <QSizePolicy>
 #include <QSlider>
 #include <QSpacerItem>
-#include <QComboBox>
 #include <QTabWidget>
+#include <QVariant>
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "IString.h"
 #include "MatrixOptions.h"
 
 namespace Isis {
 
   /**
-   * Main constructor
+   * Main constructor.
    *
    * Layouts:
    *
@@ -60,8 +58,8 @@ namespace Isis {
    *          currentCorrImg1Layout (img1 name, param1 name)
    *          currentCorrImg2Layout (img2 name, param2 name)
    *
-   * @param matrixOptionsWidget
-   * @param parent
+   * @param options Pointer to matrix options the dialog works on.
+   * @param parent Pointer to parent widget.
    */
   MatrixOptionsDialog::MatrixOptionsDialog(MatrixOptions *options,
                                            QWidget *parent) : QDialog(parent) {
@@ -374,26 +372,21 @@ namespace Isis {
 
     readOptions();
   }
-  
 
 
   /**
-   * Default Destructor
+   * Default Destructor.
    */
   MatrixOptionsDialog::~MatrixOptionsDialog() {
   }
 
 
-  
 /***************************
  * Slots
  * *************************/
-
-
-
   /**
    * Send changes back to scene widget (MatrixOptions) so it can redraw the elements in the right
-   * color. This will be called when the appy button is pressed.
+   * color. This will be called when the apply button is pressed.
    */
   void MatrixOptionsDialog::applyOptions() {
     // Color Options
@@ -430,7 +423,6 @@ namespace Isis {
 
     emit optionsUpdated();
   }
-
 
 
   /**
@@ -490,10 +482,11 @@ namespace Isis {
   }
 
 
-
   /**
    * Update the current correlation information. This slot is called when the m_options signal,
    * changedCurrentCorrData() is emit. This happens when a matrix element is clicked on.
+   *
+   * @param currentData A QString representation of the current correlation information.
    */
   void MatrixOptionsDialog::updateCorrelationData(QString currentData) {
     m_currentValueLabel->setText(currentData);
@@ -507,7 +500,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Update parameter combo boxes at real time, when the img combo boxes are changed.
    *
@@ -515,6 +507,7 @@ namespace Isis {
    */
   void MatrixOptionsDialog::populateParameterComboBox(int index) {
   }
+
 
   /**
    * If the tolerance radiobutton is selected, this method will be called with true passed as the
@@ -533,7 +526,6 @@ namespace Isis {
   }
 
 
-
   /**
    * If the focus tolerance radio button is selected, the tolerance widgets will be enabled.
    * Otherwise, they will be disabled.
@@ -545,7 +537,6 @@ namespace Isis {
     m_goodElementsComboBox->setEnabled(enable);
     m_badElementsComboBox->setEnabled(enable);
   }
-
 
 
   /**
@@ -562,7 +553,6 @@ namespace Isis {
   }
 
 
-
   /**
    * This method will enable and disable widgets depending on which radio button is selected.
    */
@@ -576,30 +566,26 @@ namespace Isis {
   }
 
 
-
   /**
-   * slot called when user clicks on good correlation color button
+   * Slot called when user clicks on good correlation color button.
    */
   void MatrixOptionsDialog::askUserForGoodColor() {
     askUserForColor(m_goodCorrelationColorButton);
   }
 
 
-
   /**
-   * slot called when user clicks on bad correlation color button
+   * Slot called when user clicks on bad correlation color button.
    */
   void MatrixOptionsDialog::askUserForBadColor() {
     askUserForColor(m_badCorrelationColorButton);
   }
 
-
   
   /**
    * Prompt the user for a new color.
    *
-   * @param good If true, modify the good correlation button. Otherwise, modify the bad correlation
-   *             button.
+   * @param button Push button to get color from and update color to the newly selected color.
    */
   void MatrixOptionsDialog::askUserForColor(QPushButton *button) {
     QPalette colorPalette( button->palette() );
@@ -613,54 +599,56 @@ namespace Isis {
   }
 
 
-
   /**
-   * slot called when user modifies the color tolerance line edit text. It will update the slider
+   * Slot called when user modifies the color tolerance line edit text. It will update the slider
    * to match the new entry.
+   *
+   * @param value A QString representation of value in the color tolerance line edit text.
    */
   void MatrixOptionsDialog::updateToleranceSlider(const QString &value) {
     m_colorToleranceSlider->setValue( qRound( 1000 * value.toDouble() ) );
   }
 
 
-
   /**
-   * slot called when user changes the slider position. It will update the tolerance line edit to
+   * Slot called when user changes the slider position. It will update the tolerance line edit to
    * match the new value.
+   *
+   * @param int The value of the current slider position.
    */
   void MatrixOptionsDialog::updateToleranceLineEdit(int value) {
     m_colorToleranceLineEdit->setText( QString::number(value / 1000.0) );
   }
 
 
-
   /**
-   * when the img1 combo box is changed this slot will update the parameter combo box.
+   * When the img1 combo box is changed this slot will update the parameter combo box.
    *
-   * @param index The index of the new img.
+   * @param key The name of the new img.
    */
-  void MatrixOptionsDialog::updateSpecParam1ComboBox(const QString & key) {
+  void MatrixOptionsDialog::updateSpecParam1ComboBox(const QString &key) {
     updateSpecificParameterComboBox(key, m_parameter1ComboBox);
   }
 
 
-
   /**
-   * when the img2 combo box is changed this slot will update the parameter combo box.
+   * When the img2 combo box is changed this slot will update the parameter combo box.
    *
-   * @param index The index of the new img.
+   * @param key The name of the new img.
    */
-  void MatrixOptionsDialog::updateSpecParam2ComboBox(const QString & key) {
+  void MatrixOptionsDialog::updateSpecParam2ComboBox(const QString &key) {
     updateSpecificParameterComboBox(key, m_parameter2ComboBox);
   }
-
 
   
   /**
    * When the user switches the image combobox this slot will update the parameter combobox to be
    * filled with the parameters associated with the new image.
+   *
+   * @param key The name of the new image.
+   * @param comboBox The combo box to update.
    */
-  void MatrixOptionsDialog::updateSpecificParameterComboBox(const QString & key,
+  void MatrixOptionsDialog::updateSpecificParameterComboBox(const QString &key,
                                                             QComboBox *comboBox) {
     comboBox->clear();
     comboBox->addItems( m_options->matrixImgsAndParams().value(key) );

@@ -1,7 +1,10 @@
 #ifndef MatrixGraphicsScene_H
 #define MatrixGraphicsScene_H
 
-#include <QGraphicsView>
+#include <QGraphicsScene>
+
+class QGraphicsSceneContextMenuEvent;
+class QGraphicsSceneMouseEvent;
 
 namespace Isis {
   class MatrixSceneWidget;
@@ -17,6 +20,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Adapted from MosaicGraphicsScene.
+   *   @history 2016-07-08 Ian Humphrey - Updated includes for coding standards in preparing to add
+   *                           to trunk. Fixes #4095, #4081.
    */
   class MatrixGraphicsScene : public QGraphicsScene {
       Q_OBJECT

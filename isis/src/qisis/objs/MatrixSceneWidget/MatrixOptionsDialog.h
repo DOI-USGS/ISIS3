@@ -4,14 +4,18 @@
 #include <QDialog>
 #include <QPointer>
 
-#include "MatrixOptions.h"
-
 class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
-class QSlider;
+class QPushButton;
 class QRadioButton;
+class QSlider;
+class QString;
+
+namespace Isis {
+
+class MatrixOptions;
 
   /**
    * @brief This widget allows the user to modify the matrix display
@@ -28,9 +32,9 @@ class QRadioButton;
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
    *   @history 2014-07-21 Kimberly Oyama - Color options are now updated and applied in the scene.
+   *   @history 2016-07-08 Ian Humphrey - Updated documentation and reviewed coding standards in
+   *                           preparing to add to trunk. Fixes #4095, #4081.
    */
-namespace Isis {
-  
   class MatrixOptionsDialog : public QDialog {
         Q_OBJECT
     public:
@@ -38,7 +42,7 @@ namespace Isis {
       ~MatrixOptionsDialog();
 
     signals:
-      void optionsUpdated();
+      void optionsUpdated(); //!< Emitted when options are updated
         
     public slots:
       void applyOptions();
@@ -52,8 +56,8 @@ namespace Isis {
       void askUserForBadColor();
       void updateToleranceSlider(const QString &value);
       void updateToleranceLineEdit(int value);
-      void updateSpecParam1ComboBox(const QString & key);
-      void updateSpecParam2ComboBox(const QString & key);
+      void updateSpecParam1ComboBox(const QString &key);
+      void updateSpecParam2ComboBox(const QString &key);
 
     private:
       Q_DISABLE_COPY(MatrixOptionsDialog);
@@ -63,7 +67,7 @@ namespace Isis {
       void setColorToleranceStatus(bool enable);
       void setFocusToleranceStatus(bool enable);
       void setSpecificParametersStatus(bool enable);
-      void updateSpecificParameterComboBox(const QString & key, QComboBox *comboBox);
+      void updateSpecificParameterComboBox(const QString &key, QComboBox *comboBox);
 
       // update widgets as radiobuttons are chagned
 
@@ -78,13 +82,15 @@ namespace Isis {
        * Select a tolerance for the color values. All values above threshold will be one color,
        * all values below the threshold will be a different color.
        */
-      QPointer<QRadioButton> m_gradientRadioButton;
-      QPointer<QRadioButton> m_colorToleranceRadioButton;
-      QPointer<QSlider> m_colorToleranceSlider;
-      //! Color to use when for matrix elements that are above the given threshold
+      QPointer<QRadioButton> m_gradientRadioButton; //!< Use color gradient
+      QPointer<QRadioButton> m_colorToleranceRadioButton; //!< Use color tolerance threshold
+      //!< Slider to set the color tolerance threshold
+      QPointer<QSlider> m_colorToleranceSlider; 
+      //! Color to use for matrix elements that are above the given threshold
       QPointer<QPushButton> m_badCorrelationColorButton;
       //! Color to use for matrix elements that are below the given threshold
       QPointer<QPushButton> m_goodCorrelationColorButton;
+      //! Line edit to set the color tolerance threshold
       QPointer<QLineEdit> m_colorToleranceLineEdit;
 
       // ------------------ Focus Widgets ------------------------------------
@@ -97,24 +103,26 @@ namespace Isis {
 
       //! Focus the matrix on the correlation corresponding to the specified images and parameters.
       QPointer<QRadioButton> m_specificCorrelationRadioButton;
-      QPointer<QComboBox> m_image1ComboBox;
-      QPointer<QComboBox> m_parameter1ComboBox;
-      QPointer<QComboBox> m_image2ComboBox;
-      QPointer<QComboBox> m_parameter2ComboBox;
+      QPointer<QComboBox> m_image1ComboBox; //!< Combobox to choose image 1
+      QPointer<QComboBox> m_parameter1ComboBox; //!< Combobox to choose parameter 1
+      QPointer<QComboBox> m_image2ComboBox; //!< Combobox to choose image 2
+      QPointer<QComboBox> m_parameter2ComboBox; //!< Combobox to choose parameter 2
 
       //! Focus the matrix on a selected correlation value.
       QPointer<QRadioButton> m_focusToleranceRadioButton;
-      QPointer<QLineEdit> m_focusToleranceLineEdit;
-      QPointer<QComboBox> m_goodElementsComboBox;
+      QPointer<QLineEdit> m_focusToleranceLineEdit; //!< Line edit to set the tolerance
+      //! Combobox to choose from elements with good correlation values
+      QPointer<QComboBox> m_goodElementsComboBox; 
+      //! Combobox to choose from elements with bad correlation values
       QPointer<QComboBox> m_badElementsComboBox;
-      QPointer<QWidget> m_verticalLayoutWidget;
+      // QPointer<QWidget> m_verticalLayoutWidget; //!< Focus widget
 
       // ------------------ Current Element Widgets------------------------------------
-      QPointer<QLabel> m_currentValueLabel;
-      QPointer<QLabel> m_image1NameLabel;
-      QPointer<QLabel> m_parameter1NameLabel;
-      QPointer<QLabel> m_image2NameLabel;
-      QPointer<QLabel> m_parameter2NameLabel;
+      QPointer<QLabel> m_currentValueLabel; //!< Label for current correlation value in focus
+      QPointer<QLabel> m_image1NameLabel; //!< Label for current image 1 in focus
+      QPointer<QLabel> m_parameter1NameLabel; //!< Label for current parameter 1 in focus
+      QPointer<QLabel> m_image2NameLabel; //!< Label for current image 2 in focus
+      QPointer<QLabel> m_parameter2NameLabel; //!< Label for current paramter 2 in focus
   };
 };
 
