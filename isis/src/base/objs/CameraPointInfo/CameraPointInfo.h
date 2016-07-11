@@ -76,6 +76,7 @@ namespace Isis {
    *                           variable names with more descriptive names. References #1659.
    *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
    *                           closer to ISIS coding standards. References #1438
+   *   @history 2016-07-11 Curtis Rose - Added units to a few of the outputs. References #3979.
    */
   class CameraPointInfo {
 

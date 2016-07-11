@@ -334,11 +334,11 @@ namespace Isis {
         gp->findKeyword("Line").setValue(toString(m_camera->Line()));
         gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
         gp->findKeyword("RightAscension").setValue(toString(
-                        m_camera->RightAscension()));
+                        m_camera->RightAscension()), "degrees");
         gp->findKeyword("Declination").setValue(toString(
-                        m_camera->Declination()));
+                        m_camera->Declination()), "degrees");
         ocentricLat = m_camera->UniversalLatitude();
-        gp->findKeyword("PlanetocentricLatitude").setValue(toString(ocentricLat));
+        gp->findKeyword("PlanetocentricLatitude").setValue(toString(ocentricLat), "degrees");
 
         // Convert lat to planetographic
         Distance radii[3];
@@ -346,22 +346,22 @@ namespace Isis {
         ographicLat = TProjection::ToPlanetographic(ocentricLat, 
                                               radii[0].kilometers(), 
                                               radii[2].kilometers());
-        gp->findKeyword("PlanetographicLatitude").setValue(toString(ographicLat));
+        gp->findKeyword("PlanetographicLatitude").setValue(toString(ographicLat), "degrees");
        
         pe360Lon = m_camera->UniversalLongitude();
-        gp->findKeyword("PositiveEast360Longitude").setValue(toString(pe360Lon));
+        gp->findKeyword("PositiveEast360Longitude").setValue(toString(pe360Lon), "degrees");
        
         //Convert lon to -180 - 180 range
         gp->findKeyword("PositiveEast180Longitude").setValue(toString(
-                                                      TProjection::To180Domain(pe360Lon)));
+                                              TProjection::To180Domain(pe360Lon)), "degrees");
 
         //Convert lon to positive west
         pw360Lon = TProjection::ToPositiveWest(pe360Lon, 360);
-        gp->findKeyword("PositiveWest360Longitude").setValue(toString(pw360Lon));
+        gp->findKeyword("PositiveWest360Longitude").setValue(toString(pw360Lon), "degrees");
 
         //Convert pwlon to -180 - 180 range
         gp->findKeyword("PositiveWest180Longitude").setValue(
-                                                      toString(TProjection::To180Domain(pw360Lon)));
+                                   toString( TProjection::To180Domain(pw360Lon)), "degrees");
         
         m_camera->Coordinate(pB);
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
@@ -385,7 +385,7 @@ namespace Isis {
         
         double spacecraftAzi = m_camera->SpacecraftAzimuth();
         if (Isis::IsValidPixel(spacecraftAzi)) {
-          gp->findKeyword("SpacecraftAzimuth").setValue(toString(spacecraftAzi));
+          gp->findKeyword("SpacecraftAzimuth").setValue(toString(spacecraftAzi), "degrees");
         }
         else {
           gp->findKeyword("SpacecraftAzimuth").setValue("NULL");
@@ -396,16 +396,17 @@ namespace Isis {
         gp->findKeyword("TargetCenterDistance").setValue(toString(
                         m_camera->targetCenterDistance()), "km");
         m_camera->subSpacecraftPoint(ssplat, ssplon);
-        gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat));
-        gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon));
+        gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat), "degrees");
+        gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon), "degrees");
         gp->findKeyword("SpacecraftAltitude").setValue(toString(
                         m_camera->SpacecraftAltitude()), "km");
         gp->findKeyword("OffNadirAngle").setValue(toString(
-                        m_camera->OffNadirAngle()));
+                        m_camera->OffNadirAngle()), "degrees");
         double subspcgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(), 
                                               m_camera->UniversalLongitude(),
                                               ssplat, ssplon);
-        gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(toString(subspcgrdaz));
+        gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(
+                                                 toString(subspcgrdaz), "degrees");
 
         m_camera->sunPosition(sB);
         gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
@@ -415,7 +416,7 @@ namespace Isis {
         
         double sunAzi = m_camera->SunAzimuth();
         if (Isis::IsValidPixel(sunAzi)) {
-          gp->findKeyword("SubSolarAzimuth").setValue(toString(sunAzi));
+          gp->findKeyword("SubSolarAzimuth").setValue(toString(sunAzi), "degrees");
         }
         else {
           gp->findKeyword("SubSolarAzimuth").setValue("NULL");
@@ -424,23 +425,24 @@ namespace Isis {
         gp->findKeyword("SolarDistance").setValue(toString(
                         m_camera->SolarDistance()), "AU");
         m_camera->subSolarPoint(sslat, sslon);
-        gp->findKeyword("SubSolarLatitude").setValue(toString(sslat));
-        gp->findKeyword("SubSolarLongitude").setValue(toString(sslon));
+        gp->findKeyword("SubSolarLatitude").setValue(toString(sslat), "degrees");
+        gp->findKeyword("SubSolarLongitude").setValue(toString(sslon), "degrees");
         double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(), 
                                               m_camera->UniversalLongitude(),
                                               sslat, sslon);
-        gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz));
+        gp->findKeyword("SubSolarGroundAzimuth").setValue(
+                                                 toString(subsolgrdaz), "degrees");
 
-        gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()));
+        gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "degrees");
         gp->findKeyword("Phase").addComment("Illumination and Other");
         gp->findKeyword("Incidence").setValue(toString(
-                        m_camera->IncidenceAngle()));
+                        m_camera->IncidenceAngle()), "degrees");
         gp->findKeyword("Emission").setValue(toString(
-                        m_camera->EmissionAngle()));
+                        m_camera->EmissionAngle()), "degrees");
         
         double northAzi = m_camera->NorthAzimuth();
         if (Isis::IsValidPixel(northAzi)) {
-          gp->findKeyword("NorthAzimuth").setValue(toString(northAzi));
+          gp->findKeyword("NorthAzimuth").setValue(toString(northAzi), "degrees");
         }
         else {
           gp->findKeyword("NorthAzimuth").setValue("NULL");
@@ -454,7 +456,7 @@ namespace Isis {
         gp->findKeyword("LocalSolarTime").setValue(toString(
                         m_camera->LocalSolarTime()), "hour");
         gp->findKeyword("SolarLongitude").setValue(toString(
-                        m_camera->solarLongitude().degrees()));
+                        m_camera->solarLongitude().degrees()), "degrees");
         if (allowErrors) gp->findKeyword("Error").setValue("NULL");
       }
     }

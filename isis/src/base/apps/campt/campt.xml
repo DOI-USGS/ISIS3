@@ -200,6 +200,9 @@ End_Group
     <change name="Ian Humphrey" date="2015-03-03">
       Updated documentation. References #1449.
     </change>
+    <change name="Curtis Rose" date="2016-06-29">
+      Added units to many of the outputs of the PVL. Fixes #3979.
+    </change>
   </history>
 
   <oldName>
