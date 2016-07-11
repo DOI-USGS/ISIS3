@@ -64,6 +64,8 @@ namespace Isis {
    *                           initialized, resulting in a segmentation fault.  Also added
    *                           testing for exceptions being thrown in this constructor,
    *                           as well as the function computeCorrelationMatrix. Fixes #3997,3999.
+   *   @history 2016-07-11 Jesse Mapel - Updated method names to meet coding standards.
+   *                           Fixes #4112.
    */
   class CorrelationMatrix {
     public:
@@ -94,8 +96,8 @@ namespace Isis {
       FileName covarianceFileName();
       QMap<QString, QStringList> *imagesAndParameters();
 
-      void getWholeMatrix();
-      void getThreeVisibleBlocks();
+      void retrieveWholeMatrix();
+      void retrieveThreeVisibleBlocks();
 
       // Need these for range used to pick colors....
       QList<SparseBlockColumnMatrix> *visibleBlocks();

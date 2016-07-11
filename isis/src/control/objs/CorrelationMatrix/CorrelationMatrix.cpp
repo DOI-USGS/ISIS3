@@ -412,7 +412,7 @@ namespace Isis {
    * This will only be used when the matrix is small enough that this will be useful.
    *
    */
-  void CorrelationMatrix::getWholeMatrix() {
+  void CorrelationMatrix::retrieveWholeMatrix() {
 //     SparseBlockColumnMatrix sbcm;
 //     QFile matrixInput( m_correlationFileName->expanded() );
 //     matrixInput.open(QIODevice::ReadOnly);
@@ -430,7 +430,7 @@ namespace Isis {
    * It will read in the block we want to see and the two blocks for the diagonals that belong to
    * the right images.
    */
-  void CorrelationMatrix::getThreeVisibleBlocks() {
+  void CorrelationMatrix::retrieveThreeVisibleBlocks() {
   }
 
 
