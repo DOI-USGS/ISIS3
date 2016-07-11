@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+
+<application name="amicacal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Calibrates Hayabusa 1 AMICA images
+  </brief>
+
+  <description>
+  This program calibrates images from the Messenger mission's MDIS instrument.
+  The input image is corrected for the following, in order, during
+  calibration: <br/>
+  <ul>
+    <li><a href="#BiasRemoval">Step 1: Bias removal.</a ></li>
+    <li><a href="#Linearity">Step 2: Linearity correction.</a ></li>
+    <li><a href="#HotPixel">Step 3: Remove the hot pixels.</a ></li>
+    <li><a href="#Smear">Step 4: Readout smear correction.</a ></li>
+    <li><a href="#Flatfield">Step 5: Uniformity (flat field) correction.</a ></li>
+    <li><a href="#ConvertIOF">Step 6: Conversion to I over F</a ></li>
+    <li><a href="#PSFCorrection">Step 7: PSF correction</a ></li>
+    <li><a href="#References">References</a ></li>
+  </ul>
+
+  <p>
+    <h1><a id="BiasRemoval">Step 1: Bias removal.</a ></h1>
+    The signal level of AMICA is determined by a combination of an of an electronic offset
+    which defines the "zero" level of the analog-to-digital converter (the bias) as well
+    as any additional signal due to thermal electrons (the dark current).  In general, the bias
+    offset depends upon the electronics and CCD temperature.   The bias for AMICA was empirically
+    modeled as a function of time:
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+
+    <center><strong>BIAS(t) = B<sub>0</sub> + B<sub>1</sub>*t + B<sub>2</sub>*t<sup>2</sup>
+    </strong>, where <strong>t</strong> is in units of days.</center>
+    </div>
+
+    The constants <strong>B<sub>0</sub></strong>, <strong>B<sub>1</sub></strong> and
+    <strong>B<sub>2</sub></strong> were chosen to
+    fit the curve to the data as closely as possible with the following values:
+
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <center><table border = "1" cellpadding="5">
+    <tr>
+         <td>Variable</td>
+         <td>Value</td>
+    </tr>
+    <tr>
+         <td>B<sub>0</sub></td>
+         <td>3.18x10E02</td>
+    </tr>
+    <tr>
+          <td>B<sub>1</sub></td>
+          <td>-4.12x10E-03</td>
+    </tr>
+    <tr>
+          <td>B<sub>2</sub></td>
+          <td>2.00x10E-05</td>
+    </tr>
+    </table></center>
+
+    </div>
+  </p>
+  <p>
+    <h1><a id="Linearity">Step 2: Linearity correction:</a ></h1>
+    The DN level stored in raw images is approximately proportional to the number
+    of photons detected in each CCD pixel over the exposure time.  Linearity is a meausure
+    of the degree to which the CCD response is proportional to the incident flux.
+    Linearity was tested during the pre-flight and mission phase of the mission.  During the
+    pre-flight phase, DN values taken at different exposure times showed a linear intensity with
+    an incidence flux between 1000 DN and 3500 DN.  By curve-fitting the pre-flight data, the
+    following equation was obtained:
+
+    <br/><br/>
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <center><strong>I<sub>output</sub> = (I<sub>input</sub>)<sup>c</sup> +
+    L<sub>0</sub>*(I<sub>input</sub>)*exp(L<sub>1</sub>*I<sub>input</sub>)</strong></center>
+    <br/><br/>
+
+    <center><table border = "1" cellpadding="5">
+    <tr>
+         <td>Variable</td>
+         <td>Value</td>
+         <td>Description</td>
+    </tr>
+    <tr>
+         <td>I<sub>output</sub></td>
+         <td></td>
+         <td>The observed intensity of the input.</td>
+    </tr>
+    <tr>
+         <td>I<sub>input</sub></td>
+         <td>1000 DN - 3500 DN</td>
+         <td>The actual intensity of the input.</td>
+    </tr>
+    <tr>
+         <td>c</td>
+         <td>1-5.0x10E-08</td>
+         <td>The power index of the output signal.</td>
+    </tr>
+    <tr>
+          <td>L<sub>0</sub></td>
+          <td>-4.87x10E-11</td>
+          <td>Linearity correction term determined empirically.</td>
+    </tr>
+    <tr>
+          <td>L<sub>1</sub></td>
+          <td>5.09x10E-03</td>
+          <td>Correction for the nonlinearity around the saturation limit
+          (I<sub>input</sub> > 3800 DN)</td>
+    </tr>
+    </table></center>
+    </div>
+
+  </p>
+  <p>
+    <h1><a id="HotPixel">Step 3: Hot pixel removal:</a ></h1>
+    During the mission the CCD was exposed to intense radition from cosmic rays.  This resulted
+    in some pixels with an aberrant dark current value that was higher than their neighbors
+    (the hot pixels).  The number of hot pixels increased during the mission.  This made
+    accurate measurement of faint objects such as stars difficult.  The following hot pixels
+    were identified and removed from the output images during calibration by setting
+    their values to Isis::Null:
+
+    <br/><br/>
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <center><table border="1" cellpadding="5">
+    <tr>
+        <td>Line</td>
+        <td>Sample</td>
+        <td>Dark Rate (DN/s)</td>
+    </tr>
+    <tr>
+        <td>407</td>
+        <td>300</td>
+        <td><center>540</center></td>
+    </tr>
+    <tr>
+        <td>599</td>
+        <td>408</td>
+        <td><center>330</center></td>
+    </tr>
+    <tr>
+        <td>820</td>
+        <td>14</td>
+        <td><center>310</center></td>
+    </tr>
+    <tr>
+        <td>930</td>
+        <td>624</td>
+        <td><center>305</center></td>
+    </tr>
+    <tr>
+        <td>897</td>
+        <td>716</td>
+        <td><center>290</center></td>
+    </tr>
+    </table></center>
+    </div>
+
+
+  </p>
+  <p>
+    <h1><a id="Smear">Step 4: Read-out smear:</a ></h1>
+    The AMICA instrument is shuttered electronically.  Images are exposed for a certain
+    exposure time in addition to the vertical charge-transfer period of 12.288 milliseconds.
+    It is during the charge-transfer period that a read-out smear in the vertical direction
+    is produced.  The read-out smear is predominant in images with exposure times
+    on the order of 100 microseconds.  Originally the mission plan was to correct
+    for this smear on-board the spacecraft.  However, an anomaly in one of the reaction
+    wheels on October 2, 2005 made this impossible.  So some of the images returned
+    by the AMICA instrument are smear-corrected, while others are not.  This necessitated
+    creating a smear model to remove smears from images taken during the descending and ascending
+    period.  The read-out smear brightness <strong>I<sub>smear</sub></strong>
+    for unbinned images is modeled from the observed images as follows:
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <br/><br/>
+    <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> -1) [K*[(I<sub>raw</sub>(H,V) -
+    I<sub>sky</sub>(H,V)]/N<sub>v</sub>]</strong></center>
+    <br/><br/>
+           <center>Where:  <strong>K = t<sub>VCT</sub>/(t<sub>VCT</sub>+t<sub>exp</sub>)
+           </strong></center>
+    <br/><br/>
+
+    <center><table border = "1" cellpadding="5">
+    <tr>
+      <td>Variable</td><td>Description</td>
+    </tr>
+    <tr>
+      <td>I<sub>smear</sub></td><td>The read-out smear.</td>
+    </tr>
+    <tr>
+      <td>I<sub>raw</sub></td><td>The intensity of the raw data taken with exposure time
+      t<sub>exp</sub>.</td>
+    </tr>
+    <tr>
+      <td>I<sub>sky</sub></td><td>The sum of the bias and the dark current (~300 DN).</td>
+    </tr>
+
+    <tr>
+      <td>t<sub>VCT</sub></td><td>The vertical charge-transfer period (0.012288 microseconds).</td>
+    </tr>
+    <tr>
+      <td>t<sub>exp</sub></td><td>The exposure time (in microseconds).</td>
+    </tr>
+    <tr>
+      <td>N<sub>v</sub></td><td>The number of pixels along the V-direction (1024).</td>
+    </tr>
+    <tr>
+      <td>H</td><td>The line number of the pixel.</td>
+    </tr>
+    <tr>
+      <td>L</td><td>The sample number of the pixel.</td>
+    </tr>
+    </table></center>
+
+    </div>
+
+
+  </p>
+  <p>
+    <h1><a id="Flatfield">Step 5: Flat-field correction:</a ></h1>
+    Performs a correction for pixel-to-pixel variation in CCD response and vignetting
+    (reduction of image brightness near the periphery compared with the center).
+    Flat-field images for all bands were acquired using an integrating sphere
+    at NEC Toshiba Space Systems Ltd at room temperature (around 30 degrees Celsius).
+    A flat-field image is one which has constant uniform brightness everywhere.  AMICA
+    was pointed into the integrating sphere to acquire images of a field  that is known be
+    be spatially uniform to an accuracy of approximately 2%.  The correction is accomplished
+    by dividing each pixel of the output image by the corresponding pixel in the
+    flat-field image.
+  </p>
+  <p>
+    <h1><a id="ConvertIOF">Step 6: Convert units to I over F:</a ></h1>
+    This converts the raw DN values to I/F (radiance) units.  The formula is:
+    <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+      <center><strong>IoF = Raw*[&#960;*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
+      <br/><br/>
+      <center><table border="1" cellpadding="5">
+      <tr>
+          <td>Variable</td><td>Description</td>
+     </tr>
+     <tr>
+          <td>Raw</td><td>The raw DN value.</td>
+     </tr>
+     <tr>
+          <td>IoF</td><td>The IoF units of the raw DN value.</td>
+     </tr>
+     <tr>
+         <td>R<sub>s</sub></td><td>The distance in Astronomical Units (AU) between the Sun
+         and the target body.
+         </td>
+     </tr>
+     <tr>
+          <td>F</td><td>The solar flux at the target body.</td>
+     </tr>
+     </table></center>
+     </div>
+
+  </p>
+  <p>
+    <h1><a id="PSFCorrection">Step 7: PSF Correction:</a ></h1>
+    The point-spread function (PSF) is a model describing the two-dimensional distribution of
+    light emitted from an infinitely small point source.  For point light sources, there
+    is a focused and an unfocused function, which when combined give a full description of the
+    light distribution.  The focused function was determined empirically to have the following
+    form:
+    <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+                          <center> <strong>F<sub>foc</sub>(r) = exp(-&#945;*r) </strong></center>
+     </div>
+     <br/><br/>
+     The variable <strong>r</strong> is the distance in pixels from the optical center of the point
+     source.  The values of <strong>&#945;</strong> for the different filters are listed below:
+     <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+
+      <center><table border = "1" cellpadding="5">
+      <tr>
+          <td> Filter</td><td> &#945;</td>
+      </tr>
+      <tr>
+          <td> ul </td><td> 1.26 </td>
+      </tr>
+      <tr>
+          <td> b </td><td> 1.28 </td>
+      </tr>
+      <tr>
+          <td> v </td><td> 1.41 </td>
+      </tr>
+      <tr>
+          <td> w </td><td> 1.85 </td>
+      </tr>
+      <tr>
+          <td> x </td><td> 1.85 </td>
+      </tr>
+      <tr>
+          <td> p </td><td> 1.60 </td>
+      </tr>
+      <tr>
+          <td> zs </td><td> 1.48 </td>
+      </tr>
+      </table></center>
+
+      </div>
+
+  The unfocused component of light distribution is
+  modeled as a sum of Gaussian functions:
+
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+     <center> <strong>F<sub>ufoc</sub>(r) =  SUM(i=1...N){ [A<sub>i</sub>/
+     (&#963;<sub>i</sub>*SQRT(2*&#960;))]
+     * exp(-r<sup>2</sup>/2*(&#963;<sub>i</sub>)<sup>2</sup>}
+     </strong></center>
+     </div>
+     Both the focused and the unfocused components are calculated for each pixel in the image, and
+     subtracted out of the final calibrated image.
+     <strong>A<sub>i</sub></strong> and <strong>&#963;<sub>i</sub></strong> are constants
+     derived empircally from images of Itokawa and the Moon and enumerated below:
+     <br/><br/>
+
+
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+
+     <center><table border="1" cellpadding="5">
+
+     <tr>
+        <td>Band</td><td>A<sub>1</sub></td><td>A<sub>2</sub></td><td>A<sub>3</sub></td>
+        <td>A<sub>4</sub></td><td>A<sub>5</sub></td><td>A<sub>6</sub></td>
+     </tr>
+     <tr>
+        <td>ul</td><td>12.0</td><td>8.0</td><td>1.2</td><td>1.0</td><td>0.8</td><td>0.7</td>
+     </tr>
+
+     <tr>
+        <td>b</td><td>10.0</td><td>1.5</td><td>0.3</td><td>0.4</td><td>0.4</td><td>0.5</td>
+     </tr>
+
+     <tr>
+        <td>v</td><td>10.0</td><td>1.5</td><td>0.3</td><td>0.4</td><td>0.4</td><td>0.5</td>
+     </tr>
+
+     <tr>
+        <td>w</td><td>10.0</td><td>1.5</td><td>0.6</td><td>0.8</td><td>0.7</td><td>0.6</td>
+     </tr>
+
+     <tr>
+        <td>x</td><td>9.0</td><td>3.5</td><td>2.0</td><td>2.7</td><td>2.2</td><td>0.5</td>
+     </tr>
+
+     <tr>
+        <td>p</td><td>10.0</td><td>5.0</td><td>8.3</td><td>4.0</td><td>6.4</td><td>1.8</td>
+     </tr>
+
+     <tr>
+        <td>zs</td><td>50.0</td><td>16.0</td><td>6.0</td><td>9.0</td><td>9.5</td><td>4.5</td>
+     </tr>
+
+    </table></center>
+
+    </div>
+
+    <br/><br/>
+
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+
+    <center><table border="1" cellpadding="5">
+
+    <tr>
+        <td></td><td>&#963;<sub>1</sub></td><td>&#963;<sub>2</sub></td><td>&#963;<sub>3</sub></td>
+        <td>&#963;<sub>4</sub></td><td>&#963;<sub>5</sub></td>
+        <td>&#963;<sub>6</sub></td>
+    </tr>
+    <tr>
+        <td>All bands</td><td>8</td><td>16</td><td>32</td><td>64</td><td>110</td>
+        <td>710</td>
+    </tr>
+    </table></center>
+    </div>
+  </p>
+
+  <p>
+    <h1><a id="References">References:</a ></h1>
+    <ol>
+      <li>Ishiguro, M., et al.  The Hayabusa Spacecraft Asteroid Multi-band Imaging Camera (AMICA).
+      Icarus 207(2010) 714-731.</li>
+      <li>Ishiguro, M.  Scattered light correction of Hayabusa/AMICA data and quantitative
+      spectral comparisons of Itokawa.  Publ. Astron. Soc. Japan (2014) 66(3), 55 (1-9).</li>
+    </ol>
+
+  </p>
+
+
+  <p>
+    <h1>Output units</h1>
+    The output units of the DNs will depend on which calibration flags are turned on.
+    <ul>
+      <li>If IOF=TRUE, output units are measured in I/F</li>
+      <li>Otherwise output units are measured in W/(m**2 micrometer sr)</li>
+    </ul>
+  </p>
+
+  </description>
+
+  <category>
+    <missionItem>Hayabusa</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>amica2isis</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Kris Becker" date="2016-01-24">
+      Original version
+    </change>
+    <change name="Tyler Wilson" date="2016-07-08">
+      Added calibration correction routines for linearity, PSF, smear removal for binned
+      and unbinned images, and converting to I/F units.  Also added hot pixel removal.
+      Updated the application documentation.  Added routines for converting
+      a single-band Isis cube to an OpenCV::OpenMat matrix and vice versa for the purpose
+      of translating and scaling flat-field images so their dimensions match
+      some AMICA images which have been cropped.
+
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This is the Isis Cube to be calibrated.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Non-PSF Corrected Output cube
+        </brief>
+        <description>
+          This is the output file. The output cube will be a calibrated version 
+          of the input cube (without PSF correction).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>      
+
+
+      <parameter name="PSFCORRECTED">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          PSF Corrected Output cube
+        </brief>
+        <description>
+          This is the output file. The output cube will be a calibrated version
+          of the input cube (with PSF correction).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+
+
+
+    </group>
+    <group name="Options">
+      <parameter name = "NULLPOLARPIX">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Set polarized pixels to Isis::Null.
+        </brief>
+	<description>
+          Four position angle glass polarizers (of dimension 200 x 200 pixels each) 
+          are attached to the upper left of the CCD chip.  This option sets those
+          pixels to Null in the calibrated image by default.
+	</description>
+      </parameter>  
+
+      <parameter name = "IOF">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Convert to I/F units.
+        </brief>
+        <description>
+
+        </description>
+      </parameter>
+
+	
+
+    </group>
+    
+
+  </groups>
+  
+</application>
