@@ -97,8 +97,9 @@ namespace Isis {
     ProcessExport &p = process();
     if (!p.HasInputRange()) p.SetInputRange();
     p.ProcessCubes(*this);
-
+    
     outputName = outputName.addExtension(m_extension);
+    
     createWorldFile(outputName);
   }
 

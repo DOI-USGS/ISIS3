@@ -66,6 +66,9 @@ namespace Isis {
    */
   void TiffExporter::write(FileName outputName, int quality,
                            QString compression) {
+    
+    outputName = outputName.addExtension(extension());
+    
     // Open the output image
     m_image = TIFFOpen(outputName.expanded().toAscii().data(), "w");
 
