@@ -31,8 +31,8 @@
 
 #include <cholmod.h>
 
+#include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
-#include "BundleControlPointVector.h"
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
@@ -193,6 +193,9 @@ namespace Isis {
    *                           the prefix can be used to specify the path of the location where the
    *                           matrix file should be written. Some improvements made to comply with
    *                           coding standards.
+   *   @history 2016-07-11 Jesse Mapel - Changed m_bundleControlPoints to be a vector of
+   *                           QSharedPointers to BundleControlPoints instead of a
+   *                           BundleControlPointVector.  Fixes #4099.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -320,7 +323,7 @@ namespace Isis {
                                 SparseBlockColumnMatrix  &N12,
                                 boost::numeric::ublas::vector< double >  &n2,
                                 boost::numeric::ublas::vector< double >  &nj,
-                                BundleControlPoint *point);
+                                BundleControlPointQsp &point);
 
       bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double >  &n1,
                                 boost::numeric::ublas::vector< double >  &nj);
@@ -446,7 +449,7 @@ namespace Isis {
       double m_dError;                                  //!< error
 
       BundleObservationVector m_bundleObservations;
-      BundleControlPointVector m_bundleControlPoints;
+      QVector <BundleControlPointQsp> m_bundleControlPoints;
       BundleTargetBodyQsp m_bundleTargetBody;
 
       double m_dRTM;                                    //!< radians to meters conversion factor (body specific)

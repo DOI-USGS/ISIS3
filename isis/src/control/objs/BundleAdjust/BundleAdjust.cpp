@@ -365,7 +365,8 @@ namespace Isis {
         if (point->IsIgnored())
           continue;
 
-        BundleControlPoint* bundleControlPoint = m_bundleControlPoints.addControlPoint(point);
+        BundleControlPointQsp bundleControlPoint(new BundleControlPoint(point));
+        m_bundleControlPoints.append(bundleControlPoint);
 
         bundleControlPoint->setWeights(m_bundleSettings, m_dMTR);
 
@@ -950,7 +951,7 @@ namespace Isis {
 
     for (int i = 0; i < n3DPoints; i++) {
 
-      BundleControlPoint *point = m_bundleControlPoints.at(i);
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
       if (point->isRejected()) {
         nRejected3DPoints++;
@@ -1205,7 +1206,7 @@ namespace Isis {
                                           SparseBlockColumnMatrix &N12,
                                           vector<double> &n2,
                                           vector<double> &nj,
-                                          BundleControlPoint *bundleControlPoint) {
+                                          BundleControlPointQsp &bundleControlPoint) {
 
 //N12.printClean(std::cout);
 
@@ -1423,7 +1424,7 @@ namespace Isis {
 //    printf("%s", buf);
 
     for (int i = 0; i < n3DPoints; i++) {
-      BundleControlPoint *point = m_bundleControlPoints.at(i);
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
       if ( point->isRejected() ) {
         nRejected3DPoints++;
@@ -2579,9 +2580,9 @@ namespace Isis {
    */
   bool BundleAdjust::computePartials_DC(matrix<double> &coeff_target, 
                                         matrix<double> &coeff_image,
-                         matrix<double> &coeff_point3D,
+                                        matrix<double> &coeff_point3D,
                                         vector<double> &coeff_RHS,
-                         BundleMeasure &measure,
+                                        BundleMeasure &measure,
                                         BundleControlPoint &point) {
 
     // additional vectors
@@ -2922,7 +2923,7 @@ namespace Isis {
     int nPointIndex = 0;
     int nControlPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nControlPoints; i++) {
-      BundleControlPoint *point = m_bundleControlPoints.at(i);
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
       if (point->isRejected()) {
           nPointIndex++;
@@ -3240,7 +3241,7 @@ namespace Isis {
 
     for (int i = 0; i < nObjectPoints; i++) {
 
-      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
+      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
       ControlPoint* point = bundleControlPoint->rawControlPoint();
 
       point->ComputeResiduals();
@@ -3281,7 +3282,7 @@ namespace Isis {
     // add vtpv from constrained 3D points
     int nPointIndex = 0;
     for (int i = 0; i < nObjectPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
+      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
 
       // get weight and correction vector for this point
       boost::numeric::ublas::bounded_vector<double, 3> weights = bundleControlPoint->weights();
@@ -3841,7 +3842,7 @@ namespace Isis {
       int nPointIndex = 0;
       for (j = 0; j < nObjectPoints; j++) {
 
-        BundleControlPoint *point = m_bundleControlPoints.at(nPointIndex);
+        BundleControlPointQsp point = m_bundleControlPoints.at(nPointIndex);
         if ( point->isRejected() )
           continue;
 
@@ -3926,7 +3927,7 @@ namespace Isis {
     int nPointIndex = 0;
     for (j = 0; j < nObjectPoints; j++) {
 
-      BundleControlPoint *point = m_bundleControlPoints.at(nPointIndex);
+      BundleControlPointQsp point = m_bundleControlPoints.at(nPointIndex);
 
       if ( point->isRejected() )
         continue;
@@ -4761,7 +4762,7 @@ namespace Isis {
 
     int nPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
+      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
 
       QString pointSummaryString =
           bundleControlPoint->formatBundleOutputSummaryString(berrorProp);
@@ -4773,7 +4774,7 @@ namespace Isis {
     fp_out << buf;
 
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
+      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
 
       QString pointDetailString =
           bundleControlPoint->formatBundleOutputDetailString(berrorProp, m_dRTM);
@@ -4831,7 +4832,7 @@ namespace Isis {
     fp_out << buf;
 
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundlecontrolpoint = m_bundleControlPoints.at(i);
+      BundleControlPointQsp bundlecontrolpoint = m_bundleControlPoints.at(i);
 
       const ControlPoint *point = bundlecontrolpoint->rawControlPoint();
 

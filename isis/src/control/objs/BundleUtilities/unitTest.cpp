@@ -11,7 +11,6 @@
 
 #include "Angle.h"
 #include "BundleControlPoint.h"
-#include "BundleControlPointVector.h"
 #include "BundleImage.h"
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
@@ -828,27 +827,6 @@ int main(int argc, char *argv[]) {
     bcp2.copy(*bcp3);
     qDebug().noquote() << bcp2.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    qDebug() << "";
-    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "";
-    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "Testing BundleControlPointVector...";
-    #if 0
-    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
-    #endif
-    BundleControlPointVector bcpvector;
-    BundleControlPoint *freeBCP   = bcpvector.addControlPoint(freePoint);
-    BundleControlPoint *fixedBCP  = bcpvector.addControlPoint(fixedPoint);
-    BundleControlPoint *constrBCP = bcpvector.addControlPoint(constrainedPoint);
-    qDebug() << "FreePoint";
-    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << freeBCP->formatBundleOutputSummaryString(errorProp);
-    qDebug() << "FixedPoint";
-    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << fixedBCP->formatBundleOutputSummaryString(errorProp);
-    qDebug() << "ConstrainedPoint";
-    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << constrBCP->formatBundleOutputSummaryString(errorProp);
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
