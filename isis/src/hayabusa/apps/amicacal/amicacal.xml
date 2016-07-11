@@ -239,7 +239,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     This converts the raw DN values to I/F (radiance) units.  The formula is:
     <br/><br/>
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-      <center><strong>IoF = Raw*[&#960;*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
+      <center><strong>IoF = Raw*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
       <br/><br/>
       <center><table border="1" cellpadding="5">
       <tr>
@@ -272,17 +272,17 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     form:
     <br/><br/>
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-                          <center> <strong>F<sub>foc</sub>(r) = exp(-&#945;*r) </strong></center>
+                          <center> <strong>F<sub>foc</sub>(r) = exp(-alpha*r) </strong></center>
      </div>
      <br/><br/>
      The variable <strong>r</strong> is the distance in pixels from the optical center of the point
-     source.  The values of <strong>&#945;</strong> for the different filters are listed below:
+     source.  The values of <strong>alpha</strong> for the different filters are listed below:
      <br/><br/>
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
 
       <center><table border = "1" cellpadding="5">
       <tr>
-          <td> Filter</td><td> &#945;</td>
+          <td> Filter</td><td> alpha</td>
       </tr>
       <tr>
           <td> ul </td><td> 1.26 </td>
@@ -314,13 +314,13 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
      <center> <strong>F<sub>ufoc</sub>(r) =  SUM(i=1...N){ [A<sub>i</sub>/
-     (&#963;<sub>i</sub>*SQRT(2*&#960;))]
-     * exp(-r<sup>2</sup>/2*(&#963;<sub>i</sub>)<sup>2</sup>}
+     (sigma<sub>i</sub>*SQRT(2*pi))]
+     * exp(-r<sup>2</sup>/2*(sigma<sub>i</sub>)<sup>2</sup>}
      </strong></center>
      </div>
      Both the focused and the unfocused components are calculated for each pixel in the image, and
      subtracted out of the final calibrated image.
-     <strong>A<sub>i</sub></strong> and <strong>&#963;<sub>i</sub></strong> are constants
+     <strong>A<sub>i</sub></strong> and <strong>sigma<sub>i</sub></strong> are constants
      derived empircally from images of Itokawa and the Moon and enumerated below:
      <br/><br/>
 
@@ -373,9 +373,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <center><table border="1" cellpadding="5">
 
     <tr>
-        <td></td><td>&#963;<sub>1</sub></td><td>&#963;<sub>2</sub></td><td>&#963;<sub>3</sub></td>
-        <td>&#963;<sub>4</sub></td><td>&#963;<sub>5</sub></td>
-        <td>&#963;<sub>6</sub></td>
+        <td></td><td>sigma<sub>1</sub></td><td>sigma<sub>2</sub></td><td>sigma<sub>3</sub></td>
+        <td>sigma<sub>4</sub></td><td>sigma<sub>5</sub></td>
+        <td>sigma<sub>6</sub></td>
     </tr>
     <tr>
         <td>All bands</td><td>8</td><td>16</td><td>32</td><td>64</td><td>110</td>
@@ -402,7 +402,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     The output units of the DNs will depend on which calibration flags are turned on.
     <ul>
       <li>If IOF=TRUE, output units are measured in I/F</li>
-      <li>Otherwise output units are measured in W/(m**2 micrometer sr)</li>
+      <li>Otherwise output units are measured in W/(m<sup>2</sup> micrometer sr)</li>
     </ul>
   </p>
 
