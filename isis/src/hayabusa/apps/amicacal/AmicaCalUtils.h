@@ -312,7 +312,8 @@ static double f_focused(double alpha,int binning,double x,double y) {
  *
  */
 
-static double f_diffuse(double *A,double *sigma,int N,double r){
+/*
+ * static double f_diffuse(double *A,double *sigma,int N,double r){
 
   double sum = 0;
 
@@ -325,7 +326,7 @@ static double f_diffuse(double *A,double *sigma,int N,double r){
 
 
 }
-
+*/
 
 
 static double f_unfocused(double * A,double * sigma, int N,int binning,double x,double y)  {
@@ -352,7 +353,7 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
 }
 
 
-
+/*
 
 static double psf(double *A, double *sigma, int N,double alpha,double Ixy,int binning,double x, double y) {
 
@@ -374,7 +375,7 @@ static double psf(double *A, double *sigma, int N,double alpha,double Ixy,int bi
 }
 
 
-
+*/
 
 
 

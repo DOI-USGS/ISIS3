@@ -102,7 +102,7 @@ static double g_L1(0);
 static int nsubImages(0);      // Number of sub images
 static int binning(1);
 static bool g_nullPolarizedPixels = true;
-static bool g_applyPSFCorrection = true;
+//static bool g_applyPSFCorrection = true;
 static bool g_iofCorrection = true;
 
 //  I/F variables
@@ -357,7 +357,7 @@ CubeAttributeInput att1;
     QString psfVals = "psf"+kernel_sz+".cub";
     //Cube *diffusionCube = new Cube(psfVals,"rw");
     //QScopedPointer<Cube,TemporaryCubeDeleter> dCube (diffusionCube );
-    Cube *diffusionCube = p1.SetOutputCube(psfVals,att2,ns,nl);
+    p1.SetOutputCube(psfVals,att2,ns,nl);
 
     //p1.SetOutputCube(psfVals,att2,ns,nl,nb);
 
