@@ -35,31 +35,45 @@ void IsisMain() {
   IString id, bitMode;
   int sumMode, editMode;
   bool projected;
-  try {
-    Pvl lab(inFile.expanded());
-    id = (QString) lab.findKeyword("DATA_SET_ID");
-    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
-    if(lab.hasKeyword("SPATIAL_SUMMING")) {
-      sumMode = (int)lab.findKeyword("SPATIAL_SUMMING");
-    }
-    else {
-      sumMode = (int)lab.findKeyword("SAMPLING_FACTOR");
-    }
 
-    bitMode = (QString) lab.findKeyword("SAMPLE_BIT_MODE_ID");
-    if(lab.hasKeyword("EDIT_MODE_ID")) {
-      editMode = (int)lab.findKeyword("EDIT_MODE_ID");
-    }
-    else {
-      editMode = (int)lab.findKeyword("SAMPLE_FIRST_PIXEL");
-    }
+  {
+    QString msg;
+    try {
+      msg = "File could not be opened.";
+      Pvl lab(inFile.expanded());
 
+      msg = "PVL Keyword [DATA_SET_ID] not found in label.";
+      id = (QString) lab.findKeyword("DATA_SET_ID");
+      projected = lab.hasObject("IMAGE_MAP_PROJECTION");
+
+      msg = "PVL Keywords [SPATIAL_SUMMING] and [SAMPLING_FACTOR] not found in label.";
+      msg += "The mroctx2isis application requires at least one to exist in order to set summing mode.";
+      if(lab.hasKeyword("SPATIAL_SUMMING")) {
+        sumMode = (int)lab.findKeyword("SPATIAL_SUMMING");
+      }
+      else {
+        sumMode = (int)lab.findKeyword("SAMPLING_FACTOR");
+      }
+
+      msg = "PVL Keyword [SAMPLE_BIT_MODE_ID] not found in label.";
+      bitMode = (QString) lab.findKeyword("SAMPLE_BIT_MODE_ID");
+
+      msg = "PVL Keywords [EDIT_MODE_ID] and [SAMPLE_FIRST_PIXEL] not found in label.";
+      msg += "The mroctx2isis application requires at least one to exist in order to set edit mode.";
+      if(lab.hasKeyword("EDIT_MODE_ID")) {
+        editMode = (int)lab.findKeyword("EDIT_MODE_ID");
+      }
+      else {
+        editMode = (int)lab.findKeyword("SAMPLE_FIRST_PIXEL");
+      }
+    }
+    catch(IException &e) {
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
   }
-  catch(IException &e) {
-    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
-                  inFile.expanded() + "]";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
-  }
+
+
+
 
   //Checks if in file is rdr
   if(projected) {
@@ -137,6 +151,7 @@ void IsisMain() {
         suf = 0;
       }
     }
+    ui.PutInteger("SUFFIX", suf);
   }
   p.SetDataPrefixBytes(endPix + 1);
   p.SetDataSuffixBytes(suf);

@@ -46,6 +46,10 @@
         <change name="Steven Lambright" date="2008-09-02">
           Fixed bug where dark current data could be corrupted if FILLGAP was true
         </change>
+        <change name="Curtis Rose" date="2016-06-10">
+          Fixed bug where program would get stuck in an infinite loop when a cube
+          was smaller than 10 in either lines or samples
+        </change>
     </history>
 
     <category>
