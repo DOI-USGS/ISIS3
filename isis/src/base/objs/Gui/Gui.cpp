@@ -708,10 +708,32 @@ namespace Isis {
       //When defaults are used they do not get rewritten because they do not
       //exist in the history file to be written over. Must reset parameters first.
       ResetParameters();
-      Isis::PvlGroup &up = hist.group(useEntry); 
-      for(int k = 0; k < up.keywords(); k++) {
+      Isis::PvlGroup &up = hist.group(useEntry);
+      for (int k = 0; k < up.keywords(); k++) {
         QString key = up[k].name();
-        QString val = up[k];
+        QString val;
+        // If the value has more than one element,
+        // construct a string array of those elements
+        if (up[k].size() > 1) {
+          val = "(";
+          for (int i = 0; i < up[k].size(); i++) {
+            QString newVal = up[k][i];
+            if (newVal.contains(",")) {
+              newVal = '"' + newVal + '"';
+            }
+            if (i == up[k].size() - 1) {
+              val += newVal + ")";
+            }
+            else {
+              val += newVal + ", ";
+            }
+          }
+        }
+        // Else, return the value on its own
+        else {
+          QString newVal = up[k];
+          val = newVal;
+        }
         ui.Clear(key);
         ui.PutAsString(key, val);
       }
