@@ -4,6 +4,8 @@
 
 #include <geos/geom/Point.h>
 
+#include <QDebug>
+
 #include "Brick.h"
 #include "CubePlotCurve.h"
 #include "Histogram.h"
@@ -286,19 +288,19 @@ namespace Isis {
       else if(rubberBandTool()->currentMode() == RubberBandTool::RectangleMode) {
         double ssamp, sline, esamp, eline;
 
-        // Convert them to line sample values
+        // Convert vertices to line sample values
         activeViewport->viewportToCube(vertices[0].x(), vertices[0].y(),
                                        ssamp, sline);
+
         activeViewport->viewportToCube(vertices[2].x(), vertices[2].y(),
                                        esamp, eline);
 
-        ssamp = ssamp + 0.5;
-        sline = sline + 0.5;
-        esamp = esamp + 0.5;
-        eline = eline + 0.5;
+        ssamp = round(ssamp);
+        sline = round(sline);
+        esamp = round(esamp);
+        eline = round(eline);
 
-        int nsamps = (int)(esamp - ssamp + 1);
-        if(nsamps < 1) nsamps = -nsamps;
+        int nsamps = (int)(std::fabs(esamp - ssamp) + 1);
 
         Brick *brick = new Brick(*cube, nsamps, 1, 1);
 
