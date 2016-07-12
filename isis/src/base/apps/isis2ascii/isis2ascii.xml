@@ -3,11 +3,14 @@
   <brief> Export cube to an ascii file</brief>
 
   <description>
-    This program will print the cube data to an ascii file.  Special pixels will be represented
-    as NULL, LIS, LRS, HIS and HRS.  If you do not want special pixels in your ascii output,
-    run the program "stretch" to replace their value.  If there are multiple bands in the cube,
-    they will be output in band sequential format.  Beware:  The output file will be roughly
-    3 times as big as the input.
+    This program converts sn ISIS cube to ASCII file format.  Special pixels such as
+    <def>NULL</def>, <def>LIS</def>, <def>LRS</def>, <def>HIS</def> and <def>HRS</def> 
+    have predetermined pixel values. You may opt to assign a range of pixel values to 
+    the individual <def>Special Pixels</def> using the SETPIXELVALUES parameter. Bands in the cube 
+    will be output in band sequential format.
+    <br />
+    <br />
+    Beware: The output file will be roughly 3 times as big as the input.
   </description>
 
   <category>
@@ -65,6 +68,9 @@
     <change name="Makayla Shepherd" date="2015-01-30">
       Increased precision of the DNs in the output text file from 6 to 7
     </change>
+    <change name="Adam Paquette" date="2016-06-15">
+      Added the ability for a user to specify the special pixel values
+    </change>
   </history>
 
 
@@ -103,6 +109,102 @@
         </default>
       </parameter>
     </group>
+
+    <group name="Special Pixels">
+      <parameter name="SETPIXELVALUES">
+        <type>boolean</type>
+	<default>
+	  <item>NO</item>
+	</default>
+	<brief>User defined output for special pixels</brief>
+	<description>
+	      Determine whether the user would like a 
+	      specific output for the special pixels in the image.
+	</description>
+	<inclusions>
+	  <item>NULLVALUE</item>
+	  <item>LRSVALUE</item>
+	  <item>LISVALUE</item>
+          <item>HISVALUE</item>
+	  <item>HRSVALUE</item>
+	</inclusions>
+      </parameter>
+      
+      <parameter name="NULLVALUE">
+	<type>string</type>
+	<default>
+	  <item>NULL</item>
+	</default>
+	<brief>Value to set to any null pixel</brief>
+	<description>
+	    Value that will replace any null pixel within a cub with
+	    the number entered. Defaults to NULL if nothing is entered.
+	</description>
+	<inclusions>
+	  <item>SETPIXELVALUES</item>
+	</inclusions>
+      </parameter>
+
+      <parameter name="LRSVALUE">
+        <type>string</type>
+        <default>
+          <item>LRS</item>
+        </default>
+        <brief>Value to set to any LRS pixel</brief>
+        <description>
+            Value that will replace any LRS pixel within a cub with
+            the number entered. Defaults to LRS if nothing is entered.
+        </description>
+        <inclusions>
+          <item>SETPIXELVALUES</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LISVALUE">
+        <type>string</type>
+        <default>
+          <item>LIS</item>
+        </default>
+        <brief>Value to set to any LIS pixel</brief>
+        <description>
+            Value that will replace any LIS pixel within a cub with
+            the number entered. Defaults to LIS if nothing is entered.
+        </description>
+        <inclusions>
+          <item>SETPIXELVALUES</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HISVALUE">
+        <type>string</type>
+        <default>
+          <item>HIS</item>
+        </default>
+        <brief>Value to set to any HIS pixel</brief>
+        <description>
+            Value that will replace any HIS pixel within a cub with
+            the number entered. Defaults to HIS if nothing is entered.
+        </description>
+        <inclusions>
+          <item>SETPIXELVALUES</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSVALUE">
+        <type>string</type>
+        <default>
+          <item>HRS</item>
+        </default>
+        <brief>Value to set to any HRS pixel</brief>
+        <description>
+            Value that will replace any HRS pixel within a cub with
+            the number entered. Defaults to HRS if nothing is entered.
+        </description>
+        <inclusions>
+          <item>SETPIXELVALUES</item>
+        </inclusions>
+      </parameter>
+     </group>
   </groups>
 
   <liens>

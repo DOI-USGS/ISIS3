@@ -13,8 +13,48 @@ using namespace Isis;
 void isis2ascii(Buffer &in);
 ofstream fout;
 
+class SpecialPixelFunctor{
+
+public:
+    explicit SpecialPixelFunctor(QString null,
+                                 QString hrs,
+                                 QString his,
+                                 QString lrs,
+                                 QString lis) :
+        null(null), hrs(hrs), his(his), lrs(lrs), lis(lis) {}
+
+    void operator() (Buffer &in) const {
+        for(int i = 0; i < in.size(); i++) {
+          fout.width(13);        //  Width must be set everytime
+          if(IsSpecial(in[i])) {
+            if(IsNullPixel(in[i])) fout << null;
+            if(IsHrsPixel(in[i])) fout << hrs;
+            if(IsHisPixel(in[i])) fout << his;
+            if(IsLrsPixel(in[i])) fout << lrs;
+            if(IsLisPixel(in[i])) fout << lis;
+          }
+          else {
+            fout << in[i];
+          }
+        }
+        fout << endl;
+    }
+private:
+    QString null;
+    QString hrs;
+    QString his;
+    QString lrs;
+    QString lis;
+};
+
 void IsisMain() {
   // Create a process by line object
+  QString null;
+  QString hrs;
+  QString his;
+  QString lrs;
+  QString lis;
+
   ProcessByLine p;
 
   // Get the size of the cube
@@ -31,30 +71,30 @@ void IsisMain() {
     fout << "Samples:Lines:Bands:  " << icube->sampleCount() << ":" <<
          icube->lineCount() << ":" << icube->bandCount() << endl;
   }
+
+  //Determine special pixel values
+  if (ui.GetBoolean("SETPIXELVALUES")) {
+    null = ui.GetString("NULLVALUE");
+    hrs = ui.GetString("HRSVALUE");
+    his = ui.GetString("HISVALUE");
+    lrs = ui.GetString("LRSVALUE");
+    lis = ui.GetString("LISVALUE");
+  }
+  else {
+    null = "NULL";
+    hrs = "HRS";
+    his = "HIS";
+    lrs = "LRS";
+    lis = "LIS";
+  }
+
+  SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis);
   
   fout << std::setprecision(7);
   
   // List the cube
-  p.StartProcess(isis2ascii);
+  p.ProcessCubeInPlace(isis2ascii, false);
   p.EndProcess();
 
   fout.close();
-}
-
-void isis2ascii(Buffer &in) {
-  for(int i = 0; i < in.size(); i++) {
-    fout.width(13);        //  Width must be set everytime
-    if(IsSpecial(in[i])) {
-      if(IsNullPixel(in[i])) fout << "NULL";
-      if(IsHrsPixel(in[i])) fout << "HRS";
-      if(IsHisPixel(in[i])) fout << "HIS";
-      if(IsLrsPixel(in[i])) fout << "LRS";
-      if(IsLisPixel(in[i])) fout << "LIS";
-    }
-    else {
-      fout << in[i];
-    }
-  }
-  fout << endl;
-
 }
