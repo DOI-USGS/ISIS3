@@ -12,6 +12,19 @@ using namespace Isis;
 // Global declarations
 void isis2ascii(Buffer &in);
 ofstream fout;
+/**
+ * @brief The SpecialPixelFunctor class
+ *
+ * This class is used to convert ISIS cubes into ascii format with
+ * specified values for the special pixels in the cube.  The main purpose
+ * for the class was to reduce global variables.
+ *
+ * @author 2016-06-15 Adam Paquette
+ *
+ * @internal
+ *   @history 2016-06-15 Adam Paquette - Original Version
+ *
+ */
 
 class SpecialPixelFunctor{
 
