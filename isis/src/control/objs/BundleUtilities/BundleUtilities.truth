@@ -547,11 +547,6 @@ init exterior orientiation successful?   "Yes"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Testing BundleMeasure...
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleControlPoint...
 Create FreePoint with free point containing 2 measures...
        FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
@@ -834,10 +829,28 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleMeasure...
+parent control point id "FixedPoint"
+
 rejected? "No"
-measure sample  "0.0"
-measure line    "0.0"
-measure serial number "Ignored"
+measure sample  "1.0"
+measure line    "2.0"
+measure serial number "NotIgnored"
+focal x "-1.79769313486231e+308"
+focal y "-1.79769313486231e+308"
+observation index "0"
+
+rejected? "No"
+measure sample  "1.0"
+measure line    "2.0"
+measure serial number "NotIgnored"
+focal x "-1.79769313486231e+308"
+focal y "-1.79769313486231e+308"
+observation index "0"
+
+rejected? "No"
+measure sample  "1.0"
+measure line    "2.0"
+measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
 observation index "0"

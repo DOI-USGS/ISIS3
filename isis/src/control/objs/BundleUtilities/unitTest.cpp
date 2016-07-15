@@ -34,6 +34,8 @@
 using namespace std;
 using namespace Isis;
 
+void printBundleMeasure(BundleMeasure &);
+
 /**
  * @author 2014 Jeannie Backer
  *
@@ -577,33 +579,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "Testing BundleMeasure...";
-    #if 0
-    Move test after BundleObservation to setObs
-    // constructor
-    BundleMeasure(ControlMeasure *controlMeasure, BundleControlPoint *bundleControlPoint);
-    // copy constructor
-    BundleMeasure(const BundleMeasure &src);
-    bundleMeasure.setParentObservation(BundleObservation *observation);
-    BundleObservation  *parentObs = parentBundleObservation();
-    BundleControlPoint *parentBCP = parentControlPoint();
-    BundleImage        *parentImage = parentBundleImage();
-
-    BundleObservationSolveSettings solveSettings = observationSolveSettings();
-    Camera *cam = bundleMeasure.camera();
-
-    qDebug() << "rejected?" << toString(bundleMeasure.isRejected());
-    qDebug() << "measure sample " << toString(bundleMeasure.sample());
-    qDebug() << "measure line   " << toString(bundleMeasure.line());
-    qDebug() << "measure serial number" << bundleMeasure.cubeSerialNumber();
-    qDebug() << "focal x" << toString(bundleMeasure.focalPlaneMeasuredX());
-    qDebug() << "focal y" << toString(bundleMeasure.focalPlaneMeasuredY());
-    qDebug() << "focal z" << toString(bundleMeasure.observationIndex());
-    #endif
-    qDebug() << "";    
-    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "";
-    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleControlPoint...";
     #if 0
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
@@ -832,29 +807,57 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleMeasure...";
-    #if 0
-    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 86%
-    Camera *cam = bundleMeasure.camera();
-    BundleObservationSolveSettings solveSettings = bundleMeasure.observationSolveSettings();
-    #endif
-    BundleMeasure bundleMeasure(cm1, bcp3);
-    BundleMeasure bundleMeasureCopy(bcm);
-    bundleMeasure.setParentObservation(&bo);
-//    BundleObservation  *parentObs = bundleMeasure.parentBundleObservation();
-//    BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
-//    BundleImage        *parentImage = bundleMeasure.parentBundleImage();
-    qDebug() << "rejected?" << toString(bundleMeasure.isRejected());
-    qDebug() << "measure sample " << toString(bundleMeasure.sample());
-    qDebug() << "measure line   " << toString(bundleMeasure.line());
-    qDebug() << "measure serial number" << bundleMeasure.cubeSerialNumber();
-    qDebug() << "focal x" << toString(bundleMeasure.focalPlaneMeasuredX());
-    qDebug() << "focal y" << toString(bundleMeasure.focalPlaneMeasuredY());
-    qDebug() << "observation index" << toString(bundleMeasure.observationIndex());
-    qDebug() << "";    
+
+    // TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 86% //TODO update when SquishCoco works again
+    BundleMeasure bundleMeasure(cm2, bcp3);
+
+    bundleMeasure.setParentObservation(&bo2);
+    // const BundleObservationSolveSettings *solveSettings = 
+    bundleMeasure.observationSolveSettings();
+    // Camera *cam = 
+    bundleMeasure.camera();
+    // BundleObservation  *parentObs = 
+    bundleMeasure.parentBundleObservation();
+    BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
+    qDebug() << "parent control point id" << parentBCP->getId();
+    // BundleImage        *parentImage = 
+    bundleMeasure.parentBundleImage(); //TODO m_parentBundleImage always NULL ??? 
+
+    // Copy and =
+    BundleMeasure bundleMeasureCopy(bundleMeasure);
+    BundleMeasure bundleMeasureEq = bundleMeasure;
+
+    // Test self-assignment
+    bundleMeasure = bundleMeasure;
+
+    qDebug() << "";
+    // Verify state and copies
+    printBundleMeasure(bundleMeasure);
+    printBundleMeasure(bundleMeasureCopy);
+    printBundleMeasure(bundleMeasureEq);
+      
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
   } 
   catch (IException &e) {
     e.print();
   }
+
+}
+
+
+/**
+ * Outputs the BundleMeasure state fo testing and verification
+ *
+ * @param m The BundleMeasure to print information on
+ */
+ void printBundleMeasure(BundleMeasure &m) {
+   qDebug() << "rejected?" << toString(m.isRejected());
+   qDebug() << "measure sample " << toString(m.sample());
+   qDebug() << "measure line   " << toString(m.line());
+   qDebug() << "measure serial number" << m.cubeSerialNumber();
+   qDebug() << "focal x" << toString(m.focalPlaneMeasuredX());
+   qDebug() << "focal y" << toString(m.focalPlaneMeasuredY());
+   qDebug() << "observation index" << toString(m.observationIndex());
+   qDebug() << "";  
 }

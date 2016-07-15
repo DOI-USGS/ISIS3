@@ -27,16 +27,21 @@
 
 namespace Isis {
   /**
-   * @brief 
-   *  
+   * @brief A container class for a control measure
+   *
+   * This class is used as a wrapper around a control measure for use with bundle adjust.
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-07-09 Ken Edmundson
    *
    * @internal
-   *   @history 2015-02-20 Jeannie Backer - Added assignment operator. Brought closer to Isis coding
-   *                           standards.
+   *   @history 2015-02-20 Jeannie Backer - Added assignment operator. Brought closer to Isis
+   *                           coding standards.
    *
+   *   @history 2016-07-14 Ian Humphrey - Updated documentation and coding standards in preparation
+   *                           to merge into trunk. Updated unit test for BundleMeasure. Fixes
+   *                           #4145, #4077.
    */
 
   class BundleControlPoint;
@@ -78,10 +83,11 @@ namespace Isis {
       int observationIndex() const;
 
     private:
-      ControlMeasure *m_controlMeasure;
-      BundleControlPoint *m_parentControlPoint;
-      BundleImage *m_parentBundleImage;
-      BundleObservation *m_parentObservation;
+      ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
+      BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
+                                                     bundle control measure **/
+      BundleImage *m_parentBundleImage; /**< Parent image of this bundle control measure **/
+      BundleObservation *m_parentObservation; /**< Parent bundle observation **/
   };
 }
 
