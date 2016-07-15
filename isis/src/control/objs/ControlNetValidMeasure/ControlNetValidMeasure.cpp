@@ -208,10 +208,12 @@ namespace Isis {
 
     if (measureCamera != NULL) {
       measureCamera->SetImage(pSample, pLine);
-
-      mdEmissionAngle     = measureCamera->EmissionAngle();
-      mdIncidenceAngle    = measureCamera->IncidenceAngle();
-      mdResolution        = measureCamera->PixelResolution();
+      bool success = measureCamera->SetImage(pSample, pLine);
+      if (success) {
+        mdEmissionAngle     = measureCamera->EmissionAngle();
+        mdIncidenceAngle    = measureCamera->IncidenceAngle();
+        mdResolution        = measureCamera->PixelResolution();
+      }
     }
 
     if (pMeasure != NULL) {
