@@ -2,6 +2,7 @@
 #include "MultivariateStatistics.h"
 #include "IException.h"
 #include "Preference.h"
+#include "PvlObject.h"
 
 using namespace std;
 int main(int argc, char *argv[]) {
@@ -30,6 +31,30 @@ int main(int argc, char *argv[]) {
   cout << endl;
   double a, b;
   s.LinearRegression(a, b);
+  cout << "Linear Regression Y = aX + b" << endl;
+  cout << "a = " << a << endl;
+  cout << "b = " << b << endl;
+  cout << endl;
+
+  cout << endl << "Testing Pvl serialization methods..." << endl;
+  Isis::PvlObject toStats = s.toPvl();
+  Isis::MultivariateStatistics fromStats(toStats);
+  cout << "SumX            = " << fromStats.X().Sum() << endl;
+  cout << "SumY            = " << fromStats.Y().Sum() << endl;
+  cout << "SumXY           = " << fromStats.SumXY() << endl;
+  cout << "SumXX           = " << fromStats.X().SumSquare() << endl;
+  cout << "SumYY           = " << fromStats.Y().SumSquare() << endl;
+  cout << endl;
+  cout << "Covariance      = " << fromStats.Covariance() << endl;
+  cout << "VarianceX       = " << fromStats.X().Variance() << endl;
+  cout << "VarianceY       = " << fromStats.Y().Variance() << endl;
+  cout << "Correlation     = " << fromStats.Correlation() << endl;
+  cout << endl;
+  cout << "Valid Pixels    = " << fromStats.ValidPixels() << endl;
+  cout << "Invalid Pixels  = " << fromStats.InvalidPixels() << endl;
+  cout << "Total Pixels    = " << fromStats.TotalPixels() << endl;
+  cout << endl;
+  fromStats.LinearRegression(a, b);
   cout << "Linear Regression Y = aX + b" << endl;
   cout << "a = " << a << endl;
   cout << "b = " << b << endl;

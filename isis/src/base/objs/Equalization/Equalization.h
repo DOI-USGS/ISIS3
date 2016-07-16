@@ -25,21 +25,21 @@
 
 #include <vector>
 
-// TODO Don't include
+#include <QString>
+#include <QStringList>
+
 #include "FileList.h"
-// The following includes are needed since class enumerations are used as input
-// parameters (calculateStatistics)
 #include "LeastSquares.h"
 #include "OverlapNormalization.h"
 
+using namespace std;
 
 namespace Isis {
   class Buffer;
-  class Cube;
-  class FileList;
   class OverlapStatistics;
   class Pvl;
   class PvlGroup;
+  class PvlObject;
   class Statistics;
   /**
    * This class can be used to calculate, read in, and/or apply equalization
@@ -81,7 +81,7 @@ namespace Isis {
    * Equalization eq(inputCubeListFileName);
    * // calculate
    * eq.addHolds(holdListFileName);
-   * eq.calculateStatistics(sampPercent, mincnt, wtopt, sType, methodType);
+   * eq.calculateStatistics(samplingPercent, mincnt, wtopt, sType, methodType);
    * // write to PvlGroup
    * PvlGroup resultsGroup = eq.getResults();
    * // write to file
@@ -120,6 +120,16 @@ namespace Isis {
    *                           formula in evaluate() instead of just modifying how statistics
    *                           are computed. Implemented the GainsWithoutNormalization solution
    *                           type. References #911.
+   *   @history 2016-07-15 Ian Humphrey - Added recalculateStatistics() method to allow for 
+   *                           statistics to be calculated only for new input images, using
+   *                           previously calculated statistics for the rest of the input images.
+   *                           Added fromPvl() method to unserialize Equalization data from a pvl
+   *                           object. Refactored calculateStatistics() to separate functionality
+   *                           and allow for statistics recalculation. Added methods to properly 
+   *                           free some of the vector members. Added new members to help with 
+   *                           unserialization via the fromPvl() method and help with recalulating
+   *                           overlap statistics. Added API documentation. Updated unit test.
+   *                           Fixes #2282.
    */
   class Equalization {
     public:
@@ -128,9 +138,9 @@ namespace Isis {
 
       void addHolds(QString holdListName);
 
-      void calculateStatistics(double sampPercent, int mincnt,
-          bool wtopt,
+      void calculateStatistics(double samplingPercent, int mincnt, bool wtopt,
           LeastSquares::SolveMethod methodType);
+      void recalculateStatistics(QString inStatsFileName);
       void importStatistics(QString instatsFileName);
       void applyCorrection(QString toListName);
 
@@ -193,20 +203,29 @@ namespace Isis {
           }
 
         private:
-          std::vector<double> gains;
-          std::vector<double> offsets;
-          std::vector<double> avgs;
+          vector<double> gains;
+          vector<double> offsets;
+          vector<double> avgs;
 
           OverlapNormalization::SolutionType m_sType;
       };
 
-      /**
+      /** 
+       * This class is used as a functor calculate image statistics
+       *
        * @author ????-??-?? Unknown
        *
        * @internal
        */
       class CalculateFunctor {
         public:
+          /**
+           * Constructs a CalculateFunctor
+           *
+           * @param stats Pointer to a Statistics object to add data to
+           * @param percent Sampling percentage of the image, used to calculate a line increment, 
+           *                when calculating statistics
+           */
           CalculateFunctor(Statistics *stats, double percent) {
             m_stats = stats;
             m_linc = (int) (100.0 / percent + 0.5);
@@ -220,11 +239,13 @@ namespace Isis {
           virtual void addStats(Buffer &in) const;
 
         private:
-          Statistics *m_stats;
-          int m_linc;
+          Statistics *m_stats; //!< Calculated statistics
+          int m_linc; //!< Line increment value when calculating statistics
       };
 
       /**
+       * This class is used as a functor to apply adjustments (equalize) to an image 
+       *
        * @author ????-??-?? Unknown
        *
        * @internal
@@ -238,14 +259,19 @@ namespace Isis {
           void operator()(Buffer &in, Buffer &out) const;
 
         private:
-          const ImageAdjustment *m_adjustment;
+          const ImageAdjustment *m_adjustment; //!< ImageAdjustment to equalize image
       };
 
     protected:
       Equalization();
       void loadInputs(QString fromListName);
       void setInput(int index, QString value);
-      const FileList & getInputs() const;
+      const FileList &getInputs() const;
+
+      // Should these be protected or private? (Recall children, i.e. HiEqual... can't
+      // access Equalization's private vars directly)
+      void calculateBandStatistics();
+      void calculateOverlapStatistics();
 
       virtual void fillOutList(FileList &outList, QString toListName);
       virtual void errorCheck(QString fromListName);
@@ -254,35 +280,56 @@ namespace Isis {
       void loadOutputs(FileList &outList, QString toListName);
       void loadHolds(OverlapNormalization *oNorm);
 
-      void setResults(std::vector<OverlapStatistics> &overlapStats);
       void setResults();
 
       void clearAdjustments();
       void addAdjustment(ImageAdjustment *adjustment);
 
+      void clearNormalizations();
+      void clearOverlapStatistics();
+
       void addValid(int count);
       void addInvalid(int count);
 
+      void fromPvl(const PvlObject &inStats);
+      void setSolved(bool solved);
+      bool isSolved() const;
+
     private:
       void init();
-      std::vector<int> validateInputStatistics(QString instatsFileName);
+      QVector<int> validateInputStatistics(QString instatsFileName);
 
-      FileList m_imageList;
-      std::vector<ImageAdjustment *> m_adjustments;
-      std::vector<int> m_holdIndices;
+      bool m_normsSolved; //!< Indicates if corrective factors were solved
+      bool m_recalculating; //!< Indicates if recalculating with loaded statistics
+      bool m_wtopt; //!< Whether or not overlaps should be weighted
 
-      int m_validCnt;
-      int m_invalidCnt;
+      FileList m_imageList; //<! List of input image filenames
 
-      int m_mincnt;
-      bool m_wtopt;
+      double m_samplingPercent; /**< Percentage of the lines to consider when gathering cube and
+                                     overlap statistics (process-by-line)**/
 
-      int m_maxCube;
-      int m_maxBand;
+      int m_validCnt; //!< Number of valid overlaps
+      int m_invalidCnt; //!< Number of invalid overlaps
+      int m_mincnt; //!< Minimum number of pixels for an overlap to be considered valid
 
+      int m_maxCube; //!< Number of input images
+      int m_maxBand; //!< Number of bands in each input image
+
+      QStringList m_badFiles; //!< List of image names that don't overlap
+
+      vector<ImageAdjustment *> m_adjustments; //<! Corrective factors for equalization
+      vector<int> m_holdIndices; //!< Indices of images being held
+      vector<bool> m_doesOverlapList; //!< Which images have a valid overlap
+      vector<bool> m_alreadyCalculated; //!< Which images that have statistics already calculated
+      vector<OverlapNormalization *> m_overlapNorms; //!< Normalization data for input images
+      vector<OverlapStatistics *> m_overlapStats; //!< Calculated overlap statistics
+
+      //! The normalization solution type for solving normalizations (offsets, gains, or both)
       OverlapNormalization::SolutionType m_sType;
+      //! Least squares method for solving normalization correcitve factors
+      LeastSquares::SolveMethod m_lsqMethod; 
 
-      Pvl *m_results;
+      Pvl *m_results; //!< Calculation results and normalization corrective factors (if solved)
   };
 };
 

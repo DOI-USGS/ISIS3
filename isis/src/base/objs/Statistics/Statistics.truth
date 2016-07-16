@@ -173,6 +173,34 @@ SumSquare:            91
 Removed Data?         false 
 Z-Score at 1.0        -1.33631 
 
+Testing Pvl serialization methods 
+Average:              3.5 
+Variance:             3.5 
+Rms:                  3.89444 
+Std Deviation:        1.87083 
+Minimum:              1 
+Maximum:              6 
+ChebyShev Min:        -22.9575 
+ChebyShev Max:        29.9575 
+Best Minimum:         1 
+Best Maximum:         6 
+Valid Minimum:        1 
+Valid Maximum:        6 
+Total Pixels:         14 
+Valid Pixels:         6 
+Null Pixels:          2 
+Lis Pixels:           1 
+Lrs Pixels:           1 
+His Pixels:           1 
+Hrs Pixels:           1 
+Out of Range Pixels:  2 
+Over Range Pixels:    1 
+Under Range Pixels:   1 
+Sum:                  21 
+SumSquare:            91 
+Removed Data?         false 
+Z-Score at 1.0        -1.33631 
+ 
 Testing RemoveData(3, Null, HRS, LRS, HIS, LIS, 10, -1) 
 Average:              3.6 
 Variance:             4.3 

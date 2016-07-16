@@ -24,11 +24,16 @@
 #include <float.h>
 #include <string>
 #include <iostream>
-#include "MultivariateStatistics.h"
+
 #include "IException.h"
+#include "MultivariateStatistics.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 
 
 namespace Isis {
+
   /**
    * Constructs a Multivariate Statistics object with accumulators and counters
    * set to zero.
@@ -36,6 +41,18 @@ namespace Isis {
   MultivariateStatistics::MultivariateStatistics() {
     Reset();
   }
+
+
+  /**
+   * Constructs a MulitvariateStatistics object from a PvlObject.
+   *
+   * @param const PvlObject & - Input multivariate statistics.
+   */
+  MultivariateStatistics::MultivariateStatistics(const PvlObject &inStats) {
+    Reset();
+    fromPvl(inStats);
+  }
+
 
   //! Resets all accumulators to zero
   void MultivariateStatistics::Reset() {
@@ -48,8 +65,11 @@ namespace Isis {
     p_totalPixels = 0;
   }
 
+
   //! Destructs a MultivariateStatistics object.
   MultivariateStatistics::~MultivariateStatistics() {};
+
+
   /**
    * Add two arrays of doubles to the accumulators and counters. This method can
    * be invoked multiple times, for example, once for each line in a cube, before
@@ -78,6 +98,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Add an x,y value to the accumulators and counters count times. This method
    * can be invoked multiple times before obtaining statistics.
@@ -102,6 +123,7 @@ namespace Isis {
       p_invalidPixels += count;
     }
   }
+
 
   /**
    * Remove an array of doubles from the accumulators and counters.
@@ -137,6 +159,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Computes and returns the covariance between the two data sets If there are
    * no valid data (pixels) then NULL8 is returned.
@@ -149,6 +172,7 @@ namespace Isis {
                    p_x.Average() * p_y.Average() * (double)p_validPixels;
     return covar / (double)(p_validPixels - 1);
   }
+
 
   /**
    * Computes and returns the coefficient of correlation (between -1.0 and 1.0) of
@@ -172,6 +196,7 @@ namespace Isis {
     return covar / (stdX * stdY);
   }
 
+
   /**
    * Returns the total number of pixels processed.
    *
@@ -180,6 +205,7 @@ namespace Isis {
   BigInt MultivariateStatistics::TotalPixels() const {
     return p_totalPixels;
   }
+
 
   /**
    * Returns the number of valid pixels processed. Only valid pixels are utilized
@@ -192,6 +218,7 @@ namespace Isis {
     return p_validPixels;
   }
 
+
   /**
    * Returns the number of invalid pixels encountered.
    *
@@ -200,6 +227,7 @@ namespace Isis {
   BigInt MultivariateStatistics::InvalidPixels() const {
     return p_invalidPixels;
   }
+
 
   /**
    * Fits a line @f[ y=A+Bx @f] through the data.
@@ -221,6 +249,7 @@ namespace Isis {
     b = b / denom;
   }
 
+
   /**
    * Returns the sum of x*y for all data given through the AddData method.
    *
@@ -229,6 +258,7 @@ namespace Isis {
   double MultivariateStatistics::SumXY() const {
     return p_sumxy;
   }
+
 
   /**
    * Returns a Stats object for all of the X data fed through the AddData method.
@@ -239,6 +269,7 @@ namespace Isis {
     return p_x;
   };
 
+
   /**
    * Returns a Stats object for all of the Y data fed through the AddData method.
    *
@@ -247,5 +278,67 @@ namespace Isis {
   Isis::Statistics MultivariateStatistics::Y() const {
     return p_y;
   };
+
+
+  /**
+   * Unserializes a multivariate statistics object from a PvlObject
+   *
+   * @param const PvlObject & - Input multivariate statistics
+   */
+  void MultivariateStatistics::fromPvl(const PvlObject &inStats) {
+    p_sumxy = inStats["SumXY"];
+    p_validPixels = inStats["ValidPixels"];
+    p_invalidPixels = inStats["InvalidPixels"];
+    p_totalPixels = inStats["TotalPixels"];
+
+    // unserialize the X and Y Statistics as well
+    PvlGroup xStats = inStats.findGroup("XStatistics"); //
+    p_x = Statistics(xStats);
+    PvlGroup yStats = inStats.findGroup("YStatistics");
+    p_y = Statistics(yStats);
+  }
+
+
+  /**
+   * Serializes a multivariate statistics object as a PvlObject
+   *
+   * @param QString (Default value is "MultivariateStatistics") - Name of the PvlObject
+   *
+   * @return PvlObject The serialized multivariate statistics
+   */
+  PvlObject MultivariateStatistics::toPvl(QString name) const {
+    if (name.isEmpty()) {
+      name = "MultivariateStatistics";
+    }
+    PvlObject mStats(name); 
+    mStats += PvlKeyword("Covariance" , toString(Covariance()));
+    mStats += PvlKeyword("Correlation", toString(Correlation()));
+    mStats += PvlKeyword("SumXY", toString(SumXY()));
+    mStats += PvlKeyword("ValidPixels", toString(ValidPixels()));
+    mStats += PvlKeyword("InvalidPixels", toString(InvalidPixels()));
+    mStats += PvlKeyword("TotalPixels", toString(TotalPixels()));
+
+    PvlKeyword linReg("LinearRegression");
+    double a, b;
+    try {
+      LinearRegression(a, b);
+      linReg += toString(a);
+      linReg += toString(b);
+    } catch (IException &e) {
+      // It is possible one of the overlaps was constant and therefore
+      // the regression would be a vertical line (x=c instead of y=ax+b)
+    }
+    mStats += linReg; 
+
+    PvlGroup xStats = X().toPvl("XStatistics");
+    PvlGroup yStats = Y().toPvl("YStatistics");
+    mStats.addGroup(xStats);
+    mStats.addGroup(yStats);
+
+    return mStats;
+  }
+
 }
+
+
 

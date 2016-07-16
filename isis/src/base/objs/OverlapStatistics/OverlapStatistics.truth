@@ -22,3 +22,25 @@ Overlap Areas:
     Start Line = 380
     End Line = 719
 
+
+Testing Pvl serialization methods...
+Has Overlap? = 0
+
+Overlap Dimensions: 
+  Samples = 46
+  Lines = 340
+  Bands = 10
+
+Overlap Areas:
+  Filename = I00824006RDR.lev2.cub
+    Start Sample = 38
+    End Sample = 83
+    Start Line = 1
+    End Line = 340
+
+  Filename = I02609002RDR.lev2.cub
+    Start Sample = 1
+    End Sample = 46
+    Start Line = 380
+    End Line = 719
+

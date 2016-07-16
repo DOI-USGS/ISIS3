@@ -73,6 +73,7 @@ namespace Isis {
 
     // Attempt to solve the least squares equation
     oNorm.Solve(OverlapNormalization::Both);
+    setSolved(true);
 
     clearAdjustments();
     for (int img = 0; img < imageList.size(); img++) {

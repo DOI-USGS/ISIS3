@@ -19,7 +19,8 @@ using namespace Isis;
  * @internal
  *   @history 2014-09-05 Jeannie Backer - Added xml read/write tests. Improved coverage of
  *                           existing code.
- *
+ *   @history 2016-07-15 Ian Humphrey - Added toPvl() and new constructor that takes a PvlGroup
+ *                           to test pvl serialization methods. References #2282.
  *
  */
 namespace Isis {
@@ -268,6 +269,37 @@ int main(int argc, char *argv[]) {
     qDebug() << "Z-Score at 1.0       " << assignedStats.ZScore(1.0);
     qDebug();
 
+    qDebug() << "Testing Pvl serialization methods";
+    PvlGroup toStats = s.toPvl();
+    Statistics fromStats(toStats);
+    qDebug() << "Average:             " << fromStats.Average();
+    qDebug() << "Variance:            " << fromStats.Variance();
+    qDebug() << "Rms:                 " << fromStats.Rms();
+    qDebug() << "Std Deviation:       " << fromStats.StandardDeviation();
+    qDebug() << "Minimum:             " << fromStats.Minimum();
+    qDebug() << "Maximum:             " << fromStats.Maximum();
+    qDebug() << "ChebyShev Min:       " << fromStats.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << fromStats.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << fromStats.BestMinimum();
+    qDebug() << "Best Maximum:        " << fromStats.BestMaximum();
+    qDebug() << "Valid Minimum:       " << fromStats.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << fromStats.ValidMaximum();
+    qDebug() << "Total Pixels:        " << fromStats.TotalPixels();
+    qDebug() << "Valid Pixels:        " << fromStats.ValidPixels();
+    qDebug() << "Null Pixels:         " << fromStats.NullPixels();
+    qDebug() << "Lis Pixels:          " << fromStats.LisPixels();
+    qDebug() << "Lrs Pixels:          " << fromStats.LrsPixels();
+    qDebug() << "His Pixels:          " << fromStats.HisPixels();
+    qDebug() << "Hrs Pixels:          " << fromStats.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << fromStats.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << fromStats.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << fromStats.UnderRangePixels();
+    qDebug() << "Sum:                 " << fromStats.Sum();
+    qDebug() << "SumSquare:           " << fromStats.SumSquare();
+    qDebug() << "Removed Data?        " << fromStats.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << fromStats.ZScore(1.0);
+    qDebug() << "";
+
     qDebug() << "Testing RemoveData(3, Null, HRS, LRS, HIS, LIS, 10, -1)";
     s.RemoveData(&a[2], 8);
     qDebug() << "Average:             " << s.Average();
@@ -341,7 +373,7 @@ int main(int argc, char *argv[]) {
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
     Project *project = NULL;
-    assignedStats.save(writer, project);
+    fromStats.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml    

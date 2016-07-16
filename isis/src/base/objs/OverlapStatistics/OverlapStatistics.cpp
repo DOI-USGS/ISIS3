@@ -33,10 +33,22 @@
 #include "Progress.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "PvlObject.h"
 
 using namespace std;
 namespace Isis {
+
+  /**
+   * Constructs an OverlapStatistics from a PvlObject
+   *
+   * @param inStats The serialized OverlapStatistics PvlObject
+   */
+  OverlapStatistics::OverlapStatistics(const PvlObject &inStats) {
+    init();
+    fromPvl(inStats);
+  }
 
   /**
    * Constructs an OverlapStatistics object.  Compares the two input cubes and
@@ -49,11 +61,14 @@ namespace Isis {
    * @param sampPercent (Default value of 100.0) Sampling percent, or the percentage
    *       of lines to consider during the statistic gathering procedure
    *
-   * @throws Isis::iException::User - All images must have the same number of
+   * @throws Isis::IException::User - All images must have the same number of
    *                                  bands
    */
   OverlapStatistics::OverlapStatistics(Isis::Cube &x, Isis::Cube &y,
                                        QString progressMsg, double sampPercent) {
+
+    init();
+
     // Test to ensure sampling percent in bound
     if (sampPercent <= 0.0 || sampPercent > 100.0) {
       string msg = "The sampling percent must be a decimal (0.0, 100.0]";
@@ -165,6 +180,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Checks all bands of the cubes for an overlap, and will only return false
    * if none of the bands overlap
@@ -180,10 +196,33 @@ namespace Isis {
   }
 
 
-  PvlObject OverlapStatistics::toPvl() const {
-    // Output the private variables
+  /**
+   * Serialize overlap statistics as a PvlObject
+   *
+   * @param QString name (Default value of "OverlapStatistics") Name of the PvlObject created
+   *
+   * @return PvlObject A pvl object representing the OverlapStatistics and its data
+   *
+   * @throws Isis::IException::User - Trivial overlap between [File1] and [File2]
+   */
+  PvlObject OverlapStatistics::toPvl(QString name) const {
     try {
-      PvlObject o("OverlapStatistics");
+      // Empty strings are set to default value as well
+      if (name.isEmpty()) {
+        name = "OverlapStatistics";
+      }
+
+      // Add keywords for OverlapStatistics data
+      PvlObject o(name);
+      o += PvlKeyword("File1", FileNameX().name());
+      o += PvlKeyword("File2", FileNameY().name());
+      o += PvlKeyword("Width", toString(Samples()));
+      o += PvlKeyword("Height", toString(Lines()));
+      o += PvlKeyword("Bands", toString(Bands()));
+      o += PvlKeyword("SamplingPercent", toString(SampPercent()));
+      o += PvlKeyword("MinCount", toString(MinCount())); // Do we need this if EqInfo has this?
+
+      // Create group for first file of overlap
       PvlGroup gX("File1");
       PvlKeyword stsX("StartSample", toString(StartSampleX()));
       PvlKeyword ensX("EndSample", toString(EndSampleX()));
@@ -207,6 +246,7 @@ namespace Isis {
       gX += stdX;
       gX += varX;
 
+      // Create group for second file of overlap
       PvlGroup gY("File2");
       PvlKeyword stsY("StartSample", toString(StartSampleY()));
       PvlKeyword ensY("EndSample", toString(EndSampleY()));
@@ -230,65 +270,95 @@ namespace Isis {
       gY += stdY;
       gY += varY;
 
-      o += PvlKeyword("File1", FileNameX().name());
-      o += PvlKeyword("File2", FileNameY().name());
-      o += PvlKeyword("Width", toString(Samples()));
-      o += PvlKeyword("Height", toString(Lines()));
-      o += PvlKeyword("SamplingPercent", toString(SampPercent()));
       o.addGroup(gX);
       o.addGroup(gY);
 
-      PvlKeyword cov("Covariance");
-      PvlKeyword cor("Correlation");
-
-      PvlKeyword valid("ValidOverlap");
-      PvlKeyword val("ValidPixels");
-      PvlKeyword inv("InvalidPixels");
-      PvlKeyword tot("TotalPixels");
+      bool isValid = false;
+      // Unserialize the MultivariateStatistics
       for (int band = 1; band <= Bands(); band++) {
+        PvlKeyword validBand("ValidOverlap", "false");
+
         if (HasOverlap(band)) {
-          QString validStr = "false";
-          if (IsValid(band)) validStr = "true";
-          valid += validStr;
-          cov += toString(GetMStats(band).Covariance());
-          cor += toString(GetMStats(band).Correlation());
-          val += toString(GetMStats(band).ValidPixels());
-          inv += toString(GetMStats(band).InvalidPixels());
-          tot += toString(GetMStats(band).TotalPixels());
+          if (IsValid(band)) {
+            validBand.setValue("true");
+            isValid = true;
+          }
         }
+
+        QString mStatsName = "MultivariateStatistics" + toString(band);
+        PvlObject mStats(GetMStats(band).toPvl(mStatsName));
+        mStats += validBand;
+        o.addObject(mStats);
       }
+      PvlKeyword valid("Valid", (isValid) ? "true" : "false");
       o += valid;
-      o += cov;
-      o += cor;
-      o += val;
-      o += inv;
-      o += tot;
-
-      for (int band = 1; band <= Bands(); band++) {
-        if (HasOverlap(band)) {
-          QString bandStr = "LinearRegression" + toString(band);
-          PvlKeyword LinReg(bandStr);
-          double a, b;
-          try {
-            GetMStats(band).LinearRegression(a, b);
-            LinReg += toString(a);
-            LinReg += toString(b);
-          }
-          catch (IException &e) {
-            // It is possible one of the overlaps was constant and therefore
-            // the regression would be a vertical line (x=c instead of y=ax+b)
-          }
-          o += LinReg;
-        }
-      }
-
       return o;
     }
+
     catch (IException &e) {
       QString msg = "Trivial overlap between [" + FileNameX().name();
       msg += "] and [" + FileNameY().name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+  }
+
+
+  /**
+   * Unserialize overlap statistics from a Pvl
+   *
+   * @param const PvlObject & - The pvl object to initialize the overlap statistics with
+   */
+  void OverlapStatistics::fromPvl(const PvlObject &inStats) {
+    init();
+
+    const PvlGroup &fileX = inStats.findGroup("File1");
+    const PvlGroup &fileY = inStats.findGroup("File2");
+    p_xFile = inStats["File1"][0];
+    p_yFile = inStats["File2"][0];
+    p_sampRange = inStats["Width"];
+    p_lineRange = inStats["Height"];
+    p_bands = inStats["Bands"];
+    p_sampPercent = inStats["SamplingPercent"];
+
+    p_minSampX = fileX["StartSample"];
+    p_maxSampX = fileX["EndSample"];
+    p_minLineX = fileX["StartLine"];
+    p_maxLineX = fileX["EndLine"];
+
+    p_minSampY = fileY["StartSample"];
+    p_maxSampY = fileY["EndSample"];
+    p_minLineY = fileY["StartLine"];
+    p_maxLineY = fileY["EndLine"];
+
+    p_mincnt = inStats["MinCount"];
+
+    // unserialize the MStats
+    for (int band = 1; band <= Bands(); band++) {
+      QString name = "MultivariateStatistics" + toString(band);
+      const PvlObject &mStats = inStats.findObject(name);
+      p_stats.push_back(MultivariateStatistics(mStats)); 
+    }
+
+  }
+
+
+  /**
+   * Reset member variables to default values
+   */
+  void OverlapStatistics::init() {
+    p_sampPercent = 0.0;
+    p_bands = 0;
+    p_sampRange = 0;
+    p_lineRange = 0;
+    p_minSampX = 0;
+    p_maxSampX = 0;
+    p_minSampY = 0;
+    p_maxSampY = 0;
+    p_minLineX = 0;
+    p_maxLineX = 0;
+    p_minLineY = 0;
+    p_maxLineY = 0;
+    p_mincnt = 0;
   }
 
 
@@ -305,7 +375,6 @@ namespace Isis {
     os << p << endl;
     return os;
   }
-
 
 }
 
