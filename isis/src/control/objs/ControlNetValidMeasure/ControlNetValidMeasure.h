@@ -74,9 +74,6 @@ namespace Isis {
     *                          Fixes #1436. 
     *  @history 2014-03-03 Janet Barrett - Initialize the mdDnValue variable in
     *                          the ValidStandardOptions method. Fixes #2040.
-    *  @history 2016-07-13 Adam Paquette - Updated ValidStandardOptions to only
-    *                          get the EmissionAngle, IncidenceAngle, and PixelResolution
-    *                          if an image was properly set.
     */
 
   class ControlNetValidMeasure {
