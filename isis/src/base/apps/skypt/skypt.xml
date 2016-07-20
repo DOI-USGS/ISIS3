@@ -7,7 +7,7 @@
 
   <description>
     This program requires the user supply a "level 1" cube.  That is, a
-    cube in raw camera geometry. 
+    cube in raw camera geometry.
     The user must also enter one of the following coordinates:
     <pre>
      sample/line
@@ -17,7 +17,7 @@
     time and pixel dn value.
 
    <p>
-    Hint:  If you would like to use this program for multiple points, look into the 
+    Hint:  If you would like to use this program for multiple points, look into the
     -batchlist option.
    </p>
   </description>
@@ -47,6 +47,9 @@
     <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
     </change>
+    <change name="Kelvin Rodriguez" date="2016-06-27">
+       Added functionality to compute celestial north clock angle, References #2365.
+    </change>
   </history>
 
   <groups>
@@ -58,7 +61,7 @@
             Filename of a cube
           </brief>
           <description>
-            Input cube with appropriate camera labels 
+            Input cube with appropriate camera labels
             (Instrument and kernel groups)
           </description>
           <filter>
@@ -73,8 +76,8 @@
           Output List
         </brief>
         <description>
-          The output list will be a text file and will contain the  filename,  
-         sample, line, ra, dec, et, and dn values.  The values will be written out 
+          The output list will be a text file and will contain the  filename,
+         sample, line, ra, dec, et, and dn values.  The values will be written out
           in pvl or flat format, depending on what the user selects for the FORMAT
           parameter.
         </description>
@@ -88,7 +91,7 @@
         </brief>
         <description>
           Format type for output file.  Pvl format is default.
-        </description>  
+        </description>
         <default><item>PVL</item></default>
         <list>
           <option value="PVL">
@@ -104,7 +107,7 @@
               FlatFile Format
             </brief>
             <description>
-              Output file will be a comma deliminated flatfile.  This file format can easily be 
+              Output file will be a comma deliminated flatfile.  This file format can easily be
               imported into excel.
             </description>
           </option>
@@ -117,8 +120,8 @@
           Append Output to File
         </brief>
         <description>
-          If this option is selected, the output from the application will be appended to the file. 
-          If it is not selected, any information in the TO file will be overwritten.  This option is 
+          If this option is selected, the output from the application will be appended to the file.
+          If it is not selected, any information in the TO file will be overwritten.  This option is
          selected by default.
         </description>
         <default><item>TRUE</item></default>

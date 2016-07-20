@@ -23,7 +23,7 @@ void IsisMain() {
   double samp, line;
 
   // Do conversion from samp/line to ra/dec
-  if(type == "IMAGE") {
+  if (type == "IMAGE") {
     // Get users sample & line values and do a setImage for the camera
     samp = ui.GetDouble("SAMPLE");
     line = ui.GetDouble("LINE");
@@ -33,7 +33,7 @@ void IsisMain() {
   else {
     double ra = ui.GetDouble("RA");
     double dec = ui.GetDouble("DEC");
-    if(!cam->SetRightAscensionDeclination(ra, dec)) {
+    if (!cam->SetRightAscensionDeclination(ra, dec)) {
       QString msg = "Invalid Ra/Dec coordinate";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -48,6 +48,8 @@ void IsisMain() {
   b.SetBasePosition(intSamp, intLine, 1);
   cube.read(b);
 
+  double rot = cam->CelestialNorthClockAngle();
+
   // Create group with sky position
   PvlGroup sp("SkyPoint");
   {
@@ -58,23 +60,25 @@ void IsisMain() {
     sp += PvlKeyword("Declination", toString(cam->Declination()));
     sp += PvlKeyword("EphemerisTime", toString(cam->time().Et()));
     sp += PvlKeyword("PixelValue", PixelToString(b[0]));
+    sp += PvlKeyword("CelestialNorthClockAngle", toString(rot), "degrees");
   }
+
   //Write the group to the screen
   Application::Log(sp);
 
   // Write an output label file if necessary
-  if(ui.WasEntered("TO")) {
+  if (ui.WasEntered("TO")) {
     // Get user params from ui
     QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // Write the pvl group out to the file
-    if(ui.GetString("FORMAT") == "PVL") {
+    if (ui.GetString("FORMAT") == "PVL") {
       Pvl temp;
       temp.setTerminator("");
       temp.addGroup(sp);
-      if(append) {
+      if (append) {
         temp.append(ui.GetAsString("TO"));
       }
       else {
@@ -86,9 +90,9 @@ void IsisMain() {
     else {
       ofstream os;
       bool writeHeader = false;
-      if(append) {
+      if (append) {
         os.open(outFile.toAscii().data(), ios::app);
-        if(!exists) {
+        if (!exists) {
           writeHeader = true;
         }
       }
@@ -97,11 +101,11 @@ void IsisMain() {
         writeHeader = true;
       }
 
-      if(writeHeader) {
+      if (writeHeader) {
         for(int i = 0; i < sp.keywords(); i++) {
           os << sp[i].name();
 
-          if(i < sp.keywords() - 1) {
+          if (i < sp.keywords() - 1) {
             os << ",";
           }
         }
@@ -111,14 +115,14 @@ void IsisMain() {
       for(int i = 0; i < sp.keywords(); i++) {
         os << (QString)sp[i];
 
-        if(i < sp.keywords() - 1) {
+        if (i < sp.keywords() - 1) {
           os << ",";
         }
       }
       os << endl;
     }
   }
-  else if(ui.GetString("FORMAT") == "FLAT") {
+  else if (ui.GetString("FORMAT") == "FLAT") {
     QString msg = "Flat file must have a name.";
     throw IException(IException::User, msg, _FILEINFO_);
   }

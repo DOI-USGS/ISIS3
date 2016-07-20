@@ -56,7 +56,7 @@ namespace Isis {
    * the label object. The constructor expects an Instrument and Kernels group
    * to be in the labels (see Spice documentation).
    *
-   * @param cube Cube whose label contains Instrument and Kernels groups. 
+   * @param cube Cube whose label contains Instrument and Kernels groups.
    */
   Sensor::Sensor(Cube &cube) : Spice(cube) {
   }
@@ -85,13 +85,13 @@ namespace Isis {
 
 
   /**
-   * This method is implemented in Camera which defaults to the (pixel pitch * summing mode ) / 2. 
-   * If the instrument has a non-square ifov, it must implement this method to return offsets 
-   * from the center of the pixel. 
-   * 
+   * This method is implemented in Camera which defaults to the (pixel pitch * summing mode ) / 2.
+   * If the instrument has a non-square ifov, it must implement this method to return offsets
+   * from the center of the pixel.
+   *
    * @author tsucharski (3/8/2013)
-   * 
-   * @return QList<QPointF> 
+   *
+   * @return QList<QPointF>
    */
   QList<QPointF> Sensor::PixelIfovOffsets() {
 
@@ -104,8 +104,8 @@ namespace Isis {
    * By setting the time you essential set the position of the
    * spacecraft and body as indicated in the class Spice. However, after this
    * is invoked there will be no intersection point until SetLookDirection or
-   * SetUniversalGround is invoked. (Read NAIF documentation for a detailed 
-   * description of ephemeris time.) 
+   * SetUniversalGround is invoked. (Read NAIF documentation for a detailed
+   * description of ephemeris time.)
    *
    * @param time Ephemeris time.
    */
@@ -125,7 +125,7 @@ namespace Isis {
    *            usually the look direction out of the boresight of a camera.
    *
    * @return @b bool Indicates whether the given look direction intersects the target.
-   *  
+   *
    * @internal
    *   @history  2009-09-23  Tracie Sucharski - Convert negative longitudes
    *                           returned my reclat.
@@ -151,7 +151,7 @@ namespace Isis {
    *                           loop in the ray tracing algorithm.  The problem
    *                           was first exposed when trying to intersect the
    *                           Vesta DEM on the limb.
-   *  
+   *
    */
   bool Sensor::SetLookDirection(const double v[3]) {
     // The look vector must be in the camera coordinate system
@@ -216,8 +216,8 @@ namespace Isis {
 
 
   /**
-   * Returns the planetocentric latitude, in degrees, at the surface 
-   * intersection point in the body fixed coordinate system. 
+   * Returns the planetocentric latitude, in degrees, at the surface
+   * intersection point in the body fixed coordinate system.
    *
    * @return @b double Universal latitude, in degrees.
    */
@@ -227,8 +227,8 @@ namespace Isis {
 
 
   /**
-   * Returns a planetocentric latitude object at the surface 
-   * intersection point in body fixed. 
+   * Returns a planetocentric latitude object at the surface
+   * intersection point in body fixed.
    *
    * @return @b Latidude Universal latitude object.
    */
@@ -240,7 +240,7 @@ namespace Isis {
   /**
    * Returns the positive east, 0-360 domain longitude, in degrees,
    * at the surface intersection point in the body fixed coordinate
-   * system. 
+   * system.
    *
    * @return @b double Universal longitude, in degrees.
    */
@@ -252,7 +252,7 @@ namespace Isis {
   /**
    * Returns a positive east, 0-360 domain longitude object
    * at the surface intersection point in the body fixed coordinate
-   * system. 
+   * system.
    *
    * @return @b Longitude Universal longitude object.
    */
@@ -262,9 +262,9 @@ namespace Isis {
 
 
   /**
-   * Returns the surface point (most efficient accessor). 
-   *  
-   * @return @b SurfacePoint Coordinate for the surface intersection. 
+   * Returns the surface point (most efficient accessor).
+   *
+   * @return @b SurfacePoint Coordinate for the surface intersection.
    */
   SurfacePoint Sensor::GetSurfacePoint() const {
     return *(target()->shape()->surfaceIntersection());
@@ -274,9 +274,9 @@ namespace Isis {
   /**
    * Returns the local radius at the intersection point. This is either the
    * radius on the ellipsoid, the radius from the surface model passed into
-   * the constructor, or the radius set with SetUniversalGround. 
-   *  
-   * @return @b Distance The local radius at the surface intersection. 
+   * the constructor, or the radius set with SetUniversalGround.
+   *
+   * @return @b Distance The local radius at the surface intersection.
    */
   Distance Sensor::LocalRadius() const {
     //TODO: We probably need to be validating surface intersect point is not NULL
@@ -289,15 +289,15 @@ namespace Isis {
    * Returns the local radius at the intersection point. This is either the
    * radius on the ellipsoid, the radius from the surface model passed into
    * the constructor, or the radius set with SetUniversalGround.
-   *  
-   * @param lat 
-   * @param lon 
-   *  
+   *
+   * @param lat
+   * @param lon
+   *
    * @return @b Distance The distance from the center of the planet to this
    *          lat,lon in meters.
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
-    return target()->shape()->localRadius(lat, lon); 
+    return target()->shape()->localRadius(lat, lon);
   }
 
 
@@ -305,9 +305,9 @@ namespace Isis {
     * Returns the local radius at the intersection point. This is either the
     * radius on the ellipsoid, the radius from the surface model passed into
     * the constructor, or the radius set with SetUniversalGround.
-   *  
-   * @param lat 
-   * @param lon 
+   *
+   * @param lat
+   * @param lon
     *
     * @return @b Distance The distance from the center of the planet to this
     *          lat,lon in meters.
@@ -368,7 +368,7 @@ namespace Isis {
    * @return bool True if the look direction intersects the target.
    */
   bool Sensor::SetUniversalGround(const double latitude,
-                                  const double longitude, 
+                                  const double longitude,
                                   bool backCheck) {
 
     ShapeModel *shape = target()->shape();
@@ -404,7 +404,7 @@ namespace Isis {
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
-                                  const double radius, 
+                                  const double radius,
                                   bool backCheck) {
 
     ShapeModel *shape = target()->shape();
@@ -500,7 +500,7 @@ namespace Isis {
 
     // return with success
     shape->setHasIntersection(true);
-    
+
     return true;
   }
 
@@ -525,8 +525,8 @@ namespace Isis {
 
   /**
    * Returns the right ascension angle (sky longitude).
-   *  
-   * @return @b double The angle of right ascension, in degrees. 
+   *
+   * @return @b double The angle of right ascension, in degrees.
    */
   double Sensor::RightAscension() {
     if (m_newLookB) computeRaDec();
@@ -536,7 +536,7 @@ namespace Isis {
 
   /**
    * Returns the declination angle (sky latitude).
-   *  
+   *
    * @return @b double Declination angle, in degrees.
    */
   double Sensor::Declination() {
@@ -554,7 +554,7 @@ namespace Isis {
     lookB[0] = m_lookB[0];
     lookB[1] = m_lookB[1];
     lookB[2] = m_lookB[2];
-    vector<double> lookJ = bodyRotation()->J2000Vector(lookB);;
+    vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
 
     SpiceDouble range;
     recrad_c((SpiceDouble *)&lookJ[0], &range, &m_ra, &m_dec);
@@ -582,8 +582,8 @@ namespace Isis {
 
   /**
    * Sets the vector between the spacecraft and surface point in body-fixed.
-   *  
-   * @param scSurfaceVector The direction vector from the observer to the 
+   *
+   * @param scSurfaceVector The direction vector from the observer to the
    *                        surface intersection.
    *
    * @author 2011-12-20 Tracie Sucharski
@@ -597,7 +597,7 @@ namespace Isis {
 
   /**
    * Return the distance between the spacecraft and surface point in kmv.
-   *  
+   *
    * @return @b double Slant distance.
    */
   double Sensor::SlantDistance() const {
@@ -620,7 +620,7 @@ namespace Isis {
 
   /**
    * Return the local solar time in hours.
-   *  
+   *
    * @return @b double Local solar time, in hours.
    */
   double Sensor::LocalSolarTime() {
@@ -637,7 +637,7 @@ namespace Isis {
 
   /**
    * Returns the distance between the sun and surface point in AU.
-   *  
+   *
    * @return @b double Solar distance.
    */
   double Sensor::SolarDistance() const {
@@ -660,8 +660,8 @@ namespace Isis {
 
   /**
    * Returns the distance from the spacecraft to the subspacecraft point in km.
-   * It uses the ellipsoid, not the shape model. 
-   *  
+   * It uses the ellipsoid, not the shape model.
+   *
    * @return @b double Spacecraft altitude.
    */
   double Sensor::SpacecraftAltitude() {

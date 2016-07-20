@@ -21,6 +21,8 @@ NorthAzimuth: 269.544
 SunAzimuth: 168.17
 SpacecraftAzimuth: 184.591
 OffNadirAngle: 44.4225
+CelestialNorthClockAngle: 186.19
+RaDecResolution: 0.0216226
 
 GroundAzimuth in North: 59.9718
 GroundAzimuth in North: 89.4306
@@ -211,8 +213,8 @@ Lines: 1404
 Bands: 1
 ParentLines: 768
 ParentSamples: 640
-**PROGRAMMER ERROR** Camera::RaDecRange can not calculate a right ascension, declination range for projected images which are not projected to sky.
-**PROGRAMMER ERROR** Camera::RaDecResolution can not calculate a right ascension, declination resolution for projected images which are not projected to sky.
+1
+0.0216
 Calling Distortion, FocalPlane, Detector, Ground, and Sky Map functions... Done.
 Calling IgnoreProjection (false)...
 

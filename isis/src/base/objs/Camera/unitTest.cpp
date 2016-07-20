@@ -48,10 +48,10 @@ using namespace Isis;
  * @internal
  *   @history 2015-04-30 Jeannie Backer - Added call to GetLocalNormal() for cube ellipsoidal
  *                           (i.e. non-DEM) shape model. References #2243.
- *   @history 2015-10-16 Ian Humphrey - Updated to test spacecraft and instrument name methods. 
+ *   @history 2015-10-16 Ian Humphrey - Updated to test spacecraft and instrument name methods.
  *                           References #2335.
- *  
- *  
+ *
+ *
  *   testcoverage 2015-04-30 - 43.262% scope, 61.561% line, 87.5% function
  */
 
@@ -121,7 +121,9 @@ int main() {
     cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
     cout << "SunAzimuth: " << c->SunAzimuth() << endl;
     cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
-    cout << "OffNadirAngle: " << c->OffNadirAngle() << endl << endl;
+    cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
+    cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
+    cout << "RaDecResolution: " << c->RaDecResolution()  << endl << endl;
 
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 226.671, 20.0, 230.0) << endl;
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(20.0, 226.671, 20.0, 230.0) << endl;
@@ -345,7 +347,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -371,7 +373,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -397,7 +399,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -423,7 +425,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -449,7 +451,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -475,7 +477,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -501,7 +503,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -527,7 +529,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -553,7 +555,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -579,7 +581,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
@@ -606,7 +608,7 @@ int main() {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
       cout << "Incidence = " << incidence.degrees() << endl;
-    } 
+    }
     else {
       cout << "Angles could not be calculated." << endl;
     }
