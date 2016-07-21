@@ -108,6 +108,14 @@ Group = GroundPoint
   LocalSolarTime             = 17.089704420784 &lt;hour&gt;
   <def link="Solar Longitude">SolarLongitude</def>             = 201.83159041209 &lt;degrees&gt;
   Error                      = NULL
+  
+  # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
+  LookDirectionBodyFixed     = (0.95457395414683, 0.074906840825054,
+                                -0.28840515124058) &lt;degrees&gt;
+  LookDirectionJ2000         = (0.5482662642052, -0.25280984110143,
+                                -0.797177074292) &lt;degrees&gt;
+  LookDirectionCamera        = (0.0040987946596217, -0.6021663586021,
+                                0.79836011702128) &lt;degrees&gt;
 End_Group
     </pre>
     

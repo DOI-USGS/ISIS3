@@ -271,6 +271,9 @@ namespace Isis {
       gp->addKeyword(PvlKeyword("UTC"));
       gp->addKeyword(PvlKeyword("LocalSolarTime"));
       gp->addKeyword(PvlKeyword("SolarLongitude"));
+      gp->addKeyword(PvlKeyword("LookDirectionBodyFixed"));
+      gp->addKeyword(PvlKeyword("LookDirectionJ2000"));
+      gp->addKeyword(PvlKeyword("LookDirectionCamera"));
       if (allowErrors) gp->addKeyword(PvlKeyword("Error"));
     }
 
@@ -457,6 +460,26 @@ namespace Isis {
                         m_camera->LocalSolarTime()), "hour");
         gp->findKeyword("SolarLongitude").setValue(toString(
                         m_camera->solarLongitude().degrees()), "degrees");
+
+        std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "degrees");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "degrees");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "degrees");
+        gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
+
+        std::vector<double>lookJ = m_camera->lookDirectionJ2000();
+        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "degrees");
+        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "degrees");
+        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "degrees");
+
+        double lookC[3];
+        m_camera->LookDirection(lookC);
+        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "degrees");
+        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "degrees");
+        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "degrees");
+
+
+
         if (allowErrors) gp->findKeyword("Error").setValue("NULL");
       }
     }

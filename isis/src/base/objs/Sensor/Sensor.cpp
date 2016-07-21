@@ -154,6 +154,7 @@ namespace Isis {
    *
    */
   bool Sensor::SetLookDirection(const double v[3]) {
+    //std::cout << "Sensor::SetLookDirection()\n";
     // The look vector must be in the camera coordinate system
 
     // copy v to LookC
@@ -438,6 +439,7 @@ namespace Isis {
    * @return bool
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
+    //std::cout << "Sensor::SetGround()\n";
     ShapeModel *shape = target()->shape();
     shape->clearSurfacePoint();
 
@@ -511,16 +513,36 @@ namespace Isis {
    * @param v[] The look vector.
    */
   void Sensor::LookDirection(double v[3]) const {
+    vector<double> lookC = instrumentRotation()->ReferenceVector(lookDirectionJ2000());
+    v[0] = lookC[0];
+    v[1] = lookC[1];
+    v[2] = lookC[2]; 
+  }
+
+ /**
+   * Returns the look direction in the body fixed coordinate system.
+   *
+   * @return @b vector<double> Look direction in body fixed coordinate system.
+   */
+  vector<double> Sensor::lookDirectionBodyFixed() const {
     vector<double> lookB(3);
     lookB[0] = m_lookB[0];
     lookB[1] = m_lookB[1];
     lookB[2] = m_lookB[2];
-    vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
-    vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
-    v[0] = lookC[0];
-    v[1] = lookC[1];
-    v[2] = lookC[2];
+    return lookB;
   }
+  
+  
+   /**
+   * Returns the look direction in the camera coordinate system.
+   *
+   * @return @b vector<double> Look direction in J2000 cooridinate system.
+   */
+  vector<double> Sensor::lookDirectionJ2000() const {
+    vector<double> lookJ = bodyRotation()->J2000Vector(lookDirectionBodyFixed());
+    return lookJ;
+  }
+
 
 
   /**
