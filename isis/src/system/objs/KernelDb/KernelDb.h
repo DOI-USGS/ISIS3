@@ -38,29 +38,29 @@ namespace Isis {
   class FileName;
   class iTime;
   /**
-   * @brief KernelDb class 
-   *  
-   * This class handles kernel database files.  Once the database files have been
-   * loaded into a Pvl, the highest version of each kernel can be found by 
-   * calling methods with corresponding kernel names, as shown below. 
+   * @brief KernelDb class
    *
-   * <code> 
-   * KernelDb baseKernels(0); 
-   *                                                                 
-   * baseKernels.loadSystemDb(mission, lab);                         
-   *                                                                 
-   * Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;    
-   * priority_queue< Kernel > ck;                                    
-   * lk        = baseKernels.leapSecond(lab);                        
-   * pck       = baseKernels.targetAttitudeShape(lab);               
-   * targetSpk = baseKernels.targetPosition(lab);                    
-   * ik        = baseKernels.instrument(lab);                        
-   * sclk      = baseKernels.spacecraftClock(lab);                   
-   * iak       = baseKernels.instrumentAddendum(lab);                
-   * fk        = ckKernels.frame(lab);                               
-   * ck        = ckKernels.spacecraftPointing(lab);                  
-   * spk       = spkKernels.spacecraftPosition(lab);                 
-   *  
+   * This class handles kernel database files.  Once the database files have been
+   * loaded into a Pvl, the highest version of each kernel can be found by
+   * calling methods with corresponding kernel names, as shown below.
+   *
+   * <code>
+   * KernelDb baseKernels(0);
+   *
+   * baseKernels.loadSystemDb(mission, lab);
+   *
+   * Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
+   * priority_queue< Kernel > ck;
+   * lk        = baseKernels.leapSecond(lab);
+   * pck       = baseKernels.targetAttitudeShape(lab);
+   * targetSpk = baseKernels.targetPosition(lab);
+   * ik        = baseKernels.instrument(lab);
+   * sclk      = baseKernels.spacecraftClock(lab);
+   * iak       = baseKernels.instrumentAddendum(lab);
+   * fk        = ckKernels.frame(lab);
+   * ck        = ckKernels.spacecraftPointing(lab);
+   * spk       = spkKernels.spacecraftPosition(lab);
+   *
    * </code>
    * @ingroup System
    *
@@ -111,16 +111,16 @@ namespace Isis {
    *                           information. References #1232.
    */
   class KernelDb {
-  
+
     public:
       // constructor
       KernelDb(const unsigned int allowedKernelTypes);
       KernelDb(const QString &dbName, const unsigned int allowedKernelTypes);
       KernelDb(std::istream &dbStream, const unsigned int allowedKernelTypes);
-  
+
       // destructor
       ~KernelDb();
-  
+
       // Members for getting kernels
       Kernel leapSecond(Pvl &lab);
       Kernel targetAttitudeShape(Pvl &lab);
@@ -132,41 +132,38 @@ namespace Isis {
       Kernel frame(Pvl &lab);
       Kernel instrumentAddendum(Pvl &lab);
       Kernel dem(Pvl &lab);
-  
+
       Kernel findLast(const QString &entry, Pvl &lab);
       QList< std::priority_queue<Kernel> > findAll(const QString &entry,
                                                    Pvl &lab);
-  
+
       void loadSystemDb(const QString &mission, const Pvl &lab);
       QList<FileName> kernelDbFiles();
-  
+
       static bool matches(const Pvl &lab, PvlGroup &kernelDbGrp,
                           iTime timeToMatch, int cameraVersion);
-      bool better(QString newType, QString oldType);
-      bool better(Kernel::Type newType, Kernel::Type oldType);
-  
     private:
-      void loadKernelDbFiles(PvlGroup &dataDir, 
-                             QString directory, 
+      void loadKernelDbFiles(PvlGroup &dataDir,
+                             QString directory,
                              const Pvl &lab);
       void readKernelDbFiles();
 
       QStringList files(PvlGroup &grp);
       QString m_filename; /**< The name of the kernel database file. This
                                may be set to "None" or "internal stream".*/
-      QList<FileName> m_kernelDbFiles; /**< List of the kernel database file 
-                                            names that were read in when the 
+      QList<FileName> m_kernelDbFiles; /**< List of the kernel database file
+                                            names that were read in when the
                                             loadSystemDb() method is called.*/
-      unsigned int m_allowedKernelTypes; /**< This integer value represents 
-                                              which Kernel::Types are allowed. It 
+      unsigned int m_allowedKernelTypes; /**< This integer value represents
+                                              which Kernel::Types are allowed. It
                                               is the sum of the enumeration
                                               values of the allowed Kernel::Types.
-                                              When this integer value and the 
-                                              enumeration types are  expressed 
-                                              binary numbers, it is clear which 
-                                              types are allowed.*/ 
-      Pvl m_kernelData; /**< Pvl containing the information in the kernel 
-                             database(s) that is read in from the constructor 
+                                              When this integer value and the
+                                              enumeration types are  expressed
+                                              binary numbers, it is clear which
+                                              types are allowed.*/
+      Pvl m_kernelData; /**< Pvl containing the information in the kernel
+                             database(s) that is read in from the constructor
                              and whenever the loadSystemDb() method is called.*/
   };
 };

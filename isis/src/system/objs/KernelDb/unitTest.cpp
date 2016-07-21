@@ -18,14 +18,13 @@
 using namespace std;
 using namespace Isis;
 
-void testBetter(KernelDb kdb, QString conditions);
 void testLoadSystemDb(KernelDb &kdb, const QString &mission, const Pvl &lab);
 void testKernelAccessors(KernelDb &kdb, Pvl &lab, bool timeBasedKernelsOnly);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
-  Cube cube("$base/testData/isisTruth.cub", "r"); 
+  Cube cube("$base/testData/isisTruth.cub", "r");
   Pvl &lab = *cube.label();
   PvlObject &obj = lab.findObject("IsisCube");
   PvlGroup group("Instrument");
@@ -66,11 +65,11 @@ int main(int argc, char *argv[]) {
 
   // Test loadSystemDb
 
-  // In the following tests, we test 
-  // 
+  // In the following tests, we test
+  //
   // (1) No config file exists, use kernel.????.db file (this is true for all
   // but ck directories
-  // 
+  //
   // (2) A config file exists with two match cases and no default (MDIS)
   //    (a) test for the correct match to NAC
   //    (b) test for the correct match to WAC
@@ -80,7 +79,7 @@ int main(int argc, char *argv[]) {
   lab.findObject("IsisCube").findGroup("Instrument")
      .findKeyword("StartTime").setValue("2008 JAN 12 00:00:00.0");
   lab.findObject("IsisCube").findGroup("Instrument")
-     .findKeyword("StopTime").setValue("2008 JAN 12 00:00:00.0"); 
+     .findKeyword("StopTime").setValue("2008 JAN 12 00:00:00.0");
 
   // (1) and (3a)
   lab.findObject("IsisCube").findGroup("Instrument")
@@ -105,31 +104,28 @@ int main(int argc, char *argv[]) {
   KernelDb mroMatchCrism(13);
   testLoadSystemDb(mroMatchCrism, "Mro", lab);
   testKernelAccessors(mroMatchCrism, lab, true);
-
-  testBetter(kdb, "When all kernel types are allowed");
-  testBetter(mroMatchCrism, "When Nadir is not allowed");
-
+  
   // Not yet tested:
 
   // constructor stream db file, not label
-  
+
   // Not able to test the following from "loadSystemDb()"
   // since these are in system config file:
-  // 
+  //
   // Obj = Instrument has group != Selection.
   // pvl.Read(kernelDbFileName.expanded())
 
   // findLast() and findAll() not tested:
-  // 
+  //
   // priority queue has only empty Kernel (i.e. no matches found)
   // kerneldb file doesn't have specified kernel file "entry" name
   // Label InstrumentGroup does not have StopTime
   // group != Selection.
   // one group has keyword "Type" and another doesn't
   // different "Type" values for allowed groups
-  
+
   // files()
-  // 
+  //
   // Test Selection group has File keyword with no value
   // Test Selection group has File keyword with 1 value that is versioned
 
@@ -191,56 +187,11 @@ int main(int argc, char *argv[]) {
 }
 
 /**
- * Method that prints a table of results that compare all Kernel::Types 
- * with for the given KernelDb using the better() method. This table will 
- * depend on the kernel types allowed. This should be described in the 
- * conditions parameter. 
- * 
- * @param kdb KernelDb object
- * @param conditions QString describing which Kernel::Types are allowed
- */
-void testBetter(KernelDb kdb, QString conditions) {
-  cout << endl; 
-  cout << endl; 
-  cout << endl; 
-  cout << "Testing better(row, column) method ..." << endl; 
-  cout << endl; 
-  cout << "\t" << conditions << ", is row better than col?" << endl; 
-  cout << "\t\t\tUnknown\tPredicted\tNadir\tRecon\tSmithed" << endl; 
-  cout << "Unknown\t\t\t" << kdb.better("Unknown","Unknown") << "\t\t"
-                          << kdb.better("Unknown","Predicted") << "\t\t"
-                          << kdb.better("Unknown","Nadir") << "\t\t"
-                          << kdb.better("Unknown","Reconstructed") << "\t\t" 
-                          << kdb.better("Unknown","Smithed") << endl; 
-  cout << "Predicted\t\t" << kdb.better("Predicted","Unknown") << "\t\t"
-                          << kdb.better("Predicted","Predicted") << "\t\t" 
-                          << kdb.better("Predicted","Nadir") << "\t\t" 
-                          << kdb.better("Predicted","Reconstructed") << "\t\t" 
-                          << kdb.better("Predicted","Smithed") << endl; 
-  cout << "Nadir\t\t\t" << kdb.better("Nadir","Unknown") << "\t\t" 
-                        << kdb.better("Nadir","Predicted") << "\t\t" 
-                        << kdb.better("Nadir","Nadir") << "\t\t" 
-                        << kdb.better("Nadir","Reconstructed") << "\t\t" 
-                        << kdb.better("Nadir","Smithed") << endl; 
-  cout << "Reconstructed\t" << kdb.better("Reconstructed","Unknown") << "\t\t" 
-                            << kdb.better("Reconstructed","Predicted") << "\t\t" 
-                            << kdb.better("Reconstructed","Nadir") << "\t\t" 
-                            << kdb.better("Reconstructed","Reconstructed") << "\t\t" 
-                            << kdb.better("Reconstructed","Smithed") << endl; 
-  cout << "Smithed\t\t\t"   << kdb.better("Smithed","Unknown") << "\t\t" 
-                            << kdb.better("Smithed","Predicted") << "\t\t" 
-                            << kdb.better("Smithed","Nadir") << "\t\t" 
-                            << kdb.better("Smithed","Reconstructed") << "\t\t" 
-                            << kdb.better("Smithed","Smithed") << endl; 
-
-}
-
-/**
  * Method that prints the kernel database files that are read in by the
- * loadSystemDb() method.  These file names have the version numbers 
- * replaced with ?.  Also, the begining of the paths is stripped off 
- * and we are left with $mission or $base. 
- * 
+ * loadSystemDb() method.  These file names have the version numbers
+ * replaced with ?.  Also, the begining of the paths is stripped off
+ * and we are left with $mission or $base.
+ *
  * @param kdb KernelDb object
  * @param mission Mission to be loaded
  * @param lab Pvl containing the labels (the insturment id will be matched, if
@@ -267,10 +218,10 @@ void testLoadSystemDb(KernelDb &kdb, const QString &mission, const Pvl &lab){
 }
 
 /**
- * Method that prints the files that are returned by the following 
- * accessor methods: 
- *  
- * <ul> 
+ * Method that prints the files that are returned by the following
+ * accessor methods:
+ *
+ * <ul>
  *   <li>leapSecond()
  *   <li>targetAttitudeShape()
  *   <li>targetPosition()
@@ -282,7 +233,7 @@ void testLoadSystemDb(KernelDb &kdb, const QString &mission, const Pvl &lab){
  *   <li>instrumentAddendum()
  *   <li>dem()
  * </ul>
- * 
+ *
  * @param kdb KernelDb object
  * @param lab Pvl containing the labels (the insturment id will be matched, if
  *            necessary)
@@ -344,7 +295,7 @@ void testKernelAccessors(KernelDb &kdb, Pvl &lab, bool timeBasedKernelsOnly){
   try {
     cout << endl << "SpacecraftPointing Kernels: " << endl;
     temp.clear();
-    QList< priority_queue<Kernel> > cks = kdb.spacecraftPointing(lab); 
+    QList< priority_queue<Kernel> > cks = kdb.spacecraftPointing(lab);
     for (int i = 0; i < cks.size(); i++) {
       priority_queue<Kernel> ck_queue = cks[i];
       if (ck_queue.size() > 0) {

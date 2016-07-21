@@ -389,30 +389,6 @@ $mro/kernels/ck/mro_crm_psp_080101_080131.bc
 
 SpacecraftPosition Kernels: 
 $mro/kernels/spk/mro_psp6.bsp
-
-
-
-Testing better(row, column) method ...
-
-	When all kernel types are allowed, is row better than col?
-			Unknown	Predicted	Nadir	Recon	Smithed
-Unknown			0		0		0		0		0
-Predicted		1		1		0		0		0
-Nadir			1		1		1		0		0
-Reconstructed	1		1		1		1		0
-Smithed			1		1		1		1		1
-
-
-
-Testing better(row, column) method ...
-
-	When Nadir is not allowed, is row better than col?
-			Unknown	Predicted	Nadir	Recon	Smithed
-Unknown			0		0		0		0		0
-Predicted		1		1		0		0		0
-Nadir			0		0		0		0		0
-Reconstructed	1		1		1		1		0
-Smithed			1		1		1		1		1
 /---------------------------------------/
 
 
