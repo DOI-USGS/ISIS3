@@ -216,7 +216,7 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
-   *   @history 2016-6-27 Kelvin Rodriguez - Added member function to compute celestial north
+   *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
    *                           clock angle. References #2365
    */
 
