@@ -307,6 +307,13 @@ NNINCDIR = -I$(ISIS3LOCAL)/include/nn
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
+# Set up for HDF5 libraries 
+#---------------------------------------------------------------------------
+HDF5INCDIR = -I$(ISIS3OPT)/include
+#HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
+HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+
+#---------------------------------------------------------------------------
 # Final generic setup for includes at the top level
 #---------------------------------------------------------------------------
 DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
@@ -414,6 +421,11 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libp11-kit*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libffi*.dylib"
 #THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/lib*.dylib"
 
+# hdf5
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhdf5*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhdf5_hl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhdf5_cpp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhdf5_hl_cpp*.dylib"
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
