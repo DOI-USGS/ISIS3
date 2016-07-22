@@ -8,6 +8,7 @@
 #include <QXmlStreamWriter>
 
 #include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
 #include "Angle.h"
 #include "BundleControlPoint.h"
@@ -17,6 +18,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleSettings.h"
+#include "BundleTargetBody.h"
 #include "Camera.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
@@ -28,7 +30,9 @@
 #include "Preference.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
+#include "Spice.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "XmlStackedHandlerReader.h"
 
 using namespace std;
@@ -838,6 +842,779 @@ int main(int argc, char *argv[]) {
       
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
+
+    qDebug() << "";
+    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    qDebug() << "Testing BundleTargetBody...";
+    qDebug() << "";
+
+    qDebug() << "Create an empty BundleTargetBody";
+    qDebug() << "";
+    BundleTargetBody btb1;
+    qDebug().noquote() << btb1.formatBundleOutputString(false);
+
+    //TODO test creating a BundleTargetBody from a target
+
+    qDebug() << "";
+    qDebug() << "Convert strings to TargetRadiiSolveMethods and back";
+    qDebug() << "";
+
+    BundleTargetBody::TargetRadiiSolveMethod targetRadiiSolveMethod;
+    targetRadiiSolveMethod = BundleTargetBody::stringToTargetRadiiOption("none");
+    qDebug() << targetRadiiSolveMethod;
+    qDebug() << BundleTargetBody::targetRadiiOptionToString(targetRadiiSolveMethod);
+    targetRadiiSolveMethod = BundleTargetBody::stringToTargetRadiiOption("mean");
+    qDebug() << targetRadiiSolveMethod;
+    qDebug() << BundleTargetBody::targetRadiiOptionToString(targetRadiiSolveMethod);
+    targetRadiiSolveMethod = BundleTargetBody::stringToTargetRadiiOption("all");
+    qDebug() << targetRadiiSolveMethod;
+    qDebug() << BundleTargetBody::targetRadiiOptionToString(targetRadiiSolveMethod);
+
+    qDebug() << "";
+    qDebug() << "Setup the BundleTargetBody to solve for everything but mean radius";
+    qDebug() << "";
+    // We do not test solving for acceleration as it is not implemented.
+    std::set<int> targetParameterSolveCodes;
+    targetParameterSolveCodes.insert(BundleTargetBody::PoleRA);
+    targetParameterSolveCodes.insert(BundleTargetBody::VelocityPoleRA);
+//     targetParameterSolveCodes.insert(BundleTargetBody::AccelerationPoleRA);
+    targetParameterSolveCodes.insert(BundleTargetBody::PoleDec);
+    targetParameterSolveCodes.insert(BundleTargetBody::VelocityPoleDec);
+//     targetParameterSolveCodes.insert(BundleTargetBody::AccelerationPoleDec);
+    targetParameterSolveCodes.insert(BundleTargetBody::PM);
+    targetParameterSolveCodes.insert(BundleTargetBody::VelocityPM);
+//     targetParameterSolveCodes.insert(BundleTargetBody::AccelerationPM);
+    targetParameterSolveCodes.insert(BundleTargetBody::TriaxialRadiusA);
+    targetParameterSolveCodes.insert(BundleTargetBody::TriaxialRadiusB);
+    targetParameterSolveCodes.insert(BundleTargetBody::TriaxialRadiusC);
+    double poleRA               = -2.0;
+    double poleRASigma          = -0.2;
+    double poleRAVelocity       = -3.0;
+    double poleRAVelocitySigma  = -3.5;
+    double poleDec              = -4.0;
+    double poleDecSigma         = -5.0;
+    double poleDecVelocity      = -6.0;
+    double poleDecVelocitySigma = -7.0;
+    double pm                   = -8.0;
+    double pmSigma              = -9.0;
+    double pmVelocity           = -10.0;
+    double pmVelocitySigma      = -11.0;
+    double aRadius              = 12.0;
+    double aRadiusSigma         = 13.0;
+    double bRadius              = 14.0;
+    double bRadiusSigma         = 0.001;
+    double cRadius              = 15.0;
+    double cRadiusSigma         = 17.0;
+    double meanRadius           = 20.0;
+    double meanRadiusSigma      = 21.0;
+    btb1.setSolveSettings(
+        targetParameterSolveCodes,
+        Angle(poleRA, Angle::Degrees),             Angle(poleRASigma, Angle::Degrees),
+        Angle(poleRAVelocity, Angle::Degrees),     Angle(poleRAVelocitySigma, Angle::Degrees),
+        Angle(poleDec, Angle::Degrees),            Angle(poleDecSigma, Angle::Degrees),
+        Angle(poleDecVelocity, Angle::Degrees),    Angle(poleDecVelocitySigma, Angle::Degrees),
+        Angle(pm, Angle::Degrees),                 Angle(pmSigma, Angle::Degrees),
+        Angle(pmVelocity, Angle::Degrees),         Angle(pmVelocitySigma, Angle::Degrees),
+        (BundleTargetBody::TargetRadiiSolveMethod)2,
+        Distance(aRadius, Distance::Kilometers),   Distance(aRadiusSigma, Distance::Kilometers),
+        Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
+        Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
+        Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
+    qDebug().noquote() << btb1.formatBundleOutputString(false);
+    qDebug() << "";
+    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    boost::numeric::ublas::vector<double> btb1Weights = btb1.parameterWeights();
+    QString btb1WString;
+    for (size_t i = 0; i < btb1Weights.size(); i++) {
+      btb1WString.append(toString(btb1Weights[i]));
+      if (i < btb1Weights.size() - 1) {
+        btb1WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1WString;
+
+    qDebug() << "";
+    qDebug() << "Apply some corrections";
+    qDebug() << "";
+
+    boost::numeric::ublas::vector<double> btb1CumCorrections (btb1.numberParameters());
+    btb1CumCorrections = btb1.parameterCorrections();
+    QString btb1CString;
+    for (size_t i = 0; i < btb1CumCorrections.size(); i++) {
+      btb1CString.append(toString(btb1CumCorrections[i]));
+      if (i < btb1CumCorrections.size() - 1) {
+        btb1CString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1CString;
+    qDebug() << "";
+    boost::numeric::ublas::vector<double> btb1Corrections (btb1.numberParameters());
+    for (size_t i = 0; i < btb1Corrections.size(); i++) {
+      btb1Corrections[i] = pow(-0.7, i);
+    }
+    btb1.applyParameterCorrections(btb1Corrections);
+    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    btb1Weights = btb1.parameterWeights();
+    btb1WString.clear();
+    for (size_t i = 0; i < btb1Weights.size(); i++) {
+      btb1WString.append(toString(btb1Weights[i]));
+      if (i < btb1Weights.size() - 1) {
+        btb1WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1WString;
+    qDebug() << "";
+    btb1CumCorrections = btb1.parameterCorrections();
+    btb1CString.clear();
+    for (size_t i = 0; i < btb1CumCorrections.size(); i++) {
+      btb1CString.append(toString(btb1CumCorrections[i]));
+      if (i < btb1CumCorrections.size() - 1) {
+        btb1CString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1CString;
+    qDebug() << "";
+    for (size_t i = 0; i < btb1Corrections.size(); i++) {
+      btb1Corrections[i] = pow(1.1, i);
+    }
+    btb1.applyParameterCorrections(btb1Corrections);
+    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    btb1Weights = btb1.parameterWeights();
+    btb1WString.clear();
+    for (size_t i = 0; i < btb1Weights.size(); i++) {
+      btb1WString.append(toString(btb1Weights[i]));
+      if (i < btb1Weights.size() - 1) {
+        btb1WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1WString;
+    qDebug() << "";
+    btb1CumCorrections = btb1.parameterCorrections();
+    btb1CString.clear();
+    for (size_t i = 0; i < btb1CumCorrections.size(); i++) {
+      btb1CString.append(toString(btb1CumCorrections[i]));
+      if (i < btb1CumCorrections.size() - 1) {
+        btb1CString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1CString;
+
+    qDebug() << "";
+    qDebug() << "Test acccessors";
+    qDebug() << "";
+    qDebug() << "Pole Right Ascension";
+    qDebug() << btb1.solvePoleRA() << btb1.solvePoleRAVelocity() << btb1.solvePoleRAAcceleration();
+    qDebug() << "Pole Declination";
+    qDebug() << btb1.solvePoleDec() << btb1.solvePoleDecVelocity() << btb1.solvePoleDecAcceleration();
+    qDebug() << "Prime Meridian";
+    qDebug() << btb1.solvePM() << btb1.solvePMVelocity() << btb1.solvePMAcceleration();
+    qDebug() << "Radii";
+    qDebug() << btb1.solveTriaxialRadii() << btb1.solveMeanRadius();
+    qDebug() << "Parameter Count";
+    qDebug() << btb1.numberRadiusParameters() << btb1.numberParameters();
+    qDebug() << "Parameter Solutions";
+    boost::numeric::ublas::vector<double> btb1Solutions = btb1.parameterSolution();
+    QString btb1SString;
+    for (size_t i = 0; i < btb1Solutions.size(); i++) {
+      btb1SString.append(toString(btb1Solutions[i]));
+      if (i < btb1Solutions.size() - 1) {
+        btb1SString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1SString;
+    qDebug() << "Apriori Sigmas";
+    boost::numeric::ublas::vector<double> btb1Apriori = btb1.aprioriSigmas();
+    QString btb1AprioriString;
+    for (size_t i = 0; i < btb1Apriori.size(); i++) {
+      btb1AprioriString.append(toString(btb1Apriori[i]));
+      if (i < btb1Apriori.size() - 1) {
+        btb1AprioriString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1AprioriString;
+    qDebug() << "Adjusted Sigmas";
+    boost::numeric::ublas::vector<double> btb1Adjusted = btb1.adjustedSigmas();
+    QString btb1AdjustedString;
+    for (size_t i = 0; i < btb1Adjusted.size(); i++) {
+      btb1AdjustedString.append(toString(btb1Adjusted[i]));
+      if (i < btb1Adjusted.size() - 1) {
+        btb1AdjustedString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1AdjustedString;
+    qDebug() << "Pole Right Ascension Coefficients";
+    std::vector<Angle> btb1RACoefs = btb1.poleRaCoefs();
+    QString btb1RACoefString;
+    for (size_t i = 0; i < btb1RACoefs.size(); i++) {
+      btb1RACoefString.append(btb1RACoefs[i].toString());
+      if (i < btb1RACoefs.size() - 1) {
+        btb1RACoefString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1RACoefString;
+    qDebug() << "Pole Declination Coefficients";
+    std::vector<Angle> btb1DecCoefs = btb1.poleDecCoefs();
+    QString btb1DecCoefString;
+    for (size_t i = 0; i < btb1DecCoefs.size(); i++) {
+      btb1DecCoefString.append(btb1DecCoefs[i].toString());
+      if (i < btb1DecCoefs.size() - 1) {
+        btb1DecCoefString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1DecCoefString;
+    qDebug() << "Prime Meridian Coefficients";
+    std::vector<Angle> btb1PMCoefs = btb1.pmCoefs();
+    QString btb1PMCoefString;
+    for (size_t i = 0; i < btb1PMCoefs.size(); i++) {
+      btb1PMCoefString.append(btb1PMCoefs[i].toString());
+      if (i < btb1PMCoefs.size() - 1) {
+        btb1PMCoefString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1PMCoefString;
+    qDebug() << "VtPV";
+    qDebug() << btb1.vtpv();
+    qDebug() << "Local Radius";
+    qDebug().noquote()
+      << btb1.localRadius(Latitude(15, Angle::Degrees), Longitude(15, Angle::Degrees)).toString();
+
+    qDebug() << "";
+    qDebug() << "Test copy constructor";
+    qDebug() << "";
+    BundleTargetBody btb3(btb1);
+    qDebug().noquote() << btb3.formatBundleOutputString(true);
+
+    qDebug() << "Switch free and valid sigmas";
+    qDebug() << "";
+    poleRASigma          = 0.2;
+    poleRAVelocitySigma  = 3.5;
+    poleDecSigma         = 5.0;
+    poleDecVelocitySigma = 7.0;
+    pmSigma              = 9.0;
+    pmVelocitySigma      = 11.0;
+    aRadiusSigma         = 0.0;
+    bRadiusSigma         = 0.0;
+    cRadiusSigma         = 0.0;
+    btb1.setSolveSettings(
+        targetParameterSolveCodes,
+        Angle(poleRA, Angle::Degrees),             Angle(poleRASigma, Angle::Degrees),
+        Angle(poleRAVelocity, Angle::Degrees),     Angle(poleRAVelocitySigma, Angle::Degrees),
+        Angle(poleDec, Angle::Degrees),            Angle(poleDecSigma, Angle::Degrees),
+        Angle(poleDecVelocity, Angle::Degrees),    Angle(poleDecVelocitySigma, Angle::Degrees),
+        Angle(pm, Angle::Degrees),                 Angle(pmSigma, Angle::Degrees),
+        Angle(pmVelocity, Angle::Degrees),         Angle(pmVelocitySigma, Angle::Degrees),
+        (BundleTargetBody::TargetRadiiSolveMethod)2,
+        Distance(aRadius, Distance::Kilometers),   Distance(aRadiusSigma, Distance::Kilometers),
+        Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
+        Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
+        Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
+    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    btb1Weights = btb1.parameterWeights();
+    btb1WString.clear();
+    for (size_t i = 0; i < btb1Weights.size(); i++) {
+      btb1WString.append(toString(btb1Weights[i]));
+      if (i < btb1Weights.size() - 1) {
+        btb1WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb1WString;
+
+    qDebug() << "";
+    qDebug() << "Test assignment operator";
+    qDebug() << "";
+    qDebug() << "Self assignment";
+    btb3 = btb3;
+    qDebug().noquote() << btb3.formatBundleOutputString(true);
+    qDebug() << "Assignment to other";
+    btb3 = btb1;
+    qDebug().noquote() << btb3.formatBundleOutputString(true);
+
+    qDebug() << "Setup a BundleTargetBody that solves for only mean radius";
+    qDebug() << "";
+    BundleTargetBody btb2;
+    targetParameterSolveCodes.clear();
+    targetParameterSolveCodes.insert(BundleTargetBody::MeanRadius);
+    btb2.setSolveSettings(
+        targetParameterSolveCodes,
+        Angle(poleRA, Angle::Degrees),             Angle(poleRASigma, Angle::Degrees),
+        Angle(poleRAVelocity, Angle::Degrees),     Angle(poleRAVelocitySigma, Angle::Degrees),
+        Angle(poleDec, Angle::Degrees),            Angle(poleDecSigma, Angle::Degrees),
+        Angle(poleDecVelocity, Angle::Degrees),    Angle(poleDecVelocitySigma, Angle::Degrees),
+        Angle(pm, Angle::Degrees),                 Angle(pmSigma, Angle::Degrees),
+        Angle(pmVelocity, Angle::Degrees),         Angle(pmVelocitySigma, Angle::Degrees),
+        (BundleTargetBody::TargetRadiiSolveMethod)1,
+        Distance(aRadius, Distance::Kilometers),   Distance(aRadiusSigma, Distance::Kilometers),
+        Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
+        Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
+        Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
+    qDebug().noquote() << btb2.formatBundleOutputString(true);
+    boost::numeric::ublas::vector<double> btb2Weights = btb2.parameterWeights();
+    QString btb2WString;
+    for (size_t i = 0; i < btb2Weights.size(); i++) {
+      btb2WString.append(toString(btb2Weights[i]));
+      if (i < btb2Weights.size() - 1) {
+        btb2WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb2WString;
+    qDebug() << "";
+    qDebug().noquote() << btb2.meanRadius().toString();
+    qDebug() << "";
+    qDebug() << "Switch free and valid sigmas";
+    qDebug() << "";
+    meanRadiusSigma = 0;
+    btb2.setSolveSettings(
+        targetParameterSolveCodes,
+        Angle(poleRA, Angle::Degrees),             Angle(poleRASigma, Angle::Degrees),
+        Angle(poleRAVelocity, Angle::Degrees),     Angle(poleRAVelocitySigma, Angle::Degrees),
+        Angle(poleDec, Angle::Degrees),            Angle(poleDecSigma, Angle::Degrees),
+        Angle(poleDecVelocity, Angle::Degrees),    Angle(poleDecVelocitySigma, Angle::Degrees),
+        Angle(pm, Angle::Degrees),                 Angle(pmSigma, Angle::Degrees),
+        Angle(pmVelocity, Angle::Degrees),         Angle(pmVelocitySigma, Angle::Degrees),
+        (BundleTargetBody::TargetRadiiSolveMethod)1,
+        Distance(aRadius, Distance::Kilometers),   Distance(aRadiusSigma, Distance::Kilometers),
+        Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
+        Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
+        Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
+    qDebug().noquote() << btb2.formatBundleOutputString(true);
+    btb2Weights = btb2.parameterWeights();
+    btb2WString.clear();
+    for (size_t i = 0; i < btb2Weights.size(); i++) {
+      btb2WString.append(toString(btb2Weights[i]));
+      if (i < btb2Weights.size() - 1) {
+        btb2WString.append(", ");
+      }
+    }
+    qDebug().noquote() << btb2WString;
+
+    qDebug() << "";
+    qDebug() << "Test reading from a PvlObject";
+    qDebug() << "";
+    PvlGroup goodRAGroup;
+    goodRAGroup += PvlKeyword("Ra", "velocity");
+    goodRAGroup += PvlKeyword("RaValue", "15");
+    goodRAGroup += PvlKeyword("RaSigma", "0.487");
+    goodRAGroup += PvlKeyword("RaVelocityValue", "10");
+    goodRAGroup += PvlKeyword("RaVelocitySigma", "1.01");
+    PvlGroup goodDecGroup;
+    goodDecGroup += PvlKeyword("Dec", "velocity");
+    goodDecGroup += PvlKeyword("DecValue", "25");
+    goodDecGroup += PvlKeyword("DecSigma", "2.3");
+    goodDecGroup += PvlKeyword("DecVelocityValue", "5");
+    goodDecGroup += PvlKeyword("DecVelocitySigma", "0.03");
+    PvlGroup goodPMGroup;
+    goodPMGroup += PvlKeyword("PM", "velocity");
+    goodPMGroup += PvlKeyword("PmValue", "20");
+    goodPMGroup += PvlKeyword("PmSigma", "2.4");
+    goodPMGroup += PvlKeyword("PmVelocityValue", "30");
+    goodPMGroup += PvlKeyword("pmVelocitySigma", "10");
+    PvlGroup goodRadiiGroup;
+    goodRadiiGroup += PvlKeyword("RadiiSolveOption", "triaxial");
+    goodRadiiGroup += PvlKeyword("RadiusAValue", "2");
+    goodRadiiGroup += PvlKeyword("RadiusASigma", "0.2");
+    goodRadiiGroup += PvlKeyword("RadiusBValue", "3");
+    goodRadiiGroup += PvlKeyword("RadiusBSigma", "0.3");
+    goodRadiiGroup += PvlKeyword("RadiuscValue", "4");
+    goodRadiiGroup += PvlKeyword("RadiuscSigma", "0.4");
+    PvlObject goodBTBObject;
+    goodBTBObject += goodRAGroup;
+    goodBTBObject += goodDecGroup;
+    goodBTBObject += goodPMGroup;
+    goodBTBObject += goodRadiiGroup;
+    btb3.readFromPvl(goodBTBObject);
+    qDebug().noquote() << btb3.formatBundleOutputString(true);
+
+    qDebug() << "Test error throws";
+    qDebug() << "";
+
+    // Correction errors
+    try {
+      btb1.applyParameterCorrections(
+          boost::numeric::ublas::vector<double>(btb1.numberParameters() + 1));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+    // Radii solve method errors
+    try {
+      BundleTargetBody::stringToTargetRadiiOption("Invalid Method");
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    try {
+      BundleTargetBody::targetRadiiOptionToString((BundleTargetBody::TargetRadiiSolveMethod)-1);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+    // Radii accessor errors
+    try {
+      btb2.radii();
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    try {
+      btb1.meanRadius();
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+    // local radius error
+    try {
+      btb2.localRadius(Latitude(15, Angle::Degrees), Longitude(15, Angle::Degrees));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+    // Read Pvl errors
+    PvlObject badBTBObject;
+    PvlGroup badRaPosGroup;
+    badRaPosGroup += PvlKeyword("RaValue", "Not a double");
+    badBTBObject += badRaPosGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRaPosSigGroup;
+    badRaPosSigGroup += PvlKeyword("RaSigma", "Also not a double");
+    badBTBObject += badRaPosSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRaVelGroup;
+    badRaVelGroup += PvlKeyword("RaVelocityValue", "Still not a double");
+    badBTBObject += badRaVelGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRaVelSigGroup;
+    badRaVelSigGroup += PvlKeyword("RaVelocitySigma", "Definitely not a double");
+    badBTBObject += badRaVelSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRaAccGroup;
+    badRaAccGroup += PvlKeyword("RaAccelerationValue", "A string");
+    badBTBObject += badRaAccGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRaAccSigGroup;
+    badRaAccSigGroup += PvlKeyword("RaAccelerationSigma", "Also a string");
+    badBTBObject += badRaAccSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecPosGroup;
+    badDecPosGroup += PvlKeyword("DecValue", "Another string");
+    badBTBObject += badDecPosGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecPosSigGroup;
+    badDecPosSigGroup += PvlKeyword("DecSigma", "The seventh string");
+    badBTBObject += badDecPosSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecVelGroup;
+    badDecVelGroup += PvlKeyword("DecVelocityValue", "The loneliest string");
+    badBTBObject += badDecVelGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecVelSigGroup;
+    badDecVelSigGroup += PvlKeyword("DecVelocitySigma", "The happy string");
+    badBTBObject += badDecVelSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecAccGroup;
+    badDecAccGroup += PvlKeyword("DecAccelerationValue", "The fast string");
+    badBTBObject += badDecAccGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badDecAccSigGroup;
+    badDecAccSigGroup += PvlKeyword("DecAccelerationSigma", "The wobbling string");
+    badBTBObject += badDecAccSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMGroup;
+    badPMGroup += PvlKeyword("PmValue", "Or are they char arrays?");
+    badBTBObject += badPMGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMSigGroup;
+    badPMGroup += PvlKeyword("PmSigma", "This one is");
+    badBTBObject += badPMGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMVelGroup;
+    badPMVelGroup += PvlKeyword("PmVelocityValue", "This is also a char array");
+    badBTBObject += badPMVelGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMVelSigGroup;
+    badPMVelSigGroup += PvlKeyword("pmVelocitySigma", "These still aren't doubles");
+    badBTBObject += badPMVelSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMAccGroup;
+    badPMAccGroup += PvlKeyword("PmAccelerationValue", "And that's what matters");
+    badBTBObject += badPMAccGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badPMAccSigGroup;
+    badPMAccSigGroup += PvlKeyword("PmAccelerationSigma", "The eighteenth not double");
+    badBTBObject += badPMAccSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadAGroup;
+    badRadAGroup += PvlKeyword("RadiusAValue", "The twentieth not double");
+    badBTBObject += badRadAGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadAGroup;
+    negRadAGroup += PvlKeyword("RadiusAValue", "-8");
+    badBTBObject += negRadAGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadASigGroup;
+    badRadASigGroup += PvlKeyword("RadiusASigma", "The true twentieth not double");
+    badBTBObject += badRadASigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadASigGroup;
+    negRadASigGroup += PvlKeyword("RadiusASigma", "-7");
+    badBTBObject += negRadASigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadBGroup;
+    badRadBGroup += PvlKeyword("RadiusBValue", "Only five more");
+    badBTBObject += badRadBGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadBGroup;
+    negRadBGroup += PvlKeyword("RadiusBValue", "-6");
+    badBTBObject += negRadBGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadBSigGroup;
+    badRadBSigGroup += PvlKeyword("RadiusBSigma", "Only four more");
+    badBTBObject += badRadBSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadBSigGroup;
+    negRadBSigGroup += PvlKeyword("RadiusBSigma", "-5");
+    badBTBObject += negRadBSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadCGroup;
+    badRadCGroup += PvlKeyword("RadiusCValue", "Only three more");
+    badBTBObject += badRadCGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadCGroup;
+    negRadCGroup += PvlKeyword("RadiusCValue", "-4");
+    badBTBObject += negRadCGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badRadCSigGroup;
+    badRadCSigGroup += PvlKeyword("RadiusCSigma", "Only two more");
+    badBTBObject += badRadCSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negRadCSigGroup;
+    negRadCSigGroup += PvlKeyword("RadiusCSigma", "-3");
+    badBTBObject += negRadCSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badMeanRadGroup;
+    badMeanRadGroup += PvlKeyword("MeanRadiusValue", "Only one more");
+    badBTBObject += badMeanRadGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negMeanRadGroup;
+    negMeanRadGroup += PvlKeyword("MeanRadiusValue", "-2");
+    badBTBObject += negMeanRadGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup badMeanRadSigGroup;
+    badMeanRadSigGroup += PvlKeyword("MeanRadiusSigma", "The end");
+    badBTBObject += badMeanRadSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    badBTBObject.clear();
+    PvlGroup negMeanRadSigGroup;
+    negMeanRadSigGroup += PvlKeyword("MeanRadiusSigma", "-1");
+    badBTBObject += negMeanRadSigGroup;
+    try {
+      btb3.readFromPvl(badBTBObject);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug() << "";
+    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
   } 
   catch (IException &e) {
     e.print();

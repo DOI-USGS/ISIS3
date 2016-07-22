@@ -857,3 +857,226 @@ observation index "0"
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleTargetBody...
+
+Create an empty BundleTargetBody
+
+
+
+Convert strings to TargetRadiiSolveMethods and back
+
+0
+"None"
+1
+"MeanRadius"
+2
+"Radii"
+
+Setup the BundleTargetBody to solve for everything but mean radius
+
+POLE RA          -2.00000000           0.00000000         -2.00000000              FREE               N/A
+POLE RAv         -3.00000000           0.00000000         -3.00000000              FREE               N/A
+POLE DEC         -4.00000000           0.00000000         -4.00000000              FREE               N/A
+POLE DECv        -6.00000000           0.00000000         -6.00000000              FREE               N/A
+  PM             -8.00000000           0.00000000         -8.00000000              FREE               N/A
+  PMv           -10.00000000           0.00000000        -10.00000000              FREE               N/A
+  RadiusA        12.00000000           0.00000000         12.00000000              13.0               N/A
+  RadiusB        14.00000000           0.00000000         14.00000000             0.001               N/A
+  RadiusC        15.00000000           0.00000000         15.00000000              17.0               N/A
+
+
+POLE RA          -2.00000000           0.00000000         -2.00000000              FREE        0.00000000
+POLE RAv         -3.00000000           0.00000000         -3.00000000              FREE        0.00000000
+POLE DEC         -4.00000000           0.00000000         -4.00000000              FREE        0.00000000
+POLE DECv        -6.00000000           0.00000000         -6.00000000              FREE        0.00000000
+  PM             -8.00000000           0.00000000         -8.00000000              FREE        0.00000000
+  PMv           -10.00000000           0.00000000        -10.00000000              FREE        0.00000000
+  RadiusA        12.00000000           0.00000000         12.00000000              13.0        0.00000000
+  RadiusB        14.00000000           0.00000000         14.00000000             0.001        0.00000000
+  RadiusC        15.00000000           0.00000000         15.00000000              17.0        0.00000000
+
+-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 0.0059171597633136, 1000000.0, 0.0034602076124567
+
+Apply some corrections
+
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+POLE RA          -2.00000000          57.29577951         55.29577951              FREE        0.00000000
+POLE RAv         -3.00000000         -40.10704566        -43.10704566              FREE        0.00000000
+POLE DEC         -4.00000000          28.07493196         24.07493196              FREE        0.00000000
+POLE DECv        -6.00000000         -19.65245237        -25.65245237              FREE        0.00000000
+  PM             -8.00000000          13.75671666          5.75671666              FREE        0.00000000
+  PMv           -10.00000000          -9.62970166        -19.62970166              FREE        0.00000000
+  RadiusA        12.00000000           0.11764900         12.11764900              13.0        0.00000000
+  RadiusB        14.00000000          -0.08235430         13.91764570             0.001        0.00000000
+  RadiusC        15.00000000           0.05764801         15.05764801              17.0        0.00000000
+
+-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 0.0059171597633136, 1000000.0, 0.0034602076124567
+
+1.0, -0.7, 0.49, -0.343, 0.2401, -0.16807, 0.117649, -0.0823543, 0.05764801
+
+POLE RA          -2.00000000         114.59155903        112.59155903              FREE        0.00000000
+POLE RAv         -3.00000000          22.91831181         19.91831181              FREE        0.00000000
+POLE DEC         -4.00000000          97.40282517         93.40282517              FREE        0.00000000
+POLE DECv        -6.00000000          56.60823016         50.60823016              FREE        0.00000000
+  PM             -8.00000000          97.64346745         89.64346745              FREE        0.00000000
+  PMv           -10.00000000          82.64572420         72.64572420              FREE        0.00000000
+  RadiusA        12.00000000           1.88921000         13.88921000              13.0        0.00000000
+  RadiusB        14.00000000           1.86636280         15.86636280             0.001        0.00000000
+  RadiusC        15.00000000           2.20123682         17.20123682              17.0        0.00000000
+
+-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 0.0059171597633136, 1000000.0, 0.0034602076124567
+
+2.0, 0.4, 1.7, 0.988, 1.7042, 1.44244, 1.88921, 1.8663628, 2.20123682
+
+Test acccessors
+
+Pole Right Ascension
+true true false
+Pole Declination
+true true false
+Prime Meridian
+true true false
+Radii
+true false
+Parameter Count
+3 9
+Parameter Solutions
+
+Apriori Sigmas
+-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 13.0, 0.001, 17.0
+Adjusted Sigmas
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+Pole Right Ascension Coefficients
+112.59155902616 degrees, 19.918311805233 degrees, 0.0 degrees
+Pole Declination Coefficients
+93.40282517224 degrees, 50.608230158925 degrees, 0.0 degrees
+Prime Meridian Coefficients
+89.643467446195 degrees, 72.64572420085 degrees, 0.0 degrees
+VtPV
+3.48331e+06
+Local Radius
+14160.275174221 meters
+
+Test copy constructor
+
+POLE RA          -2.00000000         114.59155903        112.59155903              FREE        0.00000000
+POLE RAv         -3.00000000          22.91831181         19.91831181              FREE        0.00000000
+POLE DEC         -4.00000000          97.40282517         93.40282517              FREE        0.00000000
+POLE DECv        -6.00000000          56.60823016         50.60823016              FREE        0.00000000
+  PM             -8.00000000          97.64346745         89.64346745              FREE        0.00000000
+  PMv           -10.00000000          82.64572420         72.64572420              FREE        0.00000000
+  RadiusA        12.00000000           1.88921000         13.88921000              13.0        0.00000000
+  RadiusB        14.00000000           1.86636280         15.86636280             0.001        0.00000000
+  RadiusC        15.00000000           2.20123682         17.20123682              17.0        0.00000000
+
+Switch free and valid sigmas
+
+POLE RA          -2.00000000           0.00000000         -2.00000000               0.2        0.00000000
+POLE RAv         -3.00000000           0.00000000         -3.00000000               3.5        0.00000000
+POLE DEC         -4.00000000           0.00000000         -4.00000000               5.0        0.00000000
+POLE DECv        -6.00000000           0.00000000         -6.00000000               7.0        0.00000000
+  PM             -8.00000000           0.00000000         -8.00000000               9.0        0.00000000
+  PMv           -10.00000000           0.00000000        -10.00000000              11.0        0.00000000
+  RadiusA        12.00000000           0.00000000         12.00000000              FREE        0.00000000
+  RadiusB        14.00000000           0.00000000         14.00000000              FREE        0.00000000
+  RadiusC        15.00000000           0.00000000         15.00000000              FREE        0.00000000
+
+82070.158750294, 267.98419183769, 131.31225400047, 66.996047959423, 40.528473456935, 27.130630991833, -1.0, -1.0, -1.0
+
+Test assignment operator
+
+Self assignment
+POLE RA          -2.00000000         114.59155903        112.59155903              FREE        0.00000000
+POLE RAv         -3.00000000          22.91831181         19.91831181              FREE        0.00000000
+POLE DEC         -4.00000000          97.40282517         93.40282517              FREE        0.00000000
+POLE DECv        -6.00000000          56.60823016         50.60823016              FREE        0.00000000
+  PM             -8.00000000          97.64346745         89.64346745              FREE        0.00000000
+  PMv           -10.00000000          82.64572420         72.64572420              FREE        0.00000000
+  RadiusA        12.00000000           1.88921000         13.88921000              13.0        0.00000000
+  RadiusB        14.00000000           1.86636280         15.86636280             0.001        0.00000000
+  RadiusC        15.00000000           2.20123682         17.20123682              17.0        0.00000000
+
+Assignment to other
+POLE RA          -2.00000000           0.00000000         -2.00000000               0.2        0.00000000
+POLE RAv         -3.00000000           0.00000000         -3.00000000               3.5        0.00000000
+POLE DEC         -4.00000000           0.00000000         -4.00000000               5.0        0.00000000
+POLE DECv        -6.00000000           0.00000000         -6.00000000               7.0        0.00000000
+  PM             -8.00000000           0.00000000         -8.00000000               9.0        0.00000000
+  PMv           -10.00000000           0.00000000        -10.00000000              11.0        0.00000000
+  RadiusA        12.00000000           0.00000000         12.00000000              FREE        0.00000000
+  RadiusB        14.00000000           0.00000000         14.00000000              FREE        0.00000000
+  RadiusC        15.00000000           0.00000000         15.00000000              FREE        0.00000000
+
+Setup a BundleTargetBody that solves for only mean radius
+
+MeanRadius       20.00000000           0.00000000         20.00000000              21.0        0.00000000
+
+0.0022675736961451
+
+20000.0 meters
+
+Switch free and valid sigmas
+
+MeanRadius       20.00000000           0.00000000         20.00000000              FREE        0.00000000
+
+-1.0
+
+Test reading from a PvlObject
+
+POLE RA          15.00000000           0.00000000         15.00000000             0.487        0.00000000
+POLE RAv         10.00000000           0.00000000         10.00000000              1.01        0.00000000
+POLE DEC         25.00000000           0.00000000         25.00000000               2.3        0.00000000
+POLE DECv         5.00000000           0.00000000          5.00000000              0.03        0.00000000
+  PM             20.00000000           0.00000000         20.00000000               2.4        0.00000000
+  PMv            30.00000000           0.00000000         30.00000000              10.0        0.00000000
+  RadiusA         0.00200000           0.00000000          0.00200000           2.0e-04        0.00000000
+  RadiusB         0.00300000           0.00000000          0.00300000           3.0e-04        0.00000000
+  RadiusC         0.00400000           0.00000000          0.00400000           4.0e-04        0.00000000
+
+Test error throws
+
+**PROGRAMMER ERROR** In BundleTargetBody::applyParameterCorrections: correction and m_targetParameter vectors sizes don't match.
+**PROGRAMMER ERROR** Unknown target body radius solution method [Invalid Method].
+**PROGRAMMER ERROR** Unknown target body radius solve method enum [-1].
+**PROGRAMMER ERROR** The triaxial radii can only be accessed when solving for triaxial radii.
+**PROGRAMMER ERROR** The mean radius can only be accessed when solving for mean radius.
+**PROGRAMMER ERROR** Local radius can only be found if triaxial radii were solved for.
+**USER ERROR** RaValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RaSigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RaVelocityValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RaVelocitySigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RaAccelerationValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RaAccelerationSigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecSigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecVelocityValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecVelocitySigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecAccelerationValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** DecAccelerationSigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmVelocityValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmVelocitySigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmAccelerationValue must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** PmAccelerationSigma must be a valid double (>= 0; blank defaults to 0).
+**USER ERROR** RadiusAValue must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusAValue must be >= 0.
+**USER ERROR** RadiusASigma must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusASigma must be >= 0.
+**USER ERROR** RadiusBValue must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusBValue must be >= 0.
+**USER ERROR** RadiusBSigma must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusBSigma must be >= 0.
+**USER ERROR** RadiusCValue must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusCValue must be >= 0.
+**USER ERROR** RadiusCSigma must be a valid double (blank defaults to 0).
+**USER ERROR** RadiusCSigma must be >= 0.
+**USER ERROR** MeanRadiusValue must be a valid double (blank defaults to 0).
+**USER ERROR** MeanRadiusValue must be >= 0.
+**USER ERROR** MeanRadiusSigma must be a valid double (blank defaults to 0).
+**USER ERROR** MeanRadiusSigma must be >= 0.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

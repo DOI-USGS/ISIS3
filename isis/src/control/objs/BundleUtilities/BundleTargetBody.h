@@ -22,14 +22,13 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <set>
 
 #include <QObject>
 #include <QSharedPointer>
 #include <QStringList>
 
 #include <boost/numeric/ublas/vector.hpp>
-
-#include "set"
 
 #include "Angle.h"
 #include "Distance.h"
@@ -43,7 +42,7 @@ namespace Isis {
   class Target;
 
   /**
-   * @brief 
+   * This class is used to represent a target body in a bundle and how to solve for it. 
    *  
    * @ingroup ControlNetworks
    *
@@ -51,7 +50,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-05-15 Ken Edmundson - version 1.
-   *
+   *   @histroy 2016-07-13 Jesse Mapel - Updated documentation and coding standards, and added
+   *                           testing in preparation for merging from IPCE to ISIS.
+   *                           Fixes #4079.
    */
   class BundleTargetBody : public QObject {
 
@@ -61,19 +62,19 @@ namespace Isis {
       // constructors
       BundleTargetBody();                            // default
       BundleTargetBody(Target *target);
-      //BundleTargetBody(const BundleTargetBody &src); // copy
+      BundleTargetBody(const BundleTargetBody &src); // copy
       ~BundleTargetBody();
 
-      // copy (move to private????)
-      //BundleTargetBody &operator=(const BundleTargetBody &src);
-      //void copy(const BundleTargetBody &src);
+      BundleTargetBody &operator=(const BundleTargetBody &src);
 
+      //! Enumeration that defines how to solve for target radii.
       enum TargetRadiiSolveMethod {
-        None = 0,                  //!< none
-        Mean = 1,                  //!< mean radius
-        All  = 2                   //!< all radii
+        None = 0,                  //!< Solve for none. 
+        Mean = 1,                  //!< Solve for mean radius.
+        All  = 2                   //!< Solve for all radii.
       };
 
+      //! Enumeration that defines what BundleTargetBody can solve for.
       enum TargetSolveCodes { PoleRA              = 0,
                               VelocityPoleRA      = 1,
                               AccelerationPoleRA  = 2,
@@ -122,9 +123,9 @@ namespace Isis {
       Distance meanRadius();
 
       // string format methods
-      // TODO implement
       QString formatBundleOutputString(bool errorPropagation);
       QStringList parameterList();
+      // TODO implement
       QString formatValue(double value, int fieldWidth, int precision) const;
       QString formatAprioriSigmaString(int type, int fieldWidth, int precision) const;
       QString formatPolePositionAprioriSigmaString(int fieldWidth, int precision) const;
@@ -161,35 +162,35 @@ namespace Isis {
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
     private:
-      TargetRadiiSolveMethod m_solveTargetBodyRadiusMethod;
-      Distance m_aprioriRadiusA;
-      Distance m_sigmaRadiusA;
-      Distance m_aprioriRadiusB;
-      Distance m_sigmaRadiusB;
-      Distance m_aprioriRadiusC;
-      Distance m_sigmaRadiusC;
-      Distance m_aprioriMeanRadius;
-      Distance m_sigmaMeanRadius;
+      TargetRadiiSolveMethod m_solveTargetBodyRadiusMethod; //!< Which radii will be solved for.
+      Distance m_aprioriRadiusA;                            //!< Apriori Radius A.
+      Distance m_sigmaRadiusA;                              //!< Apriori Radius A Sigma.
+      Distance m_aprioriRadiusB;                            //!< Apriori Radius B.
+      Distance m_sigmaRadiusB;                              //!< Apriori Radius B Sigma.
+      Distance m_aprioriRadiusC;                            //!< Apriori Radius C.
+      Distance m_sigmaRadiusC;                              //!< Apriori Radius C Sigma.
+      Distance m_aprioriMeanRadius;                         //!< Apriori Mean Radius.
+      Distance m_sigmaMeanRadius;                           //!< Apriori Mean Radius Sigma.
 
-      std::vector<Distance> m_radii;
-      Distance m_meanRadius;
+      std::vector<Distance> m_radii;                 //!< Adjusted triaxial radii values.
+      Distance m_meanRadius;                         //!< Adjusted mean radius value.
 
       std::vector<Angle> m_raPole;                   //!< pole ra quadratic polynomial coefficients
       std::vector<Angle> m_decPole;                  //!< pole dec quadratic polynomial coefficients
       std::vector<Angle> m_pm ;                      //!< pole pm quadratic polynomial coefficients
 
-      std::set<int> m_parameterSolveCodes;  //!< target parameter solve codes (TODO: explain better)
-                                            //!< ALSO, WHY DID I USE A std::set here? (there was a
-                                            //!  good reason)
-      QStringList m_parameterNamesList;     //!< list of all target parameters
+      std::set<int> m_parameterSolveCodes;  /**< Target parameter solve codes.  Stored as a set to
+                                                 ensure they are always in the correct order. **/
+      QStringList m_parameterNamesList;     //!< List of all target parameters.
 
-      boost::numeric::ublas::vector<double> m_weights;         //!< parameter weights
-      boost::numeric::ublas::vector<double> m_corrections;     //!< cumulative parameter corrections
-      boost::numeric::ublas::vector<double> m_solution;        //!< parameter solution vector
-      boost::numeric::ublas::vector<double> m_aprioriSigmas;   //!< a priori parameter sigmas
-      boost::numeric::ublas::vector<double> m_adjustedSigmas;  //!< adjusted parameter sigmas
+      boost::numeric::ublas::vector<double> m_weights;         //!< Parameter weights.
+      boost::numeric::ublas::vector<double> m_corrections;     //!< Cumulative parameter corrections.
+      boost::numeric::ublas::vector<double> m_solution;        //!< Parameter solution vector.
+      boost::numeric::ublas::vector<double> m_aprioriSigmas;   //!< A priori parameter sigmas.
+      boost::numeric::ublas::vector<double> m_adjustedSigmas;  //!< Adjusted parameter sigmas.
   };
 
+  //! Definition for BundleTargetBodyQsp, a QSharedPointer to a BundleTargetBody.
   typedef QSharedPointer<BundleTargetBody> BundleTargetBodyQsp;
 }
 

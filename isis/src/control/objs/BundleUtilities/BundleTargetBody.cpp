@@ -15,11 +15,12 @@ using namespace boost::numeric::ublas;
 namespace Isis {
 
   /**
-   * default constructor
+   * Creates an empty BundleTargetBody object.
    */
   BundleTargetBody::BundleTargetBody() {
     m_solveTargetBodyRadiusMethod = None;
     m_parameterNamesList.clear();
+    m_parameterSolveCodes.clear();
 
     m_weights.clear();
     m_corrections.clear();
@@ -35,11 +36,15 @@ namespace Isis {
 
 
   /**
-   * constructor
+   * Creates an BundleTargetBody object from a target.
+   * 
+   * @param target A pointer to the target body that this object will represent.
    */
   BundleTargetBody::BundleTargetBody(Target *target) {
     m_solveTargetBodyRadiusMethod = None;
     m_parameterNamesList.clear();
+    //TODO This should probably be set to something based on the target. JAM
+    m_parameterSolveCodes.clear();
 
     m_weights.clear();
     m_corrections.clear();
@@ -64,66 +69,152 @@ namespace Isis {
 
 
   /**
-   * copy constructor
+   * Copy constructor. Makes a copy of another BundleTargetBody.
+   * 
+   * @param src The BundleTargetBody to copy from.
    */
-//  BundleTargetBody::BundleTargetBody(const BundleTargetBody &src) {
-//    copy(src);
-//  }
+  BundleTargetBody::BundleTargetBody(const BundleTargetBody &src) {
+    m_solveTargetBodyRadiusMethod = src.m_solveTargetBodyRadiusMethod;
+
+    m_aprioriRadiusA = src.m_aprioriRadiusA;
+    m_sigmaRadiusA = src.m_sigmaRadiusA;
+    m_aprioriRadiusB = src.m_aprioriRadiusB;
+    m_sigmaRadiusB = src.m_sigmaRadiusB;
+    m_aprioriRadiusC = src.m_aprioriRadiusC;
+    m_sigmaRadiusC = src.m_sigmaRadiusC;
+    m_aprioriMeanRadius = src.m_aprioriMeanRadius;
+    m_sigmaMeanRadius = src.m_sigmaMeanRadius;
+
+    m_radii = src.m_radii;
+    m_meanRadius = src.m_meanRadius;
+
+    m_raPole = src.m_raPole;
+    m_decPole = src.m_decPole;
+    m_pm = src.m_pm;
+
+    m_parameterSolveCodes = src.m_parameterSolveCodes;
+    
+    m_parameterNamesList = src.m_parameterNamesList;
+    
+    m_weights = src.m_weights;
+    m_corrections = src.m_corrections;
+    m_solution = src.m_solution;
+    m_aprioriSigmas = src.m_aprioriSigmas;
+    m_adjustedSigmas = src.m_adjustedSigmas;
+  }
 
 
   /**
-   * destructor
+   * Destructor.
    */
   BundleTargetBody::~BundleTargetBody() {
   }
 
 
   /**
-   * copy method
+   * Assignment operator.  Makes this a copy of another BundleTargetBody.
+   *
+   * @param src The other BundleTargetBody to assign from
    */
-//  void BundleTargetBody::copy(const BundleTargetBody &src) {
-//    m_solveTargetBodyRaPole = src.m_solveTargetBodyRaPole;
-//    m_aprioriRaPole = src.m_aprioriRaPole;
-//    m_sigmaRaPole = src.m_sigmaRaPole;
-//    m_solveTargetBodyDecPole = src.m_solveTargetBodyDecPole;
-//    m_aprioriDecPole = src.m_aprioriDecPole;
-//    m_sigmaDecPole = src.m_sigmaDecPole;
-//    m_solveTargetBodyZeroMeridian = src.m_solveTargetBodyZeroMeridian;
-//    m_aprioriW0 = src.m_aprioriW0;
-//    m_sigmaW0 = src.m_sigmaW0;
-//    m_solveTargetBodyRotationRate = src.m_solveTargetBodyRotationRate;
-//    m_aprioriWDot = src.m_aprioriWDot;
-//    m_sigmaWDot = src.m_sigmaWDot;
-//    m_solveTargetBodyRadiusMethod = src.m_solveTargetBodyRadiusMethod;
-//    m_aprioriRadiusA = src.m_aprioriRadiusA;
-//    m_sigmaRadiusA = src.m_sigmaRadiusA;
-//    m_aprioriRadiusB = src.m_aprioriRadiusB;
-//    m_sigmaRadiusB = src.m_sigmaRadiusB;
-//    m_aprioriRadiusC = src.m_aprioriRadiusC;
-//    m_sigmaRadiusC = src.m_sigmaRadiusC;
-//    m_aprioriMeanRadius = src.m_aprioriMeanRadius;
-//    m_sigmaMeanRadius = src.m_sigmaMeanRadius;
+  BundleTargetBody &BundleTargetBody::operator=(const BundleTargetBody &src) {
+    if (this != &src) {
+      m_solveTargetBodyRadiusMethod = src.m_solveTargetBodyRadiusMethod;
 
-//    //m_targetBody;
-//    m_weights = src.m_weights;
-//    m_corrections = src.m_corrections;
-//    m_solution = src.m_solution;
-//    m_aprioriSigmas = src.m_aprioriSigmas;
-//    m_adjustedSigmas = src.m_adjustedSigmas;
-//  }
+      m_aprioriRadiusA = src.m_aprioriRadiusA;
+      m_sigmaRadiusA = src.m_sigmaRadiusA;
+      m_aprioriRadiusB = src.m_aprioriRadiusB;
+      m_sigmaRadiusB = src.m_sigmaRadiusB;
+      m_aprioriRadiusC = src.m_aprioriRadiusC;
+      m_sigmaRadiusC = src.m_sigmaRadiusC;
+      m_aprioriMeanRadius = src.m_aprioriMeanRadius;
+      m_sigmaMeanRadius = src.m_sigmaMeanRadius;
+
+      m_radii = src.m_radii;
+      m_meanRadius = src.m_meanRadius;
+
+      m_raPole = src.m_raPole;
+      m_decPole = src.m_decPole;
+      m_pm = src.m_pm;
+
+      m_parameterSolveCodes = src.m_parameterSolveCodes;
+      
+      m_parameterNamesList = src.m_parameterNamesList;
+      
+      m_weights = src.m_weights;
+      m_corrections = src.m_corrections;
+      m_solution = src.m_solution;
+      m_aprioriSigmas = src.m_aprioriSigmas;
+      m_adjustedSigmas = src.m_adjustedSigmas;
+    }
+    
+    return *this;
+  }
 
 
   /**
-   * TODO
-   * set solve parameters
+   * @brief Sets the solve settings for the target body.
+   * 
+   * @description Sets the solve settings for the target body's right ascension, declination,
+   * prime meridian, and radius based on the input values.
+   * Parameter vectors, sigma vectors and the weight vector will be filled in the following order:
+   * 
+   * pole right ascension,
+   * pole right ascension velocity,
+   * pole right ascension acceleration,
+   * pole declination,
+   * pole declination velocity,
+   * pole declination acceleration,
+   * prime meridian,
+   * prime meridian velocity,
+   * prime meridian acceleration,
+   * triaxial radius A,
+   * triaxial radius B,
+   * triaxial radius C,
+   * mean radius.
+   * 
+   * Any parameters that are not being solved for (based on targetParameterSolveCodes)
+   * will be omitted.  For example, if solving for pole right ascension, pole declination,
+   * prime meridian, and mean radius; the vectors would be:
+   * 
+   * pole right ascension,
+   * pole declination,
+   * prime meridian,
+   * mean radius.
+   * 
+   * @param targetParameterSolveCodes A set of TargetSolveCodes indicating what to solve for.
+   * @param aprioriPoleRA The apriori pole right ascension angle.
+   * @param sigmaPoleRA The apriori pole right ascension angle sigma.
+   * @param aprioriVelocityPoleRA The apriori pole right ascension velocity.
+   * @param sigmaVelocityPoleRA The apriori pole right ascension velocity sigma.
+   * @param aprioriPoleDec The apriori pole declination angle.
+   * @param sigmaPoleDec The apriori pole declination angle sigma.
+   * @param aprioriVelocityPoleDec The apriori pole declination velocity.
+   * @param sigmaVelocityPoleDec The apriori pole declination velocity sigma.
+   * @param aprioriPM The apriori prime meridian angle.
+   * @param sigmaPM The apriori prime meridian angle sigma.
+   * @param aprioriVelocityPM The apriori prime meridian velocity.
+   * @param sigmaVelocityPM The apriori prime meridian velocity sigma.
+   * @param solveRadiiMethod What radius to solve for.
+   * @param aprioriRadiusA The apriori A radius distance.
+   * @param sigmaRadiusA The apriori A radius distance sigma.
+   * @param aprioriRadiusB The apriori B radius distance.
+   * @param sigmaRadiusB The apriori B Radius distance sigma.
+   * @param aprioriRadiusC The apriori C radius distance.
+   * @param sigmaRadiusC The apriori C radius distance sigma.
+   * @param aprioriMeanRadius The apriori mean radius distance.
+   * @param sigmaMeanRadius the apriori mean radius distance sigma.
+   * 
+   * @see readFromPvl(PvlObject &tbObject)
    */
   void BundleTargetBody::setSolveSettings(std::set<int> targetParameterSolveCodes,
                                           Angle aprioriPoleRA, Angle sigmaPoleRA,
-                                          Angle aprioriVelocityPoleRA, Angle sigmaVelocityPoleRA,
+                                          Angle aprioriVelocityPoleRA,
+                                          Angle sigmaVelocityPoleRA,
                                           Angle aprioriPoleDec, Angle sigmaPoleDec,
                                           Angle aprioriVelocityPoleDec,
-                                          Angle sigmaVelocityPoleDec, Angle aprioriPM,
-                                          Angle sigmaPM, Angle aprioriVelocityPM,
+                                          Angle sigmaVelocityPoleDec,
+                                          Angle aprioriPM, Angle sigmaPM,
+                                          Angle aprioriVelocityPM,
                                           Angle sigmaVelocityPM,
                                           TargetRadiiSolveMethod solveRadiiMethod,
                                           Distance aprioriRadiusA, Distance sigmaRadiusA,
@@ -330,6 +421,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole right ascension angle will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleRA() {
     if (m_parameterSolveCodes.find(PoleRA) != m_parameterSolveCodes.end())
       return true;
@@ -337,6 +433,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole right ascension velocity will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleRAVelocity() {
     if (m_parameterSolveCodes.find(VelocityPoleRA) != m_parameterSolveCodes.end())
       return true;
@@ -344,6 +445,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole right ascension acceleration will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleRAAcceleration() {
     if (m_parameterSolveCodes.find(AccelerationPoleRA) != m_parameterSolveCodes.end())
       return true;
@@ -351,6 +457,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole declination angle will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleDec() {
     if (m_parameterSolveCodes.find(PoleDec) != m_parameterSolveCodes.end())
       return true;
@@ -358,6 +469,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole declination velocity will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleDecVelocity() {
     if (m_parameterSolveCodes.find(VelocityPoleDec) != m_parameterSolveCodes.end())
       return true;
@@ -365,6 +481,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the pole declination acceleration will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePoleDecAcceleration() {
     if (m_parameterSolveCodes.find(AccelerationPoleDec) != m_parameterSolveCodes.end())
       return true;
@@ -372,6 +493,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the prime meridian angle will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePM() {
     if (m_parameterSolveCodes.find(PM) != m_parameterSolveCodes.end())
       return true;
@@ -379,6 +505,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the prime meridian velocity will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePMVelocity() {
     if (m_parameterSolveCodes.find(VelocityPM) != m_parameterSolveCodes.end())
       return true;
@@ -386,6 +517,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the prime meridian acceleration will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solvePMAcceleration() {
     if (m_parameterSolveCodes.find(AccelerationPM) != m_parameterSolveCodes.end())
       return true;
@@ -393,6 +529,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the triaxial radii will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solveTriaxialRadii() {
     if (m_parameterSolveCodes.find(TriaxialRadiusA) != m_parameterSolveCodes.end() &&
         m_parameterSolveCodes.find(TriaxialRadiusB) != m_parameterSolveCodes.end() &&
@@ -402,6 +543,11 @@ namespace Isis {
   }
 
 
+  /**
+   * If the mean radius will be solved for with this target body.
+   * 
+   * @return @b bool If it will be solved for.
+   */
   bool BundleTargetBody::solveMeanRadius() {
     if (m_parameterSolveCodes.find(MeanRadius) != m_parameterSolveCodes.end())
       return true;
@@ -410,12 +556,26 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * @brief Applies a vector of corrections to the parameters for the target body.
+   * 
+   * @description Applies a vector of corrections to the internal parameters for the
+   * target body and records the corrections in the internal corrections vector.
+   * The corrections vector should be ordered the same as the parameter vector descriped
+   * in setSolveSettings.
+   * 
+   * @param corrections The vector containing correction values.
+   * 
+   * @throws IException::Programmer "In BundleTargetBody::applyParameterCorrections:
+   *                                 correction and m_targetParameter vectors sizes don't match."
+   * @throws IException::Unknown "Unable to apply parameter corrections to BundleTargetBody."
+   * 
+   * @see setSolveSettings
    */
-  void BundleTargetBody::applyParameterCorrections(boost::numeric::ublas::vector<double> corrections) {
+  void BundleTargetBody::applyParameterCorrections(
+      boost::numeric::ublas::vector<double> corrections) {
     if (corrections.size() != m_parameterSolveCodes.size()) {
       QString msg = "In BundleTargetBody::applyParameterCorrections: "
-                    "correction and m_targetParameter vectors sizes don't match\n";
+                    "correction and m_targetParameter vectors sizes don't match.\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -425,7 +585,8 @@ namespace Isis {
 
     try {
       int n = 0;
-      for (std::set<int>::iterator it=m_parameterSolveCodes.begin(); it!=m_parameterSolveCodes.end(); ++it) {
+      for (std::set<int>::iterator it=m_parameterSolveCodes.begin(); 
+           it!=m_parameterSolveCodes.end(); ++it) {
         switch (*it) {
           case PoleRA:
             m_raPole[0] += Angle(corrections[n], Angle::Radians);
@@ -502,7 +663,17 @@ namespace Isis {
   }
 
 
-  BundleTargetBody::TargetRadiiSolveMethod BundleTargetBody::stringToTargetRadiiOption(QString method) {
+  /**
+   * Converts a QString to a TargetRadiiSolveMethod.
+   * 
+   * @param method The Qstring of a solve method.
+   * 
+   * @return @b TargetRadiiSolveMethod The converted solve method.
+   * 
+   * @throws IException::Programmer "Unknown target body radius solution method"
+   */
+  BundleTargetBody::TargetRadiiSolveMethod BundleTargetBody::stringToTargetRadiiOption(
+      QString method) {
     if (method.compare("NONE", Qt::CaseInsensitive) == 0) {
       return None;
     }
@@ -520,6 +691,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Converts a TargetRadiiSolveMethod to a QString
+   * 
+   * @param method The TargetRadiiSolveMethod to convert.
+   * 
+   * @return @b QString The solve method as a QString.
+   * 
+   * @throws IException::Programmer "Unknown target body radius solve method enum"
+   */
   QString BundleTargetBody::targetRadiiOptionToString(TargetRadiiSolveMethod method) {
     if (method == None)
       return "None";
@@ -534,7 +714,12 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns the vector of parameter weights.
+   * See setSolveSettings for how the vector is ordered.
+   * 
+   * @return @b vector<double>& The vector of parameter weights.
+   * 
+   * @see setSolveSettings
    */
   vector<double> &BundleTargetBody::parameterWeights() {
     return m_weights;
@@ -542,23 +727,38 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns the vector of corrections applied to the parameters.
+   * See setSolveSettings for how the vector is ordered.
+   * 
+   * @return @b vector<double>& The vector of parameter corrections.
+   * 
+   * @see setSolveSettings
    */
-  vector< double > &BundleTargetBody::parameterCorrections() {
+  vector<double> &BundleTargetBody::parameterCorrections() {
     return m_corrections;
   }
 
 
   /**
-   * TODO
+   * Returns the vector of parameters solution.
+   * See setSolveSettings for how the vector is ordered.
+   * 
+   * @return @b vector<double>& The vector of parameter solution.
+   * 
+   * @see setSolveSettings
    */
-  vector< double > &BundleTargetBody::parameterSolution() {
+  vector<double> &BundleTargetBody::parameterSolution() {
     return m_solution;
   }
 
 
   /**
-   * TODO
+   * Returns the vector of apriori parameters sigmas.
+   * See setSolveSettings for how the vector is ordered.
+   * 
+   * @return @b vector<double>& The vector of apriori parameter sigmas.
+   * 
+   * @see setSolveSettings
    */
   vector<double> &BundleTargetBody::aprioriSigmas() {
     return m_aprioriSigmas;
@@ -566,9 +766,14 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns the vector of adjusted parameters sigmas.
+   * See setSolveSettings for how the vector is ordered.
+   * 
+   * @return @b vector<double>& The vector of adjusted parameter sigmas.
+   * 
+   * @see setSolveSettings
    */
-  vector< double > &BundleTargetBody::adjustedSigmas() {
+  vector<double> &BundleTargetBody::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
@@ -596,6 +801,19 @@ namespace Isis {
 //  }
 
 
+  /**
+   * @brief Returns the number of radius parameters being solved for.
+   * 
+   * @description Returns the number of radius parameters being solved for
+   * which is based on the target radius solve method:
+   * None -> 0
+   * Mean -> 1
+   * All  -> 3
+   * 
+   * @return @b int The number of radius parameters being solved for.
+   * 
+   * @see TargetRadiiSolveMethod
+   */
   int BundleTargetBody::numberRadiusParameters() {
     if (m_solveTargetBodyRadiusMethod == All)
       return 3;
@@ -605,38 +823,116 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the total number of parameters being solved for.
+   * 
+   * @return @b int The number of parameters being solved for.
+   */
   int BundleTargetBody::numberParameters() {
     return m_parameterSolveCodes.size();
   }
 
 
+  /**
+   * @brief Returns the coefficients of the right ascension polynomial.
+   * 
+   * @description Returns The vector of right ascension polynomial coefficients ordered as:
+   * 
+   * angle,
+   * velocity,
+   * acceleration.
+   * 
+   * Only coefficients that are being solved for will be included.
+   * 
+   * @return @b vector<Angle> The right ascension polynomial coefficients.
+   */
   std::vector<Angle> BundleTargetBody::poleRaCoefs() {
     return m_raPole;
   }
 
 
+  /**
+   * @brief Returns the coefficients of the declination polynomial.
+   * 
+   * @description Returns The vector of declination polynomial coefficients ordered as:
+   * 
+   * angle,
+   * velocity,
+   * acceleration.
+   * 
+   * Only coefficients that are being solved for will be included.
+   * 
+   * @return @b vector<Angle> The declination polynomial coefficients.
+   */
   std::vector<Angle> BundleTargetBody::poleDecCoefs() {
     return m_decPole;
   }
 
 
+  /**
+   * @brief Returns the coefficients of the prime meridian polynomial.
+   * 
+   * @description Returns The vector of prime meridian polynomial coefficients ordered as:
+   * 
+   * angle,
+   * velocity,
+   * acceleration.
+   * 
+   * Only coefficients that are being solved for will be included.
+   * 
+   * @return @b vector<Angle> The prime meridian polynomial coefficients.
+   */
   std::vector<Angle> BundleTargetBody::pmCoefs() {
     return m_pm;
   }
 
 
+  /**
+   * @brief Returns the radius values.
+   * 
+   * @description Returns the vector of radius values formatted as RadiusA, RadiusB, RadiusC.
+   * 
+   * @return @b vector<Distance> The vector of radius values.
+   * 
+   * @throws IException::Programmer "The triaxial radii can only be accessed
+   *                                 when solving for triaxial radii."
+   */
   std::vector<Distance> BundleTargetBody::radii() {
+    if (!solveTriaxialRadii()) {
+      QString msg = "The triaxial radii can only be accessed when solving for triaxial radii.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return m_radii;
   }
 
 
+  /**
+   * Returns the mean radius.
+   * 
+   * @return @b Distance The mean radius.
+   * 
+   * @throws IException::Programmer "The mean radius can only be accessed
+   *                                 when solving for mean radius."
+   */
   Distance BundleTargetBody::meanRadius() {
+    if (!solveMeanRadius()) {
+      QString msg = "The mean radius can only be accessed when solving for mean radius.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return m_meanRadius;
   }
 
 
   /**
-   * TODO
+   * @brief Calculates and returns the weighted sum of the squares of the corrections.
+   * 
+   * @description Calculates and returns the weighted sum of the squares of the corrections
+   * computed by V(T)*P*V where:
+   * V is the vector of corrections,
+   * P is the weight matrix,
+   * V(T) is the transpose of V.
+   * 
+   * @return @b double The weighted sum of the squares of the corrections (vtpv).
    */
   double BundleTargetBody::vtpv() {
     double vtpv = 0.0;
@@ -653,6 +949,14 @@ namespace Isis {
     return vtpv;
   }
 
+
+  /**
+   * Formats and returns the parameter values as a QString.
+   * 
+   * @param errorPropagation If adjusted sigmas should be output.
+   * 
+   * @return @b QString A formatted QString containing the parameter values.
+   */
   QString BundleTargetBody::formatBundleOutputString(bool errorPropagation) {
 
     // for convenience, create vectors of parameters names and values in the correct sequence
@@ -663,22 +967,22 @@ namespace Isis {
     int nRadiusParameters = 0;
     if (solvePoleRA()) {
       finalParameterValues.push_back(m_raPole[0].degrees());
-      parameterNamesList.append( str.arg("POLE RA  ") );
+      parameterNamesList.append( str.arg("POLE RA    ") );
       nAngleParameters++;
     }
     if (solvePoleRAVelocity()) {
       finalParameterValues.push_back(m_raPole[1].degrees());
-      parameterNamesList.append( str.arg("POLE RAv  ") );
+      parameterNamesList.append( str.arg("POLE RAv   ") );
       nAngleParameters++;
     }
     if (solvePoleRAAcceleration()) {
       finalParameterValues.push_back(m_raPole[2].degrees());
-      parameterNamesList.append( str.arg("POLE RAa  ") );
+      parameterNamesList.append( str.arg("POLE RAa   ") );
       nAngleParameters++;
     }
     if (solvePoleDec()) {
       finalParameterValues.push_back(m_decPole[0].degrees());
-      parameterNamesList.append( str.arg("POLE DEC ") );
+      parameterNamesList.append( str.arg("POLE DEC   ") );
       nAngleParameters++;
     }
     if (solvePoleDecVelocity()) {
@@ -693,31 +997,31 @@ namespace Isis {
     }
     if (solvePM()) {
       finalParameterValues.push_back(m_pm[0].degrees());
-      parameterNamesList.append( str.arg("  PM  ") );
+      parameterNamesList.append( str.arg("  PM       ") );
       nAngleParameters++;
     }
     if (solvePMVelocity()) {
       finalParameterValues.push_back(m_pm[1].degrees());
-      parameterNamesList.append( str.arg("  PMv  ") );
+      parameterNamesList.append( str.arg("  PMv      ") );
       nAngleParameters++;
     }
     if (solvePoleDecAcceleration()) {
       finalParameterValues.push_back(m_pm[2].degrees());
-      parameterNamesList.append( str.arg("  PMa  ") );
+      parameterNamesList.append( str.arg("  PMa      ") );
       nAngleParameters++;
     }
     if (solveTriaxialRadii()) {
       finalParameterValues.push_back(m_radii[0].kilometers());
       finalParameterValues.push_back(m_radii[1].kilometers());
       finalParameterValues.push_back(m_radii[2].kilometers());
-      parameterNamesList.append( str.arg("  RadiusA") );
-      parameterNamesList.append( str.arg("  RadiusB") );
-      parameterNamesList.append( str.arg("  RadiusC") );
+      parameterNamesList.append( str.arg("  RadiusA  ") );
+      parameterNamesList.append( str.arg("  RadiusB  ") );
+      parameterNamesList.append( str.arg("  RadiusC  ") );
       nRadiusParameters += 3;
     }
     if (solveMeanRadius()) {
       finalParameterValues.push_back(m_meanRadius.kilometers());
-      parameterNamesList.append( str.arg("MeanRadius") );
+      parameterNamesList.append( str.arg("MeanRadius ") );
       nRadiusParameters++;
     }
 
@@ -761,10 +1065,10 @@ namespace Isis {
 
     for (int i = nAngleParameters; i < nParameters; i++) {
 
-    if (m_aprioriSigmas[i] <= 0.0)
-      sigma = "FREE";
-    else
-      sigma = toString(m_aprioriSigmas[i], 8);
+      if (m_aprioriSigmas[i] <= 0.0)
+        sigma = "FREE";
+      else
+        sigma = toString(m_aprioriSigmas[i], 8);
 
       if (errorPropagation) {
         double d1 = finalParameterValues[i];
@@ -796,7 +1100,12 @@ namespace Isis {
 
 
   /**
-   * Access to parameters for CorrelationMatrix to use.
+   * Returns a list of all the parameters being solved for as QStrings.
+   * This should only be called after formatBundleOutputString.
+   * 
+   * @return @b QStringList A list of the parameters being solved for.
+   * 
+   * @see formatBundleOutputString
    */
   QStringList BundleTargetBody::parameterList() {
     return m_parameterNamesList;
@@ -804,11 +1113,63 @@ namespace Isis {
 
 
   /**
-   * set bundle solve parameters for target body from a pvl
-   * file
+   * Set bundle solve parameters for target body from a pvl file.
    *
    * specifically for standard jigsaw interface, not the
    * Integrated Photogrammetric Control Environment (IPCE)
+   * 
+   * @param tbObject The Pvl file to read from.
+   * 
+   * @return @b bool If the solve parameters were successfuly set.
+   * 
+   * @throws IException::User "Ra must be given as none, position, velocity, or acceleration"
+   * @throws IException::User "Dec must be given as none, position, velocity, or acceleration"
+   * @throws IException::User "Pm must be given as none, position, velocity, or acceleration"
+   * @throws IException::User "RadiiSolveOption must be given as none, triaxial, or mean"
+   * @throws IException::User "RaValue must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "RaSigma must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "RaVelocityValue must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "RaVelocitySigma must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "RaAccelerationValue must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "RaAccelerationSigma must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecValue must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecSigma must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecVelocityValue must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecVelocitySigma must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecAccelerationValue must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "DecAccelerationSigma must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmValue must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmSigma must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmVelocityValue must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmVelocitySigma must be a valid double (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmAccelerationValue must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "PmAccelerationSigma must be a valid double
+   *                           (>= 0; blank defaults to 0)."
+   * @throws IException::User "RadiusAValue must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusAValue must be >= 0."
+   * @throws IException::User "RadiusASigma must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusASigma must be >= 0."
+   * @throws IException::User "RadiusBValue must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusBValue must be >= 0".
+   * @throws IException::User "RadiusBSigma must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusBSigma must be >= 0".
+   * @throws IException::User "RadiusCValue must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusCValue must be >= 0".
+   * @throws IException::User "RadiusCSigma must be a valid double (blank defaults to 0)."
+   * @throws IException::User "RadiusCSigma must be >= 0".
+   * @throws IException::User "MeanRadiusValue must be a valid double (blank defaults to 0)."
+   * @throws IException::User "MeanRadiusValue must be >= 0".
+   * @throws IException::User "MeanRadiusSigma must be a valid double (blank defaults to 0)."
+   * @throws IException::User "MeanRadiusSigma must be >= 0".
+   * 
+   * @see setSolveSettings
    */
   bool BundleTargetBody::readFromPvl(PvlObject &tbObject) {
     // reset defaults
@@ -817,6 +1178,8 @@ namespace Isis {
     double d = -1.0;
     QString str;
     TargetRadiiSolveMethod solveRadiiMethod = None;
+
+    //TODO Solve method keywords need to be checked for validity. JAM
 
     // determine which parameters we're solving for
     std::set<int> targetParameterSolveCodes;
@@ -937,6 +1300,8 @@ namespace Isis {
     Distance sigmaRadiusC;
     Distance aprioriMeanRadius;
     Distance sigmaMeanRadius;
+    
+    //TODO Determine which need to be non-negative. JAM
 
     for (g = tbObject.beginGroup(); g != tbObject.endGroup(); ++g) {
       if (g->hasKeyword("RaValue")) {
@@ -1143,10 +1508,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusAValue"));
         }
         catch (IException &e) {
-          QString msg = "RadiusAValue must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusAValue must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        aprioriRadiusA = Distance(d, Distance::Meters);
+        try {
+          aprioriRadiusA = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusAValue must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("RadiusASigma")) {
@@ -1154,10 +1525,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusASigma"));
         }
         catch (IException &e) {
-          QString msg = "RadiusASigma must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusASigma must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        sigmaRadiusA = Distance(d, Distance::Meters);
+        try {
+          sigmaRadiusA = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusASigma must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("RadiusBValue")) {
@@ -1165,10 +1542,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusBValue"));
         }
         catch (IException &e) {
-          QString msg = "RadiusBValue must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusBValue must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        aprioriRadiusB = Distance(d, Distance::Meters);
+        try {
+          aprioriRadiusB = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusBValue must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("RadiusBSigma")) {
@@ -1176,10 +1559,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusBSigma"));
         }
         catch (IException &e) {
-          QString msg = "RadiusBSigma must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusBSigma must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        sigmaRadiusB = Distance(d, Distance::Meters);
+        try {
+          sigmaRadiusB = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusBSigma must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("RadiusCValue")) {
@@ -1187,10 +1576,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusCValue"));
         }
         catch (IException &e) {
-          QString msg = "RadiusCValue must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusCValue must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        aprioriRadiusC = Distance(d, Distance::Meters);
+        try {
+          aprioriRadiusC = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusCValue must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("RadiusCSigma")) {
@@ -1198,10 +1593,16 @@ namespace Isis {
           d = (double)(g->findKeyword("RadiusCSigma"));
         }
         catch (IException &e) {
-          QString msg = "RadiusCSigma must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "RadiusCSigma must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        sigmaRadiusC = Distance(d, Distance::Meters);
+        try {
+          sigmaRadiusC = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "RadiusCSigma must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("MeanRadiusValue")) {
@@ -1209,10 +1610,16 @@ namespace Isis {
           d = (double)(g->findKeyword("MeanRadiusValue"));
         }
         catch (IException &e) {
-          QString msg = "MeanRadiusValue must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "MeanRadiusValue must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        aprioriMeanRadius = Distance(d, Distance::Meters);
+        try {
+          aprioriMeanRadius = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "MeanRadiusValue must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       if (g->hasKeyword("MeanRadiusSigma")) {
@@ -1220,10 +1627,16 @@ namespace Isis {
           d = (double)(g->findKeyword("MeanRadiusSigma"));
         }
         catch (IException &e) {
-          QString msg = "MeanRadiusSigma must be a valid double (>= 0; blank defaults to 0).";
+          QString msg = "MeanRadiusSigma must be a valid double (blank defaults to 0).";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        sigmaMeanRadius = Distance(d, Distance::Meters);
+        try {
+          sigmaMeanRadius = Distance(d, Distance::Meters);
+        }
+        catch (IException &e) {
+          QString msg = "MeanRadiusSigma must be >= 0.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
     }
 
@@ -1255,14 +1668,25 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * Gets the local radius for the given latitude/longitude coordinate.
    *
-   * @return Distance The distance from the center of the ellipsoid to its
-   *         surface at the given lat/lon location.
+   * @param lat Latitude coordinate.
+   * @param lon Longitude coordinate.
    *
+   * @return @b Distance The distance from the center of the ellipsoid to its surface
+   *                     at the given lat/lon location.
+   * 
+   * @throws IException::Programmer "Local radius can only be found if
+   *                                 triaxial radii were solved for."
    */
   Distance BundleTargetBody::localRadius(const Latitude &lat, const Longitude &lon) {
+
+    if (!solveTriaxialRadii()) {
+      QString msg = "Local radius can only be found if triaxial radii were solved for.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     double a = m_radii[0].kilometers();
     double b = m_radii[1].kilometers();
@@ -1278,6 +1702,7 @@ namespace Isis {
 
     return Distance(radius, Distance::Kilometers);
   }
+
 
   /**
    * set bundle solve parameters for an observation
