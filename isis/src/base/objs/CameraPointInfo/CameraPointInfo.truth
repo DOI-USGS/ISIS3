@@ -54,8 +54,7 @@ Group = GroundPoint
                                 0.99614962443708) <degrees>
   LookDirectionJ2000         = (-0.065080625277796, -0.41666190298971,
                                 0.90672894009756) <degrees>
-  LookDirectionCamera        = (-5.55111512312578e-17, 8.74300631892311e-16,
-                                1.0) <degrees>
+  LookDirectionCamera        = (0.0, 0.0, 1.0) <degrees>
 End_Group
 Group = GroundPoint
   Sample                     = 0.90348451909767
@@ -113,6 +112,6 @@ Group = GroundPoint
                                 0.99698587393526) <degrees>
   LookDirectionJ2000         = (-0.055242605204482, -0.4079045962425,
                                 0.91135179537568) <degrees>
-  LookDirectionCamera        = (-0.0094547052774946, 0.010268734490901,
-                                0.99990257607433) <degrees>
+  LookDirectionCamera        = (-0.0094547053, 0.0102687345,
+                                0.9999025761) <degrees>
 End_Group
