@@ -1,8 +1,8 @@
 #include "IsisDebug.h"
 
 #include <iostream>
+
 #include <QApplication>
-#include <QWorkspace>
 #include <QFontDialog>
 
 #include <sys/types.h>
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
   if (newWindow < 0) {
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
-    strcpy(p_socketName.sun_path, p_socketFile.toAscii().data());
+    strcpy(p_socketName.sun_path, p_socketFile.toLatin1().data());
     int p_socket;
 
     if (((FileName)p_socketFile).fileExists()) {
@@ -93,14 +93,14 @@ int main(int argc, char *argv[]) {
           }
           temp += "raise";
           // Try to send data to the socket
-          if (send(p_socket, temp.toAscii().data(), temp.size(), 0) >= 0) {
+          if (send(p_socket, temp.toLatin1().data(), temp.size(), 0) >= 0) {
             // Success, the other qview will open this file.
             exit(0);
           }
           else {
             QString msg = "Unable to write to socket";
             std::cout << msg << std::endl;
-            remove(p_socketFile.toAscii().data());
+            remove(p_socketFile.toLatin1().data());
           }
         }
 
@@ -108,13 +108,13 @@ int main(int argc, char *argv[]) {
         //   socket is no longer running & remove the tmp file...it falls out &
         //   create a new one. This happens if qview is not already running.
         else {
-          remove(p_socketFile.toAscii().data());
+          remove(p_socketFile.toLatin1().data());
         }
       }
       else {
         QString msg = "Unable to create socket";
         std::cout << msg << std::endl;
-        remove(p_socketFile.toAscii().data());
+        remove(p_socketFile.toLatin1().data());
       }
     }
   }
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 
   // Add the Qt plugin directory to the library path
   FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-  QCoreApplication::addLibraryPath(qtpluginpath.expanded().toAscii().data());
+  QCoreApplication::addLibraryPath(qtpluginpath.expanded().toLatin1().data());
 
   ViewportMainWindow *vw = new ViewportMainWindow("qview");
 
@@ -204,6 +204,12 @@ int main(int argc, char *argv[]) {
         // If we're trying to open more later or have opened a file, allow
         //   qview to continue running. Otherwise (this if), crash.
         if (i == argc - 1 && !openingAFileSucceeded) {
+          // since we intend to exit, we need to cleanup our heap
+          // (tools cleaned since they are vw's children)
+          delete vw;
+          vw = NULL;
+          delete app;
+          app = NULL;
           return 1;
         }
       }
@@ -245,7 +251,7 @@ int main(int argc, char *argv[]) {
     temp->wait(); // wait for the stop to finish
     delete temp;
 
-    remove(p_socketFile.toAscii().data());
+    remove(p_socketFile.toLatin1().data());
   }
 
   delete panTool;
