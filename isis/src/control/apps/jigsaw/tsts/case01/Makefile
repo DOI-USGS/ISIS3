@@ -16,27 +16,27 @@ commands:
 	$(CP) $(INPUT)/*.cub $(OUTPUT) > /dev/null;
 	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	cnet=$(INPUT)/redPntreg.net \
-	onet=$(OUTPUT)/case01OutNet.net \
-	observations=yes \
-	method=oldsparse \
-	cksolvedegree=3 \
-	camsolve=all \
-	update=yes \
-	file_pre=t \
-	twist=no > /dev/null;
-	cat t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  | $(SED) 's/\(Iterations:\).*/\1/' \
-	  > $(OUTPUT)/bundleout.txt
-	cat t_residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
-	  > $(OUTPUT)/residuals.csv
-	cat t_bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/bundleout_images.csv
+	           cnet=$(INPUT)/redPntreg.net \
+	           onet=$(OUTPUT)/case01OutNet.net \
+	           observations=yes \
+	           method=oldsparse \
+	           cksolvedegree=3 \
+	           camsolve=all \
+	           update=yes \
+	           file_pre=t \
+	           twist=no > /dev/null;
+	$(CAT) t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       | $(SED) 's/\(Iterations:\).*/\1/' \
+	       > $(OUTPUT)/bundleout.txt
+	$(CAT) t_residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
+	       > $(OUTPUT)/residuals.csv
+	$(CAT) t_bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+	       > $(OUTPUT)/bundleout_images.csv
 	$(RM) t_bundleout_images.csv > /dev/null;
 	$(MV) t_bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;

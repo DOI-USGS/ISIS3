@@ -15,25 +15,25 @@ commands:
 	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cub.lis;
 	$(LS) -1 $(OUTPUT)/e0400710.lev1.cub > $(OUTPUT)/held.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cub.lis  \
-	heldlist=$(OUTPUT)/held.lis  \
-	cnet=$(INPUT)/mocVik.net \
-	onet=$(OUTPUT)/case2OutNet.net \
-	maxits=10 \
-	method=oldsparse \
-	sigma0=1.e-5  \
-	update=yes \
-	spsolve=position > /dev/null;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/bundleout.txt
-	cat residuals.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/residuals.csv
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/bundleout_images.csv
+	           heldlist=$(OUTPUT)/held.lis  \
+	           cnet=$(INPUT)/mocVik.net \
+	           onet=$(OUTPUT)/case2OutNet.net \
+	           maxits=10 \
+	           method=oldsparse \
+	           sigma0=1.e-5  \
+	           update=yes \
+	           spsolve=position > /dev/null;
+	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       > $(OUTPUT)/bundleout.txt
+	$(CAT) residuals.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       > $(OUTPUT)/residuals.csv
+	$(CAT) bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       > $(OUTPUT)/bundleout_images.csv
 	$(RM) residuals.csv bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin print.prt > /dev/null;

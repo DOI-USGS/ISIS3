@@ -7,30 +7,30 @@ commands:
 	$(CP) $(INPUT)/*.cub $(OUTPUT) > /dev/null;
 	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	cnet=$(INPUT)/redPntreg.net \
-	onet=$(OUTPUT)/obsmode_cholmod_out.net \
-	observations=yes \
-	method=sparse \
-	cksolvedegree=3 \
-	camsolve=all \
-	update=yes \
-	twist=no > /dev/null;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  | $(SED) 's/\(Iterations:\).*/\1/' \
-	  > $(OUTPUT)/obsmode_cholmod_bundleout.txt
+	           cnet=$(INPUT)/redPntreg.net \
+	           onet=$(OUTPUT)/obsmode_cholmod_out.net \
+	           observations=yes \
+	           method=sparse \
+	           cksolvedegree=3 \
+	           camsolve=all \
+	           update=yes \
+	           twist=no > /dev/null;
+	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       | $(SED) 's/\(Iterations:\).*/\1/' \
+	       > $(OUTPUT)/obsmode_cholmod_bundleout.txt
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
 	# 2. remove net filename paths
 	# 3. remove digits beyond the fifth decimal place of decimal numbers
 	# 4. remove date and time
 	# 5. remove number of iterations
-	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
-	  > $(OUTPUT)/obsmode_cholmod_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
+	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
+	       > $(OUTPUT)/obsmode_cholmod_residuals.csv
+	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	       > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
 	$(RM) residuals.csv bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/obsmode_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
