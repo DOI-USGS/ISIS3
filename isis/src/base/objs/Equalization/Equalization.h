@@ -138,8 +138,10 @@ namespace Isis {
 
       void addHolds(QString holdListName);
 
-      void calculateStatistics(double samplingPercent, int mincnt, bool wtopt,
-          LeastSquares::SolveMethod methodType);
+      void calculateStatistics(double samplingPercent, 
+                               int mincnt, 
+                               bool wtopt,
+                               LeastSquares::SolveMethod methodType);
       void recalculateStatistics(QString inStatsFileName);
       void importStatistics(QString instatsFileName);
       void applyCorrection(QString toListName);

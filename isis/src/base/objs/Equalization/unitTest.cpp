@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
 
   FileList toFileList(toList);
   for (int i = 0; i < toFileList.size(); i++) {
-    remove(toFileList[i].expanded().toAscii());
+    remove(toFileList[i].expanded().toLatin1());
   }
 
 
