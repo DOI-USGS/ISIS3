@@ -57,6 +57,9 @@ namespace Isis {
    */
   void JP2Exporter::write(FileName outputName, int quality,
                           QString compression) {
+    
+    outputName = outputName.addExtension(extension());
+    
     PixelType type = pixelType();
     m_encoder = new JP2Encoder(
         outputName.expanded(), samples(), lines(), bands(), type);

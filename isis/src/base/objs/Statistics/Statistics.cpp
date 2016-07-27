@@ -34,6 +34,8 @@
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "XmlStackedHandlerReader.h"
 
 using namespace std;
@@ -53,6 +55,17 @@ namespace Isis {
     SetValidRange();
     Reset(); // initialize
     xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
+  }
+
+  /**
+   * Constructs a Statistics object from an input Pvl
+   *
+   * @param const PvlGroup & - The input statistics
+   */
+  Statistics::Statistics(const PvlGroup &inStats, QObject *parent) {
+    SetValidRange();
+    Reset();
+    fromPvl(inStats);
   }
 
 
@@ -652,6 +665,70 @@ namespace Isis {
       }
     }
     return (value - Average()) / StandardDeviation();
+  }
+
+
+  /**
+   * Unserializes a Statistics object from a pvl group
+   *
+   * @param const PvlGroup &inStats - The input statistics
+   */
+  void Statistics::fromPvl(const PvlGroup &inStats) {
+    Reset();
+    m_sum = inStats["Sum"];
+    m_sumsum = inStats["SumSquare"];
+    m_minimum = inStats["Minimum"];
+    m_maximum = inStats["Maximum"];
+    m_validMinimum = inStats["ValidMinimum"];
+    m_validMaximum = inStats["ValidMaximum"];
+    m_totalPixels = inStats["TotalPixels"];
+    m_validPixels = inStats["ValidPixels"];
+    m_nullPixels = inStats["NullPixels"];
+    m_lrsPixels = inStats["LrsPixels"];
+    m_lisPixels = inStats["LisPixels"];
+    m_hrsPixels = inStats["HrsPixels"];
+    m_hisPixels = inStats["HisPixels"];
+    m_underRangePixels = inStats["UnderValidMinimumPixels"];
+    m_overRangePixels = inStats["OverValidMaximumPixels"];
+    m_removedData = false; //< Is this the correct state?
+  }
+
+
+  /**
+   * Serialize statistics as a pvl group
+   *
+   * @param QString name (Default value is "Statistics") - Name of the statistics group
+   *
+   * @return PvlGroup Statistics information as a pvl group
+   */
+  PvlGroup Statistics::toPvl(QString name) const {
+    if (name.isEmpty()) {
+      name = "Statistics";
+    }
+    // Construct a label with the results
+    PvlGroup results(name);  
+    results += PvlKeyword("Sum", toString(Sum()));
+    results += PvlKeyword("SumSquare", toString(SumSquare()));
+    results += PvlKeyword("Minimum", toString(Minimum()));
+    results += PvlKeyword("Maximum", toString(Maximum()));
+    results += PvlKeyword("ValidMinimum", toString(ValidMinimum()));
+    results += PvlKeyword("ValidMaximum", toString(ValidMaximum()));
+    if (ValidPixels() != 0) {
+      results += PvlKeyword("Average", toString(Average()));
+      results += PvlKeyword("StandardDeviation", toString(StandardDeviation()));
+      results += PvlKeyword("Variance", toString(Variance()));
+    }
+    results += PvlKeyword("TotalPixels", toString(TotalPixels()));
+    results += PvlKeyword("ValidPixels", toString(ValidPixels()));
+    results += PvlKeyword("OverValidMaximumPixels", toString(OverRangePixels()));
+    results += PvlKeyword("UnderValidMinimumPixels", toString(UnderRangePixels()));
+    results += PvlKeyword("NullPixels", toString(NullPixels()));
+    results += PvlKeyword("LisPixels", toString(LisPixels()));
+    results += PvlKeyword("LrsPixels", toString(LrsPixels()));
+    results += PvlKeyword("HisPixels", toString(HisPixels()));
+    results += PvlKeyword("HrsPixels", toString(HrsPixels()));
+
+    return results;
   }
 
 

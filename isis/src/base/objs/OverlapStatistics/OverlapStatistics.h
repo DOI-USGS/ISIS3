@@ -24,11 +24,12 @@
 
 #include "Cube.h"
 #include "FileName.h"
-#include "Projection.h"
 #include "MultivariateStatistics.h"
+#include "Projection.h"
 
 namespace Isis {
   class PvlObject;
+  
   /**
    * @brief Calculates statistics in the area of overlap between two projected cubes
    *
@@ -64,6 +65,12 @@ namespace Isis {
    *  @history 2012-04-16 Jeannie Backer - Added forward declaration for
    *                          PvlObject and ordered #includes in the
    *                          implementation file. Added documentation.
+   *  @history 2016-07-15 Ian Humphrey - Modified toPvl() method to get the internal multivariate
+   *                          statistics. Added init() method to initialize primitive members during
+   *                          construction. Added new constructor that creates an OverlapStatistics
+   *                          object from a PvlObject. Added private fromPvl() method to implement
+   *                          these details. Updated unitTest to test these changes. References 
+   *                          #2282.
    *
    */
 
@@ -72,6 +79,7 @@ namespace Isis {
       OverlapStatistics(Isis::Cube &x, Isis::Cube &y,
                         QString progressMsg = "Gathering Overlap Statistics",
                         double sampPercent = 100.0);
+      OverlapStatistics(const PvlObject &inStats);
 
       /**
        * Checks the specified band for an overlap
@@ -238,6 +246,10 @@ namespace Isis {
         p_mincnt = mincnt;
       };
 
+      int MinCount() const {
+        return p_mincnt;
+      }
+
       /**
        * Returns whether the overlap meets the minimum valid pixel requirement
        *
@@ -251,7 +263,26 @@ namespace Isis {
 
       /**
        * Creates a Pvl containing the following Overlap Statistics information
-       *  
+       * File1
+       * File2
+       * Width
+       * Height
+       * Bands
+       * SamplingPercent
+       * MinCount
+       * MutlivariateStatisticsN (N = current band)
+       *   Covariance
+       *   Correlation
+       *   SumXY
+       *   ValidPixels
+       *   InvalidPixels
+       *   TotalPixels
+       *   LinearRegression
+       *   ValidOverlap
+       *   XStatistics
+       *     #FileX Statistics information
+       *   YStatistics
+       *     #FileY Statistics information
        * File1
        *   StartSample
        *   EndSample
@@ -268,24 +299,19 @@ namespace Isis {
        *   Average
        *   StandardDeviation
        *   Variance
-       * Width 
-       * Height 
-       * SamplingPercent 
-       * Covariance 
-       * Correlation 
-       * ValidOverlap 
-       * ValidPixels 
-       * InvalidPixels 
-       * TotalPixels 
-       *
        *
        * @return PvlObject PvlObject containing the information for the Overlap
        *         Statistics.
        */
-      PvlObject toPvl() const;
+
+      PvlObject toPvl(QString name = "OverlapStatistics") const;
 
 
     private:
+
+      void fromPvl(const PvlObject &inStats);
+      void init();
+
       int p_bands;               //!< Number of bands
       double p_sampPercent;      //!< Percentage of lines sampled
       Isis::FileName p_xFile;    //!< FileName of X cube
@@ -302,7 +328,7 @@ namespace Isis {
       int p_maxLineY;            //!< Ending Line of overlap in Y cube
       int p_mincnt;              //!< Minimum valid pixels to be valid overlap
 
-      //!Multivariate Stats object for overlap data from both cubes
+      //! Multivariate Stats object for overlap data from both cubes
       std::vector<Isis::MultivariateStatistics> p_stats;
   };
   std::ostream &operator<<(std::ostream &os, Isis::OverlapStatistics &stats);

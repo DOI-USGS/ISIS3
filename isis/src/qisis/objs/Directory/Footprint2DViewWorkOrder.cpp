@@ -39,7 +39,7 @@
 namespace Isis {
   
   /** 
-   * Constrictor. This method sets the text of the project to View Footprints.
+   * Constructor. This method sets the text of the project to View Footprints.
    * 
    * @param project Current project
    */

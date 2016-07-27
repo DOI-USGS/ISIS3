@@ -52,7 +52,9 @@ namespace Isis {
        *
        * @internal
        *   @history 2012-11-30 Tracie Sucharski - Removed unused include file Projection.h.  This 
-       *                          change was made in reference to #775
+       *                           change was made in reference to #775
+       *   @histroy 2016-07-15 Ian Humphrey - Modified calculateStatisics() to set the solved state
+       *                           to true to reflect changes to Equalization. References #2282.
       */
       class HiCalculateFunctor : public CalculateFunctor {
         public:

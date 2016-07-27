@@ -701,7 +701,7 @@ namespace Isis {
   bool ImageFileListWidget::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
+  /*  //tjw
     if (result) {
 
 //    if (localName == "geometry") {
@@ -769,6 +769,7 @@ namespace Isis {
       }
 
     }
+    */
 
     return result;
   }

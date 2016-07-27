@@ -40,12 +40,11 @@
 #include "FileName.h"
 #include "IString.h"
 #include "Progress.h"
-
+#include "IException.h"
 
 using std::cerr;
 using std::cout;
 using std::swap;
-
 
 namespace Isis {
 
@@ -54,9 +53,9 @@ namespace Isis {
    */
   ConcurrentControlNetReader::ConcurrentControlNetReader() {
     nullify();
-
+    
     m_mappedRunning = false;
-
+    
     m_progressBar = new ProgressBar("Reading Control Nets");
     m_watcher = new QFutureWatcher<Control *>;
 
@@ -93,12 +92,13 @@ namespace Isis {
    * @param filename The filename of the network to read
    */
   void ConcurrentControlNetReader::read(QString filename) {
+        
     m_backlog.append(filename);
-
+    
     if (!m_progressBar.isNull()) {
       m_progressBar->setRange(0, m_progressBar->maximum() + 1);
     }
-
+    
     start();
   }
 
@@ -107,12 +107,13 @@ namespace Isis {
    * @param filenames The filenames of the networks to read
    */
   void ConcurrentControlNetReader::read(QStringList filenames) {
-    m_backlog.append(filenames);
 
+    m_backlog.append(filenames);
+    
     if (!m_progressBar.isNull()) {
       m_progressBar->setRange(0, m_progressBar->maximum() + filenames.size());
     }
-
+    
     start();
   }
 
@@ -135,12 +136,8 @@ namespace Isis {
 
 
   void ConcurrentControlNetReader::start() {
+        
     if (!m_backlog.isEmpty() && !m_mappedRunning) {
-      if (!m_progressBar.isNull()) {
-        m_progressBar->setVisible(true);
-      }
-
-      delete m_progressUpdateTimer;
 
       QList< QPair<FileName, Progress *> > functorInput;
       foreach (QString backlogFileName, m_backlog) {
@@ -150,15 +147,26 @@ namespace Isis {
 
         functorInput.append(qMakePair(FileName(backlogFileName), progress));
       }
-
-      QFuture< Control * > networks = QtConcurrent::mapped(
-          functorInput,
-          FileNameToControlFunctor(QThread::currentThread()));
-
+      
+      QFuture<Control *> networks = QtConcurrent::mapped(functorInput,
+                                    FileNameToControlFunctor(QThread::currentThread()));
+            
+      Control * control = networks.result();
+      ControlNet * cnet = control->controlNet();
+      if (!cnet->IsValid()) {
+        throw IException();
+      }  
+      
+      if (!m_progressBar.isNull()) {
+        m_progressBar->setVisible(true);
+      }
+      
+      delete m_progressUpdateTimer;
+      
       m_watcher->setFuture(networks);
       m_mappedRunning = true;
       m_backlog.clear();
-
+      
       m_progressUpdateTimer = new QTimer;
       connect(m_progressUpdateTimer, SIGNAL(timeout()),
               this, SLOT(updateProgressValue()));
@@ -166,6 +174,7 @@ namespace Isis {
     }
   }
 
+  
   void ConcurrentControlNetReader::updateProgressValue() {
     if (!m_mappedRunning) {
       foreach (Progress *progress, m_progress) {
@@ -242,6 +251,7 @@ namespace Isis {
 
   Control * ConcurrentControlNetReader::FileNameToControlFunctor::operator()(
       const QPair<FileName, Progress *> &fileNameAndProgress) const {
+
     QString fileNameString = fileNameAndProgress.first.expanded();
     Progress *progress = fileNameAndProgress.second;
 

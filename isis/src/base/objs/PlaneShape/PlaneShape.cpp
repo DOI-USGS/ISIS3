@@ -22,11 +22,11 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  PlaneShape::PlaneShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
+  PlaneShape::PlaneShape(Target *target, Pvl &pvl) : ShapeModel (target) {
     setName("Plane");
 
     // set surface normal
-//    setNormal(0.0, 0.0, 1.0);
+    // setNormal(0.0, 0.0, 1.0);
   }
 
 
@@ -39,7 +39,7 @@ namespace Isis {
     setName("Plane");
 
     // set normal vector
-//    setNormal(0.0, 0.0, 1.0);
+    // setNormal(0.0, 0.0, 1.0);
   }
 
 
@@ -53,7 +53,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Destructor
    */
   PlaneShape::~PlaneShape() {
@@ -109,9 +109,9 @@ namespace Isis {
 
     if (nxpts != 1 ) {
       setHasIntersection(false);
-      return false; 
+      return false;
     }
-    
+
     setHasIntersection(true);
     setNormal(0.0,0.0,1.0);
     surfaceIntersection()->FromNaifArray(xpt);
@@ -121,35 +121,35 @@ namespace Isis {
   }
 
 
-  /** 
-   * Indicates that this shape model is not from a DEM. Since this method 
-   * returns false for this class, the Camera class will not calculate the 
-   * local normal using neighbor points. 
-   *  
-   * @return bool Indicates that this is not a DEM shape model. 
-   */ 
-  bool PlaneShape::isDEM() const { 
+  /**
+   * Indicates that this shape model is not from a DEM. Since this method
+   * returns false for this class, the Camera class will not calculate the
+   * local normal using neighbor points.
+   *
+   * @return bool Indicates that this is not a DEM shape model.
+   */
+  bool PlaneShape::isDEM() const {
     return false;
   }
 
 
-  /** 
-   * There is no implementation for this method. 
-   */ 
+  /**
+   * There is no implementation for this method.
+   */
   void PlaneShape::calculateSurfaceNormal() {
   }
 
 
-  /** 
-   * There is no implementation for this method. 
-   */ 
+  /**
+   * There is no implementation for this method.
+   */
   void PlaneShape::calculateDefaultNormal() {
   }
 
 
-  /** 
-   * There is no implementation for this method. 
-   */ 
+  /**
+   * There is no implementation for this method.
+   */
   void PlaneShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
   }
 
@@ -263,13 +263,13 @@ namespace Isis {
 
     return acos(angle) * RAD2DEG;
   }
-  
-    
-  /** 
-   * Gets the local radius for the given latitude/longitude coordinate. For the 
-   * plane shape model, this is calculated by finding the distance of the 
+
+
+  /**
+   * Gets the local radius for the given latitude/longitude coordinate. For the
+   * plane shape model, this is calculated by finding the distance of the
    * surface intersection point from the plane's origin.
-   * 
+   *
    * @return Distance The distance from the center of the body to its surface at
    *         the given lat/lon location.
    *
@@ -279,14 +279,14 @@ namespace Isis {
   Distance PlaneShape::localRadius(const Latitude &lat, const Longitude &lon) {
 
     SpiceDouble pB[3];   // surface intersection in body-fixed coordinates
-    
+
     // Get vector from center of body to surface point
     pB[0] = surfaceIntersection()->GetX().kilometers();
     pB[1] = surfaceIntersection()->GetY().kilometers();
     pB[2] = surfaceIntersection()->GetZ().kilometers();
 
     double radius = sqrt(pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2]);
-    
+
     return Distance(radius, Distance::Kilometers);
   }
 }

@@ -77,6 +77,8 @@ namespace Isis {
    *  @history 2013-01-28 Janet Barrett - Modified the AddParameter method to
    *                         also update exclusions for boolean widgets. References
    *                         #1452.
+   *  @history 2016-06-28 Adam Paquette - Modified UpdateHistory to appropriately
+   *                         retrieve lists from the history pvl
    */
 
   class Gui : public QMainWindow {

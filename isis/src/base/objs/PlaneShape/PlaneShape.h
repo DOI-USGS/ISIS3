@@ -43,7 +43,7 @@ namespace Isis {
    * provide utilities to retrieve radii and photometric information.
    *
    *
-   * @ingroup 
+   * @ingroup
    *
    * @author 2012-07-30 Ken Edmundson
    *
@@ -52,6 +52,8 @@ namespace Isis {
    *                           Moved method implementation to cpp file.
    *   @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF
    *                           errors were signaled. References #2248.
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
+   *                           References #2214
    */
   class PlaneShape : public Isis::ShapeModel {
     public:
@@ -66,7 +68,7 @@ namespace Isis {
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
-      
+
       bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
@@ -83,4 +85,3 @@ namespace Isis {
 };
 
 #endif
-

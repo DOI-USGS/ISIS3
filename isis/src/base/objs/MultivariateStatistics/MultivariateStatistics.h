@@ -24,11 +24,13 @@
 #ifndef MultivariateStatistics_h
 #define MultivariateStatistics_h
 
-#include "Statistics.h"
-#include "SpecialPixel.h"
 #include "Constants.h"
+#include "PvlObject.h"
+#include "SpecialPixel.h"
+#include "Statistics.h"
 
 namespace Isis {
+
   /**
    * @brief Container of multivariate statistics.
    *
@@ -54,6 +56,10 @@ namespace Isis {
    *                           unsigned int) for a significant performance
    *                           improvement and to increase the consistency in
    *                           the API relative to the Statistics class.
+   *   @history 2016-07-15 Ian Humphrey - Added constructor to initialize a MultivariateStatistics
+   *                           object from a PvlObject. Added fromPvl() and toPvl() methods to allow
+   *                           for serialization/unserialization with PvlObjects. Updated unit test.
+   *                           References #2282.
    *
    *   @todo This class needs an example.
    *   @todo For the below methods we will need to compute log x, loy y, sumx3,
@@ -65,6 +71,7 @@ namespace Isis {
   class MultivariateStatistics {
     public:
       MultivariateStatistics();
+      MultivariateStatistics(const PvlObject &inStats);
       ~MultivariateStatistics();
 
       void Reset();
@@ -86,7 +93,12 @@ namespace Isis {
       BigInt InvalidPixels() const;
       BigInt TotalPixels() const;
 
+      PvlObject toPvl(QString name = "MultivariateStatistics") const;
+
     private:
+
+      void fromPvl(const PvlObject &inStats);
+
       //! A Statistics object holding x data.
       Isis::Statistics p_x;
       //! A Statistics object holding y data.

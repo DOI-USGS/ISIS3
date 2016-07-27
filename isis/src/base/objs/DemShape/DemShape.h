@@ -35,13 +35,13 @@ namespace Isis {
   /**
    * @brief Define shapes and provide utilities for targets stored as Isis3 maps
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an ISIS 3 map 
-   * fille (level 2 image), as well as provide utilities to retrieve radii and photometric 
-   * information for the intersection point. 
+   * This class will define shapes of Isis3 target bodies with the shape defined by an ISIS 3 map
+   * fille (level 2 image), as well as provide utilities to retrieve radii and photometric
+   * information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
    *
-   * @internal 
+   * @internal
    *   @history 2010-07-30 - Debbie A. Cook - Original version.
    *   @history 2012-10-25 - Jeannie Backer - Changed call to Spice::resolution() method
    *                             to lower camel case. Added documentation. Ordered includes.
@@ -51,6 +51,8 @@ namespace Isis {
    *                             were signaled. References #2248.
    *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
    *                           closer to ISIS coding standards. References #1438
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
+   *                           References #2214
    */
   class DemShape : public ShapeModel {
     public:
@@ -73,7 +75,7 @@ namespace Isis {
       double demScale();
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal(); 
+      virtual void calculateDefaultNormal();
 
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
@@ -83,13 +85,13 @@ namespace Isis {
       // calculateSurfaceNormal and directSurfaceNormal to calculate the normal.
       // Use removeLOcalAreaPoints to clean up as needed.  See Camera for an
       // example, or use its GetLocalNormal method.
-      
+
       // Calculate the surface normal of the current intersection point
-     void calculateLocalNormal(QVector<double *> cornerNeighborPoints); 
-     void calculateSurfaceNormal(); 
+     void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
+     void calculateSurfaceNormal();
 
     protected:
-     Cube *demCube();         //!< Returns the cube defining the shape model.  
+     Cube *demCube();         //!< Returns the cube defining the shape model.
 
     private:
       Cube *m_demCube;        //!< The cube containing the model
@@ -101,4 +103,3 @@ namespace Isis {
 }
 
 #endif
-

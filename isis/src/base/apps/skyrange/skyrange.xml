@@ -32,7 +32,11 @@
       Fixed appTest to comply with changes made to all camera model
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
+    </change>
+    <change name="Kelvin Rodriguez" date="2016-06-27">
+      Changed rotation computation to the function call Camera::celestialNorthClockAngle.
+      References #2365.
     </change>
   </history>
 

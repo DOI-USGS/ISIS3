@@ -40,7 +40,7 @@ namespace Isis {
   /**
    * @brief Define shapes and provide utilities for Isis3 targets
    *
-   * This base class will define shapes of Isis3 target bodies as well as provide utilities to 
+   * This base class will define shapes of Isis3 target bodies as well as provide utilities to
    * retrieve radii and photometric information.
    *
    *
@@ -62,18 +62,19 @@ namespace Isis {
    *                           were signaled. References #2248
    *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
    *                           closer to ISIS coding standards. References #1438
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor ShapeModel(Target, Pvl).
+   *                           Fixes #2214
    */
   class ShapeModel {
     public:
       // Constructors
       ShapeModel();
-      ShapeModel(Target *target, Isis::Pvl &pvl);
       ShapeModel(Target *target);
 
       // Initialization
       void Initialize();
 
-      // Destructor -- must be virtual in order to clean up properly because of 
+      // Destructor -- must be virtual in order to clean up properly because of
       // virtual method below
       virtual ~ShapeModel()=0;
 
@@ -88,15 +89,15 @@ namespace Isis {
       bool hasNormal() const;
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal() = 0; 
+      virtual void calculateDefaultNormal() = 0;
 
-      // Calculate the local normal of the current intersection point 
+      // Calculate the local normal of the current intersection point
       // (relative to neighbor points)
-      virtual void calculateLocalNormal(QVector<double *> neighborPoints) = 0; 
+      virtual void calculateLocalNormal(QVector<double *> neighborPoints) = 0;
 
-      // Calculate the surface normal of the current intersection point 
+      // Calculate the surface normal of the current intersection point
       // (relative to ellipsoid)
-      virtual void calculateSurfaceNormal() = 0; 
+      virtual void calculateSurfaceNormal() = 0;
 
       // Clear current point
       void clearSurfacePoint();
@@ -108,20 +109,20 @@ namespace Isis {
       virtual double incidenceAngle(const std::vector<double> &uB);
 
       // Calculate the phase angle of the current intersection point
-      virtual double phaseAngle(const std::vector<double> &sB, 
+      virtual double phaseAngle(const std::vector<double> &sB,
                                 const std::vector<double> &uB);
 
       // Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
-      /** 
-       * Indicates whether this shape model is from a DEM. This method is used to 
-       * determine whether the Camera class will calculate the local normal using 
-       * neighbor points. This method is pure virtual and must be implemented by 
-       * all ShapeModel classes.  The parent implementation returns false. 
-       *  
-       * @return bool Indicates whether this is a DEM shape model. 
-       */ 
+      /**
+       * Indicates whether this shape model is from a DEM. This method is used to
+       * determine whether the Camera class will calculate the local normal using
+       * neighbor points. This method is pure virtual and must be implemented by
+       * all ShapeModel classes.  The parent implementation returns false.
+       *
+       * @return bool Indicates whether this is a DEM shape model.
+       */
       virtual bool isDEM() const = 0;
 
       // Get shape name
@@ -144,7 +145,7 @@ namespace Isis {
 
       // Set shape name
       void setName(QString name);
- 
+
       void calculateEllipsoidalSurfaceNormal();
       bool hasEllipsoidIntersection();
 
@@ -169,4 +170,3 @@ namespace Isis {
 };
 
 #endif
-

@@ -1,9 +1,8 @@
 Begin testing Ellipsoid Shape Model class....
 
   Testing constructors...
-    Shape1  name is Ellipsoid
+    Shape  name is Ellipsoid
     Shape2  name is Ellipsoid
-    Shape3  name is Ellipsoid
     Shape is DEM type?No
 
   Testing method intersectSurface with failure...

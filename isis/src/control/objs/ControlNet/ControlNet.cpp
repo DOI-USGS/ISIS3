@@ -41,7 +41,9 @@ using namespace boost::numeric::ublas;
 
 
 namespace Isis {
+  
   void ControlNet::nullify() {
+    
     points = NULL;
     cubeGraphNodes = NULL;
     pointIds = NULL;
@@ -50,6 +52,7 @@ namespace Isis {
 
   //!Creates an empty ControlNet object
   ControlNet::ControlNet() {
+    
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -64,6 +67,7 @@ namespace Isis {
 
 
   ControlNet::ControlNet(const ControlNet &other) {
+    
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -97,6 +101,7 @@ namespace Isis {
    * @param progress A pointer to the progress of reading in the control points
    */
   ControlNet::ControlNet(const QString &ptfile, Progress *progress) {
+    
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -105,7 +110,13 @@ namespace Isis {
 
     p_invalid = false;
     m_ownPoints = true;
-    ReadControl(ptfile, progress);
+    
+    try {
+      ReadControl(ptfile, progress);
+    }
+    catch (IException &e) {
+      p_invalid = true;
+    }
   }
 
 
@@ -115,6 +126,7 @@ namespace Isis {
   * @author Kris Becker 
   */
   ControlNet::~ControlNet() {
+    
     clear();
 
     delete points;
@@ -136,9 +148,9 @@ namespace Isis {
   void ControlNet::clear() {
 
     // Now must also own points to delete them. 
-    if ( points ) {
-      if ( GetNumPoints() > 0 ) {
-        if ( m_ownPoints ) {
+    if (points) {
+      if (GetNumPoints() > 0) {
+        if (m_ownPoints) {
           QHashIterator<QString, ControlPoint*> i(*points); 
           while (i.hasNext()) {
             i.next();
@@ -187,8 +199,9 @@ namespace Isis {
    * @return QList<ControlPoint*> Returns the list of all control points to caller
    */
     QList< ControlPoint * > ControlNet::take() {
+      
       // First check to see if someone else has taken ownership
-      if ( !m_ownPoints ) {
+      if (!m_ownPoints) {
         throw IException(IException::Programmer, "Ownership has already been taken",
                          _FILEINFO_);
       }
@@ -198,7 +211,7 @@ namespace Isis {
       clear();
 
       // Disconnect the parent network reference
-      for (int i = 0 ; i < points.size() ; i++) {
+      for (int i = 0; i < points.size(); i++) {
         points[i]->parentNetwork = NULL;
       }
       return (points);
@@ -228,6 +241,7 @@ namespace Isis {
    *
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
+    
     LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
@@ -319,8 +333,8 @@ namespace Isis {
    *
    * @param point Control point to be added
    *
-   * @throws Isis::IException::Programmer - "ControlPoint must
-   *             have unique Id"
+   * @throws IException::Programmer "Null pointer passed to ControlNet::AddPoint!"
+   * @throws IException::Programmer "ControlPoint must have unique Id"
    */
   void ControlNet::AddPoint(ControlPoint *point) {
     if (!point) {
@@ -354,6 +368,11 @@ namespace Isis {
    * this measure as its first.
    *
    * @param measure The measure added to the network.
+   * 
+   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "Control measure with NULL parent passed to 
+   *     ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "ControlNet does not contain the point."
    */
   void ControlNet::measureAdded(ControlMeasure *measure) {
     if (!measure) {
@@ -412,6 +431,12 @@ namespace Isis {
    * measure's serial number to reflect the unignoration.
    *
    * @param measure The measure unignored from the network.
+   * 
+   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "Control measure with NULL parent passed to 
+   *     ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "ControlNet does not contain the point."
+   * @throws IException::Programmer "Node does not exist for the cube serial number."
    */
   void ControlNet::measureUnIgnored(ControlMeasure *measure) {
     if (!measure) {
@@ -509,6 +534,7 @@ namespace Isis {
     }
   }
 
+  
   void ControlNet::measureIgnored(ControlMeasure *measure) {
     if (!measure) {
       IString msg = "NULL measure passed to "
@@ -625,6 +651,7 @@ namespace Isis {
    *          second element is the number of critical edges.
    */
   QPair< int, int > ControlNet::CalcBWAndCE(QList< QString > serials) const {
+    
     for (int i = 0; i < serials.size(); i++)
       ASSERT(cubeGraphNodes->contains(serials[i]));
 
@@ -679,6 +706,8 @@ namespace Isis {
    * Delete a ControlPoint from the network using the point's Id.
    *
    * @param pointId The Point Id of the ControlPoint to be deleted.
+   * 
+   * @throw IException::User "the point Id does not exist in the network"
    */
   int ControlNet::DeletePoint(QString pointId) {
     if (!points->contains(pointId)) {
@@ -984,7 +1013,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Used for verifying graph intergrity
    *
@@ -1072,7 +1100,6 @@ namespace Isis {
   }
 
 
-
   /**
    * The () operator for the Control Measure less than functor
    * 
@@ -1086,6 +1113,7 @@ namespace Isis {
 
   }
 
+  
   /**
    * Get a sorted list of all the measures that have values in a given ragen
    *

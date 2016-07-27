@@ -10,6 +10,7 @@ namespace Ui {
 
 namespace Isis {
   class Directory;
+  class GuiCamera;
 
   /**
    * @brief Widget for displaying information about a sensor
@@ -21,8 +22,6 @@ namespace Isis {
    * @internal
    *   @history 2015-07-10 Ken Edmundson - Original version.
    */
-  class GuiCamera;
-
   class SensorInfoWidget : public QFrame {
     Q_OBJECT
 

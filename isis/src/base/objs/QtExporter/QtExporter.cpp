@@ -193,6 +193,8 @@ namespace Isis {
   void QtExporter::write(FileName outputName, int quality,
                          QString compression) {
     ImageExporter::write(outputName, quality);
+    
+    outputName = outputName.addExtension(extension());
 
     // The return status is wrong for JPEG images, so the code will always
     // continue

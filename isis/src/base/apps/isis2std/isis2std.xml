@@ -305,6 +305,12 @@
           This parameter is used to select the output format.  It can be one of
           PNG, BMP, JPEG, TIF, GIF, or JP2.  Note that not all formats may be
           available.  It will depend on your installation of the Qt libraries.
+          <p>
+          In addition, if the cube has Mapping labels, the program will produce 
+          a world file for use in Arc and/or other GIS packages. The file will 
+          have an extension that uses the first and last letters for the image 
+          extention and a "w". For example, .tif produces a world file extension of .tfw.
+          </p>
         </description>
 
         <list>
@@ -679,6 +685,7 @@
       </parameter>
     </group>
   </groups>
+  
   <examples>
     <example>
       <brief>

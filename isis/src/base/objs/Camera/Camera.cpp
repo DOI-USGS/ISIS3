@@ -25,6 +25,8 @@
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
+#include <algorithm>
+#include <stdint.h>
 
 #include <QDebug>
 #include <QList>
@@ -168,7 +170,7 @@ namespace Isis {
     // get shape
     // TODO: we need to validate this pointer (somewhere)
     ShapeModel *shape = target()->shape();
-    shape->clearSurfacePoint();  // Set initial condition for ShapeModel 
+    shape->clearSurfacePoint();  // Set initial condition for ShapeModel
 
     // Case of no map projection
     if (p_projection == NULL || p_ignoreProjection) {
@@ -361,11 +363,11 @@ namespace Isis {
   bool Camera::RawFocalPlanetoImage() {
     double ux = p_groundMap->FocalPlaneX();
     double uy = p_groundMap->FocalPlaneY();
-    
+
     // get shape
     // TODO: we need to validate this pointer (somewhere)
     ShapeModel *shape = target()->shape();
-   
+
     //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
     //cout.precision(15);
     //cout << "Backward Time: " << Time().Et() << endl;
@@ -1049,7 +1051,7 @@ namespace Isis {
    * @return @b bool Returns true if it crosses the longitude domain boundary and
    *              false if it does not
    */
-  bool Camera::ringRange(double &minRingRadius, double &maxRingRadius, 
+  bool Camera::ringRange(double &minRingRadius, double &maxRingRadius,
                          double &minRingLongitude, double &maxRingLongitude, Pvl &pvl) {
     // Compute the ring range and resolution
     ringRangeResolution();
@@ -1126,7 +1128,7 @@ namespace Isis {
     std::vector<Distance> radii = target()->radii();
     map += PvlKeyword("EquatorialRadius", toString(radii[0].meters()), "meters");
     map += PvlKeyword("PolarRadius", toString(radii[2].meters()), "meters");
-    
+
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
@@ -1242,8 +1244,8 @@ namespace Isis {
 
 
   /**
-   * This method will find the local normal at the current (sample, line) and 
-   * set it to the passed in array. 
+   * This method will find the local normal at the current (sample, line) and
+   * set it to the passed in array.
    *
    * @param [out] normal The local normal vector to be calculated.
    *
@@ -1301,7 +1303,7 @@ namespace Isis {
       Longitude lon;
       Distance radius;
 
-      // if this is a dsk, we only need to use the existing intercept point (plate) normal then return 
+      // if this is a dsk, we only need to use the existing intercept point (plate) normal then return
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
         // If a surrounding point fails, set it to the original point
         if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
@@ -1316,7 +1318,7 @@ namespace Isis {
             // restore input state
             if (computed) {
               SetImage(originalSample, originalLine);
-            } 
+            }
             else {
               p_pointComputed = false;
             }
@@ -1338,8 +1340,8 @@ namespace Isis {
         latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
       }
 
-      // if the first 2 surrounding points match or the last 2 surrounding points match, 
-      // we can't get a normal.  Clean up and return. 
+      // if the first 2 surrounding points match or the last 2 surrounding points match,
+      // we can't get a normal.  Clean up and return.
       if ((surroundingPoints[0].first == surroundingPoints[1].first &&
           surroundingPoints[0].second == surroundingPoints[1].second) ||
          (surroundingPoints[2].first == surroundingPoints[3].first &&
@@ -1350,7 +1352,7 @@ namespace Isis {
         // restore input state
         if (!computed) {
           SetImage(originalSample, originalLine);
-        } 
+        }
         else {
           p_pointComputed = false;
         }
@@ -1370,7 +1372,7 @@ namespace Isis {
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
         delete [] cornerNeighborPoints[i];
       }
-   
+
     }
 
     // restore input state if calculation failed and clean up.
@@ -1464,21 +1466,11 @@ namespace Isis {
    * @param mindec Minimum declination value
    * @param maxdec Maximum declination value
    *
-   * @throw iException::Programmer - "Camera::RaDecRange can not calculate a
-   *  right ascension, declination range for projected images which are not
-   *  projected to sky"
    * @return @b bool Returns true if the range computation was successful and false
    *              if it was not
    */
   bool Camera::RaDecRange(double &minra, double &maxra,
                           double &mindec, double &maxdec) {
-    TProjection *tproj = (TProjection *) p_projection;
-    if (p_projection != NULL && !tproj->IsSky()) {
-      IString msg = "Camera::RaDecRange can not calculate a right ascension, declination range";
-      msg += " for projected images which are not projected to sky";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
     bool computed = p_pointComputed;
     double originalSample = Sample();
     double originalLine = Line();
@@ -1618,13 +1610,6 @@ namespace Isis {
    * @return @b double The resutant RaDec resolution
    */
   double Camera::RaDecResolution() {
-    TProjection *tproj = (TProjection *) p_projection;
-    if (p_projection != NULL && !tproj->IsSky()) {
-      IString msg = "Camera::RaDecResolution can not calculate a right ascension, declination resolution";
-      msg += " for projected images which are not projected to sky";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
     bool computed = p_pointComputed;
     double originalSample = Sample();
     double originalLine = Line();
@@ -1701,6 +1686,7 @@ namespace Isis {
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
+
   /**
    * Return the Spacecraft Azimuth
    *
@@ -1714,39 +1700,40 @@ namespace Isis {
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
+
   /**
-   * Computes the image azimuth value from your current position (origin) to a point of interest 
-   * specified by the lat/lon input to this method. (NOTE: This azimuth is different from a Ground 
-   * Azimuth) 
-   *  
-   * All azimuths are measured the same way regardless of the image level (level1 or level2) and 
-   * the shape model being used. 
-   *  
-   * The azimuth is an angle formed by a reference vector and a point of interest vector. The 
-   * current position is the vertex of the angle, i.e. the origin of the coordinate system on which 
-   * this angle will be measured. The azimuth is measured in a positive clockwise direction from the 
-   * reference vector (i.e. the initial ray of the angle) to the point of interest vector (i.e. the
-   * terminal ray of the angle). 
-   *  
-   * The azimuth is measured in a positive clockwise direction because images have lines that 
-   * increase downward. If lines increased upward, then the azimuth would be measure in a positive 
-   * counterclockwise direction. 
+   * Computes the image azimuth value from your current position (origin) to a point of interest
+   * specified by the lat/lon input to this method. (NOTE: This azimuth is different from a Ground
+   * Azimuth)
    *
-   *  
-   * The reference vector is the vector from the origin to the right side of the image. This is 
-   * usually called the 3 o'clock reference vector because the image can be viewed as a clock face 
-   * and the origin point as the center of the clock face with the hand of the clock pointing at 3 
-   * o'clock. 
-   *  
-   * The point of interest vector is the vector along the surface of the body from the origin to 
-   * the point of interest. In order to calculate the azimuth, this vector is projected into the 
-   * reference plane (the plane containing the reference vector that is tangent to the surface). The 
-   * point of interest vector is also unitzed to 1 km in length and then scaled even further to 
-   * within a pixel of the azimuth's origin. 
-   *  
-   * The algorithm works by 
+   * All azimuths are measured the same way regardless of the image level (level1 or level2) and
+   * the shape model being used.
+   *
+   * The azimuth is an angle formed by a reference vector and a point of interest vector. The
+   * current position is the vertex of the angle, i.e. the origin of the coordinate system on which
+   * this angle will be measured. The azimuth is measured in a positive clockwise direction from the
+   * reference vector (i.e. the initial ray of the angle) to the point of interest vector (i.e. the
+   * terminal ray of the angle).
+   *
+   * The azimuth is measured in a positive clockwise direction because images have lines that
+   * increase downward. If lines increased upward, then the azimuth would be measure in a positive
+   * counterclockwise direction.
+   *
+   *
+   * The reference vector is the vector from the origin to the right side of the image. This is
+   * usually called the 3 o'clock reference vector because the image can be viewed as a clock face
+   * and the origin point as the center of the clock face with the hand of the clock pointing at 3
+   * o'clock.
+   *
+   * The point of interest vector is the vector along the surface of the body from the origin to
+   * the point of interest. In order to calculate the azimuth, this vector is projected into the
+   * reference plane (the plane containing the reference vector that is tangent to the surface). The
+   * point of interest vector is also unitzed to 1 km in length and then scaled even further to
+   * within a pixel of the azimuth's origin.
+   *
+   * The algorithm works by
    *   1.  Getting the body-fixed (x,y,z) of the azimuth's origin point and the body-fixed (x,y,z)
-   *       of the point of interest. These coordinate also represent vectors from the center of the 
+   *       of the point of interest. These coordinate also represent vectors from the center of the
    *       body-fixed system to the coordinate.
    *   2.  The vector from the origin point to the point of interest is then determined by vector
    *       subtraction.
@@ -1768,15 +1755,15 @@ namespace Isis {
    *   8.  The arctangent of (newline-originline)/ (newsample-originsample) is used to acquire the
    *       azimuth value.
    *
-   * NOTE: All vectors in this method are body-fixed and use the radius of the shape model at the 
-   * origin point for doing calculations. By using the radius of the shape model at the origin, we 
-   * avoid problems where the DEM does not completely cover the planet. 
+   * NOTE: All vectors in this method are body-fixed and use the radius of the shape model at the
+   * origin point for doing calculations. By using the radius of the shape model at the origin, we
+   * avoid problems where the DEM does not completely cover the planet.
    *
-   * Note: This image azimuth algorithm is different from the ground azimuth algorithm used in 
-   * GroundAzimuth(). For ground azimuths, the initial ray of the angle is the vector from 
-   * the selected ground point to the north pole. For image azimuths, the initial ray is the vector 
-   * from the selected image location to the right, horizontally.    * 
-   *  
+   * Note: This image azimuth algorithm is different from the ground azimuth algorithm used in
+   * GroundAzimuth(). For ground azimuths, the initial ray of the angle is the vector from
+   * the selected ground point to the north pole. For image azimuths, the initial ray is the vector
+   * from the selected image location to the right, horizontally.    *
+   *
    * @param radius The Radius
    * @param lat The Latitude
    * @param lon The Longitude
@@ -1843,9 +1830,9 @@ namespace Isis {
     // Get the difference vector with its tail at the azimuth origin and its
     // head at the point of interest by subtracting vectors the vectors that
     // originate at the body center
-    // 
+    //
     // pointOfInterest = pointOfInterestFromBodyCenter - azimuthOriginFromBodyCenter
-    // 
+    //
     SpiceDouble pointOfInterest[3];
     vsub_c(pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
 
@@ -1879,9 +1866,9 @@ namespace Isis {
 
     // Convert the point to a lat/lon and find out its image coordinate
     double adjustedPointOfInterestRad, adjustedPointOfInterestLon, adjustedPointOfInterestLat;
-    reclat_c(adjustedPointOfInterestFromBodyCenter, 
-             &adjustedPointOfInterestRad, 
-             &adjustedPointOfInterestLon, 
+    reclat_c(adjustedPointOfInterestFromBodyCenter,
+             &adjustedPointOfInterestRad,
+             &adjustedPointOfInterestLon,
              &adjustedPointOfInterestLat);
     adjustedPointOfInterestLat = adjustedPointOfInterestLat * 180.0 / PI;
     adjustedPointOfInterestLon = adjustedPointOfInterestLon * 180.0 / PI;
@@ -1890,8 +1877,8 @@ namespace Isis {
     // Use the radius of the azimuth's origin point
     // (rather than that of the adjusted point of interest location)
     // to avoid the effects of topography on the calculation
-    bool success = SetUniversalGround(adjustedPointOfInterestLat, 
-                                      adjustedPointOfInterestLon, 
+    bool success = SetUniversalGround(adjustedPointOfInterestLat,
+                                      adjustedPointOfInterestLon,
                                       originRadius.meters());
     if (!success) {
       // if the adjusted lat/lon values for the point of origin fail to be set, we can not compute
@@ -1907,8 +1894,8 @@ namespace Isis {
     // internals of the class are set based on SetImage or SetGround
 
     // We now have the information needed to calculate an arctangent
-    // 
-    // 
+    //
+    //
     //         point of interest
     //                  |\       |
     //                  | \      |
@@ -1928,10 +1915,10 @@ namespace Isis {
     // in this example, the azimuth is the angle indicated by the A plus 180 degrees, since we begin
     // the angle rotation at the positive x-axis
     // This quadrant issue (i.e.need to add 180 degrees) is handled by the atan2 program
-    // 
+    //
     double deltaSample = adjustedPointOfInterestSample - azimuthOriginSample;
     double deltaLine = adjustedPointOfInterestLine - azimuthOriginLine;
-    
+
     // Compute the angle; the azimuth is the arctangent of the line difference divided by the
     // sample difference; the atan2 function is used because it determines which quadrant we
     // are in based on the sign of the 2 arguments; the arctangent is measured in a positive
@@ -1964,6 +1951,7 @@ namespace Isis {
     return azimuth;
   }
 
+
   /**
    * Return the off nadir angle in degrees.
    *
@@ -1989,20 +1977,21 @@ namespace Isis {
     return c;
   }
 
+
   /**
    * Computes and returns the ground azimuth between the ground point and
    * another point of interest, such as the subspacecraft point or the
    * subsolar point. The ground azimuth is the clockwise angle on the
    * ground between a line drawn from the ground point to the North pole
-   * of the body and a line drawn from the selected point on the surface 
+   * of the body and a line drawn from the selected point on the surface
    * to some point of interest on the surface (such as the subsolar point
-   * or the subspacecraft point). 
-   *  
-   * Note: This is different from the image azimuth algorithm used in ComputeAzimuth(). 
-   * For ground azimuths, the initial ray of the angle is the vector from the selected ground point 
-   * to the north pole. For image azimuths, the initial ray is the vector from the selected image 
-   * location to the right, horizontally. 
-   *  
+   * or the subspacecraft point).
+   *
+   * Note: This is different from the image azimuth algorithm used in ComputeAzimuth().
+   * For ground azimuths, the initial ray of the angle is the vector from the selected ground point
+   * to the north pole. For image azimuths, the initial ray is the vector from the selected image
+   * location to the right, horizontally.
+   *
    * @param glat The latitude of the ground point
    * @param glon The longitude of the ground point
    * @param slat The latitude of the subspacecraft or subsolar point
@@ -2017,7 +2006,7 @@ namespace Isis {
     if (glat >= 0.0) {
       a = (90.0 - slat) * PI / 180.0;
       b = (90.0 - glat) * PI / 180.0;
-    } 
+    }
     else {
       a = (90.0 + slat) * PI / 180.0;
       b = (90.0 + glat) * PI / 180.0;
@@ -2035,13 +2024,13 @@ namespace Isis {
         while ((cglon-cslon) > 180.0) cglon = cglon - 360.0;
       }
     }
- 
+
     // Which quadrant are we in?
     int quad;
     if (slat > glat) {
       if (cslon > cglon) {
         quad = 1;
-      } 
+      }
       else if (cslon < cglon) {
         quad = 2;
       }
@@ -2052,14 +2041,14 @@ namespace Isis {
     else if (slat < glat) {
       if (cslon > cglon) {
         quad = 4;
-      } 
+      }
       else if (cslon < cglon) {
         quad = 3;
-      } 
+      }
       else {
         quad = 4;
       }
-    } 
+    }
     else {
       if (cslon > cglon) {
         quad = 1;
@@ -2116,6 +2105,7 @@ namespace Isis {
     p_distortionMap = map;
   }
 
+
   /**
    * Sets the Focal Plane Map. This object will take ownership of the focal plane
    * map pointer.
@@ -2129,6 +2119,7 @@ namespace Isis {
 
     p_focalPlaneMap = map;
   }
+
 
   /**
    * Sets the Detector Map. This object will take ownership of the detector map
@@ -2144,6 +2135,7 @@ namespace Isis {
     p_detectorMap = map;
   }
 
+
   /**
    * Sets the Ground Map. This object will take ownership of the ground map
    * pointer.
@@ -2158,6 +2150,7 @@ namespace Isis {
     p_groundMap = map;
   }
 
+
   /**
    * Sets the Sky Map. This object will take ownership of the sky map pointer.
    *
@@ -2170,6 +2163,7 @@ namespace Isis {
 
     p_skyMap = map;
   }
+
 
   /**
    * This loads the spice cache big enough for this image. The default cache size
@@ -2266,6 +2260,7 @@ namespace Isis {
     return ephemerisTimes;
   }
 
+
   /**
    * This method calculates the spice cache size. This method finds the number
    * of lines in the beta cube and adds 1, since we need at least 2 points for
@@ -2350,6 +2345,7 @@ namespace Isis {
     p_geometricTilingEndSize = endSize;
   }
 
+
   /**
    * This will get the geometric tiling hint; these values are typically used for
    * ProcessRubberSheet::SetTiling(...).
@@ -2383,15 +2379,17 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * Checks to see if the camera object has a projection
    *
-   * @return @b bool Returns true if it has a projection and false if it 
+   * @return @b bool Returns true if it has a projection and false if it
    *              does not
    */
   bool Camera::HasProjection() {
     return p_projection != 0;
-  }
+    }
+
 
   /**
    * Virtual method that checks if the band is independent
@@ -2403,6 +2401,7 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * Returns the reference band
    *
@@ -2411,6 +2410,7 @@ namespace Isis {
   int Camera::ReferenceBand() const {
     return p_referenceBand;
   }
+
 
   /**
    * Checks to see if the Camera object has a reference band
@@ -2422,6 +2422,7 @@ namespace Isis {
     return p_referenceBand != 0;
   }
 
+
   /**
    * Virtual method that sets the band number
    *
@@ -2430,6 +2431,7 @@ namespace Isis {
   void Camera::SetBand(const int band) {
     p_childBand = band;
   }
+
 
   /**
    * Returns the current sample number
@@ -2440,6 +2442,7 @@ namespace Isis {
     return p_childSample;
   }
 
+
   /**
    * Returns the current band
    *
@@ -2449,6 +2452,7 @@ namespace Isis {
     return p_childBand;
   }
 
+
   /**
    * Returns the current line number
    *
@@ -2457,6 +2461,8 @@ namespace Isis {
    double Camera::Line() {
     return p_childLine;
   }
+
+
   /**
    * Returns the resolution of the camera
    *
@@ -2465,6 +2471,8 @@ namespace Isis {
   double Camera::resolution() {
     return PixelResolution();
   }
+
+
   /**
    * Returns the focal length
    *
@@ -2473,6 +2481,7 @@ namespace Isis {
    double Camera::FocalLength() const {
     return p_focalLength;
   }
+
 
   /**
    * Returns the pixel pitch
@@ -2483,11 +2492,12 @@ namespace Isis {
     return p_pixelPitch;
   }
 
+
   /**
-   * Returns the pixel ifov offsets from center of pixel, which defaults to the 
-   * (pixel pitch * summing mode ) / 2.  If an instrument has a non-square ifov, it must implement 
-   * this method to return the offsets from the center of the pixel. 
-   *  
+   * Returns the pixel ifov offsets from center of pixel, which defaults to the
+   * (pixel pitch * summing mode ) / 2.  If an instrument has a non-square ifov, it must implement
+   * this method to return the offsets from the center of the pixel.
+   *
    */
    QList<QPointF> Camera::PixelIfovOffsets() {
 
@@ -2514,6 +2524,7 @@ namespace Isis {
     return p_samples;
   }
 
+
   /**
    * Returns the number of lines in the image
    *
@@ -2522,6 +2533,7 @@ namespace Isis {
    int Camera::Lines() const {
     return p_lines;
   }
+
 
   /**
    * Returns the number of bands in the image
@@ -2532,6 +2544,7 @@ namespace Isis {
     return p_bands;
   }
 
+
   /**
    * Returns the number of lines in the parent alphacube
    *
@@ -2541,6 +2554,7 @@ namespace Isis {
     return p_alphaCube->AlphaLines();
   }
 
+
   /**
    * Returns the number of samples in the parent alphacube
    *
@@ -2549,6 +2563,8 @@ namespace Isis {
    int Camera::ParentSamples() const {
     return p_alphaCube->AlphaSamples();
   }
+
+
   /**
    * Returns a pointer to the CameraDistortionMap object
    *
@@ -2557,6 +2573,7 @@ namespace Isis {
   CameraDistortionMap *Camera::DistortionMap() {
     return p_distortionMap;
   }
+
 
   /**
    * Returns a pointer to the CameraFocalPlaneMap object
@@ -2567,6 +2584,7 @@ namespace Isis {
     return p_focalPlaneMap;
   }
 
+
   /**
    * Returns a pointer to the CameraDetectorMap object
    *
@@ -2575,6 +2593,7 @@ namespace Isis {
   CameraDetectorMap *Camera::DetectorMap() {
     return p_detectorMap;
   }
+
 
   /**
    * Returns a pointer to the CameraGroundMap object
@@ -2585,6 +2604,7 @@ namespace Isis {
     return p_groundMap;
   }
 
+
   /**
    * Returns a pointer to the CameraSkyMap object
    *
@@ -2593,8 +2613,8 @@ namespace Isis {
   CameraSkyMap *Camera::SkyMap() {
     return p_skyMap;
   }
-  
-  
+
+
   /**
    * This method returns the full instrument name.
    *
@@ -2603,8 +2623,8 @@ namespace Isis {
   QString Camera::instrumentNameLong() const {
     return m_instrumentNameLong;
   }
-  
-  
+
+
   /**
    * This method returns the shortened instrument name.
    *
@@ -2613,18 +2633,18 @@ namespace Isis {
   QString Camera::instrumentNameShort() const {
     return m_instrumentNameShort;
   }
-  
-  
+
+
   /**
    * This method returns the full spacecraft name.
-   * 
+   *
    * @return QString
    */
   QString Camera::spacecraftNameLong() const {
     return m_spacecraftNameLong;
   }
-  
-  
+
+
   /**
    * This method returns the shortened spacecraft name.
    *
@@ -2643,20 +2663,20 @@ namespace Isis {
     p_ignoreProjection = ignore;
   }
   /**
-   * @brief Provides target code for instruments SPK NAIF kernel 
-   *  
-   * This virtual method may need to be implemented in each camera model 
-   * providing the target NAIF ID code found in the mission SPK kernel. This 
-   * is typically the spacecraft ID code. 
-   *  
-   * This value can be easily determined by using the NAIF @b spacit 
-   * application that sumarizes binary kernels on the SPK kernel used for a 
-   * particular instrument on a spacecraft.  @b spacit will additionally 
-   * require a leap seconds kernel (LSK).  For example, the output of the 
-   * MESSENGER SPK camera supporting the MDIS camera below indicates it is 
-   * indeed the MESSENGER spacecraft: 
-   *  
-   * @code 
+   * @brief Provides target code for instruments SPK NAIF kernel
+   *
+   * This virtual method may need to be implemented in each camera model
+   * providing the target NAIF ID code found in the mission SPK kernel. This
+   * is typically the spacecraft ID code.
+   *
+   * This value can be easily determined by using the NAIF @b spacit
+   * application that sumarizes binary kernels on the SPK kernel used for a
+   * particular instrument on a spacecraft.  @b spacit will additionally
+   * require a leap seconds kernel (LSK).  For example, the output of the
+   * MESSENGER SPK camera supporting the MDIS camera below indicates it is
+   * indeed the MESSENGER spacecraft:
+   *
+   * @code
    *     Segment ID     : msgr_20050903_20061125_recon002.nio
    *     Target Body    : Body -236, MESSENGER
    *     Center Body    : Body 2, VENUS BARYCENTER
@@ -2667,37 +2687,37 @@ namespace Isis {
    *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
    *     ET Start Time  : 2006 OCT 16 19:26:46.293
    *     ET Stop time   : 2006 OCT 31 22:15:29.222
-   * @endcode 
-   *  
-   * The SpkTargetId value is found in the "Target Body" entry (-236). 
-   *  
-   * For most cases, this is the NAIF SPK code returned by the naifSpkCode() 
+   * @endcode
+   *
+   * The SpkTargetId value is found in the "Target Body" entry (-236).
+   *
+   * For most cases, this is the NAIF SPK code returned by the naifSpkCode()
    * method (in the Spice class).  Some instrument camera models may need to
-   * override this method if this is not case. 
-   * 
+   * override this method if this is not case.
+   *
    * @return @b int NAIF code for the SPK target for an instrument
    */
-  int Camera::SpkTargetId() const { 
+  int Camera::SpkTargetId() const {
     return (naifSpkCode());
   }
 
   /**
-   * @brief Provides the center of motion body for SPK NAIF kernel 
-   *  
-   * This virtual method may need to be implemented in each camera model 
-   * providing the NAIF integer code for the center of motion of the object 
-   * identified by the SpkTargetId() code.  This is typically the targeted 
-   * body for a particular image observation, but may be unique depending 
-   * upon the design of the SPK mission kernels. 
-   *  
-   * This value can be easily determined by using the NAIF @b spacit 
-   * application that sumarizes binary kernels on the SPK kernel used for a 
-   * particular instrument on a spacecraft.  @b spacit will additionally 
-   * require a leap seconds kernel (LSK).  For example, the output of the 
-   * MESSENGER SPK camera supporting the MDIS camera below indicates it is 
+   * @brief Provides the center of motion body for SPK NAIF kernel
+   *
+   * This virtual method may need to be implemented in each camera model
+   * providing the NAIF integer code for the center of motion of the object
+   * identified by the SpkTargetId() code.  This is typically the targeted
+   * body for a particular image observation, but may be unique depending
+   * upon the design of the SPK mission kernels.
+   *
+   * This value can be easily determined by using the NAIF @b spacit
+   * application that sumarizes binary kernels on the SPK kernel used for a
+   * particular instrument on a spacecraft.  @b spacit will additionally
+   * require a leap seconds kernel (LSK).  For example, the output of the
+   * MESSENGER SPK camera supporting the MDIS camera below indicates it is
    * Venus.
-   *  
-   * @code 
+   *
+   * @code
    *     Segment ID     : msgr_20050903_20061125_recon002.nio
    *     Target Body    : Body -236, MESSENGER
    *     Center Body    : Body 2, VENUS BARYCENTER
@@ -2708,18 +2728,18 @@ namespace Isis {
    *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
    *     ET Start Time  : 2006 OCT 16 19:26:46.293
    *     ET Stop time   : 2006 OCT 31 22:15:29.222
-   * @endcode 
-   *  
-   * The SpkCenterId value is found in the "Center Body" entry (2). The 
-   * center of motion is most likely the targeted body for the image and 
-   * this is provided by the naifBodyCode() method (in the Spice class).  If 
-   * this is not consistently the case for a particular mission, then camera 
-   * models will need to reimplement this method. 
-   * 
-   * @return @b int NAIF code for SPK center of motion body for an 
+   * @endcode
+   *
+   * The SpkCenterId value is found in the "Center Body" entry (2). The
+   * center of motion is most likely the targeted body for the image and
+   * this is provided by the naifBodyCode() method (in the Spice class).  If
+   * this is not consistently the case for a particular mission, then camera
+   * models will need to reimplement this method.
+   *
+   * @return @b int NAIF code for SPK center of motion body for an
    *         instrument
    */
-  int Camera::SpkCenterId() const { 
+  int Camera::SpkCenterId() const {
     return (naifBodyCode());
   }
 
@@ -2740,5 +2760,36 @@ namespace Isis {
   void Camera::SetPixelPitch(double v) {
     p_pixelPitch = v;
   }
+
+  /**
+   * Computes the celestial north clock angle at the current
+   * line/sample or ra/dec. The reference vector is a vecor from the
+   * current pixel pointed directly "upward". Celetial North
+   * is a vector from the current pixel poiting towards celetial north.
+   * The Celestial North Clock Angle is the angle between these two vectors
+   * on the image.
+   *
+   * @return @b double The resultant Celestial North Clock Angle
+   */
+  double Camera::CelestialNorthClockAngle() {
+    double orgLine = Line();
+    double orgSample = Sample();
+    double orgDec = Declination();
+    double orgRa = RightAscension();
+
+    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution()));
+    double y = Line() - orgLine;
+    double x = Sample() - orgSample;
+    double celestialNorthClockAngle = atan2(-y, x) * 180.0 / Isis::PI;
+    celestialNorthClockAngle = 90.0 - celestialNorthClockAngle;
+
+    if (celestialNorthClockAngle < 0.0) {
+       celestialNorthClockAngle += 360.0;
+    }
+
+    SetImage(orgSample, orgLine);
+    return celestialNorthClockAngle;
+  }
+
 // end namespace isis
 }

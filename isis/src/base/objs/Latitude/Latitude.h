@@ -28,7 +28,7 @@ namespace Isis {
 
   /**
    * This class is designed to encapsulate the concept of a Latitude. This is
-   *   used primary for surface points but is also a general purpose class.
+   *   used primarily for surface points but is also a general purpose class.
    *   This class has error checking for past the poles. This adds
    *   the concept of 90/-90 and planetographic to the Angle class.
    *
@@ -49,6 +49,10 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Added try/catch around calls to
    *                           Target::radiiGroup() in constructors and add(angle, mapGroup). 
    *                           Appended message to caught exceptions. References #3892,3896
+   *   @history 2016-07-05 Marjorie Hahn - Fixed documentation for 
+   *                           Latitude::Latitude(double latitude, PvlGroup mapping, 
+   *                           Angle::Units latitudeUnits, ErrorChecking errors) and added in
+   *                           documentation for all exceptions thrown. Fixes #3907
    */
   class Latitude : public Angle {
     public:

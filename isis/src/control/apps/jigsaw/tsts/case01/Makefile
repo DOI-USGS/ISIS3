@@ -8,11 +8,14 @@ APPNAME = jigsaw
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
+# 5. remove the number of iterations that occurred
 #
 # 2014-07-23 Jeannie Backer - Changed method from oldsparse to default (sparse). 
 #                Commented out references to bundleout_images.csv.  Removed default parameters.
 # 2015-07-30 Jeannie Backer - Changed file_prefix from "t" to "t_" since BundleAdjust no longer adds
 #                the underscore. 
+# 2016-07-27 Ian Humphrey -  Added the SED to remove iterations. This fixed the issue with macs 
+#                having slightly different iteration values in jigsaw observation mode tests. 
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -28,14 +31,15 @@ commands:
 	camsolve=all \
 	file_pre=t_ \
 	twist=no > /dev/null;
-	cat t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	$(CAT) t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	  | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	  | $(SED) 's/\(Iterations:\).*/\1/' \
 	  > $(OUTPUT)/bundleout.txt
-	cat t_residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
+	$(CAT) t_residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/residuals.csv
-#	cat t_bundleout_images.csv \
+#	$(CAT) t_bundleout_images.csv \
 #	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 #	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
 #	  > $(OUTPUT)/bundleout_images.csv

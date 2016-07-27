@@ -8,25 +8,53 @@
 
   <description>
     <p>
-      This program can be used to tonematch or equalize the brightness and/or
-      contrast of a list of input cubes prior to mosaicking.  All the input
-      cubes, which can include mosaics, must be in a common map projection as
-      this program will use the mapping information to gather statistics in
-      overlapping areas. This statistic gathering is done on a band-by-band
-      basis.  The statistics are used in a least squares solution to
-      determine multiplicative (GAIN or MULT) and additive (OFFSET or BASE)
-      corrections for each image. In addition to simply calculating corrective
-      factors and applying said factors to each image in one run of the
-      program, the user has the option to stop the processing and examine the
-      gathered statistics in a text file. The program can then be run again,
-      using the file containing those statistics as an input, to apply
-      correction to any or all of the images without the need to recalculate
-      corrective factors.
+      This program tone matches or equalizes the brightness and/or contrast of a list of
+      input cubes prior to mosaicking. All the input cubes, including mosaics, must be in identical
+      map projection since equalizer uses the mapping information to gather statistics in
+      overlapping areas.
     </p>
-
+    <p>
+      Statistic gathering is done on a band-by-band basis. The statistics
+      are used in a least squares solution to determine multiplicative (GAIN or MULT) and additive
+      (OFFSET or BASE) corrections for each image. In addition to simply calculating corrective 
+      factors and applying said factors to each image (BOTH), the user has the option to only 
+      calculate statistics (CALCULATE) and then examine these gathered statistics in a text file
+      (OUTSTATS). Then, equalizer can be run again using that statistics file as input (INSTATS)
+      to apply correction to any or all of the images without the need to calculate corrective
+      factors again.
+    </p>
+    <p>
+      Corrective factors will be undetermined if there are insufficient valid overlaps or if there
+      are any images that have no overlaps. If an output statistics file is provided (OUTSTATS),
+      images that do not overlap will appear in the file.
+    </p>
+    <p>
+      When corrective factors are undetermined, the user can use the RECALCULATE process option
+      to try to solve them. To do this, images can be added to the input list to try to create
+      more overlaps or images without overlaps can be removed. An input statistics file (INSTATS) 
+      containing previously calculated image statistics must be provided. These statistics will be
+      reloaded so overlap statistics will only be recalculated for new images in the modified input
+      list. If all the images have overlaps and sufficient valid overlaps exist, corrective factors
+      will be determined. Statistics can be recalculated as many times as desired by repeating the
+      above steps.
+    </p>
+    <p>
+      Additionally, the RETRYBOTH process option may be used to recalculate statistics and then
+      apply corrective factors. This requires the user to provide an INSTATS file containing
+      previously calculated statistics. It is also suggested that the user provide an OUTSTATS file
+      in case corrective factors cannot be determined. If the corrective factors are determined, 
+      they will then be applied to the input images.
+    </p>
+    <p>
+      The addition of these RETRYBOTH and RECALCULATE parameters has modified the content of
+      the output statistics. Additional information is included in the output statistics
+      so that previously calculated overlap statistics can be reloaded when using these parameters.
+      Note that statistics files created with previous versions of ISIS 3 can still be used as 
+      input statistics.
+    </p>
     <p>
       The actual equation to be used for equalization, for ADJUST=BRIGHTNESS, CONTRAST or BOTH, on
-      each band in each cube is as follows:
+      each band in each cube is as follows: 
       <pre>
         newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + (avg(b) + OFFSET(b))
       </pre>
@@ -76,7 +104,7 @@
       If the user chooses to apply correction to the images, then a list
       of output file names can be specified with the TOLIST parameter.  If no
       TOLIST is specified, the equalized cubes will be named the same as the
-      input cubes with the addition of a '.equ' prior to the '.cub'
+      input cubes with the addition of '.equ' prior to the '.cub'
       extension, and placed in the same directories as their input files.
     </p>
 
@@ -209,6 +237,11 @@
     <change name="Jeannie Backer" date="2013-02-27">
       Fixed user documentation. References #962.
     </change>
+    <change name="Ian Humphrey" date="2016-07-15">
+      Added RETRYBOTH and RECALCULATE parameters to allow user to fix any non-overlapping images
+      in the input image list and recalculate statistics for any new images in the input list,
+      reusing previously calculated statistics for the rest of the images. Fixes #2282.
+    </change>
   </history>
 
   <groups>
@@ -280,7 +313,7 @@
         </description>
         <internalDefault>None</internalDefault>
         <filter>
-          *.txt *.pvl *.lis *.lst
+          *.txt *.pvl *.lis *.lst *.dat
         </filter>
       </parameter>
 
@@ -297,7 +330,7 @@
           (OFFSET and GAIN) for every image in the FROMLIST.
         </description>
         <filter>
-          *.txt *.pvl *.lis *.lst
+          *.txt *.pvl *.lis *.lst *.dat
         </filter>
       </parameter>
     </group>
@@ -314,7 +347,7 @@
           afterwards, apply correction to the images off previously
           gathered statistics, or do the calculations but not apply
           correction.  If the APPLY option is not selected, you must
-          specify an OUTSTATS file.  If it is selected you can still
+          specify an OUTSTATS file.  If it is selected, you can still
           optionally specify an OUTSTATS file and the GAIN/OFFSET values
           will be applied to each input cube.  The names and locations of
           the output cubes are specified by the TOLIST file.
@@ -333,13 +366,33 @@
               <item>INSTATS</item>
             </exclusions>
           </option>
+          <option value="RETRYBOTH">
+            <brief>
+              Recalculate statistics and apply correction
+            </brief>
+            <description>
+              This option will load previously calculated image statistics, calculate statistics
+              for any new images in FROMLIST and then apply corrections from the results (if
+              the corrections can be determined).
+            </description>
+            <inclusions>
+              <item>INSTATS</item>
+            </inclusions>
+            <exclusions>
+              <item>ADJUST</item>
+              <item>MINCOUNT</item>
+              <item>WEIGHT</item>
+              <item>PERCENT</item>
+              <item>SOLVEMETHOD</item>
+            </exclusions>
+          </option>
           <option value="CALCULATE">
             <brief>
               Calculate statistics only
             </brief>
             <description>
-              This option will calculate image statistics and print them to an 
-              output PVL file, but image corrections will not be applied.
+              This option will calculate image statistics and write them to an 
+              output PVL file. Image corrections will not be applied.
             </description>
             <inclusions>
               <item>OUTSTATS</item>
@@ -347,6 +400,29 @@
             <exclusions>
               <item>TOLIST</item>
               <item>INSTATS</item>
+            </exclusions>
+          </option>
+          <option value="RECALCULATE">
+            <brief>
+              Recalculate statistics using previously calculated statistics
+            </brief>
+            <description>
+              This option will load previously calculated image statistics, calculate statistics
+              for any new images in FROMLIST and then write them to an output PVL file. Image
+              corrections will not be applied.
+            </description>
+            <inclusions>
+              <item>INSTATS</item>
+              <item>OUTSTATS</item>
+            </inclusions>
+            <exclusions>
+              <item>TOLIST</item>
+              <!--<item>HOLDLIST</item>-->
+              <item>ADJUST</item>
+              <item>MINCOUNT</item>
+              <item>WEIGHT</item>
+              <item>PERCENT</item>
+              <item>SOLVEMETHOD</item>
             </exclusions>
           </option>
           <option value="APPLY">
@@ -372,6 +448,7 @@
           </option>
         </list>
       </parameter>
+
       <parameter name="SOLVEMETHOD">
         <type>string</type>
         <brief>
@@ -399,7 +476,7 @@
               result in invalid values when no hold list is provided.
               -->
                This method is likely to result in invalid values when no
-               hold list is provided
+               hold list is provided.
             </description>
           </option>
 
@@ -604,7 +681,7 @@
               value of "None", a record of the calculations performed will only be
               written to the print file.
             </description>
-            <thumbnail width="164" height="200" caption="Equalizer Gui" src="assets/thumbs/bothGui.jpg" />
+            <thumbnail width="164" height="200" caption="Equalizer GUI" src="assets/thumbs/bothGui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -664,7 +741,7 @@
         </commandLine>
         <description>
           In addition to specifying a fromlist and a holdlist, we must also
-          specify a location to write the output statistics pvl, and set the
+          specify a location to write the output statistics PVL file, and set the
           process type to "calculate."  Since no output images will be created,
           we do not (and cannot), specify a tolist.  All other options are at
           default values.
@@ -717,7 +794,7 @@
         <dataFile path="assets/stats.pvl">
           <brief>Click here to see the output text file containing statistics for equalizing</brief>
           <description>
-            This pvl contains thorough equalization-related statistics
+            This PVL file contains thorough equalization-related statistics
             that can be used for applying correction to any or all images
             used to generate this file.
           </description>
@@ -758,7 +835,8 @@
               subset of the images used to produce a specified input statistics
               file.
             </description>
-            <thumbnail width="164" height="200" caption="Equalizer Gui" src="assets/thumbs/applyGui.jpg" />
+            <thumbnail width="164" height="200" caption="Equalizer GUI" 
+                       src="assets/thumbs/applyGui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -789,7 +867,7 @@
         <dataFile path="assets/stats.pvl">
           <brief>Click here to see the input text file containing statistics for equalizing</brief>
           <description>
-            This pvl contains thorough equalization-related statistics for
+            This PVL file contains thorough equalization-related statistics for
             applying correction to any or all images used to generate this
             file.  In this example, two of the three files used to
             generate these statistics have been selected for equalization.
@@ -807,10 +885,269 @@
             applying correction, that the results are the same as those in
             Example 1.
           </description>
-          <thumbnail caption="Mosaic showing results of the equalizer application." src="assets/thumbs/EqualizedMosaic.jpg" width="200" height="200"/>
+          <thumbnail caption="Mosaic showing results of the equalizer application."
+                     src="assets/thumbs/EqualizedMosaic.jpg" width="200" height="200"/>
           <parameterName>TOLIST</parameterName>
         </image>
       </outputImages>
     </example>
+
+    <example>
+      <brief>Recalculate Statistics</brief>
+      <description>
+        This example shows the use of the equalizer application for recalculating statistics after
+        initially calculating statistics where some images do not have any overlaps.
+      </description>
+      <terminalInterface>
+        <commandLine> fromlist=fixedList.lst
+          instats=nonOverlapStats.pvl outstats=fixedStats.pvl process=recalculate
+        </commandLine>
+        <description>
+          In addition to specifying a fromlist, we must also specify the previously calculated
+          statistics PVL file (instats), specify a location to write the output statistics PVL file
+          (outstats), and set the process type to "recalculate."  Since no output images will be 
+          created, we do not (and cannot), specify a tolist.  All other options are at
+          default values.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="610" height="990" src="assets/images/recalculateFirstGui.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to initially calculate statistics
+              for a set of images with non-overlapping images.
+            </description>
+            <thumbnail width="123" height="200" caption="Equalizer GUI" 
+                       src="assets/thumbs/recalculateFirstGui.png" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width ="610" height="990" src="assets/images/recalculateFixedGui.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to recalculate statistics
+              after calculating statistics for a set of images with non-overlapping images.
+            </description>
+            <thumbnail width="123" height="200" caption="Equalizer GUI"
+                       src="assets/thumbs/recalculateFixedGui.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image width="314" height="990" src="assets/images/nonOverlapMosaic.png">
+          <brief>
+            Mosaic of the input images for equalizer for initial calculation
+          </brief>
+          <description>
+            This is a small section of the input images mosaicked together. Two of the images do not
+            have any overlaps.
+          </description>
+          <thumbnail width="63" height="200" caption="Mosaic of unequalized input images where two
+                     images do not have overlaps"
+                     src="assets/thumbs/nonOverlapMosaic.png" />
+        </image>
+        <image width="314" height="990" src="assets/images/nonEqualizedMosaic2.png">
+          <brief>
+            Mosaic of the input images for equalizer for recalculation
+          </brief>
+          <description>
+            This is a small section of the input images mosaicked together. The non-overlaps have
+            been corrected.
+          </description>
+          <parameterName>FROMLIST</parameterName>
+          <thumbnail width="63" height="200" caption="Mosaic of unequalized input images where all
+                     images have valid overlaps"
+                     src="assets/thumbs/nonEqualizedMosaic2.png" />
+        </image>
+      </inputImages>
+
+      <dataFiles>
+        <dataFile path="assets/fromlist.lis">
+          <brief>
+            Click here to see the list with non-overlapping images used to calculate statistics
+          </brief>
+          <description>
+            This list contains the names of four files where two images do not have any overlaps.
+          </description>
+        </dataFile>
+        <dataFile path="assets/fixedFromlist.lis">
+          <brief>
+            Click here to see the corrected list with all overlapping images used to recalculate
+            statistics
+          </brief>
+          <description>
+            This list contains the names of five files that all have valid overlaps. The third file,
+            I50695002EDR.proj.reduced.cub, was added to fix the non-overlapping areas. (FROMLIST)
+          </description>
+        </dataFile>
+        <dataFile path="assets/firstRunStats.pvl">
+          <brief>
+            Click here to see the output text file containing the statistics needed for 
+            recalculating
+          </brief>
+          <description>
+            This PVL file contains equalization-related statistics where corrective factors have not
+            been determined (since there were images without overlaps). This can be used to 
+            recalculate statistics for a corrected input image list. Overlap statistics will only be
+            calculated for new overlaps. (INSTATS)
+          </description>
+        </dataFile>
+        <dataFile path="assets/fixedStats.pvl">
+          <brief>
+            Click here to see the output text file containing the recalculated statistics to be
+            used for equalizing
+          </brief>
+          <description>
+            This PVL file contains equalization-related statistics that were recalculated from a 
+            previous run of equalizer. This can be used for applying
+            correction to any or all images used to generate this file. (OUTSTATS)
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+    <example>
+      <brief>Recalculate Statistics and Apply Correction (RETRYBOTH)</brief>
+      <description>
+        This example shows the use of the equalizer application for recalculating statistics after
+        initially trying to calculate and apply corrections on a non-overlapping data set.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          fromlist=fixedFromlist.lis tolist=tolist.lis outstats=retryBothStats.pvl 
+          instats=nonOverlapStats.pvl process=retryboth
+        </commandLine>
+        <description>
+          In addition to specifying a fromlist, we must also specify the previously calculated
+          statistics (instats). We should also provide a location to write the output statistics
+          PVL file (outstats) if we still have images without overlaps in our fromlist. We will
+          also provide a list of output files (tolist).
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="610" height="990" src="assets/images/bothFailGui.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to calculate statistics and apply 
+              corrections (BOTH). This fails because some of the images do not have any overlaps
+              (see the application log at the bottom of the screenshot).
+            </description>
+            <thumbnail width="123" height="200" caption="Equalizer GUI"
+                       src="assets/thumbs/bothFailGui.png" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="610" height="990" src="assets/images/retryBothGui.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to recalculate statistics from previously
+              calculated statistics and apply corrections (RETRYBOTH) to the input images.
+            </description>
+            <thumbnail width="123" height="200" caption="Equalizer GUI" 
+                       src="assets/thumbs/retryBothGui.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image width="314" height="990" src="assets/images/nonOverlapMosaic.png">
+          <brief>
+            Mosaic of the input images for equalizer for initial calculation
+          </brief>
+          <description>
+            This is a small section of the input images mosaicked together. Two of the images do not
+            have any overlaps.
+          </description>
+          <thumbnail width="63" height="200" caption="Mosaic of unequalized input images where two
+                     images do not have overlaps"
+                     src="assets/thumbs/nonOverlapMosaic.png" />
+        </image>
+        <image width="314" height="990" src="assets/images/nonEqualizedMosaic2.png">
+          <brief>
+            Mosaic of the input images for equalizer before corrections are applied
+          </brief>
+          <description>
+            This is a small section of the input images mosaicked together. The non-overlaps have
+            been corrected by adding I50695002EDR.proj.reduced.cub to the input list.
+          </description>
+          <parameterName>FROMLIST</parameterName>
+          <thumbnail width="63" height="200" caption="Mosaic of unequalized input images where all
+                     images have valid overlaps"
+                     src="assets/thumbs/nonEqualizedMosaic2.png" />
+        </image>
+      </inputImages>
+
+      <dataFiles>
+        <dataFile path="assets/fixedFromlist.lis">
+          <brief>
+            Click here to see the corrected list with all overlapping images used to recalculate
+            statistics
+          </brief>
+          <description>
+            This list contains the names of five files that all have valid overlaps. The third file,
+            I50695002EDR.proj.reduced.cub, was added to fix non-overlapping areas from a previous
+            run. (FROMLIST)
+          </description>
+        </dataFile>
+        <dataFile path="assets/tolist.lis">
+          <brief>
+            Click here to see the list of the output images to be created.
+          </brief>
+          <description>
+            This list contains the names of the five equalized output files that will be created.
+            (TOLIST)
+          </description>
+        </dataFile>
+        <dataFile path="assets/firstRunStats.pvl">
+          <brief>
+            Click here to see the output text file containing the statistics needed for 
+            recalculating and then applying.
+          </brief>
+          <description>
+            This PVL file contains equalization-related statistics where corrective factors have not been
+            determined (since there were images without overlaps). This can be used to recalculate
+            statistics for a corrected input image list. Overlap statistics will only be calculated
+            for new overlaps. (INSTATS)
+          </description>
+        </dataFile>
+        <dataFile path="assets/fixedStats.pvl">
+          <brief>
+            Click here to see the output text file containing the recalculated statistics.
+          </brief>
+          <description>
+            This PVL file contains equalization-related statistics that were recalculated from a 
+            previous run of equalizer. (OUTSTATS)
+          </description>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image width="314" height="990" src="assets/images/equalizedMosaic2.png">
+          <brief>
+            Mosaic of the equalized output images
+          </brief>
+          <description>
+            This is a small section of the equalized output images mosaicked together.
+          </description>
+          <parameterName>TOLIST</parameterName>
+          <thumbnail width="63" height="200" caption="Mosaic of equalized output images"
+                     src="assets/thumbs/equalizedMosaic2.png" />
+        </image>
+      </outputImages>
+    </example>
+
   </examples>
 </application>

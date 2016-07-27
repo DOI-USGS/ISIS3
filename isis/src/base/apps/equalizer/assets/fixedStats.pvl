@@ -1,0 +1,2419 @@
+Object = EqualizationInformation
+  Group = General
+    TotalOverlaps   = 40
+    ValidOverlaps   = 40
+    InvalidOverlaps = 0
+    MinCount        = 1000
+    SamplingPercent = 100.0
+    Weighted        = false
+    SolutionType    = 2
+    SolveMethod     = 2
+    NonOverlaps     = Null
+    HasCorrections  = true
+  End_Group
+
+  # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
+  # BandN = (GAIN, OFFSET, AVERAGE)
+  Group = Normalization
+    FileName = $odyssey/testData/I10047011EDR.proj.reduced.cub
+    Band1    = (0.93152671949526, 6.8917115026193, 115.47426360088)
+    Band2    = (0.86384744244226, 6.5539312542221, 92.532407988854)
+    Band3    = (0.80306456179597, 4.4447440301132, 88.324629525638)
+    Band4    = (0.81716459604772, 3.9514904160531, 98.228501851765)
+    Band5    = (0.82422266041678, 5.3032605516296, 98.747018404395)
+    Band6    = (0.84886557250475, 4.5855510338926, 109.20160353302)
+    Band7    = (0.85295992950037, 3.0335777085584, 123.39335550486)
+    Band8    = (1.2075923222204, 0.99108731057177, 86.319003300654)
+  End_Group
+
+  # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
+  # BandN = (GAIN, OFFSET, AVERAGE)
+  Group = Normalization
+    FileName = $odyssey/testData/I25685003EDR.crop.proj.reduced.cub
+    Band1    = (0.83205548471968, -5.8307661142424, 145.61574545953)
+    Band2    = (0.85878080894809, -6.0792409854031, 127.99110106071)
+    Band3    = (0.90156276679541, -7.7199279393793, 120.5170145403)
+    Band4    = (0.9066543758906, -10.267462382808, 129.19243916917)
+    Band5    = (0.88460179054836, -13.921396190264, 134.50638384743)
+    Band6    = (0.86565748246919, -14.397671511598, 142.14988283214)
+    Band7    = (0.8909764247424, -13.003027907971, 148.01554781366)
+    Band8    = (1.2610913247383, -6.4773248104628, 95.929327806067)
+  End_Group
+
+  # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
+  # BandN = (GAIN, OFFSET, AVERAGE)
+  Group = Normalization
+    FileName = $odyssey/testData/I50695002EDR.proj.reduced.cub
+    Band1    = (0.61304196521891, -28.390433817194, 148.09828872294)
+    Band2    = (0.63854694422858, -39.951256345725, 135.19529272481)
+    Band3    = (0.69437523310386, -37.588975628767, 126.6021071024)
+    Band4    = (0.72793272588658, -34.198281672685, 133.19504739482)
+    Band5    = (0.73603715233778, -36.773622147422, 137.52285970899)
+    Band6    = (0.74861554636164, -31.238298563298, 142.59210591432)
+    Band7    = (0.77810287278373, -20.402944103014, 145.43200269536)
+    Band8    = (0.88757942686085, 4.1582161692791, 86.012185540116)
+  End_Group
+
+  # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
+  # BandN = (GAIN, OFFSET, AVERAGE)
+  Group = Normalization
+    FileName = $odyssey/testData/I51718010EDR.crop.proj.reduced.cub
+    Band1    = (0.77844407732164, -11.029286408666, 119.0013504582)
+    Band2    = (0.7502459928146, -17.695216864398, 98.714611029686)
+    Band3    = (0.75100278297462, -18.502621867222, 95.041772145495)
+    Band4    = (0.77264981456243, -15.693607561037, 104.0007120778)
+    Band5    = (0.81005135876035, -14.778207402161, 104.5253289197)
+    Band6    = (0.83013616374586, -10.107512258383, 113.36920272854)
+    Band7    = (0.87143288463316, -5.0135074615051, 126.01540498705)
+    Band8    = (0.58462492979234, 11.020871977974, 86.358451687979)
+  End_Group
+
+  # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
+  # BandN = (GAIN, OFFSET, AVERAGE)
+  Group = Normalization
+    FileName = $odyssey/testData/I56969027EDR.proj.reduced.cub
+    Band1    = (2.7035522806794, 38.358774837512, 77.220361285484)
+    Band2    = (2.813740891084, 57.171782941317, 32.698505929389)
+    Band3    = (2.6486087068972, 59.366781405278, 25.034809470416)
+    Band4    = (2.3997983278828, 56.207861200451, 39.06968694182)
+    Band5    = (2.3003575475188, 60.169965188218, 37.159995912522)
+    Band6    = (2.189811927608, 51.157931299399, 57.205862831912)
+    Band7    = (1.9405918121653, 35.385901763943, 87.877266364875)
+    Band8    = (1.2654604041684, -9.6928506473606, 99.816933343971)
+  End_Group
+End_Object
+
+Object = OverlapStatistics
+  File1           = I10047011EDR.proj.reduced.cub
+  File2           = I56969027EDR.proj.reduced.cub
+  Width           = 455
+  Height          = 1056
+  Bands           = 8
+  SamplingPercent = 100.0
+  MinCount        = 1000
+  Valid           = true
+
+  Object = MultivariateStatistics1
+    Covariance       = -0.43115698190226
+    Correlation      = -0.034876391040085
+    SumXY            = 100879253.45587
+    ValidPixels      = 12401
+    InvalidPixels    = 468079
+    TotalPixels      = 480480
+    LinearRegression = (77.333985753736, -0.01242064003495)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1327349.7612381
+      SumSquare               = 142504256.21868
+      Minimum                 = 83.136177062988
+      Maximum                 = 141.87841796875
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 107.03570367213
+      StandardDeviation       = 5.8917691735091
+      Variance                = 34.712943993913
+      TotalPixels             = 12401
+      ValidPixels             = 12401
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 942532.22374725
+      SumSquare               = 71691315.396077
+      Minimum                 = 70.478507995605
+      Maximum                 = 85.871520996094
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 76.004533807536
+      StandardDeviation       = 2.0982544893807
+      Variance                = 4.4026719022062
+      TotalPixels             = 12401
+      ValidPixels             = 12401
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics2
+    Covariance       = -0.04920898567019
+    Correlation      = -0.002455201071023
+    SumXY            = 31051555.997189
+    ValidPixels      = 12444
+    InvalidPixels    = 468036
+    TotalPixels      = 480480
+    LinearRegression = (30.936121949622, -7.58906475721983e-04)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1005745.2209244
+      SumSquare               = 82092865.946988
+      Minimum                 = 47.566993713379
+      Maximum                 = 127.26403045654
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 80.821698884957
+      StandardDeviation       = 8.0524507491662
+      Variance                = 64.841963067747
+      TotalPixels             = 12444
+      ValidPixels             = 12444
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 384205.83498001
+      SumSquare               = 11939360.316596
+      Minimum                 = 25.984279632568
+      Maximum                 = 48.563674926758
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 30.874785838959
+      StandardDeviation       = 2.4890250705098
+      Variance                = 6.1952458016265
+      TotalPixels             = 12444
+      ValidPixels             = 12444
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics3
+    Covariance       = 0.22331111136946
+    Correlation      = 0.01189665748651
+    SumXY            = 22289336.173384
+    ValidPixels      = 12490
+    InvalidPixels    = 467990
+    TotalPixels      = 480480
+    LinearRegression = (22.837146540715, 0.0033944271865035)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 964812.52700806
+      SumSquare               = 75350300.869845
+      Minimum                 = 42.890182495117
+      Maximum                 = 123.74995422363
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 77.246799600325
+      StandardDeviation       = 8.1109536180388
+      Variance                = 65.787568593977
+      TotalPixels             = 12490
+      ValidPixels             = 12490
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 288510.94616508
+      SumSquare               = 6731305.798954
+      Minimum                 = 17.856109619141
+      Maximum                 = 38.817279815674
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 23.099355177348
+      StandardDeviation       = 2.3142669695898
+      Variance                = 5.3558316065344
+      TotalPixels             = 12490
+      ValidPixels             = 12490
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics4
+    Covariance       = 2.355361782116
+    Correlation      = 0.13853808680118
+    SumXY            = 41314586.485632
+    ValidPixels      = 12531
+    InvalidPixels    = 467949
+    TotalPixels      = 480480
+    LinearRegression = (33.226554896016, 0.044369418378776)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1110998.0931396
+      SumSquare               = 99166216.626936
+      Minimum                 = 56.824604034424
+      Maximum                 = 129.39448547363
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 88.659970723773
+      StandardDeviation       = 7.2859627088452
+      Variance                = 53.085252594683
+      TotalPixels             = 12531
+      ValidPixels             = 12531
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 465656.2986145
+      SumSquare               = 17372175.932765
+      Minimum                 = 31.257295608521
+      Maximum                 = 47.991016387939
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 37.160346230508
+      StandardDeviation       = 2.333466089977
+      Variance                = 5.4450639930726
+      TotalPixels             = 12531
+      ValidPixels             = 12531
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics5
+    Covariance       = 1.1150285327653
+    Correlation      = 0.060054270407853
+    SumXY            = 38996577.022035
+    ValidPixels      = 12570
+    InvalidPixels    = 467910
+    TotalPixels      = 480480
+    LinearRegression = (32.986240834869, 0.020266537114563)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1120423.8086891
+      SumSquare               = 100560220.03047
+      Minimum                 = 57.410106658936
+      Maximum                 = 130.12356567383
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 89.134750094598
+      StandardDeviation       = 7.4174258966345
+      Variance                = 55.018206932064
+      TotalPixels             = 12570
+      ValidPixels             = 12570
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 437344.15799713
+      SumSquare               = 15295136.32735
+      Minimum                 = 28.699256896973
+      Maximum                 = 49.829200744629
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 34.792693555858
+      StandardDeviation       = 2.503161493891
+      Variance                = 6.2658174644988
+      TotalPixels             = 12570
+      ValidPixels             = 12570
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics6
+    Covariance       = 1.5399576283399
+    Correlation      = 0.10594392868049
+    SumXY            = 70856664.404971
+    ValidPixels      = 12603
+    InvalidPixels    = 467877
+    TotalPixels      = 480480
+    LinearRegression = (51.497665146167, 0.03849500561071)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1278581.5039139
+      SumSquare               = 130216950.86956
+      Minimum                 = 73.165573120117
+      Maximum                 = 135.79080200195
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 101.45056763579
+      StandardDeviation       = 6.3248785714613
+      Variance                = 40.004088943731
+      TotalPixels             = 12603
+      ValidPixels             = 12603
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 698244.07600403
+      SumSquare               = 38751378.289293
+      Minimum                 = 49.211544036865
+      Maximum                 = 64.836982727051
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 55.403005316514
+      StandardDeviation       = 2.2981612927503
+      Variance                = 5.2815453274956
+      TotalPixels             = 12603
+      ValidPixels             = 12603
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics7
+    Covariance       = 0.94468076874565
+    Correlation      = 0.10913539693273
+    SumXY            = 129924941.15627
+    ValidPixels      = 12640
+    InvalidPixels    = 467840
+    TotalPixels      = 480480
+    LinearRegression = (81.255360582602, 0.04598987385722)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1498301.6436844
+      SumSquare               = 177863084.87377
+      Minimum                 = 97.794067382812
+      Maximum                 = 142.36473083496
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 118.53652244339
+      StandardDeviation       = 4.5322246443905
+      Variance                = 20.54106022722
+      TotalPixels             = 12640
+      ValidPixels             = 12640
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 1095974.4613571
+      SumSquare               = 95074585.543534
+      Minimum                 = 81.938491821289
+      Maximum                 = 96.462287902832
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 86.706840297239
+      StandardDeviation       = 1.9098885013179
+      Variance                = 3.6476740874665
+      TotalPixels             = 12640
+      ValidPixels             = 12640
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics8
+    Covariance       = -1.1859323169591
+    Correlation      = -0.51226803558144
+    SumXY            = 113834376.67194
+    ValidPixels      = 12679
+    InvalidPixels    = 467801
+    TotalPixels      = 480480
+    LinearRegression = (137.06852215678, -0.40577975315189)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1127346.577095
+      SumSquare               = 100274477.2082
+      Minimum                 = 84.447341918945
+      Maximum                 = 93.932968139648
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 88.914470943686
+      StandardDeviation       = 1.7095616430477
+      Variance                = 2.92260101138
+      TotalPixels             = 12679
+      ValidPixels             = 12679
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 1280437.3766556
+      SumSquare               = 129333121.78584
+      Minimum                 = 97.80744934082
+      Maximum                 = 104.0
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 100.98883008562
+      StandardDeviation       = 1.3541846325164
+      Variance                = 1.8338160189437
+      TotalPixels             = 12679
+      ValidPixels             = 12679
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Group = File1
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (107.03570367213, 80.821698884957, 77.246799600325,
+                         88.659970723773, 89.134750094598, 101.45056763579,
+                         118.53652244339, 88.914470943686)
+    StandardDeviation = (5.8917691735091, 8.0524507491662, 8.1109536180388,
+                         7.2859627088452, 7.4174258966345, 6.3248785714613,
+                         4.5322246443905, 1.7095616430477)
+    Variance          = (34.712943993913, 64.841963067747, 65.787568593977,
+                         53.085252594683, 55.018206932064, 40.004088943731,
+                         20.54106022722, 2.92260101138)
+  End_Group
+
+  Group = File2
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (76.004533807536, 30.874785838959, 23.099355177348,
+                         37.160346230508, 34.792693555858, 55.403005316514,
+                         86.706840297239, 100.98883008562)
+    StandardDeviation = (2.0982544893807, 2.4890250705098, 2.3142669695898,
+                         2.333466089977, 2.503161493891, 2.2981612927503,
+                         1.9098885013179, 1.3541846325164)
+    Variance          = (4.4026719022062, 6.1952458016265, 5.3558316065344,
+                         5.4450639930726, 6.2658174644988, 5.2815453274956,
+                         3.6476740874665, 1.8338160189437)
+  End_Group
+End_Object
+
+Object = OverlapStatistics
+  File1           = I10047011EDR.proj.reduced.cub
+  File2           = I50695002EDR.proj.reduced.cub
+  Width           = 455
+  Height          = 1056
+  Bands           = 8
+  SamplingPercent = 100.0
+  MinCount        = 1000
+  Valid           = true
+
+  Object = MultivariateStatistics1
+    Covariance       = 133.94497707884
+    Correlation      = 0.93432989143485
+    SumXY            = 608033613.92899
+    ValidPixels      = 35949
+    InvalidPixels    = 444531
+    TotalPixels      = 480480
+    LinearRegression = (-7.4538131318311, 1.3734810041349)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 4072209.213623
+      SumSquare               = 464794997.90619
+      Minimum                 = 83.136177062988
+      Maximum                 = 160.22506713867
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 113.27739891577
+      StandardDeviation       = 9.875336145979
+      Variance                = 97.52226399608
+      TotalPixels             = 35949
+      ValidPixels             = 35949
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 5325144.8714981
+      SumSquare               = 796392308.49183
+      Minimum                 = 96.776145935059
+      Maximum                 = 212.0837097168
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 148.13054247679
+      StandardDeviation       = 14.516913919043
+      Variance                = 210.74078973291
+      TotalPixels             = 35949
+      ValidPixels             = 35949
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics2
+    Covariance       = 231.39846930335
+    Correlation      = 0.93906076627998
+    SumXY            = 444435132.83944
+    ValidPixels      = 36017
+    InvalidPixels    = 444463
+    TotalPixels      = 480480
+    LinearRegression = (22.432037411008, 1.2616128682337)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3222752.4278641
+      SumSquare               = 294973394.12223
+      Minimum                 = 47.624137878418
+      Maximum                 = 150.54122924805
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 89.478646968489
+      StandardDeviation       = 13.54307195352
+      Variance                = 183.41479793823
+      TotalPixels             = 36017
+      ValidPixels             = 36017
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 4873800.6255569
+      SumSquare               = 671443270.11169
+      Minimum                 = 68.696510314941
+      Maximum                 = 211.00833129883
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 135.31944985859
+      StandardDeviation       = 18.194896928408
+      Variance                = 331.0542742354
+      TotalPixels             = 36017
+      ValidPixels             = 36017
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics3
+    Covariance       = 195.03605611568
+    Correlation      = 0.93417186985822
+    SumXY            = 397898604.9604
+    ValidPixels      = 36094
+    InvalidPixels    = 444386
+    TotalPixels      = 480480
+    LinearRegression = (28.63032871046, 1.1478334994294)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3084444.7654076
+      SumSquare               = 269716764.31418
+      Minimum                 = 43.331451416016
+      Maximum                 = 143.23742675781
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 85.45588644671
+      StandardDeviation       = 13.035209199215
+      Variance                = 169.9166788673
+      TotalPixels             = 36094
+      ValidPixels             = 36094
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 4573812.1133499
+      SumSquare               = 588849972.94217
+      Minimum                 = 65.133964538574
+      Maximum                 = 193.09623718262
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 126.71945789743
+      StandardDeviation       = 16.016592100124
+      Variance                = 256.53122250177
+      TotalPixels             = 36094
+      ValidPixels             = 36094
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics4
+    Covariance       = 147.65427662456
+    Correlation      = 0.93151246638384
+    SumXY            = 467140242.5996
+    ValidPixels      = 36164
+    InvalidPixels    = 444316
+    TotalPixels      = 480480
+    LinearRegression = (26.703351544936, 1.1115769303497)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3465987.8181
+      SumSquare               = 336986798.85753
+      Minimum                 = 56.96117401123
+      Maximum                 = 146.81269836426
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 95.840831160822
+      StandardDeviation       = 11.525326908364
+      Variance                = 132.83316034466
+      TotalPixels             = 36164
+      ValidPixels             = 36164
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 4818412.104744
+      SumSquare               = 648834929.89036
+      Minimum                 = 78.207466125488
+      Maximum                 = 189.11758422852
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 133.23780844884
+      StandardDeviation       = 13.753211007266
+      Variance                = 189.15081301038
+      TotalPixels             = 36164
+      ValidPixels             = 36164
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics5
+    Covariance       = 153.28724702845
+    Correlation      = 0.93432476273145
+    SumXY            = 484840753.34948
+    ValidPixels      = 36237
+    InvalidPixels    = 444243
+    TotalPixels      = 480480
+    LinearRegression = (30.926452273248, 1.1106373408616)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3481994.8262558
+      SumSquare               = 339584302.3313
+      Minimum                 = 55.280445098877
+      Maximum                 = 147.00541687012
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 96.089489368761
+      StandardDeviation       = 11.748079502536
+      Variance                = 138.0173719979
+      TotalPixels             = 36237
+      ValidPixels             = 36237
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 4987915.3257523
+      SumSquare               = 693638517.11483
+      Minimum                 = 80.893272399902
+      Maximum                 = 194.08195495605
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 137.64702723052
+      StandardDeviation       = 13.965011203151
+      Variance                = 195.02153790415
+      TotalPixels             = 36237
+      ValidPixels             = 36237
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics6
+    Covariance       = 110.22134435967
+    Correlation      = 0.93110812321535
+    SumXY            = 559534405.11016
+    ValidPixels      = 36309
+    InvalidPixels    = 444171
+    TotalPixels      = 480480
+    LinearRegression = (21.763732856933, 1.1261929973796)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3895776.0802383
+      SumSquare               = 421550992.00055
+      Minimum                 = 72.769706726074
+      Maximum                 = 150.31483459473
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 107.29505302372
+      StandardDeviation       = 9.8929642707825
+      Variance                = 97.870742062979
+      TotalPixels             = 36309
+      ValidPixels             = 36309
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 5177615.1172256
+      SumSquare               = 743519561.46437
+      Minimum                 = 92.655700683594
+      Maximum                 = 191.78411865234
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 142.59867022572
+      StandardDeviation       = 11.965728584353
+      Variance                = 143.17866055441
+      TotalPixels             = 36309
+      ValidPixels             = 36309
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics7
+    Covariance       = 46.911025699325
+    Correlation      = 0.91383270802101
+    SumXY            = 648882027.73175
+    ValidPixels      = 36375
+    InvalidPixels    = 444105
+    TotalPixels      = 480480
+    LinearRegression = (17.446129523241, 1.0446891545222)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 4452976.7581558
+      SumSquare               = 546760551.66501
+      Minimum                 = 97.457382202148
+      Maximum                 = 152.32144165039
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 122.41860503521
+      StandardDeviation       = 6.7010664005359
+      Variance                = 44.904290904391
+      TotalPixels             = 36375
+      ValidPixels             = 36375
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 5286579.4859924
+      SumSquare               = 770462386.37735
+      Minimum                 = 111.2836151123
+      Maximum                 = 178.57933044434
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 145.33551851526
+      StandardDeviation       = 7.660626864115
+      Variance                = 58.6852039512
+      TotalPixels             = 36375
+      ValidPixels             = 36375
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics8
+    Covariance       = 3.5511613563237
+    Correlation      = 0.81333134006482
+    SumXY            = 272255542.06092
+    ValidPixels      = 36452
+    InvalidPixels    = 444028
+    TotalPixels      = 480480
+    LinearRegression = (-34.127377626488, 1.3333409269823)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3233672.7804718
+      SumSquare               = 286957601.32905
+      Minimum                 = 82.435844421387
+      Maximum                 = 93.932968139648
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 88.710435105668
+      StandardDeviation       = 1.6319791202101
+      Variance                = 2.6633558488018
+      TotalPixels             = 36452
+      ValidPixels             = 36452
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 3067577.0934296
+      SumSquare               = 258409409.99271
+      Minimum                 = 77.227966308594
+      Maximum                 = 90.709373474121
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 84.153876150268
+      StandardDeviation       = 2.6753974005015
+      Variance                = 7.1577512506101
+      TotalPixels             = 36452
+      ValidPixels             = 36452
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Group = File1
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (113.27739891577, 89.478646968489, 85.45588644671,
+                         95.840831160822, 96.089489368761, 107.29505302372,
+                         122.41860503521, 88.710435105668)
+    StandardDeviation = (9.875336145979, 13.54307195352, 13.035209199215,
+                         11.525326908364, 11.748079502536, 9.8929642707825,
+                         6.7010664005359, 1.6319791202101)
+    Variance          = (97.52226399608, 183.41479793823, 169.9166788673,
+                         132.83316034466, 138.0173719979, 97.870742062979,
+                         44.904290904391, 2.6633558488018)
+  End_Group
+
+  Group = File2
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (148.13054247679, 135.31944985859, 126.71945789743,
+                         133.23780844884, 137.64702723052, 142.59867022572,
+                         145.33551851526, 84.153876150268)
+    StandardDeviation = (14.516913919043, 18.194896928408, 16.016592100124,
+                         13.753211007266, 13.965011203151, 11.965728584353,
+                         7.660626864115, 2.6753974005015)
+    Variance          = (210.74078973291, 331.0542742354, 256.53122250177,
+                         189.15081301038, 195.02153790415, 143.17866055441,
+                         58.6852039512, 7.1577512506101)
+  End_Group
+End_Object
+
+Object = OverlapStatistics
+  File1           = I25685003EDR.crop.proj.reduced.cub
+  File2           = I50695002EDR.proj.reduced.cub
+  Width           = 455
+  Height          = 1056
+  Bands           = 8
+  SamplingPercent = 100.0
+  MinCount        = 1000
+  Valid           = true
+
+  Object = MultivariateStatistics1
+    Covariance       = 84.567058493344
+    Correlation      = 0.93224413551886
+    SumXY            = 106718529.64848
+    ValidPixels      = 4371
+    InvalidPixels    = 476109
+    TotalPixels      = 480480
+    LinearRegression = (-15.910093208501, 1.2650622466943)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 634288.13707733
+      SumSquare               = 92335466.761145
+      Minimum                 = 110.40977478027
+      Maximum                 = 173.79298400879
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 145.11282019614
+      StandardDeviation       = 8.1760711989964
+      Variance                = 66.848140251059
+      TotalPixels             = 4371
+      ValidPixels             = 4371
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 732870.95832825
+      SumSquare               = 123415965.42474
+      Minimum                 = 120.32790374756
+      Maximum                 = 206.42068481445
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 167.66665713298
+      StandardDeviation       = 11.094989612757
+      Variance                = 123.09879450719
+      TotalPixels             = 4371
+      ValidPixels             = 4371
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics2
+    Covariance       = 124.82064668889
+    Correlation      = 0.93681288349975
+    SumXY            = 89680326.010654
+    ValidPixels      = 4388
+    InvalidPixels    = 476092
+    TotalPixels      = 480480
+    LinearRegression = (0.98651556974289, 1.2597264173084)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 555487.95870209
+      SumSquare               = 70755306.283914
+      Minimum                 = 84.909088134766
+      Maximum                 = 161.23115539551
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 126.59251565681
+      StandardDeviation       = 9.9541709680096
+      Variance                = 99.085519660365
+      TotalPixels             = 4388
+      ValidPixels             = 4388
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 704091.68639374
+      SumSquare               = 113763465.6067
+      Minimum                 = 102.39891815186
+      Maximum                 = 205.12281799316
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 160.45845177615
+      StandardDeviation       = 13.385311359042
+      Variance                = 179.16656017849
+      TotalPixels             = 4388
+      ValidPixels             = 4388
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics3
+    Covariance       = 98.499337543254
+    Correlation      = 0.93379271006173
+    SumXY            = 78845121.801385
+    ValidPixels      = 4407
+    InvalidPixels    = 476073
+    TotalPixels      = 480480
+    LinearRegression = (4.5369071873494, 1.2122919483669)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 525713.39765167
+      SumSquare               = 63070623.385806
+      Minimum                 = 81.471313476562
+      Maximum                 = 150.03051757812
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 119.29053724794
+      StandardDeviation       = 9.0139064082983
+      Variance                = 81.250508737561
+      TotalPixels             = 4407
+      ValidPixels             = 4407
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 657312.26909637
+      SumSquare               = 98642721.318268
+      Minimum                 = 97.123947143555
+      Maximum                 = 188.33332824707
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 149.15186500939
+      StandardDeviation       = 11.702261159642
+      Variance                = 136.94291624847
+      TotalPixels             = 4407
+      ValidPixels             = 4407
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics4
+    Covariance       = 71.789915568098
+    Correlation      = 0.92838766380112
+    SumXY            = 86757898.042945
+    ValidPixels      = 4419
+    InvalidPixels    = 476061
+    TotalPixels      = 480480
+    LinearRegression = (3.8612063273207, 1.1562115946696)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 567449.86153412
+      SumSquare               = 73141332.812288
+      Minimum                 = 95.128974914551
+      Maximum                 = 154.31437683105
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 128.4113739611
+      StandardDeviation       = 7.8797612903655
+      Variance                = 62.090637993142
+      TotalPixels             = 4419
+      ValidPixels             = 4419
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 673154.78005981
+      SumSquare               = 102968432.83352
+      Minimum                 = 108.98077392578
+      Maximum                 = 184.95935058594
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 152.3319257886
+      StandardDeviation       = 9.8134343253189
+      Variance                = 96.303493257347
+      TotalPixels             = 4419
+      ValidPixels             = 4419
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics5
+    Covariance       = 75.970947714375
+    Correlation      = 0.93165589484616
+    SumXY            = 93281971.302718
+    ValidPixels      = 4432
+    InvalidPixels    = 476048
+    TotalPixels      = 480480
+    LinearRegression = (6.8347054221335, 1.1195677034003)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 593203.25946045
+      SumSquare               = 79698263.443873
+      Minimum                 = 98.352958679199
+      Maximum                 = 161.77577209473
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 133.84550078079
+      StandardDeviation       = 8.2375600060372
+      Variance                = 67.857394853063
+      TotalPixels             = 4432
+      ValidPixels             = 4432
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 694422.62527466
+      SumSquare               = 109238978.20805
+      Minimum                 = 111.64597320557
+      Maximum                 = 189.51734924316
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 156.68380534176
+      StandardDeviation       = 9.8990476941109
+      Variance                = 97.991145250281
+      TotalPixels             = 4432
+      ValidPixels             = 4432
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics6
+    Covariance       = 57.71256655005
+    Correlation      = 0.92993950854873
+    SumXY            = 100173144.34509
+    ValidPixels      = 4448
+    InvalidPixels    = 476032
+    TotalPixels      = 480480
+    LinearRegression = (6.1738665429179, 1.0751753295714)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 630282.70272064
+      SumSquare               = 89549918.423601
+      Minimum                 = 110.61294555664
+      Maximum                 = 165.94314575195
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 141.70024791381
+      StandardDeviation       = 7.3264830436221
+      Variance                = 53.677353788482
+      TotalPixels             = 4448
+      ValidPixels             = 4448
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 705125.77100372
+      SumSquare               = 112100190.27696
+      Minimum                 = 120.24077606201
+      Maximum                 = 188.01124572754
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 158.526477294
+      StandardDeviation       = 8.4707163730667
+      Variance                = 71.75303587294
+      TotalPixels             = 4448
+      ValidPixels             = 4448
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics7
+    Covariance       = 28.100386516238
+    Correlation      = 0.89512997359567
+    SumXY            = 102572054.06385
+    ValidPixels      = 4465
+    InvalidPixels    = 476015
+    TotalPixels      = 480480
+    LinearRegression = (3.7117545566744, 1.0248614558842)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 660041.12036133
+      SumSquare               = 97693344.649561
+      Minimum                 = 126.12147521973
+      Maximum                 = 165.51254272461
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 147.82555887152
+      StandardDeviation       = 5.2362885029408
+      Variance                = 27.41871728603
+      TotalPixels             = 4465
+      ValidPixels             = 4465
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 693023.68765259
+      SumSquare               = 107726365.94345
+      Minimum                 = 128.26933288574
+      Maximum                 = 176.23901367188
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 155.21247203865
+      StandardDeviation       = 5.9951855226083
+      Variance                = 35.942249450493
+      TotalPixels             = 4465
+      ValidPixels             = 4465
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics8
+    Covariance       = 0.13015495565393
+    Correlation      = 0.16021575436631
+    SumXY            = 35835245.338413
+    ValidPixels      = 4480
+    InvalidPixels    = 476000
+    TotalPixels      = 480480
+    LinearRegression = (62.661885664581, 0.22769069169763)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 425220.1627655
+      SumSquare               = 40362423.463222
+      Minimum                 = 92.879577636719
+      Maximum                 = 98.447807312012
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 94.915214903014
+      StandardDeviation       = 0.75606253143953
+      Variance                = 0.57163055144676
+      TotalPixels             = 4480
+      ValidPixels             = 4480
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 377543.92076111
+      SumSquare               = 31822004.083522
+      Minimum                 = 81.88591003418
+      Maximum                 = 89.096015930176
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 84.273196598462
+      StandardDeviation       = 1.0744786081143
+      Variance                = 1.1545042792952
+      TotalPixels             = 4480
+      ValidPixels             = 4480
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Group = File1
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (145.11282019614, 126.59251565681, 119.29053724794,
+                         128.4113739611, 133.84550078079, 141.70024791381,
+                         147.82555887152, 94.915214903014)
+    StandardDeviation = (8.1760711989964, 9.9541709680096, 9.0139064082983,
+                         7.8797612903655, 8.2375600060372, 7.3264830436221,
+                         5.2362885029408, 0.75606253143953)
+    Variance          = (66.848140251059, 99.085519660365, 81.250508737561,
+                         62.090637993142, 67.857394853063, 53.677353788482,
+                         27.41871728603, 0.57163055144676)
+  End_Group
+
+  Group = File2
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (167.66665713298, 160.45845177615, 149.15186500939,
+                         152.3319257886, 156.68380534176, 158.526477294,
+                         155.21247203865, 84.273196598462)
+    StandardDeviation = (11.094989612757, 13.385311359042, 11.702261159642,
+                         9.8134343253189, 9.8990476941109, 8.4707163730667,
+                         5.9951855226083, 1.0744786081143)
+    Variance          = (123.09879450719, 179.16656017849, 136.94291624847,
+                         96.303493257347, 97.991145250281, 71.75303587294,
+                         35.942249450493, 1.1545042792952)
+  End_Group
+End_Object
+
+Object = OverlapStatistics
+  File1           = I50695002EDR.proj.reduced.cub
+  File2           = I51718010EDR.crop.proj.reduced.cub
+  Width           = 455
+  Height          = 1056
+  Bands           = 8
+  SamplingPercent = 100.0
+  MinCount        = 1000
+  Valid           = true
+
+  Object = MultivariateStatistics1
+    Covariance       = 43.400099891708
+    Correlation      = 0.80489081926341
+    SumXY            = 35314269.314078
+    ValidPixels      = 2126
+    InvalidPixels    = 478354
+    TotalPixels      = 480480
+    LinearRegression = (33.037263782955, 0.63402813830779)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 292709.86418152
+      SumSquare               = 40446053.999565
+      Minimum                 = 106.90229797363
+      Maximum                 = 189.22164916992
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 137.68102736666
+      StandardDeviation       = 8.2735348075038
+      Variance                = 68.451378210977
+      TotalPixels             = 2126
+      ValidPixels             = 2126
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 255823.51305389
+      SumSquare               = 30873733.62899
+      Minimum                 = 104.40869140625
+      Maximum                 = 165.24783325195
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 120.33090924454
+      StandardDeviation       = 6.5172241323697
+      Variance                = 42.474210391543
+      TotalPixels             = 2126
+      ValidPixels             = 2126
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics2
+    Covariance       = 70.230704496853
+    Correlation      = 0.79583173523679
+    SumXY            = 26002053.518271
+    ValidPixels      = 2147
+    InvalidPixels    = 478333
+    TotalPixels      = 480480
+    LinearRegression = (16.911839130445, 0.67754040002841)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 260669.68933868
+      SumSquare               = 31870645.152801
+      Minimum                 = 82.713203430176
+      Maximum                 = 185.25100708008
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 121.41112684615
+      StandardDeviation       = 10.181128394007
+      Variance                = 103.65537537526
+      TotalPixels             = 2147
+      ValidPixels             = 2147
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 212923.96420288
+      SumSquare               = 21277493.336609
+      Minimum                 = 77.068977355957
+      Maximum                 = 159.97018432617
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 99.172782581686
+      StandardDeviation       = 8.6678194640783
+      Variance                = 75.131094261854
+      TotalPixels             = 2147
+      ValidPixels             = 2147
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics3
+    Covariance       = 56.99218827967
+    Correlation      = 0.76096629407854
+    SumXY            = 23722845.126688
+    ValidPixels      = 2166
+    InvalidPixels    = 478314
+    TotalPixels      = 480480
+    LinearRegression = (14.803733145345, 0.70378896798232)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 247681.02342987
+      SumSquare               = 28497521.647953
+      Minimum                 = 79.083854675293
+      Maximum                 = 169.75425720215
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 114.34950296855
+      StandardDeviation       = 8.9988381083851
+      Variance                = 80.979087300924
+      TotalPixels             = 2166
+      ValidPixels             = 2166
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 206380.05786133
+      SumSquare               = 19814196.068522
+      Minimum                 = 71.318603515625
+      Maximum                 = 154.14715576172
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 95.281651828868
+      StandardDeviation       = 8.3226852945038
+      Variance                = 69.26709051135
+      TotalPixels             = 2166
+      ValidPixels             = 2166
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics4
+    Covariance       = 41.756823620181
+    Correlation      = 0.7764494746795
+    SumXY            = 28108770.791476
+    ValidPixels      = 2185
+    InvalidPixels    = 478295
+    TotalPixels      = 480480
+    LinearRegression = (14.473816316902, 0.73170118364626)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 268445.8769989
+      SumSquare               = 33105501.286815
+      Minimum                 = 92.835327148438
+      Maximum                 = 167.43511962891
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 122.85852494229
+      StandardDeviation       = 7.5543455912928
+      Variance                = 57.068137312686
+      TotalPixels             = 2185
+      ValidPixels             = 2185
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 228047.45459747
+      SumSquare               = 23911893.609295
+      Minimum                 = 84.31657409668
+      Maximum                 = 155.94357299805
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 104.3695444382
+      StandardDeviation       = 7.1189739848864
+      Variance                = 50.67979059749
+      TotalPixels             = 2185
+      ValidPixels             = 2185
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics5
+    Covariance       = 42.693677767494
+    Correlation      = 0.7739205480564
+    SumXY            = 29364882.569686
+    ValidPixels      = 2205
+    InvalidPixels    = 478275
+    TotalPixels      = 480480
+    LinearRegression = (15.612890894243, 0.70335575715136)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 279438.18222046
+      SumSquare               = 35546797.569771
+      Minimum                 = 90.885292053223
+      Maximum                 = 172.12882995605
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 126.72933434034
+      StandardDeviation       = 7.7910189493179
+      Variance                = 60.69997626863
+      TotalPixels             = 2205
+      ValidPixels             = 2205
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 230970.87865448
+      SumSquare               = 24304397.540818
+      Minimum                 = 84.808082580566
+      Maximum                 = 156.47286987305
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 104.74869780249
+      StandardDeviation       = 7.0806467741945
+      Variance                = 50.135558740911
+      TotalPixels             = 2205
+      ValidPixels             = 2205
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics6
+    Covariance       = 31.040668161424
+    Correlation      = 0.7797096440689
+    SumXY            = 33566227.852118
+    ValidPixels      = 2222
+    InvalidPixels    = 478258
+    TotalPixels      = 480480
+    LinearRegression = (18.580088317668, 0.70327189941749)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 297292.72133636
+      SumSquare               = 39874340.005218
+      Minimum                 = 102.31094360352
+      Maximum                 = 172.54302978516
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 133.79510411178
+      StandardDeviation       = 6.6436064516425
+      Variance                = 44.137506684306
+      TotalPixels             = 2222
+      ValidPixels             = 2222
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 250362.57305908
+      SumSquare               = 28289210.212539
+      Minimum                 = 95.694808959961
+      Maximum                 = 155.61401367188
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 112.67442531912
+      StandardDeviation       = 5.9923097832249
+      Variance                = 35.907776538133
+      TotalPixels             = 2222
+      ValidPixels             = 2222
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics7
+    Covariance       = 15.462307916124
+    Correlation      = 0.76186229539065
+    SumXY            = 39329594.827206
+    ValidPixels      = 2238
+    InvalidPixels    = 478242
+    TotalPixels      = 480480
+    LinearRegression = (29.500020698883, 0.68036085944527)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 314264.97119141
+      SumSquare               = 44180630.403455
+      Minimum                 = 116.45135498047
+      Maximum                 = 167.86575317383
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 140.42223913825
+      StandardDeviation       = 4.7672452888374
+      Variance                = 22.726627643942
+      TotalPixels             = 2238
+      ValidPixels             = 2238
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 279834.63221741
+      SumSquare               = 35030455.261137
+      Minimum                 = 112.22162628174
+      Maximum                 = 155.1382598877
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 125.0378160042
+      StandardDeviation       = 4.2572616095097
+      Variance                = 18.124276411805
+      TotalPixels             = 2238
+      ValidPixels             = 2238
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics8
+    Covariance       = -0.37429627719126
+    Correlation      = -0.57975465924031
+    SumXY            = 17360168.600169
+    ValidPixels      = 2255
+    InvalidPixels    = 478225
+    TotalPixels      = 480480
+    LinearRegression = (164.73162173962, -0.88065796356315)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 205763.06560516
+      SumSquare               = 18776319.042368
+      Minimum                 = 89.698654174805
+      Maximum                 = 94.125427246094
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 91.247479204064
+      StandardDeviation       = 0.65193473446413
+      Variance                = 0.42501889800081
+      TotalPixels             = 2255
+      ValidPixels             = 2255
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 190262.92469025
+      SumSquare               = 16055416.923486
+      Minimum                 = 82.693717956543
+      Maximum                 = 88.860275268555
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 84.373802523391
+      StandardDeviation       = 0.99030082204889
+      Variance                = 0.9806957181507
+      TotalPixels             = 2255
+      ValidPixels             = 2255
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Group = File1
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (137.68102736666, 121.41112684615, 114.34950296855,
+                         122.85852494229, 126.72933434034, 133.79510411178,
+                         140.42223913825, 91.247479204064)
+    StandardDeviation = (8.2735348075038, 10.181128394007, 8.9988381083851,
+                         7.5543455912928, 7.7910189493179, 6.6436064516425,
+                         4.7672452888374, 0.65193473446413)
+    Variance          = (68.451378210977, 103.65537537526, 80.979087300924,
+                         57.068137312686, 60.69997626863, 44.137506684306,
+                         22.726627643942, 0.42501889800081)
+  End_Group
+
+  Group = File2
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (120.33090924454, 99.172782581686, 95.281651828868,
+                         104.3695444382, 104.74869780249, 112.67442531912,
+                         125.0378160042, 84.373802523391)
+    StandardDeviation = (6.5172241323697, 8.6678194640783, 8.3226852945038,
+                         7.1189739848864, 7.0806467741945, 5.9923097832249,
+                         4.2572616095097, 0.99030082204889)
+    Variance          = (42.474210391543, 75.131094261854, 69.26709051135,
+                         50.67979059749, 50.135558740911, 35.907776538133,
+                         18.124276411805, 0.9806957181507)
+  End_Group
+End_Object
+
+Object = OverlapStatistics
+  File1           = I50695002EDR.proj.reduced.cub
+  File2           = I56969027EDR.proj.reduced.cub
+  Width           = 455
+  Height          = 1056
+  Bands           = 8
+  SamplingPercent = 100.0
+  MinCount        = 1000
+  Valid           = true
+
+  Object = MultivariateStatistics1
+    Covariance       = 1.5161379839899
+    Correlation      = 0.063081188139032
+    SumXY            = 235980153.72934
+    ValidPixels      = 21314
+    InvalidPixels    = 459166
+    TotalPixels      = 480480
+    LinearRegression = (74.849413905079, 0.013825201489539)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3070592.8179932
+      SumSquare               = 444701002.44525
+      Minimum                 = 99.070419311523
+      Maximum                 = 184.55192565918
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 144.06459688436
+      StandardDeviation       = 10.472096351833
+      Variance                = 109.66480200207
+      TotalPixels             = 21314
+      ValidPixels             = 21314
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 1637791.972374
+      SumSquare               = 125962063.42244
+      Minimum                 = 71.817962646484
+      Maximum                 = 86.991554260254
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 76.841135984515
+      StandardDeviation       = 2.2951191369913
+      Variance                = 5.2675718529839
+      TotalPixels             = 21314
+      ValidPixels             = 21314
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics2
+    Covariance       = 6.4202437984185
+    Correlation      = 0.17845760176564
+    SumXY            = 89533927.505043
+    ValidPixels      = 21355
+    InvalidPixels    = 459125
+    TotalPixels      = 480480
+    LinearRegression = (26.965693725701, 0.04018336044637)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 2777055.0975571
+      SumSquare               = 364546671.11459
+      Minimum                 = 75.036109924316
+      Maximum                 = 180.46446228027
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 130.04238340234
+      StandardDeviation       = 12.640161809877
+      Variance                = 159.77369057988
+      TotalPixels             = 21355
+      ValidPixels             = 21355
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 687443.79547691
+      SumSquare               = 22302648.256738
+      Minimum                 = 25.984279632568
+      Maximum                 = 51.636016845703
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 32.191233691263
+      StandardDeviation       = 2.8461896443829
+      Variance                = 8.1007954917925
+      TotalPixels             = 21355
+      ValidPixels             = 21355
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics3
+    Covariance       = 6.4003777613369
+    Correlation      = 0.18305745800242
+    SumXY            = 64331186.835706
+    ValidPixels      = 21401
+    InvalidPixels    = 459079
+    TotalPixels      = 480480
+    LinearRegression = (18.2920855118, 0.050948564172956)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 2617631.2018509
+      SumSquare               = 322859992.62421
+      Minimum                 = 70.915832519531
+      Maximum                 = 169.38500976562
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 122.31349945567
+      StandardDeviation       = 11.208224703451
+      Variance                = 125.62430100305
+      TotalPixels             = 21401
+      ValidPixels             = 21401
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 524833.47330666
+      SumSquare               = 13079147.954402
+      Minimum                 = 17.494136810303
+      Maximum                 = 41.469856262207
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 24.523782688036
+      StandardDeviation       = 3.1194738624699
+      Variance                = 9.7311171786327
+      TotalPixels             = 21401
+      ValidPixels             = 21401
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics4
+    Covariance       = 8.0089647947633
+    Correlation      = 0.258841967604
+    SumXY            = 107306850.53625
+    ValidPixels      = 21444
+    InvalidPixels    = 459036
+    TotalPixels      = 480480
+    LinearRegression = (27.690913139513, 0.083404841598791)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 2781932.9336472
+      SumSquare               = 362959592.3975
+      Minimum                 = 83.261329650879
+      Maximum                 = 169.49851989746
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 129.73013120906
+      StandardDeviation       = 9.7992437672397
+      Variance                = 96.025178409786
+      TotalPixels             = 21444
+      ValidPixels             = 21444
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 825830.617033
+      SumSquare               = 32017379.360033
+      Minimum                 = 31.257295608521
+      Maximum                 = 51.452171325684
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 38.511034183595
+      StandardDeviation       = 3.1575419618386
+      Variance                = 9.9700712407718
+      TotalPixels             = 21444
+      ValidPixels             = 21444
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics5
+    Covariance       = 8.2552037610959
+    Correlation      = 0.23976611326109
+    SumXY            = 105334207.00233
+    ValidPixels      = 21489
+    InvalidPixels    = 458991
+    TotalPixels      = 480480
+    LinearRegression = (25.600090019378, 0.081384922274071)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 2880323.1105118
+      SumSquare               = 388249754.4438
+      Minimum                 = 86.48461151123
+      Maximum                 = 174.7103729248
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 134.03709388579
+      StandardDeviation       = 10.071448170829
+      Variance                = 101.4340682577
+      TotalPixels             = 21489
+      ValidPixels             = 21489
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 784535.20689964
+      SumSquare               = 28893477.741962
+      Minimum                 = 28.699256896973
+      Maximum                 = 53.932773590088
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 36.508688487116
+      StandardDeviation       = 3.4185982974071
+      Variance                = 11.686814319034
+      TotalPixels             = 21489
+      ValidPixels             = 21489
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics6
+    Covariance       = 9.4023924856841
+    Correlation      = 0.32663969663927
+    SumXY            = 170678124.72249
+    ValidPixels      = 21527
+    InvalidPixels    = 458953
+    TotalPixels      = 480480
+    LinearRegression = (40.072602107186, 0.11903765729952)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3006695.5761261
+      SumSquare               = 421648160.60401
+      Minimum                 = 97.273017883301
+      Maximum                 = 174.14642333984
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 139.67090519469
+      StandardDeviation       = 8.8874465614926
+      Variance                = 78.986706383387
+      TotalPixels             = 21527
+      ValidPixels             = 21527
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 1220552.9031563
+      SumSquare               = 69429574.816453
+      Minimum                 = 49.211544036865
+      Maximum                 = 69.359649658203
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 56.698699454466
+      StandardDeviation       = 3.2388617456475
+      Variance                = 10.490225407419
+      TotalPixels             = 21527
+      ValidPixels             = 21527
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics7
+    Covariance       = 5.0264681939792
+    Correlation      = 0.3213308406036
+    SumXY            = 272048315.65235
+    ValidPixels      = 21574
+    InvalidPixels    = 458906
+    TotalPixels      = 480480
+    LinearRegression = (68.250604464213, 0.13429664048255)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 3105065.9141922
+      SumSquare               = 447708072.90078
+      Minimum                 = 113.84817504883
+      Maximum                 = 168.92919921875
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 143.92629619877
+      StandardDeviation       = 6.1178509933549
+      Variance                = 37.428100776893
+      TotalPixels             = 21574
+      ValidPixels             = 21574
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 1889438.4614639
+      SumSquare               = 165616966.5869
+      Minimum                 = 81.679397583008
+      Maximum                 = 99.097854614258
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 87.579422520809
+      StandardDeviation       = 2.556887579907
+      Variance                = 6.5376740962826
+      TotalPixels             = 21574
+      ValidPixels             = 21574
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Object = MultivariateStatistics8
+    Covariance       = -1.2952923861968
+    Correlation      = -0.60135987988766
+    SumXY            = 189933830.15247
+    ValidPixels      = 21616
+    InvalidPixels    = 458864
+    TotalPixels      = 480480
+    LinearRegression = (144.74726226149, -0.50800681071033)
+    ValidOverlap     = true
+
+    Group = XStatistics
+      Sum                     = 1896077.6331253
+      SumSquare               = 166372210.95397
+      Minimum                 = 83.287322998047
+      Maximum                 = 93.383140563965
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 87.716396795212
+      StandardDeviation       = 1.59679490777
+      Variance                = 2.5497539774803
+      TotalPixels             = 21616
+      ValidPixels             = 21616
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+
+    Group = YStatistics
+      Sum                     = 2165636.46978
+      SumSquare               = 217007377.68376
+      Minimum                 = 96.662147521973
+      Maximum                 = 103.22777557373
+      ValidMinimum            = -1.79769313486231e+308
+      ValidMaximum            = 1.79769313486232e+308
+      Average                 = 100.1867352785
+      StandardDeviation       = 1.3489138793346
+      Variance                = 1.8195686538614
+      TotalPixels             = 21616
+      ValidPixels             = 21616
+      OverValidMaximumPixels  = 0
+      UnderValidMinimumPixels = 0
+      NullPixels              = 0
+      LisPixels               = 0
+      LrsPixels               = 0
+      HisPixels               = 0
+      HrsPixels               = 0
+    End_Group
+  End_Object
+
+  Group = File1
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (144.06459688436, 130.04238340234, 122.31349945567,
+                         129.73013120906, 134.03709388579, 139.67090519469,
+                         143.92629619877, 87.716396795212)
+    StandardDeviation = (10.472096351833, 12.640161809877, 11.208224703451,
+                         9.7992437672397, 10.071448170829, 8.8874465614926,
+                         6.1178509933549, 1.59679490777)
+    Variance          = (109.66480200207, 159.77369057988, 125.62430100305,
+                         96.025178409786, 101.4340682577, 78.986706383387,
+                         37.428100776893, 2.5497539774803)
+  End_Group
+
+  Group = File2
+    StartSample       = 1
+    EndSample         = 455
+    StartLine         = 1
+    EndLine           = 1056
+    Average           = (76.841135984515, 32.191233691263, 24.523782688036,
+                         38.511034183595, 36.508688487116, 56.698699454466,
+                         87.579422520809, 100.1867352785)
+    StandardDeviation = (2.2951191369913, 2.8461896443829, 3.1194738624699,
+                         3.1575419618386, 3.4185982974071, 3.2388617456475,
+                         2.556887579907, 1.3489138793346)
+    Variance          = (5.2675718529839, 8.1007954917925, 9.7311171786327,
+                         9.9700712407718, 11.686814319034, 10.490225407419,
+                         6.5376740962826, 1.8195686538614)
+  End_Group
+End_Object

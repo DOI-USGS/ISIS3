@@ -208,6 +208,8 @@ namespace Isis {
       double IncidenceAngle() const;
 
       void LookDirection(double v[3]) const;
+      std::vector<double> lookDirectionJ2000() const;
+      std::vector<double> lookDirectionBodyFixed() const;
 
       double RightAscension();
       double Declination();

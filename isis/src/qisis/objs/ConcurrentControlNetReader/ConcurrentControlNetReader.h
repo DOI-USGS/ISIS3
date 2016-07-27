@@ -66,11 +66,9 @@ namespace Isis {
     signals:
       void networksReady(QList<Control *>);
 
-
     private:
       void nullify();
       void start();
-
 
     private slots:
       void updateProgressValue();

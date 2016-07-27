@@ -289,13 +289,13 @@ int main(int argc, char *argv[]) {
     copySettings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    qXmlFile.remove();
     // read xml    
     qDebug() << "Testing XML: read XML to BundleSettings object...";
     BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);
     //BundleSettings bsFromXml(xmlFile, project, &reader);
     pvl = bsFromXml2.pvlObject("BundleSettingsFromXml");
     cout << pvl << endl << endl;
+    qXmlFile.remove();
 
 
     qDebug() << "Testing error throws..."; // ??? weird error if i move this after read from empty???

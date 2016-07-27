@@ -28,12 +28,15 @@
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "Target.h"
+#include "QString"
 
 namespace Isis {
+  
   /**
    * Create a blank Latitude object without Planetographic support.
    */
   Latitude::Latitude() : Angle() {
+    
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -44,15 +47,17 @@ namespace Isis {
   /**
    * Create and initialize a Latitude value without planetographic support.
    *
-   * @see ErrorChecking
-   * @see CoordinateType
    * @param latitude The latitude value this instance will represent,
    *     in the planetocentric coordinate system
    * @param latitudeUnits The angular units of the latitude value (degs, rads)
    * @param errors Error checking conditions
+   * 
+   * @see ErrorChecking
+   * @see CoordinateType
    */
   Latitude::Latitude(double latitude, Angle::Units latitudeUnits,
                      ErrorChecking errors) : Angle() {
+
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -70,6 +75,7 @@ namespace Isis {
    * @param errors Error checking conditions
    */
   Latitude::Latitude(Angle latitude, ErrorChecking errors) : Angle() {
+    
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -80,35 +86,39 @@ namespace Isis {
 
 
   /**
-   * Create and initialize a Latitude value using the mapping group's latitude
+   * Create and initialize a latitude value using the mapping group's latitude
    * units and radii.
    *
-   * @see ErrorChecking
-   * @see CoordinateType
    * @param latitude The latitude value this instance will represent,
    *     in the mapping group's units
    * @param mapping A mapping group
-   * @param latitudeUnits The angular units of the latitude value (degs, rads)
    * @param errors Error checking conditions
+   * 
+   * @throws IException::Unknown "Unable to create Latitude object from given mapping group."
+   * @throws IException::Programmer "Latitude type is not recognized"
+   * 
+   * @see ErrorChecking
+   * @see CoordinateType
    */
   Latitude::Latitude(Angle latitude, PvlGroup mapping,
-            ErrorChecking errors) : Angle(latitude) {
+                     ErrorChecking errors) : Angle(latitude) {
+    
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
-          Distance::Meters);
+                                        Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
-          Distance::Meters);
+                                   Distance::Meters);
     }
     else {
       try {
         PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-            Distance::Meters);
+                                          Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
-            Distance::Meters);
+                                     Distance::Meters);
       }
       catch (IException &e) {
         QString msg = "Unable to create Latitude object from given mapping group.";
@@ -133,37 +143,42 @@ namespace Isis {
 
 
   /**
-   * Create and initialize a Latitude value using the mapping group's latitude
-   * units and radii.
+   * Create and initialize a latitude value using the latitude units and the
+   * mapping group's radii.
    *
-   * @see ErrorChecking
-   * @see CoordinateType
    * @param latitude The latitude value this instance will represent,
    *     in the mapping group's units
    * @param mapping A mapping group
    * @param latitudeUnits The angular units of the latitude value (degs, rads)
    * @param errors Error checking conditions
+   * 
+   * @throws IException::Unknown "Unable to create Latitude object from given mapping group."
+   * @throws IException::Programmer "Latitude type is not recognized"
+   *
+   * @see ErrorChecking
+   * @see CoordinateType
    */
   Latitude::Latitude(double latitude,
-            PvlGroup mapping,
-            Angle::Units latitudeUnits,
-            ErrorChecking errors) : Angle(latitude, latitudeUnits) {
+                     PvlGroup mapping,
+                     Angle::Units latitudeUnits,
+                     ErrorChecking errors) : Angle(latitude, latitudeUnits) {
+
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
-          Distance::Meters);
+                                        Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
-          Distance::Meters);
+                                   Distance::Meters);
     }
     else {
       try {
         PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-            Distance::Meters);
+                                          Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
-            Distance::Meters);
+                                     Distance::Meters);
       }
       catch (IException &e) {
         QString msg = "Unable to create Latitude object from given mapping group.";
@@ -180,7 +195,7 @@ namespace Isis {
       setPlanetocentric(latitude, latitudeUnits);
     }
     else {
-      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
+      QString msg = "Latitude type [" + mapping["LatitudeType"][0] +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -190,8 +205,6 @@ namespace Isis {
   /**
    * Create and initialize a Latitude value with planetographic support.
    *
-   * @see ErrorChecking
-   * @see CoordinateType
    * @param latitude The latitude value this instance will represent,
    *     in planetocentric
    * @param equatorialRadius Radius of the target (planet) at the equator
@@ -199,12 +212,18 @@ namespace Isis {
    * @param latType The coordinate system of the latitude parameter
    * @param latitudeUnits The angular units of the latitude value (degs, rads)
    * @param errors Error checking conditions
+   * 
+   * @throws IException::Programmer "Enumeration value [latType] is not a valid CoordinateType"
+   *
+   * @see ErrorChecking
+   * @see CoordinateType
    */
   Latitude::Latitude(double latitude,
                      Distance equatorialRadius, Distance polarRadius,
                      CoordinateType latType,
                      Angle::Units latitudeUnits,
                      ErrorChecking errors) : Angle(latitude, latitudeUnits) {
+    
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -220,8 +239,7 @@ namespace Isis {
       setPlanetographic(latitude, latitudeUnits);
     }
     else {
-      IString msg = "Enumeration value [" + IString(latType) + "] is not a "
-        "valid CoordinateType";
+      QString msg = "Enumeration value [" + toString(latType) + "] is not a valid CoordinateType";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -233,6 +251,7 @@ namespace Isis {
    * @param latitudeToCopy The latitude we're duplicating
    */
   Latitude::Latitude(const Latitude &latitudeToCopy) : Angle(latitudeToCopy) {
+    
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -266,9 +285,11 @@ namespace Isis {
 
   /**
    * Get the latitude in the planetocentric (universal) coordinate system.
+   * 
+   * @param units The angular units to get the latitude in
    *
    * @see CoordinateType
-   * @param units The angular units to get the latitude in
+   * 
    * @return The Planetocentric latitude value
    */
   double Latitude::planetocentric(Angle::Units units) const {
@@ -288,31 +309,40 @@ namespace Isis {
 
 
   /**
-   * Get the latitude in the planetographic coordinate system. If this instance
-   *   was not constructed with the planetary radii, then an exception will be
-   *   thrown.
+   * Get the latitude in the planetographic coordinate system. If this instance was 
+   *   not constructed with the planetary radii, then an exception will be thrown.
    *
-   * @see CoordinateType
    * @param units The angular units to get the latitude in
+   * 
+   * @throws IException::Programmer "The latitude cannot be converted to Planetographic 
+   *     without the planetary radii, please use the other Latitude constructor"
+   * @throws IException::Programmer "Latitudes outside of the -90/90 range cannot be 
+   *     converted between Planetographic and Planetocentric"
+   * @throws IException::Programmer "Invalid planetographic latitudes are not currently 
+   *     supported"
+   * 
+   * @see CoordinateType
+   *
    * @return The Planetographic latitude value
    */
   double Latitude::planetographic(Angle::Units units) const {
+    
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      IString msg = "Latitude [" + IString(degrees()) + " degrees] cannot "
+      QString msg = "Latitude [" + toString(degrees()) + " degrees] cannot "
           "be converted to Planetographic without the planetary radii, please "
-          "use the other Latitude constructor";
+          "use the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (*this > Angle(90.0, Angle::Degrees) ||
         *this < Angle(-90.0, Angle::Degrees)) {
-      IString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      QString msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (!isValid()) {
-      IString msg = "Invalid planetographic latitudes are not currently "
+      QString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -332,12 +362,20 @@ namespace Isis {
    *
    * @param latitude The planetographic latitude to set ourselves to
    * @param units The angular units latitude is in
+   * 
+   * @throws IException::Programmer "The latitude cannot be converted to Planetographic 
+   *     without the planetary radii, please use the other Latitude constructor"
+   * @throws IException::Programmer "Latitudes outside of the -90/90 range cannot be 
+   *     converted between Planetographic and Planetocentric"
+   * @throws IException::Programmer "Invalid planetographic latitudes are not currently 
+   *     supported"
    */
   void Latitude::setPlanetographic(double latitude, Angle::Units units) {
+    
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      IString msg = "Latitude [" + IString(latitude) + "] cannot be "
+      QString msg = "Latitude [" + Isis::toString(latitude) + "] cannot be "
           "converted to Planetocentic without the planetary radii, please use "
-          "the other Latitude constructor";
+          "the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -345,13 +383,13 @@ namespace Isis {
 
     if (inputAngle > Angle(90.0, Angle::Degrees) ||
         inputAngle < Angle(-90.0, Angle::Degrees)) {
-      IString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      QString msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (IsSpecial(latitude)) {
-      IString msg = "Invalid planetographic latitudes are not currently "
+      QString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -377,15 +415,19 @@ namespace Isis {
    *
    * @param min The beginning of the valid latitude range
    * @param max The end of the valid latitude range
+   * 
+   * @throws IException::User "The minimum latitude degrees is greater 
+   *     than the maximum latitude degrees"
    *
    * @return Whether the latitude is in the given range
    */
   bool Latitude::inRange(Latitude min, Latitude max) const {
+    
     // Validity check on the range
     if (min > max) {
-      IString msg = "Minimum latitude [" + IString(min.degrees()) +
-        "] degrees is greater than maximum latitude [" +
-        IString(max.degrees()) + "] degrees";
+      QString msg = "Minimum latitude [" + toString(min.degrees()) + 
+                    "] degrees is greater than maximum latitude [" + 
+                    toString(max.degrees()) + "] degrees";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -400,13 +442,15 @@ namespace Isis {
 
 
   /**
-    * This assigns another latitude to this one - making this latitude an
-    *   exact duplicate of the other.
-    *
-    * @param latitudeToCopy The latitude we are assigning from
-    * @return The result, a reference to this
-    */
+   * This assigns another latitude to this one - making this latitude an
+   *   exact duplicate of the other.
+   *
+   * @param latitudeToCopy The latitude we are assigning from
+   * 
+   * @return A reference to the dublicate latitude
+   */
   Latitude& Latitude::operator=(const Latitude & latitudeToCopy) {
+    
     if (this == &latitudeToCopy) return *this;
 
     m_equatorialRadius = NULL;
@@ -429,13 +473,18 @@ namespace Isis {
   
 
   /**
-    * Adds an angle to this latitude. The adding method is determined by the
-    *   latitude type.
-    *
-    * @param angleToAdd the latitude being added to this one
-    * @param mapping the mapping group from a projection
-    * @return The result
-    */
+   * Adds an angle to this latitude. The adding method is determined by the
+   *   latitude type.
+   *
+   * @param angleToAdd the latitude being added to this one
+   * @param mapping the mapping group from a projection
+   * 
+   * @throws IException::Unknown "Unable to add angle to Latitude object 
+   *     from given mapping group."
+   * @throws IException::Programmer "Latitude type is not recognized"
+   * 
+   * @return The result of adding an angle to the latitude
+   */
   Latitude Latitude::add(Angle angleToAdd, PvlGroup mapping) {
 
     CoordinateType latType;
@@ -444,17 +493,17 @@ namespace Isis {
     Distance polarRadius;
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       equatorialRadius = Distance(toDouble(mapping["EquatorialRadius"][0]),
-          Distance::Meters);
+                                  Distance::Meters);
       polarRadius = Distance(toDouble(mapping["PolarRadius"][0]),
-          Distance::Meters);
+                             Distance::Meters);
     }
     else {
       try {
         PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
         equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-            Distance::Meters);
+                                    Distance::Meters);
         polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),
-            Distance::Meters);
+                               Distance::Meters);
       }
       catch (IException &e) {
         QString msg = "Unable to add angle to Latitude object from given mapping group.";
@@ -467,8 +516,7 @@ namespace Isis {
     else if (mapping["LatitudeType"][0] == "Planetographic")
       latType = Planetographic;
     else {
-      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
-        "] is not recognized";
+      QString msg = "Latitude type [" + mapping["LatitudeType"][0] + "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -477,14 +525,15 @@ namespace Isis {
 
   
   /**
-    * Adds another latitude to this one. Handles planetographic latitudes.
-    *
-    * @param angleToAdd the latitude being added to this one
-    * @param equatorialRadius
-    * @param polarRadius
-    * @param latType
-    * @return The result
-    */
+   * Adds another latitude to this one. Handles planetographic latitudes.
+   *
+   * @param angleToAdd the latitude being added to this one
+   * @param equatorialRadius Radius of the target (planet) at the equator
+   * @param polarRadius Radius of the target (planet) at the poles
+   * @param latType Planetocentric or Planetographic
+   * 
+   * @return The result of adding another latitude
+   */
   Latitude Latitude::add(Angle angleToAdd, Distance equatorialRadius, Distance polarRadius,
                          CoordinateType latType) {
     Latitude result;
@@ -504,21 +553,25 @@ namespace Isis {
     return result;
   }
 
- 
+
   /**
    * We're overriding this method in order to do -90/90 degree checking
    *
    * @param angle The numeric value of the angle
-   * @param units The units angle is in (radians or degrees typically)
+   * @param units The units the angle is in (radians or degrees typically)
+   * 
+   * @throws IException::Programmer "Latitudes past 90 degrees are not valid. 
+   *     The latitude is not allowed"
    */
   void Latitude::setAngle(double angle, const Angle::Units &units) {
+    
     // Check for passing 90 degrees if that error checking is on
     if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
       if (tmpAngle > Angle(90, Angle::Degrees) ||
-         tmpAngle < Angle(-90, Angle::Degrees)) {
-        IString msg = "Latitudes past 90 degrees are not valid. The latitude "
-            "[" + IString(tmpAngle.degrees()) + " degrees] is not allowed";
+          tmpAngle < Angle(-90, Angle::Degrees)) {
+        QString msg = "Latitudes past 90 degrees are not valid. The latitude [" 
+                      + toString(tmpAngle.degrees()) + " degrees] is not allowed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }

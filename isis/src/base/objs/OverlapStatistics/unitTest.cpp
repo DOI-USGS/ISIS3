@@ -3,6 +3,7 @@
 #include "Cube.h"
 #include "OverlapStatistics.h"
 #include "Preference.h"
+#include "PvlObject.h"
 
 using namespace Isis;
 using namespace std;
@@ -39,6 +40,29 @@ int main(int argc, char *argv[]) {
     cout << "    End Sample = " << oStats.EndSampleY() << endl;
     cout << "    Start Line = " << oStats.StartLineY() << endl;
     cout << "    End Line = " << oStats.EndLineY() << endl << endl;
+
+
+    cout << endl << "Testing Pvl serialization methods..." << endl;
+    PvlObject toStats = oStats.toPvl();
+    OverlapStatistics fromStats(toStats);
+    cout << "Has Overlap? = " << fromStats.HasOverlap() << endl << endl;
+    cout << "Overlap Dimensions: " << endl;
+    cout << "  Samples = " << fromStats.Samples() << endl;
+    cout << "  Lines = " << fromStats.Lines() << endl;
+    cout << "  Bands = " << fromStats.Bands() << endl << endl;
+
+    cout << "Overlap Areas:" << endl;
+    cout << "  Filename = " << FileName(fromStats.FileNameX()).name() << endl;
+    cout << "    Start Sample = " << fromStats.StartSampleX() << endl;
+    cout << "    End Sample = " << fromStats.EndSampleX() << endl;
+    cout << "    Start Line = " << fromStats.StartLineX() << endl;
+    cout << "    End Line = " << fromStats.EndLineX() << endl << endl;
+
+    cout << "  Filename = " << FileName(fromStats.FileNameY()).name() << endl;
+    cout << "    Start Sample = " << fromStats.StartSampleY() << endl;
+    cout << "    End Sample = " << fromStats.EndSampleY() << endl;
+    cout << "    Start Line = " << fromStats.StartLineY() << endl;
+    cout << "    End Line = " << fromStats.EndLineY() << endl << endl;
   }
   catch(IException &e) {
     e.print();

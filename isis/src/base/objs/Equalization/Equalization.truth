@@ -1,8 +1,67 @@
-UnitTest for Equalization
-Create object without fromlist file.
-Create object using fromlist file.
-     Add hold list...
+Create object using fromlist file (non-overlapping)
      Calculate statistics for contrast and brightness using QRD method...
+Calculating Statistics for Band 1 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 1 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 2 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 2 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 3 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 3 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 4 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 4 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 5 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 5 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 6 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 6 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 7 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 7 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 8 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 8 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 9 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 9 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 10 of 10 in Cube 1 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Calculating Statistics for Band 10 of 10 in Cube 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering Overlap Statisitcs for Cube 1 vs 2 of 2
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+**USER ERROR** There are input images that do not overlap with enough valid pixels. See application log or "NonOverlaps" keyword in output statistics file.
+Results:
+Group = General
+  TotalOverlaps   = 0
+  ValidOverlaps   = 0
+  InvalidOverlaps = 0
+  MinCount        = 1000
+  SamplingPercent = 100.0
+  Weighted        = false
+  SolutionType    = 2
+  SolveMethod     = 1
+  NonOverlaps     = (/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev-
+                     2.cub,
+                     /usgs/cpkgs/isis3/data/odyssey/testData/I02609002RDR.lev2-
+                     .cub)
+  HasCorrections  = false
+End_Group
+     Write results to file...
+     Add hold list...
+     Recalculating the statistics with all overlapping files now...
 Calculating Statistics for Band 1 of 10 in Cube 1 of 3
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Calculating Statistics for Band 1 of 10 in Cube 2 of 3
@@ -70,12 +129,17 @@ Gathering Overlap Statisitcs for Cube 1 vs 3 of 3
 Gathering Overlap Statisitcs for Cube 2 vs 3 of 3
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Results:
-Group = Results
+Group = General
   TotalOverlaps   = 20
   ValidOverlaps   = 20
   InvalidOverlaps = 0
-  Weighted        = false
   MinCount        = 1000
+  SamplingPercent = 100.0
+  Weighted        = false
+  SolutionType    = 2
+  SolveMethod     = 1
+  NonOverlaps     = Null
+  HasCorrections  = true
   FileName        = /usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2-
                     .cub
   Band1           = (0.80247733802282, -6.41865351231352e-05,
@@ -8599,3 +8663,27 @@ sample 28, line 7178: 5.17278677e-05 => 0.0001054392
 sample 29, line 7179: 5.41724548e-05 => 0.00011055218
 sample 30, line 7180: 4.99482994e-05 => 0.000101717141
 100% Processed
+
+Testing addHolds exception (1)...
+**USER ERROR** The list of identifiers to be held must be less than or equal to the total number of identitifers.
+
+Testing addHolds exception (2)...
+**USER ERROR** The hold list file [fileDNE.cub] does not match a file in the from list.
+
+Testing applyCorrection exception ...
+**USER ERROR** Corrective factors have not yet been determined. Add more images to create more overlaps and recalculate, or try another solve method.
+
+Testing loadInputs exception ...
+**USER ERROR** The input file [HoldList.lst] must contain at least 2 file names.
+
+Testing errorCheck exception (1)...
+**USER ERROR** Number of bands do not match between cubes [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] and [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub].
+
+Testing errorCheck exception (2)...
+**USER ERROR** Mapping groups do not match between cubes [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] and [/usgs/cpkgs/isis3/data/odyssey/testData/I56632006EDR.lev2.cub].
+
+Testing validateInputStatistics exception (1)...
+**USER ERROR** Each input file in the FROM LIST must have a corresponding input file in the INPUT STATISTICS.
+
+Testing validateInputStatistics exception (2)...
+**USER ERROR** The from list file [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] does not have any corresponding file in the stats list.

@@ -438,6 +438,7 @@ namespace Isis {
    * Return false if not handled, true if handled.
    */
   bool MosaicSceneWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+
     bool handled = false;
     QList<QGraphicsItem *> selectedGraphicsItems = getScene()->selectedItems();
     QList<MosaicSceneItem *> selectedImageItems;
@@ -487,6 +488,7 @@ namespace Isis {
     }
 
     return handled;
+
   }
 
 
@@ -819,7 +821,6 @@ namespace Isis {
    */
   QList<QAction *> MosaicSceneWidget::supportedActions(ImageList *images) {
     QList<QAction *> results;
-
     //qDebug()<<"MosaicSceneWidget::supportedActions(ImageList *images)";
     bool allImagesInView = !images->isEmpty();
 
@@ -855,7 +856,6 @@ namespace Isis {
       connect(zoomFitAct, SIGNAL(triggered()), this, SLOT(fitInView()));
       results.append(zoomFitAct);
     }
-
     return results;
   }
 
@@ -2137,6 +2137,7 @@ namespace Isis {
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
 
+    /*
     m_characterData = "";
 
     if (result) {
@@ -2155,7 +2156,7 @@ namespace Isis {
         m_scrollBarYValue = atts.value("scrollBarYValue").toInt();
       }
     }
-
+    */
     return result;
   }
 

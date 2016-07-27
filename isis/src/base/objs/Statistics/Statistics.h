@@ -21,12 +21,14 @@
  */
 
 #include <QObject>
+#include <QString>
 
 #include <H5Cpp.h>
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
 #include "Constants.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "XmlStackedHandler.h"
 
@@ -95,6 +97,9 @@ namespace Isis {
    *   @history 2015-12-21 Jeannie Backer - Changed H5::PredType::NATIVE_HBOOL to
    *                           H5::PredType::NATIVE_INT64 in compoundH5DataType() method. This was
    *                           done so that MAC OSX will compile.
+   *   @history 2016-07-15 Ian Humphrey - Added constructor that initializes a Statistics object
+   *                           from a PvlGroup. Added toPvl() and fromPvl() methods to allow
+   *                           Statistics serialization/unserialization. References #2282.
    *
    *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
    *   @todo 2015-08-13 Jeannie Backer - Clean up header and implementation files once
@@ -105,7 +110,8 @@ namespace Isis {
     Q_OBJECT
     public:
       Statistics(QObject *parent = 0);
-      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   
+      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0); 
+      Statistics(const PvlGroup &inStats, QObject *parent = 0);
       // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);
       virtual ~Statistics();
@@ -155,6 +161,8 @@ namespace Isis {
       BigInt OutOfRangePixels() const;
       bool RemovedData() const;
 
+      PvlGroup toPvl(QString name = "Statistics") const;
+
       void save(QXmlStreamWriter &stream, const Project *project) const;
       // TODO: does xml stuff need project???
     
@@ -164,6 +172,9 @@ namespace Isis {
       static H5::CompType compoundH5DataType();
 
     private:
+
+      void fromPvl(const PvlGroup &inStats);
+
       /**
        *
        * @author 2014-07-28 Jeannie Backer

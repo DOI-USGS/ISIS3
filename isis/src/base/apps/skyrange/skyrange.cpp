@@ -25,12 +25,7 @@ void IsisMain() {
   double centerDec = cam->Declination();
 
   // Compute the rotation
-  cam->SetRightAscensionDeclination(centerRa, centerDec + 2.0 * res);
-  double x = cam->Sample() - icube->sampleCount() / 2.0;
-  double y = cam->Line() - icube->lineCount() / 2.0;
-  double rot = atan2(-y, x) * 180.0 / Isis::PI;
-  rot = 90.0 - rot;
-  if(rot < 0.0) rot += 360.0;
+  double rot = cam->CelestialNorthClockAngle();
 
   // Setup and log results
   PvlGroup results("Range");
