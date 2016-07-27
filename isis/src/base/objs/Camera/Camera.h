@@ -213,6 +213,8 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
+   *                           Sensor's pure virtual methods.
    *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
