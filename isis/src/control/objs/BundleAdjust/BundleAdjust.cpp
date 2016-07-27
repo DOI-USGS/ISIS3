@@ -84,7 +84,7 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     init(&progress);
   }
@@ -107,7 +107,7 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     init(&progress);
   }
@@ -133,7 +133,7 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     init();
   }
@@ -159,7 +159,7 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     init();
   }
@@ -184,7 +184,7 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     init();
   }
@@ -214,7 +214,7 @@ namespace Isis {
       }
     }
 
-    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
     m_bPrintSummary = bPrintSummary;
 
@@ -378,7 +378,7 @@ namespace Isis {
           QString cubeSerialNumber = measure->cubeSerialNumber();
 
           BundleObservation *observation =
-              m_bundleObservations.getObservationByCubeSerialNumber(cubeSerialNumber);
+              m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
 
           measure->setParentObservation(observation);
         }

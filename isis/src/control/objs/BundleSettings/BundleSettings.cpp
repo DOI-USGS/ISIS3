@@ -2,7 +2,7 @@
 
 #include <QDataStream>
 #include <QDebug>
-#include <QFile>
+//#include <QFile> currently only used in commented code
 #include <QList>
 #include <QString>
 #include <QtGlobal> // qMax()
@@ -15,11 +15,10 @@
 #include <hdf5.h>
 
 #include "BundleObservationSolveSettings.h"
-#include "FileName.h"
+//#include "FileName.h"currently only used in commented code
 #include "IException.h"
 #include "IString.h"
-#include "MaximumLikelihoodWFunctions.h"
-#include "Project.h"
+#include "Project.h" // currently used for xml handler
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
@@ -28,7 +27,10 @@
 namespace Isis {
 
   /**
-   * Constructs a BundleSettings object with default values.
+   * Constructs a BundleSettings object from a pointer to a parent QObject. 
+   * Default values are set for all member variables. 
+   *  
+   * @param parent A pointer to a parent QObject. Defaults to NULL pointer. 
    */
   BundleSettings::BundleSettings(QObject *parent) : QObject(parent) {
     m_id = NULL;
@@ -78,17 +80,26 @@ namespace Isis {
   }
 
 
-
   /**
-   * Construct this BundleSettings object from XML.
+   * Construct a BundleSettings object from member data read from an XML file. 
+   *  
+   * @code 
+   *   FileName xmlFile("bundleSettingsFileName.xml");
+   *  
+   *   QString xmlPath = xmlFile.expanded();
+   *   QFile file(xmlPath);
+   *   file.open(QFile::ReadOnly);
+   *   XmlStackedHandlerReader reader;
+   *   BundleSettings settings(project, reader);
+   * @endcode
    *
-   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param project A pointer to the project where the Settings will be saved.
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    * @param parent The Qt-relationship parent
    */
   BundleSettings::BundleSettings(Project *project, 
                                  XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
+                                 QObject *parent) : QObject(parent) {
     m_id = NULL;
     // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
 
@@ -98,143 +109,176 @@ namespace Isis {
   }
 
 
-
-//  /**
-//   * Construct this BundleSettings object from XML.
-//   *
-//   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
-//   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-//   * @param parent The Qt-relationship parent
-//   */
-//  BundleSettings::BundleSettings(FileName xmlFile,
-//                                 Project *project, 
-//                                 XmlStackedHandlerReader *xmlReader,
-//                                 QObject *parent)
-//      : QObject(parent) {   // TODO: does xml stuff need project???
-//
-//
-//    m_id = NULL;
-//    // what about the rest of the member data ??? should we set defaults ???
-//
-//    QString xmlPath = xmlFile.expanded();
-//    QFile qXmlFile(xmlPath);
-//    if (!qXmlFile.open(QFile::ReadOnly) ) {
-//      throw IException(IException::Io,
-//                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
-//                       _FILEINFO_);
-//    }
-//
-//    QXmlInputSource xmlInputSource(&qXmlFile);
-//
-//    xmlReader->pushContentHandler(new XmlHandler(this, project));
-//    xmlReader->setErrorHandler(new XmlHandler(this, project));
-//    bool success = xmlReader->parse(xmlInputSource);
-//    if (!success) {
-//      throw IException(IException::Unknown, 
-//                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
-//                        _FILEINFO_);
-//    }
-//  }
+#if 0
+  /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   * 
+   * @throw
+   * @throw
+   */
+  BundleSettings::BundleSettings(FileName xmlFile,
+                                 Project *project, 
+                                 XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent)
+      : QObject(parent) {
 
 
+    m_id = NULL;
+    // what about the rest of the member data ??? should we set defaults ???
 
-//  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
-//    m_id = NULL;
-//    xmlReader->pushContentHandler(new XmlHandler(this));
-//    xmlReader->setErrorHandler(new XmlHandler(this));
-//  }
+    QString xmlPath = xmlFile.expanded();
+    QFile qXmlFile(xmlPath);
+    if (!qXmlFile.open(QFile::ReadOnly) ) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                       _FILEINFO_);
+    }
 
+    QXmlInputSource xmlInputSource(&qXmlFile);
+
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
+    bool success = xmlReader->parse(xmlInputSource);
+    if (!success) {
+      throw IException(IException::Unknown, 
+                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                        _FILEINFO_);
+    }
+  }
+
+
+  /** 
+   * TODO
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
+    m_id = NULL;
+    xmlReader->pushContentHandler(new XmlHandler(this));
+    xmlReader->setErrorHandler(new XmlHandler(this));
+  }
+
+  /** 
+   * TODO
+   */
   BundleSettings::BundleSettings(H5::CommonFG &locationObject, QString locationName) {
     openH5Group(locationObject, locationName);
   }
+#endif
+
 
   /**
-   * copy constructor
+   * This copy constructor sets this BundleSettings' member data to match 
+   * that of the 'other' given BundleSettings. 
+   *  
+   * @param other The BundleSettings object to be copied. 
    */
-  BundleSettings::BundleSettings(const BundleSettings &src)
-      : m_id(new QUuid(src.m_id->toString())),
-        m_validateNetwork(src.m_validateNetwork),
-        m_solveMethod(src.m_solveMethod),
-        m_solveObservationMode(src.m_solveObservationMode),
-        m_solveRadius(src.m_solveRadius),
-        m_updateCubeLabel(src.m_updateCubeLabel),
-        m_errorPropagation(src.m_errorPropagation),
-        m_outlierRejection(src.m_outlierRejection),
-        m_outlierRejectionMultiplier(src.m_outlierRejectionMultiplier),
-        m_globalLatitudeAprioriSigma(src.m_globalLatitudeAprioriSigma),
-        m_globalLongitudeAprioriSigma(src.m_globalLongitudeAprioriSigma),
-        m_globalRadiusAprioriSigma(src.m_globalRadiusAprioriSigma),
-        m_observationSolveSettings(src.m_observationSolveSettings),
-        m_convergenceCriteria(src.m_convergenceCriteria),
-        m_convergenceCriteriaThreshold(src.m_convergenceCriteriaThreshold),
-        m_convergenceCriteriaMaximumIterations(src.m_convergenceCriteriaMaximumIterations),
-        m_maximumLikelihood(src.m_maximumLikelihood),
-        m_solveTargetBody(src.m_solveTargetBody),
-        m_bundleTargetBody(src.m_bundleTargetBody),
-        m_outputFilePrefix(src.m_outputFilePrefix),
-        m_createBundleOutputFile(src.m_createBundleOutputFile),
-        m_createCSVFiles(src.m_createCSVFiles),
-        m_createResidualsFile(src.m_createResidualsFile) {
+  BundleSettings::BundleSettings(const BundleSettings &other)
+      : m_id(new QUuid(other.m_id->toString())),
+        m_validateNetwork(other.m_validateNetwork),
+        m_solveMethod(other.m_solveMethod),
+        m_solveObservationMode(other.m_solveObservationMode),
+        m_solveRadius(other.m_solveRadius),
+        m_updateCubeLabel(other.m_updateCubeLabel),
+        m_errorPropagation(other.m_errorPropagation),
+        m_outlierRejection(other.m_outlierRejection),
+        m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
+        m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
+        m_globalLongitudeAprioriSigma(other.m_globalLongitudeAprioriSigma),
+        m_globalRadiusAprioriSigma(other.m_globalRadiusAprioriSigma),
+        m_observationSolveSettings(other.m_observationSolveSettings),
+        m_convergenceCriteria(other.m_convergenceCriteria),
+        m_convergenceCriteriaThreshold(other.m_convergenceCriteriaThreshold),
+        m_convergenceCriteriaMaximumIterations(other.m_convergenceCriteriaMaximumIterations),
+        m_maximumLikelihood(other.m_maximumLikelihood),
+        m_solveTargetBody(other.m_solveTargetBody),
+        m_bundleTargetBody(other.m_bundleTargetBody),
+        m_outputFilePrefix(other.m_outputFilePrefix),
+        m_createBundleOutputFile(other.m_createBundleOutputFile),
+        m_createCSVFiles(other.m_createCSVFiles),
+        m_createResidualsFile(other.m_createResidualsFile) {
   }
 
 
-
+  /**
+   * Destroys the BundleSettings object. 
+   */
   BundleSettings::~BundleSettings() {    
     delete m_id;
     m_id = NULL;
   }
 
 
-
-  BundleSettings &BundleSettings::operator=(const BundleSettings &src) {
-    if (&src != this) {
+  /** 
+   * Assignment operator to allow proper copying of the 'other' BundleSettings 
+   * object to this one. 
+   *  
+   * @param other The BundleSettings object to be copied.
+   * 
+   * @return @b BundleSettings& A reference to the copied BundleSettings object.
+   */
+  BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
+    if (&other != this) {
       delete m_id;
       m_id = NULL;
-      m_id = new QUuid(src.m_id->toString());
+      m_id = new QUuid(other.m_id->toString());
 
-      m_validateNetwork = src.m_validateNetwork;
-      m_solveMethod = src.m_solveMethod;
-      m_solveObservationMode = src.m_solveObservationMode;
-      m_solveRadius = src.m_solveRadius;
-      m_updateCubeLabel = src.m_updateCubeLabel;
-      m_errorPropagation = src.m_errorPropagation;
-      m_outlierRejection = src.m_outlierRejection;
-      m_outlierRejectionMultiplier = src.m_outlierRejectionMultiplier;
-      m_globalLatitudeAprioriSigma = src.m_globalLatitudeAprioriSigma;
-      m_globalLongitudeAprioriSigma = src.m_globalLongitudeAprioriSigma;
-      m_globalRadiusAprioriSigma = src.m_globalRadiusAprioriSigma;
-      m_observationSolveSettings = src.m_observationSolveSettings;
-      m_convergenceCriteria = src.m_convergenceCriteria;
-      m_convergenceCriteriaThreshold = src.m_convergenceCriteriaThreshold;
-      m_convergenceCriteriaMaximumIterations = src.m_convergenceCriteriaMaximumIterations;
-      m_solveTargetBody = src.m_solveTargetBody;
-      m_bundleTargetBody = src.m_bundleTargetBody;
-      m_maximumLikelihood = src.m_maximumLikelihood;
-      m_outputFilePrefix = src.m_outputFilePrefix;
-      m_createBundleOutputFile = src.m_createBundleOutputFile;
-      m_createCSVFiles = src.m_createCSVFiles;
-      m_createResidualsFile = src.m_createResidualsFile;
+      m_validateNetwork = other.m_validateNetwork;
+      m_solveMethod = other.m_solveMethod;
+      m_solveObservationMode = other.m_solveObservationMode;
+      m_solveRadius = other.m_solveRadius;
+      m_updateCubeLabel = other.m_updateCubeLabel;
+      m_errorPropagation = other.m_errorPropagation;
+      m_outlierRejection = other.m_outlierRejection;
+      m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
+      m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
+      m_globalLongitudeAprioriSigma = other.m_globalLongitudeAprioriSigma;
+      m_globalRadiusAprioriSigma = other.m_globalRadiusAprioriSigma;
+      m_observationSolveSettings = other.m_observationSolveSettings;
+      m_convergenceCriteria = other.m_convergenceCriteria;
+      m_convergenceCriteriaThreshold = other.m_convergenceCriteriaThreshold;
+      m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
+      m_solveTargetBody = other.m_solveTargetBody;
+      m_bundleTargetBody = other.m_bundleTargetBody;
+      m_maximumLikelihood = other.m_maximumLikelihood;
+      m_outputFilePrefix = other.m_outputFilePrefix;
+      m_createBundleOutputFile = other.m_createBundleOutputFile;
+      m_createCSVFiles = other.m_createCSVFiles;
+      m_createResidualsFile = other.m_createResidualsFile;
     }
     return *this;
   }
 
 
-  void BundleSettings::setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody) {
-    m_bundleTargetBody = bundleTargetBody;
-  }
-
-
-  QSharedPointer<BundleTargetBody> BundleSettings::getBundleTargetBody() {
-    return m_bundleTargetBody;
-  }
-
-
+  /**
+   * Sets the internal flag to indicate whether to validate the network before 
+   * the bundle adjustment. 
+   *  
+   * @see BundleAdjust::validateNetwork() 
+   *  
+   * @param validate Indicates whether the network should be validated by 
+   *                 BundleAdjust.
+   *  
+   */
   void BundleSettings::setValidateNetwork(bool validate) {
     m_validateNetwork = validate;
   }
 
 
-
+  /**
+   * This method is used to determine whether to validate the network before 
+   * the bundle adjustment. 
+   *  
+   * @see BundleAdjust::validateNetwork() 
+   *  
+   * @return @b bool Indicates whether the network should be validated by 
+   *                 BundleAdjust.
+   *  
+   */
   bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
   }
@@ -243,6 +287,22 @@ namespace Isis {
   // =============================================================================================//
   // ======================== Solve Options ======================================================//
   // =============================================================================================//
+
+  /**
+   * Converts the given string value to a BundleSettings::SolveMethod 
+   * enumeration. Currently accepted inputs are listed below. This method is 
+   * case insensitive. 
+   * <ul> 
+   *   <li>Sparse</li>
+   *   <li>SpecialK</li>
+   * </ul>
+   *  
+   * @param method Name of method to be converted.
+   * 
+   * @return @b SolveMethod The enumeration corresponding to the given name.
+   * 
+   * @throw Isis::Exception::Programmer "Unknown bundle solve method."
+   */
   BundleSettings::SolveMethod BundleSettings::stringToSolveMethod(QString method) {
 
     if (method.compare("SPARSE", Qt::CaseInsensitive) == 0) {
@@ -259,17 +319,43 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Converts the given BundleSettings::SolveMethod enumeration to a string. 
+   * This method is used to print the solve type to output files as strings 
+   * rather than integers. 
+   * 
+   * @param method The SolveMethod enumeration to be converted.
+   * 
+   * @return @b QString The name associated with the given solve method.
+   * 
+   * @throw Isis::Exception::Programmer "Unknown bundle solve method enum."
+   */
   QString BundleSettings::solveMethodToString(SolveMethod method) {
     if (method == Sparse)         return "Sparse";
     else if (method == SpecialK)  return "SpecialK";
     else throw IException(IException::Programmer,
-                          "Unknown solve method enum [" + toString(method) + "].",
+                          "Unknown bundle solve method enum [" + toString(method) + "].",
                           _FILEINFO_);
   }
 
 
-
+  /**
+   * Set the solve options for the bundle adjustment.
+   * 
+   * @param method An enumeration for the solve method for the bundle 
+   *               adjustment.
+   * @param solveObservationMode A boolean value indicating whether to solve for
+   *                             observation mode.
+   * @param updateCubeLabel A boolean value indicating whether to update the 
+   *                        cube labels after the bundle adjustment is
+   *                        completed.
+   * @param errorPropagation A boolean value indicating whether to use the 
+   *                         cholmod library's error propagation.
+   * @param solveRadius A boolean value indicating whether to solve for radius.
+   * @param globalLatitudeAprioriSigma The global a priori sigma for latitude.
+   * @param globalLongitudeAprioriSigma The global a priori sigma for longitude.
+   * @param globalRadiusAprioriSigma The global a priori sigma for radius.
+   */
   void BundleSettings::setSolveOptions(SolveMethod method, bool solveObservationMode,
                                        bool updateCubeLabel, bool errorPropagation, 
                                        bool solveRadius, 
@@ -305,7 +391,13 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Set the outlier rejection options for the bundle adjustment. 
+   * 
+   * @param outlierRejection Indicates whether to perform automatic outlier 
+   *                         rejection during the bundle adjustment.
+   * @param mutliplier The outlier rejection multiplier.
+   */
   void BundleSettings::setOutlierRejection(bool outlierRejection, double multiplier) {
     m_outlierRejection = outlierRejection;
     if (m_outlierRejection) {
@@ -317,26 +409,412 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Add the list of solve options for each observation.
+   * 
+   * @param observationSolveSettings A list of BundleObservationSolveSettings objects 
+   *                                 to indicate the settings for each observation of
+   *                                 the bundle adjustment.
+   */
   void BundleSettings::setObservationSolveOptions(
-      QList<BundleObservationSolveSettings> observationSolveSettings) {
-    m_observationSolveSettings = observationSolveSettings;
+      QList<BundleObservationSolveSettings> obsSolveSettingsList) {
+    m_observationSolveSettings = obsSolveSettingsList;
   }
 
 
-
-  bool BundleSettings::solveTargetBody() {
-    if (!m_bundleTargetBody)
-      return false;
-
-    else if (m_bundleTargetBody->numberParameters() > 0)
-      return true;
-
-    return false;
+  /**
+   * Retrieves the solve method for the bundle adjustment.
+   * 
+   * @return @b SolveMethod The enumeration for the solve method for the bundle 
+   *                        adjustment.
+   */
+  BundleSettings::SolveMethod BundleSettings::solveMethod() const {
+    return m_solveMethod;
   }
 
 
-  int BundleSettings::numberTargetBodyParameters() {
+  /**
+   * This method is used to determine whether this bundle adjustment will solve 
+   * for observation mode. 
+   * 
+   * @return @b bool Indicates whether to solve for observation mode.
+   */
+  bool BundleSettings::solveObservationMode() const {
+    return m_solveObservationMode;
+  }
+
+
+  /**
+   * This method is used to determine whether this bundle adjustment will solve 
+   * for radius. 
+   * 
+   * @return @b bool Indicates whether to solve for radius.
+   */
+  bool BundleSettings::solveRadius() const {
+    return m_solveRadius;
+  }
+
+
+  /**
+   * This method is used to determine whether this bundle 
+   * adjustment will update the cube labels. 
+   * 
+   * @return @b bool Indicates whether to update the cube labels after the bundle adjustment
+   *                 is completed.
+   */
+  bool BundleSettings::updateCubeLabel() const {
+    return m_updateCubeLabel;
+  }
+
+
+  /**
+   * This method is used to determine whether this bundle adjustment will 
+   * perform error propagation. 
+   * 
+   * @return @b bool Indicates whether to perform error propagation.
+   */
+  bool BundleSettings::errorPropagation() const {
+    return m_errorPropagation;
+  }
+
+
+  /**
+   * This method is used to determine whether outlier rejection will be 
+   * performed on this bundle adjustment. 
+   * 
+   * @return @b bool Indicates whether to perform automatic outlier 
+   *                 rejection during the bundle adjustment.
+   */
+  bool BundleSettings::outlierRejection() const {
+    return m_outlierRejection;
+  }
+
+
+  /**
+   * Retrieves the outlier rejection multiplier for the bundle adjustment. 
+   * 
+   * @return @b double The outlier rejection multiplier.
+   */
+  double BundleSettings::outlierRejectionMultiplier() const {
+    return m_outlierRejectionMultiplier;
+  }
+
+
+  /**
+   * Retrieves the global a priori sigma latitude value for this bundle 
+   * adjustment. 
+   * 
+   * @return @b double The global a priori sigma for latitude.
+   */
+  double BundleSettings::globalLatitudeAprioriSigma() const {
+    return m_globalLatitudeAprioriSigma;
+  }
+
+
+  /**
+   * Retrieves the global a priori sigma longitude value for this bundle 
+   * adjustment. 
+   * 
+   * @return @b double The global a priori sigma for longitude.
+   */
+  double BundleSettings::globalLongitudeAprioriSigma() const {
+    return m_globalLongitudeAprioriSigma;
+  }
+
+
+  /**
+   * Retrieves the global a priori sigma radius value for this bundle 
+   * adjustment. 
+   * 
+   * @return @b double The global a priori sigma for radius.
+   */
+  double BundleSettings::globalRadiusAprioriSigma() const {
+    return m_globalRadiusAprioriSigma;
+  }
+
+
+  /** 
+   * Retrieves the number of observation solve settings. 
+   *  
+   * @return @b int The number of solve settings object for this run of the 
+   *                bundle adjustment.
+   */
+  int BundleSettings::numberSolveSettings() const {
+     return m_observationSolveSettings.size();
+  }
+
+
+  /** 
+   * Retrieves solve settings for the observation corresponding to the given 
+   * instrument ID. 
+   *  
+   * @param instrumentId The instrument ID of the BundleObservationSolveSettings 
+   *                     object to be accessed.
+   *  
+   * @return @b BundleObservationSolveSettings The observation settings object mapped 
+   *                                           to the given instrument ID.
+   *  
+   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings 
+   *                             with given InstrumentId"
+   */
+  BundleObservationSolveSettings 
+      BundleSettings::observationSolveSettings(QString instrumentId) const {
+
+    for (int i = 0; i < numberSolveSettings(); i++) {
+      if (m_observationSolveSettings[i].instrumentId() == instrumentId) {
+        return m_observationSolveSettings[i];
+      }
+    }
+    QString msg = "Unable to find BundleObservationSolveSettings with InstrumentId = ["
+                  + instrumentId + "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+
+  /**
+   * Retrieves solve settings for the observation corresponding to the given 
+   * index. 
+   *  
+   * @param n The index of the BundleObservationSolveSettings object to be 
+   *          accessed.
+   * @return @b BundleObservationSolveSettings The observation settings object corresponding
+   *                                           to the given index.
+   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings 
+   *                             with given index"
+   */
+  BundleObservationSolveSettings 
+      BundleSettings::observationSolveSettings(int n) const { 
+
+    if (n >= 0 && n < numberSolveSettings()) {
+      return m_observationSolveSettings[n]; 
+    }
+    QString msg = "Unable to find BundleObservationSolveSettings with index = ["
+                  + toString(n) + "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+
+  // =============================================================================================//
+  // ======================== Convergence Criteria ===============================================//
+  // =============================================================================================//
+
+  /**
+   * Converts the given string value to a BundleSettings::ConvergenceCriteria 
+   * enumeration. Currently accepted inputs are listed below. This method is 
+   * case insensitive. 
+   * <ul> 
+   *   <li>Sigma0</li>
+   *   <li>ParameterCorrections</li>
+   * </ul>
+   *  
+   * @param criteria Convergence criteria name to be converted.
+   * 
+   * @return @b ConvergenceCriteria The enumeration corresponding to the given name.
+   * 
+   * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria."
+   */
+  BundleSettings::ConvergenceCriteria 
+      BundleSettings::stringToConvergenceCriteria(QString criteria) {
+    if (criteria.compare("SIGMA0", Qt::CaseInsensitive) == 0) {
+      return BundleSettings::Sigma0;
+    }
+    else if (criteria.compare("PARAMETERCORRECTIONS", Qt::CaseInsensitive) == 0) {
+      return BundleSettings::ParameterCorrections;
+    }
+    else throw IException(IException::Programmer,
+                          "Unknown bundle convergence criteria [" + criteria + "].",
+                          _FILEINFO_);
+  }
+
+
+  /**
+   * Converts the given BundleSettings::ConvergenceCriteria enumeration to a string. 
+   * This method is used to print the type of convergence criteria used in 
+   * the bundle adjustment. 
+   * 
+   * @param criteria The ConvergenceCriteria enumeration to be converted.
+   * 
+   * @return @b QString The name associated with the given convergence criteria.
+   * 
+   * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria enum."
+   */
+  QString BundleSettings::convergenceCriteriaToString(
+              BundleSettings::ConvergenceCriteria criteria) {
+    if (criteria == Sigma0)                    return "Sigma0";
+    else if (criteria == ParameterCorrections) return "ParameterCorrections";
+    else  throw IException(IException::Programmer,
+                           "Unknown convergence criteria enum [" + toString(criteria) + "].",
+                           _FILEINFO_);
+  }
+
+
+  /**
+   * Set the convergence criteria options for the bundle adjustment. 
+   * 
+   * @param criteria An enumeration for the convergence criteria to be
+   *                 used for this bundle adjustment.
+   * @param threshold The convergence threshold for this bundle adjustment.
+   * @param maximumIterations The maximum number of iterations allowed
+   *                          before the bundle adjustment determines
+   *                          that the data is not converging.
+   */
+  void BundleSettings::setConvergenceCriteria(BundleSettings::ConvergenceCriteria criteria, 
+                                              double threshold, 
+                                              int maximumIterations) {
+    m_convergenceCriteria = criteria;
+    m_convergenceCriteriaThreshold = threshold;
+    m_convergenceCriteriaMaximumIterations = maximumIterations;
+  }
+
+
+  /**
+   * Retrieves the convergence criteria to be used to solve the bundle 
+   * adjustment. 
+   * 
+   * @return @b ConvergenceCriteria The enumeration of the convergence criteria.
+   */
+  BundleSettings::ConvergenceCriteria BundleSettings::convergenceCriteria() const {
+    return m_convergenceCriteria;
+  }
+
+
+  /**
+   * Retrieves the convergence threshold to be used to solve the bundle 
+   * adjustment. 
+   * 
+   * @return @b double The threshold that determines convergence.
+   */
+  double BundleSettings::convergenceCriteriaThreshold() const {
+    return m_convergenceCriteriaThreshold;
+  }
+
+
+  /**
+   * Retrieves the maximum number of iterations allowed to solve the 
+   * bundle adjustment. 
+   * 
+   * @param maximumIterations The maximum number of iterations allowed
+   *                          before the bundle adjustment determines
+   *                          that the data is not converging.
+   */
+  int BundleSettings::convergenceCriteriaMaximumIterations() const {
+    return m_convergenceCriteriaMaximumIterations;
+  }
+
+
+  
+  // =============================================================================================//
+  // ======================== Parameter Uncertainties (Weighting) ================================//
+  // =============================================================================================//
+//   void BundleSettings::setGlobalLatitudeAprioriSigma(double sigma) {
+//     m_globalLatitudeAprioriSigma = sigma;
+//   }
+// 
+// 
+// 
+//   void BundleSettings::setGlobalLongitudeAprioriSigma(double sigma) {
+//     m_globalLongitudeAprioriSigma = sigma;
+//   }
+// 
+// 
+// 
+//   void BundleSettings::setGlobalRadiiAprioriSigma(double sigma) {
+//     m_globalRadiusAprioriSigma = sigma;
+//   }
+
+
+  // =============================================================================================//
+  // ======================== Maximum Likelihood Estimation Options ==============================//
+  // =============================================================================================//
+
+
+  /**
+   * Add a maximum likelihood estimator (MLE) model to the bundle adjustment.
+   * 
+   * @param model The enumeration for the model to be used.
+   * @param maxModelCQuantile The C-Quantile of the residual to be used to 
+   *                          compute the tweaking constant.
+   * 
+   * 
+   * @throw Isis::Exception::Programmer "For bundle adjustments with multiple maximum 
+   *                                     likelihood estimators, the first model must be of
+   *                                     type HUBER or HUBER_MODIFIED."
+   */
+  void BundleSettings::addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
+                                                          double maxModelCQuantile) {
+
+    if (m_maximumLikelihood.size() == 0 && model > MaximumLikelihoodWFunctions::HuberModified) {
+      QString msg = "For bundle adjustments with multiple maximum likelihood estimators, the first "
+                    "model must be of type HUBER or HUBER_MODIFIED.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    m_maximumLikelihood.append(qMakePair(model, maxModelCQuantile));
+  }
+
+
+  /**
+   * Retrieves the list of maximum likelihood estimator (MLE) models with their 
+   * corresponding C-Quantiles. 
+   * 
+   * @return QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
+   *             The list of tuples of the form (model, quantile) to be used for the
+   *             bundle adjustment.
+   */
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > >  
+      BundleSettings::maximumLikelihoodEstimatorModels() const {
+    return m_maximumLikelihood;
+  }
+
+
+  // =============================================================================================//
+  // ======================== Self Calibration ??? (from cnetsuite only) =========================//
+  // =============================================================================================//
+  
+  // =============================================================================================//
+  // ======================== Target Body ??? (from cnetsuite only) ==============================//
+  // =============================================================================================//
+
+  /**
+   * Sets the target body for the bundle adjustment.
+   *  
+   * @param bundleTargetBody A pointer to the BundleTargetBody object for the 
+   *                         bundle adjustment to be run.
+   */
+  void BundleSettings::setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody) {
+    m_bundleTargetBody = bundleTargetBody;
+  }
+
+
+  /**
+   * Retrieves a pointer to target body information for the bundle adjustment.
+   *  
+   * @return @b BundleTargetBodyQsp A pointer to the BundleTargetBody object for
+   *                                the bundle adjustment to be run.
+   */
+  BundleTargetBodyQsp BundleSettings::bundleTargetBody() const {
+    return m_bundleTargetBody;
+  }
+
+
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body pole position. 
+   *  
+   * @return @b bool Indicates whether to solve for target pole position.
+   */
+//  bool BundleSettings::solveTargetBodyPolePosition() const {
+//    return m_solveTargetBodyPolePosition;
+//  }
+
+
+  /**
+   * Retrieves the number of target body parameters. If the BundleTargetBody 
+   * associated with this bundle adjustment is NULL, this method returns 0.
+   *  
+   * @return @b int The number of target body parameters.
+   */
+  int BundleSettings::numberTargetBodyParameters() const {
     if (!m_bundleTargetBody)
       return 0;
 
@@ -344,67 +822,116 @@ namespace Isis {
   }
 
 
-  bool BundleSettings::solvePoleRA() {
+  /**
+   * This method is used to determine whether the bundle adjustment will solve 
+   * for target body. 
+   *  
+   * @return @b bool Indicates whether to solve for target body.
+   */
+  bool BundleSettings::solveTargetBody() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
+    else {
+      return (m_bundleTargetBody->numberParameters() > 0);
+    }
+  }
+
+
+  /**
+   * This method is used to determine whether the bundle adjustment will 
+   * solve for target body pole right ascension. 
+   * 
+   * @see BundleTargetBody::solvePoleRA()
+   * 
+   * @return @b bool Indicates whether to solve for target pole RA. 
+   */
+  bool BundleSettings::solvePoleRA() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePoleRA();
   }
 
 
-  bool BundleSettings::solvePoleRAVelocity() {
+  /**
+   * This method is used to determine whether the bundle adjustment will 
+   * solve for target body pole right ascension velocity. 
+   * 
+   * @see BundleTargetBody::solvePoleRAVelocity()
+   * 
+   * @return @b bool Indicates whether to solve for target pole RA velocity.
+   */
+  bool BundleSettings::solvePoleRAVelocity() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePoleRAVelocity();
   }
 
 
-  bool BundleSettings::solvePoleDec() {
+  /**
+   * This method is used to determine whether the bundle adjustment will 
+   * solve for target body pole declination. 
+   * 
+   * @see BundleTargetBody::solvePoleDeclination()
+   * 
+   * @return @b bool Indicates whether to solve for target pole declination.
+   */
+  bool BundleSettings::solvePoleDec() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePoleDec();
   }
 
 
-  bool BundleSettings::solvePoleDecVelocity() {
+  /**
+   * This method is used to determine whether the bundle adjustment will 
+   * solve for target body pole declination velocity. 
+   * 
+   * @see BundleTargetBody::solvePoleDeclinationVelocity()
+   * 
+   * @return @b bool Indicates whether to solve for target pole declination velocity.
+   */
+  bool BundleSettings::solvePoleDecVelocity() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePoleDecVelocity();
   }
 
 
-  bool BundleSettings::solvePM() {
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body prime meridian. 
+   * 
+   * @see BundleTargetBody::solvePM()
+   * 
+   * @return @b bool Indicates whether to solve for target PM.
+   */
+  bool BundleSettings::solvePM() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePM();
   }
 
 
-  bool BundleSettings::solvePMVelocity() {
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body prime meridian velocity. 
+   * 
+   * @see BundleTargetBody::solvePMVelocity()
+   * 
+   * @return @b bool Indicates whether to solve for target PM velocity.
+   */
+  bool BundleSettings::solvePMVelocity() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
     return m_bundleTargetBody->solvePMVelocity();
   }
-
-
-//  BundleSettings::TargetRadiiSolveMethod BundleSettings::stringToTargetRadiiOption(QString method) {
-
-//    if (method.compare("NONE", Qt::CaseInsensitive) == 0) {
-//      return BundleSettings::None;
-//    }
-//    else if (method.compare("MEANRADIUS", Qt::CaseInsensitive) == 0) {
-//      return BundleSettings::MeanRadius;
-//    }
-//    else if (method.compare("RADII", Qt::CaseInsensitive) == 0) {
-//      return BundleSettings::Radii;
-//    }
-//    else {
-//      throw IException(IException::Programmer,
-//                       "Unknown target body radius solution method [" + method + "].",
-//                       _FILEINFO_);
-//    }
-//  }
-
-
-//  QString BundleSettings::targetRadiiOptionToString(TargetRadiiSolveMethod method) {
-//    if (method == None)
-//      return "None";
-//    else if (method == MeanRadius)
-//      return "MeanRadius";
-//    else if (method == Radii)
-//      return "Radiii";
-//    else throw IException(IException::Programmer,
-//                          "Unknown target body radius solve method enum [" + toString(method) + "].",
-//                          _FILEINFO_);
-//  }
-
 
 
 //  void BundleSettings::setTargetBodySolveOptions(bool solveTargetBodyPolePosition,
@@ -450,224 +977,20 @@ namespace Isis {
 //                                         sigmaRadiusA, aprioriRadiusB, sigmaRadiusB, aprioriRadiusC,
 //                                         sigmaRadiusC, aprioriMeanRadius, sigmaMeanRadius);
 //  }
-
-
-
-  BundleSettings::SolveMethod BundleSettings::solveMethod() const {
-    return m_solveMethod;
-  }
-
-
-
-  bool BundleSettings::solveObservationMode() const {
-    return m_solveObservationMode;
-  }
-
-
-
-  bool BundleSettings::solveRadius() const {
-    return m_solveRadius;
-  }
-
-
-
-  bool BundleSettings::updateCubeLabel() const {
-    return m_updateCubeLabel;
-  }
-
-
-
-  bool BundleSettings::errorPropagation() const {
-    return m_errorPropagation;
-  }
-
-
   
-  bool BundleSettings::outlierRejection() const {
-    return m_outlierRejection;
-  }
-
-
-
-  double BundleSettings::outlierRejectionMultiplier() const {
-    return m_outlierRejectionMultiplier;
-  }
-
-
-
-  double BundleSettings::globalLatitudeAprioriSigma() const {
-    return m_globalLatitudeAprioriSigma;
-  }
-
-
-
-  double BundleSettings::globalLongitudeAprioriSigma() const {
-    return m_globalLongitudeAprioriSigma;
-  }
-
-
-
-  double BundleSettings::globalRadiusAprioriSigma() const {
-    return m_globalRadiusAprioriSigma;
-  }
-
-
-
-//  bool BundleSettings::solveTargetBodyPolePosition() const {
-//    return m_solveTargetBodyPolePosition;
-//  }
-
-
-
-  int BundleSettings::numberSolveSettings() const {
-     return m_observationSolveSettings.size();
-  }
-
-
-
-  BundleObservationSolveSettings 
-      BundleSettings::observationSolveSettings(QString instrumentId) const {
-
-    for (int i = 0; i < numberSolveSettings(); i++) {
-      if (m_observationSolveSettings[i].instrumentId() == instrumentId) {
-        return m_observationSolveSettings[i];
-      }
-    }
-    QString msg = "Unable to find BundleObservationSolveSettings with InstrumentId = ["
-                  + instrumentId + "].";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
-  }
-
-
-
-  BundleObservationSolveSettings 
-      BundleSettings::observationSolveSettings(int n) const { 
-
-    if (n >= 0 && n < numberSolveSettings()) {
-      return m_observationSolveSettings[n]; 
-    }
-    QString msg = "Unable to find BundleObservationSolveSettings with index = ["
-                  + toString(n) + "].";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
-  }
-
-
 
   // =============================================================================================//
-  // ======================== Convergence Criteria ===============================================//
+  // ========================= Output Options (from Jigsaw only) ================================//
   // =============================================================================================//
-  BundleSettings::ConvergenceCriteria 
-      BundleSettings::stringToConvergenceCriteria(QString criteria) {
-    if (criteria.compare("SIGMA0", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::Sigma0;
-    }
-    else if (criteria.compare("PARAMETERCORRECTIONS", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::ParameterCorrections;
-    }
-    else throw IException(IException::Programmer,
-                          "Unknown bundle convergence criteria [" + criteria + "].",
-                          _FILEINFO_);
-  }
-
-
-
-  QString 
-      BundleSettings::convergenceCriteriaToString(BundleSettings::ConvergenceCriteria criteria) {
-    if (criteria == Sigma0)                    return "Sigma0";
-    else if (criteria == ParameterCorrections) return "ParameterCorrections";
-    else  throw IException(IException::Programmer,
-                           "Unknown convergence criteria enum [" + toString(criteria) + "].",
-                           _FILEINFO_);
-  }
-
-
-
-  void BundleSettings::setConvergenceCriteria(BundleSettings::ConvergenceCriteria criteria, 
-                                              double threshold, 
-                                              int maximumIterations) {
-    m_convergenceCriteria = criteria;
-    m_convergenceCriteriaThreshold = threshold;
-    m_convergenceCriteriaMaximumIterations = maximumIterations;
-  }
-
-
-
-  BundleSettings::ConvergenceCriteria BundleSettings::convergenceCriteria() const {
-    return m_convergenceCriteria;
-  }
-
-
-
-  double BundleSettings::convergenceCriteriaThreshold() const {
-    return m_convergenceCriteriaThreshold;
-  }
-
-
-
-  int BundleSettings::convergenceCriteriaMaximumIterations() const {
-    return m_convergenceCriteriaMaximumIterations;
-  }
-
-
-  
-  // =============================================================================================//
-  // ======================== Parameter Uncertainties (Weighting) ================================//
-  // =============================================================================================//
-//   void BundleSettings::setGlobalLatitudeAprioriSigma(double sigma) {
-//     m_globalLatitudeAprioriSigma = sigma;
-//   }
-// 
-// 
-// 
-//   void BundleSettings::setGlobalLongitudeAprioriSigma(double sigma) {
-//     m_globalLongitudeAprioriSigma = sigma;
-//   }
-// 
-// 
-// 
-//   void BundleSettings::setGlobalRadiiAprioriSigma(double sigma) {
-//     m_globalRadiusAprioriSigma = sigma;
-//   }
-
-
-  // =============================================================================================//
-  // ======================== Maximum Likelihood Estimation Options ==============================//
-  // =============================================================================================//
-
-
-
-  void BundleSettings::addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
-                                                          double maxModelCQuantile) {
-
-    if (m_maximumLikelihood.size() == 0 && model > MaximumLikelihoodWFunctions::HuberModified) {
-      QString msg = "For bundle adjustments with multiple maximum likelihood estimators, the first "
-                    "model must be of type HUBER or HUBER_MODIFIED.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    m_maximumLikelihood.append(qMakePair(model, maxModelCQuantile));
-  }
-
-
-  
-  QList< QPair< MaximumLikelihoodWFunctions::Model, double > >  
-      BundleSettings::maximumLikelihoodEstimatorModels() const {
-    return m_maximumLikelihood;
-  }
-
-
-  
-  // =============================================================================================//
-  // ======================== Self Calibration ??? (from cnetsuite only) =========================//
-  // =============================================================================================//
-  
-  // =============================================================================================//
-  // ======================== Target Body ??? (from cnetsuite only) ==============================//
-  // =============================================================================================//
-  
-  // =============================================================================================//
-  // ======================== Output Options ??? (from Jigsaw only) ==============================//
-  // =============================================================================================//
+  /**
+   * Set the output file options for the bundle adjustment. 
+   * 
+   * @param outputFilePrefix A string containing a prefix and/or directory path 
+   *                         to be appended to all output files.
+   * @param createBundleOutputFile Indicates whether to create a bundle output file.
+   * @param createCSVFiles Indicates whether to create an output CSV file.
+   * @param createResidualsFile Indicates whether to create an output residuals file.
+   */
   void BundleSettings::setOutputFiles(QString outputFilePrefix, bool createBundleOutputFile, 
                                       bool createCSVFiles, bool createResidualsFile) {
     m_outputFilePrefix = outputFilePrefix;
@@ -677,29 +1000,65 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Retrieve the output file prefix. This string will be 
+   * appended to all of the output files created by the bundle 
+   * adjustment. 
+   * 
+   * @return @b QString A string containing a prefix and/or 
+   *                    directory path to be appended to all
+   *                    output files.
+   */
   QString BundleSettings::outputFilePrefix() const {
     return m_outputFilePrefix;
   }
 
 
-
+  /**
+   * This method is used to determine whether to the bundle 
+   * adjustment output file will be created. 
+   *  
+   * @return @b bool Indicates whether to create a 
+   *                               bundle output file.
+   */
   bool BundleSettings::createBundleOutputFile() const {
     return m_createBundleOutputFile;
   }
 
 
-
+  /**
+   * This method is used to determine whether to a bundle 
+   * adjustment output CSV file will be created. 
+   *  
+   * @return @b bool Indicates whether to create an 
+   *         output CSV
+   */
   bool BundleSettings::createCSVFiles() const {
     return m_createCSVFiles;
   }
 
 
-
+  /**
+   * This method is used to determine whether to a bundle 
+   * adjustment output residuals file will be created. 
+   *  
+   * @return @b bool Indicates whether to create an 
+   *                            output residuals file.
+   */
   bool BundleSettings::createResidualsFile() const {
     return m_createResidualsFile;
   }
 
+
+  /**
+   * Create PvlObject with the given name containing the BundleSettings 
+   * information. 
+   * 
+   * @param name The name of the output PvlObject. Defaults to "BundleSettings".
+   * 
+   * @return @b PvlObject A PVL containing all of the BundleSettings 
+   *                      information for this bundle adjustment.
+   */
   PvlObject BundleSettings::pvlObject(QString name) const {
 
     PvlObject pvl(name);
@@ -742,6 +1101,16 @@ namespace Isis {
     pvl += PvlKeyword("ConvergenceCriteriaMaximumIterations",
                         toString(convergenceCriteriaMaximumIterations()));
 
+    // Target body
+    pvl += PvlKeyword("SolveTargetBody", toString(solveTargetBody()));
+    pvl += PvlKeyword("NumberTargetBodyParameters", toString(numberTargetBodyParameters()));
+    pvl += PvlKeyword("SolvePoleRightAscension", toString(solvePoleRA()));
+    pvl += PvlKeyword("SolvePoleRightAscensionVelocity", toString(solvePoleRAVelocity()));
+    pvl += PvlKeyword("SolvePoleDeclination", toString(solvePoleDec()));
+    pvl += PvlKeyword("SolvePoleDeclinationVelocity", toString(solvePoleDecVelocity()));
+    pvl += PvlKeyword("SolvePolePrimeMeridian", toString(solvePM()));
+    pvl += PvlKeyword("SolvePolePrimeMeridianVelocity", toString(solvePMVelocity()));
+
     // Output Options
     pvl += PvlKeyword("CreateBundleOutputFile", toString(createBundleOutputFile()));
     pvl += PvlKeyword("CreateCSVFiles", toString(createCSVFiles()));
@@ -781,17 +1150,15 @@ namespace Isis {
     return pvl;
   }
 
+
   /**
-   * Output format:
-   *
-   *
-   * <image id="..." fileName="...">
-   *   ...
-   * </image>
-   *
-   * (fileName attribute is just the base name)
+   * This method is used to write a BundleSettings object to an XML format 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
    */
-  void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
+  void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {
 //#if 0
     // option 2
     stream.writeStartElement("bundleSettings");
@@ -871,7 +1238,7 @@ namespace Isis {
     if (!m_observationSolveSettings.isEmpty()) {
       stream.writeStartElement("observationSolveSettingsList");
       for (int i = 0; i < m_observationSolveSettings.size(); i++) {
-        m_observationSolveSettings[i].save(stream, project);   // TODO: does xml stuff need project???
+        m_observationSolveSettings[i].save(stream, project);
       }
       stream.writeEndElement();
     }
@@ -949,7 +1316,7 @@ namespace Isis {
     stream.writeAttribute("listSize", toString(numberSolveSettings()));
     for (int i = 0; i < m_observationSolveSettings.size(); i++) {
       stream.writeStartElement("observationSolveSettings");
-      m_observationSolveSettings[i].save(stream, project);  // TODO: does xml stuff need project???
+      m_observationSolveSettings[i].save(stream, project);
       stream.writeEndElement();
     }
     stream.writeEndElement();
@@ -958,17 +1325,17 @@ namespace Isis {
   }
 
 
-
   /**
    * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-   *   BundleSettings::save() for the expected format.
+   * BundleSettings::save() for the expected format. This contructor is called inside the
+   * BundleSettings constructor that takes an XmlStackedHandlerReader. 
    *
    * @param bundleSettings The BundleSettings we're going to be initializing
-   * @param imageFolder The folder that contains the Cube
+   * @param project The project that contains the settings
    */
-  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {  // TODO: does xml stuff need project???
+  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {
     m_xmlHandlerBundleSettings = bundleSettings;
-    m_xmlHandlerProject = project;  // TODO: does xml stuff need project???
+    m_xmlHandlerProject = project;
     m_xmlHandlerCharacters = "";
     m_xmlHandlerObservationSettings.clear();
   }
@@ -984,20 +1351,25 @@ namespace Isis {
 //   */
 //  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
 //    m_xmlHandlerBundleSettings = bundleSettings;
-//    m_xmlHandlerProject = NULL;  // TODO: does xml stuff need project???
+//    m_xmlHandlerProject = NULL;
 //    m_xmlHandlerCharacters = "";
 //    m_xmlHandlerObservationSettings.clear();
 //  }
 
 
-
+  /**
+   * Destroys BundleSettings::XmlHandler object.
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   BundleSettings::XmlHandler::~XmlHandler() {
     // do not delete these pointers...
     // we don't own them, do we??? project passed into StatCumProbDistDynCalc constructor as pointer and bundleSettings = this
-    // delete m_xmlHandlerProject;   TODO: does xml stuff need project???
+    // delete m_xmlHandlerProject;
     m_xmlHandlerProject = NULL;
   }
-
 
 
   /**
@@ -1005,11 +1377,14 @@ namespace Isis {
    * handle the read when the startElement with the name localName has been found.
    * 
    * @param qName The qualified name of the tag.
-   * @param attributes The list of attributes for the tag.
-   * @return If we should continue reading the XML (usually true).
+   * @param attributes The list of attributes for the tag. 
+   *  
+   * @return @b bool Indicates whether to continue reading the XML (usually true).
    */
-  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                                const QString &qName, const QXmlAttributes &attributes) {
+  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, 
+                                                const QString &localName,
+                                                const QString &qName, 
+                                                const QXmlAttributes &attributes) {
     m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, attributes)) {
@@ -1085,7 +1460,8 @@ namespace Isis {
         QString outlierRejectionMultiplierStr = attributes.value("multiplier");
         if (!outlierRejectionMultiplierStr.isEmpty()) {
           if (outlierRejectionMultiplierStr != "N/A") {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = toDouble(outlierRejectionMultiplierStr);
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier 
+                = toDouble(outlierRejectionMultiplierStr);
           }
           else {
             m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
@@ -1096,17 +1472,20 @@ namespace Isis {
 
         QString convergenceCriteriaStr = attributes.value("convergenceCriteria");
         if (!convergenceCriteriaStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteria 
+              = stringToConvergenceCriteria(convergenceCriteriaStr);
         }
 
         QString convergenceCriteriaThresholdStr = attributes.value("threshold");
         if (!convergenceCriteriaThresholdStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold = toDouble(convergenceCriteriaThresholdStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold 
+              = toDouble(convergenceCriteriaThresholdStr);
         }
 
         QString convergenceCriteriaMaximumIterationsStr = attributes.value("maximumIterations");
         if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations = toInt(convergenceCriteriaMaximumIterationsStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations 
+              = toInt(convergenceCriteriaMaximumIterationsStr);
         }
       }
       else if (localName == "model") {
@@ -1126,7 +1505,8 @@ namespace Isis {
 
         QString createBundleOutputFileStr = attributes.value("createBundleOutputFile");
         if (!createBundleOutputFileStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_createBundleOutputFile = toBool(createBundleOutputFileStr);
+          m_xmlHandlerBundleSettings->m_createBundleOutputFile 
+              = toBool(createBundleOutputFileStr);
         }
 
         QString createCSVFilesStr = attributes.value("createCSVFiles");
@@ -1148,14 +1528,26 @@ namespace Isis {
   }
 
 
-
+  /**
+   * XML - TBD.
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   bool BundleSettings::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
 
-
+  /**
+   * XML - TBD.
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
@@ -1168,7 +1560,8 @@ namespace Isis {
       }
       else if (localName == "observationSolveSettingsList") {
         for (int i = 0; i < m_xmlHandlerObservationSettings.size(); i++) {
-          m_xmlHandlerBundleSettings->m_observationSolveSettings.append(*m_xmlHandlerObservationSettings[i]);
+          m_xmlHandlerBundleSettings->m_observationSolveSettings.append(
+              *m_xmlHandlerObservationSettings[i]);
         }
         m_xmlHandlerObservationSettings.clear();
       }
@@ -1179,7 +1572,13 @@ namespace Isis {
   }
 
 
-
+  /**
+   * XML - TBD.
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   bool BundleSettings::XmlHandler::fatalError(const QXmlParseException &exception) {
     qDebug() << "Parse error at line " << exception.lineNumber()
              << ", " << "column " << exception.columnNumber() << ": "
@@ -1188,7 +1587,14 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Writes BundleSettings object to a binary data stream. May be used for 
+   * HDF5. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   QDataStream &BundleSettings::write(QDataStream &stream) const {
 
     stream << m_id->toString()
@@ -1218,7 +1624,14 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Reads BundleSettings object from a binary data stream. May be used for 
+   * HDF5. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   QDataStream &BundleSettings::read(QDataStream &stream) {
 
     QString id;
@@ -1258,18 +1671,50 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Writes BundleSettings object to a binary data stream. May be used for 
+   * HDF5. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings) {
     return settings.write(stream);
   }
 
 
-
+  /**
+   * Reads BundleSettings object from a binary data stream. May be used for 
+   * HDF5. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   */
   QDataStream &operator>>(QDataStream &stream, BundleSettings &settings) {
     return settings.read(stream);
   }
 
 
+  /**
+   * HDF5 - TBD. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   * @param 
+   * @param 
+   *  
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   */
   void BundleSettings::createH5Group(H5::CommonFG &locationObject, QString locationName) const {
     try {
       // Try block to detect exceptions raised by any of the calls inside it
@@ -1403,11 +1848,12 @@ namespace Isis {
 
         // Data sets??? tables???
         // ??? QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
-        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
+        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+        // // TODO: pointer???
 //        return locationObject; 
       }
       // catch failure caused by the Attribute operations
-      catch( H5::AttributeIException error ) {
+      catch ( H5::AttributeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
@@ -1415,7 +1861,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSet operations
-      catch( H5::DataSetIException error ) {
+      catch ( H5::DataSetIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
@@ -1423,7 +1869,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSpace operations
-      catch( H5::DataSpaceIException error ) {
+      catch ( H5::DataSpaceIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
@@ -1431,7 +1877,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataType operations
-      catch( H5::DataTypeIException error ) {
+      catch ( H5::DataTypeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
@@ -1439,7 +1885,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the H5File operations
-      catch( H5::FileIException error ) {
+      catch ( H5::FileIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 FILE exception handler has detected an error when invoking the function " 
@@ -1447,7 +1893,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the Group operations
-      catch( H5::GroupIException error ) {
+      catch ( H5::GroupIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 GROUP exception handler has detected an error when invoking the function " 
@@ -1471,6 +1917,24 @@ namespace Isis {
   }
 
 
+  /**
+   * HDF5 - TBD. 
+   *  
+   * NOTE: Currently this method is not used and may be deleted. Documentation 
+   * and testing to be completed if called. TargetBody info should be added 
+   * also. 
+   * @param 
+   * @param 
+   *  
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   * @throw 
+   */
   void BundleSettings::openH5Group(H5::CommonFG &locationObject, QString locationName) {
     try {
       // Try block to detect exceptions raised by any of the calls inside it
@@ -1577,10 +2041,11 @@ namespace Isis {
 
         // Data sets??? tables???
         // ??? QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
-        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
+        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+        // // TODO: pointer???
       }
       // catch failure caused by the Attribute operations
-      catch( H5::AttributeIException error ) {
+      catch ( H5::AttributeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
@@ -1588,7 +2053,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSet operations
-      catch( H5::DataSetIException error ) {
+      catch ( H5::DataSetIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
@@ -1596,7 +2061,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSpace operations
-      catch( H5::DataSpaceIException error ) {
+      catch ( H5::DataSpaceIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
@@ -1604,7 +2069,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataType operations
-      catch( H5::DataTypeIException error ) {
+      catch ( H5::DataTypeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
@@ -1612,7 +2077,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the H5File operations
-      catch( H5::FileIException error ) {
+      catch ( H5::FileIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 FILE exception handler has detected an error when invoking the function " 
@@ -1620,7 +2085,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the Group operations
-      catch( H5::GroupIException error ) {
+      catch ( H5::GroupIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 GROUP exception handler has detected an error when invoking the function " 

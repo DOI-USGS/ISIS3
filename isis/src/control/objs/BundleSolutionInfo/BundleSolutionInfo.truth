@@ -17,6 +17,14 @@ Object = DefaultSolutionInfoObject
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes
@@ -107,6 +115,14 @@ Object = CopySolutionInfoObject
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes
@@ -197,6 +213,14 @@ Object = SelfAssignedSolutionInfoObject
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes
@@ -287,6 +311,14 @@ Object = AssignedSolutionInfoObject
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes
@@ -377,6 +409,14 @@ Object = MutatorTest
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes
@@ -457,15 +497,6 @@ we cannot test updateFileName().
 
 Testing error throws...
 
-**ERROR** Unable to read bundle solution information from the given HDF5 file [./dne.hdf].
-**I/O ERROR** No file with the given name was found.
-
-**ERROR** Unable to read bundle solution information from the given HDF5 file [./tempBundleSolutionInfo.hd].
-**I/O ERROR** The given file is unsupported for constructing BundleSolutionInfo objects. Supported file types include [hdf].
-
-**ERROR** Unable to save bundle solution information to an HDF5 file.
-**I/O ERROR** A file already exists with the given name [tempBundleSolutionInfo.hdf].
-
 Testing XML write/read...
 
 Testing HDF5 write/read...
@@ -486,6 +517,14 @@ Object = BundleSolutionInfoFromHDF
     ConvergenceCriteria                  = Sigma0
     ConvergenceCriteriaThreshold         = 1.0e-10
     ConvergenceCriteriaMaximumIterations = 50
+    SolveTargetBody                      = No
+    NumberTargetBodyParameters           = 0
+    SolvePoleRightAscension              = No
+    SolvePoleRightAscensionVelocity      = No
+    SolvePoleDeclination                 = No
+    SolvePoleDeclinationVelocity         = No
+    SolvePolePrimeMeridian               = No
+    SolvePolePrimeMeridianVelocity       = No
     CreateBundleOutputFile               = Yes
     CreateCSVFiles                       = Yes
     CreateResidualsFile                  = Yes

@@ -21,21 +21,24 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+// parent class
+#include <QObject>
 
+// Qt library
 #include <QList>
 #include <QPair>
-#include <QObject>
 #include <QSharedPointer>
 #include <QString>
 
+// hdf5 library
 #include <H5Cpp.h>
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
-#include "BundleObservationSolveSettings.h"
+// ISIS library
 #include "BundleTargetBody.h"
-#include "MaximumLikelihoodWFunctions.h" // why not forward declare???
-#include "PvlObject.h"
+#include "BundleObservationSolveSettings.h"
+#include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
 #include "XmlStackedHandler.h"
 
@@ -48,8 +51,7 @@ using namespace Isis;
 
 namespace Isis {
   class FileName;
-  class MaximumLikelihoodWFunctions;
-  class Project;  // TODO: does xml stuff need project???
+  class Project;
   class PvlObject;
   class XmlStackedHandlerReader;
 
@@ -80,33 +82,56 @@ namespace Isis {
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
    *   @history 2015-10-14 Jeffrey Covington - Declared BundleSettingsQsp as a
    *                           Qt metatype for use with QVariant.
+   *   @history 2016-06-30 Jeannie Backer - Changed method name from "getBundleTargetBody" to
+   *                           "bundleTargetBody" to comply with ISIS coding standards.
+   *                           Added documentation. Updated test. References #3976. Fixes #.
    *  
-   *   @todo Determine whether xml stuff needs a Project pointer
+   *  
+   *  
+   *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
-   *  
+   *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
+   *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
+   *         should be a list of pointers, or a pointer to a list, or a pointer to a list of
+   *         pointers, etc...
+   *   @todo Determine whether QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
+   *         m_maximumLikelihood should be a list of pointers, or a pointer to a list, or a pointer
+   *         to a list of pointers, etc...
+      ; 
+   *   @todo Determine which to use or delete: XML or HDF5. Whichever is used needs to be fully
+   *         documented, tested
    */
   class BundleSettings : public QObject {
     Q_OBJECT
     public:
-      BundleSettings(QObject *parent = 0);
-      BundleSettings(const BundleSettings &src);
+
+      //=====================================================================//
+      //================ constructors, destructor, operators ================//
+      //=====================================================================//
+      BundleSettings(QObject *parent = NULL);
+      BundleSettings(const BundleSettings &other);
       BundleSettings(Project *project, 
                      XmlStackedHandlerReader *xmlReader, 
-                     QObject *parent = 0);  // TODO: does xml stuff need project???
+                     QObject *parent = NULL);
+#if 0
       BundleSettings(FileName xmlFile,
                      Project *project, 
                      XmlStackedHandlerReader *xmlReader, 
-                     QObject *parent = 0);  // TODO: does xml stuff need project???
-      BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL); // parent = 0 or NULL ???
+                     QObject *parent = NULL);
+      BundleSettings(XmlStackedHandlerReader *xmlReader, 
+                     QObject *parent = NULL);
+#endif
       ~BundleSettings();
-
-      // copy constructor
-      BundleSettings &operator=(const BundleSettings &src);
+      BundleSettings &operator=(const BundleSettings &other);
 
       void setValidateNetwork(bool validate);
       bool validateNetwork() const;
 
-      // Solve Options
+
+      //=====================================================================//
+      //============================ Solve options ==========================//
+      //=====================================================================//
+
       /**
        * This enum defines the types of matrix decomposition methods for solving
        * the bundle. 
@@ -115,7 +140,9 @@ namespace Isis {
         Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
         SpecialK  //!< Dense normal equations matrix.
       };
-      // converter
+
+
+      // enum to/from string converters
       static SolveMethod stringToSolveMethod(QString solveMethod);
       static QString solveMethodToString(SolveMethod solveMethod);
 
@@ -128,8 +155,9 @@ namespace Isis {
                            double globalLatitudeAprioriSigma = Isis::Null, 
                            double globalLongitudeAprioriSigma = Isis::Null, 
                            double globalRadiusAprioriSigma = Isis::Null);
-      void setOutlierRejection(bool outlierRejection, double multiplier = 1.0);
-      void setObservationSolveOptions(QList<BundleObservationSolveSettings> observationSolveSettings);
+      void setOutlierRejection(bool outlierRejection, 
+                               double multiplier = 1.0);
+      void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
 
       // accessors
       SolveMethod solveMethod() const;
@@ -142,37 +170,49 @@ namespace Isis {
       double globalLatitudeAprioriSigma() const;
       double globalLongitudeAprioriSigma() const;
       double globalRadiusAprioriSigma() const;
-//      bool solveTargetBodyPolePosition() const;
 
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
 
-      // Convergence Criteria
+
+      //=====================================================================//
+      //======================- Convergence Criteria ========================//
+      //=====================================================================//
+
       /**
-       * This enum defines the options for convergence. 
+       * This enum defines the options for the bundle adjustment's convergence. 
        */
       enum ConvergenceCriteria {
-        Sigma0,              /**< Sigma0 will be used to determine that the bundle adjustment has 
-                                  converged.*/
+        Sigma0,              /**< The value of sigma0 will be used to determine that the bundle 
+                                  adjustment has converged.*/
         ParameterCorrections /**< All parameter corrections will be used to determine that the 
                                   bundle adjustment has converged.*/
       };
+
+
       static ConvergenceCriteria stringToConvergenceCriteria(QString criteria);
       static QString convergenceCriteriaToString(ConvergenceCriteria criteria);
-      void setConvergenceCriteria(ConvergenceCriteria criteria, double threshold, 
+      void setConvergenceCriteria(ConvergenceCriteria criteria, 
+                                  double threshold, 
                                   int maximumIterations);
       ConvergenceCriteria convergenceCriteria() const;
       double convergenceCriteriaThreshold() const;
       int convergenceCriteriaMaximumIterations() const;
 
-      // Parameter Uncertainties (Weighting)
+      //=====================================================================//
+      //================ Parameter Uncertainties (Weighting) ================//
+      //=====================================================================//
       // mutators
 //      void setGlobalLatitudeAprioriSigma(double sigma);
 //      void setGlobalLongitudeAprioriSigma(double sigma);
 //      void setGlobalRadiiAprioriSigma(double sigma);
 
-      // Maximum Likelihood Estimation Options
+
+      //=====================================================================//
+      //=============== Maximum Likelihood Estimation Options ===============// 
+      //=====================================================================// 
+
       /**
        * This enum defines the options for maximum likelihood estimation. 
        */
@@ -191,32 +231,44 @@ namespace Isis {
                                            aggressive model that intentionally removes the largest
                                            few percent of residuals.???? */
       };
+
+
       void addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
                                               double cQuantile);
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
           maximumLikelihoodEstimatorModels() const;
 
-      // Self Calibration ??? (from cnetsuite only)
+      //=====================================================================//
+      //========================= Self Calibration ==========================//
+      //=====================================================================//
 
-      // Target Body
-      void setBundleTargetBody(QSharedPointer<BundleTargetBody> bundleTargetBody);
-      QSharedPointer<BundleTargetBody> getBundleTargetBody();
 
+      //=====================================================================//
+      //============================== Target Body ==========================//
+      //=====================================================================//
+      void setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody);
+      BundleTargetBodyQsp bundleTargetBody() const;
+//      bool solveTargetBodyPolePosition() const;
 //      static TargetRadiiSolveMethod stringToTargetRadiiOption(QString option);
 //      static QString targetRadiiOptionToString(TargetRadiiSolveMethod targetRadiiSolveMethod);
+      int numberTargetBodyParameters() const;
+      bool solveTargetBody() const;
+      bool solvePoleRA() const;
+      bool solvePoleRAVelocity() const;
+      bool solvePoleDec() const;
+      bool solvePoleDecVelocity() const;
+      bool solvePM() const;
+      bool solvePMVelocity() const;
+//  void BundleSettings::setTargetBodySolveOptions(bool solveTargetBodyPolePosition,
 
-      bool solveTargetBody();
-      int numberTargetBodyParameters();
-      bool solvePoleRA();
-      bool solvePoleRAVelocity();
-      bool solvePoleDec();
-      bool solvePoleDecVelocity();
-      bool solvePM();
-      bool solvePMVelocity();
 
-      // Output Options ??? (from Jigsaw only)
-      void setOutputFiles(QString outputFilePrefix, bool createBundleOutputFile, 
-                          bool createCSVPointsFile, bool createResidualsFile);
+      //=====================================================================//
+      //================== Output Options ??? (from Jigsaw only)=============// 
+      //=====================================================================// 
+      void setOutputFiles(QString outputFilePrefix, 
+                          bool createBundleOutputFile, 
+                          bool createCSVPointsFile, 
+                          bool createResidualsFile);
       QString outputFilePrefix() const;
       bool createBundleOutputFile() const;
       bool createCSVFiles() const;
@@ -229,32 +281,50 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void createH5Group(hid_t locationId, QString locationName) const; //delete
-      void parseH5Group(hid_t locationId, QString locationName);        //delete
+      void createH5Group(hid_t locationId, 
+                         QString locationName) const; //delete
+      void parseH5Group(hid_t locationId, 
+                        QString locationName);        //delete
 
-      void createH5Group(H5::CommonFG &locationObject, QString locationName) const;
-      H5::Group createH5Group2(H5::Group locationGroup, QString locationName);
-      void openH5Group(H5::CommonFG &locationObject, QString locationName);
-      BundleSettings(H5::CommonFG &locationObject, QString locationName);
+      void createH5Group(H5::CommonFG &locationObject, 
+                         QString locationName) const;
+      H5::Group createH5Group2(H5::Group locationGroup, 
+                               QString locationName);
+      void openH5Group(H5::CommonFG &locationObject, 
+                       QString locationName);
+      BundleSettings(H5::CommonFG &locationObject, 
+                     QString locationName);
 
     private:
+
+      //=====================================================================//
+      //============= Saving/Restoring a BundleSettings object ==============//
+      //=====================================================================//
+
       /**
-       *
+       * This class is needed to read/write BundleSettings from/to an XML 
+       * formateed file. 
+       *  
        * @author 2014-07-21 Ken Edmundson
        *
-       * @internal
+       * @internal 
+       *   @history 2014-07-21 Ken Edmundson - Original version.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleSettings *bundleSettings, Project *project);
+          XmlHandler(BundleSettings *bundleSettings, 
+                     Project *project);
           XmlHandler(BundleSettings *bundleSettings);
           ~XmlHandler();
    
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool startElement(const QString &namespaceURI, 
+                                    const QString &localName,
+                                    const QString &qName, 
+                                    const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
+          virtual bool endElement(const QString &namespaceURI, 
+                                  const QString &localName,
+                                  const QString &qName);
           bool fatalError(const QXmlParseException &exception);
 
         private:
@@ -266,44 +336,48 @@ namespace Isis {
           QList<BundleObservationSolveSettings *> m_xmlHandlerObservationSettings;
       };
 
+
       /** 
        * This struct is needed to write the m_maximumLikelihood variable as an 
        * HDF5 table. Each table record has 3 field values: index, name, and 
        * quantile. 
        */
       struct MaximumLikelihoodModelTableRecord {
-          unsigned int indexFieldValue;
-          QString nameFieldValue;
-          double quantileFieldValue;
+          unsigned int indexFieldValue; //!< The index of the TableRecord.???
+          QString nameFieldValue; //!< The model name of the TableRecord.???
+          double quantileFieldValue; //!< The quantile of the TableRecord.???
       };
 
-      /**
-       * A unique ID for this BundleSettings object (useful for others to reference this object
-       *   when saving to disk).
-       */
-      QUuid *m_id;
-
-      bool m_validateNetwork;
+      QUuid *m_id; /**< A unique ID for this BundleSettings object. 
+                        Used to reference this object when saving to disk.*/
+      bool m_validateNetwork; //!< Indicates whether the network should be validated.
       SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
-      bool m_solveObservationMode; //!< for observation mode (explain this somewhere)
-      bool m_solveRadius; //!< to solve for point radii
-      bool m_updateCubeLabel; //!< update cubes (only here for output into bundleout.txt)
-      bool m_errorPropagation; //!< to perform error propagation
-      bool m_outlierRejection; //!< to perform automatic outlier detection/rejection
-      double m_outlierRejectionMultiplier; // multiplier = 1 if rejection = false
+      bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
+      bool m_solveRadius; //!< Indicates whether to solve for point radii.
+      bool m_updateCubeLabel; //!< Indicates whether to update cubes.
+      bool m_errorPropagation; //!< Indicates whether to perform error propagation.
+      bool m_outlierRejection; /**< Indicates whether to perform automatic 
+                                    outlier detection/rejection.*/
+      double m_outlierRejectionMultiplier; /**< The multiplier value for outlier rejection.
+                                                Defaults to 1, so no change if rejection = false.*/
 
       // Parameter Uncertainties (Weighting)
-      double m_globalLatitudeAprioriSigma;
-      double m_globalLongitudeAprioriSigma;
-      double m_globalRadiusAprioriSigma;
+      double m_globalLatitudeAprioriSigma;  //!< The global a priori sigma for latitude.
+      double m_globalLongitudeAprioriSigma; //!< The global a priori sigma for longitude.
+      double m_globalRadiusAprioriSigma;    //!< The global a priori sigma for radius.
 
       // QList of observation solve settings
-      QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
+      QList<BundleObservationSolveSettings> m_observationSolveSettings; //!<
 
       // Convergence Criteria
-      ConvergenceCriteria m_convergenceCriteria;
-      double m_convergenceCriteriaThreshold;
-      int m_convergenceCriteriaMaximumIterations;
+      ConvergenceCriteria m_convergenceCriteria;  /**< Enumeration used to indicate what criteria 
+                                                       to use to determine bundle 
+                                                       adjustment convergence.*/
+      double m_convergenceCriteriaThreshold;      /**< Tolerance value corresponding to the selected 
+                                                       convergence criteria.*/
+      int m_convergenceCriteriaMaximumIterations; /**< Maximum number of iterations before 
+                                                       quitting the bundle adjustment if it has 
+                                                       not yet converged to the given threshold.*/
 
       // Maximum Likelihood Estimation Options
       /**
@@ -313,21 +387,27 @@ namespace Isis {
        * list and that the Welsch and Chen models can not be used for the 
        * first model.
        */
-      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
+      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; 
 
-      // Self Calibration ??? (from cnetsuite only)
+      // Self Calibration
 
       // Target Body
-      bool m_solveTargetBody;
-      BundleTargetBodyQsp m_bundleTargetBody;
+      bool m_solveTargetBody; //!< Indicates whether to solve for target body.
+      BundleTargetBodyQsp m_bundleTargetBody; /**< A pointer to the target body
+                                                   settings and information.*/
 
-      // Output Options ??? (from Jigsaw only)
-      QString m_outputFilePrefix; //!< output file prefix
-      bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
-      bool m_createCSVFiles; //!< to output points and image station data in csv format
-      bool m_createResidualsFile; //!< to output residuals in csv format
+      // Output Options
+      QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
+                                          output files to be written to the current directory, the 
+                                          output directory path should be included in this prefix.*/
+      bool m_createBundleOutputFile; /**< Indicates whether to print the standard bundle output file
+                                          (bundleout.txt).*/
+      bool m_createCSVFiles;         /**< Indicates whether to output points and image station data 
+                                          in csv format.*/
+      bool m_createResidualsFile;    /**< Indicates whether to output residuals in csv format.*/
  };
   // typedefs
+  //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.
   typedef QSharedPointer<BundleSettings> BundleSettingsQsp;
 
   // operators to read/write BundleResults to/from binary data

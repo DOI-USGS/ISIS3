@@ -25,8 +25,8 @@
  */
 
 #include <QList>
-#include <QObject>
 #include <QPair>
+#include <QObject>
 #include <QString>
 #include <QVector>
 
@@ -74,15 +74,12 @@ namespace Isis {
    *                           member variables to make names more descriptive.
    *   @history 2015-10-14 Jeffrey Covington - Declared BundleResults as a Qt
    *                           metatype for use with QVariant.
-   *   @history 2016-07-01 Jesse Mapel - Updated documentation and testing in preparation for
-   *                           merging from IPCE into ISIS. Fixes #3975.
    */
   class BundleResults : public QObject {
     Q_OBJECT
     public:
       BundleResults(QObject *parent = 0);
-      // TODO: does xml stuff need project???
-      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   // TODO: does xml stuff need project???
       BundleResults(const BundleResults &src);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &src);
@@ -128,14 +125,13 @@ namespace Isis {
 #endif
       void setRejectionLimit(double rejectionLimit);
 #if 0
-      double computeResiduals(
-               ControlNet *pCnet,
-               std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointWeights,
-               std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointCorrections,
-               boost::numeric::ublas::vector< double > image_Corrections,
-               std::vector< double > imageParameterWeights,
-               int numImagePartials,
-               int rank);
+      double computeResiduals(ControlNet *pCnet,
+                              std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointWeights,
+                              std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointCorrections,
+                              boost::numeric::ublas::vector< double > image_Corrections,
+                              std::vector< double > imageParameterWeights,
+                              int numImagePartials,
+                              int rank);
 #endif
       void setRmsXYResiduals(double rx, double ry, double rxy);
 #if 0
@@ -222,8 +218,7 @@ namespace Isis {
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);
 
-      // TODO: does xml stuff need project???
-      void save(QXmlStreamWriter &stream, const Project *project) const;
+      void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
       
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -237,25 +232,21 @@ namespace Isis {
 
     private:
       /**
-       * This class is an XmlHandler used to read and write BundleResults objects
-       * from and to XML files.  Documentation will be updated when it is decided
-       * if XML support will remain.
-       * 
+       *
        * @author 2014-07-28 Jeannie Backer
        *
        * @internal
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          // TODO: does xml stuff need project???
-          XmlHandler(BundleResults *statistics, Project *project);
+          XmlHandler(BundleResults *statistics, Project *project);   // TODO: does xml stuff need project???
           ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
+                                    const QString &qName);
    
         private:
           Q_DISABLE_COPY(XmlHandler);
@@ -277,7 +268,7 @@ namespace Isis {
 
           QString m_xmlHandlerCorrelationImageId;
           QStringList m_xmlHandlerCorrelationParameterList;
-          QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
+          QMap< QString, QStringList> m_xmlHandlerCorrelationMap;
       };
 
       /**
@@ -286,7 +277,7 @@ namespace Isis {
        */
       QUuid *m_id;
 //???      QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
-      CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
+      CorrelationMatrix *m_correlationMatrix;
 
 // ???       Statistics m_statsx;                       //!<  x errors
 // ???       Statistics m_statsy;                       //!<  y errors
@@ -329,32 +320,26 @@ namespace Isis {
       QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics 
                                                        for each image in the bundle  */
 
-      //!< The root mean square image x sigmas.
       QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???
-      //!< The root mean square image y sigmas.
       QVector<Statistics> m_rmsImageYSigmas;     // unset and unused ???
-      //!< The root mean square image z sigmas.
       QVector<Statistics> m_rmsImageZSigmas;     // unset and unused ???
-      //!< The root mean square image right ascension sigmas.
       QVector<Statistics> m_rmsImageRASigmas;    // unset and unused ???
-      //!< The root mean square image declination sigmas.
       QVector<Statistics> m_rmsImageDECSigmas;   // unset and unused ???
-      //!< The root mean square image twist sigmas.
       QVector<Statistics> m_rmsImageTWISTSigmas; // unset and unused ???
 
-      Distance m_minSigmaLatitudeDistance; //!< The minimum sigma latitude distance.
-      Distance m_maxSigmaLatitudeDistance; //!< The maximum sigma latitude distance.
-      Distance m_minSigmaLongitudeDistance; //!< The minimum sigma longitude distance.
-      Distance m_maxSigmaLongitudeDistance; //!< The maximum sigma longitude distance.
-      Distance m_minSigmaRadiusDistance; //!< The minimum sigma radius distance.
-      Distance m_maxSigmaRadiusDistance; //!< The maximum sigma radius distance.
+      Distance m_minSigmaLatitudeDistance;
+      Distance m_maxSigmaLatitudeDistance;
+      Distance m_minSigmaLongitudeDistance;
+      Distance m_maxSigmaLongitudeDistance;
+      Distance m_minSigmaRadiusDistance;
+      Distance m_maxSigmaRadiusDistance;
 
-      QString m_minSigmaLatitudePointId; //!< The minimum sigma latitude point id.
-      QString m_maxSigmaLatitudePointId; //!< The maximum sigma latitude point id.
-      QString m_minSigmaLongitudePointId; //!< The minimum sigma longitude point id.
-      QString m_maxSigmaLongitudePointId; //!< The maximum sigma longitude point id.
-      QString m_minSigmaRadiusPointId; //!< The minimum sigma radius point id.
-      QString m_maxSigmaRadiusPointId; //!< The maximum sigma radius point id.
+      QString m_minSigmaLatitudePointId;
+      QString m_maxSigmaLatitudePointId;
+      QString m_minSigmaLongitudePointId;
+      QString m_maxSigmaLongitudePointId;
+      QString m_minSigmaRadiusPointId;
+      QString m_maxSigmaRadiusPointId;
 
       double m_rmsSigmaLatitudeStats;               //!< rms of adjusted Latitude sigmas
       double m_rmsSigmaLongitudeStats;               //!< rms of adjusted Longitude sigmas
@@ -363,8 +348,6 @@ namespace Isis {
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
-      //!< The maximum likelihood models and their quantiles.
       QList< QPair< MaximumLikelihoodWFunctions, double > > m_maximumLikelihoodFunctions;
 
       /**< The number of maximum likelihood estimation 
@@ -378,7 +361,7 @@ namespace Isis {
       /**< Quantiles of the |residual| distribution to be
            used for tweaking constants of the maximum 
            probability models.*/
-      int m_maximumLikelihoodIndex;            /**< This count keeps track of which stage of the
+      int m_maximumLikelihoodIndex;            /**< This count keeps track of which stadge of the
                                                     maximum likelihood adjustment the bundle is
                                                     currently on.*/
       StatCumProbDistDynCalc *m_cumPro;        /**< This class will be used to calculate the

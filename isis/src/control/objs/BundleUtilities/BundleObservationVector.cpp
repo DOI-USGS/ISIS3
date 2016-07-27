@@ -59,7 +59,7 @@ namespace Isis {
     else {
       // create new BundleObservation and append to this vector
       bundleObservation = new BundleObservation(bundleImage, observationNumber, instrumentId,
-                                                bundleSettings->getBundleTargetBody());
+                                                bundleSettings->bundleTargetBody());
 
       if (!bundleObservation) {
         QString message = "unable to allocate new BundleObservation ";
@@ -210,7 +210,7 @@ else {
    * TODO
    */
   BundleObservation *BundleObservationVector::
-      getObservationByCubeSerialNumber(QString cubeSerialNumber) {
+      observationByCubeSerialNumber(QString cubeSerialNumber) {
 
     if (m_imageSerialToObservationMap.contains(cubeSerialNumber))
       return m_imageSerialToObservationMap.value(cubeSerialNumber);

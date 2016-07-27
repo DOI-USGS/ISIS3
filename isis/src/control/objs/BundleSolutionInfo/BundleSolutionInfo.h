@@ -63,24 +63,22 @@ namespace Isis {
    *                           a Qt metatype for use with QVariant.
    *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
    *                           Fixes #2298.
-   *   @history 2016-07-08 Ian Humphrey - Minor updates to documentation, updated unit test (in
-   *                           preparing to add BundleSolutionInfo to trunk).
-   *                           Fixes #4109, #3974.
+   *  
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
     public:
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
-                         FileName controlNetworkFileName, 
-                         BundleResults outputStatistics, 
-                         QObject *parent = 0);
+                    FileName controlNetworkFileName, 
+                    BundleResults outputStatistics, 
+                    QObject *parent = 0);
       BundleSolutionInfo(Project *project, 
-                         XmlStackedHandlerReader *xmlReader, 
-                         QObject *parent = 0);  //TODO does xml stuff need project???
+                    XmlStackedHandlerReader *xmlReader, 
+                    QObject *parent = 0);  //TODO does xml stuff need project???
       BundleSolutionInfo(FileName bundleSolutionInfoFile);
-      BundleSolutionInfo(const BundleSolutionInfo &other);
+      BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
-      BundleSolutionInfo &operator=(const BundleSolutionInfo &other);
+      BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
@@ -135,7 +133,7 @@ namespace Isis {
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
+                                    const QString &qName);
 
         private:
           Q_DISABLE_COPY(XmlHandler);
@@ -151,9 +149,8 @@ namespace Isis {
     private:
       BundleSolutionInfo();
 
-      /** A unique ID for this BundleSolutionInfo object (useful for others to reference this
-          object when saving to disk).
-      */
+      //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
+      //! object when saving to disk).
       QUuid              *m_id;
       QString             m_runTime; //!< The run time of the bundle adjust
       FileName           *m_controlNetworkFileName; //!< The name of the control network

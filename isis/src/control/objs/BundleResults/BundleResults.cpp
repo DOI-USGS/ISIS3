@@ -7,10 +7,10 @@
 #include <QUuid>
 #include <QXmlStreamWriter>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include <H5Cpp.h>
 #include <hdf5_hl.h>
@@ -37,11 +37,6 @@ using namespace boost::numeric::ublas;
 
 namespace Isis {
 
-  /**
-   * Constructs a BundleSettings object.
-   * 
-   * @param parent The Qt-relationship parent.
-   */
   BundleResults::BundleResults(QObject *parent) : QObject(parent) {
 
     initialize();
@@ -58,17 +53,16 @@ namespace Isis {
   }
 
 
+
   /**
    * Construct this BundleSettings object from XML.
    *
-   * @param bundleSettingsFolder Where the settings XML for this bundle adjustment
-   *                             resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to a <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent.
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
    */
   BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader,
-                               QObject *parent) : QObject(parent) {   
-                               // TODO: does xml stuff need project???
+                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
 
     initialize();
 
@@ -78,25 +72,11 @@ namespace Isis {
   }
 
 
-  /**
-   * Constructs this BundleSettings object from Hdf5.
-   * 
-   * @param locationObject The Hdf5 project file to be used.
-   * @param locationName The name of the project file containing the BundleResults.
-   * 
-   * @see openH5Group
-   */
   BundleResults::BundleResults(H5::CommonFG &locationObject, QString locationName) {
     openH5Group(locationObject, locationName);
   }
 
 
-  /**
-   * Copy constructor for BundleResults.  Creates this BundleSettings object as a copy
-   * of another BundleResults object.
-   * 
-   * @param src The other BundleResults object to be copied.
-   */
   BundleResults::BundleResults(const BundleResults &src)
       : m_id(new QUuid(src.m_id->toString())),
         m_correlationMatrix(new CorrelationMatrix(*src.m_correlationMatrix)),
@@ -152,9 +132,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Destroys this BundleResults object.
-   */
+
   BundleResults::~BundleResults() {
     
     delete m_id;
@@ -171,13 +149,8 @@ namespace Isis {
 
   }
 
+  
 
-  /**
-   * Assignment operator for BundleResults. Overwrites this BundleResults object with
-   * another BundleResults object.
-   * 
-   * @param src The other BundleResults object to be copied from.
-   */
   BundleResults &BundleResults::operator=(const BundleResults &src) {
 
     if (&src != this) {
@@ -249,11 +222,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Initializes the BundleResults to a default state where all numeric members are set to
-   * 0 or another default value, all QString members are set to empty, all QVectors and
-   * QLists are cleared, and all other members are set to NULL.
-   */
   void BundleResults::initialize() {
     m_id = NULL;
     m_correlationMatrix = NULL;
@@ -337,59 +305,40 @@ namespace Isis {
   }
 
 
-  /**
-   * Resizes all image sigma vectors.
-   * 
-   * @param numberImages The new size for the image sigma vectors.
-   */
+
   void BundleResults::resizeSigmaStatisticsVectors(int numberImages) {
-    m_rmsImageXSigmas.resize(numberImages);
-    m_rmsImageYSigmas.resize(numberImages);
-    m_rmsImageZSigmas.resize(numberImages);
-    m_rmsImageRASigmas.resize(numberImages);
-    m_rmsImageDECSigmas.resize(numberImages);
-    m_rmsImageTWISTSigmas.resize(numberImages);
+      m_rmsImageXSigmas.resize(numberImages);
+      m_rmsImageYSigmas.resize(numberImages);
+      m_rmsImageZSigmas.resize(numberImages);
+      m_rmsImageRASigmas.resize(numberImages);
+      m_rmsImageDECSigmas.resize(numberImages);
+      m_rmsImageTWISTSigmas.resize(numberImages);
   }
 
 
 #if 0
   void BundleResults::setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
-                                               QVector<Statistics> rmsImageSampleResiduals,
-                                               QVector<Statistics> rmsImageResiduals) {
-    // QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
-    m_rmsImageLineResiduals = rmsImageLineResiduals.toList();
+                                                  QVector<Statistics> rmsImageSampleResiduals,
+                                                  QVector<Statistics> rmsImageResiduals) {
+    m_rmsImageLineResiduals = rmsImageLineResiduals.toList();// QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
     m_rmsImageSampleResiduals = rmsImageSampleResiduals.toList();
     m_rmsImageResiduals = rmsImageResiduals.toList();
   }
 #endif
 
 
-  /**
-   * Sets the root mean square image residual Statistics lists.
-   * 
-   * @param rmsImageLineResiduals The new image line residuals list.
-   * @param rmsImageSampleResiduals The new image sample residuals list.
-   * @param rmsImageResiduals The new image residuals list.
-   */
   void BundleResults::setRmsImageResidualLists(QList<Statistics> rmsImageLineResiduals,
-                                               QList<Statistics> rmsImageSampleResiduals,
-                                               QList<Statistics> rmsImageResiduals) {
+                                                  QList<Statistics> rmsImageSampleResiduals,
+                                                  QList<Statistics> rmsImageResiduals) {
     m_rmsImageLineResiduals = rmsImageLineResiduals;
     m_rmsImageSampleResiduals = rmsImageSampleResiduals;
     m_rmsImageResiduals = rmsImageResiduals;
   }
 
 
-  /**
-   * Sets the min and max sigma latitude distances and point ids.
-   * 
-   * @param minLatDist The new minimum sigma latitude distance.
-   * @param maxLatDist The new maximum sigma latitude distance.
-   * @param minLatPointId The new minimum sigma latitude point id.
-   * @param maxLatPointId The new maximum sigma latitude point id.
-   */
+
   void BundleResults::setSigmaLatitudeRange(Distance minLatDist, Distance maxLatDist,
-                                            QString minLatPointId, QString maxLatPointId) {
+                                               QString minLatPointId, QString maxLatPointId) {
     m_minSigmaLatitudeDistance = minLatDist;
     m_maxSigmaLatitudeDistance = maxLatDist;
     m_minSigmaLatitudePointId  = minLatPointId;
@@ -397,16 +346,9 @@ namespace Isis {
   }
 
 
-  /**
-   * Sets the min and max sigma longitude distances and point ids.
-   * 
-   * @param minLonDist The new minimum sigma longitude distance.
-   * @param maxLonDist The new maximum sigma longitude distance.
-   * @param minLonPointId The new minimum sigma longitude point id.
-   * @param maxLonPointId The new maximum sigma longitude point id.
-   */
+
   void BundleResults::setSigmaLongitudeRange(Distance minLonDist, Distance maxLonDist,
-                                             QString minLonPointId, QString maxLonPointId) {
+                                                QString minLonPointId, QString maxLonPointId) {
     m_minSigmaLongitudeDistance = minLonDist;
     m_maxSigmaLongitudeDistance = maxLonDist;
     m_minSigmaLongitudePointId  = minLonPointId;
@@ -414,16 +356,9 @@ namespace Isis {
   }
 
 
-  /**
-   * Sets the min and max sigma radius distances and point ids.
-   * 
-   * @param minRadDist The new minimum sigma radius distance.
-   * @param maxRadDist The new maximum sigma radius distance.
-   * @param minRadPointId The new minimum sigma radius point id.
-   * @param maxRadPointId The new maximum sigma radius point id.
-   */
+
   void BundleResults::setSigmaRadiusRange(Distance minRadDist, Distance maxRadDist,
-                                          QString minRadPointId, QString maxRadPointId) {
+                                             QString minRadPointId, QString maxRadPointId) {
     m_minSigmaRadiusDistance = minRadDist;
     m_maxSigmaRadiusDistance = maxRadDist;
     m_minSigmaRadiusPointId  = minRadPointId;
@@ -431,29 +366,20 @@ namespace Isis {
   }
 
 
-  /**
-   * Sets the root mean square values of the adjusted latitiude sigmas, adjusted longitude sigmas,
-   * and adjusted radius sigmas.
-   * 
-   * @param rmsFromSigmaLatStats The new RMS value of the adjusted latitude sigmas.
-   * @param rmsFromSigmaLonStats The new RMS value of the adjusted longitude sigmas.
-   * @param rmsFromSigmaRadStats The new RMS value of the adjusted radius sigmas.
-   */
+
   void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaLatStats,
-                                                double rmsFromSigmaLonStats,
-                                                double rmsFromSigmaRadStats) {
+                                                   double rmsFromSigmaLonStats,
+                                                   double rmsFromSigmaRadStats) {
     m_rmsSigmaLatitudeStats = rmsFromSigmaLatStats;
     m_rmsSigmaLongitudeStats = rmsFromSigmaLonStats;
     m_rmsSigmaRadiusStats = rmsFromSigmaRadStats;
   }
 
 
+
   /** 
   * This method steps up the maximum likelihood estimation solution.  Up to three successive
   * solutions models are available.
-  * 
-  * @param modelsWithQuantiles The maixmum likelihood models and their quantiles.  If empty,
-  *                            then maximum likelihood estimation will not be used.
   */
   void BundleResults::maximumLikelihoodSetUp(
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > modelsWithQuantiles) {
@@ -488,15 +414,13 @@ namespace Isis {
     }
     
 
-    //maximum likelihood estimation tiered solutions requiring multiple convergeances are supported,
+    //maximum likelihood estimation tiered solutions requiring multiple convergeances are support,
     // this index keeps track of which tier the solution is in
     m_maximumLikelihoodIndex = 0;
   }
 
 
-  /**
-   * Prints out information about which tier the solution is in and the status of the residuals.
-   */
+
   void BundleResults::printMaximumLikelihoodTierInformation() {
     printf("Maximum Likelihood Tier: %d\n", m_maximumLikelihoodIndex);
     if (numberMaximumLikelihoodModels() > m_maximumLikelihoodIndex) {
@@ -510,125 +434,78 @@ namespace Isis {
       m_maximumLikelihoodMedianR2Residuals = m_cumPro->value(0.5);
       printf("Median of R^2 residuals:  %lf\n", m_maximumLikelihoodMedianR2Residuals);
 
-      //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals|
-      // so it will be up to date for the next iteration
+      //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals| --so it will be up to date for the next iteration
       initializeProbabilityDistribution(101);
     }
   }
 
 
-  /**
-   * Initializes or resets the cumulative probability distribution of |R^2 residuals|.
-   * 
-   * @param nodes The number of quantiles in the cumulative probability distribution.
-   */
+
   void BundleResults::initializeProbabilityDistribution(unsigned int nodes) {
     m_cumPro->setQuantiles(nodes);
   }
 
 
-  /**
-   * Initializes or resets the cumulative probability distribution of residuals used for reporting.
-   * 
-   * @param nodes The number of quantiles in the cumulative probability distribution.
-   */
+
   void BundleResults::initializeResidualsProbabilityDistribution(unsigned int nodes) {
     m_cumProRes->setQuantiles(nodes);
   }
 
 
-  /**
-   * Adds an observation to the cumulative probability distribution
-   * of |R^2 residuals|.
-   * 
-   * @param observationValue The value of the added observation.
-   */
+
   void BundleResults::addProbabilityDistributionObservation(double observationValue) {
     m_cumPro->addObs(observationValue);
   }
 
 
-  /**
-   * Adds an observation to the cumulative probability distribution
-   * of residuals used for reporting.
-   * 
-   * @param observationValue The value of the added observation.
-   */
+
   void BundleResults::addResidualsProbabilityDistributionObservation(double observationValue) {
     m_cumProRes->addObs(observationValue);
   }
 
 
-  /**
-   * Increases the value that indicates which stage the maximum likelihood adjustment
-   * is currently on.
-   */
+
   void BundleResults::incrementMaximumLikelihoodModelIndex() {
     m_maximumLikelihoodIndex++;
   }
 
 
-  /**
-   * Increase the number of 'fixed' (ground) points.
-   */
+
   void BundleResults::incrementFixedPoints() {
     m_numberFixedPoints++;
   }
 
 
-  /**
-   * Returns the number of 'fixed' (ground) points.
-   * 
-   * @return @b int The number of fixed points.
-   */
+
   int BundleResults::numberFixedPoints() const {
     return m_numberFixedPoints;
   }
 
 
-  /**
-   * Increases the number of 'held' images.
-   */
+
   void BundleResults::incrementHeldImages() {
     m_numberHeldImages++;
   }
 
 
-  /**
-   * Returns the number of 'held' images.
-   * 
-   * @return @b int The number of held images.
-   */
+
   int BundleResults::numberHeldImages() const {
     return m_numberHeldImages;
   }
 
 
-  /**
-   * Increase the number of ignored points.
-   */
+
   void BundleResults::incrementIgnoredPoints() {
     m_numberIgnoredPoints++;
   }
 
 
-  /**
-   * Returns the number of ignored points.
-   * 
-   * @return @b int The number of ignored points.
-   */
   int BundleResults::numberIgnoredPoints() const {
     return m_numberIgnoredPoints;
   }
 
 
-  /**
-   * Sets the root mean square of the x and y residuals.
-   * 
-   * @param rx The RMS value of the x residuals.
-   * @param ry The RMS value of the y residuals.
-   * @param rxy The RMS value of both the x and y residuals.
-   */
+
   void BundleResults::setRmsXYResiduals(double rx, double ry, double rxy) {
     m_rmsXResiduals = rx;
     m_rmsYResiduals = ry;
@@ -636,113 +513,73 @@ namespace Isis {
   }
 
 
-  /**
-   * Sets the rejection limit.
-   * 
-   * @param rejectionLimit The rejection limit.
-   */
+
   void BundleResults::setRejectionLimit(double rejectionLimit) {
     m_rejectionLimit = rejectionLimit;
   }
 
 
-  /**
-   * Sets the number of rejected observations.
-   * 
-   * @param numberRejectedObservations The number of rejected observations.
-   */
+
   void BundleResults::setNumberRejectedObservations(int numberRejectedObservations) {
     m_numberRejectedObservations = numberRejectedObservations;
   }
 
 
-  /**
-   * Sets the number of observations.
-   * 
-   * @param numberObservations The number of observations.
-   */
+
   void BundleResults::setNumberObservations(int numberObservations) {
     m_numberObservations = numberObservations;
   }
 
 
-  /**
-   * Sets the number of image parameters.
-   * 
-   * @param numberParameters The number of image parameters.
-   */
+
   void BundleResults::setNumberImageParameters(int numberParameters) {
     m_numberImageParameters = numberParameters;
   }
 
 
-  /**
-   * Resets the number of contrained point parameters to 0.
-   */
+
   void BundleResults::resetNumberConstrainedPointParameters() {
     m_numberConstrainedPointParameters = 0;
   }
 
 
-  /**
-   * Increase the number of contrained point parameters.
-   * 
-   * @param incrementAmount The amount to increase by.
-   */
+
   void BundleResults::incrementNumberConstrainedPointParameters(int incrementAmount) {
     m_numberConstrainedPointParameters += incrementAmount;
   }
 
 
-  /**
-   * Resets the number of constrained image parameters to 0.
-   */
+
   void BundleResults::resetNumberConstrainedImageParameters() {
     m_numberConstrainedImageParameters = 0;
   }
 
 
-  /**
-   * Increase the number of constrained image parameters.
-   * 
-   * @param incrementAmount The amount to increase by.
-   */
+
   void BundleResults::incrementNumberConstrainedImageParameters(int incrementAmount) {
     m_numberConstrainedImageParameters += incrementAmount;
   }
 
 
-  /**
-   * Resets the number of constrained target parameters to 0.
-   */
+
   void BundleResults::resetNumberConstrainedTargetParameters() {
     m_numberConstrainedTargetParameters = 0;
   }
 
 
-  /**
-   * Increases the number of constrained target parameters.
-   * 
-   * @param incrementAmount The amount to increase by.
-   */
+
   void BundleResults::incrementNumberConstrainedTargetParameters(int incrementAmount) {
     m_numberConstrainedTargetParameters += incrementAmount;
   }
 
 
-  /**
-   * Sets the total number of parameters to solve for.
-   * 
-   * @param numberParameters The number of parameters to solve for.
-   */
+
   void BundleResults::setNumberUnknownParameters(int numberParameters) {
     m_numberUnknownParameters = numberParameters;
   }
 
 
-  /**
-   * Computes the degrees of freedom of the bundle adjustment and stores it internally.
-   */
+
   void BundleResults::computeDegreesOfFreedom() {
     m_degreesOfFreedom = m_numberObservations
                          + m_numberConstrainedPointParameters
@@ -752,17 +589,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Computes the sigma0 and stores it internally.
-   * 
-   * @param dvtpv The weighted sum of the squares of the residuals.  Computed by
-   *              V transpose * P * V, where
-   *              V is the vector of residuals and
-   *              P is the weight matrix.
-   * @param criteria The convergence criteria for the bundle adjustment.
-   * 
-   * @throws IException::Io "Computed degrees of freedom is invalid."
-   */
+
   void BundleResults::computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria) {
     computeDegreesOfFreedom();
 
@@ -782,51 +609,31 @@ namespace Isis {
   }
 
 
-  /**
-   * Sets the degrees of freedom.
-   * 
-   * @param degreesOfFreedom The degrees of freedom.
-   */
+
   void BundleResults::setDegreesOfFreedom(double degreesOfFreedom) { // old sparse
     m_degreesOfFreedom = degreesOfFreedom;
   }
 
 
-  /**
-   * Sets the sigma0.
-   * 
-   * @param sigma0 The sigma0.
-   */
+
   void BundleResults::setSigma0(double sigma0) { // old sparse
     m_sigma0 = sigma0;
   }
 
 
-  /**
-   * Sets the elapsed time for the bundle adjustment.
-   * 
-   * @param time The elapsed time.
-   */
+
   void BundleResults::setElapsedTime(double time) {
     m_elapsedTime = time;
   }
 
 
-  /**
-   *  Sets the elapsed time for error propegation.
-   * 
-   * @param time The elapsed time.
-   */
+
   void BundleResults::setElapsedTimeErrorProp(double time) {
     m_elapsedTimeErrorProp = time;
   }
 
 
-  /**
-   * Sets if the bundle adjustment converged.
-   * 
-   * @param converged If the bundle adjustment converged.
-   */
+
   void BundleResults::setConverged(bool converged) {
     m_converged = converged;
   }
@@ -834,480 +641,286 @@ namespace Isis {
 
 
   //************************* Accessors **********************************************************//
-  
-  /**
-   * Returns the list of RMS image sample residuals statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image sample residual statistics.
-   */
   QList<Statistics> BundleResults::rmsImageSampleResiduals() const {
     return m_rmsImageSampleResiduals;
   }
 
 
-  /**
-   * Returns the list of RMS image line residuals statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image line residual statistics.
-   */
+
   QList<Statistics> BundleResults::rmsImageLineResiduals() const {
     return m_rmsImageLineResiduals;
   }
 
 
-  /**
-   * Returns the list of RMS image residuals statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image residual statistics.
-   */
+
   QList<Statistics> BundleResults::rmsImageResiduals() const {
     return m_rmsImageResiduals;
   }
 
 
-  /**
-   * Returns the list of RMS image x sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image x sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageXSigmas() const {
     return m_rmsImageXSigmas;
   }
 
 
-  /**
-   * Returns the list of RMS image y sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image y sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageYSigmas() const {
     return m_rmsImageYSigmas;
   }
 
 
-  /**
-   * Returns the list of RMS image z sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image z sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageZSigmas() const {
     return m_rmsImageZSigmas;
   }
 
 
-  /**
-   * Returns the list of RMS image right ascension sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image right ascension sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageRASigmas() const {
     return m_rmsImageRASigmas;
   }
 
 
-  /**
-   * Returns the list of RMS image declination sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image declination sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageDECSigmas() const {
     return m_rmsImageDECSigmas;
   }
 
 
-  /**
-   * Returns the list of RMS image twist sigma statistics.
-   * 
-   * @return @b QList<Statistics> The RMS image twist sigma statistics.
-   */
+
   QVector<Statistics> BundleResults::rmsImageTWISTSigmas() const {
     return m_rmsImageTWISTSigmas;
   }
 
 
-  /**
-   * Returns the minimum sigma latitude distance.
-   * 
-   * @return @b Distance The minimum sigma latitude.
-   */
+
   Distance BundleResults::minSigmaLatitudeDistance() const {
     return m_minSigmaLatitudeDistance;
   }
 
 
-  /**
-   * Returns the maximum sigma latitude distance.
-   * 
-   * @return @b Distance The maximum sigma latitude.
-   */
+
   Distance BundleResults::maxSigmaLatitudeDistance() const {
     return m_maxSigmaLatitudeDistance;
   }
 
 
-  /**
-   * Returns the minimum sigma longitude distance.
-   * 
-   * @return @b Distance The minimum sigma longitude.
-   */
+
   Distance BundleResults::minSigmaLongitudeDistance() const {
     return m_minSigmaLongitudeDistance;
   }
 
 
-  /**
-   * Returns the maximum sigma longitude distance.
-   * 
-   * @return @b Distance The maximum sigma longitude.
-   */
+
   Distance BundleResults::maxSigmaLongitudeDistance() const {
     return m_maxSigmaLongitudeDistance;
   }
 
 
-  /**
-   * Returns the minimum sigma redius distance.
-   * 
-   * @return @b Distance The minimum sigma redius.
-   */
+
   Distance BundleResults::minSigmaRadiusDistance() const {
     return m_minSigmaRadiusDistance;
   }
 
 
-  /**
-   * Returns the maximum sigma redius distance.
-   * 
-   * @return @b Distance The maximum sigma radius.
-   */
+
   Distance BundleResults::maxSigmaRadiusDistance() const {
     return m_maxSigmaRadiusDistance;
   }
 
 
-  /**
-   * Returns the minimum sigma latitude point id.
-   * 
-   * @return @b @QString The minimum sigma latitude point id.
-   */
+
   QString BundleResults::minSigmaLatitudePointId() const {
     return m_minSigmaLatitudePointId;
   }
 
 
-  /**
-   * Returns the maximum sigma latitude point id.
-   * 
-   * @return @b @QString The maximum sigma latitude point id.
-   */
+
   QString BundleResults::maxSigmaLatitudePointId() const {
     return m_maxSigmaLatitudePointId;
   }
 
 
-  /**
-   * Returns the minimum sigma longitude point id.
-   * 
-   * @return @b @QString The minimum sigma longitude point id.
-   */
+
   QString BundleResults::minSigmaLongitudePointId() const {
     return m_minSigmaLongitudePointId;
   }
 
 
-  /**
-   * Returns the maximum sigma longitude point id.
-   * 
-   * @return @b @QString The maximum sigma longitude point id.
-   */
+
   QString BundleResults::maxSigmaLongitudePointId() const {
     return m_maxSigmaLongitudePointId;
   }
 
 
-  /**
-   * Returns the minimum sigma radius point id.
-   * 
-   * @return @b @QString The minimum sigma radius point id.
-   */
+
   QString BundleResults::minSigmaRadiusPointId() const {
     return m_minSigmaRadiusPointId;
   }
 
 
-  /**
-   * Returns the maximum sigma radius point id.
-   * 
-   * @return @b @QString The maximum sigma radius point id.
-   */
+
   QString BundleResults::maxSigmaRadiusPointId() const {
     return m_maxSigmaRadiusPointId;
   }
 
 
-  /**
-   * Returns the RMS of the adjusted latitude sigmas.
-   * 
-   * @return @b double The RMS of the adjusted latitude sigmas.
-   */
+
   double BundleResults::sigmaLatitudeStatisticsRms() const {
     return m_rmsSigmaLatitudeStats;
   }
 
 
-  /**
-   * Returns the RMS of the adjusted longitude sigmas.
-   * 
-   * @return @b double The RMS of the adjusted longitude sigmas.
-   */
+
   double BundleResults::sigmaLongitudeStatisticsRms() const {
     return m_rmsSigmaLongitudeStats;
   }
 
 
-  /**
-   * Returns the RMS of the adjusted raidus sigmas.
-   * 
-   * @return @b double The RMS of the adjusted radius sigmas.
-   */
+
   double BundleResults::sigmaRadiusStatisticsRms() const {
     return m_rmsSigmaRadiusStats;
   }
 
 
-  /**
-   * Returns the RMS of the x residuals.
-   * 
-   * @return @b double The RMS of the x residuals.
-   */
+
   double BundleResults::rmsRx() const {
     return m_rmsXResiduals;
   }
 
 
-  /**
-   * Returns the RMS of the y residuals.
-   * 
-   * @return @b double The RMS of the y residuals.
-   */
+
   double BundleResults::rmsRy() const {
     return m_rmsYResiduals;
   }
 
 
-  /**
-   * Returns the RMS of the x and y residuals.
-   * 
-   * @return @b double The RMS of the x and y residuals.
-   */
+
   double BundleResults::rmsRxy() const {
     return m_rmsXYResiduals;
   }
 
 
-  /**
-   * Returns the rejection limit.
-   * 
-   * @return @b double The rejection limit.
-   */
+
   double BundleResults::rejectionLimit() const {
     return m_rejectionLimit;
   }
 
 
-  /**
-   * Returns the number of observation that were rejected.
-   * 
-   * @return @b int The number of rejected observations.
-   */
+
   int BundleResults::numberRejectedObservations() const {
     return m_numberRejectedObservations;
   }
 
 
-  /**
-   * Returns the number of observations.
-   * 
-   * @return @b int The number of observations.
-   */
+
   int BundleResults::numberObservations() const {
     return m_numberObservations;
   }
 
 
-  /**
-   * Returns the total number of image parameters.
-   * 
-   * @return @b int The total number of image parameters.
-   */
+
   int BundleResults::numberImageParameters() const {
     return m_numberImageParameters;
   }
 
 
-  /**
-   * Returns the number of constrained point parameters.
-   * 
-   * @return @b int The number of constrained point parameters.
-   */
+
   int BundleResults::numberConstrainedPointParameters() const {
     return m_numberConstrainedPointParameters;
   }
 
 
-  /**
-   * Returns the number of constrained image parameters.
-   * 
-   * @return @b int The number of constrained image parameters.
-   */
+
   int BundleResults::numberConstrainedImageParameters() const {
     return m_numberConstrainedImageParameters;
   }
 
 
-  /**
-   * Return the number of constrained target parameters.
-   * 
-   * @return @b int The number of constrained target parameters.
-   */
+
   int BundleResults::numberConstrainedTargetParameters() const {
     return m_numberConstrainedTargetParameters;
   }
 
 
-  /**
-   * Returns the number of unknown parameters.
-   * 
-   * @return @b int The number of unknown parameters.
-   */
+
   int BundleResults::numberUnknownParameters() const {
     return m_numberUnknownParameters;
   }
 
 
-  /**
-   * Returns the degrees of freedom.
-   * 
-   * @return @b int the degrees of freedom.
-   */
+
   int BundleResults::degreesOfFreedom() const {
     return m_degreesOfFreedom;
   }
 
 
-  /**
-   * Returns the Sigma0 of the bundle adjustment.
-   * 
-   * @return @b double The Sigma0.
-   */
+
   double BundleResults::sigma0() const {
     return m_sigma0;
   }
 
 
-  /**
-   * Returns the elapsed time for the bundle adjustment.
-   * 
-   * @return @b double The elapsed time for the bundle adjustment.
-   */
+
   double BundleResults::elapsedTime() const {
     return m_elapsedTime;
   }
 
 
-  /**
-   * Returns the elapsed time for error propagation.
-   * 
-   * @return @b double The elapsed time for error propagation.
-   */
+
   double BundleResults::elapsedTimeErrorProp() const {
     return m_elapsedTimeErrorProp;
   }
 
 
-  /**
-   * Returns whether or not the bundle adjustment converged.
-   * 
-   * @return @b bool If the bundle adjustment converged. 
-   */
+
   bool BundleResults::converged() const {
     return m_converged;
   }
 
 
-  /**
-   * Returns how many maximum likelihood models were used in the bundle adjustment.
-   * 
-   * @return @b int The number fo maximum likelihood models.
-   */
+
   int BundleResults::numberMaximumLikelihoodModels() const {
     return m_maximumLikelihoodFunctions.size();
   }
 
 
-  /**
-   * Returns which step the bundle adjustment is on.
-   * 
-   * @return @b int The maximum likelihood model that the bundle adjustment is currently using.
-   */
+
   int BundleResults::maximumLikelihoodModelIndex() const {
     return m_maximumLikelihoodIndex;
   }
 
 
-  /**
-   * Returns the cumulative probability distribution of the |R^2 residuals|.
-   * 
-   * @return @b StatCumProbDistDynCalc The cumulative probability distribution of the
-   *                                   |R^2 residuals|.
-   */
+
   StatCumProbDistDynCalc BundleResults::cumulativeProbabilityDistribution() const {
     return *m_cumPro;
   }
 
 
-  /**
-   * Returns the cumulative probability distribution of the residuals used for reporting.
-   * 
-   * @return @b StatCumProbDistDynCalc the cumulative probability distribution of the residuals.
-   */
+
   StatCumProbDistDynCalc BundleResults::residualsCumulativeProbabilityDistribution() const {
     return *m_cumProRes;
   }
 
 
-  /**
-   * Returns the median of the |R^2 residuals|.
-   * 
-   * @return @b double The median of the |R^2 residuals|.
-   */
+
   double BundleResults::maximumLikelihoodMedianR2Residuals() const {
     return m_maximumLikelihoodMedianR2Residuals;
   }
 
 
-  /**
-   * Returns the maximum likelihood model at the given index.
-   * 
-   * @param modelIndex The index of the maximum likelihood model to be returned.
-   * 
-   * @return @b MaximumLikelihoodWFunctions The maximum likelihood model at the input index.
-   */
+
   MaximumLikelihoodWFunctions BundleResults::maximumLikelihoodModelWFunc(int modelIndex) const {
     return m_maximumLikelihoodFunctions[modelIndex].first;
   }
 
 
-  /**
-   * Returns the quantile of the maximum likelihood model at the given index.
-   * 
-   * @param modelIndex The index of the maximum likelihood model whose quantile will be returned.
-   * 
-   * @return @b double The quantile of the desired maximum likelihood model.
-   */
+
   double BundleResults::maximumLikelihoodModelQuantile(int modelIndex) const {
     return m_maximumLikelihoodFunctions[modelIndex].second;
   }
+
 
 
 //  QList< QPair< MaximumLikelihoodWFunctions, double > >
@@ -1316,13 +929,7 @@ namespace Isis {
 //  }
 
 
-  /**
-   * Saves the BundleResults object as a PvlObject.
-   * 
-   * @param name The name of the PvlObject to save to.
-   * 
-   * @return @b PvlObject A PvlObject containing the BundleResults object's information.
-   */
+
   PvlObject BundleResults::pvlObject(QString name) const {
 
     PvlObject pvl(name);
@@ -1337,12 +944,9 @@ namespace Isis {
     pvl += PvlKeyword("NumberRejectedObservations", toString(numberRejectedObservations()));
     pvl += PvlKeyword("NumberObservations", toString(numberObservations()));
     pvl += PvlKeyword("NumberImageParameters", toString(numberImageParameters()));
-    pvl += PvlKeyword("NumberConstrainedPointParameters",
-                      toString(numberConstrainedPointParameters()));
-    pvl += PvlKeyword("NumberConstrainedImageParameters",
-                      toString(numberConstrainedImageParameters()));
-    pvl += PvlKeyword("NumberConstrainedTargetParameters",
-                      toString(numberConstrainedTargetParameters()));
+    pvl += PvlKeyword("NumberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
+    pvl += PvlKeyword("NumberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    pvl += PvlKeyword("NumberConstrainedTargetParameters", toString(numberConstrainedTargetParameters()));
     pvl += PvlKeyword("NumberUnknownParameters", toString(numberUnknownParameters()));
     pvl += PvlKeyword("DegreesOfFreedom", toString(degreesOfFreedom()));
     pvl += PvlKeyword("Sigma0", toString(sigma0()));
@@ -1404,12 +1008,11 @@ namespace Isis {
   }
 
 
+
   /**
-   * Returns the Correlation Matrix.
+   * Accessor for the Correlation Matrix.
    *
-   * @return @b CorrelationMatrix The correlation matrix.
-   * 
-   * @throws IException::Unknown "Correlation matrix for this bundle is NULL."
+   * @return The correlation matrix.
    */
   CorrelationMatrix BundleResults::correlationMatrix() const {
     if (m_correlationMatrix) {
@@ -1423,10 +1026,11 @@ namespace Isis {
   }
 
 
+
   /**
    * Set the covariance file name for the matrix used to calculate the correlation matrix.
    *
-   * @param name The name of the file used to store the covariance matrix.
+   * @param name Name of the file used to store the covariance matrix.
    */
   void BundleResults::setCorrMatCovFileName(FileName name) {
     correlationMatrix();// throw error if null
@@ -1434,10 +1038,11 @@ namespace Isis {
   }
 
 
+
   /**
    * Set the images and their associated parameters of the correlation matrix.
    *
-   * @param imgsAndParams The QMap with all the images and parameters used for this bundle.
+   * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
    */
   void BundleResults::setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
     correlationMatrix();// throw error if null
@@ -1445,14 +1050,8 @@ namespace Isis {
   }
 
 
-  /**
-   * Saves the BundleResults object to an XML file.
-   * 
-   * @param stream The QXMLStreamWriter that will be used to write out the XML file.
-   * @param project The project that the BundleResults object belongs to.
-   */
-  void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {
-    // TODO: does xml stuff need project???
+
+  void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
     stream.writeStartElement("bundleResults");
     stream.writeTextElement("id", m_id->toString());
@@ -1460,10 +1059,8 @@ namespace Isis {
 //    stream.writeTextElement("instrumentId", m_instrumentId);
 
     stream.writeStartElement("correlationMatrix");
-    stream.writeAttribute("correlationFileName",
-                          correlationMatrix().correlationFileName().expanded()); 
-    stream.writeAttribute("covarianceFileName",
-                          correlationMatrix().covarianceFileName().expanded()); 
+    stream.writeAttribute("correlationFileName", correlationMatrix().correlationFileName().expanded()); 
+    stream.writeAttribute("covarianceFileName", correlationMatrix().covarianceFileName().expanded()); 
     stream.writeStartElement("imagesAndParameters");
     QMapIterator<QString, QStringList> imgParamIt(*correlationMatrix().imagesAndParameters());
     while (imgParamIt.hasNext()) {
@@ -1488,12 +1085,9 @@ namespace Isis {
     stream.writeTextElement("numberRejectedObservations", toString(numberRejectedObservations()));
     stream.writeTextElement("numberObservations", toString(numberObservations()));
     stream.writeTextElement("numberImageParameters", toString(numberImageParameters()));
-    stream.writeTextElement("numberConstrainedPointParameters",
-                            toString(numberConstrainedPointParameters()));
-    stream.writeTextElement("numberConstrainedImageParameters",
-                            toString(numberConstrainedImageParameters()));
-    stream.writeTextElement("numberConstrainedTargetParameters",
-                            toString(numberConstrainedTargetParameters()));
+    stream.writeTextElement("numberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
+    stream.writeTextElement("numberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    stream.writeTextElement("numberConstrainedTargetParameters", toString(numberConstrainedTargetParameters()));
     stream.writeTextElement("numberUnknownParameters", toString(numberUnknownParameters()));
     stream.writeTextElement("degreesOfFreedom", toString(degreesOfFreedom()));
     stream.writeTextElement("sigma0", toString(sigma0()));
@@ -1634,8 +1228,7 @@ namespace Isis {
     stream.writeStartElement("maximumLikelihoodEstimation");
     stream.writeAttribute("numberModels", toString(numberMaximumLikelihoodModels())); 
     stream.writeAttribute("maximumLikelihoodIndex", toString(maximumLikelihoodModelIndex())); 
-    stream.writeAttribute("maximumLikelihoodMedianR2Residuals",
-                          toString(maximumLikelihoodMedianR2Residuals()));
+    stream.writeAttribute("maximumLikelihoodMedianR2Residuals", toString(maximumLikelihoodMedianR2Residuals())); 
 
     stream.writeStartElement("cumulativeProbabilityCalculator");
     cumulativeProbabilityDistribution().save(stream, project);
@@ -1649,9 +1242,8 @@ namespace Isis {
       stream.writeStartElement("model");
       stream.writeAttribute("modelNumber", toString(i+1)); 
       stream.writeAttribute("modelSelection", 
-        MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihoodFunctions[i].first.model()));
-      stream.writeAttribute("tweakingConstant",
-                            toString(m_maximumLikelihoodFunctions[i].first.tweakingConstant())); 
+                          MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihoodFunctions[i].first.model()));
+      stream.writeAttribute("tweakingConstant", toString(m_maximumLikelihoodFunctions[i].first.tweakingConstant())); 
       stream.writeAttribute("quantile", toString(m_maximumLikelihoodFunctions[i].second));
       stream.writeEndElement(); // end this model
     }
@@ -1660,14 +1252,8 @@ namespace Isis {
   }
 
 
-  /**
-   * Constructs an XmlHandler used to save a BundleResults object.
-   * 
-   * @param statistics The BundleResults that the XmlHandler will save.
-   * @param project The project that the BundleResults object belongs to.
-   */
-  BundleResults::XmlHandler::XmlHandler(BundleResults *statistics, Project *project) {
-    // TODO: does xml stuff need project???
+
+  BundleResults::XmlHandler::XmlHandler(BundleResults *statistics, Project *project) {   // TODO: does xml stuff need project???
     m_xmlHandlerBundleResults = NULL;
     m_xmlHandlerProject = NULL;
 
@@ -1689,12 +1275,9 @@ namespace Isis {
   }
 
 
-  /**
-   * Destroys an XmlHandler.
-   */
+
   BundleResults::XmlHandler::~XmlHandler() {
-    // do not delete this pointer... we don't own it, do we???
-    // passed into StatCumProbDistDynCalc constructor as pointer
+    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
     // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
     m_xmlHandlerProject = NULL;
     
@@ -1704,20 +1287,11 @@ namespace Isis {
   }
   
 
-  /**
-   * Writes a starting XML element
-   * 
-   * @param namespaceURI ???
-   * @param localName ???
-   * @param qName The name of the element.
-   * @param atts The attributes of the element.
-   * 
-   * @return @b bool If the XmlHandler should continue to be used, usually true.
-   */
+
   bool BundleResults::XmlHandler::startElement(const QString &namespaceURI, 
-                                               const QString &localName,
-                                               const QString &qName,
-                                               const QXmlAttributes &atts) {
+                                                  const QString &localName,
+                                                  const QString &qName,
+                                                  const QXmlAttributes &atts) {
     m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
@@ -1965,11 +1539,9 @@ namespace Isis {
           m_xmlHandlerBundleResults->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
         }
 
-        QString maximumLikelihoodMedianR2Residuals =
-        atts.value("maximumLikelihoodMedianR2Residuals");
+        QString maximumLikelihoodMedianR2Residuals = atts.value("maximumLikelihoodMedianR2Residuals");
         if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maximumLikelihoodMedianR2Residuals =
-            toDouble(maximumLikelihoodMedianR2Residuals);
+          m_xmlHandlerBundleResults->m_maximumLikelihoodMedianR2Residuals = toDouble(maximumLikelihoodMedianR2Residuals);
         }
 
       }
@@ -1991,43 +1563,27 @@ namespace Isis {
       }
       else if (qName == "cumulativeProbabilityCalculator") {
         m_xmlHandlerBundleResults->m_cumPro = NULL;
-        m_xmlHandlerBundleResults->m_cumPro =
-          new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
+        m_xmlHandlerBundleResults->m_cumPro = new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
       }
       else if (qName == "residualsCumulativeProbabilityCalculator") {
         m_xmlHandlerBundleResults->m_cumProRes = NULL;
-        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject,
-                                                                            reader());
+        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
       }
     }
     return true;
   }
 
 
-  /**
-   * Adds a QString to the XmlHandler's internal character data.
-   * 
-   * @param ch The data to be added.
-   * 
-   * @return @b bool If false, then the data was not successfully added.
-   */
+
   bool BundleResults::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
 
-  /**
-   * Writes an ending XML element.
-   * 
-   * @param namespaceURI ???
-   * @param localName ???
-   * @param qName The name of the element.
-   * 
-   * @return @b bool If the XmlHandler should continue to be used.
-   */
+
   bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                             const QString &qName) {
+                                     const QString &qName) {
 
     if (!m_xmlHandlerCharacters.isEmpty()) {
       if (qName == "id") {
@@ -2079,16 +1635,13 @@ namespace Isis {
         m_xmlHandlerBundleResults->m_numberImageParameters = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberConstrainedPointParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedPointParameters =
-                                       toInt(m_xmlHandlerCharacters);
+        m_xmlHandlerBundleResults->m_numberConstrainedPointParameters = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberConstrainedImageParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedImageParameters =
-                                       toInt(m_xmlHandlerCharacters);
+        m_xmlHandlerBundleResults->m_numberConstrainedImageParameters = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberConstrainedTargetParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedTargetParameters =
-                                       toInt(m_xmlHandlerCharacters);
+        m_xmlHandlerBundleResults->m_numberConstrainedTargetParameters = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberUnknownParameters") {
         m_xmlHandlerBundleResults->m_numberUnknownParameters = toInt(m_xmlHandlerCharacters);
@@ -2104,8 +1657,7 @@ namespace Isis {
       }
       // copy the xml handler's statistics list to the appropriate bundle statistics list
       else if (qName == "residualsList") {
-        // do this check or assume the xml is valid???
-        // ??? if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        // ??? if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) { // do this check or assume the xml is valid???
         // ???   throw IException(IException::Unknown, 
         // ???                    "Unable to read xml file. Invalid residualsList", _FILEINFO_);
         // ??? }
@@ -2120,8 +1672,7 @@ namespace Isis {
         // ???                    "Unable to read xml file. Invalid sampleList", _FILEINFO_);
         // ??? }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageSampleResiduals.append(
-                                                                   m_xmlHandlerStatisticsList[i]);
+          m_xmlHandlerBundleResults->m_rmsImageSampleResiduals.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
@@ -2201,14 +1752,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Writes the BundleResults object to a QDataStream.
-   * 
-   * @param stream The QDataStream that the BundleResults will be written to.
-   * 
-   * @return @b QDataStream& A reference to the QDataStream that
-   *                         the BundleResults where written to.
-   */
+
   QDataStream &BundleResults::write(QDataStream &stream) const {
     stream << m_id->toString()
            << *m_correlationMatrix
@@ -2252,13 +1796,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Reads the data from a QDataStream into the BundleResults object.
-   * 
-   * @param stream The QDataStream to read from.
-   * 
-   * @return @b QDataStream& A reference to the stream after reading from it.
-   */
+
   QDataStream &BundleResults::read(QDataStream &stream) {
     QString id;
     CorrelationMatrix correlationMatrix;
@@ -2347,45 +1885,21 @@ namespace Isis {
   }
 
 
-  /**
-   * Insertion operator to save the BundleResults object to a QDataStream.
-   * 
-   * @param stream The QDataStream to write to.
-   * @param bundleResults The BundleResults object to save.
-   * 
-   * @return @b QDataStream& A reference to the QDataStream after saving.
-   *
-   * @see write
-   */
+
   QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults) {
     return bundleResults.write(stream);
   }
 
 
-  /**
-   * Extraction operator to read the BundleResults object from a QDataStream.
-   *
-   * @param stream The QDataStream to read from.
-   * @param bundleResults The BundleResults objec to read to.
-   *
-   * @return @b QDataStream& A reference to the QDataStream after reading.
-   * 
-   * @see read
-   */
+
   QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults) {
     return bundleResults.read(stream);
   } 
   
   
+    
   /**
    * Saves an hdf5 group
-   * 
-   * @param locationObject The hdf5 group.
-   * @param localName The filename for the hdf5 group.
-   * 
-   * @throws IException::Unknown "H5 ATTRIBUTE exception handler has detected an error 
-   *                              when invoking the function"
-   * @throws IException::Unknown "Unable to save bundle results information to an HDF5 group."
    */  
   void BundleResults::createH5Group(H5::CommonFG &locationObject, QString locationName) const {
     try {
@@ -2638,7 +2152,7 @@ namespace Isis {
 
       }  // end of try block
       // catch failure caused by the Attribute operations
-      catch ( H5::AttributeIException error ) {
+      catch( H5::AttributeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
@@ -2646,7 +2160,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSet operations
-      catch ( H5::DataSetIException error ) {
+      catch( H5::DataSetIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
@@ -2654,7 +2168,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataSpace operations
-      catch ( H5::DataSpaceIException error ) {
+      catch( H5::DataSpaceIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
@@ -2662,7 +2176,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the DataType operations
-      catch ( H5::DataTypeIException error ) {
+      catch( H5::DataTypeIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
@@ -2670,7 +2184,7 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the H5File operations
-      catch ( H5::FileIException error ) {
+      catch( H5::FileIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 FILE exception handler has detected an error when invoking the function " 
@@ -2678,15 +2192,14 @@ namespace Isis {
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
       // catch failure caused by the Group operations
-      catch ( H5::GroupIException error ) {
+      catch( H5::GroupIException error ) {
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 GROUP exception handler has detected an error when invoking the function " 
               + QString::fromStdString(error.getFuncName()) + ".";
         throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
       }
-      //??? how to improve printed msg using major/minor error codes?
-      catch ( H5::Exception error ) {
+      catch (H5::Exception error) {  //??? how to improve printed msg using major/minor error codes?
         QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
         IException hpfError(IException::Unknown, msg, _FILEINFO_);
         msg = "H5 GENERAL exception handler has detected an error when invoking the function " 
@@ -2703,17 +2216,6 @@ namespace Isis {
       
   }
 
-  
-  /**
-   * Reads from an hdf5 group.
-   * 
-   * @param locationObject The hdf5 group.
-   * @param locationName The filename of the hdf5 group.
-   * 
-   * @throws IException::Unknown "H5 GENERAL exception handler has detected an error
-   *                              when invoking the function"
-   * @throws IException::Unknown "Unable to read bundle results information to an HDF5 group."
-   */
   void BundleResults::openH5Group(H5::CommonFG &locationObject, QString locationName) {
     try {
       // Try block to detect exceptions raised by any of the calls inside it

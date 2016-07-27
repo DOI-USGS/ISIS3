@@ -29,15 +29,39 @@ using namespace Isis;
   * @internal
   *   @history 2014-05-14 Jeannie Backer - Original version. Code test coverage:
   *                           Scope (100%), Line (100%), Function(100%)
+  *   @history 2016-07-07 Jeannie Backer - Updated to include TargetBody tests.
+  *                           Note: This is still incomplete until we refactor how TargetBody
+  *                           and Settings classes interact.
   *
   *   @todo Test hdf5 methods when added.
+  *   @todo Test setBundleTargetBody()
+  *   @todo Test non-null bundleTargetBody()
   *  
   */
 
 
 namespace Isis {
+  /**
+   * Child class of BundleSettings used to test the embedded XML handler class.
+   *  
+   * @author 2014-05-14 Jeannie Backer
+   * @internal
+   *   @history 2014-05-14 Jeannie Backer - Original version.
+   */
   class BundleSettingsXmlHandlerTester : public BundleSettings {
     public:
+      /**
+       * Constructs BundleSettings using XML handler. 
+       *  
+       * @param project A pointer to the project.
+       * @param reader A pointer to a XmlStackedHandlerReader.
+       * @param xmlFile The name of the XML file to be used to create a 
+       *                BundleSettings object.
+       * 
+       * 
+       * @throw Isis::Exception::Io "Unable to open XML file with read access."
+       * @throw Isis::Exception::Unknown "Failed to parse XML file."
+       */
       BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
                                      FileName xmlFile) : BundleSettings(project, reader) {
 
@@ -77,7 +101,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Printing PVL group with settings from the default constructor...";
     QObject *parent = NULL;
     BundleSettings settings(parent);
-    // tested fully by call to pvlObject()
+    // tested fully by each call to pvlObject()
     //      bool validateNetwork() const;
     //      SolveMethod solveMethod() const;
     //      bool solveObservationMode() const;
@@ -96,6 +120,16 @@ int main(int argc, char *argv[]) {
     //      bool createCSVPointsFile() const;
     //      bool createResidualsFile() const;
     //      QString outputFilePrefix() const;
+    //      int numberSolveSettings();
+    //      int numberTargetBodyParameters() 
+    //      bool solveTargetBody()            
+    //      bool solvePoleRA()                
+    //      bool solvePoleRAVelocity()        
+    //      bool solvePoleDec()               
+    //      bool solvePoleDecVelocity()       
+    //      bool solvePM()                    
+    //      bool solvePMVelocity()            
+
     PvlObject pvl = settings.pvlObject("DefaultSettingsObject");
     cout << pvl << endl << endl;
 
@@ -121,8 +155,8 @@ int main(int argc, char *argv[]) {
     copySettings.setValidateNetwork(true);
     // set the solve options
     copySettings.setSolveOptions(BundleSettings::stringToSolveMethod("specialk"), 
-                             true, true, true, true, 
-                             1000.0, 2000.0, 3000.0);
+                                 true, true, true, true, 
+                                 1000.0, 2000.0, 3000.0);
     // set outlier rejection
     copySettings.setOutlierRejection(true, 4.0);
     // create and fill the list of observation solve settings... then set
@@ -155,6 +189,8 @@ int main(int argc, char *argv[]) {
     copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Welsch, 28); 
     copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::HuberModified, 29); 
     copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Chen, 30); 
+    // set target body
+    // TODO
     // set output file options
     copySettings.setOutputFiles("TestFilePrefix", false, false, false);
     pvl = copySettings.pvlObject("ResetAllOptions");
@@ -177,7 +213,6 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "Testing accessor methods...";
-
     BundleObservationSolveSettings boss2 = copySettings.observationSolveSettings("Instrument1");
     qDebug() << "Get BundleObservationSolveSettings with name InstrumentId = Instrument1";
     pvl = boss2.pvlObject();
@@ -188,7 +223,7 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl << endl;
 
     QList< QPair< MaximumLikelihoodWFunctions::Model, double > > models
-           = copySettings.maximumLikelihoodEstimatorModels();
+            = copySettings.maximumLikelihoodEstimatorModels();
     for (int i = 0; i < models.size(); i++) {
       qDebug() << MaximumLikelihoodWFunctions::modelToString(models[i].first)
                << toString(models[i].second);
@@ -254,6 +289,7 @@ int main(int argc, char *argv[]) {
     copySettings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
+    qXmlFile.remove();
     // read xml    
     qDebug() << "Testing XML: read XML to BundleSettings object...";
     BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);

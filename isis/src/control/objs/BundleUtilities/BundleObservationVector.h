@@ -40,6 +40,10 @@ namespace Isis {
    * @internal
    *   @history 2014-05-22 Ken Edmundson - Original version.
    *   @history 2015-02-20 Jeannie Backer - Brought closer to ISIS coding standards.
+   *   @history 2016-06-30 Jeannie Backer - Changed method name from
+   *                           "getObservationByCubeSerialNumber" to
+   *                           "observationByCubeSerialNumber" to comply with
+   *                           ISIS coding standards. References #4078.
    */
 
   class BundleObservationVector : public QVector < BundleObservation *> {
@@ -57,7 +61,7 @@ namespace Isis {
       int numberPointingParameters();
       int numberParameters();
 
-      BundleObservation *getObservationByCubeSerialNumber(QString cubeSerialNumber);
+      BundleObservation *observationByCubeSerialNumber(QString cubeSerialNumber);
 
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();
