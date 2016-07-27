@@ -29,14 +29,17 @@
 #include <QMessageBox>
 
 #include "Directory.h"
+//#include "Footprint2DView.h"
 #include "MosaicSceneItem.h"
 #include "MosaicSceneWidget.h"
 #include "Project.h"
+//#include "ProjectItem.h"
+//#include "ProjectItemModel.h"
 
 namespace Isis {
   
   /** 
-   * Constrictor. This method sets the text of the project to View Footprints.
+   * Constructor. This method sets the text of the project to View Footprints.
    * 
    * @param project Current project
    */
@@ -92,99 +95,6 @@ namespace Isis {
    */
   bool Footprint2DViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
-
-    /*   //tjw
-    int maxRecommendedFootprints = 50000;
-    if (success && imageList()->count() > maxRecommendedFootprints) {
-      QMessageBox::StandardButton selectedOpt = QMessageBox::warning(NULL,
-          tr("Potentially Slow Operation"),
-          tr("You are asking to open %L1 images in a 2D footprint view at once. This is possible, "
-             "but will take a significant amount of time and cause overall slowness. Working with "
-             "more than %L2 footprints is not recommended. Are you sure you want to view these "
-             "%L1 footprints?").arg(imageList()->count()).arg(maxRecommendedFootprints),
-           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
-      if (selectedOpt == QMessageBox::No) {
-        success = false;
-      }
-    }
-
-    if (success) {
-
-      QStringList viewOptions;
-
-      QList<MosaicSceneWidget *> existingViews = project()->directory()->footprint2DViews();
-      int viewToUse = -1;
-
-      if (existingViews.count()) {
-        for (int i = 0; i < existingViews.count(); i++) {
-          viewOptions.append(existingViews[i]->windowTitle());
-        }
-      }
-
-      viewOptions.append(tr("New Footprint View"));
-
-      if (viewOptions.count() > 1) {
-        QString selected = QInputDialog::getItem(NULL, tr("View to see footprints in"),
-            tr("Which view would you like your\nimage's footprints to be put into?"),
-            viewOptions, viewOptions.count() - 1, false, &success);
-
-        viewToUse = viewOptions.indexOf(selected);
-      }
-      else {
-        viewToUse = viewOptions.count() - 1;
-      }
-
-      bool newView = false;
-      if (viewToUse == viewOptions.count() - 1) {
-        newView = true;
-        if (!imageList()->name().isEmpty()) {
-          QUndoCommand::setText(tr("View image footprints of list [%1] in new 2D footprint view")
-              .arg(imageList()->name()));
-        }
-        else {
-          QUndoCommand::setText(tr("View [%1] image footprints in new footprint view")
-              .arg(imageList()->count()));
-        }
-      }
-      else if (viewToUse != -1) {
-        MosaicSceneWidget *footprintView = existingViews[viewToUse];
-
-        // Remove extra images from the image list in order to make undo only undo the necessary
-        //   ones... and not do extra work on redo.
-        ImageList list(*imageList());
-        QMutableListIterator<Image *> it(*imageList());
-
-        while (it.hasNext()) {
-          Image *image = it.next();
-
-          if (footprintView->cubeToMosaic(image)) {
-            it.remove();
-          }
-        }
-
-        if (list.count() != imageList()->count()) {
-          setData(new ImageList(list));
-        }
-
-        if (!imageList()->name().isEmpty()) {
-          QUndoCommand::setText(tr("View image footprints of list [%1] in footprint view [%2]")
-              .arg(imageList()->name()).arg(existingViews[viewToUse]->windowTitle()));
-        }
-        else {
-          QUndoCommand::setText(tr("View [%1] image footprints in footprint view [%2]")
-              .arg(imageList()->count()).arg(existingViews[viewToUse]->windowTitle()));
-        }
-      }
-
-      QStringList internalData;
-      internalData.append(QString::number(viewToUse));
-      internalData.append(newView? "new view" : "existing view");
-      setInternalData(internalData);
-
-    }
-
-    */
     return success;
   }
 
@@ -205,59 +115,10 @@ namespace Isis {
    * 
    */
   void Footprint2DViewWorkOrder::syncRedo() {
-
     /*  //tjw
-    int viewToUse = internalData().first().toInt();
-
-    MosaicSceneWidget *footprintViewToUse = NULL;
-    if (viewToUse == project()->directory()->footprint2DViews().count()) {
-      footprintViewToUse = project()->directory()->addFootprint2DView();
-    }
-    else {
-      footprintViewToUse = project()->directory()->footprint2DViews()[viewToUse];
-    }
-
-    ImageList nonFootprintable = *imageList();
-    ImageList footprintable;
-
-    QMutableListIterator<Image *> it(nonFootprintable);
-
-    while (it.hasNext()) {
-      Image *unknownFootprintability = it.next();
-
-      if (unknownFootprintability->isFootprintable()) {
-        footprintable.append(unknownFootprintability);
-        it.remove();
-      }
-    }
-
-    footprintViewToUse->addImages(footprintable);
-
-    foreach (Image *nonFootprintableImage, nonFootprintable) {
-      project()->warn(tr("Image [%1] does not have and cannot create an associated footprint")
-                        .arg(nonFootprintableImage->displayProperties()->displayName()));
-
-    }
-    */
-  }
-
-
-  void Footprint2DViewWorkOrder::syncUndo() {
-    /*  //tjw
-    int viewToUse = internalData().first().toInt();
-
-    if (internalData()[1] == "new view") {
-      delete project()->directory()->footprint2DViews().last();
-    }
-    else {
-      MosaicSceneWidget *footprintView = project()->directory()->footprint2DViews()[viewToUse];
-
-      QListIterator<Image *> it(*imageList());
-      while (it.hasNext()) {
-        Image *imageToRemoveFromView = it.next();
-        delete footprintView->cubeToMosaic(imageToRemoveFromView);
-      }
-    }
+    ProjectItem *currentItem = project()->directory()->model()->currentItem();
+    Footprint2DView *view = project()->directory()->addFootprint2DView();
+    view->addItem( currentItem );
    */
   }
 }

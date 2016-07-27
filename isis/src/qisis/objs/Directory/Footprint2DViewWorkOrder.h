@@ -35,6 +35,12 @@ namespace Isis {
    *   @history 2016-01-08 Jeffrey Covington - Updated for new Footprint2DView, syncUndo() 
    *                          was removed, and execute now uses WorkOrder's execute() method
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3954.
+   *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards for
+   *                           AbstractProjectItemView, ControlMeasureEditWidget,
+   *                           ControlPointEditWidget, CubeDnView, Footprint2DView.
+   *                           Updated includes for CubeDnViewWorkOrder and
+   *                           Footprint2DViewWorkOrder. Fixes #4004.
+   *   @todo Uncomment syncRedo() when IPCE is merged in fully. 
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -51,7 +57,6 @@ namespace Isis {
     protected:
       bool dependsOn(WorkOrder *other) const;
       void syncRedo();
-      void syncUndo();
 
     private:
       Footprint2DViewWorkOrder &operator=(const Footprint2DViewWorkOrder &rhs);
