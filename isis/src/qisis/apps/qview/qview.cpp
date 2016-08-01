@@ -207,7 +207,9 @@ int main(int argc, char *argv[]) {
           // since we intend to exit, we need to cleanup our heap
           // (tools cleaned since they are vw's children)
           delete vw;
+          vw = NULL;
           delete app;
+          app = NULL;
           return 1;
         }
       }

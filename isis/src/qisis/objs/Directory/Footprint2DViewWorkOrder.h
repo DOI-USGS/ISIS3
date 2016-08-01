@@ -40,6 +40,7 @@ namespace Isis {
    *                           ControlPointEditWidget, CubeDnView, Footprint2DView.
    *                           Updated includes for CubeDnViewWorkOrder and
    *                           Footprint2DViewWorkOrder. Fixes #4004.
+   *   @todo Uncomment syncRedo() when IPCE is merged in fully. 
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT
