@@ -220,6 +220,8 @@ namespace Isis {
    *                           References #2335.
    *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
    *                           clock angle. References #2365
+   *   @history 2016-08-01 Curtis Rose - Changed return values of resolutions from -1 to Isis::Null.
+   *                           Fixes #2065.
    */
 
   class Camera : public Sensor {
