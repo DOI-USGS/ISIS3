@@ -180,8 +180,7 @@ namespace Isis {
                 "coordinate of each sample/line of the control points from "
                 "the \"Match\" level 1 cube with the latitude/longitude from "
                 "the \"Base\" map projected cube.  To solve for all three "
-                "camera angles, select the <strong>Twist</strong> check "
-                "box.");
+                "camera angles, select the <strong>Twist</strong> check box.");
     connect(solve, SIGNAL(clicked()), this, SLOT(solve()));
     gridLayout->addWidget(solve, row++, 0);
 
@@ -205,8 +204,8 @@ namespace Isis {
    */
   void QtieTool::createMenus() {
 
-    p_saveNet = new QAction(QIcon(FileName(
-      "$base/icons/mActionFileSaveAs.png").expanded()), "Save Control Network &As...",
+    p_saveNet = new QAction(QIcon(FileName("$base/icons/mActionFileSaveAs.png").expanded()),
+                            "Save Control Network &As...",
                             p_tieTool);
     p_saveNet->setToolTip("Save current control network to chosen file");
     p_saveNet->setStatusTip("Save current control network to chosen file");
@@ -218,9 +217,8 @@ namespace Isis {
     QAction *closeQtieTool = new QAction(p_tieTool);
     closeQtieTool->setText("&Close");
     closeQtieTool->setShortcut(Qt::ALT + Qt::Key_F4);
-    whatsThis =
-      "<b>Function:</b> Closes the Qtie Tool window for this point \
-       <p><b>Shortcut:</b> Alt+F4 </p>";
+    whatsThis = "<b>Function:</b> Closes the Qtie Tool window for this point \
+                <p><b>Shortcut:</b> Alt+F4 </p>";
     closeQtieTool->setWhatsThis(whatsThis);
     connect(closeQtieTool, SIGNAL(activated()), p_tieTool, SLOT(close()));
 
@@ -237,9 +235,8 @@ namespace Isis {
 
     QAction *viewTemplate = new QAction(p_tieTool);
     viewTemplate->setText("&View/edit registration template");
-    whatsThis =
-      "<b>Function:</b> Displays the curent registration template.  \
-       The user may edit and save changes under a chosen filename.";
+    whatsThis = "<b>Function:</b> Displays the curent registration template.  \
+                The user may edit and save changes under a chosen filename.";
     viewTemplate->setWhatsThis(whatsThis);
     connect(viewTemplate, SIGNAL(activated()), this, SLOT(viewTemplateFile()));
 
@@ -250,13 +247,13 @@ namespace Isis {
     regMenu->addAction(templateFile);
     regMenu->addAction(viewTemplate);
     //    registrationMenu->addAction(interestOp);
-
-
-    p_whatsThis = new QAction(QIcon(FileName(
-      "$base/icons/contexthelp.png").expanded()),"&Whats's This", p_tieTool);
+    
+    p_whatsThis = new QAction(QIcon(FileName("$base/icons/contexthelp.png").expanded()),
+                              "&Whats's This", 
+                              p_tieTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
-                          "user interface to see more information.");
+                            "user interface to see more information.");
     connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
 
     QMenu *helpMenu = p_tieTool->menuBar()->addMenu("&Help");
@@ -283,7 +280,6 @@ namespace Isis {
    * @param pad   Input  Toolpad for the main window
    *
    */
-
   QAction *QtieTool::toolPadAction(ToolPad *pad) {
     QAction *action = new QAction(pad);
     action->setIcon(QPixmap(toolIconDir() + "/stock_draw-connector-with-arrows.png"));
@@ -386,8 +382,7 @@ namespace Isis {
     //  TODO:  Do not know if radius came from DEM (if cube spiceinit'ed
     //   with DEM) or from ellipsoid.  Once change made to camera to return
     //   DEM filename, update the point aprioiRadiusSource parameters.
-    p_matchGM->SetGround(
-              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
+    p_matchGM->SetGround(Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
     Distance radius = p_matchGM->Camera()->LocalRadius();
     if (!radius.isValid()) {
       QString message = "Could not determine radius from DEM at lat/lon ["
@@ -905,7 +900,8 @@ namespace Isis {
    */
 
   void QtieTool::setTemplateFile() {
-    QString filename = QFileDialog::getOpenFileName(p_mw,
+    
+    QString filename = QFileDialog::getOpenFileName(p_tieTool,
                        "Select a registration template", ".",
                        "Registration template files (*.def *.pvl);;All files (*)");
 
@@ -995,7 +991,6 @@ namespace Isis {
                                "Error", "Saving Aborted");
     }
   }
-
 
 
   void QtieTool::enterWhatsThisMode() {

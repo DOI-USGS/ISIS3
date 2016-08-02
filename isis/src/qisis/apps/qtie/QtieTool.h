@@ -127,7 +127,7 @@ namespace Isis {
       QAction *p_deletePoint;
       QAction *p_saveNet;
 
-      QMainWindow *p_mw;
+      //QMainWindow *p_mw; Value never initialized
       ControlPointEdit *p_pointEditor;
       QLineEdit *p_tolValue;
       QLabel *p_ptIdValue;
