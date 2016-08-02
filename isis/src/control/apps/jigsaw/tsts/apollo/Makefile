@@ -72,9 +72,9 @@ commands:
 	$(CAT) residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/apollo_cholmod_residuals.csv;
-	$(CAT) bundleout_images.csv \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
+#	$(CAT) bundleout_images.csv \
+#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	       > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
 #	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
