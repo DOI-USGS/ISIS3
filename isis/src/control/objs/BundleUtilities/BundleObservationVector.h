@@ -27,9 +27,9 @@
 #include <QSharedPointer>
 #include <QVector>
 
-#include "BundleSettings.h"
-
 #include "BundleImage.h"
+#include "BundleObservation.h"
+#include "BundleSettings.h"
 
 namespace Isis {
 
@@ -44,9 +44,12 @@ namespace Isis {
    *                           "getObservationByCubeSerialNumber" to
    *                           "observationByCubeSerialNumber" to comply with
    *                           ISIS coding standards. References #4078.
+   *   @history 2016-08-03 Jesse Mapel - Changed contained member type to a vector of
+   *                           QSharedPointers.  Removed commented out block of paths.
+   *                           Fixes #4150, #4155.
    */
 
-  class BundleObservationVector : public QVector < BundleObservation *> {
+  class BundleObservationVector : public QVector < BundleObservationQsp > {
 
     public:
       BundleObservationVector();
@@ -54,24 +57,24 @@ namespace Isis {
       ~BundleObservationVector();
 
       BundleObservationVector &operator=(const BundleObservationVector &src);
-      BundleObservation *addnew(BundleImage *image, QString observationNumber,
+      BundleObservationQsp addnew(BundleImageQsp image, QString observationNumber,
                                 QString instrumentId, BundleSettingsQsp bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
 
-      BundleObservation *observationByCubeSerialNumber(QString cubeSerialNumber);
+      BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();
 
   private:
-      QMap<QString, BundleObservation*> m_observationNumberToObservationMap; //!< map between
+      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap; //!< map between
                                                                              //!< observation # and
                                                                              //!< ptr to observation
 
-      QMap<QString, BundleObservation*> m_imageSerialToObservationMap;       //!< map between
+      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;       //!< map between
                                                                              //!< image serial # &
                                                                              //!< vector index
   };

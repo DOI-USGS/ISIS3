@@ -11,7 +11,6 @@ namespace Isis {
    */
   BundleImage::BundleImage(Camera *camera, QString serialNumber, QString fileName) {
     m_camera = camera;
-    m_parentObservation = NULL;
     m_serialNumber = serialNumber;
     m_fileName = fileName;    
   }
@@ -50,7 +49,8 @@ namespace Isis {
 
 
 
-  void BundleImage::setParentObservation(BundleObservation *parentObservation) {
+  void BundleImage::setParentObservation(QSharedPointer<BundleObservation> parentObservation) {
+
     m_parentObservation = parentObservation;
   }
 
@@ -62,7 +62,7 @@ namespace Isis {
 
 
 
-  BundleObservation *BundleImage::parentObservation() {
+  QSharedPointer<BundleObservation> BundleImage::parentObservation() {
     return m_parentObservation;
   }
 

@@ -65,6 +65,8 @@ namespace Isis {
    *   @history 2014-12-02 Jeannie Backer - Undo last modification. While it makes sense, it
    *                           was causing jigsaw to fail. Brought test coverage of this
    *                           class to 99.403% scope.
+   *   @history 2016-08-03 Jesse Mapel - Added BundleObservationSolveSettingsQsp definition.
+   *                           Fixes #4150.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
@@ -242,6 +244,10 @@ class BundleObservationSolveSettings : public QObject {
                                                     polynomial.*/ 
 
   };
+  //!  Definition for BundleObservationSolveSettingsQsp, a QSharedPointer to a
+  //!< BundleObservationSolveSettings object.
+  typedef QSharedPointer<BundleObservationSolveSettings> BundleObservationSolveSettingsQsp;
+  
   // operators to read/write BundleResults to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings);
   QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings);

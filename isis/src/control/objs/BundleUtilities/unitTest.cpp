@@ -390,7 +390,7 @@ int main(int argc, char *argv[]) {
     Camera *camera = NULL;
     BundleImage bi(camera, "TestImageSerialNumber", "TestImageFileName");
     qDebug() << "setting null parentBundleObservation to BundleImage...";
-    BundleObservation *parentObservation = NULL;
+    BundleObservationQsp parentObservation;
     bi.setParentObservation(parentObservation);
     qDebug() << "Access camera and parentObservation ...";
 //    Camera *cam = bi.camera();
@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "serial number = " << bi.serialNumber();
     qDebug() << "file name     = " << bi.fileName();
     qDebug() << "Testing copy constructor...";
-    BundleImage *bi2 = new BundleImage(bi);
+    BundleImageQsp bi2 = BundleImageQsp( new BundleImage(bi) );
     qDebug() << "serial number = " << bi2->serialNumber();
     qDebug() << "file name     = " << bi2->fileName();
     qDebug() << "Testing assignment operator to set this equal to itself...";
@@ -435,7 +435,7 @@ int main(int argc, char *argv[]) {
                           "InstrumentId2", 
                           bundleTargetBody);
 
-    BundleImage *nullImage = NULL;
+    BundleImageQsp nullImage;
     BundleObservation nullBO(nullImage, 
                              "NullObservationNumber", 
                              "NullInstrumentId", 
@@ -815,7 +815,13 @@ int main(int argc, char *argv[]) {
     // TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 86% //TODO update when SquishCoco works again
     BundleMeasure bundleMeasure(cm2, bcp3);
 
-    bundleMeasure.setParentObservation(&bo2);
+    try {
+      bundleMeasure.observationSolveSettings();
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    bundleMeasure.setParentObservation(BundleObservationQsp(new BundleObservation(bo2)));
     // const BundleObservationSolveSettings *solveSettings = 
     bundleMeasure.observationSolveSettings();
     // Camera *cam = 

@@ -196,6 +196,8 @@ namespace Isis {
    *   @history 2016-07-11 Jesse Mapel - Changed m_bundleControlPoints to be a vector of
    *                           QSharedPointers to BundleControlPoints instead of a
    *                           BundleControlPointVector.  Fixes #4099.
+   *   @history 2016-08-03 Jesse Mapel - Changed BundleObservationVector to a vector of
+   *                           QSharedPointers.  Fixes #4150.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

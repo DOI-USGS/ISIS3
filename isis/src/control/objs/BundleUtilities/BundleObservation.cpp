@@ -19,7 +19,6 @@ namespace Isis {
     m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
-    m_solveSettings = NULL;
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
     m_Index = 0;
@@ -34,14 +33,13 @@ namespace Isis {
   /**
    * constructor
    */
-  BundleObservation::BundleObservation(BundleImage *image, QString observationNumber,
+  BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
     m_serialNumbers.clear();
     m_imageNames.clear();
     m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
-    m_solveSettings = NULL;
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
     m_Index = 0;
@@ -104,11 +102,7 @@ namespace Isis {
    * destructor
    */
   BundleObservation::~BundleObservation() {
-    qDeleteAll(*this);
     clear();
-
-    delete m_solveSettings;
-    m_solveSettings = NULL;
   }
 
 
@@ -132,7 +126,8 @@ namespace Isis {
    * set solve parameters
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
-    m_solveSettings = new BundleObservationSolveSettings(solveSettings);
+    m_solveSettings = BundleObservationSolveSettingsQsp(
+                        new BundleObservationSolveSettings(solveSettings));
 
     // initialize solution parameters for this observation
     int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -229,7 +224,7 @@ namespace Isis {
   }
 
 
-  const BundleObservationSolveSettings *BundleObservation::solveSettings() { 
+  const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
     return m_solveSettings;
   }
 
@@ -247,7 +242,7 @@ namespace Isis {
       std::vector<double> posPoly1, posPoly2, posPoly3;
 
       for (int i = 0; i < size(); i++) {
-        BundleImage *image = at(i);
+        BundleImageQsp image = at(i);
         SpicePosition *spiceposition = image->camera()->instrumentPosition();
 
         if (i > 0) {
@@ -285,7 +280,7 @@ namespace Isis {
       std::vector<double> anglePoly1, anglePoly2, anglePoly3;
 
       for (int i = 0; i < size(); i++) {
-        BundleImage *image = at(i);
+        BundleImageQsp image = at(i);
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
         if (i > 0) {
@@ -326,7 +321,7 @@ namespace Isis {
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
 
     for (int i = 0; i < size(); i++) {
-      BundleImage *image = at(i);
+      BundleImageQsp image = at(i);
       image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
     }
   }
@@ -341,7 +336,7 @@ namespace Isis {
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
 
     for (int i = 0; i < size(); i++) {
-      BundleImage *image = at(i);
+      BundleImageQsp image = at(i);
       image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
@@ -354,7 +349,7 @@ namespace Isis {
         BundleObservationSolveSettings::NoPositionFactors) {
 
       for (int i = 0; i < size(); i++) {
-        BundleImage *image = at(i);
+        BundleImageQsp image = at(i);
         SpicePosition *spiceposition = image->camera()->instrumentPosition();
 
         // first, set the degree of the spk polynomial to be fit for a priori values
@@ -374,7 +369,7 @@ namespace Isis {
         BundleObservationSolveSettings::NoPointingFactors) {
 
       for (int i = 0; i < size(); i++) {
-        BundleImage *image = at(i);
+        BundleImageQsp image = at(i);
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
         // first, set the degree of the spk polynomial to be fit for a priori values
@@ -540,7 +535,7 @@ namespace Isis {
 
         // apply updates to all images in observation
         for (int i = 0; i < size(); i++) {
-          BundleImage *image = at(i);
+          BundleImageQsp image = at(i);
           SpicePosition *spiceposition = image->camera()->instrumentPosition();
           spiceposition->SetPolynomial(coefX, coefY, coefZ,
                                        m_solveSettings->positionInterpolationType());
@@ -586,7 +581,7 @@ namespace Isis {
 
         // apply updates to all images in observation
         for (int i = 0; i < size(); i++) {
-          BundleImage *image = at(i);
+          BundleImageQsp image = at(i);
           SpiceRotation *spicerotation = image->camera()->instrumentRotation();
           spicerotation->SetPolynomial(coefRA, coefDEC, coefTWI,
                                        m_solveSettings->pointingInterpolationType());

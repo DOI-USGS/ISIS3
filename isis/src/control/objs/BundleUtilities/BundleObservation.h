@@ -50,16 +50,18 @@ namespace Isis {
    *                           matrix.
    *   @history 2014-07-23 Jeannie Backer - Replaced QVectors with QLists.
    *   @history 2015-02-20 Jeannie Backer - Brought closer to Isis coding standards.
+   *   @history 2016-08-03 Jesse Mapel - Changed contained member type to a QSharedPointer.
+   *                           Also changed m_solveSettings to a QSharedPointer. Fixes #4150.
    *
    */
-  class BundleObservation : public QVector< BundleImage  *> {
+  class BundleObservation : public QVector< BundleImageQsp > {
 
     public:
       // default constructor
       BundleObservation();
 
       // constructor
-      BundleObservation(BundleImage *image, QString observationNumber, QString instrumentId,
+      BundleObservation(BundleImageQsp image, QString observationNumber, QString instrumentId,
                         BundleTargetBodyQsp bundleTargetBody);
 
       // copy constructor
@@ -94,7 +96,7 @@ namespace Isis {
       boost::numeric::ublas::vector< double > &aprioriSigmas();
       boost::numeric::ublas::vector< double > &adjustedSigmas();
       
-      const BundleObservationSolveSettings *solveSettings();
+      const BundleObservationSolveSettingsQsp solveSettings();
 
 //    QStringList serialNumbers();
 
@@ -125,7 +127,7 @@ namespace Isis {
 
       QString m_instrumentId;      //!< spacecraft instrument id
 
-      BundleObservationSolveSettings *m_solveSettings; //!< solve settings for this observation
+      BundleObservationSolveSettingsQsp m_solveSettings; //!< solve settings for this observation
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image)
       SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image)

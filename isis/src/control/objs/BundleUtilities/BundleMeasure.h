@@ -24,6 +24,7 @@
  */
 
 #include <QObject>
+#include <QSharedPointer>
 
 namespace Isis {
   /**
@@ -42,6 +43,10 @@ namespace Isis {
    *   @history 2016-07-14 Ian Humphrey - Updated documentation and coding standards in preparation
    *                           to merge into trunk. Updated unit test for BundleMeasure. Fixes
    *                           #4145, #4077.
+   * 
+   *   @history 2016-08-03 Jesse Mapel - Changed parent observation to a QSharedPointer.
+   *                           Added error throws to observationSolveSettings and observationIndex
+   *                           if calling when parent observation has not been set.  Fixes #4150.
    */
 
   class BundleControlPoint;
@@ -66,14 +71,14 @@ namespace Isis {
       ~BundleMeasure();
 
       BundleMeasure &operator=(const BundleMeasure &src);
-      void setParentObservation(BundleObservation *observation);
+      void setParentObservation(QSharedPointer<BundleObservation> observation);
 
       bool isRejected();
       Camera *camera();
       BundleControlPoint *parentControlPoint();
       BundleImage *parentBundleImage();
-      BundleObservation *parentBundleObservation();
-      const BundleObservationSolveSettings *observationSolveSettings();
+      QSharedPointer<BundleObservation> parentBundleObservation();
+      const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
       double sample() const;
       double line() const;
@@ -87,7 +92,7 @@ namespace Isis {
       BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
                                                      bundle control measure **/
       BundleImage *m_parentBundleImage; /**< Parent image of this bundle control measure **/
-      BundleObservation *m_parentObservation; /**< Parent bundle observation **/
+      QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
   };
 }
 

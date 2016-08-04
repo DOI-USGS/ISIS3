@@ -44,9 +44,11 @@ namespace Isis {
    *   @history 2014-07-17 Kimberly Oyama - Updated to better meet coding standards.
    *   @history 2014-02-20 Jeannie Backer - Added assignment operator. Updated
    *                           to better meet coding standards.
+   *   @history 2016-08-03 Jesse Mapel - Changed parent observation to a QSharedPointer.
+   *                           Fixes #4150.
    *   
    */
-  class BundleImage : QObject {
+  class BundleImage : public QObject {
 
   Q_OBJECT
 
@@ -63,17 +65,17 @@ namespace Isis {
     BundleImage &operator=(const BundleImage &src);
 
     // mutators
-    void setParentObservation(BundleObservation *parentObservation);
+    void setParentObservation(QSharedPointer<BundleObservation> parentObservation);
 
     // accessors
     Camera *camera();
-    BundleObservation *parentObservation();
+    QSharedPointer<BundleObservation> parentObservation();
     QString serialNumber();
     QString fileName();
 
     private:
       Camera *m_camera;
-      BundleObservation *m_parentObservation; //!< parent BundleObservation
+      QSharedPointer<BundleObservation> m_parentObservation; //!< parent BundleObservation
       QString m_serialNumber;
       QString m_fileName;      
   };

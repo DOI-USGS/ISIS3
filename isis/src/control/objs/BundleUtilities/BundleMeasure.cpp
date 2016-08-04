@@ -1,6 +1,7 @@
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
+#include "IException.h"
 
 #include "ControlMeasure.h"
 
@@ -22,7 +23,6 @@ namespace Isis {
     m_parentControlPoint = bundleControlPoint;
 
     m_parentBundleImage = NULL;
-    m_parentObservation = NULL;
   }
 
 
@@ -75,7 +75,7 @@ namespace Isis {
    *
    * @param observation Pointer to the parent BundleObservation  
    */
-  void BundleMeasure::setParentObservation(BundleObservation *observation) {
+  void BundleMeasure::setParentObservation(QSharedPointer<BundleObservation> observation) {
     m_parentObservation = observation;
   }
 
@@ -125,9 +125,9 @@ namespace Isis {
   /**
    * Accesses the parent BundleObservation for this bundle measure
    *
-   * @return @b BundleObservation* Returns a pointer to the parent BundleObservation
+   * @return @b QSharedPointer<BundleObservation> Returns a pointer to the parent BundleObservation
    */
-  BundleObservation *BundleMeasure::parentBundleObservation() {
+  QSharedPointer<BundleObservation> BundleMeasure::parentBundleObservation() {
     return m_parentObservation;
   }
 
@@ -137,10 +137,18 @@ namespace Isis {
    *
    * @see BundleObservation::solveSettings()
    *
-   * @return @b const BundleObservationSolveSettings* Returns a const pointer to the 
-   *     BundleObservationSolveSettings for the parent BundleObservation
+   * @return @b const QSharedPointer<BundleObservationSolveSettings> Returns a const pointer to
+   *     the BundleObservationSolveSettings for the parent BundleObservation
+   * 
+   * @throws IException::Programmer "In BundleMeasure::observationSolveSettings:
+   *                                 parent observation has not been set."
    */
-  const BundleObservationSolveSettings *BundleMeasure::observationSolveSettings() {
+  const QSharedPointer<BundleObservationSolveSettings> BundleMeasure::observationSolveSettings() {
+    if (!m_parentObservation) {
+      QString msg = "In BundleMeasure::observationSolveSettings: "
+                    "parent observation has not been set.\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return m_parentObservation->solveSettings();
   }
 
@@ -210,8 +218,16 @@ namespace Isis {
    * @see BundleObservation::index()
    *
    * @return @b int Returns the observation index of the parent observation
+   * 
+   * @throws IException::Programmer "In BundleMeasure::observationIndex:
+   *                                 parent observation has not been set."
    */
   int BundleMeasure::observationIndex() const {
+    if (!m_parentObservation) {
+      QString msg = "In BundleMeasure::observationIndex: "
+                    "parent observation has not been set.\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return m_parentObservation->index();
   }
 

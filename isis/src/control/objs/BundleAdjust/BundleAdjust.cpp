@@ -335,14 +335,14 @@ namespace Isis {
 
         // create a new BundleImage and add to new (or existing if observation mode is on)
         // BundleObservation
-        BundleImage* image = new BundleImage(camera, serialNumber, fileName);
+        BundleImageQsp image = BundleImageQsp(new BundleImage(camera, serialNumber, fileName));
 
         if (!image) {
           QString msg = "In BundleAdjust::init(): image " + fileName + "is null" + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        BundleObservation *observation =
+        BundleObservationQsp observation =
             m_bundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
@@ -377,7 +377,7 @@ namespace Isis {
           BundleMeasure *measure = bundleControlPoint->at(j);
           QString cubeSerialNumber = measure->cubeSerialNumber();
 
-          BundleObservation *observation =
+          BundleObservationQsp observation =
               m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
 
           measure->setParentObservation(observation);
@@ -426,7 +426,7 @@ namespace Isis {
     for (int i = 0; i < nObservations; i++) {
       int nImages = m_bundleObservations.at(i)->size();
       for (int j = 0; j < nImages; j++) {
-        BundleImage *bundleImage = m_bundleObservations.at(i)->at(j);
+        BundleImageQsp bundleImage = m_bundleObservations.at(i)->at(j);
         int nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
 
         if (nMeasures > 1)
@@ -1137,7 +1137,7 @@ namespace Isis {
     int t = 0;
     //testing
     for (int a = 0; a < observationIndex; a++) {
-      BundleObservation *observation = m_bundleObservations.at(a);
+      BundleObservationQsp observation = m_bundleObservations.at(a);
       t += observation->numberParameters();
     }
     // account for target parameters
@@ -1335,7 +1335,7 @@ namespace Isis {
         }
       }
       else {
-        BundleObservation *observation;
+        BundleObservationQsp observation;
 
         // get parameter weights for this observation
         if (m_bundleSettings->solveTargetBody())
@@ -1904,11 +1904,11 @@ namespace Isis {
           t += nTargetParameters;
         else {
           if (nTargetParameters > 0 ) {
-            BundleObservation *observation = m_bundleObservations.at(a-1);
+            BundleObservationQsp observation = m_bundleObservations.at(a-1);
             t += observation->numberParameters();
           }
           else {
-            BundleObservation *observation = m_bundleObservations.at(a);
+            BundleObservationQsp observation = m_bundleObservations.at(a);
            t += observation->numberParameters();
           }
         }
@@ -2601,9 +2601,9 @@ namespace Isis {
 
     // TODO - who do I get these from?
     // from this measures BundleObservation
-    const BundleObservationSolveSettings *observationSolveSettings =
+    const BundleObservationSolveSettingsQsp observationSolveSettings =
         measure.observationSolveSettings();
-    BundleObservation *observation = measure.parentBundleObservation();
+    BundleObservationQsp observation = measure.parentBundleObservation();
 
     int nImagePartials = observation->numberParameters();
     coeff_image.resize(2,nImagePartials);
@@ -2901,7 +2901,7 @@ namespace Isis {
     // Update spice for each BundleObservation
     int nobservations = m_bundleObservations.size();
     for (int i = 0; i < nobservations; i++) {
-      BundleObservation *observation = m_bundleObservations.at(i);
+      BundleObservationQsp observation = m_bundleObservations.at(i);
 
       int nParameters = observation->numberParameters();
 
@@ -3309,7 +3309,7 @@ namespace Isis {
 
     // add vtpv from constrained image parameters
     for (int i = 0; i < m_bundleObservations.size(); i++) {
-      BundleObservation *observation = m_bundleObservations.at(i);
+      BundleObservationQsp observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
       const boost::numeric::ublas::vector<double> &weights = observation->parameterWeights();
@@ -3822,7 +3822,7 @@ namespace Isis {
       }
       // save adjusted image sigmas
       else {
-        BundleObservation *observation;
+        BundleObservationQsp observation;
         if (m_bundleSettings->solveTargetBody())
           observation = m_bundleObservations.at(i-1);
         else
@@ -4631,7 +4631,7 @@ namespace Isis {
     }
 
     char buf[1056];
-    BundleObservation *observation = NULL;
+    BundleObservationQsp observation;
 
     int nObservations = m_bundleObservations.size();
 
@@ -4678,7 +4678,7 @@ namespace Isis {
 
       int nImages = observation->size();
       for (int j = 0; j < nImages; j++) {
-        BundleImage *image = observation->at(j);
+        BundleImageQsp image = observation->at(j);
         sprintf(buf, "\nImage Full File Name: %s\n", image->fileName().toLatin1().data());
         fp_out << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
