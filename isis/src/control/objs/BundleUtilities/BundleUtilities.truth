@@ -829,6 +829,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleMeasure...
+**PROGRAMMER ERROR** In BundleMeasure::observationSolveSettings: parent observation has not been set.
 parent control point id "FixedPoint"
 
 rejected? "No"
@@ -837,7 +838,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "0"
+observation index "-1"
 
 rejected? "No"
 measure sample  "1.0"
@@ -845,7 +846,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "0"
+observation index "-1"
 
 rejected? "No"
 measure sample  "1.0"
@@ -853,7 +854,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "0"
+observation index "-1"
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

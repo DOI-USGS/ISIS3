@@ -7,7 +7,12 @@ namespace Isis {
 
 
   /**
-   * constructor
+   * Constructs a BundleImage with the given camera pointer, serial number, and filename.
+   * Parent observation defaults to NULL.
+   * 
+   * @param camera The camera model for the BundleImage
+   * @param serialNumber The serial number for the BundleImage
+   * @param fileName The file name for the BundleImage
    */
   BundleImage::BundleImage(Camera *camera, QString serialNumber, QString fileName) {
     m_camera = camera;
@@ -16,64 +21,90 @@ namespace Isis {
   }
 
 
-
   /**
-   * copy constructor
+   * Constructs a BundleImage from another BundleImage object.
+   * 
+   * @param other The BundleImage to copy from.
    */
-  BundleImage::BundleImage(const BundleImage &src) {
-    m_camera = src.m_camera;
-    m_parentObservation = src.m_parentObservation;
-    m_serialNumber = src.m_serialNumber;
-    m_fileName = src.m_fileName;
+  BundleImage::BundleImage(const BundleImage &other) {
+    m_camera = other.m_camera;
+    m_parentObservation = other.m_parentObservation;
+    m_serialNumber = other.m_serialNumber;
+    m_fileName = other.m_fileName;
   }
 
 
-
   /**
-   * destructor
+   * Destroys a BundleImage object.
    */
   BundleImage::~BundleImage() {
   }
 
 
-
-  BundleImage &BundleImage::operator=(const BundleImage &src) {
-    if (&src != this) {
-      m_camera = src.m_camera;
-      m_parentObservation = src.m_parentObservation;
-      m_serialNumber = src.m_serialNumber;
-      m_fileName = src.m_fileName;
+  /**
+   * An assignment operator to set this BundleImage to another BundleImage object.
+   * 
+   * @param other The BundleImage to copy from.
+   * 
+   * @return @b BundleImage& A reference to this BundleImage after being assigned to.
+   */
+  BundleImage &BundleImage::operator=(const BundleImage &other) {
+    if (&other != this) {
+      m_camera = other.m_camera;
+      m_parentObservation = other.m_parentObservation;
+      m_serialNumber = other.m_serialNumber;
+      m_fileName = other.m_fileName;
     }
     return *this;
   }
 
 
-
+  /**
+   * Sets the parent BundleObservation object.
+   * 
+   * @param parentObservation The parent BundleObservation.
+   */
   void BundleImage::setParentObservation(QSharedPointer<BundleObservation> parentObservation) {
 
     m_parentObservation = parentObservation;
   }
 
 
-
+  /**
+   * Returns the camera model used for the BundleImage.
+   * 
+   * @return @b Camera* A pointer to the camera model.
+   */
   Camera *BundleImage::camera() {
     return m_camera;
   }
 
 
-
+  /**
+   * Returns the parent BundleObservation object.
+   * 
+   * @return @b QSharedPointer<BundleObservation> A pointer to the parent BundleObservation.
+   */
   QSharedPointer<BundleObservation> BundleImage::parentObservation() {
     return m_parentObservation;
   }
 
 
-
+  /**
+   * Returns the serial number for the BundleImage.
+   * 
+   * @return @b QString The image's serial number.
+   */
   QString BundleImage::serialNumber() {
     return m_serialNumber;
   }
 
 
-
+  /**
+   * Returns the file name for the BundleImage.
+   * 
+   * @return @b QString The image's file name.
+   */
   QString BundleImage::fileName() {
     return m_fileName;
   }

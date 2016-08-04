@@ -27,8 +27,6 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include "SerialNumber.h"
-
 namespace Isis {
 
   class BundleObservation;
@@ -44,6 +42,8 @@ namespace Isis {
    *   @history 2014-07-17 Kimberly Oyama - Updated to better meet coding standards.
    *   @history 2014-02-20 Jeannie Backer - Added assignment operator. Updated
    *                           to better meet coding standards.
+   *   @history 2016-06-27 Jesse Mapel - Updated documentation in preparation
+   *                           for merging from IPCE to ISIS.  Fixes #4076.
    *   @history 2016-08-03 Jesse Mapel - Changed parent observation to a QSharedPointer.
    *                           Fixes #4150.
    *   
@@ -57,12 +57,12 @@ namespace Isis {
     BundleImage(Camera *camera, QString serialNumber, QString fileName);
 
     // copy constructor
-    BundleImage(const BundleImage &src);
+    BundleImage(const BundleImage &other);
 
     // destructor
    ~BundleImage();
 
-    BundleImage &operator=(const BundleImage &src);
+    BundleImage &operator=(const BundleImage &other);
 
     // mutators
     void setParentObservation(QSharedPointer<BundleObservation> parentObservation);
@@ -74,12 +74,13 @@ namespace Isis {
     QString fileName();
 
     private:
-      Camera *m_camera;
+      Camera *m_camera; //!< The camera model for the image
       QSharedPointer<BundleObservation> m_parentObservation; //!< parent BundleObservation
-      QString m_serialNumber;
-      QString m_fileName;      
+      QString m_serialNumber; //!< The serial number for the image
+      QString m_fileName; //!< The file name of the image
   };
 
+  //!< Definition for a BundleImageQsp, a shared pointer to a BundleImage.
   typedef QSharedPointer<BundleImage> BundleImageQsp;
 }
 
