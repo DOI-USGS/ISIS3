@@ -1,0 +1,652 @@
+UnitTest for LinearAlgebra 
+
+
+***************************************************
+Test Protected Constructor...
+***************************************************
+
+
+***************************************************
+Test identity() method...
+***************************************************
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+
+**PROGRAMMER ERROR** Can not create identity matrix of negative size [-1].
+
+
+***************************************************
+Test zeroMatrix() method...
+***************************************************
+     0.0       0.0       0.0       
+     0.0       0.0       0.0       
+     0.0       0.0       0.0       
+
+
+
+***************************************************
+Test 3D vector setters...
+***************************************************
+i = vector(1,0,0) =  ( 1.0, 0.0, 0.0 )
+j = vector(0,1,0) =  ( 0.0, 1.0, 0.0 )
+setVec3(v, 4, 5, 6) =  ( 4.0, 5.0, 6.0 )
+
+
+***************************************************
+Test 4D vector setters...
+***************************************************
+vector(1, 2, 3, 4) =  ( 1.0, 2.0, 3.0, 4.0 )
+setVec4(v, 5, 6, 7, 8) =  ( 5.0, 6.0, 7.0, 8.0 )
+
+
+**************************************************************************
+Test subVector(vector, startIndex, size) method...
+**************************************************************************
+subVector(v5678, 1, 2) =  ( 6.0, 7.0 )
+
+
+*****************************************************************************
+Test setRow(), row(), setColumn() and column() methods...
+*****************************************************************************
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+
+column 2 (index 1) =  ( 0.0, 1.0 )
+
+     -1.0       0.0       
+     0.0       -1.0       
+     0.0       0.0       
+
+row 2 (index 1) =  ( 0.0, -1.0 )
+
+**PROGRAMMER ERROR** Unable to set the matrix row to the given vector. Row index 2 is out of bounds. The given matrix only has 2 rows.
+**PROGRAMMER ERROR** Unable to set the matrix column to the given vector. Column index 3 is out of bounds. The given matrix only has 2 columns.
+**PROGRAMMER ERROR** Unable to get the matrix row to the given vector. Row index 2 is out of bounds. The given matrix only has 2 rows.
+**PROGRAMMER ERROR** Unable to get the matrix column to the given vector. Column index 3 is out of bounds. The given matrix only has 2 columns.
+
+
+***************************************************
+Test isIdentity() methods...
+***************************************************
+Is emptyMatrix identity? true
+Is 3x3 identity matrix identity? true
+Is 3x3 2*identity matrix identity? false
+Is 2x2 ones matrix identity? false
+Is 2x3 matrix identity? false
+
+
+***************************************************
+Test isOrthogonal() method...
+***************************************************
+Is emptyMatrix orthogonal? true
+Is 3x3 identity matrix orthogonal? true
+Is [0 -1; 1 0] orthogonal? true
+Is 1/sqrt2 * [1 1; 1 1] orthogonal? false
+Is 3x3 zero matrix orthogonal? false
+Is 2x3 matrix orthogonal? false
+
+
+***************************************************
+Test isRotationMatrix() method...
+***************************************************
+Is 3x3 identity matrix rotation matrix? true
+Is 2x2 identity matrix rotation matrix? true
+Is [0 -1; 1 0] rotation? true
+Is 1/sqrt2 * [1 1; 1 1] rotation? false
+Is 3x3 2*identity matrix rotation matrix? false
+Is 3x3 zero matrix rotation matrix? false
+Is 2x3 matrix rotation matrix? false
+**PROGRAMMER ERROR** Unable to determine whether the given matrix is a rotation matrix.
+**PROGRAMMER ERROR** Unable to calculate the determinant for the given matrix. This method only calculates the determinant for 2x2 or 3x3 matrices.The given matrix is [4x4].
+
+
+***************************************************
+Test isZero(matrix) method...
+***************************************************
+Is emptyMatrix zero? true
+Is 3x3 zero matrix zero? true
+Is 3x3 identity matrix zero? false
+
+
+***************************************************
+Test determinant() method...
+***************************************************
+Determinant of 3x3 2*identity =  8
+Determinant of 2x2 2*identity =  4
+**PROGRAMMER ERROR** Unable to calculate the determinant for the given matrix. This method only calculates the determinant for 2x2 or 3x3 matrices.The given matrix is [4x4].
+**PROGRAMMER ERROR** Unable to calculate the determinant for the given matrix. This method only calculates the determinant for 2x2 or 3x3 matrices.The given matrix is [2x3].
+
+
+***************************************************
+Test transpose() method...
+***************************************************
+Input matrix
+     1.0       2.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+
+transpose matrix
+     1.0       0.0       0.0       
+     2.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+
+
+***************************************************
+Test inverse() method...
+***************************************************
+The inverse of the rotation matrix is the transpose. 
+rotation matrix = 
+     0.0       1.0       
+     -1.0       0.0       
+
+inverse = 
+     0.0       -1.0       
+     1.0       0.0       
+
+other matrix = 
+     1.0       2.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+inverse = 
+     1.0       -2.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+**PROGRAMMER ERROR** Unable to invert the given matrix.
+**PROGRAMMER ERROR** The given matrix is not invertible. The determinant is 0.0.
+
+
+v =  ( 0.0, 1.0, 2.0 )
+w =  ( 3.0, 4.0, 5.0 )
+
+
+***************************************************
+Test isZero() method...
+***************************************************
+Is emptyVector a zero vector?  true
+Is zero a zero vector?  true
+Is v a zero vector?  false
+
+
+***************************************************
+Test isEmpty() method...
+***************************************************
+Is emptyVector an empty vector?  true
+Is zero an empty vector?  false
+Is v an empty vector?  false
+
+
+***************************************************
+Test isUnit() method...
+***************************************************
+Is emptyVector a unit vector?  false
+Is zero a unit vector?  false
+Is v a unit vector?  false
+Is i a unit vector?  true
+
+
+***************************************************
+Test magnitude() method...
+***************************************************
+Magnitude of zero =  0
+Magnitude of v =  2.23607
+
+
+***************************************************
+Test absoluteMaximum() method...
+***************************************************
+Max Norm of v =  2
+
+
+***************************************************
+Test normalize() method...
+***************************************************
+u =  ( 0.0, 0.447213595499958, 0.894427190999916 )
+**ERROR** Unable to normalize the zero vector.
+
+
+***************************************************
+Test multiply(matrix1, matrix2) method...
+***************************************************
+MT * M = 
+     1.0       2.0       0.0       
+     2.0       5.0       0.0       
+     0.0       0.0       1.0       
+
+
+**PROGRAMMER ERROR** Unable to multiply matrices with mismatched dimensions. The left matrix has [3] columns and the right matrix has [2] rows.
+
+
+***************************************************
+Test multiply(matrix, vector) method...
+***************************************************
+M * v = [3](2,1,2)
+**PROGRAMMER ERROR** Unable to multiply matrix and vector with mismatched dimensions.The given vector has [3] components and the given matrix has [2] columns.
+
+
+***************************************************
+Test multiply(scalar, vector) method...
+***************************************************
+2.0 * v =  ( 0.0, 2.0, 4.0 )
+
+
+***************************************************
+Test multiply(scalar, matrix) method...
+***************************************************
+2.0 * M = 
+     2.0       4.0       0.0       
+     0.0       2.0       0.0       
+     0.0       0.0       2.0       
+
+
+
+***************************************************
+Test add(vector1, vector2) method...
+***************************************************
+u + v =  ( 0.0, 1.44721359549996, 2.89442719099992 )
+**PROGRAMMER ERROR** Unable to add vectors with mismatched sizes.Vector1 has [0] components and vector2 has [3] components.
+
+
+***************************************************
+Test subtract(vector1, vector2) method...
+***************************************************
+u - v =  ( 0.0, -0.552786404500042, -1.10557280900008 )
+**PROGRAMMER ERROR** Unable to subtract vectors with mismatched sizes.Vector1 has [0] components and vector2 has [3] components.
+
+
+***************************************************
+Test crossProduct(vector1, vector2) method...
+***************************************************
+(parallel vectors) u x v =  ( 0.0, 0.0, 0.0 )
+(basis vectors) i x j = k =  ( 0.0, 0.0, 1.0 )
+i x v =  ( 0.0, -2.0, 1.0 )
+v x i =  ( 0.0, 2.0, -1.0 )
+**PROGRAMMER ERROR** Unable to calculate the cross product on vectors that are not size 3. Vector1 has [0] components and vector2 has [3] components.
+**PROGRAMMER ERROR** Unable to calculate the cross product on vectors that are not size 3. Vector1 has [3] components and vector2 has [0] components.
+
+
+***************************************************
+Test normalizedCrossProduct(vector1, vector2) method...
+***************************************************
+i x v =  ( 0.0, -0.894427190999916, 0.447213595499958 )
+i x u =  ( 0.0, -0.894427190999916, 0.447213595499958 )
+
+
+***************************************************
+Test outerProduct(vector1, vector2) method...
+***************************************************
+     0.0       0.0       0.0       
+     0.0       0.447213595499958       0.894427190999916       
+     0.0       0.894427190999916       1.78885438199983       
+
+**PROGRAMMER ERROR** Unable to compute the outer product for vectors with mismatched sizes.Vector1 has [3] components and vector2 has [0] components.
+
+
+***************************************************
+Test dotProduct(vector1, vector2) method...
+***************************************************
+u . v =  2.23607
+**PROGRAMMER ERROR** Unable to compute the dot product for vectors with mismatched sizes.Vector1 has [3] components and vector2 has [0] components.
+
+
+***************************************************
+Test innerProduct(vector1, vector2) method...
+***************************************************
+<u,v> =  2.23607
+**PROGRAMMER ERROR** Unable to compute the dot product for vectors with mismatched sizes.Vector1 has [3] components and vector2 has [0] components.
+
+
+***************************************************
+Test project(vector1, vector2) method...
+***************************************************
+Proj(u, v) =  ( 0.0, 0.447213595499958, 0.894427190999916 )
+Proj(u, zero) is zero?  true
+**PROGRAMMER ERROR** Unable to project vector1 onto vector2 with mismatched sizes.Vector1 has [0] components and vector2 has [3] components.
+
+
+***************************************************
+Test rotate(vector1, vector2, theta) method...
+***************************************************
+rotate(u,v,PI/2) =  ( 0.0, 0.447213595499958, 0.894427190999916 )
+rotate(u,zero,PI/2) =  ( 0.0, 0.447213595499958, 0.894427190999916 )
+**PROGRAMMER ERROR** Unable to rotate vector about the given axis and angle. Vectors must be of size 3 to perform rotation. The given vector has [0] components and the given axis has [3] components.
+**PROGRAMMER ERROR** Unable to rotate vector about the given axis and angle. Vectors must be of size 3 to perform rotation. The given vector has [3] components and the given axis has [0] components.
+
+
+***************************************************
+Test perpendicular(vector1, vector2) method...
+***************************************************
+perpendicular(zero, [0 1 2]) =  ( 0.0, 0.0, 0.0 )
+perpendicular([0 1 2], zero) =  ( 0.0, 1.0, 2.0 )
+perpendicular([0 1 2], c*[0 1 2]) =  ( 0.0, 0.0, 0.0 )
+perpendicular([0 1 2], [3 4 5]) =  ( -0.84, -0.12, 0.6 )
+verify: [0 1 2] - perp =  ( 0.84, 1.12, 1.4 )
+        is parallel to [3 4 5] since 0.28*[3 4 5 ] =  ( 0.84, 1.12, 1.4 )
+
+
+***************************************************
+Test toMatrix(quaternion) method...
+***************************************************
+From the zero quaternion we get identity...
+matrix = 
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+--------------------------
+From the identity quaternion we get identity...
+matrix = 
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+--------------------------
+From quaternion 1 =  ( 0.0, 1.0, 0.0, 0.0 )
+matrix 1 = 
+     1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       -1.0       
+
+--------------------------
+From quaternion 2 =  ( 0.0, 0.0, 1.0, 0.0 )
+matrix 2 = 
+     -1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       -1.0       
+
+--------------------------
+From quaternion 3 =  ( 0.0, 0.0, 0.0, 1.0 )
+matrix 3 = 
+     -1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       1.0       
+
+--------------------------
+From quaternion 4 =  ( 0.91219099598223, -0.22019944193656, -0.2554485981203, -0.23273548577332 )
+matrix 4 = 
+     0.76116041476046       0.537097706635079       -0.363539374111003       
+     -0.312099151636813       0.794692798865369       0.520631803656967       
+     0.56853227045548       -0.2828239893624       0.772516438978402       
+
+--------------------------
+From quaternion 5 (not unit quaternion) =  ( 1.0, 1.0, 1.0, 1.0 )
+matrix 5 = 
+     0.0       0.0       1.0       
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given vector to a rotation matrix. The given vector with [3] components is not a quaternion.
+
+
+***************************************************
+Test toQuaternion(matrix) method...
+***************************************************
+From the identity matrix we get... 
+quaternion =  ( 1.0, 0.0, 0.0, 0.0 )
+
+--------------------------
+From matrix 1 = 
+     1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       -1.0       
+
+quaternion 1 =  ( 0.0, 1.0, 0.0, 0.0 )
+
+--------------------------
+From matrix 2 = 
+     -1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       -1.0       
+
+quaternion 2 =  ( 0.0, 0.0, 1.0, 0.0 )
+
+--------------------------
+From matrix 3 = 
+     -1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       1.0       
+
+quaternion 3 =  ( 0.0, 0.0, 0.0, 1.0 )
+
+--------------------------
+From matrix 4 = 
+     0.76116041476046       0.537097706635079       -0.363539374111003       
+     -0.312099151636813       0.794692798865369       0.520631803656967       
+     0.56853227045548       -0.2828239893624       0.772516438978402       
+
+quaternion 4 =  ( 0.912190995982233, -0.220199441936559, -0.255448598120299, -0.232735485773319 )
+
+--------------------------
+From matrix 5 = 
+     0.0       0.0       1.0       
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+
+quaternion 5 =  ( 0.5, 0.5, 0.5, 0.5 )
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given matrix to a quaternion. A 3x3 matrix is required. The given matrix is [2x3].
+**PROGRAMMER ERROR** Unable to convert the given matrix to a quaternion. A 3x3 matrix is required. The given matrix is [3x2].
+**PROGRAMMER ERROR** Unable to convert the given matrix to an axis of rotation and a rotation angle. The given matrix is not a rotation matrix.
+
+
+***************************************************
+Test toAxisAngle(matrix) method...
+***************************************************
+From the identity matrix we get...
+axis =  ( 0.0, 0.0, 1.0 )
+angle =  0
+
+--------------------------
+From matrix 1 = 
+     1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       -1.0       
+
+axis 1 =  ( 1.0, 0.0, 0.0 )
+angle 1 =  3.14159
+
+--------------------------
+From matrix 2 = 
+     -1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       -1.0       
+
+axis 2 =  ( 0.0, 1.0, 0.0 )
+angle 2 =  3.14159
+
+--------------------------
+From matrix 3 = 
+     -1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       1.0       
+
+axis 3 =  ( 0.0, 0.0, 1.0 )
+angle 3 =  3.14159
+
+--------------------------
+From matrix 4 = 
+     0.76116041476046       0.537097706635079       -0.363539374111003       
+     -0.312099151636813       0.794692798865369       0.520631803656967       
+     0.56853227045548       -0.2828239893624       0.772516438978402       
+
+axis 4 =  ( -0.537379449335452, -0.623402247454145, -0.567972680065728 )
+angle 4 =  0.844393
+
+--------------------------
+From matrix 5 = 
+     0.0       0.0       1.0       
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+
+axis 5 =  ( 0.577350269189626, 0.577350269189626, 0.577350269189626 )
+angle 5 =  2.0944
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given matrix to an axis of rotation and a rotation angle. A 3x3 matrix is required. The given matrix is [2x3].
+**PROGRAMMER ERROR** Unable to convert the given matrix to an axis of rotation and a rotation angle. A 3x3 matrix is required. The given matrix is [3x2].
+**PROGRAMMER ERROR** Unable to convert the given matrix to an axis of rotation and a rotation angle. The given matrix is not a rotation matrix.
+
+
+***************************************************
+Test toMatrix(AxisAngle) and toMatrix(axis, angle) methods...
+***************************************************
+From the identity axis/angle we get...
+axis =  ( 0.0, 0.0, 1.0 )
+angle =  0
+matrix = 
+     1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+
+--------------------------
+From axis =  ( 1.0, 0.0, 0.0 )
+     angle =  3.14159
+matrix = 
+     1.0       0.0       0.0       
+     0.0       -1.0       -1.224646799147353e-16       
+     0.0       1.224646799147353e-16       -1.0       
+
+--------------------------
+From axis =  ( 0.0, 1.0, 0.0 )
+     angle =  3.14159
+matrix = 
+     -1.0       0.0       1.224646799147353e-16       
+     0.0       1.0       0.0       
+     -1.224646799147353e-16       0.0       -1.0       
+
+--------------------------
+From axis =  ( 0.0, 0.0, 1.0 )
+     angle =  3.14159
+matrix = 
+     -1.0       -1.224646799147353e-16       0.0       
+     1.224646799147353e-16       -1.0       0.0       
+     0.0       0.0       1.0       
+
+--------------------------
+From axis =  ( -0.537379449335452, -0.623402247454145, -0.567972680065728 )
+     angle =  0.844393
+matrix = 
+     0.761160414760462       0.537097706635079       -0.363539374111004       
+     -0.312099151636813       0.79469279886537       0.520631803656967       
+     0.56853227045548       -0.282823989362401       0.772516438978403       
+
+--------------------------
+From axis =  ( 0.577350269189626, 0.577350269189626, 0.577350269189626 )
+     angle =  2.0944
+matrix = 
+     2.220446049250313e-16       -1.110223024625157e-16       1.0       
+     1.0       2.220446049250313e-16       -1.110223024625157e-16       
+     -1.110223024625157e-16       1.0       2.220446049250313e-16       
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given vector and angle to a rotation matrix. The given vector with size [0] is not a 3D axis vector.
+
+
+***************************************************
+Test toEulerAngles(matrix, axes) method...
+***************************************************
+From axes 323 and the identity matrix we get...
+Euler Angle 1 (angle/axis number) =  0 3
+Euler Angle 2 (angle/axis number) =  0 2
+Euler Angle 3 (angle/axis number) =  0 3
+
+--------------------------
+From Axes:  (3, 1, 3)
+     matrix 1 = 
+     1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       -1.0       
+
+Euler Angle 1 (angle/axis number) =  0 3
+Euler Angle 2 (angle/axis number) =  3.14159 1
+Euler Angle 3 (angle/axis number) =  0 3
+
+--------------------------
+From Axes:  (2, 1, 3)
+     matrix 2 = 
+     -1.0       0.0       0.0       
+     0.0       1.0       0.0       
+     0.0       0.0       -1.0       
+
+Euler Angle 1 (angle/axis number) =  3.14159 2
+Euler Angle 2 (angle/axis number) =  0 1
+Euler Angle 3 (angle/axis number) =  0 3
+
+--------------------------
+From Axes:  (1, 2, 3)
+     matrix 3 = 
+     -1.0       0.0       0.0       
+     0.0       -1.0       0.0       
+     0.0       0.0       1.0       
+
+Euler Angle 1 (angle/axis number) =  0 1
+Euler Angle 2 (angle/axis number) =  0 2
+Euler Angle 3 (angle/axis number) =  3.14159 3
+
+--------------------------
+From Axes:  (1, 2, 3)
+     matrix = 
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+     1.0       0.0       0.0       
+
+Euler Angle 1 (angle/axis number) =  1.5708 1
+Euler Angle 2 (angle/axis number) =  0 2
+Euler Angle 3 (angle/axis number) =  1.5708 3
+
+--------------------------
+From Axes:  (3, 1, 3)
+     matrix = 
+     0.0       1.0       0.0       
+     0.0       0.0       1.0       
+     1.0       0.0       0.0       
+
+Euler Angle 1 (angle/axis number) =  0 3
+Euler Angle 2 (angle/axis number) =  1.5708 1
+Euler Angle 3 (angle/axis number) =  1.5708 3
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles. A 3x3 matrix is required. The given matrix is [2x3].
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles. A 3x3 matrix is required. The given matrix is [3x2].
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles. The given matrix is not a rotation matrix.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles using the given axis codes [3, 1, 0]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles using the given axis codes [3, -1, 0]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles using the given axis codes [4, -1, 0]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles using the given axis codes [1, 1, 1]. The middle axis code must differ from its neighbors.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles using the given axis codes [2, 1, 1]. The middle axis code must differ from its neighbors.
+**PROGRAMMER ERROR** Unable to convert the given matrix to Euler angles. Exactly 3 axis codes are required. The given list has [2] axes.
+
+
+***************************************************
+Test toMatrix(EulerAngles) methods...
+***************************************************
+From Euler Angle 1 (angle/axis number) =  0 3
+     Euler Angle 2 (angle/axis number) =  3.14159 1
+     Euler Angle 3 (angle/axis number) =  0 3
+matrix = 
+     1.0       0.0       0.0       
+     0.0       -1.0       1.224646799147353e-16       
+     0.0       -1.224646799147353e-16       -1.0       
+
+--------------------------
+From Euler Angle 1 (angle/axis number) =  0 3
+     Euler Angle 2 (angle/axis number) =  3.14159 1
+     Euler Angle 3 (angle/axis number) =  0 3
+matrix = 
+     1.0       0.0       0.0       
+     0.0       -1.0       1.224646799147353e-16       
+     0.0       -1.224646799147353e-16       -1.0       
+
+--------------------------
+**PROGRAMMER ERROR** Unable to convert the given Euler angles to a matrix using the given axis codes [4, 1, 1]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given Euler angles to a matrix using the given axis codes [1, 0, 1]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given Euler angles to a matrix using the given axis codes [2, 1, -1]. Axis codes must be 1, 2, or 3.
+**PROGRAMMER ERROR** Unable to convert the given Euler angles to a matrix. Exactly 3 Euler angles are required. The given list has [2] angles.
+
