@@ -208,5 +208,9 @@
       Added shortcuts to Qtie Tool window for selecting right measures, registration, saving 
       measures, and find. Fixes #2324.
     </change>
+    <change name="Marjorie Hahn" date="2016-08-02">
+      Prevented qtie from crashing when user attempts to select a registration template. 
+      Fixes #2375.
+    </change>
   </history>
 </application>

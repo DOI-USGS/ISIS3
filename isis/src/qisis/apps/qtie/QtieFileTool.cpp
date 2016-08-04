@@ -35,14 +35,14 @@ namespace Isis {
   // Constructor
   QtieFileTool::QtieFileTool(QWidget *parent) : FileTool(parent) {
     openAction()->setToolTip("Open images");
-    QString whatsThis =
-      "<b>Function:</b> Open a <i>images</i> \
-       <p><b>Shortcut:</b>  Ctrl+O\n</p>";
+    QString whatsThis = "<b>Function:</b> Open a <i>images</i> \
+                        <p><b>Shortcut:</b>  Ctrl+O\n</p>";
     openAction()->setWhatsThis(whatsThis);
 
     saveAction()->setEnabled(false);
   }
 
+  
   /**
    *  Open base image and image to be adjusted
    *
@@ -62,7 +62,6 @@ namespace Isis {
    *
    */
   void QtieFileTool::open() {
-
 
     //  If we've already opened files, clear before starting over
     if (cubeViewportList()->size() > 0) {
@@ -313,7 +312,7 @@ namespace Isis {
           }
         }
         else {
-          //  throw error?  point not on base cube
+          // throw error?  point not on base cube
           qDebug()<<"SetGround else";
           QString message = "Error parsing input control net.  Point Id: " +
                             (p.GetId()) + " does not exist on basemap.  "
@@ -341,14 +340,5 @@ namespace Isis {
       p.Add(mB);
     }
     return true;
-
   }
-
-
 }
-
-
-
-
-
-

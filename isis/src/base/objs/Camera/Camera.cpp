@@ -53,6 +53,7 @@
 #include "ProjectionFactory.h"
 #include "RingPlaneProjection.h"
 #include "ShapeModel.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 #include "TProjection.h"
@@ -476,7 +477,7 @@ namespace Isis {
       double dist = sqrt(a * a + b * b + c * c) * 1000.0;
       return dist / (p_focalLength / p_pixelPitch);
     }
-    return -1.0;
+    return Isis::Null;
   }
 
   /**
@@ -505,8 +506,8 @@ namespace Isis {
   double Camera::PixelResolution() {
     double lineRes = LineResolution();
     double sampRes = SampleResolution();
-    if (lineRes < 0.0) return -1.0;
-    if (sampRes < 0.0) return -1.0;
+    if (lineRes < 0.0) return Isis::Null;
+    if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;
   }
 
