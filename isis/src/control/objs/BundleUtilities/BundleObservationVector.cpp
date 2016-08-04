@@ -2,20 +2,22 @@
 
 #include <QDebug>
 
+#include "BundleObservation.h"
 #include "IException.h"
-
 
 namespace Isis {
 
   /**
-   * constructor
+   * Constructs an empty BundleObservationVector.
    */
   BundleObservationVector::BundleObservationVector() {
   }
 
 
   /**
-   * destructor
+   * Destructor.
+   *
+   * Upon destruction, BundleObservation will delete all contained QObjects (BundleObservations).
    */
   BundleObservationVector::~BundleObservationVector() {
     clear();
@@ -23,25 +25,38 @@ namespace Isis {
 
 
   /**
-   * add new BundleObservation method
+   * Adds a new BundleObservation.
+   *
+   * Adds a new BundleObservation to this vector. If a BundleObservation has already been added
+   * with the passed observationNumber, the passed BundleImage is added to the existing 
+   * BundleObservation.
+   *
+   * @param bundleImage QSharedPointer to the BundleImage in the observation to add
+   * @param observationNumber Observation number of the observation to add
+   * @param instrumentId Instrument id of the observation to add
+   * @param bundleSettings Qsp to BundleSettings for the observation being added
+   * 
+   * @throws IException::Programmer "Unable to allocate new BundleObservation"
+   *
+   * @return @b BundleObservationQsp Returns a pointer to the BundleObservation that was added
    */
   BundleObservationQsp BundleObservationVector::addnew(BundleImageQsp bundleImage,
                                                        QString observationNumber,
                                                        QString instrumentId,
                                                        BundleSettingsQsp bundleSettings) {
     BundleObservationQsp bundleObservation;
-    bool bAddToExisting = false;
+    bool addToExisting = false;
 
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
 
-      if (bundleObservation->instrumentId() == instrumentId){
-        bAddToExisting = true;
+      if (bundleObservation->instrumentId() == instrumentId) {
+        addToExisting = true;
       }
     }
 
-    if (bAddToExisting) {
+    if (addToExisting) {
       // if we have already added a BundleObservation with this number, we have to add the new
       // BundleImage to this observation
       bundleObservation->append(bundleImage);
@@ -56,13 +71,13 @@ namespace Isis {
     }
     else {
       // create new BundleObservation and append to this vector
-      bundleObservation = BundleObservationQsp( new BundleObservation(bundleImage,
-                                                                      observationNumber,
-                                                                      instrumentId,
-                                                bundleSettings->bundleTargetBody()));
+      bundleObservation = BundleObservationQsp(new BundleObservation(bundleImage,
+                                                                     observationNumber,
+                                                                     instrumentId,
+                                               bundleSettings->bundleTargetBody()));
 
       if (!bundleObservation) {
-        QString message = "unable to allocate new BundleObservation ";
+        QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
@@ -86,10 +101,10 @@ namespace Isis {
       append(bundleObservation);
 
       // update observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
+      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
-      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(),bundleObservation);
+      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
     }
 
     return bundleObservation;
@@ -97,7 +112,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses the number of position parameters for the contained BundleObservations.
+   *
+   * @return @b int Returns the total number of position parameters for the BundleObservations 
    */
   int BundleObservationVector::numberPositionParameters() {
     int positionParameters = 0;
@@ -112,7 +129,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses the number of pointing parameters for the contained BundleObservations.
+   *
+   * @return @b int Returns the total number of pointing parameters for the BundleObservations 
    */
   int BundleObservationVector::numberPointingParameters() {
     int pointingParameters = 0;
@@ -127,7 +146,10 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns the sum of the position parameters and pointing parameters for the contained
+   * BundleObservations.
+   *
+   * @return @b int Returns the total number of parameters for the contained BundleObservations 
    */
   int BundleObservationVector::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
@@ -135,7 +157,14 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses a BundleObservation associated with the passed serial number.
+   *
+   * If there is no BundleObservation associated with the serial number, a NULL
+   * pointer is returned.
+   *
+   * @param cubeSerialNumber Serial number of a cube to try to find an associated BundleObservation
+   *
+   * @return @b BundleObservationQsp Pointer to the associated BundleObservation (NULL if not found)
    */
   BundleObservationQsp BundleObservationVector::
       observationByCubeSerialNumber(QString cubeSerialNumber) {
@@ -149,7 +178,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Initializes the exterior orientations for the contained BundleObservations.
+   *
+   * @return @b bool Returns true upon successful initialization 
    */
   bool BundleObservationVector::initializeExteriorOrientation() {
     int nObservations = size();
@@ -163,7 +194,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Initializes the body rotations for the contained BundleObservations.
+   *
+   * @return @b bool Returns true upon successful initialization 
    */
   bool BundleObservationVector::initializeBodyRotation() {
     int nObservations = size();

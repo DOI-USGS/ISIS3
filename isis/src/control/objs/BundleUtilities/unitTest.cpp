@@ -341,7 +341,7 @@ int main(int argc, char *argv[]) {
     }
     try {
       BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
-                                 BundleObservationSolveSettings::InstrumentPointingSolveOption(-1));
+          BundleObservationSolveSettings::InstrumentPointingSolveOption(-1));
     } 
     catch (IException &e) {
       e.print();
@@ -354,7 +354,7 @@ int main(int argc, char *argv[]) {
     }
     try {
       BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
-                                 BundleObservationSolveSettings::InstrumentPositionSolveOption(-2));
+          BundleObservationSolveSettings::InstrumentPositionSolveOption(-2));
     } 
     catch (IException &e) {
       e.print();
@@ -419,14 +419,19 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing BundleObservation...";
     qDebug() << "Constructing empty BundleObservation object...";
     #if 0
-    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 71%
+    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: ??% (need to re-run SquishCoco)
     NEED:
         1) construct with image containing camera that is not null
+          1a) construct also with non-null target body qsp
+          1b) test initilaizeBodyRotation()
         2) NOT POSSIBLE - setSolveSettings - initParameterWeights() returns false
         3) initializeExteriorOrientation - positionOption!=No, pointingOption=No
         4) applyParameterCorrections -     positionOption!=No, pointingOption=No
-        5) initParameterWeights - possigma[0] <= 0, possigma[1] <= 0, possigma[2]  > 0
-                                                    pntsigma[1]  > 0, pntsigma[2] <= 0
+          4a) Test the exceptions thrown by applyParameterCorrection (needs to have
+              m_instrumentPosition = NULL, m_instruemtnPointing = NULL). This can be tested
+              once #4153 is fixed.
+        5) initParameterWeights - possigma[0] == 0, possigma[1] == 0, possigma[2]  > 0
+                                                    pntsigma[1]  > 0, pntsigma[2] == 0
         6) formatBundleOutputString - with instrumentPosition/instrumentRotation not NULL
     #endif
     BundleObservation bo;
@@ -449,6 +454,7 @@ int main(int argc, char *argv[]) {
     bo = bo2;
     qDebug() << "Testing copy constructor...";
     BundleObservation bo3(bo);
+
     qDebug() << "Testing mutators and accessors...";
     qDebug() << "    Set/get solve settings using with CAMESOLVE=NONE...";
     bo2.setSolveSettings(settingsFromGroup1);
@@ -468,6 +474,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bo2.formatBundleOutputString(false);
     qDebug() << "    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...";
     bo3.setSolveSettings(bsFromEmptyXml);
+
     bossFromBo = *bo3.solveSettings();
     pvl = bossFromBo.pvlObject("SettingsFromBundleObservation");
     cout << pvl << endl << endl;
@@ -477,18 +484,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "number parameters =     " << toString(bo3.numberParameters());
     qDebug() << "number position param = " << toString(bo3.numberPositionParameters());
     qDebug() << "number pointing param = " << toString(bo3.numberPointingParameters());
-    //???BundleObservationSolveSettings bossFromBo = *bo3.solveSettings();
-    //???pvl = bossFromBo.pvlObject("SettingsFromBundleObservation");
-    //???cout << pvl << endl << endl;
     qDebug() << "parameter list: " << bo3.parameterList();
     qDebug() << "image names:    " << bo3.imageNames();
 
-    #if 0
-// seg fault   qDebug() << bo3.formatBundleOutputString(true);
-// seg fault   qDebug() << bo3.formatBundleOutputString(false);
-    SpiceRotation sr = *bo3.spiceRotation();
-    SpicePosition sp = *bo3.spicePosition();
-    #endif
     boost::numeric::ublas::vector< double > paramWts = bo3.parameterWeights();
     boost::numeric::ublas::vector< double > paramCor = bo3.parameterCorrections();
     boost::numeric::ublas::vector< double > aprSigma = bo3.aprioriSigmas();
@@ -514,15 +512,47 @@ int main(int argc, char *argv[]) {
       vectors.append("     ");
     }
     qDebug().noquote() << vectors;
-    //???qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
+    
+    // initializeBodyRotation (verify???)
+    // bo3.initializeBodyRotation(); //Seg fault
+
     qDebug() << "    output bundle observation...";
     qDebug().noquote() << bo3.formatBundleOutputString(false);
     qDebug().noquote() << bo3.formatBundleOutputString(true);
-    qDebug() << "init exterior orientiation successful?  " << toString(bo3.initializeExteriorOrientation());
-    qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
-//    SpiceRotation *spicePos = bo3.spiceRotation();
-//    SpicePosition *spiceRot = bo3.spicePosition();
+    qDebug() << "init exterior orientiation successful?  " 
+             << toString(bo3.initializeExteriorOrientation());
+    qDebug() << "apply param corrections successful?     " 
+             << toString(bo3.applyParameterCorrections(paramCor));
     qDebug() << "";
+
+    // spiceRotation and spicePosition (verify???)
+    //SpiceRotation *rotation = 
+    bo3.spiceRotation();
+    //SpicePosition *position = 
+    bo3.spicePosition();
+
+    /*  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
+    qDebug() << "Testing exceptions...";
+    BundleObservationSolveSettings bo3SettingsCopy(*(bo3.solveSettings()));
+    try {
+      bo3SettingsCopy.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionOnly);
+      nullBO.setSolveSettings(bo3SettingsCopy);
+      nullBO.applyParameterCorrections(paramCor);
+    }
+    catch (IException &e) {
+      e.print(); 
+    }
+    try {
+      bo3SettingsCopy.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesOnly,
+                                                    false);
+      nullBO.setSolveSettings(bo3SettingsCopy);
+      nullBO.applyParameterCorrections(paramCor);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    */
+
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -556,22 +586,14 @@ int main(int argc, char *argv[]) {
       8) getObsByCubeSerialNumber - map.contains(sn)
       9) getObsByCubeSerialNumber - map.contains(sn) == false
 
-                  
-//    bo = *bov.addnew(BundleImage* image, "obs1",
-//                              "InstrumentIdBOV", BundleSettings &bundleSettings);
-//    bo2 = *bov.addnew(BundleImage* image, "obs2",
-//                              "InstrumentIdBOV", BundleSettings &bundleSettings);
-//    BundleObservation obs1 = *bov.getObservationByCubeSerialNumber("obs1");
-    #endif
+    #endif               
     BundleObservationVector bov;
-    #if 0
-    BundleImage *bundleImage = new BundleImage();
-    BundleSettings bundleSettings;
-    BundleObservation obs1 = *bov.addnew(bundleImage, "obs1", "InstrumentIdBOV", bundleSettings);
-    qDebug() << obs1.formatBundleOutputString(true);
-    BundleObservation obs2 = *bov.addnew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
-    qDebug() << obs2.formatBundleOutputString(true);
-#endif
+    BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
+    // BundleObservation *obs1 = bov.addnew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
+    //qDebug() << obs1->formatBundleOutputString(true);
+    //obs1 = bov.observationByCubeSerialNumber("obs1");
+    //BundleObservation *obs2 = bov.addnew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
+    //qDebug() << obs2->formatBundleOutputString(true);
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
@@ -581,6 +603,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "same observation?" << toString((obs1 == obs1b));
     qDebug() << obs1b.formatBundleOutputString(true);
 #endif
+    // Following segfaults (see #4157)
     qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";

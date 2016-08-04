@@ -25,6 +25,7 @@
 
 #include <QMap>
 #include <QSharedPointer>
+#include <QString>
 #include <QVector>
 
 #include "BundleImage.h"
@@ -33,8 +34,13 @@
 
 namespace Isis {
 
-  class BundleObservation;
+
   /**
+   * This class is a container class for BundleObservations. It can be used for managing multiple
+   * BundleObservations.
+   *
+   * Upon destruction, this class will delete any contained QObjects (BundleObservations).
+   *
    * @author 2014-05-22 Ken Edmundson
    *
    * @internal
@@ -47,9 +53,10 @@ namespace Isis {
    *   @history 2016-08-03 Jesse Mapel - Changed contained member type to a vector of
    *                           QSharedPointers.  Removed commented out block of paths.
    *                           Fixes #4150, #4155.
+   *   @history 2016-08-03 Ian Humphrey - Updated documentation and coding standards. Replaced
+   *                           getObservationByCubeSerialNumber with observationByCubeSerialNumber.
    */
-
-  class BundleObservationVector : public QVector < BundleObservationQsp > {
+  class BundleObservationVector : public QVector<BundleObservationQsp> {
 
     public:
       BundleObservationVector();
@@ -70,13 +77,10 @@ namespace Isis {
       bool initializeBodyRotation();
 
   private:
-      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap; //!< map between
-                                                                             //!< observation # and
-                                                                             //!< ptr to observation
-
-      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;       //!< map between
-                                                                             //!< image serial # &
-                                                                             //!< vector index
+      //! Map between observation number and pointer to observation.
+      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
+      //! Map between image serial number and vector index.
+      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap; 
   };
 }
 

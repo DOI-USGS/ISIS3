@@ -27,7 +27,6 @@
 #include <QObject>
 #include <QString>
 
-#include "BundleImage.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 #include "XmlStackedHandler.h"
@@ -42,8 +41,8 @@ namespace Isis {
   class PvlObject;
   class XmlStackedHandlerReader;
   /**
-   * @brief 
-   *  
+   * This class is used to modify and manage solve settings for a BundleObservation. 
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-07-09 Ken Edmundson
@@ -67,11 +66,13 @@ namespace Isis {
    *                           class to 99.403% scope.
    *   @history 2016-08-03 Jesse Mapel - Added BundleObservationSolveSettingsQsp definition.
    *                           Fixes #4150.
+   *   @history 2016-08-03 Ian Humphrey - Updated documentation and reviewed coding standards.
+   *                           Fixes #4078.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
-   *   @todo Determine whether xml stuff needs a Project pointer
-   *   @todo Determine which XmlStackedHandlerReader constructor is preferred
+   *   @todo Determine whether xml stuff needs a Project pointer.
+   *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
    */
 
 class BundleObservationSolveSettings : public QObject {
@@ -93,14 +94,14 @@ class BundleObservationSolveSettings : public QObject {
       void initialize();
 
       bool setFromPvl(PvlGroup &scParameterGroup);
-      PvlObject pvlObject(QString name = "") const; // default name is instrument ID
+      PvlObject pvlObject(QString name = "") const; // Default name is instrument ID.
 
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;
 
 
 
-      // Instrument Pointing stuff
+      //! Options for how to solve for instrument pointing.
       enum InstrumentPointingSolveOption {
         NoPointingFactors          = 0, /**< Solve for none of the pointing factors.*/
         AnglesOnly                 = 1, /**< Solve for pointing angles: right ascension, declination
@@ -108,9 +109,10 @@ class BundleObservationSolveSettings : public QObject {
         AnglesVelocity             = 2, //!< Solve for pointing angles and their angular velocities.
         AnglesVelocityAcceleration = 3, /**< Solve for pointing angles, their velocities and their
                                              accelerations.*/
-        AllPointingCoefficients    = 4 /**< Solve for all coefficients in the polynomials fit to
+        AllPointingCoefficients    = 4  /**< Solve for all coefficients in the polynomials fit to
                                              the pointing angles.*/
       };
+
       static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
       static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
       void setInstrumentPointingSettings(InstrumentPointingSolveOption option, 
@@ -132,7 +134,7 @@ class BundleObservationSolveSettings : public QObject {
 
 
 
-      // Instrument Position stuff
+      //! Options for how to solve for instrument position
       enum InstrumentPositionSolveOption {
         NoPositionFactors            = 0, /**< Solve for none of the position factors.*/
         PositionOnly                 = 1, /**< Solve for instrument positions only.*/
@@ -142,6 +144,7 @@ class BundleObservationSolveSettings : public QObject {
         AllPositionCoefficients      = 4  /**< Solve for all coefficients in the polynomials fit to
                                                the instrument positions.*/
       };
+
       static InstrumentPositionSolveOption stringToInstrumentPositionSolveOption(QString option);
       static QString instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option);
       void setInstrumentPositionSettings(InstrumentPositionSolveOption option,
@@ -159,8 +162,8 @@ class BundleObservationSolveSettings : public QObject {
       QList<double> aprioriPositionSigmas() const;
       SpicePosition::Source positionInterpolationType() const;
 
-      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
-
+      // TODO: does xml stuff need project???
+      void save(QXmlStreamWriter &stream, const Project *project) const;  
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
@@ -170,17 +173,19 @@ class BundleObservationSolveSettings : public QObject {
        * @author 2014-07-28 Jeannie Backer
        *
        * @internal
+       *   @todo To be docuemnted if XML handler code is used for serialization.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleObservationSolveSettings *settings, Project *project);  // TODO: does xml stuff need project???
+          // TODO: does xml stuff need project???
+          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
           ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
+                                  const QString &qName);
    
         private:
           Q_DISABLE_COPY(XmlHandler);
@@ -199,39 +204,46 @@ class BundleObservationSolveSettings : public QObject {
       QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
 
       // pointing related parameters
+      //! Option for how to solve for instrument pointing.
       InstrumentPointingSolveOption m_instrumentPointingSolveOption;
-      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in solution.*/
-      int m_ckDegree;                             //!< ck degree (define)
-      int m_ckSolveDegree;                        //!< solve ck degree (define)
+      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in
+                                                       solution.*/
+      int m_ckDegree;                             /**< Degree of the polynomial fit to the original
+                                                       camera angles. **/
+      int m_ckSolveDegree;                        /**< Degree of the camera angles polynomial being
+                                                       fit to in the bundle adjustment. **/
       bool m_solveTwist;                          //!< Solve for "twist" angle.
       bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing 
                                                        pointing polynomial.*/
       QList<double> m_anglesAprioriSigma; /**< The image position a priori sigmas.The size of the
                                                list is equal to the number of coefficients in the
-                                               solution. A negative value implies no weighting will
-                                               be applied.*/ // ??? no negatives are filled in when size = 0
+                                               solution. An Isis::Null value implies no weighting 
+                                               will be applied.*/ 
       SpiceRotation::Source
           m_pointingInterpolationType;    /**< SpiceRotation interpolation type.
-                                                 Defined in SpiceRotation.cpp, these types are:
-                                                 1) Spice: directly from kernels,
-                                                 2) Nadir: Nadir pointing,
-                                                 3) Memcache: from cached table,
-                                                 4) PolyFunction: from nth degree polynomial,
-                                                 5) PolyFunctionOverSpice: kernels plus nth degree
-                                                    polynomial.*/
+                                               Defined in SpiceRotation.cpp, these types are:
+                                               1) Spice: directly from kernels,
+                                               2) Nadir: Nadir pointing,
+                                               3) Memcache: from cached table,
+                                               4) PolyFunction: from nth degree polynomial,
+                                               5) PolyFunctionOverSpice: kernels plus nth degree
+                                                  polynomial.*/
 
       // position related parameters
+      //! Option for how to solve for instrument position
       InstrumentPositionSolveOption m_instrumentPositionSolveOption;
       int m_numberCamPosCoefSolved;          /**< The number of camera position coefficients in the
                                                   solution.*/
-      int m_spkDegree;                       //!< spk degree (define)
-      int m_spkSolveDegree;                  //!< solve spk degree (define)
+      int m_spkDegree;                       /**< Degree of the polynomial fit to the original
+                                                  camera position. **/
+      int m_spkSolveDegree;                  /**< Degree of the camera position polynomial being
+                                                  fit to in the bundle adjustment. **/
       bool m_solvePositionOverHermiteSpline; /**< The polynomial will be fit over an existing
                                                   Hermite spline.*/
       QList<double> m_positionAprioriSigma; /**< The instrument pointing a priori sigmas. The
-                                                   size of the list is equal to the number of
-                                                   coefficients in the solution. A negative value
-                                                   implies no weighting will be applied.*/ // ??? no negatives are filled in when size = 0
+                                                  size of the list is equal to the number of
+                                                  coefficients in the solution. An Isis:Null value
+                                                  implies no weighting will be applied.*/ 
       SpicePosition::Source
           m_positionInterpolationType;      /**< SpicePosition interpolation types.
                                                  Defined in SpicePosition.cpp, these types are:
@@ -248,7 +260,7 @@ class BundleObservationSolveSettings : public QObject {
   //!< BundleObservationSolveSettings object.
   typedef QSharedPointer<BundleObservationSolveSettings> BundleObservationSolveSettingsQsp;
   
-  // operators to read/write BundleResults to/from binary data
+  // Operators to read/write BundleResults to/from binary data.
   QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings);
   QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings);
 };

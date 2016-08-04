@@ -31,12 +31,17 @@
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
-#include "SpiceRotation.h"
-#include "SpicePosition.h"
 
 namespace Isis {  
+  class BundleObservationSolveSettings;
+  class SpicePosition;
+  class SpiceRotation;
+
   /**
-   * @brief 
+   * @brief Class for bundle observations
+   *
+   * This class is used for creating a bundle observation. Upon destruction, this class will
+   * delete all contained QObjects (BundleImages).
    *  
    * @ingroup ControlNetworks
    *
@@ -52,9 +57,9 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Brought closer to Isis coding standards.
    *   @history 2016-08-03 Jesse Mapel - Changed contained member type to a QSharedPointer.
    *                           Also changed m_solveSettings to a QSharedPointer. Fixes #4150.
-   *
+   *   @history 2016-08-03 Ian Humphrey - Updated documentation and coding standards. Fixes #4078.
    */
-  class BundleObservation : public QVector< BundleImageQsp > {
+  class BundleObservation : public QVector<BundleImageQsp> {
 
     public:
       // default constructor
@@ -89,12 +94,12 @@ namespace Isis {
       
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
-      
-      boost::numeric::ublas::vector< double > &parameterWeights();
-      boost::numeric::ublas::vector< double > &parameterCorrections();
-//    boost::numeric::ublas::vector< double > &parameterSolution();
-      boost::numeric::ublas::vector< double > &aprioriSigmas();
-      boost::numeric::ublas::vector< double > &adjustedSigmas();
+     
+      boost::numeric::ublas::vector<double> &parameterWeights();
+      boost::numeric::ublas::vector<double> &parameterCorrections();
+//    boost::numeric::ublas::vector<double> &parameterSolution();
+      boost::numeric::ublas::vector<double> &aprioriSigmas();
+      boost::numeric::ublas::vector<double> &adjustedSigmas();
       
       const BundleObservationSolveSettingsQsp solveSettings();
 
@@ -113,36 +118,40 @@ namespace Isis {
       bool initParameterWeights();
 
     private:
-      QString m_observationNumber; //!< this is typically equivalent to serial number
-                                   //!< except in the case of "observation mode" (e.g.
-                                   //!< Lunar Orbiter) where for each image in the
-                                   //!< observation the observation # is the serial #
-                                   //!< augmented with an additional integer
+      QString m_observationNumber; /**< This is typically equivalent to serial number
+                                        except in the case of "observation mode" (e.g.
+                                        Lunar Orbiter) where for each image in the
+                                        observation, the observation number is the serial number
+                                        augmented with an additional integer. **/
 
-      int m_Index;
+      int m_index; //!< Index of this observation.
 
-      QStringList m_serialNumbers; //!< list of all cube serial numbers in observation
-      QStringList m_parameterNamesList; //!< list of all cube parameters
-      QStringList m_imageNames; //!< list of all cube parameters
+      QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
+      QStringList m_parameterNamesList; //!< List of all cube parameters.
+      QStringList m_imageNames;         //!< List of all cube names.
 
-      QString m_instrumentId;      //!< spacecraft instrument id
+      QString m_instrumentId;      //!< Spacecraft instrument id.
 
-      BundleObservationSolveSettingsQsp m_solveSettings; //!< solve settings for this observation
+      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
 
-      SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image)
-      SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image)
-//    SpiceRotation *m_bodyRotation;         //!< Instrument spice position (in primary image)
+      SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
+      SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image).
+//    SpiceRotation *m_bodyRotation;         //!< Instrument body rotation (in primary image).
 
-      BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody
+      BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
 
     // TODO??? change these to LinearAlgebra vectors...
-      boost::numeric::ublas::vector< double > m_weights;            //!< parameter weights
-      boost::numeric::ublas::vector< double > m_corrections;        //!< cumulative parameter correction vector
-      //boost::numeric::ublas::vector< double > m_solution;           //!< parameter solution vector
-      boost::numeric::ublas::vector< double > m_aprioriSigmas;      //!< a posteriori (adjusted) parameter sigmas
-      boost::numeric::ublas::vector< double > m_adjustedSigmas;     //!< a posteriori (adjusted) parameter sigmas
+      boost::numeric::ublas::vector<double> m_weights;     //!< Parameter weights.
+      //! Cumulative parameter correction vector.
+      boost::numeric::ublas::vector<double> m_corrections;
+      //boost::numeric::ublas::vector<double> m_solution;  //!< parameter solution vector.
+      //! A posteriori (adjusted) parameter sigmas.
+      boost::numeric::ublas::vector<double> m_aprioriSigmas;
+      //! A posteriori (adjusted) parameter sigmas.
+      boost::numeric::ublas::vector<double> m_adjustedSigmas; 
   };
 
+  //! Typdef for BundleObservation QSharedPointer.
   typedef QSharedPointer<BundleObservation> BundleObservationQsp;
 }
 

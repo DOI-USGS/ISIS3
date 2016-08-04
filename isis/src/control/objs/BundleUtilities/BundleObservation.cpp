@@ -1,17 +1,22 @@
 #include "BundleObservation.h"
 
 #include <QDebug>
+#include <QString>
+#include <QStringList>
 
-#include "Camera.h"
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
+#include "BundleTargetBody.h"
+#include "Camera.h"
+#include "SpicePosition.h"
+#include "SpiceRotation.h"
 
 using namespace boost::numeric::ublas;
 
 namespace Isis {
 
   /**
-   * default constructor
+   * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
     m_serialNumbers.clear();
@@ -21,7 +26,7 @@ namespace Isis {
     m_instrumentId = "";
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
-    m_Index = 0;
+    m_index = 0;
     m_weights.clear();
     m_corrections.clear();
 //    m_solution.clear();
@@ -31,7 +36,13 @@ namespace Isis {
 
 
   /**
-   * constructor
+   * Constructs a BundleObservation from an BundleImage, an instrument id, an observation
+   * number to assign to this BundleObservation, and a target body.
+   *
+   * @param image QSharedPointer to the primary image in the observation  
+   * @param observationNumber Observation number of the observation
+   * @param instrumentId Id of the instrument for the observation
+   * @param bundleTargetBody QSharedPointer to the target body of the observation
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
@@ -42,7 +53,7 @@ namespace Isis {
     m_instrumentId = "";
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
-    m_Index = 0;
+    m_index = 0;
     m_weights.clear();
     m_corrections.clear();
 //    m_solution.clear();
@@ -63,13 +74,13 @@ namespace Isis {
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
       m_instrumentPosition = (image->camera() ? 
-                                (image->camera()->instrumentPosition() ?
-                                   image->camera()->instrumentPosition() : NULL)
-                                : NULL);
+                               (image->camera()->instrumentPosition() ?
+                                 image->camera()->instrumentPosition() : NULL)
+                               : NULL);
       m_instrumentRotation = (image->camera() ? 
-                                (image->camera()->instrumentRotation() ?
-                                   image->camera()->instrumentRotation() : NULL)
-                                : NULL);
+                               (image->camera()->instrumentRotation() ?
+                                  image->camera()->instrumentRotation() : NULL)
+                               : NULL);
 
       // set the observations target body spice rotation object from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
@@ -83,7 +94,9 @@ namespace Isis {
 
 
   /**
-   *  copy constructor
+   * Creates a copy of another BundleObservation.
+   *
+   * @param src Reference to the BundleObservation to copy
    */
   BundleObservation::BundleObservation(const BundleObservation &src) {
     m_serialNumbers = src.m_serialNumbers;
@@ -95,17 +108,30 @@ namespace Isis {
     m_instrumentRotation = src.m_instrumentRotation;
 
     m_solveSettings = src.m_solveSettings;
+
+    m_index = src.m_index;
   }
 
 
   /**
-   * destructor
+   * Destructor.
+   *
+   * Upon destruction, any contained QObjects (BundleImages) will be deleted.
    */
   BundleObservation::~BundleObservation() {
     clear();
   }
 
 
+  /**
+   * Assignment operator
+   *
+   * Assigns the state of the source BundleObservation to this BundleObservation
+   *
+   * @param BundleObservation Reference to the source BundleObservation to assign from
+   *
+   * @return @b BundleObservation& Reference to this BundleObservation
+   */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
       m_serialNumbers = src.m_serialNumbers;
@@ -123,7 +149,15 @@ namespace Isis {
 
 
   /**
-   * set solve parameters
+   * Set solve parameters
+   *
+   * @param solveSettings The solve settings to use
+   *
+   * @return @b bool Returns true if settings were successfully set
+   *
+   * @internal
+   *   @todo initParameterWeights() doesn't return false, so this methods always 
+   *         returns true.
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
     m_solveSettings = BundleObservationSolveSettingsQsp(
@@ -161,7 +195,9 @@ namespace Isis {
 
 
   /**
-   * return instrumentId
+   * Accesses the instrument id
+   *
+   * @return @b QString Returns the instrument id of the observation
    */
   QString BundleObservation::instrumentId() {
     return m_instrumentId;
@@ -169,7 +205,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses the instrument's spice rotation
+   *
+   * @return @b SpiceRotation* Returns the SpiceRotation for this observation
    */
   SpiceRotation *BundleObservation::spiceRotation() {
     return m_instrumentRotation;
@@ -177,7 +215,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses the instrument's spice position 
+   *
+   * @return @b SpicePosition* Returns the SpicePosition for this observation
    */
   SpicePosition *BundleObservation::spicePosition() {
     return m_instrumentPosition;
@@ -185,52 +225,72 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Accesses the solve parameter weights
+   * 
+   * @return @b vector<double> Returns the parameter weights for solving
    */
-  vector< double > &BundleObservation::parameterWeights() {
+  vector<double> &BundleObservation::parameterWeights() {
     return m_weights;
   }
 
 
   /**
-   * TODO
+   * Accesses the parameter corrections 
+   *
+   * @return @b vector<double> Returns the parameter corrections
    */
-  vector< double > &BundleObservation::parameterCorrections() {
+  vector<double> &BundleObservation::parameterCorrections() {
     return m_corrections;
   }
 
 
   /**
-   * TODO
+   * @internal
+   *   @todo 
    */
-//  vector< double > &BundleObservation::parameterSolution() {
+//  vector<double> &BundleObservation::parameterSolution() {
 //    return m_solution;
 //  }
 
 
   /**
-   * TODO
+   * Accesses the a priori sigmas
+   *
+   * @return @b vecotr<double> Returns the a priori sigmas
    */
-  vector< double > &BundleObservation::aprioriSigmas() {
+  vector<double> &BundleObservation::aprioriSigmas() {
     return m_aprioriSigmas;
   }
 
 
   /**
-   * TODO
+   * Accesses the adjusted sigmas 
+   *
+   * @return @b vector<double> Returns the adjusted sigmas
    */
-  vector< double > &BundleObservation::adjustedSigmas() {
+  vector<double> &BundleObservation::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
 
+  /**
+   * Accesses the solve settings
+   *
+   * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
+   *                                                    settings for this BundleObservation
+   */
   const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
     return m_solveSettings;
   }
 
 
   /**
-   * TODO
+   * Initializes the exterior orientation 
+   *
+   * @return @b bool Returns true upon successful intialization
+   *
+   * @internal
+   *   @todo Should this always return true?
    */
   bool BundleObservation::initializeExteriorOrientation() {
 
@@ -243,25 +303,25 @@ namespace Isis {
 
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);
-        SpicePosition *spiceposition = image->camera()->instrumentPosition();
+        SpicePosition *spicePosition = image->camera()->instrumentPosition();
 
         if (i > 0) {
-          spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-          spiceposition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-          spiceposition->SetPolynomial(posPoly1, posPoly2, posPoly3,
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+          spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
+          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
                                        m_solveSettings->positionInterpolationType());
         }
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
-          spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
           // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
           // function, or polynomial function over constant hermite spline)
           // TODO: verify - I think this actually performs the a priori fit
-          spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
+          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
           // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
 
           if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
             positionBaseTime = m_instrumentPosition->GetBaseTime();
@@ -313,7 +373,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Intializes the body rotation 
+   *
+   * @todo check to make sure m_bundleTargetBody is valid
    */
   void BundleObservation::initializeBodyRotation() {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
@@ -328,7 +390,10 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Updates the body rotation 
+   *
+   * @internal
+   *   @todo Is this a duplicate of initializeBodyRotation?
    */
   void BundleObservation::updateBodyRotation() {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
@@ -391,12 +456,18 @@ namespace Isis {
 
 
   /**
-   * TODO
-   * Don't like this, don't like this, don't like this, don't like this, don't like this.
-   * By the way, this seems klunky to me, would like to come up with a better way.
-   * Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
-   * the BundleObservation class too - this is unnecessary should only be in the
-   * BundleObservationSolveSettings. But, they are split into position and pointing.
+   * Initializes the paramater weights for solving
+   * 
+   * @return @b bool Returns true upon successful intialization
+   *
+   * @internal  
+   *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
+   *         By the way, this seems klunky to me, would like to come up with a better way.
+   *         Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
+   *         the BundleObservation class too - this is unnecessary should only be in the
+   *         BundleObservationSolveSettings. But, they are split into position and pointing.
+   *
+   *   @todo always returns true?
    */
   bool BundleObservation::initParameterWeights() {
 
@@ -405,8 +476,8 @@ namespace Isis {
     double velWeight    = 0.0;     // velocity
     double accWeight    = 0.0;     // acceleration
     double angWeight    = 0.0;     // angles
-    double angvelWeight = 0.0;     // angular velocity
-    double angaccWeight = 0.0;     // angular acceleration
+    double angVelWeight = 0.0;     // angular velocity
+    double angAccWeight = 0.0;     // angular acceleration
 
     QList<double> aprioriPointingSigmas = m_solveSettings->aprioriPointingSigmas();
     QList<double> aprioriPositionSigmas = m_solveSettings->aprioriPositionSigmas();
@@ -439,45 +510,45 @@ namespace Isis {
       angWeight = 1.0 / (angWeight  *angWeight * DEG2RAD * DEG2RAD);
     }
     if (aprioriPointingSigmas.size() >= 2 && aprioriPointingSigmas.at(1) > 0.0) {
-      angvelWeight = aprioriPointingSigmas.at(1);
-      angvelWeight = 1.0 / (angvelWeight * angvelWeight * DEG2RAD * DEG2RAD);
+      angVelWeight = aprioriPointingSigmas.at(1);
+      angVelWeight = 1.0 / (angVelWeight * angVelWeight * DEG2RAD * DEG2RAD);
     }
     if (aprioriPointingSigmas.size() >= 3 && aprioriPointingSigmas.at(2) > 0.0) {
-      angaccWeight = aprioriPointingSigmas.at(2);
-      angaccWeight = 1.0 / (angaccWeight * angaccWeight * DEG2RAD * DEG2RAD);
+      angAccWeight = aprioriPointingSigmas.at(2);
+      angAccWeight = 1.0 / (angAccWeight * angAccWeight * DEG2RAD * DEG2RAD);
     }
 
-    int nspkTerms = m_solveSettings->spkSolveDegree()+1;
-    nspkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
+    int nSpkTerms = m_solveSettings->spkSolveDegree()+1;
+    nSpkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
     for ( int i = 0; i < nCamPosCoeffsSolved; i++) {
-      if (i % nspkTerms == 0) {
+      if (i % nSpkTerms == 0) {
        m_aprioriSigmas[i] = aprioriPositionSigmas.at(0);
        m_weights[i] = posWeight;
       }
-      if (i % nspkTerms == 1) {
+      if (i % nSpkTerms == 1) {
        m_aprioriSigmas[i] = aprioriPositionSigmas.at(1);
        m_weights[i] = velWeight;
       }
-      if (i % nspkTerms == 2) {
+      if (i % nSpkTerms == 2) {
        m_aprioriSigmas[i] = aprioriPositionSigmas.at(2);
        m_weights[i] = accWeight;
       }
     }
 
-    int nckTerms = m_solveSettings->ckSolveDegree()+1;
-    nckTerms = m_solveSettings->numberCameraAngleCoefficientsSolved()    ;
+    int nCkTerms = m_solveSettings->ckSolveDegree()+1;
+    nCkTerms = m_solveSettings->numberCameraAngleCoefficientsSolved();
     for ( int i = 0; i < nCamAngleCoeffsSolved; i++) {
-      if (i % nckTerms == 0) {
+      if (i % nCkTerms == 0) {
         m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(0);
         m_weights[nCamPosCoeffsSolved + i] = angWeight;
       }
-      if (i % nckTerms == 1) {
+      if (i % nCkTerms == 1) {
         m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(1);
-        m_weights[nCamPosCoeffsSolved + i] = angvelWeight;
+        m_weights[nCamPosCoeffsSolved + i] = angVelWeight;
       }
-      if (i % nckTerms == 2) {
+      if (i % nCkTerms == 2) {
         m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(2);
-        m_weights[nCamPosCoeffsSolved + i] = angaccWeight;
+        m_weights[nCamPosCoeffsSolved + i] = angAccWeight;
       }
     }
 
@@ -489,10 +560,25 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Applies the parameter corrections 
+   *
+   * @param corrections Vector of corrections to apply
+   *
+   * @throws IException::Unknown "Instrument position is NULL, but position solve option is 
+   *                              [not NoPositionFactors]"
+   * @throws IException::Unknown "Instrument position is NULL, but pointing solve option is
+   *                              [not NoPointingFactors]"
+   * @throws IException::Unknown "Unable to apply parameter corrections to BundleObservation."
+   *
+   * @return @b bool Returns true upon successful application of corrections
+   *
+   * @internal
+   *   @todo always returns true?
    */  
-  bool BundleObservation::applyParameterCorrections(boost::numeric::ublas::vector<double> corrections) {
-    int index=0;
+  bool BundleObservation::applyParameterCorrections(
+      boost::numeric::ublas::vector<double> corrections) {
+
+    int index = 0;
 
     try {
       int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -553,9 +639,9 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        std::vector< double > coefRA(nCameraPositionCoefficients);
-        std::vector< double > coefDEC(nCameraPositionCoefficients);
-        std::vector< double > coefTWI(nCameraPositionCoefficients);
+        std::vector<double> coefRA(nCameraPositionCoefficients);
+        std::vector<double> coefDEC(nCameraPositionCoefficients);
+        std::vector<double> coefTWI(nCameraPositionCoefficients);
 
         m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
 
@@ -582,8 +668,8 @@ namespace Isis {
         // apply updates to all images in observation
         for (int i = 0; i < size(); i++) {
           BundleImageQsp image = at(i);
-          SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-          spicerotation->SetPolynomial(coefRA, coefDEC, coefTWI,
+          SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
+          spiceRotation->SetPolynomial(coefRA, coefDEC, coefTWI,
                                        m_solveSettings->pointingInterpolationType());
         }
       }
@@ -594,17 +680,27 @@ namespace Isis {
     } 
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleObservation.";
-      IException(e, IException::Unknown, msg, _FILEINFO_);
+      IException(e, IException::Unknown, msg, _FILEINFO_); //THROW ???
     }
     return true;
   }
 
 
+  /**
+   * Returns the number of position parameters there are
+   *
+   * @return @b int Returns the number of position parameters
+   */
   int BundleObservation::numberPositionParameters() {
     return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
   }
 
 
+  /**
+   * Returns the number of pointing parameters being solved for
+   *
+   * @return @b int Returns the number of pointing parameters
+   */
   int BundleObservation::numberPointingParameters() {
     int angleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
@@ -615,21 +711,48 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the number of total parameters there are for solving
+   *
+   * The total number of parameters is equal to the number of position parameters and number of
+   * pointing parameters
+   *
+   * @return @b int Returns the number of parameters there are
+   */
   int BundleObservation::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
   }
 
 
+  /**
+   * Sets the index for the observation
+   *
+   * @param n Value to set the index of the observation to
+   */
   void BundleObservation::setIndex(int n) {
-    m_Index = n;
+    m_index = n;
   }
 
 
+  /**
+   * Accesses the observation's index
+   *
+   * @return @b int Returns the observation's index
+   */
   int BundleObservation::index() {
-    return m_Index;
+    return m_index;
   }
 
 
+  /**
+   * Creates and returns a formatted QString representing the bundle coefficients and 
+   * parameters
+   *
+   * @param errorPropagation Boolean indicating whether or not to attach more information 
+   *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   *
+   * @return @b QString Returns a formatted QString representing the BundleObservation 
+   */
   QString BundleObservation::formatBundleOutputString(bool errorPropagation) {
     std::vector<double> coefX;
     std::vector<double> coefY;
@@ -776,6 +899,8 @@ namespace Isis {
 
   /**
    * Access to parameters for CorrelationMatrix to use.
+   *
+   * @return @b QStringList Returns a QStringList of the names of the parameters
    */
   QStringList BundleObservation::parameterList() {
     return m_parameterNamesList;
@@ -784,6 +909,8 @@ namespace Isis {
 
   /**
    * Access to image names for CorrelationMatrix to use.
+   *
+   * @return @b QStringList Returns a QStringList of the image names
    */
   QStringList BundleObservation::imageNames() {
     return m_imageNames;

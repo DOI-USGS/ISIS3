@@ -838,7 +838,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "-1"
+observation index "0"
 
 rejected? "No"
 measure sample  "1.0"
@@ -846,7 +846,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "-1"
+observation index "0"
 
 rejected? "No"
 measure sample  "1.0"
@@ -854,7 +854,7 @@ measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
-observation index "-1"
+observation index "0"
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
