@@ -85,7 +85,7 @@ namespace Isis {
 
     int numMeasures = src.size();
 
-    for(int i = 0; i < numMeasures; i++)
+    for (int i = 0; i < numMeasures; i++)
       append(new BundleMeasure(*(src.at(i))));
 
     m_corrections = src.m_corrections;
@@ -136,7 +136,7 @@ namespace Isis {
     double d;
 
     double globalLatitudeAprioriSigma = settings->globalLatitudeAprioriSigma();
-    double globalLongitudeAprioriSigma =settings->globalLongitudeAprioriSigma();
+    double globalLongitudeAprioriSigma = settings->globalLongitudeAprioriSigma();
     double globalRadiusAprioriSigma = settings->globalRadiusAprioriSigma();
 
     if (m_controlPoint->GetType() == ControlPoint::Fixed) {
@@ -246,7 +246,7 @@ namespace Isis {
    * 
    * @return @b SurfacePoint The adjusted surface point.
    */
-  SurfacePoint BundleControlPoint::getAdjustedSurfacePoint() const {
+  SurfacePoint BundleControlPoint::adjustedSurfacePoint() const {
     return m_controlPoint->GetAdjustedSurfacePoint();
   }
 
@@ -256,7 +256,7 @@ namespace Isis {
    * 
    * @return @b QString The ID for this point.
    */
-  QString BundleControlPoint::getId() const {
+  QString BundleControlPoint::id() const {
     return m_controlPoint->GetId();
   }
 
@@ -266,8 +266,7 @@ namespace Isis {
    * Accesses the 3 dimensional ordered vector of correction values associated 
    * with latitude, longitude, and radius. 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of 
-   *         correction values.
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of correction values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() {
     return m_corrections;
@@ -278,8 +277,7 @@ namespace Isis {
    * Accesses the 3 dimenstional ordered vector of apriori sigmas (apriori 
    * latitude, apriori longitude, apriori radius). 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of 
-   *         apriori sigmas.
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of apriori sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
     return m_aprioriSigmas;
@@ -291,8 +289,7 @@ namespace Isis {
    * Accesses the 3 dimenstional ordered vector of adjusted sigmas (adjusted 
    * latitude, adjusted longitude, adjusted radius). 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of 
-   *         adjusted sigmas.
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of adjusted sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
     return m_adjustedSigmas;
@@ -303,8 +300,7 @@ namespace Isis {
    * Accesses the 3 dimensional ordered vector of weight values associated 
    * with latitude, longitude, and radius. 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of 
-   *         weight values.
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of weight values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
     return m_weights;
@@ -326,8 +322,8 @@ namespace Isis {
    * 
    * @return @b SparseBlockRowMatrix& The CholMod row matrix.
    */
-  SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() {
-    return m_cholmod_QMatrix;
+  SparseBlockRowMatrix &BundleControlPoint::cholmodQMatrix() {
+    return m_cholmodQMatrix;
   }
 
 
@@ -353,7 +349,7 @@ namespace Isis {
     QString pointType = m_controlPoint->GetPointTypeString().toUpper();
 
     QString output = QString("%1%2%3 of %4%5%6%7%8%9%10%11\n")
-                             .arg(getId(), 16)
+                             .arg(id(), 16)
                              .arg(pointType, 15)
                              .arg(numGoodRays, 5)
                              .arg(numRays)
@@ -370,10 +366,10 @@ namespace Isis {
 
 
   /**
-   * Formats an detailed output string table for this BundleControlPoint. 
+   * Formats a detailed output string table for this BundleControlPoint. 
    *  
    * @param errorPropagation Indicates whether error propagation was selected.
-   * @param RTM Conversion factor from meters to radians. Used to convert the 
+   * @param RTM Conversion factor from radians to meters. Used to convert the 
    *            latitude and longitude corrections to meters.
    * 
    * @return @b QString The formatted output detailed string.
@@ -418,7 +414,7 @@ namespace Isis {
     QString output;
 
     output = QString(" Label: %1\nStatus: %2\n  Rays: %3 of %4\n")
-                        .arg(getId())
+                        .arg(id())
                         .arg(pointType)
                         .arg(numGoodRays)
                         .arg(numRays);
@@ -562,7 +558,6 @@ namespace Isis {
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
    * @return @b QString The formatted value, as a string.
-   * 
    */
   QString BundleControlPoint::formatAdjustedSigmaString(int type, int fieldWidth, int precision,
                                                         bool errorPropagation) const {
@@ -601,8 +596,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted latitude sigma value, as a 
-   *         string.
+   * @return @b QString The formatted adjusted latitude sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */
@@ -619,8 +613,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted longitude sigma value, as a 
-   *         string.
+   * @return @b QString The formatted adjusted longitude sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */

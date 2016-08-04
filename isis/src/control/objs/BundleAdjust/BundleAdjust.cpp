@@ -1211,7 +1211,7 @@ namespace Isis {
 //N12.printClean(std::cout);
 
     boost::numeric::ublas::bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
-    SparseBlockRowMatrix &Q = bundleControlPoint->cholmod_QMatrix();
+    SparseBlockRowMatrix &Q = bundleControlPoint->cholmodQMatrix();
 
     NIC.clear();
     Q.zeroBlocks();
@@ -1253,7 +1253,7 @@ namespace Isis {
     // save upper triangular covariance matrix for error propagation
     // TODO:  The following method does not exist yet (08-13-2010)
 //    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
-    SurfacePoint SurfacePoint = bundleControlPoint->getAdjustedSurfacePoint();
+    SurfacePoint SurfacePoint = bundleControlPoint->adjustedSurfacePoint();
     SurfacePoint.SetSphericalMatrix(N22);
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
 
@@ -2624,23 +2624,23 @@ namespace Isis {
     }
 
     // REMOVE
-    SurfacePoint surfacePoint = point.getAdjustedSurfacePoint();
+    SurfacePoint surfacePoint = point.adjustedSurfacePoint();
     // REMOVE
 
     // Compute the look vector in instrument coordinates based on time of observation and apriori
     // lat/lon/radius
-    if (!(pCamera->GroundMap()->GetXY(point.getAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
+    if (!(pCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(), &dComputedx, &dComputedy))) {
       QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure.cubeSerialNumber() + " on point " + point.getId() + " into focal plane";
+      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // partials for fixed point w/r lat, long, radius in Body-Fixed
-    d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.getAdjustedSurfacePoint(),
+    d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
                       CameraGroundMap::WRT_Latitude);
-    d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.getAdjustedSurfacePoint(),
+    d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
                       CameraGroundMap::WRT_Longitude);
-    d_lookB_WRT_RAD = pCamera->GroundMap()->PointPartial(point.getAdjustedSurfacePoint(),
+    d_lookB_WRT_RAD = pCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
                       CameraGroundMap::WRT_Radius);
 
 //  std::cout << "d_lookB_WRT_LAT" << d_lookB_WRT_LAT << std::endl;
@@ -2932,7 +2932,7 @@ namespace Isis {
 
       // get NIC, Q, and correction vector for this point
       boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
-      SparseBlockRowMatrix &Q = point->cholmod_QMatrix();
+      SparseBlockRowMatrix &Q = point->cholmodQMatrix();
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
 
 //      printf("Q\n");
@@ -2955,7 +2955,7 @@ namespace Isis {
 //      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toLatin1().data(),dLatCorr, dLongCorr, dRadCorr);
 //      std::cout <<"Point " <<  point->GetId().toLatin1().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
-      SurfacePoint surfacepoint = point->getAdjustedSurfacePoint();
+      SurfacePoint surfacepoint = point->adjustedSurfacePoint();
 
       double dLat = surfacepoint.GetLatitude().degrees();
       double dLon = surfacepoint.GetLongitude().degrees();
@@ -3857,7 +3857,7 @@ namespace Isis {
         }
 
         // get corresponding Q matrix
-        SparseBlockRowMatrix Q = point->cholmod_QMatrix();
+        SparseBlockRowMatrix Q = point->cholmodQMatrix();
 
         T.clear();
 
@@ -3942,7 +3942,7 @@ namespace Isis {
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
-      SurfacePoint SurfacePoint = point->getAdjustedSurfacePoint();
+      SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
 
       dSigmaLat = SurfacePoint.GetLatSigma().radians();
       dSigmaLong = SurfacePoint.GetLonSigma().radians();
@@ -3954,7 +3954,7 @@ namespace Isis {
       t = dSigmaLong*dSigmaLong + cv(1, 1);
       t = sqrt(dSigma02 * t) * m_dRTM;
       Distance tLonSig(
-          t * cos(point->getAdjustedSurfacePoint().GetLatitude().radians()),
+          t * cos(point->adjustedSurfacePoint().GetLatitude().radians()),
           Distance::Meters);
 
       t = dSigmaRadius*dSigmaRadius + cv(2, 2);

@@ -24,6 +24,7 @@
  */
 
 #include <QVector>
+
 #include <QSharedPointer>
 
 #include "BundleMeasure.h"
@@ -37,12 +38,16 @@ namespace Isis {
   class ControlPoint;
 
   /**
+   * This class holds information about a control point that BundleAdjust needs to run correctly.
+   * 
    * @author 2014-05-22 Ken Edmundson
    *
    * @internal
    *   @history 2014-05-22 Ken Edmundson - Original version.
    *   @history 2015-02-20 Jeannie Backer - Added unitTest.  Reformatted output
    *                           strings. Brought closer to ISIS coding standards.
+   *   @history 2016-06-27 Jesse Mapel - Updated documentation and ISIS coding standards in
+   *                           preparation for merging IPCE into ISIS.  Fixes #4075.
    */
   class BundleControlPoint : public QVector<BundleMeasure*> {
 
@@ -64,14 +69,14 @@ namespace Isis {
       ControlPoint *rawControlPoint() const;
       bool isRejected() const;
       int numberMeasures() const;
-      SurfacePoint getAdjustedSurfacePoint() const; // TODO: Rename this method without "get" to meet coding standards
-      QString getId() const; // TODO: Rename this method without "get" to meet coding standards
+      SurfacePoint adjustedSurfacePoint() const;
+      QString id() const;
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections();
       boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &weights();
-      boost::numeric::ublas::bounded_vector<double, 3> &nicVector();         //!< array of NICs (see Brown, 1976)
-      SparseBlockRowMatrix &cholmod_QMatrix();
+      boost::numeric::ublas::bounded_vector<double, 3> &nicVector();
+      SparseBlockRowMatrix &cholmodQMatrix();
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
@@ -91,18 +96,25 @@ namespace Isis {
                                               bool errorPropagation) const;
 
     private:
+      //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;
 
-      boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;                             //!< corrections to point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_aprioriSigmas;                           //!< apriori sigmas for point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_adjustedSigmas;                          //!< adjusted sigmas for point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_weights;                                 //!< weights for point parameters
-
+      //! corrections to point parameters
+      boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;
+      //! apriori sigmas for point parameters
+      boost::numeric::ublas::bounded_vector< double, 3 > m_aprioriSigmas;
+      //! adjusted sigmas for point parameters
+      boost::numeric::ublas::bounded_vector< double, 3 > m_adjustedSigmas;
+      //! weights for point parameters
+      boost::numeric::ublas::bounded_vector< double, 3 > m_weights;
+      //! array of NICs (see Brown, 1976)
       boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;
-      SparseBlockRowMatrix m_cholmod_QMatrix;
+      //! The CholMod matrix associated with this point
+      SparseBlockRowMatrix m_cholmodQMatrix;
   };
 
   // typedefs
+  //! Definition for BundleControlPointQSP, a shared pointer to a BundleControlPoint.
   typedef QSharedPointer<BundleControlPoint> BundleControlPointQsp;
 }
 
