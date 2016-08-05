@@ -28,6 +28,7 @@
 // Qt Library
 #include <QDebug>
 #include <QtDebug>
+#include <QtGlobal>
 
 // boost library
 #include <boost/assign/std/vector.hpp>
@@ -1113,7 +1114,7 @@ namespace Isis {
                         && qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) )
                    || (    qFuzzyCompare(tempRotation(2, 0) + 1.0, 1.0) 
                         && qFuzzyCompare(tempRotation(2, 1) + 1.0, 1.0) )
-                   || qFuzzyCompare( abs(tempRotation(2, 2)), 1.0 );
+                   || qFuzzyCompare( qAbs(tempRotation(2, 2)), 1.0 );
 
       if ( degen ) {
 
@@ -1150,7 +1151,7 @@ namespace Isis {
                         && qFuzzyCompare(tempRotation(0, 1) + 1.0, 1.0) )
                    || (    qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) 
                         && qFuzzyCompare(tempRotation(2, 2) + 1.0, 1.0) )
-                   || qFuzzyCompare( abs(tempRotation(0, 2)), 1.0 );
+                   || qFuzzyCompare( qAbs(tempRotation(0, 2)), 1.0 );
 
       if ( degen ) {
 
@@ -1789,7 +1790,8 @@ namespace Isis {
    * 
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Vector &vector) {
-    dbg.nospace() << toString(vector);
+    QDebugStateSaver saver(dbg);
+    dbg.noquote() << toString(vector);
     return dbg;
   }
 
@@ -1806,12 +1808,13 @@ namespace Isis {
    * 
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix) {
+    QDebugStateSaver saver(dbg);
     for (unsigned int i = 0; i < matrix.size1(); i++) {
-      dbg.nospace() << "    ";
+      dbg.noquote() << "    ";
       for (unsigned int j = 0; j < matrix.size2(); j++) {
-        dbg.nospace() << toString(matrix(i, j), 15) << "     ";
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
       }
-      dbg.nospace() << endl;
+      dbg.noquote() << endl;
     }
     return dbg;
   }
