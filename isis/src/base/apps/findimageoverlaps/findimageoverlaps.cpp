@@ -13,17 +13,18 @@ void IsisMain() {
 
   FileList images(ui.GetFileName("FROMLIST"));
   // list of sns/filenames sorted by serial number
+
   vector< pair<QString, QString> > sortedList;
 
   // We want to sort the input data by serial number so that the same
   //   results are produced every time this program is run with the same
   //   images. This is a modified insertion sort.
-  for(int image = 0; image < images.size(); image++) {
+  for (int image = 0; image < images.size(); image++) {
     unsigned int insertPos = 0;
     QString sn = SerialNumber::Compose(images[image].toString());
 
-    for(insertPos = 0; insertPos < sortedList.size(); insertPos++) {
-      if(sn.compare(sortedList[insertPos].first) < 0) break;
+    for (insertPos = 0; insertPos < sortedList.size(); insertPos++) {
+      if (sn.compare(sortedList[insertPos].first) < 0) break;
     }
 
     pair<QString, QString> newPair = pair<QString, QString>(sn, images[image].toString());
@@ -31,7 +32,7 @@ void IsisMain() {
   }
 
   // Add the serial numbers in sorted order now
-  for(unsigned int i = 0; i < sortedList.size(); i++) {
+  for (unsigned int i = 0; i < sortedList.size(); i++) {
     serialNumbers.add(sortedList[i].second);
   }
 
@@ -39,29 +40,28 @@ void IsisMain() {
   ImageOverlapSet overlaps(true);
 
   // Use multi-threading to create the overlaps
-  overlaps.FindImageOverlaps(serialNumbers, FileName(ui.GetFileName(
-      "OVERLAPLIST")).expanded());
+  overlaps.FindImageOverlaps(serialNumbers, 
+                             FileName(ui.GetFileName("OVERLAPLIST")).expanded());
 
-
-  // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was
+  // This will only occur when "CONTINUE" is true, so we can assume "ERRORS" was
   //   an entered parameter.
-  if(overlaps.Errors().size() != 0 && ui.WasEntered("ERRORS")) {
+  if (overlaps.Errors().size() != 0 && ui.WasEntered("ERRORS")) {
     Pvl outFile;
 
     bool filenamesOnly = !ui.GetBoolean("DETAILED");
 
     vector<PvlGroup> errorList = overlaps.Errors();
 
-    for(unsigned int err = 0; err < errorList.size(); err++) {
-      if(!filenamesOnly) {
+    for (unsigned int err = 0; err < errorList.size(); err++) {
+      if (!filenamesOnly) {
         outFile += errorList[err];
       }
-      else if(errorList[err].hasKeyword("FileNames")) {
+      else if (errorList[err].hasKeyword("FileNames")) {
         PvlGroup origError = errorList[err];
         PvlGroup err("ImageOverlapError");
 
-        for(int keyword = 0; keyword < origError.keywords(); keyword++) {
-          if(origError[keyword].name() == "FileNames") {
+        for (int keyword = 0; keyword < origError.keywords(); keyword++) {
+          if (origError[keyword].name() == "FileNames") {
             err += origError[keyword];
           }
         }

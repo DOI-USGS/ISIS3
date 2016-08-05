@@ -119,6 +119,10 @@
       Improved documentation in preparation for the October release. Working
       with me to document findimageoverlaps was Ra'ad Saleh and Bob Sucharski.
     </change>
+    <change name="Marjorie Hahn" date="2016-08-05">
+      Fixed a bug where ImageOverlapSet was not recording overlaps where 
+      one image is fully enveloped within another. Fixes #2199.
+    </change>
   </history>
 
   <groups>
