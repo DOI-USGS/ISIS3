@@ -66,56 +66,56 @@ Group = GroundPoint
   <def>Sample</def>                     = 1.0
   <def>Line</def>                       = 1.0
   <def link="Digital Number">PixelValue</def>                 = 0.0607816
-  <def link="Right Ascension">RightAscension</def>             = 65.749350916052 &lt;degrees&gt;
-  <def>Declination</def>                = -18.390093214966 &lt;degrees&gt;
-  <def link="Planetocentric Latitude">PlanetocentricLatitude</def>     = 34.444196777763 &lt;degrees&gt;
-  <def link="Planetographic Latitude">PlanetographicLatitude</def>     = 34.760399604837 &lt;degrees&gt;
-  <def link="Positive East Longitude">PositiveEastLongitude</def>      = 223.84999971299 &lt;degrees&gt;
-  <def link="Positive West Longitude">PositiveWestLongitude</def>      = 136.15000028701 &lt;degrees&gt;
-  <def link="Body Fixed Coordinate">BodyFixedCoordinate</def>        = (-2015.9595225544, -1936.6155808127, 1917.2574858384) &lt;km&gt;
-  <def link="Local Radius">LocalRadius</def>                = 3389756.4767145 &lt;m&gt;
-  <def link="Sample Resolution">SampleResolution</def>           = 536.05556350077 &lt;m&gt;
-  <def link="Line Resolution">LineResolution</def>             = 536.05556350077 &lt;m&gt;
+  <def link="Right Ascension">RightAscension</def>             = 65.749350916052 &lt;DEGREE&gt;
+  <def>Declination</def>                = -18.390093214966 &lt;DEGREE&gt;
+  <def link="Planetocentric Latitude">PlanetocentricLatitude</def>     = 34.444196777763 &lt;DEGREE&gt;
+  <def link="Planetographic Latitude">PlanetographicLatitude</def>     = 34.760399604837 &lt;DEGREE&gt;
+  <def link="Positive East Longitude">PositiveEastLongitude</def>      = 223.84999971299 &lt;DEGREE&gt;
+  <def link="Positive West Longitude">PositiveWestLongitude</def>      = 136.15000028701 &lt;DEGREE&gt;
+  <def link="Body Fixed Coordinate">BodyFixedCoordinate</def>        = (-2015.9595225544, -1936.6155808127, 1917.2574858384) &lt;KM&gt;
+  <def link="Local Radius">LocalRadius</def>                = 3389756.4767145 &lt;M&gt;
+  <def link="Sample Resolution">SampleResolution</def>           = 536.05556350077 &lt;M&gt;
+  <def link="Line Resolution">LineResolution</def>             = 536.05556350077 &lt;M&gt;
 
   # Spacecraft Information
-  SpacecraftPosition         = (-2025.6211429076, -2130.1417975758, 2009.318879871) &lt;km&gt;
-  <def link="Spacecraft Azimuth">SpacecraftAzimuth</def>          = 0.006855593033889 &lt;degrees&gt;
-  <def link="Slant Distance">SlantDistance</def>              = 214.52515878961 &lt;km&gt;
-  <def link="Target Center Distance">TargetCenterDistance</def>       = 3560.6189705415 &lt;km&gt;
-  <def link="SubSpacecraft Latitude">SubSpacecraftLatitude</def>      = 34.354896748841 &lt;degrees&gt;
-  <def link="SubSpacecraft Longitude">SubSpacecraftLongitude</def>     = 226.44072947174 &lt;degrees&gt;
-  SpacecraftAltitude         = 170.83335389965 &lt;km&gt;
-  <def link="Off Nadir Angle">OffNadirAngle</def>              = 36.149255932304 &lt;degrees&gt;
-  <def link="SubSpacecraft Ground Azimuth">SubSpacecraftGroundAzimuth</def> = 91.64525294858 &lt;degrees&gt;
+  SpacecraftPosition         = (-2025.6211429076, -2130.1417975758, 2009.318879871) &lt;KM&gt;
+  <def link="Spacecraft Azimuth">SpacecraftAzimuth</def>          = 0.006855593033889 &lt;DEGREE&gt;
+  <def link="Slant Distance">SlantDistance</def>              = 214.52515878961 &lt;KM&gt;
+  <def link="Target Center Distance">TargetCenterDistance</def>       = 3560.6189705415 &lt;KM&gt;
+  <def link="SubSpacecraft Latitude">SubSpacecraftLatitude</def>      = 34.354896748841 &lt;DEGREE&gt;
+  <def link="SubSpacecraft Longitude">SubSpacecraftLongitude</def>     = 226.44072947174 &lt;DEGREE&gt;
+  SpacecraftAltitude         = 170.83335389965 &lt;KM&gt;
+  <def link="Off Nadir Angle">OffNadirAngle</def>              = 36.149255932304 &lt;DEGREE&gt;
+  <def link="SubSpacecraft Ground Azimuth">SubSpacecraftGroundAzimuth</def> = 91.64525294858 &lt;DEGREE&gt;
 
   # Sun Information
-  SunPosition                = (-177337948.13839, 112957442.69098, -33704752.205292) &lt;km&gt;
-  <def link="Sun Azimuth">SubSolarAzimuth</def>            = 172.30460990873 &lt;degrees&gt;
+  SunPosition                = (-177337948.13839, 112957442.69098, -33704752.205292) &lt;KM&gt;
+  <def link="Sun Azimuth">SubSolarAzimuth</def>            = 172.30460990873 &lt;DEGREE&gt;
   SolarDistance             = 1.4234246174889 &lt;AU&gt;
-  <def link="SubSolar Latitude">SubSolarLatitude</def>           = -9.1071705738361 &lt;degrees&gt;
-  <def link="SubSolar Longitude">SubSolarLongitude</def>          = 147.50443340123 &lt;degrees&gt;
-  <def link="Subsolar Ground Azimuth">SubSolarGroundAzimuth</def>      = 254.69139701227 &lt;degrees&gt;
+  <def link="SubSolar Latitude">SubSolarLatitude</def>           = -9.1071705738361 &lt;DEGREE&gt;
+  <def link="SubSolar Longitude">SubSolarLongitude</def>          = 147.50443340123 &lt;DEGREE&gt;
+  <def link="Subsolar Ground Azimuth">SubSolarGroundAzimuth</def>      = 254.69139701227 &lt;DEGREE&gt;
 
   # Illumination and Other
-  <def link="Phase Angle">Phase</def>                      = 120.59515694473 &lt;degrees&gt;
-  <def link="Incidence Angle">Incidence</def>                  = 84.106289446623 &lt;degrees&gt;
-  <def link="Emission Angle">Emission</def>                   = 38.288719431206 &lt;degrees&gt;
-  <def link="North Azimuth">NorthAzimuth</def>               = 261.46910874636 &lt;degrees&gt;
+  <def link="Phase Angle">Phase</def>                      = 120.59515694473 &lt;DEGREE&gt;
+  <def link="Incidence Angle">Incidence</def>                  = 84.106289446623 &lt;DEGREE&gt;
+  <def link="Emission Angle">Emission</def>                   = 38.288719431206 &lt;DEGREE&gt;
+  <def link="North Azimuth">NorthAzimuth</def>               = 261.46910874636 &lt;DEGREE&gt;
 
   # Time
   <def link="Ephemeris Time">EphemerisTime</def>              = -69382819.160519 &lt;seconds&gt;
   <def>UTC</def>                        = 1997-10-20T10:58:37.6570806
   LocalSolarTime             = 17.089704420784 &lt;hour&gt;
-  <def link="Solar Longitude">SolarLongitude</def>             = 201.83159041209 &lt;degrees&gt;
+  <def link="Solar Longitude">SolarLongitude</def>             = 201.83159041209 &lt;DEGREE&gt;
   Error                      = NULL
   
   # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
   LookDirectionBodyFixed     = (0.95457395414683, 0.074906840825054,
-                                -0.28840515124058) &lt;degrees&gt;
+                                -0.28840515124058) &lt;DEGREE&gt;
   LookDirectionJ2000         = (0.5482662642052, -0.25280984110143,
-                                -0.797177074292) &lt;degrees&gt;
+                                -0.797177074292) &lt;DEGREE&gt;
   LookDirectionCamera        = (0.0040987946596217, -0.6021663586021,
-                                0.79836011702128) &lt;degrees&gt;
+                                0.79836011702128) &lt;DEGREE&gt;
 End_Group
     </pre>
     
@@ -210,6 +210,9 @@ End_Group
     </change>
     <change name="Curtis Rose" date="2016-06-29">
       Added units to many of the outputs of the PVL. Fixes #3979.
+    </change>
+    <change name="Curtis Rose" date="2016-08-01">
+      Added spacecraft look direction unit vectors in Body Fixed, J200, and Camera Coordinate Systems. Fixes #4180.
     </change>
   </history>
 
