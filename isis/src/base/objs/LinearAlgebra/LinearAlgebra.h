@@ -62,6 +62,7 @@ namespace Isis {
    *   @history 2013-06-01 Jeannie Backer - Original version.
    *   @history 2013-08-07 Kimberly Oyama - Updated documentation.
    *   @history 2016-07-25 Jeannie Backer - Updated documentation and test.
+   *   @history 2016-08-05 Jeannie Backer - Replace std abs() function with qAbs() from QtGlobal.
    *  
    *  
    *   @todo document methods (a) add naif routine names to documentation where appropriate,

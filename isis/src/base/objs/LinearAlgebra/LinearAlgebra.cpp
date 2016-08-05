@@ -28,6 +28,7 @@
 // Qt Library
 #include <QDebug>
 #include <QtDebug>
+#include <QtGlobal>
 
 // boost library
 #include <boost/assign/std/vector.hpp>
@@ -1113,7 +1114,7 @@ namespace Isis {
                         && qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) )
                    || (    qFuzzyCompare(tempRotation(2, 0) + 1.0, 1.0) 
                         && qFuzzyCompare(tempRotation(2, 1) + 1.0, 1.0) )
-                   || qFuzzyCompare( abs(tempRotation(2, 2)), 1.0 );
+                   || qFuzzyCompare( qAbs(tempRotation(2, 2)), 1.0 );
 
       if ( degen ) {
 
@@ -1150,7 +1151,7 @@ namespace Isis {
                         && qFuzzyCompare(tempRotation(0, 1) + 1.0, 1.0) )
                    || (    qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) 
                         && qFuzzyCompare(tempRotation(2, 2) + 1.0, 1.0) )
-                   || qFuzzyCompare( abs(tempRotation(0, 2)), 1.0 );
+                   || qFuzzyCompare( qAbs(tempRotation(0, 2)), 1.0 );
 
       if ( degen ) {
 
