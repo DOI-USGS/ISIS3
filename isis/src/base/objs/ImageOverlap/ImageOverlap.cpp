@@ -36,6 +36,7 @@ namespace Isis {
     Add(serialNumber);
   }
 
+  
   /**
    * Construct an ImageOverlap object and initialize it from the istream
    *
@@ -119,6 +120,7 @@ namespace Isis {
 
 
   void ImageOverlap::Write(std::ostream &outputStream) {
+    
     geos::io::WKBWriter geosWriter;
 
     QString serialNums;
@@ -137,6 +139,8 @@ namespace Isis {
 
     geosWriter.writeHEX(*p_polygon, outputStream);
   }
+  
+  
   /**
    * This method will add a new serial number to the list of serial numbers
    * alread associated with the overlap.
@@ -168,6 +172,7 @@ namespace Isis {
     return p_polygon->getArea();
   }
 
+  
   /**
    * This method will return true if any serial number from this ImageOverlap is
    * also in the other ImageOverlap
@@ -182,7 +187,6 @@ namespace Isis {
     }
     return false;
   }
-
 
 
   /**
@@ -202,6 +206,4 @@ namespace Isis {
     }
     return false;
   }
-
-
 }
