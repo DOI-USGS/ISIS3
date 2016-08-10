@@ -1080,8 +1080,8 @@ namespace Isis {
     userDefinedMapFileAnyTime->setWordWrap(true);
     mapHelpLayout->addWidget(userDefinedMapFileAnyTime);
 
-    QString mapProjWorkshopUrl("http://isis.astrogeology.usgs.gov/IsisWorkshop/"
-        "index.php/Learning_About_Map_Projections");
+    QString mapProjWorkshopUrl("https://isis.astrogeology.usgs.gov/fixit/projects/"
+    "isis/wiki/Learning_About_Map_Projections");
     QLabel *preparingMapFile = new QLabel(tr(
         "<h3>Preparing a Map File</h3>"
         "Please refer to Isis applications such as 'maptemplate' or 'mosrange' for more details "
