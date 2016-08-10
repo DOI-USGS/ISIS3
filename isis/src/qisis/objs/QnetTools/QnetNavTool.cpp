@@ -945,7 +945,7 @@ namespace Isis {
    *  
    * @internal 
    * @todo  This method should be temporary until the control point editor 
-   *           comes online.  If this stick around, needs to be re-disigned-
+   *           comes online.  If this stick around, needs to be re-designed-
    *           put in a separate class??
    *  
    */ 
@@ -964,8 +964,7 @@ namespace Isis {
       connect(m_aprioriDialog, SIGNAL(netChanged()),
               this, SIGNAL(netChanged()));
     }
-    m_aprioriDialog->show();
-    m_aprioriDialog->activateWindow();
+    m_aprioriDialog->setVisiblity();
   }
 
 
@@ -991,7 +990,7 @@ namespace Isis {
     m_aprioriDialog->setPoints(selected);
 
   }
-
+  
 
   /**
    * Figures out what type of widget the filter was selected for and calls the
