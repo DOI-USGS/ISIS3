@@ -117,10 +117,6 @@ namespace Isis {
                              QString &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
-    // initialize m_dConvergenceThreshold ???
-    // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
-    // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
-    // ???
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
@@ -143,10 +139,6 @@ namespace Isis {
                              Control &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
-    // initialize m_dConvergenceThreshold ???
-    // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
-    // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
-    // ???
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
@@ -169,10 +161,6 @@ namespace Isis {
                              ControlNet &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
-    // initialize m_dConvergenceThreshold ???
-    // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
-    // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
-    // ???
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
@@ -226,6 +214,10 @@ namespace Isis {
   }
 
 
+  /** 
+   * Destroys BundleAdjust object, deallocates pointers (if we have ownership), 
+   * and frees variables from cholmod library. 
+   */
   BundleAdjust::~BundleAdjust() {
     // If we have ownership
     if (m_bCleanUp) {
@@ -246,12 +238,28 @@ namespace Isis {
 
 
   /**
-   * Initialize solution parameters
+   * Initialize all solution parameters. This method is called 
+   * by constructors to 
+   * <ul>
+   *   <li> initialize member variables                            </li>
+   *   <li> set up the control net                                 </li>
+   *   <li> get the cameras set up for all images                  </li>
+   *   <li> clear JigsawRejected flags                             </li>
+   *   <li> create a new BundleImages and add to BundleObservation </li>
+   *   <li> set up vector of BundleControlPoints                   </li>
+   *   <li> set parent observation for each BundleMeasure          </li>
+   *   <li> use BundleSettings to set more parameters              </li>
+   *   <li> set up matrix initializations                          </li>
+   *   <li> initialize cholomod library variables                  </li>
+   * </ul>
    *
    * @internal
    *   @history 2011-08-14 Debbie A. Cook - Opt out of network validation
    *                      for deltack network in order to allow
    *                      a single measure on a point
+   *  
+   *   @todo remove printf statements
+   *   @todo answer comments with questions, TODO, ???, and !!!
    */
   void BundleAdjust::init(Progress *progress) {
 //printf("BOOST_UBLAS_CHECK_ENABLE = %d\n", BOOST_UBLAS_CHECK_ENABLE);
@@ -323,7 +331,7 @@ namespace Isis {
      }
 
       // TESTING
-      // code below should go into a separate method?
+      // TODO: code below should go into a separate method???
       // set up BundleObservations and assign solve settings for each from BundleSettings class
       for (int i = 0; i < nImages; i++) {
 
@@ -402,6 +410,51 @@ namespace Isis {
     // ===========================================================================================//
     // =============== End Bundle Settings =======================================================//
     // ===========================================================================================//
+
+    // ===========================================================================================//
+    // ======================== initialize matrices and more parameters ==========================//
+    // ===========================================================================================//
+
+    // size of reduced normals matrix
+
+    // TODO
+    // this should be determined from BundleSettings
+    // m_nRank will be the sum of observation, target, and self-cal parameters
+    // TODO
+    m_nRank = m_bundleObservations.numberParameters();
+
+    if (m_bundleSettings->solveTargetBody())
+      m_nRank += m_bundleSettings->numberTargetBodyParameters();
+//    m_nRank = m_bundleSettings->sizeReducedNormalEquationsMatrix();
+
+    int n3DPoints = m_bundleControlPoints.size();
+
+    if ( m_bundleSettings->solveMethod() == BundleSettings::SpecialK ) {
+      m_Normals.resize(m_nRank);           // set size of reduced normals matrix
+      m_Normals.clear();                   // zero all elements
+      m_Qs_SPECIALK.resize(n3DPoints);
+    }
+
+    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * n3DPoints);
+
+    m_imageSolution.resize(m_nRank);
+
+
+    // initialize NICS, Qs, and point correction vectors to zero
+    for (int i = 0; i < n3DPoints; i++) {
+
+      // TODO_CHOLMOD: is this needed with new cholmod implementation?
+      if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
+        m_Qs_SPECIALK[i].clear();
+      }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // initializations for cholmod
+    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
+      initializeCHOLMODLibraryVariables();
+    }
+
   }
 
 
@@ -505,53 +558,6 @@ namespace Isis {
     }
   }
 
-
-  /**
-   * Initializes matrices and parameters for bundle adjustment.
-   */
-  void BundleAdjust::initialize() { // ??? rename this method, maybe call it in the init() method if Sparse
-
-    // size of reduced normals matrix
-
-    // TODO
-    // this should be determined from BundleSettings
-    // m_nRank will be the sum of observation, target, and self-cal parameters
-    // TODO
-    m_nRank = m_bundleObservations.numberParameters();
-
-    if (m_bundleSettings->solveTargetBody())
-      m_nRank += m_bundleSettings->numberTargetBodyParameters();
-//    m_nRank = m_bundleSettings->sizeReducedNormalEquationsMatrix();
-
-    int n3DPoints = m_bundleControlPoints.size();
-
-    if ( m_bundleSettings->solveMethod() == BundleSettings::SpecialK ) {
-      m_Normals.resize(m_nRank);           // set size of reduced normals matrix
-      m_Normals.clear();                   // zero all elements
-      m_Qs_SPECIALK.resize(n3DPoints);
-    }
-
-    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * n3DPoints);
-
-    m_imageSolution.resize(m_nRank);
-
-
-    // initialize NICS, Qs, and point correction vectors to zero
-    for (int i = 0; i < n3DPoints; i++) {
-
-      // TODO_CHOLMOD: is this needed with new cholmod implementation?
-      if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
-        m_Qs_SPECIALK[i].clear();
-      }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // initializations for cholmod
-    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      initializeCHOLMODLibraryVariables();
-    }
-  }
-
   /**
    * Least squares bundle adjustment solution using Cholesky decomposition.
    */
@@ -588,8 +594,6 @@ namespace Isis {
   //        }
   //      }
   //    }
-
-      initialize();
 
       // Compute the apriori lat/lons for each nonheld point
       m_pCnet->ComputeApriori(); // original location

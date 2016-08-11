@@ -23,14 +23,17 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
+// Qt lib
 #include <QObject> // parent class
 
+// std lib
 #include <vector>
 #include <fstream>
 
+// cholmod lib
 #include <cholmod.h>
 
+// Isis lib
 #include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
@@ -52,8 +55,6 @@
 
 template< typename T > class QList;
 template< typename A, typename B > class QMap;
-
-using namespace boost::numeric::ublas;
 
 namespace Isis {
   class Control;
@@ -204,6 +205,8 @@ namespace Isis {
    *   @history 2016-08-10 Jeannie Backer - Replaced boost vectors and matrices with
    *                           Isis::LinearAlgebra::Vector and Isis::LinearAlgebra::Matrix,
    *                           respectively. References #4163.
+   *   @history 2016-07-11 Jeannie Backer - Removed initialize(). Implementation was moved the the
+   *                           bottom of init() method. Fixes #4161.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -281,8 +284,7 @@ namespace Isis {
 
     private:
 
-      void init(Progress *progress = 0); // combine all initializations?
-      void initialize();
+      void init(Progress *progress = 0);
 
       void checkHeldList(); // unnecessary?
 
