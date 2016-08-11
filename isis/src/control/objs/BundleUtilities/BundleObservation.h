@@ -26,11 +26,10 @@
 #include <QStringList>
 #include <QVector>
 
-#include <boost/numeric/ublas/vector.hpp>
-
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
+#include "LinearAlgebra.h"
 
 namespace Isis {  
   class BundleObservationSolveSettings;
@@ -58,6 +57,8 @@ namespace Isis {
    *   @history 2016-08-03 Jesse Mapel - Changed contained member type to a QSharedPointer.
    *                           Also changed m_solveSettings to a QSharedPointer. Fixes #4150.
    *   @history 2016-08-03 Ian Humphrey - Updated documentation and coding standards. Fixes #4078.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
+   *                           References #4163.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -95,17 +96,17 @@ namespace Isis {
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
      
-      boost::numeric::ublas::vector<double> &parameterWeights();
-      boost::numeric::ublas::vector<double> &parameterCorrections();
-//    boost::numeric::ublas::vector<double> &parameterSolution();
-      boost::numeric::ublas::vector<double> &aprioriSigmas();
-      boost::numeric::ublas::vector<double> &adjustedSigmas();
+      LinearAlgebra::Vector &parameterWeights();
+      LinearAlgebra::Vector &parameterCorrections();
+//    LinearAlgebra::Vector &parameterSolution();
+      LinearAlgebra::Vector &aprioriSigmas();
+      LinearAlgebra::Vector &adjustedSigmas();
       
       const BundleObservationSolveSettingsQsp solveSettings();
 
 //    QStringList serialNumbers();
 
-      bool applyParameterCorrections(boost::numeric::ublas::vector<double> corrections);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
@@ -141,14 +142,14 @@ namespace Isis {
       BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
 
     // TODO??? change these to LinearAlgebra vectors...
-      boost::numeric::ublas::vector<double> m_weights;     //!< Parameter weights.
+      LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
-      boost::numeric::ublas::vector<double> m_corrections;
-      //boost::numeric::ublas::vector<double> m_solution;  //!< parameter solution vector.
+      LinearAlgebra::Vector m_corrections;
+      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
       //! A posteriori (adjusted) parameter sigmas.
-      boost::numeric::ublas::vector<double> m_aprioriSigmas;
+      LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
-      boost::numeric::ublas::vector<double> m_adjustedSigmas; 
+      LinearAlgebra::Vector m_adjustedSigmas; 
   };
 
   //! Typdef for BundleObservation QSharedPointer.

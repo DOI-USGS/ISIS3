@@ -1,18 +1,23 @@
 #include "SparseBlockMatrix.h"
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
-
+// std lib
 #include <iostream>
 #include <iomanip>
 
+// qt lib
 #include <QDataStream>
 #include <QDebug>
 #include <QMapIterator>
 #include <QListIterator>
 
+// boost lib
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+// Isis lib
 #include "IString.h"
+#include "LinearAlgebra.h"
 
 using namespace boost::numeric::ublas;
 
@@ -56,12 +61,12 @@ namespace Isis {
     wipe();
 
     // copy matrix blocks from src
-    QMapIterator<int, matrix<double>*> it(src);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(src);
     while ( it.hasNext() ) {
       it.next();
 
       // copy matrix block from src
-      matrix<double>* m = new matrix<double>(*(it.value()));
+      LinearAlgebra::Matrix *m = new LinearAlgebra::Matrix(*(it.value()));
 
       // insert matrix into map
       this->insert(it.key(),m);
@@ -86,8 +91,8 @@ namespace Isis {
 
 
   /**
-   * Inserts a "newed" boost matrix<double>* of size (nRows, nCols) into the map with the block
-   *  column number as key. The matrix::clear call initializes the matrix elements to zero. If an
+   * Inserts a "newed" LinearAlgebra::Matrix pointer of size (nRows, nCols) into the map with the
+   *  block column number as key. The clear call initializes the matrix elements to zero. If an
    *  entry exists at the key nColumnBlock, no insertion is made.
    *
    * @param nColumnBlock block column number of inserted matrix (key into map)
@@ -103,7 +108,7 @@ namespace Isis {
       return true;
 
     // allocate matrix block with nRows and nCols
-    matrix<double>* m = new matrix<double>(nRows,nCols);
+    LinearAlgebra::Matrix *m = new LinearAlgebra::Matrix(nRows,nCols);
 
     if ( !m )
       return false;
@@ -127,7 +132,7 @@ namespace Isis {
   int SparseBlockColumnMatrix::numberOfElements() {
     int nElements = 0;
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -150,7 +155,7 @@ namespace Isis {
 
     int nColumns = 0;
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -174,7 +179,7 @@ namespace Isis {
   int SparseBlockColumnMatrix::numberOfRows() {
 
     // iterate to last block (the diagonal one)
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -202,7 +207,7 @@ namespace Isis {
     }
 
     outstream << "Printing SparseBlockColumnMatrix..." << std::endl;
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -228,11 +233,11 @@ namespace Isis {
       return;
     }
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
-      matrix<double>* m = it.value();
+      LinearAlgebra::Matrix * m = it.value();
 
       int rows = m->size1();
       int cols = m->size2();
@@ -256,7 +261,7 @@ namespace Isis {
    * Sets all elements of all matrix blocks to zero.
    */
   void SparseBlockColumnMatrix::zeroBlocks() {
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
       it.value()->clear();
@@ -275,7 +280,7 @@ namespace Isis {
     int nBlocks = sbcm.size();
     stream << (qint32)nBlocks;
 
-    QMapIterator<int, matrix<double>*> it(sbcm);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(sbcm);
     while ( it.hasNext() ) {
       it.next();
 
@@ -323,7 +328,7 @@ namespace Isis {
       sbcm.insertMatrixBlock(nBlockNumber, nRows, nCols);
 
       // get matrix
-      matrix<double>* matrix = sbcm[nBlockNumber];
+      LinearAlgebra::Matrix *matrix = sbcm[nBlockNumber];
 
       // fill with data
       for ( r = 0; r < nRows; r++ ) {
@@ -347,7 +352,7 @@ namespace Isis {
   QDebug operator<<(QDebug dbg, const SparseBlockColumnMatrix &sbcm) {
     dbg.space() << "New Block" << endl;
 
-    QMapIterator<int, matrix<double>*> it(sbcm);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(sbcm);
     while ( it.hasNext() ) {
       it.next();
 
@@ -355,7 +360,7 @@ namespace Isis {
         continue;
 
       // get matrix
-      matrix<double>* matrix = it.value();
+      LinearAlgebra::Matrix *matrix = it.value();
 
       // matrix rows, columns
       int nRows = matrix->size1();
@@ -419,12 +424,12 @@ namespace Isis {
     wipe();
 
     // copy matrix blocks from src
-    QMapIterator<int, matrix<double>*> it(src);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(src);
     while ( it.hasNext() ) {
       it.next();
 
       // copy matrix block from src
-      matrix<double>* m = new matrix<double>(*(it.value()));
+      LinearAlgebra::Matrix *m = new LinearAlgebra::Matrix(*(it.value()));
 
       // insert matrix into map
       this->insert(it.key(),m);
@@ -449,9 +454,9 @@ namespace Isis {
 
 
   /**
-   * Inserts a "newed" boost matrix<double>* of size (nRows, nCols) into the map with the block row
-   * number as key. The matrix::clear call initializes the matrix elements to zero. If an entry
-   * exists at the key nRowBlock, no insertion is made.
+   * Inserts a "newed" LinearAlgebra::Matrix pointer of size (nRows, nCols) into the map with the 
+   * block row number as key. The matrix::clear call initializes the matrix elements to zero. If an 
+   * entry exists at the key nRowBlock, no insertion is made. 
    *
    * @param nRowBlock block row number of inserted matrix (key into map)
    * @param nRows number of rows in matrix to be inserted
@@ -467,7 +472,7 @@ namespace Isis {
     if ( this->contains(nRowBlock) )
       return false;
 
-    matrix<double>* m = new matrix<double>(nRows,nCols);
+    LinearAlgebra::Matrix *m = new LinearAlgebra::Matrix(nRows,nCols);
 
     if ( !m )
       return false;
@@ -489,7 +494,7 @@ namespace Isis {
   int SparseBlockRowMatrix::numberOfElements() {
     int nElements = 0;
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -515,7 +520,7 @@ namespace Isis {
     }
 
     outstream << "Printing SparseBlockRowMatrix..." << std::endl;
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
@@ -540,11 +545,11 @@ namespace Isis {
       return;
     }
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
-      matrix<double>* m = it.value();
+      LinearAlgebra::Matrix *m = it.value();
 
       int rows = m->size1();
       int cols = m->size2();
@@ -568,7 +573,7 @@ namespace Isis {
    * Sets all elements of all matrix blocks to zero.
    */
   void SparseBlockRowMatrix::zeroBlocks() {
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
       it.value()->clear();
@@ -589,12 +594,12 @@ namespace Isis {
     range rRow = range(0,3);
     range rCol;
 
-    QMapIterator<int, matrix<double>*> it(*this);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
     while ( it.hasNext() ) {
       it.next();
 
       nrowBlock = it.key();
-      matrix<double>* m = it.value();
+      LinearAlgebra::Matrix *m = it.value();
 
       ncols = m->size2();
 
@@ -657,7 +662,7 @@ namespace Isis {
     int nBlocks = sbrm.size();
     stream << (qint32)nBlocks;
 
-    QMapIterator<int, matrix<double>*> it(sbrm);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(sbrm);
     while ( it.hasNext() ) {
       it.next();
 
@@ -705,7 +710,7 @@ namespace Isis {
       sbrm.insertMatrixBlock(nBlockNumber, nRows, nCols);
 
       // get matrix
-      matrix<double>* matrix = sbrm[nBlockNumber];
+      LinearAlgebra::Matrix *matrix = sbrm[nBlockNumber];
 
       // fill with data
       for ( r = 0; r < nRows; r++ ) {
@@ -729,7 +734,7 @@ namespace Isis {
   QDebug operator<<(QDebug dbg, const SparseBlockRowMatrix &sbrm) {
     dbg.space() << "New Block" << endl;
 
-    QMapIterator<int, matrix<double>*> it(sbrm);
+    QMapIterator<int, LinearAlgebra::Matrix *> it(sbrm);
     while ( it.hasNext() ) {
       it.next();
 
@@ -737,7 +742,7 @@ namespace Isis {
         continue;
 
       // get matrix
-      matrix<double>* matrix = it.value();
+      LinearAlgebra::Matrix *matrix = it.value();
 
       // matrix rows, columns
       int nRows = matrix->size1();
@@ -839,9 +844,9 @@ namespace Isis {
 
 
   /**
-   * Inserts a "newed" boost matrix<double>* of size (nRows, nCols) into the
-   * matrix at nColumnBlock, nRowBlock. The inserted matrix elements are
-   * initialized to zero.
+   * Inserts a "newed" boost LinearAlgebra::Matrix pointer of size (nRows, 
+   * nCols) into the matrix at nColumnBlock, nRowBlock. The inserted matrix 
+   * elements are initialized to zero. 
    * If an entry exists at nColumnBlock, RowBlock, no insertion is made.
    *
    * @param nColumnBlock block column number of inserted matrix (QList index)
@@ -889,7 +894,7 @@ namespace Isis {
       if ( !column )
         continue;
 
-      QMapIterator<int, matrix<double>*> it(*column);
+      QMapIterator<int, LinearAlgebra::Matrix *> it(*column);
       while ( it.hasNext() ) {
         it.next();
 
@@ -939,9 +944,10 @@ namespace Isis {
    * @param column block column number
    * @param row block row number
    *
-   * @return matrix<double>* Pointer to Boost matrix at position (column, row)
+   * @return LinearAlgebra::Matrix  Pointer to Boost matrix at position (column,
+   *         row)
    */
-  matrix<double>* SparseBlockMatrix::getBlock(int column, int row) {
+  LinearAlgebra::Matrix *SparseBlockMatrix::getBlock(int column, int row) {
     return (*(*this)[column])[row];
   }
 
@@ -1057,7 +1063,7 @@ namespace Isis {
       if ( !column )
         continue;
 
-      QMapIterator<int, matrix<double>*> it(*column);
+      QMapIterator<int, LinearAlgebra::Matrix *> it(*column);
       // iterate to last element in column
       while ( it.hasNext() ) {
         it.next();

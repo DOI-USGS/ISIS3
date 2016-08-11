@@ -1,14 +1,16 @@
-#include "SparseBlockMatrix.h"
-
+// std lib
 #include <iostream>
 
+// boost lib
+#include <boost/numeric/ublas/matrix.hpp>
+
+// Isis lib
 #include "IException.h"
 #include "Preference.h"
-#include <boost/numeric/ublas/matrix.hpp>
+#include "SparseBlockMatrix.h"
 
 using namespace std;
 using namespace Isis;
-using boost::numeric::ublas::matrix;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);

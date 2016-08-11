@@ -8,10 +8,9 @@
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
+#include "LinearAlgebra.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
-
-using namespace boost::numeric::ublas;
 
 namespace Isis {
 
@@ -227,9 +226,9 @@ namespace Isis {
   /**
    * Accesses the solve parameter weights
    * 
-   * @return @b vector<double> Returns the parameter weights for solving
+   * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
    */
-  vector<double> &BundleObservation::parameterWeights() {
+  LinearAlgebra::Vector &BundleObservation::parameterWeights() {
     return m_weights;
   }
 
@@ -237,9 +236,9 @@ namespace Isis {
   /**
    * Accesses the parameter corrections 
    *
-   * @return @b vector<double> Returns the parameter corrections
+   * @return @b LinearAlgebra::Vector Returns the parameter corrections
    */
-  vector<double> &BundleObservation::parameterCorrections() {
+  LinearAlgebra::Vector &BundleObservation::parameterCorrections() {
     return m_corrections;
   }
 
@@ -248,7 +247,7 @@ namespace Isis {
    * @internal
    *   @todo 
    */
-//  vector<double> &BundleObservation::parameterSolution() {
+//  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
 //    return m_solution;
 //  }
 
@@ -256,9 +255,9 @@ namespace Isis {
   /**
    * Accesses the a priori sigmas
    *
-   * @return @b vecotr<double> Returns the a priori sigmas
+   * @return @b LinearAlgebra::Vector Returns the a priori sigmas
    */
-  vector<double> &BundleObservation::aprioriSigmas() {
+  LinearAlgebra::Vector &BundleObservation::aprioriSigmas() {
     return m_aprioriSigmas;
   }
 
@@ -266,9 +265,9 @@ namespace Isis {
   /**
    * Accesses the adjusted sigmas 
    *
-   * @return @b vector<double> Returns the adjusted sigmas
+   * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
    */
-  vector<double> &BundleObservation::adjustedSigmas() {
+  LinearAlgebra::Vector &BundleObservation::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
@@ -575,8 +574,7 @@ namespace Isis {
    * @internal
    *   @todo always returns true?
    */  
-  bool BundleObservation::applyParameterCorrections(
-      boost::numeric::ublas::vector<double> corrections) {
+  bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
 
     int index = 0;
 

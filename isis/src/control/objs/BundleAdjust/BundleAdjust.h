@@ -42,6 +42,7 @@
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "LinearAlgebra.h"
 #include "MaximumLikelihoodWFunctions.h" // why not just forward declare???
 #include "ObservationNumberList.h"
 #include "Progress.h"
@@ -51,6 +52,8 @@
 
 template< typename T > class QList;
 template< typename A, typename B > class QMap;
+
+using namespace boost::numeric::ublas;
 
 namespace Isis {
   class Control;
@@ -198,6 +201,9 @@ namespace Isis {
    *                           BundleControlPointVector.  Fixes #4099.
    *   @history 2016-08-03 Jesse Mapel - Changed BundleObservationVector to a vector of
    *                           QSharedPointers.  Fixes #4150.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost vectors and matrices with
+   *                           Isis::LinearAlgebra::Vector and Isis::LinearAlgebra::Matrix,
+   *                           respectively. References #4163.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -309,26 +315,24 @@ namespace Isis {
       // solution, error propagation, and matrix methods for cholmod approach
       bool formNormalEquations_CHOLMOD();
 
-      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
-                                boost::numeric::ublas::upper >  &N22,
+      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
                                 SparseBlockColumnMatrix  &N12,
                                 boost::numeric::ublas::compressed_vector< double >  &n1,
-                                boost::numeric::ublas::vector< double >  &n2,
-                                boost::numeric::ublas::matrix< double >  &coeff_target,
-                                boost::numeric::ublas::matrix< double >  &coeff_image,
-                                boost::numeric::ublas::matrix< double >  &coeff_point3D,
-                                boost::numeric::ublas::vector< double >  &coeff_RHS,
+                                LinearAlgebra::Vector  &n2,
+                                LinearAlgebra::Matrix  &coeff_target,
+                                LinearAlgebra::Matrix  &coeff_image,
+                                LinearAlgebra::Matrix  &coeff_point3D,
+                                LinearAlgebra::Vector  &coeff_RHS,
                                 int observationIndex);
 
-      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
-                                boost::numeric::ublas::upper >  &N22,
+      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
                                 SparseBlockColumnMatrix  &N12,
-                                boost::numeric::ublas::vector< double >  &n2,
-                                boost::numeric::ublas::vector< double >  &nj,
+                                LinearAlgebra::Vector  &n2,
+                                LinearAlgebra::Vector  &nj,
                                 BundleControlPointQsp &point);
 
       bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double >  &n1,
-                                boost::numeric::ublas::vector< double >  &nj);
+                                LinearAlgebra::Vector  &nj);
 
       bool solveSystem_CHOLMOD();
 
@@ -336,8 +340,8 @@ namespace Isis {
                                     SparseBlockRowMatrix &B);
 
       void transA_NZ_multAdd_CHOLMOD(double alpha, SparseBlockRowMatrix &A,
-                                     boost::numeric::ublas::vector< double > &B,
-                                     boost::numeric::ublas::vector< double > &C);
+                                     LinearAlgebra::Vector &B,
+                                     LinearAlgebra::Vector &C);
 
       void applyParameterCorrections_CHOLMOD();
 
@@ -347,39 +351,37 @@ namespace Isis {
       // TODO: this may be able to go away if I can verify cholmod behavior for a truly dense matrix
       bool formNormalEquations_SPECIALK();
 
-      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
-                                 boost::numeric::ublas::upper >  &N22,
-                                 boost::numeric::ublas::matrix< double >  &N12,
+      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+                                 LinearAlgebra::Matrix  &N12,
                                  boost::numeric::ublas::compressed_vector< double >  &n1,
-                                 boost::numeric::ublas::vector< double >  &n2,
-                                 boost::numeric::ublas::matrix< double >  &coeff_image,
-                                 boost::numeric::ublas::matrix< double >  &coeff_point3D,
-                                 boost::numeric::ublas::vector< double >  &coeff_RHS,
+                                 LinearAlgebra::Vector  &n2,
+                                 LinearAlgebra::Matrix  &coeff_image,
+                                 LinearAlgebra::Matrix  &coeff_point3D,
+                                 LinearAlgebra::Vector  &coeff_RHS,
                                  int nImageIndex);
 
-      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
-                                 boost::numeric::ublas::upper >  &N22,
-                                 boost::numeric::ublas::matrix< double >  &N12,
-                                 boost::numeric::ublas::vector< double >  &n2,
-                                 boost::numeric::ublas::vector< double >  &nj,
+      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+                                 LinearAlgebra::Matrix  &N12,
+                                 LinearAlgebra::Vector  &n2,
+                                 LinearAlgebra::Vector  &nj,
                                  int nPointIndex, int i);
 
       bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector< double >  &n1,
-                                 boost::numeric::ublas::vector< double >  &nj);
+                                 LinearAlgebra::Vector  &nj);
 
       bool solveSystem_SPECIALK();
 
       void AmultAdd_CNZRows_SPECIALK(double alpha,
-                                     boost::numeric::ublas::matrix< double > &A,
+                                     LinearAlgebra::Matrix &A,
                                      boost::numeric::ublas::compressed_matrix< double > &B,
-                                     boost::numeric::ublas::symmetric_matrix< double,
-                                     boost::numeric::ublas::upper,
-                                     boost::numeric::ublas::column_major > &C);
+                                     boost::numeric::ublas::symmetric_matrix< double, 
+                                                                              upper,
+                                                                              column_major > &C);
 
       void transA_NZ_multAdd_SPECIALK(double alpha,
                                       boost::numeric::ublas::compressed_matrix< double > &A,
-                                      boost::numeric::ublas::vector< double > &B,
-                                      boost::numeric::ublas::vector< double > &C);
+                                      LinearAlgebra::Vector &B,
+                                      LinearAlgebra::Vector &C);
 
       void applyParameterCorrections_SPECIALK();
 
@@ -389,41 +391,41 @@ namespace Isis {
       bool CholeskyUT_NOSQR_Inverse();
       bool CholeskyUT_NOSQR_BackSub(
                                     boost::numeric::ublas::symmetric_matrix< double,
-                                    boost::numeric::ublas::upper,
-                                    boost::numeric::ublas::column_major >  &m,
-                                    boost::numeric::ublas::vector< double >  &s,
-                                    boost::numeric::ublas::vector< double >  &rhs);
+                                                                             upper,
+                                                                             column_major >  &m,
+                                    LinearAlgebra::Vector  &s,
+                                    LinearAlgebra::Vector  &rhs);
 
-//      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_image,
-//                              boost::numeric::ublas::matrix< double >  &coeff_point3D,
-//                              boost::numeric::ublas::vector< double >  &coeff_RHS,
+//      bool computePartials_DC(LinearAlgebra::Matrix  &coeff_image,
+//                              LinearAlgebra::Matrix  &coeff_point3D,
+//                              LinearAlgebra::Vector  &coeff_RHS,
 //                              const ControlMeasure &measure, const ControlPoint &point);
-      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_target,
-                              boost::numeric::ublas::matrix< double >  &coeff_image,
-                              boost::numeric::ublas::matrix< double >  &coeff_point3D,
-                              boost::numeric::ublas::vector< double >  &coeff_RHS,
+      bool computePartials_DC(LinearAlgebra::Matrix  &coeff_target,
+                              LinearAlgebra::Matrix  &coeff_image,
+                              LinearAlgebra::Matrix  &coeff_point3D,
+                              LinearAlgebra::Vector  &coeff_RHS,
                               BundleMeasure &measure, BundleControlPoint &point);
 
 //      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower> &m, vector<double> &s, vector<double> &rhs);
       double computeResiduals();
 
       // dedicated matrix functions
-      void AmulttransBNZ(boost::numeric::ublas::matrix< double >  &A,
+      void AmulttransBNZ(LinearAlgebra::Matrix  &A,
                          boost::numeric::ublas::compressed_matrix< double >  &B,
-                         boost::numeric::ublas::matrix< double >  &C, double alpha = 1.0);
+                         LinearAlgebra::Matrix  &C, double alpha = 1.0);
       void ANZmultAdd(boost::numeric::ublas::compressed_matrix< double >  &A,
-                      boost::numeric::ublas::symmetric_matrix< double,
-                      boost::numeric::ublas::upper, boost::numeric::ublas::column_major >  &B,
-                      boost::numeric::ublas::matrix< double >  &C, double alpha = 1.0);
+                      boost::numeric::ublas::symmetric_matrix< double, upper, column_major >  &B,
+                      LinearAlgebra::Matrix  &C, double alpha = 1.0);
 
-      bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< double,
-                      boost::numeric::ublas::upper >  &m);
+      bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< double, upper >  &m);
 
-      bool product_ATransB(boost::numeric::ublas::symmetric_matrix< double,
-                           boost::numeric::ublas::upper >  &N22, SparseBlockColumnMatrix  &N12,
+      bool product_ATransB(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22, 
+                           SparseBlockColumnMatrix  &N12,
                            SparseBlockRowMatrix  &Q);
-      void product_AV(double alpha, boost::numeric::ublas::bounded_vector< double, 3 > &v2,
-                      SparseBlockRowMatrix &Q, boost::numeric::ublas::vector< double > &v1);
+      void product_AV(double alpha, 
+                      boost::numeric::ublas::bounded_vector< double, 3 > &v2,
+                      SparseBlockRowMatrix &Q, 
+                      LinearAlgebra::Vector &v1);
 
       bool computeRejectionLimit();
       bool flagOutliers();
@@ -471,15 +473,14 @@ namespace Isis {
 
       int m_nRank;
 
-      boost::numeric::ublas::symmetric_matrix< double, 
-                                               boost::numeric::ublas::upper, 
-                                               boost::numeric::ublas::column_major > m_Normals; //!< reduced normal equations matrix
-      boost::numeric::ublas::vector< double > m_nj;
+      //! reduced normal equations matrix
+      boost::numeric::ublas::symmetric_matrix< double, upper, column_major > m_Normals;
+      LinearAlgebra::Vector m_nj;
 
       //!< array of Qs   (see Brown, 1976)
       std::vector< boost::numeric::ublas::compressed_matrix< double > > m_Qs_SPECIALK;
 
-      boost::numeric::ublas::vector< double > m_imageSolution;                                     //!< image parameter solution vector
+      LinearAlgebra::Vector m_imageSolution; //!< image parameter solution vector
 
 
       QString m_iterationSummary;

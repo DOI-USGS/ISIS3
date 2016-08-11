@@ -10,8 +10,6 @@
 #include "PvlObject.h"
 #include "Target.h"
 
-using namespace boost::numeric::ublas;
-
 namespace Isis {
 
   /**
@@ -572,7 +570,7 @@ namespace Isis {
    * @see setSolveSettings
    */
   void BundleTargetBody::applyParameterCorrections(
-      boost::numeric::ublas::vector<double> corrections) {
+      LinearAlgebra::Vector corrections) {
     if (corrections.size() != m_parameterSolveCodes.size()) {
       QString msg = "In BundleTargetBody::applyParameterCorrections: "
                     "correction and m_targetParameter vectors sizes don't match.\n";
@@ -721,7 +719,7 @@ namespace Isis {
    * 
    * @see setSolveSettings
    */
-  vector<double> &BundleTargetBody::parameterWeights() {
+  LinearAlgebra::Vector &BundleTargetBody::parameterWeights() {
     return m_weights;
   }
 
@@ -734,7 +732,7 @@ namespace Isis {
    * 
    * @see setSolveSettings
    */
-  vector<double> &BundleTargetBody::parameterCorrections() {
+  LinearAlgebra::Vector &BundleTargetBody::parameterCorrections() {
     return m_corrections;
   }
 
@@ -747,7 +745,7 @@ namespace Isis {
    * 
    * @see setSolveSettings
    */
-  vector<double> &BundleTargetBody::parameterSolution() {
+  LinearAlgebra::Vector &BundleTargetBody::parameterSolution() {
     return m_solution;
   }
 
@@ -760,7 +758,7 @@ namespace Isis {
    * 
    * @see setSolveSettings
    */
-  vector<double> &BundleTargetBody::aprioriSigmas() {
+  LinearAlgebra::Vector &BundleTargetBody::aprioriSigmas() {
     return m_aprioriSigmas;
   }
 
@@ -773,7 +771,7 @@ namespace Isis {
    * 
    * @see setSolveSettings
    */
-  vector<double> &BundleTargetBody::adjustedSigmas() {
+  LinearAlgebra::Vector &BundleTargetBody::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 

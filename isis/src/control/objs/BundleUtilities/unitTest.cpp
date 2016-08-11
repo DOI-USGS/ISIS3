@@ -26,6 +26,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
+#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "Preference.h"
 #include "PvlObject.h"
@@ -48,6 +49,8 @@ void printBundleMeasure(BundleMeasure &);
  * @internal
  *   @history 2014-12-11 Jeannie Backer - Added test for BundleControlPoint.
  *                           Updated truth file, improved overall test coverage.
+ *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
+ *                           References #4163.
  */
 
 
@@ -487,10 +490,10 @@ int main(int argc, char *argv[]) {
     qDebug() << "parameter list: " << bo3.parameterList();
     qDebug() << "image names:    " << bo3.imageNames();
 
-    boost::numeric::ublas::vector< double > paramWts = bo3.parameterWeights();
-    boost::numeric::ublas::vector< double > paramCor = bo3.parameterCorrections();
-    boost::numeric::ublas::vector< double > aprSigma = bo3.aprioriSigmas();
-    boost::numeric::ublas::vector< double > adjSigma = bo3.adjustedSigmas();
+    LinearAlgebra::Vector paramWts = bo3.parameterWeights();
+    LinearAlgebra::Vector paramCor = bo3.parameterCorrections();
+    LinearAlgebra::Vector aprSigma = bo3.aprioriSigmas();
+    LinearAlgebra::Vector adjSigma = bo3.adjustedSigmas();
     QString vectors = "parameter weights :     ";
     for (unsigned int i = 0; i < paramWts.size(); i++) {
       vectors.append(toString(paramWts[i]));
@@ -976,7 +979,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << btb1.formatBundleOutputString(false);
     qDebug() << "";
     qDebug().noquote() << btb1.formatBundleOutputString(true);
-    boost::numeric::ublas::vector<double> btb1Weights = btb1.parameterWeights();
+    LinearAlgebra::Vector btb1Weights = btb1.parameterWeights();
     QString btb1WString;
     for (size_t i = 0; i < btb1Weights.size(); i++) {
       btb1WString.append(toString(btb1Weights[i]));
@@ -990,7 +993,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Apply some corrections";
     qDebug() << "";
 
-    boost::numeric::ublas::vector<double> btb1CumCorrections (btb1.numberParameters());
+    LinearAlgebra::Vector btb1CumCorrections (btb1.numberParameters());
     btb1CumCorrections = btb1.parameterCorrections();
     QString btb1CString;
     for (size_t i = 0; i < btb1CumCorrections.size(); i++) {
@@ -1001,7 +1004,7 @@ int main(int argc, char *argv[]) {
     }
     qDebug().noquote() << btb1CString;
     qDebug() << "";
-    boost::numeric::ublas::vector<double> btb1Corrections (btb1.numberParameters());
+    LinearAlgebra::Vector btb1Corrections (btb1.numberParameters());
     for (size_t i = 0; i < btb1Corrections.size(); i++) {
       btb1Corrections[i] = pow(-0.7, i);
     }
@@ -1066,7 +1069,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Parameter Count";
     qDebug() << btb1.numberRadiusParameters() << btb1.numberParameters();
     qDebug() << "Parameter Solutions";
-    boost::numeric::ublas::vector<double> btb1Solutions = btb1.parameterSolution();
+    LinearAlgebra::Vector btb1Solutions = btb1.parameterSolution();
     QString btb1SString;
     for (size_t i = 0; i < btb1Solutions.size(); i++) {
       btb1SString.append(toString(btb1Solutions[i]));
@@ -1076,7 +1079,7 @@ int main(int argc, char *argv[]) {
     }
     qDebug().noquote() << btb1SString;
     qDebug() << "Apriori Sigmas";
-    boost::numeric::ublas::vector<double> btb1Apriori = btb1.aprioriSigmas();
+    LinearAlgebra::Vector btb1Apriori = btb1.aprioriSigmas();
     QString btb1AprioriString;
     for (size_t i = 0; i < btb1Apriori.size(); i++) {
       btb1AprioriString.append(toString(btb1Apriori[i]));
@@ -1086,7 +1089,7 @@ int main(int argc, char *argv[]) {
     }
     qDebug().noquote() << btb1AprioriString;
     qDebug() << "Adjusted Sigmas";
-    boost::numeric::ublas::vector<double> btb1Adjusted = btb1.adjustedSigmas();
+    LinearAlgebra::Vector btb1Adjusted = btb1.adjustedSigmas();
     QString btb1AdjustedString;
     for (size_t i = 0; i < btb1Adjusted.size(); i++) {
       btb1AdjustedString.append(toString(btb1Adjusted[i]));
@@ -1201,7 +1204,7 @@ int main(int argc, char *argv[]) {
         Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
         Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
     qDebug().noquote() << btb2.formatBundleOutputString(true);
-    boost::numeric::ublas::vector<double> btb2Weights = btb2.parameterWeights();
+    LinearAlgebra::Vector btb2Weights = btb2.parameterWeights();
     QString btb2WString;
     for (size_t i = 0; i < btb2Weights.size(); i++) {
       btb2WString.append(toString(btb2Weights[i]));
@@ -1282,8 +1285,7 @@ int main(int argc, char *argv[]) {
 
     // Correction errors
     try {
-      btb1.applyParameterCorrections(
-          boost::numeric::ublas::vector<double>(btb1.numberParameters() + 1));
+      btb1.applyParameterCorrections(LinearAlgebra::Vector(btb1.numberParameters() + 1));
     }
     catch (IException &e) {
       e.print();

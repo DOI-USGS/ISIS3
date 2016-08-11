@@ -23,19 +23,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
+// Qt Library
 #include <QList>
 #include <QObject>
 #include <QPair>
 #include <QString>
 #include <QVector>
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-
+// hdf5 Library
 #include <H5Cpp.h>
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
+// Isis Library
 #include "BundleSettings.h"
 #include "Distance.h"
 #include "MaximumLikelihoodWFunctions.h"
@@ -43,11 +43,13 @@
 #include "Statistics.h" // ???
 #include "XmlStackedHandler.h"
 
+// Qt Library
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
+  // Isis Library
   class ControlNet;
   class CorrelationMatrix;
   class FileName;
@@ -76,6 +78,8 @@ namespace Isis {
    *                           metatype for use with QVariant.
    *   @history 2016-07-01 Jesse Mapel - Updated documentation and testing in preparation for
    *                           merging from IPCE into ISIS. Fixes #3975.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
+   *                           References #4163.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -132,7 +136,7 @@ namespace Isis {
                ControlNet *pCnet,
                std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointWeights,
                std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointCorrections,
-               boost::numeric::ublas::vector< double > image_Corrections,
+               LinearAlgebra::Vector image_Corrections,
                std::vector< double > imageParameterWeights,
                int numImagePartials,
                int rank);

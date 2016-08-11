@@ -906,13 +906,13 @@ namespace Isis {
     m_bundleResults.setNumberObservations(0);// ???
     m_bundleResults.resetNumberConstrainedPointParameters();//???
 
-    static boost::numeric::ublas::matrix<double> coeff_target;
-    static boost::numeric::ublas::matrix<double> coeff_image;
-    static boost::numeric::ublas::matrix<double> coeff_point3D(2, 3);
-    static boost::numeric::ublas::vector<double> coeff_RHS(2);
+    static LinearAlgebra::Matrix coeff_target;
+    static LinearAlgebra::Matrix coeff_image;
+    static LinearAlgebra::Matrix coeff_point3D(2, 3);
+    static LinearAlgebra::Vector coeff_RHS(2);
     static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);                // 3x3 upper triangular
     SparseBlockColumnMatrix N12;
-    static boost::numeric::ublas::vector<double> n2(3);                                  // 3x1 vector
+    static LinearAlgebra::Vector n2(3);                                  // 3x1 vector
     boost::numeric::ublas::compressed_vector<double> n1(m_nRank);                        // image parameters x 1
 
     m_nj.resize(m_nRank);
@@ -1116,7 +1116,7 @@ namespace Isis {
 
     int nImagePartials = coeff_image.size2();
 
-    static boost::numeric::ublas::vector<double> n1_image(nImagePartials);
+    static LinearAlgebra::Vector n1_image(nImagePartials);
     n1_image.resize(nImagePartials);
     n1_image.clear();
 
@@ -1313,7 +1313,7 @@ namespace Isis {
     int n = 0;
 
     for (int i = 0; i < m_SparseNormals.size(); i++) {
-      boost::numeric::ublas::matrix<double> *diagonalBlock = m_SparseNormals.getBlock(i, i);
+      LinearAlgebra::Matrix *diagonalBlock = m_SparseNormals.getBlock(i, i);
       if ( !diagonalBlock )
         continue;
 
@@ -1343,8 +1343,8 @@ namespace Isis {
         else
           observation = m_bundleObservations.at(i);
 
-        boost::numeric::ublas::vector< double > weights = observation->parameterWeights();
-        boost::numeric::ublas::vector< double > corrections = observation->parameterCorrections();
+        LinearAlgebra::Vector weights = observation->parameterWeights();
+        LinearAlgebra::Vector corrections = observation->parameterCorrections();
 
         int blockSize = diagonalBlock->size1();
         for (int j = 0; j < blockSize; j++) {
@@ -1387,12 +1387,12 @@ namespace Isis {
     m_bundleResults.setNumberObservations(0); // ??? necessary???
     m_bundleResults.resetNumberConstrainedPointParameters();
 
-    static boost::numeric::ublas::matrix<double> coeff_image;
-    static boost::numeric::ublas::matrix<double> coeff_point3D(2, 3);
-    static boost::numeric::ublas::vector<double> coeff_RHS(2);
+    static LinearAlgebra::Matrix coeff_image;
+    static LinearAlgebra::Matrix coeff_point3D(2, 3);
+    static LinearAlgebra::Vector coeff_RHS(2);
     static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
-    static boost::numeric::ublas::matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
-    static boost::numeric::ublas::vector<double> n2(3);                       // 3x1 vector
+    static LinearAlgebra::Matrix N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
+    static LinearAlgebra::Vector n2(3);                       // 3x1 vector
     boost::numeric::ublas::compressed_vector<double> n1(m_nRank);             // image parameters x 1
 
     m_nj.resize(m_nRank);
@@ -1726,7 +1726,7 @@ namespace Isis {
                                 SparseBlockRowMatrix &Q,
                                 vector<double> &v1) {
 
-    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iQ(Q);
+    QMapIterator< int, LinearAlgebra::Matrix * > iQ(Q);
 
     // subrange start, end
     int srStart, srEnd;
@@ -1755,7 +1755,7 @@ namespace Isis {
                                      SparseBlockColumnMatrix &N12,
                                      SparseBlockRowMatrix &Q) {
 
-    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iN12(N12);
+    QMapIterator< int, LinearAlgebra::Matrix * > iN12(N12);
 
     while ( iN12.hasNext() ) {
       iN12.next();
@@ -1788,15 +1788,15 @@ namespace Isis {
     }
 
     // iterators for N12 and Q
-    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iN12(N12);
-    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iQ(Q);
+    QMapIterator<int, LinearAlgebra::Matrix*> iN12(N12);
+    QMapIterator<int, LinearAlgebra::Matrix*> iQ(Q);
 
     // now multiply blocks and subtract from m_SparseNormals
     while ( iN12.hasNext() ) {
       iN12.next();
 
       int nrow = iN12.key();
-      boost::numeric::ublas::matrix<double> *in12 = iN12.value();
+      LinearAlgebra::Matrix *in12 = iN12.value();
 
       while ( iQ.hasNext() ) {
         iQ.next();
@@ -1806,7 +1806,7 @@ namespace Isis {
         if ( nrow > ncol )
           continue;
 
-        boost::numeric::ublas::matrix<double> *iq = iQ.value();
+        LinearAlgebra::Matrix *iq = iQ.value();
 
         // insert submatrix at column, row
         m_SparseNormals.insertMatrixBlock(ncol, nrow,
@@ -1886,15 +1886,15 @@ namespace Isis {
 
     int nTargetParameters = m_bundleSettings->numberTargetBodyParameters();
 
-    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iQ(Q);
+    QMapIterator<int, LinearAlgebra::Matrix*> iQ(Q);
 
     while ( iQ.hasNext() ) {
       iQ.next();
 
       int nrow = iQ.key();
-      boost::numeric::ublas::matrix<double> *m = iQ.value();
+      LinearAlgebra::Matrix *m = iQ.value();
 
-      boost::numeric::ublas::vector<double> v = prod(trans(*m),n2);
+      LinearAlgebra::Vector v = prod(trans(*m),n2);
 
       //testing - should ask m_bundleObservations for this???
 //      int n = Q.getLeadingColumnsForBlock(nrow);
@@ -2208,7 +2208,7 @@ namespace Isis {
 
       int nLeadingColumns = m_SparseNormals.getLeadingColumnsForBlock(ncol);
 
-      QMapIterator< int, boost::numeric::ublas::matrix<double> * > it(*sbc);
+      QMapIterator< int, LinearAlgebra::Matrix * > it(*sbc);
 
       while ( it.hasNext() ) {
         it.next();
@@ -2217,7 +2217,7 @@ namespace Isis {
 
         int nLeadingRows = m_SparseNormals.getLeadingRowsForBlock(nrow);
 
-        boost::numeric::ublas::matrix<double> *m = it.value();
+        LinearAlgebra::Matrix *m = it.value();
         if ( !m ) {
           printf("matrix block retrieval failure at column %d, row %d", ncol,nrow);
           printf("Total # of block columns: %d", nblockcolumns);
@@ -2450,10 +2450,10 @@ namespace Isis {
 //    symmetric_matrix<double,lower> tmp = m_Normals;
 
     // solution vector
-    boost::numeric::ublas::vector<double> s(m_nRank);
+    LinearAlgebra::Vector s(m_nRank);
 
     // initialize column vector
-    boost::numeric::ublas::vector<double> column(m_nRank);
+    LinearAlgebra::Vector column(m_nRank);
     column.clear();
     column(0) = 1.0;
 
@@ -3312,8 +3312,8 @@ namespace Isis {
       BundleObservationQsp observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
-      const boost::numeric::ublas::vector<double> &weights = observation->parameterWeights();
-      const boost::numeric::ublas::vector<double> &corrections = observation->parameterCorrections();
+      const LinearAlgebra::Vector &weights = observation->parameterWeights();
+      const LinearAlgebra::Vector &corrections = observation->parameterCorrections();
 
       for (int j = 0; j < (int)corrections.size(); j++) {
         if (weights[j] > 0.0) {
@@ -3628,8 +3628,8 @@ namespace Isis {
     if ( !CholeskyUT_NOSQR_Inverse() )
         return false;
 
-    boost::numeric::ublas::matrix<double> T(3, 3);
-    boost::numeric::ublas::matrix<double> QS(3, m_nRank);
+    LinearAlgebra::Matrix T(3, 3);
+    LinearAlgebra::Matrix QS(3, m_nRank);
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
@@ -3706,7 +3706,7 @@ namespace Isis {
     cholmod_free_triplet(&m_pTriplet, &m_cm);
     cholmod_free_sparse(&m_N, &m_cm);
 
-    boost::numeric::ublas::matrix<double> T(3, 3);
+    LinearAlgebra::Matrix T(3, 3);
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
@@ -3796,7 +3796,7 @@ namespace Isis {
 
         // store solution in corresponding column of inverse
         for (k = 0; k < sbcMatrix.size(); k++) {
-          boost::numeric::ublas::matrix<double> *matrix = sbcMatrix.value(k);
+          LinearAlgebra::Matrix *matrix = sbcMatrix.value(k);
 
           int sz1 = matrix->size1();
 
@@ -3865,7 +3865,7 @@ namespace Isis {
         boost::numeric::ublas::symmetric_matrix<double> &cv = point_covs[nPointIndex];
 
         // get qT - index i is the key into Q for qT
-        boost::numeric::ublas::matrix<double> *qT = Q.value(i);
+        LinearAlgebra::Matrix *qT = Q.value(i);
         if (!qT) {
           nPointIndex++;
           continue;
@@ -3873,7 +3873,7 @@ namespace Isis {
 
         // iterate over Q
         // q is current map value
-        QMapIterator< int, boost::numeric::ublas::matrix<double> * > it(Q);
+        QMapIterator< int, LinearAlgebra::Matrix * > it(Q);
         while ( it.hasNext() ) {
           it.next();
 
@@ -3883,13 +3883,13 @@ namespace Isis {
             break;
           }
 
-          boost::numeric::ublas::matrix<double> *q = it.value();
+          LinearAlgebra::Matrix *q = it.value();
 
           if ( !q ) {// should never be NULL
             continue;
           }
 
-          boost::numeric::ublas::matrix<double> *nI = sbcMatrix.value(it.key());
+          LinearAlgebra::Matrix *nI = sbcMatrix.value(it.key());
 
           if ( !nI ) {// should never be NULL
             continue;
@@ -5229,7 +5229,7 @@ namespace Isis {
     output_columns.clear();
 
     // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
-    boost::numeric::ublas::vector<double> vImageAdjustedSigmas;
+    LinearAlgebra::Vector vImageAdjustedSigmas;
 
     std::vector<double> BFP(3);
 

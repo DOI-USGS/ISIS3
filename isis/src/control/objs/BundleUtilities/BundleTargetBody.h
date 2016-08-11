@@ -33,6 +33,7 @@
 #include "Angle.h"
 #include "Distance.h"
 #include "Latitude.h"
+#include "LinearAlgebra.h"
 #include "Longitude.h"
 
 namespace Isis {
@@ -53,6 +54,8 @@ namespace Isis {
    *   @histroy 2016-07-13 Jesse Mapel - Updated documentation and coding standards, and added
    *                           testing in preparation for merging from IPCE to ISIS.
    *                           Fixes #4079.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
+   *                           References #4163.
    */
   class BundleTargetBody : public QObject {
 
@@ -109,11 +112,11 @@ namespace Isis {
       //
 
       // accessors
-      boost::numeric::ublas::vector<double> &parameterWeights();
-      boost::numeric::ublas::vector<double> &parameterCorrections();
-      boost::numeric::ublas::vector<double> &parameterSolution();
-      boost::numeric::ublas::vector<double> &aprioriSigmas();
-      boost::numeric::ublas::vector<double> &adjustedSigmas();
+      LinearAlgebra::Vector &parameterWeights();
+      LinearAlgebra::Vector &parameterCorrections();
+      LinearAlgebra::Vector &parameterSolution();
+      LinearAlgebra::Vector &aprioriSigmas();
+      LinearAlgebra::Vector &adjustedSigmas();
 
       std::vector<Angle> poleRaCoefs();
       std::vector<Angle> poleDecCoefs();
@@ -155,7 +158,7 @@ namespace Isis {
       int numberRadiusParameters();
       int numberParameters();
 
-      void applyParameterCorrections(boost::numeric::ublas::vector<double> corrections);
+      void applyParameterCorrections(LinearAlgebra::Vector corrections);
 
       double vtpv();
 
@@ -183,11 +186,11 @@ namespace Isis {
                                                  ensure they are always in the correct order. **/
       QStringList m_parameterNamesList;     //!< List of all target parameters.
 
-      boost::numeric::ublas::vector<double> m_weights;         //!< Parameter weights.
-      boost::numeric::ublas::vector<double> m_corrections;     //!< Cumulative parameter corrections.
-      boost::numeric::ublas::vector<double> m_solution;        //!< Parameter solution vector.
-      boost::numeric::ublas::vector<double> m_aprioriSigmas;   //!< A priori parameter sigmas.
-      boost::numeric::ublas::vector<double> m_adjustedSigmas;  //!< Adjusted parameter sigmas.
+      LinearAlgebra::Vector m_weights;         //!< Parameter weights.
+      LinearAlgebra::Vector m_corrections;     //!< Cumulative parameter corrections.
+      LinearAlgebra::Vector m_solution;        //!< Parameter solution vector.
+      LinearAlgebra::Vector m_aprioriSigmas;   //!< A priori parameter sigmas.
+      LinearAlgebra::Vector m_adjustedSigmas;  //!< Adjusted parameter sigmas.
   };
 
   //! Definition for BundleTargetBodyQsp, a QSharedPointer to a BundleTargetBody.

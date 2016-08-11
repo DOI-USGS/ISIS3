@@ -803,7 +803,7 @@ namespace Isis {
       m_serialNumberList->add( m_rightCube->fileName() );
     }
 
-    vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
+    std::vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
     m_targetRadius = Distance(targetRadius[0]);
     //  If radius combo box set to ellipsoid, update the radius line edit
     if ( !m_targetRadius.isValid() ) {
