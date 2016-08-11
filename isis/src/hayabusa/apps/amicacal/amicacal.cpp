@@ -10,8 +10,10 @@
 #include <QFile>
 #include <QString>
 #include <QScopedPointer>
+#include <QTemporaryFile>
 #include <QVector>
 
+#include "AlphaCube.h"
 #include "AmicaCalUtils.h"
 #include "Buffer.h"
 #include "FileName.h"
@@ -31,24 +33,23 @@
 #include "TextFile.h"
 
 
-
 using namespace Isis;
 using namespace std;
 
 // Calibration support routines
 FileName DetermineFlatFieldFile(const QString &filter, const bool nullPolarPix);
 void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
+
 void loadCalibrationVariables();
 void psfCorrection(vector<Buffer *>& in, vector<Buffer *>& out);
 void psfCorrectionBoxcar(Buffer &in, double &result);
-
-
 
 
 // Temporary cube file pointer deleter
 struct TemporaryCubeDeleter {
    static inline void cleanup(Cube *cube) {
      if ( cube ) {
+
        FileName filename( cube->fileName() );
        delete cube;
        remove( filename.expanded().toAscii().data() );
@@ -56,7 +57,10 @@ struct TemporaryCubeDeleter {
    }
 };
 
-Cube *mCube = NULL;
+
+//For subimage and binning mapping
+static AlphaCube *alpha(0);
+
 
 QString g_filter = "";
 static QString g_target ="";
@@ -68,6 +72,7 @@ static Pvl g_configFile;
 static double g_b0(0);
 static double g_b1(0);
 static double g_b2(0);
+static double g_bias(0);
 
 static QString g_launchTimeStr;
 static iTime g_launchTime;
@@ -75,7 +80,6 @@ static QString g_startTime;
 
 
 //Dark Current variables
-
 static double g_d0(0);
 static double g_d1(0);
 static double g_temp(0);
@@ -84,42 +88,41 @@ static double g_darkCurrent(0);
 
 
 //Smear calculation variables
-
-static double g_Tvct(0);       // vertical charge-transfer period (in seconds)
-static double g_texp(1);       // exposure time;
+static double g_Tvct(0);       //!< Vertical charge-transfer period (in seconds).
+static double g_texp(1);       //!< Exposure time.
 static double g_timeRatio(1.0);
 
 //Linearity calculation variables
-
 static double g_Gamma(0);
-
-
 static double g_L0(0);
 static double g_L1(0);
 
 
 // Calibration parameters
-static int nsubImages(0);      // Number of sub images
-static int binning(1);
-static bool g_nullPolarizedPixels = true;
-//static bool g_applyPSFCorrection = true;
-static bool g_iofCorrection = true;
+static int nsubImages(0);      //!< Number of sub images
+static int binning(1);         //!< The number of samples/lines which are binned
+static bool g_nullPolarizedPixels = true;   /**< Flag which tells us if the Polarized pixels are to
+                                                 to be set to ISIS::Null */
+
+static bool g_iofCorrection = true;  //!< Is I/F correction to be applied?
+
 
 //  I/F variables
-static double g_solarDist(1.0);
-static double g_iof(1.0);   //  I/F value for observation
-double g_iofScale(1.0);
-static double g_solarFlux(1.0);
+static double g_solarDist(1.0);  /**< Distance from the Sun to the target body
+                                 (used to calculate g_iof) */
+static double g_iof(1.0);        //!< I/F conversion value
+static double g_iofScale(1.0);
+static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
+static double g_v_standard(3.42E-3);//!< Base conversion for all filters (Tbl. 9)
 
 
 //Hot pixel vector container
-static QVector<Pixel> hotPixelVector;
+static QVector<Pixel> hotPixelVector;  //!< A pixel vector that contains the Hot Pixel locations
 
 //PSF variables
+static int ns,nl,nb;     //!< Number of samples, lines, bands of the input cube
+//static int g_size(23);   //!< The size of the Boxcar used for calculating the light diffusion model.
 
-static int ns,nl,nb;
-static int g_size(43);
-static double g_weight(0.0006);
 static const int g_N = 6;
 static double g_alpha(0.0);
 static double * g_psfFilter;
@@ -132,7 +135,6 @@ void IsisMain() {
 
   UserInterface& ui = Application::GetUserInterface();
   g_nullPolarizedPixels = ui.GetBoolean("NULLPOLARPIX");
-  //g_applyPSFCorrection = ui.GetBoolean("PSF");
   g_iofCorrection = ui.GetBoolean("IOF");
 
   const QString amicacal_program = "amicacal";
@@ -143,6 +145,8 @@ void IsisMain() {
   ProcessBySample p;
 
   Cube *icube = p.SetInputCube("FROM");
+
+
 
 
   // Basic assurances...
@@ -158,12 +162,22 @@ void IsisMain() {
   QString filter = bandbin["Name"];
   g_filter=filter;
 
-  loadCalibrationVariables();
+  binning = inst["Binning"];
+  int startLine = inst["FirstLine"];
+  int startSample = inst["FirstSample"];
+  int lastLine = inst["LastLine"];
+  int lastSample = inst["LastSample"];
+
+  //Set up binning and image subarea mapping
+
+  AlphaCube myAlpha(1024,1024,icube->sampleCount(), icube->lineCount(),
+                    startSample+1,startLine+1,lastSample+1,lastLine+1);
+
+  alpha=&myAlpha;
 
   try {
 
   g_texp = inst["ExposureDuration"] ; 
-  cout << "g_texp = " << g_texp << endl;
 
   }
   catch(IException &e) {
@@ -188,16 +202,18 @@ void IsisMain() {
 
   }
 
-  g_timeRatio = g_Tvct/(g_texp+g_Tvct);
-  cout <<"g_timeRatio = " << g_timeRatio << endl;
-  g_darkCurrent = g_d0*exp(g_d1*g_temp);
-  cout << "Dark current = "<< g_darkCurrent << endl;
 
 
+//tjw
   QString startTime = inst["SpacecraftClockStartCount"];
+
+
+
+
 
   g_startTime = startTime;
   binning = inst["Binning"];
+
   int startline = inst["FirstLine"];
   int startsample = inst["FirstSample"];
   int lastline = inst["LastLine"];
@@ -205,21 +221,24 @@ void IsisMain() {
 
 
   nsubImages = archive["SubImageCount"];  // If > 1, some correction is 
-                                              // not needed/performed
+                                          // not needed/performed
+
+
+
+
 
   // I/F values
-
   QString target = inst["TargetName"];
   g_target = target;
 
 
   if ( sunDistanceAU(startTime,target,g_solarDist) ) {
 
-    g_iof = pi_c()*(g_solarDist*g_solarDist)/g_solarFlux;
+    g_iof = pi_c()*(g_solarDist*g_solarDist)*(g_v_standard*g_iofScale);
 
   }
 
-  cout << "g_iof = "  << g_iof << endl;
+
 
   //  Determine if we need to subsample the flat field should pixel binning
   //  occurred
@@ -230,7 +249,6 @@ void IsisMain() {
 
 
 //Image is not cropped
-
 if (startline ==0 && startsample == 0){
 
 
@@ -269,7 +287,6 @@ else {
       FileName transFlat =
           FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
 
-      cout << "transflat = " << transFlat.expanded() << endl;
       Cube *flatOriginal = new Cube(flatfile.expanded() );
 
       int transform[5] = {binning,startsample,startline,lastsample,lastline};
@@ -287,44 +304,21 @@ else {
 
  }
 
-
-
-
-    CubeAttributeOutput att10;
-    Cube *ocube;
-    //FileName psfStart = FileName::createTempFile("$TEMPORARY/psfStart.cub");
-
-
-
-/*
-    if (!g_applyPSFCorrection) {
-      ocube = p.SetOutputCube("TO");
-      //QScopedPointer<Cube,TemporaryCubeDeleter> psfCorrectionInputCube(ocube);
-    }
-    else {
-
-      ocube = p.SetOutputCube("TO");
-      //QScopedPointer<Cube,TemporaryCubeDeleter> ocube (new Cube(psfStart.expanded(),"r") );
-      ocube = p.SetOutputCube(psfStart.expanded(),att10);
-
-    }
-
-*/
-
- ocube = p.SetOutputCube("TO");
-
+  Cube *ocube;
+  ocube = p.SetOutputCube("TO");
   QString fname = ocube->fileName();
-
-  //ns = ocube->sampleCount();
-  //nl = ocube->lineCount();
-  //nb = ocube->bandCount();
-
 
   ns = icube->sampleCount();
   nl = icube->lineCount();
   nb = icube->bandCount();
 
 
+  loadCalibrationVariables();
+
+  g_timeRatio = g_Tvct/(g_texp+g_Tvct);
+
+
+  g_darkCurrent = g_d0*exp(g_d1*g_temp);
 
   // Calibrate!
   try {
@@ -338,99 +332,76 @@ else {
 
 
   p.EndProcess();
+#if 0
+  //PSF correction
+  CubeAttributeInput attInput;
+  CubeAttributeOutput attOutput;
+
+  ProcessByBoxcar pDiffusionModel;
+  QScopedPointer<Cube, TemporaryCubeDeleter> diffusionModel;
+
+  QString kernel_sz = QString::number(g_size);
 
 
-CubeAttributeInput att1;
+  //QTemporaryFile psfModel("$TEMPORARY/psfModel.cub");
 
 
-  //if (g_applyPSFCorrection) {
+  QFile psfModel("psfModel"+QString::number(g_size)+".cub");
 
-    //ocube is input for this process
-
-    ProcessByBoxcar p1;
-
-    QString kernel_sz = QString::number(g_size);
+  //QFile("psfModel.cub");
+  //psfModel.setAutoRemove(false);
 
 
-    p1.SetInputCube(fname,att1);
-    CubeAttributeOutput att2;
-    QString psfVals = "psf"+kernel_sz+".cub";
-    //Cube *diffusionCube = new Cube(psfVals,"rw");
-    //QScopedPointer<Cube,TemporaryCubeDeleter> dCube (diffusionCube );
-    p1.SetOutputCube(psfVals,att2,ns,nl);
+  pDiffusionModel.SetInputCube(fname,attInput);
+  pDiffusionModel.SetOutputCube(psfModel.fileName(),attOutput,ns,nl,nb);
 
-    //p1.SetOutputCube(psfVals,att2,ns,nl,nb);
+  pDiffusionModel.SetBoxcarSize(g_size,g_size);
+  g_psfFilter = setPSFFilter(g_size, g_A,g_sigma, g_alpha,g_N,binning);
 
-    p1.SetBoxcarSize(g_size,g_size);
+  try {
 
+       pDiffusionModel.StartProcess(psfCorrectionBoxcar);  //Determine the diffusion model.
 
-    g_psfFilter = setPSFFilter(g_size, g_A,g_sigma, g_alpha,g_N,binning);
-
-    try{
-    p1.StartProcess(psfCorrectionBoxcar);        //Determine the diffusion model.
     }
 
     catch(IException &ie){
 
-      cout << ie.toString() << endl;
+    throw IException(ie, IException::Programmer,
+                     "Calculating the diffusion model failed!", _FILEINFO_);
 
     }
 
-    p1.EndProcess();
 
-
-
-
-
+    pDiffusionModel.EndProcess();
 
    //Apply the PSF correction
-    ProcessByLine p2;
-    CubeAttributeInput att12;
-    CubeAttributeOutput att13;
+    ProcessByLine pPSFCorrection;
 
     //The diffusion model
-    p2.SetInputCube(psfVals,att12);
+    pPSFCorrection.SetInputCube(psfModel.fileName(),attInput);
+
     //The original output cube.
+    pPSFCorrection.SetInputCube(fname,attInput);
+    pPSFCorrection.SetOutputCube("PSFCORRECTED");
 
 
+    try {
 
-    p2.SetInputCube(fname,att1);
-
-    p2.SetOutputCube("PSFCORRECTED");
-
-
-
-    try{
-    p2.StartProcess(psfCorrection);
+      pPSFCorrection.StartProcess(psfCorrection);
     }
 
     catch(IException &ie){
 
-      cout << ie.toString() << endl;
+      throw IException(ie, IException::Programmer,
+                       "Applying the PSF correction failed!", _FILEINFO_);
+
 
     }    
 
 
-    p2.EndProcess();
+   pPSFCorrection.EndProcess();
 
-    try {
-      QFile tempFile(psfVals);
-      tempFile.remove();
-    }
-    catch(IException &ie){
-
-      cout << ie.toString() << endl;
-
-    }
-
-
-
-
-  //}
-
-
-
-
+#endif
   // Log calibration activity
   PvlGroup calibrationLog("RadiometricCalibration");
   calibrationLog.addKeyword(PvlKeyword("SoftwareName", amicacal_program));
@@ -459,14 +430,11 @@ CubeAttributeInput att1;
  * @return FileName Path and name of flat file file
  */
 FileName DetermineFlatFieldFile(const QString &filter, const bool nullPolarPix) {
-  //tjw:  Wrong directory
-  //QString filename = "$hayabusa/calibration/amica/flatfield/";
 
   QString fileName = "$hayabusa/calibration/flatfield/";
 
 
   // FileName consists of binned/notbinned, camera, and filter
-
 
   if (nullPolarPix) {
       fileName += "flat_" + filter.toLower() + "np.cub";
@@ -483,33 +451,45 @@ FileName DetermineFlatFieldFile(const QString &filter, const bool nullPolarPix) 
   return final;
 }
 
+
+/**
+ * @brief This function moves the PSF kernel through each pixel of the input cube and approximates
+ * the amount of light diffusion produced by that pixel.
+ * @param in The radiometrically calibrated cube (minus PSF correction).
+ * @param result  The light diffusion estimate at the central pixel of the boxcar of all the
+ * surrounding pixels.
+ */
+
 void psfCorrectionBoxcar(Buffer &in, double &result) {
-
-
 
     result = 0;
 
-    for (int i =0; i < in.size(); i++) {
+    Statistics stats;
+
+    for (int i = 0; i < in.size(); i++) {
+
 
       if(!IsSpecial(in[i])) {
 
-        result+=in[i]*g_psfFilter[i];
+        stats.AddData(in[i]*g_psfFilter[i]);
+        //result += in[i]*g_psfFilter[i];
       }
-
 
     }
 
-
-    //if(result != Isis::Null) {
-      result *= g_weight;
-
-    //}
+    result = stats.Sum();
 
 
 
 }
 
 
+/**
+ * @brief Applies the PSF function
+ * @param in[0]  The PSF light diffusion model (a cube)
+ * @parm  in[1]  The radiometrically corrected cube (without PSF correction).
+ * @param out    The radiometrically corrected cube after PSF correction has been applied.
+ */
 
 void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
 
@@ -518,9 +498,12 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer& psfVals =  *in[0];
   Buffer& imageOut  = *out[0];
 
+
   for (int i = 0; i < nopsf.size(); i++) {
     if (!IsSpecial(psfVals[i])) {
+
       imageOut[i] = nopsf[i]-psfVals[i];
+      //imageOut[i] = psfVals[i];
 
     }
     else {
@@ -531,8 +514,11 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
 }
 
 
-void loadCalibrationVariables()  {
+/**
+ * @brief Loads the calibration variables into the program.
+ */
 
+void loadCalibrationVariables()  {
 
 
   FileName calibFile("$hayabusa/calibration/amica/amicaCalibration????.trn");
@@ -552,60 +538,68 @@ void loadCalibrationVariables()  {
   PvlGroup &psfDiffuse = g_configFile.findGroup("PSFDiffuse");
   PvlGroup &psfFocused = g_configFile.findGroup("PSFFocused");
   PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
+  PvlGroup &iof = g_configFile.findGroup("IOF");
 
 
   //Load the hot pixels into a vector
 
-
   for (int i = 0; i< hotPixels.keywords(); i++ ){
 
-    QString samp(hotPixels[i][0]);
-    QString line(hotPixels[i][1]);
+    int samp(hotPixels[i][0].toInt());
+    int line (hotPixels[i][1].toInt());
 
-    Pixel *hotpix = new Pixel(samp.toInt(),line.toInt(),1,0);
-    hotPixelVector.append(*hotpix);
+
+    hotPixelVector.append( Pixel(alpha->BetaSample(samp),alpha->BetaLine(line),1,0));
   }
 
 
   //Load linearity variables
-
   g_Gamma = Linearity["Gamma"];
-  g_Gamma = 1-g_Gamma;
+  g_Gamma = 1.0-g_Gamma;
 
   g_L0 = Linearity["L"][0].toDouble();
   g_L1 = Linearity["L"][1].toDouble();
 
-  cout << "Gamma = " << setprecision(20)  << g_Gamma << endl;
-  cout << "<L0,L1> = "<< "<" << g_L0 << "," << g_L1 <<">" << endl;
   //Load Smear Removal Variables
-
   g_Tvct = Smear["Tvct"];
 
-  cout <<"g_Tvct = " << g_Tvct << endl;
+
 
   //Load DarkCurrent variables
-
-
   g_d0 = DarkCurrent["D"][0].toDouble();
   g_d1 = DarkCurrent["D"][1].toDouble();
 
-  cout << "<D0,D1> = "<< "<" << g_d0 << "," << g_d1 <<">" << endl;
-
 
   //Load Bias variables
-
   g_b0 = Bias["B"][0].toDouble();
   g_b1 = Bias["B"][1].toDouble();
   g_b2 = Bias["B"][2].toDouble();
 
-  cout << "<B0,B1,B2> = "<< "<" << g_b0 << "," << g_b1 << "," << g_b2 << ">" << endl;
 
   g_launchTimeStr=QString(Bias["launchTime"]);
 
-  cout <<"Launch Time = " << g_launchTimeStr << endl;
+  //cout << g_launchTimeStr << endl;
+
   //static iTime g_launchTime("2003-05-09T04:29:25");
   g_launchTime =g_launchTimeStr;
+  //iTime g_t0(g_startTime);
+  //cout << "g_t0"  << g_t0.EtString();
 
+  //Compute BIAS correction factor (it's a constant so do it once!)
+
+  double obsStartTime;
+  double tsecs;
+  double tdays;
+
+  loadNaifTiming();  //Ensure the proper kernels are loaded
+
+  scs2e_c(g_HayabusaNaifCode,g_startTime.toAscii().data(), &obsStartTime);  
+  tsecs = obsStartTime - g_launchTime.Et();
+  tdays = tsecs/86400;
+  g_bias = g_b0+g_b1*tdays+g_b2*(tdays*tdays);
+
+  //g_bias = 0;
+  //cout << "g_bias = "  << g_bias << endl;
 
 
   //Load the PSF constants.  These come from
@@ -614,8 +608,6 @@ void loadCalibrationVariables()  {
 
    g_alpha = psfFocused[g_filter.toLower()];
 
-   cout <<"g_alpha = " << g_alpha << endl;
-
    for (int i =0; i < g_N; i++) {
 
      g_sigma[i] = psfDiffuse["sigma"][i].toDouble();
@@ -623,202 +615,161 @@ void loadCalibrationVariables()  {
 
    }
 
-
   //Load the Solar Flux for the specific filter
-
-
   g_solarFlux=solar[g_filter.toLower()];
 
-  cout <<"g_solarFlux = " <<g_solarFlux << endl;
+  //radiance = g_v_standard*g_iofScale
+  //iof      = radiance * pi *dist_au^2
 
+  g_v_standard = iof["iof_standard"];
+  g_iofScale   = iof[g_filter];
 
-
+  return;
 
 }
 
 
 /**
- * @brief Apply radiometric correction to each line of an AMICA image
- *  
- *  
+ * @brief Apply radiometric correction to each line of an AMICA image.
  * @author 2016-03-30 Kris Becker
- * 
  * @param in   Raw image and flat field
  * @param out  Radometrically corrected image
  */
-void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
+void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
-  double obsStartTime;
-  double tsecs;
-  double tdays;
-  double bias=0;
-  double smear = 0;
-  double t1;
-  double c1;
-  int pixelsToNull = 12/binning;
+
+  int pixelsToNull = 12;
 
   int currentSample = imageIn.Sample();
+  int alphaSample = alpha->AlphaSample(currentSample);
 
+  if ( (alphaSample <= pixelsToNull)  || (alphaSample >= (1024 - pixelsToNull ))) {
 
-
-  if(currentSample <= pixelsToNull) {
     for (int i = 0; i < imageIn.size(); i++ ) {
-
-      imageOut[i]=Isis::Null;
-
+      imageOut[i] = Isis::Null;
     }
     return;
+
   }
 
- else if ( currentSample >= ( imageIn.size() -pixelsToNull ) ) {
-      for (int i = 0; i < imageIn.size(); i++ ) {
 
-        imageOut[i]=Isis::Null;
 
-      }
+  //Compute smear component here as its a constant for the entire sample
 
-    return;
+  double t1 = g_timeRatio/imageIn.size();
+  double b = binning;
+  double c1(1.0);  //default if no binning
+
+  if (binning > 1) {
+    c1 = 1.0/(1.0 + t1*((b -1.0)/(2.0*b) ) );
   }
+
+  double smear = 0;
+
+  for (int j = 0; j < imageIn.size(); j++ ) {
+    smear += t1*(imageIn[j] - g_bias);
+  }
+
+
 
   //iterate over the line space
 
-
   for (int i = 0; i < imageIn.size(); i++) {
 
+    imageOut[i] = imageIn[i];
 
 
     // Check for special pixel in input image and pass through
-    if (Isis::IsSpecial(imageIn[i])) {
+    if (Isis::IsSpecial(imageOut[i])) {
       imageOut[i] = imageIn[i];
       continue;
     }
 
+
     // 1) BIAS Removal - Only needed if not on-board corrected
     if ( nsubImages <= 1 ) {
 
-      scs2e_c(g_HayabusaNaifCode,g_startTime.toAscii().data(), &obsStartTime);
-      tsecs = obsStartTime - g_launchTime.Et();
-      tdays = tsecs/86400;
-      bias = g_b0+g_b1*tdays+g_b2*(tdays*tdays);
-      imageOut[i]= imageIn[i] - bias;
+      if ( (imageOut[i] - g_bias) < 0) {
+        imageOut[i] = Isis::Null;
+      }
+      else {
+      imageOut[i]= imageOut[i] - g_bias;
 
-
-
+      }
     }
 
     // 2) LINEARITY Correction - always done
 
-      imageOut[i] = pow(imageIn[i],g_Gamma) +g_L0*imageIn[i]*exp(g_L1*imageIn[i]);
+    if (imageOut[i] != Isis::Null) {
+      imageOut[i] = pow(imageOut[i],g_Gamma) +g_L0*imageOut[i]*exp(g_L1*imageOut[i]);
+    }
+
 
     // 3) DARK Current - Currently negligible and removed
 
+#if 0
 
-      //imageOut[i] = imageIn[i]-g_darkCurrent;
+      imageOut[i] = imageOut[i]-g_darkCurrent;
+
+#endif
 
 
     // 4) HOT Pixel Removal
 
-      if (binning < 2) {
+      bool hot = false;
 
+      for (int j=0; j < hotPixelVector.size(); j++) {
 
-          for(int j =0;j < hotPixelVector.size(); j++) {
+        if ((hotPixelVector[j].sample() == currentSample) && (hotPixelVector[j].line() == i)) {
 
+          imageOut[i] = Isis::Null;
+          hot = true;
 
-              if (hotPixelVector[j].sample() == currentSample && hotPixelVector[j].line() == i )
-              {
-                  imageOut[i] = Isis::Null;
-
-              }
-          }
-
-      }
-
-    // 5) READOUT Smear Removal - Not needed if on-board corrected
-    if ( nsubImages <= 1 ) {
-
-
-      if(binning >=2) {
-
-        smear =0;
-
-        t1 = g_timeRatio/imageIn.size() ;
-
-
-        int b = binning;
-
-        c1 = 1.0/ (1.0+t1*((b-1.0)/(2.0*b)) ) ;
-
-
-
-        for (int j = 0; j < imageIn.size(); j++ ) {
-           smear +=   t1*imageIn[j];
         }
-
-
-        imageOut[i]=c1*(imageIn[i]-smear);
-
       }
 
-      // If we are not binning, then it is OK to apply Formula 7 of Ishiguro(2007)
-      // to calculate smear
+      if (hot == true)
+        continue;
 
-      else {
 
-        smear=0;
 
-        t1= g_timeRatio*(1.0/imageIn.size());
-        //cout << "t1 = " << t1 << endl;
-        // sum over the line space for each sample
-        for (int j = 0; j< imageIn.size(); j++) {
+    // 5) READOUT Smear Removal - Not needed if on-board corrected.  Binning is
+    //    accounted for in computation of c1 before loop.
 
-          smear+= t1*(imageIn[j]);
-        }
 
-        //cout << smear << endl;
 
-        imageOut[i] = (imageIn[i] - smear);
+    if ( imageOut[i] != Isis::Null && nsubImages <= 1 ) {
+
+      imageOut[i] = c1*(imageOut[i] - smear);
 
 
       }
-
-    }
-
 
 
     // 6) FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
 
-    if (Isis::IsSpecial(flatField[i])) {
-      imageOut[i] = Isis::Null;
-      //continue;
-    }
+
+      if (Isis::IsSpecial(flatField[i])) {
+        imageOut[i] = Isis::Null;
+        continue;
+      }
     else {
-
-       imageOut[i] /= flatField[i];
+       if (imageOut[i] != Isis::Null )
+          imageOut[i] /= flatField[i];
     }
-
 
 
     // 7) I/F Conversion
 
 
-    if (g_iofCorrection) {
-
+    if (imageOut[i] != Isis::Null && g_iofCorrection == true) {
           imageOut[i] *= g_iof;
-
        }
-
-
-    //imageOut[i]= imageIn[i]-g_darkCurrent;
-
-
-
-
-
 
   }
 

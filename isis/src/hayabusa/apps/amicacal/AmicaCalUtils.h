@@ -31,9 +31,10 @@
  *
  *
  */
-
-using namespace std;
 using namespace cv;
+using namespace std;
+
+
 
 
 
@@ -42,12 +43,12 @@ namespace Isis {
 
 
 /**
- * @brief Load required NAIF kernels required for timing needs
- *
+ * @description Load required NAIF kernels required for timing needs.
  * This method maintains the loading of kernels for HAYABUSA timing and
  * planetary body ephemerides to support time and relative positions of planet
  * bodies.
  */
+
 static void loadNaifTiming() {
   static bool naifLoaded = false;
   if (!naifLoaded) {
@@ -72,8 +73,6 @@ static void loadNaifTiming() {
     QString pckName3(pck3.expanded());
     QString pckName4(pck4.expanded());
 
-
-
     furnsh_c(leapsecondsName.toAscii().data());
     furnsh_c(sclkName.toAscii().data());
 
@@ -91,13 +90,12 @@ static void loadNaifTiming() {
 
 
 /**
- * @brief Computes the distance from the Sun to the observed body
- *
+ * @description Computes the distance from the Sun to the observed body.
  * This method requires the appropriate NAIK kernels to be loaded that
  * provides instrument time support, leap seconds and planet body ephemeris.
- *
- * @return double Distance in AU between Sun and observed body
+ * @return @b double Distance in AU between Sun and observed body.
  */
+
 static bool sunDistanceAU(const QString &scStartTime,
                           const QString &target,
                           double &sunDist) {
@@ -110,15 +108,14 @@ static bool sunDistanceAU(const QString &scStartTime,
   SpiceInt tcode;
   SpiceBoolean found;
   bodn2c_c(target.toAscii().data(), &tcode, &found);
-  //cout << "tcode = " << tcode << endl;
-  //cout << "found = " << found << endl;
+
   if (!found) return (false);
 
   //  Convert starttime to et
   double obsStartTime;
   scs2e_c(-130, scStartTime.toAscii().data(), &obsStartTime);
 
-  //cout << "obsStartTime =  "  << obsStartTime << endl;
+
 
   //  Get the vector from target to sun and determine its length
   double sunv[3];
@@ -129,7 +126,7 @@ static bool sunDistanceAU(const QString &scStartTime,
 
   double sunkm = vnorm_c(sunv);
 
-  //cout << "lt = " << lt << endl;
+
   //  Return in AU units
   sunDist = sunkm / 1.49597870691E8;
 
@@ -145,7 +142,7 @@ static bool sunDistanceAU(const QString &scStartTime,
  *
  * @param icube A pointer to the input cube
  *
- * @return Mat A pointer to the OpenMat object
+ * @return @b Mat A pointer to the OpenMat object
  */
 
 Mat * isis2mat(Cube *icube) {
@@ -170,8 +167,9 @@ return matrix;
 
 }
 
+
 /**
- * @brief Translates an OpenMat object to an Isis::Cube with one band
+ * @brief Translates an OpenMat object to an ISIS::Cube with one band
  *
  * @author 2016-04-19 Tyler Wilson
  *
@@ -206,8 +204,6 @@ void mat2isis(Mat *matrix, QString cubeName) {
 
   }
 
-
-
 }
 
 
@@ -218,10 +214,9 @@ void mat2isis(Mat *matrix, QString cubeName) {
  *
  * @param matrix A pointer to the OpenMat object
  *
- * @param cubeName The name of the Isis::Cube that is being created.
+ * @param cubeName The name of the ISIS::Cube that is being created.
  *
  */
-
 
 void  translate(Cube *flatField, int *transform, QString fname) {
 
@@ -233,11 +228,8 @@ void  translate(Cube *flatField, int *transform, QString fname) {
   int lastsample = transform[3];
   int lastline = transform[4];
 
-
-
   int width  = (lastsample-startsample);
   int height = (lastline-startline);
-
 
   Size sz(flatField->lineCount()/scale,flatField->sampleCount()/scale);
 
@@ -258,8 +250,8 @@ void  translate(Cube *flatField, int *transform, QString fname) {
     mat2isis(resizedMatrix,fname);
   }
 
-
 }
+
 
 /**
  * @brief This function characterizes the point spread function
@@ -276,11 +268,10 @@ void  translate(Cube *flatField, int *transform, QString fname) {
  * @param r The distance (in pixels) from the optical center of the
  *        point source
  *
- * @return
+ * @return @b double An estimate of the diffusion of light from near light sources
+ * at pixel with coordinates (x,y) relative to the central pixel (with coordinates (0,0) ).
  *
  */
-
-
 
 static double f_focused(double alpha,int binning,double x,double y) {
 
@@ -288,9 +279,7 @@ static double f_focused(double alpha,int binning,double x,double y) {
         double Y = y*binning;
         double r = sqrt(X*X+Y*Y);
         return exp(-alpha*r);
-
 }
-
 
 
 /**
@@ -307,44 +296,29 @@ static double f_focused(double alpha,int binning,double x,double y) {
  *
  * @param sigma An empirically derived vector of standard deviations of length N
  *        also stored in $hayabusa/calibration/amica/amicaCalibration????.trn"
+ * @param N  The number of filter-bands (N=6)
+ * @param binning  The number of lines/samples which are binned together.
+ * @param x  The x-coordinate in pixels of the current pixel we are evaluating.
+ * @param y  The y-coordinate in pixels of the current pixel we are evaluating.
  *
- * @return
+ * @return @b double An estimate of diffuse light at the point (x,y) relative to the
+ * central pixel (at coordinates (0,0) ).
  *
  */
 
-/*
- * static double f_diffuse(double *A,double *sigma,int N,double r){
-
-  double sum = 0;
-
-  for (int i = 0; i < N; i ++)   {
-    sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c() ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
-  }
-
-
-  return sum;
-
-
-}
-*/
-
-
 static double f_unfocused(double * A,double * sigma, int N,int binning,double x,double y)  {
 
-  //double X = abs(binning*x-512);
-  //double Y = abs(binning*y-512);
 
   double X = binning*x;
   double Y = binning*y;
 
   double r = sqrt(X*X+Y*Y);
 
+
   double sum = 0;
 
   for (int i = 0; i < N; i ++)   {     
     sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c() ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
-
-
   }
 
 
@@ -353,51 +327,51 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
 }
 
 
-/*
-
-static double psf(double *A, double *sigma, int N,double alpha,double Ixy,int binning,double x, double y) {
-
-
-
-    //double psfVal = f_unfocused(A,sigma,N,x,y);
-    //double psfVal = Ixy*f_unfocused(A,sigma,N,binning,x,y);
-
-    //double psfVal = Ixy*(f_unfocused(A,sigma,N,binning,x,y)  + f_focused(alpha,x,y) );
-
-    double psfVal = Ixy*f_unfocused(A,sigma,N,binning,x,y);
-
-
-
-    return psfVal;
-
-
-
-}
-
-
-*/
-
-
-
-
+/**
+ * @brief This function returns a matrix of [size x size] of light distribution values.
+ * The center pixel value is at the center of the matrix, and the values around the central
+ * pixel represent the fraction of light intensity from the central pixel that seeps into the
+ * neighboring pixels.
+ * @param size  The dimension of the matrix (in pixels).
+ * @param A An empirically derived vector of constants of length N which is stored in
+ *        $hayabusa/calibration/amica/amicaCalibration????.trn"
+ *        Each filter has a different A vector.
+ * @param sigma sigma An empirically derived vector of standard deviations of length N
+ *        also stored in $hayabusa/calibration/amica/amicaCalibration????.trn"
+ * @param alpha  alpha An empirically derived constant which is stored in
+ *        $hayabusa/calibration/amica/amicaCalibration????.trn"  Each filter has a different
+ *        alpha value.
+ * @param N
+ * @param binning
+ * @return @b double * A pointer to a [size x size] matrix of light distribution values.
+ */
 
 double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int binning) {
 
 
   double * psfVals = new double[size*size];
 
-
   int i = 0;
-
 
   for(double y = -(size / 2) ; y <= (size / 2) ; y++) {
     for(double x = -(size / 2) ; x <= (size / 2) ; x++) {
 
-       psfVals[i]=f_unfocused(A,sigma,N,binning,x,y)+f_focused(alpha,binning,x,y);
-       //psfVals[i]=f_unfocused(A,sigma,N,binning,x,y);
-         //psfVals[i]=f_focused(alpha,binning,x,y);
+       if (x == 0 && y ==0) {
 
-      i++;
+
+         psfVals[i] = 0;
+         i++;
+
+       }
+       else {
+
+         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);
+         //psfVals[i] = f_focused(alpha,binning,x,y);
+
+         i++;
+
+       }
+      //i++;
     }
   }
 
@@ -405,12 +379,7 @@ double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int 
 }
 
 
-
-
 }
-
-
-
 
 
 
