@@ -317,7 +317,8 @@ namespace Isis {
       // solution, error propagation, and matrix methods for cholmod approach
       bool formNormalEquations_CHOLMOD();
 
-      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix<
+                                    double, boost::numeric::ublas::upper >  &N22,
                                 SparseBlockColumnMatrix  &N12,
                                 boost::numeric::ublas::compressed_vector< double >  &n1,
                                 LinearAlgebra::Vector  &n2,
@@ -327,7 +328,8 @@ namespace Isis {
                                 LinearAlgebra::Vector  &coeff_RHS,
                                 int observationIndex);
 
-      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix<
+                                    double, boost::numeric::ublas::upper >  &N22,
                                 SparseBlockColumnMatrix  &N12,
                                 LinearAlgebra::Vector  &n2,
                                 LinearAlgebra::Vector  &nj,
@@ -353,7 +355,8 @@ namespace Isis {
       // TODO: this may be able to go away if I can verify cholmod behavior for a truly dense matrix
       bool formNormalEquations_SPECIALK();
 
-      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix<
+                                    double, boost::numeric::ublas::upper >  &N22,
                                  LinearAlgebra::Matrix  &N12,
                                  boost::numeric::ublas::compressed_vector< double >  &n1,
                                  LinearAlgebra::Vector  &n2,
@@ -362,7 +365,8 @@ namespace Isis {
                                  LinearAlgebra::Vector  &coeff_RHS,
                                  int nImageIndex);
 
-      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22,
+      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix<
+                                    double, boost::numeric::ublas::upper >  &N22,
                                  LinearAlgebra::Matrix  &N12,
                                  LinearAlgebra::Vector  &n2,
                                  LinearAlgebra::Vector  &nj,
@@ -376,9 +380,10 @@ namespace Isis {
       void AmultAdd_CNZRows_SPECIALK(double alpha,
                                      LinearAlgebra::Matrix &A,
                                      boost::numeric::ublas::compressed_matrix< double > &B,
-                                     boost::numeric::ublas::symmetric_matrix< double, 
-                                                                              upper,
-                                                                              column_major > &C);
+                                     boost::numeric::ublas::symmetric_matrix<  
+                                         double, 
+                                         boost::numeric::ublas::upper,
+                                         boost::numeric::ublas::column_major > &C);
 
       void transA_NZ_multAdd_SPECIALK(double alpha,
                                       boost::numeric::ublas::compressed_matrix< double > &A,
@@ -392,9 +397,10 @@ namespace Isis {
       bool CholeskyUT_NOSQR();
       bool CholeskyUT_NOSQR_Inverse();
       bool CholeskyUT_NOSQR_BackSub(
-                                    boost::numeric::ublas::symmetric_matrix< double,
-                                                                             upper,
-                                                                             column_major >  &m,
+                                    boost::numeric::ublas::symmetric_matrix<
+                                        double, 
+                                        boost::numeric::ublas::upper,
+                                        boost::numeric::ublas::column_major >  &m,
                                     LinearAlgebra::Vector  &s,
                                     LinearAlgebra::Vector  &rhs);
 
@@ -416,12 +422,17 @@ namespace Isis {
                          boost::numeric::ublas::compressed_matrix< double >  &B,
                          LinearAlgebra::Matrix  &C, double alpha = 1.0);
       void ANZmultAdd(boost::numeric::ublas::compressed_matrix< double >  &A,
-                      boost::numeric::ublas::symmetric_matrix< double, upper, column_major >  &B,
+                      boost::numeric::ublas::symmetric_matrix< 
+                          double, 
+                          boost::numeric::ublas::upper,
+                          boost::numeric::ublas::column_major >  &B,
                       LinearAlgebra::Matrix  &C, double alpha = 1.0);
 
-      bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< double, upper >  &m);
+      bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< 
+                          double, boost::numeric::ublas::upper >  &m);
 
-      bool product_ATransB(boost::numeric::ublas::symmetric_matrix< double, upper >  &N22, 
+      bool product_ATransB(boost::numeric::ublas::symmetric_matrix< 
+                               double, boost::numeric::ublas::upper >  &N22,
                            SparseBlockColumnMatrix  &N12,
                            SparseBlockRowMatrix  &Q);
       void product_AV(double alpha, 
@@ -476,7 +487,8 @@ namespace Isis {
       int m_nRank;
 
       //! reduced normal equations matrix
-      boost::numeric::ublas::symmetric_matrix< double, upper, column_major > m_Normals;
+      boost::numeric::ublas::symmetric_matrix< 
+          double, boost::numeric::ublas::upper, boost::numeric::ublas::column_major > m_Normals;
       LinearAlgebra::Vector m_nj;
 
       //!< array of Qs   (see Brown, 1976)

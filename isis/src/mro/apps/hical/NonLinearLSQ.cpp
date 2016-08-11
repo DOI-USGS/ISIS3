@@ -21,19 +21,22 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+// std lib
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <sstream>
 
-#include <gsl/gsl_errno.h>
+// gsl lib
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_multifit_nlin.h>
 
-#include "NonLinearLSQ.h"
+// Isis lib
 #include "IException.h"
 #include "IString.h"
+#include "NonLinearLSQ.h"
 
 using namespace std;
 

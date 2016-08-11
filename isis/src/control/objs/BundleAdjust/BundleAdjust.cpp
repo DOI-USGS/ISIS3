@@ -1,19 +1,23 @@
 #include "BundleAdjust.h"
 
+// std lib
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 
+// qt lib
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
 #include <QMutex>
-#include <QCoreApplication>
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/vector_proxy.hpp>
+// boost lib
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 
+// Isis lib
 #include "Application.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
