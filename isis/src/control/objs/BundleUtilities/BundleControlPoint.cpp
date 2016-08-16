@@ -115,12 +115,46 @@ namespace Isis {
 
 
   /**
+   * Computes the residuals for this BundleControlPoint.
+   *
+   * @see ControlPoint::ComputeResiduals()
+   */
+  void BundleControlPoint::computeResiduals() {
+    m_controlPoint->ComputeResiduals();
+  }
+
+
+  /**
    * Sets the adjusted surface point for this BundleControlPoint. 
    *  
    * @param surfacePoint The surface point to be set.
    */
   void BundleControlPoint::setAdjustedSurfacePoint(SurfacePoint surfacePoint) {
     m_controlPoint->SetAdjustedSurfacePoint(surfacePoint);
+  }
+
+
+  /**
+   * Sets the number of rejected measures for this BundleControlPoint.
+   *
+   * @param numRejected Number of rejected measures.
+   *
+   * @see ControlPoint::SetNumberOfRejectedMeasures(int numRejected)
+   */
+  void BundleControlPoint::setNumberOfRejectedMeasures(int numRejected) {
+    m_controlPoint->SetNumberOfRejectedMeasures(numRejected);
+  }
+
+
+  /**
+   * Sets this BundleControlPoint to rejected or not rejected.
+   *
+   * @param reject True will set the BundleControlPoint to rejected.
+   *
+   * @see ControlPoint::SetRejected(bool reject)
+   */
+  void BundleControlPoint::setRejected(bool reject) {
+    m_controlPoint->SetRejected(reject);
   }
 
 
@@ -212,6 +246,16 @@ namespace Isis {
 
 
   /**
+   * Resets the number of rejected measures for this BundleControlPoint to zero.
+   *
+   * @see ControlPoint::ZeroNumberOfRejectedMeasures()
+   */
+   void BundleControlPoint::zeroNumberOfRejectedMeasures() {
+     m_controlPoint->ZeroNumberOfRejectedMeasures();
+   }
+
+
+  /**
    * Accessor for the raw ControlPoint object used for this BundleControlPoint.
    * 
    * @return @b ControlPoint* A pointer to the raw ControlPoint.
@@ -237,7 +281,31 @@ namespace Isis {
    * @return @b int The number of measures for this point.
    */
   int BundleControlPoint::numberMeasures() const {
-    return m_controlPoint->GetNumMeasures();
+    return this->size();
+  }
+
+
+  /**
+   * Accesses the number of rejected measures for this BundleControlPoint.
+   *
+   * @return @b int Returns the number of rejected measures.
+   *
+   * @see ControlPoint::GetNumberOfRejectedMeasures()
+   */
+  int BundleControlPoint::numberOfRejectedMeasures() const {
+    return m_controlPoint->GetNumberOfRejectedMeasures();
+  }
+
+
+  /**
+   * Gets the root-mean-square (rms) of the BundleControlPoint's residuals.
+   *
+   * @return @b double Returns the rms of the residuals.
+   *
+   * @see ControlPoint::GetResidualRms()
+   */
+  double BundleControlPoint::residualRms() const {
+    return m_controlPoint->GetResidualRms();
   }
 
 
@@ -258,6 +326,16 @@ namespace Isis {
    */
   QString BundleControlPoint::id() const {
     return m_controlPoint->GetId();
+  }
+
+
+  /**
+   * Accesses the PointType of the BundleControlPoint.
+   *
+   * @return @b ControlPoint::PointType The point type of this point.
+   */
+  ControlPoint::PointType BundleControlPoint::type() const {
+    return m_controlPoint->GetType();
   }
 
 

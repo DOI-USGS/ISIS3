@@ -28,9 +28,13 @@
 
 namespace Isis {
   /**
-   * @brief A container class for a control measure
+   * @brief A container class for a ControlMeasure.
    *
-   * This class is used as a wrapper around a control measure for use with bundle adjust.
+   * This class is used as a wrapper around a ControlMeasure to provide the necessary information
+   * for BundleAdjust. This class can be used to get the parent bundle observation solve settings 
+   * for observation mode adjustment.
+   *
+   * Note that a BundleMeasure should be created from a non-ignored ControlMeasure. 
    *
    * @ingroup ControlNetworks
    *
@@ -39,14 +43,16 @@ namespace Isis {
    * @internal
    *   @history 2015-02-20 Jeannie Backer - Added assignment operator. Brought closer to Isis
    *                           coding standards.
-   *
    *   @history 2016-07-14 Ian Humphrey - Updated documentation and coding standards in preparation
    *                           to merge into trunk. Updated unit test for BundleMeasure. Fixes
    *                           #4145, #4077.
-   * 
    *   @history 2016-08-03 Jesse Mapel - Changed parent observation to a QSharedPointer.
    *                           Added error throws to observationSolveSettings and observationIndex
    *                           if calling when parent observation has not been set.  Fixes #4150.
+   *   @history 2016-08-15 Ian Humphrey - Added sampleResidual(), lineResidual(),
+   *                           residualMagnitude(), focalPlaneComputedX(), and
+   *                           focalPlaneComputedY(). Modified isRejected() and camera() accessors
+   *                           to be const. Updated unit test for these methods. References #4201.
    */
 
   class BundleControlPoint;
@@ -72,17 +78,23 @@ namespace Isis {
 
       BundleMeasure &operator=(const BundleMeasure &src);
       void setParentObservation(QSharedPointer<BundleObservation> observation);
+      void setRejected(bool reject);
 
-      bool isRejected();
-      Camera *camera();
+      bool isRejected() const;
+      Camera *camera() const;
       BundleControlPoint *parentControlPoint();
       BundleImage *parentBundleImage();
       QSharedPointer<BundleObservation> parentBundleObservation();
       const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
       double sample() const;
+      double sampleResidual() const;
       double line() const;
+      double lineResidual() const;
+      double residualMagnitude() const;
       QString cubeSerialNumber() const;
+      double focalPlaneComputedX() const;
+      double focalPlaneComputedY() const;
       double focalPlaneMeasuredX() const;
       double focalPlaneMeasuredY() const;
       int observationIndex() const;

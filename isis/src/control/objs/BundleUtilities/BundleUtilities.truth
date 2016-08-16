@@ -548,12 +548,18 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleControlPoint...
-Create FreePoint with free point containing 2 measures...
-       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+Create FreePoint with free point containing 2 measures... (note that first measure is ignored, second measure is not ignored)
+Type of BundleControlPoint 1: 2
+Set BundleControlPoint 1 to rejected - is rejected? "Yes"
+Set BundleControlPoint 1 to non-rejected - is rejected? "No"
+Number of rejected measures: 0
+Set number of rejected measures: 2
+Zero out number of rejected measures: 0
+       FreePoint           FREE    1 of 1  3.54            Null            Null            Null             N/A             N/A             N/A
 
  Label: FreePoint
 Status: FREE
-  Rays: 2 of 2
+  Rays: 1 of 1
 
      Point         Initial               Total               Total              Final             Initial             Final
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
@@ -563,11 +569,11 @@ Coordinate          Value             Correction          Correction            
     RADIUS             Null           0.00000000          0.00000000                Null               N/A               N/A
 
 
-       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+       FreePoint           FREE    1 of 1  3.54            Null            Null            Null             N/A             N/A             N/A
 
  Label: FreePoint
 Status: FREE
-  Rays: 2 of 2
+  Rays: 1 of 1
 
      Point         Initial               Total               Total              Final             Initial             Final
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
@@ -616,6 +622,7 @@ nicVector:       0 0 0
 qMatrix:
  New Block 
 
+Residual rms: 3.53553
 
 Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0
        FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
@@ -832,28 +839,43 @@ Testing BundleMeasure...
 **PROGRAMMER ERROR** In BundleMeasure::observationSolveSettings: parent observation has not been set.
 parent control point id "FixedPoint"
 
-rejected? "No"
+rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
+computed focal x "-1.79769313486231e+308"
+computed focal y "-1.79769313486231e+308"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 observation index "0"
 
-rejected? "No"
+rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
+computed focal x "-1.79769313486231e+308"
+computed focal y "-1.79769313486231e+308"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 observation index "0"
 
-rejected? "No"
+rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
+computed focal x "-1.79769313486231e+308"
+computed focal y "-1.79769313486231e+308"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 observation index "0"
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

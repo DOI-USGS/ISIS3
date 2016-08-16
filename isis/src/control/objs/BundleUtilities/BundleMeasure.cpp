@@ -81,11 +81,23 @@ namespace Isis {
 
 
   /**
+   * Sets the BundleMeasure's status to rejected or not rejected.
+   *
+   * @param reject True will set the BundleMeasure to rejected.
+   *
+   * @see ControlMeasure::SetRejected(bool reject)
+   */
+  void BundleMeasure::setRejected(bool reject) {
+    m_controlMeasure->SetRejected(reject); 
+  }
+
+
+  /**
    * Determines whether or not this BundleMeasure is rejected
    *
    * @return @b bool Returns a boolean indicating whether this BundleMeasure is rejected
    */
-  bool BundleMeasure::isRejected() {
+  bool BundleMeasure::isRejected() const {
     return m_controlMeasure->IsRejected();
   }
 
@@ -97,7 +109,7 @@ namespace Isis {
    *
    * @return @b Camera* Returns a pointer to the camera associated with this bundle measure
    */
-  Camera *BundleMeasure::camera() {
+  Camera *BundleMeasure::camera() const {
     return m_controlMeasure->Camera();
   }
 
@@ -166,6 +178,18 @@ namespace Isis {
 
 
   /**
+   * Accesses the sample residual for this control measure
+   *
+   * @see ControlMeasure::GetSampleResidual()
+   *
+   * @return @b double Returns the sample residual
+   */
+  double BundleMeasure::sampleResidual() const {
+    return m_controlMeasure->GetSampleResidual();
+  }
+
+
+  /**
    * Accesses the current line measurement for this control measure
    *
    * @see ControlMeasure::GetLine()
@@ -174,6 +198,30 @@ namespace Isis {
    */
   double BundleMeasure::line() const {
     return m_controlMeasure->GetLine();
+  }
+
+
+  /**
+   * Accesses the line residual for this control measure
+   *
+   * @see ControlMeasure::GetLineResidual()
+   *
+   * @return @b double Returns the line residual
+   */
+  double BundleMeasure::lineResidual() const {
+    return m_controlMeasure->GetLineResidual();
+  }
+
+
+  /**
+   * Accesses the residual magnitude for this control measure
+   *
+   * @see ControlMeasure::GetResidualMagnitude()
+   *
+   * @return @b double Returns the residual magnitude
+   */
+  double BundleMeasure::residualMagnitude() const {
+    return m_controlMeasure->GetResidualMagnitude();
   }
 
 
@@ -187,6 +235,30 @@ namespace Isis {
   QString BundleMeasure::cubeSerialNumber() const {
     return m_controlMeasure->GetCubeSerialNumber();
   }
+
+
+  /**
+   * Accesses the computed focal plane x value for this control measure
+   *
+   * @see ControlMeasure::GetFocalPlaneComputedX()
+   *
+   * @return @b double Returns the computed focal plane x value
+   */
+  double BundleMeasure::focalPlaneComputedX() const {
+    return m_controlMeasure->GetFocalPlaneComputedX();
+  }
+
+
+  /**
+   * Accesses the computed focal plane y value for this control measure
+   *
+   * @see ControlMeasure::GetFocalPlaneComputedY()
+   *
+   * @return @b double Returns the computed focal plane y value
+   */
+   double BundleMeasure::focalPlaneComputedY() const {
+     return m_controlMeasure->GetFocalPlaneComputedY();
+   }
 
 
   /**

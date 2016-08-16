@@ -207,6 +207,12 @@ namespace Isis {
    *                           respectively. References #4163.
    *   @history 2016-07-11 Jeannie Backer - Removed initialize(). Implementation was moved the the
    *                           bottom of init() method. Fixes #4161.
+   *   @history 2016-08-15 Ian Humphrey - Replaced ISIS ControlPoint and ControlMeasure uses with
+   *                           BundleControlPoint and BundleMeasure. No longer need to check if the
+   *                           BundleControlPoint or BundleMeasure is ignored before use, since we
+   *                           only add non-ignored ControlPoints to the BundleControlPoint, and
+   *                           we only add non-ignored ControlMeasures to the BundleControlPoint.
+   *                           Fixes #4173, #4201.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

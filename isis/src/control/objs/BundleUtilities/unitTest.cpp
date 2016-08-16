@@ -615,7 +615,8 @@ int main(int argc, char *argv[]) {
     #if 0
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
     #endif
-    qDebug() << "Create FreePoint with free point containing 2 measures...";
+    qDebug() << "Create FreePoint with free point containing 2 measures..."
+        << "(note that first measure is ignored, second measure is not ignored)";
     ControlPoint *freePoint = new ControlPoint("FreePoint");
     ControlMeasure *cm1 = new ControlMeasure;
     cm1->SetCubeSerialNumber("Ignored");
@@ -630,6 +631,22 @@ int main(int argc, char *argv[]) {
     BundleControlPoint bcp1(freePoint);
     bool errorProp = false;
     double radiansToMeters = 10.0;
+
+    qDebug() << "Type of BundleControlPoint 1:" << bcp1.type();
+
+    bcp1.setRejected(true);
+    qDebug() << "Set BundleControlPoint 1 to rejected - is rejected?"
+        << toString(bcp1.isRejected());
+    bcp1.setRejected(false);
+    qDebug() << "Set BundleControlPoint 1 to non-rejected - is rejected?" 
+        << toString(bcp1.isRejected());
+
+    qDebug() << "Number of rejected measures:" << bcp1.numberOfRejectedMeasures();
+    bcp1.setNumberOfRejectedMeasures(2);
+    qDebug() << "Set number of rejected measures:" << bcp1.numberOfRejectedMeasures();
+    bcp1.zeroNumberOfRejectedMeasures();
+    qDebug() << "Zero out number of rejected measures:" << bcp1.numberOfRejectedMeasures();
+
     // ??? these print outs are not pretty... fix???
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
     // ??? these print outs are not pretty... fix???
@@ -685,6 +702,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "nicVector:      " << nicVector[0] << nicVector[1] << nicVector[2];
     qDebug() << "qMatrix:";
     qDebug() << qMatrix;
+
+    qDebug() << "Residual rms:" << bcp1.residualRms();
     qDebug() << "";
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0";
@@ -884,8 +903,11 @@ int main(int argc, char *argv[]) {
     bundleMeasure.parentBundleImage(); //TODO m_parentBundleImage always NULL ??? 
 
     // Copy and =
-    BundleMeasure bundleMeasureCopy(bundleMeasure);
+    BundleMeasure bundleMeasureRejected(bundleMeasure); // We will use this to test setRejected.
     BundleMeasure bundleMeasureEq = bundleMeasure;
+
+    // Test setRejected(true)
+    bundleMeasureRejected.setRejected(true);
 
     // Test self-assignment
     bundleMeasure = bundleMeasure;
@@ -893,7 +915,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     // Verify state and copies
     printBundleMeasure(bundleMeasure);
-    printBundleMeasure(bundleMeasureCopy);
+    printBundleMeasure(bundleMeasureRejected);
     printBundleMeasure(bundleMeasureEq);
       
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -1690,6 +1712,11 @@ int main(int argc, char *argv[]) {
    qDebug() << "measure serial number" << m.cubeSerialNumber();
    qDebug() << "focal x" << toString(m.focalPlaneMeasuredX());
    qDebug() << "focal y" << toString(m.focalPlaneMeasuredY());
+   qDebug() << "computed focal x" << toString(m.focalPlaneComputedX());
+   qDebug() << "computed focal y" << toString(m.focalPlaneComputedY());
+   qDebug() << "sample residual" << toString(m.sampleResidual());
+   qDebug() << "line residual" << toString(m.lineResidual());
+   qDebug() << "residual magnitude" << toString(m.residualMagnitude());
    qDebug() << "observation index" << toString(m.observationIndex());
    qDebug() << "";  
 }

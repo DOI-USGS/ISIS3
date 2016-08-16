@@ -29,16 +29,22 @@
 
 #include "BundleMeasure.h"
 #include "BundleSettings.h"
+#include "ControlPoint.h"
 #include "SparseBlockMatrix.h"
 #include "SurfacePoint.h"
 
 namespace Isis {
 
   class ControlMeasure;
-  class ControlPoint;
 
   /**
-   * This class holds information about a control point that BundleAdjust needs to run correctly.
+   * This class holds information about a control point that BundleAdjust needs to run corretly.
+   * 
+   * This class was created to extract functionality from BundleAdjust and wrap a ControlPoint
+   * with the extra necessary information to correctly perform a bundle adjustment.
+   *
+   * Note that only non-ignored control points should be used to construct a BundleControlPoint.
+   * Similarly, a BundleControlPoint should only contain non-ignored control measures.
    * 
    * @author 2014-05-22 Ken Edmundson
    *
@@ -48,6 +54,13 @@ namespace Isis {
    *                           strings. Brought closer to ISIS coding standards.
    *   @history 2016-06-27 Jesse Mapel - Updated documentation and ISIS coding standards in
    *                           preparation for merging IPCE into ISIS.  Fixes #4075.
+   *   @history 2016-08-15 Ian Humphrey - Added computeResiduals(), setNumberOfRejectedMeasures(),
+   *                           setRejected(), zeroNumberOfRejectedMeasures(), 
+   *                           numberOfRejectedMeasures(), residualRms(), and type(). Modified
+   *                           numberMeasures() to return this->size(), since only non-ignored
+   *                           control measures will be added to this BundleControlPoint.
+   *                           Updated unit test for these methods (except computeResiduals).
+   *                           References #4173.
    */
   class BundleControlPoint : public QVector<BundleMeasure*> {
 
@@ -62,15 +75,22 @@ namespace Isis {
 
       // mutators
       BundleMeasure *addMeasure(ControlMeasure *controlMeasure);
-      void setWeights(const BundleSettingsQsp settings, double metersToRadians);
+      void computeResiduals();
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
+      void setNumberOfRejectedMeasures(int numRejected);
+      void setRejected(bool reject);
+      void setWeights(const BundleSettingsQsp settings, double metersToRadians);
+      void zeroNumberOfRejectedMeasures();
 
       // accessors
       ControlPoint *rawControlPoint() const;
       bool isRejected() const;
       int numberMeasures() const;
+      int numberOfRejectedMeasures() const;
+      double residualRms() const;
       SurfacePoint adjustedSurfacePoint() const;
       QString id() const;
+      ControlPoint::PointType type() const;
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections();
       boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();

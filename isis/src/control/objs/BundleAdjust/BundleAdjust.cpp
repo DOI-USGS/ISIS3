@@ -607,26 +607,26 @@ namespace Isis {
       if (m_bundleTargetBody && m_bundleTargetBody->solveMeanRadius()) {
         int nControlPoints = m_bundleControlPoints.size();
         for (int i = 0; i < nControlPoints; i++) {
-          ControlPoint *point = m_bundleControlPoints.at(i)->rawControlPoint();
-          SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+          BundleControlPointQsp point = m_bundleControlPoints.at(i);
+          SurfacePoint surfacepoint = point->adjustedSurfacePoint();
 
           surfacepoint.ResetLocalRadius(m_bundleTargetBody->meanRadius());
 
-          point->SetAdjustedSurfacePoint(surfacepoint);
+          point->setAdjustedSurfacePoint(surfacepoint);
         }
       }
 
       if (m_bundleTargetBody && m_bundleTargetBody->solveTriaxialRadii()) {
         int nControlPoints = m_bundleControlPoints.size();
         for (int i = 0; i < nControlPoints; i++) {
-          ControlPoint *point = m_bundleControlPoints.at(i)->rawControlPoint();
-          SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+          BundleControlPointQsp point = m_bundleControlPoints.at(i);
+          SurfacePoint surfacepoint = point->adjustedSurfacePoint();
 
           Distance localRadius = m_bundleTargetBody->localRadius(surfacepoint.GetLatitude(),
                                                                  surfacepoint.GetLongitude());
           surfacepoint.ResetLocalRadius(localRadius);
 
-          point->SetAdjustedSurfacePoint(surfacepoint);
+          point->setAdjustedSurfacePoint(surfacepoint);
         }
       }
 
@@ -3249,27 +3249,23 @@ namespace Isis {
 
     for (int i = 0; i < nObjectPoints; i++) {
 
-      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
-      ControlPoint* point = bundleControlPoint->rawControlPoint();
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-      point->ComputeResiduals();
+      point->computeResiduals();
 
-      int nMeasures = point->GetNumMeasures();
+      int nMeasures = point->numberMeasures();
       for (int j = 0; j < nMeasures; j++) {
-        const ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored()) {
-          continue;
-        }
+        const BundleMeasure *measure = point->at(j);
 
-        dWeight = 1.4 * (measure->Camera())->PixelPitch();
+        dWeight = 1.4 * (measure->camera())->PixelPitch();
         dWeight = 1.0 / dWeight;
         dWeight *= dWeight;
 
-        vx = measure->GetFocalPlaneMeasuredX() - measure->GetFocalPlaneComputedX();
-        vy = measure->GetFocalPlaneMeasuredY() - measure->GetFocalPlaneComputedY();
+        vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
+        vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
 
         // if rejected, don't include in statistics
-        if (measure->IsRejected()) {
+        if (measure->isRejected()) {
           continue;
         }
 
@@ -3359,15 +3355,11 @@ namespace Isis {
     // compute residuals in pixels
 
     // vtpv for image coordinates
-    int nObjectPoints = m_pCnet->GetNumPoints();
-    for (int i = 0; i < nObjectPoints; i++) {
-      ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored()) {
-        continue;
-      }
-
-      point->ComputeResiduals();
+    for (int i = 0;  i < m_bundleControlPoints.size(); i++) {
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
+      point->computeResiduals();
     }
+
     computeBundleStatistics();
 //     m_bundleResults.computeBundleStatistics(m_pSnList, m_pCnet, m_bundleSettings->errorPropagation(), m_bundleSettings->solveRadius());
 
@@ -3395,32 +3387,26 @@ namespace Isis {
 
       // load magnitude (squared) of residual vector
       int nObservation = 0;
-      int nObjectPoints = m_pCnet->GetNumPoints();
+      int nObjectPoints = m_bundleControlPoints.size();
       for (int i = 0; i < nObjectPoints; i++) {
 
-          const ControlPoint *point = m_pCnet->GetPoint(i);
-          if ( point->IsIgnored() ) {
+          const BundleControlPointQsp point = m_bundleControlPoints.at(i);
+
+          if ( point->isRejected() ) {
             continue;
           }
 
-          if ( point->IsRejected() ) {
-            continue;
-          }
-
-          int nMeasures = point->GetNumMeasures();
+          int nMeasures = point->numberMeasures();
           for (int j = 0; j < nMeasures; j++) {
 
-              const ControlMeasure *measure = point->GetMeasure(j);
-              if ( measure->IsIgnored() ) {
+              const BundleMeasure *measure = point->at(j);
+
+              if ( measure->isRejected() ) {
                   continue;
               }
 
-              if ( measure->IsRejected() ) {
-                  continue;
-              }
-
-              vx = measure->GetSampleResidual();
-              vy = measure->GetLineResidual();
+              vx = measure->sampleResidual();
+              vy = measure->lineResidual();
 
               resvectors[nObservation] = sqrt(vx*vx + vy*vy);
 
@@ -3510,29 +3496,23 @@ namespace Isis {
 
     int nComingBack = 0;
 
-    int nObjectPoints = m_pCnet->GetNumPoints();
+    int nObjectPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nObjectPoints; i++) {
-      ControlPoint *point = m_pCnet->GetPoint(i);
-      if ( point->IsIgnored() ) {
-        continue;
-      }
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-      point->ZeroNumberOfRejectedMeasures();
+      point->zeroNumberOfRejectedMeasures();
 
       nRejected = 0;
       nIndexMaxResidual = -1;
       dMaxResidual = -1.0;
 
-      int nMeasures = point->GetNumMeasures();
+      int nMeasures = point->numberMeasures();
       for (int j = 0; j < nMeasures; j++) {
 
-          ControlMeasure *measure = point->GetMeasure(j);
-          if ( measure->IsIgnored() ) {
-              continue;
-          }
+          BundleMeasure *measure = point->at(j);
 
-          vx = measure->GetSampleResidual();
-          vy = measure->GetLineResidual();
+          vx = measure->sampleResidual();
+          vy = measure->lineResidual();
 
           dSumSquares = sqrt(vx*vx + vy*vy);
 
@@ -3540,18 +3520,18 @@ namespace Isis {
           if ( dSumSquares <= dUsedRejectionLimit ) {
 
             // was it previously rejected?
-            if ( measure->IsRejected() ) {
-                  printf("Coming back in: %s\r",point->GetId().toLatin1().data());
+            if ( measure->isRejected() ) {
+                  printf("Coming back in: %s\r",point->id().toLatin1().data());
                   nComingBack++;
-                  m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
+                  m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->cubeSerialNumber());
               }
 
-              measure->SetRejected(false);
+              measure->setRejected(false);
               continue;
           }
 
           // if it's still rejected, skip it
-          if ( measure->IsRejected() ) {
+          if ( measure->isRejected() ) {
               nRejected++;
               ntotalrejected++;
               continue;
@@ -3565,14 +3545,14 @@ namespace Isis {
 
       // no observations above the current rejection limit for this 3D point
       if ( dMaxResidual == -1.0 || dMaxResidual <= dUsedRejectionLimit ) {
-          point->SetNumberOfRejectedMeasures(nRejected);
+          point->setNumberOfRejectedMeasures(nRejected);
           continue;
       }
 
       // this is another kluge - if we only have two observations
       // we won't reject (for now)
       if ((nMeasures - (nRejected + 1)) < 2) {
-          point->SetNumberOfRejectedMeasures(nRejected);
+          point->setNumberOfRejectedMeasures(nRejected);
           continue;
       }
 
@@ -3580,20 +3560,20 @@ namespace Isis {
       // for this point whose residual is above the
       // current rejection limit - we'll flag the
       // worst of these as rejected
-      ControlMeasure *rejected = point->GetMeasure(nIndexMaxResidual);
-      rejected->SetRejected(true);
+      BundleMeasure *rejected = point->at(nIndexMaxResidual);
+      rejected->setRejected(true);
       nRejected++;
-      point->SetNumberOfRejectedMeasures(nRejected);
-      m_pCnet->IncrementNumberOfRejectedMeasuresInImage(rejected->GetCubeSerialNumber());
+      point->setNumberOfRejectedMeasures(nRejected);
+      m_pCnet->IncrementNumberOfRejectedMeasuresInImage(rejected->cubeSerialNumber());
       ntotalrejected++;
 
       // do we still have sufficient remaining observations for this 3D point?
       if ( ( nMeasures-nRejected ) < 2 ) {
-          point->SetRejected(true);
-          printf("Rejecting Entire Point: %s\r",point->GetId().toLatin1().data());
+          point->setRejected(true);
+          printf("Rejecting Entire Point: %s\r",point->id().toLatin1().data());
       }
       else
-          point->SetRejected(false);
+          point->setRejected(false);
 
 //      int ndummy = point->GetNumberOfRejectedMeasures();
 //      printf("Rejected for point %s = %d\n", point->GetId().toLatin1().data(), ndummy);
@@ -3644,13 +3624,11 @@ namespace Isis {
     double dSigma02 = m_bundleResults.sigma0() * m_bundleResults.sigma0();
 
     int nPointIndex = 0;
-    int nObjectPoints = m_pCnet->GetNumPoints();
+    int nObjectPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nObjectPoints; i++) {
-      ControlPoint *point = m_pCnet->GetPoint(i);
-        if ( point->IsIgnored() )
-            continue;
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-        if ( point->IsRejected() )
+        if ( point->isRejected() )
             continue;
 
         printf("\rProcessing point %d of %d",i+1,nObjectPoints);
@@ -3669,7 +3647,7 @@ namespace Isis {
 
         // Ask Ken what is happening here...Setting just the sigmas is not very accurate
         // Shouldn't we be updating and setting the matrix???  TODO
-        SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+        SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
 
         dSigmaLat = SurfacePoint.GetLatSigma().radians();
         dSigmaLong = SurfacePoint.GetLonSigma().radians();
@@ -3687,7 +3665,7 @@ namespace Isis {
         t = dSigmaLong*dSigmaLong + T(1, 1);
         t = sqrt(dSigma02 * t) * m_dRTM;
         Distance tLonSig(
-            t * cos(point->GetAdjustedSurfacePoint().GetLatitude().radians()),
+            t * cos(point->adjustedSurfacePoint().GetLatitude().radians()),
             Distance::Meters);
 
         t = dSigmaRadius*dSigmaRadius + T(2, 2);
@@ -3696,7 +3674,7 @@ namespace Isis {
         SurfacePoint.SetSphericalSigmasDistance(tLatSig, tLonSig,
             Distance(t, Distance::Meters));
 
-        point->SetAdjustedSurfacePoint(SurfacePoint);
+        point->setAdjustedSurfacePoint(SurfacePoint);
 
        nPointIndex++;
     }
@@ -4840,41 +4818,39 @@ namespace Isis {
     fp_out << buf;
 
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPointQsp bundlecontrolpoint = m_bundleControlPoints.at(i);
-
-      const ControlPoint *point = bundlecontrolpoint->rawControlPoint();
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
       if (!point) {
         continue;
       }
 
-      if (point->IsRejected()) {
+      if (point->isRejected()) {
         continue;
       }
 
-      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
-      dX = point->GetAdjustedSurfacePoint().GetX().kilometers();
-      dY = point->GetAdjustedSurfacePoint().GetY().kilometers();
-      dZ = point->GetAdjustedSurfacePoint().GetZ().kilometers();
-      nMeasures = point->GetNumMeasures();
-      nRejectedMeasures = point->GetNumberOfRejectedMeasures();
-      dResidualRms = point->GetResidualRms();
+      dLat = point->adjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->adjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->adjustedSurfacePoint().GetLocalRadius().kilometers();
+      dX = point->adjustedSurfacePoint().GetX().kilometers();
+      dY = point->adjustedSurfacePoint().GetY().kilometers();
+      dZ = point->adjustedSurfacePoint().GetZ().kilometers();
+      nMeasures = point->numberMeasures();
+      nRejectedMeasures = point->numberOfRejectedMeasures();
+      dResidualRms = point->residualRms();
 
       // point corrections and initial sigmas
-      boost::numeric::ublas::bounded_vector< double, 3 > corrections = bundlecontrolpoint->corrections();
+      boost::numeric::ublas::bounded_vector< double, 3 > corrections = point->corrections();
       cor_lat_m = corrections[0]*m_dRTM;
       cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
       cor_rad_m  = corrections[2]*1000.0;
 
-      if (point->GetType() == ControlPoint::Fixed) {
+      if (point->type() == ControlPoint::Fixed) {
         strStatus = "FIXED";
       }
-      else if (point->GetType() == ControlPoint::Constrained) {
+      else if (point->type() == ControlPoint::Constrained) {
         strStatus = "CONSTRAINED";
       }
-      else if (point->GetType() == ControlPoint::Free) {
+      else if (point->type() == ControlPoint::Free) {
         strStatus = "FREE";
       }
       else {
@@ -4882,20 +4858,20 @@ namespace Isis {
       }
 
       if (m_bundleSettings->errorPropagation()) {
-        dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-        dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-        dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
+        dSigmaLat = point->adjustedSurfacePoint().GetLatSigmaDistance().meters();
+        dSigmaLong = point->adjustedSurfacePoint().GetLonSigmaDistance().meters();
+        dSigmaRadius = point->adjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nMeasures,
+                point->id().toLatin1().data(), strStatus.toLatin1().data(), nMeasures,
                 nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat, dSigmaLong,
                 dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
       else
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf\n",
-                point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nMeasures,
+                point->id().toLatin1().data(), strStatus.toLatin1().data(), nMeasures,
                 nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, cor_lat_m, cor_lon_m,
                 cor_rad_m, dX, dY, dZ);
 
@@ -4937,53 +4913,47 @@ namespace Isis {
 
     // printf("output residuals!!!\n");
 
-    int nObjectPoints = m_pCnet->GetNumPoints();
+    int nObjectPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nObjectPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored()) {
-        continue;
-      }
+      const BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-      int nObservations = point->GetNumMeasures();
+      int nObservations = point->numberMeasures();
       for (int j = 0; j < nObservations; j++) {
-        const ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored()) {
-          continue;
-        }
+        const BundleMeasure *measure = point->at(j);
 
-        Camera *pCamera = measure->Camera();
+        Camera *pCamera = measure->camera();
         if (!pCamera) {
           continue;
         }
 
         // Determine the image index
-        nImageIndex = m_pSnList->serialNumberIndex(measure->GetCubeSerialNumber());
+        nImageIndex = m_pSnList->serialNumberIndex(measure->cubeSerialNumber());
 
-        if (measure->IsRejected()) {
+        if (measure->isRejected()) {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                  point->GetId().toLatin1().data(),
+                  point->id().toLatin1().data(),
                   m_pSnList->fileName(nImageIndex).toLatin1().data(),
                   m_pSnList->serialNumber(nImageIndex).toLatin1().data(),
-                  measure->GetFocalPlaneMeasuredX(),
-                  measure->GetFocalPlaneMeasuredY(),
-                  measure->GetSample(),
-                  measure->GetLine(),
-                  measure->GetSampleResidual(),
-                  measure->GetLineResidual(),
-                  measure->GetResidualMagnitude());
+                  measure->focalPlaneMeasuredX(),
+                  measure->focalPlaneMeasuredY(),
+                  measure->sample(),
+                  measure->line(),
+                  measure->sampleResidual(),
+                  measure->lineResidual(),
+                  measure->residualMagnitude());
         }
         else {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                  point->GetId().toLatin1().data(),
+                  point->id().toLatin1().data(),
                   m_pSnList->fileName(nImageIndex).toLatin1().data(),
                   m_pSnList->serialNumber(nImageIndex).toLatin1().data(),
-                  measure->GetFocalPlaneMeasuredX(),
-                  measure->GetFocalPlaneMeasuredY(),
-                  measure->GetSample(),
-                  measure->GetLine(),
-                  measure->GetSampleResidual(),
-                  measure->GetLineResidual(),
-                  measure->GetResidualMagnitude());
+                  measure->focalPlaneMeasuredX(),
+                  measure->focalPlaneMeasuredY(),
+                  measure->sample(),
+                  measure->line(),
+                  measure->sampleResidual(),
+                  measure->lineResidual(),
+                  measure->residualMagnitude());
         }
         fp_out << buf;
       }
@@ -5668,35 +5638,29 @@ namespace Isis {
     QVector<Statistics> rmsImageLineResiduals(numberImages);
     QVector<Statistics> rmsImageResiduals(numberImages);
 
-    int numObjectPoints = m_pCnet->GetNumPoints();
+    int numObjectPoints = m_bundleControlPoints.size();
     for (int i = 0; i < numObjectPoints; i++) {
 
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored()) {
+      const BundleControlPointQsp point = m_bundleControlPoints.at(i);
+
+      if (point->isRejected()) {
         continue;
       }
 
-      if (point->IsRejected()) {
-        continue;
-      }
-
-      int numMeasures = point->GetNumMeasures();
+      int numMeasures = point->numberMeasures();
       for (int j = 0; j < numMeasures; j++) {
 
-        const ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored()) {
+        const BundleMeasure *measure = point->at(j);
+
+        if (measure->isRejected()) {
           continue;
         }
 
-        if (measure->IsRejected()) {
-          continue;
-        }
-
-        double sampleResidual = fabs(measure->GetSampleResidual());
-        double lineResidual = fabs(measure->GetLineResidual());
+        double sampleResidual = fabs(measure->sampleResidual());
+        double lineResidual = fabs(measure->lineResidual());
 
         // Determine the index for this measure's serial number
-        int imageIndex = m_pSnList->serialNumberIndex(measure->GetCubeSerialNumber());
+        int imageIndex = m_pSnList->serialNumberIndex(measure->cubeSerialNumber());
 
         // add residual data to the statistics object at the appropriate serial number index
         rmsImageSampleResiduals[imageIndex].AddData(sampleResidual);
@@ -5735,28 +5699,25 @@ namespace Isis {
 
       Distance sigmaLatDist, sigmaLonDist, sigmaRadDist;
 
-      int nPoints = m_pCnet->GetNumPoints();
+      int nPoints = m_bundleControlPoints.size();
       // initialize max and min values to those from first valid point
       for (int i = 0; i < nPoints; i++) {
 
-        const ControlPoint *point = m_pCnet->GetPoint(i);
-        if (point->IsIgnored()) {
-          continue;
-        }
+        const BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-        maxSigmaLatDist = point->GetAdjustedSurfacePoint().GetLatSigmaDistance();;
+        maxSigmaLatDist = point->adjustedSurfacePoint().GetLatSigmaDistance();;
         minSigmaLatDist = maxSigmaLatDist;
 
-        maxSigmaLonDist = point->GetAdjustedSurfacePoint().GetLonSigmaDistance();;
+        maxSigmaLonDist = point->adjustedSurfacePoint().GetLonSigmaDistance();;
         minSigmaLonDist = maxSigmaLonDist;
 
-        maxSigmaLatPointId = point->GetId();
+        maxSigmaLatPointId = point->id();
         maxSigmaLonPointId = maxSigmaLatPointId;
         minSigmaLatPointId = maxSigmaLatPointId;
         minSigmaLonPointId = maxSigmaLatPointId;
 
         if (m_bundleSettings->solveRadius()) {
-          maxSigmaRadDist = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma();
+          maxSigmaRadDist = point->adjustedSurfacePoint().GetLocalRadiusSigma();
           minSigmaRadDist = maxSigmaRadDist;
 
           maxSigmaRadPointId = maxSigmaLatPointId;
@@ -5767,14 +5728,11 @@ namespace Isis {
 
       for (int i = 0; i < nPoints; i++) {
 
-        const ControlPoint *point = m_pCnet->GetPoint(i);
-        if (point->IsIgnored()) {
-          continue;
-        }
+        const BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-        sigmaLatDist = point->GetAdjustedSurfacePoint().GetLatSigmaDistance();
-        sigmaLonDist = point->GetAdjustedSurfacePoint().GetLonSigmaDistance();
-        sigmaRadDist = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma();
+        sigmaLatDist = point->adjustedSurfacePoint().GetLatSigmaDistance();
+        sigmaLonDist = point->adjustedSurfacePoint().GetLonSigmaDistance();
+        sigmaRadDist = point->adjustedSurfacePoint().GetLocalRadiusSigma();
 
         sigmaLatStats.AddData(sigmaLatDist.meters());
         sigmaLonStats.AddData(sigmaLonDist.meters());
@@ -5782,30 +5740,30 @@ namespace Isis {
 
         if (sigmaLatDist > maxSigmaLatDist) {
           maxSigmaLatDist = sigmaLatDist;
-          maxSigmaLatPointId = point->GetId();
+          maxSigmaLatPointId = point->id();
         }
         if (sigmaLonDist > maxSigmaLonDist) {
           maxSigmaLonDist = sigmaLonDist;
-          maxSigmaLonPointId = point->GetId();
+          maxSigmaLonPointId = point->id();
         }
         if (m_bundleSettings->solveRadius()) {
           if (sigmaRadDist > maxSigmaRadDist) {
             maxSigmaRadDist = sigmaRadDist;
-            maxSigmaRadPointId = point->GetId();
+            maxSigmaRadPointId = point->id();
           }
         }
         if (sigmaLatDist < minSigmaLatDist) {
           minSigmaLatDist = sigmaLatDist;
-          minSigmaLatPointId = point->GetId();
+          minSigmaLatPointId = point->id();
         }
         if (sigmaLonDist < minSigmaLonDist) {
           minSigmaLonDist = sigmaLonDist;
-          minSigmaLonPointId = point->GetId();
+          minSigmaLonPointId = point->id();
         }
         if (m_bundleSettings->solveRadius()) {
           if (sigmaRadDist < minSigmaRadDist) {
             minSigmaRadDist = sigmaRadDist;
-            minSigmaRadPointId = point->GetId();
+            minSigmaRadPointId = point->id();
           }
         }
       }
