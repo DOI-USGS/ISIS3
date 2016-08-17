@@ -21,8 +21,6 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
-
-    m_parentBundleImage = NULL;
   }
 
 
@@ -81,6 +79,16 @@ namespace Isis {
 
 
   /**
+   * Sets the parent bundle image
+   *
+   * @param image Pointer to the parent BundleImage  
+   */
+  void BundleMeasure::setParentImage(QSharedPointer<BundleImage> image) {
+    m_parentBundleImage = image;
+  }
+
+
+  /**
    * Sets the BundleMeasure's status to rejected or not rejected.
    *
    * @param reject True will set the BundleMeasure to rejected.
@@ -127,9 +135,9 @@ namespace Isis {
   /**
    * Access the parent BundleImage for this bundle measure
    *
-   * @return @b BundleImage* Returns a pointer to the parent BundleImage
+   * @return @b QSharedPointer<BundleImage> Returns a pointer to the parent BundleImage
    */
-  BundleImage *BundleMeasure::parentBundleImage() {
+  QSharedPointer<BundleImage> BundleMeasure::parentBundleImage() {
     return m_parentBundleImage;
   }
 
@@ -283,6 +291,7 @@ namespace Isis {
   double BundleMeasure::focalPlaneMeasuredY() const {
     return m_controlMeasure->GetFocalPlaneMeasuredY();
   }
+
 
   /**
    * Accesses the observation index for the parent observation

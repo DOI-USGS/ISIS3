@@ -2,9 +2,7 @@
 
 #include <QDebug>
 
-#include "BundleMeasure.h"
 #include "ControlMeasure.h"
-#include "ControlPoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SpecialPixel.h"
@@ -65,8 +63,6 @@ namespace Isis {
    * Destructor for BundleControlPoint. 
    */
   BundleControlPoint::~BundleControlPoint() {
-    qDeleteAll(*this);
-    clear();
   }
 
 
@@ -78,7 +74,6 @@ namespace Isis {
   void BundleControlPoint::copy(const BundleControlPoint &src) {
 
     // sanity check
-    qDeleteAll(*this);
     clear();
 
     m_controlPoint = src.m_controlPoint;
@@ -86,7 +81,7 @@ namespace Isis {
     int numMeasures = src.size();
 
     for (int i = 0; i < numMeasures; i++)
-      append(new BundleMeasure(*(src.at(i))));
+      append(BundleMeasureQsp( new BundleMeasure(*(src.at(i))) ));
 
     m_corrections = src.m_corrections;
     m_aprioriSigmas = src.m_aprioriSigmas;
@@ -104,9 +99,9 @@ namespace Isis {
    * 
    * @return @b BundleMeasure* A pointer to the new BundleMeasure.
    */
-  BundleMeasure *BundleControlPoint::addMeasure(ControlMeasure *controlMeasure) {
+  BundleMeasureQsp BundleControlPoint::addMeasure(ControlMeasure *controlMeasure) {
 
-    BundleMeasure *bundleMeasure = new BundleMeasure(controlMeasure, this);
+    BundleMeasureQsp bundleMeasure = BundleMeasureQsp( new BundleMeasure(controlMeasure, this) );
 
     append(bundleMeasure);
 
@@ -280,7 +275,7 @@ namespace Isis {
    * 
    * @return @b int The number of measures for this point.
    */
-  int BundleControlPoint::numberMeasures() const {
+  int BundleControlPoint::numberOfMeasures() const {
     return this->size();
   }
 
@@ -330,11 +325,14 @@ namespace Isis {
 
 
   /**
-   * Accesses the PointType of the BundleControlPoint.
-   *
-   * @return @b ControlPoint::PointType The point type of this point.
+   * Accesses BundleControlPoint's type.
+   * 
+   * @return @b ControlPoint::PointType The BundleControlPoint's type.  Options are:
+   *                                    Fixed = 0, Constrained = 1, Free = 2.
+   * 
+   * @see ControlPoint::GetType()
    */
-  ControlPoint::PointType BundleControlPoint::type() const {
+  ControlPoint::PointType BundleControlPoint::type() const{
     return m_controlPoint->GetType();
   }
 
@@ -417,21 +415,21 @@ namespace Isis {
    */
   QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
 
-    int numRays        = numberMeasures(); // should this depend on the raw point, as written, or this->size()???
-    int numGoodRays    = numRays - m_controlPoint->GetNumberOfRejectedMeasures();
-    double residualRms = m_controlPoint->GetResidualRms();
+    int numRays        = numberOfMeasures(); // should this depend on the raw point, as written, or this->size()???
+    int numGoodRays    = numRays - numberOfRejectedMeasures();
+    double ResidualRms = residualRms();
     double lat         = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
     double lon         = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
     double rad         = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
 
-    QString pointType = m_controlPoint->GetPointTypeString().toUpper();
+    QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
 
     QString output = QString("%1%2%3 of %4%5%6%7%8%9%10%11\n")
                              .arg(id(), 16)
                              .arg(pointType, 15)
                              .arg(numGoodRays, 5)
                              .arg(numRays)
-                             .arg(formatValue(residualRms, 6, 2))
+                             .arg(formatValue(ResidualRms, 6, 2))
                              .arg(formatValue(lat, 16, 8)) // deg
                              .arg(formatValue(lon, 16, 8)) // deg
                              .arg(formatValue(rad, 16, 8)) // km
@@ -455,8 +453,8 @@ namespace Isis {
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
                                                              double RTM) const {
 
-    int numRays     = numberMeasures();
-    int numGoodRays = numRays - m_controlPoint->GetNumberOfRejectedMeasures();
+    int numRays     = numberOfMeasures();
+    int numGoodRays = numRays - numberOfRejectedMeasures();
     double lat      = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
     double lon      = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
     double rad      = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
@@ -487,7 +485,7 @@ namespace Isis {
       radInit = rad - m_corrections(2); // km
     }
 
-    QString pointType = m_controlPoint->GetPointTypeString().toUpper();
+    QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
 
     QString output;
 

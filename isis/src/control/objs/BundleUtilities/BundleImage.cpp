@@ -66,6 +66,9 @@ namespace Isis {
    */
   void BundleImage::setParentObservation(QSharedPointer<BundleObservation> parentObservation) {
 
+
+    // TODO: BundleImage's setParentObservation should take a QSharedPointer. JAM
+
     m_parentObservation = parentObservation;
   }
 

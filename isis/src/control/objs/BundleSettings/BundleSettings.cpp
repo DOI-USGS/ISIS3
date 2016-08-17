@@ -934,6 +934,54 @@ namespace Isis {
   }
 
 
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body prime meridian acceleration. 
+   * 
+   * @see BundleTargetBody::solvePMAcceleration()
+   * 
+   * @return @b bool Indicates whether to solve for target PM acceleration.
+   */
+  bool BundleSettings::solvePMAcceleration() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
+    return m_bundleTargetBody->solvePMAcceleration();
+  }
+
+
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body triaxial radii. 
+   * 
+   * @see BundleTargetBody::solveTriaxialRadii()
+   * 
+   * @return @b bool Indicates whether to solve for target triaxial radii.
+   */
+  bool BundleSettings::solveTriaxialRadii() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
+    return m_bundleTargetBody->solveTriaxialRadii();
+  }
+
+
+  /**
+   * This method is used to determine whether the bundle adjustment 
+   * will solve for target body mean radius. 
+   * 
+   * @see BundleTargetBody::solveMeanRadius()
+   * 
+   * @return @b bool Indicates whether to solve for target mean radius.
+   */
+  bool BundleSettings::solveMeanRadius() const {
+    if (!m_bundleTargetBody) {
+      return false;
+    }
+    return m_bundleTargetBody->solveMeanRadius();
+  }
+
+
 //  void BundleSettings::setTargetBodySolveOptions(bool solveTargetBodyPolePosition,
 //                                                 double aprioriRaPole, double sigmaRaPole,
 //                                                 double aprioriDecPole, double sigmaDecPole,
@@ -1110,6 +1158,9 @@ namespace Isis {
     pvl += PvlKeyword("SolvePoleDeclinationVelocity", toString(solvePoleDecVelocity()));
     pvl += PvlKeyword("SolvePolePrimeMeridian", toString(solvePM()));
     pvl += PvlKeyword("SolvePolePrimeMeridianVelocity", toString(solvePMVelocity()));
+    pvl += PvlKeyword("SolvePolePrimeMeridianAcceleration", toString(solvePMAcceleration()));
+    pvl += PvlKeyword("solveTriaxialRadii", toString(solveTriaxialRadii()));
+    pvl += PvlKeyword("solveMeanRadius", toString(solveMeanRadius()));
 
     // Output Options
     pvl += PvlKeyword("CreateBundleOutputFile", toString(createBundleOutputFile()));

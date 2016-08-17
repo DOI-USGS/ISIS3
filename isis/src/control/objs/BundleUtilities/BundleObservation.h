@@ -59,6 +59,8 @@ namespace Isis {
    *   @history 2016-08-03 Ian Humphrey - Updated documentation and coding standards. Fixes #4078.
    *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
    *                           References #4163.
+   *   @history 2016-08-15 Jesse Mapel - Added a map between cube serial number and contained
+   *                           bundle image.  References #4159.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -81,6 +83,10 @@ namespace Isis {
       
       // copy method
       void copy(const BundleObservation &src);
+
+      void append(const BundleImageQsp &value);
+
+      BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
       
       bool setSolveSettings(BundleObservationSolveSettings solveSettings);
       
@@ -126,6 +132,9 @@ namespace Isis {
                                         augmented with an additional integer. **/
 
       int m_index; //!< Index of this observation.
+
+      //! Map between cube serial number and BundleImage pointers.
+      QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
 
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
       QStringList m_parameterNamesList; //!< List of all cube parameters.

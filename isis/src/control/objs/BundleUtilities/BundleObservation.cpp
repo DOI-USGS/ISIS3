@@ -68,6 +68,7 @@ namespace Isis {
       append(image);
       m_serialNumbers.append(image->serialNumber());
       m_imageNames.append(image->fileName());
+      m_cubeSerialNumberToBundleImageMap.insert(image->serialNumber(), image);
 
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
@@ -99,6 +100,7 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(const BundleObservation &src) {
     m_serialNumbers = src.m_serialNumbers;
+    m_cubeSerialNumberToBundleImageMap = src.m_cubeSerialNumberToBundleImageMap;
 
     m_observationNumber = src.m_observationNumber;
     m_instrumentId = src.m_instrumentId;
@@ -134,6 +136,7 @@ namespace Isis {
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
       m_serialNumbers = src.m_serialNumbers;
+      m_cubeSerialNumberToBundleImageMap = src.m_cubeSerialNumberToBundleImageMap;
 
       m_observationNumber = src.m_observationNumber;
       m_instrumentId = src.m_instrumentId;
@@ -144,6 +147,42 @@ namespace Isis {
       m_solveSettings = src.m_solveSettings;
     }
     return *this;
+  }
+
+
+  /**
+   * Appends a BundleImage shared pointer to the BundleObservation.
+   * If the pointer is valid, then the BundleImage and its serial number will be inserted into
+   * the serial number to BundleImage map.
+   * 
+   * @param value The BundleImage to be appended.
+   * 
+   * @see QVector::append()
+   */
+  void BundleObservation::append(const BundleImageQsp &value) {
+    if (value) {
+      m_cubeSerialNumberToBundleImageMap.insert(value->serialNumber(), value);
+    }
+    QVector<BundleImageQsp>::append(value);
+  }
+
+
+  /**
+   * Returns the BundleImage shared pointer associated with the given serial number.
+   * If no BundleImage with that serial number is contained a NULL pointer is returned.
+   * 
+   * @param cubeSerialNumber The serial number of the cube to be returned.
+   * 
+   * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
+   */
+  BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
+    BundleImageQsp bundleImage;
+
+    if (m_cubeSerialNumberToBundleImageMap.contains(cubeSerialNumber)) {
+      bundleImage = m_cubeSerialNumberToBundleImageMap.value(cubeSerialNumber);
+    }
+
+    return bundleImage;
   }
 
 

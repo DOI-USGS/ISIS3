@@ -61,8 +61,11 @@ namespace Isis {
    *                           control measures will be added to this BundleControlPoint.
    *                           Updated unit test for these methods (except computeResiduals).
    *                           References #4173.
+   *   @history 2016-08-15 Jesse Mapel - Changed contained member data type to a shared pointer.
+   *                           Added wrapper methods for several ControlPoint methods.
+   *                           Fixes #4159.
    */
-  class BundleControlPoint : public QVector<BundleMeasure*> {
+  class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
     public:
       BundleControlPoint(ControlPoint *point); // default constructor
@@ -74,7 +77,7 @@ namespace Isis {
       void copy(const BundleControlPoint &src);
 
       // mutators
-      BundleMeasure *addMeasure(ControlMeasure *controlMeasure);
+      BundleMeasureQsp addMeasure(ControlMeasure *controlMeasure);
       void computeResiduals();
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
       void setNumberOfRejectedMeasures(int numRejected);
@@ -85,7 +88,7 @@ namespace Isis {
       // accessors
       ControlPoint *rawControlPoint() const;
       bool isRejected() const;
-      int numberMeasures() const;
+      int numberOfMeasures() const;
       int numberOfRejectedMeasures() const;
       double residualRms() const;
       SurfacePoint adjustedSurfacePoint() const;

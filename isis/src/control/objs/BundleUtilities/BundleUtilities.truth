@@ -535,6 +535,10 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
 init exterior orientiation successful?   "Yes"
 apply param corrections successful?      "Yes"
 
+    add another image...
+    access images by serial number...
+TestImageFileName
+TestImage2FileName
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -838,10 +842,14 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleMeasure...
 **PROGRAMMER ERROR** In BundleMeasure::observationSolveSettings: parent observation has not been set.
 parent control point id "FixedPoint"
+parent image id "TestImageSerialNumber"
 
 rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
@@ -855,6 +863,9 @@ observation index "0"
 rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
@@ -868,6 +879,9 @@ observation index "0"
 rejected? "Yes"
 measure sample  "1.0"
 measure line    "2.0"
+sample residual "-3.0"
+line residual "4.0"
+residual magnitude "5.0"
 measure serial number "NotIgnored"
 focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"

@@ -128,7 +128,10 @@ int main(int argc, char *argv[]) {
     //      bool solvePoleDec()               
     //      bool solvePoleDecVelocity()       
     //      bool solvePM()                    
-    //      bool solvePMVelocity()            
+    //      bool solvePMVelocity()   
+    //      bool solvePMAcceleration()
+    //      bool solveTriaxialRadii()
+    //      bool solveMeanRadius()
 
     PvlObject pvl = settings.pvlObject("DefaultSettingsObject");
     cout << pvl << endl << endl;

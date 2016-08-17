@@ -85,6 +85,8 @@ namespace Isis {
    *   @history 2016-06-30 Jeannie Backer - Changed method name from "getBundleTargetBody" to
    *                           "bundleTargetBody" to comply with ISIS coding standards.
    *                           Added documentation. Updated test. References #3976. Fixes #.
+   *   @history 2016-08-15 Jesse Mapel - Added methods to check if solving for triaxial radii,
+   *                           mean radius, or Prime Meridian Acceleration. Fixes #4159.
    *  
    *  
    *  
@@ -259,6 +261,9 @@ namespace Isis {
       bool solvePoleDecVelocity() const;
       bool solvePM() const;
       bool solvePMVelocity() const;
+      bool solvePMAcceleration() const;
+      bool solveTriaxialRadii() const;
+      bool solveMeanRadius() const;
 //  void BundleSettings::setTargetBodySolveOptions(bool solveTargetBodyPolePosition,
 
 

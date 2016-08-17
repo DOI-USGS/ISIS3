@@ -63,6 +63,8 @@ namespace Isis {
    *                           a Qt metatype for use with QVariant.
    *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
    *                           Fixes #2298.
+   *   @history 2016-08-15 Jesse Mapel - added output, outputHeader, outputText, outputPointsCSV,
+   *                           and outputResiduals from BundleAdjust.  Fixes #4159.
    *  
    */
   class BundleSolutionInfo : public QObject {
@@ -88,6 +90,12 @@ namespace Isis {
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QString runTime() const;
+
+      bool output();
+      bool outputHeader(std::ofstream &fpOut);
+      bool outputText();
+      bool outputPointsCSV();
+      bool outputResiduals();
 
       PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
                           QString settingsName = "InputSettings",

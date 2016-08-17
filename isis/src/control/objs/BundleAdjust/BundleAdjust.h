@@ -200,13 +200,16 @@ namespace Isis {
    *   @history 2016-07-11 Jesse Mapel - Changed m_bundleControlPoints to be a vector of
    *                           QSharedPointers to BundleControlPoints instead of a
    *                           BundleControlPointVector.  Fixes #4099.
+   *   @history 2016-07-11 Jeannie Backer - Removed initialize(). Implementation was moved the the
+   *                           bottom of init() method. Fixes #4161.
    *   @history 2016-08-03 Jesse Mapel - Changed BundleObservationVector to a vector of
    *                           QSharedPointers.  Fixes #4150.
    *   @history 2016-08-10 Jeannie Backer - Replaced boost vectors and matrices with
    *                           Isis::LinearAlgebra::Vector and Isis::LinearAlgebra::Matrix,
    *                           respectively. References #4163.
-   *   @history 2016-07-11 Jeannie Backer - Removed initialize(). Implementation was moved the the
-   *                           bottom of init() method. Fixes #4161.
+   *   @history 2016-08-15 Jesse Mapel - Moved write methods to BundleSolutionInfo.  Changed
+   *                           constructors to always construct a new control network.
+   *                           Fixes #4159.
    *   @history 2016-08-15 Ian Humphrey - Replaced ISIS ControlPoint and ControlMeasure uses with
    *                           BundleControlPoint and BundleMeasure. No longer need to check if the
    *                           BundleControlPoint or BundleMeasure is ignored before use, since we
@@ -257,7 +260,7 @@ namespace Isis {
       void             abortBundle();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
       // accessors
-      ControlNet       *controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
+      ControlNetQsp    controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
       SerialNumberList *serialNumberList() { return m_pSnList; } // TODO: move implementation to cpp per ISIS standards
       int              images() const { return m_pSnList->size(); }// TODO: move implementation to cpp per ISIS standards
 //      int              observations() const;
@@ -305,12 +308,6 @@ namespace Isis {
 
       // output methods
       void iterationSummary();
-      bool output();
-      bool outputHeader(std::ofstream  &fp_out);
-      bool outputText();
-      bool outputPointsCSV();
-      bool outputImagesCSV();
-      bool outputResiduals();
       bool wrapUp();
       BundleSolutionInfo bundleSolveInformation();
       bool computeBundleStatistics();
@@ -482,7 +479,7 @@ namespace Isis {
       QString m_strCnetFileName;                        //!< Control Net file specification
 
       //!< pointers to...
-      ControlNet *m_pCnet;                              //!< 'ControlNet' object
+      ControlNetQsp m_pCnet;                              //!< 'ControlNet' object
       SerialNumberList *m_pSnList;                      //!< list of image serial numbers
       SerialNumberList *m_pHeldSnList;                  //!< list of held image serial numbers
 

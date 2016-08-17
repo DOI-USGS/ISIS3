@@ -18,7 +18,6 @@
 
 #include "Camera.h"
 #include "ControlMeasure.h"
-#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "CorrelationMatrix.h"
 #include "Distance.h"
@@ -106,7 +105,7 @@ namespace Isis {
         m_rmsXResiduals(src.m_rmsXResiduals),
         m_rmsYResiduals(src.m_rmsYResiduals),
         m_rmsXYResiduals(src.m_rmsXYResiduals),
-        m_rejectionLimit(src.m_rejectionLimit), 
+        m_rejectionLimit(src.m_rejectionLimit),
         m_numberObservations(src.m_numberObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
@@ -118,7 +117,12 @@ namespace Isis {
         m_sigma0(src.m_sigma0),
         m_elapsedTime(src.m_elapsedTime),
         m_elapsedTimeErrorProp(src.m_elapsedTimeErrorProp),
+        m_radiansToMeters(src.m_radiansToMeters),
         m_converged(src.m_converged),
+        m_bundleControlPoints(src.m_bundleControlPoints),
+        m_outNet(src.m_outNet),
+        m_iterations(src.m_iterations),
+        m_observations(src.m_observations),
         m_rmsImageSampleResiduals(src.m_rmsImageSampleResiduals),
         m_rmsImageLineResiduals(src.m_rmsImageLineResiduals),
         m_rmsImageResiduals(src.m_rmsImageResiduals),
@@ -207,7 +211,12 @@ namespace Isis {
       m_sigma0 = src.m_sigma0;
       m_elapsedTime = src.m_elapsedTime;
       m_elapsedTimeErrorProp = src.m_elapsedTimeErrorProp;
+      m_radiansToMeters = src.m_radiansToMeters;
       m_converged = src.m_converged;
+      m_bundleControlPoints = src.m_bundleControlPoints;
+      m_outNet = src.m_outNet;
+      m_iterations = src.m_iterations;
+      m_observations = src.m_observations;
       m_rmsImageSampleResiduals = src.m_rmsImageSampleResiduals;
       m_rmsImageLineResiduals = src.m_rmsImageLineResiduals;
       m_rmsImageResiduals = src.m_rmsImageResiduals;
@@ -323,6 +332,7 @@ namespace Isis {
 
     // solve and solve cholesky
     m_degreesOfFreedom = -1;
+    m_iterations = 0;
     m_sigma0 = 0.0;
     m_elapsedTime = 0.0;
     m_elapsedTimeErrorProp = 0.0;
@@ -333,6 +343,10 @@ namespace Isis {
     m_maximumLikelihoodMedianR2Residuals = 0.0;
     m_maximumLikelihoodFunctions.clear();
     m_cumProRes = NULL;
+    
+    m_radiansToMeters = 0;
+    m_observations.clear();
+    m_outNet.clear();
 
   }
 
@@ -813,12 +827,22 @@ namespace Isis {
 
 
   /**
-   *  Sets the elapsed time for error propegation.
+   * Sets the elapsed time for error propegation.
    * 
    * @param time The elapsed time.
    */
   void BundleResults::setElapsedTimeErrorProp(double time) {
     m_elapsedTimeErrorProp = time;
+  }
+
+
+  /**
+   * Sets the radians to meters conversion constant for the target body.
+   * 
+   * @param rtm The (double) conversion factor.
+   */
+  void BundleResults::setRadiansToMeters(double rtm) {
+    m_radiansToMeters = rtm;
   }
 
 
@@ -829,6 +853,46 @@ namespace Isis {
    */
   void BundleResults::setConverged(bool converged) {
     m_converged = converged;
+  }
+
+
+  /**
+   * Sets the bundle control point vector.
+   * 
+   * @param controlPoints The vector of BundleControlPointQsps.
+   */
+  void BundleResults::setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints) {
+    m_bundleControlPoints = controlPoints;
+  }
+
+
+  /**
+   * Sets the output ControlNet.
+   * 
+   * @param outNet A QSharedPointer to the output ControlNet.
+   */
+  void BundleResults::setOutputControlNet(ControlNetQsp outNet) {
+    m_outNet = outNet;
+  }
+
+
+  /**
+   * Sets the number of iterations taken by the BundleAdjust.
+   * 
+   * @param iterations The number of iterations.
+   */
+  void BundleResults::setIterations(int iterations) {
+    m_iterations = iterations;
+  }
+
+
+  /**
+   * Sets the vector of BundleObservations.
+   * 
+   * @param observations The vector of BundleObservations.
+   */
+  void BundleResults::setObservations(BundleObservationVector observations) {
+    m_observations = observations;
   }
 
 
@@ -1116,6 +1180,16 @@ namespace Isis {
 
 
   /**
+   * Returns the radians to meters conversion factor for the target body.
+   * 
+   * @return @b double The conversion factor.
+   */
+  double BundleResults::radiansToMeters() const {
+    return m_radiansToMeters;
+  }
+
+
+  /**
    * Returns the number of observation that were rejected.
    * 
    * @return @b int The number of rejected observations.
@@ -1236,6 +1310,53 @@ namespace Isis {
 
 
   /**
+   * Returns a reference to the BundleControlPoint vector.
+   * 
+   * @return @b QVector<BundleControlPointQsp>& The BundleControlPoint vector.
+   */
+  QVector<BundleControlPointQsp> &BundleResults::bundleControlPoints() {
+    return m_bundleControlPoints;
+  }
+
+
+  /**
+   * Returns a shared pointer to the output control network.
+   * 
+   * @return @b ControlNetQsp A shared pointer to the output control network.
+   * 
+   * @throws IException::Programmer "Output Control Network has not been set."
+   */
+  ControlNetQsp BundleResults::outputControlNet() const {
+    if (!m_outNet) {
+      throw IException(IException::Programmer, 
+                       "Output Control Network has not been set.",
+                       _FILEINFO_);
+    }
+    return m_outNet;
+  }
+
+
+  /**
+   * Returns the number of iterations taken by the BundleAdjust.
+   * 
+   * @return @b int The number of iterations.
+   */
+  int BundleResults::iterations() const {
+    return m_iterations;
+  }
+
+
+  /**
+   * Returns a reference to the observations used by the BundleAdjust.
+   * 
+   * @return @b BundleObservationVector& A reference to the observation vector.
+   */
+  const BundleObservationVector &BundleResults::observations() const {
+    return m_observations;
+  }
+
+
+  /**
    * Returns how many maximum likelihood models were used in the bundle adjustment.
    * 
    * @return @b int The number fo maximum likelihood models.
@@ -1334,6 +1455,7 @@ namespace Isis {
     pvl += PvlKeyword("RMSResidualY", toString(rmsRy()));
     pvl += PvlKeyword("RMSResidualXY", toString(rmsRxy()));
     pvl += PvlKeyword("RejectionLimit", toString(rejectionLimit()));
+    pvl += PvlKeyword("RadiansToMeters", toString(radiansToMeters()));
     pvl += PvlKeyword("NumberRejectedObservations", toString(numberRejectedObservations()));
     pvl += PvlKeyword("NumberObservations", toString(numberObservations()));
     pvl += PvlKeyword("NumberImageParameters", toString(numberImageParameters()));
@@ -1348,6 +1470,7 @@ namespace Isis {
     pvl += PvlKeyword("Sigma0", toString(sigma0()));
     pvl += PvlKeyword("ElapsedTime", toString(elapsedTime()));
     pvl += PvlKeyword("ElapsedTimeErrorProp", toString(elapsedTimeErrorProp()));
+    pvl += PvlKeyword("Iterations", toString(iterations()));
     pvl += PvlKeyword("Converged", toString(converged()));
 #if 0
     // loop through these ??? what value to store???
@@ -2453,6 +2576,7 @@ namespace Isis {
                                             H5::PredType::NATIVE_INT,
                                             spc);
         att.write(H5::PredType::NATIVE_INT, &m_numberObservations);
+
 
         att = resultsGroup.createAttribute("numberRejectedObservations", 
                                             H5::PredType::NATIVE_INT,

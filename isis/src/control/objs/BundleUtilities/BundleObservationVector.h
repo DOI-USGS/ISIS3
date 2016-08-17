@@ -55,6 +55,8 @@ namespace Isis {
    *                           Fixes #4150, #4155.
    *   @history 2016-08-03 Ian Humphrey - Updated documentation and coding standards. Replaced
    *                           getObservationByCubeSerialNumber with observationByCubeSerialNumber.
+   *   @history 2016-08-11 Jesse Mapel - Defined assignment operator and copy constructor.
+   *                           Fixes #4159.
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 
@@ -79,8 +81,8 @@ namespace Isis {
   private:
       //! Map between observation number and pointer to observation.
       QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
-      //! Map between image serial number and vector index.
-      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap; 
+      //! Map between image serial number and pointer to observation.
+      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
   };
 }
 

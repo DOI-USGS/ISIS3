@@ -8,9 +8,16 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
+#include "BundleControlPoint.h"
+#include "BundleObservation.h"
+#include "BundleObservationVector.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "Camera.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+#include "ControlNet.h"
 #include "FileName.h"
 #include "IException.h"
 #include "ImageList.h"
@@ -80,9 +87,52 @@ int main(int argc, char *argv[]) {
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    settings->setOutputFiles("", true, true, true);
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
+    ControlPoint *freePoint = new ControlPoint("FreePoint");
+    ControlMeasure *freeMeasure1 = new ControlMeasure;
+    freeMeasure1->SetCubeSerialNumber("Ignored");
+    freeMeasure1->SetIgnored(true);
+    freePoint->Add(freeMeasure1);
+    ControlMeasure *freeMeasure2 = new ControlMeasure;
+    freeMeasure2->SetCubeSerialNumber("NotIgnored");
+    freeMeasure2->SetIgnored(false);
+    freeMeasure2->SetCoordinate(1.0, 2.0);
+    freeMeasure2->SetResidual(-3.0, 4.0);
+    freePoint->Add(freeMeasure2);
+    SurfacePoint freeSurfacePoint(Latitude(45.0, Angle::Degrees), 
+                                  Longitude(120.0, Angle::Degrees), 
+                                  Distance(6.0, Distance::Meters));
+    freePoint->SetAdjustedSurfacePoint(freeSurfacePoint);
+    ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
+    fixedPoint->SetType(ControlPoint::Fixed);
+    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees), 
+                                   Longitude(180.0, Angle::Degrees), 
+                                   Distance(10.0, Distance::Meters));
+    fixedPoint->SetAdjustedSurfacePoint(fixedSurfacePoint);
+    ControlNet outNet;
+    outNet.AddPoint(freePoint);
+    outNet.AddPoint(fixedPoint);
+    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
+    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    QVector<BundleControlPointQsp> bundleControlPointVector;
+    bundleControlPointVector.append(freeBundleControlPoint);
+    bundleControlPointVector.append(fixedBundleControlPoint);
+    Camera *camera = NULL;
+    BundleImage bundleImage(camera,
+                            "TestImageSerialNumber",
+                            "TestImageFileName");
+    BundleObservationVector observationVector;
     QObject *parent = NULL;
+    observationVector.addnew(BundleImageQsp(new BundleImage(bundleImage)),
+                             "ObservationNumber1",
+                             "InstrumentId1",
+                             BundleSettingsQsp(new BundleSettings(parent)));
+
+    statistics.setBundleControlPoints(bundleControlPointVector);
+    statistics.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+    statistics.setObservations(observationVector);
     BundleSolutionInfo results(settings, cnetFile, statistics, parent);
 
     PvlObject pvl = results.pvlObject("DefaultSolutionInfoObject");
@@ -127,7 +177,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing error throws...";
     try {
-      // bundleResults exception cannot be tested because the BundleResults cnnot be NULL
+      // bundleResults exception cannot be tested because the BundleResults cannot be NULL
     }
     catch (IException &e) {
       e.print();
@@ -202,6 +252,9 @@ int main(int argc, char *argv[]) {
                                         rmsImageResiduals);
     results.setOutputStatistics(statistics);
 
+    qDebug() << "Testing output methods";
+    
+    results.output();
 
 
 
@@ -246,6 +299,21 @@ int main(int argc, char *argv[]) {
     pvl = fromHDF.pvlObject("BundleSolutionInfoFromHDF");
     cout << pvl << endl << endl;
 //    QFile::remove(hdfFile.expanded());
+    FileName txtFile("./bundleout.txt");
+    QFile txtOutput(txtFile.expanded());
+    if (txtOutput.exists()) {
+      txtOutput.remove();
+    }
+    FileName pointsCsv("./bundleout_points.csv");
+    QFile pointsOutput(pointsCsv.expanded());
+    if (pointsOutput.exists()) {
+      pointsOutput.remove();
+    }
+    FileName residualsCsv("./residuals.csv");
+    QFile residualsOutput(residualsCsv.expanded());
+    if (residualsOutput.exists()) {
+      residualsOutput.remove();
+    }
 
   }
   catch (IException &e) {

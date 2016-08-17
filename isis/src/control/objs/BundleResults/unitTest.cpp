@@ -8,7 +8,14 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
+#include "BundleControlPoint.h"
+#include "BundleObservation.h"
+#include "BundleObservationVector.h"
 #include "BundleResults.h"
+#include "Camera.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+#include "ControlNet.h"
 #include "FileName.h"
 #include "IException.h"
 #include "MaximumLikelihoodWFunctions.h"
@@ -173,6 +180,8 @@ int main(int argc, char *argv[]) {
     results.incrementFixedPoints();
     results.incrementHeldImages();
     results.incrementIgnoredPoints();
+    results.setRadiansToMeters(23.68);
+    results.setIterations(6);
     pvl = results.pvlObject("MutatedResultsObject");
     cout << pvl << endl << endl;
     qDebug() << "";
@@ -193,6 +202,47 @@ int main(int argc, char *argv[]) {
     imgsAndParams.insert("img2", list2);
     results.setCorrMatImgsAndParams(imgsAndParams);
     qDebug() << "";
+    
+    qDebug() << "Testing storage for output methods...";
+    ControlPoint *freePoint = new ControlPoint("FreePoint");
+    ControlMeasure *freeMeasure1 = new ControlMeasure;
+    freeMeasure1->SetCubeSerialNumber("Ignored");
+    freeMeasure1->SetIgnored(true);
+    freePoint->Add(freeMeasure1);
+    ControlMeasure *freeMeasure2 = new ControlMeasure;
+    freeMeasure2->SetCubeSerialNumber("NotIgnored");
+    freeMeasure2->SetIgnored(false);
+    freeMeasure2->SetCoordinate(1.0, 2.0);
+    freeMeasure2->SetResidual(-3.0, 4.0);
+    freePoint->Add(freeMeasure2);
+    ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
+    fixedPoint->SetType(ControlPoint::Fixed);
+    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees), 
+                                   Longitude(180.0, Angle::Degrees), 
+                                   Distance(10.0, Distance::Meters));
+    fixedPoint->SetAdjustedSurfacePoint(fixedSurfacePoint);
+    ControlNet outNet;
+    outNet.AddPoint(freePoint);
+    outNet.AddPoint(fixedPoint);
+    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
+    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    QVector<BundleControlPointQsp> bundleControlPointVector;
+    bundleControlPointVector.append(freeBundleControlPoint);
+    bundleControlPointVector.append(fixedBundleControlPoint);
+    Camera *camera = NULL;
+    BundleImage bundleImage(camera,
+                            "TestImageSerialNumber",
+                            "TestImageFileName");
+    BundleObservationVector observationVector;
+    observationVector.addnew(BundleImageQsp(new BundleImage(bundleImage)),
+                             "ObservationNumber1",
+                             "InstrumentId1",
+                             BundleSettingsQsp(new BundleSettings(parent)));
+
+    results.setBundleControlPoints(bundleControlPointVector);
+    results.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+    results.setObservations(observationVector);
+    qDebug() << "";
 
     qDebug() << "Testing accessor methods...";
     qDebug() << "maximum likelihood index = " << toString(results.maximumLikelihoodModelIndex());
@@ -206,6 +256,24 @@ int main(int argc, char *argv[]) {
                << ", " << toString(results.maximumLikelihoodModelQuantile(i))
                << "]";
   //??       QList< QPair< MaximumLikelihoodWFunctions, double > > maximumLikelihoodModels() const;
+    }
+
+    qDebug() << "bundle control points...";
+    QVector<BundleControlPointQsp> accessedControlPoints = results.bundleControlPoints();
+    for (int i = 0; i < accessedControlPoints.size(); i++) {
+      qDebug().noquote() << accessedControlPoints[i]->formatBundleOutputSummaryString(false);
+    }
+
+    qDebug() << "output control network";
+    ControlNetQsp accessedControlNet = results.outputControlNet();
+    qDebug() << accessedControlNet->GetNumMeasures();
+    qDebug() << accessedControlNet->GetNumPoints();
+
+    qDebug() << "bundle observations";
+    BundleObservationVector accessedBundleObservations = results.observations();
+    for (int i = 0; i < accessedBundleObservations.size(); i++) {
+      qDebug() << accessedBundleObservations[i]->instrumentId();
+      qDebug() << accessedBundleObservations[i]->imageNames();
     }
 
     qDebug() << "";
@@ -271,6 +339,13 @@ int main(int argc, char *argv[]) {
       results.setNumberUnknownParameters(1);
       results.computeSigma0(1.0, BundleSettings::Sigma0);
     } 
+    catch (IException &e) {
+      e.print();
+    }
+    try {
+      BundleResults defaultResaults;
+      defaultResaults.outputControlNet();
+    }
     catch (IException &e) {
       e.print();
     }

@@ -11,13 +11,17 @@
 #include <H5Cpp.h>
 
 #include "BundleResults.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
 #include "FileName.h"
 #include "ImageList.h"
 #include "IString.h"
+#include "iTime.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "StatCumProbDistDynCalc.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -508,6 +512,793 @@ namespace Isis {
                        _FILEINFO_);
     }
   }
+
+  /**
+   * Outputs the results of the BundleAdjust to files.
+   * 
+   * @return @b bool If the results were successfully output.
+   * 
+   * @see outputText()
+   * @see outputPointsCSV()
+   * @see outputResiduals()
+   */
+  bool BundleSolutionInfo::output() {
+    if (m_settings->createBundleOutputFile()) {
+      outputText();
+    }
+
+    if (m_settings->createCSVFiles()) {
+      outputPointsCSV();
+    }
+
+    if (m_settings->createResidualsFile()) {
+      outputResiduals();
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Output header for bundle results file.
+   * 
+   * @param fpOut The output stream that the header will be sent to.
+   * 
+   * @throws IException::Io "Failed to output residual percentiles for bundleout"
+   * @throws IException::Io "Failed to output residual box plot for bundleout"
+   */
+  bool BundleSolutionInfo::outputHeader(std::ofstream &fpOut) {
+
+    if (!fpOut) {
+      return false;
+    }
+
+    char buf[1056];
+    int numObservations = m_statisticsResults->observations().size();
+    int numImages = 0;
+    for (int i = 0; i < numObservations; i++) {
+      numImages += m_statisticsResults->observations().at(i)->size();
+    }
+    int numValidPoints = m_statisticsResults->outputControlNet()->GetNumValidPoints();
+    int numInnerConstraints = 0;
+    int numDistanceConstraints = 0;
+    int numDegreesOfFreedom = m_statisticsResults->numberObservations()
+                            + m_statisticsResults->numberConstrainedPointParameters()
+                            + m_statisticsResults->numberConstrainedImageParameters()
+                            + m_statisticsResults->numberConstrainedTargetParameters()
+                            - m_statisticsResults->numberUnknownParameters();
+
+    int convergenceCriteria = 1;
+
+    sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
+    fpOut << buf;
+    sprintf(buf, "\n                       Run Time: %s",
+                  Isis::iTime::CurrentLocalTime().toLatin1().data());
+    fpOut << buf;
+    sprintf(buf, "\n               Network Filename: %s",
+                  m_controlNetworkFileName->expanded().toLatin1().data());
+    fpOut << buf;
+    sprintf(buf, "\n                     Network Id: %s",
+                  m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
+    fpOut << buf;
+    sprintf(buf, "\n            Network Description: %s",\
+                  m_statisticsResults->outputControlNet()->Description().toLatin1().data());
+    fpOut << buf;
+    sprintf(buf, "\n                         Target: %s",
+                  m_statisticsResults->outputControlNet()->GetTarget().toLatin1().data());
+    fpOut << buf;
+    sprintf(buf, "\n\n                   Linear Units: kilometers");
+    fpOut << buf;
+    sprintf(buf, "\n                  Angular Units: decimal degrees");
+    fpOut << buf;
+    sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
+    fpOut << buf;
+
+    m_settings->solveObservationMode() ?
+      sprintf(buf, "\n                   OBSERVATIONS: ON"):
+      sprintf(buf, "\n                   OBSERVATIONS: OFF");
+    fpOut << buf;
+
+    m_settings->solveRadius() ?
+      sprintf(buf, "\n                         RADIUS: ON"):
+      sprintf(buf, "\n                         RADIUS: OFF");
+    fpOut << buf;
+
+    m_settings->solveTargetBody() ?
+      sprintf(buf, "\n                    TARGET BODY: ON"):
+      sprintf(buf, "\n                    TARGET BODY: OFF");
+    fpOut << buf;
+
+    m_settings->updateCubeLabel() ?
+      sprintf(buf, "\n                         UPDATE: YES"):
+      sprintf(buf, "\n                         UPDATE: NO");
+    fpOut << buf;
+
+    sprintf(buf, "\n                  SOLUTION TYPE: %s",
+                  BundleSettings::solveMethodToString(
+                      m_settings->solveMethod()).toUpper().toLatin1().data());
+    fpOut << buf;
+
+    m_settings->errorPropagation() ?
+      sprintf(buf, "\n              ERROR PROPAGATION: ON"):
+      sprintf(buf, "\n              ERROR PROPAGATION: OFF");
+    fpOut << buf;
+
+    if (m_settings->outlierRejection()) {
+      sprintf(buf, "\n              OUTLIER REJECTION: ON");
+      fpOut << buf;
+      sprintf(buf, "\n           REJECTION MULTIPLIER: %lf",
+                    m_settings->outlierRejectionMultiplier());
+      fpOut << buf;
+
+    }
+    else {
+      sprintf(buf, "\n              OUTLIER REJECTION: OFF");
+      fpOut << buf;
+      sprintf(buf, "\n           REJECTION MULTIPLIER: N/A");
+      fpOut << buf;
+    }
+
+    sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
+    fpOut << buf;
+
+    for (int tier = 0; tier < 3; tier++) {
+      if (tier < m_statisticsResults->numberMaximumLikelihoodModels()) {
+        sprintf(buf, "\n                         Tier %d Enabled: TRUE", tier);
+        fpOut << buf;
+        sprintf(buf, "\n               Maximum Likelihood Model: %s",
+                      MaximumLikelihoodWFunctions::modelToString(
+                          m_statisticsResults->
+                              maximumLikelihoodModelWFunc(tier).model()).toLatin1().data());
+        fpOut << buf;
+        sprintf(buf, "\n    Quantile used for tweaking constant: %lf",
+                      m_statisticsResults->maximumLikelihoodModelQuantile(tier));
+        fpOut << buf;
+        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",
+                      m_statisticsResults->maximumLikelihoodModelWFunc(tier).tweakingConstant());
+        fpOut << buf;
+        sprintf(buf, "\n       Approx. weighted Residual cutoff: %s",
+                      m_statisticsResults->maximumLikelihoodModelWFunc(tier)
+                          .weightedResidualCutoff().toLatin1().data());
+        fpOut << buf;
+        if (tier != 2) fpOut << "\n";
+      }
+      else {
+        sprintf(buf, "\n                         Tier %d Enabled: FALSE", tier);
+        fpOut << buf;
+      }
+    }
+
+    sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
+    fpOut << buf;
+    sprintf(buf, "\n                         SIGMA0: %e",
+                  m_settings->convergenceCriteriaThreshold());
+    fpOut << buf;
+    sprintf(buf, "\n             MAXIMUM ITERATIONS: %d",
+                  m_settings->convergenceCriteriaMaximumIterations());
+    fpOut << buf;
+    sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
+    fpOut << buf;
+
+    if (m_settings->solveTargetBody()) {
+      sprintf(buf, "\n\nINPUT: TARGET BODY OPTIONS\n==============================\n");
+      fpOut << buf;
+
+      if (m_settings->solvePoleRA() && m_settings->solvePoleDec()) {
+        sprintf(buf,"\n                             POLE: RIGHT ASCENSION");
+        fpOut << buf;
+        sprintf(buf,"\n                                 : DECLINATION\n");
+        fpOut << buf;
+      }
+      else if (m_settings->solvePoleRA()) {
+        sprintf(buf,"\n                             POLE: RIGHT ASCENSION\n");
+        fpOut << buf;
+      }
+      else if (m_settings->solvePoleDec()) {
+        sprintf(buf,"\n                             POLE: DECLINATION\n");
+        fpOut << buf;
+      }
+
+      if (m_settings->solvePM() || m_settings->solvePMVelocity()
+          || m_settings->solvePMAcceleration()) {
+        sprintf(buf,"\n                   PRIME MERIDIAN: W0 (OFFSET)");
+        fpOut << buf;
+
+        if (m_settings->solvePMVelocity()) {
+          sprintf(buf,"\n                                 : WDOT (SPIN RATE)");
+          fpOut << buf;
+        }
+        if (m_settings->solvePMAcceleration()) {
+          sprintf(buf,"\n                               :W ACCELERATION");
+          fpOut << buf;
+        }
+      }
+
+      if (m_settings->solveTriaxialRadii() || m_settings->solveMeanRadius()) {
+        if (m_settings->solveMeanRadius()) {
+          sprintf(buf,"\n                          RADII: MEAN");
+          fpOut << buf;
+        }
+        else if (m_settings->solveTriaxialRadii()) {
+          sprintf(buf,"\n                          RADII: TRIAXIAL");
+          fpOut << buf;
+        }
+      }
+    }
+
+    sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
+    fpOut << buf;
+    sprintf(buf, "\n                         Images: %6d",numImages);
+    fpOut << buf;
+    sprintf(buf, "\n                         Points: %6d",numValidPoints);
+    fpOut << buf;
+
+    sprintf(buf, "\n                 Total Measures: %6d",
+                  (m_statisticsResults->numberObservations()
+                      + m_statisticsResults->numberRejectedObservations()) / 2);
+    fpOut << buf;
+
+    sprintf(buf, "\n             Total Observations: %6d",
+                  m_statisticsResults->numberObservations()
+                      + m_statisticsResults->numberRejectedObservations());
+    fpOut << buf;
+
+    sprintf(buf, "\n              Good Observations: %6d",
+                  m_statisticsResults->numberObservations());
+    fpOut << buf;
+
+    sprintf(buf, "\n          Rejected Observations: %6d",
+                  m_statisticsResults->numberRejectedObservations());
+    fpOut << buf;
+
+    if (m_statisticsResults->numberConstrainedPointParameters() > 0) {
+      sprintf(buf, "\n   Constrained Point Parameters: %6d",
+                    m_statisticsResults->numberConstrainedPointParameters());
+      fpOut << buf;
+    }
+
+    if (m_statisticsResults->numberConstrainedImageParameters() > 0) {
+      sprintf(buf, "\n   Constrained Image Parameters: %6d",
+                    m_statisticsResults->numberConstrainedImageParameters());
+      fpOut << buf;
+    }
+
+    if (m_statisticsResults->numberConstrainedTargetParameters() > 0) {
+      sprintf(buf, "\n  Constrained Target Parameters: %6d",
+                    m_statisticsResults->numberConstrainedTargetParameters());
+      fpOut << buf;
+    }
+
+    sprintf(buf, "\n                       Unknowns: %6d",
+                  m_statisticsResults->numberUnknownParameters());
+    fpOut << buf;
+
+    if (numInnerConstraints > 0) {
+      sprintf(buf, "\n      Inner Constraints: %6d", numInnerConstraints);
+     fpOut << buf;
+    }
+
+    if (numDistanceConstraints > 0) {
+      sprintf(buf, "\n   Distance Constraints: %d", numDistanceConstraints);
+      fpOut << buf;
+    }
+
+    sprintf(buf, "\n             Degrees of Freedom: %6d", numDegreesOfFreedom);
+    fpOut << buf;
+
+    sprintf(buf, "\n           Convergence Criteria: %6.3g",
+                               m_settings->convergenceCriteriaThreshold());
+    fpOut << buf;
+
+    if (convergenceCriteria == 1) {
+      sprintf(buf, "(Sigma0)");
+      fpOut << buf;
+    }
+
+    sprintf(buf, "\n                     Iterations: %6d", m_statisticsResults->iterations());
+    fpOut << buf;
+
+    if (m_statisticsResults->iterations() >= m_settings->convergenceCriteriaMaximumIterations()) {
+      sprintf(buf, "(Maximum reached)");
+      fpOut << buf;
+    }
+
+    sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_statisticsResults->sigma0());
+    fpOut << buf;
+    sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",
+                  m_statisticsResults->elapsedTimeErrorProp());
+    fpOut << buf;
+    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",
+                  m_statisticsResults->elapsedTime());
+    fpOut << buf;
+    if (m_statisticsResults->numberObservations() 
+        + m_statisticsResults->numberRejectedObservations()
+        > 100) {
+      sprintf(buf, "\n           Residual Percentiles:\n");
+      fpOut << buf;
+
+    // residual prob distribution values are calculated/printed
+    // even if there is no maximum likelihood estimation
+      try {
+        for (int bin = 1;bin < 34;bin++) {
+          double cumProb = double(bin) / 100.0;
+          double resValue =
+              m_statisticsResults->
+                  residualsCumulativeProbabilityDistribution().value(cumProb);
+          double resValue33 =
+              m_statisticsResults->
+                  residualsCumulativeProbabilityDistribution().value(cumProb + 0.33);
+          double resValue66 =
+              m_statisticsResults->
+                  residualsCumulativeProbabilityDistribution().value(cumProb + 0.66);
+          sprintf(buf, "                 Percentile %3d: %+8.3lf"
+                       "                 Percentile %3d: %+8.3lf"
+                       "                 Percentile %3d: %+8.3lf\n",
+                                         bin,      resValue,
+                                         bin + 33, resValue33,
+                                         bin + 66, resValue66);
+          fpOut << buf;
+        }
+      }
+      catch (IException &e) {
+        QString msg = "Failed to output residual percentiles for bundleout";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+      try {
+        sprintf(buf, "\n              Residual Box Plot:");
+        fpOut << buf;
+        sprintf(buf, "\n                        minimum: %+8.3lf",
+                m_statisticsResults->residualsCumulativeProbabilityDistribution().min());
+        fpOut << buf;
+        sprintf(buf, "\n                     Quartile 1: %+8.3lf",
+                m_statisticsResults->residualsCumulativeProbabilityDistribution().value(0.25));
+        fpOut << buf;
+        sprintf(buf, "\n                         Median: %+8.3lf",
+                m_statisticsResults->residualsCumulativeProbabilityDistribution().value(0.50));
+        fpOut << buf;
+        sprintf(buf, "\n                     Quartile 3: %+8.3lf",
+                m_statisticsResults->residualsCumulativeProbabilityDistribution().value(0.75));
+        fpOut << buf;
+        sprintf(buf, "\n                        maximum: %+8.3lf\n",
+                m_statisticsResults->residualsCumulativeProbabilityDistribution().max());
+        fpOut << buf;
+      }
+      catch (IException &e) {
+        QString msg = "Failed to output residual box plot for bundleout";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
+
+    sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+    fpOut << buf;
+
+    int numMeasures;
+    int numRejectedMeasures;
+    int numUsed;
+    int imageIndex = 0;
+
+    for (int i = 0; i < numObservations; i++) {
+      
+      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+      
+      for (int j = 0; j < numImagesInObservation; j++) {
+        
+        BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+        
+        double rmsSampleResiduals = m_statisticsResults->
+                                        rmsImageSampleResiduals()[imageIndex].Rms();
+        double rmsLineResiduals =   m_statisticsResults->
+                                        rmsImageLineResiduals()[imageIndex].Rms();
+        double rmsLandSResiduals =  m_statisticsResults->
+                                        rmsImageResiduals()[imageIndex].Rms();
+
+        numMeasures =         m_statisticsResults->outputControlNet()->
+                                  GetNumberOfValidMeasuresInImage(
+                                      bundleImage->serialNumber());
+
+        numRejectedMeasures = m_statisticsResults->outputControlNet()->
+                                  GetNumberOfJigsawRejectedMeasuresInImage(
+                                      bundleImage->serialNumber());
+
+        numUsed =             numMeasures - numRejectedMeasures;
+
+        if (numUsed == numMeasures) {
+          sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
+                  bundleImage->fileName().toLatin1().data(),
+                  (numMeasures-numRejectedMeasures), numMeasures,
+                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+        }
+        else {
+          sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
+                  bundleImage->fileName().toLatin1().data(),
+                  (numMeasures-numRejectedMeasures), numMeasures,
+                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+        }
+        fpOut << buf;
+        imageIndex++;
+      }
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Outputs a text file with the results of the BundleAdjust.
+   * 
+   * @return @b bool If the text file was successfully output.
+   */
+  bool BundleSolutionInfo::outputText() {
+
+    QString ofname = "bundleout.txt";
+    ofname = m_settings->outputFilePrefix() + ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+    char buf[1056];
+    BundleObservationQsp observation;
+
+    int nObservations = m_statisticsResults->observations().size();
+
+    outputHeader(fpOut);
+
+    bool berrorProp = false;
+    if (m_statisticsResults->converged() && m_settings->errorPropagation()) {
+      berrorProp = true;
+    }
+
+    // output target body header if solving for target
+    if (m_settings->solveTargetBody()) {
+      sprintf(buf, "\nTARGET BODY\n==========================\n");
+      fpOut << buf;
+
+      sprintf(buf, "\n   Target         Initial              Total               "
+                   "Final             Initial           Final\n"
+                   "Parameter         Value              Correction           "
+                   "Value             Accuracy          Accuracy\n");
+      fpOut << buf;
+
+      QString targetString =
+          m_settings->bundleTargetBody()->formatBundleOutputString(berrorProp);
+      fpOut << (const char*)targetString.toLatin1().data();
+    }
+
+    // output image exterior orientation header
+    sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
+    fpOut << buf;
+
+    QMap<QString, QStringList> imagesAndParameters;
+
+    if (m_settings->solveTargetBody()) {
+      imagesAndParameters.insert( "target", m_settings->bundleTargetBody()->parameterList() );
+    }
+
+    for (int i = 0; i < nObservations; i++) {
+
+      observation = m_statisticsResults->observations().at(i);
+      if (!observation) {
+        continue;
+      }
+
+      int numImages = observation->size();
+      for (int j = 0; j < numImages; j++) {
+        BundleImageQsp image = observation->at(j);
+        sprintf(buf, "\nImage Full File Name: %s\n", image->fileName().toLatin1().data());
+        fpOut << buf;
+        sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
+        fpOut << buf;
+      }
+
+      sprintf(buf, "\n    Image         Initial              Total               "
+                   "Final             Initial           Final\n"
+                   "Parameter         Value              Correction            "
+                   "Value             Accuracy          Accuracy\n");
+      fpOut << buf;
+
+      QString observationString =
+          observation->formatBundleOutputString(berrorProp);
+      fpOut << (const char*)observationString.toLatin1().data();
+
+      // Build list of images and parameters for correlation matrix.
+      foreach ( QString image, observation->imageNames() ) {
+        imagesAndParameters.insert( image, observation->parameterList() );
+      }
+    }
+        
+    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
+    m_statisticsResults->setCorrMatImgsAndParams(imagesAndParameters);
+
+    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
+    m_statisticsResults->setCorrMatImgsAndParams(imagesAndParameters);
+
+    // output point uncertainty statistics if error propagation is on
+    if (berrorProp) {
+      sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
+      fpOut << buf;
+      sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n",
+              m_statisticsResults->sigmaLatitudeStatisticsRms());
+      fpOut << buf;
+      sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
+              m_statisticsResults->minSigmaLatitudeDistance().meters(),
+              m_statisticsResults->minSigmaLatitudePointId().toLatin1().data());
+      fpOut << buf;
+      sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
+              m_statisticsResults->maxSigmaLatitudeDistance().meters(),
+              m_statisticsResults->maxSigmaLatitudePointId().toLatin1().data());
+      fpOut << buf;
+      sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
+              m_statisticsResults->sigmaLongitudeStatisticsRms());
+      fpOut << buf;
+      sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
+              m_statisticsResults->minSigmaLongitudeDistance().meters(),
+              m_statisticsResults->minSigmaLongitudePointId().toLatin1().data());
+      fpOut << buf;
+      sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
+              m_statisticsResults->maxSigmaLongitudeDistance().meters(),
+              m_statisticsResults->maxSigmaLongitudePointId().toLatin1().data());
+      fpOut << buf;
+      if ( m_settings->solveRadius() ) {
+        sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
+                m_statisticsResults->sigmaRadiusStatisticsRms());
+        fpOut << buf;
+        sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
+                m_statisticsResults->minSigmaRadiusDistance().meters(),
+                m_statisticsResults->minSigmaRadiusPointId().toLatin1().data());
+        fpOut << buf;
+        sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
+                m_statisticsResults->maxSigmaRadiusDistance().meters(),
+                m_statisticsResults->maxSigmaRadiusPointId().toLatin1().data());
+        fpOut << buf;
+      }
+      else {
+        sprintf(buf, "   RMS Sigma Radius(m)                 N/A\n");
+        fpOut << buf;
+        sprintf(buf, "   MIN Sigma Radius(m)                 N/A\n");
+        fpOut << buf;
+        sprintf(buf, "   MAX Sigma Radius(m)                 N/A\n");
+        fpOut << buf;
+      }
+    }
+
+    // output point summary data header
+    sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103s"
+            "Sigma          Sigma              Sigma\n"
+            "           Label         Status     Rays    RMS"
+            "        Latitude       Longitude          Radius"
+            "        Latitude       Longitude          Radius\n", "");
+    fpOut << buf;
+
+    int nPoints = m_statisticsResults->bundleControlPoints().size();
+    for (int i = 0; i < nPoints; i++) {
+      BundleControlPointQsp bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
+
+      QString pointSummaryString =
+          bundleControlPoint->formatBundleOutputSummaryString(berrorProp);
+      fpOut << (const char*)pointSummaryString.toLatin1().data();
+    }
+
+    // output point detail data header
+    sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
+    fpOut << buf;
+
+    for (int i = 0; i < nPoints; i++) {
+      BundleControlPointQsp bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
+
+      QString pointDetailString =
+          bundleControlPoint->formatBundleOutputDetailString(berrorProp,
+                                                           m_statisticsResults->radiansToMeters());
+      fpOut << (const char*)pointDetailString.toLatin1().data();
+    }
+
+    fpOut.close();
+
+    return true;
+  }
+
+
+  /**
+   * Outputs point data to a csv file.
+   * 
+   * @return @b bool If the point data was successfully output.
+   */
+  bool BundleSolutionInfo::outputPointsCSV() {
+    char buf[1056];
+
+    QString ofname = "bundleout_points.csv";
+    ofname = m_settings->outputFilePrefix() + ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+    int numPoints = m_statisticsResults->bundleControlPoints().size();
+
+    double dLat, dLon, dRadius;
+    double dX, dY, dZ;
+    double dSigmaLat, dSigmaLong, dSigmaRadius;
+    QString strStatus;
+    double cor_lat_m;
+    double cor_lon_m;
+    double cor_rad_m;
+    int numMeasures, numRejectedMeasures;
+    double dResidualRms;
+
+    // print column headers
+    if (m_settings->errorPropagation()) {
+      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
+              "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
+              "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
+              "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
+              "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
+              "(m),(m),(m),(km),(km),(km)\n");
+    }
+    else {
+      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
+              "Correction,Correction,Correction,Coordinate,Coordinate,"
+              "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
+              "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
+              "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+    }
+    fpOut << buf;
+
+    for (int i = 0; i < numPoints; i++) {
+      BundleControlPointQsp bundlecontrolpoint = m_statisticsResults->bundleControlPoints().at(i);
+
+      if (!bundlecontrolpoint) {
+        continue;
+      }
+
+      if (bundlecontrolpoint->isRejected()) {
+        continue;
+      }
+
+      dLat              = bundlecontrolpoint->adjustedSurfacePoint().GetLatitude().degrees();
+      dLon              = bundlecontrolpoint->adjustedSurfacePoint().GetLongitude().degrees();
+      dRadius           = bundlecontrolpoint->adjustedSurfacePoint().GetLocalRadius().kilometers();
+      dX                = bundlecontrolpoint->adjustedSurfacePoint().GetX().kilometers();
+      dY                = bundlecontrolpoint->adjustedSurfacePoint().GetY().kilometers();
+      dZ                = bundlecontrolpoint->adjustedSurfacePoint().GetZ().kilometers();
+      numMeasures         = bundlecontrolpoint->numberOfMeasures();
+      numRejectedMeasures = bundlecontrolpoint->numberOfRejectedMeasures();
+      dResidualRms      = bundlecontrolpoint->residualRms();
+
+      // point corrections and initial sigmas
+      boost::numeric::ublas::bounded_vector< double, 3 > corrections = bundlecontrolpoint->
+                                                                           corrections();
+      cor_lat_m = corrections[0]*m_statisticsResults->radiansToMeters();
+      cor_lon_m = corrections[1]*m_statisticsResults->radiansToMeters()*cos(dLat*Isis::DEG2RAD);
+      cor_rad_m  = corrections[2]*1000.0;
+
+      if (bundlecontrolpoint->type() == ControlPoint::Fixed) {
+        strStatus = "FIXED";
+      }
+      else if (bundlecontrolpoint->type() == ControlPoint::Constrained) {
+        strStatus = "CONSTRAINED";
+      }
+      else if (bundlecontrolpoint->type() == ControlPoint::Free) {
+        strStatus = "FREE";
+      }
+      else {
+        strStatus = "UNKNOWN";
+      }
+
+      if (m_settings->errorPropagation()) {
+        dSigmaLat = bundlecontrolpoint->adjustedSurfacePoint().GetLatSigmaDistance().meters();
+        dSigmaLong = bundlecontrolpoint->adjustedSurfacePoint().GetLonSigmaDistance().meters();
+        dSigmaRadius = bundlecontrolpoint->adjustedSurfacePoint().GetLocalRadiusSigma().meters();
+
+        sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
+                     "%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                bundlecontrolpoint->id().toLatin1().data(), strStatus.toLatin1().data(),
+                numMeasures, numRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat,
+                dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
+      }
+      else
+        sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
+                     "%16.8lf,%16.8lf\n",
+                bundlecontrolpoint->id().toLatin1().data(), strStatus.toLatin1().data(),
+                numMeasures, numRejectedMeasures, dResidualRms, dLat, dLon, dRadius, cor_lat_m,
+                cor_lon_m, cor_rad_m, dX, dY, dZ);
+
+      fpOut << buf;
+    }
+
+    fpOut.close();
+
+    return true;
+  }
+
+
+  /**
+   * Outputs image coordinate residuals to a csv file.
+   * 
+   * @return @b bool If the residuals were successfully output.
+   */
+  bool BundleSolutionInfo::outputResiduals() {
+    char buf[1056];
+
+    QString ofname = "residuals.csv";
+    ofname = m_settings->outputFilePrefix() + ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+    // output column headers
+
+    sprintf(buf, ",,,x image,y image,Measured,Measured,sample,line,Residual Vector\n");
+    fpOut << buf;
+    sprintf(buf, "Point,Image,Image,coordinate,coordinate,"
+                 "Sample,Line,residual,residual,Magnitude\n");
+    fpOut << buf;
+    sprintf(buf, "Label,Filename,Serial Number,(mm),(mm),"
+                 "(pixels),(pixels),(pixels),(pixels),(pixels),Rejected\n");
+    fpOut << buf;
+
+    // Setup counts and pointers
+
+    int numPoints = m_statisticsResults->bundleControlPoints().size();
+    int numMeasures = 0;
+
+    BundleControlPointQsp bundleControlPoint;
+    BundleMeasureQsp bundleMeasure;
+    
+    for (int i = 0; i < numPoints; i++) {
+      bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
+      numMeasures = bundleControlPoint->size();
+
+      if (bundleControlPoint->rawControlPoint()->IsIgnored()) {
+        continue;
+      }
+      
+      for (int j = 0; j < numMeasures; j++) {
+        bundleMeasure = bundleControlPoint->at(j);
+
+        Camera *measureCamera = bundleMeasure->camera();
+        if (!measureCamera) {
+          continue;
+        }
+
+        if (bundleMeasure->isRejected()) {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
+                  bundleControlPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        else {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                  bundleControlPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        fpOut << buf;
+      }
+    }
+
+    fpOut.close();
+
+    return true;
+  }
+
 
   /**
    * Writes the data to the stream.

@@ -53,6 +53,9 @@ namespace Isis {
    *                           residualMagnitude(), focalPlaneComputedX(), and
    *                           focalPlaneComputedY(). Modified isRejected() and camera() accessors
    *                           to be const. Updated unit test for these methods. References #4201.
+   *   @history 2016-08-15 Jesse Mapel - Changed parent BundleImage to a QSharedPointer and added
+   *                           a mutator.  Added wrapper methods for several ControlMeasure
+   *                           methods.  Added typedef for BundleMeasureQsp.  Fixes #4159.
    */
 
   class BundleControlPoint;
@@ -62,7 +65,7 @@ namespace Isis {
   class Camera;
   class ControlMeasure;
 
-  class BundleMeasure : QObject {
+  class BundleMeasure : public QObject {
 
     Q_OBJECT
 
@@ -78,12 +81,13 @@ namespace Isis {
 
       BundleMeasure &operator=(const BundleMeasure &src);
       void setParentObservation(QSharedPointer<BundleObservation> observation);
+      void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
       bool isRejected() const;
       Camera *camera() const;
       BundleControlPoint *parentControlPoint();
-      BundleImage *parentBundleImage();
+      QSharedPointer<BundleImage> parentBundleImage();
       QSharedPointer<BundleObservation> parentBundleObservation();
       const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
@@ -103,9 +107,11 @@ namespace Isis {
       ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
       BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
                                                      bundle control measure **/
-      BundleImage *m_parentBundleImage; /**< Parent image of this bundle control measure **/
+      QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
       QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
   };
+  //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
+  typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;
 }
 
 #endif // BundleMeasure_h

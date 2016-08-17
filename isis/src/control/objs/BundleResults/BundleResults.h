@@ -36,7 +36,10 @@
 #include <hdf5.h>
 
 // Isis Library
+#include "BundleControlPoint.h"
+#include "BundleObservationVector.h"
 #include "BundleSettings.h"
+#include "ControlNet.h"
 #include "Distance.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlObject.h"
@@ -80,6 +83,9 @@ namespace Isis {
    *                           merging from IPCE into ISIS. Fixes #3975.
    *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
    *                           References #4163.
+   *   @history 2016-08-15 Jesse Mapel - Added iteration count, radians to meters conversion,
+   *                           observation vector, bundle control point vector, and output control
+   *                           network for write methods in BundleSolutionInfo.  Fixes #4159.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -161,7 +167,12 @@ namespace Isis {
       void setSigma0(double sigma0);
       void setElapsedTime(double time);
       void setElapsedTimeErrorProp(double time);
+      void setRadiansToMeters(double rtm);
       void setConverged(bool converged); // or initialze method
+      void setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints);
+      void setOutputControlNet(ControlNetQsp outNet);
+      void setIterations(int iterations);
+      void setObservations(BundleObservationVector observations);
       
       // Accessors...
       QList<Statistics> rmsImageSampleResiduals() const;
@@ -192,6 +203,7 @@ namespace Isis {
       double rmsRy() const;  // currently unused ???
       double rmsRxy() const; // currently unused ???
       double rejectionLimit() const;
+      double radiansToMeters() const;
       int numberRejectedObservations() const;
       int numberObservations() const;
 
@@ -205,6 +217,10 @@ namespace Isis {
       double elapsedTime() const;
       double elapsedTimeErrorProp() const;
       bool converged() const; // or initialze method
+      QVector<BundleControlPointQsp> &bundleControlPoints();
+      ControlNetQsp outputControlNet() const;
+      int iterations() const;
+      const BundleObservationVector &observations() const;
       
       int numberMaximumLikelihoodModels() const;
       int maximumLikelihoodModelIndex() const;
@@ -299,12 +315,14 @@ namespace Isis {
 // ???       Statistics m_statsrxy;                     //!< xy residuals
 
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
-      int m_numberIgnoredPoints;              //!< number of ignored points                  // currently set but unused ???
+      // Currently set but unused
+      int m_numberIgnoredPoints;              //!< number of ignored points
       int m_numberHeldImages;                 //!< number of 'held' images (define)          
 
-      double m_rmsXResiduals;  // set but unused ???                   //!< rms of x residuals
-      double m_rmsYResiduals;  // set but unused ???                   //!< rms of y residuals
-      double m_rmsXYResiduals; // set but unused ???                   //!< rms of all x and y residuals
+      // The following three members are set but unused.
+      double m_rmsXResiduals;                 //!< rms of x residuals
+      double m_rmsYResiduals;                 //!< rms of y residuals
+      double m_rmsXYResiduals;                //!< rms of all x and y residuals
       
       double m_rejectionLimit;                //!< current rejection limit
       // TODO:??? reorder read/write data stream, init, copy constructor, operator= 
@@ -315,11 +333,29 @@ namespace Isis {
       int m_numberConstrainedImageParameters;  //!< number of constrained image parameters
       int m_numberConstrainedPointParameters;  //!< number of constrained point parameters
       int m_numberConstrainedTargetParameters; //!< number of constrained target parameters
-      int m_degreesOfFreedom;           //!< degrees of freedom
-      double m_sigma0;                     //!< std deviation of unit weight
-      double m_elapsedTime;                //!< elapsed time for bundle
-      double m_elapsedTimeErrorProp;       //!< elapsed time for error propagation
+      int m_degreesOfFreedom;                  //!< degrees of freedom
+      double m_sigma0;                         //!< std deviation of unit weight
+      double m_elapsedTime;                    //!< elapsed time for bundle
+      double m_elapsedTimeErrorProp;           //!< elapsed time for error propagation
+      double m_radiansToMeters;                //!< radian to meters conversion factor for the body
       bool m_converged;
+
+      // Variables for output methods in BundleSolutionInfo
+      
+      QVector<BundleControlPointQsp> m_bundleControlPoints; /**< The vector of BundleControlPoints
+                                                                 from BundleAdjust.  Equivalent to
+                                                                 the output control net minus
+                                                                 ignored points and measures.
+                                                                 The contained points and members
+                                                                 hold pointers to the points
+                                                                 and measures in the output
+                                                                 control net.*/
+      ControlNetQsp m_outNet;                               /**< The output control net from
+                                                                 BundleAdjust.*/
+      int m_iterations;                                     /**< The number of iterations taken
+                                                                 by BundleAdjust.*/
+      BundleObservationVector m_observations;               /**< The vector of BundleObservations
+                                                                 from BundleAdjust.*/
 
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -346,23 +382,23 @@ namespace Isis {
       //!< The root mean square image twist sigmas.
       QVector<Statistics> m_rmsImageTWISTSigmas; // unset and unused ???
 
-      Distance m_minSigmaLatitudeDistance; //!< The minimum sigma latitude distance.
-      Distance m_maxSigmaLatitudeDistance; //!< The maximum sigma latitude distance.
+      Distance m_minSigmaLatitudeDistance;  //!< The minimum sigma latitude distance.
+      Distance m_maxSigmaLatitudeDistance;  //!< The maximum sigma latitude distance.
       Distance m_minSigmaLongitudeDistance; //!< The minimum sigma longitude distance.
       Distance m_maxSigmaLongitudeDistance; //!< The maximum sigma longitude distance.
-      Distance m_minSigmaRadiusDistance; //!< The minimum sigma radius distance.
-      Distance m_maxSigmaRadiusDistance; //!< The maximum sigma radius distance.
+      Distance m_minSigmaRadiusDistance;    //!< The minimum sigma radius distance.
+      Distance m_maxSigmaRadiusDistance;    //!< The maximum sigma radius distance.
 
-      QString m_minSigmaLatitudePointId; //!< The minimum sigma latitude point id.
-      QString m_maxSigmaLatitudePointId; //!< The maximum sigma latitude point id.
-      QString m_minSigmaLongitudePointId; //!< The minimum sigma longitude point id.
-      QString m_maxSigmaLongitudePointId; //!< The maximum sigma longitude point id.
-      QString m_minSigmaRadiusPointId; //!< The minimum sigma radius point id.
-      QString m_maxSigmaRadiusPointId; //!< The maximum sigma radius point id.
+      QString m_minSigmaLatitudePointId;    //!< The minimum sigma latitude point id.
+      QString m_maxSigmaLatitudePointId;    //!< The maximum sigma latitude point id.
+      QString m_minSigmaLongitudePointId;   //!< The minimum sigma longitude point id.
+      QString m_maxSigmaLongitudePointId;   //!< The maximum sigma longitude point id.
+      QString m_minSigmaRadiusPointId;      //!< The minimum sigma radius point id.
+      QString m_maxSigmaRadiusPointId;      //!< The maximum sigma radius point id.
 
-      double m_rmsSigmaLatitudeStats;               //!< rms of adjusted Latitude sigmas
-      double m_rmsSigmaLongitudeStats;               //!< rms of adjusted Longitude sigmas
-      double m_rmsSigmaRadiusStats;               //!< rms of adjusted Radius sigmas
+      double m_rmsSigmaLatitudeStats;       //!< rms of adjusted Latitude sigmas
+      double m_rmsSigmaLongitudeStats;      //!< rms of adjusted Longitude sigmas
+      double m_rmsSigmaRadiusStats;         //!< rms of adjusted Radius sigmas
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation

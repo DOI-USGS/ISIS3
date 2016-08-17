@@ -53,6 +53,8 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
    *                           ControlNet's target instead of the TargetName.
    *                           References #3892
+   *   @history 2016-08-15 Jesse Mapel - Added an output control network to account for
+   *                           BundleAdjust creating a new control network.  References #4159.
    *
    */
 

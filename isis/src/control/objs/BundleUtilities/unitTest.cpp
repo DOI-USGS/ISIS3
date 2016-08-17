@@ -534,6 +534,14 @@ int main(int argc, char *argv[]) {
     //SpicePosition *position = 
     bo3.spicePosition();
 
+    qDebug() << "    add another image...";
+    bo3.append(
+      BundleImageQsp(
+        new BundleImage(camera, "TestImage2SerialNumber", "TestImage2FileName")));
+    qDebug() << "    access images by serial number...";
+    qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImageSerialNumber")->fileName();
+    qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImage2SerialNumber")->fileName();
+
     /*  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
     qDebug() << "Testing exceptions...";
     BundleObservationSolveSettings bo3SettingsCopy(*(bo3.solveSettings()));
@@ -899,8 +907,9 @@ int main(int argc, char *argv[]) {
     bundleMeasure.parentBundleObservation();
     BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
     qDebug() << "parent control point id" << parentBCP->id();
-    // BundleImage        *parentImage = 
-    bundleMeasure.parentBundleImage(); //TODO m_parentBundleImage always NULL ??? 
+    bundleMeasure.setParentImage(BundleImageQsp(new BundleImage(bi)));
+    BundleImageQsp parentImage = bundleMeasure.parentBundleImage();
+    qDebug() << "parent image id" << parentImage->serialNumber();
 
     // Copy and =
     BundleMeasure bundleMeasureRejected(bundleMeasure); // We will use this to test setRejected.
@@ -1709,6 +1718,9 @@ int main(int argc, char *argv[]) {
    qDebug() << "rejected?" << toString(m.isRejected());
    qDebug() << "measure sample " << toString(m.sample());
    qDebug() << "measure line   " << toString(m.line());
+   qDebug() << "sample residual" << toString(m.sampleResidual());
+   qDebug() << "line residual" << toString(m.lineResidual());
+   qDebug() << "residual magnitude" << toString(m.residualMagnitude());
    qDebug() << "measure serial number" << m.cubeSerialNumber();
    qDebug() << "focal x" << toString(m.focalPlaneMeasuredX());
    qDebug() << "focal y" << toString(m.focalPlaneMeasuredY());

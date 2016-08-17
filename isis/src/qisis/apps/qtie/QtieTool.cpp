@@ -765,10 +765,11 @@ namespace Isis {
       }
     }
 
-    //  Create temporary network for solution which will not contain measures for
+    //  Create temporary networks for solution which will not contain measures for
     //  the basemap.
-    ControlNet net;
-    net.SetTarget(*p_matchCube->label());
+    ControlNet inNet;
+    ControlNet outNet;
+    inNet.SetTarget(*p_matchCube->label());
 
     // Bundle adjust to solve for new pointing
     try {
@@ -776,7 +777,7 @@ namespace Isis {
       for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
         ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
         pt->Delete(p_baseSN);
-        net.AddPoint(pt);
+        inNet.AddPoint(pt);
       }
 
 
@@ -829,13 +830,14 @@ namespace Isis {
       // =============== End Bundle Settings =====================================================//
       // =========================================================================================//
 
-      BundleAdjust bundleAdjust(settings, net, *p_serialNumberList, false);
+      BundleAdjust bundleAdjust(settings, inNet, *p_serialNumberList, false);
       bundleAdjust.solveCholesky();
       // bundleAdjust.solveCholeskyBR();
 
       // Print results and give user option of updating cube pointin
-      double maxError = net.GetMaximumResidual();
-      double avgError = net.AverageResidual();
+      outNet = *bundleAdjust.controlNet().data();
+      double maxError = outNet.GetMaximumResidual();
+      double avgError = outNet.AverageResidual();
 
       QString message = "Maximum Error = " + QString::number(maxError);
       message += "\nAverage Error = " + QString::number(avgError);
@@ -876,10 +878,12 @@ namespace Isis {
       QString message = "Unable to bundle adjust. Solution failed.\n";
       QString errors = e.toString();
       message += errors;
-//      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());
-//      message += "\nAverage Error = " + QString::number(net.AverageResidual());
-      message += "\n\nMaximum Error = " + QString::number(net.GetMaximumResidual());
-      message += "\nAverage Error = " + QString::number(net.AverageResidual());
+//      message += "\n\nMaximum Error = " + QString::number(outNet.MaximumResiudal());
+//      message += "\nAverage Error = " + QString::number(outNet.AverageResidual());
+      message += "\n\nMaximum Error = " 
+               + QString::number(outNet.GetMaximumResidual());
+      message += "\nAverage Error = " 
+               + QString::number(outNet.AverageResidual());
       QMessageBox::warning((QWidget *)parent(), "Error", message);
       return;
     }

@@ -15,12 +15,45 @@ namespace Isis {
 
 
   /**
+   * Copy constructor.
+   * 
+   * Constructs a BundleObservationVector as a copy of another BundleObservationVector.
+   * 
+   * @param src A reference to the BundleObservationVector to copy from.
+   */
+  BundleObservationVector::BundleObservationVector(const BundleObservationVector &src)
+      :QVector<BundleObservationQsp>(src) {
+    m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
+    m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+  }
+
+
+  /**
    * Destructor.
    *
    * Upon destruction, BundleObservation will delete all contained QObjects (BundleObservations).
    */
   BundleObservationVector::~BundleObservationVector() {
     clear();
+  }
+
+
+  /**
+   * Assignment operator.
+   * 
+   * Assigns the state of the source BundleObservationVector to this BundleObservationVector.
+   * 
+   * @param src The BundleObservationVector to assign from.
+   * 
+   * @return @b BundleObservationVector& A reference to this BundleObservationVector.
+   */
+  BundleObservationVector &BundleObservationVector::operator=(const BundleObservationVector &src) {
+    if (&src != this) {
+      QVector<BundleObservationQsp>::operator=(src);
+      m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
+      m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+    }
+    return *this;
   }
 
 
