@@ -544,6 +544,8 @@ namespace Isis {
    * 
    * @param fpOut The output stream that the header will be sent to.
    * 
+   * @return @b bool If the header was successfully output to the output stream.
+   * 
    * @throws IException::Io "Failed to output residual percentiles for bundleout"
    * @throws IException::Io "Failed to output residual box plot for bundleout"
    */
