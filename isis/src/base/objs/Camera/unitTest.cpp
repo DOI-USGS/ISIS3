@@ -162,9 +162,15 @@ int main() {
     }
 
     cout << "PixelResolution: " << c->PixelResolution() << endl;
+    cout << "ObliquePixelResolution: " << c->ObliquePixelResolution() << endl;
     cout << "LineResolution: " << c->LineResolution() << endl;
+    cout << "ObliqueLineResolution: " << c->ObliqueLineResolution() << endl;
     cout << "SampleResolution: " << c->SampleResolution() << endl;
+    cout << "ObliqueSampleResolution: " << c->ObliqueSampleResolution() << endl;
     cout << "DetectorResolution: " << c->DetectorResolution() << endl;
+    cout << "ObliqueDetectorResolution: " << c->ObliqueDetectorResolution() << endl;
+
+
     cout << "LowestImageResolution: " << setprecision(4)
          << c->LowestImageResolution() << endl;
     cout << "HighestImageResolution: " << setprecision(3)
