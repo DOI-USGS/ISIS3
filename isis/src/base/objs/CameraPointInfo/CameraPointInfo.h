@@ -75,9 +75,20 @@ namespace Isis {
    *                           "NULL" to be consistent with caminfo's CamTools.cpp. Replaced local
    *                           variable names with more descriptive names. References #1659.
    *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
-   *                           closer to ISIS coding standards. References #1438
+   *                           closer to ISIS coding standards. References #1438   
    *   @history 2016-07-11 Curtis Rose - Added units to a few of the outputs. References #3979.
-   */
+   *   @history 2016-08-16 Tyler Wilson - Modified the GetPointInfo function to allow
+   *                           developers to specify which order CameraPointInfo fields
+   *                           are output for different file formats (PVL or CSV).
+   *                           This is managed by setting the m_csvOutput flag via
+   *                           the public member function SetCSVOutput.  PVL is the
+   *                           default output format, as m_csvOuput is set to false in
+   *                           the constructor.  The reason for this is to not to break any
+   *                           scripts processors might be running when outputting files in
+   *                           csv format.  Column order is important in this case.
+   *                           References #476,#4100.
+   *
+   **/
   class CameraPointInfo {
 
     public:
@@ -85,6 +96,7 @@ namespace Isis {
       virtual ~CameraPointInfo();
 
       void SetCube(const QString &cubeFileName);
+      void SetCSVOutput(bool csvOutput);
       PvlGroup *SetImage(const double sample, const double line,
                          const bool outside = false, const bool error = false);
       PvlGroup *SetCenter(const bool outside = false, const bool error = false);
@@ -105,6 +117,7 @@ namespace Isis {
       CubeManager *m_usedCubes;
       Cube *m_currentCube;
       Camera *m_camera;
+      bool m_csvOutput;
   };
 };
 
