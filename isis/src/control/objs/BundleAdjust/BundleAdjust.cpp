@@ -3979,6 +3979,36 @@ namespace Isis {
 */
 
   /**
+   * Returns a pointer to the output control network.
+   * 
+   * @return @b ControlNetQsp A shared pointer to the output control network.
+   */
+  ControlNetQsp BundleAdjust::controlNet() {
+    return m_pCnet;
+  }
+
+
+  /**
+   * Returns a pointer to the serial number list.
+   * 
+   * @return @b SerialNumberList* A pointer to the serial number list.
+   */
+  SerialNumberList *BundleAdjust::serialNumberList() {
+    return m_pSnList;
+  }
+
+
+  /**
+   * Returns the number of images.
+   * 
+   * @return @b int The number of images.
+   */
+  int BundleAdjust::numberOfImages() const {
+    return m_pSnList->size();
+  }
+
+
+  /**
    * Return the ith filename in the cube list file given to constructor.
    *
    */
@@ -3997,6 +4027,26 @@ namespace Isis {
          if ((m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i))))
            return true;
     return false;
+  }
+
+
+  /**
+   * Returns the error.
+   * 
+   * @return @b double The error.
+   */
+  double BundleAdjust::error() const {
+    return m_dError;
+  }
+
+
+  /**
+   * Returns what iteration the BundleAdjust is currently on.
+   * 
+   * @return @b double The current iteration number.
+   */
+  double BundleAdjust::iteration() const {
+    return m_nIteration;
   }
 
 
@@ -4168,10 +4218,26 @@ namespace Isis {
     return sigma;
   }
 #endif
+  /**
+   * Returns if the BundleAdjust converged.
+   * 
+   * @return @b bool If the BundleAdjust converged.
+   */
   bool BundleAdjust::isConverged() {
     return m_bundleResults.converged();
   }
 
+
+  /**
+   * Returns the iteration summary string.
+   * 
+   * @return @b QString the iteration summary string.
+   * 
+   * @see iterationSummary()
+   */
+  QString BundleAdjust::iterationSummaryGroup() const {
+    return m_iterationSummary;
+  }
 
 
   /**

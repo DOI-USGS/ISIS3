@@ -75,7 +75,7 @@ void IsisMain() {
         gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
       }
       else {
-        for (int i = 0; i < bundleAdjustment->images(); i++) {
+        for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
           Process p;
           CubeAttributeInput inAtt;
           Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);

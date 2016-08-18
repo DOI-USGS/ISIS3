@@ -216,6 +216,8 @@ namespace Isis {
    *                           only add non-ignored ControlPoints to the BundleControlPoint, and
    *                           we only add non-ignored ControlMeasures to the BundleControlPoint.
    *                           Fixes #4173, #4201.
+   *   @history 2016-08-17 Jesse Mapel - Moved all method implementations to the cpp file.
+   *                           Fixes #4185.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -260,25 +262,19 @@ namespace Isis {
       void             abortBundle();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
       // accessors
-      ControlNetQsp    controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
-      SerialNumberList *serialNumberList() { return m_pSnList; } // TODO: move implementation to cpp per ISIS standards
-      int              images() const { return m_pSnList->size(); }// TODO: move implementation to cpp per ISIS standards
+      ControlNetQsp    controlNet();
+      SerialNumberList *serialNumberList();
+      int              numberOfImages() const;
 //      int              observations() const;
       QString          fileName(int index);
       bool             isHeld(int index);
       Table            cMatrix(int index);
       Table            spVector(int index);
-      double error() const { // TODO: move implementation to cpp per ISIS standards
-        return m_dError;
-      }
-      double iteration() const { // TODO: move implementation to cpp per ISIS standards
-        return m_nIteration;
-      }
+      double           error() const;
+      double           iteration() const;
 
       bool isConverged();
-      QString iterationSummaryGroup() const {
-        return m_iterationSummary;
-      } // TODO: move implementation to cpp per ISIS standards
+      QString iterationSummaryGroup() const;
 
     signals:
       void statusUpdate(QString);
