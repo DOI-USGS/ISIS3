@@ -39,8 +39,8 @@ namespace Isis {
   /**
    * @brief Class for bundle observations
    *
-   * This class is used for creating a bundle observation. Upon destruction, this class will
-   * delete all contained QObjects (BundleImages).
+   * This class is used for creating a bundle observation. Contained BundleImages are stored as
+   * shared pointers, so they will be automatically deleted when all shared pointers are deleted.
    *  
    * @ingroup ControlNetworks
    *

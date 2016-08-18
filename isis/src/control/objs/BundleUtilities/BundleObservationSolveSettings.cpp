@@ -29,11 +29,8 @@ namespace Isis {
 
   /**
    * Constructor with default parameter initializations.
-   *
-   * @param parent The Qt-relationship parent 
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(QObject *parent)
-      : QObject(parent) {
+  BundleObservationSolveSettings::BundleObservationSolveSettings() {
     initialize();
   }
 
@@ -44,12 +41,10 @@ namespace Isis {
    * @param bundleSettingsFolder Where this settings XML resides - 
    *                             /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(Project *project, 
-                                                                 XmlStackedHandlerReader *xmlReader,
-                                                                 QObject *parent)
-      : QObject(parent) {
+  BundleObservationSolveSettings::BundleObservationSolveSettings(
+                                                             Project *project, 
+                                                             XmlStackedHandlerReader *xmlReader) {
     initialize();
     xmlReader->pushContentHandler(new XmlHandler(this, project));
     xmlReader->setErrorHandler(new XmlHandler(this, project));
@@ -62,13 +57,11 @@ namespace Isis {
    *
    * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(FileName xmlFile,
-                                                                 Project *project, 
-                                                                 XmlStackedHandlerReader *xmlReader,
-                                                                 QObject *parent)
-      : QObject(parent) {
+  BundleObservationSolveSettings::BundleObservationSolveSettings(
+                                                             FileName xmlFile,
+                                                             Project *project, 
+                                                             XmlStackedHandlerReader *xmlReader) {
 
     initialize();
     QString xmlPath = xmlFile.expanded();

@@ -24,7 +24,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QObject>
 #include <QSharedPointer>
 
 namespace Isis {
@@ -46,11 +45,10 @@ namespace Isis {
    *                           for merging from IPCE to ISIS.  Fixes #4076.
    *   @history 2016-08-03 Jesse Mapel - Changed parent observation to a QSharedPointer.
    *                           Fixes #4150.
+   *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    *   
    */
-  class BundleImage : public QObject {
-
-  Q_OBJECT
+  class BundleImage {
 
   public:
     // constructor

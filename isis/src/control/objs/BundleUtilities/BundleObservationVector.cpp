@@ -31,7 +31,7 @@ namespace Isis {
   /**
    * Destructor.
    *
-   * Upon destruction, BundleObservation will delete all contained QObjects (BundleObservations).
+   * Contained BundleObservations will remain until all shared pointers to them are deleted.
    */
   BundleObservationVector::~BundleObservationVector() {
     clear();

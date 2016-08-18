@@ -24,7 +24,6 @@
  */
 
 #include <QList>
-#include <QObject>
 #include <QString>
 
 #include "SpicePosition.h"
@@ -68,6 +67,7 @@ namespace Isis {
    *                           Fixes #4150.
    *   @history 2016-08-03 Ian Humphrey - Updated documentation and reviewed coding standards.
    *                           Fixes #4078.
+   *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
@@ -75,19 +75,15 @@ namespace Isis {
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
    */
 
-class BundleObservationSolveSettings : public QObject {
-
-    Q_OBJECT
+class BundleObservationSolveSettings {
 
     public:
-      BundleObservationSolveSettings(QObject *parent = 0);
+      BundleObservationSolveSettings();
       BundleObservationSolveSettings(Project *project, 
-                                     XmlStackedHandlerReader *xmlReader, 
-                                     QObject *parent = 0);  // TODO: does xml stuff need project???
+                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(FileName xmlFile, 
                                      Project *project, 
-                                     XmlStackedHandlerReader *xmlReader, 
-                                     QObject *parent = 0);  // TODO: does xml stuff need project???
+                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);

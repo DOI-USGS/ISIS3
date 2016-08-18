@@ -39,7 +39,8 @@ namespace Isis {
    * This class is a container class for BundleObservations. It can be used for managing multiple
    * BundleObservations.
    *
-   * Upon destruction, this class will delete any contained QObjects (BundleObservations).
+   * Contained BundleObservations are stored as shared pointers, so they will be automatically
+   * deleted when all shared pointers are deleted.
    *
    * @author 2014-05-22 Ken Edmundson
    *

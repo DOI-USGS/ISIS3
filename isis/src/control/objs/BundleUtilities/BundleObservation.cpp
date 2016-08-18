@@ -117,7 +117,7 @@ namespace Isis {
   /**
    * Destructor.
    *
-   * Upon destruction, any contained QObjects (BundleImages) will be deleted.
+   * Contained BundleImages will remain until all shared pointers are deleted.
    */
   BundleObservation::~BundleObservation() {
     clear();

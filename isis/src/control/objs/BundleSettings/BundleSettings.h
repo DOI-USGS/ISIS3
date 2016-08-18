@@ -21,8 +21,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-// parent class
-#include <QObject>
 
 // Qt library
 #include <QList>
@@ -87,8 +85,7 @@ namespace Isis {
    *                           Added documentation. Updated test. References #3976. Fixes #.
    *   @history 2016-08-15 Jesse Mapel - Added methods to check if solving for triaxial radii,
    *                           mean radius, or Prime Meridian Acceleration. Fixes #4159.
-   *  
-   *  
+   *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    *  
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -103,18 +100,16 @@ namespace Isis {
    *   @todo Determine which to use or delete: XML or HDF5. Whichever is used needs to be fully
    *         documented, tested
    */
-  class BundleSettings : public QObject {
-    Q_OBJECT
+  class BundleSettings {
     public:
 
       //=====================================================================//
       //================ constructors, destructor, operators ================//
       //=====================================================================//
-      BundleSettings(QObject *parent = NULL);
+      BundleSettings();
       BundleSettings(const BundleSettings &other);
       BundleSettings(Project *project, 
-                     XmlStackedHandlerReader *xmlReader, 
-                     QObject *parent = NULL);
+                     XmlStackedHandlerReader *xmlReader);
 #if 0
       BundleSettings(FileName xmlFile,
                      Project *project, 

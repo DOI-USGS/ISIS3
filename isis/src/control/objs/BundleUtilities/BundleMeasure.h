@@ -23,7 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QObject>
 #include <QSharedPointer>
 
 namespace Isis {
@@ -56,6 +55,7 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Changed parent BundleImage to a QSharedPointer and added
    *                           a mutator.  Added wrapper methods for several ControlMeasure
    *                           methods.  Added typedef for BundleMeasureQsp.  Fixes #4159.
+   *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    */
 
   class BundleControlPoint;
@@ -65,9 +65,7 @@ namespace Isis {
   class Camera;
   class ControlMeasure;
 
-  class BundleMeasure : public QObject {
-
-    Q_OBJECT
+  class BundleMeasure {
 
     public:
       // constructor

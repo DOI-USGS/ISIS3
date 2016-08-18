@@ -27,12 +27,10 @@
 namespace Isis {
 
   /**
-   * Constructs a BundleSettings object from a pointer to a parent QObject. 
+   * Constructs a BundleSettings object. 
    * Default values are set for all member variables. 
-   *  
-   * @param parent A pointer to a parent QObject. Defaults to NULL pointer. 
    */
-  BundleSettings::BundleSettings(QObject *parent) : QObject(parent) {
+  BundleSettings::BundleSettings() {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
 
@@ -52,7 +50,7 @@ namespace Isis {
     m_globalLongitudeAprioriSigma = Isis::Null;
     m_globalRadiusAprioriSigma    = Isis::Null;
 
-    BundleObservationSolveSettings defaultSolveSettings(NULL);
+    BundleObservationSolveSettings defaultSolveSettings;
     m_observationSolveSettings.append(defaultSolveSettings);
 
     // Convergence Criteria
@@ -95,11 +93,9 @@ namespace Isis {
    *
    * @param project A pointer to the project where the Settings will be saved.
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
    */
   BundleSettings::BundleSettings(Project *project, 
-                                 XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
+                                 XmlStackedHandlerReader *xmlReader) {
     m_id = NULL;
     // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
 
