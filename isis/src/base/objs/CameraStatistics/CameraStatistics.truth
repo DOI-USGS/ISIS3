@@ -36,24 +36,6 @@ Resolution:
   ResolutionAverage = 245.015
   ResolutionStandardDeviation = 0.181039
 
-ObliqueSampleResolution:
-  ObliqueSampleResolutionMinimum = 244.735
-  ObliqueSampleResolutionMaximum = 246.319
-  ObliqueSampleResolutionAverage = 245.205
-  ObliqueSampleResolutionStandardDeviation = 0.304432
-
-ObliqueLineResolution:
-  ObliqueLineResolutionMinimum = 244.735
-  ObliqueLineResolutionMaximum = 246.319
-  ObliqueLineResolutionAverage = 245.205
-  ObliqueLineResolutionStandardDeviation = 0.304432
-
-ObliqueResolution:
-  ObliqueResolutionMinimum = 244.735
-  ObliqueResolutionMaximum = 246.319
-  ObliqueResolutionAverage = 245.205
-  ObliqueResolutionStandardDeviation = 0.304432
-
 AspectRatio:
   AspectRatioMinimum = 1
   AspectRatioMaximun = 1

@@ -49,10 +49,7 @@ namespace Isis {
    *
    * @internal
    * @history 2011-06-14 Travis Addair - Extracted logic from "camstats"
-   *                     application to create this class.
-   * @history 2016-08-17 Tyler Wilson - Added Statistics objects for
-   *                     ObliquePixelResolution,ObliqueSampleResolution, and 
-   *                     ObliqueLineResolution.  References #476, #4100.
+   * application to create this class.
    */
 
   class CameraStatistics {
@@ -90,7 +87,6 @@ namespace Isis {
       };
 
 
-
       /**
        * Accessor method for inspecting the statistics gathered on the
        * Pixel Resolutions of the input Camera.
@@ -100,41 +96,6 @@ namespace Isis {
       const Statistics * getResStat() const {
         return m_resStat;
       };
-
-
-
-      /**
-       * Accessor method for inspecting the statistics gathered on the
-       * oblique pixel resolutions of the input Camera.
-       *
-       * @return Statistics * Constant pointer to oblique pixel resolution statistics
-       */
-      const Statistics * getObliqueResStat() const {
-        return m_obliqueResStat;
-      };
-
-      /**
-       * Accessor method for inspecting the statistics gathered on the
-       * oblique sample resolutions of the input Camera.
-       *
-       * @return Statistics * Constant pointer to oblique sample resolution statistics
-       */
-      const Statistics * getObliqueSampleResStat() const {
-        return m_obliqueSampleResStat;
-      };
-
-
-
-      /**
-       * Accessor method for inspecting the statistics gathered on the
-       * oblique line resolution of the input Camera.
-       *
-       * @return Statistics * Constant pointer to oblique line resolution statistics
-       */
-      const Statistics * getObliqueLineResStat() const {
-        return m_obliqueLineResStat;
-      };
-
 
 
       /**
@@ -245,13 +206,6 @@ namespace Isis {
 
       Statistics *m_latStat; //!< Universal latitude statistics.
       Statistics *m_lonStat; //!< Universal longitude statistics.
-
-
-
-      Statistics *m_obliqueResStat;  //!< Oblique pixel resolution statistics.
-      Statistics *m_obliqueSampleResStat; //!< Oblique sample resolution statistics.
-      Statistics *m_obliqueLineResStat; //!< Oblique line resolution statistics.
-
       Statistics *m_resStat; //!< Pixel resolution statistics.
       Statistics *m_sampleResStat; //!< Sample resolution statistics.
       Statistics *m_lineResStat; //!< Line resolution statistics.

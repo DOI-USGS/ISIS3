@@ -47,13 +47,9 @@ Line: 962
 GroundRange: 0
 IntersectsLongitudeDomain: 0
 PixelResolution: 628
-ObliquePixelResolution: 685
 LineResolution: 628
-ObliqueLineResolution: 685
 SampleResolution: 628
-ObliqueSampleResolution: 685
 DetectorResolution: 157
-ObliqueDetectorResolution: 171
 LowestImageResolution: 2047
 HighestImageResolution: 430
 Calling BasicMapping (pvl)...

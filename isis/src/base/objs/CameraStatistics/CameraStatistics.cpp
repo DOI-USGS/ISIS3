@@ -93,13 +93,6 @@ namespace Isis {
     m_latStat = new Statistics();
     m_lonStat = new Statistics();
     m_resStat = new Statistics();
-
-    
-    m_obliqueResStat = new Statistics();
-    m_obliqueSampleResStat = new Statistics();
-    m_obliqueLineResStat = new Statistics();
-
-
     m_sampleResStat = new Statistics();
     m_lineResStat = new Statistics();
     m_aspectRatioStat = new Statistics();
@@ -164,28 +157,6 @@ namespace Isis {
       delete m_resStat;
       m_resStat = NULL;
     }
-
-
-   if (m_obliqueLineResStat != NULL) {
-     delete m_obliqueLineResStat;
-     m_obliqueLineResStat = NULL;
-
-   }
-
-   if (m_obliqueSampleResStat != NULL) {
-     delete m_obliqueSampleResStat;
-     m_obliqueSampleResStat = NULL;
-
-   }
-
-   if (m_obliqueResStat != NULL) {
-     delete m_obliqueResStat;
-     m_obliqueResStat = NULL;
-   }
-
-
-
-
     if (m_sampleResStat != NULL) {
       delete m_sampleResStat;
       m_sampleResStat = NULL;
@@ -238,14 +209,6 @@ namespace Isis {
     if(cam->HasSurfaceIntersection()) {
       m_latStat->AddData(cam->UniversalLatitude());
       m_lonStat->AddData(cam->UniversalLongitude());
-
-
-      m_obliqueResStat->AddData(cam->ObliquePixelResolution());
-      m_obliqueSampleResStat->AddData(cam->ObliqueSampleResolution());
-      m_obliqueLineResStat->AddData(cam->ObliqueLineResolution());
-
-
-
       m_resStat->AddData(cam->PixelResolution());
       m_sampleResStat->AddData(cam->SampleResolution());
       m_lineResStat->AddData(cam->LineResolution());
@@ -381,56 +344,6 @@ namespace Isis {
     pLon += constructKeyword("LongitudeAverage", m_lonStat->Average());
     pLon += constructKeyword("LongitudeStandardDeviation", m_lonStat->StandardDeviation());
 
-
-
-
-
-
-
-
-    PvlGroup pObliqueSampleRes("ObliqueSampleResolution");
-    pObliqueSampleRes += constructKeyword("ObliqueSampleResolutionMinimum",
-                                          m_obliqueSampleResStat->Minimum(), "meters/pixel");
-    pObliqueSampleRes += constructKeyword("ObliqueSampleResolutionMaximum",
-                                          m_obliqueSampleResStat->Maximum(),"meters/pixel");
-    pObliqueSampleRes += constructKeyword("ObliqueSampleResolutionAverage",
-                                          m_obliqueSampleResStat->Average(),"meters/pixel");
-    pObliqueSampleRes += constructKeyword("ObliqueSampleResolutionStandardDeviation",
-        m_obliqueSampleResStat->StandardDeviation(), "meters/pixel");
-
-    PvlGroup pObliqueLineRes("ObliqueLineResolution");
-    pObliqueLineRes += constructKeyword("ObliqueLineResolutionMinimum", m_obliqueLineResStat->Minimum(),
-        "meters/pixel");
-    pObliqueLineRes += constructKeyword("ObliqueLineResolutionMaximum", m_obliqueLineResStat->Maximum(),
-        "meters/pixel");
-    pObliqueLineRes += constructKeyword("ObliqueLineResolutionAverage", m_obliqueLineResStat->Average(),
-        "meters/pixel");
-    pObliqueLineRes += constructKeyword("ObliqueLineResolutionStandardDeviation",
-        m_obliqueLineResStat->StandardDeviation(), "meters/pixel");
-
-    PvlGroup pObliqueResolution("ObliqueResolution");
-    pObliqueResolution += constructKeyword("ObliqueResolutionMinimum", m_obliqueResStat->Minimum(),
-        "meters/pixel");
-    pObliqueResolution += constructKeyword("ObliqueResolutionMaximum", m_obliqueResStat->Maximum(),
-        "meters/pixel");
-    pObliqueResolution += constructKeyword("ObliqueResolutionAverage", m_obliqueResStat->Average(),
-        "meters/pixel");
-    pObliqueResolution += constructKeyword("ObliqueResolutionStandardDeviation",
-        m_obliqueResStat->StandardDeviation(), "meters/pixel");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     PvlGroup pSampleRes("SampleResolution");
     pSampleRes += constructKeyword("SampleResolutionMinimum", m_sampleResStat->Minimum(),
         "meters/pixel");
@@ -460,18 +373,6 @@ namespace Isis {
         "meters/pixel");
     pResolution += constructKeyword("ResolutionStandardDeviation",
         m_resStat->StandardDeviation(), "meters/pixel");
-
-
-
-
-
-
-
-
-
-
-
-
 
     PvlGroup pAspectRatio("AspectRatio");
     pAspectRatio += constructKeyword("AspectRatioMinimum", m_aspectRatioStat->Minimum());
@@ -532,14 +433,6 @@ namespace Isis {
     returnPvl.addGroup(pSampleRes);
     returnPvl.addGroup(pLineRes);
     returnPvl.addGroup(pResolution);
-
-    returnPvl.addGroup(pObliqueSampleRes);
-    returnPvl.addGroup(pObliqueLineRes);
-    returnPvl.addGroup(pObliqueResolution);
-
-
-
-
     returnPvl.addGroup(pAspectRatio);
     returnPvl.addGroup(pPhase);
     returnPvl.addGroup(pEmission);

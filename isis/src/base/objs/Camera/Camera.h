@@ -68,7 +68,7 @@ namespace Isis {
    *   @history 2008-02-15 Stacy Alley - In the GroundRangeResolution () method we had to subtract
    *                           0.5 when looking at the far left of pixels and add 0.5 to ensure we
    *                           are seeing the far right of pixels.
-   *   @history 2008-05-21 Steven Lambright - Fixed boundary condition in the 
+   *   @history 2008-05-21 Steven Lambright - Fixed boundary condition in the
    *                           GroundRangeResolution() method.
    *   @history 2008-06-18 Christopher Austin - Fixed documentation errors
    *   @history 2008-07-15 Steven Lambright - Added NaifStatus calls
@@ -132,7 +132,7 @@ namespace Isis {
    *                           method to report if the angles could successfully be calculated.
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods, pure virtual in
    *                           Camera, implemented in mission specific cameras.
-   *   @history 2011-01-14 Kris Becker - Added the (pure) virtual methods CkFrameId(), 
+   *   @history 2011-01-14 Kris Becker - Added the (pure) virtual methods CkFrameId(),
    *                           CkReferenceId(), SpkTargetId(), SpkCenterId() and SpkReferenceId().
    *                           Camera model developers must provide, at a minimum, implementations
    *                           for CkFrameId(), CkReferenceId() and SpkReferenceId().
@@ -179,7 +179,7 @@ namespace Isis {
    *                           pole, then the azimuth is adjusted to be relative to the North pole.
    *   @history 2012-06-04 Janet Barrett - Got rid of redundant calls to Sample(), Line(), and
    *                           SetImage() in the ComputeAzimuth method.
-   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-10-12 Debbie A. Cook - Updated to use new Target and ShapeModel classes.
    *                           References Mantis ticket #775 and #1114.
@@ -208,20 +208,20 @@ namespace Isis {
    *                           check-in. Fixes #2243.
    *   @history 2015-05-15 Kris Becker - Set ShapeModel state in SetImage() to reflect no
    *                           intersection before attempting to map to surface. Fixes #2252.
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override
+   *                           Sensor's pure virtual methods.
+   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
+   *                           names as well as public member getters. Updated unit test.
+   *                           References #2335.
    *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
    *                           Sensor's pure virtual methods.
-   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
    *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
    *                           clock angle. References #2365
    *   @history 2016-08-01 Curtis Rose - Changed return values of resolutions from -1 to Isis::Null.
    *                           Fixes #2065.
-   *   @history 2016-08-16 Tyler Wilson - Added ObliqueDectectorResolution,ObliqueLineResolution,
-   *                           ObliqueSampleResolution, and ObliquePixelResolution functions
-   *                           which give greatly improved approximations compared to their
-   *                           non-oblique counterpart functions when the Look vector is pointing
-   *                           off nadir and near the limb.  Fixes #476.  References #4100.
    */
 
   class Camera : public Sensor {
@@ -233,7 +233,7 @@ namespace Isis {
       //! Destroys the Camera Object
       virtual ~Camera();
 
-      // Methods      
+      // Methods
       bool SetImage(const double sample, const double line);
       bool SetUniversalGround(const double latitude, const double longitude);
       bool SetUniversalGround(const double latitude, const double longitude,
@@ -258,7 +258,7 @@ namespace Isis {
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);
-      bool ringRange(double &minRingRadius, double &maxRingRadius, 
+      bool ringRange(double &minRingRadius, double &maxRingRadius,
                      double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
@@ -267,17 +267,9 @@ namespace Isis {
       double SampleResolution();
       double DetectorResolution();
 
-      double ObliqueDetectorResolution();
-      double ObliqueSampleResolution();
-      double ObliqueLineResolution();
-      double ObliquePixelResolution();
-
-
-      virtual double resolution();      
+      virtual double resolution();
       double LowestImageResolution();
       double HighestImageResolution();
-      double LowestObliqueImageResolution();
-      double HighestObliqueImageResolution();
 
       void BasicMapping(Pvl &map);
       void basicRingMapping(Pvl &map);
@@ -296,6 +288,7 @@ namespace Isis {
 
       bool RaDecRange(double &minra, double &maxra,
                       double &mindec, double &maxdec);
+
       double RaDecResolution();
 
       CameraDistortionMap *DistortionMap();
@@ -303,7 +296,7 @@ namespace Isis {
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
-      
+
       QString instrumentNameLong() const;
       QString instrumentNameShort() const;
       QString spacecraftNameLong() const;
@@ -346,9 +339,9 @@ namespace Isis {
       };
 
       /**
-       * Returns the type of camera that was created.  This is a pure virtual method, so all child 
-       * classes must define and identify themselves as one of the enumerated camera types defined 
-       * in this class. 
+       * Returns the type of camera that was created.  This is a pure virtual method, so all child
+       * classes must define and identify themselves as one of the enumerated camera types defined
+       * in this class.
        *
        * @return @b CameraType Type of camera that was created.
        */
@@ -356,18 +349,18 @@ namespace Isis {
 
       /**
        * @brief Provides the NAIF frame code for an instruments CK kernel
-       *  
-       * This pure virtual method must be implemented in each camera model providing the reference 
+       *
+       * This pure virtual method must be implemented in each camera model providing the reference
        * frame NAIF ID code found in the mission CK kernel.
-       *  
-       * This value can be easily determined by using the NAIF @b spacit application that sumarizes 
-       * binary CK kernels a particular instrument on a spacecraft. @b spacit will additionally 
-       * require a spacecraft clock kernel (SCLK) and a leap seconds kernel (LSK). For example, 
-       * the output of the MESSENGER camera CK supporting the MDIS camera below indicates it is the 
-       * MESSENGER spacecraft. 
-       * 
-       *  
-       * @code 
+       *
+       * This value can be easily determined by using the NAIF @b spacit application that sumarizes
+       * binary CK kernels a particular instrument on a spacecraft. @b spacit will additionally
+       * require a spacecraft clock kernel (SCLK) and a leap seconds kernel (LSK). For example,
+       * the output of the MESSENGER camera CK supporting the MDIS camera below indicates it is the
+       * MESSENGER spacecraft.
+       *
+       *
+       * @code
        *   Segment ID     : MSGR_SPACECRAFT
        *   Instrument Code: -236000
        *   Spacecraft     : Body -236, MESSENGER
@@ -379,28 +372,28 @@ namespace Isis {
        *   UTC Stop Time  : 2010 JUL 23 12:35:22.814
        *   SCLK Start Time: 1/000818300:000000
        *   SCLK Stop Time : 1/188375996:000000
-       * @endcode 
-       *  
-       * The CkFrameId value is found in the "Instrument Code" entry (-236000). 
-       * 
+       * @endcode
+       *
+       * The CkFrameId value is found in the "Instrument Code" entry (-236000).
+       *
        * @return @b int NAIF code for CK frame for an instrument
        */
       virtual int CkFrameId() const = 0;
 
       /**
        * @brief Provides the NAIF reference code for an instruments CK kernel
-       * 
-       * This virtual method must be implemented in each camera model providing the reference frame 
-       * NAIF ID code found in the mission CK kernel. 
-       *  
-       * This value can be easily determined by using the NAIF @b spacit application that sumarizes 
-       * binary CK kernels a particular instrument on a spacecraft.  @b spacit will additionally 
-       * require a spacecraft clock kernel (SCLK) and a leap seconds kernel (LSK).For example, 
-       * the output of the MESSENGER camera CK supporting the MDIS camera below indicates it is the 
-       * MESSENGER spacecraft. 
-       * 
-       *  
-       * @code 
+       *
+       * This virtual method must be implemented in each camera model providing the reference frame
+       * NAIF ID code found in the mission CK kernel.
+       *
+       * This value can be easily determined by using the NAIF @b spacit application that sumarizes
+       * binary CK kernels a particular instrument on a spacecraft.  @b spacit will additionally
+       * require a spacecraft clock kernel (SCLK) and a leap seconds kernel (LSK).For example,
+       * the output of the MESSENGER camera CK supporting the MDIS camera below indicates it is the
+       * MESSENGER spacecraft.
+       *
+       *
+       * @code
        *   Segment ID     : MSGR_SPACECRAFT
        *   Instrument Code: -236000
        *   Spacecraft     : Body -236, MESSENGER
@@ -412,28 +405,28 @@ namespace Isis {
        *   UTC Stop Time  : 2010 JUL 23 12:35:22.814
        *   SCLK Start Time: 1/000818300:000000
        *   SCLK Stop Time : 1/188375996:000000
-       * @endcode 
-       *  
-       * The CkReferenced value is found in the "Reference Frame" entry (1). 
-       * 
+       * @endcode
+       *
+       * The CkReferenced value is found in the "Reference Frame" entry (1).
+       *
        * @return @b int NAIF code for CK reference for an instrument
        */
       virtual int CkReferenceId() const = 0;
 
       /**
-       * @brief Provides reference frame for instruments SPK NAIF kernel 
-       *  
-       * This pure virtual method must be implemented in each camera model providing the reference 
-       * frame NAIF ID code found in the mission SPK kernel.  This is typically J2000, but may be 
-       * relative to other frames. 
-       *  
-       * This value can be easily determined by using the NAIF @b spacit application that sumarizes 
-       * binary kernels on the SPK kernel used for a particular instrument on a spacecraft. 
-       * @b spacit will additionally require a leap seconds kernel (LSK).  For example, the output 
-       * of the MESSENGER SPK camera supporting the MDIS camera below indicates it is indeed the 
-       * J2000 reference frame: 
-       *  
-       * @code 
+       * @brief Provides reference frame for instruments SPK NAIF kernel
+       *
+       * This pure virtual method must be implemented in each camera model providing the reference
+       * frame NAIF ID code found in the mission SPK kernel.  This is typically J2000, but may be
+       * relative to other frames.
+       *
+       * This value can be easily determined by using the NAIF @b spacit application that sumarizes
+       * binary kernels on the SPK kernel used for a particular instrument on a spacecraft.
+       * @b spacit will additionally require a leap seconds kernel (LSK).  For example, the output
+       * of the MESSENGER SPK camera supporting the MDIS camera below indicates it is indeed the
+       * J2000 reference frame:
+       *
+       * @code
        *     Segment ID     : msgr_20050903_20061125_recon002.nio
        *     Target Body    : Body -236, MESSENGER
        *     Center Body    : Body 2, VENUS BARYCENTER
@@ -444,10 +437,10 @@ namespace Isis {
        *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
        *     ET Start Time  : 2006 OCT 16 19:26:46.293
        *     ET Stop time   : 2006 OCT 31 22:15:29.222
-       * @endcode 
-       *  
+       * @endcode
+       *
        * The SpkReferenceId value is found in the "Reference frame" entry (1).
-       * 
+       *
        * @return @b int NAIF code for SPK reference frame for an instrument
        */
       virtual int SpkReferenceId() const = 0;
@@ -456,7 +449,7 @@ namespace Isis {
 
 
     protected:
-      
+
       QString m_instrumentNameLong; //!< Full instrument name
       QString m_instrumentNameShort; //!< Shortened instrument name
       QString m_spacecraftNameLong; //!< Full spacecraft name
@@ -476,8 +469,8 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;
       friend class RadarSlantRangeMap;
-      
-      
+
+
     private:
       double p_focalLength;                  //!< The focal length, in units of millimeters
       double p_pixelPitch;                   //!< The pixel pitch, in millimeters per pixel
@@ -490,8 +483,6 @@ namespace Isis {
       double p_maxlon;                       //!< The maximum longitude
       double p_minres;                       //!< The minimum resolution
       double p_maxres;                       //!< The maximum resolution
-      double p_minobliqueres;                //!< The minimum oblique resolution
-      double p_maxobliqueres;                //!< The maximum oblique resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
       bool p_groundRangeComputed;            /**!< Flag showing if ground range
@@ -529,7 +520,7 @@ namespace Isis {
       AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child
       double p_childLine;                    //!< Line value for child
-      int p_childBand;                       //!< Band value for child
+      int p_childBand;                       //!< Band value for child. Should be the virtual band not original band.
       CameraDistortionMap *p_distortionMap;  //!< A pointer to the DistortionMap
       CameraFocalPlaneMap *p_focalPlaneMap;  //!< A pointer to the FocalPlaneMap
       CameraDetectorMap *p_detectorMap;      //!< A pointer to the DetectorMap
@@ -549,4 +540,3 @@ namespace Isis {
 };
 
 #endif
-
