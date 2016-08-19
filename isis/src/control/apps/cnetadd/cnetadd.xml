@@ -321,7 +321,7 @@
           List of ISIS3 output images in the ONET
         </brief>
         <description>
-          Use this optional parameter to receive a ist of all images in the ONET 
+          Use this optional parameter to receive a list of all images in the ONET 
           that are also in the FROMLIST or ADDLIST. To have a complete 
           list, it is important to have the FROMLIST.
         </description>
