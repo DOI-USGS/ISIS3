@@ -179,13 +179,15 @@ BundleSettingsQsp bundleSettings() {
   // =========================================================================================//
   settings->setValidateNetwork(false);
   //  set the following:
-  //     solve observation mode = false update cube label      = false error
-  //     propagation      = false solve radius           = false latitude
-  //     sigma         = 1000.0 longitude sigma        = 1000.0 radius sigma
-  //     = -1.0 (since we are not solving for radius) outlier rejection =
-  //     false
-  settings->setSolveOptions(BundleSettings::Sparse, false, false, false, false,
-                           1000.0, 1000.0, -1.0);
+  //     solve observation mode = false
+  //     update cube label      = false
+  //     error propagation      = false
+  //     solve radius           = false
+  //     latitude sigma         = 1000.0
+  //     longitude sigma        = 1000.0
+  //     radius sigma           = Null since we are not solving for radius
+  //     outlier rejection      = false
+  settings->setSolveOptions(false, false, false, false, 1000.0, 1000.0, Isis::Null);
   settings->setOutlierRejection(false);
 
   // =========================================================================================//

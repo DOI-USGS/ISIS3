@@ -36,7 +36,6 @@ namespace Isis {
 
     m_validateNetwork = true;
 
-    m_solveMethod = Sparse;
     m_solveObservationMode = false;
     m_solveRadius          = false;
     m_updateCubeLabel      = false;
@@ -172,7 +171,6 @@ namespace Isis {
   BundleSettings::BundleSettings(const BundleSettings &other)
       : m_id(new QUuid(other.m_id->toString())),
         m_validateNetwork(other.m_validateNetwork),
-        m_solveMethod(other.m_solveMethod),
         m_solveObservationMode(other.m_solveObservationMode),
         m_solveRadius(other.m_solveRadius),
         m_updateCubeLabel(other.m_updateCubeLabel),
@@ -220,7 +218,6 @@ namespace Isis {
       m_id = new QUuid(other.m_id->toString());
 
       m_validateNetwork = other.m_validateNetwork;
-      m_solveMethod = other.m_solveMethod;
       m_solveObservationMode = other.m_solveObservationMode;
       m_solveRadius = other.m_solveRadius;
       m_updateCubeLabel = other.m_updateCubeLabel;
@@ -281,61 +278,8 @@ namespace Isis {
   // =============================================================================================//
 
   /**
-   * Converts the given string value to a BundleSettings::SolveMethod 
-   * enumeration. Currently accepted inputs are listed below. This method is 
-   * case insensitive. 
-   * <ul> 
-   *   <li>Sparse</li>
-   *   <li>SpecialK</li>
-   * </ul>
-   *  
-   * @param method Name of method to be converted.
-   * 
-   * @return @b SolveMethod The enumeration corresponding to the given name.
-   * 
-   * @throw Isis::Exception::Programmer "Unknown bundle solve method."
-   */
-  BundleSettings::SolveMethod BundleSettings::stringToSolveMethod(QString method) {
-
-    if (method.compare("SPARSE", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::Sparse;
-    }
-    else if (method.compare("SPECIALK", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::SpecialK;
-    }
-    else {
-      throw IException(IException::Programmer,
-                       "Unknown bundle solve method [" + method + "].",
-                       _FILEINFO_);
-    }
-  }
-
-
-  /**
-   * Converts the given BundleSettings::SolveMethod enumeration to a string. 
-   * This method is used to print the solve type to output files as strings 
-   * rather than integers. 
-   * 
-   * @param method The SolveMethod enumeration to be converted.
-   * 
-   * @return @b QString The name associated with the given solve method.
-   * 
-   * @throw Isis::Exception::Programmer "Unknown bundle solve method enum."
-   */
-  QString BundleSettings::solveMethodToString(SolveMethod method) {
-    if (method == Sparse)         return "Sparse";
-    else if (method == SpecialK)  return "SpecialK";
-    else throw IException(IException::Programmer,
-                          "Unknown bundle solve method enum [" + toString(method) + "].",
-                          _FILEINFO_);
-  }
-
-
-  /**
    * Set the solve options for the bundle adjustment.
    * 
-   * @param method An enumeration for the solve method for the bundle 
-   *               adjustment.
    * @param solveObservationMode A boolean value indicating whether to solve for
    *                             observation mode.
    * @param updateCubeLabel A boolean value indicating whether to update the 
@@ -348,13 +292,13 @@ namespace Isis {
    * @param globalLongitudeAprioriSigma The global a priori sigma for longitude.
    * @param globalRadiusAprioriSigma The global a priori sigma for radius.
    */
-  void BundleSettings::setSolveOptions(SolveMethod method, bool solveObservationMode,
-                                       bool updateCubeLabel, bool errorPropagation, 
+  void BundleSettings::setSolveOptions(bool solveObservationMode,
+                                       bool updateCubeLabel, 
+                                       bool errorPropagation, 
                                        bool solveRadius, 
                                        double globalLatitudeAprioriSigma, 
                                        double globalLongitudeAprioriSigma, 
                                        double globalRadiusAprioriSigma) {
-    m_solveMethod = method;
     m_solveObservationMode = solveObservationMode;
     m_solveRadius = solveRadius;
     m_updateCubeLabel = updateCubeLabel;
@@ -411,17 +355,6 @@ namespace Isis {
   void BundleSettings::setObservationSolveOptions(
       QList<BundleObservationSolveSettings> obsSolveSettingsList) {
     m_observationSolveSettings = obsSolveSettingsList;
-  }
-
-
-  /**
-   * Retrieves the solve method for the bundle adjustment.
-   * 
-   * @return @b SolveMethod The enumeration for the solve method for the bundle 
-   *                        adjustment.
-   */
-  BundleSettings::SolveMethod BundleSettings::solveMethod() const {
-    return m_solveMethod;
   }
 
 
@@ -1105,7 +1038,6 @@ namespace Isis {
 
     // General Solve Options
     pvl += PvlKeyword("NetworkValidated", toString(validateNetwork()));
-    pvl += PvlKeyword("SolveMethod", solveMethodToString(solveMethod()));
     pvl += PvlKeyword("SolveObservationMode", toString(solveObservationMode()));
     pvl += PvlKeyword("SolveRadius", toString(solveRadius()));
     pvl += PvlKeyword("UpdateCubeLabel", toString(updateCubeLabel()));
@@ -1212,7 +1144,6 @@ namespace Isis {
     stream.writeTextElement("validateNetwork", toString(validateNetwork()));
     
     stream.writeStartElement("solveOptions");
-    stream.writeAttribute("solveMethod", solveMethodToString(solveMethod()));
     stream.writeAttribute("solveObservationMode", toString(solveObservationMode()));
     stream.writeAttribute("solveRadius", toString(solveRadius()));
     stream.writeAttribute("updateCubeLabel", toString(updateCubeLabel()));
@@ -1302,7 +1233,6 @@ namespace Isis {
     stream.writeTextElement("validateNetwork", toString(validateNetwork()));
     
     stream.writeStartElement("solveOptions");
-    stream.writeTextElement("solveMethod", solveMethodToString(solveMethod()));
     stream.writeTextElement("solveObservationMode", toString(solveObservationMode()));
     stream.writeTextElement("solveRadius", toString(solveRadius()));
     stream.writeTextElement("updateCubeLabel", toString(updateCubeLabel()));
@@ -1434,11 +1364,6 @@ namespace Isis {
 
       if (localName == "solveOptions") {
 
-        QString solveMethodStr = attributes.value("solveMethod");
-        if (!solveMethodStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
-        }
-
         QString solveObservationModeStr = attributes.value("solveObservationMode");
         if (!solveObservationModeStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(solveObservationModeStr);
@@ -1462,6 +1387,8 @@ namespace Isis {
       else if (localName == "aprioriSigmas") {
 
         QString globalLatitudeAprioriSigmaStr = attributes.value("latitude");
+        m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = Isis::Null;
+        // TODO: why do I need to init this one and not other sigmas???
         if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
           if (globalLatitudeAprioriSigmaStr == "N/A") {
             m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = Isis::Null;
@@ -1642,7 +1569,6 @@ namespace Isis {
 
     stream << m_id->toString()
            << m_validateNetwork
-           << (qint32)m_solveMethod
            << m_solveObservationMode
            << m_solveRadius
            << m_updateCubeLabel
@@ -1678,11 +1604,10 @@ namespace Isis {
   QDataStream &BundleSettings::read(QDataStream &stream) {
 
     QString id;
-    qint32 solveMethod, convergenceCriteria, convergenceCriteriaMaximumIterations;
+    qint32 convergenceCriteria, convergenceCriteriaMaximumIterations;
 
     stream >> id 
            >> m_validateNetwork
-           >> solveMethod
            >> m_solveObservationMode
            >> m_solveRadius
            >> m_updateCubeLabel
@@ -1706,7 +1631,6 @@ namespace Isis {
     m_id = NULL;
     m_id = new QUuid(id);
 
-    m_solveMethod = (BundleSettings::SolveMethod)solveMethod;
     m_convergenceCriteria = (BundleSettings::ConvergenceCriteria)convergenceCriteria;
     m_convergenceCriteriaMaximumIterations = (int)convergenceCriteriaMaximumIterations;
 
@@ -1832,12 +1756,6 @@ namespace Isis {
         QString enumToStringValue = "";
         int stringSize = 0;
         H5::StrType strDataType;
-
-        enumToStringValue = solveMethodToString(m_solveMethod);
-        stringSize = enumToStringValue.length();
-        strDataType = H5::StrType(PredType::C_S1, stringSize); 
-        att = settingsGroup.createAttribute("solveMethod", strDataType, spc);
-        att.write(strDataType, enumToStringValue.toStdString());
 
         enumToStringValue = convergenceCriteriaToString(m_convergenceCriteria);
         stringSize = enumToStringValue.length();
@@ -2039,11 +1957,6 @@ namespace Isis {
          */ 
         H5std_string strAttValue;
         H5::StrType strDataType;
-
-        att = settingsGroup.openAttribute("solveMethod");
-        strDataType = H5::StrType(PredType::C_S1, att.getStorageSize());
-        att.read(strDataType, strAttValue);
-        m_solveMethod = stringToSolveMethod(QString::fromStdString(strAttValue));
 
         att = settingsGroup.openAttribute("convergenceCriteria");
         strDataType = H5::StrType(PredType::C_S1, att.getStorageSize());

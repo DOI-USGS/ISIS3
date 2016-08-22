@@ -65,7 +65,8 @@ namespace Isis {
    *                           Fixes #2298.
    *   @history 2016-08-15 Jesse Mapel - added output, outputHeader, outputText, outputPointsCSV,
    *                           and outputResiduals from BundleAdjust.  Fixes #4159.
-   *  
+   *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated
+   *                           BundleSettings::solveMethod. References #4162.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

@@ -296,7 +296,7 @@ namespace Isis {
   /**
    * Returns the BundleSettings stored in the data of the item.
    *
-   * @return @b BundleSettings* The BundleSettings of the item.
+   * @return @b BundleSettingsQsp The BundleSettings of the item.
    */
   BundleSettingsQsp ProjectItem::bundleSettings() const {
     return data().value<BundleSettingsQsp>();

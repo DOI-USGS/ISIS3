@@ -1,7 +1,8 @@
 APPNAME = jigsaw
 # These tests exercise the bundle adjustment of images from the MiniRF radar instrument onboard LRO.
-# Test 1: oldsparse method, solving for position only, with error propagation
-# Test 2: sparse (cholmod) method, solving for position, velocity, acceleration, using polynomial over a constant hermite spline, with error propagation
+# Test 1: solving for position only, with error propagation
+# Test 2: solving for position, velocity, acceleration, using polynomial over a constant hermite 
+#         spline, with error propagation
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -9,7 +10,9 @@ APPNAME = jigsaw
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
 #
-# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
+#                Removed default parameters.
+# 2016-08-11 Jeannie Backer - Updated documentation
 
 include $(ISISROOT)/make/isismake.tsts
 

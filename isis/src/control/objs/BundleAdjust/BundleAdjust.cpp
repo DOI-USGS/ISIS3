@@ -239,9 +239,7 @@ namespace Isis {
 
     }
 
-    if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
-      freeCHOLMODLibraryVariables();
-    }
+    freeCHOLMODLibraryVariables();
 
   }
 
@@ -310,7 +308,6 @@ namespace Isis {
     // matrix stuff
     m_Normals.clear();
     m_nj.clear();
-    m_Qs_SPECIALK.clear();
     m_imageSolution.clear();
 
     // we don't want to call initializeCHOLMODLibraryVariables() here since mRank=0
@@ -441,31 +438,13 @@ namespace Isis {
 
     int n3DPoints = m_bundleControlPoints.size();
 
-    if ( m_bundleSettings->solveMethod() == BundleSettings::SpecialK ) {
-      m_Normals.resize(m_nRank);           // set size of reduced normals matrix
-      m_Normals.clear();                   // zero all elements
-      m_Qs_SPECIALK.resize(n3DPoints);
-    }
-
     m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * n3DPoints);
 
     m_imageSolution.resize(m_nRank);
 
-
-    // initialize NICS, Qs, and point correction vectors to zero
-    for (int i = 0; i < n3DPoints; i++) {
-
-      // TODO_CHOLMOD: is this needed with new cholmod implementation?
-      if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
-        m_Qs_SPECIALK[i].clear();
-      }
-    }
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // initializations for cholmod
-    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      initializeCHOLMODLibraryVariables();
-    }
+    initializeCHOLMODLibraryVariables();
 
   }
 
@@ -664,12 +643,7 @@ namespace Isis {
 
         // zero normals (after iteration 0)
         if (m_nIteration != 1) {
-          if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
-            m_Normals.clear();
-          }
-          else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-            m_SparseNormals.zeroBlocks();
-          }
+          m_SparseNormals.zeroBlocks();
         }
 
         // form normal equations
@@ -829,9 +803,8 @@ namespace Isis {
 
         // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
         // otherwise we need it for error propagation
-        if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
-          if (!m_bundleResults.converged() || !m_bundleSettings->errorPropagation())
-            cholmod_free_factor(&m_L, &m_cm);
+        if (!m_bundleResults.converged() || !m_bundleSettings->errorPropagation()) {
+          cholmod_free_factor(&m_L, &m_cm);
         }
 
 
@@ -891,14 +864,7 @@ namespace Isis {
    * Forming the least-squares normal equations matrix.
    */
   bool BundleAdjust::formNormalEquations() {
-    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      return formNormalEquations_CHOLMOD();
-    }
-    else {
-      return formNormalEquations_SPECIALK();
-    }
-
-    return false;
+    return formNormalEquations_CHOLMOD();
   }
 
 
@@ -906,14 +872,7 @@ namespace Isis {
    * Solve normal equations system.
    */
   bool BundleAdjust::solveSystem() {
-    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      return solveSystem_CHOLMOD();
-    }
-    else {
-      return solveSystem_SPECIALK();
-    }
-
-    return false;
+    return solveSystem_CHOLMOD();
   }
 
 
@@ -1391,348 +1350,6 @@ namespace Isis {
 
 
   /**
-   * Forming the least-squares normal equations matrix via specialK.
-   */
-  bool BundleAdjust::formNormalEquations_SPECIALK() {
-
-//    if (m_pProgressBar != NULL)
-//    {
-//      m_pProgressBar->SetText("Forming Normal Equations...");
-//      m_pProgressBar->SetMaximumSteps(m_pCnet->Size());
-//      m_pProgressBar->CheckStatus();
-//    }
-
-    bool bStatus = false;
-/*
-    m_bundleResults.resetNumberConstrainedPointParameters();
-
-    static LinearAlgebra::Matrix coeff_image;
-    static LinearAlgebra::Matrix coeff_point3D(2, 3);
-    static LinearAlgebra::Vector coeff_RHS(2);
-    static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
-    static LinearAlgebra::Matrix N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
-    static LinearAlgebra::Vector n2(3);                       // 3x1 vector
-    boost::numeric::ublas::compressed_vector<double> n1(m_nRank);             // image parameters x 1
-
-    m_nj.resize(m_nRank);
-
-    coeff_image.resize(2, m_nNumImagePartials);
-    N12.resize(m_nRank, 3);
-
-    // clear N12, n1, and nj
-    N12.clear();
-    n1.clear();
-    m_nj.clear();
-
-    // clear static matrices
-    coeff_point3D.clear();
-    coeff_RHS.clear();
-    N22.clear();
-    n2.clear();
-
-    // loop over 3D points
-    int nGood3DPoints = 0;
-    int nRejected3DPoints = 0;
-    int nPointIndex = 0;
-    int nImageIndex;
-    int n3DPoints = m_bundleControlPoints.size();
-
-//    char buf[1056];
-//    sprintf(buf,"\n\t                      Points:%10d\n", n3DPoints);
-//    m_fp_log << buf;
-//    printf("%s", buf);
-
-    for (int i = 0; i < n3DPoints; i++) {
-      BundleControlPointQsp point = m_bundleControlPoints.at(i);
-
-      if ( point->isRejected() ) {
-        nRejected3DPoints++;
-//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toLatin1().data(),nPointIndex,n3DPoints,m_bundleResults.rejectionLimit());
-//      m_fp_log << buf;
-
-        nPointIndex++;
-        continue;
-      }
-
-      // send notification to UI indicating index of point currently being processed
-      // m_nProcessedPoint = i+1;
-      // UI.Notify(BundleEvent.NEW_POINT_PROCESSED);
-
-      if ( i != 0 ) {
-          N22.clear();
-          N12.clear();
-          n2.clear();
-      }
-
-      // loop over measures for this point
-      int nMeasures = point->size();
-      for (int j = 0; j < nMeasures; j++) {
-        BundleMeasureQsp measure = point->at(j);
-
-        // flagged as "JigsawFail" implies this measure has been rejected
-        // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
-        if ( measure->isRejected() ) {
-          continue;
-        }
-
-        // printf("   Processing Measure %d of %d\n", j,nMeasures);
-
-        bStatus = computePartials_DC(coeff_image, coeff_point3D, coeff_RHS, *measure, *point);
-
-//        std::cout << coeff_image << std::endl;
-//        std::cout << coeff_point3D << std::endl;
-//        std::cout << coeff_RHS << std::endl;
-
-        if ( !bStatus ) {
-          continue;     // this measure should be flagged as rejected
-        }
-
-
-        formNormals1_SPECIALK(N22, N12, n1, n2, coeff_image, coeff_point3D,
-                             coeff_RHS, measure->observationIndex());
-      } // end loop over this points measures
-
-      formNormals2_SPECIALK(N22, N12, n2, m_nj, nPointIndex, i);
-      nPointIndex++;
-
-//    if (m_pProgressBar != NULL)
-//      m_pProgressBar->CheckStatus();
-
-      nGood3DPoints++;
-
-    } // end loop over 3D points
-
-    // finally, form the reduced normal equations
-    formNormals3_SPECIALK(n1, m_nj);
-
-//  std::cout << m_Normals << std::endl;
-//  m_SparseNormals.print();
-
-    // update number of unknown parameters
-    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
-*/
-    return bStatus;
-  }
-
-
-  /**
-   * Forming first set of auxiliary matrices for normal equations matrix via specialK.
-   */
-  bool BundleAdjust::formNormals1_SPECIALK(symmetric_matrix<double, upper>&N22,
-                                           matrix<double> &N12,
-                                           compressed_vector<double> &n1,
-                                           vector<double> &n2,
-                                           matrix<double> &coeff_image,
-                                           matrix<double> &coeff_point3D,
-                                           vector<double> &coeff_RHS,
-                                           int nImageIndex) {
-/*
-    int i, j;
-
-    static vector<double> n1_image(m_nNumImagePartials);
-    n1_image.clear();
-
-    // form N11 (normals for photo)
-    static symmetric_matrix<double, upper> N11(m_nNumImagePartials);
-    N11.clear();
-
-//    std::cout << "image" << std::endl << coeff_image << std::endl;
-//    std::cout << "point" << std::endl << coeff_point3D << std::endl;
-//    std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
-
-    N11 = prod(trans(coeff_image), coeff_image);
-
-//    std::cout << "N11" << std::endl << N11 << std::endl;
-
-    // insert into reduced normal equations
-    int t = m_nNumImagePartials * nImageIndex;
-    for (i = 0; i < m_nNumImagePartials; i++) {
-      for (j = i; j < m_nNumImagePartials; j++) {
-        m_Normals(i + t, j + t) += N11(i, j);
-      }
-    }
-
-    // form N12_Image
-    static matrix<double> N12_Image(m_nNumImagePartials, 3);
-    N12_Image.clear();
-
-    N12_Image = prod(trans(coeff_image), coeff_point3D);
-
-
-//    printf("N12 before insert\n");
-//    std::cout << N12 << std::endl;
-
-//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
-
-    // insert N12_Image into N12
-    for (i = 0; i < m_nNumImagePartials; i++) {
-      for (j = 0; j < 3; j++) {
-        N12(i + t, j) += N12_Image(i, j);
-      }
-    }
-
-//    printf("N12\n");
-//    std::cout << N12 << std::endl;
-
-    // form n1
-    n1_image = prod(trans(coeff_image), coeff_RHS);
-
-//    std::cout << "n1_image" << std::endl << n1_image << std::endl;
-
-    // insert n1_image into n1
-    for (i = 0; i < m_nNumImagePartials; i++) {
-      n1(i + t) += n1_image(i);
-    }
-
-    // form N22
-    N22 += prod(trans(coeff_point3D), coeff_point3D);
-
-//    std::cout << "N22" << std::endl << N22 << std::endl;
-
-    // form n2
-    n2 += prod(trans(coeff_point3D), coeff_RHS);
-
-//    std::cout << "n2" << std::endl << n2 << std::endl;
-*/
-    return true;
-  }
-
-
-  /**
-   * Forming second set of auxiliary matrices for normal equations matrix via specialK.
-   */
-  bool BundleAdjust::formNormals2_SPECIALK(symmetric_matrix<double, upper>&N22,
-                                           matrix<double> &N12,
-                                           vector<double> &n2,
-                                           vector<double> &nj,
-                                           int nPointIndex,
-                                           int i) {
-/*
-      bounded_vector<double, 3> &NIC = m_NICs[nPointIndex];
-      compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
-
-      NIC.clear();
-      Q.clear();
-
-      // weighting of 3D point parameters
-  //    const ControlPoint *point = m_pCnet->GetPoint(i);
-      ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
-
-      bounded_vector<double, 3> &weights = m_Point_Weights[nPointIndex];
-      bounded_vector<double, 3> &corrections = m_Point_Corrections[nPointIndex];
-
-  //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
-
-  //    std::cout << "corrections" << std::endl << corrections << std::endl;
-
-      if (weights[0] > 0.0) {
-        N22(0, 0) += weights[0];
-        n2(0) += (-weights[0] * corrections(0));
-        m_bundleResults.incrementNumberConstrainedPointParameters(1);
-      }
-
-      if (weights[1] > 0.0) {
-        N22(1, 1) += weights[1];
-        n2(1) += (-weights[1] * corrections(1));
-        m_bundleResults.incrementNumberConstrainedPointParameters(1);
-      }
-
-      if (weights[2] > 0.0) {
-        N22(2, 2) += weights[2];
-        n2(2) += (-weights[2] * corrections(2));
-        m_bundleResults.incrementNumberConstrainedPointParameters(1);
-      }
-
-  //    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
-      // invert N22
-      Invert_3x3(N22);
-  //    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
-
-      // save upper triangular covariance matrix for error propagation
-      // TODO:  The following method does not exist yet (08-13-2010)
-      SurfacePoint SurfacePoint = point->getAdjustedSurfacePoint();
-      SurfacePoint.SetSphericalMatrix(N22);
-      point->setAdjustedSurfacePoint(SurfacePoint);
-  //    point->getAdjustedSurfacePoint().setSphericalMatrix(N22);
-
-  // TODO  Test to make sure spherical matrix is truly set.  Try to read it back
-
-      // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
-  //    point->SetSigmaLatitude(N22(0,0));
-  //    point->SetSigmaLongitude(N22(1,1));
-  //    point->SetSigmaRadius(N22(2,2));
-
-      // form Q (this is N22{-1} * N12{T})
-  //    clock_t FormQ1 = clock();
-      Q = prod(N22, trans(N12));
-  //    clock_t FormQ2 = clock();
-  //    double dFormQTime = ((FormQ2-FormQ1)/(double)CLOCKS_PER_SEC);
-  //    printf("FormQ Elapsed Time: %20.10lf\n",dFormQTime);
-
-  //    std::cout << "Q: " << Q << std::endl;
-
-      // form product of N22(inverse) and n2; store in NIC
-  //    clock_t FormNIC1 = clock();
-      NIC = prod(N22, n2);
-  //    clock_t FormNIC2 = clock();
-  //    double dFormNICTime = ((FormNIC2-FormNIC1)/(double)CLOCKS_PER_SEC);
-  //    printf("FormNIC Elapsed Time: %20.10lf\n",dFormNICTime);
-
-      // accumulate -R directly into reduced normal equations
-  //  clock_t AccumIntoNormals1 = clock();
-  //  m_Normals -= prod(N12,Q);
-  //  printf("starting AmultAdd_CNZRows\n");
-      AmultAdd_CNZRows_SPECIALK(-1.0, N12, Q, m_Normals);
-  //  clock_t AccumIntoNormals2 = clock();
-  //  double dAccumIntoNormalsTime = ((AccumIntoNormals2-AccumIntoNormals1)/(double)CLOCKS_PER_SEC);
-  //  printf("Accum Into Normals Elapsed Time: %20.10lf\n",dAccumIntoNormalsTime);
-
-      // accumulate -nj
-  //    clock_t Accum_nj_1 = clock();
-  //    m_nj -= prod(trans(Q),n2);
-      transA_NZ_multAdd_SPECIALK(-1.0, Q, n2, m_nj);
-  //    clock_t Accum_nj_2 = clock();
-  //    double dAccumnjTime = ((Accum_nj_2-Accum_nj_1)/(double)CLOCKS_PER_SEC);
-  //    printf("Accum nj Elapsed Time: %20.10lf\n",dAccumnjTime);
-*/
-      return true;
-    }
-
-
-  /**
-   * apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
-   * velocities, angular accelerations if so stipulated (legalese).
-   */
-  bool BundleAdjust::formNormals3_SPECIALK(compressed_vector<double> &n1,
-                                           vector< double > &nj) {
-/*
-  //  std::cout << m_dImageParameterWeights << std::endl;
-
-    m_bundleResults.resetNumberConstrainedImageParameters();
-
-    int n = 0;
-    do {
-      for (int j = 0; j < m_nNumImagePartials; j++) {
-        if (m_dImageParameterWeights[j] > 0.0) {
-          m_Normals(n, n) += m_dImageParameterWeights[j];
-          m_nj[n] -= m_dImageParameterWeights[j] * m_imageCorrections[n];
-          m_bundleResults.incrementNumberConstrainedImageParameters(1);
-        }
-
-        n++;
-      }
-
-    }
-    while (n < m_nRank);
-
-    // add n1 to nj
-    m_nj += n1;
-*/
-    return true;
-  }
-
-
-  /**
    * Dedicated matrix multiplication method.
    *
    * TODO: Define.
@@ -1838,58 +1455,6 @@ namespace Isis {
    * Dedicated matrix multiplication method.
    *
    * TODO: Define.
-   *
-   */
-  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, 
-                                               matrix<double> &A,
-                                               compressed_matrix<double> &B,
-                                               symmetric_matrix<double, upper, column_major> &C) {
-/*
-    if (alpha == 0.0) {
-      return;
-    }
-
-    register int i, j, k, ii, jj;
-    double d;
-
-    int nColsA = A.size2();
-
-    // create array of non-zero indices of matrix B
-    std::vector<int> nz(B.nnz() / B.size1());
-
-    // iterators for B
-    typedef compressed_matrix<double>::iterator1 it_row;
-    typedef compressed_matrix<double>::iterator2 it_col;
-
-    it_row itr = B.begin1();
-    int nIndex = 0;
-    for (it_col itc = itr.begin(); itc != itr.end(); ++itc) {
-      nz[nIndex] = itc.index2();
-      nIndex++;
-    }
-
-    int nzlength = nz.size();
-    for (i = 0; i < nzlength; ++i) {
-      ii = nz[i];
-      for (j = i; j < nzlength; ++j) {
-        jj = nz[j];
-        d = 0.0;
-
-        for (k = 0; k < nColsA; ++k) {
-          d += A(ii, k) * B(k, jj);
-        }
-
-        C(ii, jj) += alpha * d;
-      }
-    }
-*/
-  }
-
-
-  /**
-   * Dedicated matrix multiplication method.
-   *
-   * TODO: Define.
    */
   void BundleAdjust::transA_NZ_multAdd_CHOLMOD(double alpha,
                                                SparseBlockRowMatrix &Q,
@@ -1935,50 +1500,6 @@ namespace Isis {
     }
   }
 
-
-  /**
-   * Dedicated matrix multiplication method.
-   *
-   * TODO: Define.
-   */
-  void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double> &A,
-                                                vector<double> &B,
-                                                vector<double> &C) {
-/*
-    if (alpha == 0.0)
-      return;
-
-    register int i, j, ii;
-    double d;
-
-    int nRowsA = A.size1();
-
-    // create array of non-zero indices of matrix A
-    std::vector<int> nz(A.nnz() / A.size1());
-
-    typedef compressed_matrix<double>::iterator1 it_row;
-    typedef compressed_matrix<double>::iterator2 it_col;
-
-    it_row itr = A.begin1();
-    int nIndex = 0;
-    for (it_col itc = itr.begin(); itc != itr.end(); ++itc) {
-      nz[nIndex] = itc.index2();
-      nIndex++;
-    }
-
-    int nzlength = nz.size();
-    for (i = 0; i < nzlength; ++i) {
-      ii = nz[i];
-      d = 0.0;
-
-      for (j = 0; j < nRowsA; ++j) {
-        d += A(j, ii) * B(j);
-      }
-
-      C(ii) += alpha * d;
-    }
-*/
-  }
 
 
   /**
@@ -2286,40 +1807,6 @@ namespace Isis {
       }
     }
 
-    return true;
-  }
-
-
-  /**
-   * Solution with specialK (dense).
-   *
-   */
-  bool BundleAdjust::solveSystem_SPECIALK() {
-/*
-    // decomposition (this is UTDU - need to test row vs column major
-    // storage and access, and use of matrix iterators)
-//    clock_t CholeskyUtDUclock1 = clock();
-//    printf("Starting Cholesky\n");
-//    cholesky_decompose(m_Normals);
-    if ( !CholeskyUT_NOSQR() )
-      return false;
-//    clock_t CholeskyUtDUclock2 = clock();
-//    double dCholeskyTime = ((CholeskyUtDUclock2-CholeskyUtDUclock1)/(double)CLOCKS_PER_SEC);
-//    printf("Cholesky Elapsed Time: %20.10lf\n",dCholeskyTime);
-
-//    cholesky_solve(m_Normals, m_nj);
-
-    // solve via back-substitution
-//    clock_t BackSubclock1 = clock();
-//    printf("Starting Back Substitution\n");
-//    if (!CholeskyUT_NOSQR_BackSub(m_Normals, m_imageSolution, m_nj))
-//      return false;
-//    clock_t BackSubclock2 = clock();
-//    double dBackSubTime = ((BackSubclock1-BackSubclock2)/(double)CLOCKS_PER_SEC);
-//    printf("Back Substitution Elapsed Time: %20.10lf\n",dBackSubTime);
-
-//    std::cout << m_imageSolution << std::endl;
-*/
     return true;
   }
 
@@ -2884,12 +2371,7 @@ namespace Isis {
    * apply parameter corrections
    */
   void BundleAdjust::applyParameterCorrections() {
-    if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
-      applyParameterCorrections_CHOLMOD();
-    }
-    else { //??? does a check belong here ??? what if it's not special k
-      applyParameterCorrections_SPECIALK();
-    }
+    applyParameterCorrections_CHOLMOD();
   }
 
 
@@ -3033,197 +2515,6 @@ namespace Isis {
     } // end loop over point corrections
   }
 
-
-  /**
-   * Apply parameter corrections for specialK solution.
-   */
-  void BundleAdjust::applyParameterCorrections_SPECIALK() {
-/*
-//    std::cout << "image corrections: " << m_imageCorrections << std::endl;
-//    std::cout << "   image solution: " << m_imageSolution << std::endl;
-
-      int index;
-      int currentindex = -1;
-      bool bsameindex = false;
-
-      // Update selected spice for each image
-      int nImages = images();
-      for (int i = 0; i < nImages; i++) {
-
-          if ( m_bundleResults.numberHeldImages() > 0 ) {
-              if ((m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i)))) {
-                  continue;
-              }
-          }
-
-          Camera *pCamera = m_pCnet->Camera(i);
-          index = imageIndex(i);
-          if ( index == currentindex ) {
-              bsameindex = true;
-          }
-          else {
-              bsameindex = false;
-          }
-
-          currentindex = index;
-
-          if (m_bundleSettings->instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
-            SpicePosition         *pInstPos = pCamera->instrumentPosition();
-            std::vector<double> coefX(m_nNumberCamPosCoefSolved),
-                coefY(m_nNumberCamPosCoefSolved),
-                coefZ(m_nNumberCamPosCoefSolved);
-            pInstPos->GetPolynomial(coefX, coefY, coefZ);
-
-//        printf("X0:%20.10lf X1:%20.10lf X2:%20.10lf\n",abcX[0],abcX[1],abcX[2]);
-
-            // Update the X coordinate coefficient(s) and sum parameter correction
-            for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
-              coefX[icoef] += m_imageSolution(index);
-              if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-              index++;
-            }
-
-            // Update the Y coordinate coefficient(s)
-            for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
-              coefY[icoef] += m_imageSolution(index);
-              if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-              index++;
-            }
-
-            // Update the Z coordinate coefficient(s)
-            for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
-              coefZ[icoef] += m_imageSolution(index);
-              if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-              index++;
-            }
-
-            pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
-          }
-
-      if (m_bundleSettings->instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
-        SpiceRotation         *pInstRot = pCamera->instrumentRotation();
-        std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
-            coefDEC(m_nNumberCamAngleCoefSolved),
-            coefTWI(m_nNumberCamAngleCoefSolved);
-        pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
-
-        // Update right ascension coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
-          coefRA[icoef] += m_imageSolution(index);
-          if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-          index++;
-        }
-
-        // Update declination coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
-          coefDEC[icoef] += m_imageSolution(index);
-          if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-          index++;
-        }
-
-        if (m_bundleSettings->solveTwist()) {
-          // Update twist coefficient(s)
-          for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
-            coefTWI[icoef] += m_imageSolution(index);
-            if (!bsameindex) m_imageCorrections(index) += m_imageSolution(index);
-            index++;
-          }
-        }
-
-        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI, m_nPointingType);
-      }
-    }
-
-    // Update lat/lon for each control point
-    double dLatCorr, dLongCorr, dRadCorr;
-    int nPointIndex = 0;
-    int nObjectPoints = m_pCnet->GetNumPoints();
-    for (int i = 0; i < nObjectPoints; i++) {
-      ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
-        continue;
-
-      if ( point->IsRejected() ) {
-          nPointIndex++;
-          continue;
-      }
-
-      // get NIC, Q, and correction vector for this point
-      bounded_vector<double, 3> &NIC = m_NICs[nPointIndex];
-      compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
-      bounded_vector<double, 3> &corrections = m_Point_Corrections[nPointIndex];
-
-//      printf("Q\n");
-//      std::cout << Q << std::endl;
-
-//      printf("NIC\n");
-//      std::cout << NIC << std::endl;
-
-//      std::cout << m_imageSolution << std::endl;
-
-      // subtract product of Q and nj from NIC
-      NIC -= prod(Q, m_imageSolution);
-
-      // get point parameter corrections
-      dLatCorr = NIC(0);
-      dLongCorr = NIC(1);
-      dRadCorr = NIC(2);
-
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toLatin1().data(),dLatCorr, dLongCorr, dRadCorr);
-//      std::cout <<"Point " <<  point->GetId().toLatin1().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
-
-      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-
-      dLat += RAD2DEG * dLatCorr;
-      dLon += RAD2DEG * dLongCorr;
-
-      // Make sure updated values are still in valid range.
-      // TODO What is the valid lon range?
-      if (dLat < -90.0) {
-        dLat = -180.0 - dLat;
-        dLon = dLon + 180.0;
-      }
-      if (dLat > 90.0) {
-        dLat = 180.0 - dLat;
-        dLon = dLon + 180.0;
-      }
-      while (dLon > 360.0) dLon = dLon - 360.0;
-      while (dLon < 0.0) dLon = dLon + 360.0;
-
-      dRad += 1000.*dRadCorr;
-
-//      std::cout << corrections << std::endl;
-
-      // sum and save corrections
-      corrections(0) += dLatCorr;
-      corrections(1) += dLongCorr;
-      corrections(2) += dRadCorr;
-
-//      std::cout << corrections << std::endl;
-
-      SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
-
-      surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
-                                              Longitude(dLon, Angle::Degrees),
-                                              Distance(dRad, Distance::Meters));
-
-      point->SetAdjustedSurfacePoint(surfacepoint);
-
-      nPointIndex++;
-
-      // testing
-      // Compute fixed point in body-fixed coordinates
-//      double pB[3];
-//      latrec_c( dRad * 0.001,
-//               (dLon * DEG2RAD),
-//               (dLat * DEG2RAD),
-//               pB);
-//      printf("%s %lf %lf %lf\n",point->Id().toLatin1().data(),pB[0],pB[1],pB[2]);
-    } // end loop over point corrections
-*/
-  }
 
 
   /**
@@ -3603,90 +2894,7 @@ namespace Isis {
    * error propagation.
    */
   bool BundleAdjust::errorPropagation() {
-    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      return errorPropagation_CHOLMOD();
-    }
-    else {
-      return errorPropagation_SPECIALK();
-    }
-
-    return false;
-  }
-
-
-  /**
-   * error propagation for specialK solution.
-   */
-  bool BundleAdjust::errorPropagation_SPECIALK() {
-
-    // create inverse of normal equations matrix
-    if ( !CholeskyUT_NOSQR_Inverse() )
-        return false;
-
-    LinearAlgebra::Matrix T(3, 3);
-    LinearAlgebra::Matrix QS(3, m_nRank);
-    double dSigmaLat, dSigmaLong, dSigmaRadius;
-    double t;
-
-    double dSigma02 = m_bundleResults.sigma0() * m_bundleResults.sigma0();
-
-    int nPointIndex = 0;
-    int nObjectPoints = m_bundleControlPoints.size();
-    for (int i = 0; i < nObjectPoints; i++) {
-      BundleControlPointQsp point = m_bundleControlPoints.at(i);
-
-        if ( point->isRejected() )
-            continue;
-
-        printf("\rProcessing point %d of %d",i+1,nObjectPoints);
-
-        T.clear();
-        QS.clear();
-
-        // get corresponding Q matrix
-        boost::numeric::ublas::compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
-
-        // form QS
-        QS = prod(Q, m_Normals);
-
-        // form T
-        T = prod(QS, trans(Q));
-
-        // Ask Ken what is happening here...Setting just the sigmas is not very accurate
-        // Shouldn't we be updating and setting the matrix???  TODO
-        SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
-
-        dSigmaLat = SurfacePoint.GetLatSigma().radians();
-        dSigmaLong = SurfacePoint.GetLonSigma().radians();
-        dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().meters();
-
-//      std::cout << dSigmaLat << " " << dSigmaLong << " " << dSigmaRadius << std::endl;
-
-//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
-
-        t = dSigmaLat*dSigmaLat + T(0, 0);
-        Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
-
-        t = dSigmaLong*dSigmaLong + T(1, 1);
-        t = sqrt(dSigma02 * t) * m_dRTM;
-        Distance tLonSig(
-            t * cos(point->adjustedSurfacePoint().GetLatitude().radians()),
-            Distance::Meters);
-
-        t = dSigmaRadius*dSigmaRadius + T(2, 2);
-        t = sqrt(dSigma02 * t) * 1000.0;
-
-        SurfacePoint.SetSphericalSigmasDistance(tLatSig, tLonSig,
-            Distance(t, Distance::Meters));
-
-        point->setAdjustedSurfacePoint(SurfacePoint);
-
-       nPointIndex++;
-    }
-
-    return true;
+    return errorPropagation_CHOLMOD();
   }
 
 
@@ -4204,17 +3412,8 @@ namespace Isis {
 
   double BundleAdjust::solveMethodSigma(int normalEquationIndex, int sigmaIndex, int imageIndex) {
     double sigma = 0.0;
-    if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
-      gmm::row_matrix< gmm::rsvector< double > > lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
-      sigma = sqrt((double)(lsqCovMatrix(normalEquationIndex, normalEquationIndex)));
-    }
-    else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
-      vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
-      sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleResults.sigma0();
-    }
-    else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
-      sigma = sqrt((double)(m_Normals(normalEquationIndex, normalEquationIndex))) * m_bundleResults.sigma0();
-    }
+    vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
+    sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleResults.sigma0();
     return sigma;
   }
 #endif

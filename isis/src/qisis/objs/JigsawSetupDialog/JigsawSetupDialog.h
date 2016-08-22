@@ -30,6 +30,8 @@ namespace Isis {
    *                           Changed condition of if-statements for QLineEdit::setText for the
    *                           global a priori sigma variables from less than zero to !IsNullPixel
    *                           for consistency with bundle classes.
+   *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
+   *                           SpeckialK and OldSparse. References #4162.
    */
   class Project;
   class Control;

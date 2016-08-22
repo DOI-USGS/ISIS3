@@ -212,5 +212,9 @@
       Prevented qtie from crashing when user attempts to select a registration template. 
       Fixes #2375.
     </change>
+    <change name="Jeannie Backer" date="2016-08-18">
+      Modified to use the CholMod sparse decomposition matrix solve method instead of the 
+      "SpecialK" solve method (deprecated). Results are expected to be identical. References #4162.
+    </change>
   </history>
 </application>

@@ -616,11 +616,6 @@ namespace Isis {
       sprintf(buf, "\n                         UPDATE: NO");
     fpOut << buf;
 
-    sprintf(buf, "\n                  SOLUTION TYPE: %s",
-                  BundleSettings::solveMethodToString(
-                      m_settings->solveMethod()).toUpper().toLatin1().data());
-    fpOut << buf;
-
     m_settings->errorPropagation() ?
       sprintf(buf, "\n              ERROR PROPAGATION: ON"):
       sprintf(buf, "\n              ERROR PROPAGATION: OFF");

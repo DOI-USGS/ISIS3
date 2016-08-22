@@ -1,15 +1,17 @@
 APPNAME = jigsaw
-# This test exercises the bundle adjustment of one image each from the MOC-WA camera and Viking Orbiter-1 B Camera.
-# oldsparse method with held image option; solving for position.
-
+# This test exercises the bundle adjustment of one image each from the MOC-WA camera 
+# and Viking Orbiter-1 B Camera with held image option, solving for position.
+#
 # The "cat t_bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
 #
-# 2014-07-23 JWB - Changed method from oldsparse to default (sparse).
-#                  Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2014-07-23 Jeannie Backer - Changed method from oldsparse to default (sparse).
+#                Commented out references to bundleout_images.csv.
+#                Removed default parameters.
+# 2016-08-11 Jeannie Backer - Updated documentation
 
 include $(ISISROOT)/make/isismake.tsts
 

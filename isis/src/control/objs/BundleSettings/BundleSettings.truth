@@ -2,7 +2,6 @@ Unit test for BundleSettings...
 Printing PVL group with settings from the default constructor...
 Object = DefaultSettingsObject
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = No
   SolveRadius                          = No
   UpdateCubeLabel                      = No
@@ -52,7 +51,6 @@ End_Object
 Testing copy constructor...
 Object = CopySettingsObject
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = No
   SolveRadius                          = No
   UpdateCubeLabel                      = No
@@ -102,7 +100,6 @@ End_Object
 Testing assignment operator to set this equal to itself...
 Object = SelfAssignedSettingsObject
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = No
   SolveRadius                          = No
   UpdateCubeLabel                      = No
@@ -152,7 +149,6 @@ End_Object
 Testing assignment operator to create a new settings object...
 Object = AssignedSettingsObject
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = No
   SolveRadius                          = No
   UpdateCubeLabel                      = No
@@ -202,7 +198,6 @@ End_Object
 Testing mutator methods...
 Object = ResetAllOptions
   NetworkValidated                     = Yes
-  SolveMethod                          = SpecialK
   SolveObservationMode                 = Yes
   SolveRadius                          = Yes
   UpdateCubeLabel                      = Yes
@@ -272,7 +267,6 @@ End_Object
 
 Object = ResetSolveOptions
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = Yes
   SolveRadius                          = No
   UpdateCubeLabel                      = Yes
@@ -321,7 +315,6 @@ End_Object
 
 Object = ResetOutputOptions
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = Yes
   SolveRadius                          = No
   UpdateCubeLabel                      = Yes
@@ -413,15 +406,12 @@ End_Object
 "Chen" "30.0"
 
 Testing static enum-to-string and string-to-enum methods...
-"Sparse"
-"SpecialK"
 "Sigma0"
 "ParameterCorrections"
 
 Testing serialization...
 Object = BundleSettings
   NetworkValidated                     = Yes
-  SolveMethod                          = SpecialK
   SolveObservationMode                 = Yes
   SolveRadius                          = Yes
   UpdateCubeLabel                      = Yes
@@ -493,7 +483,6 @@ Testing XML: write XML from BundleSettings object...
 Testing XML: read XML to BundleSettings object...
 Object = BundleSettingsFromXml
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = Yes
   SolveRadius                          = No
   UpdateCubeLabel                      = Yes
@@ -543,7 +532,6 @@ End_Object
 Testing XML: read XML to BundleSettings object...
 Object = BundleSettingsFromXml
   NetworkValidated                     = Yes
-  SolveMethod                          = SpecialK
   SolveObservationMode                 = Yes
   SolveRadius                          = Yes
   UpdateCubeLabel                      = Yes
@@ -576,8 +564,6 @@ Object = BundleSettingsFromXml
 End_Object
 
 Testing error throws...
-**PROGRAMMER ERROR** Unknown bundle solve method [Nonsense].
-**PROGRAMMER ERROR** Unknown bundle solve method enum [31].
 **ERROR** Unable to find BundleObservationSolveSettings with InstrumentId = [NoSuchInstrumentId].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [32].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [-1].
@@ -588,10 +574,9 @@ Testing error throws...
 Testing XML: read XML with no attributes or values to object...
 Object = DefaultBundleSettingsFromEmptyXml
   NetworkValidated                     = Yes
-  SolveMethod                          = Sparse
   SolveObservationMode                 = Yes
   SolveRadius                          = Yes
-  UpdateCubeLabel                      = Yes
+  UpdateCubeLabel                      = No
   ErrorPropagation                     = No
   OutlierRejection                     = No
   GlobalLatitudeAprioriSigma           = None

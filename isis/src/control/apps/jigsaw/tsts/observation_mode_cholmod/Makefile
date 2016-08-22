@@ -1,7 +1,9 @@
 APPNAME = jigsaw
-#This test exercises observation mode using the CHOLMOD solution on HiRISE images, with update=yes
+# This test exercises observation mode on HiRISE images, with update=yes
 #
-# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
+#                Removed default parameters.
+# 2016-08-11 Jeannie Backer - Updated documentation
 
 include $(ISISROOT)/make/isismake.tsts
 

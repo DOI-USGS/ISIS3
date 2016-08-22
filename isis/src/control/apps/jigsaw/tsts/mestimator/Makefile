@@ -1,6 +1,6 @@
 APPNAME = jigsaw
 # This test exercises the bundle adjustment of images from the Apollo frame camera.
-# sparse (cholmod) method, solving for position, angles (with twist), and radius; using a two tier M-estimator approach.
+# It is solving for position, angles (with twist), and radius using a two tier M-estimator approach.
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -8,7 +8,9 @@ APPNAME = jigsaw
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
 #
-# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
+#                Removed default parameters.
+# 2016-08-11 Jeannie Backer - Updated documentation
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

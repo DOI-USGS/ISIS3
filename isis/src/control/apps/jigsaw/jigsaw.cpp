@@ -143,10 +143,13 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
     radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
   }
 
-  settings->setSolveOptions(BundleSettings::stringToSolveMethod(ui.GetString("METHOD")),
-                           ui.GetBoolean("OBSERVATIONS"), ui.GetBoolean("UPDATE"), 
-                           ui.GetBoolean("ERRORPROPAGATION"), ui.GetBoolean("RADIUS"),
-                           latitudeSigma, longitudeSigma, radiusSigma);
+  settings->setSolveOptions(ui.GetBoolean("OBSERVATIONS"), 
+                            ui.GetBoolean("UPDATE"), 
+                            ui.GetBoolean("ERRORPROPAGATION"), 
+                            ui.GetBoolean("RADIUS"),
+                            latitudeSigma, 
+                            longitudeSigma, 
+                            radiusSigma);
 
   settings->setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));

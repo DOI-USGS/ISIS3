@@ -1,7 +1,7 @@
 APPNAME = jigsaw
 
-# This test exercises the bundle adjustment of images from the HiRISE camera onboard MRO.
-# sparse method with observation mode; solving for angles (3rd degree polynomial).
+# This test exercises the bundle adjustment of images from the HiRISE camera onboard MRO
+# with observation mode, solving for angles (3rd degree polynomial).
 
 # The "cat t_bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -10,12 +10,14 @@ APPNAME = jigsaw
 # 4. remove date and time
 # 5. remove the number of iterations that occurred
 #
-# 2014-07-23 Jeannie Backer - Changed method from oldsparse to default (sparse). 
-#                Commented out references to bundleout_images.csv.  Removed default parameters.
-# 2015-07-30 Jeannie Backer - Changed file_prefix from "t" to "t_" since BundleAdjust no longer adds
-#                the underscore. 
-# 2016-07-27 Ian Humphrey -  Added the SED to remove iterations. This fixed the issue with macs 
-#                having slightly different iteration values in jigsaw observation mode tests. 
+# 2014-07-23 Jeannie Backer - Changed method from oldsparse to default (sparse).
+#                Commented out references to bundleout_images.csv.
+#                Removed default parameters.
+# 2015-07-30 Jeannie Backer - Changed file_prefix from "t" to "t_" since BundleAdjust
+#                no longer adds the underscore. 
+# 2016-07-27 Ian Humphrey -  Added the SED to remove iterations. This fixed the issue with macs
+#                having slightly different iteration values in jigsaw observation mode tests
+# 2016-08-11 Jeannie Backer - Updated documentation
 
 include $(ISISROOT)/make/isismake.tsts
 

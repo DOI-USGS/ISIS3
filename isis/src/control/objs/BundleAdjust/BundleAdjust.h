@@ -218,6 +218,8 @@ namespace Isis {
    *                           Fixes #4173, #4201.
    *   @history 2016-08-17 Jesse Mapel - Moved all method implementations to the cpp file.
    *                           Fixes #4185.
+   *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
+   *                           SpeckialK and OldSparse. Fixes #4162.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -350,49 +352,6 @@ namespace Isis {
 
       bool errorPropagation_CHOLMOD();
 
-      // solution, error propagation, and matrix methods for specialk approach
-      // TODO: this may be able to go away if I can verify cholmod behavior for a truly dense matrix
-      bool formNormalEquations_SPECIALK();
-
-      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix<
-                                    double, boost::numeric::ublas::upper >  &N22,
-                                 LinearAlgebra::Matrix  &N12,
-                                 boost::numeric::ublas::compressed_vector< double >  &n1,
-                                 LinearAlgebra::Vector  &n2,
-                                 LinearAlgebra::Matrix  &coeff_image,
-                                 LinearAlgebra::Matrix  &coeff_point3D,
-                                 LinearAlgebra::Vector  &coeff_RHS,
-                                 int nImageIndex);
-
-      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix<
-                                    double, boost::numeric::ublas::upper >  &N22,
-                                 LinearAlgebra::Matrix  &N12,
-                                 LinearAlgebra::Vector  &n2,
-                                 LinearAlgebra::Vector  &nj,
-                                 int nPointIndex, int i);
-
-      bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector< double >  &n1,
-                                 LinearAlgebra::Vector  &nj);
-
-      bool solveSystem_SPECIALK();
-
-      void AmultAdd_CNZRows_SPECIALK(double alpha,
-                                     LinearAlgebra::Matrix &A,
-                                     boost::numeric::ublas::compressed_matrix< double > &B,
-                                     boost::numeric::ublas::symmetric_matrix<  
-                                         double, 
-                                         boost::numeric::ublas::upper,
-                                         boost::numeric::ublas::column_major > &C);
-
-      void transA_NZ_multAdd_SPECIALK(double alpha,
-                                      boost::numeric::ublas::compressed_matrix< double > &A,
-                                      LinearAlgebra::Vector &B,
-                                      LinearAlgebra::Vector &C);
-
-      void applyParameterCorrections_SPECIALK();
-
-      bool errorPropagation_SPECIALK();
-
       bool CholeskyUT_NOSQR();
       bool CholeskyUT_NOSQR_Inverse();
       bool CholeskyUT_NOSQR_BackSub(
@@ -480,8 +439,8 @@ namespace Isis {
       SerialNumberList *m_pHeldSnList;                  //!< list of held image serial numbers
 
       // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
-      // as either 'CHOLMOD' (sparse solution) or 'SpecialK' (dense solution - less desirable) in
-      // the interim; there is no dependence on the least-squares class.
+      // as 'CHOLMOD' (sparse solution) in the interim;
+      // there is no dependence on the least-squares class.
 
       int m_nRank;
 
@@ -489,9 +448,6 @@ namespace Isis {
       boost::numeric::ublas::symmetric_matrix< 
           double, boost::numeric::ublas::upper, boost::numeric::ublas::column_major > m_Normals;
       LinearAlgebra::Vector m_nj;
-
-      //!< array of Qs   (see Brown, 1976)
-      std::vector< boost::numeric::ublas::compressed_matrix< double > > m_Qs_SPECIALK;
 
       LinearAlgebra::Vector m_imageSolution; //!< image parameter solution vector
 

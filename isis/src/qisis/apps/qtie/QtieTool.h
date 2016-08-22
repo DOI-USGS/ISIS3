@@ -67,6 +67,10 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
    *                           ControlNet's target instead of the TargetName.
    *                           References #3892
+   *   @history 2016-08-18 Jeannie Backer - Removed all references to the "SpecialK" solve
+   *                           method (deprecated). This program now uses what was
+   *                           previously called the "Sparse" method instead. Results are
+   *                           expected to be identical. References #4162.
    */
   class QtieTool : public Tool {
       Q_OBJECT

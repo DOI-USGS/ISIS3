@@ -39,11 +39,11 @@
 
     <p>
     Optional output files can be selected to provide more information for analyzing the 
-    results.  <b>BUNDLEOUT.TXT</b> provides an overall summary of the bundle adjustment.  
+    results.  <b>bundleout.txt</b> provides an overall summary of the bundle adjustment.  
     It lists the user input parameters selected and tables of statistics for both the
     images and the points.   The image statistics can also be written to a separate
-    <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
-    option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
+    <b>CSV</b> file and likewise for the point statistics with the <b>output_csv</b>
+    option selected.  <b>residuals_csv</b> provides a table of the measured image
     coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
     in both millimeters and pixels.
     </p>
@@ -180,6 +180,13 @@
       Modified appTests to use SPARSE method only. Commented out bundleout_images.csv references.
       Created observationSolveSettings() method to create an observation settings object from the user
       entered values.
+    </change>
+    <change name="Jeannie Backer" date="2016-08-18">
+      Removed the user parameter called METHOD (i.e. the method used for solving the bundle matrix). 
+      This solve method is no longer user-selected. The program will now use what was called the SPARSE option
+      for the METHOD parameter (i.e. solve with CholMod sparse decomposition). This method should give
+      the same results as the other options and should run faster. So the other options were no longer needed.
+      References #4162.
     </change>
   </history>
 
@@ -367,33 +374,6 @@
         <default>
           <item>No</item>
         </default>
-      </parameter>
-
-      <parameter name="METHOD">
-        <type>string</type>
-        <brief> Matrix solution method</brief>
-        <default>
-          <item>SPARSE</item>
-        </default>
-        <description>
-            Enter the desired method to use to solve the matrix.  Methods will
-            vary in speed and accuracy.   The default, SPARSE, is the preferred
-            method because of speed and memory usage.  
-        </description>
-        <list>
-        <option value="SPARSE">
-          <brief>CholMod </brief>
-          <description>
-            Solve with CholMod sparse decomposition.
-          </description>
-          </option>
-          <option value="SPECIALK">
-            <brief>SpecialK (dense)</brief>
-            <description>
-            Solve with Cholesky dense decomposition.
-            </description>
-          </option>
-        </list>
       </parameter>
 
       <parameter name="OUTLIER_REJECTION">

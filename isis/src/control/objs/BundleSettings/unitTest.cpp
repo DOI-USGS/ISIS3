@@ -31,7 +31,9 @@ using namespace Isis;
   *                           Scope (100%), Line (100%), Function(100%)
   *   @history 2016-07-07 Jeannie Backer - Updated to include TargetBody tests.
   *                           Note: This is still incomplete until we refactor how TargetBody
-  *                           and Settings classes interact.
+  *   @history 2016-08-12 Jeannie Backer - Removed references to solve method. References #4162.
+  *   @history 2016-08-18 Jeannie Backer - Removed references to BundleSettings solve method.
+  *                           References #4162.
   *
   *   @todo Test hdf5 methods when added.
   *   @todo Test setBundleTargetBody()
@@ -102,7 +104,6 @@ int main(int argc, char *argv[]) {
     BundleSettings settings;
     // tested fully by each call to pvlObject()
     //      bool validateNetwork() const;
-    //      SolveMethod solveMethod() const;
     //      bool solveObservationMode() const;
     //      bool solveRadius() const;
     //      bool updateCubeLabel() const;
@@ -156,9 +157,7 @@ int main(int argc, char *argv[]) {
     // validate the network
     copySettings.setValidateNetwork(true);
     // set the solve options
-    copySettings.setSolveOptions(BundleSettings::stringToSolveMethod("specialk"), 
-                                 true, true, true, true, 
-                                 1000.0, 2000.0, 3000.0);
+    copySettings.setSolveOptions(true, true, true, true, 1000.0, 2000.0, 3000.0);
     // set outlier rejection
     copySettings.setOutlierRejection(true, 4.0);
     // create and fill the list of observation solve settings... then set
@@ -201,8 +200,7 @@ int main(int argc, char *argv[]) {
     // now for test coverage, call some more resets
     // SolveObservationMode = UpdateCubeLabel = ErrorPropagation = true and
     // SolveRadius = OutlierRejection = false
-    settings.setSolveOptions(BundleSettings::stringToSolveMethod("sparse"), 
-                             true, true, true, false);
+    settings.setSolveOptions(true, true, true, false);
     settings.setOutlierRejection(false);
     settings.setOutputFiles("TestFilePrefix", false, true, false);
     pvl = settings.pvlObject("ResetSolveOptions");
@@ -233,8 +231,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing static enum-to-string and string-to-enum methods...";
-    qDebug() << BundleSettings::solveMethodToString(BundleSettings::stringToSolveMethod("SPARSE"));
-    qDebug() << BundleSettings::solveMethodToString(BundleSettings::stringToSolveMethod("SPECIALK"));
     qDebug() << BundleSettings::convergenceCriteriaToString(
                                BundleSettings::stringToConvergenceCriteria("SIGMA0")); 
     qDebug() << BundleSettings::convergenceCriteriaToString(
@@ -301,18 +297,6 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "Testing error throws..."; // ??? weird error if i move this after read from empty???
-    try {
-      BundleSettings::stringToSolveMethod("Nonsense");
-    } 
-    catch (IException &e) {
-      e.print();
-    }
-    try {
-      BundleSettings::solveMethodToString(BundleSettings::SolveMethod(31));
-    } 
-    catch (IException &e) {
-      e.print();
-    }
     try {
       settings.observationSolveSettings("NoSuchInstrumentId");
     } 

@@ -86,6 +86,10 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Added methods to check if solving for triaxial radii,
    *                           mean radius, or Prime Meridian Acceleration. Fixes #4159.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
+   *   @history 2016-08-18 Jeannie Backer - Removed the SolveMethod enum and all references to it.
+   *                           This option was deprecated because the Sparse option is faster than
+   *                           the other options (OldSparse and SpecialK) and gets identical
+   *                           results. Fixes #4162.
    *  
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -113,8 +117,10 @@ namespace Isis {
 #if 0
       BundleSettings(FileName xmlFile,
                      Project *project, 
-                     XmlStackedHandlerReader *xmlReader);
-      BundleSettings(XmlStackedHandlerReader *xmlReader);
+                     XmlStackedHandlerReader *xmlReader, 
+                     QObject *parent = NULL);
+      BundleSettings(XmlStackedHandlerReader *xmlReader, 
+                     QObject *parent = NULL);
 #endif
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);
@@ -127,23 +133,8 @@ namespace Isis {
       //============================ Solve options ==========================//
       //=====================================================================//
 
-      /**
-       * This enum defines the types of matrix decomposition methods for solving
-       * the bundle. 
-       */
-      enum SolveMethod {
-        Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
-        SpecialK  //!< Dense normal equations matrix.
-      };
-
-
-      // enum to/from string converters
-      static SolveMethod stringToSolveMethod(QString solveMethod);
-      static QString solveMethodToString(SolveMethod solveMethod);
-
       // mutators
-      void setSolveOptions(SolveMethod method = Sparse, 
-                           bool solveObservationMode = false,
+      void setSolveOptions(bool solveObservationMode = false,
                            bool updateCubeLabel = false, 
                            bool errorPropagation = false,
                            bool solveRadius = false, 
@@ -155,7 +146,6 @@ namespace Isis {
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
 
       // accessors
-      SolveMethod solveMethod() const;
       bool solveObservationMode() const;
       bool solveRadius() const;
       bool updateCubeLabel() const;
@@ -349,7 +339,6 @@ namespace Isis {
       QUuid *m_id; /**< A unique ID for this BundleSettings object. 
                         Used to reference this object when saving to disk.*/
       bool m_validateNetwork; //!< Indicates whether the network should be validated.
-      SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
       bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.

@@ -1,9 +1,6 @@
 APPNAME = jigsaw
 # These tests exercise the bundle adjustment of images from the Apollo frame camera.
-# Test 1: specialk (dense cholesky) method, solving for position, angles (with twist), and radius; 
-#         with error propagation.
-# Test 2: sparse (cholmod) method, solving for position, angles (with twist), and radius; 
-#         with error propagation.
+# Solving for position, angles (with twist), and radius with error propagation.
 #
 # 2013-04-02 Ken Edmundson - added weights for spacecraft position and angles to test. This reduced 
 #                the precision of the adjusted point covariance matrices in the output netfiles.
@@ -21,6 +18,8 @@ APPNAME = jigsaw
 # 2014-07-23 Jeannie Backer - Commented out specialk test and references to bundleout_images.csv
 # 2015-07-30 Jeannie Backer - Added command to remove inverseMatrix.dat file since error propagation
 #                is turned on and we do not have a way to compare this file type.
+# 2016-08-11 Jeannie Backer - Removed specialk test since we have removed this solve method from 
+#                the bundle adjustment. Updated documentation
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -32,30 +31,6 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
-#	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-#	           cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
-#	           onet=$(OUTPUT)/apollo_specialK_out.net \
-#	           radius=yes \
-#	           method=specialk \
-#	           errorpropagation=yes \
-#	           spsolve=position \
-#	           spacecraft_position_sigma=1000.0 \
-#	           camera_angles_sigma=2.0 > /dev/null;
-#	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-#	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-#	       > $(OUTPUT)/apollo_specialK_bundleout.txt;
-#	$(CAT) residuals.csv \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       > $(OUTPUT)/apollo_specialK_residuals.csv;
-#	$(CAT) bundleout_images.csv \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       > $(OUTPUT)/apollo_specialK_bundleout_images.csv;
-#	$(RM) bundleout_images.csv > /dev/null;
-#	$(MV) bundleout_points.csv $(OUTPUT)/apollo_specialK_bundleout_points.csv > /dev/null;
-#	$(RM) bundleout.txt print.prt > /dev/null;
-#	$(RM) residuals.csv > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis  \
 	           cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
 	           onet=$(OUTPUT)/apollo_cholmod_out.net \

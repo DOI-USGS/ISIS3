@@ -327,7 +327,6 @@ namespace Isis {
     BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
 
     // general tab
-    m_ui->solveMethodComboBox->setCurrentIndex(settings->solveMethod());
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
     m_ui->radiusCheckBox->setChecked(settings->solveRadius());
     m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
@@ -436,13 +435,13 @@ namespace Isis {
     if (m_ui->pointRadiusSigmaLineEdit->isModified()) {
       radiusSigma = m_ui->pointRadiusSigmaLineEdit->text().toDouble();
     }
-    settings->setSolveOptions(
-        BundleSettings::stringToSolveMethod(m_ui->solveMethodComboBox->currentText()), 
-        m_ui->observationModeCheckBox->isChecked(),
-        m_ui->updateCubeLabelCheckBox->isChecked(),
-        m_ui->errorPropagationCheckBox->isChecked(),
-        m_ui->radiusCheckBox->isChecked(),
-        latitudeSigma, longitudeSigma, radiusSigma);
+    settings->setSolveOptions(m_ui->observationModeCheckBox->isChecked(),
+                              m_ui->updateCubeLabelCheckBox->isChecked(),
+                              m_ui->errorPropagationCheckBox->isChecked(),
+                              m_ui->radiusCheckBox->isChecked(),
+                              latitudeSigma, 
+                              longitudeSigma, 
+                              radiusSigma);
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
 
@@ -660,7 +659,6 @@ namespace Isis {
 
   void JigsawSetupDialog::makeReadOnly() {
     m_ui->controlNetworkComboBox->setEnabled(false);
-    m_ui->solveMethodComboBox->setEnabled(false);
     m_ui->observationModeCheckBox->setEnabled(false);
     m_ui->radiusCheckBox->setEnabled(false);
     m_ui->updateCubeLabelCheckBox->setEnabled(false);

@@ -51,6 +51,8 @@ void printBundleMeasure(BundleMeasure &);
  *                           Updated truth file, improved overall test coverage.
  *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
  *                           References #4163.
+ *   @history 2016-08-18 Jeannie Backer - Removed references to BundleSettings solve method.
+ *                           References #4162.
  */
 
 
@@ -715,7 +717,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0";
-    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, Isis::Null);
+    settings->setSolveOptions(false, false, false, true, Isis::Null);
     bcp1.setWeights(settings, metersToRadians);
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
@@ -729,7 +731,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0";
-    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
+    settings->setSolveOptions(false, false, false, true, 2.0, 3.0, 4.0);
     bcp1.setWeights(settings, metersToRadians);
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
@@ -785,7 +787,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=false";
-    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, false);
+    settings->setSolveOptions(false, false, false, false);
     bcp4.setWeights(settings, metersToRadians);
     qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
@@ -800,7 +802,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad <= 0";
-    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true);
+    settings->setSolveOptions(false, false, false, true);
     bcp4.setWeights(settings, metersToRadians);
     qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
@@ -815,7 +817,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad > 0";
-    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
+    settings->setSolveOptions(false, false, false, true, 2.0, 3.0, 4.0);
     bcp4.setWeights(settings, metersToRadians);
     qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
