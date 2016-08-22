@@ -258,6 +258,12 @@
           orthorectified files. 
       Fixes ticket #801
     </change>
+    <change name="Jeannie Backer" date="2016-08-19">
+      Modified the code so that when DEFAULTNAMES=true, then
+      SOURCE_PRODUCT_ID = (DTM_PRODUCT_ID,  pSP_xxxxxx_xxxx) where
+      pSP_xxxxxx_xxxx is the first 15 characters of the ortho product ID described in 
+      the documentation. References #801.
+    </change>
   </history>
   
   <groups>

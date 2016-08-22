@@ -26,6 +26,8 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2016-08-09 Makayla Shepherd - Complete redesign of the user interface. 
+   *                           Fixes #2325, #2383.
    */
   class QnetSetAprioriDialog : public QDialog {
       Q_OBJECT

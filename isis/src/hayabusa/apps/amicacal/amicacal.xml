@@ -17,14 +17,15 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <li><a href="#HotPixel">Step 3: Remove the hot pixels.</a ></li>
     <li><a href="#Smear">Step 4: Readout smear correction.</a ></li>
     <li><a href="#Flatfield">Step 5: Uniformity (flat field) correction.</a ></li>
-    <li><a href="#ConvertIOF">Step 6: Conversion to I over F</a ></li>
+    <li><a href="#ConvertIOF">Step 6: Conversion to I/F</a ></li>
     <li><a href="#PSFCorrection">Step 7: PSF correction</a ></li>
+    <li><a href="#Notes">Notes</a></li>
     <li><a href="#References">References</a ></li>
   </ul>
 
   <p>
-    <h1><a id="BiasRemoval">Step 1: Bias removal.</a ></h1>
-    The signal level of AMICA is determined by a combination of an of an electronic offset
+    <h1><a id="BiasRemoval:">Step 1: Bias removal.</a ></h1>
+    The signal level of AMICA is determined by a combination of an electronic offset
     which defines the "zero" level of the analog-to-digital converter (the bias) as well
     as any additional signal due to thermal electrons (the dark current).  In general, the bias
     offset depends upon the electronics and CCD temperature.   The bias for AMICA was empirically
@@ -32,8 +33,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
 
-    <center><strong>BIAS(t) = B<sub>0</sub> + B<sub>1</sub>*t + B<sub>2</sub>*t<sup>2</sup>
-    </strong>, where <strong>t</strong> is in units of days.</center>
+    <center><strong>BIAS(t) = B<sub>0</sub> + B<sub>1</sub>*t + B<sub>2</sub>*t<sup>2</sup>,
+    </strong> where <strong>t</strong> is in units of days.</center>
     </div>
 
     The constants <strong>B<sub>0</sub></strong>, <strong>B<sub>1</sub></strong> and
@@ -66,7 +67,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
   <p>
     <h1><a id="Linearity">Step 2: Linearity correction:</a ></h1>
     The DN level stored in raw images is approximately proportional to the number
-    of photons detected in each CCD pixel over the exposure time.  Linearity is a meausure
+    of photons detected in each CCD pixel over the exposure time.  Linearity is a measure
     of the degree to which the CCD response is proportional to the incident flux.
     Linearity was tested during the pre-flight and mission phase of the mission.  During the
     pre-flight phase, DN values taken at different exposure times showed a linear intensity with
@@ -117,12 +118,12 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
   </p>
   <p>
     <h1><a id="HotPixel">Step 3: Hot pixel removal:</a ></h1>
-    During the mission the CCD was exposed to intense radition from cosmic rays.  This resulted
+    During the mission the CCD was exposed to intense radiation from cosmic rays.  This resulted
     in some pixels with an aberrant dark current value that was higher than their neighbors
     (the hot pixels).  The number of hot pixels increased during the mission.  This made
     accurate measurement of faint objects such as stars difficult.  The following hot pixels
     were identified and removed from the output images during calibration by setting
-    their values to Isis::Null:
+    their values to ISIS::Null:
 
     <br/><br/>
 
@@ -171,19 +172,45 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     is produced.  The read-out smear is predominant in images with exposure times
     on the order of 100 microseconds.  Originally the mission plan was to correct
     for this smear on-board the spacecraft.  However, an anomaly in one of the reaction
-    wheels on October 2, 2005 made this impossible.  So some of the images returned
-    by the AMICA instrument are smear-corrected, while others are not.  This necessitated
+    wheels on October 2, 2005 made this impossible.  As a result of this, some of the images
+    returned by the AMICA instrument are smear-corrected, while others are not.  This necessitated
     creating a smear model to remove smears from images taken during the descending and ascending
     period.  The read-out smear brightness <strong>I<sub>smear</sub></strong>
     for unbinned images is modeled from the observed images as follows:
 
     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
     <br/><br/>
-    <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> -1) [K*[(I<sub>raw</sub>(H,V) -
-    I<sub>sky</sub>(H,V)]/N<sub>v</sub>]</strong></center>
+    <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> -1) { [K*[(I<sub>raw</sub>(H,V) -
+    I<sub>sky</sub>(H,V)]/N<sub>v</sub>] } </strong></center>
     <br/><br/>
            <center>Where:  <strong>K = t<sub>VCT</sub>/(t<sub>VCT</sub>+t<sub>exp</sub>)
            </strong></center>
+    <br/><br/>
+
+
+
+    For binned images a different formula is applied:
+
+
+     <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> - 1)
+     { [ K1*I<sub>raw</sub>(H,V) ] }</strong>
+     </center>
+
+    <br/><br/>
+           <center>Where:  <strong>K1 = (1/N<sub>v</sub>)*[t<sub>VCT</sub>/
+           (t<sub>VCT</sub>+t<sub>exp</sub>)]
+           </strong></center>
+
+    <br/><br/>
+
+    A correction factor is then applied after the smear component is subtracted
+    from the input image (I<sub>raw</sub>):
+
+    <center> <strong> I<sub>out</sub> = C*(I<sub>raw></sub> - I<sub>smear</sub>)</strong></center>
+    <br/><br/>
+
+    <center>Where:  <strong>C = 1/( 1 + K1 * ( (B - 1)/2*B ) ) </strong></center>
+
     <br/><br/>
 
     <center><table border = "1" cellpadding="5">
@@ -216,9 +243,18 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <tr>
       <td>L</td><td>The sample number of the pixel.</td>
     </tr>
+    <tr>
+      <td>B</td><td>The binning number.</td>
+    </tr>
     </table></center>
 
+
+
     </div>
+
+
+
+
 
 
   </p>
@@ -227,7 +263,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     Performs a correction for pixel-to-pixel variation in CCD response and vignetting
     (reduction of image brightness near the periphery compared with the center).
     Flat-field images for all bands were acquired using an integrating sphere
-    at NEC Toshiba Space Systems Ltd at room temperature (around 30 degrees Celsius).
+    at NEC Space Technologies, Ltd. at room temperature (around 30 degrees Celsius).
     A flat-field image is one which has constant uniform brightness everywhere.  AMICA
     was pointed into the integrating sphere to acquire images of a field  that is known be
     be spatially uniform to an accuracy of approximately 2%.  The correction is accomplished
@@ -236,7 +272,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
   </p>
   <p>
     <h1><a id="ConvertIOF">Step 6: Convert units to I over F:</a ></h1>
-    This converts the raw DN values to I/F (radiance) units.  The formula is:
+    This converts the raw DN values to I/F (radiance) units.  The formula is as follows:
     <br/><br/>
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
       <center><strong>IoF = Raw*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
@@ -264,6 +300,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
   </p>
   <p>
+
     <h1><a id="PSFCorrection">Step 7: PSF Correction:</a ></h1>
     The point-spread function (PSF) is a model describing the two-dimensional distribution of
     light emitted from an infinitely small point source.  For point light sources, there
@@ -321,7 +358,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
      Both the focused and the unfocused components are calculated for each pixel in the image, and
      subtracted out of the final calibrated image.
      <strong>A<sub>i</sub></strong> and <strong>sigma<sub>i</sub></strong> are constants
-     derived empircally from images of Itokawa and the Moon and enumerated below:
+     derived empirically from images of Itokawa and the Moon and enumerated below:
      <br/><br/>
 
 
@@ -384,14 +421,30 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     </table></center>
     </div>
   </p>
+  <p>
+  <h1><a id="Notes">Notes</a></h1>
+  <ol>
+    <li>Any in-flight dark current noise for this mission was buried in the read-out noise (~ 4 DN).
+    When observing Itokawa, the image intensity had a range of 1000-3000 DN.  Therefore,
+    the dark current was considered negligible, and is not accounted for in this calibration
+    application (see Ishiguro (2010) ).
+    </li>
+    <li>The derivation for the formula for smear-removal in the case of unbinned images
+    does not appear in any of the references given below.  Questions concerning
+    the derivation steps for this formula should be directed towards the USGS.
+    </li>
+  </ol>
+  </p>
 
   <p>
-    <h1><a id="References">References:</a ></h1>
+    <h1><a id="References">References:</a></h1>
     <ol>
-      <li>Ishiguro, M., et al.  The Hayabusa Spacecraft Asteroid Multi-band Imaging Camera (AMICA).
+      <li>Ishiguro, Masateru, et al.  <i>"The Hayabusa Spacecraft Asteroid Multi-band Imaging
+      Camera (AMICA)"</i>.
       Icarus 207(2010) 714-731.</li>
-      <li>Ishiguro, M.  Scattered light correction of Hayabusa/AMICA data and quantitative
-      spectral comparisons of Itokawa.  Publ. Astron. Soc. Japan (2014) 66(3), 55 (1-9).</li>
+      <li>Ishiguro, Masateru.  <i>"Scattered light correction of Hayabusa/AMICA data and
+      quantitative spectral comparisons of Itokawa"</i>.
+      Publ. Astron. Soc. Japan (2014) 66(3), 55 (1-9).</li>
     </ol>
 
   </p>
@@ -426,9 +479,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       Added calibration correction routines for linearity, PSF, smear removal for binned
       and unbinned images, and converting to I/F units.  Also added hot pixel removal.
       Updated the application documentation.  Added routines for converting
-      a single-band Isis cube to an OpenCV::OpenMat matrix and vice versa for the purpose
+      a single-band ISIS cube to an OpenCV::OpenMat matrix and vice versa for the purpose
       of translating and scaling flat-field images so their dimensions match
-      some AMICA images which have been cropped.
+      some AMICA images which have been cropped.  Fixes #3880.
 
     </change>
   </history>
@@ -442,7 +495,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
           Input cube
         </brief>
         <description>
-          This is the Isis Cube to be calibrated.
+          This is the ISIS cube to be calibrated.
         </description>
         <filter>
           *.cub
@@ -463,7 +516,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         </filter>
       </parameter>      
 
-
+      <!--
       <parameter name="PSFCORRECTED">
         <type>cube</type>
         <fileMode>output</fileMode>
@@ -478,7 +531,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
           *.cub
         </filter>
       </parameter>
-
+      -->
 
 
 
@@ -488,7 +541,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Set polarized pixels to Isis::Null.
+          Set polarized pixels to ISIS::Null.
         </brief>
 	<description>
           Four position angle glass polarizers (of dimension 200 x 200 pixels each) 

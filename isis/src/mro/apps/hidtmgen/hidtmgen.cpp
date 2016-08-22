@@ -160,11 +160,6 @@ void IsisMain() {
     // -------------------------------------------------------------------------//
     // -------------------------------------------------------------------------//
     
-    // We should add verify identical mapping groups for all inputs???
-    // all keywords except upperleftcorner values, resolution values???
-    // compare objects code in pvldiff - does this belong in the PvlObject
-    // class???
-
     // The output directory will be used for DTM and ortho images when defaultNames=true
     // this directory won't be used if defaultNames=false but will be used for
     // both DTM and ortho if defaultNames=true.
@@ -273,15 +268,15 @@ void IsisMain() {
         }
       }
 
-    ProcessExportPds orthoExportProcess;
-    // Set ExportType and Endian for all output
-    orthoExportProcess.SetExportType(ProcessExportPds::Fixed);
-    if (ui.GetString("ENDIAN") == "MSB") {
-      orthoExportProcess.SetOutputEndian(Isis::Msb);
-    }
-    else if (ui.GetString("ENDIAN") == "LSB") {
-      orthoExportProcess.SetOutputEndian(Isis::Lsb);
-    }
+      ProcessExportPds orthoExportProcess;
+      // Set ExportType and Endian for all output
+      orthoExportProcess.SetExportType(ProcessExportPds::Fixed);
+      if (ui.GetString("ENDIAN") == "MSB") {
+        orthoExportProcess.SetOutputEndian(Isis::Msb);
+      }
+      else if (ui.GetString("ENDIAN") == "LSB") {
+        orthoExportProcess.SetOutputEndian(Isis::Lsb);
+      }
       setUpProcessPixels(ui, orthoExportProcess, Orthorectified);
       
       // Loop through all ortho images
@@ -300,8 +295,10 @@ void IsisMain() {
         setProjectionInformation(inCube, pdsLabel, mappingObject, projectionType);
 
         QString productId = "";
+        QString orthoId = "";
         if (defaultNames) {
-          productId = orthoFromList[i].baseName().left(15);
+          orthoId = orthoFromList[i].baseName().left(15);
+          productId = orthoId;
           productId += "_";
           productId += orthoContentColorCode(orthoFromList[i]);
           productId += "_";
@@ -317,6 +314,7 @@ void IsisMain() {
         else {
           productId = orthoProductIdList[i].expanded();
           outFile = orthoToList[i];
+          orthoId = productId;
         }
 
         // for ortho images, source product ID is the DTM product ID followed by the
@@ -328,7 +326,7 @@ void IsisMain() {
         else {
           source += dtmProductId;
         }
-        source += productId;
+        source += orthoId;
         setIdentificationInformation(pdsLabel, productId, source, paramsPvl, ui);
       
         processCube(orthoExportProcess, outFile);
@@ -592,7 +590,7 @@ QString dtmSourceOrbitAndTargetCodes(const PvlKeyword &sourceKeyword) {
   // we use the source product id for the DTM to get the orbit IDs and target code
   // for the source products (i.e. the stereo pair)
   return sourceKeyword[0].mid(4,11) + "_" + 
-         sourceKeyword[1].mid(4,12) + "_";//??? why diff number of characters???
+         sourceKeyword[1].mid(4,12) + "_";
 }
 
 

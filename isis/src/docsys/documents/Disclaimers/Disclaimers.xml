@@ -31,8 +31,8 @@
         <h2>Privacy Notice</h2>
         <h3>ISIS Web Site</h3>
         <p>
-        Visits to this site are logged by domain - personal
-        identifying information, such as e-mail addresses, are
+        Visits to this site are logged by domain. Personal
+        identifying information, such as e-mail addresses, is
         not logged. Information, web traffic logs, e-mails,
         and other correspondence related to this web server and
         its content are archived. This information is used only by
@@ -45,7 +45,7 @@
         <p>
             In addition to the general privacy policy for the ISIS Web Site, mentioned above,
             the
-            <a href="http://isis.astrogeology.usgs.gov/IsisSupport/">ISIS Support Center</a>
+            <a href="https://isis.astrogeology.usgs.gov/fixit">ISIS Support Center</a>
             does collect information that has the potential to identify a particular user.
             Some of the information users put in their profiles can be accessed by other users of this
             system, such as IM user names, location, website, occupation, and interests.
@@ -77,13 +77,13 @@
         </p>
 
         <p>
-          <strong>Cookies</strong>
+          <strong>Cookies:</strong>
           The ISIS Support Center uses temporary cookies to store your session ID and a small amount of user data needed to
           determine your log-in status as you move around the web site. These temporary cookies are automatically deleted
           when you close your browser. Persistent cookies are used to automatically log
           you onto the site when you come back later <em>if</em> you choose this option when you log-in, and will remain
           available to your browser between visits to our site. To disable automatic log-in, log out of the ISIS Support
-          Center, and make sure to the "Log me in automatically" box is not checked the next time you log in. Cookies are
+          Center, and make sure the "Log me in automatically" box is not checked the next time you log in. Cookies are
           only used to keep you logged in to the ISIS Support Center, and <em>never</em> used to track the frequency of
           visits, pages you visit, or any other purpose.
         </p>

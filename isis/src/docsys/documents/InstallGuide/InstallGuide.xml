@@ -26,7 +26,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <h2>Overview</h2>
 
         <h3>Operating System Requirements</h3>
-        <p>ISIS runs on many UNIX variants including:</p>
+        <p>ISIS runs on many UNIX variants. ISIS does not run on MS Windows. The UNIX variants supported are listed here:</p>
         <ul>
          <li>Ubuntu</li>
          <li>RHEL</li>
@@ -34,37 +34,39 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
          <li>Fedora</li>
          <li>MacOSX</li>
         </ul>
-         <p>It does not run on MS Windows.</p>
 
          <h3>Hardware Requirements</h3>
-         <p>ISIS has fairly minimal requirements depending on your needs:</p>
+         <p>Here are the minimum hardware requirements</p>
          <ul>
-         <li>64-bit x86 processors (more cores is better)</li>
-         <lI>2 GB memory (more memory is better)</lI>
-         <li>10 GB to 180GB disk storage for ISIS installation</li>
-         <li>10 GB to many TB disk storage for processing images</li>
-         <li>Quality graphics card (one that support two monitors can be useful)</li>
+         <li>64-bit (x86) processors</li>
+         <lI>2 GB memory</lI>
+         <li>10 GB to 180 GB disk space for ISIS installation</li>
+         <li>10 GB to many TB disk space for processing images</li>
+         <li>A quality graphics card</li>
          </ul>
+	 <p>Note: More processors, memory, disk storage, and an additional graphcis card (to support the use of two monitors at
+	 one time) may be useful depending on the complexity of your processing requirements
+	 </p>
 
          <h3>Mission Requirements</h3>
          <p>ISIS supports many planetary missions; in fact, over 40 different instruments including some
          flown as early
-         as the 1960s.  Ancillary data is required to process images from these instruments.  For example, translation
-         definition files to help convert from PDS format to ISIS cubes, dark current and flat file images are used for radiometric
+         as the 1960s.  Ancillary data are required to process images from these instruments.  For example, translation
+         definition files to help convert from PDS format to ISIS cubes, dark current and flat file images for radiometric
          calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images.
          If you plan to work with data
-         from all missions then the download will require about 180 GB for all the ancillary data.  However, most of this
+         from all missions, then the download will require about 180 GB for all the ancillary data.  However, most of this
          volume is taken up by SPICE files.  We have a SPICE Web service that can be used in lieu of downloading all of the
-         SPICE files which can reduce the download size to 10 GB.  When downloading ISIS you will have the option of
+         SPICE files which can reduce the download size to 10 GB.  When downloading ISIS, you will have the option of
          choosing which mission data to acquire as well as if you only want the translation and calibration files and not
          SPICE files.
          </p>
 
          <h3>DTM Requirements</h3>
-         <p>A strength of ISIS lies in it capabilities for planetary cartography.
+         <p>ISIS strength lies in its capabilities for planetary cartography.
          The image orthorectification process is improved if a digital
-         terrain model is used (DTM).  The DTMs can be quite large and take time to download.  They exist for
-         many planetary bodies (e.g., Moon, Mars, etc). Therefore there are options for selecting which DTMs to download
+         terrain model (DTM) is used.  The DTMs can be quite large and take some time to download.  They exist for
+         many planetary bodies (e.g., the Moon, Mars, etc.). Therefore, there are options for selecting which DTMs to download
          if you are only working with a particular target body.
          </p>
 
@@ -72,9 +74,9 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
         <h3>Recommended Installation Process</h3>
         <p>
-          ISIS 3 now features a downloadable Java-based installer.  The installer provides user options for chosing which mission packages and target DEMS (e.g. Mars, Moon) to download.
-          It also includes the sizes of the packages.   During the installation process, you can chose to use the ISIS SPICE web service which will eliminate the need to download most of the
-          SPICE data for a mission.
+          ISIS 3 now features a downloadable Java-based installer.  The installer provides user options for choosing which mission
+          packages and target DEMs (e.g. Mars, Moon) to download. It also includes the sizes of the packages.   During the installation process, 
+	  you can choose to use the ISIS SPICE Web service which will eliminate the need to download most of theSPICE data for a mission.
         </p>
         <p>
           To run the installer, download the isisInstall.sh Bashscript from the link below and execute it.  This script will automatically fetch the most recent version of the installer and
@@ -106,7 +108,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
         <h3>Alternate Installation Process</h3>
         <p>
-          If you are familar with the UNIX rsync command and prefer to use the old installation information
+          If you are familiar with the UNIX rsync command and prefer to use the old installation information
           follow this link:
           <a href="#rsyncInstallation">Rsync Installation</a>
         </p>
@@ -114,7 +116,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 
        <h2>FAQs</h2>
-       <h3>Cannot connect to the rsync server</h3>
+       <h3>I cannot connect to the rsync server</h3>
        <p>
          This is one of the biggest issues with downloading ISIS.  Most problems stem from a firewall restriction on
          the user's side.   USGS has opened the rsync port to allow access to our server.  Your institution likely has
@@ -129,7 +131,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           </pre>
           This should list the packages available for download.  If you do not receive this list then 1) either both of our servers
           are down or 2) your firewall does not allow access.  In the former case please post a message on our
-          <a href="http://isis.astrogeology.usgs.gov/IsisSupport">ISIS support board</a>.  In the later case, see you local
+          <a href="https://isis.astrogeology.usgs.gov/fixit">ISIS support board</a>.  In the latter case, see your local
           system administrator.  </p>
 
           <p>
@@ -143,31 +145,31 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
        </p>
 
        <p>
-       If you are still running into problems you can try a different network path.  For example, your home network to see if
+       If you are still running into problems you can try a different network path.  For example, you can try your home network to see if
        you can make connections to our rsync server.
     </p>
 
 
-    <h3>How do I know if the rsync commands were successful</h3>
+    <h3>How do I know if the rsync commands were successful?</h3>
     <p>
       Unfortunately rsync sometimes hangs or does not complete because of dropped network connections.  The drops can happen
       on your end, our end, or anywhere in between.  Keep rerunning rsync until the command completes.
     </p>
 
-    <h3>How do I get updates to ISIS</h3>
+    <h3>How do I get updates to ISIS?</h3>
     <p>
-    Just rerun the the rsync commands or GUI installer (which uses rsync) again.  Rsync only acquires files that have changed or do not
+    Just rerun the rsync commands or GUI installer (which uses rsync) again.  Rsync only acquires files that have changed or do not
     exist in you installation.  The update process will typically be much faster than the original download.
     </p>
 
-    <h3>How often do you update ISIS</h3>
+    <h3>How often do you update ISIS?</h3>
     <p>
       We update our mission data areas often (sometime nightly) as new SPICE files are provided by the active missions.  Our binaries (application programs) are updated
       on a quarterly schedule.
     </p>
 
 
-    <h3>How do I install ISIS 2</h3>
+    <h3>How do I install ISIS 2?</h3>
     <p>
          If you are looking for ISIS 2, please
         <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">refer to the ISIS 2 Installation
@@ -182,7 +184,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         </p>
 
 
-        <h3>When will a Windows version be available</h3>
+        <h3>When will a Windows version be available?</h3>
             <p>
                 Currently we have limited software development staff to support and modify ISIS, which implies directly running on a native Windows
                 environment is not something that will happen in the near future.
@@ -190,7 +192,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 
 
-             <h3>What operating systems have been dropped</h3>
+             <h3>What operating systems have been dropped?</h3>
              <p>
                As operating systems and hardware age security flaws are no longer patched and new APIs are not upgraded, which stunts the growth of ISIS on those systems.
                Therefore we no longer build ISIS on the following platforms:
@@ -204,14 +206,14 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 
 
-             <h3>I just can not get ISIS installed.  What can I do</h3>
+             <h3>I just can not get ISIS installed.  What can I do?</h3>
              <p>
-               If you encounter any problems we will be monitoring our discussion
-               board daily and will respond to any questions as best we can.  Other people
-               have posted problems and may have similar issues to you.
+               If you encounter problems, we monitor our discussion
+               board daily and will respond to any questions as soon as we can.  But, first, please check the discussion board 
+	       as others may have posted the problem with similar issues to you.
              </p>
              <p>
-               <a href="http://isis.astrogeology.usgs.gov/IsisSupport">ISIS Support Center</a>
+               <a href="https://isis.astrogeology.usgs.gov/fixit">ISIS Support Center</a>
              </p>
 
 
@@ -220,7 +222,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
         <A NAME="rsyncInstallation">  </A>
         <h2>Manual Installation</h2>
-        <h3>Creating a Download Directory</h3>
+        <h3>Create a Download Directory</h3>
 
 
         <p>
@@ -241,7 +243,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <p>
           <span style="font-size:120%; color:red; font-weight:bold">Warning:<i>
            You must be in the correct directory as shown above, and you
-           must type the below rsync commands correctly. If you do not you could
+           must type the below rsync commands correctly. If you do not, you could
            remove files not associated with ISIS.  That is ... you could remove
            personal files on your computer.   Please research and understand
            the rsync command, especially the --delete option.
@@ -253,15 +255,15 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
         <p>
           We are distributing ISIS 3 using two rsync servers. If the "rsync"
-          command is is not available on your system please see your system
-          administrator. To download ISIS 3 follow the example for your hardware
+          command is not available on your system please see your system
+          administrator. To download ISIS 3, follow the example for your hardware
           and operating system combination.
           <strong><i>Make sure to include the period "." at the end of the "rsync"
-          commands - if you don't, you will only get a list of available
+          commands - if you do not, you will only get a list of available
           downloads from the rsync server.</i></strong>
         </p>
         <p>
-          We have two rsync servers and suggest using the first server as it is a much faster
+          We have two rsync servers and suggest using the first server for a faster
           connection.
          </p>
         <ul>
@@ -269,8 +271,8 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           <li>10Mbit/sec - isisdist.wr.usgs.gov</li>
         </ul>
         <p>
-          All of the example commands below use the faster server name. You
-          can use the slower server name if you need to through simple substitution.
+          All of the example commands below use the faster server name. If you prefer to use
+	  the slower server, substitute the faster server name for the slower name in the command.
         </p>
 
 
@@ -327,13 +329,13 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 <h3>Full Data Download</h3>
 
 <p>
-    If you have the disk space and network speed you may want to download all of the ISIS data areas which
-    includes all missions supported by ISIS.   This takes over 130 GB of disk space!!  If you only have a 10 Mbps
+    If you have the disk space and network speed, you may want to download all of the ISIS data areas which
+    includes all missions supported by ISIS.   This takes over 130 GB of disk space!  If you only have a 10 Mbps
     network connection it will take nearly two days to download.  If you want to acquire only certain mission data
      <a href="#MissionSpecific">click here</a>.   To download all ISIS 3 data files continue reading.
 </p>
 <p>
-    Remember to use this followng command from the same directory you ran the previous rsync
+    Remember to use the following command from the same directory you ran the previous rsync
     command. In the example it was "/work1/isis3".
 </p>
       <pre>
@@ -341,7 +343,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       </pre>
 <p>
  Note:  The above command downloads all ISIS data including the required base data area and all of the optional mission
- data areas.  After completing this step skip to the <a href="#UnixEnvironment">Unix Environment Setup</a>.  If you chose
+ data areas.  After completing this step, skip to the <a href="#UnixEnvironment">Unix Environment Setup</a>.  If you chose
  not to download everything at once then continue below.
 </p>
 
@@ -363,7 +365,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <p>
           There are many missions supported by ISIS.  If you are only working with a few missions
           then you should download only those specific data areas.    One way you can save time and space is to not download the SPICE data
-          for the mission you need.  If chose to do so read the next section about the SPICE Web Service that
+          for the mission you need.  If you chose download the SPICE data, read the next section about the SPICE Web Service that
           provides instructions for excluding the SPICE kernels.  Otherwise <a href="#ApolloMission">jump</a> to the mission
           specific sections.
          </p>
@@ -579,8 +581,8 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <p>
             Run the startup script for ISIS. This script assumes you installed
             the ISIS 3 data area in the same directory you installed the ISIS 3
-            package. If you did not do this, you will need to modify the script to
-            meet your needs.
+            package. If you did not do this, you will need to modify the script to 
+	    indicatethe proper location.
         </p>
 
         <p>
@@ -636,9 +638,10 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <change name="Jeff Anderson" date="2012-08-24">Reorganized document format</change>
     <change name="Steven Lambright and Mathew Eis" date="2013-01-09">Updated Mac OSX support to reflect new versions: 10.7 and 10.8</change>
     <change name="Steven Lambright" date="2013-02-12">Updated Fedora support to reflect version upgrade: 16 to 18</change>
-    <change name="Stuart Sides" date="2013-06-23">Updated for latest OSX, RHEL, and Debian versoins</change>
+    <change name="Stuart Sides" date="2013-06-23">Updated for latest OSX, RHEL, and Debian versions</change>
     <change name="Kristin Berry" date="2014-01-19">Updated for latest RHEL version and removed references to SUSE and SLES support. </change>
     <change name="Ian Humphrey" date="2016-02-26">Updated for latest Fedora version (Fedora21).</change>
+    <change name="Adam Paquette" date="2016-06-24">Updated links to the support center.</change>
   </history>
 
   <bibliography>

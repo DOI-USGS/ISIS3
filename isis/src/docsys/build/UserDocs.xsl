@@ -125,7 +125,7 @@ Deborah Lee Soltesz
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop" target="_blank" title="Launch ISIS Workshop in a new window">
+            <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
             ISIS Workshop</a>
           </th>
           <td>
