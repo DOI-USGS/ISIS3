@@ -111,16 +111,13 @@ namespace Isis {
    *
    * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
    * 
    * @throw
    * @throw
    */
   BundleSettings::BundleSettings(FileName xmlFile,
                                  Project *project, 
-                                 XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent)
-      : QObject(parent) {
+                                 XmlStackedHandlerReader *xmlReader) {
 
 
     m_id = NULL;
@@ -150,9 +147,8 @@ namespace Isis {
   /** 
    * TODO
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
    */
-  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
+  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader) {
     m_id = NULL;
     xmlReader->pushContentHandler(new XmlHandler(this));
     xmlReader->setErrorHandler(new XmlHandler(this));

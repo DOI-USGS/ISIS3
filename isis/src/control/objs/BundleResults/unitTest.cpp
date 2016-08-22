@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
     observationVector.addnew(BundleImageQsp(new BundleImage(bundleImage)),
                              "ObservationNumber1",
                              "InstrumentId1",
-                             BundleSettingsQsp(new BundleSettings(parent)));
+                             BundleSettingsQsp(new BundleSettings()));
 
     results.setBundleControlPoints(bundleControlPointVector);
     results.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));

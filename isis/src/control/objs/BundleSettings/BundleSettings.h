@@ -113,10 +113,8 @@ namespace Isis {
 #if 0
       BundleSettings(FileName xmlFile,
                      Project *project, 
-                     XmlStackedHandlerReader *xmlReader, 
-                     QObject *parent = NULL);
-      BundleSettings(XmlStackedHandlerReader *xmlReader, 
-                     QObject *parent = NULL);
+                     XmlStackedHandlerReader *xmlReader);
+      BundleSettings(XmlStackedHandlerReader *xmlReader);
 #endif
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);

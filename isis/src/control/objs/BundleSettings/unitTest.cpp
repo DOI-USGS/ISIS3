@@ -99,8 +99,7 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for BundleSettings...";
     qDebug() << "Printing PVL group with settings from the default constructor...";
-    QObject *parent = NULL;
-    BundleSettings settings(parent);
+    BundleSettings settings;
     // tested fully by each call to pvlObject()
     //      bool validateNetwork() const;
     //      SolveMethod solveMethod() const;
