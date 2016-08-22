@@ -589,7 +589,7 @@ Testing XML: read XML with no attributes or values to object...
 Object = DefaultBundleSettingsFromEmptyXml
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
-  SolveObservationMode                 = No
+  SolveObservationMode                 = Yes
   SolveRadius                          = Yes
   UpdateCubeLabel                      = Yes
   ErrorPropagation                     = No
