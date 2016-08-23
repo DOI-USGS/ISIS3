@@ -432,9 +432,8 @@ int main(int argc, char *argv[]) {
         2) NOT POSSIBLE - setSolveSettings - initParameterWeights() returns false
         3) initializeExteriorOrientation - positionOption!=No, pointingOption=No
         4) applyParameterCorrections -     positionOption!=No, pointingOption=No
-          4a) Test the exceptions thrown by applyParameterCorrection (needs to have
-              m_instrumentPosition = NULL, m_instruemtnPointing = NULL). This can be tested
-              once #4153 is fixed.
+          4a) Test the second exception thrown by applyParameterCorrections
+          4b) Test successful call to applyParameterCorrections (#4249).
         5) initParameterWeights - possigma[0] == 0, possigma[1] == 0, possigma[2]  > 0
                                                     pntsigma[1]  > 0, pntsigma[2] == 0
         6) formatBundleOutputString - with instrumentPosition/instrumentRotation not NULL
@@ -526,8 +525,16 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bo3.formatBundleOutputString(true);
     qDebug() << "init exterior orientiation successful?  " 
              << toString(bo3.initializeExteriorOrientation());
-    qDebug() << "apply param corrections successful?     " 
-             << toString(bo3.applyParameterCorrections(paramCor));
+    //TODO: We should not have to catch an exception here, we need to use an observation
+    //      with a better (i.e. non-null) Camera. See ticket #4249.
+    try {
+      qDebug() << "apply param corrections successful?     " 
+               << toString(bo3.applyParameterCorrections(paramCor));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
     qDebug() << "";
 
     // spiceRotation and spicePosition (verify???)
@@ -543,8 +550,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "    access images by serial number...";
     qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImageSerialNumber")->fileName();
     qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImage2SerialNumber")->fileName();
+    qDebug() << "";
 
-    /*  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
+    //  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
     qDebug() << "Testing exceptions...";
     BundleObservationSolveSettings bo3SettingsCopy(*(bo3.solveSettings()));
     try {
@@ -556,15 +564,11 @@ int main(int argc, char *argv[]) {
       e.print(); 
     }
     try {
-      bo3SettingsCopy.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesOnly,
-                                                    false);
-      nullBO.setSolveSettings(bo3SettingsCopy);
-      nullBO.applyParameterCorrections(paramCor);
+      bo3.applyParameterCorrections(paramCor);
     }
     catch (IException &e) {
       e.print();
     }
-    */
 
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
@@ -940,6 +944,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Create an empty BundleTargetBody";
     qDebug() << "";
     BundleTargetBody btb1;
+
     qDebug().noquote() << btb1.formatBundleOutputString(false);
 
     //TODO test creating a BundleTargetBody from a target
@@ -1316,9 +1321,21 @@ int main(int argc, char *argv[]) {
     qDebug() << "Test error throws";
     qDebug() << "";
 
-    // Correction errors
+    // Correction errors (parameters and corrections mismatch)
     try {
       btb1.applyParameterCorrections(LinearAlgebra::Vector(btb1.numberParameters() + 1));
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+    // Internal correction errors - the corrections vector contains a non-Null special Isis
+    // pixel value (e.g. Hrs, Lrs...), and one of our parameter solve codes is for an angle.
+    // This causes the Angle(double, Angle::Radians) to throw an exception.
+    try {
+      LinearAlgebra::Vector hasSpecial(btb1.numberParameters());
+      hasSpecial[0] = Isis::Lrs; 
+      btb1.applyParameterCorrections(hasSpecial);
     }
     catch (IException &e) {
       e.print();
@@ -1728,9 +1745,6 @@ int main(int argc, char *argv[]) {
    qDebug() << "focal y" << toString(m.focalPlaneMeasuredY());
    qDebug() << "computed focal x" << toString(m.focalPlaneComputedX());
    qDebug() << "computed focal y" << toString(m.focalPlaneComputedY());
-   qDebug() << "sample residual" << toString(m.sampleResidual());
-   qDebug() << "line residual" << toString(m.lineResidual());
-   qDebug() << "residual magnitude" << toString(m.residualMagnitude());
    qDebug() << "observation index" << toString(m.observationIndex());
    qDebug() << "";  
 }

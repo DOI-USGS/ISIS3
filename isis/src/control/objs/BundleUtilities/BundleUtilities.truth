@@ -533,12 +533,19 @@ DEC  (t0)       0.00000000           0.00000000          0.00000000             
 TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
 
 init exterior orientiation successful?   "Yes"
-apply param corrections successful?      "Yes"
+**ERROR** Unable to apply parameter corrections to BundleObservation.
+**ERROR** Instrument rotation is NULL, but pointing solve option is AnglesOnly.
 
     add another image...
     access images by serial number...
 TestImageFileName
 TestImage2FileName
+
+Testing exceptions...
+**ERROR** Unable to apply parameter corrections to BundleObservation.
+**ERROR** Instrument position is NULL, but position solve option is PositionOnly.
+**ERROR** Unable to apply parameter corrections to BundleObservation.
+**ERROR** Instrument rotation is NULL, but pointing solve option is AnglesOnly.
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -855,9 +862,6 @@ focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
 computed focal x "-1.79769313486231e+308"
 computed focal y "-1.79769313486231e+308"
-sample residual "-3.0"
-line residual "4.0"
-residual magnitude "5.0"
 observation index "0"
 
 rejected? "Yes"
@@ -871,9 +875,6 @@ focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
 computed focal x "-1.79769313486231e+308"
 computed focal y "-1.79769313486231e+308"
-sample residual "-3.0"
-line residual "4.0"
-residual magnitude "5.0"
 observation index "0"
 
 rejected? "Yes"
@@ -887,9 +888,6 @@ focal x "-1.79769313486231e+308"
 focal y "-1.79769313486231e+308"
 computed focal x "-1.79769313486231e+308"
 computed focal y "-1.79769313486231e+308"
-sample residual "-3.0"
-line residual "4.0"
-residual magnitude "5.0"
 observation index "0"
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1076,6 +1074,8 @@ POLE DECv         5.00000000           0.00000000          5.00000000           
 Test error throws
 
 **PROGRAMMER ERROR** In BundleTargetBody::applyParameterCorrections: correction and m_targetParameter vectors sizes don't match.
+**ERROR** Unable to apply parameter corrections to BundleTargetBody.
+**PROGRAMMER ERROR** Angle cannot be a non-Null special pixel.
 **PROGRAMMER ERROR** Unknown target body radius solution method [Invalid Method].
 **PROGRAMMER ERROR** Unknown target body radius solve method enum [-1].
 **PROGRAMMER ERROR** The triaxial radii can only be accessed when solving for triaxial radii.

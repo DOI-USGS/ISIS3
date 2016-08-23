@@ -61,6 +61,8 @@ namespace Isis {
    *                           References #4163.
    *   @history 2016-08-15 Jesse Mapel - Added a map between cube serial number and contained
    *                           bundle image.  References #4159.
+   *   @history 2016-08-23 Ian Humphrey - The applyParameterCorrections() method now throws the
+   *                           last exception. Fixes #4153.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 

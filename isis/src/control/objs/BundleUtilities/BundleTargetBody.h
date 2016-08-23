@@ -56,6 +56,9 @@ namespace Isis {
    *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
    *                           References #4163.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
+   *   @history 2016-08-23 Ian Humphrey - The applyParameterCorrections() method now throws its
+   *                           last exception. Updated unit test to test that exception.
+   *                           Fixes #4153.
    */
   class BundleTargetBody {
 

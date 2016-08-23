@@ -656,7 +656,7 @@ namespace Isis {
 
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleTargetBody.";
-      IException(e, IException::Unknown, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
 
