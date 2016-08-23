@@ -352,16 +352,6 @@ namespace Isis {
 
       bool errorPropagation_CHOLMOD();
 
-      bool CholeskyUT_NOSQR();
-      bool CholeskyUT_NOSQR_Inverse();
-      bool CholeskyUT_NOSQR_BackSub(
-                                    boost::numeric::ublas::symmetric_matrix<
-                                        double, 
-                                        boost::numeric::ublas::upper,
-                                        boost::numeric::ublas::column_major >  &m,
-                                    LinearAlgebra::Vector  &s,
-                                    LinearAlgebra::Vector  &rhs);
-
 //      bool computePartials_DC(LinearAlgebra::Matrix  &coeff_image,
 //                              LinearAlgebra::Matrix  &coeff_point3D,
 //                              LinearAlgebra::Vector  &coeff_RHS,
