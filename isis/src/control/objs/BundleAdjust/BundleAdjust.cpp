@@ -2916,7 +2916,15 @@ namespace Isis {
             T += trans(T);
           }
 
-          cv += T;
+          try {
+            cv += T;
+          }
+          catch (std::exception &e) {
+            printf("\n\n");
+            QString msg = "Input data and settings are not sufficiently stable "
+                          "for error propagation.";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
         }
         nPointIndex++;
       }

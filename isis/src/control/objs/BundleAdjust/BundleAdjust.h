@@ -216,6 +216,8 @@ namespace Isis {
    *                           only add non-ignored ControlPoints to the BundleControlPoint, and
    *                           we only add non-ignored ControlMeasures to the BundleControlPoint.
    *                           Fixes #4173, #4201.
+   *   @history 2016-08-16 Jesse Mapel - Added error throw when covariance matrices are not
+   *                           symmetric due to unstable data and settings.  Fixes #2302.
    *   @history 2016-08-17 Jesse Mapel - Moved all method implementations to the cpp file.
    *                           Fixes #4185.
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods

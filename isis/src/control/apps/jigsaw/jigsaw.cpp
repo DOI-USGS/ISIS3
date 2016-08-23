@@ -60,6 +60,8 @@ void IsisMain() {
 
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
+    QObject::connect( bundleAdjustment, SIGNAL( bundleException(QString) ),
+                      bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     bundleAdjustment->solveCholesky();
     
     // write updated control net if bundle has converged

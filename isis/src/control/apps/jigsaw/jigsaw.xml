@@ -188,6 +188,9 @@
     <change name="Ken Edmundson" date="2015-09-05">
       Added preliminary target body functionality. Added SOLVETARGETBODY and TB_PARAMETERS.
     </change>
+    <change name="Jesse Mapel" date="2016-08-16">
+      Added a connection to allow jigsaw to surface exceptions from BundleAdjust.  Fixes #2302
+    </change>
     <change name="Jeannie Backer" date="2016-08-18">
       Removed the user parameter called METHOD (i.e. the method used for solving the bundle matrix). 
       This solve method is no longer user-selected. The program will now use what was called the SPARSE option
