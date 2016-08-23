@@ -101,7 +101,9 @@ namespace Isis {
    *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                      coding standards. References #972.
    * @history 2013-02-11 Debbie A. Cook, Fixed SetGround method by adding call to set the surface point 
-                           in the ShapeModel so that photometric angles can be calculated.  References #775
+   *                       in the ShapeModel so that photometric angles can be calculated.  References #775
+   * @history 2016-07-19 Kristin Berry, Updated SetGround to call p_camera->Sensor::SetGround so that 
+   *                       RA, DEC values will be set on level 2 images. References #2400.  
    */
   class RadarGroundMap : public CameraGroundMap {
     public:

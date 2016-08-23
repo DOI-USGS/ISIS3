@@ -101,6 +101,30 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+
+    cout << "RightAscension = " << cam->RightAscension() << endl;
+    cout << "Declination = " << cam->Declination() << endl;     
+    
+    // Test a Level-2 image
+    cout << endl << "Testing a Level-2 CH1 cube: " << endl << endl; 
+
+    Cube c2("$chandrayaan1/testData/CH1_xBandLvl2.cub", "r");
+    Camera *cam2 = CameraFactory::Create(c2);
+
+    // Just test the center pixel to make sure the Camera still works on Level-2 
+    // images
+    
+    cout << "For a central pixel position ..." << endl;
+    samp = 2000; 
+    line = 2500; 
+
+    if (!cam2->SetImage(samp, line)) {
+      cout << "ERROR" << endl;
+      return 0;
+    }
+    else {
+      cout << "SetImage succeeded." << endl; 
+    }
   }
   catch (IException &e) {
     e.print();

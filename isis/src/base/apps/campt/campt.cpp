@@ -105,7 +105,7 @@ QList<PvlGroup*> getCameraPointInfo(const UserInterface &ui,
  
   // Depending on what type is selected, set values accordingly
   for (int i = 0; i < points.size(); i++) {
-    
+
     QPair<double, double> pt = points[i];
     if (type == "GROUND") {
       camPoint = campt.SetGround(pt.first, pt.second, allowOutside, usePointList);

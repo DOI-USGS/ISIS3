@@ -328,6 +328,8 @@ namespace Isis {
         if(dp < 0.0 && p_lookDirection == Radar::Right) return false;
         if(dp == 0.0) return false;
 
+
+
         // Compute body fixed look direction
         std::vector<double> lookB;
         lookB.resize(3);
@@ -336,7 +338,7 @@ namespace Isis {
         lookB[2] = X[2] - Xsc[2];
 
         std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
-        SpiceRotation *cameraFrame = p_camera->instrumentRotation();
+        SpiceRotation *cameraFrame = p_camera->instrumentRotation(); //this is the pointer to the camera's SpiceRotation/instrumentatrotation object
         std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
 
         SpiceDouble unitLookC[3];
@@ -346,7 +348,10 @@ namespace Isis {
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
         p_focalPlaneY = 0.0;
         p_camera->target()->shape()->setSurfacePoint(surfacePoint); // Added 2-11-2013 by DAC
-        return true;
+
+        // set the sensor's ground point and also makes it possible to calculate m_ra & m_dec
+
+        return p_camera->Sensor::SetGround(surfacePoint, true);
       }
     }
 

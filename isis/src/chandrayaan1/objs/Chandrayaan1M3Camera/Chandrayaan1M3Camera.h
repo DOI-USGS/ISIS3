@@ -41,6 +41,8 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2016-08-01 Kristin Berry - Added to unitTest to test camera model performance on
+   *                           level 2 cubes and to test RA/DEC values. References #2400. 
    */
   class Chandrayaan1M3Camera : public LineScanCamera {
     public:
