@@ -1,4 +1,4 @@
-# This is an observation test that tests sets of images corresponding to three different seonsors:
+# This is an observation test that tests sets of images corresponding to three different sensors:
 # Apollo Metric, LRO NAC, and Lunar Orbiter (LO).
 # 
 # Tested parameters:

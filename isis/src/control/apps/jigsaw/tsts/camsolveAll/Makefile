@@ -10,7 +10,7 @@ APPNAME = jigsaw
 # 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.
 #                Removed default parameters.
 # 2016-08-20 Ian Humphrey - Removed analogous case01 test and renamed this test from
-#                observation_mode_cholmod to camsolveAll. References #4226.
+#                observation_mode_cholmod to camsolveAll. References #4122.
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
