@@ -1,23 +1,29 @@
 APPNAME = jigsaw
-# This test exercises observation mode on HiRISE images, with update=yes
+# Adapted originally from observation_mode_cholmod test.
 #
-# 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
+# This test exercises the bundle adjustment of images from the HiRISE camera onboard MRO.
+# sparse method with observation mode; solving for angles (3rd degree polynomial, using 
+# camsolve=all).
+#
+# NOTE: This test can be removed if another test tests the CAMSOLVE=ALL option.
+#
+# 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.
 #                Removed default parameters.
-# 2016-08-11 Jeannie Backer - Updated documentation
-
+# 2016-08-20 Ian Humphrey - Removed analogous case01 test and renamed this test from
+#                observation_mode_cholmod to camsolveAll. References #4226.
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(CP) $(INPUT)/*.cub $(OUTPUT) > /dev/null;
 	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	           cnet=$(INPUT)/redPntreg.net \
-	           onet=$(OUTPUT)/obsmode_cholmod_out.net \
-	           observations=yes \
-	           update=yes \
-	           cksolvedegree=3 \
-	           camsolve=all \
-	           twist=no > /dev/null;
+	  cnet=$(INPUT)/redPntreg.net \
+	  onet=$(OUTPUT)/obsmode_cholmod_out.net \
+	  observations=yes \
+	  update=yes \
+	  cksolvedegree=3 \
+	  camsolve=all \
+	  twist=no > /dev/null;
 	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
