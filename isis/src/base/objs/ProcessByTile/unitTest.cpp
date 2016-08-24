@@ -177,11 +177,11 @@ void IsisMain() {
   p.EndProcess();
 
   p.Finalize();
-  //Isis::Cube cube;
-  //cube.open("$temporary/isisProcessByTile_01");
-  //cube.close(true);
-  //cube.open("$temporary/isisProcessByTile_02");
-  //cube.close(true);
+  Isis::Cube cube;
+  cube.open("$temporary/isisProcessByTile_01");
+  cube.close(true);
+  cube.open("$temporary/isisProcessByTile_02");
+  cube.close(true);
 }
 
 void inPlaceFunction(Isis::Buffer &in){
