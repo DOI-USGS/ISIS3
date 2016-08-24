@@ -108,6 +108,8 @@ namespace Isis {
    *                          Also needed to define a compiler directive,
    *                          USE_GUI_QAPP, to bypass a problem the Macs have
    *                          with using QApplication. References #575.
+   *   @history 2016-08-15 Adam Paquette - Reset locale after QApplication or 
+   *                          QCoreApplication are instantiated. Fixes #3908.
    */
   class Application : public Environment {
     public:

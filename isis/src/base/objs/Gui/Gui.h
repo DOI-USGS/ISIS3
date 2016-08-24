@@ -78,7 +78,9 @@ namespace Isis {
    *                         also update exclusions for boolean widgets. References
    *                         #1452.
    *  @history 2016-06-28 Adam Paquette - Modified UpdateHistory to appropriately
-   *                         retrieve lists from the history pvl
+   *                         retrieve lists from the history pvl.
+   *  @history 2016-08-15 Adam Paquette - Reset locale after QApplication is 
+   *                         instantiated. Fixes #3908.
    */
 
   class Gui : public QMainWindow {
