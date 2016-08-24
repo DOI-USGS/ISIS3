@@ -68,13 +68,15 @@ int NonLinearLSQ::curvefit() {
                   gsl_blas_dnrm2(s->f), GSL_CONTINUE);
 
 
+  gsl_matrix *J = gsl_matrix_alloc(n, p);
   do {
     _nIters++;
 
     _status = gsl_multifit_fdfsolver_iterate(s);
     _fitParms = gslToNlsq(s->x);
 
-    gsl_multifit_covar(s->J, 0.0, covar);
+    gsl_multifit_fdfsolver_jac(s, J);
+    gsl_multifit_covar(J, 0.0, covar);
     _uncert = getUncertainty(covar);
 
     _status = checkIteration(_nIters, _fitParms, _uncert, gsl_blas_dnrm2(s->f),
@@ -88,6 +90,7 @@ int NonLinearLSQ::curvefit() {
   // Clean up
   gsl_multifit_fdfsolver_free(s);
   gsl_matrix_free(covar);
+  gsl_matrix_free(J);
 
   return (_status);
 }
