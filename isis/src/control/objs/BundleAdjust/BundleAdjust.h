@@ -222,6 +222,9 @@ namespace Isis {
    *                           Fixes #4185.
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
    *                           SpeckialK and OldSparse. Fixes #4162.
+   *   @history 2016-08-23 Jesse Mapel - Removed output file calls.  Apps and objects that use
+   *                           BundleAdjust must call output methods from BundleSolutionInfo.
+   *                           Fixes #4279.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

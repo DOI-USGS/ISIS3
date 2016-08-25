@@ -10,6 +10,7 @@
 #include "BundleResults.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleSettings.h"
+#include "BundleSolutionInfo.h"
 #include "CubeAttribute.h"
 #include "IException.h"
 #include "iTime.h"
@@ -62,7 +63,18 @@ void IsisMain() {
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     QObject::connect( bundleAdjustment, SIGNAL( bundleException(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
-    bundleAdjustment->solveCholesky();
+    BundleSolutionInfo bundleSolution = bundleAdjustment->solveCholeskyBR();
+    
+    // write output files
+    if (ui.GetBoolean("BUNDLEOUT_TXT")) {
+      bundleSolution.outputText();
+    }
+    if (ui.GetBoolean("OUTPUT_CSV")) {
+      bundleSolution.outputPointsCSV();
+    }
+    if (ui.GetBoolean("RESIDUALS_CSV")) {
+      bundleSolution.outputResiduals();
+    }
     
     // write updated control net if bundle has converged
     if (bundleAdjustment->isConverged()) {
@@ -215,8 +227,7 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
   if (ui.WasEntered("FILE_PREFIX"))  {
     outputfileprefix = ui.GetString("FILE_PREFIX");
   }
-  settings->setOutputFiles(outputfileprefix, ui.GetBoolean("BUNDLEOUT_TXT"),
-                          ui.GetBoolean("OUTPUT_CSV"), ui.GetBoolean("RESIDUALS_CSV"));
+  settings->setOutputFilePrefix(outputfileprefix);
 
   return settings;
 }

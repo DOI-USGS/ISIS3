@@ -71,9 +71,6 @@ namespace Isis {
 
     // Output Options
     m_outputFilePrefix = "";
-    m_createBundleOutputFile = true;
-    m_createCSVFiles = true;
-    m_createResidualsFile    = true;
   }
 
 
@@ -187,10 +184,7 @@ namespace Isis {
         m_maximumLikelihood(other.m_maximumLikelihood),
         m_solveTargetBody(other.m_solveTargetBody),
         m_bundleTargetBody(other.m_bundleTargetBody),
-        m_outputFilePrefix(other.m_outputFilePrefix),
-        m_createBundleOutputFile(other.m_createBundleOutputFile),
-        m_createCSVFiles(other.m_createCSVFiles),
-        m_createResidualsFile(other.m_createResidualsFile) {
+        m_outputFilePrefix(other.m_outputFilePrefix) {
   }
 
 
@@ -235,9 +229,6 @@ namespace Isis {
       m_bundleTargetBody = other.m_bundleTargetBody;
       m_maximumLikelihood = other.m_maximumLikelihood;
       m_outputFilePrefix = other.m_outputFilePrefix;
-      m_createBundleOutputFile = other.m_createBundleOutputFile;
-      m_createCSVFiles = other.m_createCSVFiles;
-      m_createResidualsFile = other.m_createResidualsFile;
     }
     return *this;
   }
@@ -956,20 +947,12 @@ namespace Isis {
   // ========================= Output Options (from Jigsaw only) ================================//
   // =============================================================================================//
   /**
-   * Set the output file options for the bundle adjustment. 
+   * Set the output file prefix for the bundle adjustment. 
    * 
    * @param outputFilePrefix A string containing a prefix and/or directory path 
-   *                         to be appended to all output files.
-   * @param createBundleOutputFile Indicates whether to create a bundle output file.
-   * @param createCSVFiles Indicates whether to create an output CSV file.
-   * @param createResidualsFile Indicates whether to create an output residuals file.
    */
-  void BundleSettings::setOutputFiles(QString outputFilePrefix, bool createBundleOutputFile, 
-                                      bool createCSVFiles, bool createResidualsFile) {
+  void BundleSettings::setOutputFilePrefix(QString outputFilePrefix) {
     m_outputFilePrefix = outputFilePrefix;
-    m_createBundleOutputFile = createBundleOutputFile;
-    m_createCSVFiles = createCSVFiles;
-    m_createResidualsFile = createResidualsFile;
   }
 
 
@@ -984,42 +967,6 @@ namespace Isis {
    */
   QString BundleSettings::outputFilePrefix() const {
     return m_outputFilePrefix;
-  }
-
-
-  /**
-   * This method is used to determine whether to the bundle 
-   * adjustment output file will be created. 
-   *  
-   * @return @b bool Indicates whether to create a 
-   *                               bundle output file.
-   */
-  bool BundleSettings::createBundleOutputFile() const {
-    return m_createBundleOutputFile;
-  }
-
-
-  /**
-   * This method is used to determine whether to a bundle 
-   * adjustment output CSV file will be created. 
-   *  
-   * @return @b bool Indicates whether to create an 
-   *         output CSV
-   */
-  bool BundleSettings::createCSVFiles() const {
-    return m_createCSVFiles;
-  }
-
-
-  /**
-   * This method is used to determine whether to a bundle 
-   * adjustment output residuals file will be created. 
-   *  
-   * @return @b bool Indicates whether to create an 
-   *                            output residuals file.
-   */
-  bool BundleSettings::createResidualsFile() const {
-    return m_createResidualsFile;
   }
 
 
@@ -1087,12 +1034,7 @@ namespace Isis {
     pvl += PvlKeyword("solveMeanRadius", toString(solveMeanRadius()));
 
     // Output Options
-    pvl += PvlKeyword("CreateBundleOutputFile", toString(createBundleOutputFile()));
-    pvl += PvlKeyword("CreateCSVFiles", toString(createCSVFiles()));
-    pvl += PvlKeyword("CreateResidualsFile", toString(createResidualsFile()));
-    if (createBundleOutputFile() || createCSVFiles() || createResidualsFile()) {
-      pvl += PvlKeyword("FilePrefix", outputFilePrefix());
-    }
+    pvl += PvlKeyword("FilePrefix", outputFilePrefix());
 
     // Maximum Likelihood Options
     PvlKeyword models("MaximumLikelihoodModels"); 
@@ -1202,9 +1144,6 @@ namespace Isis {
     
     stream.writeStartElement("outputFileOptions");
     stream.writeAttribute("fileNamePrefix", outputFilePrefix());
-    stream.writeAttribute("createBundleOutputFile", toString(createBundleOutputFile()));
-    stream.writeAttribute("createCSVFiles", toString(createCSVFiles()));
-    stream.writeAttribute("createResidualsFile", toString(createResidualsFile()));
     stream.writeEndElement();
     
     stream.writeEndElement(); // end global settings
@@ -1278,9 +1217,6 @@ namespace Isis {
     
     stream.writeStartElement("outputFileOptions");
     stream.writeTextElement("fileNamePrefix", outputFilePrefix());
-    stream.writeTextElement("createBundleOutputFile", toString(createBundleOutputFile()));
-    stream.writeTextElement("createCSVFiles", toString(createCSVFiles()));
-    stream.writeTextElement("createResidualsFile", toString(createResidualsFile()));
     stream.writeEndElement();
     
     stream.writeEndElement(); // end global settings
@@ -1472,22 +1408,6 @@ namespace Isis {
         if (!outputFilePrefixStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_outputFilePrefix = outputFilePrefixStr;
         }
-
-        QString createBundleOutputFileStr = attributes.value("createBundleOutputFile");
-        if (!createBundleOutputFileStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_createBundleOutputFile 
-              = toBool(createBundleOutputFileStr);
-        }
-
-        QString createCSVFilesStr = attributes.value("createCSVFiles");
-        if (!createCSVFilesStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_createCSVFiles = toBool(createCSVFilesStr);
-        }
-
-        QString createResidualsFileStr = attributes.value("createResidualsFile");
-        if (!createResidualsFileStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_createResidualsFile = toBool(createResidualsFileStr);
-        }
       }
       else if (localName == "bundleObservationSolveSettings") {
         m_xmlHandlerObservationSettings.append(
@@ -1583,10 +1503,7 @@ namespace Isis {
            << m_convergenceCriteriaThreshold
            << (qint32)m_convergenceCriteriaMaximumIterations
            << m_maximumLikelihood
-           << m_outputFilePrefix
-           << m_createBundleOutputFile
-           << m_createCSVFiles
-           << m_createResidualsFile;
+           << m_outputFilePrefix;
 
     return stream;
 
@@ -1622,10 +1539,7 @@ namespace Isis {
            >> m_convergenceCriteriaThreshold
            >> convergenceCriteriaMaximumIterations
            >> m_maximumLikelihood
-           >> m_outputFilePrefix
-           >> m_createBundleOutputFile
-           >> m_createCSVFiles
-           >> m_createResidualsFile;
+           >> m_outputFilePrefix;
 
     delete m_id;
     m_id = NULL;
@@ -1736,18 +1650,6 @@ namespace Isis {
 
         intFromBool = (int)m_outlierRejection;
         att = settingsGroup.createAttribute("outlierRejection", PredType::NATIVE_HBOOL, spc);
-        att.write(PredType::NATIVE_HBOOL, &intFromBool);
-
-        intFromBool = (int)m_createBundleOutputFile;
-        att = settingsGroup.createAttribute("createBundleOutputFile", PredType::NATIVE_HBOOL, spc);
-        att.write(PredType::NATIVE_HBOOL, &intFromBool);
-
-        intFromBool = (int)m_createCSVFiles;
-        att = settingsGroup.createAttribute("createCSVFiles", PredType::NATIVE_HBOOL, spc);
-        att.write(PredType::NATIVE_HBOOL, &intFromBool);
-
-        intFromBool = (int)m_createResidualsFile;
-        att = settingsGroup.createAttribute("createResidualsFile", PredType::NATIVE_HBOOL, spc);
         att.write(PredType::NATIVE_HBOOL, &intFromBool);
 
         /* 
@@ -1939,18 +1841,6 @@ namespace Isis {
         att = settingsGroup.openAttribute("outlierRejection");
         att.read(PredType::NATIVE_HBOOL, &boolAttValue);
         m_outlierRejection = (bool)boolAttValue;
-
-        att = settingsGroup.openAttribute("createBundleOutputFile");
-        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
-        m_createBundleOutputFile = (bool)boolAttValue;
-
-        att = settingsGroup.openAttribute("createCSVFiles");
-        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
-        m_createCSVFiles = (bool)boolAttValue;
-
-        att = settingsGroup.openAttribute("createResidualsFile");
-        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
-        m_createResidualsFile = (bool)boolAttValue;
 
         /* 
          * read enum attributes as predefined data type PredType::C_S1 (string)

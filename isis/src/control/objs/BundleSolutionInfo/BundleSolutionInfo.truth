@@ -27,9 +27,6 @@ Object = DefaultSolutionInfoObject
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 
@@ -129,9 +126,6 @@ Object = CopySolutionInfoObject
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 
@@ -231,9 +225,6 @@ Object = SelfAssignedSolutionInfoObject
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 
@@ -333,9 +324,6 @@ Object = AssignedSolutionInfoObject
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 
@@ -435,9 +423,6 @@ Object = MutatorTest
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 
@@ -548,9 +533,6 @@ Object = BundleSolutionInfoFromHDF
     SolvePolePrimeMeridianAcceleration   = No
     solveTriaxialRadii                   = No
     solveMeanRadius                      = No
-    CreateBundleOutputFile               = Yes
-    CreateCSVFiles                       = Yes
-    CreateResidualsFile                  = Yes
     FilePrefix                           = Null
     NumberObservationSolveSettings       = 1
 

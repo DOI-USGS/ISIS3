@@ -824,7 +824,7 @@ namespace Isis {
 
       settings->setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                       p_sigma0, p_maxIterations);
-      settings->setOutputFiles("", false, false, false);
+      settings->setOutputFilePrefix("");
       // =========================================================================================//
       // =============== End Bundle Settings =====================================================//
       // =========================================================================================//

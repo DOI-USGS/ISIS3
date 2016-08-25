@@ -67,6 +67,8 @@ namespace Isis {
    *                           and outputResiduals from BundleAdjust.  Fixes #4159.
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated
    *                           BundleSettings::solveMethod. References #4162.
+   *   @history 2016-08-23 Jesse Mapel - Removed output() method.  Individual output
+   *                           file methods must be called.  Fixes #4279.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -92,7 +94,6 @@ namespace Isis {
       BundleResults bundleResults();
       QString runTime() const;
 
-      bool output();
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
       bool outputPointsCSV();

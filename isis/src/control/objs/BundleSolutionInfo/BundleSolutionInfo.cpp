@@ -349,7 +349,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
    *
@@ -399,6 +398,7 @@ namespace Isis {
     return XmlStackedHandler::characters(ch);
   }
 
+
   /**
    * Handle an XML end element.
    * 
@@ -441,6 +441,7 @@ namespace Isis {
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
+
   /**
    * Get a unique, identifying string associated with this BundleSolutionInfo object.
    *
@@ -449,6 +450,7 @@ namespace Isis {
   QString BundleSolutionInfo::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
+
 
   /**
    * Sets the run time
@@ -468,6 +470,7 @@ namespace Isis {
     m_runTime = runTime;
   }
 
+
   /**
    * Returns the run time.
    * 
@@ -477,6 +480,7 @@ namespace Isis {
     return m_runTime;
   }
 
+
   /**
    * Returns the name of the control network.
    * 
@@ -485,7 +489,8 @@ namespace Isis {
   QString BundleSolutionInfo::controlNetworkFileName() const {
     return m_controlNetworkFileName->expanded();
   }
-  
+
+
   /**
    * Returns the bundle settings.
    * 
@@ -494,6 +499,7 @@ namespace Isis {
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
     return m_settings;
   }
+
 
   /**
    * Returns the bundle results.
@@ -511,31 +517,6 @@ namespace Isis {
                        "Results for this bundle is NULL.",
                        _FILEINFO_);
     }
-  }
-
-  /**
-   * Outputs the results of the BundleAdjust to files.
-   * 
-   * @return @b bool If the results were successfully output.
-   * 
-   * @see outputText()
-   * @see outputPointsCSV()
-   * @see outputResiduals()
-   */
-  bool BundleSolutionInfo::output() {
-    if (m_settings->createBundleOutputFile()) {
-      outputText();
-    }
-
-    if (m_settings->createCSVFiles()) {
-      outputPointsCSV();
-    }
-
-    if (m_settings->createResidualsFile()) {
-      outputResiduals();
-    }
-
-    return true;
   }
 
 
@@ -1314,7 +1295,8 @@ namespace Isis {
   //          << *m_images;
     return stream;
   }
-  
+
+
   /**
    * Reads the data from the stream
    * 
@@ -1371,6 +1353,7 @@ namespace Isis {
     return bundleSolutionInfo.write(stream);
   }
 
+
   /**
    * Creates the read operator for BundleSolutionInfo
    * 
@@ -1382,6 +1365,7 @@ namespace Isis {
   QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo) {
     return bundleSolutionInfo.read(stream);
   }
+
 
   /**
    * Reads the settings and results from another BundleSolutionInfo
@@ -1520,6 +1504,7 @@ namespace Isis {
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
+
 
   /**
    * Creates a new file using H5F_ACC_EXCL

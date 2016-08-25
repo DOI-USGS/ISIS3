@@ -5,6 +5,7 @@
 #include "BundleAdjust.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
+#include "BundleSolutionInfo.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -108,8 +109,11 @@ void IsisMain() {
     BundleAdjust *bundleAdjust = new BundleAdjust(settings, cnet, serialNumberList);
     QObject::connect( bundleAdjust, SIGNAL( statusUpdate(QString) ),
                       bundleAdjust, SLOT( outputBundleStatus(QString) ) );
-    bundleAdjust->solveCholesky();
-//    bundleAdjust.solveCholeskyBR();
+    BundleSolutionInfo bundleSolution = bundleAdjust->solveCholeskyBR();
+
+    // Output bundle adjust files
+    bundleSolution.outputText();
+    bundleSolution.outputResiduals();
 
     // ??? Cube c;
     // ??? c.open(filename, "rw");
@@ -223,7 +227,7 @@ BundleSettingsQsp bundleSettings() {
                                   ui.GetDouble("SIGMA0"),
                                   ui.GetInteger("MAXITS"));
 
-  settings->setOutputFiles("", true, false, true);
+  settings->setOutputFilePrefix("");
 
 
   //************************************************************************************************

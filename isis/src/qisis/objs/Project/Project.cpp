@@ -670,8 +670,7 @@ namespace Isis {
                                                            // save solution information to a file
     QString bundleFileName = bundleDir.absolutePath() + "/" + "BundleSolutionInfo.hdf";
 
-    bundleSolutionInfo->bundleSettings()->setOutputFiles(bundleDir.absolutePath() + "/",
-                                                         true, true, true);
+    bundleSolutionInfo->bundleSettings()->setOutputFilePrefix(bundleDir.absolutePath() + "/");
     bundleSolutionInfo->createH5File(FileName(bundleFileName));
 
     loadBundleSolutionInfo(bundleSolutionInfo);

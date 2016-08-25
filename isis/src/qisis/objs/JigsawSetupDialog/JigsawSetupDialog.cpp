@@ -633,7 +633,7 @@ namespace Isis {
     }
 
      // output options
-//???     settings->setOutputFiles("", false, false, false);
+//???     settings->setOutputFilePrefix("");
 
     return settings;
   }

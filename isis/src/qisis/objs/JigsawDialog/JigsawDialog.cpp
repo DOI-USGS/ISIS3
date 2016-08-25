@@ -146,7 +146,7 @@ namespace Isis {
 //    QString runTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
 //    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
 //    QString path = cwd.absolutePath() + "/";
-//    m_bundleSettings->setOutputFiles(path, true, true, true);
+//    m_bundleSettings->setOutputFilePrefix(path);
        
 //     m_bundleAdjust = new BundleAdjust(m_bundleSettings,
 //                                            *m_selectedControl,

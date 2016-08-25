@@ -90,6 +90,8 @@ namespace Isis {
    *                           This option was deprecated because the Sparse option is faster than
    *                           the other options (OldSparse and SpecialK) and gets identical
    *                           results. Fixes #4162.
+   *   @history 2016-08-23 Jesse Mapel - Modified to no longer determine which output files
+   *                           BundleAdjust and BundleSolutionInfo create.  Fixes #4279.
    *  
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -253,14 +255,8 @@ namespace Isis {
       //=====================================================================//
       //================== Output Options ??? (from Jigsaw only)=============// 
       //=====================================================================// 
-      void setOutputFiles(QString outputFilePrefix, 
-                          bool createBundleOutputFile, 
-                          bool createCSVPointsFile, 
-                          bool createResidualsFile);
+      void setOutputFilePrefix(QString outputFilePrefix);
       QString outputFilePrefix() const;
-      bool createBundleOutputFile() const;
-      bool createCSVFiles() const;
-      bool createResidualsFile() const;
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
@@ -387,11 +383,6 @@ namespace Isis {
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
                                           output files to be written to the current directory, the 
                                           output directory path should be included in this prefix.*/
-      bool m_createBundleOutputFile; /**< Indicates whether to print the standard bundle output file
-                                          (bundleout.txt).*/
-      bool m_createCSVFiles;         /**< Indicates whether to output points and image station data 
-                                          in csv format.*/
-      bool m_createResidualsFile;    /**< Indicates whether to output residuals in csv format.*/
  };
   // typedefs
   //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.

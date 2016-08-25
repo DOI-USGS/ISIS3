@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
-    settings->setOutputFiles("", true, true, true);
+    settings->setOutputFilePrefix("");
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
     ControlPoint *freePoint = new ControlPoint("FreePoint");
@@ -254,7 +254,9 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing output methods";
     
-    results.output();
+    results.outputText();
+    results.outputPointsCSV();
+    results.outputResiduals();
 
 
 

@@ -116,9 +116,6 @@ int main(int argc, char *argv[]) {
     //      ConvergenceCriteria convergenceCriteria() const;
     //      double convergenceCriteriaThreshold() const;
     //      int convergenceCriteriaMaximumIterations() const;
-    //      bool createBundleOutputFile() const;
-    //      bool createCSVPointsFile() const;
-    //      bool createResidualsFile() const;
     //      QString outputFilePrefix() const;
     //      int numberSolveSettings();
     //      int numberTargetBodyParameters() 
@@ -193,7 +190,7 @@ int main(int argc, char *argv[]) {
     // set target body
     // TODO
     // set output file options
-    copySettings.setOutputFiles("TestFilePrefix", false, false, false);
+    copySettings.setOutputFilePrefix("TestFilePrefix");
     pvl = copySettings.pvlObject("ResetAllOptions");
     cout << pvl << endl << endl;
 
@@ -202,12 +199,12 @@ int main(int argc, char *argv[]) {
     // SolveRadius = OutlierRejection = false
     settings.setSolveOptions(true, true, true, false);
     settings.setOutlierRejection(false);
-    settings.setOutputFiles("TestFilePrefix", false, true, false);
+    settings.setOutputFilePrefix("TestFilePrefix");
     pvl = settings.pvlObject("ResetSolveOptions");
     cout << pvl << endl << endl;
 
     // reset output options - test coverage
-    settings.setOutputFiles("TestFilePrefix", false, false, true);
+    settings.setOutputFilePrefix("TestFilePrefix");
     pvl = settings.pvlObject("ResetOutputOptions");
     cout << pvl << endl << endl;
 

@@ -833,9 +833,7 @@ namespace Isis {
       m_bundleResults.setObservations(m_bundleObservations);
       m_bundleResults.setBundleControlPoints(m_bundleControlPoints);
 
-      emit statusUpdate("\n Generating report files");
       BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
-      results->output();
       emit resultsReady(results);
 
       emit statusUpdate("\n Bundle Complete");
