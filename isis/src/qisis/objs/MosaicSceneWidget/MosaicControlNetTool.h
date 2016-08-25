@@ -16,7 +16,10 @@ namespace Isis {
   class ImageList;
 
   /**
-   * //TODO: Remove debug printout & comment
+   * //TODO: Remove debug printout & comment 
+   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal. 
+   *                           Is there a better design?  This might go away if we emit signals,
+   *                           which only IPCE classes would connect to.
    * @brief Handles Control Net displays
    *
    * @ingroup Visualization Tools
@@ -42,6 +45,10 @@ namespace Isis {
    *                           and fromMovementColorSourceString(). Fixes #479.
    *   @history 2013-01-31 Steven Lambright - Removed some debugging statements that were left
    *                           around from the last change. Fixes #1459.
+   *   @history 2016-08-25 Tracie Sucharski - Fixed IPCE code which caused qmos to segfault.  Added
+   *                           checks for the existence of a Directory pointer in the openControlNet
+   *                           and mouseButtonRelease methods.  If Directory point is NULL, IPCE
+   *                           code not executed.  Fixes #4063.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

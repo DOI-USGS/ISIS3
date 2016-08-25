@@ -457,7 +457,6 @@ namespace Isis {
     }
   }
 
-  
 
   void MosaicControlNetTool::displayChangedControlPoint(QString changedControlPoint) {
     //qDebug()<<"MosaicControlNetTool::displayChangedControlPoint";
@@ -466,12 +465,10 @@ namespace Isis {
   }
 
 
-
   void MosaicControlNetTool::displayNewControlPoint(QString newControlPoint) {
     //qDebug()<<"MosaicControlNetTool::displayNewControlPoint";
     m_controlNetGraphics->buildChildren();
   }
-
 
 
 /*
@@ -641,7 +638,9 @@ namespace Isis {
         //  However for cnetsuite, if we want to follow the Directory/WorkOrder design paradigm this 
         //  is probably not the best place to implement this.
         //  Also, once we figure out how to determine the active control network, this will change.
-        getWidget()->directory()->addControlPointEditor(m_controlNet, netFile);
+        if (getWidget()->directory()) {
+          getWidget()->directory()->addControlPointEditor(m_controlNet, netFile);
+        }
       }
       catch(IException &e) {
         QString message = "Invalid control network.\n";
@@ -680,6 +679,9 @@ namespace Isis {
   void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton mouseButton) {
 
     if (!isActive() || !m_controlNet) return;
+
+    // If not IPCE, return, qmos does not use this code
+    if (!getWidget()->directory()) return;
 
     ControlPoint *cp = NULL;
 
