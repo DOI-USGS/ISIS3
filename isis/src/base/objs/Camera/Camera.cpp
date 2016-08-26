@@ -22,10 +22,11 @@
  */
 #include "Camera.h"
 
+
+#include <algorithm>
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
-#include <algorithm>
 #include <stdint.h>
 
 #include <QDebug>
@@ -61,10 +62,10 @@
 using namespace std;
 
 namespace Isis {
+
   /**
-   * Constructs the Camera object
-   *
-   * @param lab Pvl label used to create the Camera object
+   * @brief Constructs the Camera object.
+   * @param cube The Pvl label from the cube is used to create the Camera object.
    */
   Camera::Camera(Cube &cube) : Sensor(cube) {
     m_instrumentNameLong = "Unknown";
@@ -153,15 +154,13 @@ namespace Isis {
     }
   }
 
-
   /**
-   * Sets the sample/line values of the image to get the lat/lon values
+   * @brief Sets the sample/line values of the image to get the lat/lon values.
    *
-   * @param sample Sample coordinate of the cube
-   * @param line Line coordinate of the cube
-   *
-   * @return @b bool Returns true if the image was set successfully and false if it
-   *              was not
+   * @param sample Sample coordinate of the cube.
+   * @param line Line coordinate of the cube.
+   * @return @b bool Returns True if the image was set successfully and Talse if it
+   *              was not.
    */
   bool Camera::SetImage(const double sample, const double line) {
     p_childSample = sample;
@@ -274,7 +273,6 @@ namespace Isis {
     shape->clearSurfacePoint();
     return false;
   }
-
 
   /**
    * Sets the lat/lon values to get the sample/line values
@@ -416,9 +414,10 @@ namespace Isis {
             }
           }
           else { // ring plane
-            // UniversalLongitude should return azimuth (ring longitude) in this case TODO: when we make the change
-            // to real azimuths this value may need to be adjusted or code changed in the shapemodel or
-            // surfacepoint class.
+            // UniversalLongitude should return azimuth (ring longitude) in this case
+            // TODO:
+            //  when we make the change to real azimuths this value may need to be adjusted or
+            //  code changed in the shapemodel or surfacepoint class.
             if (p_projection->SetUniversalGround(LocalRadius().meters(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
@@ -438,14 +437,14 @@ namespace Isis {
 
 
   /**
-  * Sets the lat/lon/radius values to get the sample/line values
+  * @brief Sets the lat/lon/radius values to get the sample/line values
   *
   * @param latitude Latitude coordinate of the cube
   * @param longitude Longitude coordinate of the cube
   * @param radius Radius coordinate of the cube
   *
-  * @return @b bool Returns true if the Universal Ground was set successfully
-  *              and false if it was not
+  * @return @b bool Returns True if the Universal Ground was set successfully
+  *              and False if it was not
   */
   bool Camera::SetUniversalGround(const double latitude, const double longitude,
                                   const double radius) {
@@ -460,8 +459,114 @@ namespace Isis {
    return false;
   }
 
+
+
   /**
-   * Returns the detector resolution at the current position
+   * @description This function provides an improved estimate of the detector resolution (in meters)
+   * when the target is near the limb.  It does this by calculating the determinant of an affine
+   * transformation. The area element of one pixel projected onto the surface at Nadir looks
+   * like a square with sides of length = Detector Resolution.  The detector resolution is the
+   * value returned by the original function.  An affine projective transformation of this
+   * area element as one would see if it was on the limb instead of looking straight down, appears
+   * like a skewed parallelogram.
+   *
+   * The determinant of the transformation matrix taking the Nadir-area element into
+   * some parallelogram near the limb of a planet measures the change in area for the
+   * transformation when we are off-Nadir.  The sqare-root of the area of this parallelogram
+   * gives us the resolution.
+   *
+   *The calculation is straightforward.  Any affine transformation with a strictly positive
+   *determinant that is not a similarity transformation has a unique decomposition
+   *(See Theorem 2.1 in Reference #1):
+   *
+   *
+   *
+   *
+   * @f{eqnarray*}
+   *
+   *        A = \[\left[\begin{array}{cc} a & b \\
+   *                                      c & d \end{array} \right]\] =
+   *
+   *         H_{\lambda}R_1(\psi)T_tR_2(\phi) = \lambda
+   *        \[ \left[\begin{array}{cc} cos(\psi) & -sin(\psi) \\
+   *                                   sin(\psi) & cos(\psi) \end{array} \right]\]
+   *        \[ \left[\begin{array}{cc} t & 0 \\
+   *                                   0 & 1 \end{array} \right]\]
+   *        \[ \left[\begin{array}{cc} cos(\phi) & -sin(\phi) \\
+   *                                   sin(\phi) & cos(\phi) \end{array} \right]\]
+   *
+   * @f}
+   *
+   * Where:
+   *
+   * @f$ t = \frac{1}{cos(\theta)}},\;\;\theta = \text{Emmission\;\; Angle}@f$
+   * and @f$\lambda = \text{zoom\;\;factor} = 1@f$
+   *
+   *  The determinant of A is:
+   *
+   *  @f[ |A| = \lambda t = \frac{\lambda}{cos(\theta)} = \frac{1}{\cos(\theta)} @f]
+   *
+   * This is because the two rotation matrices in this decomposition have determinants equal to 1.
+   *
+   *  Let @f$ n = \text{Detector\;\;Resolution} @f$
+   *
+   *  Then:
+   *
+   *   @f[ Area = n^2 |A| =\frac{n^2}{cos(\theta)}@f]
+   *
+   * And:
+   *
+   *   @f[ \text{Local\;\;Detector\;\; Resolution} = \frac{n}{\sqrt{cos(\theta)}} @f]
+   *
+   *
+   * This method returns the Local Detector Resolution if the Look Vector intersects the target
+   * and if @f$ 0 \leq \theta < \frac{\pi}{2} @f$ and -1.0 otherwise.
+   *
+   *
+   *
+   *
+   *   Reference 1:  J-M Morel and G. Yu, "Asift:  A new framework for fully affine
+   *                 invariant image comparison," SIAM Journal on Imaging Sciences
+   *                 2(2), pp. 438-469, 2009
+   *
+   *
+   * @return @b double
+   */
+  double Camera::ObliqueDetectorResolution(){
+
+
+      if(HasSurfaceIntersection()){
+
+
+          double thetaRad;
+          double sB[3];
+          instrumentPosition(sB);
+          double pB[3];
+          Coordinate(pB);
+          double a = sB[0] - pB[0];
+          double b = sB[1] - pB[1];
+          double c = sB[2] - pB[2];
+          double rho = sqrt(a * a + b * b + c * c) * 1000.0;
+
+          thetaRad = EmissionAngle()*DEG2RAD;
+
+          if (thetaRad < HALFPI) {
+
+            double nadirResolution = rho/(p_focalLength/p_pixelPitch);
+            return nadirResolution/sqrt(cos(thetaRad));
+
+          }
+              return Isis::Null;
+
+      }
+
+      return Isis::Null;
+
+  }
+
+
+  /**
+   * @brief Returns the detector resolution at the current position in meters.
    *
    * @return @b double The detector resolution
    */
@@ -480,17 +585,31 @@ namespace Isis {
     return Isis::Null;
   }
 
+
   /**
-   * Returns the sample resolution at the current position
+   * @brief Returns the sample resolution at the current position in meters.
    *
    * @return @b double The sample resolution
    */
   double Camera::SampleResolution() {
+
     return DetectorResolution() * p_detectorMap->SampleScaleFactor();
   }
 
   /**
-   * Returns the line resolution at the current position
+   * @brief Returns the  oblique sample resolution at the current position in m.  This gives
+   * a more accurate estimate of the sample resolution at oblique angles.
+   *
+   * @return @b double The sample resolution
+   */
+  double Camera::ObliqueSampleResolution() {
+
+    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+  }
+
+
+  /**
+   * @brief Returns the line resolution at the current position in meters.
    *
    * @return @b double The line resolution
    */
@@ -498,9 +617,22 @@ namespace Isis {
     return DetectorResolution() * p_detectorMap->LineScaleFactor();
   }
 
+
   /**
-   * Returns the pixel resolution at the current position in m/pix
+   * @brief Returns the oblique line resolution at the current position in meters.  This
+   * provides a more accurate estimate of the line resolution at oblique
+   * angles.
    *
+   * @return @b double The line resolution
+   */
+  double Camera::ObliqueLineResolution() {
+
+    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+  }
+
+
+  /**
+   * @brief Returns the pixel resolution at the current position in meters/pixel.
    * @return @b double The pixel resolution
    */
   double Camera::PixelResolution() {
@@ -511,8 +643,24 @@ namespace Isis {
     return (lineRes + sampRes) / 2.0;
   }
 
+
   /**
-   * Returns the lowest/worst resolution in the entire image
+   * @brief Returns the oblique pixel resolution at the current position in meters/pixel.  This
+   * provides a more accurate estimate of the pixel resolution at oblique angles.
+   *
+   * @return @b double The pixel resolution
+   */
+  double Camera::ObliquePixelResolution() {
+    double lineRes = ObliqueLineResolution();
+    double sampRes = ObliqueSampleResolution();
+    if (lineRes < 0.0) return Isis::Null;
+    if (sampRes < 0.0) return Isis::Null;
+    return (lineRes + sampRes) / 2.0;
+  }
+
+
+  /**
+   * @brief Returns the lowest/worst resolution in the entire image
    *
    * @return @b double The lowest/worst resolution in the image
    */
@@ -521,8 +669,9 @@ namespace Isis {
     return p_maxres;
   }
 
+
   /**
-   * Returns the highest/best resolution in the entire image
+   * @brief Returns the highest/best resolution in the entire image
    *
    * @return @b double The highest/best resolution in the entire image
    */
@@ -531,8 +680,31 @@ namespace Isis {
     return p_minres;
   }
 
+
   /**
-   * Computes the ground range and min/max resolution
+   * @brief Returns the lowest/worst oblique resolution in the entire image
+   *
+   * @return @b double The lowest/worst oblique resolution in the image
+   */
+  double Camera::LowestObliqueImageResolution() {
+    GroundRangeResolution();
+    return p_minobliqueres;
+  }
+
+
+  /**
+   *  @brief Returns the highest/best oblique resolution in the entire image
+   *
+   * @return @b double The highest/best oblique resolution in the entire image
+   */
+  double Camera::HighestObliqueImageResolution() {
+    GroundRangeResolution();
+    return p_maxobliqueres;
+  }
+
+
+  /**
+   *  @brief Computes the ground range and min/max resolution
    */
   void Camera::GroundRangeResolution() {
     // Software adjustment is needed if we get here -- call RingRangeResolution instead
@@ -560,6 +732,8 @@ namespace Isis {
     p_maxlon180 = -DBL_MAX;
     p_minres    = DBL_MAX;
     p_maxres    = -DBL_MAX;
+    p_minobliqueres = DBL_MAX;
+    p_maxobliqueres = -DBL_MAX;
 
     // See if we have band dependence and loop for the appropriate number of bands
     int eband = p_bands;
@@ -591,6 +765,13 @@ namespace Isis {
               if (res < p_minres) p_minres = res;
               if (res > p_maxres) p_maxres = res;
             }
+            //  Determine min/max oblique resolution
+            double obliqueres = ObliquePixelResolution();
+            if (obliqueres > 0.0) {
+                if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
+                if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
+
+            }
             if ((line != 1) && (line != p_lines + 1)) break;
           }
         } // end loop through samples
@@ -618,6 +799,14 @@ namespace Isis {
               if (res > 0.0) {
                 if (res < p_minres) p_minres = res;
                 if (res > p_maxres) p_maxres = res;
+              }
+
+              //  Determine min/max oblique resolution
+              double obliqueres = ObliquePixelResolution();
+              if (obliqueres > 0.0) {
+                  if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
+                  if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
+
               }
               break;
             }
@@ -647,6 +836,13 @@ namespace Isis {
             if (res > 0.0) {
               if (res < p_minres) p_minres = res;
               if (res > p_maxres) p_maxres = res;
+            }
+
+            double obliqueres = ObliquePixelResolution();
+            if (obliqueres > 0.0) {
+                if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
+                if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
+
             }
           }
         }
@@ -738,7 +934,9 @@ namespace Isis {
 
 
     // Checks for invalid lat/lon ranges
-//    if(p_minlon == DBL_MAX  ||  p_minlat == DBL_MAX  ||  p_maxlon == -DBL_MAX  ||  p_maxlat == -DBL_MAX) {
+//    if(p_minlon == DBL_MAX  ||  p_minlat == DBL_MAX  ||  p_maxlon == -DBL_MAX
+//    ||  p_maxlat == -DBL_MAX)
+//    {
 //      string message = "Camera missed planet or SPICE data off.";
 //      throw IException(IException::Unknown, message, _FILEINFO_);
 //    }
@@ -746,7 +944,7 @@ namespace Isis {
 
 
   /**
-   * Analogous to above GroundRangeResolution method. Computes the ring range
+   * @brief Analogous to above GroundRangeResolution method. Computes the ring range
    * and min/max resolution
    */
   void Camera::ringRangeResolution() {
@@ -916,7 +1114,8 @@ namespace Isis {
     }
 
     // Checks for invalid radius/lon ranges
-    if (p_minRingRadius == DBL_MAX  ||  p_minRingRadius == DBL_MAX  || p_minRingLongitude == DBL_MAX  ||  p_maxRingLongitude == -DBL_MAX) {
+    if (p_minRingRadius == DBL_MAX  ||  p_minRingRadius == DBL_MAX
+        || p_minRingLongitude == DBL_MAX  ||  p_maxRingLongitude == -DBL_MAX) {
       string message = "RingPlane ShapeModel - Camera missed plane or SPICE data off.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
@@ -1152,7 +1351,8 @@ namespace Isis {
    * @param pvl Pvl to write mapping group to
    */
   void Camera::basicRingMapping(Pvl &pvl) {
-    if (target()->shape()->name() != "Plane") { // If we get here and we don't have a plane, throw an error
+    if (target()->shape()->name() != "Plane") {
+      // If we get here and we don't have a plane, throw an error
       IString msg = "A ring plane projection has been requested on an image whose shape is not a ring plane.  ";
       msg += "Rerun spiceinit with shape=RINGPLANE.  ";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -1188,6 +1388,8 @@ namespace Isis {
     QString key = "INS" + toString(code) + "_PIXEL_PITCH";
     SetPixelPitch(Spice::getDouble(key));
   }
+
+
 
   /**
    * Sets the right ascension declination
@@ -1456,6 +1658,8 @@ namespace Isis {
     // angle (in radians)
     incidence = Angle(vsep_c(unitizedSurfSunVect, normal),
         Angle::Radians);
+
+
   }
 
 
@@ -1466,12 +1670,13 @@ namespace Isis {
    * @param maxra Maximum right ascension value
    * @param mindec Minimum declination value
    * @param maxdec Maximum declination value
-   *
    * @return @b bool Returns true if the range computation was successful and false
    *              if it was not
    */
   bool Camera::RaDecRange(double &minra, double &maxra,
                           double &mindec, double &maxdec) {
+
+
     bool computed = p_pointComputed;
     double originalSample = Sample();
     double originalLine = Line();
@@ -1611,6 +1816,7 @@ namespace Isis {
    * @return @b double The resutant RaDec resolution
    */
   double Camera::RaDecResolution() {
+
     bool computed = p_pointComputed;
     double originalSample = Sample();
     double originalLine = Line();
@@ -1687,7 +1893,6 @@ namespace Isis {
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
-
   /**
    * Return the Spacecraft Azimuth
    *
@@ -1700,7 +1905,6 @@ namespace Isis {
     subSpacecraftPoint(lat, lon);
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
-
 
   /**
    * Computes the image azimuth value from your current position (origin) to a point of interest
@@ -1952,7 +2156,6 @@ namespace Isis {
     return azimuth;
   }
 
-
   /**
    * Return the off nadir angle in degrees.
    *
@@ -1977,7 +2180,6 @@ namespace Isis {
 
     return c;
   }
-
 
   /**
    * Computes and returns the ground azimuth between the ground point and
@@ -2106,7 +2308,6 @@ namespace Isis {
     p_distortionMap = map;
   }
 
-
   /**
    * Sets the Focal Plane Map. This object will take ownership of the focal plane
    * map pointer.
@@ -2120,7 +2321,6 @@ namespace Isis {
 
     p_focalPlaneMap = map;
   }
-
 
   /**
    * Sets the Detector Map. This object will take ownership of the detector map
@@ -2136,7 +2336,6 @@ namespace Isis {
     p_detectorMap = map;
   }
 
-
   /**
    * Sets the Ground Map. This object will take ownership of the ground map
    * pointer.
@@ -2151,7 +2350,6 @@ namespace Isis {
     p_groundMap = map;
   }
 
-
   /**
    * Sets the Sky Map. This object will take ownership of the sky map pointer.
    *
@@ -2164,7 +2362,6 @@ namespace Isis {
 
     p_skyMap = map;
   }
-
 
   /**
    * This loads the spice cache big enough for this image. The default cache size
@@ -2261,7 +2458,6 @@ namespace Isis {
     return ephemerisTimes;
   }
 
-
   /**
    * This method calculates the spice cache size. This method finds the number
    * of lines in the beta cube and adds 1, since we need at least 2 points for
@@ -2346,7 +2542,6 @@ namespace Isis {
     p_geometricTilingEndSize = endSize;
   }
 
-
   /**
    * This will get the geometric tiling hint; these values are typically used for
    * ProcessRubberSheet::SetTiling(...).
@@ -2380,7 +2575,6 @@ namespace Isis {
     return true;
   }
 
-
   /**
    * Checks to see if the camera object has a projection
    *
@@ -2389,8 +2583,7 @@ namespace Isis {
    */
   bool Camera::HasProjection() {
     return p_projection != 0;
-    }
-
+  }
 
   /**
    * Virtual method that checks if the band is independent
@@ -2402,7 +2595,6 @@ namespace Isis {
     return true;
   }
 
-
   /**
    * Returns the reference band
    *
@@ -2411,7 +2603,6 @@ namespace Isis {
   int Camera::ReferenceBand() const {
     return p_referenceBand;
   }
-
 
   /**
    * Checks to see if the Camera object has a reference band
@@ -2423,7 +2614,6 @@ namespace Isis {
     return p_referenceBand != 0;
   }
 
-
   /**
    * Virtual method that sets the band number
    *
@@ -2432,7 +2622,6 @@ namespace Isis {
   void Camera::SetBand(const int band) {
     p_childBand = band;
   }
-
 
   /**
    * Returns the current sample number
@@ -2443,7 +2632,6 @@ namespace Isis {
     return p_childSample;
   }
 
-
   /**
    * Returns the current band
    *
@@ -2453,7 +2641,6 @@ namespace Isis {
     return p_childBand;
   }
 
-
   /**
    * Returns the current line number
    *
@@ -2462,8 +2649,6 @@ namespace Isis {
    double Camera::Line() {
     return p_childLine;
   }
-
-
   /**
    * Returns the resolution of the camera
    *
@@ -2472,6 +2657,8 @@ namespace Isis {
   double Camera::resolution() {
     return PixelResolution();
   }
+
+
 
 
   /**
@@ -2483,7 +2670,6 @@ namespace Isis {
     return p_focalLength;
   }
 
-
   /**
    * Returns the pixel pitch
    *
@@ -2492,7 +2678,6 @@ namespace Isis {
    double Camera::PixelPitch() const {
     return p_pixelPitch;
   }
-
 
   /**
    * Returns the pixel ifov offsets from center of pixel, which defaults to the
@@ -2525,7 +2710,6 @@ namespace Isis {
     return p_samples;
   }
 
-
   /**
    * Returns the number of lines in the image
    *
@@ -2534,7 +2718,6 @@ namespace Isis {
    int Camera::Lines() const {
     return p_lines;
   }
-
 
   /**
    * Returns the number of bands in the image
@@ -2545,7 +2728,6 @@ namespace Isis {
     return p_bands;
   }
 
-
   /**
    * Returns the number of lines in the parent alphacube
    *
@@ -2555,7 +2737,6 @@ namespace Isis {
     return p_alphaCube->AlphaLines();
   }
 
-
   /**
    * Returns the number of samples in the parent alphacube
    *
@@ -2564,8 +2745,6 @@ namespace Isis {
    int Camera::ParentSamples() const {
     return p_alphaCube->AlphaSamples();
   }
-
-
   /**
    * Returns a pointer to the CameraDistortionMap object
    *
@@ -2574,7 +2753,6 @@ namespace Isis {
   CameraDistortionMap *Camera::DistortionMap() {
     return p_distortionMap;
   }
-
 
   /**
    * Returns a pointer to the CameraFocalPlaneMap object
@@ -2585,7 +2763,6 @@ namespace Isis {
     return p_focalPlaneMap;
   }
 
-
   /**
    * Returns a pointer to the CameraDetectorMap object
    *
@@ -2595,7 +2772,6 @@ namespace Isis {
     return p_detectorMap;
   }
 
-
   /**
    * Returns a pointer to the CameraGroundMap object
    *
@@ -2604,7 +2780,6 @@ namespace Isis {
   CameraGroundMap *Camera::GroundMap() {
     return p_groundMap;
   }
-
 
   /**
    * Returns a pointer to the CameraSkyMap object
@@ -2794,3 +2969,5 @@ namespace Isis {
 
 // end namespace isis
 }
+
+

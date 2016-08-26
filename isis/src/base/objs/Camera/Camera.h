@@ -213,15 +213,15 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
-   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
-   *                           Sensor's pure virtual methods.
-   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
-   *                           names as well as public member getters. Updated unit test.
-   *                           References #2335.
    *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
    *                           clock angle. References #2365
    *   @history 2016-08-01 Curtis Rose - Changed return values of resolutions from -1 to Isis::Null.
    *                           Fixes #2065.
+   *   @history 2016-08-16 Tyler Wilson - Added ObliqueDectectorResolution,ObliqueLineResolution,
+   *                           ObliqueSampleResolution, and ObliquePixelResolution functions
+   *                           which give greatly improved approximations compared to their
+   *                           non-oblique counterpart functions when the Look vector is pointing
+   *                           off nadir and near the limb.  Fixes #476.  References #4100.
    */
 
   class Camera : public Sensor {
@@ -267,9 +267,17 @@ namespace Isis {
       double SampleResolution();
       double DetectorResolution();
 
+      double ObliqueDetectorResolution();
+      double ObliqueSampleResolution();
+      double ObliqueLineResolution();
+      double ObliquePixelResolution();
+
+
       virtual double resolution();
       double LowestImageResolution();
       double HighestImageResolution();
+      double LowestObliqueImageResolution();
+      double HighestObliqueImageResolution();
 
       void BasicMapping(Pvl &map);
       void basicRingMapping(Pvl &map);
@@ -288,7 +296,6 @@ namespace Isis {
 
       bool RaDecRange(double &minra, double &maxra,
                       double &mindec, double &maxdec);
-
       double RaDecResolution();
 
       CameraDistortionMap *DistortionMap();
@@ -483,6 +490,8 @@ namespace Isis {
       double p_maxlon;                       //!< The maximum longitude
       double p_minres;                       //!< The minimum resolution
       double p_maxres;                       //!< The maximum resolution
+      double p_minobliqueres;                //!< The minimum oblique resolution
+      double p_maxobliqueres;                //!< The maximum oblique resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
       bool p_groundRangeComputed;            /**!< Flag showing if ground range
@@ -520,7 +529,7 @@ namespace Isis {
       AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child
       double p_childLine;                    //!< Line value for child
-      int p_childBand;                       //!< Band value for child. Should be the virtual band not original band.
+      int p_childBand;                       //!< Band value for child
       CameraDistortionMap *p_distortionMap;  //!< A pointer to the DistortionMap
       CameraFocalPlaneMap *p_focalPlaneMap;  //!< A pointer to the FocalPlaneMap
       CameraDetectorMap *p_detectorMap;      //!< A pointer to the DetectorMap
@@ -540,3 +549,5 @@ namespace Isis {
 };
 
 #endif
+
+
