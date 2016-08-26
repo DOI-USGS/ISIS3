@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="cnettable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="cnettable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Application to get Excel compatible statistics  
   </brief>
@@ -124,6 +125,11 @@
     </change>
     <change name="Jeannie Backer" date="2014-08-22">
       Updated truth data due to modifications, printing NULL instead of N/A. References #1659.
+    </change>
+    <change name="Tyler Wilson" date="2014-08-17">
+      Updated application truth data due to modifications in CameraPointInfo class.
+      References #476.
+
     </change>
   </history>
 

@@ -1,5 +1,6 @@
 #include "Isis.h"
 
+
 #include "CameraPointInfo.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
@@ -20,6 +21,7 @@
 #include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
+//#include "LocalPointInfo.h"
 
 #include <QList>
 #include <QString>
@@ -84,7 +86,9 @@ void IsisMain() {
   }
 
   PvlGroup * grp = NULL;
+
   CameraPointInfo camPoint;
+  camPoint.SetCSVOutput(true);
 
   outside = ui.GetBoolean("ALLOWOUTSIDE");
   errors = ui.GetBoolean("ALLOWERRORS");
