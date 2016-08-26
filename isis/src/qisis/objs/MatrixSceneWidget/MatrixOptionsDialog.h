@@ -13,6 +13,8 @@ class QLineEdit;
 class QSlider;
 class QRadioButton;
 
+namespace Isis {
+
   /**
    * @brief This widget allows the user to modify the matrix display
    *
@@ -28,8 +30,8 @@ class QRadioButton;
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
    *   @history 2014-07-21 Kimberly Oyama - Color options are now updated and applied in the scene.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
-namespace Isis {
   
   class MatrixOptionsDialog : public QDialog {
         Q_OBJECT

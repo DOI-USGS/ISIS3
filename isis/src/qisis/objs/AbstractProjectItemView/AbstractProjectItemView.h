@@ -52,12 +52,14 @@ namespace Isis {
    *
    * Note that AbstractProjectItemView does not inherit from QAbstractItemView.
    *
+   * @author 2015-10-21 Jeffrey Covington
    * @internal
-   *   @author Jeffrey Covington
    *
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards. 
    *                           Fixes #4004.
+   *   @history 2016-08-25 Adam Paquette - Minor updates to documentation.
+   *                           Fixes #4299.
    */
   class AbstractProjectItemView : public QWidget {
 

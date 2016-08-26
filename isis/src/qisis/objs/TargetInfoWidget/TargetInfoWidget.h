@@ -10,6 +10,7 @@ namespace Ui {
 
 namespace Isis {
   class Directory;
+  class TargetBody;
 
   /**
    * @brief Widget for displaying information about a target
@@ -20,8 +21,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-06-13 Ken Edmundson - Original version.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
-  class TargetBody;
 
   class TargetInfoWidget : public QFrame {
     Q_OBJECT

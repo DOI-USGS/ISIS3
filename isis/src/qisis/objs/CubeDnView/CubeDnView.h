@@ -45,12 +45,13 @@ namespace Isis {
   /**
    * View that displays cubes in a QView-like way. 
    *
-   * @author Jeffrey Covington
+   * @author 2016-01-13 Jeffrey Covington
    * 
    * @internal
    *   @history 2016-01-13 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards.
    *                           Fixes #4004.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class CubeDnView : public AbstractProjectItemView {
 

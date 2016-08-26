@@ -26,7 +26,14 @@
 #include <QSharedPointer>
 
 namespace Isis {
-  /**
+  class BundleControlPoint;
+  class BundleImage;
+  class BundleObservation;
+  class BundleObservationSolveSettings;
+  class Camera;
+  class ControlMeasure;
+
+/**
    * @brief A container class for a ControlMeasure.
    *
    * This class is used as a wrapper around a ControlMeasure to provide the necessary information
@@ -56,14 +63,8 @@ namespace Isis {
    *                           a mutator.  Added wrapper methods for several ControlMeasure
    *                           methods.  Added typedef for BundleMeasureQsp.  Fixes #4159.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
-
-  class BundleControlPoint;
-  class BundleImage;
-  class BundleObservation;
-  class BundleObservationSolveSettings;
-  class Camera;
-  class ControlMeasure;
 
   class BundleMeasure {
 

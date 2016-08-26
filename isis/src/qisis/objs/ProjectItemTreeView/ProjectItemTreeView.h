@@ -40,15 +40,17 @@ namespace Isis {
    * model directly without adding items to the model using the
    * setInternalModel() method instead of setModel().
    *
-   * @internal
-   *   @author Jeffrey Covington
    *
+   * @author 2015-10-21 Jeffrey Covington
+   *
+   * @internal
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-01-13 Jeffrey Covington - Added destructor and treeView() methods. Added 
    *                           onItemAdded() slot. Replaced setSourceModel() with
    *                           setInternalModel() method.
    *   @history 2016-06-27 Ian Humphrey - Added documentation (treeView() and onItemAdded()), 
    *                           checked coding standards. Fixes #4006.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 

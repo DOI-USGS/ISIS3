@@ -10,6 +10,9 @@ namespace Ui {
 }
 
 namespace Isis {
+  class Project;
+  class Control;
+
   /**
    * @brief 
    *  
@@ -32,9 +35,8 @@ namespace Isis {
    *                           for consistency with bundle classes.
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
    *                           SpeckialK and OldSparse. References #4162.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
-  class Project;
-  class Control;
 
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT

@@ -25,7 +25,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author 2014-07-22 Kimberly Oyama & Tracie Sucharski - Refactored from QnetTools
+   * @author ????-??-?? Tracie Sucharski
    *
    * @internal
    *   @history 2008-11-24 Jeannie Walldren - Changed name from TieTool.
@@ -195,7 +195,7 @@ namespace Isis {
    *  
    *  
    *  
-   * @history 2014-07-18 Kimberly Oyama & Tracie Sucharski - Refactored from QnetTools
+   * @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Refactored from QnetTools
    */
   class ControlNetEditor : public QObject {
     Q_OBJECT

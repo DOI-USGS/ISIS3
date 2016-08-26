@@ -42,12 +42,13 @@ namespace Isis {
   /**
    * View for displaying footprints of images in a QMos like way.
    *
-   * @author Jeffrey Covington
+   * @author 2016-01-13 Jeffrey Covington
    * 
    * @internal
    *   @history 2016-01-13 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation, checked coding standards.
    *                           Fixes #4004.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class Footprint2DView : public AbstractProjectItemView {
 

@@ -92,12 +92,13 @@ namespace Isis {
    * model->appendRow(item);
    * @endcode
    *
-   * @author Jeffrey Covington 2015-10-21 
+   * @author 2015-10-21 Jeffrey Covington 
    *  
    * @internal
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor documentation updates. Fixes #4006.
    *   @history 2016-08-18 Jeannie Backer - Changed raw BundleSettings pointer to BundleSettingsQsp.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class ProjectItem : public QStandardItem {
     public:

@@ -80,13 +80,14 @@ namespace Isis {
    *
    * @ingroup
    *
-   * @internal
-   *   @author Jeffrey Covington
+   * @author 2015-10-21 Jeffrey Covington
    *
+   * @internal
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-01-13 Jeffrey Covington - Added canDropMimeData() method.
    *   @history 2016-06-27 Ian Humphrey - Added documentation to canDropMimeData(), checked coding
    *                           standards. Fixes #4006.
+   *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class ProjectItemModel : public QStandardItemModel {
 
