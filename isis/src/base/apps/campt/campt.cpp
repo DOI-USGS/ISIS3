@@ -7,10 +7,14 @@
 #include "Camera.h"
 #include "CameraPointInfo.h"
 #include "CSVReader.h"
+#include "Distance.h"
 #include "IException.h"
 #include "iTime.h"
+#include "Longitude.h"
 #include "Progress.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
@@ -21,17 +25,28 @@ QList<PvlGroup *> getCameraPointInfo(const UserInterface &ui,
                                     CameraPointInfo &campt);
 void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints);
 
+
+
+
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   
   // Setup our input cube
   CameraPointInfo campt;
+
+  QString fileFormat = ui.GetString("FORMAT");
+  if(fileFormat=="PVL")
+      campt.SetCSVOutput(false);
+  else
+      campt.SetCSVOutput(true);
+
   campt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString());
 
   // Grab the provided points (coordinates)
   QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));
   
   // Get the camera point info for coordiante
+
   QList<PvlGroup*> camPoints = getCameraPointInfo(ui, points, campt);
   
   writePoints(ui, camPoints);
@@ -209,6 +224,8 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
           os << endl;
         }
         
+
+
         for (int i = 0; i < (*point).keywords(); i++) {
           if ((*point)[i].size() == 3) {
             os << (QString)(*point)[i][0] << ","
