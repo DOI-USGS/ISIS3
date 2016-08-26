@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Creates photometric and geometric information bands for an image cube
@@ -80,28 +82,32 @@
  
     The following options are available for Level1 images that contain a camera model:
      <ul>
-     <li>DN</li>
-     <li>PHASE</li>
-     <li>EMISSION</li>
-     <li>INCIDENCE</li>
-     <li>LOCALEMISSION</li>
-     <li>LOCALINCIDENCE</li>
-     <li>LATITUDE</li>
-     <li>LONGITUDE</li>
-     <li>PIXELRESOLUTION</li>
-     <li>LINERESOLUTION</li>
-     <li>SAMPLERESOLUTION</li>
-     <li>DETECTORRESOLUTION</li>
-     <li>NORTHAZIMUTH</li>
-     <li>SUNAZIMUTH</li>
-     <li>SPACECRAFTAZIMUTH</li>
-     <li>OFFNADIRANGLE</li>
-     <li>SUBSPACECRAFTGROUNDAZIMUTH</li>
-     <li>SUBSOLARGROUNDAZIMUTH</li>
+    
+     <li><def link="Digital Number">DN</def></li>
+     <li><def link="Emission Angle">EMISSION</def></li>          
+     <li><def link="Incidence Angle">INCIDENCE</def></li>
+     <li><def link="Phase Angle">PHASE</def></li>
+     <li><def link="Off Nadir Angle">OFFNADIRANGLE</def></li>
+    
+     <li><def link="Local Emission Angle">LOCALEMISSION</def></li>
+     <li><def link="Local Incidence Angle">LOCALINCIDENCE</def></li>
+     
+     <li><def link="Latitude">LATITUDE</def></li>       
+     <li><def link="Longitude">LONGITUDE</def></li>
+     <li><def link="Detector Resolution">DETECTORRESOLUTION</def></li>   
+     <li><def link="Oblique Detector Resolution">OBLIQUEDETECTORRESOLUTION</def></li>
+     <li><def link="Pixel Resolution">PIXELRESOLUTION</def></li>
+     <li><def link="Line Resolution">LINERESOLUTION</def></li>
+     <li><def link="Sample Resolution">SAMPLERESOLUTION</def></li>    
+     <li><def link="North Azimuth">NORTHAZIMUTH</def></li> 
+     <li><def link="Sun Azimuth">SUNAZIMUTH</def></li>
+     <li><def link="Spacecraft Azimuth">SPACECRAFTAZIMUTH</def></li>     
+     <li><def link="SubSpacecraft Ground Azimuth">SUBSPACECRAFTGROUNDAZIMUTH</def></li>
+     <li><def link="Subsolar Ground Azimuth">SUBSOLARGROUNDAZIMUTH</def></li>
      <li>MORPHOLOGY</li>
-     <li>ALBEDO</li>
-     <li>RADEC</li>
-     <li>BODYFIXED</li>
+     <li><def link="Albedo">ALBEDO</def></li>
+     <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
+     <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      </ul>
 	The following options are available for Level2 images:
      <ul>
@@ -287,8 +293,13 @@
     </change>
     <change name="Makayla Shepherd" date="2015-07-02">
       Added Ra/Dec and Body Fixed Coordinates options to help create new camera models and help 
-      with mission team operations. References #2277."
+      with mission team operations. References #2277.
     </change>
+    <change name="Tyler Wilson" date="2016-08-17">
+      Added an ObliqueDetectorResolution band.  This is an improvement over the previous DetectorResolution
+      function (particularly for images taken near the limb of the target).  References #476, #4100.
+    </change>
+
   </history>
 
   <category>
@@ -369,6 +380,7 @@
               <item>LINERESOLUTION</item>
               <item>SAMPLERESOLUTION</item>
               <item>DETECTORRESOLUTION</item>
+              <item>OBLIQUEDETECTORRESOLUTION</item>
               <item>SUNAZIMUTH</item>
               <item>SPACECRAFTAZIMUTH</item>
               <item>OFFNADIRANGLE</item>
@@ -532,6 +544,20 @@
 	  in millimeters.
         </description>
       </parameter>
+
+      <parameter name="OBLIQUEDETECTORRESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create an oblique detector resolution band</brief>
+        <description>
+          If this parameter is true, the <def>Oblique Detector Resolution</def> will be
+    computed for every pixel and placed in a band in the output cube.  The
+    output cube labels will contain "Oblique Detector Resolution" in the BandBin
+    group, in band sequence of the output file.  ObliqueDetectorResolution is
+    in millimeters.
+        </description>
+      </parameter>
+
       <parameter name="NORTHAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
