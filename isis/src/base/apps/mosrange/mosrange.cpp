@@ -97,6 +97,10 @@ void IsisMain() {
   prog.CheckStatus();
 
   Statistics scaleStat;
+
+  
+  Statistics obliqueScaleStat;
+
   Statistics longitudeStat;
   Statistics latitudeStat;
   Statistics equiRadStat;
@@ -147,15 +151,51 @@ void IsisMain() {
       // Get resolution
       double lowres = cam->LowestImageResolution();
       double hires = cam->HighestImageResolution();
-      scaleStat.AddData(&lowres, 1);
+
+      
+      double lowObliqueRes = cam->LowestObliqueImageResolution();
+
+
+      
+      double hiObliqueRes= cam->HighestObliqueImageResolution();
+
+
       scaleStat.AddData(&hires, 1);
+      scaleStat.AddData(&lowres, 1);
+
+      
+      obliqueScaleStat.AddData(&hiObliqueRes,1);
+      obliqueScaleStat.AddData(&lowObliqueRes,1);
+
 
       double pixres = (lowres + hires) / 2.0;
+
+      
+      //double obliquePixRes = (lowObliqueRes+hiObliqueRes)/2.0;
+
       double scale = Scale(pixres, poleRad, eqRad);
+
+      
+      //double obliqueScale = Scale(obliquePixRes,poleRad,eqRad);
+
+
       mapgrp.addKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
+
+      
+      //mapgrp.addKeyword(PvlKeyword("ObliquePixelResolution", toString(obliquePixRes)),
+      //                  Pvl::Replace);
+
       mapgrp.addKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
-      mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters");
-      mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters");
+
+      
+      //mapgrp.addKeyword(PvlKeyword("ObliqueScale", toString(obliqueScale), "pixels/degree"),
+      //                  Pvl::Replace);
+      mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters/pixel");
+      mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters/pixel");
+
+      
+      mapgrp += PvlKeyword("MinObliquePixelResolution", toString(lowObliqueRes), "meters/pixel");
+      mapgrp += PvlKeyword("MaxObliquePixelResolution", toString(hiObliqueRes), "meters/pixel");
 
       // Get the universal ground range
       double minlat, maxlat, minlon, maxlon;
@@ -185,12 +225,17 @@ void IsisMain() {
 
 //  Construct the output mapping group with statistics
   PvlGroup mapping("Mapping");
-  double avgPixRes((scaleStat.Minimum() + scaleStat.Maximum()) / 2.0);
+  double avgPixRes( (scaleStat.Minimum() + scaleStat.Maximum() ) / 2.0);
+
+  
+  //double avgObliquePixRes( (obliqueScaleStat.Minimum() + obliqueScaleStat.Maximum() ) / 2.0);
+
   double avgLat((latitudeStat.Minimum() + latitudeStat.Maximum()) / 2.0);
   double avgLon((longitudeStat.Minimum() + longitudeStat.Maximum()) / 2.0);
   double avgEqRad((equiRadStat.Minimum() + equiRadStat.Maximum()) / 2.0);
   double avgPoleRad((poleRadStat.Minimum() + poleRadStat.Maximum()) / 2.0);
   double scale  = Scale(avgPixRes, avgPoleRad, avgEqRad);
+  //double obliqueScale = Scale(avgObliquePixRes,avgPoleRad,avgEqRad);
 
   mapping += PvlKeyword("ProjectionName", projection);
   mapping += PvlKeyword("TargetName", target);
@@ -200,15 +245,37 @@ void IsisMain() {
   mapping += PvlKeyword("LongitudeDirection", londir);
   mapping += PvlKeyword("LongitudeDomain", londom);
   mapping += PvlKeyword("PixelResolution", toString(SetRound(avgPixRes, digits)), "meters/pixel");
+
+  
+  //mapping += PvlKeyword("ObliquePixelResolution", toString(SetRound(avgObliquePixRes, digits)),
+  //                      "meters/pixel");
+
+
   mapping += PvlKeyword("Scale", toString(SetRound(scale, digits)), "pixels/degree");
-  mapping += PvlKeyword("MinPixelResolution", toString(scaleStat.Minimum()), "meters");
-  mapping += PvlKeyword("MaxPixelResolution", toString(scaleStat.Maximum()), "meters");
+
+  
+  //mapping += PvlKeyword("ObliqueScale", toString(SetRound(obliqueScale, digits)), "pixels/degree");
+
+
+  mapping += PvlKeyword("MinPixelResolution", toString(scaleStat.Minimum()), "meters/pixel");
+  mapping += PvlKeyword("MaxPixelResolution", toString(scaleStat.Maximum()), "meters/pixel");
+
+  
+  mapping += PvlKeyword("MinObliquePixelResolution", toString(obliqueScaleStat.Minimum()),
+                        "meters/pixel");
+  mapping += PvlKeyword("MaxObliquePixelResolution", toString(obliqueScaleStat.Maximum()),
+                        "meters/pixel");
+
   mapping += PvlKeyword("CenterLongitude", toString(SetRound(avgLon, digits)));
   mapping += PvlKeyword("CenterLatitude",  toString(SetRound(avgLat, digits)));
-  mapping += PvlKeyword("MinimumLatitude", toString(MAX(SetFloor(latitudeStat.Minimum(), digits), -90.0)));
-  mapping += PvlKeyword("MaximumLatitude", toString(MIN(SetCeil(latitudeStat.Maximum(), digits), 90.0)));
-  mapping += PvlKeyword("MinimumLongitude", toString(MAX(SetFloor(longitudeStat.Minimum(), digits), -180.0)));
-  mapping += PvlKeyword("MaximumLongitude", toString(MIN(SetCeil(longitudeStat.Maximum(), digits), 360.0)));
+  mapping += PvlKeyword("MinimumLatitude", toString(MAX(SetFloor(latitudeStat.Minimum(),
+                                                                 digits), -90.0)));
+  mapping += PvlKeyword("MaximumLatitude", toString(MIN(SetCeil(latitudeStat.Maximum(),
+                                                                 digits), 90.0)));
+  mapping += PvlKeyword("MinimumLongitude", toString(MAX(SetFloor(longitudeStat.Minimum(),
+                                                                  digits), -180.0)));
+  mapping += PvlKeyword("MaximumLongitude", toString(MIN(SetCeil(longitudeStat.Maximum(),
+                                                                 digits), 360.0)));
 
   PvlKeyword clat("PreciseCenterLongitude", toString(avgLon));
   clat.addComment("Actual Parameters without precision applied");
