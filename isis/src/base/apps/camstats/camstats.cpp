@@ -112,7 +112,21 @@ void IsisMain() {
            "NorthAzimuthMinimum," <<
            "NorthAzimuthMaximum," <<
            "NorthAzimuthAverage," <<
-           "NorthAzimuthStandardDeviation," << endl;
+           "NorthAzimuthStandardDeviation," <<
+           "ObliqueResolutionMinimum," <<
+           "ObliqueResolutionMaximum," <<
+           "ObliqueResolutionAverage," <<
+           "ObliqueResolutionStandardDeviation," <<
+           "ObliqueLineResolutionMinimum," <<
+           "ObliqueLineResolutionMaximum," <<
+           "ObliqueLineResolutionAverage," <<
+           "ObliqueLineResolutionStandardDeviation," <<
+           "ObliqueSampleResolutionMinimum," <<
+           "ObliqueSampleResolutionMaximum," <<
+           "ObliqueSampleResolutionAverage," <<
+           "ObliqueSampleResolutionStandardDeviation," << endl;
+
+
       }
       os << FileName(from).expanded() << ",";
       //call the function to write out the values for each group
@@ -128,6 +142,9 @@ void IsisMain() {
       writeFlat(os, camStats.getLocalSolarTimeStat());
       writeFlat(os, camStats.getLocalRaduisStat());
       writeFlat(os, camStats.getNorthAzimuthStat());
+      writeFlat(os,camStats.getObliqueResStat());
+      writeFlat(os,camStats.getObliqueLineResStat());
+      writeFlat(os,camStats.getObliqueSampleResStat());
       os << endl;
     }
   }
@@ -137,7 +154,7 @@ void IsisMain() {
     QString cam_name = "CameraStatistics";
 
     //Creates new CameraStatistics Table
-    TableField fname("Name", Isis::TableField::Text, 20);
+    TableField fname("Name", Isis::TableField::Text, 45);
     TableField fmin("Minimum", Isis::TableField::Double);
     TableField fmax("Maximum", Isis::TableField::Double);
     TableField favg("Average", Isis::TableField::Double);

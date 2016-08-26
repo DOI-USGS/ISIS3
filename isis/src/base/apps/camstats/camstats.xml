@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="camstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="camstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Generates and outputs camera statistics for a cube in raw camera geometry
@@ -15,17 +16,20 @@
     average, and standard  deviation values.  The output groups are listed below:
     <blockquote>
     <ul>
-      <li><def>Latitude</def></li>
-      <li><def>Longitude</def></li>
-      <li><def>Sample Resolution</def></li>
-      <li><def>Line Resolution</def></li>
-      <li><def link="Pixel Resolution">Resolution</def></li>
+      <li><def link="Latitude">Latitude</def></li>
+      <li><def link="Longitude">Longitude</def></li>
+      <li><def link="Sample Resolution">Sample Resolution</def></li>
+      <li><def link="Line Resolution">Line Resolution</def></li>
+      <li><def link="Pixel Resolution">Pixel Resolution</def></li>
+      <li><def link="Oblique Line Resolution">Oblique Line Resolution</def></li>
+      <li><def link="Oblique Sample Resolution">Oblique Sample Resolution</def></li>
+      <li><def link="Oblique Pixel Resolution">Oblique Pixel Resolution</def></li>
       <li><def>Aspect Ratio</def></li>
-      <li><def>Phase Angle</def></li>
-      <li><def>Emission Angle</def></li>
-      <li><def>Incidence Angle</def></li>
-      <li><def>Local Solar Time</def></li>
-      <li><def>North Azimuth</def></li>
+      <li><def link="Phase Angle">Phase Angle</def></li>
+      <li><def link="Emission Angle">EmissionAngle</def></li>
+      <li><def link="Incidence Angle">Incidence Angle</def></li>
+      <li><def link="Local Solar Time">Local Solar Time</def></li>
+      <li><def link="North Azimuth">North Azimuth</def></li>
     </ul>
     </blockquote>
     </p>
@@ -95,6 +99,10 @@
       Removed the filter on the TO parameter so that any file can be used for output. Updated
       documentation to clarify the existence and functioning of a few quirks. Addresses redmine
       ticket #175.
+    </change>
+    <change name="Tyler Wilson"  date="2016-08-17">
+      Added statistics for ObliqueLineResolution/ObliqueSampleResolution,
+      and Oblique Pixel Resolution. References #476, #4100.
     </change>
   </history>
 
