@@ -36,7 +36,7 @@ int main(void) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit Test for MiniRFCamera..." << endl;
- // try {
+  try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
@@ -86,6 +86,9 @@ int main(void) {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
     
+    cout << endl << "RightAscension = " << cam->RightAscension() << endl;
+    cout << "Declination = " << cam->Declination() << endl;     
+
     Cube c2("$lro/testData/LSZ_04970_1CD_XKU_71S272_V1.reduced.cub", "r");
     Camera *cam2 = CameraFactory::Create(c2);
     
@@ -103,19 +106,56 @@ int main(void) {
 
     // Test kernel ID messages
     cout << endl << "Kernel ID error messages: " << endl;
-    try{ cam->CkFrameId(); }
-    catch (IException e){ e.print(); }
-    try{ cam->CkReferenceId(); }
-    catch (IException e){ e.print(); }
-    try{ cam->SpkTargetId(); }
-    catch (IException e){ e.print(); }
-    try{ cam->SpkReferenceId(); }
-    catch (IException e){ e.print(); }
+    try{ 
+      cam->CkFrameId(); 
+    }
+    catch(IException e){
+       e.print(); 
+    }
+    try{ 
+      cam->CkReferenceId(); 
+    }
+    catch (IException e){ 
+      e.print(); 
+    }
+    try{ 
+      cam->SpkTargetId(); 
+    }
+    catch (IException e){ 
+      e.print(); 
+    }
+    try{ 
+      cam->SpkReferenceId(); 
+    }
+    catch (IException e){
+       e.print(); 
+    }
 
- // }
-//  catch(Isis::IException &e) {
-//    e.print();
-//  }
+   // Test a Level-2 image
+    cout << endl << "Testing a Level-2 cube: " << endl << endl; 
+
+    Cube c3("$lro/testData/LSB_00291_1CD_XIU_89S206_V1_c2m.cub", "r");
+    Camera *cam3 = CameraFactory::Create(c3);
+
+    // Just test the center pixel to make sure the Camera still works on Level-2 
+    // images
+    
+    cout << "For a central pixel position ..." << endl;
+    samp = 2014; 
+    line = 1026; 
+
+    if (!cam3->SetImage(samp, line)) {
+      cout << "ERROR" << endl;
+      return 0;
+    }
+    else {
+      cout << "SetImage succeeded." << endl; 
+    }
+
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
 }
 
 void TestLineSamp(Isis::Camera *cam, double samp, double line) {

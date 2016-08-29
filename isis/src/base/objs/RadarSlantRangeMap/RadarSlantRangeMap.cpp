@@ -26,6 +26,8 @@
 #include "iTime.h"
 #include "PvlSequence.h"
 
+using namespace std;
+
 namespace Isis {
   /** Radar ground to slant range map constructor
    *
@@ -50,12 +52,13 @@ namespace Isis {
     // allow for solving for coordinates that are slightly outside of
     // the actual image area. Use S=-0.25*p_camera->Samples() and
     // S=1.25*p_camera->Samples().
-    p_initialMinGroundRangeGuess = (-0.25 * p_camera->Samples() - 1.0)
-                                   * groundRangeResolution;
-    p_initialMaxGroundRangeGuess = (1.25 * p_camera->Samples() - 1.0)
-                                   * groundRangeResolution;
+    // The above approach works nicely for a level 1 image but the
+    // sensor model at level2 doesn't have access to the level 1 
+    // number of samples. Instead, we will calculate initial guesses
+    // on the fly in SetUndistortedFocalPlane.
     p_tolerance = 0.1; // Default tolerance is a tenth of a meter
     p_maxIterations = 30;
+
   }
 
   /** Set the ground range and compute a slant range
@@ -85,20 +88,92 @@ namespace Isis {
 
     if(p_et != p_camera->time().Et()) ComputeA();
 
-    // Evaluate the ground range at the 2 extremes of the image
     double slant = p_undistortedFocalPlaneX;
+    // First trap the case where no iteration is needed. Since this occurs at
+    // the first pixel of the image, it's a real possibility to encounter.
+    if (fabs(slant-p_a[0]) < p_tolerance) {
+      p_focalPlaneX = 0.0;
+      p_focalPlaneY = 0.0;
+      return true;
+    }
+    // Now calculate two guesses by the first and second iterations of
+    // Newton's method, where the zeroth iteration is at ground range = 0.
+    // The nature of the slant range function is such that, in the region
+    // of validity (including all image data) the Newton approximations are
+    // always too high, but the second one is within a few meters.  We therefore
+    // add 10 m of “windage” to it to bracket the root.
+    // Performing a third Newton iteration would give a satisfactory solution in
+    // the data area but raises the problem of trapping errors outside this region
+    // where the polynomial is not so well behaved.
+    // Use the “min” variables temporarily to hold the first approximation
+    p_initialMinGroundRangeGuess = (slant - p_a[0]) / p_a[1];
     double minGroundRangeGuess = slant - (p_a[0] + p_initialMinGroundRangeGuess *
-                                          (p_a[1] + p_initialMinGroundRangeGuess * (p_a[2] +
-                                              p_initialMinGroundRangeGuess * p_a[3])));
+       (p_a[1] + p_initialMinGroundRangeGuess * (p_a[2] + p_initialMinGroundRangeGuess * p_a[3])));
+    // Now the max is the second approximation
+    p_initialMaxGroundRangeGuess = p_initialMinGroundRangeGuess + minGroundRangeGuess /
+       (p_a[1] + p_initialMinGroundRangeGuess * (2.0 * p_a[2] + p_initialMinGroundRangeGuess *
+       3.0 * p_a[3]));
     double maxGroundRangeGuess = slant - (p_a[0] + p_initialMaxGroundRangeGuess *
                                           (p_a[1] + p_initialMaxGroundRangeGuess * (p_a[2] +
                                               p_initialMaxGroundRangeGuess * p_a[3])));
+    // Finally, apply the “windage” to bracket the root.
+    p_initialMinGroundRangeGuess = p_initialMaxGroundRangeGuess - 10.0;
+    minGroundRangeGuess = slant - (p_a[0] + p_initialMinGroundRangeGuess *
+       (p_a[1] + p_initialMinGroundRangeGuess * (p_a[2] + p_initialMinGroundRangeGuess * p_a[3])));
 
+    // If both guesses are on the same side of zero, we need to expand the bracket range
+    // to include a zero-crossing. 
+    if ((minGroundRangeGuess < 0.0 && maxGroundRangeGuess < 0.0) ||
+        (minGroundRangeGuess > 0.0 && maxGroundRangeGuess > 0.0)) {
+
+      int maxBracketIters = 10; 
+      
+      float xMin = p_initialMinGroundRangeGuess;
+      float xMax = p_initialMaxGroundRangeGuess;
+
+      float funcMin = minGroundRangeGuess;
+      float funcMax = maxGroundRangeGuess; 
+
+      for (int j=0; j<maxBracketIters; j++) {
+
+        //distance between guesses
+        float dist = abs(abs(xMin) - abs(xMax));
+        
+        // move move the x-value of the closest root twice as far away from the other root as it was
+        // before to extend the bracket range. 
+        if (abs(funcMin) <= abs(funcMax)) {
+          //min is closer
+          xMin = xMax - 2*dist; 
+          xMax = xMax; //doesn't change
+        }
+        else {
+          //max is closer
+          xMax = xMin + 2*dist;
+          xMin = xMin; //doesn't change
+        }
+
+        funcMin = slant -(p_a[0]+ xMin *(p_a[1] + xMin * (p_a[2] + xMin * p_a[3])));
+        funcMax = slant - (p_a[0] + xMax *(p_a[1] + xMax * (p_a[2] + xMax * p_a[3])));
+        
+        // if we've successfully bracketed the root, we can break. 
+        if((funcMin <= 0.0 && funcMax >= 0.0) || (funcMin >= 0.0 && funcMax <= 0.0)){
+          p_initialMinGroundRangeGuess = xMin;
+          p_initialMaxGroundRangeGuess = xMax;
+          minGroundRangeGuess = funcMin;
+          maxGroundRangeGuess = funcMax; 
+          break; 
+        }
+      }
+    }
+    
     // If the ground range guesses at the 2 extremes of the image are equal
     // or they have the same sign, then the ground range cannot be solved for.
+    // The only case where they are equal should be at zero, which we already trapped.
     if((minGroundRangeGuess == maxGroundRangeGuess) ||
         (minGroundRangeGuess < 0.0 && maxGroundRangeGuess < 0.0) ||
-        (minGroundRangeGuess > 0.0 && maxGroundRangeGuess > 0.0)) return false;
+       (minGroundRangeGuess > 0.0 && maxGroundRangeGuess > 0.0)) {
+      return false;
+    }
 
     // Use Wijngaarden/Dekker/Brent algorithm to find a root of the function:
     // g(groundRange) = slantRange - (p_a[0] + groundRange * (p_a[1] +

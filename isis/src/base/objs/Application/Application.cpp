@@ -132,6 +132,7 @@ namespace Isis {
       QString xmlfile = f.expanded();
 
       p_ui = new UserInterface(xmlfile, argc, argv);
+
       if (!p_ui->IsInteractive()) {
         // Get the starting wall clock time
         p_datetime = DateTime(&p_startTime);
@@ -139,9 +140,15 @@ namespace Isis {
         
         if (p_applicationForceGuiApp) {
           new QApplication(argc, argv);
+          // When QApplication is initialized, it will reset the locale to the shells locale. As a result
+          // the locale needs to be reset after QApplications initialization.
+          setlocale(LC_ALL, "en_US");
         }
         else {
           new QCoreApplication(argc, argv);
+          // When QCoreApplication is initialized, it will reset the locale to the shells locale. As a result
+          // the locale needs to be reset after QCoreApplications initialization.
+          setlocale(LC_ALL, "en_US");
         }
 
         QCoreApplication::setApplicationName(FileName(p_appName).baseName());

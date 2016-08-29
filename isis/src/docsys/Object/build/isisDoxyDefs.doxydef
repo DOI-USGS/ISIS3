@@ -97,7 +97,8 @@
  * @history  2008-05-19 steven lambright - Fixed Mission End Group Tag
  * @history  2008-05-19 steven lambright - Fixed Bad Namespace Documentation
  * @history  2013-03-27 Jeannie Backer - Added NEAR Shoemaker mission. References #1248.
- *
+ * @history  2016-08-25 Marjorie Hahn - Added OSIRIS-REx mission. References #4300.
+ * 
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
  * @todo Make "std" namespace invisible... probably not gonna happen
@@ -390,7 +391,6 @@
            *
            */
 
-
           // MRO
           /**
            * \defgroup  MarsReconnaissanceOrbiter     Mars Reconnaissance Orbiter
@@ -439,7 +439,6 @@
            *
            */
 
-
           // New Horizons
           /**
            * \defgroup  NewHorizons                   New Horizons
@@ -447,15 +446,28 @@
            * These objects provide functionality for manipulating data from the
            * New Horizons mission. New Horizons is part of NASA's New Frontiers
            * Program.
-           * New Horizons launced January 19, 2006 and is expected to spend five months studying 
+           * New Horizons launched January 19, 2006 and is expected to spend five months studying 
            * Pluto durring the summer of 2015.
            *
            * Mission site: http://www.nasa.gov/mission_pages/newhorizons/main/#.VA4QY8NuH4I
            *
+           */
+          
+          // OSIRIS-REx
+          /**
+           * \defgroup  OSIRIS-REx                                   OSIRIS-REx
+           *
+           * These objects provide functionality for manipulating data from the 
+           * OSIRIS-REx asteroid sample return mission. The 2016 OSIRIS-REx mission's
+           * key objectives include mapping out the asteroid Bennu's surface, analyzing
+           * a sample of Bennu's regolith, documenting the sample site, calculating Bennu's 
+           * orbit deviation, and comparing observations made at the asteroid to observations
+           * made on Earth.
+           *
+           * Mission site: http://www.asteroidmission.org/
            *
            */
-
-
+          
           // VIKING
           /**
            * \defgroup  Viking                        Viking
@@ -491,8 +503,6 @@
            *
            */
 
-
-
           // LUNAR ORBITER 
           /**
            * \defgroup  LunarOrbiter                      Lunar Orbiter 
@@ -516,9 +526,6 @@
            * Mission site: http://lunar.gsfc.nasa.gov/ 
            *
            */
-
-
-
 
      /* @}  end of Missions group */
 

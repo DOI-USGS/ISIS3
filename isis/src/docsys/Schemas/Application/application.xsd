@@ -35,6 +35,9 @@
   <xs:annotation>
     <xs:documentation>2016-03-29 Kristin Berry - Added  missionItem_type enummeration for Rosetta.</xs:documentation>
   </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2016-08-25 Marjorie Hahn - Added  missionItem_type enummeration for OSIRIS-REx.</xs:documentation>
+  </xs:annotation>
   <xs:element name="application">
     <xs:annotation>
       <xs:documentation>XML file describing an Isis application</xs:documentation>
@@ -449,6 +452,7 @@
       <xs:enumeration value="Messenger"/>
       <xs:enumeration value="New Horizons"/>
       <xs:enumeration value="Near Earth Asteroid Rendezvous"/>
+      <xs:enumeration value="OSIRIS-REx"/>
       <xs:enumeration value="Robotic Lunar Observatory"/>
       <xs:enumeration value="Rosetta"/>
       <xs:enumeration value="Small Missions for Advanced Research and Technology 1"/>

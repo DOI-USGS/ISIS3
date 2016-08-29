@@ -34,6 +34,7 @@ bool pixelResolution;
 bool lineResolution;
 bool sampleResolution;
 bool detectorResolution;
+bool obliqueDetectorResolution;
 bool northAzimuth;
 bool sunAzimuth;
 bool spacecraftAzimuth;
@@ -119,6 +120,7 @@ void IsisMain() {
   lineResolution = false;
   sampleResolution = false;
   detectorResolution = false;
+  obliqueDetectorResolution = false;
   sunAzimuth = false;
   spacecraftAzimuth = false;
   offnadirAngle = false;
@@ -141,6 +143,7 @@ void IsisMain() {
     if ((lineResolution = ui.GetBoolean("LINERESOLUTION"))) nbands++;
     if ((sampleResolution = ui.GetBoolean("SAMPLERESOLUTION"))) nbands++;
     if ((detectorResolution = ui.GetBoolean("DETECTORRESOLUTION"))) nbands++;
+    if ((obliqueDetectorResolution = ui.GetBoolean("OBLIQUEDETECTORRESOLUTION"))) nbands++;
     if ((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
     if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
@@ -193,6 +196,7 @@ void IsisMain() {
   if (lineResolution) name += "Line Resolution";
   if (sampleResolution) name += "Sample Resolution";
   if (detectorResolution) name += "Detector Resolution";
+  if (obliqueDetectorResolution) name += "Oblique Detector Resolution";
   if (northAzimuth) name += "North Azimuth";
   if (sunAzimuth) name += "Sun Azimuth";
   if (spacecraftAzimuth) name += "Spacecraft Azimuth";
@@ -363,6 +367,10 @@ void phocube(Buffer &out) {
         }
         if(detectorResolution) {
           out[index] = cam->DetectorResolution();
+          index += 64 * 64;
+        }
+        if(obliqueDetectorResolution) {
+          out[index] = cam->ObliqueDetectorResolution();
           index += 64 * 64;
         }
         if(northAzimuth) {

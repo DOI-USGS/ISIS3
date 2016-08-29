@@ -22,6 +22,9 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
+RightAscension = 144.785941008
+Declination = -46.290650078
+
 
 Testing name methods ...
 Spacecraft Name Long: Chandrayaan 1
@@ -38,3 +41,8 @@ Instrument Name Short: Mini-RF
 Kernel ID error messages: 
 **USER ERROR** Cannot generate CK for MiniRF.
 **USER ERROR** Cannot generate CK for MiniRF.
+
+Testing a Level-2 cube: 
+
+For a central pixel position ...
+SetImage succeeded.

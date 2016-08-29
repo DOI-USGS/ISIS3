@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="mosrange" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="mosrange" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Compute the lat/lon range of a set camera images for mosaicking
   </brief>
@@ -10,7 +12,8 @@
       This program computes and outputs the 
       <def link="Latitude">latitude</def>/<def link="Longitude">longitude</def>
       range of a set of images in camera space, as well as the <def link="Pixel Resolution">
-      pixel resolution</def>.  It creates a <i>cam2map</i> ready map file with 
+      pixel resolution</def> and the <def link="Oblique Pixel Resolution"> 
+      oblique pixel resolution.</def>.  It creates a <i>cam2map</i> ready map file with 
       the extents of the latitude/longitude ranges of the image set.  
     </p>
 
@@ -47,6 +50,7 @@ Group = Mapping
   <def link="Longitude Direction">LongitudeDirection</def>      = <def link="Positive East Longitude">PositiveEast</def>
   <def link="Longitude Domain">LongitudeDomain</def>         = 360
   <def link="Pixel Resolution">PixelResolution</def>         = 505.3668 &lt;meters/pixel&gt; 
+  <def link="Oblique Pixel Resolution">ObliquePixelResolution</def> = 791.251 &lt;meters/pixel&gt;
   <def>Scale</def>                   = 84.2676 &lt;pixels/degree&gt;
   MinPixelResolution      = 483.45317995544 &lt;meters&gt;
   MaxPixelResolution      = 527.28051834369 &lt;meters&gt;
@@ -105,6 +109,11 @@ End
     </change>
     <change name="Debbie A. Cook" date="2012-10-11">
        Updated to use new Target class. References Mantis tickets #775 and #1114.
+    </change>
+    <change name="Tyler Wilson" date="2016-08-25">
+       Updated to use upated Camera/CameraPointInfo classes which include improved approximations
+       to Pixel/Detector/Line/Sample resolutions, as well as providing the ability for developers
+       to order the fields in CSV/Pvl output.  References #476"
     </change>
 </history>
 

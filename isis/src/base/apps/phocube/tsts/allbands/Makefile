@@ -20,6 +20,7 @@ commands:
 	  lineresolution=true \
 	  sampleresolution=true \
 	  detectorresolution=true \
+	  obliquedetectorresolution=true \
 	  northazimuth=true \
 	  sunazimuth=true \
 	  spacecraftazimuth=true \

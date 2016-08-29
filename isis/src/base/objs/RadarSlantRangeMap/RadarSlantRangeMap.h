@@ -55,7 +55,13 @@ namespace Isis {
    *                      known range coefficients.
    *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                      coding standards. References #972.
-   *
+   *  @history 2016-02-24 Randy Kirk and Janet Barrett - Fixed an issue that caused
+   *                      the sensor model for LRO and Chandrayaan's MiniRF to not be able to 
+   *                      calculate and report lat/lon in the LXB mode. References #2400.
+   *  @history 2016-08-01 Kristin Berry - Added the ability to extend the range of the initial root
+   *                      bracket in SetUndistortedFocalPlan if the initial range was too narrow.
+   *                      Also added RAs & DECs to the camera model.References #2400. 
+   *                      
    */
   class RadarSlantRangeMap : public CameraDistortionMap {
     public:

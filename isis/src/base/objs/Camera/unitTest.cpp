@@ -50,8 +50,8 @@ using namespace Isis;
  *                           (i.e. non-DEM) shape model. References #2243.
  *   @history 2015-10-16 Ian Humphrey - Updated to test spacecraft and instrument name methods.
  *                           References #2335.
- *
- *
+ *   @history 2016-08-19 Tyler Wilson - Updated to test ObliquePixel/ObliqueLine/ObliqueSample
+ *                           and ObliqueDetector resolutions.  References #476.
  *   testcoverage 2015-04-30 - 43.262% scope, 61.561% line, 87.5% function
  */
 
@@ -162,9 +162,15 @@ int main() {
     }
 
     cout << "PixelResolution: " << c->PixelResolution() << endl;
+    cout << "ObliquePixelResolution: " << c->ObliquePixelResolution() << endl;
     cout << "LineResolution: " << c->LineResolution() << endl;
+    cout << "ObliqueLineResolution: " << c->ObliqueLineResolution() << endl;
     cout << "SampleResolution: " << c->SampleResolution() << endl;
+    cout << "ObliqueSampleResolution: " << c->ObliqueSampleResolution() << endl;
     cout << "DetectorResolution: " << c->DetectorResolution() << endl;
+    cout << "ObliqueDetectorResolution: " << c->ObliqueDetectorResolution() << endl;
+
+
     cout << "LowestImageResolution: " << setprecision(4)
          << c->LowestImageResolution() << endl;
     cout << "HighestImageResolution: " << setprecision(3)
@@ -628,3 +634,4 @@ int main() {
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }
+
