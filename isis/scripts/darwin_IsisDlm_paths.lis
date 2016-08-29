@@ -3,10 +3,11 @@
 # as a pattern to search all cooked library paths and replace with second
 # column.  Order is crtical as more complete paths must come before 
 # directories higher in the hierarchy.
-/(.*)/isis/lib             @loader_path/../../lib
-/usgs/pkgs/local(.*?)lib   @loader_path/../../3rdParty/lib
-/opt/local/libexec/qt4-mac @loader_path/../../3rdParty
-/opt/local                 @loader_path/../../3rdParty
+/(.*)/isis/lib                  @loader_path/../../lib
+/usgs/pkgs/local(.*?)lib        @loader_path/../../3rdParty/lib
+/opt/local/libexec/qt4-mac      @loader_path/../../3rdParty
+/opt/local                      @loader_path/../../3rdParty
 #  New MacPorts structure
-/opt/usgs/(.*?)lib         @loader_path/../../3rdParty/lib
-/opt/usgs/(.*?)/Frameworks @loader_path/../../3rdParty/lib
+/opt/usgs/(.*?)/libexec/qt5/lib @loader_path/../../3rdParty/lib
+/opt/usgs/(.*?)lib              @loader_path/../../3rdParty/lib
+/opt/usgs/(.*?)/Frameworks      @loader_path/../../3rdParty/lib

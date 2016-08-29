@@ -6,7 +6,8 @@ all:  install
 
 install: libs plugins
 
-libs: license
+#libs: license
+libs:
 	@for library in $(THIRDPARTYLIBS); do                                \
 	  $(INSTALL3P) $(INSTALL3POPTS) $$library $(ISISROOT)/3rdParty/lib/; \
 	  echo $(CURTIMESTAMP) "  Installing [$$library]";                   \
@@ -34,7 +35,7 @@ libs: license
 	    --liblog=DarwinLibs.lis --update                                 \
 	    --relocdir=$(ISISROOT)/3rdParty/lib:$(ISISROOT)/3rdParty         \
 	    --errlog=DarwinErrors.lis                                        \
-	    `find $(ISISROOT)/3rdParty/lib -name '*.dylib' -type f`          \
+	    `find $(ISISROOT)/3rdParty/lib -name '*.dylib*' -type f`          \
 	    > /dev/null;                                                     \
 	  $(ISISROOT)/scripts/SetRunTimePath --libs                          \
 	     --libmap=$(ISISROOT)/scripts/qt_paths.lis                       \
@@ -78,7 +79,7 @@ plugins:
 
 
 clean:
-	rm -f lib/lib*.so* lib/lib*.dylib lib/lib*.a
+	rm -f lib/lib*.so* lib/lib*.dylib* lib/lib*.a
 	cd lib && rm -rf *.framework
 	$(RM) -rf license
 	@for plugs in plugins/*; do \

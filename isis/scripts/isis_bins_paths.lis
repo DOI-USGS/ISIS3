@@ -6,5 +6,6 @@
 /opt/local/libexec/qt4-mac/lib @rpath/3rdParty/lib
 /opt/local/lib                 @rpath/3rdParty/lib
 #  Add new MacPorts structure
+/opt/usgs/(.*?)/qt5/lib        @rpath/3rdParty/lib
 /opt/usgs/(.*?)lib             @rpath/3rdParty/lib
 /opt/usgs/(.*?)Frameworks      @rpath/3rdParty/lib
