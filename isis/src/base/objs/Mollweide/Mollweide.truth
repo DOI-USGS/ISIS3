@@ -1,0 +1,104 @@
+Unit Test For the Mollweide Projection
+
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
+
+Test SetGround method ... 
+Longitude = 90, while latitude is in the range [0:90]:
+
+Latitude:	90.000000	XCoord:		0.000000	YCoord:		1.000000
+Latitude:	85.000000	XCoord:		0.206844	YCoord:		0.978374
+Latitude:	80.000000	XCoord:		0.325934	YCoord:		0.945393
+Latitude:	75.000000	XCoord:		0.423159	YCoord:		0.906055
+Latitude:	70.000000	XCoord:		0.507061	YCoord:		0.861910
+Latitude:	65.000000	XCoord:		0.581112	YCoord:		0.813824
+Latitude:	60.000000	XCoord:		0.647122	YCoord:		0.762386
+Latitude:	55.000000	XCoord:		0.706170	YCoord:		0.708043
+Latitude:	50.000000	XCoord:		0.758943	YCoord:		0.651158
+Latitude:	45.000000	XCoord:		0.805907	YCoord:		0.592042
+Latitude:	40.000000	XCoord:		0.847389	YCoord:		0.530973
+Latitude:	35.000000	XCoord:		0.883620	YCoord:		0.468204
+Latitude:	30.000000	XCoord:		0.914771	YCoord:		0.403973
+Latitude:	25.000000	XCoord:		0.940965	YCoord:		0.338504
+Latitude:	20.000000	XCoord:		0.962293	YCoord:		0.272015
+Latitude:	15.000000	XCoord:		0.978822	YCoord:		0.204715
+Latitude:	10.000000	XCoord:		0.990597	YCoord:		0.136811
+Latitude:	5.000000	XCoord:		0.997651	YCoord:		0.068506
+Latitude:	0.000000	XCoord:		1.000000	YCoord:		0.000000
+
+Test SetCoordinate method ... 
+
+Setting coordinate to (0.0,1.0)
+Latitude:               90.000000
+Longitude:              0.000000
+
+Setting coordinate to (1.0,0.0)
+Latitude:               0.000000
+Longitude:              90.000000
+
+Setting coordinate to (0.8059072939585296690978566,0.5920417498322624316742235)
+Latitude:               45.000000
+Longitude:              90.000000
+
+Test XYRange method ... 
+Minimum X:  -2.000000
+Maximum X:  2.000000
+Minimum Y:  -1.000000
+Maximum Y:  1.000000
+
+Test Name and comparision method ... 
+Name:       Mollweide
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 0.70710678118655
+  PolarRadius        = 0.70710678118655
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = Mollweide
+  CenterLongitude    = 0.0
+End_Group
+End
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = Mollweide
+  EquatorialRadius   = 0.70710678118655
+  PolarRadius        = 0.70710678118655
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLongitude    = 0.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90.0
+  MaximumLatitude = 90.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = 0.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 249-252
