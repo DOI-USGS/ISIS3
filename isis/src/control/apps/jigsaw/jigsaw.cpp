@@ -5,6 +5,8 @@
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
+#include <QString>
+#include <QChar>
 
 #include "BundleAdjust.h"
 #include "BundleResults.h"
@@ -226,6 +228,12 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
   QString outputfileprefix = "";
   if (ui.WasEntered("FILE_PREFIX"))  {
     outputfileprefix = ui.GetString("FILE_PREFIX");
+    int length = (outputfileprefix.length()) - 1;
+    QChar endvalue = outputfileprefix[length];
+    QString check = "/";
+    if (endvalue != check) {
+      outputfileprefix += "_";
+    }
   }
   settings->setOutputFilePrefix(outputfileprefix);
 

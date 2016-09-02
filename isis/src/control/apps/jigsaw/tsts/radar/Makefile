@@ -64,4 +64,4 @@ commands:
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
-
+	$(RM) inverseMatrix.dat > /dev/null;

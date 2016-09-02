@@ -26,7 +26,7 @@ commands:
 	  radius=yes \
 	  errorpropagation=yes \
 	  point_radius_sigma=500 \
-	  file_prefix=temp_ \
+	  file_prefix=temp \
 	  > /dev/null
 	$(CAT) temp_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

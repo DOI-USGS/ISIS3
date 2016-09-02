@@ -33,26 +33,27 @@ commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis  \
 	           cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
-	           onet=$(OUTPUT)/apollo_cholmod_out.net \
+	           onet=$(OUTPUT)/apollo_out.net \
 	           radius=yes \
 	           errorpropagation=yes \
 	           spsolve=position \
 	           spacecraft_position_sigma=1000.0 \
-	           camera_angles_sigma=2.0 > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	           camera_angles_sigma=2. \
+	           file_prefix=$(OUTPUT)/ > /dev/null;
+	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/apollo_cholmod_bundleout.txt;
-	$(CAT) residuals.csv \
+	       > $(OUTPUT)/apollo_bundleout.txt;
+	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       > $(OUTPUT)/apollo_cholmod_residuals.csv;
+	       > $(OUTPUT)/apollo_residuals.csv;
 #	$(CAT) bundleout_images.csv \
 #	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 #	       > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
-#	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/apollo_cholmod_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null;
-	$(RM) residuals.csv > /dev/null;
-	$(RM) inverseMatrix.dat > /dev/null;
+	#$(RM) bundleout_images.csv > /dev/null;
+	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/apollo_bundleout_points.csv > /dev/null;
+	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
+	$(RM) $(OUTPUT)/inverseMatrix.dat > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
