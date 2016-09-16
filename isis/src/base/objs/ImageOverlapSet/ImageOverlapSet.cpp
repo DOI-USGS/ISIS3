@@ -167,7 +167,7 @@ namespace Isis {
    * @param outputFile The output ImageOverlapSet file
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
-    
+      
     // Do a common sense programmer check, this should be empty before we start
     if (!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on " \
@@ -438,13 +438,9 @@ namespace Isis {
         
     IString file = FileName(filename).expanded();
     bool failed = false;
+    bool noOverlaps = false;
     if (p_threadedCalculate) {
       p_calculatePolygonMutex.lock();
-    }
-        
-    if (p_lonLatOverlaps.size() == 0) {
-      IString msg = "No overlaps were found.";
-      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     try {
@@ -465,24 +461,28 @@ namespace Isis {
         // Let's not try anything during a possible reallocate
         QMutexLocker locker(&p_lonLatOverlapsMutex);
         
-        if (overlap < p_lonLatOverlaps.size() && p_lonLatOverlaps[overlap]) {
+        if (p_lonLatOverlaps.size() == 0) {
+          noOverlaps = true;
+        }
+        else {
+          if (overlap < p_lonLatOverlaps.size() && p_lonLatOverlaps[overlap]) {
                    
-          if (!p_lonLatOverlaps[overlap]->Polygon()->isEmpty()) {
+            if (!p_lonLatOverlaps[overlap]->Polygon()->isEmpty()) {
                         
-            if (overlapWritten) {
-              outStream << std::endl;
+              if (overlapWritten) {
+                outStream << std::endl;
+              }
+
+              p_lonLatOverlaps[overlap]->Write(outStream);
+              overlapWritten = true;
             }
 
-            p_lonLatOverlaps[overlap]->Write(outStream);
-            overlapWritten = true;
-          }
-
-          delete p_lonLatOverlaps[overlap];
-          p_lonLatOverlaps[overlap] = NULL;
-          p_writtenSoFar ++;                
+            delete p_lonLatOverlaps[overlap];
+            p_lonLatOverlaps[overlap] = NULL;
+            p_writtenSoFar ++;                
+          }          
         }
       }
-
       failed |= outStream.fail();
       outStream.close();
 
@@ -505,7 +505,11 @@ namespace Isis {
     if (failed) {
       IString msg = "Unable to write the image overlap list to [" + filename + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
-    }    
+    }
+    else if (noOverlaps) {
+      IString msg = "No overlaps were found.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
   }
 
 
