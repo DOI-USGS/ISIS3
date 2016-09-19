@@ -123,9 +123,11 @@ namespace Isis {
           continue;
         }
       }
-
+      
+      p_lonLatOverlapsMutex.lock();
       p_lonLatOverlaps.push_back(CreateNewOverlap(sns.serialNumber(i), mp));
-            
+      p_lonLatOverlapsMutex.unlock();
+      
       if (mp) {
         delete mp;
         mp = NULL;
@@ -306,7 +308,9 @@ namespace Isis {
 
     // Create one ImageOverlap for each image sn
     for (unsigned int i = 0; i < sns.size(); ++i) {
+      p_lonLatOverlapsMutex.lock();
       p_lonLatOverlaps.push_back(CreateNewOverlap(sns[i], polygons[i]));
+      p_lonLatOverlapsMutex.unlock();
     }
 
     // Despikes the polygons from the Serial Numbers prior to overlap determination
@@ -332,7 +336,9 @@ namespace Isis {
       inStream.open(file.c_str(), fstream::in | fstream::binary);
 
       while (!inStream.eof()) {
+        p_lonLatOverlapsMutex.lock();
         p_lonLatOverlaps.push_back(new ImageOverlap(inStream));
+        p_lonLatOverlapsMutex.unlock();
       }
 
       inStream.close();
@@ -418,8 +424,9 @@ namespace Isis {
 
         // Insert could cause a reallocation of the overlap list, so lock it with
         //   the writing code so that we don't conflict
-        QMutexLocker locker(&p_lonLatOverlapsMutex);
+        p_lonLatOverlapsMutex.lock();
         p_lonLatOverlaps.insert(p_lonLatOverlaps.begin() + position, imageOverlap);
+        p_lonLatOverlapsMutex.unlock();
       }
       
       success = true;
@@ -459,7 +466,7 @@ namespace Isis {
       static bool overlapWritten = false;
       for (int overlap = p_writtenSoFar; !failed && overlap <= p_calculatedSoFar; overlap++) {
         // Let's not try anything during a possible reallocate
-        QMutexLocker locker(&p_lonLatOverlapsMutex);
+        p_lonLatOverlapsMutex.lock();
         
         if (p_lonLatOverlaps.size() == 0) {
           noOverlaps = true;
@@ -480,9 +487,12 @@ namespace Isis {
             delete p_lonLatOverlaps[overlap];
             p_lonLatOverlaps[overlap] = NULL;
             p_writtenSoFar ++;                
-          }          
+          }
         }
+        
+        p_lonLatOverlapsMutex.unlock();
       }
+      
       failed |= outStream.fail();
       outStream.close();
 
@@ -556,15 +566,19 @@ namespace Isis {
           // Check to see if the two poygons are equivalent.
           // If they are, then we can get rid of one of them
           if (PolygonTools::Equal(poly1, poly2)) {
+            p_lonLatOverlapsMutex.lock();
             AddSerialNumbers(p_lonLatOverlaps[outside], p_lonLatOverlaps[inside]);
             p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
+            p_lonLatOverlapsMutex.unlock();
             inside --;
             continue;
           }
 
           // We can get empty polygons in our list sometimes; try to avoid extra processing
           if (poly2->isEmpty() || poly2->getArea() < 1.0e-14) {
+            p_lonLatOverlapsMutex.lock();
             p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
+            p_lonLatOverlapsMutex.unlock();
             inside --;      
             continue;
           }
@@ -592,13 +606,17 @@ namespace Isis {
               if (poly1->getArea() > poly2->getArea()) {
                 error += " The first polygon will be removed.";
                 HandleError(e, snlist, error, inside, outside);
+                p_lonLatOverlapsMutex.lock();
                 p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
+                p_lonLatOverlapsMutex.unlock();
                 inside --;
               }
               else {
                 error += " The second polygon will be removed.";
                 HandleError(e, snlist, error, inside, outside);
+                p_lonLatOverlapsMutex.lock();
                 p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + outside);
+                p_lonLatOverlapsMutex.unlock();
                 inside = outside;
               }
             }
@@ -606,8 +624,10 @@ namespace Isis {
               error += " Both polygons will be removed to prevent the "
                        "possibility of double counted areas.";
               HandleError(e, snlist, error, inside, outside);
+              p_lonLatOverlapsMutex.lock();
               p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
               p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + outside);
+              p_lonLatOverlapsMutex.unlock();
               inside = outside;
             }
 
@@ -678,13 +698,15 @@ namespace Isis {
 
               // Delete outside polygon directly and reset outside loop
               //   - current outside is thrown out!
+              p_lonLatOverlapsMutex.lock();
               p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + outside);
+              p_lonLatOverlapsMutex.unlock();
               inside = outside;
               continue;
             }
             if (SetPolygon(tmpGeom, inside) &&
                 SetPolygon(overlap, outside, p_lonLatOverlaps[inside]))
-              foundOverlap = true;  
+              foundOverlap = true;
           }
           // poly2 is completely inside poly1
           else if (PolygonTools::Equal(poly2, overlap)) {
@@ -697,7 +719,9 @@ namespace Isis {
                                      "The second polygon will be removed.", inside, outside);
 
               // Delete inside polygon directly and process next inside
+              p_lonLatOverlapsMutex.lock();
               p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
+              p_lonLatOverlapsMutex.unlock();
               inside --;
               continue;
             }
@@ -768,7 +792,9 @@ namespace Isis {
     
     // Do not write empty overlap files
     if (foundOverlap == false) {
+      p_lonLatOverlapsMutex.lock();
       p_lonLatOverlaps.clear();
+      p_lonLatOverlapsMutex.unlock();
     }
     
     // unblock the writing process
