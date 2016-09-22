@@ -459,9 +459,12 @@ namespace Isis {
    *   @history  2011-08-4 Debbie A. Cook - Changed error message to
    *                        indicate it fails with one measure as
    *                        well as no measures.
+   *   @history 2016-09-22 Ian Humphrey - Replaced statusUpdate signal emits with direct
+   *                           calls to outputBundleStats() so the validation messages are
+   *                           printed to stdout. References #4313.
    */
   bool BundleAdjust::validateNetwork() {
-    emit statusUpdate("Validating network...");
+    outputBundleStatus("\nValidating network...");
 
     int nimagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
@@ -485,7 +488,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    emit statusUpdate("Validation complete!...");
+    outputBundleStatus("Validation complete!...");
 
     return true;
   }

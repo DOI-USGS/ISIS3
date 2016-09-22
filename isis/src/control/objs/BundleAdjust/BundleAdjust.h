@@ -225,6 +225,8 @@ namespace Isis {
    *   @history 2016-08-23 Jesse Mapel - Removed output file calls.  Apps and objects that use
    *                           BundleAdjust must call output methods from BundleSolutionInfo.
    *                           Fixes #4279.
+   *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
+   *                           messages are logged to stdout. Fixes #4313.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
