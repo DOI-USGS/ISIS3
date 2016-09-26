@@ -88,6 +88,9 @@ namespace Isis {
    *           are calculated. (i.e. All overlaps contain only a single Serial Number)
    *  @history 2011-03-29 Steven Lambright - Added some safety around
    *           p_lonLatOverlaps to (hopefully) get rid of a race condition.
+   *  @history 2016-09-14 Marjorie Hahn - Modified FindAllOverlaps()'s check to ensure 
+   *           that at least one overlap has been calculated by adding in the 
+   *           "foundOverlap" boolean. References #2199.
    */
   class ImageOverlapSet : private QThread {
     public:

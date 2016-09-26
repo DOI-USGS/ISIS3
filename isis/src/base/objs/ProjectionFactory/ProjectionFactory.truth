@@ -73,3 +73,15 @@ Test for ProjectionFactory's Create with unsupported projection
 **ERROR** Unsupported projection, unable to find plugin for [UnsupportedProjection].
 **ERROR** Unable to find PVL group [UnsupportedProjection] in file [isis/lib/Projection.plugin].
 
+
+Test for ProjectionFactory's Create method when the maximum latitude = 0.0
+South Map Samples = 8420
+North Map Samples = 8420
+South Map Lines = 1404
+North Map Lines = 1404
+
+Test for ProjectionFactory's Create method when the maximum longitude = 0.0
+West Map Samples = 2105
+East Map Samples = 2105
+West Map Lines = 1404
+East Map Lines = 1404

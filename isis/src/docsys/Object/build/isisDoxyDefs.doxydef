@@ -98,6 +98,7 @@
  * @history  2008-05-19 steven lambright - Fixed Bad Namespace Documentation
  * @history  2013-03-27 Jeannie Backer - Added NEAR Shoemaker mission. References #1248.
  * @history  2016-08-25 Marjorie Hahn - Added OSIRIS-REx mission. References #4300.
+ * @history  2016-09-12 Marjorie Hahn - Added the Apollo, Chandrayaan1, Dawn, Hayabusa, Hayabusa2, Kaguya, Mars Express, ROLO, Rosetta, and SMART1 missions. Fixes #4300.
  * 
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
@@ -246,6 +247,7 @@
     * and control points between images.
     */
 
+
 // MISSIONS
 
     /**
@@ -255,6 +257,18 @@
      *
      * @{
      */
+    
+          // APOLLO
+          /**
+           * \defgroup  Apollo                       Apollo
+           *
+           * These objects provide functionality for manipulating data from the Apollo missions to the moon.
+           *
+           * Mission site: http://www.nasa.gov/mission_pages/apollo/missions/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/missions/apollo
+           *
+           */
 
           // CASSINI
           /**
@@ -276,13 +290,24 @@
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Cassini/
            *
            */
+          
+          // CHANDRAYAAN1
+          /**
+           * \defgroup  Chandrayaan1                       Chandrayaan 1
+           *
+           * These objects provide functionality for manipulating data from the 2008
+           * Chandrayaan-1 mission to the moon.
+           *
+           * Mission site: http://www.isro.gov.in/Spacecraft/chandrayaan-1
+           *
+           */
 
           // CLEMENTINE
           /**
            * \defgroup  Clementine                    Clementine
            *
            * These objects provide functionality for manipulating data from the
-           * Clemtine mission to the Earth's Moon. Clementine was a joint project
+           * Clementine mission to the Earth's Moon. Clementine was a joint project
            * between the Strategic Defense Initiative Organization and NASA. The
            * objective of the mission was to test sensors and spacecraft components
            * under extended exposure to the space environment and to make scientific
@@ -298,6 +323,19 @@
            * Mission site: http://nssdc.gsfc.nasa.gov/planetary/clementine.html
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Clementine/
+           */
+          
+          // DAWN
+          /**
+           * \defgroup  Dawn                       Dawn
+           *
+           * These objects provide functionality for manipulating data from the 2007 Dawn 
+           * mission to the celestial bodies Vesta and Ceres.
+           *
+           * Mission site: http://dawn.jpl.nasa.gov/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/missions/dawn
+           *
            */
 
           // GALILEO
@@ -320,6 +358,65 @@
            * Mission site: http://voyager.jpl.nasa.gov/
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Galileo/
+           */
+          
+          // HAYABUSA
+          /**
+           * \defgroup  Hayabusa                         Hayabusa
+           *
+           * These objects provide functionality for manipulating data from the 2003 Hayabusa 
+           * mission to the small asteroid Itokawa.
+           *
+           * Mission site: http://www.isas.jaxa.jp/e/enterp/missions/hayabusa/
+           *
+           */
+          
+          // HAYABUSA2
+          /**
+           * \defgroup  Hayabusa2                        Hayabusa2
+           *
+           * These objects provide functionality for manipulating data from the 2014 Hayabusa2 
+           * mission to the asteroid Ryugu. The purpose of this mission is to study the origin 
+           * and evolution of the solar system as well as materials for life by leveraging the
+           * experience acquired from the Hayabusa mission.
+           *
+           * Mission site: http://global.jaxa.jp/projects/sat/hayabusa2/
+           *
+           */
+          
+          // KAGUYA
+          /**
+           * \defgroup  Kaguya                       Kaguya
+           *
+           * These objects provide functionality for manipulating data from the 2007
+           * Kaguya mission to the moon. 
+           *
+           * Mission site: http://www.isas.jaxa.jp/e/enterp/missions/kaguya/
+           *
+           */
+          
+          // LUNAR ORBITER 
+          /**
+           * \defgroup  LunarOrbiter                      Lunar Orbiter 
+           *
+           * These objects provide functionality for manipulating data from the
+           * Lunar Orbiter missions of the 1960's.
+           *
+           * Mission summary: http://www.lpi.usra.edu/expmoon/orbiter/orbiter.html 
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/LunarOrbiter/
+           *
+           */
+
+          // LUNAR RECONNAISSANCE ORBITER
+          /**
+           * \defgroup  LunarReconnaissanceOrbiter       Lunar Reconnaissance Orbiter
+           *
+           * These objects provide functionality for manipulating data from the
+           * Lunar Reconnaissance Orbiter (2008).
+           *
+           * Mission site: http://lunar.gsfc.nasa.gov/ 
+           *
            */
 
           // MARINER
@@ -352,6 +449,19 @@
            * MER Athena science package site: http://athena.cornell.edu/
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Rovers/
+           *
+           */
+          
+          // MARS EXPRESS
+          /**
+           * \defgroup  MarsExpress                    Mars Express
+           *
+           * These objects provide functionality for manipulating data from the 2003
+           * Mars Express mission to search for sub-surface water on Mars.
+           *
+           * Mission site: http://sci.esa.int/mars-express/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/missions/mars-express
            *
            */
 
@@ -468,6 +578,40 @@
            *
            */
           
+          // ROBOTIC LUNAR OBSERVATORY
+          /**
+           * \defgroup  RoboticLunarObservatory                   Robotic Lunar Observatory
+           *
+           * These objects provide functionality for manipulating data from the Robotic Lunar 
+           * Observatory at the United States Geological Survey in Flagstaff, Arizona.
+           *
+           * Mission site: http://www.moon-cal.org/
+           *
+           */
+          
+          // ROSETTA
+          /**
+           * \defgroup  Rosetta                              Rosetta
+           *
+           * These objects provide functionality for manipulating data from the 2004
+           * Rosetta mission that orbited the comet Churyumov-Gerasimenko.
+           *
+           * Mission site: http://rosetta.esa.int/
+           *
+           */
+          
+          // SMALL MISSIONS FOR ADVANCED RESEARCH AND TECHNOLOGY 1
+          /**
+           * \defgroup  SmallMissionsForAdvancedResearchAndTechnology1  Small Missions for Advanced Research and Technology 1
+           *
+           * These objects provide functionality for manipulating data from the 2003
+           * Small Missions for Advanced Research and Technology (SMART) satellite that
+           * orbited around the Moon.
+           *
+           * Mission site: http://sci.esa.int/smart-1/
+           *
+           */
+          
           // VIKING
           /**
            * \defgroup  Viking                        Viking
@@ -503,31 +647,7 @@
            *
            */
 
-          // LUNAR ORBITER 
-          /**
-           * \defgroup  LunarOrbiter                      Lunar Orbiter 
-           *
-           * These objects provide functionality for manipulating data from the
-           * Lunar Orbiter missions of the 1960's.
-           *
-           * Mission summary: http://www.lpi.usra.edu/expmoon/orbiter/orbiter.html 
-           *
-           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/LunarOrbiter/
-           *
-           */
-
-          // LUNAR RECONNAISSANCE ORBITER
-          /**
-           * \defgroup  LunarReconnaissance Orbiter       Lunar Reconnaissance Orbiter
-           *
-           * These objects provide functionality for manipulating data from the
-           * Lunar Reconnaissance Orbiter (2008).
-           *
-           * Mission site: http://lunar.gsfc.nasa.gov/ 
-           *
-           */
-
-     /* @}  end of Missions group */
+    /* @}  end of Missions group */
 
 
 // MAIN PAGE - content of the table-of-contents page for the %Isis 3.0 Object Documentation
@@ -616,7 +736,3 @@
      *   </tr>
      * </table>
      */
-
-
-
-

@@ -22,8 +22,10 @@
 
 #include "ProjectionFactory.h"
 
-#include <cmath>
+
 #include <cfloat>
+#include <cmath>
+#include <iomanip>
 
 #include "Camera.h"
 #include "Cube.h"
@@ -109,9 +111,6 @@ namespace Isis {
   }
 
 
-
-
-
   /**
    * This method returns a pointer to a RingPlaneProjection object. The projection is
    * intialized using information contained in a Label object. The information
@@ -177,6 +176,7 @@ namespace Isis {
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
+
 
   /**
    * This method creates a map projection for a cube given a label.  The label
@@ -269,46 +269,99 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
+
         // Convert upperleft coordinate to units of pixel
         // Truncate it to the nearest whole pixel (floor/ceil)
         // Convert it back to meters.  But don't do this if
         // the X/Y position is already close to a whole pixel because
         // the floor/ceil function could cause an extra pixel to be added
         // just due to machine precision issues
-        if (fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-          if (pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-            double sampleOffset = floor(minX / pixelResolution);
-            minX = sampleOffset * pixelResolution;
-          }
-        }
-        // make sure that the distance from minX to maxX is at least one pixel wide
-        // so we have at least one sample in the created cube
-        if (maxX < minX + pixelResolution) {
-          maxX = minX + pixelResolution;
+
+        bool flipX = false;
+        bool flipY = false;
+
+        double minXFlipped = minX;
+        double maxXFlipped = maxX;
+        double minYFlipped = minY;
+        double maxYFlipped = maxY;
+
+        //New range is (-1)*[0,maxX] = [-maxX, 0]
+
+        if (minX == 0)  {
+          minXFlipped = -maxX;
+          maxXFlipped = 0;
+          flipX = true;
+
         }
 
-        if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-          if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-            double lineOffset = -1.0 * ceil(maxY / pixelResolution);
-            maxY = -1.0 * lineOffset * pixelResolution;
+          if (fabs(fmod(minXFlipped, pixelResolution)) > 1.0e-6) {
+            if (pixelResolution - fabs(fmod(minXFlipped, pixelResolution)) > 1.0e-6) {            
+              double sampleOffset = floor(minXFlipped / pixelResolution);
+
+              minXFlipped = sampleOffset * pixelResolution;
+
+            }
+          }
+
+
+        // make sure that the distance from minX to maxX is at least one pixel wide
+        // so we have at least one sample in the created cube
+
+
+        if (maxXFlipped < minXFlipped + pixelResolution) {
+          maxXFlipped = minXFlipped + pixelResolution;
+        }
+
+
+        //New range is (-1)*[minY,0] = [0,-minY]
+        if (maxY == 0) {
+          maxYFlipped = -minY;
+          minYFlipped = 0;
+          flipY = true;
+
+        }
+
+        if (fabs(fmod(maxYFlipped, pixelResolution)) > 1.0e-6) {
+          if (abs(pixelResolution - fabs(fmod(maxYFlipped, pixelResolution))) > 1.0e-6) {
+            double lineOffset = ceil(maxYFlipped / pixelResolution);        
+            maxYFlipped =  lineOffset * pixelResolution;
+
           }
         }
+        
+
         // make sure that the distance from minY to maxY is at least one pixel wide
         // so we have at least one line in the created cube
-        if (minY > maxY - pixelResolution) {
-          minY = maxY - pixelResolution;
+        if (minYFlipped > maxYFlipped - pixelResolution) {
+          minYFlipped = maxYFlipped - pixelResolution;
         }
 
         // Determine the number of samples and lines
-        samples = (int)((maxX - minX) / pixelResolution + 0.5);
-        lines = (int)((maxY - minY) / pixelResolution + 0.5);
+
+         samples = (int)((maxXFlipped - minXFlipped) / pixelResolution + 0.5);
+         lines = (int)((maxYFlipped - minYFlipped) / pixelResolution + 0.5);
+
 
         // Set the upper left corner and add to the labels
-        upperLeftX = minX;
+        if (flipX) {
+         upperLeftX = 0;
+
+        }
+        else {
+            upperLeftX = minXFlipped;
+        }
         mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
                             Isis::Pvl::Replace);
 
-        upperLeftY = maxY;
+        if (flipY)  {
+          upperLeftY = 0;
+
+        }
+        else {
+           upperLeftY = maxYFlipped;
+
+        }
+
         mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
                             Isis::Pvl::Replace);
 
@@ -367,6 +420,7 @@ namespace Isis {
     return (Isis::Projection *) proj;
   }
 
+
   /**
    * This method creates a projection for a cube to a ring plane given a label.
    * Currently this is utilized only for projecting images of rings to the ring
@@ -388,7 +442,7 @@ namespace Isis {
    *                  the size of the output cube to the size of the input cube.
    *                  Defaults to true.
    *
-   * @return A pointer to a Projection object.
+   * @return @b Projection* A pointer to a Projection object.
    *
    */
   Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,
@@ -577,7 +631,7 @@ namespace Isis {
    *              and returned.
    * @param cam An initialized camera model
    *
-   * @return A pointer to a Projection object.
+   * @return @b Projection* A pointer to a Projection object.
    *
    */
   Isis::Projection *ProjectionFactory::CreateForCube(Isis::Pvl &label,
@@ -828,7 +882,7 @@ namespace Isis {
    *              and returned.
    * @param cam An initialized camera model
    *
-   * @return A pointer to a Projection object.
+   * @return Projection* A pointer to a Projection object.
    *
    */
   Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,

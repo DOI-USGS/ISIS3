@@ -84,6 +84,9 @@ namespace Isis {
    *                           at least one line. References #775.
    *  @history 2014-01-16 Kimberly Oyama - Updated the error messages for unsupported projections
    *                          to include the source of the error. Fixes #988.
+   *  @history 2016-09-02 Tyler Wilson - Fixed a bug in the CreateForCube function because it was
+   *  producing an unequal number of lines/samples for maps from projections that are symmetric about 
+   *  the prime meridian or the equator.  Fixes #2245.
    */
   class ProjectionFactory {
     public:
