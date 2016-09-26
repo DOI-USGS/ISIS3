@@ -117,7 +117,7 @@ namespace Isis {
 
       bundleImage->setParentObservation(bundleObservation);
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // TODO: problem when using settings from gui that no instrument id is set
+      // TODO: problem when using settings from jigsaw app - no instrument id is set
       //
       BundleObservationSolveSettings solveSettings;
       if ( bundleSettings->numberSolveSettings() == 1) {
