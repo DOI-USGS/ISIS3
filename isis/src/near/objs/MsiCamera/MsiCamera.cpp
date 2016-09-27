@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -50,7 +50,7 @@ namespace Isis {
     m_instrumentNameShort = "MSI";
     m_spacecraftNameLong = "Near Earth Asteroid Rendezvous";
     m_spacecraftNameShort = "NEAR";
-    
+
     Pvl &lab = *cube.label();
     NaifStatus::CheckErrors();
     SetFocalLength();
@@ -75,19 +75,20 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    QString sample = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
-    QString line = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
-    focalMap->SetDetectorOrigin(Spice::getDouble(sample), Spice::getDouble(line));
+    // Make sure to grab lines and samples in the correct order. 
+    double line = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
+    double sample = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    focalMap->SetDetectorOrigin(sample, line);
 
     // Setup distortion map
     double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
-    new RadialDistortionMap(this, k1, 1); 
+    new RadialDistortionMap(this, k1, 1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
     setTime(centerTime);
-    // Note: If the temperature-dependent instrument kernel is used,  
+    // Note: If the temperature-dependent instrument kernel is used,
     // the following LoadCache() command should be replaced with the
     // commented lines at the end of this file.
     LoadCache();
@@ -100,15 +101,15 @@ namespace Isis {
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
-   * the StartTime keyword value, converted to ephemeris time. 
-   *  
-   *  
+   * the StartTime keyword value, converted to ephemeris time.
+   *
+   *
    * The StartTime keyword value from the labels represents the shutter open ???
-   * time of the exposure. 
-   *  
-   * This method uses the FramingCamera class implementation, returning the 
-   * given time value as the shutter open and the sum of the time value and 
-   * exposure duration as the shutter close. 
+   * time of the exposure.
+   *
+   * This method uses the FramingCamera class implementation, returning the
+   * given time value as the shutter open and the sum of the time value and
+   * exposure duration as the shutter close.
    *
    * @param exposureDuration ExposureDuration keyword value from the labels,
    *                         converted to seconds.
@@ -129,39 +130,39 @@ namespace Isis {
 
   /**
    * CK frame ID - Instrument Code from spacit run on CK For more details,
-   * read the Camera class documentation for this method. 
-   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   * read the Camera class documentation for this method.
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Frame ID
-   *  
-   * @see Camera 
+   *
+   * @see Camera
    */
   int MsiCamera::CkFrameId() const { return -93000; }
 
-  /** 
-   * CK Reference ID - Reference Frame value for J2000 from spacit run on 
-   * CK. For more details, read the Camera class documentation for this 
-   * method. 
-   * 
+  /**
+   * CK Reference ID - Reference Frame value for J2000 from spacit run on
+   * CK. For more details, read the Camera class documentation for this
+   * method.
+   *
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Reference ID
    */
   int MsiCamera::CkReferenceId() const { return 1; }
 
-  /** 
-   * SPK Target ID - Target Body value for NEAR Shoemaker from spacit run 
+  /**
+   * SPK Target ID - Target Body value for NEAR Shoemaker from spacit run
    * on SPK. For more details, read the Camera class documentation for this
-   * method. 
-   *  
-   * @return @b int The appropriate instrument code for the Spacecraft 
+   * method.
+   *
+   * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Center ID
    */
 //  int MsiCamera::SpkTargetId() const { return -93; }
 
-  /** 
-   * SPK Reference ID - Reference Frame value for J2000 from spacit run on SPK. 
-   * For more details, read the Camera class documentation for this method. 
-   *  
-   * @return @b int The appropriate instrument code for the Spacecraft 
+  /**
+   * SPK Reference ID - Reference Frame value for J2000 from spacit run on SPK.
+   * For more details, read the Camera class documentation for this method.
+   *
+   * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Reference ID
    */
   int MsiCamera::SpkReferenceId() const { return 1; }
@@ -169,7 +170,7 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate a MsiCamera
- * object. 
+ * object.
  *
  * @param lab Cube labels
  *
@@ -195,14 +196,14 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       SpiceDouble tempCelcius = toDouble(inst["DpuDeckTemperature"][0])+toCelcius;
 //       ConstSpiceChar *nearMsiTimeDependentFrame;
 //       iTime originalTempDependencyDate("1999-12-20T00:00:00");
-// 
+//
 //       if (centerTime.Et() <= originalTempDependencyDate.Et() ) {
 //         nearMsiTimeDependentFrame = "NEAR_MSI_TEMP_DEP0000";
 //       }
 //       else {
 //         nearMsiTimeDependentFrame = "NEAR_MSI_TEMP_DEP0001";
 //       }
-// 
+//
 //       // get transformation matrix based on temperature, from spacecraft to MSI
 //       SpiceDouble sc2msiMatrix[3][3];
 //       pxform_c("J2000", nearMsiTimeDependentFrame,tempCelcius, sc2msiMatrix);
@@ -212,13 +213,12 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       // get new CJ matrix based on temperatureBasedRotation x originalTC
 //       // now we have transformation from j2000 to msi
 //       vector<double> newCJ(9);
-//       mxm_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalCJ[0], 
+//       mxm_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalCJ[0],
 //             (SpiceDouble( *)[3]) &newCJ[0]);
 //       NaifStatus::CheckErrors();
-//       // mxmg_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalTC[0], 
+//       // mxmg_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalTC[0],
 //       //        6, 6, 6, (SpiceDouble( *)[3]) &newCJ[0]);
 //       // set new CJ matrix
 //       instrumentRotation()->SetTimeBasedMatrix(newCJ);
 //       LoadCache();
 //     }
-

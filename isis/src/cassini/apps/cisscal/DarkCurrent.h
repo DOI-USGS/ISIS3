@@ -48,6 +48,8 @@ namespace Isis {
    *                         Fixed instrument data rate value in the
    *                         constructor.
    *  @history 2010-07-19 Jeannie Walldren - Fixed formatting.
+   *  @history 2016-08-28 Kelvin Rodriguez - Removed usused private member variables to
+   *           eliminate unused member variables warnings in clang. Part of porting to OS X 10.11.
    */
   class DarkCurrent {
     public:
@@ -59,11 +61,11 @@ namespace Isis {
       //! Retrieves the name of the bias distortion table
       FileName BiasDistortionTable() {
         return p_bdpath;
-      };      
+      };
       //! Retrieves the name of the dark parameters file
       FileName DarkParameterFile()  {
         return p_dparamfile;
-      };  
+      };
 
 
     private:
@@ -87,7 +89,6 @@ namespace Isis {
       double p_expDur;              //!< Value of <b>PvlKeyword</b> ExposureDuration from the labels of the image.  Called "exposure" or "time" in IDL code.
       QString p_flightSoftware;     //!< Value of <b>PvlKeyword</b> FlightSoftwareVersion from the labels of the image.  Called "fsw" in IDL code.
       int p_gainMode;               //!< Value of <b>PvlKeyword</b> GainModeId from the labels of the image.
-      double p_instDataRate;        //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.
       bool p_narrow;                //!< Indicates whether the image is from a narrow-angle camera
       int p_readoutIndex;           //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.  Called "rdind" or "roindex" in IDL code.
       int p_readoutOrder;           //!< Value of <b>PvlKeyword</b> ReadoutOrder from the labels of the image. Valid values are: NAC first = 0, WAC first = 1.  Called "roo" in IDL code.
@@ -100,4 +101,3 @@ namespace Isis {
   };
 };
 #endif
-

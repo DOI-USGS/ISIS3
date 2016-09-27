@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -48,7 +48,7 @@ namespace Isis {
    *
    * @param [in] lab   (Pvl &)  Label used to create camera model
    *
-   * @internal 
+   * @internal
    *   @history 2012-04-12  Kris Becker, Flagstaff Original Version
    *
    */
@@ -106,8 +106,8 @@ namespace Isis {
 
 //    double start_time = start_clocks * pixel_clock_time;
 //    double stop_time  = stop_clocks  * pixel_clock_time;
-    
-    // Start of first line exposure time.  This is the start time of the 
+
+    // Start of first line exposure time.  This is the start time of the
     // frame time plus the itegration delay start time - constant for all
     // frames
 //    double obsStartTime(etStart+start_time);
@@ -139,7 +139,7 @@ namespace Isis {
 #else
     // Have to use variable line scan detector mapping due to how line scans
     // are performed.  This is currently segfaulting...
-    
+
     double stime(obsStartTime);
     double scanTime(stop_time-start_time);
     m_lineRates.clear();
@@ -158,8 +158,13 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, naifIkCode());
-    fmap->SetDetectorOrigin(getDouble("INS"+ikCode+"_BORESIGHT_SAMPLE"),
-                            getDouble("INS"+ikCode+"_BORESIGHT_LINE"));
+
+    // lines and samples added to the pvl in the order you
+    // call getDouble()
+    double bLine = getDouble("INS"+ikCode+"_BORESIGHT_LINE");
+    double bSample = getDouble("INS"+ikCode+"_BORESIGHT_SAMPLE");
+
+    fmap->SetDetectorOrigin(bSample, bLine);
     fmap->SetDetectorOffset(0.0, 0.0);
 
     // Setup distortion map
@@ -172,7 +177,7 @@ namespace Isis {
 //    new CrismCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    setTime(iTime(frameStartTime)); 
+    setTime(iTime(frameStartTime));
     double tol = 0.0; //PixelResolution();
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
@@ -183,8 +188,8 @@ namespace Isis {
 #if 0
 //    cout << "CacheSize: " << CacheSize(obsStartTime, obsStopTime) << "\n";
     createCache(obsStartTime, obsStopTime, ParentLines(), tol);
-     
-#else 
+
+#else
 //    cout << "LoadCache()...\n";
     LoadCache();
 #endif
@@ -209,15 +214,14 @@ namespace Isis {
 
 
 // Plugin
-/** 
- * This is the function that is called in order to instantiate a CrismCamera object. 
+/**
+ * This is the function that is called in order to instantiate a CrismCamera object.
  *
  * @param lab Cube labels
  *
  * @return Isis::Camera* CrismCamera
- * @internal 
+ * @internal
  */
 extern "C" Isis::Camera *CrismCameraPlugin(Isis::Cube &cube) {
   return new Isis::CrismCamera(cube);
 }
-

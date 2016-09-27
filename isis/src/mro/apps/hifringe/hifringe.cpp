@@ -23,6 +23,9 @@ Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 
 #include <string>
 
+#include <QPair>
+#include <QVector>
+
 #include "Process.h"
 #include "Statistics.h"
 #include "LineManager.h"
@@ -35,9 +38,6 @@ using namespace Isis;
 
 void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
             int end, PvlObject *one, PvlObject *two);
-
-static const char *const
-ID = "PIRL::hifringe ($Revision: 1.6 $ $Date: 2008/05/14 21:07:24 $)";
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -90,9 +90,9 @@ void IsisMain() {
     }
   }
 
-  Statistics sections[numSections][2];
+  QVector<QPair<Statistics,Statistics> > sections(numSections, qMakePair(Statistics(), Statistics()));
   Statistics leftTotal, rightTotal;
-  int sectionStarts[numSections];
+  QVector<int> sectionStarts(numSections, 0);
   sectionStarts[0] = 0;
   for(int i = 1 ; i < numSections - 1 ; i ++) {
     sectionStarts[i] = (totalLines / numSections) * i;
@@ -127,10 +127,10 @@ void IsisMain() {
     if(lineCount < sectionStarts[currentSection] + sectionLength) {
       //Index is not too small for this fringe section
       if(lineCount >= sectionStarts[currentSection]) {
-        sections[currentSection][0].AddData(leftFringeBuf.DoubleBuffer(),
-                                            leftFringeBuf.size());
-        sections[currentSection][1].AddData(rightFringeBuf.DoubleBuffer(),
-                                            rightFringeBuf.size());
+        sections[currentSection].first.AddData(leftFringeBuf.DoubleBuffer(),
+                                               leftFringeBuf.size());
+        sections[currentSection].second.AddData(rightFringeBuf.DoubleBuffer(),
+                                                rightFringeBuf.size());
       }
     }
     else {
@@ -138,10 +138,10 @@ void IsisMain() {
       //Since sections may butt up against each other, it is possible that
       // we have to add this data to the next section.
       if(lineCount >= sectionStarts[currentSection]) {
-        sections[currentSection][0].AddData(leftFringeBuf.DoubleBuffer(),
-                                            leftFringeBuf.size());
-        sections[currentSection][1].AddData(rightFringeBuf.DoubleBuffer(),
-                                            rightFringeBuf.size());
+        sections[currentSection].first.AddData(leftFringeBuf.DoubleBuffer(),
+                                               leftFringeBuf.size());
+        sections[currentSection].second.AddData(rightFringeBuf.DoubleBuffer(),
+                                                rightFringeBuf.size());
       }
     }
   }
@@ -150,8 +150,8 @@ void IsisMain() {
   PvlObject leftSide("LeftSide"), rightSide("RightSide");
   for(int i = 0 ; i < numSections ; i++) {
     QString sectionName = "Section" + toString(i + 1);
-    pvlOut(sections[i][0], //Stats to add to the left Object
-           sections[i][1], //Stats to add to the right Object
+    pvlOut(sections[i].first, //Stats to add to the left Object
+           sections[i].second, //Stats to add to the right Object
            sectionName,    //Name for the new groups
            sectionStarts[i], //start line
            sectionStarts[i] + sectionLength, //end line

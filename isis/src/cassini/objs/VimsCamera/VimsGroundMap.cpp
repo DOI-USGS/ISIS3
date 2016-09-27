@@ -361,10 +361,10 @@ namespace Isis {
    *                            sample and line against edge of starting
    *                            ending pixels (0.5/Parent+0.5) instead of
    *                            center of pixels.
-   * @history 2012-12-03  Tracie Sucharski - Check for valid minLat/maxLat, minLon/maxLon.  If 
+   * @history 2012-12-03  Tracie Sucharski - Check for valid minLat/maxLat, minLon/maxLon.  If
    *                            none are valid, this means the latMap and lonMap have no valid
    *                            data, therefore we cannot back project, so return false.
-   * @history 2014-04-08  Tracie Sucharski - Change the sanity check made on 2012-12-03 from lat/lon 
+   * @history 2014-04-08  Tracie Sucharski - Change the sanity check made on 2012-12-03 from lat/lon
    *                            to xyz.
    *
    */
@@ -430,7 +430,7 @@ namespace Isis {
     //  closest point.  Use this point and surrounding 8 pts as
     //  control pts.
     //----------------------------------------------------------------
-    if (minDist >= DBL_MAX) return false; 
+    if (minDist >= DBL_MAX) return false;
 
     //-------------------------------------------------------------
     //  Set-up for LU decomposition (least2 fit).

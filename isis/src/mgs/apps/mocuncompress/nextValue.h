@@ -50,8 +50,8 @@ SCCSID @(#)nextValue.h  1.1 10/04/99
 
 #define nextValue(DEFvalue,DEFcode,DEFleft,DEFright,DEFcur,DEFbitCount,DEFdata) \
 { \
-register uint8 *LCLcode,*LCLleft,*LCLright; \
-register uint32 LCLindex;    /* Current internal node index */ \
+uint8 *LCLcode,*LCLleft,*LCLright; \
+uint32 LCLindex;    /* Current internal node index */ \
  \
   LCLcode  = (DEFcode); \
   LCLleft  = (DEFleft); \

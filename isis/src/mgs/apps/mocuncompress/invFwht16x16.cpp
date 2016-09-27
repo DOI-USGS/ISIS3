@@ -92,7 +92,7 @@ extern void exit();
 
 #define BUTTERFLY4(in,ii,i0,i1,i2,i3,out,oi,o0,o1,o2,o3)  \
   {              \
-    register int32 t0,t1,t2,t3,t4;      \
+int32 t0,t1,t2,t3,t4;      \
                 \
     /* Load input into registers */      \
     t0 = in[(ii)*(i0)];        \
@@ -139,7 +139,7 @@ static void invFwht16_row(register int32 *in, register int32 *out)
   *  "out" - the 16 outputs stored as 32 bit integers in a vector.
   */
   int32 data[32];      /* Temporary storage used between stages */
-  register int32 *tmp;    /* Register pointer to the temporary storage */
+int32 *tmp;    /* Register pointer to the temporary storage */
 
   /* Point at temporary storage */
   tmp = data;
@@ -175,7 +175,7 @@ static void invFwht16_col(register int32 *in, register int32 *out)
   *  "out" - the 16 outputs stored as 32 bit integers in every 16th location.
   */
   int32 data[16];      /* Temporary storage used between stages */
-  register int32 *tmp;    /* Register pointer to the temporary storage */
+int32 *tmp;    /* Register pointer to the temporary storage */
 
   /* Point at temporary storage */
   tmp = data;
@@ -216,8 +216,8 @@ void invFwht16x16(register int16 *in, register int16 *out)
 
   /* Convert 16 bit integers to 32 bit integers */
   {
-    register int16 *scanIn;
-    register int32 *scanData;
+int16 *scanIn;
+int32 *scanData;
 
     scanIn = in;
     scanData = data;
@@ -230,7 +230,7 @@ void invFwht16x16(register int16 *in, register int16 *out)
   };
 
   {
-    register int32 *scanData;  /* Current row start in "data" */
+int32 *scanData;  /* Current row start in "data" */
 
     /*
     * Pass each row in "data" array (as a vector of size 16) to the
@@ -244,7 +244,7 @@ void invFwht16x16(register int16 *in, register int16 *out)
   };
 
   {
-    register int32 *scanData;  /* Current column start in "data" */
+int32 *scanData;  /* Current column start in "data" */
 
     /*
     * Inverse transform each column in the 16 x 16 block stored by rows
@@ -257,14 +257,14 @@ void invFwht16x16(register int16 *in, register int16 *out)
 
   /* Convert 32 bit integers to 16 bit integers */
   {
-    register int32 *scanData;
-    register int16 *scanOut;
+int32 *scanData;
+int16 *scanOut;
 
     scanData = data;
     scanOut = out;
 
     for(i = 0; i < 256; i++) {
-      register int32 cur;
+int32 cur;
       cur = *(scanData++);
 
 

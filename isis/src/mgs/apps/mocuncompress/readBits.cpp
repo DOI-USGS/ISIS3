@@ -103,9 +103,9 @@ BITSTRUCT *initBits(uint8 *data, int len)
 
 uint32 readBits(register uint8 bitCount, register BITSTRUCT *bitStuff)
 {
-  register uint32 bitQueue;
-  register uint32 bitQueueCount;
-  register uint32 bits;
+uint32 bitQueue;
+uint32 bitQueueCount;
+uint32 bits;
 
   if(bitCount > 24) {
     (void)fprintf(stderr, "Asked for more than 24 bits: %d\n", bitCount);

@@ -24,17 +24,17 @@ namespace Isis {
   /**
    * @brief NEAR Shoemaker MSI Camera Model
    *
-   * This is the camera model for the Near Earth Asteroid Rendezvous 
-   * - Shoemaker Multi-Spectral Imager. 
+   * This is the camera model for the Near Earth Asteroid Rendezvous
+   * - Shoemaker Multi-Spectral Imager.
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup NearEarthAsteroidRendezvousShoemaker
-   *  
-   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1996-008A 
+   *
+   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1996-008A
    * @see http://pdssbn.astro.umd.edu/data_sb/missions/near/index.shtml
-   * @see http://near.jhuapl.edu/instruments/MSI/index.html 
-   * @see http://near.jhuapl.edu/fact_sheets/MSI.pdf 
-   *  
+   * @see http://near.jhuapl.edu/instruments/MSI/index.html
+   * @see http://near.jhuapl.edu/fact_sheets/MSI.pdf
+   *
    * @author  2013-03-27 Jeannie Backer
    *
    * @internal
@@ -42,15 +42,18 @@ namespace Isis {
    *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2016-09-14 Kelvin Rodriguez - Enforced the order in which BORESIGHT_LINE and
+   *                           BORESIGHT_SAMPLE are added to the PVL. Part of porting to
+   *                           OSX 10.11 
    */
   class MsiCamera : public FramingCamera {
     public:
       MsiCamera(Cube &cube);
       ~MsiCamera();
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
       virtual int CkFrameId() const;
       virtual int CkReferenceId() const;

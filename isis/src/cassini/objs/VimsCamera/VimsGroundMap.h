@@ -32,7 +32,7 @@ namespace Isis {
   class Latitude;
   class Longitude;
 
-  /** 
+  /**
    *  Convert between undistorted focal plane and ground coordinates
    *
    * This base class is used to convert between undistorted focal plane
@@ -70,7 +70,7 @@ namespace Isis {
    *                           Since the exception is in the constructor the
    *                           error will probably lead to an alternate seg
    *                           fault.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                          coding standards. References #972.
    *   @history 2012-09-10 Ken Edmundson,  Added new methods, SetGroundwithLatitudeLongitude and
    *                          SetGroundwithRadiusLongitude to support rings data.
@@ -109,38 +109,35 @@ namespace Isis {
 
       SpiceDouble p_etStart;     //!< Start ephemeris time
 
-      double p_exposureDuration; //!< Exposure duration
       double p_interlineDelay;   /**< InterlineDelayDuration keyword value from
                                       the instrument group of the labels, divided by 1000 */
 
-      double p_ux;               //!< Distorted focal plane x, in millimeters    
-      double p_uy;               //!< Distorted focal plane y, in millimeters    
-      double p_uz;               //!< Distorted focal plane z, in millimeters    
+      double p_ux;               //!< Distorted focal plane x, in millimeters
+      double p_uy;               //!< Distorted focal plane y, in millimeters
+      double p_uz;               //!< Distorted focal plane z, in millimeters
 
       double p_xPixSize;         //!< X pixel size
       double p_yPixSize;         //!< Y pixel size
       double p_xBore;            //!< X boresight
       double p_yBore;            //!< Y boresight
 
-      QString p_channel;     /**< Channel keyword value from the instrument group of the labels.    
+      QString p_channel;     /**< Channel keyword value from the instrument group of the labels.
                                       Possible values are IR or VIS */
-      double p_visExp;           //!< VIS exposure duration, divided by 1000                            
-      double p_irExp;            //!< IR exposure duration, divided by 1000                             
-      int    p_nsUv;             //!< Normal or high resolution sample uv                               
-      int    p_nlUv;             //!< Normal or high resolution line uv                                 
+      double p_visExp;           //!< VIS exposure duration, divided by 1000
+      double p_irExp;            //!< IR exposure duration, divided by 1000
       int    p_swathWidth;       /**< SwathWidth keyword value from the instrument group of the labels. 
                                       This will be image size unless occultation image */
       int    p_swathLength;      /**< SwathLength keyword value from the instrument group of the labels.
                                       This will be image size unless occultation image */
-      int    p_camSampOffset;    //!< Sample offset                                                     
-      int    p_camLineOffset;    //!< Line offset                                                       
+      int    p_camSampOffset;    //!< Sample offset
+      int    p_camLineOffset;    //!< Line offset
 
       double p_minX,p_maxX;
       double p_minY,p_maxY;
       double p_minZ,p_maxZ;
 
       QVector3D p_xyzMap[64][64];
-     
+
   };
 };
 #endif

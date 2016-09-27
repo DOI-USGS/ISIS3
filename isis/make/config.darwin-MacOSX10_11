@@ -63,7 +63,8 @@ ISISDYNAMIC =
 #---------------------------------------------------------------------------
 # Shared library options
 #---------------------------------------------------------------------------
-RANLIB          = /usr/bin/ranlib
+#RANLIB          = /usr/bin/ranlib
+RANLIB          = /usr/bin/true
 SHAREDLIBEXT    = dylib
 DYLIBVERSION    = -compatibility_version $(ISISMAJOR).$(ISISMINOR) \
                   -current_version $(ISISLIBVERSION)
@@ -338,10 +339,10 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 #OPENCVINCDIR =  -I$(ISIS3OPT)/include
 #OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
-OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
-               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
-               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
-               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+OPENCVLIBS   = -lopencv_calib3d -lopencv_core -lopencv_features2d \
+               -lopencv_flann -lopencv_highgui -lopencv_imgproc \
+               -lopencv_ml -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres \
                -lopencv_video -lopencv_videostab
 
 #---------------------------------------------------------------------------
@@ -406,8 +407,11 @@ THIRDPARTYLIBS    += "$(QWTFRAMES)/qwt.framework"
 #  Qt dependencies
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpcre16*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgthread-*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpcre.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libharfbuzz*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgraphite2.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libleveldb*.dylib*"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsnappy.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libwebp*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libdbus*.dylib"
 
@@ -438,6 +442,8 @@ THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_a63R.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcamd*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuitesparseconfig*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libccolamd*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd*.dylib"
 #THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
 

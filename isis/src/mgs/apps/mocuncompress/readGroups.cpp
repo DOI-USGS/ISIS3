@@ -57,9 +57,9 @@ extern void exit();
 
 uint32 *readGroups(register uint32 numBlocks, register BITSTRUCT *bitStuff)
 {
-  register uint32 block;
+uint32 block;
   uint32 *groups;
-  register uint32 *scanGroups;
+uint32 *scanGroups;
 
   if((groups = (uint32 *)malloc((uint32)(numBlocks * sizeof(*groups)))) == NULL) {
     (void)fprintf(stderr, "Not enough memory for decoding of image\n");
