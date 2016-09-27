@@ -1892,6 +1892,7 @@ namespace Isis {
     return ComputeAzimuth(lat, lon);
   }
 
+
   /**
    * Return the Spacecraft Azimuth
    *
@@ -1904,6 +1905,7 @@ namespace Isis {
     subSpacecraftPoint(lat, lon);
     return ComputeAzimuth(lat, lon);
   }
+
 
   /**
    * Computes the image azimuth value from your current position (origin) to a point of interest
@@ -2154,6 +2156,7 @@ namespace Isis {
     return azimuth;
   }
 
+
   /**
    * Return the off nadir angle in degrees.
    *
@@ -2178,6 +2181,7 @@ namespace Isis {
 
     return c;
   }
+
 
   /**
    * Computes and returns the ground azimuth between the ground point and
@@ -2306,6 +2310,7 @@ namespace Isis {
     p_distortionMap = map;
   }
 
+
   /**
    * Sets the Focal Plane Map. This object will take ownership of the focal plane
    * map pointer.
@@ -2319,6 +2324,7 @@ namespace Isis {
 
     p_focalPlaneMap = map;
   }
+
 
   /**
    * Sets the Detector Map. This object will take ownership of the detector map
@@ -2334,6 +2340,7 @@ namespace Isis {
     p_detectorMap = map;
   }
 
+
   /**
    * Sets the Ground Map. This object will take ownership of the ground map
    * pointer.
@@ -2348,6 +2355,7 @@ namespace Isis {
     p_groundMap = map;
   }
 
+
   /**
    * Sets the Sky Map. This object will take ownership of the sky map pointer.
    *
@@ -2360,6 +2368,7 @@ namespace Isis {
 
     p_skyMap = map;
   }
+
 
   /**
    * This loads the spice cache big enough for this image. The default cache size
@@ -2456,6 +2465,7 @@ namespace Isis {
     return ephemerisTimes;
   }
 
+
   /**
    * This method calculates the spice cache size. This method finds the number
    * of lines in the beta cube and adds 1, since we need at least 2 points for
@@ -2540,6 +2550,7 @@ namespace Isis {
     p_geometricTilingEndSize = endSize;
   }
 
+
   /**
    * This will get the geometric tiling hint; these values are typically used for
    * ProcessRubberSheet::SetTiling(...).
@@ -2573,6 +2584,7 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * Checks to see if the camera object has a projection
    *
@@ -2581,7 +2593,8 @@ namespace Isis {
    */
   bool Camera::HasProjection() {
     return p_projection != 0;
-  }
+    }
+
 
   /**
    * Virtual method that checks if the band is independent
@@ -2593,6 +2606,7 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * Returns the reference band
    *
@@ -2601,6 +2615,7 @@ namespace Isis {
   int Camera::ReferenceBand() const {
     return p_referenceBand;
   }
+
 
   /**
    * Checks to see if the Camera object has a reference band
@@ -2612,6 +2627,7 @@ namespace Isis {
     return p_referenceBand != 0;
   }
 
+
   /**
    * Virtual method that sets the band number
    *
@@ -2620,6 +2636,7 @@ namespace Isis {
   void Camera::SetBand(const int band) {
     p_childBand = band;
   }
+
 
   /**
    * Returns the current sample number
@@ -2630,6 +2647,7 @@ namespace Isis {
     return p_childSample;
   }
 
+
   /**
    * Returns the current band
    *
@@ -2639,6 +2657,7 @@ namespace Isis {
     return p_childBand;
   }
 
+
   /**
    * Returns the current line number
    *
@@ -2647,6 +2666,8 @@ namespace Isis {
    double Camera::Line() {
     return p_childLine;
   }
+
+
   /**
    * Returns the resolution of the camera
    *
@@ -2668,6 +2689,7 @@ namespace Isis {
     return p_focalLength;
   }
 
+
   /**
    * Returns the pixel pitch
    *
@@ -2676,6 +2698,7 @@ namespace Isis {
    double Camera::PixelPitch() const {
     return p_pixelPitch;
   }
+
 
   /**
    * Returns the pixel ifov offsets from center of pixel, which defaults to the
@@ -2708,6 +2731,7 @@ namespace Isis {
     return p_samples;
   }
 
+
   /**
    * Returns the number of lines in the image
    *
@@ -2716,6 +2740,7 @@ namespace Isis {
    int Camera::Lines() const {
     return p_lines;
   }
+
 
   /**
    * Returns the number of bands in the image
@@ -2726,6 +2751,7 @@ namespace Isis {
     return p_bands;
   }
 
+
   /**
    * Returns the number of lines in the parent alphacube
    *
@@ -2735,6 +2761,7 @@ namespace Isis {
     return p_alphaCube->AlphaLines();
   }
 
+
   /**
    * Returns the number of samples in the parent alphacube
    *
@@ -2743,6 +2770,8 @@ namespace Isis {
    int Camera::ParentSamples() const {
     return p_alphaCube->AlphaSamples();
   }
+
+
   /**
    * Returns a pointer to the CameraDistortionMap object
    *
@@ -2751,6 +2780,7 @@ namespace Isis {
   CameraDistortionMap *Camera::DistortionMap() {
     return p_distortionMap;
   }
+
 
   /**
    * Returns a pointer to the CameraFocalPlaneMap object
@@ -2761,6 +2791,7 @@ namespace Isis {
     return p_focalPlaneMap;
   }
 
+
   /**
    * Returns a pointer to the CameraDetectorMap object
    *
@@ -2770,6 +2801,7 @@ namespace Isis {
     return p_detectorMap;
   }
 
+
   /**
    * Returns a pointer to the CameraGroundMap object
    *
@@ -2778,6 +2810,7 @@ namespace Isis {
   CameraGroundMap *Camera::GroundMap() {
     return p_groundMap;
   }
+
 
   /**
    * Returns a pointer to the CameraSkyMap object

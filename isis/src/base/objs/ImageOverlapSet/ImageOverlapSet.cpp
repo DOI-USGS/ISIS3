@@ -798,6 +798,9 @@ namespace Isis {
     }
     
     // unblock the writing process
+    // Check first if the the thread is still locked
+    // to avoid undefined behavior
+    p_calculatePolygonMutex.tryLock();
     p_calculatePolygonMutex.unlock();
   }
 

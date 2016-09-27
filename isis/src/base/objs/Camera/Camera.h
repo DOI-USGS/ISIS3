@@ -222,6 +222,13 @@ namespace Isis {
    *                           which give greatly improved approximations compared to their
    *                           non-oblique counterpart functions when the Look vector is pointing
    *                           off nadir and near the limb.  Fixes #476.  References #4100.
+   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
+   *                           names as well as public member getters. Updated unit test.
+   *                           References #2335.
+   *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
+   *                           clock angle. References #2365
+   *   @history 2016-08-01 Curtis Rose - Changed return values of resolutions from -1 to Isis::Null.
+   *                           Fixes #2065.
    */
 
   class Camera : public Sensor {
@@ -296,6 +303,7 @@ namespace Isis {
 
       bool RaDecRange(double &minra, double &maxra,
                       double &mindec, double &maxdec);
+
       double RaDecResolution();
 
       CameraDistortionMap *DistortionMap();

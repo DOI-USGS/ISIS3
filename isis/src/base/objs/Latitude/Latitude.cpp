@@ -566,6 +566,7 @@ namespace Isis {
   void Latitude::setAngle(const double &angle, const Angle::Units &units) {
     
     
+    
     // Check for passing 90 degrees if that error checking is on
     if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);

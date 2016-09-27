@@ -619,6 +619,7 @@ namespace Isis {
    * @brief Add the matrix view widget to the window.
    * @return @b (MatrixSceneWidget*) The widget to view.
    */
+  /*
   MatrixSceneWidget *Directory::addMatrixView() {
     MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
 
@@ -628,7 +629,6 @@ namespace Isis {
     m_matrixViewWidgets.append(result);
 
     result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
-    result->setObjectName( result->windowTitle() );
     result->setObjectName( result->windowTitle() );
 
     emit newWidgetAvailable(result);
