@@ -216,7 +216,7 @@ namespace Isis {
         appName.SetText("Running " + Application(i).Name());
         appName.SetMaximumSteps(1);
         appName.CheckStatus();
-         
+
         // grab the sets of parameters this program needs to be run with
         const vector<QString> &params = Application(i).ParamString();
         for (int j = 0; j < (int)params.size(); j++) {
@@ -928,7 +928,6 @@ namespace Isis {
     }
 
     for (int i = 0; i < pipeline.Size(); i++) {
-      if (&(pipeline.Application(i)) == NULL) continue;
       if (pipeline.Application(i).Enabled()) {
         const vector<QString> &params = pipeline.Application(i).ParamString();
         for (int j = 0; j < (int)params.size(); j++) {
@@ -949,7 +948,6 @@ namespace Isis {
 
     if (!pipeline.KeepTemporaryFiles()) {
       for (int i = 0; i < pipeline.Size(); i++) {
-        if (&(pipeline.Application(i)) == NULL) continue;
         if (pipeline.Application(i).Enabled()) {
           vector<QString> tmpFiles = pipeline.Application(i).TemporaryFiles();
           for (int file = 0; file < (int)tmpFiles.size(); file++) {

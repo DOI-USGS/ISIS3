@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Test CleanUp() methods
- 
+
   // Try cleaning up a cube that isn't managed by CubeManager
   CubeManager::CleanUp("unmanagedCube.cub");
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     // only isisTruth pointers are valid now, so let's verify those
     if (i < 2 or i > 3) {
       cout << FileName(cubes[i]->fileName()).baseName() << endl;
-    } 
+    }
     else {
       cout << "(cleaned)" << endl;
     }
@@ -108,6 +108,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < (int)cubes2.size(); i++) {
     cout << "  " << i + 1 << " : ";
     cout << FileName(cubes2[i]->fileName()).baseName() << endl;
+
   }
   cout << endl;
 
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
   cout << "Setting number of open cubes > 60 percent of system open file limit" << endl;
   mgr.SetNumOpenCubes(100000);
   cout << endl;
-  
+
   // Open a cube that DNE
   cout << "Attempting to open a file that does not exist:" << endl;
   try {

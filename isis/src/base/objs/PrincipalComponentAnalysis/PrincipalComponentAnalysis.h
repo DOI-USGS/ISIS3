@@ -44,6 +44,9 @@ namespace Isis {
    * @author 2006-05-18 Jacob Danton
    *
    * @internal
+   *   @history 2016-08-28 Kelvin Rodriguez - Added string concatinations to properly convert
+   *                                      numbers using QString::number to squash conversion
+   *                                      warnings. Part of porting to OS X 10.11.
    */
   class PrincipalComponentAnalysis {
     public:

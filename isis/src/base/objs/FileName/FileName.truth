@@ -775,16 +775,16 @@ Testing parallel temporary file name creation for atomicity
 
 Testing Versioning Missing Problems
 	Testing Versioning Methods [tttt]
-		Highest Version Failed:     **ERROR** Asked for highest version of file named [tttt] in [.] but there are no version sequences in the name.
-		New Version Failed:         **ERROR** Asked for new version of file named [tttt] in [.] but there are no version sequences in the name.
+		Highest Version Name:          		Highest Version Failed:     **ERROR** Asked for highest version of file named [tttt] in [.] but there are no version sequences in the name.
+		New Version Name:              		New Version Failed:         **ERROR** Asked for new version of file named [tttt] in [.] but there are no version sequences in the name.
 
 	Testing Versioning Methods [tttt{}.tmp]
-		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [tttt{}.tmp].
-		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [tttt{}.tmp].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [tttt{}.tmp].
+		New Version Name:              		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [tttt{}.tmp].
 
 	Testing Versioning Methods [ttttt{}.tmp]
-		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [ttttt{}.tmp].
-		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [ttttt{}.tmp].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [ttttt{}.tmp].
+		New Version Name:              		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [ttttt{}.tmp].
 
 Testing Numerical-Only Versioning
 	Testing Versioning Methods [tttt??????]
@@ -818,7 +818,7 @@ Testing Numerical-Only Versioning
 		New version changed FileName: 1
 
 	Testing Versioning Methods [??tttt]
-		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [??tttt] in [.].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [??tttt] in [.].
 		New Version Name:              01tttt
 		New Version Orig:              ./01tttt
 		New Version Orig Path:         .
@@ -835,15 +835,15 @@ Testing Numerical-Only Versioning
 		New version changed FileName: 1
 
 	Testing Versioning Methods [junk?]
-		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [junk?] in [.].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [junk?] in [.].
 		New Version Name:              junk1
 		New Version Orig:              ./junk1
 		New Version Orig Path:         .
 		New version changed FileName: 1
 
 	Testing Versioning Methods [??tttt??]
-		Highest Version Failed:     **ERROR** Only one numerical version sequence is allowed in a filename; there are multiple in [??tttt??].
-		New Version Failed:         **ERROR** Only one numerical version sequence is allowed in a filename; there are multiple in [??tttt??].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** Only one numerical version sequence is allowed in a filename; there are multiple in [??tttt??].
+		New Version Name:              		New Version Failed:         **ERROR** Only one numerical version sequence is allowed in a filename; there are multiple in [??tttt??].
 
 Testing Date-Only Versioning
 	Testing Versioning Methods [tttt{ddMMMyyyy}.tmp]
@@ -859,7 +859,7 @@ Testing Date-Only Versioning
 		High version changed FileName: 1
 
 	Testing Versioning Methods [tt{d}tt{MMM}.tmp]
-		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{d}tt{MMM}.tmp] in [.].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{d}tt{MMM}.tmp] in [.].
 
 	Testing Versioning Methods [tt{d}tt{MMMM}.tmp]
 		Highest Version Name:          tt2ttDecember.tmp
@@ -868,14 +868,14 @@ Testing Date-Only Versioning
 		High version changed FileName: 1
 
 	Testing Versioning Methods [tt{dd}.tmp]
-		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{dd}.tmp] in [.].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{dd}.tmp] in [.].
 
 	Testing Versioning Methods [tttt{dd}.tmp]
-		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tttt{dd}.tmp] in [.].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tttt{dd}.tmp] in [.].
 
 	Testing Versioning Methods [tttt{aaaa}.tmp]
-		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [tttt{aaaa}.tmp].
-		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [tttt{aaaa}.tmp].
+		Highest Version Name:          		Highest Version Failed:     **ERROR** The date version sequences are not recognized in the file named [tttt{aaaa}.tmp].
+		New Version Name:              		New Version Failed:         **ERROR** The date version sequences are not recognized in the file named [tttt{aaaa}.tmp].
 
 Testing Date and Numerical Versioning Combined
 	Testing Versioning Methods [$TEMPORARY/{MMM}-{dd}-{yy}_v???.tmp]

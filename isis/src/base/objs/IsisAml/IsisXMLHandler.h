@@ -33,7 +33,8 @@ namespace XERCES = XERCES_CPP_NAMESPACE;
  * @internal
  */
 class IsisXMLHandler : public XERCES::DefaultHandler {
-
+  using XERCES::DefaultHandler::ignorableWhitespace;
+  
   public:
 
     ContentHandler *prevDocHandler;
@@ -93,6 +94,3 @@ class IsisXMLHandler : public XERCES::DefaultHandler {
 
 
 #endif
-
-
-

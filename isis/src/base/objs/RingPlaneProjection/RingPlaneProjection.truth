@@ -212,9 +212,9 @@ Test Error Throws for invalid inputs to conversion methods
 **ERROR** Unable to convert to 180 degree domain. The given ring longitude value [-1.79769313486231e+308] is invalid.
 **ERROR** Unable to convert to 360 degree domain. The given ring longitude value [-1.79769313486231e+308] is invalid.
 **ERROR** Unable to convert to Clockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
-**ERROR** Unable to convert ring longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert ring longitude.  Domain [-2147483647] is not 180 or 360.
 **ERROR** Unable to convert to Clockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
-**ERROR** Unable to convert ring longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert ring longitude.  Domain [-2147483647] is not 180 or 360.
 **ERROR** Unable to convert to CounterClockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
 
 ///////////////////////////////////////////////////////////

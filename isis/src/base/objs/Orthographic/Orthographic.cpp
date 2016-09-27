@@ -143,7 +143,7 @@ namespace Isis {
         QString msg = "The longitude range cannot exceed 360 degrees.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-    
+
       sinphi = sin(m_minimumLatitude * PI / 180.0);
       cosphi = cos(m_minimumLatitude * PI / 180.0);
 
@@ -208,18 +208,18 @@ namespace Isis {
    }
 
    /**
-    * Returns the center latitude, in degrees. 
-    *  
-    * **NOTE** In the case of Orthographic projections, there is NO latitude 
-    * that is entirely true to scale. The only true scale for this projection is 
-    * at the single point, (center latitude, center longitude). 
+    * Returns the center latitude, in degrees.
+    *
+    * **NOTE** In the case of Orthographic projections, there is NO latitude
+    * that is entirely true to scale. The only true scale for this projection is
+    * at the single point, (center latitude, center longitude).
     *
     * @return double The center latitude.
     */
    double Orthographic::TrueScaleLatitude() const {
      //Snyder pg. 45
      // no distortion at center of projection (centerLatitude, centerLongitude)
-     return m_centerLatitude * 180.0 / PI;// Change to true scale 
+     return m_centerLatitude * 180.0 / PI;// Change to true scale
    }
 
   /**
@@ -291,7 +291,7 @@ namespace Isis {
     rho = sqrt(GetX() * GetX() + GetY() * GetY());
 
     /* Error calculating rho - should be less than equatorial radius.
-     * 
+     *
      * This if statement included "fabs(rho - m_equatorialRadius) < 1E-10 ||"
      * to make the method more stable for limbs but this caused a false failure
      * for some images when rho == m_equatorialRadius.
@@ -340,7 +340,7 @@ namespace Isis {
 
     // Cleanup the longitude
     if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
-    
+
     /*
      * When the longitude range is 0 to 360 and the seam is within the 180 displayable degrees,
      * the longitude needs to be converted to its 360 lon domain counterpart. However, if the
@@ -358,7 +358,7 @@ namespace Isis {
     // Cleanup the latitude
     if (IsPlanetocentric())
       m_latitude = ToPlanetocentric(m_latitude);
-    
+
     m_good = true;
     return m_good;
   }
@@ -386,7 +386,7 @@ namespace Isis {
    *
    * @return bool
    */
-  bool Orthographic::XYRange(double &minX, double &maxX, 
+  bool Orthographic::XYRange(double &minX, double &maxX,
                              double &minY, double &maxY) {
     double lat, lon;
 
@@ -409,11 +409,9 @@ namespace Isis {
 
     // Walk top and bottom edges
     for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
-      lat = lat;
       lon = m_minimumLongitude;
       XYRangeCheck(lat, lon);
 
-      lat = lat;
       lon = m_maximumLongitude;
       XYRangeCheck(lat, lon);
     }
@@ -421,11 +419,9 @@ namespace Isis {
     // Walk left and right edges
     for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
       lat = m_minimumLatitude;
-      lon = lon;
       XYRangeCheck(lat, lon);
 
       lat = m_maximumLatitude;
-      lon = lon;
       XYRangeCheck(lat, lon);
     }
 
@@ -455,13 +451,13 @@ namespace Isis {
      *                            o  o                  180 degrees.
      *
      */
-    
+
     for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
       double x = m_equatorialRadius * cos(angle * PI / 180.0);
       double y = m_equatorialRadius * sin(angle * PI / 180.0);
 
       if (SetCoordinate(x, y)){
-        
+
         adjustedLon =    To360Domain(m_longitude);
         if (adjustedLon > To360Domain(MinimumLongitude()) && correctedMinLon) {
           adjustedLon -= 360;
@@ -533,21 +529,20 @@ namespace Isis {
   }
 } // end namespace isis
 
-/** 
- * This is the function that is called in order to instantiate an 
+/**
+ * This is the function that is called in order to instantiate an
  * Orthographic object.
- *  
+ *
  * @param lab Cube labels with appropriate Mapping information.
- *  
- * @param allowDefaults If the label does not contain the value for 
+ *
+ * @param allowDefaults If the label does not contain the value for
  *                      CenterLongitude, this method indicates
  *                      whether the constructor should compute this value.
- * 
- * @return @b Isis::Projection* Pointer to an Orthographic projection 
+ *
+ * @return @b Isis::Projection* Pointer to an Orthographic projection
  *         object.
  */
 extern "C" Isis::Projection *OrthographicPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Orthographic(lab, allowDefaults);
 }
-

@@ -21,8 +21,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include <string>
 
 #include <xercesc/util/PlatformUtils.hpp>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "IsisXMLGroups.h"
 #include "IsisXMLChTrans.h"
+
+using namespace std;
 
 namespace XERCES = XERCES_CPP_NAMESPACE;
 
@@ -102,9 +102,3 @@ void IsisXMLGroups::startElement(const XMLCh *const uri,
   }
 
 }
-
-
-
-
-
-

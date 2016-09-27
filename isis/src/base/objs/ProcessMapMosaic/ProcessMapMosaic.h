@@ -90,14 +90,17 @@ namespace Isis {
    *                           for in the input files that make up a mosaic. This change was
    *                           needed to handle input files that are missing the min/max lat/lon
    *                           keywords (such as those that were cropped). Fixes #1500.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                            functions to ensure successful 
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
+   *                                            functions to ensure successful
    *                                            inheritance between Process and its
    *                                            child classes. Made destructor virtual.
    *                                            References #2215.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation
+   * @history 2016-08-28 Kelvin Rodriguez - Changed SetOutputCube default parameters to
+   *                         avoid hidden virtual function warnings in clang and the abiguous called
+   *                         errors. Part of porting to OS X 10.11.
    */
 
   class ProcessMapMosaic : public Isis::ProcessMosaic {
@@ -111,7 +114,7 @@ namespace Isis {
       // SetOutputCube() is not virtual in the Process class nor in the
       // ProcessMosaic class, so the following definitions for this method are
       // the only ones that are allowed for ProcessMapMosaic objects and child
-      // objects  
+      // objects
       virtual Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const QString &mosaicFile);
 
@@ -147,8 +150,10 @@ namespace Isis {
 
       Isis::Cube *RingsSetOutputCube(const QString &mosaicFile);
 
+      using Isis::ProcessMosaic::SetInputCube;
       virtual Isis::Cube *SetInputCube();
 
+      using Isis::ProcessMosaic::StartProcess;
       virtual bool StartProcess(QString inputFile);
 
     private:
@@ -163,4 +168,3 @@ namespace Isis {
 };
 
 #endif
-

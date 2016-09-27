@@ -8,6 +8,7 @@ The equation is:  "1 + 2"
 Does the empty one compile correctly: 1
 Did this compile correctly: 1
 Testing compile's exception.
+Did this compile correctly: 
 "**USER ERROR** Missing an operator before @."
 This should throw an exception: 
 "**USER ERROR** Missing an operator before 2."

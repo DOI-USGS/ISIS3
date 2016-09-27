@@ -63,8 +63,8 @@ namespace Isis {
 
 
   /**
-   * Extract all the FITS labels from the file. This includes the labels for the main and each 
-   * extensions 
+   * Extract all the FITS labels from the file. This includes the labels for the main and each
+   * extensions
    *
    */
   void ProcessImportFits::extractFitsLabels() {
@@ -79,7 +79,7 @@ namespace Isis {
     unsigned int place;
 
     // The main FITS label starts at the beginning of the file
-    // FITS extension labels start after the previous data and on a 2080 byte boundry 
+    // FITS extension labels start after the previous data and on a 2080 byte boundry
     // Each FITS keyword in all lables is store in 80 bytes (space padded to 80 if necessary)
 
     // Start at the beginning of the file for the main FITS label
@@ -95,7 +95,7 @@ namespace Isis {
       line = readBuf;
       place = 80;
 
-      // Process each fits label record (80 bytes) and place keyword, value pairs into PvlKeywords 
+      // Process each fits label record (80 bytes) and place keyword, value pairs into PvlKeywords
       // with any associated comments
       while (line.substr(0, 3) != "END") {
 
@@ -159,12 +159,12 @@ namespace Isis {
       // NOTE: For now we only handle image data (i.e., keywords BITPIX & NAXIS & NAXISx must exist)
       // Does this look like a label for a FITS image? Stop after the first label that does not
       // because we don't know how to move the file pointer past a non-image data extension.
-      if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") && 
+      if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") &&
           fitsLabel->hasKeyword("NAXIS1")) {
 
         int bytesPerPixel = 0;
         bytesPerPixel = (int)((*fitsLabel)["BITPIX"]);
-        bytesPerPixel = fabs(bytesPerPixel);
+        bytesPerPixel = std::abs(bytesPerPixel);
         bytesPerPixel /= 8;
 
         unsigned int axis1 = 1;
@@ -201,8 +201,8 @@ namespace Isis {
 
 
   /**
-   * Supplies the requested FITS label 
-   * 
+   * Supplies the requested FITS label
+   *
    * @param labelNumber FITS label number. zero (0) is the first/main label
    * @return PvlGroup version of a FITS label corrisponding to requested label number
    */
@@ -229,8 +229,8 @@ namespace Isis {
 
 
   /**
-   * Return a populated instrument group 
-   *  
+   * Return a populated instrument group
+   *
    * @param a FITS label after being converted to a PvlGroup
    * @return an instrument group filled with keywords from the FITS label
    */
@@ -258,8 +258,8 @@ namespace Isis {
 
 
   /**
-   * Opens a FITS file and reads the FITS labels 
-   * 
+   * Opens a FITS file and reads the FITS labels
+   *
    * @param fitsFile Name of the FITS file to open
    */
   void ProcessImportFits::setFitsFile(FileName fitsFile) {
@@ -290,13 +290,13 @@ namespace Isis {
 
 
   /**
-   * Sets the Process file structure parameters based on the FITS labels of choice. NOTE: The 
-   * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before 
-   * the output file is created. 
-   *  
-   * @param labelNumber FITS label number. Zero indicates the first/main label, one indicates the 
+   * Sets the Process file structure parameters based on the FITS labels of choice. NOTE: The
+   * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before
+   * the output file is created.
+   *
+   * @param labelNumber FITS label number. Zero indicates the first/main label, one indicates the
    *                    first extension, etc...
-   * 
+   *
    */
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
@@ -409,4 +409,3 @@ namespace Isis {
   }
 
 } // end namespace Isis
-

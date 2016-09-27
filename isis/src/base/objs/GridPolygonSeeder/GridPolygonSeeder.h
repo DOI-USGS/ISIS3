@@ -70,7 +70,7 @@ namespace Isis {
 
       std::vector<geos::geom::Point *> Seed(const geos::geom::MultiPolygon *mp);
 
-      const bool SubGrid() {
+      bool SubGrid() {
         return p_subGrid;
       }
       virtual PvlGroup PluginParameters(QString grpName);

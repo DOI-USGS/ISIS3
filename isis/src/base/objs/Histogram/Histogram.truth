@@ -409,7 +409,7 @@ Mode:                  0
 Skew:                  0.126577
 Percent(0.5):          0
 Percent(99.5):         10
-**PROGRAMMER ERROR** Minimum is invalid since you removed data.
+Minimum:               **PROGRAMMER ERROR** Minimum is invalid since you removed data.
 Changing BinRange for b-vector's histogram...
 
 ++++++++++++++++++ Statistics Counters ++++++++++++++++++

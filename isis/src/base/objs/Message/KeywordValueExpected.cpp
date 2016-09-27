@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include "Message.h"
+
+using namespace std;
 
 QString Isis::Message::KeywordValueExpected(const QString &key) {
   return "Keyword value for [" + key + "] expected but was not found";

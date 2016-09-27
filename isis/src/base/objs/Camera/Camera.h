@@ -208,9 +208,9 @@ namespace Isis {
    *                           check-in. Fixes #2243.
    *   @history 2015-05-15 Kris Becker - Set ShapeModel state in SetImage() to reflect no
    *                           intersection before attempting to map to surface. Fixes #2252.
-   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override
    *                           Sensor's pure virtual methods.
-   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument
    *                           names as well as public member getters. Updated unit test.
    *                           References #2335.
    *   @history 2016-06-27 Kelvin Rodriguez - Added member function to compute celestial north
@@ -536,8 +536,7 @@ namespace Isis {
       CameraGroundMap *p_groundMap;          //!< A pointer to the GroundMap
       CameraSkyMap *p_skyMap;                //!< A pointer to the SkyMap
 
-      double ComputeAzimuth(Distance radius,
-                            const double lat, const double lon);
+      double ComputeAzimuth(const double lat, const double lon);
 
       bool RawFocalPlanetoImage();
 

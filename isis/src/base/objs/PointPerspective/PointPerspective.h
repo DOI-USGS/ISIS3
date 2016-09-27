@@ -31,18 +31,18 @@ namespace Isis {
    * @brief PointPerspective Map Projection
    *
    * This class provides methods for the forward and inverse equations of an
-   * PointPerspective map projection (for a sphere). 
-   *  
-   *  
-   *  
-   * The code was converted to C++ from the C version of the USGS General 
-   * Cartographic Transformation Package (GCTP). This class inherits Projection 
-   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
-   * (inverse) and a third virtual method, XYRange, for obtaining projection 
-   * coordinate coverage for a latitude/longitude window. 
-   *  
-   * Please see the Projection class for a full accounting of all the methods 
-   * available. 
+   * PointPerspective map projection (for a sphere).
+   *
+   *
+   *
+   * The code was converted to C++ from the C version of the USGS General
+   * Cartographic Transformation Package (GCTP). This class inherits Projection
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate
+   * (inverse) and a third virtual method, XYRange, for obtaining projection
+   * coordinate coverage for a latitude/longitude window.
+   *
+   * Please see the Projection class for a full accounting of all the methods
+   * available.
    *
    * @ingroup MapProjection
    *
@@ -56,6 +56,8 @@ namespace Isis {
    *                           some coding standards. References #928.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed useless var=var lines causing warnigns in
+   *                           clang. Part of Porting to OSX 10.11
    */
   class PointPerspective : public TProjection {
     public:

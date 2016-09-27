@@ -33,40 +33,40 @@ namespace Isis {
   class FileName;
 
   /**
-   * This class helps to call other Isis Applications in a Pipeline. This object 
+   * This class helps to call other Isis Applications in a Pipeline. This object
    * works by creating a Pipeline and setting the initial input, final
-   * output of the Pipeline which are got from the user interface. Applications 
-   * are added to the Pipeline and parameters relevant to the application are set 
-   * using relevant APIs'. 
-   *  
-   * The Pipeline will control the flow of calls to the different applications in 
-   * the Pipeline in First In First Out fashion. Also the first and last application 
-   * in the Pipeline can be explicitly set. Pipeline automatically calculates the 
-   * input to an application from the output of the previous application. 
-   *  
-   * The Pipeline branches automatically for a list file with multiple input files 
-   * or user can explicitly create branches from the Pipeline directly or from any 
-   * application in the Pipeline. The branches are required when an application 
-   * generates multiple outputs. Branches may be disabled / enabled and the Pipeline 
-   * will figure out the input for an application whose previous app in the same 
-   * branch was disabled. 
-   *  
-   * Parameters for an application in a branch can be set commonly for all branches 
-   * or explicitly for a branch by specifiying the branch name. 
-   *  
-   * Option continue allows the pipeline to proceed with the execution inspite of any 
-   * exceptions encountered while running an application in the pipeline. If continue 
+   * output of the Pipeline which are got from the user interface. Applications
+   * are added to the Pipeline and parameters relevant to the application are set
+   * using relevant APIs'.
+   *
+   * The Pipeline will control the flow of calls to the different applications in
+   * the Pipeline in First In First Out fashion. Also the first and last application
+   * in the Pipeline can be explicitly set. Pipeline automatically calculates the
+   * input to an application from the output of the previous application.
+   *
+   * The Pipeline branches automatically for a list file with multiple input files
+   * or user can explicitly create branches from the Pipeline directly or from any
+   * application in the Pipeline. The branches are required when an application
+   * generates multiple outputs. Branches may be disabled / enabled and the Pipeline
+   * will figure out the input for an application whose previous app in the same
+   * branch was disabled.
+   *
+   * Parameters for an application in a branch can be set commonly for all branches
+   * or explicitly for a branch by specifiying the branch name.
+   *
+   * Option continue allows the pipeline to proceed with the execution inspite of any
+   * exceptions encountered while running an application in the pipeline. If continue
    * is not enabled, then on encountering  an exception the pipeline exits.
-   *  
-   * Temporary files are created and will be deleted when explicitly set by the user. 
-   *  
-   * The Pipeline calls cubeatt app inherently if virtual bands are true. 
-   *  
-   * It is suggested that you "cout" this object in order to debug you're usage of 
+   *
+   * Temporary files are created and will be deleted when explicitly set by the user.
+   *
+   * The Pipeline calls cubeatt app inherently if virtual bands are true.
+   *
+   * It is suggested that you "cout" this object in order to debug you're usage of
    * the class.
-   *  
-   * Refer to Applications thmproc, mocproc, hidestripe, hiproc, hinoise2 for Pipeline usage. 
-   *  
+   *
+   * Refer to Applications thmproc, mocproc, hidestripe, hiproc, hinoise2 for Pipeline usage.
+   *
    * Here's an example usage of this class:
    * @code
    * UserInterface &ui = Application::GetUserInterface();
@@ -76,8 +76,8 @@ namespace Isis {
    * p.SetOutputFile("TO");
    *
    * p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
-   *  
-   * // The app "thm2isis" generates multiple outputs for a single input. 
+   *
+   * // The app "thm2isis" generates multiple outputs for a single input.
    * // Hence the branches have to be created to process the outputs odd, even.
    * p.AddToPipeline("thm2isis");
    * p.Application("thm2isis").SetInputParameter("FROM", false);
@@ -146,7 +146,7 @@ namespace Isis {
    *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed
    *                           with execution even if an application in the
    *                           pipeline encounters an exception.
-   *   @history 2011-08-15 Debbie A. Cook - Added member p_pausePosition and 
+   *   @history 2011-08-15 Debbie A. Cook - Added member p_pausePosition and
    *                           method AddPause and modified method Run to allow
    *                           the pipeline to be stopped temporarily and
    *                           resumed.  When AddPause is used, Run will need to
@@ -156,6 +156,8 @@ namespace Isis {
    *   @history 2012-11-21 Jeannie Backer - Added Progress output to indicate
    *                           which application is running. Added padding to
    *                           control statements. References # 795.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed useless if statement comparing
+   *                           a reference variable to Null. Part of porting to OS X 10.11.
    */
   class Pipeline {
     public:
@@ -216,18 +218,18 @@ namespace Isis {
       QString OriginalInput(unsigned int branch) {
         return ((branch < p_originalInput.size()) ? p_originalInput[branch] : "");
       }
-      
+
       //! Returns the number of input files
       int OriginalInputSize() {
          return p_originalInput.size();
       }
-      
+
       /**
-       * Returns the total number of input branches 
+       * Returns the total number of input branches
        * Original branches = Number of input files * Number of branches
-       * 
+       *
        * @author Sharmila Prasad (12/20/2010)
-       * 
+       *
        * @return int - Total number of branches
        */
       int OriginalBranchesSize() {
@@ -236,8 +238,8 @@ namespace Isis {
         }
         return p_inputBranches.size();
       }
-      
-      //! Returns the names of the original branches of the pipeline 
+
+      //! Returns the names of the original branches of the pipeline
       //! (input files * branches if any)
       std::vector<QString> OriginalBranches() {
         if (p_originalBranches.size() > 0){
@@ -245,17 +247,17 @@ namespace Isis {
         }
         return p_inputBranches;
       }
-      
+
       QString FinalOutput(int branch = 0, bool addModifiers = true);
       QString TemporaryFolder();
 
       void EnableAllApplications();
-      
+
       /**
        * Start off the branches directly from the pipeline
-       * 
+       *
        * @author Sharmila Prasad (12/20/2010)
-       * 
+       *
        * @param branch - Branch name to be added
        */
       void AddOriginalBranch(QString branch){
@@ -269,12 +271,12 @@ namespace Isis {
           }
         }
       }
-      
+
       /**
        * Set the continue flag
-       * 
+       *
        * @author Sharmila Prasad (2/9/2011)
-       * 
+       *
        * @param pbFlag - true/false
        */
       void SetContinue(bool pbFlag) {

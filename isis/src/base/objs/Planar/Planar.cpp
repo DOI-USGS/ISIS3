@@ -247,7 +247,7 @@ namespace Isis {
     // compute radius and azimuth in degrees
     m_ringRadius = sqrt(x*x + y*y);
 
-    if (y == 0.0) 
+    if (y == 0.0)
       m_ringLongitude = m_ringLongitude;
     else
       m_ringLongitude = atan2(y,x)  + m_centerRingLongitude;
@@ -394,7 +394,7 @@ namespace Isis {
    */
   bool Planar::XYRange(double &minX, double &maxX,
                              double &minY, double &maxY) {
-    
+
     double rad, az;
 
     // Check the corners of the rad/az range
@@ -403,61 +403,25 @@ namespace Isis {
     XYRangeCheck(m_minimumRingRadius, m_maximumRingLongitude);
     XYRangeCheck(m_maximumRingRadius, m_maximumRingLongitude);
 
-//cout << " ************ WALK RADIUS ******************\n";
-//cout << "MIN RAD: " << m_minimumRingRadius << " MAX LAT: " << m_maximumRingRadius << "\n";
     // Walk top and bottom edges in half pixel increments
     double radiusInc = 2. * (m_maximumRingRadius - m_minimumRingRadius) / PixelResolution();
 
     for (rad = m_minimumRingRadius; rad <= m_maximumRingRadius; rad += radiusInc) {
-//cout << "WALKED A STEP - rad: " << rad << "\n";
-      rad = rad;
       az = m_minimumRingLongitude;
       XYRangeCheck(rad, az);
 
-      rad = rad;
       az = m_maximumRingLongitude;
       XYRangeCheck(rad, az);
-//cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
     }
 
-//cout << " ************ WALK AZIMUTH ******************\n";
     // Walk left and right edges
     for (az = m_minimumRingLongitude; az <= m_maximumRingLongitude; az += 0.01) {
       rad = m_minimumRingRadius;
-      az = az;
       XYRangeCheck(rad, az);
 
       rad = m_maximumRingRadius;
-      az = az;
       XYRangeCheck(rad, az);
     }
-
-    // Walk the limb 
-/*
-    for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
-      double x = m_equatorialRadius * cos(angle * PI / 180.0);
-      double y = m_equatorialRadius * sin(angle * PI / 180.0);
-      if (SetCoordinate(x, y) == 0) {
-        if (m_latitude > m_maximumLatitude) {
-          continue;
-        }
-        if (m_longitude > m_maximumRingLongitude) {
-          continue;
-        }
-        if (m_latitude < m_minimumLatitude) {
-          continue;
-        }
-        if (m_longitude < m_minimumRingLongitude) {
-          continue;
-        }
-
-        if (m_minimumX > x) m_minimumX = x;
-        if (m_maximumX < x) m_maximumX = x;
-        if (m_minimumY > y) m_minimumY = y;
-        if (m_maximumY < y) m_maximumY = y;
-        XYRangeCheck(m_latitude, m_longitude);
-      }
-    } */
 
     // Make sure everything is ordered
     if (m_minimumX >= m_maximumX) return false;
@@ -503,7 +467,7 @@ namespace Isis {
   PvlGroup Planar::MappingRingRadii() {
     PvlGroup mapping = RingPlaneProjection::MappingRingRadii();
 
-    if (HasGroundRange()) 
+    if (HasGroundRange())
       mapping += m_mappingGrp["CenterRingRadius"];
 
     return mapping;
@@ -518,7 +482,7 @@ namespace Isis {
   PvlGroup Planar::MappingRingLongitudes() {
     PvlGroup mapping = RingPlaneProjection::MappingRingLongitudes();
 
-    if (HasGroundRange()) 
+    if (HasGroundRange())
       mapping += m_mappingGrp["CenterRingLongitude"];
 
     return mapping;
@@ -526,16 +490,16 @@ namespace Isis {
 
 } // end namespace isis
 
-/** 
- * This is the function that is called in order to instantiate an 
+/**
+ * This is the function that is called in order to instantiate an
  * Planar object.
- *  
+ *
  * @param lab Cube labels with appropriate Mapping information.
- *  
- * @param allowDefaults If the label does not contain the value for 
+ *
+ * @param allowDefaults If the label does not contain the value for
  *                      CenterRingLongitude, this method indicates
  *                      whether the constructor should compute this value.
- * 
+ *
  * @return @b Isis::Projection* Pointer to an Planar projection
  *         object.
  */
@@ -543,4 +507,3 @@ extern "C" Isis::Projection *PlanarPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Planar(lab, allowDefaults);
 }
-

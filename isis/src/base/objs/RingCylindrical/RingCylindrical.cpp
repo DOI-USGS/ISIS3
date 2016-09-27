@@ -71,7 +71,7 @@ namespace Isis {
         mapGroup += PvlKeyword("CenterRingRadius", toString(radius));
       }
 
-      // Get the center ring radius and center ring longitude. 
+      // Get the center ring radius and center ring longitude.
       m_centerRingLongitude = mapGroup["CenterRingLongitude"];
       m_centerRingRadius = mapGroup["CenterRingRadius"];
 
@@ -140,7 +140,7 @@ namespace Isis {
    *   the same as an image projected at 360.
    *
    *
-   * @return @b bool true if the projection is equatorial 
+   * @return @b bool true if the projection is equatorial
    *         cylindrical
    */
   bool RingCylindrical::IsEquatorialCylindrical() {
@@ -198,7 +198,7 @@ namespace Isis {
    *
    * @param ringLongitude Ring longitude (azimuth) value to project
    *
-   * @return @b bool Indicates whether the x and y values were successfully 
+   * @return @b bool Indicates whether the x and y values were successfully
    *         calculated and whether the ground values were successfully set.
    */
   bool RingCylindrical::SetGround(const double ringRadius, const double ringLongitude) {
@@ -248,10 +248,10 @@ namespace Isis {
    * @param y Y coordinate of the projection in units that are the same as the
    *          radii in the label
    *
-   * @return @b bool Indicates whether the ring radius and longitude were 
+   * @return @b bool Indicates whether the ring radius and longitude were
    *         successfully calculated and whether the coordinate was
-   *         successfully set.  
-   */ 
+   *         successfully set.
+   */
   bool RingCylindrical::SetCoordinate(const double x, const double y) {
     // Save the coordinate
     SetXY(x, y);
@@ -280,132 +280,10 @@ namespace Isis {
     return m_good;
   }
 
-  /**
-   * This method is used to determine the x/y range which completely covers the
-   * area of interest specified by the radus/lon range. The radius/longitude
-   * range may be obtained from the labels. This method should not be used if
-   * HasGroundRange is false. The purpose of this method is to return the x/y
-   * range so it can be used to compute how large a map may need to be. For
-   * example, how big a piece of paper is needed or how large of an image needs
-   * to be created. This is method and therefore must be written by the derived
-   * class (e.g., RingCylindrical). The method may fail as indicated by its return
-   * value.
-   *
-   * 
-   * @param &minX Reference to the address where the minimum x 
-   *             coordinate value will be written.  The Minimum x projection
-   *             coordinate calculated by this method covers the
-   *             radius/longitude range specified in the labels.
-   *
-   * @param &maxX Reference to the address where the maximum x 
-   *             coordinate value will be written.  The Maximum x projection
-   *             coordinate calculated by this method covers the
-   *             radius/longitude range specified in the labels.
-   *
-   * @param &minY Reference to the address where the minimum y 
-   *             coordinate value will be written.  The Minimum y projection
-   *             coordinate calculated by this method covers the
-   *             radius/longitude range specified in the labels.
-   *
-   * @param &maxY Reference to the address where the maximum y 
-   *             coordinate value will be written.  The Maximum y projection
-   *             coordinate calculated by this method covers the
-   *             radius/longitude range specified in the labels.
-   * 
-   * @return @b bool Indicates whether the method was able to determine the X/Y 
-   *              Range of the projection.  If yes, minX, maxX, minY, maxY will
-   *              be set with these values.
-   *
-   */
-  bool RingCylindrical::XYRange(double &minX, double &maxX, 
-                           double &minY, double &maxY) {
-    
-    double rad, az;
-
-    // Check the corners of the rad/az range
-    XYRangeCheck(m_minimumRingRadius, m_minimumRingLongitude);
-    XYRangeCheck(m_maximumRingRadius, m_minimumRingLongitude);
-    XYRangeCheck(m_minimumRingRadius, m_maximumRingLongitude);
-    XYRangeCheck(m_maximumRingRadius, m_maximumRingLongitude);
-
-// cout << " ************ WALK RADIUS ******************\n";
-// cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
-    // Walk top and bottom edges in half pixel increments
-    double radiusInc = 2. * (m_maximumRingRadius - m_minimumRingRadius) / PixelResolution();
-
-    for (rad = m_minimumRingRadius; rad <= m_maximumRingRadius; rad += radiusInc) {
-// cout << "WALKED A STEP - rad: " << rad << "\n";
-      rad = rad;
-      az = m_minimumRingLongitude;
-      XYRangeCheck(rad, az);
-
-      rad = rad;
-      az = m_maximumRingLongitude;
-      XYRangeCheck(rad, az);
-// cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
-    }
-
-//cout << " ************ WALK AZIMUTH ******************\n";
-    // Walk left and right edges
-    for (az = m_minimumRingLongitude; az <= m_maximumRingLongitude; az += 0.01) {
-      rad = m_minimumRingRadius;
-      az = az;
-      XYRangeCheck(rad, az);
-
-      rad = m_maximumRingRadius;
-      az = az;
-      XYRangeCheck(rad, az);
-    }
-
-    // Walk the limb 
-/*
-    for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
-      double x = m_equatorialRingRadius * cos(angle * PI / 180.0);
-      double y = m_equatorialRingRadius * sin(angle * PI / 180.0);
-      if (SetCoordinate(x, y) == 0) {
-        if (m_latitude > m_maximumLatitude) {
-          continue;
-        }
-        if (m_longitude > m_maximumRingLongitude) {
-          continue;
-        }
-        if (m_latitude < m_minimumLatitude) {
-          continue;
-        }
-        if (m_longitude < m_minimumRingLongitude) {
-          continue;
-        }
-
-        if (m_minimumX > x) m_minimumX = x;
-        if (m_maximumX < x) m_maximumX = x;
-        if (m_minimumY > y) m_minimumY = y;
-        if (m_maximumY < y) m_maximumY = y;
-        XYRangeCheck(m_latitude, m_longitude);
-      }
-    } */
-
-    // Make sure everything is ordered
-    if (m_minimumX >= m_maximumX) return false;
-    if (m_minimumY >= m_maximumY) return false;
-
-    // Return X/Y min/maxs
-    // m_maximumX = m_maximumRingRadius*cos(m_maximumRingLongitude);
-    // m_minimumX = -m_maximumX;
-    // m_maximumY = m_maximumRingRadius*sin(m_maximumRingLongitude);
-    // m_minimumY = -m_maximumY;
-
-    minX = m_minimumX;
-    maxX = m_maximumX;
-    minY = m_minimumY;
-    maxY = m_maximumY;
-
-    return true;
-  }
-
 
   /**
-   * This function returns the keywords that this projection uses. For 
-   * RingCylindrical, this is the CenterRingRadius and CenterRingLongitude. 
+   * This function returns the keywords that this projection uses. For
+   * RingCylindrical, this is the CenterRingRadius and CenterRingLongitude.
    *
    * @return @b PvlGroup The keywords that this projection uses
    */
@@ -422,15 +300,15 @@ namespace Isis {
   }
 
   /**
-   * This function returns the radii keywords that this projection uses. For 
-   * RingCylindrical, this is the CenterRingRadius. 
+   * This function returns the radii keywords that this projection uses. For
+   * RingCylindrical, this is the CenterRingRadius.
    *
    * @return @b PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup RingCylindrical::MappingRingRadii() {
     PvlGroup mapping = RingPlaneProjection::MappingRingRadii();
 
-    if (HasGroundRange()) 
+    if (HasGroundRange())
       mapping += m_mappingGrp["CenterRingRadius"];
 
     return mapping;
@@ -438,32 +316,118 @@ namespace Isis {
 
 
   /**
-   * This function returns the longitude keywords that this projection uses. For 
-   * RingCylindrical, this is the CenterRingLongitude. 
+   * This function returns the longitude keywords that this projection uses. For
+   * RingCylindrical, this is the CenterRingLongitude.
    *
    * @return @b PvlGroup The ring longitude keywords that this projection uses
    */
   PvlGroup RingCylindrical::MappingRingLongitudes() {
     PvlGroup mapping = RingPlaneProjection::MappingRingLongitudes();
 
-    if (HasGroundRange()) 
+    if (HasGroundRange())
       mapping += m_mappingGrp["CenterRingLongitude"];
 
     return mapping;
   }
 
+
+      /**
+       * This method is used to determine the x/y range which completely covers the
+       * area of interest specified by the radius/lon range. The radius/longitude
+       * range may be obtained from the labels. This method should not be used if
+       * HasGroundRange is false. The purpose of this method is to return the x/y
+       * range so it can be used to compute how large a map may need to be. For
+       * example, how big a piece of paper is needed or how large of an image needs
+       * to be created. This is method and therefore must be written by the derived
+       * class (e.g., RingCylindrical). The method may fail as indicated by its return
+       * value.
+       *
+       *
+       * @param &minX Reference to the address where the minimum x
+       *             coordinate value will be written.  The Minimum x projection
+       *             coordinate calculated by this method covers the
+       *             radius/longitude range specified in the labels.
+       *
+       * @param &maxX Reference to the address where the maximum x
+       *             coordinate value will be written.  The Maximum x projection
+       *             coordinate calculated by this method covers the
+       *             radius/longitude range specified in the labels.
+       *
+       * @param &minY Reference to the address where the minimum y
+       *             coordinate value will be written.  The Minimum y projection
+       *             coordinate calculated by this method covers the
+       *             radius/longitude range specified in the labels.
+       *
+       * @param &maxY Reference to the address where the maximum y
+       *             coordinate value will be written.  The Maximum y projection
+       *             coordinate calculated by this method covers the
+       *             radius/longitude range specified in the labels.
+       *
+       * @return @b bool Indicates whether the method was able to determine the X/Y
+       *              Range of the projection.  If yes, minX, maxX, minY, maxY will
+       *              be set with these values.
+       *
+       */
+      bool RingCylindrical::XYRange(double &minX, double &maxX,
+                               double &minY, double &maxY) {
+
+        double rad, az;
+
+        // Check the corners of the rad/az range
+        XYRangeCheck(m_minimumRingRadius, m_minimumRingLongitude);
+        XYRangeCheck(m_maximumRingRadius, m_minimumRingLongitude);
+        XYRangeCheck(m_minimumRingRadius, m_maximumRingLongitude);
+        XYRangeCheck(m_maximumRingRadius, m_maximumRingLongitude);
+
+        // Walk top and bottom edges in half pixel increments
+        double radiusInc = 2. * (m_maximumRingRadius - m_minimumRingRadius) / PixelResolution();
+
+        for (rad = m_minimumRingRadius; rad <= m_maximumRingRadius; rad += radiusInc) {
+          az = m_minimumRingLongitude;
+          XYRangeCheck(rad, az);
+
+          az = m_maximumRingLongitude;
+          XYRangeCheck(rad, az);
+        }
+
+        // Walk left and right edges
+        for (az = m_minimumRingLongitude; az <= m_maximumRingLongitude; az += 0.01) {
+          rad = m_minimumRingRadius;
+          XYRangeCheck(rad, az);
+
+          rad = m_maximumRingRadius;
+          XYRangeCheck(rad, az);
+        }
+
+        // Make sure everything is ordered
+        if (m_minimumX >= m_maximumX) return false;
+        if (m_minimumY >= m_maximumY) return false;
+
+        // Return X/Y min/maxs
+        // m_maximumX = m_maximumRingRadius*cos(m_maximumRingLongitude);
+        // m_minimumX = -m_maximumX;
+        // m_maximumY = m_maximumRingRadius*sin(m_maximumRingLongitude);
+        // m_minimumY = -m_maximumY;
+
+        minX = m_minimumX;
+        maxX = m_maximumX;
+        minY = m_minimumY;
+        maxY = m_maximumY;
+
+        return true;
+      }
 } // end namespace isis
 
-/** 
- * This is the function that is called in order to instantiate a 
+/**
+ * This is the function that is called in order to instantiate a
  * RingCylindrical object.
- *  
+ *
  * @param lab Cube labels with appropriate Mapping information.
- *  
- * @param allowDefaults Indicates whether CenterLongitude is allowed to be 
+ *
+ * @param allowDefaults Indicates whether CenterLongitude is allowed to be
  *                      computed.
- * 
- * @return @b Isis::Projection* Pointer to a RingCylindrical 
+ *
+ * @return @b Isis::Projection* Pointer to a RingCylindrical
  *                              projection object.
  */
 extern "C" Isis::Projection *RingCylindricalPlugin(Isis::Pvl &lab,

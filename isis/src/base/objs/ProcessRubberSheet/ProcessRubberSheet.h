@@ -36,14 +36,14 @@ namespace Isis {
    * @brief Derivative of Process, designed for geometric transformations
    *
    * This is the processing class for geometric transformations of cube data.
-   * Objects of this class can be used to apply rubber sheet transformations 
-   * from one space to another, such as converting from one map projection to 
-   * another or from instrument space to ground space. Each pixel position in 
-   * the output cube will be processed by querying a transformer to find what 
-   * input pixel should be used and an interpolator to find the value of the 
-   * pixel. Any application using this class must supply a Transform object and 
-   * an Interpolator object. This class allows only one input cube and one 
-   * output cube. 
+   * Objects of this class can be used to apply rubber sheet transformations
+   * from one space to another, such as converting from one map projection to
+   * another or from instrument space to ground space. Each pixel position in
+   * the output cube will be processed by querying a transformer to find what
+   * input pixel should be used and an interpolator to find the value of the
+   * pixel. Any application using this class must supply a Transform object and
+   * an Interpolator object. This class allows only one input cube and one
+   * output cube.
    *
    * @ingroup HighLevelCubeIO
    *
@@ -91,13 +91,13 @@ namespace Isis {
    *                           of just the outline of the quad).
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                            $temporary variable instead of /tmp directory.
-   *   @history 2012-05-07 Jeff Anderson - Added the forward patch algorithm. 
-   *   @history 2012-05-15 Jeff Anderson - Added UniqueCachingAlgorithm to 
+   *   @history 2012-05-07 Jeff Anderson - Added the forward patch algorithm.
+   *   @history 2012-05-15 Jeff Anderson - Added UniqueCachingAlgorithm to
    *                           reverse patch algorithm (startProcess)
    *   @history 2012-07-11 Jeff Anderson - Fixed a bug in the reverse patch
    *                           algorithm.  When an input patch contains the
    *                           0/360 seam (or -180/180) it caused stripes in
-   *                           certain output projections (cylindrical). 
+   *                           certain output projections (cylindrical).
    *                           This has been fixed by making sure the output
    *                           patch size is not too large.
    *   @history 2012-08-03 Kimberly Oyama and Steven Lambright - Changed the
@@ -107,11 +107,11 @@ namespace Isis {
    *                           results on different machines due to double
    *                           rounding error. References #604.
    *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to StartProcess
-   *                                            function to ensure successful 
+   *                                            function to ensure successful
    *                                            inheritance between Process and its
    *                                            child classes.  Made destructor virtual.
    *                                            References #2215.
-   *  
+   *
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation
    */
@@ -123,6 +123,7 @@ namespace Isis {
       //! Destroys the RubberSheet object.
       virtual ~ProcessRubberSheet() {};
 
+      using Isis::Process::StartProcess;
       // Output driven processing method for one input and output cube
       virtual void StartProcess(Transform &trans, Interpolator &interp);
 
@@ -138,11 +139,11 @@ namespace Isis {
       }
 
       /**
-       * This sets the start and end tile sizes for the rubber sheet; numbers 
+       * This sets the start and end tile sizes for the rubber sheet; numbers
        * are inclusive and must be powers of 2.
        *
        * @param start Start position; must be at least 4 and a power of 2
-       * @param end End position; must be at least 4, a power of 2 and less than 
+       * @param end End position; must be at least 4, a power of 2 and less than
        *          start
        */
       void SetTiling(int start, int end) {
@@ -150,26 +151,26 @@ namespace Isis {
         p_endQuadSize = end;
       }
 
-      void setPatchParameters(int startSample, int startLine, 
+      void setPatchParameters(int startSample, int startLine,
                               int samples, int lines,
                               int sampleIncrement, int lineIncrement);
 
 
     private:
 
-      /** 
+      /**
        * @author ????-??-?? Unknown
        *
        * @internal
        */
       class Quad {
         public:
-          int slineTile; //!< 
-          int ssampTile; //!< 
-          int sline;     //!< 
-          int ssamp;     //!< 
-          int eline;     //!< 
-          int esamp;     //!< 
+          int slineTile; //!<
+          int ssampTile; //!<
+          int sline;     //!<
+          int ssamp;     //!<
+          int eline;     //!<
+          int esamp;     //!<
       };
 
       void ProcessQuad(std::vector<Quad *> &quadTree, Transform &trans,
@@ -178,7 +179,7 @@ namespace Isis {
 
       void SplitQuad(std::vector<Quad *> &quadTree);
       void SlowQuad(std::vector<Quad *> &quadTree, Transform &trans,
-                    std::vector< std::vector<double> > &lineMap, 
+                    std::vector< std::vector<double> > &lineMap,
                     std::vector< std::vector<double> > &sampMap);
       double Det4x4(double m[4][4]);
       double Det3x3(double m[3][3]);
@@ -190,36 +191,36 @@ namespace Isis {
                     Transform &trans, Interpolator &interp,
                     bool useLastTileMap);
 
-      bool TestLine(Transform &trans, int ssamp, int esamp, int sline, 
+      bool TestLine(Transform &trans, int ssamp, int esamp, int sline,
                     int eline, int increment);
 
       void (*p_bandChangeFunct)(const int band);
 
-      void transformPatch (double startingSample, double endingSample, 
+      void transformPatch (double startingSample, double endingSample,
                            double startingLine, double endingLine,
                            Brick &obrick, Portal &iportal,
                            Transform &trans, Interpolator &interp);
 
-      void splitPatch (double startingSample, double endingSample, 
+      void splitPatch (double startingSample, double endingSample,
                        double startingLine, double endingLine,
                        Brick &obrick, Portal &iportal,
                        Transform &trans, Interpolator &interp);
 #if 0
-      void transformPatch (double startingSample, double endingSample, 
+      void transformPatch (double startingSample, double endingSample,
                            double startingLine, double endingLine);
 
-      void splitPatch (double startingSample, double endingSample, 
+      void splitPatch (double startingSample, double endingSample,
                        double startingLine, double endingLine);
 #endif
 
-      std::vector< std::vector<double> > p_sampMap; //!< 
-      std::vector< std::vector<double> > p_lineMap; //!< 
+      std::vector< std::vector<double> > p_sampMap; //!<
+      std::vector< std::vector<double> > p_lineMap; //!<
 
-      double p_forceSamp; //!< 
-      double p_forceLine; //!< 
+      double p_forceSamp; //!<
+      double p_forceLine; //!<
 
-      int p_startQuadSize; //!< 
-      int p_endQuadSize;   //!< 
+      int p_startQuadSize; //!<
+      int p_endQuadSize;   //!<
 
       int m_patchStartSample;
       int m_patchStartLine;

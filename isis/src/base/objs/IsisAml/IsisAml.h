@@ -145,6 +145,9 @@ class QString;
  *                                       stop searching for a matched string until an
  *                                       exact match is found or it has gone through the
  *                                       entire list. Fixes #554.
+ *   @history 2016-08-28 Kelvin Rodriguez - Moved 'using namespace std' statements to be
+ *                                         after #includes to squash implicit declaration
+ *                                         warnings in clang. Part of porting to OSX 10.11.
  */
 class IsisAml : protected IsisAmlData {
 
@@ -214,7 +217,7 @@ class IsisAml : protected IsisAmlData {
     int  NumGroups() const;
 
     QString GroupName(const int &group) const;
-    
+
     //! Given the group name get its index in group array
     int GroupIndex(const QString & grpName) const;
 
@@ -325,13 +328,13 @@ class IsisAml : protected IsisAmlData {
                            const int &helper) const;
 
     //! Verify whether Parameter name is in the Include list
-    //! Used in creation of DefFile 
+    //! Used in creation of DefFile
     bool IsParamInPvlInclude(QString & paramName, std::vector<QString> & exclude);
-    
+
     //! Create Pvl with the parameters in a user defined group given the Pvl object and group name
-    void CreatePVL(Isis::Pvl &pvlDef , QString guiGrpName, QString pvlObjName, 
+    void CreatePVL(Isis::Pvl &pvlDef , QString guiGrpName, QString pvlObjName,
                    QString pvlGrpName, std::vector<QString> & exclude);
-    
+
     // Test all parameters for valid values and conditions
     void VerifyAll();
 
@@ -357,7 +360,7 @@ class IsisAml : protected IsisAmlData {
 
 
     void Verify(const IsisParameterData *param);
-    
+
     void CheckFileNamePreference(QString filename, QString paramname);
 };
 

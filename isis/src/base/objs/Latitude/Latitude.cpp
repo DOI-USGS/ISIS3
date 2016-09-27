@@ -470,7 +470,7 @@ namespace Isis {
 
     return *this;
   }
-  
+
 
   /**
    * Adds an angle to this latitude. The adding method is determined by the
@@ -523,7 +523,7 @@ namespace Isis {
     return add(angleToAdd, equatorialRadius, polarRadius, latType);
   }
 
-  
+
   /**
    * Adds another latitude to this one. Handles planetographic latitudes.
    *
@@ -537,7 +537,7 @@ namespace Isis {
   Latitude Latitude::add(Angle angleToAdd, Distance equatorialRadius, Distance polarRadius,
                          CoordinateType latType) {
     Latitude result;
-    
+
     switch (latType) {
       case Planetocentric:
         result = Latitude(planetocentric() + angleToAdd.radians(), equatorialRadius, polarRadius,
@@ -549,21 +549,22 @@ namespace Isis {
                           latType, Radians, m_errors);
         break;
     }
-    
+
     return result;
   }
 
 
   /**
    * We're overriding this method in order to do -90/90 degree checking
-   *
+   *d
    * @param angle The numeric value of the angle
    * @param units The units the angle is in (radians or degrees typically)
    * 
    * @throws IException::Programmer "Latitudes past 90 degrees are not valid. 
    *     The latitude is not allowed"
    */
-  void Latitude::setAngle(double angle, const Angle::Units &units) {
+  void Latitude::setAngle(const double &angle, const Angle::Units &units) {
+    
     
     // Check for passing 90 degrees if that error checking is on
     if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {

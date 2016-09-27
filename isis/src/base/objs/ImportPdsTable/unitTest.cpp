@@ -19,9 +19,9 @@ using namespace Isis;
 
 /**
  * Test class that allows testing protected methods in ImportPdsTable
- * 
+ *
  * @author 2016-02-24 Ian Humphrey
- * 
+ *
  * @internal
  *   @history 2016-02-24 Ian Humphrey - Original version (created for #2397).
  */
@@ -29,7 +29,7 @@ class ImportPdsTableTester : public ImportPdsTable {
 
   public:
     ImportPdsTableTester(const QString &labelFile, const QString &tableFile,
-                         QString tableName = "TABLE") 
+                         QString tableName = "TABLE")
       : ImportPdsTable(labelFile, tableFile, tableName) {}
 
     // Wrapper around ImportPdsTable protected method
@@ -59,29 +59,34 @@ class ImportPdsTableTester : public ImportPdsTable {
 
 /**
  * Unit test for ImportPdsTable
- * 
- * NOTE - exception thrown by fill Table "Unable to open file containing PDS table" seems untestable
+ *
+ * NOTE - Unit Test currently fails when running on a file system that is case insensative. (e.g
+ *        running on a local OS X hard drive )
+ *
+ *      - exception thrown by fill Table "Unable to open file containing PDS table" seems untestable
  *        as the exception is thrown if a std::ifstream is incorrectly created.
  *
  *      - Need to test getColumnFields where the condition where item size is not specified. More
  *        specifically, if (1 >= colDesc.m_itemBytes) is true.
  *        * I changed this from the original (1 < coldescr.m_itemBytes), as this condition doesn't
  *        * suggest that there is not item size specified
- * 
+ *
  *      - Need to test getColumnFields with delimited column fields in table.
- * 
+ *
  *      - makeFieldFromBinaryTable has untested conditions (such as INTEGER, SUN_INTEGER, etc.)
- * 
+ *
  *      - TODO does makeField or makeFieldFromBinaryTable actually account for multi-field columns?
- *        * colDesc.m_items and colDesc.m_itemBytes only used in getColumnDescriptor and 
+ *        * colDesc.m_items and colDesc.m_itemBytes only used in getColumnDescriptor and
  *        * getColumnFields.
- * 
+ *
  * @author original unknown
- * 
+ *
  * @internal
  *   @history 2016-06-24 Ian Humphrey - Updated to test Kris' changes to ImportPdsTable. Added tests
  *                           for getColumnDescriptor.
  *                           Fixes #2397.
+ *   @History 2016-08-26 Kelvin Rodriguez - Added note about testing on case insensative file
+ *                           systems. Part of porting to OS X 10.11
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
@@ -132,13 +137,13 @@ int main(int argc, char *argv[]) {
 
   // this test was commented out since the output is not what was expected.
   // See mantis ticket
-  // 
+  //
   //??? Table newTable2 = myTable.importTable("Apid,PacketsLength", "VIR_DATA_2");
   //??? for (int i = 0; i < newTable2[0].Fields(); i++) {
   //???   cout << newTable[0][i].name() << "\t";
   //??? }
   //??? cout << endl;//??? add mantis ticket -- appears to be failing
-  //??? 
+  //???
   //??? vector<string> cols;
   //??? cols.push_back("Apid");
   //??? cols.push_back("PacketsLength");
@@ -178,7 +183,7 @@ int main(int argc, char *argv[]) {
   pdsLabelFile = pdsTableDir + "lsb_pds_binary_table.lbl";
   pdsTableFile = pdsTableDir + "lsb_pds_binary_table.dat";
   // TEST: Use default constructor and load() method - default table name is TABLE
-  //       The next 2 lines are equivalent to calling 
+  //       The next 2 lines are equivalent to calling
   //       ImportPdsTable pdsLsbTable(pdsLabelFile, pdsTableFile, "TABLE");
   ImportPdsTable pdsLsbTable;
   pdsLsbTable.load(pdsLabelFile, pdsTableFile);
@@ -200,7 +205,7 @@ int main(int argc, char *argv[]) {
 
   // the following currently does not work for binary tables
   // implement this test if the code is fixed...
-  // 
+  //
   //??? isisTableFromLsb = pdsLsbTable.importTable("Double Value,Real Value", "LsbTable");
   //??? cout << isisTableFromLsb[0][0].name() << "\t";
   //??? cout << isisTableFromLsb[0][1].name() << endl;
@@ -271,13 +276,13 @@ int main(int argc, char *argv[]) {
 //   QStringList manyDelimited = myTestTable.getColumnFieldsWrap(rowData,
 //                                   myTestTable.getColumnDescriptorWrap(43),
 //                                   fieldsDelimiter);
-  
+
   cout << "\n\n";
 
 
 
   //  test error throws...
-  // 1) load(pdsLabFile, pdsTabFile) -  Unable to import PDS table.  
+  // 1) load(pdsLabFile, pdsTabFile) -  Unable to import PDS table.
   //        Neither of the following possible table files were found.
   try {
     cout << "Throw error for invalid table file name: " << endl;
@@ -288,7 +293,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 2) getColumnName(index) - Unable to import the binary PDS table into Isis. 
+  // 2) getColumnName(index) - Unable to import the binary PDS table into Isis.
   //        The requested column index exceeds the number of columns.
   try {
     cout << "Throw error for attempt to access invalid column index: " << endl;
@@ -299,7 +304,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 3) importTable(QStringList colNames, Qtring tableName) - Unable to import the PDS table into 
+  // 3) importTable(QStringList colNames, Qtring tableName) - Unable to import the PDS table into
   //        Isis. The requested column name does not exist in the table.
   try {
     cout << "Throw error for attempt to export non-existent columns: " << endl;
@@ -311,8 +316,8 @@ int main(int argc, char *argv[]) {
     e.print();
     cout << endl;
   }
-  
-  // 4) loadLabel(labFile, tabFile) - The PDS file does not have the required TABLE object. 
+
+  // 4) loadLabel(labFile, tabFile) - The PDS file does not have the required TABLE object.
   //        The PDS label file is probably invalid.
   try {
     cout << "Throw error for missing table location in label file:" << endl;
@@ -447,11 +452,11 @@ int main(int argc, char *argv[]) {
     e.print();
     cout << endl;
   }
- 
+
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
   //                     into Isis.
-  // 16) setByteOrder()- The column DATA_TYPE values indicate differing byte 
+  // 16) setByteOrder()- The column DATA_TYPE values indicate differing byte
   //                     orders.
   try {
     cout << "Throw error for inconsistent byte order in label file: " << endl;
@@ -493,11 +498,11 @@ int main(int argc, char *argv[]) {
   cout << "has double = " << pdsLsbTable.hasColumn("Double Value") << endl;
   cout << "col 1 name = " << pdsLsbTable.getColumnName(1)          << endl;
   QStringList names = pdsLsbTable.getColumnNames();
-  for (int i = 0; i < names.size(); i++) { 
+  for (int i = 0; i < names.size(); i++) {
     cout << names[i] << endl;
   }
   cout << "type Double Value column = " << pdsLsbTable.getType("Double Value") << endl;
-  pdsLsbTable.setType("Double Value", "MSB_INTEGER"); 
+  pdsLsbTable.setType("Double Value", "MSB_INTEGER");
   cout << "set Double Value column to type MSB_INTEGER " << endl;
   cout << "type Double Value column = " << pdsLsbTable.getType("Double Value") << endl;
 

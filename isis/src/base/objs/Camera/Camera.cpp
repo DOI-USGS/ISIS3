@@ -1869,12 +1869,11 @@ namespace Isis {
     double lat = UniversalLatitude();
     // We are in northern hemisphere
     if (lat >= 0.0) {
-      return ComputeAzimuth(LocalRadius(90.0, 0.0), 90.0, 0.0);
+      return ComputeAzimuth(90.0, 0.0);
     }
     // We are in southern hemisphere
     else {
-      double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0),
-                                      -90.0, 0.0) + 180.0;
+      double azimuth = ComputeAzimuth(-90.0, 0.0) + 180.0;
       if (azimuth > 360.0) azimuth = azimuth - 360.0;
       return azimuth;
     }
@@ -1890,7 +1889,7 @@ namespace Isis {
   double Camera::SunAzimuth() {
     double lat, lon;
     subSolarPoint(lat, lon);
-    return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
+    return ComputeAzimuth(lat, lon);
   }
 
   /**
@@ -1903,7 +1902,7 @@ namespace Isis {
   double Camera::SpacecraftAzimuth() {
     double lat, lon;
     subSpacecraftPoint(lat, lon);
-    return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
+    return ComputeAzimuth(lat, lon);
   }
 
   /**
@@ -2006,8 +2005,7 @@ namespace Isis {
    *   @todo Write PushState and PopState method to ensure the internals of the class are set based
    *         on SetImage or SetGround
    */
-  double Camera::ComputeAzimuth(Distance radius,
-                                const double lat, const double lon) {
+  double Camera::ComputeAzimuth(const double lat, const double lon) {
     // Make sure we are on the planet, if not, north azimuth is meaningless
     if (!HasSurfaceIntersection()) return Isis::Null;
 
