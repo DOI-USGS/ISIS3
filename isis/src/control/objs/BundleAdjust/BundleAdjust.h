@@ -197,6 +197,8 @@ namespace Isis {
    *                           the prefix can be used to specify the path of the location where the
    *                           matrix file should be written. Some improvements made to comply with
    *                           coding standards.
+   *   @history 2015-09-10 Ian Humphrey - Fixed include for cholmod header after updating v005
+   *                           libraries.
    *   @history 2016-07-11 Jesse Mapel - Changed m_bundleControlPoints to be a vector of
    *                           QSharedPointers to BundleControlPoints instead of a
    *                           BundleControlPointVector.  Fixes #4099.
@@ -227,6 +229,9 @@ namespace Isis {
    *                           Fixes #4279.
    *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
    *                           messages are logged to stdout. Fixes #4313.
+   *   @history 2016-08-28 Kelvin Rodriguez - Remvoed useless register keywords to squash warnigns
+   *                         in clang. Part of porting to OS X 10.11. 
+
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

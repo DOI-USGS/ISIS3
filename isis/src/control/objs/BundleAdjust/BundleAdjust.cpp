@@ -1517,7 +1517,7 @@ namespace Isis {
       return;
     }
 
-    register int i,j,k,kk;
+    int i,j,k,kk;
     double d;
 
     int nRowsB = B.size1();
@@ -1569,7 +1569,7 @@ namespace Isis {
     if ( alpha == 0.0 )
       return;
 
-    register int i,j,k,kk;
+    int i,j,k,kk;
     double d;
 
     int nRowsA = A.size1();
@@ -1641,7 +1641,7 @@ namespace Isis {
 
     // check for "matrix not positive definite" error
     if (m_cm.status == CHOLMOD_NOT_POSDEF) {
-      QString msg = QString("matrix NOT positive-definite: failure at column %1").arg(m_L->minor);
+      QString msg = "Matrix NOT positive-definite: failure at column " + toString(m_L->minor);
 //    throw IException(IException::User, msg, _FILEINFO_);
       error(msg);
       emit(finished());
@@ -2335,9 +2335,9 @@ namespace Isis {
    * This method computes the focal plane residuals for the measures.
    *
    * @history 2012-01-18 Debbie A. Cook - Fixed the computation of vx
-   *                            and vy to make sure they are focal
-   *                            plane x and y residuals instead of
-   *                            image sample and line residuals.
+   *                         and vy to make sure they are focal
+   *                         plane x and y residuals instead of
+   *                         image sample and line residuals.
    *
    */
   double BundleAdjust::computeResiduals() {
