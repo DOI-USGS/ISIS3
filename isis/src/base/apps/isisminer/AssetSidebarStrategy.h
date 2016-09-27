@@ -1,9 +1,9 @@
 #ifndef AssetSidebarStrategy_h
 #define AssetSidebarStrategy_h
 /**
- * @file                                                                  
- * $Revision: 6513 $ 
- * $Date: 2016-01-14 16:04:44 -0700 (Thu, 14 Jan 2016) $ 
+ * @file
+ * $Revision: 6513 $
+ * $Date: 2016-01-14 16:04:44 -0700 (Thu, 14 Jan 2016) $
  * $Id: AssetSidebarStrategy.h 6513 2016-01-14 23:04:44Z kbecker@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
@@ -39,20 +39,20 @@ namespace Isis {
 
   /**
    * @brief AssetSidebarStrategy - allows assets to be processed with most strategies.
-   * 
-   * This strategy gives users the ability to process assets with most other isisminer 
-   * strategies. 
-   * 
+   *
+   * This strategy gives users the ability to process assets with most other isisminer
+   * strategies.
+   *
    * If the user gives the Operation keyword a value of "create", then this strategy will create
-   * new assets to add to the active resources. In other words, the specified strategy will not be 
+   * new assets to add to the active resources. In other words, the specified strategy will not be
    * applied to any existing assets contained in the active resources. Therefore, this operation
-   * would be useful with strategies that create/obtain resources, such as PvlReader. 
+   * would be useful with strategies that create/obtain resources, such as PvlReader.
    * The created assets would then added to the active resources.
-   * 
-   * If the Operation keyword does not exist or has a value other than "create", then this 
+   *
+   * If the Operation keyword does not exist or has a value other than "create", then this
    * AssetSidebar strategy will apply the provided strategy to the assets contained in the active
    * resources and add the processed assets to the active resources.
-   *  
+   *
    * @code
    * Object = Strategy
    * Name        = TestCreateAsset
@@ -73,7 +73,7 @@ namespace Isis {
    *  EndObject
    * EndObject
    * @endcode
-   *  
+   *
    * @author 2012-07-15 Kris Becker
    * @internal
    *   @history 2012-07-15 Kris Becker - Original version.
@@ -84,23 +84,26 @@ namespace Isis {
    *                          a global resource list.
    *   @history 2015-09-15 Kris Becker - Reworked how the create option is
    *                         implemented.
+   *   @history 2016-08-28 Kelvin Rodriguez - Added using Strategy::apply; to avoid
+   *                           hidden virtual function warnings in clang.
+   *                           Part of porting to OS X 10.11.
    */
   class AssetSidebarStrategy : public SidebarStrategy {
-  
+
     public:
       AssetSidebarStrategy();
       AssetSidebarStrategy(const PvlObject &definition, const ResourceList &globals);
       virtual ~AssetSidebarStrategy();
-  
+
     protected:
       virtual int preRunProcess(ResourceList &resources, const ResourceList &globals);
 
+      using SidebarStrategy::apply;  // make parent functions visable
       virtual int apply(SharedStrategy &strategy, ResourceList &resources,
                         const ResourceList &globals);
 
-      
       virtual int postRunProcess(ResourceList &resources, const ResourceList &globals);
-  
+
     private:
       enum CreateSource{ FromNone, FromCopy, FromClone };
       QString      m_asset;         //!< Name (identifier) of the asset to process

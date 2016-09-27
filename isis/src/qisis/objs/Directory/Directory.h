@@ -194,8 +194,8 @@ namespace Isis {
 
       QWidget *warningWidget();
 
-      QAction *redoAction();
-      QAction *undoAction();
+      //QAction *redoAction();  //tjw
+      //QAction *undoAction();  //tjw
 
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
@@ -249,6 +249,7 @@ namespace Isis {
        *   This will create a new ImageFileListViewWorkOrder and append it to m_workOrders.
        * @return @b A pointer to the WorkOrder created by this function.
        */
+      /*
       template <typename WorkOrderType>
       WorkOrderType *createWorkOrder() {
         WorkOrderType *newWorkOrder = new WorkOrderType(m_project);
@@ -256,6 +257,7 @@ namespace Isis {
         return newWorkOrder;
       }
 
+      */
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
 

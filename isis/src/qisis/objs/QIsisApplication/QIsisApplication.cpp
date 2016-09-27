@@ -6,7 +6,11 @@
 #include <QObject>
 #include <QMessageBox>
 #include <QUrl>
+#if defined(__APPLE__)
+#include <QtWebEngineWidgets/QWebEngineView>
+#else
 #include <QWebEngineView>
+#endif
 
 #include "FileName.h"
 #include "IException.h"

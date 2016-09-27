@@ -31,9 +31,12 @@ namespace Isis {
         QSize minimumSizeHint() const;
         QString getText();
         void setText(QString text);
-        QSize sizeHint() {
+
+
+        QSize sizeHint() const {
           return minimumSizeHint();
         }
+
         TreeViewHeader &operator=(const TreeViewHeader &other);
 
 

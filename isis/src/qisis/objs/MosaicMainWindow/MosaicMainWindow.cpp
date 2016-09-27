@@ -647,8 +647,8 @@ namespace Isis {
    * and location and the tool bar location.
    *
    */
-  void MosaicMainWindow::readSettings() {
-    MainWindow::readSettings(QSize(800, 600));
+  void MosaicMainWindow::readSettings(QSize defaultSize) {
+    MainWindow::readSettings(defaultSize);
   }
 
 
@@ -713,7 +713,7 @@ namespace Isis {
     QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
                   QDir::currentPath(),
                   "Mosaic (*.mos)");
-      
+
     if (!fn.isEmpty()) {
       closeMosaic();
 

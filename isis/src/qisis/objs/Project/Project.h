@@ -114,6 +114,8 @@ namespace Isis {
       ImageList *imageList(QString name);
 //       CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
+      static QString targetBodyRoot(QString projectRoot);
+      QString targetBodyRoot() const;
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;

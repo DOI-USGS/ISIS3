@@ -791,7 +791,7 @@ namespace Isis {
       return;
     }
 
-    QPixmap pm = QPixmap::grabWidget(cubeViewport()->viewport());
+    QPixmap pm = cubeViewport()->viewport()->grab();
 
     //if (!cubeViewport()->pixmap().save(output,format)) {
 
@@ -822,7 +822,7 @@ namespace Isis {
     QPrintDialog printDialog(printer, (QWidget *)parent());
     if (printDialog.exec() == QDialog::Accepted) {
       // Get display widget as a pixmap and convert to an image
-      QPixmap pixmap = QPixmap::grabWidget(cubeViewport()->viewport());
+      QPixmap pixmap = cubeViewport()->viewport()->grab();
       QImage img = pixmap.toImage();
 
       // C++ Gui Programmign with Qt, page 201

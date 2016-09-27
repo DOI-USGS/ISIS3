@@ -13,7 +13,6 @@
 #include "UniversalGroundMap.h"
 
 #include <cmath>
-
 #include <QFile>
 #include <QFont>
 #include <QFontMetrics>
@@ -91,7 +90,7 @@ void IsisMain() {
   int placeSample = 0;
   if (ui.GetBoolean("PADIMAGE") ) {
     padImage = true;
-    padLocation = ui.GetString("PLACEMENT").toUpper();  
+    padLocation = ui.GetString("PLACEMENT").toUpper();
   }
   else {
     if (!ui.WasEntered("CORNERLINE") || !ui.WasEntered("CORNERSAMPLE") ) {
@@ -103,7 +102,7 @@ void IsisMain() {
     placeSample = ui.GetInteger("CORNERSAMPLE");
   }
 
-  // Determine width/height of the scale based on the resolution that the bar 
+  // Determine width/height of the scale based on the resolution that the bar
   // scale will be printed at
   int barHeight = ui.GetInteger("BARHEIGHT");
   if (barHeight < 5) {
@@ -113,7 +112,7 @@ void IsisMain() {
   int barWidth = ( (rightLimit + leftLimit) * scaleUnit) / resolution + .5;
 
   // Determine how many pixels are needed to make up each component of the bar
-  // scale. The amount of pixels available are determined by height. Each 
+  // scale. The amount of pixels available are determined by height. Each
   // component takes up a specified percentage of the available pixels. Extra
   // pixels need to be divided between the horizontal measurement line and the
   // space around it.
@@ -135,7 +134,7 @@ void IsisMain() {
   // scale. All vertical lines have the same weight as the exterior horizontal lines.
   // Interior horizontal lines take up 16.6% of the total height of the bar
   // scale. The remaining 66.6% of the total height of the bar scale is evenly
-  // divided among the space between the interior horizontal line and the exterior 
+  // divided among the space between the interior horizontal line and the exterior
   // horizontal lines.
   //
   int bndLine = .083 * barHeight;
@@ -150,7 +149,7 @@ void IsisMain() {
   if (spacing > (2 * midLine) ) {
     while (spacing > (2 * midLine) && total < barHeight) {
       midLine = midLine + 1;
-      total = total + 1; 
+      total = total + 1;
     }
     if (total < barHeight) {
       while (total < barHeight) {
@@ -193,7 +192,7 @@ void IsisMain() {
   // will be the text character that occurs at the left side
   // of the scale bar - set cornerSample in slightly to make
   // room for the digit "0" plus some space between the left
-  // edge and the "0". 
+  // edge and the "0".
   // A starting totalWidth is calculated, but will be updated
   // to account for text on left and right sides of bar scale.
   cornerSample = (textHt + 1) / 2 + 10;
@@ -216,7 +215,7 @@ void IsisMain() {
   int textCtrLine = (fontHeight + 8) / 2;
   if (textLoc == "BELOW") {
     textCtrLine = textCtrLine + barHeight + 8;
-  } 
+  }
 
   // Define rectangles to contain text at left, center, and right locations in bar scale
   QRect ctrDisplayRect;
@@ -253,7 +252,7 @@ void IsisMain() {
   lblStr = lblStr + " " + unitStr;
   lblStrWidth = metric.width(lblStr);
   totalWidth = totalWidth + lblStrWidth + (textHt + 1) / 2 + 10;
-  rightDisplayRect.setRect( (barWidth + cornerSample - lblStrWidth / 2), 
+  rightDisplayRect.setRect( (barWidth + cornerSample - lblStrWidth / 2),
                            (textCtrLine - fontHeight / 2 - 2),
                            (lblStrWidth + 30), (fontHeight + 8) );
 
@@ -324,7 +323,7 @@ void IsisMain() {
   painter.setPen(pen);
 
   // Need to keep track of location of vertical division
-  // lines so horizontal lines can be drawn without 
+  // lines so horizontal lines can be drawn without
   // overshooting them
   QVector<int> vertLine;
   vertLine.push_back(cornerSample);
@@ -388,7 +387,7 @@ void IsisMain() {
     pt1.setY(cornerLine - barHeight + 1);
     pt2.setY(cornerLine);
     for (int i = 1; i < rightSegs; i++) {
-      vertLine.insert(vertLine.size(), 
+      vertLine.insert(vertLine.size(),
                       (cornerSample + leftLimit * scaleUnit / resolution + ticSpace * i) );
       for (int j = 0; j < bndLine; j++) {
         pt1.setX(cornerSample + leftLimit * scaleUnit / resolution + ticSpace * i + j);
@@ -465,7 +464,7 @@ void IsisMain() {
   QString scaleStrCub = tmpBarFile.expanded();
   if (stats->ValidPixels() > 0) {
     parameters = "FROM=" + scaleCub + " TO=" + scaleStrCub + " NULLMIN=0 NULLMAX=130" +
-                 " HRSMIN=131 HRSMAX=255"; 
+                 " HRSMIN=131 HRSMAX=255";
   }
   else {
     parameters = "FROM=" + scaleCub + " TO=" + scaleStrCub + " NULLMIN=0 NULLMAX=0" +
@@ -486,7 +485,7 @@ void IsisMain() {
         ProgramLauncher::RunIsisProgram("handmos", parameters);
       }
       parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=" +
-                   toString(placeSample) + " OUTLINE=" + toString(placeLine) + " OUTBAND=" + 
+                   toString(placeSample) + " OUTLINE=" + toString(placeLine) + " OUTBAND=" +
                    toString(i) + " MATCHBANDBIN=NO NULL=YES HIGHSATURATION=YES";
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }
@@ -498,7 +497,7 @@ void IsisMain() {
     ProgramLauncher::RunIsisProgram("pad", parameters);
     for (int i = 1; i <= numBands; i++) {
       parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=1" +
-                   " OUTLINE=" + toString(numLines+1) + " OUTBAND=" + toString(i) + 
+                   " OUTLINE=" + toString(numLines+1) + " OUTBAND=" + toString(i) +
                    " MATCHBANDBIN=NO " + " NULL=YES HIGHSATURATION=YES";
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }

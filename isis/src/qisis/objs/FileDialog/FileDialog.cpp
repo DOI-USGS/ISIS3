@@ -122,7 +122,14 @@ namespace Isis {
   void FileDialog::done() {
     close();
     sendSignal();
+  }
 
+  /**
+   * Called when the user presses OK.
+   *
+   */
+  void FileDialog::done(int r) {
+    QFileDialog::done(r);
   }
 
 
@@ -208,4 +215,3 @@ namespace Isis {
   }
 
 }
-

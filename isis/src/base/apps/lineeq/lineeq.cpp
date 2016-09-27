@@ -27,7 +27,7 @@ void IsisMain() {
     lineAverages[i] = NULL;
   }
 
-  int boxcarSize;
+  int boxcarSize = 0;
 
   if(ui.GetString("BOXTYPE").compare("NONE") == 0) {
     boxcarSize = (int)(icube->lineCount() * 0.10);
@@ -136,5 +136,3 @@ void apply(Buffer &in, Buffer &out) {
       out[sample] = in[sample];
   }
 }
-
-

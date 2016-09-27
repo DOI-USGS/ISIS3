@@ -37,7 +37,7 @@
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
-template< typename A, typename B > class QPair;
+template< typename A, typename B > struct QPair;
 template< typename T > class QSet;
 class QMutex;
 class QString;
@@ -198,6 +198,7 @@ namespace Isis {
    *   @history 2016-04-28 Tracie Sucharski - Updated toAscii() calls to toLatin1() for QT 5 upgrade.
    *   @history 2016-05-10 Jeannie Backer - Replaced calls to TProjection::TargetRadii() with calls
    *                           to Target::radiiGroup(). References #3934
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2016-06-08 Jesse Mapel - Merged changes from IPCE to ISIS.  Fixes #3948.
    */
   class ControlNet : public QObject {

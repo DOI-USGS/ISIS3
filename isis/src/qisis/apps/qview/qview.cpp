@@ -1,15 +1,15 @@
 #include "IsisDebug.h"
 
+#include <fcntl.h>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #include <QApplication>
 #include <QFontDialog>
-
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <fcntl.h>
+#include <QMdiArea>
 
 #include "Application.h"
 #include "AdvancedTrackTool.h"
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
   vw->show();
 
   bool openingAFileSucceeded = false;
-  for(int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++) {
     if (i != newWindow) {
       try {
         vw->workspace()->addCubeViewport(QString(argv[i]));

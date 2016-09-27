@@ -97,7 +97,7 @@ namespace Isis {
     m_controlPointEditWidget = NULL;
 
     try {
-      m_project = new Project(*this);
+      //m_project = new Project(*this);  //tjw
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -125,6 +125,7 @@ namespace Isis {
     m_projectItemModel->addProject(m_project);
 
     try {
+      /*  //tjw
       createWorkOrder<CnetEditorViewWorkOrder>();
       createWorkOrder<CubeDnViewWorkOrder>();
       createWorkOrder<Footprint2DViewWorkOrder>();
@@ -144,6 +145,7 @@ namespace Isis {
       m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
       m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
+      */
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -417,10 +419,12 @@ namespace Isis {
    * @param historyContainer The widget to fill.
    */
   void Directory::setHistoryContainer(QDockWidget *historyContainer) {
+    /*  //tjw
     if (!m_historyTreeWidget) {
       m_historyTreeWidget = new HistoryTreeWidget( project() );
     }
     historyContainer->setWidget(m_historyTreeWidget);
+    */
   }
 
 
@@ -586,6 +590,14 @@ namespace Isis {
     /*
     //qDebug()<<"Directory::addFootprint2DView";
     MosaicSceneWidget *result = new MosaicSceneWidget(NULL, true, true, this);
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupCubeDnViewWidgets() ) );
+    
+    result->setWindowTitle("Cube DN View");
+    result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
+    
+    emit newWidgetAvailable(result);
+    return result;
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFootprint2DViewWidgets() ) );
@@ -617,12 +629,47 @@ namespace Isis {
 
     result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
     result->setObjectName( result->windowTitle() );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
+    */
+
+//  }
+
+
+
+
+  /**
+   * @brief Add the matrix view widget to the window.
+   * @return @b (MatrixSceneWidget*) The widget to view.
+   */
+  /*
+  MatrixSceneWidget *Directory::addMatrixView() {
+    MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupMatrixViewWidgets() ) );
+
+    m_matrixViewWidgets.append(result);
+
+    result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
+    result->setObjectName( result->windowTitle() );
 
     emit newWidgetAvailable(result);
 
     return result;
   }
+*/
 
+  /**
+   * @brief Add target body data view widget to the window.
+   * @return (TargetInfoWidget*) The widget to view.
+   */
+  /*
+  TargetInfoWidget *Directory::addTargetInfoView(TargetBodyQsp target) {
+    TargetInfoWidget *result = new TargetInfoWidget(target.data(), this);
 
   /**
    * @brief Add target body data view widget to the window.
@@ -758,7 +805,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets() {
-    m_cnetEditorViewWidgets.removeAll(NULL);
+    //m_cnetEditorViewWidgets.removeAll(NULL);  //tjw
   }
 
 
@@ -766,7 +813,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CubeDnView objects.
    */
   void Directory::cleanupCubeDnViewWidgets() {
-    m_cubeDnViewWidgets.removeAll(NULL);
+    //m_cubeDnViewWidgets.removeAll(NULL);  //tjw
   }
 
 
@@ -783,7 +830,7 @@ namespace Isis {
    * @brief Removes pointers to deleted Footprint2DView objects.
    */
   void Directory::cleanupFootprint2DViewWidgets() {
-    m_footprint2DViewWidgets.removeAll(NULL);
+    //m_footprint2DViewWidgets.removeAll(NULL);  //tjw
   }
 
 
@@ -839,7 +886,10 @@ namespace Isis {
     return m_project;
   }
 
-
+  /**
+   * @brief Returns a list of all the control network views for this directory.
+   * @return @b QList<CnetEditorWidget *> A pointer list of all the CnetEditorWidget objects.
+   */
   /**
    * @brief Returns a list of all the control network views for this directory.
    * @return @b QList<CnetEditorWidget *> A pointer list of all the CnetEditorWidget objects.
@@ -868,7 +918,15 @@ namespace Isis {
 
     return results;
   }
+*/
 
+  /**
+   * @brief Accessor for the list of MatrixSceneWidgets currently available.
+   * @return @b QList<MatrixSceneWidget *> The list of MatrixSceneWidget objects.
+   */
+  /* //tjw
+  QList<MatrixSceneWidget *> Directory::matrixViews() {
+    QList<MatrixSceneWidget *> results;
 
   /**
    * @brief Accessor for the list of MatrixSceneWidgets currently available.
@@ -990,6 +1048,7 @@ namespace Isis {
     return project()->undoStack()->createRedoAction(this);
   }
 
+  */
 
   /**
    * @brief Creates an Action to undo the last action.
@@ -998,8 +1057,12 @@ namespace Isis {
   QAction *Directory::undoAction() {
     return project()->undoStack()->createUndoAction(this);
   }
+*/
 
-
+  /**
+   * @brief Loads the Directory from an XML file.
+   * @param xmlReader  The reader that takes in and parses the XML file.
+   */
   /**
    * @brief Loads the Directory from an XML file.
    * @param xmlReader  The reader that takes in and parses the XML file.
@@ -1020,9 +1083,9 @@ namespace Isis {
     if ( !m_fileListWidgets.isEmpty() ) {
       stream.writeStartElement("fileListWidgets");
 
-      foreach (ImageFileListWidget *fileListWidget, m_fileListWidgets) {
-        fileListWidget->save(stream, project(), newProjectRoot);
-      }
+      //foreach (ImageFileListWidget *fileListWidget, m_fileListWidgets) {  //tjw
+      //  fileListWidget->save(stream, project(), newProjectRoot);
+      //}
 
       stream.writeEndElement();
     }

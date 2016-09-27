@@ -18,7 +18,7 @@
 #include <QToolButton>
 #include <QToolTip>
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 #include <QtXml>
 
 #include "Camera.h"
@@ -254,7 +254,7 @@ namespace Isis {
       m_tools = NULL;
     }
 
-    if (m_ownProjection) {
+    if (m_ownProjection && m_projection) {
       delete m_projection;
     }
     m_projection = NULL;
@@ -886,7 +886,7 @@ namespace Isis {
     QPixmap previewPixmap;
 
     if (cnetToolContainer) {
-      previewPixmap = QPixmap::grabWidget(cnetToolContainer).scaled(
+      previewPixmap = cnetToolContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
     else {
@@ -896,7 +896,7 @@ namespace Isis {
 
       tmpToolPad.resize(QSize(32, 32));
 
-      previewPixmap = QPixmap::grabWidget(&tmpToolPad);
+      previewPixmap = tmpToolPad.grab();
     }
 
     QLabel *previewWrapper = new QLabel;
@@ -960,7 +960,7 @@ namespace Isis {
     QPixmap previewPixmap;
 
     if (gridToolContainer) {
-      previewPixmap = QPixmap::grabWidget(gridToolContainer).scaled(
+      previewPixmap = gridToolContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
     else {
@@ -970,7 +970,7 @@ namespace Isis {
 
       tmpToolPad.resize(QSize(32, 32));
 
-      previewPixmap = QPixmap::grabWidget(&tmpToolPad);
+      previewPixmap = tmpToolPad.grab();
     }
 
     QLabel *previewWrapper = new QLabel;
@@ -1050,7 +1050,7 @@ namespace Isis {
     longHelpLayout->addWidget(title);
 
     if (sceneContainer) {
-      QPixmap previewPixmap = QPixmap::grabWidget(sceneContainer).scaled(
+      QPixmap previewPixmap = sceneContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       QLabel *previewWrapper = new QLabel;
@@ -1100,7 +1100,7 @@ namespace Isis {
     mapHelpLayout->addWidget(title);
 
     if (mapContainer) {
-      QPixmap previewPixmap = QPixmap::grabWidget(mapContainer).scaled(
+      QPixmap previewPixmap = mapContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       QLabel *previewWrapper = new QLabel;
@@ -1258,7 +1258,7 @@ namespace Isis {
     previewHelpLayout->addWidget(title);
 
     if (worldViewContainer) {
-      QPixmap previewPixmap = QPixmap::grabWidget(worldViewContainer).scaled(
+      QPixmap previewPixmap = worldViewContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       QLabel *previewWrapper = new QLabel;
@@ -1401,7 +1401,7 @@ namespace Isis {
 
       QPoint projectScrollPos(toInt(positionInfo["ScrollPosition"][0]),
                               toInt(positionInfo["ScrollPosition"][1]));
-        
+
       getView()->horizontalScrollBar()->setValue(projectScrollPos.x());
       getView()->verticalScrollBar()->setValue(projectScrollPos.y());
     }
@@ -1413,7 +1413,7 @@ namespace Isis {
       delete m_projectViewTransform;
       m_projectViewTransform = NULL;
     }
-    
+
     m_progress->setVisible(false);
     emit cubesChanged();
   }
@@ -1436,7 +1436,7 @@ namespace Isis {
     }
 
     QString format = QFileInfo(output).suffix();
-    QPixmap pm = QPixmap::grabWidget(getScene()->views().last());
+    QPixmap pm = getScene()->views().last()->grab();
 
     std::string formatString = format.toStdString();
     if (!pm.save(output, formatString.c_str())) {
@@ -1670,6 +1670,7 @@ namespace Isis {
         stopProcessingEvent = false;
         break;
     }
+
     return stopProcessingEvent;
   }
 

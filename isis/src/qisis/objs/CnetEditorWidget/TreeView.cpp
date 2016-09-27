@@ -39,7 +39,7 @@ namespace Isis {
     }
 
 
-    QSize TreeView::sizeHint() {
+    QSize TreeView::sizeHint() const {
       if (parentWidget())
         return QSize(parentWidget()->width() / 4, parentWidget()->height() / 2);
 

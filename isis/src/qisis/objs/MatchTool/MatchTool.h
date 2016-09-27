@@ -136,7 +136,7 @@ namespace Isis {
    *                          ControlMeasure header files.  Remove findPointFiles
    *                          method, the code is now in the createPoint method.
    *  @history 2010-11-19 Tracie Sucharski - Renamed pointSaved slot to measureSaved.
-   *  
+   *
    *
    *   @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
@@ -164,7 +164,7 @@ namespace Isis {
    *                          from a Dem if one is open.
    *   @history 2011-09-16 Tracie Sucharski - Added method to draw Fixed and
    *                          Constrained points on the ground source viewport.
-   *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, 
+   *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat,
    *                          lon when creating new control point.
    *   @history 2012-04-09 Tracie Sucharski - When checking if left measure
    *                          editLock has changed, use measure->IsEditLocked()
@@ -196,15 +196,17 @@ namespace Isis {
    *                          serial number list, but calculates one in real-time base on available
    *                          viewports.  Fixes #1130.  Also, added a few more error checks to
    *                          insure cubes for displayed measures are available.
-   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and
    *                          print warning that point will be deleted. References #1491.
-   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button),
    *                          Swapped checking for empty network and not allowing mouse clicks on
    *                          the ground source. First check if there are any points in the network.
    *                          If not print message and return.  References #1493.
    * @history 2015-11-08 Ian Humphrey - Added shortcut for Save Point (P). Added shortcuts
    *                         (PageUp/PageDown) for selecting right measures and added slots to
    *                         handle these shortcuts. References #2324.
+   * @history 2016-08-28 Kelvin Rodriguez - Removed unused member variables to eliminate warnings
+   *                         in clang. Part of porting to OS X 10.11
    */
   class MatchTool : public Tool {
     Q_OBJECT
@@ -365,7 +367,7 @@ namespace Isis {
 
       QAction *m_whatsThis;
       QAction *m_showHelp;
-      
+
       ControlPointEdit *m_pointEditor;
 
       QPushButton *m_savePoint;
@@ -378,7 +380,7 @@ namespace Isis {
       QLabel *m_templateFileNameLabel;
       QLabel *m_ptIdValue;
       QLabel *m_numMeasures;
-      
+
       QCheckBox *m_lockPoint;
       QCheckBox *m_ignorePoint;
       QLabel *m_leftReference;

@@ -5,7 +5,7 @@
 #include "Distance.h"
 
 template <typename A, typename B> class QHash;
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class Buffer;

@@ -20,6 +20,8 @@ void unaryFunction(Buffer &in, Buffer &out);
 double Isisa, Isisb, Isisc, Isisd, Isise;
 
 void IsisMain() {
+  std::cout << "algebra - got to main...\n";
+
   // We will be processing by line
   ProcessByLine p;
 

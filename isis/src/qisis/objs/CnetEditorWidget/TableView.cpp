@@ -202,6 +202,7 @@ namespace Isis {
     //       m_header->update();
     //     }
     //   }
+    
 
     void TableView::displayWarning(AbstractTableModel::Warning warning) {
       switch (warning) {
@@ -225,6 +226,7 @@ namespace Isis {
           break;
       }
     }
+
 
     void TableView::handleModelSelectionChanged() {
       m_content->refresh();

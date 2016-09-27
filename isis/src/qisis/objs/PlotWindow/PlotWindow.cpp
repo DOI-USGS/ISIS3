@@ -582,7 +582,7 @@ namespace Isis {
 
     if (printDialog.exec() == QDialog::Accepted) {
       /* Get display widget as a pixmap and convert to an image*/
-      pixmap = QPixmap::grabWidget(m_plot);
+      pixmap = m_plot->grab();
       QImage img = pixmap.toImage();
       /* C++ Gui Programming with Qt, page 201*/
       QPainter painter(printer);
@@ -618,7 +618,7 @@ namespace Isis {
     }
 
     QString format = QFileInfo(output).suffix();
-    pixmap = QPixmap::grabWidget(m_plot);
+    pixmap = m_plot->grab();
 
     std::string formatString = format.toStdString();
     if (!pixmap.save(output, formatString.c_str())) {

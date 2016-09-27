@@ -38,6 +38,9 @@ namespace Isis {
   *                          destroyed in the table widget but our copies of the pointers were not
   *                          yet cleared. This has been fixed by adding the method itemList()
   *                          instead of storing p_itemList. References #710.
+  *   @history 2016-08-28 Kelvin Rodriguez - writeSettings now const to match parent and eliminate
+  *                          hidden virtual overload warnings in clang. Part of porting to
+  *                          OS X 10.11
   */
   class TableMainWindow : public MainWindow {
       Q_OBJECT
@@ -57,7 +60,7 @@ namespace Isis {
       };
 
 
-      QList<QListWidgetItem *> itemList();
+      QList<QListWidgetItem *> itemList() const;
 
 
       /**
@@ -122,7 +125,7 @@ namespace Isis {
       void setTrackListItems(bool track = false);
       bool trackListItems();
       void loadTable();
-      void writeSettings();
+      void writeSettings() const;
 
     signals:
       /**

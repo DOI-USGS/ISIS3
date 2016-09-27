@@ -334,7 +334,7 @@ End_Object
         extends to a common lat range, and centered at the pole (clat = 90 or
         -90). Nothing about the extent in meters is needed if the center of the
         image is again 90 or -90 lat.  Again GIS/RS application will still
-        register to the upper left pixel but manually this can be harder to use
+to the upper left pixel but manually this can be harder to use
         than just using the center which will be defined as X,Y = 0,0 when in a
         Polar or Lambert Azimuthal projection.  Using an example where the polar
         image is 2000 lines by 2000 samples then the run would look like:

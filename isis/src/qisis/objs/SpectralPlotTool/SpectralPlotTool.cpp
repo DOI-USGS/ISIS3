@@ -36,7 +36,7 @@ using std::cerr;
 namespace Isis {
 
   /**
-   * This constructs a spectral plot tool. The spectral plot tool graphs statistics across a 
+   * This constructs a spectral plot tool. The spectral plot tool graphs statistics across a
    * spectrum (bands).
    *
    *
@@ -564,7 +564,7 @@ namespace Isis {
    *
    * @param labels
    * @param data
-   * @param viewport 
+   * @param viewport
    */
   void SpectralPlotTool::getSpectralStatistics(QVector<double> &labels,
                                                QVector<Statistics> &data,
@@ -579,7 +579,7 @@ namespace Isis {
     // Convert vertices to their sub-pixel sample/line values
     viewport->viewportToCube(vertices[0].x(), vertices[0].y(), ss, sl);
     viewport->viewportToCube(vertices[2].x(), vertices[2].y(), es, el);
-    
+
     // round the start and end sample/line sub-pixel points to the nearest int (pixel)
     ss = round(ss);
     sl = round(sl);
@@ -588,7 +588,7 @@ namespace Isis {
 
     // calculate number of samples will be in Brick's shape buffer with absolute value
     // in case user makes a rectangle from right to left
-    int samps = ( (int)abs(es - ss) + 1) ;
+    int samps = ( std::abs(es - ss) + 1) ;
     Cube *cube = viewport->cube();
     Brick *brick = new Brick(*cube, samps, 1, 1);
     Pvl &pvl = *viewport->cube()->label();
@@ -614,7 +614,7 @@ namespace Isis {
       // round the (double) max x's and y's and min x's and y's to the nearest pixel
       for (int y = (int)round(envelope->getMinY());
            y <= (int)round(envelope->getMaxY()); y++) {
-        for (int x = (int)round(envelope->getMinX()); 
+        for (int x = (int)round(envelope->getMinX());
              x <= (int)round(envelope->getMaxX()); x++) {
           // create a point at the center of the pixel
           geos::geom::Coordinate c(x, y);
@@ -689,4 +689,3 @@ namespace Isis {
     delete brick;
   }
 }
-

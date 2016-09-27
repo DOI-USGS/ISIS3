@@ -59,17 +59,17 @@ namespace Isis
       virtual ~TabBar();
 
       virtual void addTab(Tab * newTab);
-      const int curSelectedTab() const;
+      int curSelectedTab() const;
       void setRadioStyle(const bool & radioStyle);
       bool radioStyle();
-      const int size() const;
+      int size() const;
 
       void setSelected(const int & index, const bool & status);
       bool isSelected(const int & index);
       bool noneSelected();
       void setEnabled(bool);
 
-    
+
     private slots:
       void tabClicked(const int & index);
 

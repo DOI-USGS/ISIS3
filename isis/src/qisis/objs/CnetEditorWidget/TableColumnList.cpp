@@ -118,9 +118,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::lower(int visibleColumnIndex, bool emitSortOutDated) {
-      lower(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
-    }
+    //void TableColumnList::lower(int visibleColumnIndex, bool emitSortOutDated) {
+    //  lower(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
+    //}
 
 
     void TableColumnList::raise(TableColumn *col, bool emitSortOutDated) {
@@ -138,9 +138,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::raise(int visibleColumnIndex, bool emitSortOutDated) {
-      raise(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
-    }
+    //void TableColumnList::raise(int visibleColumnIndex, bool emitSortOutDated) {
+    //  raise(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
+    //}
 
 
     void TableColumnList::raiseToTop(TableColumn *col) {
@@ -151,9 +151,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::raiseToTop(int visibleColumnIndex) {
-      raiseToTop(indexOf(getVisibleColumns()[visibleColumnIndex]));
-    }
+    //void TableColumnList::raiseToTop(int visibleColumnIndex) {
+    //  raiseToTop(indexOf(getVisibleColumns()[visibleColumnIndex]));
+    //}
 
 
     int TableColumnList::size() const {

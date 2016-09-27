@@ -6,7 +6,7 @@
 
 class QwtInterval;
 
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 class QCheckBox;
 class QComboBox;
 class QSpinBox;
@@ -24,6 +24,7 @@ namespace Isis {
    * @author 2012-01-18 Steven Lambright
    *
    * @internal
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    */
   class ScatterPlotConfigDialog : public QDialog {
       Q_OBJECT

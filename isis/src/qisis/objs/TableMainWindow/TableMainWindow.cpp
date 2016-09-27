@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QTableWidget>
+#include <QToolBar>
 
 
 namespace Isis {
@@ -21,7 +22,7 @@ namespace Isis {
    */
   TableMainWindow::TableMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     p_parent = parent;
-    
+
     p_title = title;
     p_table = NULL;
     p_visibleColumns = -1;
@@ -47,7 +48,7 @@ namespace Isis {
   }
 
 
-  QList<QListWidgetItem *> TableMainWindow::itemList() {
+  QList<QListWidgetItem *> TableMainWindow::itemList() const {
     QList<QListWidgetItem *> result;
 
     if (p_listWidget)
@@ -219,7 +220,7 @@ namespace Isis {
 
       p_table->setColumnWidth(destinationColumn,
           QFontMetrics(header->font()).width(header->text()) + 20);
-          // Removed: rounding and int? 
+          // Removed: rounding and int?
           // qRound(QFontMetrics(header->font()).width(header->text()) + 20));
     }
 
@@ -552,7 +553,7 @@ namespace Isis {
    * home directory.
    *
    */
-  void TableMainWindow::writeSettings() {
+  void TableMainWindow::writeSettings() const {
     if (p_listWidget) {
       QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
@@ -823,4 +824,3 @@ namespace Isis {
   }
 
 }
-

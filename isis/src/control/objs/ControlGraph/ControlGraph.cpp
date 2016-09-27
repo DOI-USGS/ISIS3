@@ -105,7 +105,7 @@ namespace Isis {
 
 
   //! Returns true if this ControlGraph is connected or false otherwise
-  const bool ControlGraph::IsConnected() const {
+  bool ControlGraph::IsConnected() const {
     return connected;
   }
 
@@ -114,7 +114,7 @@ namespace Isis {
    *  There can be 0 islands or 2 or more islands.  GetIslandCount will never
    *  return 1 since 1 island is really just a connected graph (with 0 islands).
    */
-  const int ControlGraph::GetIslandCount() const {
+  int ControlGraph::GetIslandCount() const {
     return islands->size();
   }
 

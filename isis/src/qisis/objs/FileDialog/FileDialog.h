@@ -42,7 +42,10 @@ namespace Isis {
 
     protected slots:
       void sendSignal();
+
       void done();
+      void done(int r);
+
       void cancel();
       void saveFilter();
 

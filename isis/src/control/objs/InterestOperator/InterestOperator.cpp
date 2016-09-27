@@ -148,6 +148,9 @@ namespace Isis {
    *          in a Control Measure
    * @history 2010-06-23 Sharmila Prasad - Validate for Resolution Range and Pixels/Meters
    *                                       from edge options
+   * @history 2016-08-24 Kelvin Rodriguez - Changed calls to abs to qAbs to squash implicit
+   *                                       conversion warnings in clang. Part of porting to OS X
+   *                                       10.11.
    */
   bool InterestOperator::Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap,
                                  int piSample, int piLine) {
@@ -820,9 +823,9 @@ namespace Isis {
     mtInterestResults[piMeasure].mdInterest    = dBestInterest;
     mtInterestResults[piMeasure].mdBestSample  = chip.CubeSample();
     mtInterestResults[piMeasure].mdBestLine    = chip.CubeLine();
-    mtInterestResults[piMeasure].miDeltaSample = (int)abs(mtInterestResults[piMeasure].mdBestSample -
+    mtInterestResults[piMeasure].miDeltaSample = qAbs(mtInterestResults[piMeasure].mdBestSample -
         iOrigSample);
-    mtInterestResults[piMeasure].miDeltaLine   = (int)abs(mtInterestResults[piMeasure].mdBestLine -
+    mtInterestResults[piMeasure].miDeltaLine   = qAbs(mtInterestResults[piMeasure].mdBestLine -
         iOrigLine);
     return true;
   }

@@ -46,7 +46,7 @@ namespace Isis {
     QVERIFY(widget.cubesSelectable());
 
     // Check that the bounding rect is approx. the same
-    QRectF expected(QPointF(2376269.37351469, -964957.418535598), QSize(109739.587494429, 48049.2250501961));
+    QRectF expected(QPointF(2376269.37351469, -964957.418535598), QSize(109739, 48049));
 
     QVERIFY(qAbs(widget.cubesBoundingRect().top() - expected.top()) < 0.0001);
     QVERIFY(qAbs(widget.cubesBoundingRect().left() - expected.left()) < 0.0001);

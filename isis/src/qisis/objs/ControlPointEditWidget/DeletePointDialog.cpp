@@ -1,4 +1,4 @@
-#include <QtWidgets>
+#include <QtGui>
 
 #include "DeletePointDialog.h"
 

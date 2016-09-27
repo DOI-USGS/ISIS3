@@ -41,6 +41,8 @@ namespace Isis {
    * @author 2006-12-21 Elizabeth Miller
    *
    * @internal
+   *   @history 2016-09-14 Ian Humphrey - Modified printPlot() and savePlot() - replaced deprecated
+   *                           static QPixmap::grabWidget with QWidget::grab. References #4304.
    */
   class QHistogram: public QwtPlot {
       Q_OBJECT
