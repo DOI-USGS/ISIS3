@@ -255,40 +255,29 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 
-  /*
-  Enum value of -1 is undefined and cannot be properly tested.
   try {
-    Displacement disp(1, (Displacement::Units)-1);
-    disp.setKilometers(-1);
-  }
-  catch(IException &e) {
-    e.print();
-  }
-  */
-
-  try {
-    Displacement() > Displacement();
+    cout << (Displacement() > Displacement()) << endl;
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    Displacement() >= Displacement();
+    cout << (Displacement() > Displacement()) << endl;
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    Displacement() < Displacement();
+    cout << (Displacement() < Displacement()) << endl;
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    Displacement() <= Displacement();
+    cout << (Displacement() < Displacement()) << endl;
   }
   catch(IException &e) {
     e.print();

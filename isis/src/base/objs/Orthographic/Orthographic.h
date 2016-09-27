@@ -31,31 +31,31 @@ namespace Isis {
    * @brief Orthographic Map Projection
    *
    * This class provides methods for the forward and inverse equations of an
-   * Orthographic map projection (for a sphere). 
-   *  
-   * The Orthographic projection is an azimuthal projection.  Latitudes and 
-   * longitudes are ellipses, circles, or straight lines.  Only one hemisphere 
-   * can be projected.  Scale is true at the point (center latitude, center 
-   * longitude). 
-   *  
-   * The code was converted to C++ from the C version of the USGS General 
-   * Cartographic Transformation Package (GCTP). This class inherits Projection 
-   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
-   * (inverse) and a third virtual method, XYRange, for obtaining projection 
-   * coordinate coverage for a latitude/longitude window. 
-   *  
-   * Please see the Projection class for a full accounting of all the methods 
-   * available. 
+   * Orthographic map projection (for a sphere).
+   *
+   * The Orthographic projection is an azimuthal projection.  Latitudes and
+   * longitudes are ellipses, circles, or straight lines.  Only one hemisphere
+   * can be projected.  Scale is true at the point (center latitude, center
+   * longitude).
+   *
+   * The code was converted to C++ from the C version of the USGS General
+   * Cartographic Transformation Package (GCTP). This class inherits Projection
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate
+   * (inverse) and a third virtual method, XYRange, for obtaining projection
+   * coordinate coverage for a latitude/longitude window.
+   *
+   * Please see the Projection class for a full accounting of all the methods
+   * available.
    *
    * @ingroup MapProjectioncisbell
    *
    * @author 2005-03-04 Elizabeth Ribelin
    *
    * @internal
-   *   @history 2005-08-22 Kris Becker - Fixed bug in XYRange method that 
+   *   @history 2005-08-22 Kris Becker - Fixed bug in XYRange method that
    *                           computes the line/samp ranges as it was not
    *                           correctly computing limb limits
-   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes 
+   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes
    *                           and MappingLongitudes methods.
    *   @history 2008-05-09 Steven Lambright - Added Name, Version methods
    *   @history 2011-01-31 Steven Lambright - Improved ability to work with
@@ -85,6 +85,8 @@ namespace Isis {
    *                           when clat = 0. Added a range check in SetCoordinate()
    *                           to make sure m_longitude is in the correct domain.
    *                           Fixes #1471.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed several redundant var=var lines
+   *                           causing warnings in clang. Part of porting to OS X 10.11. 
    */
   class Orthographic : public TProjection {
     public:

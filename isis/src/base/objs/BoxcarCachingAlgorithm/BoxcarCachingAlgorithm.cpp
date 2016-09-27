@@ -64,7 +64,7 @@ namespace Isis {
       BoxcarCachingAlgorithm::recommendChunksToFree(
       QList <RawCubeChunk *> allocated, QList <RawCubeChunk *> justUsed,
           const Buffer &justRequested) {
-
+    (void) justRequested; // unused, for fullfilling virtual function signiture 
     QList<RawCubeChunk *> chunksToToss;
 
     //std::cerr << "begin" << std::endl;
@@ -102,4 +102,3 @@ namespace Isis {
     return CacheResult(chunksToToss);
   }
 }
-

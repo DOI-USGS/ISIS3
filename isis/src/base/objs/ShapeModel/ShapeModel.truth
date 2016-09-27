@@ -50,7 +50,7 @@ Begin testing Shape Model base class....
 
   Testing setHasIntersection method
     Do we have an intersection? 0
-    Test resolution() error message when there is no intersection:
+    Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
   Testing setSurfacePoint method ...
@@ -60,7 +60,7 @@ Begin testing Shape Model base class....
 
   Testing ellipsoid methods in base class
     Do we have an intersection? 0
-    Test resolution() error message when there is no intersection:
+    Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  failing of method intersectEllipsoid...
@@ -68,7 +68,7 @@ Begin testing Shape Model base class....
                                  lookDirection = -1, 1, 1
     ...  intersectSurface method failed -- no intersection
     Do we have an intersection? 0
-    Test resolution() error message when there is no intersection:
+    Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  method intersectEllipsoid...
@@ -84,7 +84,7 @@ Begin testing Shape Model base class....
 
     Testing  method setHasIntersection false...
     Do we have an intersection? 0
-    Test resolution() error message when there is no intersection:
+    Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  method calculateEllipsoidalSurfaceNormal with no intersection...

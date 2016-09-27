@@ -16,8 +16,16 @@
 #include "SpecialPixel.h"
 #include "WorldMapper.h"
 
+/**
+  * @internal
+  *   @history 2016-08-26 Kelvin Rodriguez - Changed invalidValue varible to have
+  *                           both an int and double version to avoid undefined behavior in
+  *                           trying to convert double to int. Part of porting to OSX 10.11
+ */
+
 using namespace std;
 using namespace Isis;
+
 class MyProjection : public RingPlaneProjection {
   public:
     // create a child class
@@ -251,10 +259,10 @@ int main(int argc, char *argv[]) {
   cout << "Universal Ring Longitude:                      " << p2.UniversalRingLongitude() << endl;
   cout << "Setting bad position..." << p2.SetUniversalGround((double) Null, (double) Null) << endl;
   cout << endl;
-  
+
   /* The following projection is used to test the ToPlanetographic() methods
    *   at the ring radius boundaries (2000 and 20000 meters). qFuzzyCompare() methods
-   *   were added to accommodate for double imprecission. 
+   *   were added to accommodate for double imprecission.
    */
   Isis::Pvl radRangeTest;
   radRangeTest.addGroup(Isis::PvlGroup("Mapping"));
@@ -332,14 +340,14 @@ int main(int argc, char *argv[]) {
   cout << "Testing == operator Projection conditions..."  << p.Name() << endl;
   cout << "Projection 1 name and resolution = " << p.Name() << " " << p.Resolution() << endl;
   cout << "Projection 2 name and resolution = " << p2.Name() << " " << p2.Resolution() << endl;
-  cout << "Projection 3 name and resolution = " << radTestProjection->Name() << " " << radTestProjection->Resolution() << endl;  
+  cout << "Projection 3 name and resolution = " << radTestProjection->Name() << " " << radTestProjection->Resolution() << endl;
 
   if (p == p2)
      cout << "Projection 1 = Projection 2" << endl;
   else
     cout << "Projection 1 != Projection 2" << endl;
 
-  if (p == *radTestProjection) 
+  if (p == *radTestProjection)
      cout << "Projection 1 = Projection3" << endl;
   else
     cout << "Projection 1 != Projection3" << endl;
@@ -429,7 +437,7 @@ int main(int argc, char *argv[]) {
   cout << "Ring Longitude domain    = " << noproj.RingLongitudeDomainString() << endl;
   cout << "True scale ring radius   = " << noproj.TrueScaleRingRadius() << endl;
   double badvalue = Null;
-  if (noproj.XYRange(badvalue, badvalue, badvalue,badvalue)) 
+  if (noproj.XYRange(badvalue, badvalue, badvalue,badvalue))
     cout << "Bad range" << endl;
   cout << endl;
 
@@ -449,46 +457,50 @@ int main(int argc, char *argv[]) {
   cout << endl;
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << "Test Error Throws for invalid inputs to conversion methods " << endl;
-  
-  double invalidValue = Null;
+
+  // Keep an double and an int for used for invalid data.
+  // Seperating the two prevents undefined behavior from trying to
+  // convert Isis::Null to an integer.
+  double invalidDouble = Null;
+  int invalidInt = -INT_MAX;
   try {
-    RingPlaneProjection::To180Domain(invalidValue);
+    RingPlaneProjection::To180Domain(invalidDouble);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::To360Domain(invalidValue);
+    RingPlaneProjection::To360Domain(invalidDouble);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::ToClockwise(invalidValue, 180);
+    RingPlaneProjection::ToClockwise(invalidDouble, 180);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::ToClockwise(0, invalidValue);
+    RingPlaneProjection::ToClockwise(0, invalidInt);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::ToClockwise(invalidValue, 360);
+    RingPlaneProjection::ToClockwise(invalidDouble, 360);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::ToCounterClockwise(0, invalidValue);
+    RingPlaneProjection::ToCounterClockwise(0, invalidInt);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    RingPlaneProjection::ToCounterClockwise(invalidValue, 360);
+    RingPlaneProjection::ToCounterClockwise(invalidDouble, 360);
   }
   catch(IException &error) {
     error.print();
@@ -512,13 +524,13 @@ int main(int argc, char *argv[]) {
     error.print();
   }
   try {
-    p.ToWorldX(invalidValue);
+    p.ToWorldX(invalidDouble);
   }
   catch(IException &error) {
     error.print();
   }
   try {
-    p.ToWorldY(invalidValue);
+    p.ToWorldY(invalidDouble);
   }
   catch(IException &error) {
     error.print();
@@ -527,7 +539,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
   cout << endl;
 
-  // Add remaining keywords for Mapping() test 
+  // Add remaining keywords for Mapping() test
   mg += PvlKeyword("PixelResolution", "1.0");
   mg += PvlKeyword("Scale", "1.0");
   mg += PvlKeyword("UpperLeftCornerX", "1.0");

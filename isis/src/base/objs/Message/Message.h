@@ -28,8 +28,12 @@
 #include <vector>
 
 namespace Isis {
-  /* Documentation for this namespaceis in:
+  /* Documentation for this namespace is in:
   *    isis/src/docsys/Object/build/isisDoxyDefs.doxydef
+  * @internal
+  *   @history 2016-08-28 Kelvin Rodriguez - Moved 'using namespace' to be properly defined
+  *                           after the includes for every cpp file in the message folder.
+  *                           Part of porting to OS X 10.11.
   */
   namespace Message {
     /**

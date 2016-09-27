@@ -41,6 +41,8 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of
    *                           /tmp directory.
+   *   @history 2011-08-19 Kelvin Rodriguez - Added truth data for OS X 10.11
+   *                           Part of proting to 10.11.
    */
   class ProgramLauncher {
     public:

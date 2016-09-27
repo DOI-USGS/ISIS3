@@ -100,17 +100,20 @@ namespace Isis {
 
     private:
       QString p_jp2File;           //!<Output file name
+      std::string p_progressionOrder;  //!<Progression order used to create output file
+      std::vector<unsigned int> p_precinctSize; //!<Precinct size(s) used to create output file
+      JP2Error *Kakadu_Error;          //!<JP2 Error handling facility
+
+#if ENABLEJP2K
       unsigned int p_sampleDimension;  //!<Sample dimension of output file
       unsigned int p_lineDimension;    //!<Line dimension of output file
       unsigned int p_bandDimension;    //!<Band dimension of output file
       unsigned int p_resolutionLevels; //!<Number of resolution levels used to make output file
-      std::string p_progressionOrder;  //!<Progression order used to create output file
       unsigned int p_codeBlockSize;    //!<Code block size used to create output file
       bool p_signedData;               //!<Determines if output file will contain signed/unsigned
       //!<data
       unsigned int p_tileSizeWidth;    //!<Width of tiles used to create output file
       unsigned int p_tileSizeHeight;   //!<Height of tiles used to create output file
-      std::vector<unsigned int> p_precinctSize; //!<Precinct size(s) used to create output file
       unsigned int p_pixelBits;        //!<Number of bits per pixel used to create output file
       unsigned int p_pixelBytes;       //!<Number of bytes per pixel used to create output file
       int p_flushLines;                //!<Number of lines to store in memory before flushing the
@@ -125,8 +128,6 @@ namespace Isis {
       bool *p_isSigned;                //!<Determines if the data is signed/unsigned for each
       //!<band in the JP2 file
 
-      JP2Error *Kakadu_Error;          //!<JP2 Error handling facility
-#if ENABLEJP2K
       jp2_family_tgt *JP2_Stream;      //!<JP2 file output stream
       jp2_target *JP2_Boxes;           //!<JP2 boxes for the JP2 file output stream
       kdu_codestream *JPEG2000_Codestream; //!<Allow access to JP2 file codestream

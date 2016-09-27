@@ -1,5 +1,5 @@
 #ifndef EllipsoidShape_h
-#define EllipsoicShape_h
+#define EllipsoidShape_h
 /**
  * @file
  * $Revision: 1.20 $

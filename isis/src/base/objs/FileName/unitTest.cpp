@@ -197,14 +197,14 @@ void TestVersioning(QString prefix, QString name, bool containsDate) {
     FileName test(name);
 
     try {
-      cout << prefix << "\tHighest Version Name:          "
-           << test.highestVersion().name() << endl;
-      cout << prefix << "\tHighest Version Orig:          "
-           << test.highestVersion().original() << endl;
-      cout << prefix << "\tHighest Version Orig Path:     "
-           << test.highestVersion().originalPath() << endl;
-      cout << prefix << "\tHigh version changed FileName: "
-           << (test != test.highestVersion()) << endl;
+      cout << prefix << "\tHighest Version Name:          ";
+      cout << test.highestVersion().name() << endl;
+      cout << prefix << "\tHighest Version Orig:          ";
+      cout << test.highestVersion().original() << endl;
+      cout << prefix << "\tHighest Version Orig Path:     ";
+      cout << test.highestVersion().originalPath() << endl;
+      cout << prefix << "\tHigh version changed FileName: ";
+      cout << (test != test.highestVersion()) << endl;
     }
     catch (IException &e) {
       cout << prefix << "\tHighest Version Failed:     " << e.toString() << endl;
@@ -212,14 +212,14 @@ void TestVersioning(QString prefix, QString name, bool containsDate) {
 
     try {
       if (!containsDate) {
-        cout << prefix << "\tNew Version Name:              "
-             << test.newVersion().name() << endl;
-        cout << prefix << "\tNew Version Orig:              "
-             << test.newVersion().original() << endl;
-        cout << prefix << "\tNew Version Orig Path:         "
-             << test.newVersion().originalPath() << endl;
-        cout << prefix << "\tNew version changed FileName: "
-             << (test != test.newVersion()) << endl;
+        cout << prefix << "\tNew Version Name:              ";
+        cout << test.newVersion().name() << endl;
+        cout << prefix << "\tNew Version Orig:              ";
+        cout << test.newVersion().original() << endl;
+        cout << prefix << "\tNew Version Orig Path:         ";
+        cout << test.newVersion().originalPath() << endl;
+        cout << prefix << "\tNew version changed FileName: ";
+        cout << (test != test.newVersion()) << endl;
       }
     }
     catch (IException &e) {
@@ -248,8 +248,9 @@ void TestGenericAccessors(QString prefix, QString name, bool showExpandedValues)
   cout << prefix << "\tName:              " << test.name() << endl;
   cout << prefix << "\tBase Name:         " << test.baseName() << endl;
 
-  if (showExpandedValues)
+  if (showExpandedValues) {
     cout << prefix << "\tPath:              " << test.path() << endl;
+  }
 
   cout << prefix << "\tOriginal path      " << test.originalPath() << endl;
 
@@ -259,8 +260,9 @@ void TestGenericAccessors(QString prefix, QString name, bool showExpandedValues)
 
   cout << prefix << "\tComparison (!=):   " << (a != c) << endl;
 
-  if (showExpandedValues)
+  if (showExpandedValues) {
     cout << prefix << "\tExpanded           " << test.expanded() << endl;
+  }
 
   cout << prefix << "\tExists             " << test.fileExists() << endl;
   cout << endl;
@@ -281,9 +283,10 @@ void TestExtensionChanges(QString prefix, QString name, bool showExpandedValues)
 
   FileName beforeLastChange = test;
 
-  if (!showExpandedValues)
+  if (!showExpandedValues) {
     toStringMethod = &FileName::original;
-
+  }
+  
   cout << prefix << "Testing Extension change [" << name << "]" << endl;
   cout << prefix << "\tBefore modification:      " << (test.*toStringMethod)() << endl;
   cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;

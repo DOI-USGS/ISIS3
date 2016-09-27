@@ -1,5 +1,7 @@
 #include "Gui.h"
 
+#include <clocale>
+
 #include <sstream>
 #include <string>
 
@@ -80,7 +82,7 @@ namespace Isis {
     new QApplication(argc, argv);
     // When QApplication is initialized, it will reset the locale to the shells locale. As a result
     // the locale needs to be reset after QApplications initialization.
-    std::setlocale(LC_ALL, "en_US");
+    setlocale(LC_ALL, "en_US");
     QCoreApplication::setApplicationName(FileName(argv[0]).baseName());
     QApplication::setQuitOnLastWindowClosed(true);
 

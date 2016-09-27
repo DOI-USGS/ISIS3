@@ -1092,9 +1092,9 @@ namespace Isis {
     //   if it's smaller than the edge DN's invert the chip DNs
     double samples = window.Samples();
     double lines= window.Lines();
-    double bestDN = window.GetValue(window.ChipSample(), window.ChipLine()); 
+    double bestDN = window.GetValue(window.ChipSample(), window.ChipLine());
     if (bestDN < window.GetValue(1, 1)) {
-      for (int s=1; s <= samples; s++) 
+      for (int s=1; s <= samples; s++)
         for (int l=1; l <= lines; l++)
           window.SetValue(s, l, 1.0/window.GetValue(s, l)); //invert all the window DN's
       bestDN = 1 / bestDN;
@@ -1136,9 +1136,9 @@ namespace Isis {
 
     if (p_chipSample != p_chipSample) {
       p_surfaceModelSolutionInvalidCount++;
-      return false;  //this should never happen, but just in case...       
+      return false;  //this should never happen, but just in case...
     }
-    
+
     return true;
   }
 

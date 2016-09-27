@@ -46,6 +46,8 @@ namespace Isis {
    *   @history 2012-11-02 Steven Lambright - Updated automatic environment setup to fix
    *                           a library dependency problem (that is ignoring our plugin path
    *                           setting) with QDBus. Fixes #1228.
+   *   @history 2106-06-20 Kris Becker - Porting to Qt5.6 requires a different Qt startup
+   *                           strategy. See QStartup().
    */
   class Environment {
     public:
@@ -55,13 +57,12 @@ namespace Isis {
       static QString hostName();
       static QString isisVersion();
       
-      
+      static QString getEnvironmentValue(QString, QString);
     protected:
       Environment();
       
       
     private:
-      static QString getEnvironmentValue(QString, QString);
       /**
        *  Construct an environment in static space to initialize some
        *    global Isis 3 environment options. This initialization

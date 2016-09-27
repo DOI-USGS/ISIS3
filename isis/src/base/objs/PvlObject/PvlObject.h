@@ -67,6 +67,9 @@ namespace Isis {
    *                                        corresponding Template Object
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *  @history 2016-08-24 Kelvin Rodriguez - Unit test properly converts indices
+   *                          to strings inside loops when appending to strings. Silences
+   *                          -Wstring-plus-int warnings on Clang. Part of porting to OS X 10.11
    */
   class PvlObject : public Isis::PvlContainer {
     public:

@@ -383,7 +383,7 @@ namespace Isis {
     euler = 0.5772156649;
 
     nm1 = n - 1;
-    if(n < 0 || x < 0.0 || (x == 0.0 && (n == 0 || n == 1))) {
+    if((x < 0.0) || (x == 0.0 && (n == 0 || n == 1))) {
       IString msg = "AtmosModel::En() - Invalid arguments. ";
       msg += "Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). ";
       msg += "Entered x = " + IString(x) + " and n = " + IString((int) n);

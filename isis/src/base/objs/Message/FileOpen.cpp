@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include "Message.h"
+
+using namespace std;
 
 QString Isis::Message::FileOpen(const QString &filename) {
   return "Unable to open [" + filename + "]";

@@ -30,10 +30,10 @@ namespace Isis {
    * @brief Process cubes by spectra
    *
    * This class allows a programmer to develop a program which process input and
-   * output cubes sequentially by spectra. That is, receive the input data for 
-   * spectra one, manipulate the data, and pass back the data for output spectra 
-   * one. Then proceed to the spectra two and so one. This class is derived from 
-   * the ProcessByBrick class which give many functions for setting up input and 
+   * output cubes sequentially by spectra. That is, receive the input data for
+   * spectra one, manipulate the data, and pass back the data for output spectra
+   * one. Then proceed to the spectra two and so one. This class is derived from
+   * the ProcessByBrick class which give many functions for setting up input and
    * output cubes.
    *
    *
@@ -53,25 +53,26 @@ namespace Isis {
    */
   class ProcessBySpectra : public Isis::ProcessByBrick {
     private:
-      int p_spectraType; /**< Spectra type: valid values are 0 (PerPixel), 
+      int p_spectraType; /**< Spectra type: valid values are 0 (PerPixel),
                               1 (ByLine), or 2 (BySample)*/
 
     public:
-      /** 
-       * Constructs ProcessBySpectra object using specified spectra type. 
-       * <UL> 
+      /**
+       * Constructs ProcessBySpectra object using specified spectra type.
+       * <UL>
        *   <LI> 0 = PerPixel
        *   <LI> 1 = ByLine
        *   <LI> 2 = BySample
        * </UL>
-       *  
-       * @param type Spectra type to be given the object. Defaults to PerPixel 
+       *
+       * @param type Spectra type to be given the object. Defaults to PerPixel
        *             (0)
        */
       ProcessBySpectra(const int type = PerPixel): ProcessByBrick() {
         SetType(type);
       };
 
+      using Isis::ProcessByBrick::SetInputCube; // Make parent functions visable
       Isis::Cube *SetInputCube(const QString &parameter,
                                const int requirements = 0);
       Isis::Cube *SetInputCube(const QString &file,
@@ -81,8 +82,8 @@ namespace Isis {
       void SetType(const int type);
 
       /**
-       * Returns the spectra type: 
-       * <UL> 
+       * Returns the spectra type:
+       * <UL>
        *   <LI> 0 = PerPixel
        *   <LI> 1 = ByLine
        *   <LI> 2 = BySample
@@ -106,7 +107,7 @@ namespace Isis {
        * @param funct
        * @param threaded
        */
-      template <typename Functor> 
+      template <typename Functor>
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
         //SetBrickSizesForProcessCubeInPlace();
           VerifyCubes(InPlace);
@@ -119,7 +120,7 @@ namespace Isis {
        * @param funct
        * @param threaded
        */
-      template <typename Functor>     
+      template <typename Functor>
       void ProcessCube(const Functor & funct, bool threaded = true) {
         //SetBrickSizesForProcessCube();
           VerifyCubes(InputOutput);

@@ -5,7 +5,7 @@
 
 template<typename T> class QList;
 
-template<typename A, typename B> class QPair;
+template<typename A, typename B> struct QPair;
 template<typename A, typename B> class QMap;
 
 class QReadWriteLock;
@@ -45,6 +45,7 @@ namespace Isis {
    *   @history 2010-08-24 Eric Hyer - Added the RemoveCube method
    *   @history 2012-02-27 Jai Rideout and Steven Lambright - Made
    *                           BricksInMemory() thread-safe. Fixes #733.
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *
    *   @todo Add state recording/reverting functionality
    *

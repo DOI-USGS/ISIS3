@@ -72,6 +72,7 @@ namespace Isis {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;
     }
+
     lib.setFileName(libraryFile.expanded());
 
     QFunctionPointer plugin = lib.resolve(pluginName.toLatin1().data());
@@ -84,4 +85,3 @@ namespace Isis {
     return plugin;
   }
 } // end namespace isis
-

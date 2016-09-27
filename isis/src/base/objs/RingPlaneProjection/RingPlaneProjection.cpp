@@ -67,19 +67,19 @@ namespace Isis {
    *                     End
    *                   @endcode
    *
-   * @throw IException::Unknown - "Projection failed. Invalid value 
+   * @throw IException::Unknown - "Projection failed. Invalid value
    *            for keyword [RingLongitudeDirection] must be [Clockwise or CounterClockwise]"
-   * @throw IException::Unknown - "Projection failed. Invalid value 
+   * @throw IException::Unknown - "Projection failed. Invalid value
    *            for keyword [RingLongitudeDomain] must be [180 or 360]"
    * @throw IException::Unknown - "Projection failed. [MinimumRingRadius] is not valid"
    * @throw IException::Unknown - "Projection failed. [MaximumRingRadius] is not valid"
-   * @throw IException::Unknown - "Projection failed. 
+   * @throw IException::Unknown - "Projection failed.
    *            [MinimumRingRadius,MaximumRingRadius] are not properly ordered"
-   * @throw IException::Unknown - "Projection failed. 
+   * @throw IException::Unknown - "Projection failed.
    *            [MinimumRingLongitude,MaximumRingLongitude] are not properly ordered"
-   * @throw IException::Unknown - "Projection failed. Invalid label 
+   * @throw IException::Unknown - "Projection failed. Invalid label
    *            group [Mapping]"
-   * 
+   *
    */
   RingPlaneProjection::RingPlaneProjection(Pvl &label) : Projection::Projection(label) {
     try {
@@ -149,7 +149,7 @@ namespace Isis {
         if (m_minimumRingLongitude >= m_maximumRingLongitude) {
           IString msg = "Projection failed. "
                         "[MinimumRingLongitude,MaximumRingLongitude] of ["
-                        + IString(m_minimumRingLongitude) + "," 
+                        + IString(m_minimumRingLongitude) + ","
                         + IString(m_maximumRingLongitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -185,10 +185,10 @@ namespace Isis {
   }
 
   /**
-   * This method determines whether two map projection objects are equal by 
-   * comparing the ring longitude direction, resolution, and projection name. 
-   *  
-   * @param proj A reference to a Projection object to which this Projection 
+   * This method determines whether two map projection objects are equal by
+   * comparing the ring longitude direction, resolution, and projection name.
+   *
+   * @param proj A reference to a Projection object to which this Projection
    *             will be compared.
    *
    * @return bool Indicates whether the Projection objects are equivalent.
@@ -203,11 +203,11 @@ namespace Isis {
 
 
   /**
-   * This method returns the radius of true scale. It is a virtual function 
-   * and if it is not overriden the default radius of true scale is 0 (at 
-   * the equator). Otherwise it is projection specific. This method is 
-   * used by the Scale routine to ensure the  local radius is used in the 
-   * computation. 
+   * This method returns the radius of true scale. It is a virtual function
+   * and if it is not overriden the default radius of true scale is 0 (at
+   * the equator). Otherwise it is projection specific. This method is
+   * used by the Scale routine to ensure the  local radius is used in the
+   * computation.
    *
    * @return double The radius where the projection is not distorted.
    */
@@ -218,7 +218,7 @@ namespace Isis {
 
   /**
    * This indicates if the longitude direction type is positive west (as
-   * opposed to postive east). The longitude type was obtained from the 
+   * opposed to postive east). The longitude type was obtained from the
    * label during object construction.
    *
    * @return bool
@@ -229,7 +229,7 @@ namespace Isis {
 
   /**
    * This indicates if the longitude direction type is positive east (as
-   * opposed to postive west). The longitude type was obtained from the 
+   * opposed to postive west). The longitude type was obtained from the
    * label during object construction.
    *
    * @return bool
@@ -241,22 +241,22 @@ namespace Isis {
   /**
    * This method converts an ring longitude into the clockwise direction.
    *
-   * @param ringLongitude The ring longitude to convert into the clockwise 
+   * @param ringLongitude The ring longitude to convert into the clockwise
    *                      direction.
-   * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for 
+   * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for
    *            0 to 360).
-   *  
-   * @throw IException::Unknown - "The given ring longitude is invalid." 
+   *
+   * @throw IException::Unknown - "The given ring longitude is invalid."
    * @throw IException::Unknown - "Unable to convert ring longitude.  Domain is
    *            not 180 or 360."
-   *  
+   *
    * @return double The ring longitude value, in clockwise direction.
    */
   double RingPlaneProjection::ToClockwise(const double ringLongitude, const int domain) {
     if (ringLongitude == Null) {
-      throw IException(IException::Unknown, 
-                       "Unable to convert to Clockwise. The given ring longitude value [" 
-                       + IString(ringLongitude) + "] is invalid.", 
+      throw IException(IException::Unknown,
+                       "Unable to convert to Clockwise. The given ring longitude value ["
+                       + Isis::toString(ringLongitude) + "] is invalid.",
                        _FILEINFO_);
     }
     double myRingLongitude = ringLongitude;
@@ -270,7 +270,7 @@ namespace Isis {
       myRingLongitude = To180Domain(myRingLongitude);
     }
     else {
-      IString msg = "Unable to convert ring longitude.  Domain [" + IString(domain) 
+      IString msg = "Unable to convert ring longitude.  Domain [" + Isis::toString(domain)
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -281,22 +281,22 @@ namespace Isis {
   /**
    * This method converts an ring longitude into the counterclockwise direction.
    *
-   * @param ringLongitude The ring Longitude to convert into the counterclockwise 
+   * @param ringLongitude The ring Longitude to convert into the counterclockwise
    *            direction.
-   * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for 
+   * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for
    *            0 to 360).
    *
-   * @throw IException::Unknown - "The given ring longitude is invalid." 
+   * @throw IException::Unknown - "The given ring longitude is invalid."
    * @throw IException::Unknown - "Unable to convert ring longitude.  Domain is
    *            not 180 or 360."
-   *  
+   *
    * @return double The ring longitude value, in counterclockwise direction.
    */
   double RingPlaneProjection::ToCounterClockwise(const double ringLongitude, const int domain) {
     if (ringLongitude == Null) {
-      throw IException(IException::Unknown, 
-                       "Unable to convert to CounterClockwise. The given ring longitude value [" 
-                       + IString(ringLongitude) + "] is invalid.", 
+      throw IException(IException::Unknown,
+                       "Unable to convert to CounterClockwise. The given ring longitude value ["
+                       + IString(ringLongitude) + "] is invalid.",
                        _FILEINFO_);
     }
     double myRingLongitude = ringLongitude;
@@ -323,7 +323,7 @@ namespace Isis {
    * This method returns the ring longitude direction as a string. It will return
    * either Clockwise or CounterClockwise.
    *
-   * @return string The ring longitude direction, "Clockwise" or 
+   * @return string The ring longitude direction, "Clockwise" or
    *         "CounterClockwise".
    */
   string RingPlaneProjection::RingLongitudeDirectionString() const {
@@ -354,28 +354,28 @@ namespace Isis {
   }
 
   /**
-   * This method converts a ring longitude into the -180 to 180 domain. It will 
-   * leave the ring longitude unchanged if it is already in the domain. 
+   * This method converts a ring longitude into the -180 to 180 domain. It will
+   * leave the ring longitude unchanged if it is already in the domain.
    *
-   * @param ringLongitude A ring longitude to convert into the -180 to 180 
+   * @param ringLongitude A ring longitude to convert into the -180 to 180
    *                      domain.
    *
-   * @throw IException::Unknown - "The given longitude is invalid." 
-   *  
+   * @throw IException::Unknown - "The given longitude is invalid."
+   *
    * @return double The ring longitude, converted to 180 domain.
    */
   double RingPlaneProjection::To180Domain(const double ringLongitude) {
     if (ringLongitude == Null) {
-      throw IException(IException::Unknown, 
-                       "Unable to convert to 180 degree domain. The given ring longitude value [" 
-                       + IString(ringLongitude) + "] is invalid.", 
+      throw IException(IException::Unknown,
+                       "Unable to convert to 180 degree domain. The given ring longitude value ["
+                       + IString(ringLongitude) + "] is invalid.",
                        _FILEINFO_);
     }
     return Isis::Longitude(ringLongitude, Angle::Degrees).force180Domain().degrees();
   }
 
   /**
-   * This method converts an ring longitude into the 0 to 360 domain. It will leave 
+   * This method converts an ring longitude into the 0 to 360 domain. It will leave
    * the ring longitude unchanged if it is already in the domain.
    *
    * @param ringLongitude The ring longitude to convert into the 0 to 360 domain.
@@ -384,9 +384,9 @@ namespace Isis {
    */
   double RingPlaneProjection::To360Domain(const double ringLongitude) {
     if (ringLongitude == Null) {
-      throw IException(IException::Unknown, 
-                       "Unable to convert to 360 degree domain. The given ring longitude value [" 
-                       + IString(ringLongitude) + "] is invalid.", 
+      throw IException(IException::Unknown,
+                       "Unable to convert to 360 degree domain. The given ring longitude value ["
+                       + IString(ringLongitude) + "] is invalid.",
                        _FILEINFO_);
     }
     double result = ringLongitude;
@@ -400,8 +400,8 @@ namespace Isis {
   }
 
   /**
-   * This method returns the ring longitude domain as a string. It will return 
-   * either 180 or 360. 
+   * This method returns the ring longitude domain as a string. It will return
+   * either 180 or 360.
    *
    * @return string The ring longitude domain, "180" or "360".
    */
@@ -411,8 +411,8 @@ namespace Isis {
   }
 
   /**
-   * This returns the minimum radius of the area of interest. The value 
-   * was obtained from the labels during object construction. This method 
+   * This returns the minimum radius of the area of interest. The value
+   * was obtained from the labels during object construction. This method
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
@@ -422,8 +422,8 @@ namespace Isis {
   }
 
   /**
-   * This returns the maximum radius of the area of interest. The value 
-   * was obtained from the labels during object construction. This method 
+   * This returns the maximum radius of the area of interest. The value
+   * was obtained from the labels during object construction. This method
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
@@ -434,7 +434,7 @@ namespace Isis {
 
   /**
    * This returns the minimum ring longitude of the area of interest. The value
-   * was obtained from the labels during object construction. This method 
+   * was obtained from the labels during object construction. This method
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
@@ -445,7 +445,7 @@ namespace Isis {
 
   /**
    * This returns the maximum ring longitude of the area of interest. The value
-   * was obtained from the labels during object construction. This method 
+   * was obtained from the labels during object construction. This method
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
@@ -456,12 +456,12 @@ namespace Isis {
 
   /**
    * This method is used to set the ring radius/longitude (assumed to be
-   * of the correct LatitudeType, LongitudeDirection, and LongitudeDomain. The 
-   * Set forces an attempted calculation of the projection X/Y values. This may 
-   * or may not be successful and a status is returned as such. Usually this 
-   * method is overridden in a dervied class, for example, Sinusoidal. If not 
-   * the default method simply copies ring rad/lon to x/y which is no 
-   * projection. 
+   * of the correct LatitudeType, LongitudeDirection, and LongitudeDomain. The
+   * Set forces an attempted calculation of the projection X/Y values. This may
+   * or may not be successful and a status is returned as such. Usually this
+   * method is overridden in a dervied class, for example, Sinusoidal. If not
+   * the default method simply copies ring rad/lon to x/y which is no
+   * projection.
    *
    * @param ringRadius The ring radius value to project
    * @param ringLongitude The ring longitude value to project
@@ -484,11 +484,11 @@ namespace Isis {
 
   /**
    * This method is used to set the projection x/y. The Set forces an attempted
-   * calculation of the corresponding ring radius/longitude position. This may 
-   * or may not be successful and a status is returned as such.  Usually this 
-   * method is overridden in a dervied class, for example, Sinusoidal. If not 
-   * the default method simply copies x/y to  ring rad/lon to x/y which is no 
-   * projection. 
+   * calculation of the corresponding ring radius/longitude position. This may
+   * or may not be successful and a status is returned as such.  Usually this
+   * method is overridden in a dervied class, for example, Sinusoidal. If not
+   * the default method simply copies x/y to  ring rad/lon to x/y which is no
+   * projection.
    *
    * @param x X coordinate of the projection in units that are the same as the
    *          radii in the label
@@ -537,8 +537,8 @@ namespace Isis {
   /**
    * This returns a ring longitude with correct ring longitude direction and
    * domain as specified in the label object. The method can only be used if
-   * SetGround, SetCoordinate, SetUniversalGround, or SetWorld return with 
-   * success. Success can also be checked using the IsGood method. 
+   * SetGround, SetCoordinate, SetUniversalGround, or SetWorld return with
+   * success. Success can also be checked using the IsGood method.
    *
    * @return double
    */
@@ -548,12 +548,12 @@ namespace Isis {
 
   /**
    * This method is used to set the ring radius/longitude which must be
-   * PositiveEast/Domain360 (ring longitude). The Set forces an attempted 
-   * calculation of the projection X/Y values. This may or may not be 
-   * successful and a status is returned as such. 
+   * PositiveEast/Domain360 (ring longitude). The Set forces an attempted
+   * calculation of the projection X/Y values. This may or may not be
+   * successful and a status is returned as such.
    *
    * @param ringRadius The ring radius value to project
-   * @param ringLongitude PositiveEast, Domain360 ring longitude value to 
+   * @param ringLongitude PositiveEast, Domain360 ring longitude value to
    *                      project
    *
    * @return bool Indicates whether the method was successful.
@@ -583,7 +583,7 @@ namespace Isis {
     }
 
   /**
-   * This returns a universal radius, which is just the radius in meters. 
+   * This returns a universal radius, which is just the radius in meters.
    *
    * @return double The universal radius.
    */
@@ -633,42 +633,42 @@ namespace Isis {
 
   /**
    * This method is used to determine the x/y range which completely covers the
-   * area of interest specified by the ring radius/longitude range. The ring 
-   * radius/ring longitude range may be obtained from the labels. This method 
-   * should not be used if HasGroundRange is false. The purpose of this method 
-   * is to return the x/y range so it can be used to compute how large a map 
-   * may need to be. For example, how big a piece of paper is needed or how 
-   * large of an image needs to be created. This is method and therefore must 
-   * be written by the derived class (e.g., Planar). The method may fail as 
-   * indicated by its return value. 
+   * area of interest specified by the ring radius/longitude range. The ring
+   * radius/ring longitude range may be obtained from the labels. This method
+   * should not be used if HasGroundRange is false. The purpose of this method
+   * is to return the x/y range so it can be used to compute how large a map
+   * may need to be. For example, how big a piece of paper is needed or how
+   * large of an image needs to be created. This is method and therefore must
+   * be written by the derived class (e.g., Planar). The method may fail as
+   * indicated by its return value.
    *
-   * 
-   * @param &minX Reference to the address where the minimum x 
+   *
+   * @param &minX Reference to the address where the minimum x
    *             coordinate value will be written.  The Minimum x projection
    *             coordinate calculated by this method covers the ring
    *             radius/longitude range specified in the labels.
    *
-   * @param &maxX Reference to the address where the maximum x 
+   * @param &maxX Reference to the address where the maximum x
    *             coordinate value will be written.  The Maximum x projection
    *             coordinate calculated by this method covers the ring
    *             radius/longitude range specified in the labels.
    *
-   * @param &minY Reference to the address where the minimum y 
+   * @param &minY Reference to the address where the minimum y
    *             coordinate value will be written.  The Minimum y projection
    *             coordinate calculated by this method covers the ring
    *             radius/longitude range specified in the labels.
    *
-   * @param &maxY Reference to the address where the maximum y 
+   * @param &maxY Reference to the address where the maximum y
    *             coordinate value will be written.  The Maximum y projection
    *             coordinate calculated by this method covers the ring
    *             radius/longitude range specified in the labels.
-   * 
-   * @return bool Indicates whether the method was able to determine the X/Y 
+   *
+   * @return bool Indicates whether the method was able to determine the X/Y
    *              Range of the projection.  If yes, minX, maxX, minY, maxY will
    *              be set with these values.
    *
    */
-  bool RingPlaneProjection::XYRange(double &minX, double &maxX, 
+  bool RingPlaneProjection::XYRange(double &minX, double &maxX,
                            double &minY, double &maxY) {
     if (minX == Null || maxX == Null || minY == Null || maxY == Null) {
       return false;
@@ -685,9 +685,9 @@ namespace Isis {
 
   /**
    * This convience function is established to assist in the development of the
-   * XYRange virtual method. It allows the developer to test ground points (ring 
-   * radius/longitude) to see if they produce a minimum/maximum projection 
-   * coordinate. For example in Planar, 
+   * XYRange virtual method. It allows the developer to test ground points (ring
+   * radius/longitude) to see if they produce a minimum/maximum projection
+   * coordinate. For example in Planar,
    *    @code
    *       bool Planar::XYRange(double &minX, double &maxX,
    *                                    double &minY, double &maxY) {
@@ -736,34 +736,34 @@ namespace Isis {
     return;
   }
 
-  /** 
-   * This method is used to find the XY range for oblique aspect projections 
-   * (non-polar projections) by "walking" around each of the min/max ring 
-   * rad/lon. 
-   *  
-   * @param minX Minimum x projection coordinate which covers the ring 
+  /**
+   * This method is used to find the XY range for oblique aspect projections
+   * (non-polar projections) by "walking" around each of the min/max ring
+   * rad/lon.
+   *
+   * @param minX Minimum x projection coordinate which covers the ring
    *             radius/longitude range specified in the labels.
-   * @param maxX Maximum x projection coordinate which covers the ring 
+   * @param maxX Maximum x projection coordinate which covers the ring
    *             radius/longitude range specified in the labels.
-   * @param minY Minimum y projection coordinate which covers the ring 
+   * @param minY Minimum y projection coordinate which covers the ring
    *             radius/longitude range specified in the labels.
-   * @param maxY Maximum y projection coordinate which covers the ring 
+   * @param maxY Maximum y projection coordinate which covers the ring
    *             radius/longitude range specified in the labels.
-   * 
+   *
    * @return @b bool Indicates whether the method was successful.
    * @see XYRange()
-   * @author Stephen Lambright 
+   * @author Stephen Lambright
    * @internal
    *   @history 2011-07-02 Jeannie Backer - Moved this code from
    *                           ObliqueCylindrical class to its own method here.
    */
-  // bool Projection::xyRangeOblique(double &minX, double &maxX, 
+  // bool Projection::xyRangeOblique(double &minX, double &maxX,
   //                                 double &minY, double &maxY) {
   //   if (minX == Null || maxX == Null || minY == Null || maxY == Null) {
   //     return false;
   //   }
   //   //For oblique, we'll have to walk all 4 sides to find out min/max x/y values
-  //   if (!HasGroundRange()) return false; // Don't have min/max ring rad/lon, 
+  //   if (!HasGroundRange()) return false; // Don't have min/max ring rad/lon,
   //                                       //can't continue
 
   //   m_specialLatCases.clear();
@@ -774,16 +774,16 @@ namespace Isis {
   //   double minFoundY1, minFoundY2;
 
   //   // Search for minX between minlat and maxlat along minlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            minFoundX1, MinimumLongitude(), true, true, true);
   //   // Search for minX between minlat and maxlat along maxlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            minFoundX2, MaximumLongitude(), true, true, true);
   //   // Search for minY between minlat and maxlat along minlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            minFoundY1, MinimumLongitude(), false, true, true);
   //   // Search for minY between minlat and maxlat along maxlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            minFoundY2, MaximumLongitude(), false, true, true);
 
   //   // Second, search latitude for min X/Y
@@ -791,16 +791,16 @@ namespace Isis {
   //   double minFoundY3, minFoundY4;
 
   //   // Search for minX between minlon and maxlon along minlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            minFoundX3, MinimumLatitude(), true, false, true);
   //   // Search for minX between minlon and maxlon along maxlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            minFoundX4, MaximumLatitude(), true, false, true);
   //   // Search for minY between minlon and maxlon along minlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            minFoundY3, MinimumLatitude(), false, false, true);
   //   // Search for minY between minlon and maxlon along maxlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            minFoundY4, MaximumLatitude(), false, false, true);
 
   //   // We've searched all possible minimums, go ahead and store the lowest
@@ -818,16 +818,16 @@ namespace Isis {
   //   maxFoundY2;
 
   //   // Search for maxX between minlat and maxlat along minlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            maxFoundX1, MinimumLongitude(), true, true, false);
   //   // Search for maxX between minlat and maxlat along maxlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            maxFoundX2, MaximumLongitude(), true, true, false);
   //   // Search for maxY between minlat and maxlat along minlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            maxFoundY1, MinimumLongitude(), false, true, false);
   //   // Search for maxY between minlat and maxlat along maxlon
-  //   doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //   doSearch(MinimumLatitude(), MaximumLatitude(),
   //            maxFoundY2, MaximumLongitude(), false, true, false);
 
   //   // Search latitude for max X/Y
@@ -835,16 +835,16 @@ namespace Isis {
   //   double maxFoundY3, maxFoundY4;
 
   //   // Search for maxX between minlon and maxlon along minlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            maxFoundX3, MinimumLatitude(), true, false, false);
   //   // Search for maxX between minlon and maxlon along maxlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            maxFoundX4, MaximumLatitude(), true, false, false);
   //   // Search for maxY between minlon and maxlon along minlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            maxFoundY3, MinimumLatitude(), false, false, false);
   //   // Search for maxY between minlon and maxlon along maxlat
-  //   doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //   doSearch(MinimumLongitude(), MaximumLongitude(),
   //            maxFoundY4, MaximumLatitude(), false, false, false);
 
   //   // We've searched all possible maximums, go ahead and store the highest
@@ -858,22 +858,22 @@ namespace Isis {
 
   //   // Look along discontinuities for more extremes
   //   vector<double> specialLatCases = m_specialLatCases;
-  //   for (unsigned int specialLatCase = 0; 
-  //       specialLatCase < specialLatCases.size(); 
+  //   for (unsigned int specialLatCase = 0;
+  //       specialLatCase < specialLatCases.size();
   //       specialLatCase ++) {
   //     double minX, maxX, minY, maxY;
 
   //     // Search for minX between minlon and maxlon along latitude discontinuities
-  //     doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //     doSearch(MinimumLongitude(), MaximumLongitude(),
   //              minX, specialLatCases[specialLatCase], true,  false, true);
   //     // Search for minY between minlon and maxlon along latitude discontinuities
-  //     doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //     doSearch(MinimumLongitude(), MaximumLongitude(),
   //              minY, specialLatCases[specialLatCase], false, false, true);
   //     // Search for maxX between minlon and maxlon along latitude discontinuities
-  //     doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //     doSearch(MinimumLongitude(), MaximumLongitude(),
   //              maxX, specialLatCases[specialLatCase], true,  false, false);
   //     // Search for maxX between minlon and maxlon along latitude discontinuities
-  //     doSearch(MinimumLongitude(), MaximumLongitude(), 
+  //     doSearch(MinimumLongitude(), MaximumLongitude(),
   //              maxY, specialLatCases[specialLatCase], false, false, false);
 
   //     m_minimumX = min(minX, m_minimumX);
@@ -883,22 +883,22 @@ namespace Isis {
   //   }
 
   //   vector<double> specialLonCases = m_specialLonCases;
-  //   for (unsigned int specialLonCase = 0; 
-  //       specialLonCase < specialLonCases.size(); 
+  //   for (unsigned int specialLonCase = 0;
+  //       specialLonCase < specialLonCases.size();
   //       specialLonCase ++) {
   //     double minX, maxX, minY, maxY;
 
   //     // Search for minX between minlat and maxlat along longitude discontinuities
-  //     doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //     doSearch(MinimumLatitude(), MaximumLatitude(),
   //              minX, specialLonCases[specialLonCase], true,  true, true);
   //     // Search for minY between minlat and maxlat along longitude discontinuities
-  //     doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //     doSearch(MinimumLatitude(), MaximumLatitude(),
   //              minY, specialLonCases[specialLonCase], false, true, true);
   //     // Search for maxX between minlat and maxlat along longitude discontinuities
-  //     doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //     doSearch(MinimumLatitude(), MaximumLatitude(),
   //              maxX, specialLonCases[specialLonCase], true,  true, false);
   //     // Search for maxY between minlat and maxlat along longitude discontinuities
-  //     doSearch(MinimumLatitude(), MaximumLatitude(), 
+  //     doSearch(MinimumLatitude(), MaximumLatitude(),
   //              maxY, specialLonCases[specialLonCase], false, true, false);
 
   //     m_minimumX = min(minX, m_minimumX);
@@ -925,33 +925,33 @@ namespace Isis {
 
   /**
    * This method searches for extreme (min/max/discontinuity) coordinate values
-   * along the constBorder line between minBorder and maxBorder (that is, 
-   * across ring radii/longitudes). This method locates the extrema by 
-   * utilizing the findExtreme() method until the coordinate values converge. 
-   * Then, extremeVal parameter is updated with this value before returning. 
-   *  
-   * Discontinuities are stored in m_specialLatCases and m_specialLonCases so 
-   * they may be checked again later, which creates significantly more accuracy 
-   * in some cases. 
-   *  
+   * along the constBorder line between minBorder and maxBorder (that is,
+   * across ring radii/longitudes). This method locates the extrema by
+   * utilizing the findExtreme() method until the coordinate values converge.
+   * Then, extremeVal parameter is updated with this value before returning.
+   *
+   * Discontinuities are stored in m_specialLatCases and m_specialLonCases so
+   * they may be checked again later, which creates significantly more accuracy
+   * in some cases.
+   *
    * @param minBorder Minimum latitude or longitude to search between.
    * @param maxBorder Maximum latitude or longitude to search between.
-   * @param extremeVal The resulting global coordinate value (min or max 
+   * @param extremeVal The resulting global coordinate value (min or max
    *            value for x or y, depending on findMin and searchX) on the
    *            constBorder.
-   * @param constBorder The latitude or longitude that remains constant.  The 
+   * @param constBorder The latitude or longitude that remains constant.  The
    *            method will step along this border.
-   * @param searchX Indicates whether the method is searching for a min or max 
+   * @param searchX Indicates whether the method is searching for a min or max
    *            x-coordinate.  If false the method searches for min or max
    *            y-coordinate.
-   * @param searchLongitude Indicates whether the method will search 
+   * @param searchLongitude Indicates whether the method will search
    *            along a longitude. If true, constBorder is longitude and all
    *            other borders are latitudes. If false, the method searches a
    *            latitude (constBorder is a lat, other borders lons).
-   * @param findMin Indicates whether the method is looking for a minimum 
+   * @param findMin Indicates whether the method is looking for a minimum
    *            coordinate value. If false, the method is looking for a maximum
    *            value.
-   * @author Steven Lambright 
+   * @author Steven Lambright
    * @internal
    *   @history 2011-07-02 Jeannie Backer - Moved this code from
    *                           ObliqueCylindrical class to its own method
@@ -960,39 +960,39 @@ namespace Isis {
    *                           TOLERANCE with 1/2 pixel resolution.
    *                           (Defaults to 0.5)
    */
-  // void Projection::doSearch(double minBorder, double maxBorder, 
-  //                           double &extremeVal, const double constBorder, 
+  // void Projection::doSearch(double minBorder, double maxBorder,
+  //                           double &extremeVal, const double constBorder,
   //                           bool searchX, bool searchRingLongitude, bool findMin) {
   //   if (minBorder == Null || maxBorder == Null || constBorder == Null) {
   //     return;
   //   }
   //   const double TOLERANCE = m_pixelResolution/2;
-  //   const int NUM_ATTEMPTS = (unsigned int)DBL_DIG; // It's unsafe to go past 
+  //   const int NUM_ATTEMPTS = (unsigned int)DBL_DIG; // It's unsafe to go past
   //                                                   // this precision
 
   //   double minBorderX, minBorderY, maxBorderX, maxBorderY;
   //   int attempts = 0;
 
   //   do {
-  //     findExtreme(minBorder, maxBorder, minBorderX, minBorderY, maxBorderX, 
+  //     findExtreme(minBorder, maxBorder, minBorderX, minBorderY, maxBorderX,
   //                 maxBorderY, constBorder, searchX, searchLongitude, findMin);
-  //     if (minBorderX == Null && maxBorderX == Null 
+  //     if (minBorderX == Null && maxBorderX == Null
   //         && minBorderY == Null && maxBorderY == Null ) {
   //       attempts = NUM_ATTEMPTS;
   //       continue;
   //     }
   //     attempts ++;
   //   }
-  //   while ((fabs(minBorderX - maxBorderX) > TOLERANCE 
+  //   while ((fabs(minBorderX - maxBorderX) > TOLERANCE
   //          || fabs(minBorderY - maxBorderY) > TOLERANCE)
-  //          && (attempts < NUM_ATTEMPTS)); 
+  //          && (attempts < NUM_ATTEMPTS));
   //   // check both x and y distance in case symmetry of map
   //   // For example, if minBorderX = maxBorderX but minBorderY = -maxBorderY,
   //   // these points may not be close enough.
 
   //   if (attempts >= NUM_ATTEMPTS) {
   //     // We zoomed in on a discontinuity because our range never shrank, this
-  //     // will need to be rechecked later. 
+  //     // will need to be rechecked later.
   //     // *min and max border should be nearly identical, so it doesn't matter
   //     //  which is used here
   //     if (searchLongitude) {
@@ -1016,57 +1016,57 @@ namespace Isis {
   // }
 
   /**
-   * Searches for extreme (min/max/discontinuity) coordinate values across 
-   * latitudes/longitudes. 
-   *  
-   * This method looks for these extrema along the constBorder between minBorder 
-   * and maxBorder by stepping along constBorder (10 times) from the minBorder 
-   * and maxBorder. Then, the range of this extreme value is recorded in 
-   * minBorder and maxBorder and the coordinate values corresponding to these 
-   * new borders are stored in minBorderX, minBorderY, maxBorderX and 
-   * maxBorderY. 
-   *  
-   * This function should be used by calling it repeatedly until minBorderX and 
-   * minBorderY do not equal maxBorderX and maxBorderY, respectively. 
-   * Discontinuities will cause the minBorderX, minBorderY, maxBorderX and 
-   * maxBorderY to never converge. If minBorderX never comes close to maxBorderX 
-   * or minBorderY never comes close to maxBorderY, then between minBorder and 
-   * maxBorder is the value of the most extreme value. In this case, either the 
-   * smaller or larger of the x or y values found will be correct, depending on 
-   * the values of findMin and searchX. 
-   *  
-   *  
-   * 
+   * Searches for extreme (min/max/discontinuity) coordinate values across
+   * latitudes/longitudes.
    *
-   * @param minBorder Minimum latitude or longitude to search between. This 
+   * This method looks for these extrema along the constBorder between minBorder
+   * and maxBorder by stepping along constBorder (10 times) from the minBorder
+   * and maxBorder. Then, the range of this extreme value is recorded in
+   * minBorder and maxBorder and the coordinate values corresponding to these
+   * new borders are stored in minBorderX, minBorderY, maxBorderX and
+   * maxBorderY.
+   *
+   * This function should be used by calling it repeatedly until minBorderX and
+   * minBorderY do not equal maxBorderX and maxBorderY, respectively.
+   * Discontinuities will cause the minBorderX, minBorderY, maxBorderX and
+   * maxBorderY to never converge. If minBorderX never comes close to maxBorderX
+   * or minBorderY never comes close to maxBorderY, then between minBorder and
+   * maxBorder is the value of the most extreme value. In this case, either the
+   * smaller or larger of the x or y values found will be correct, depending on
+   * the values of findMin and searchX.
+   *
+   *
+   *
+   *
+   * @param minBorder Minimum latitude or longitude to search between. This
    *            value gets updated to a more precise range.
-   * @param maxBorder Maximum latitude or longitude to search between. This 
+   * @param maxBorder Maximum latitude or longitude to search between. This
    *            value gets updated to a more precise range.
-   * @param minBorderX The x-value corresponding to the lower resultant 
+   * @param minBorderX The x-value corresponding to the lower resultant
    *            minBorder and the constBorder, which is more accurate when
    *            nearly equal to maxBorderX.
-   * @param minBorderY The y-value corresponding to the lower resultant 
+   * @param minBorderY The y-value corresponding to the lower resultant
    *            minBorder and the constBorder, which is more accurate when
    *            nearly equal to maxBorderY.
-   * @param maxBorderX The x-value corresponding to the higher resultant 
+   * @param maxBorderX The x-value corresponding to the higher resultant
    *            maxBorder and the constBorder, which is more accurate when
    *            nearly equal to minBorderX.
-   * @param maxBorderY The y-value corresponding to the higher resultant 
+   * @param maxBorderY The y-value corresponding to the higher resultant
    *            maxBorder and the constBorder, which is more accurate when
    *            nearly equal to minBorderY.
-   * @param constBorder The latitude or longitude that remains constant.  The 
+   * @param constBorder The latitude or longitude that remains constant.  The
    *            method will step along this border.
-   * @param searchX Indicates whether the method is searching for a min or max 
+   * @param searchX Indicates whether the method is searching for a min or max
    *            x-coordinate.  If false the method searches for min or max
    *            y-coordinate.
-   * @param searchLongitude Indicates whether the method will search 
+   * @param searchLongitude Indicates whether the method will search
    *            along a longitude. If true, constBorder is longitude and all
    *            other borders are latitudes. If false, the method searches a
    *            latitude (constBorder is a lat, other borders lons).
-   * @param findMin Indicates whether the method is looking for a minimum 
+   * @param findMin Indicates whether the method is looking for a minimum
    *            coordinate value. If false, the method is looking for a maximum
    *            value.
-   * @author Stephen Lambright 
+   * @author Stephen Lambright
    * @internal
    *   @history 2011-07-02 Jeannie Backer - Moved this code from
    *                           ObliqueCylindrical class to its own method here.
@@ -1076,8 +1076,8 @@ namespace Isis {
    */
   // void Projection::findExtreme(double &minBorder,  double &maxBorder,
   //                              double &minBorderX, double &minBorderY,
-  //                              double &maxBorderX, double &maxBorderY, 
-  //                              const double constBorder, bool searchX, 
+  //                              double &maxBorderX, double &maxBorderY,
+  //                              const double constBorder, bool searchX,
   //                              bool searchRingLongitude, bool findMin) {
   //   if (minBorder == Null || maxBorder == Null || constBorder == Null) {
   //     minBorderX = Null;
@@ -1097,7 +1097,7 @@ namespace Isis {
   //   }
   //   // Always do 10 steps
   //   const double STEP_SIZE = (maxBorder - minBorder) / 10.0;
-  //   const double LOOP_END = maxBorder + (STEP_SIZE / 2.0); // This ensures we do 
+  //   const double LOOP_END = maxBorder + (STEP_SIZE / 2.0); // This ensures we do
   //                                                          // all of the steps
   //                                                          // properly
   //   double currBorderVal = minBorder;
@@ -1137,7 +1137,7 @@ namespace Isis {
   //   double value1 = (searchX) ? XCoord() : YCoord();
   //   double value2 = value1;
 
-  //   // initialize the extreme coordinate value 
+  //   // initialize the extreme coordinate value
   //   // -- this is the largest coordinate value found so far
   //   double extremeVal2 = value2;
 
@@ -1160,20 +1160,20 @@ namespace Isis {
   //     // update the current border value along constBorder
   //     currBorderVal += STEP_SIZE;
   //     setSearchGround(currBorderVal, constBorder, searchRingLongitude);
-  //     if (!m_good){ 
+  //     if (!m_good){
   //       continue;
-  //     } 
-                     
-  //     // update the border and coordinate values 
+  //     }
+
+  //     // update the border and coordinate values
   //     border3 = border2;
   //     border2 = border1;
-  //     border1 = currBorderVal;                                             
+  //     border1 = currBorderVal;
   //     value2 = value1;
   //     value1 = (searchX) ? XCoord() : YCoord();
 
-  //     if ((findMin && value2 < extremeVal2) 
+  //     if ((findMin && value2 < extremeVal2)
   //         || (!findMin && value2 > extremeVal2)) {
-  //       // Compare the coordinate value associated with the center border with 
+  //       // Compare the coordinate value associated with the center border with
   //       // the current extreme. If the updated coordinate value is more extreme
   //       // (smaller or larger, depending on findMin), then we update the
   //       // extremeVal and it's borders.
@@ -1184,12 +1184,12 @@ namespace Isis {
   //     }
   //   }
 
-  //   // update min/max border values to the values on either side of the most 
+  //   // update min/max border values to the values on either side of the most
   //   // extreme coordinate found in this call to this method
-    
+
   //   minBorder = extremeBorder3; // Border 3 is lagging and thus smaller
 
-  //   // since the loop steps past the original maxBorder, we want to retain 
+  //   // since the loop steps past the original maxBorder, we want to retain
   //   // the original maxBorder value so we don't go outside of the original
   //   // min/max range given
   //   if (extremeBorder1 <= maxBorder ) {
@@ -1199,7 +1199,7 @@ namespace Isis {
   //   // update minBorder coordinate values
   //   setSearchGround(minBorder, constBorder, searchRingLongitude);
   //   // if (!m_good){
-  //   //   this should not happen since minBorder has already been verified in 
+  //   //   this should not happen since minBorder has already been verified in
   //   //   the while loop above
   //   // }
 
@@ -1219,29 +1219,29 @@ namespace Isis {
   // }
 
   /**
-   * This function sets the ground for the given border values.  It calls the 
-   * SetGround(lat, lon) method with the appropriate lat/lon values, depending 
-   * on whether variableIsLat is true. 
-   *  
-   * This method is used by doSearch and findExtreme in order to set the ground 
-   * correctly each time. 
+   * This function sets the ground for the given border values.  It calls the
+   * SetGround(lat, lon) method with the appropriate lat/lon values, depending
+   * on whether variableIsLat is true.
    *
-   * @param variableBorder The latitude or longitude that is variable in the 
+   * This method is used by doSearch and findExtreme in order to set the ground
+   * correctly each time.
+   *
+   * @param variableBorder The latitude or longitude that is variable in the
    *            search methods.
-   * @param constBorder The latitude or longitude that is constant in the search 
+   * @param constBorder The latitude or longitude that is constant in the search
    *            methods.
-   * @param variableIsLat Indicates whether variableBorder is the latittude 
+   * @param variableIsLat Indicates whether variableBorder is the latittude
    *            value and constBorder is the longitude value. If false,
    *            variableBorder is the longitude value and constBorder is the
    *            latitude value.
-   * @author Stephen Lambright 
+   * @author Stephen Lambright
    * @internal
    *   @history 2011-07-02 Jeannie Backer - Moved this code from
    *                           ObliqueCylindrical class to its own method here.
    *                           Added error.
    */
-  // void Projection::setSearchGround(const double variableBorder, 
-  //                                  const double constBorder, 
+  // void Projection::setSearchGround(const double variableBorder,
+  //                                  const double constBorder,
   //                                  bool variableIsLat) {
   //   if (variableBorder == Null || constBorder == Null) {
   //     return;
@@ -1336,7 +1336,4 @@ namespace Isis {
     return mapping;
   }
 
-
 } //end namespace isis
-
-

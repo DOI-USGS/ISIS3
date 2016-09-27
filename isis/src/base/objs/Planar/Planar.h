@@ -32,15 +32,15 @@ namespace Isis {
    *
    * This class provides methods for the forward and inverse equations of an
    * Planar map projection.
-   *  
-   * The Orthographic projection is an azimuthal projection.  Latitudes and 
-   * longitudes are ellipses, circles, or straight lines.  Only one hemisphere 
-   * can be projected.  Scale is true at the point (center latitude, center 
-   * longitude). 
-   *  
-   *  
+   *
+   * The Orthographic projection is an azimuthal projection.  Latitudes and
+   * longitudes are ellipses, circles, or straight lines.  Only one hemisphere
+   * can be projected.  Scale is true at the point (center latitude, center
+   * longitude).
+   *
+   *
    * See the Projection class for a full accounting of all the methods
-   * available. 
+   * available.
    *
    * @ingroup MapProjection
    *
@@ -50,6 +50,8 @@ namespace Isis {
    *   @history 2012-08-09 Ken Edmundson - initial version
    *   @history 2012-01-20 Debbie A. Cook - Changed to use RingPlaneProjection instead of Projection.
    *                           References #775.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed several redundant var=var lines
+   *                           causing warnings in clang. Part of porting to OS X 10.11. 
    */
   class Planar : public RingPlaneProjection {
     public:

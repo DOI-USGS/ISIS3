@@ -25,6 +25,8 @@
 
 #include <string>
 #include <vector>
+
+#include <QString>
 #include "NumericalApproximation.h"
 #include "Pvl.h"
 
@@ -60,7 +62,7 @@ namespace Isis {
       //! Return algorithm name found in Pvl file from constructor
       inline QString AlgorithmName() const {
         return p_photoAlgorithmName;
-      };
+      }
 
       virtual void SetStandardConditions(bool standard);
       //! Returns true if standard conditions are used, i.e., if SetStandardConditions(true) has been called.  This is initialized to false in the constructor.
@@ -77,82 +79,104 @@ namespace Isis {
       // Calculate the surface brightness
       double CalcSurfAlbedo(double pha, double inc, double ema);
 
-      virtual void SetPhotoL(const double l) {};
+      virtual void SetPhotoL(const double l) {
+        p_photoL = l;
+      }
 
       //! Return photometric L value
       inline double PhotoL() const {
         return p_photoL;
-      };
+      }
 
-      virtual void SetPhotoK(const double k) {};
+      virtual void SetPhotoK(const double k) {
+        p_photoK = k;
+      }
 
       //! Return photometric K value
       inline double PhotoK() const {
         return p_photoK;
-      };
+      }
 
-      virtual void SetPhotoHg1(const double hg1) {};
+      virtual void SetPhotoHg1(const double hg1) {
+        p_photoHg1 = hg1;
+      }
 
       //! Return photometric Hg1 value
       inline double PhotoHg1() const {
         return p_photoHg1;
-      };
+      }
 
-      virtual void SetPhotoHg2(const double hg2) {};
+      virtual void SetPhotoHg2(const double hg2) {
+        p_photoHg2 = hg2;
+      }
 
       //! Return photometric Hg2 value
       inline double PhotoHg2() const {
         return p_photoHg2;
-      };
+      }
 
-      virtual void SetPhotoBh(const double bh) {};
+      virtual void SetPhotoBh(const double bh) {
+        p_photoBh = bh;
+      }
 
       //! Return photometric Bh value
       inline double PhotoBh() const {
         return p_photoBh;
-      };
+      }
 
-      virtual void SetPhotoCh(const double ch) {};
+      virtual void SetPhotoCh(const double ch) {
+        p_photoCh = ch;
+      }
 
       //! Return photometric Ch value
       inline double PhotoCh() const {
         return p_photoCh;
-      };
+      }
 
-      virtual void SetPhotoWh(const double wh) {};
+      virtual void SetPhotoWh(const double wh) {
+        p_photoWh = wh;
+      }
 
       //! Return photometric Wh value
       inline double PhotoWh() const {
         return p_photoWh;
-      };
+      }
 
-      virtual void SetPhotoHh(const double hh) {};
+      virtual void SetPhotoHh(const double hh) {
+        p_photoHh = hh;
+      }
 
       //! Return photometric Hh value
       inline double PhotoHh() const {
         return p_photoHh;
-      };
+      }
 
-      virtual void SetPhotoB0(const double b0) {};
+      virtual void SetPhotoB0(const double b0) {
+        p_photoB0 = b0;
+      }
 
       //! Return photometric B0 value
       inline double PhotoB0() const {
         return p_photoB0;
-      };
+      }
 
-      virtual void SetPhotoTheta(const double theta) {};
+      virtual void SetPhotoTheta(const double theta) {
+        p_photoTheta = theta;
+      }
 
       //! Return photometric Theta value
       inline double PhotoTheta() const {
         return p_photoTheta;
-      };
+      }
 
-      virtual void SetOldTheta(double theta) {};
+      // virtual void SetOldTheta(double theta) = 0;
 
-      virtual void SetPhoto0B0Standard(const std::string &b0standard) {};
+      virtual void SetPhoto0B0Standard(const QString &b0standard) {
+        p_photo0B0Standard = b0standard;
+      }
 
       //! Return photometric B0 standardization value
-      inline std::string Photo0B0Standard() const {
+      inline QString Photo0B0Standard() const {
         return p_photo0B0Standard;
       }
 
@@ -160,35 +184,36 @@ namespace Isis {
       inline double Hfunc(double u, double gamma) {
         return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
       }
- 
-      virtual void SetPhotoPhaseList(const std::string phasestrlist) {};
-      virtual void SetPhotoKList(const std::string kstrlist) {};
-      virtual void SetPhotoLList(const std::string kstrlist) {};
-      virtual void SetPhotoPhaseCurveList(const std::string phasecurvestrlist) {};
+
+      virtual void SetPhotoPhaseList(const QString) {}
+      virtual void SetPhotoKList(const QString) {}
+      virtual void SetPhotoLList(const QString) {}
+      virtual void SetPhotoPhaseCurveList(const QString) {}
 
       //! Return photometric phase angle list
       inline std::vector<double> PhotoPhaseList() const {
         return p_photoPhaseList;
-      };
+      }
 
       //! Return photometric k value list
       inline std::vector<double> PhotoKList() const {
         return p_photoKList;
-      };
+      }
 
       //! Return photometric l value list
       inline std::vector<double> PhotoLList() const {
         return p_photoLList;
-      };
+      }
 
       //! Return photometric phase curve value list
       inline std::vector<double> PhotoPhaseCurveList() const {
         return p_photoPhaseCurveList;
-      };
+      }
 
     protected:
       virtual double PhotoModelAlgorithm(double phase,
                                          double incidence, double emission) = 0;
+
       double p_photoL;
       double p_photoK;
       double p_photoHg1;
@@ -201,7 +226,7 @@ namespace Isis {
       double p_photoSr;
       double p_photoOsr;
       QString p_algName;
-      std::string p_photo0B0Standard;
+      QString p_photo0B0Standard;
       double p_photoWh;
       double p_photoHh;
       double p_photoB0;

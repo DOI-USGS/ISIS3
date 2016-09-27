@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <sys/resource.h>
+#include <cstdlib>  // atexit
+#include <memory>   // smart pointers
+#include <QCoreApplication>
 
 #include "Cube.h"
 #include "CubeAttribute.h"
@@ -10,7 +13,7 @@
 #include "IString.h"
 
 namespace Isis {
-  CubeManager CubeManager::p_instance;
+  CubeManager *CubeManager::p_instance = 0;
 
   /**
    * This initializes a CubeManager object
@@ -18,23 +21,46 @@ namespace Isis {
    */
   CubeManager::CubeManager() {
 
+    // Grab the Qcore application instace to check if it has been
+    // instantiated yet. If not, instantiate it.
+    if (QCoreApplication::instance() == 0) {
+      static char **argv = 0;
+
+      if(!argv) {
+        argv = new char*[2];
+        argv[0] = new char[1024];
+        strcpy(argv[0], "CubeManager");
+        argv[1] = 0;
+      }
+
+      static int argc  = 1;
+      new QCoreApplication(argc, argv);
+    }
+
     // Get the maximum allowable number of open files for a process
     struct rlimit fileLimit;
-    
+
     if (getrlimit(RLIMIT_NOFILE, &fileLimit) != 0) {
       QString msg = "Cannot read the maximum allowable open files from system resources.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     // Allow for library files, etc used by this process
     // So set or file limit to 60% of maximum allowed number of opened files
     p_maxOpenFiles = fileLimit.rlim_cur * .60;
     p_currentLimit = p_maxOpenFiles;
+
+    // Add the CleanUp() call to QCoreApplication's clean up routine,
+    // this ensures that the static instance of CubeManager is cleaned
+    // up with the rest of ISIS before System application clean up begins
+    // in order to ensure clean destruction. If System deletes CubeManager's
+    // Cubes or any of the individual Cube's memebers before CubeManager gets
+    // deleted, it will cause a segfault.
+    qAddPostRoutine(CleanUp);
   }
 
-
   /**
-   * This is the CubeManager destructor. This method calls CleanCubes().
+   * This is the CubeManager destructor. This method calls CleanCˇubes().
    *
    */
   CubeManager::~CubeManager() {
@@ -53,7 +79,7 @@ namespace Isis {
    * Note that this method will allow for 60% of the system's maximum file limit + 1
    * cubes to be opened, since the cube passed is opened and then cleanup follows. However,
    * since our maximum limit is 60% of the system limit, this will allow enough room for
-   * this extra file to be opened before the cleanup occurs. 
+   * this extra file to be opened before the cleanup occurs.
    *
    * @param cubeFileName The filename of the cube you wish to open
    *
@@ -82,13 +108,13 @@ namespace Isis {
 
       // Need to clean up memory if there is a problem opening a cube
       // This allows the CubeManager class to clean up the dynamically alloc'd
-      // Cube before rethrowing the exception from Cube's open method 
+      // Cube before rethrowing the exception from Cube's open method
       try {
         (*searchResult)->open(fileName);
       }
       catch (IException &e) {
         CleanCubes(fileName);
-        throw; 
+        throw;
       }
     }
 

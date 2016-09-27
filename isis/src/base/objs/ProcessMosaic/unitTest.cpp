@@ -80,7 +80,7 @@ void IsisMain() {
   m2.SetCreateFlag(true);
   m2.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
 
-  m2.SetInputCube("FROM", 2, 2, 1);
+  m2.SetInputCube("FROM", 2, 2, 1, -1, -1, -1);
 
   p.SetOutputCube("TO", 5, 5, 2);
   p.EndProcess();
@@ -340,8 +340,8 @@ void IsisMain() {
   qDebug() << "Test multiple input error";
   try {
     ProcessMosaic m;
-    m.SetInputCube("FROM");
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
@@ -372,7 +372,7 @@ void IsisMain() {
   qDebug() << "Test input does not overlap mosaic";
   try {
     ProcessMosaic m;
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.SetOutputCube("TO");
     m.StartProcess(-20, 0, 1);
     m.EndProcess();
@@ -386,7 +386,7 @@ void IsisMain() {
   qDebug() << "Test input does not overlap mosaic";
   try {
     ProcessMosaic m;
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.SetOutputCube("TO");
     m.StartProcess(54, 23, 1);
     m.EndProcess();
@@ -417,7 +417,7 @@ void IsisMain() {
   qDebug() << "Test no output cube";
   try {
     ProcessMosaic m;
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
@@ -437,7 +437,7 @@ void IsisMain() {
     m.SetBandNumber(1);
 
     m.SetOutputCube("TO");
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
@@ -457,7 +457,7 @@ void IsisMain() {
     m.SetBandNumber(10);
 
     m.SetOutputCube("TO");
-    m.SetInputCube("FROM");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
@@ -488,14 +488,14 @@ void testIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   UserInterface &ui = Isis::Application::GetUserInterface();
   QString sFrom = ui.GetFileName("FROM");
   cInCube.open(sFrom);
-  
+
   qDebug() << "";
   qDebug() << "***  Input Image  ***  ";
   if (ins == 0) ins = cInCube.sampleCount() - iss + 1;
   if (inl == 0) inl = cInCube.lineCount()   - isl + 1;
   if (inb == 0) inb = cInCube.bandCount()   - isb + 1;
 
-  qDebug() << "Stats " << isl << ", " << iss << ", " << isb << ", " 
+  qDebug() << "Stats " << isl << ", " << iss << ", " << isb << ", "
                        << inl << ", " << ins << ", " << inb;
 
   int iS;
@@ -509,7 +509,7 @@ void testIn(int iss, int isl, int isb, int ins, int inl, int inb) {
         if (iPixel == 5) {
           qDebug() << "";
         }
-        qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iS++) << "," 
+        qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iS++) << ","
                  << Isis::toString(band) << ")=" << Isis::toString((int)ciPortal[iPixel]);
       }
       qDebug() << "";
@@ -545,7 +545,7 @@ void testOut(int piSamples, int piLines,
 
   qDebug() << "";
   qDebug() << "***  Mosaic Image  ***  ";
-  qDebug() << "Start Stats " << Isis::toString(piLines) << ", " << Isis::toString(piSamples) 
+  qDebug() << "Start Stats " << Isis::toString(piLines) << ", " << Isis::toString(piSamples)
            << ", " << Isis::toString(piBands);
   qDebug() << "Total Bands=" << Isis::toString(iBands);
   Portal coPortal(5, 1, cOutCube.pixelType());
@@ -581,12 +581,12 @@ void testOut(int piSamples, int piLines,
           iFileIndex = (int)coPortal[iPixel] + iFileIndexOffset + 1;
         }
         if (band == originBand && piPriority != ProcessMosaic::AverageImageWithMosaic) {//orig band
-          qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iPixel + 1) 
-                   << "," << Isis::toString(band) << ")=" << Isis::toString((int)coPortal[iPixel]) 
+          qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iPixel + 1)
+                   << "," << Isis::toString(band) << ")=" << Isis::toString((int)coPortal[iPixel])
                    << ", " << iFileIndex;
         }
         else {
-          qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iPixel + 1) 
+          qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iPixel + 1)
                    << "," << Isis::toString(band) << ")=" << Isis::toString((int)coPortal[iPixel]);
         }
       }

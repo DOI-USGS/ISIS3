@@ -21,10 +21,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include "IException.h"
 #include "IsisAmlData.h"
+
+using namespace std;
 
 // Constructors
 IsisAmlData::IsisAmlData() {
@@ -68,4 +68,3 @@ IsisChangeData::IsisChangeData() {
 
 IsisChangeData::~IsisChangeData() {
 }
-

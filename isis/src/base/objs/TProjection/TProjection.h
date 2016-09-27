@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "Projection.h"  
-#include "PvlGroup.h" // protected data member object (m_mappingGrp) 
+#include "Projection.h"
+#include "PvlGroup.h" // protected data member object (m_mappingGrp)
 
 namespace Isis {
   class Displacement;
@@ -38,10 +38,10 @@ namespace Isis {
    * @brief Base class for Map TProjections
    *
    * This is a second level virtual base class for map projections of triaxial bodies.  It
-   * must be used to create specific map projection classes such as Sinusoidal, 
-   * Mercator, etc. The foundation of this class is the ability to convert ground 
+   * must be used to create specific map projection classes such as Sinusoidal,
+   * Mercator, etc. The foundation of this class is the ability to convert ground
    * coordinates (latitude and longitude) into projection coordinates (x and y) and
-   * vice versa. Options exist to allow conversion to and from programmer specified 
+   * vice versa. Options exist to allow conversion to and from programmer specified
    * world coordinates. The world coordinates can be cube pixels, paper units in
    * millimeters, or any other unit the program may need. Generally, you should
    * never directly instantiate this class.
@@ -128,7 +128,7 @@ namespace Isis {
    *                           iterations for vesta (an asteroid). Fixes #279
    *   @history 2012-03-01 Jeff Anderson - Fixed bug in SetUpperLeftCorner by
    *                           adding Pvl::Replace when updating the mapping
-   *                           labels 
+   *                           labels
    *   @history 2012-03-30 Steven Lambright and Stuart Sides - To360Domain() and
    *                           To180Domain() are now constant time operations.
    *                           Fixes #656.
@@ -164,7 +164,9 @@ namespace Isis {
    *                           TargetRadii() methods to find radii values using the given
    *                           NAIF target code. Fixes #3892
    *   @history 2016-05-10 Jeannie Backer - Moved TargetRadii() methods to Target class.
-   *  
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed redundant var=var lines
+   *            causing warnings in clang. Part of porting to OS X 10.11.
+   *
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
    *         "Get" from methods GetX and GetY, change methods to lower camel
@@ -187,14 +189,14 @@ namespace Isis {
 
       // These return or change properties of the projection, independent of calculations
       /**
-       * This method returns the name of the map projection.  It is a pure 
-       * virtual method (requires all subclasses to override). 
+       * This method returns the name of the map projection.  It is a pure
+       * virtual method (requires all subclasses to override).
        *
        * @return string The name of the map projection.
        */
       virtual QString Name() const = 0;
       /**
-       * This method returns the Version of the map projection.  It is a pure 
+       * This method returns the Version of the map projection.  It is a pure
        * virtual method (requires all subclasses to override).
        *
        * @return string The Version number of the map projection.
@@ -205,15 +207,15 @@ namespace Isis {
       /**
        * This enum defines the types of Latitude supported in this class
        */
-      enum LatitudeType { Planetocentric, /**< Latitudes are measured as the 
-                                               angle from the equatorial 
-                                               plane to the plane through the 
-                                               center of the planet and a given 
-                                               point on the surface of the 
+      enum LatitudeType { Planetocentric, /**< Latitudes are measured as the
+                                               angle from the equatorial
+                                               plane to the plane through the
+                                               center of the planet and a given
+                                               point on the surface of the
                                                planet.*/
-                          Planetographic  /**< Latitudes are measured as the 
-                                               angle from the equatorial plane 
-                                               to the normal to the surface of 
+                          Planetographic  /**< Latitudes are measured as the
+                                               angle from the equatorial plane
+                                               to the normal to the surface of
                                                the planet at a given point.*/
 
                         };
@@ -226,12 +228,12 @@ namespace Isis {
       double ToPlanetographic(const double lat) const;
 
       /**
-       * This enum defines the types of Longitude directions supported in this 
-       * class.  
+       * This enum defines the types of Longitude directions supported in this
+       * class.
        */
-      enum LongitudeDirection { PositiveEast, /**< Longitude values increase in 
+      enum LongitudeDirection { PositiveEast, /**< Longitude values increase in
                                                    the easterly direction.*/
-                                PositiveWest  /**< Longitude values increase in 
+                                PositiveWest  /**< Longitude values increase in
                                                    the westerly direction.*/
                               };
 
@@ -272,7 +274,7 @@ namespace Isis {
       double Scale() const;
 
       // Return the x/y range which covers the lat/lon range in the labels
-      virtual bool XYRange(double &minX, double &maxX, 
+      virtual bool XYRange(double &minX, double &maxX,
                            double &minY, double &maxY);
 
       // get mapping information
@@ -289,13 +291,13 @@ namespace Isis {
       static double ToPositiveEast(const double lon, const int domain);
       static double ToPositiveWest(const double lon, const int domain);
 
-      // change longitude domain 
+      // change longitude domain
       static double To180Domain(const double lon);
       static double To360Domain(const double lon);
 
     protected:
       void XYRangeCheck(const double latitude, const double longitude);
-      bool xyRangeOblique(double &minX, double &maxX, 
+      bool xyRangeOblique(double &minX, double &maxX,
                           double &minY, double &maxY);
 
       // Convience methods for typical projection computations from Snyder
@@ -306,38 +308,38 @@ namespace Isis {
       double e4Compute() const; // page 161
 
     private:
-      void doSearch(double minBorder, double maxBorder, 
+      void doSearch(double minBorder, double maxBorder,
                     double &extremeVal, const double constBorder,
                     bool searchX, bool searchLongitude, bool findMin);
-      void findExtreme(double &minBorder,  double &maxBorder, 
-                       double &minBorderX, double &minBorderY, 
-                       double &maxBorderX, double &maxBorderY, 
-                       const double constBorder, bool searchX, 
+      void findExtreme(double &minBorder,  double &maxBorder,
+                       double &minBorderX, double &minBorderY,
+                       double &maxBorderX, double &maxBorderY,
+                       const double constBorder, bool searchX,
                        bool searchLongitude, bool findMin);
-      void setSearchGround(const double variableBorder, 
+      void setSearchGround(const double variableBorder,
                            const double constBorder, bool variableIsLat);
 
     protected:
-      double m_latitude;   /**< This contain a latitude value. The value is 
+      double m_latitude;   /**< This contain a latitude value. The value is
                                 only usable if m_good is true.*/
-      double m_longitude;  /**< This contain a longitude value. The value is 
+      double m_longitude;  /**< This contain a longitude value. The value is
                                 only usable if m_good is true.*/
 
-      LatitudeType m_latitudeType; /**< An enumerated type indicating the 
-                                        LatitudeType read from the labels. It 
+      LatitudeType m_latitudeType; /**< An enumerated type indicating the
+                                        LatitudeType read from the labels. It
                                         can be either Planetographic or
                                         Planetocentric.**/
 
-      LongitudeDirection m_longitudeDirection; /**< An enumerated type indicating the 
-                                                    LongitudeDirection read from the 
+      LongitudeDirection m_longitudeDirection; /**< An enumerated type indicating the
+                                                    LongitudeDirection read from the
                                                     labels. It can be either PositiveEast
-                                                    or PositiveWest. Indicating which 
-                                                    direction the positive axis for 
+                                                    or PositiveWest. Indicating which
+                                                    direction the positive axis for
                                                     longitude is.**/
 
       // TODO** Can this be generalized for both longitude and azimuth???
-      int m_longitudeDomain; /**< This integer is either 180 or 360 and is read 
-                                  from the labels. It represents the longitude 
+      int m_longitudeDomain; /**< This integer is either 180 or 360 and is read
+                                  from the labels. It represents the longitude
                                   domain when returning values through Longitude
                                   method. The domain is either -180 to 180 or
                                   0 to 360.**/
@@ -345,7 +347,7 @@ namespace Isis {
       double m_equatorialRadius;  /**< Polar radius of the target. This is a
                                        unitless value so that if the radius are
                                        in inches then the m_x and m_y will be in
-                                       inches. The value is read from the 
+                                       inches. The value is read from the
                                        labels.**/
       double m_polarRadius;       /**< Polar radius of the target. This is a
                                        unitless value so that if the radius are
@@ -370,13 +372,12 @@ namespace Isis {
                                        m_groundRangeGood is true.*/
 
     private:
-      // These are necessary for calculating oblique X/Y range with 
+      // These are necessary for calculating oblique X/Y range with
       // discontinuity
-      std::vector<double> m_specialLatCases; /**< Constant Latitudes that 
+      std::vector<double> m_specialLatCases; /**< Constant Latitudes that
                                                   intersect a discontinuity.**/
-      std::vector<double> m_specialLonCases; /**< Constant Longitudes that 
+      std::vector<double> m_specialLonCases; /**< Constant Longitudes that
                                                   intersect a discontinuity.**/
   };
 };
 #endif
-

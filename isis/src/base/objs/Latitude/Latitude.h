@@ -47,7 +47,7 @@ namespace Isis {
    *   @history 2013-03-06 Steven Lambright - Added support for getting Radii from TargetName
    *                           keyword. References #1534.
    *   @history 2016-04-22 Jeannie Backer - Added try/catch around calls to
-   *                           Target::radiiGroup() in constructors and add(angle, mapGroup). 
+   *                           Target::radiiGroup() in constructors and add(angle, mapGroup).
    *                           Appended message to caught exceptions. References #3892,3896
    *   @history 2016-07-05 Marjorie Hahn - Fixed documentation for 
    *                           Latitude::Latitude(double latitude, PvlGroup mapping, 
@@ -153,13 +153,13 @@ namespace Isis {
        * Same as planetocentric.
        *
        * @see planetocentric
-       
+
       operator double() const {
         return planetocentric();
       }*/
 
     protected:
-      virtual void setAngle(double angle, const Angle::Units &units);
+      virtual void setAngle(const double &angle, const Angle::Units &units);
 
     private:
       /**
@@ -172,7 +172,7 @@ namespace Isis {
        *   perpendicular to the equatorial plane.
        */
       Distance *m_polarRadius;
-      
+
       //! This contains which exceptions should not be thrown
       ErrorChecking m_errors;
   };

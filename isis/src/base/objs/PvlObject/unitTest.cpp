@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <QString>
+
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
 #include "IException.h"
@@ -126,7 +128,7 @@ int main() {
     cout.flush();
     e.print();
   }
-  
+
   try {
     // Validate PvlObject
     // Template Object
@@ -137,49 +139,49 @@ int main() {
     PvlKeyword pvlTmplKwrd("Point_ErrorMagnitude__Required", "true");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("LessThan", "double");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("LessThan__Required", "false");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("LessThan__Repeated", "false");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("GreaterThan", "double");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("GreaterThan__Required", "true");
     pvlTmplGrp += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-  
+
     pvlTmplKwrd = PvlKeyword("GreaterThan__Repeated", "true");
     pvlTmplGrp += pvlTmplKwrd;
-   
+
     pvlTmplObject1 += pvlTmplGrp;
     pvlTmplKwrd.clear();
     pvlTmplKwrd = PvlKeyword("Test_Required", "false");
     pvlTmplObject1 += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-     
+
     pvlTmplKwrd = PvlKeyword("Test_Repeated", "true");
     pvlTmplObject1 += pvlTmplKwrd;
     pvlTmplKwrd.clear();
-    
+
     pvlTmplKwrd = PvlKeyword("Test", "string");
     pvlTmplObject1 += pvlTmplKwrd;
 
     pvlTmplObject2 += pvlTmplObject1;
-    
+
     pvlTmplObjectRoot += pvlTmplObject2;
-     
+
     cout << "Template Object:\n" << pvlTmplObjectRoot << endl << endl;
-    
+
     // PvlGroup to be Validated
     PvlObject pvlObjectRoot("Object0");
     PvlObject pvlObject1("Object1");
@@ -187,37 +189,37 @@ int main() {
     PvlGroup pvlGrp("Point_errormagnitude");
     PvlKeyword pvlKwrd("LessThan", "2");
     pvlGrp += pvlKwrd;
-      
+
     pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", "3.5");
     pvlGrp += pvlKwrd;
-      
+
     pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", "4.4545");
     pvlGrp += pvlKwrd;
-    
+
     pvlObject1 += pvlGrp;
-    
+
     pvlKwrd.clear();
     pvlKwrd = PvlKeyword("Test", "testing1");
     pvlObject1 += pvlKwrd;
-    
+
     pvlKwrd.clear();
     pvlKwrd = PvlKeyword("Test", "testing2");
     pvlObject1 += pvlKwrd;
-    
+
     pvlKwrd.clear();
     pvlKwrd = PvlKeyword("TestTest", "Not in Template");
     pvlObject1 += pvlKwrd;
-  
+
     pvlObject2 += pvlObject1;
-    
+
     pvlObjectRoot += pvlObject2;
-     
+
     pvlTmplObjectRoot.validateObject(pvlObjectRoot);
-    
+
     cout << "After Validation Results PVL:\n" << pvlObjectRoot << endl;
-    
+
   } catch (IException &e) {
     cout.flush();
     e.print();
@@ -227,19 +229,19 @@ int main() {
   PvlObject po;
   po += PvlObject("firstObj");
   PvlObject * ptro1 = &po.findObject("firstObj");
-  for (int i = 0; i < 250; i++) 
-    po += PvlObject("testObj" + i);
+  for (int i = 0; i < 250; i++)
+    po += PvlObject("testObj" + QString::number(i));
 
   PvlObject * ptro2 = &po.findObject("firstObj");
-  if (ptro1 == ptro2) 
-    cout << "PvlObject pointers are equal" << endl; 
+  if (ptro1 == ptro2)
+    cout << "PvlObject pointers are equal" << endl;
   else
     cout << "FAILURE: PvlObject pointers were not the same after adding more objects" << endl;
-  
+
   po += PvlGroup("firstGroup");
   PvlGroup * ptrg1 = &po.findGroup("firstGroup");
   for (int i = 0; i < 250; i++)
-    po += PvlObject("testGroup" + i);
+    po += PvlObject("testGroup" + QString::number(i));
 
   PvlGroup * ptrg2 = &po.findGroup("firstGroup");
   if (ptrg1 == ptrg2)

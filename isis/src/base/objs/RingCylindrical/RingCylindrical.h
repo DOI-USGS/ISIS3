@@ -30,22 +30,24 @@ namespace Isis {
   /**
    * @brief Ring Cylindrical Map Projection
    *
-   * This class provides methods for the forward and inverse equations of a 
-   * Ring Cylindrical map projection (for a sphere). 
-   *  
+   * This class provides methods for the forward and inverse equations of a
+   * Ring Cylindrical map projection (for a sphere).
+   *
    * The Ring Cylindrical projection is an
-   *  
-   * Please see the Projection class for a full accounting of all the methods 
-   * available. 
+   *
+   * Please see the Projection class for a full accounting of all the methods
+   * available.
    *
    * @ingroup MapProjection
    * @see Equirectangular
    *
    * @author 2013-03-10 Debbie A. Cook
    *
-   * @internal 
+   * @internal
    *   @history 2013-05-09 Jeannie Backer - Added comments and documentation.
    *            References #775.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed several redundant var=var lines
+   *            causing warnings in clang. Part of porting to OS X 10.11.
    */
   // or Rectilinear projection?? scale azimuth with 1/(2*pi) * radius maybe
   class RingCylindrical : public RingPlaneProjection {
@@ -80,4 +82,3 @@ namespace Isis {
 };
 
 #endif
-

@@ -16,6 +16,13 @@
 #include "TProjection.h"
 #include "WorldMapper.h"
 
+/**
+  * @internal
+  *   @history 2016-08-26 Kelvin Rodriguez - Changed invalidValue varible to have
+  *                           both an int and double version to avoid undefined behavior in
+  *                           trying to convert double to int. Part of porting to OSX 10.11
+ */
+
 using namespace std;
 using namespace Isis;
 class MyProjection : public Isis::TProjection {
@@ -74,12 +81,12 @@ class MyProjection : public Isis::TProjection {
       return true;
     }
 
-    bool testXYRangeOblique(double &minX, double &maxX, 
+    bool testXYRangeOblique(double &minX, double &maxX,
                             double &minY, double &maxY) {
       return xyRangeOblique(minX, maxX, minY, maxY);
     }
 
-    // create output method to print results of private methods 
+    // create output method to print results of private methods
     void Output() const {
       cout << "tCompute(0,sin(0)):             " << tCompute(0.0, 0.0) << endl;
       cout << "tCompute(pi/4,sin(pi/4)):       " << tCompute(HALFPI / 2.0, sin(HALFPI / 2.0)) << endl;
@@ -346,10 +353,10 @@ int main(int argc, char *argv[]) {
   cout << "UniversalLatitude:                             " << p2.UniversalLatitude() << endl;
   cout << "UniversalLongitude:                            " << p2.UniversalLongitude() << endl;
   cout << endl;
-  
+
   /* The following projection is used to test the ToPlanetographic() methods
    *   at the latitude boundaries (-90 and 90 degrees). qFuzzyCompare() methods
-   *   were added to accommodate for double imprecission. 
+   *   were added to accommodate for double imprecission.
    */
   Isis::Pvl latRangeTest;
   latRangeTest.addGroup(Isis::PvlGroup("Mapping"));
@@ -368,7 +375,7 @@ int main(int argc, char *argv[]) {
   latTestGroup += Isis::PvlKeyword("MaximumLongitude", "360.0");
   latTestGroup += Isis::PvlKeyword("CenterLatitude", "-90.0");
   latTestGroup += Isis::PvlKeyword("CenterLongitude", "0.0");
-  Isis::TProjection *latTestProjection = 
+  Isis::TProjection *latTestProjection =
       (Isis::TProjection *) Isis::ProjectionFactory::Create(latRangeTest);
 
   cout << "PolarStereographic Projection Specifications" << endl;
@@ -434,7 +441,7 @@ int main(int argc, char *argv[]) {
   catch(IException &error) {
     error.print();
   }
-  
+
   cout << "Testing projection coordinate routines" << endl;
   cout << "Setting x/y position to (-2550,15):  " << p2.SetCoordinate(-2250.0, 15.0) << endl;
   cout << "Is Good:                             " << p2.IsGood() << endl;
@@ -570,7 +577,12 @@ int main(int argc, char *argv[]) {
   cout << endl;
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << "Test Error Throws for invalid inputs to conversion methods " << endl;
+
+  // Keep an double and an int for used for invalid data.
+  // Seperating the two prevents undefined behavior from trying to
+  // convert Isis::Null to an integer.
   double invalidValue = Null;
+  int invalidInt = -INT_MAX;
   try {
     TProjection::To180Domain(invalidValue);
   }
@@ -638,7 +650,7 @@ int main(int argc, char *argv[]) {
     error.print();
   }
   try {
-    TProjection::ToPositiveEast(0, invalidValue);
+    TProjection::ToPositiveEast(0, invalidInt);
   }
   catch(IException &error) {
     error.print();
@@ -650,7 +662,7 @@ int main(int argc, char *argv[]) {
     error.print();
   }
   try {
-    TProjection::ToPositiveWest(0, invalidValue);
+    TProjection::ToPositiveWest(0, invalidInt);
   }
   catch(IException &error) {
     error.print();

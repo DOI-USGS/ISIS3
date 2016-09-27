@@ -35,8 +35,6 @@ namespace Isis {
   /**
    * Creates a Camera object using Pvl Specifications
    *
-   * @param lab Pvl label containing specifications for the Camera object
-   *
    * @return Camera* The Camera object created
    *
    * @throws Isis::iException::System - Unsupported camera model, unable to find
@@ -66,7 +64,6 @@ namespace Isis {
       }
 
       int cameraOriginalVersion = (int)kerns["CameraVersion"];
-
       int cameraNewestVersion = CameraVersion(cube);
 
       if (cameraOriginalVersion != cameraNewestVersion) {
@@ -166,5 +163,3 @@ namespace Isis {
     }
   }
 } // end namespace isis
-
-

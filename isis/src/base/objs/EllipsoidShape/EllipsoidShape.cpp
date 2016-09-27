@@ -81,7 +81,6 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
-    // calculateEllipsoidalSurfaceNormal();
 
     if (!surfaceIntersection()->Valid() || !hasIntersection()) {
      IString msg = "A valid intersection must be defined before computing the surface normal";

@@ -2,9 +2,9 @@
 #define SpectralDefinition2D_h
 
 /**
- * @file                                                                  
- * $Revision: 6129 $ 
- * $Date: 2015-04-02 10:42:32 -0700 (Thu, 02 Apr 2015) $ 
+ * @file
+ * $Revision: 6129 $
+ * $Date: 2015-04-02 10:42:32 -0700 (Thu, 02 Apr 2015) $
  * $Id: CalculatorStrategy.h 6129 2015-04-02 17:42:32Z jwbacker@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
@@ -34,14 +34,14 @@ template<typename T> class QList;
 
 namespace Isis {
 
-  class Spectel; 
+  class Spectel;
 
   /**
-   * @brief A Spectral definition that includes wavelength and 
-   *        center values for each (line, sample) coordinate. 
-   * 
-   * @author 2015-05-21 Kristin Berry 
-   *  
+   * @brief A Spectral definition that includes wavelength and
+   *        center values for each (line, sample) coordinate.
+   *
+   * @author 2015-05-21 Kristin Berry
+   *
    * @internal
    *  @history 2015-06-09 Stuart Sides - Removed WavelengthsAndWidths storage class and used Spectel
    *  @history 2015-06-12 Stuart Sides - Added getSpectel(spectel) and constness
@@ -52,31 +52,30 @@ namespace Isis {
    */
   class SpectralDefinition2D : public SpectralDefinition {
     public:
-      SpectralDefinition2D(FileName smileDefFilename); 
+      SpectralDefinition2D(FileName smileDefFilename);
       ~SpectralDefinition2D();
 
-      Spectel findSpectel(const int sample, const int line, const int band) const; 
+      Spectel findSpectel(const int sample, const int line, const int band) const;
       Spectel findSpectelByWavelength(const double wavelength, const int sectionNumber) const;
       Spectel findSpectel(const Spectel &inSpectel, const int sectionNumber) const;
-      
-      int sectionCount();
-      int sectionNumber(int s, int l, int b) const;       
-      
-      QString toString(); 
-            
+
+      virtual int sectionCount() const;
+      int sectionNumber(int s, int l, int b) const;
+
+      QString toString();
+
       //! Internal function used to help read-in a calibration cube
       void operator()(Buffer &in) const;
 
   private:
       //! Internally represent the samples x 2 lines x n bands calibration file
-      //! Outside list is the sample index, inside list is the band  
-      QList<QList<Spectel> *> *m_spectelList; 
+      //! Outside list is the sample index, inside list is the band
+      QList<QList<Spectel> *> *m_spectelList;
       //! The number of sections of this Spectral Definition
-      int m_numSections; 
+      int m_numSections;
       //! The list of sections
-      QList<int> *m_sectionList; 
+      QList<int> *m_sectionList;
   };
-} 
+}
 
 #endif
-

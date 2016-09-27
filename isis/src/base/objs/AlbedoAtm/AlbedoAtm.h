@@ -57,8 +57,8 @@ namespace Isis {
       virtual ~AlbedoAtm() {};
 
     protected:
-      virtual void NormModelAlgorithm(double pha, double inc, double ema,
-                                      double dn, double &albedo, double &mult, double &base) {};
+       virtual void NormModelAlgorithm(double pha, double inc, double ema,
+                                    double dn, double &albedo, double &mult, double &base) {};
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
                                       double deminc, double demema, double dn, double &albedo,
                                       double &mult, double &base);
