@@ -81,7 +81,6 @@ namespace Isis {
     delete m_camera;
     m_camera = NULL;
 
-
     delete m_projection;
     m_projection = NULL;
 
@@ -513,7 +512,7 @@ namespace Isis {
       string msg = "You already have a cube opened";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     initLabelFromFile(cubeFileName, (access == "rw"));
 
     // Figure out the name of the data file
@@ -559,7 +558,7 @@ namespace Isis {
       cleanUp(false);
       throw;
     }
-
+    
     if (access == "r") {
       if (!m_labelFile->open(QIODevice::ReadOnly)) {
         QString msg = "Failed to open [" + m_labelFile->fileName() + "] with "
@@ -577,7 +576,6 @@ namespace Isis {
         }
       }
     }
-
     else if (access == "rw") {
       if (!m_labelFile->open(QIODevice::ReadWrite)) {
         QString msg = "Failed to open [" + m_labelFile->fileName() + "] with "
@@ -607,7 +605,7 @@ namespace Isis {
       cleanUp(false);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     initCoreFromLabel(*m_label);
 
     // Determine the number of bytes in the label
@@ -617,7 +615,7 @@ namespace Isis {
     else {
       m_labelBytes = labelSize(true);
     }
-
+    
     QPair<bool, Pvl *> dataLabel = qMakePair(false, m_label);
     if (!m_storesDnData) {
       dataLabel = qMakePair(true, new Pvl(m_dataFileName->expanded()));
@@ -632,12 +630,12 @@ namespace Isis {
       m_ioHandler = new CubeTileHandler(dataFile(), m_virtualBandList,
           realDataFileLabel(), true);
     }
-
+    
     if (dataLabel.first) {
       delete dataLabel.second;
       dataLabel.second = NULL;
     }
-
+    
     applyVirtualBandsToLabel();
   }
 
@@ -748,7 +746,7 @@ namespace Isis {
       streampos endByte = stream.tellp();
       // maxbyte = position after the cube DN data and labels
       streampos maxbyte = (streampos) m_labelBytes;
-
+     
       if (m_storesDnData) {
         maxbyte += (streampos) m_ioHandler->getDataSize();
       }
@@ -1230,7 +1228,7 @@ namespace Isis {
       QString msg = "Cannot create histogram object for an unopened cube";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     // Make sure band is valid
     if ((band < 0) || (band > bandCount())) {
       QString msg = "Invalid band in [CubeInfo::Histogram]";
@@ -1452,7 +1450,7 @@ namespace Isis {
       QString msg = "Cannot create statistics object for an unopened cube";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     // Make sure band is valid
     if ((band < 0) || (band > bandCount())) {
       string msg = "Invalid band in [CubeInfo::Statistics]";
@@ -1639,7 +1637,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
       return;
     }
-
+    
     PvlObject &isiscube = label()->findObject("IsisCube");
     if (isiscube.hasGroup(group.name())) {
       isiscube.findGroup(group.name()) = group;

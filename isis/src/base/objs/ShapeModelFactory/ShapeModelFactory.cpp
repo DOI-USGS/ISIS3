@@ -45,28 +45,32 @@ using namespace std;
 namespace Isis {
   /**
    * Constructor is private to avoid instantiating the class.  Use the Create method.
-   *
+   * 
    * @author dcook (7/29/2010)
    */
   ShapeModelFactory::ShapeModelFactory() {}
 
+
+
   //! Destructor
   ShapeModelFactory::~ShapeModelFactory() {}
+
+
 
   /**
    *
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
-
+    
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.findGroup("Kernels", Pvl::Traverse);
     // Do we need a sky shape model, member variable, or neither? For now treat sky as ellipsoid
-    bool skyTarget = target->isSky();
+    bool skyTarget = target->isSky(); 
 
-    // Determine if target is a plane??? target name has rings in it?
+    // Determine if target is a plane??? target name has rings in it? 
     // Another keyword in label to indicate plane? What about lander/rovers?
     // bool planeTarget = false;
-
+    
     // shape model file name
     QString shapeModelFilenames = "";
 
@@ -94,8 +98,8 @@ namespace Isis {
 
     // This exception will be thrown at the end of this method if no shape model is constructed.
     // More specific exceptions will be appended before throwing this error.
-    IException finalError(IException::Programmer,
-                          "Unable to create a shape model from given target and pvl.",
+    IException finalError(IException::Programmer, 
+                          "Unable to create a shape model from given target and pvl.", 
                           _FILEINFO_);
 
     if (shapeModelFilenames == "") {
@@ -105,7 +109,7 @@ namespace Isis {
 
       try {
         shapeModel = new EllipsoidShape(target);
-      }
+      } 
       catch (IException &e) {
         // No file name given and ellipsoid fails. Append e to new exception
         // with above message. Append this to finalError and throw.
@@ -122,7 +126,7 @@ namespace Isis {
 
       try {
         shapeModel = new PlaneShape(target, pvl);
-      }
+      } 
       catch (IException &e) {
         // No file name given, RingPlane specified. Append a message to the finalError and throw it.
         finalError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
@@ -157,16 +161,15 @@ namespace Isis {
       }
 
       if (shapeModel == NULL) {
-
         // in case no error was thrown, but constructor returned NULL
         fileError.append(dskError);
 
-        //-------------- Is the shape model an ISIS DEM? ------------------------------//
+        //-------------- Is the shape model an ISIS DEM? ------------------------------// 
         // TODO Deal with stacks -- this could be a list of DEMs
-        Isis::Cube* shapeModelCube = new Isis::Cube();
+        Isis::Cube shapeModelCube;
         try {
           // first, try to open the shape model file as an Isis3 cube
-          shapeModelCube->open(FileName(shapeModelFilenames).expanded(), "r" );
+          shapeModelCube.open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
           // The file is neither a valid DSK nor an ISIS cube. Append a message and throw the error.
@@ -176,11 +179,11 @@ namespace Isis {
           finalError.append(fileError);
           throw finalError;
         }
-
+        
         Projection *projection = NULL;
         try {
           // get projection of shape model cube
-          projection = shapeModelCube->projection();
+          projection = shapeModelCube.projection();
         }
         catch (IException &e) {
           // The file is neither a valid DSK nor a valid ISIS DEM. Append message and throw the error.
@@ -199,7 +202,7 @@ namespace Isis {
 
           try {
             shapeModel = new EquatorialCylindricalShape(target, pvl);
-          }
+          } 
           catch (IException &e) {
             // The file is an equatorial cylindrical ISIS cube. Append fileError and throw.
             fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
@@ -217,7 +220,7 @@ namespace Isis {
 
           try {
             shapeModel = new DemShape(target, pvl);
-          }
+          } 
           catch (IException &e) {
             // The file is projected ISIS cube (assumed to be DEM). Append fileError and throw.
             fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));

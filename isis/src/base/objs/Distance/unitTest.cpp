@@ -10,7 +10,6 @@ using std::cerr;
 using std::endl;
 
 using namespace Isis;
-using namespace std;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -279,28 +278,28 @@ int main(int argc, char *argv[]) {
   }
 
   try {
-    cout << (Distance() > Distance()) << endl;
+    Distance() > Distance();
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    cout << (Distance() > Distance()) << endl;
+    Distance() >= Distance();
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    cout << (Distance() < Distance()) << endl;
+    Distance() < Distance();
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    cout << (Distance() < Distance()) << endl;
+    Distance() <= Distance();
   }
   catch(IException &e) {
     e.print();

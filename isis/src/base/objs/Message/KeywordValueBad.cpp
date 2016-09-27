@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
-
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordValueBad(const QString &key) {
   return "Keyword [" + key + "] has bad value";

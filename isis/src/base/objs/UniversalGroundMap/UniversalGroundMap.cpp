@@ -72,15 +72,10 @@ namespace Isis {
 
   //! Destroys the UniversalGroundMap object
   UniversalGroundMap::~UniversalGroundMap() {
-    if (p_camera != NULL) {
+    if (p_camera != NULL)
       delete p_camera;
-      p_camera = NULL;
-    }
-
-    if (p_projection != NULL) {
+    if (p_projection != NULL)
       delete p_projection;
-      p_projection = NULL;
-    }
   }
 
   /**
@@ -291,7 +286,7 @@ namespace Isis {
     // For now just return false
     if (HasCamera())
       if (p_camera->target()->shape()->name() == "Plane") return false;
-    if (HasProjection())
+    if (HasProjection()) 
       if (p_projection->projectionType() == Projection::RingPlane) return false;
 
     minLat = Latitude();

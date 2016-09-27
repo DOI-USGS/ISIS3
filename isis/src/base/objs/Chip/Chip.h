@@ -171,7 +171,7 @@ namespace Isis {
        * @param sample  Sample position to get (1-based)
        * @param line    Line position to get (1-based)
        */
-      inline double GetValue(int sample, int line) const {
+      inline const double GetValue(int sample, int line) const {
         return m_buf[line-1][sample-1];
       }
 
@@ -301,7 +301,7 @@ namespace Isis {
        * @internal
        *   @history 2010-06-05 Jeannie Walldren - Original version
        */
-      Interpolator::interpType GetReadInterpolator() {
+      const Interpolator::interpType GetReadInterpolator() {
         return m_readInterpolator;
       }
 

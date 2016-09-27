@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
-
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordValueNotInList(const QString &key, const QString &value,
                                              const vector<QString> &list) {

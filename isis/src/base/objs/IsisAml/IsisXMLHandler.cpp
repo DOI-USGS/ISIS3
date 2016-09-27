@@ -21,6 +21,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+using namespace std;
+
 #include <string>
 
 #include <xercesc/sax2/SAX2XMLReader.hpp>
@@ -34,8 +36,6 @@
 
 #include "IsisXMLHandler.h"
 #include "IsisXMLChTrans.h"
-
-using namespace std;
 
 namespace XERCES = XERCES_CPP_NAMESPACE;
 
@@ -178,3 +178,5 @@ void IsisXMLHandler::startElement(const XMLCh *const uri,
     outputEndTag++;
   }
 }
+
+

@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
-
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordBlockStartMissing(const QString &block, const QString &found) {
   return "Expecting start of keyword block [" + block + "] but found [" + found + "]";

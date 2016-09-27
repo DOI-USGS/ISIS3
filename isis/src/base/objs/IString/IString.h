@@ -280,11 +280,9 @@ namespace Isis {
        *
        * @return IString
        */
-#if 0
       operator IString() const {
         return ToQt();
       };
-#endif
 
       IString &operator= (const int &value);
 

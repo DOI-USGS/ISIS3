@@ -406,7 +406,6 @@ namespace Isis {
     p_photoB0 = b0;
   }
 
-
   /**
     * Determine if the Hapke opposition surge component is initialized
     * to zero during the SetStandardConditions phase.
@@ -423,11 +422,9 @@ namespace Isis {
                    temp + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
     if (temp == "NO" || temp == "FALSE") p_photo0B0Standard = "FALSE";
     if (temp == "YES" || temp == "TRUE") p_photo0B0Standard = "TRUE";
   }
-
 
   /**
     * Set the Hapke macroscopic roughness component. This parameter

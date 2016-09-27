@@ -48,9 +48,6 @@ using namespace Isis;
  * @internal
  *   @history 2015-05-04 Jeannie Backer - Added test for isDEM() and improved
  *                           overall test coverage.
- *   @history 2016-08-28 Kelvin Rodriguez - Changed print statements to properly flush
- *                           std out before exceptions to better suit differences in MAC OSX 10.11
- *                           part of porting to 10.11.
  *
  *   testcoverage 2015-04-30 - 78.947% scope, 91.057% line, 96.154% function
  *   testcoverage 2015-05-04 - 94.737% scope, 100% line, 100% function
@@ -288,8 +285,7 @@ int main() {
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     cout << "    Do we have an ellipsoid intersection? " << shape.ellipsoidIntersection() << endl;
     try {
-      cout << "    Get the resolution:         ";
-      cout << shape.resolution() << endl;
+      cout << "    Get the resolution:         " << shape.resolution() << endl;
     }
     catch (IException &e) {
       cout << "    Test resolution() error message when there is no intersection:" << endl;
@@ -368,8 +364,7 @@ int main() {
     shape.setHasIntersection(false);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     try {
-      cout << "    Get the resolution:         ";
-      cout << shape.resolution() << endl;
+      cout << "    Get the resolution:         " << shape.resolution() << endl;
     }
     catch (IException &e) {
       cout << "    Test resolution() error message when there is no intersection:" << endl;
@@ -380,8 +375,7 @@ int main() {
     shape.setSurfacePoint(*sp);
     cout << "     Do we have an intersection? " << shape.hasIntersection() << endl;
     try {
-      cout << "    Get the resolution:         ";
-      cout << shape.resolution() << endl;
+      cout << "    Get the resolution:         " << shape.resolution() << endl;
     }
     catch (IException &e) {
       cout << "    Test resolution() error message when there is no intersection:" << endl;
@@ -394,11 +388,9 @@ int main() {
     MyEllipse eshape(&targ);
     try {
       cout << endl << "  Testing ellipsoid methods in base class" << endl;
-      cout << "    Do we have an intersection? ";
-      cout << eshape.hasIntersection() << endl;
+      cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
-        cout << "    Get the resolution:         ";
-        cout << eshape.resolution() << endl;
+        cout << "    Get the resolution:         " << eshape.resolution() << endl;
       }
       catch (IException &e) {
         cout << "    Test resolution() error message when there is no intersection:" << endl;
@@ -414,8 +406,7 @@ int main() {
 
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
-        cout << "    Get the resolution:         ";
-        cout << eshape.resolution() << endl;
+        cout << "    Get the resolution:         " << eshape.resolution() << endl;
       }
       catch (IException &e) {
         cout << "    Test resolution() error message when there is no intersection:" << endl;
@@ -449,8 +440,7 @@ int main() {
       eshape.setHasIntersection(false);
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
-        cout << "    Get the resolution:         ";
-        cout << eshape.resolution() << endl;
+        cout << "    Get the resolution:         " << eshape.resolution() << endl;
       }
       catch (IException &e) {
         cout << "    Test resolution() error message when there is no intersection:" << endl;

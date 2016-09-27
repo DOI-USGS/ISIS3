@@ -176,8 +176,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cerr << "  angle1 <  angle2?  ";
-    cerr << (angle1 < angle2) << endl;
+    cerr << "  angle1 <  angle2?  " << (angle1 < angle2) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -188,8 +187,7 @@ int main(int argc, char *argv[]) {
     Angle angle2(45., Angle::Degrees);
     //Angle epsilon((double)numeric_limits<float>::epsilon(), Angle::Degrees);//1.1920929e-07
     Angle epsilon(1.1920929e-12, Angle::Degrees);//1.1920929e-07
-    cerr << "  angle1 <  (angle1 + epsilon)?  ";
-    cerr << (angle1 < angle1 + epsilon) << endl;
+    cerr << "  angle1 <  (angle1 + epsilon)?  " << (angle1 < angle1 + epsilon) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -199,8 +197,7 @@ int main(int argc, char *argv[]) {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
     Angle epsilon(1.1920929e-12, Angle::Degrees);
-    cerr << "  angle2 >  (angle2 - epsilon)?  ";
-    cerr << (angle2 > angle2 - epsilon) << endl;
+    cerr << "  angle2 >  (angle2 - epsilon)?  " << (angle2 > angle2 - epsilon) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -209,8 +206,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cerr << "  angle1 <= angle2?  ";
-    cerr << (angle1 <= angle2) << endl;
+    cerr << "  angle1 <= angle2?  " << (angle1 <= angle2) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -218,8 +214,7 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle1(30., Angle::Degrees );
-    cout << "  angle1 <  angle2?  ";
-    cerr << (angle1 < Angle());
+    cerr << "  angle1 <  angle2?  " << (angle1 < Angle());
   }
   catch(Isis::IException &e) {
     e.print();
@@ -227,8 +222,7 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle1(30., Angle::Degrees );
-    cout << "  angle1 <  angle2?  ";
-    cerr  << (Angle() < angle1);
+    cerr << "  angle1 <  angle2?  " << (Angle() < angle1);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -236,27 +230,7 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle1(30., Angle::Degrees );
-    cerr << "  angle1 <=  angle2?  ";
-    cerr << (Angle() <= angle1);
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
-
-  try {
-    Angle angle1(30., Angle::Degrees );
-    Angle angle2(45., Angle::Degrees);
-    cerr << "  angle1 >  angle2?  ";
-    cerr << (angle1 > angle2) << endl;
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
-
-  try {
-    Angle angle1(30., Angle::Degrees );
-    cerr << "  angle1 >  angle2?  ";
-    cerr << (angle1 > Angle()) << endl;
+    cerr << "  angle1 <=  angle2?  " << (Angle() <= angle1);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -265,8 +239,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cerr << "  angle1 >= angle2?  ";
-    cerr << (angle1 >= angle2) << endl;
+    cerr << "  angle1 >  angle2?  " << (angle1 > angle2) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -274,8 +247,24 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle1(30., Angle::Degrees );
-    cerr << "  angle1 >= angle2?  ";
-    cerr << (angle1 >= Angle()) << endl;
+    cerr << "  angle1 >  angle2?  " << (angle1 > Angle()) << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    Angle angle2(45., Angle::Degrees);
+    cerr << "  angle1 >= angle2?  " << (angle1 >= angle2) << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    cerr << "  angle1 >= angle2?  " << (angle1 >= Angle()) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -313,7 +302,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("-70 15 30.125"));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
@@ -321,7 +310,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("  +70  30 11     "));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
@@ -329,7 +318,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("100"));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
@@ -337,7 +326,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("70 11"));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
@@ -345,7 +334,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("this 79 should 00 fail 0.111"));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
@@ -353,9 +342,16 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(QString("100 00 00"));
     cerr << angle.toString() << endl;
-  }
+  } 
   catch (Isis::IException &e) {
     e.print();
   }
 
 }
+
+
+
+
+
+
+

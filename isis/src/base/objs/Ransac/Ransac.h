@@ -118,9 +118,14 @@ namespace Isis {
   int foresub (double *,double *, int);
   int backsub (double *,double *, int);
 
-#define SOLVED 1
-#define NOT_SOLVABLE 0
-#define NO_ERRORS -1
+
+  int solve_errcode (int);
+
+
+
+#define SOLVED            1
+#define NOT_SOLVABLE      0
+#define  NO_ERRORS      -1
 
 
   inline int choleski_solve (double *a, double *b, int nsize, int flag)
@@ -133,23 +138,23 @@ namespace Isis {
      */
 
     if (flag < 1 && flag > 3)
-      return NOT_SOLVABLE;
+      solve_errcode (01);
 
-    /*************** STEP 1:  DECOMPOSE THE A MATRIX ***************/
+    /*************** STEP 1:  DECOMPOSE THE A MATRIX ***************/ 
     if (! decompose (a, nsize)) return NOT_SOLVABLE;
 
     if (flag == 1) return SOLVED;
 
-    /*************** STEP 2:  FORWARD SUBSTITUTION *****************/
+    /*************** STEP 2:  FORWARD SUBSTITUTION *****************/ 
     if (! foresub (a, b, nsize)) return NOT_SOLVABLE;
 
 
-    /*************** STEP 2:  BACKWARD SUBSTITUTION ****************/
+    /*************** STEP 2:  BACKWARD SUBSTITUTION ****************/ 
     if (! backsub (a, b, nsize)) return NOT_SOLVABLE;
 
     if (flag == 2) return SOLVED;
 
-    /*************** STEP 4:  INVERSE THE A MATRIX *****************/
+    /*************** STEP 4:  INVERSE THE A MATRIX *****************/ 
     inverse (a, nsize);
     return SOLVED;
   }
@@ -190,7 +195,7 @@ namespace Isis {
           sum += *ap4++ * *ap5++;
         }
         if (*ap2 == 0.0)
-          return NOT_SOLVABLE;
+          return (solve_errcode (05));
         *ap3 = (*ap3 - sum) / *ap2;ap3++;
         ap2 += m++;
       }
@@ -230,7 +235,7 @@ namespace Isis {
     double *bp2;
 
     if (*ap1 == 0.0)
-      return NOT_SOLVABLE;
+      return (solve_errcode (05));
     *bp1++ /= *ap1++;
     for (i = 1; i < nsize; i++)
     {
@@ -240,7 +245,7 @@ namespace Isis {
         sum += *ap1++ * *bp2++;
       }
       if (*ap1 == 0.0)
-        return NOT_SOLVABLE;
+        return (solve_errcode (06));
       *bp1 = (*bp1 - sum) / *ap1;bp1++;ap1++;
     }
     return SOLVED;
@@ -256,7 +261,7 @@ namespace Isis {
     int i,j;
     int k = nsize - 1;
     int m = nsize;
-    int n;
+    int n; 
     double sum;
     double *ap1 = a + (k + k * (k + 1) / 2);
     double *ap2 = ap1 - 1;
@@ -266,20 +271,20 @@ namespace Isis {
     double *bp3;
 
     if (*ap1 == 0.0)
-      return NOT_SOLVABLE;
+      return (solve_errcode (05));
     *bp1 = *bp1 / *ap1;bp1--;
     for (i = k - 1; i >= 0; i--)
     {
-      sum = 0.0;
+      sum = 0.0; 
       n = nsize - 1;
       for (j = nsize - 1, ap3 = ap2--, bp3 = bp2; j >= i + 1; j--)
       {
         sum += *ap3 * *bp3--;
         ap3 -= n--;
-      }
+      }    
       ap1 -= m--;
       if (*ap1 == 0.0)
-        return NOT_SOLVABLE;
+        return (solve_errcode (05));
       *bp1 = (*bp1 - sum) / *ap1;bp1--;
     }
     return SOLVED;
@@ -304,7 +309,7 @@ namespace Isis {
     m = 2;
     while (ap1 < (a + (nsize * (nsize + 1)/2)))
     {
-      *ap1  = 1. / *ap1;
+      *ap1  = 1. / *ap1;   
       ap1 += m++;
     }
 
@@ -341,14 +346,14 @@ namespace Isis {
       m = 0;
       for (j = i; j < nsize;)
       {
-        ap5 += j;
+        ap5 += j; 
         ap1 = ap3 = ap5 + i + n;
         ap2 = ap5 + m++;
         sum = 0.0;
         for (k = j; k < nsize;)
         {
           sum += *ap1 * *ap2;
-          ap1 += ++k;
+          ap1 += ++k; 
           ap2 += k;
         }
         *ap3 = sum;
@@ -358,6 +363,34 @@ namespace Isis {
       n--;
     }
     return SOLVED;
+  }
+
+  /****************************************************************************
+    ERRCODE():  Error messages for subroutine SOLVE - Cholesky Decomposition
+   ****************************************************************************/
+
+  inline int solve_errcode (int code)
+    //int code;
+  {
+
+    /* switch (code)
+       {
+       case 01:   printf ("\n*** INVALID CODE TO SOLVE ***\n");
+       break;
+       case 02:   printf ("\n*** DECOMPOSITION FAILED ***\n");
+       break;
+       case 03:   printf ("\n*** FORWARD SUBSTITUTION FAILED ***\n");
+       break;
+       case 04:   printf ("\n*** BACKWARD SUBSTITUTION FAILED ***\n");
+       break;
+       case 05:   printf ("\n*** Attempted division by zero ***");
+       break;
+       case 06:   printf ("\n*** Matrix not positive, definite ***");
+       break;
+       default:   printf ("\n*** INVALID ERROR CODE ***\n");
+       }*/
+
+    return (0);
   }
 }
 

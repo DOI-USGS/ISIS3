@@ -21,9 +21,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
+using namespace std;
 
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordAmbiguous(const QString &key) {
   return "Keyword [" + key + "] ambiguous";

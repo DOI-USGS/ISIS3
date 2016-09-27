@@ -169,7 +169,7 @@ namespace Isis {
    * @param outputFile The output ImageOverlapSet file
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
-    
+      
     // Do a common sense programmer check, this should be empty before we start
     if (!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on " \
@@ -186,7 +186,7 @@ namespace Isis {
     p_threadedCalculate = true;
 
     FindImageOverlaps(boundaries);
-
+    
     // While our exit condition is not true, call WriteImageOverlaps with the filename. 
     // The WriteImageOverlaps call will block if it is waiting on calculations.
     while (p_calculatedSoFar != p_lonLatOverlaps.size()) {
@@ -388,7 +388,7 @@ namespace Isis {
       delete multiPolygon;
       multiPolygon = Isis::globalFactory.createMultiPolygon();
     }
-
+    
     if (position > p_lonLatOverlaps.size()) {
       position = p_lonLatOverlaps.size();
     }
@@ -486,7 +486,7 @@ namespace Isis {
 
             delete p_lonLatOverlaps[overlap];
             p_lonLatOverlaps[overlap] = NULL;
-            p_writtenSoFar ++;
+            p_writtenSoFar ++;                
           }
         }
         
@@ -546,7 +546,7 @@ namespace Isis {
       p_calculatedSoFar = outside - 1;
 
       // unblock the writing process after every 10 polygons if we need to write
-      if (p_calculatedSoFar % 10 == 0 && (!snlist || (p_lonLatOverlaps.size() > snlist->size()))) {
+      if (p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > snlist->size())) {
         if (p_threadedCalculate) {
           p_calculatePolygonMutex.unlock();
         }

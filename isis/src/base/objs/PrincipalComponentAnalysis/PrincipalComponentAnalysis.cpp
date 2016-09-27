@@ -20,8 +20,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QString>
-
 #include "PrincipalComponentAnalysis.h"
 #include "jama/jama_eig.h"
 #include "jama/jama_lu.h"
@@ -130,7 +128,7 @@ namespace Isis {
   // Transform the vector into principal component space
   TNT::Array2D<double> PrincipalComponentAnalysis::Transform(TNT::Array2D<double> data) {
     if(data.dim1() != 1 || data.dim2() != p_dimensions) {
-      QString m = "Transform input must be of dimension 1 x " +  QString::number(p_dimensions);
+      std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
@@ -141,7 +139,7 @@ namespace Isis {
   // Transform the vector from principal component space
   TNT::Array2D<double> PrincipalComponentAnalysis::Inverse(TNT::Array2D<double> data) {
     if(data.dim1() != 1 || data.dim2() != p_dimensions) {
-      QString m = "Transform input must be of dimension 1 x " +  QString::number(p_dimensions);
+      std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 

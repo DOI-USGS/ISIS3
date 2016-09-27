@@ -21,6 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+using namespace std;
 
 #include <string>
 
@@ -30,8 +31,6 @@
 
 #include "IsisXMLHistory.h"
 #include "IsisXMLChTrans.h"
-
-using namespace std;
 
 namespace XERCES = XERCES_CPP_NAMESPACE;
 
@@ -117,3 +116,9 @@ void IsisXMLHistory::startElement(const XMLCh *const uri,
   }
 
 }
+
+
+
+
+
+

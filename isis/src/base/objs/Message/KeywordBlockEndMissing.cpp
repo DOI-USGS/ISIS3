@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
-
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordBlockEndMissing(const QString &block, const QString &found) {
   return "Expecting end of keyword block [" + block + "] but found [" + found + "]";

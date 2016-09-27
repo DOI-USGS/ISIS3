@@ -137,7 +137,7 @@ namespace Isis {
         // Get the starting wall clock time
         p_datetime = DateTime(&p_startTime);
         p_startClock = clock();
-
+        
         if (p_applicationForceGuiApp) {
           new QApplication(argc, argv);
           // When QApplication is initialized, it will reset the locale to the shells locale. As a result
@@ -549,6 +549,7 @@ namespace Isis {
    * to the terminal or showing the log in the gui.
    */
   void Application::FunctionCleanup() {
+    CubeManager::CleanUp();
 
     SessionLog::TheLog().Write();
 
@@ -1034,3 +1035,4 @@ namespace Isis {
     return results;
   }
 }  //end namespace isis
+

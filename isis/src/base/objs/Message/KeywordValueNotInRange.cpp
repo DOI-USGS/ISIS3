@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Message.h"
-
 using namespace std;
+
+#include "Message.h"
 
 QString Isis::Message::KeywordValueNotInRange(const QString &key, const QString &value, const QString &range) {
   return "Keyword [" + key + "=" + value + "] is not in the range of " + range;

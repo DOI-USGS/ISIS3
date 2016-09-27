@@ -542,7 +542,7 @@ namespace Isis {
     unsigned long byteContainer = bitPosition / 8;
     unsigned int bitOffset = bitPosition % 8;
 
-    if(byteContainer > p_gridSize) return;
+    if(byteContainer < 0 || byteContainer > p_gridSize) return;
 
     if(p_grid) {
       char &importantByte = p_grid[byteContainer];
@@ -578,7 +578,7 @@ namespace Isis {
     unsigned long byteContainer = bitPosition / 8;
     unsigned int bitOffset = bitPosition % 8;
 
-    if(byteContainer > p_gridSize) return false;
+    if(byteContainer < 0 || byteContainer > p_gridSize) return false;
 
     bool result = false;
 
