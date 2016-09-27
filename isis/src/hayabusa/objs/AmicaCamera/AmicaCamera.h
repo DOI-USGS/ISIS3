@@ -1,8 +1,8 @@
 #ifndef AmicaCamera_h
 #define AmicaCamera_h
 /**
- * @file 
- *  
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -28,10 +28,10 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Hayabusa
-   *  
+   *
    * @author  2013-11-27 Kris Becker
    *
-   * @internal 
+   * @internal
    *   @history 2013-11-27 Kris Becker - Original version
    *   @history 2015-02-26 Kris Becker - Implement starting detector specs; add
    *                           summing and AlphaCube support.
@@ -41,37 +41,40 @@ namespace Isis {
    *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these added methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2016-09-14 Kelvin Rodriguez - Enforced the order in which BORESIGHT_LINE and
+   *                           BORESIGHT_SAMPLE are added to the PVL. Part of porting to
+   *                           OSX 10.11 
    */
   class AmicaCamera : public FramingCamera {
     public:
       AmicaCamera(Cube &cube);
       /** Destructor  */
       ~AmicaCamera() { }
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-130000); }
 
-      /** 
+      /**
        * CK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (1); }
 
-      /** 
+      /**
        * SPK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */
