@@ -54,43 +54,45 @@ namespace Isis {
    * @author 2006-01-20 Stuart Sides
    *
    * @internal
-   *  @history 2008-06-18 Christopher Austin - Fixed documentation
-   *  @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0
-   *           instead of geos2. Mostly namespace changes.
-   *  @history 2008-11-24 Steven Lambright - Improved upon error reporting. Added
-   *           the Errors() method.
-   *  @history 2008-11-25 Steven Koechle - Moved Despike Methods from
-   *           ImageOverlapSet to PolygonTools
-   *  @history 2008-12-10 Steven Koechle - Moved MakeMultiPolygon Method from
-   *           ImageOverlapSet to PolygonTools
-   *  @history 2008-12-05 Steven Lambright - Checking footprints for validity now,
-   *           fixed an issue with the intersection operator where an invalid but
-   *           repairable polygon is produced, and fixed a memory leak.
-   *  @history 2008-12-15 Steven Koechle - Fixed to read new footprint blob naming
-   *           scheme.
-   *  @history 2009-01-06 Steven Koechle - Removed backwards compatibility for old
-   *           footprint blob name. Added a throw if footprints are invalid in an
-   *           image.
-   *  @history 2009-01-07 Steven Lambright & Christopher Austin - Fixed handling
-   *           of Despike(...) throwing errors on empty polygons
-   *  @history 2009-01-13 Steven Lambright - Deletes both overlaps if an
-   *           intersection fails for an unknown reason.
-   *  @history 2009-01-28 Steven Lambright - Fixed memory leaks
-   *  @history 2009-03-12 Christopher Austin - Added the MULTIPOLYGON to
-   *           HandleError() as the Keyword "Polygon"
-   *  @history 2009-06-01 Christopher Austin - Changed the basic algorithm to
-   *           improve results.
-   *  @history 2009-06-01 Steven Lambright - Multi-threaded this object. Split
-   *           code into smaller methods, now new elements are inserted next
-   *           instead of appended to the end of the overlap list, and added more
-   *           error-recovery solutions.
-   *  @history 2010-09-27 Christopher Austin - Added an error when no new overlaps
-   *           are calculated. (i.e. All overlaps contain only a single Serial Number)
-   *  @history 2011-03-29 Steven Lambright - Added some safety around
-   *           p_lonLatOverlaps to (hopefully) get rid of a race condition.
-   *  @history 2016-09-14 Marjorie Hahn - Modified FindAllOverlaps()'s check to ensure 
-   *           that at least one overlap has been calculated by adding in the 
-   *           "foundOverlap" boolean. References #2199.
+   *   @history 2008-06-18 Christopher Austin - Fixed documentation
+   *   @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0 instead of geos2.
+   *                           Mostly namespace changes.
+   *   @history 2008-11-24 Steven Lambright - Improved upon error reporting.
+   *                           Added the Errors() method.
+   *   @history 2008-11-25 Steven Koechle - Moved Despike Methods from ImageOverlapSet to
+   *                           PolygonTools.
+   *   @history 2008-12-10 Steven Koechle - Moved MakeMultiPolygon Method from ImageOverlapSet to
+   *                           PolygonTools.
+   *   @history 2008-12-05 Steven Lambright - Checking footprints for validity now, fixed an issue
+   *                           with the intersection operator where an invalid but repairable
+   *                           polygon is produced, and fixed a memory leak.
+   *   @history 2008-12-15 Steven Koechle - Fixed to read new footprint blob naming scheme.
+   *   @history 2009-01-06 Steven Koechle - Removed backwards compatibility for old footprint blob
+   *                           name. Added a throw if footprints are invalid in an image.
+   *   @history 2009-01-07 Steven Lambright & Christopher Austin - Fixed handling of Despike(...)
+   *                           throwing errors on empty polygons.
+   *   @history 2009-01-13 Steven Lambright - Deletes both overlaps if an intersection fails for an
+   *                           unknown reason.
+   *   @history 2009-01-28 Steven Lambright - Fixed memory leaks.
+   *   @history 2009-03-12 Christopher Austin - Added the MULTIPOLYGON to HandleError() as the
+   *                           Keyword "Polygon".
+   *   @history 2009-06-01 Christopher Austin - Changed the basic algorithm to improve results.
+   *   @history 2009-06-01 Steven Lambright - Multi-threaded this object. Split code into smaller
+   *                           methods, now new elements are inserted next instead of appended to
+   *                           the end of the overlap list, and added more error-recovery solutions.
+   *   @history 2010-09-27 Christopher Austin - Added an error when no new overlaps are calculated.
+   *                           (i.e. All overlaps contain only a single Serial Number).
+   *   @history 2011-03-29 Steven Lambright - Added some safety around p_lonLatOverlaps to
+   *                           (hopefully) get rid of a race condition.
+   *   @history 2016-08-26 Kelvin Rodriguez - Added tryLock() just before unlocking mutex in
+   *                           FindAllOverlaps() to avoid undefined behavior. This was done to
+   *                           prevent compile errors on MAC OS 10.11.
+   *   @history 2016-09-14 Marjorie Hahn - Modified FindAllOverlaps()'s check to ensure that at
+   *                           least one overlap has been calculated by adding in the "foundOverlap"
+   *                           boolean. References #2199.
+   *   @history 2016-09-28 Jeannie Backer - Replaced deprecated IStrings with QStrings. Added mutex
+   *                          unlock() calls immediately before exception calls to prevent warning
+   *                          message by latest Qt library 5.7.
    */
   class ImageOverlapSet : private QThread {
     public:
