@@ -27,10 +27,10 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  static QString sPointType [255];
+  extern QString sPointType[];
 
   //! String values for Boolean
-  static QString sBoolean[255];
+  extern QString sBoolean[];
 
   /**
    * ControlNetFilter Constructor

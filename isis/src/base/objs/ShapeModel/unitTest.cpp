@@ -48,7 +48,7 @@ using namespace Isis;
  * @internal
  *   @history 2015-05-04 Jeannie Backer - Added test for isDEM() and improved
  *                           overall test coverage.
- *   @history 2015-05-04 Jeannie Backer - Changed print statements to properly flush
+ *   @history 2016-08-28 Kelvin Rodriguez - Changed print statements to properly flush
  *                           std out before exceptions to better suit differences in OSX 10.11
  *                           part of porting to 10.11.
  *

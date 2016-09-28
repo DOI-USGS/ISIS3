@@ -1641,7 +1641,7 @@ namespace Isis {
 
     // check for "matrix not positive definite" error
     if (m_cm.status == CHOLMOD_NOT_POSDEF) {
-      QString msg = "Matrix NOT positive-definite: failure at column " + toString(m_L->minor);
+      QString msg = "Matrix NOT positive-definite: failure at column " + toString((int) m_L->minor);
 //    throw IException(IException::User, msg, _FILEINFO_);
       error(msg);
       emit(finished());

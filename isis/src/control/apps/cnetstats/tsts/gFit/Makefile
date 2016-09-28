@@ -9,5 +9,6 @@ commands:
 	  filter=yes \
 	  deffile=$(INPUT)/deffile.def \
 	  flatfile=$(OUTPUT)/out.txt > /dev/null;
+	#$(SED) 's/, \(.*\)input\//, \1/' $(OUTPUT)/out.txt > $(OUTPUT)/out1.txt;
 	$(SED) 's/, \/.*\/input\//, /' $(OUTPUT)/out.txt > $(OUTPUT)/truth.txt;
-	$(RM) $(OUTPUT)/cube.lis $(OUTPUT)/out.txt;
+	$(RM) $(OUTPUT)/cube.lis $(OUTPUT)/out.txt $(OUTPUT)/out1.txt;

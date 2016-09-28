@@ -75,9 +75,9 @@ namespace Isis {
   /**
    * Remove the specified serial number from the list
    *
-   * @author 2010-09-09 Sharmila Prasad
-   *
    * @param sn Name of serial number to remove
+   *
+   * @author 2010-09-09 Sharmila Prasad
    */
   void SerialNumberList::Delete(const QString &sn) {
     int index = serialNumberIndex(sn);
@@ -218,9 +218,6 @@ namespace Isis {
    *
    * @param serialNumber the serial number to be added
    * @param filename the filename to be added
-   *
-   * @author 2012-07-12 Tracie Sucharski
-   *
    *
    * @throws IException::User "Unable to find Instrument or Mapping group for comparing target."
    * @throws IException::User "Target name from file does not match."

@@ -110,8 +110,8 @@ namespace Isis {
    *                           when cube dimensions and buffer shape are same size. Fixes #1689.
    *   @history 2015-01-30 Ian Humphrey - Modified destructor to free m_writThreadMutex to
    *                           prevent memory leaks upon destruction. Fixes #2082.
-   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2016-08-28 Kelvin Rodriguez - updateLabels now a pure virtual, it had no
    *                           implementation causing warnings in clang. Part of OS X 10.11 porting.
    *                           QPair forward declaration now properly claims it as a struct. 
