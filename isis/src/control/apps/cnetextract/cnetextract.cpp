@@ -32,8 +32,8 @@ using namespace std;
 using namespace Isis;
 
 void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints);
-void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
-                        QVector<QString> cannotGenerateLatLonPoints,
+void ExtractLatLonRange(ControlNet &outNet, QVector<QString> &nonLatLonPoints,
+                        QVector<QString> &cannotGenerateLatLonPoints,
                         QMap<QString, QString> sn2filename);
 bool NotInLatLonRange(SurfacePoint surfacePt, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon);
@@ -564,18 +564,26 @@ void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints) {
 
 
 /**
- * Removes control points not in the lat/lon range provided in the unput
+ * Removes control points not in the lat/lon range provided in the input
  * parameters.
  *
- * @param outNet The output control net being removed from
- * @param noLanLonPoint The keyword recording all of the control points removed
- *                      due to the provided lat/lon range
- * @param noLanLonPoint The keyword recording all of the control points removed
- *                      due to the inability to calculate the lat/lon for that
- *                      point
+ * @param outNet[in] The output control net being removed from
+ * @param noLanLonPoint[out] The keyword recording all of the control points removed
+ *            due to the control point being out of the lat/lon range.
+ * @param cannotGenerateLatLonPoints[out] The keyword recording all of the control points removed
+ *            due to the inability to find a cube to calculate the lat/lon for that point.
+ * @param sn2filename[in] QMap that maps the serial numbers to (input) file names.
+ * 
+ * @internal
+ *   @history 2016-09-29 Ian Humphrey - Reverted r6597, which had reveresed the logic for
+ *                           checking the reference measure and other measures (see lines 635,643).
+ *                           Modified the QVector parameters to be pass-by-reference OUT parameters,
+ *                           since the cnetextract main uses them for summary output.
  */
-void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
-                        QVector<QString> cannotGenerateLatLonPoints,  QMap<QString, QString> sn2filename) {
+void ExtractLatLonRange(ControlNet &outNet, 
+                        QVector<QString> &nonLatLonPoints,
+                        QVector<QString> &cannotGenerateLatLonPoints,  
+                        QMap<QString, QString> sn2filename) {
   if(outNet.GetNumPoints() == 0) {
     return;
   }
@@ -624,8 +632,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
       Distance radius;
 
       // First check the reference Measure
-      //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-      if(!sn2filename[controlPt->GetReferenceSN()].length()) {
+      if(sn2filename[controlPt->GetReferenceSN()].length() != 0) {
         sn = controlPt->GetReferenceSN();
       }
 
@@ -633,13 +640,13 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
       if(sn.isEmpty()) {
         // Find the Serial Number if it exists
         for(int cm = 0; (cm < controlPt->GetNumMeasures()) && sn.isEmpty(); cm ++) {
-          if(!sn2filename[controlPt->GetReferenceSN()].length()) {
+          if(sn2filename[controlPt->GetReferenceSN()].length() != 0) {
             sn = controlPt->GetReferenceSN();
           }
         }
       }
 
-      // Connot fine a cube to get the lat/lon from
+      // Cannot find a cube to get the lat/lon from
       if(sn.isEmpty()) {
         cannotGenerateLatLonPoints.push_back(controlPt->GetId());
         omit(outNet, cp);

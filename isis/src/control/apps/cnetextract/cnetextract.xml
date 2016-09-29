@@ -275,6 +275,11 @@
       removed redundant boolean statement (len == 0) which caused warnings in clang.
       Part of porting to OS X 10.11. 
     </change>
+    <change name="Ian Humphrey" date="2016-09-29">
+      When using LATLON=true, control points that are out of the specified latitude and longitude
+      ranges will now be properly recorded into the approriate output text files. See the internal
+      history for cnetextract.cpp's ExtractLatLonRange() for more detailed change information.
+    </change>
   </history>
 
   <category>

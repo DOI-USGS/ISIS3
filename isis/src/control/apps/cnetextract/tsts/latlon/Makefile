@@ -18,8 +18,8 @@ commands:
 	  minlat=15.0 \
 	  maxlat=28.0 \
 	  minlon=20.0 \
-	  maxlon=28.0;# \
-#	  > /dev/null;
-#	$(SED) 's+/.*/input/+input/+' $(OUTPUT)/newList.lis > $(OUTPUT)/newList.txt;
-#	$(RM) $(OUTPUT)/newList.lis;
-#	$(RM) $(OUTPUT)/list.lis;
+	  maxlon=28.0 \
+	  > /dev/null;
+	$(SED) 's+/.*/input/+input/+' $(OUTPUT)/newList.lis > $(OUTPUT)/newList.txt;
+	$(RM) $(OUTPUT)/newList.lis;
+	$(RM) $(OUTPUT)/list.lis;
