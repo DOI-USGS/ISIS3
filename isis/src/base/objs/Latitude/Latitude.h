@@ -53,6 +53,8 @@ namespace Isis {
    *                           Latitude::Latitude(double latitude, PvlGroup mapping, 
    *                           Angle::Units latitudeUnits, ErrorChecking errors) and added in
    *                           documentation for all exceptions thrown. Fixes #3907
+   *   @history 2016-09-29 Jeannie Backer - Changed strings in error message to use Angle::toString
+   *                           instead of the Isis::toString(double) method.
    */
   class Latitude : public Angle {
     public:

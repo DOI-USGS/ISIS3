@@ -40,65 +40,72 @@ namespace Isis {
    * @author 2010-01-06 Steven Lambright
    *
    * @internal
-   *   @history 2010-05-06 Steven Lambright - Added Split Lat/Lon
-   *                           Functionality
+   *   @history 2010-05-06 Steven Lambright - Added Split Lat/Lon functionality
    *   @history 2010-06-22 Steven Lambright - Improved handling of resolutions
-   *   @history 2011-01-25 Steven Lambright - Now uses native units to the
-   *                           projection, Lat/Lon classes, and several bug
-   *                           fixes when it comes to out of range values or
-   *                           non-standard projection types.
-   *   @history 2011-01-26 Steven Lambright - Fixed a bug where the grid was not
-   *                           consistent on the edges and added SetGroundLimits
-   *                           and WalkBoundary for the new grid options Bound
-   *                           lat/lon range.
-   *   @history 2011-02-25 Steven Lambright - Min/Max Lat/Lons do not have
-   *                           to be known in the constructor any more
-   *   @history 2011-12-08 Steven Lambright - Fixed a bug causing the longitude
-   *                           range to be incorrect. Fixes #607.
-   *   @history 2014-06-06 Kristin Berry - Fixed a bug where lat/lon were swapped
-   *                           in the code. Fixes #2081.
-   *          
+   *   @history 2011-01-25 Steven Lambright - Now uses native units to the projection,
+   *                           Lat/Lon classes, and several bug fixes when it comes to
+   *                           out of range values or non-standard projection types.
+   *   @history 2011-01-26 Steven Lambright - Fixed a bug where the grid was not consistent
+   *                           on the edges and added SetGroundLimits and WalkBoundary
+   *                           for the new grid options Bound lat/lon range.
+   *   @history 2011-02-25 Steven Lambright - Min/Max Lat/Lons do not have to be known
+   *                           in the constructor any more
+   *   @history 2011-12-08 Steven Lambright - Fixed a bug causing the longitude range
+   *                           to be incorrect. Fixes #607.
+   *   @history 2014-06-06 Kristin Berry - Fixed a bug where lat/lon were swapped in the code.
+   *                           Fixes #2081.
+   *   @history 2016-09-29 Jeannie Backer - Changed Latitude objects that were created with
+   *                           Latitude's mapping group constructor to have enum value
+   *                           Latitude::AllowPastPole. This was done for p_minLat in the
+   *                           GroundGrid constructor and for startLat in the CreateGrid()
+   *                           method. The reason for this is that these objects are copied
+   *                           to initialize another Latitude variable (lat) within for-loops
+   *                           that go past the poles. Thus lat must be allowed to go past
+   *                           the poles. This bug was uncovered when Latitude's virtual setAngle()
+   *                           method was fixed to match the signature of the parent method.
+   *                           Moved implementation of GroundMap() and GetMappingGroup() to the
+   *                           cpp file per ISIS coding standards.
    */
   class GroundGrid {
     public:
-      GroundGrid(UniversalGroundMap *gmap, bool splitLatLon,
-                 unsigned int width, unsigned int height);
+      GroundGrid(UniversalGroundMap *gmap, 
+                 bool splitLatLon,
+                 unsigned int width, 
+                 unsigned int height);
 
       virtual ~GroundGrid();
 
-      void CreateGrid(Latitude baseLat, Longitude baseLon,
-                      Angle latInc,  Angle lonInc,
+      void CreateGrid(Latitude baseLat, 
+                      Longitude baseLon,
+                      Angle latInc,  
+                      Angle lonInc,
                       Progress *progress = 0);
 
-      void CreateGrid(Latitude baseLat, Longitude baseLon,
-                      Angle latInc,  Angle lonInc,
+      void CreateGrid(Latitude baseLat, 
+                      Longitude baseLon,
+                      Angle latInc,  
+                      Angle lonInc,
                       Progress *progress,
-                      Angle latRes, Angle lonRes);
+                      Angle latRes, 
+                      Angle lonRes);
 
       void WalkBoundary();
 
-      void SetGroundLimits(Latitude minLat, Longitude minLon, Latitude maxLat,
+      void SetGroundLimits(Latitude minLat, 
+                           Longitude minLon, 
+                           Latitude maxLat,
                            Longitude maxLon);
 
       bool PixelOnGrid(int x, int y);
       bool PixelOnGrid(int x, int y, bool latGrid);
 
-      /**
-       * Returns a mapping group representation of the projection or camera.
-       * This is useful for matching units with lat/lons.
-       *
-       * @returns Returns a mapping group representation of the projection or camera
-       */
-      PvlGroup *GetMappingGroup() { return p_mapping; }
+      PvlGroup *GetMappingGroup();
 
     protected:
       virtual bool GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y);
 
-      //! Returns the ground map for children
-      UniversalGroundMap *GroundMap() {
-        return p_groundMap;
-      }
+      UniversalGroundMap *GroundMap();
 
     private:
       void SetGridBit(unsigned int x, unsigned int y, bool latGrid);
