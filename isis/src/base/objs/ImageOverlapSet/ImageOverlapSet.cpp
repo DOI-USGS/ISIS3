@@ -1,9 +1,9 @@
-#include <string>
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
+#include <string>
 #include <vector>
-#include <cmath>
 
 #include "Cube.h"
 #include "FileName.h"
@@ -72,7 +72,6 @@ namespace Isis {
     
     // Create an ImageOverlap for each image boundary
     for (int i = 0; i < sns.size(); i++) {
-            
       // Open the cube
       Cube cube;
       try {
@@ -89,7 +88,6 @@ namespace Isis {
       ImagePolygon *poly = new ImagePolygon();
       cube.read(*poly);
       cube.close();
-
       // Create an ImageOverlap with the serial number and the bounding
       // polygon and save it
       geos::geom::MultiPolygon *tmp = PolygonTools::MakeMultiPolygon(poly->Polys());
@@ -151,6 +149,7 @@ namespace Isis {
       // Determine the overlap between each boundary polygon
       FindAllOverlaps(&sns);
     }
+
   }
 
 
@@ -186,7 +185,7 @@ namespace Isis {
     p_threadedCalculate = true;
 
     FindImageOverlaps(boundaries);
-    
+
     // While our exit condition is not true, call WriteImageOverlaps with the filename. 
     // The WriteImageOverlaps call will block if it is waiting on calculations.
     while (p_calculatedSoFar != p_lonLatOverlaps.size()) {
@@ -446,10 +445,11 @@ namespace Isis {
     IString file = FileName(filename).expanded();
     bool failed = false;
     bool noOverlaps = false;
+    
     if (p_threadedCalculate) {
       p_calculatePolygonMutex.lock();
     }
-
+    
     try {
       // Let's get an ostream pointed at our file
       std::ofstream outStream;
@@ -460,7 +460,7 @@ namespace Isis {
       else {
         outStream.open(file.c_str(), fstream::out | fstream::app | fstream::binary);
       }
-
+      
       failed |= outStream.fail();
 
       static bool overlapWritten = false;
@@ -492,7 +492,7 @@ namespace Isis {
         
         p_lonLatOverlapsMutex.unlock();
       }
-      
+            
       failed |= outStream.fail();
       outStream.close();
 
