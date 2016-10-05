@@ -4,18 +4,19 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Creates a mosaic with little to no seams using a list of map projected
+  <brief>Create a mosaic with little to no seams using a list of map projected
       cubes</brief>
 
   <description>
-    This program uses a text-based list of cubes, all in the same map projection
-    and equivalent projection parameters (PixelResolution, CenterLongitude,
-    LatitudeSystem, etc), to generate a seamless mosaic.   The size of the
-    mosaic is determined automatically by examining each listed cube.
+    This program, noseam, creates a mosaic using an algorithm that minimizes seams.
+    The user will enter a text-based list of cubes that must be 1) in the same map projection
+    and 2) contain equivalent projection parameters such as PixelResolution, CenterLongitude, and 
+    LatitudeSystem. More help is given in the Parameter Groups and with examples at the end of 
+    this document. 
 
-    This application uses the automos application in order to generate the mosaic.
-    The parameters FROMLIST and MATCHBANDBIN are forwarded into automos and the rest of
-    the parameters are left at their default value. To know more about automos parameters,
+    To generate the mosaic, noseam uses the automos application. The FROMLIST and MATCHBANDBIN 
+    parameters are taken from noseam and forwarded to automos as well as the remainder of the 
+    parameters except with their default values. To learn more about <def link="automos">automos</def> parameters,
     see the automos application documentation.
   </description>
 
@@ -33,7 +34,12 @@
       use the correct temporary folder.
     </change>
     <change name="Kelvin Rodriguez" date="2016-6-29">
-      Added a short description of how noseam utlizes automos in the documentation. 
+      Added a short description of how noseam utilizes automos in the documentation. 
+    </change>
+    <change name="Makayla Shepherd" date="2016-8-18">
+      The noseam parameters HNS HNL LNS and LNL, which correspond to the size of the 
+      boxcar for the highpass and lowpass filters, have been condensed down to two 
+      parameters, SAMPLES and LINES as the size of the boxcars must be the same. Fixes #258.
     </change>
   </history>
 
@@ -70,57 +76,34 @@
     </group>
 
     <group name="Filter Sizes">
-      <parameter name="HNS">
+      <parameter name="SAMPLES">
         <type>integer</type>
         <brief>
-              Number of samples in high frequency data boxcar
+              Number of samples for the boxcar filters
         </brief>
         <description>
-          This is the total number of samples in the high frequency data boxcar.
-          It must be odd and can not exceed twice the number of samples in the
-          input cubes.  In general, the size of the boxcar does not cause the
-          program to operate significantly slower.
+          This is the total number of samples in the boxcar dimension applied using the highpass 
+          and lowpass filters. The number must be odd and cannot exceed twice the number of samples 
+          in the input cubes. The smaller the boxcar dimension, the more confined the filtered 
+          results are near the image seams, which will remain similar to the original mosaic.
+          The larger the boxcar dimension, the greater the extent of the filter effects are beyond 
+          the seams. 
         </description>
         <odd />
         <minimum inclusive="yes">1</minimum>
       </parameter>
-      <parameter name="HNL">
+      <parameter name="LINES">
         <type>integer</type>
         <brief>
-                Number of lines in high frequency data boxcar
+                Number of lines for the boxcar filters
         </brief>
-        <description> This is the total number of lines in the high frequency
-           data boxcar. It must be odd and can not exceed twice the number of
-           lines in the input cubes.  In general, the size of the boxcar does
-           not cause the program to operate significantly slower.
-        </description>
-        <odd />
-        <minimum inclusive="yes">1</minimum>
-      </parameter>
-      <parameter name="LNS">
-        <type>integer</type>
-        <brief>
-                Number of samples in low frequency data boxcar
-        </brief>
-        <description>
-          This is the total number of samples in the low frequency data boxcar.
-          It must be odd and can not exceed twice the number of samples in the
-          input cubes.  In general, the size of the boxcar does not cause the
-          program to operate significantly slower.
-        </description>
-        <odd />
-        <minimum inclusive="yes">1</minimum>
-      </parameter>
-      <parameter name="LNL">
-        <type>integer</type>
-        <brief>
-                Number of lines in low frequency data boxcar
-        </brief>
-        <description>
-          This is the total number of lines in the low frequency data boxcar. It
-          must be odd and can not exceed twice the number of lines in the input
-          cubes.  In general, the size of the boxcar does not cause the program
-          to operate significantly slower.
+        <description> 
+          This is the total number of lines in the boxcar dimension applied using the highpass 
+          and lowpass filters. The number must be odd and cannot exceed twice the number of lines 
+          in the input cubes. The smaller the boxcar dimension, the more confined the filtered 
+          results are near the image seams, which will remain similar to the original mosaic.
+          The larger the boxcar dimension, the greater the extent of the filter effects are beyond 
+          the seams. 
         </description>
         <odd />
         <minimum inclusive="yes">1</minimum>
@@ -145,9 +128,28 @@
         <default><item>TRUE</item></default>
         <brief>Destroy intermediate data</brief>
         <description>
-          Multiple cube images as well as lists are created durring the
+          Multiple cube images as well as lists are created during the
           production of the final seamless mosaic.  If this parameter is changed
           to false, those temporary cubes and lists will not be destroyed.
+          
+          <p>
+          If REMOVETEMP=NO:
+          <ul>
+            <li>OriginalMosaic.cub - This file is the mosaic result (automos) of the input cubes listed 
+              in FROMLIST. </li>
+            <li>LowpassMosaic.cub  - This file is the low pass filter (samples x lines) applied to the 
+              OriginalMosaic.cub. </li>
+            <li>HighpassMosaic.cub - This file is the mosaic result (automos) of the high pass filtered 
+              input cubes listed in FROMLIST. </li>
+            <li>HighPassList.lis - This single column list contains the individual highpass filter image 
+              results and filenames. </li>
+            <li>_highpass.cub - Every image in the fromlist will have a high pass filter 
+              (samples x lines) output result. This is the suffix filename appended the original input 
+              filenames. </li>
+            <li>LowpassMosaic.cub + HighpassMosaic.cub = TO (noseam output filename) </li>
+          </ul>
+        </p>
+
         </description>
       </parameter>
     </group>
@@ -158,79 +160,76 @@
 
     <example>
       <brief>No Seam Result</brief>
+        <description>
+           This example shows how noseam works upon a small mosaic and
+           compares that result to an automos output.
+        </description>
+
+        <terminalInterface>
+            <commandLine>FROMLIST=cubes.lis
+              TO=final.cub SAMPLES=73 LINES=73</commandLine>
             <description>
-                This example shows how noseam works upon a small mosaic and
-                compares that result to an automos output.
+                Runs noseam with a 73x73 highpass filter and a 73x73 lowpass 
+                filter.
             </description>
+        </terminalInterface>
 
-            <terminalInterface>
-                <commandLine>FROMLIST=cubes.lis
-                  TO=final.cub HNS=73 HNL=73 LNS=73 LNL=73</commandLine>
+        <dataFiles>
+          <dataFile path="assets/cubes.lis">
+            <brief>cubes.lis</brief>
+            <description>
+              This is a text-based file that lists all of the cubes to mosaic.
+              This list as well as the cubes to be mosaicked must
+              be within the current directory when noseam is executed.
+            </description>
+            <parameterName>FROMLIST</parameterName>
+          </dataFile>
+        </dataFiles>
+
+        <inputImages>
+            <image src="assets/images/cube1.jpg" width="204" height="550">
+                <brief>First listed cube</brief>
                 <description>
-                    Runs noseam with a 73x73 highpass filter and a 73x73 lowpass
-                    filter.  Choosing the same dimensions will preserve the
-                    original image and only reduce the presence of seams in the
-                    final mosaic.
+                    This is the first cube listed in cubes.lis.
                 </description>
-            </terminalInterface>
-
-            <dataFiles>
-              <dataFile path="assets/cubes.lis">
-                <brief>cubes.lis</brief>
+                <thumbnail caption="cube1.cub" src="assets/images/cube1.jpg" width="74" height="200"/>
+            </image>
+            <image src="assets/images/cube2.jpg" width="223" height="550">
+                <brief>Second listed cube</brief>
                 <description>
-                 This is a simple file that lists all of the cubes to mosaic.
-                 This list as well as the cubes to be mosaiced must
-                  be within the current directory when noseam is executed.
+                    This is the second cube listed in cubes.lis.
                 </description>
-                <parameterName>FROMLIST</parameterName>
-              </dataFile>
-            </dataFiles>
+                <thumbnail caption="cube2.cub" src="assets/images/cube2.jpg" width="81" height="200"/>
+            </image>
+            <image src="assets/images/cube3.jpg" width="241" height="550">
+                <brief>Third listed cube</brief>
+                <description>
+                    This is the third cube listed in cubes.lis.
+                </description>
+                <thumbnail caption="cube3.cub" src="assets/images/cube3.jpg" width="87" height="200"/>
+            </image>
+        </inputImages>
 
-            <inputImages>
-                <image src="assets/images/cube1.jpg" width="204" height="550">
-                    <brief>First listed cube</brief>
-                    <description>
-                        This is the first cube listed in cubes.lis
-                    </description>
-                    <thumbnail caption="cube1.cub" src="assets/images/cube1.jpg" width="74" height="200"/>
-                </image>
-                <image src="assets/images/cube2.jpg" width="223" height="550">
-                    <brief>Second listed cube</brief>
-                    <description>
-                        This is the second cube listed in cubes.lis
-                    </description>
-                    <thumbnail caption="cube2.cub" src="assets/images/cube2.jpg" width="81" height="200"/>
-                </image>
-                <image src="assets/images/cube3.jpg" width="241" height="550">
-                    <brief>Third listed cube</brief>
-                    <description>
-                        This is the third cube listed in cubes.lis
-                    </description>
-                    <thumbnail caption="cube3.cub" src="assets/images/cube3.jpg" width="87" height="200"/>
-                </image>
-            </inputImages>
-
-            <outputImages>
-              <image src="assets/images/result.jpg" width="404" height="550">
-                    <brief>The resulting mosaic</brief>
-                    <description>
-                        This is the resulting mosaic final.cub.
-                    </description>
-                    <thumbnail caption="final.cub" src="assets/images/result.jpg" width="147" height="200"/>
-                    <parameterName>TO</parameterName>
-                </image>
-                <image src="assets/images/original.jpg" width="404" height="550">
-                    <brief>Automos result (NOT AN OUTPUT OF NOSEAM)</brief>
-                    <description>
-                        This is the same mosaic created from automos.  Notice
-                        the difference between this image and final.cub.  The
-                        seams that exist between the original images are nearly
-                        invisible in final.cub.  However, those same seams are
-                        ugly in this image, automos.cub.
-                    </description>
-                    <thumbnail caption="automos.cub" src="assets/images/original.jpg" width="147" height="200"/>
-                </image>
-            </outputImages>
+        <outputImages>
+          <image src="assets/images/result.jpg" width="404" height="550">
+                <brief>The resulting mosaic</brief>
+                <description>
+                    This is the resulting mosaic final.cub.
+                </description>
+                <thumbnail caption="final.cub" src="assets/images/result.jpg" width="147" height="200"/>
+                <parameterName>TO</parameterName>
+            </image>
+            <image src="assets/images/original.jpg" width="404" height="550">
+                <brief>Automos result (NOT AN OUTPUT OF NOSEAM)</brief>
+                <description>
+                    This is the same mosaic created using automos.  Notice
+                    the difference between automos.cub and final.cub.  The
+                    seams that existed between the original images in automos
+                    are nearly invisible in final.cub.
+                </description>
+                <thumbnail caption="automos.cub" src="assets/images/original.jpg" width="147" height="200"/>
+            </image>
+        </outputImages>
 
     </example>
 
