@@ -39,8 +39,8 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <opencv2/superres.hpp>
-#include <opencv2/xfeatures2d.hpp>
+#include <opencv2/superres/superres.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
 
 #include "FileName.h"
 #include "IString.h"
@@ -65,7 +65,7 @@ FeatureAlgorithmFactory *FeatureAlgorithmFactory::m_maker = 0;
  * environment by setting necessary parsing elements, setting the OpenCV error
  * handler to an ISIS handler method, and enabling all OpenCV algorithms for
  * parsing and resolving algorithms.
-
+ */
 FeatureAlgorithmFactory::FeatureAlgorithmFactory() : AlgorithmParameters() {
 //  This ensures this singleton is shut down when the application exists
    qAddPostRoutine(DieAtExit);

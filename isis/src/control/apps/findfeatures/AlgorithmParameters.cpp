@@ -40,10 +40,9 @@
 #include <boost/foreach.hpp>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
 
-#include <opencv2/superres.hpp>
-#include <opencv2/xfeatures2d.hpp>
+#include <opencv2/superres/superres.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
 
 #include "AlgorithmParameters.h"
 #include "FileName.h"

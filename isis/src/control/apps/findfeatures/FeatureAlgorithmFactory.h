@@ -103,6 +103,7 @@ namespace Isis {
  * @internal 
  *   @history 2015-10-01 Kris Becker - Original Version 
  *   @history 2016-03-06 Kris Becker Completed documentation 
+ *   @history 2016-10-05 Ian Humphrey & Makayla Shepherd - Changed headers to OpenCV2.
  */ 
 class FeatureAlgorithmFactory : public AlgorithmParameters {
   public:

@@ -71,6 +71,7 @@ namespace Isis {
  * @internal 
  *   @history 2015-08-18 Kris Becker - Original Version 
  *   @history 2016-04-12 Kris Becker Added class documentation 
+ *   @history 2016-10-05 Ian Humphrey & Makayla Shepherd - Changed headers back to OpenCV2.
  */
 class AlgorithmParameters {
   public:
