@@ -28,7 +28,11 @@ namespace Isis {
 
   /**
    * Constructs a BundleSettings object. 
-   * Default values are set for all member variables. 
+   * Default values are set for all member variables. By default, BundleSettings allows creation
+   * of the inverse correlation matrix file.
+   * 
+   * @see createInverseMatrix()
+   * @see setCreateInverseMatrix()
    */
   BundleSettings::BundleSettings() {
     m_id = NULL;
@@ -40,6 +44,7 @@ namespace Isis {
     m_solveRadius          = false;
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
+    m_createInverseMatrix  = true;
 
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 1.0;
@@ -172,6 +177,7 @@ namespace Isis {
         m_solveRadius(other.m_solveRadius),
         m_updateCubeLabel(other.m_updateCubeLabel),
         m_errorPropagation(other.m_errorPropagation),
+        m_createInverseMatrix(other.m_createInverseMatrix),
         m_outlierRejection(other.m_outlierRejection),
         m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
         m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
@@ -216,6 +222,7 @@ namespace Isis {
       m_solveRadius = other.m_solveRadius;
       m_updateCubeLabel = other.m_updateCubeLabel;
       m_errorPropagation = other.m_errorPropagation;
+      m_createInverseMatrix = other.m_createInverseMatrix;
       m_outlierRejection = other.m_outlierRejection;
       m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
       m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
@@ -350,6 +357,34 @@ namespace Isis {
 
 
   /**
+   * Indicates if the settings will allow the inverse correlation matrix to be created.
+   * 
+   * This method is used to determine if the inverse correlation matrix file will be created when
+   * creating error propagation information in the bundle adjust. If error propagation is not
+   * turned on, then the inverse correlation matrix file will not be created.
+   * 
+   * @return @b bool Returns whether or now the inverse correlation matrix is allowed to be created.
+   * 
+   * @see BundleAdjust::errorPropagation()
+   */
+  bool BundleSettings::createInverseMatrix() const {
+    return (m_errorPropagation && m_createInverseMatrix);
+  }
+
+
+  /**
+   * This method is used to determine whether outlier rejection will be 
+   * performed on this bundle adjustment. 
+   * 
+   * @return @b bool Indicates whether to perform automatic outlier 
+   *                 rejection during the bundle adjustment.
+   */
+  bool BundleSettings::outlierRejection() const {
+    return m_outlierRejection;
+  }
+
+
+  /**
    * This method is used to determine whether this bundle adjustment will solve 
    * for observation mode. 
    * 
@@ -393,16 +428,22 @@ namespace Isis {
     return m_errorPropagation;
   }
 
-
+ 
   /**
-   * This method is used to determine whether outlier rejection will be 
-   * performed on this bundle adjustment. 
+   * Turn the creation of the inverse correlation matrix file on or off.
    * 
-   * @return @b bool Indicates whether to perform automatic outlier 
-   *                 rejection during the bundle adjustment.
+   * Note that the inverse correlation matrix is created in BundleAdjust, and will only be created
+   * if error propagation is turned on. By default, BundleSettings allows the inverse matrix to
+   * be created. This requires stand-alone applications (e.g. jigsaw) to call this method
+   * to turn of the correlation matrix creation. 
+   * 
+   * @param createMatrixFile Boolean indicating whether or not to allow the inverse matrix file to
+   *                         be created.
+   * 
+   * @see BundleAdjust::errorPropagation()
    */
-  bool BundleSettings::outlierRejection() const {
-    return m_outlierRejection;
+  void BundleSettings::setCreateInverseMatrix(bool createMatrixFile) {
+    m_createInverseMatrix = createMatrixFile;
   }
 
 
@@ -989,6 +1030,7 @@ namespace Isis {
     pvl += PvlKeyword("SolveRadius", toString(solveRadius()));
     pvl += PvlKeyword("UpdateCubeLabel", toString(updateCubeLabel()));
     pvl += PvlKeyword("ErrorPropagation", toString(errorPropagation()));
+    pvl += PvlKeyword("CreateInverseMatrix", toString(createInverseMatrix()));
     pvl += PvlKeyword("OutlierRejection", toString(outlierRejection()));
     if (m_outlierRejection) {
       pvl += PvlKeyword("OutlierMultiplier", toString(outlierRejectionMultiplier()));
@@ -1090,6 +1132,7 @@ namespace Isis {
     stream.writeAttribute("solveRadius", toString(solveRadius()));
     stream.writeAttribute("updateCubeLabel", toString(updateCubeLabel()));
     stream.writeAttribute("errorPropagation", toString(errorPropagation()));
+    stream.writeAttribute("createInverseMatrix", toString(createInverseMatrix()));
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
@@ -1319,6 +1362,11 @@ namespace Isis {
         if (!errorPropagationStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_errorPropagation = toBool(errorPropagationStr);
         }
+
+        QString createInverseMatrixStr = attributes.value("createInverseMatrix");
+        if (!createInverseMatrixStr.isEmpty()) {
+          m_xmlHandlerBundleSettings->m_createInverseMatrix = toBool(createInverseMatrixStr);
+        }
       }
       else if (localName == "aprioriSigmas") {
 
@@ -1493,6 +1541,7 @@ namespace Isis {
            << m_solveRadius
            << m_updateCubeLabel
            << m_errorPropagation
+           << m_createInverseMatrix
            << m_outlierRejection
            << m_outlierRejectionMultiplier
            << m_globalLatitudeAprioriSigma
@@ -1529,6 +1578,7 @@ namespace Isis {
            >> m_solveRadius
            >> m_updateCubeLabel
            >> m_errorPropagation
+           >> m_createInverseMatrix
            >> m_outlierRejection
            >> m_outlierRejectionMultiplier
            >> m_globalLatitudeAprioriSigma
@@ -1646,6 +1696,10 @@ namespace Isis {
 
         intFromBool = (int)m_errorPropagation;
         att = settingsGroup.createAttribute("errorPropagation", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_createInverseMatrix;
+        att = settingsGroup.createAttribute("createInverseMatrix", PredType::NATIVE_HBOOL, spc);
         att.write(PredType::NATIVE_HBOOL, &intFromBool);
 
         intFromBool = (int)m_outlierRejection;
@@ -1837,6 +1891,10 @@ namespace Isis {
         att = settingsGroup.openAttribute("errorPropagation");
         att.read(PredType::NATIVE_HBOOL, &boolAttValue);
         m_errorPropagation = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("createInverseMatrix");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_createInverseMatrix = (bool)boolAttValue;
 
         att = settingsGroup.openAttribute("outlierRejection");
         att.read(PredType::NATIVE_HBOOL, &boolAttValue);

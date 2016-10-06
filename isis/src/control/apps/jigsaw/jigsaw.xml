@@ -206,7 +206,11 @@
     </change>
     <change name="Ian Humphrey" date="2016-09-22">
       Output from jigsaw will again provide "Validating network" and "Validation complete" messages
-      to inform user that their control network has been validated. Fixes #4313."
+      to inform user that their control network has been validated. Fixes #4313.
+    </change>
+    <change name="Ian Humphrey" date="2016-10-05">
+      When running jigsaw with error propagation turned on, the correlation matrix file,
+      inverseMatrix.dat, is no longer generated. Fixes #4315.
     </change>
   </history>
 

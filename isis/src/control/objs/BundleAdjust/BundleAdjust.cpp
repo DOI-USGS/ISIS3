@@ -2714,6 +2714,10 @@ namespace Isis {
 
   /**
    * error propagation for CHOLMOD solution.
+   * 
+   * @internal
+   *   @history 2016-10-05 Ian Humphrey - Updated to check to see if bundle settings is allowing
+   *                           us to create the inverse matrix correlation file. References #4315.
    */
   bool BundleAdjust::errorPropagation_CHOLMOD() {
 
@@ -2756,8 +2760,12 @@ namespace Isis {
     //???                                               + "inverseMatrix.dat");
     // Create file handle
     QFile matrixOutput(matrixFile.expanded());
-    // Open file to write to
-    matrixOutput.open(QIODevice::WriteOnly);
+
+    // Check to see if creating the inverse correlation matrix is turned on
+    if (m_bundleSettings->createInverseMatrix()) {
+      // Open file to write to
+      matrixOutput.open(QIODevice::WriteOnly);
+    }
     QDataStream outStream(&matrixOutput);
 
     int i, j, k;
@@ -2850,8 +2858,10 @@ namespace Isis {
       }
 
 
-      // Output inverse matrix to the open file.
-      outStream << sbcMatrix;
+      if (m_bundleSettings->createInverseMatrix()) {
+        // Output inverse matrix to the open file.
+        outStream << sbcMatrix;
+      }
 
       // now loop over all object points to sum contributions into 3x3 point covariance matrix
       int nPointIndex = 0;
@@ -2930,10 +2940,13 @@ namespace Isis {
         nPointIndex++;
       }
     }
-    // Close the file.
-    matrixOutput.close();
-    // Save the location of the "covariance" matrix
-    m_bundleResults.setCorrMatCovFileName(matrixFile);
+
+    if (m_bundleSettings->createInverseMatrix()) {
+      // Close the file.
+      matrixOutput.close();
+      // Save the location of the "covariance" matrix
+      m_bundleResults.setCorrMatCovFileName(matrixFile);
+    }
 
     // can free sparse normals now
     m_SparseNormals.wipe();

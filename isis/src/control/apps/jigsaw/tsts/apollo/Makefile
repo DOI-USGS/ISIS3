@@ -20,6 +20,8 @@ APPNAME = jigsaw
 #                is turned on and we do not have a way to compare this file type.
 # 2016-08-11 Jeannie Backer - Removed specialk test since we have removed this solve method from 
 #                the bundle adjustment. Updated documentation
+# 2016-10-05 Ian Humphrey - Removed no longer relevant RM command for inverseMatrix.dat, as it is
+#                no longer generated from jigsaw during error propagation. References #4315.
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -55,5 +57,4 @@ commands:
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/apollo_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
-	$(RM) $(OUTPUT)/inverseMatrix.dat > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;

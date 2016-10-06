@@ -92,6 +92,10 @@ namespace Isis {
    *                           results. Fixes #4162.
    *   @history 2016-08-23 Jesse Mapel - Modified to no longer determine which output files
    *                           BundleAdjust and BundleSolutionInfo create.  Fixes #4279.
+   *   @history 2016-10-05 Ian Humphrey - Added m_createInverseMatrix, createInverseMatrix(), and
+   *                           setCreateInverseMatrix() so that bundle settings stores whether or
+   *                           not the inverse correlation matrix file (inverseMatrix.dat) will be
+   *                           generated during error propagation in the adjustment. Fixes #4315.
    *  
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -146,8 +150,10 @@ namespace Isis {
       void setOutlierRejection(bool outlierRejection, 
                                double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
+      void setCreateInverseMatrix(bool createMatrix);
 
       // accessors
+      bool createInverseMatrix() const;
       bool solveObservationMode() const;
       bool solveRadius() const;
       bool updateCubeLabel() const;
@@ -339,6 +345,7 @@ namespace Isis {
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.
       bool m_errorPropagation; //!< Indicates whether to perform error propagation.
+      bool m_createInverseMatrix; //!< Indicates whether to create the inverse matrix file.
       bool m_outlierRejection; /**< Indicates whether to perform automatic 
                                     outlier detection/rejection.*/
       double m_outlierRejectionMultiplier; /**< The multiplier value for outlier rejection.

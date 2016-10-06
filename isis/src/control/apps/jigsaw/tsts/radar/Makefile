@@ -13,6 +13,9 @@ APPNAME = jigsaw
 # 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
 #                Removed default parameters.
 # 2016-08-11 Jeannie Backer - Updated documentation
+# 2016-10-05 Ian Humphrey - Removed no longer relevant RM command to remove inverseMatrix.dat
+#                as jigsaw no longer generates this file during error propagation.
+#                References #4315.
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -64,4 +67,3 @@ commands:
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
-	$(RM) inverseMatrix.dat > /dev/null;

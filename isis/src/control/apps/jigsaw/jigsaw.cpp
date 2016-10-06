@@ -167,6 +167,9 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
                             longitudeSigma, 
                             radiusSigma);
 
+  // Don't create the inverse correlation matrix file
+  settings->setCreateInverseMatrix(false);
+
   settings->setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));
 

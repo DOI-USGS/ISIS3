@@ -227,11 +227,13 @@ namespace Isis {
    *   @history 2016-08-23 Jesse Mapel - Removed output file calls.  Apps and objects that use
    *                           BundleAdjust must call output methods from BundleSolutionInfo.
    *                           Fixes #4279.
-   *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
-   *                           messages are logged to stdout. Fixes #4313.
    *   @history 2016-08-28 Kelvin Rodriguez - Remvoed useless register keywords to squash warnigns
    *                         in clang. Part of porting to OS X 10.11. 
-
+   *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
+   *                           messages are logged to stdout. Fixes #4313.
+   *   @history 2016-10-05 Ian Humphrey - Modified errorPropagation_CHOLMOD() to check bundle
+   *                           settings to see if it should generate the inverseMatrix.dat file.
+   *                           References #4315.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
