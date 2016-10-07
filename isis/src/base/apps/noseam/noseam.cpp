@@ -18,10 +18,8 @@ void IsisMain() {
   FileList cubes;
   cubes.read(ui.GetFileName("FROMLIST"));
 
-  int hns = ui.GetInteger("HNS");
-  int hnl = ui.GetInteger("HNL");
-  int lns = ui.GetInteger("LNS");
-  int lnl = ui.GetInteger("LNL");
+  int samples = ui.GetInteger("SAMPLES");
+  int lines = ui.GetInteger("LINES");
   QString match = ui.GetAsString("MATCHBANDBIN");
 
   //Sets upt the pathName to be used for most application calls
@@ -48,7 +46,7 @@ void IsisMain() {
     QString outParam = pathName + inFile.baseName() + "_highpass.cub";
     parameters = "FROM=" + inFile.expanded() +
                  " TO=" + outParam
-                 + " SAMPLES=" + toString(hns) + " LINES=" + toString(hnl);
+                 + " SAMPLES=" + toString(samples) + " LINES=" + toString(lines);
     ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
     highPassList << outParam << endl;
@@ -63,7 +61,7 @@ void IsisMain() {
   //Does a lowpass on the original mosaic
   parameters = "FROM=" + pathName + "OriginalMosaic.cub"
                + " TO=" + pathName + "LowpassMosaic.cub"
-               + " SAMPLES=" + toString(lns) + " LINES=" + toString(lnl);
+               + " SAMPLES=" + toString(samples) + " LINES=" + toString(lines);
   ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the highpass and lowpass mosaics

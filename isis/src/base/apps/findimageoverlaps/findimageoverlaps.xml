@@ -123,6 +123,10 @@
       Fixed a bug where ImageOverlapSet was not recording overlaps where 
       one image is fully enveloped within another. Fixes #2199.
     </change>
+    <change name="Marjorie Hahn" date="2016-10-03">
+      Added an exception for giving findimageoverlaps a cube list of only 
+      one cube. Fixes #4200.
+    </change>
   </history>
 
   <groups>
