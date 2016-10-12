@@ -520,6 +520,224 @@ namespace Isis {
   }
 
 
+
+
+
+  /**
+   * @brief Outputs the header for the bundleout_images.csv file
+   * @param fpOut The output file stream.
+   * @return True if the write is successful, False otherwise.
+   */
+  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut) {
+
+    if (!fpOut) {
+      return false;
+    }
+
+    char buf[1056];
+
+    // setup column headers
+    std::vector<QString> outputColumns;
+
+    outputColumns.push_back("Image,");
+    outputColumns.push_back("rms,");
+    outputColumns.push_back("rms,");
+    outputColumns.push_back("rms,");
+
+
+    BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
+
+    int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
+    int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
+    bool solveTwist = obsSettings.solveTwist();
+
+    char strCoeff = 'a' + numberCamPosCoefSolved -1;
+    std::ostringstream oStr;
+    int nCoeff = 1;
+    if (numberCamPosCoefSolved > 0)
+      nCoeff = numberCamPosCoefSolved;
+
+    for (int i = 0; i < nCoeff; i++) {
+      if (i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (nCoeff == 1)
+          outputColumns.push_back("X,");
+        else {
+          QString str = "X(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+    }
+    strCoeff = 'a' + numberCamPosCoefSolved - 1;
+    for (int i = 0; i < nCoeff; i++) {
+      if (i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (nCoeff == 1)
+          outputColumns.push_back("Y,");
+        else {
+          QString str = "Y(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+    }
+    strCoeff = 'a' + numberCamPosCoefSolved - 1;
+    for (int i = 0; i < nCoeff; i++) {
+      if (i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (nCoeff == 1) {
+          outputColumns.push_back("Z,");
+        }
+        else {
+          QString str = "Z(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+      if (!i)
+        break;
+    }
+
+    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
+    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+      if(i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (numberCamAngleCoefSolved == 1)
+          outputColumns.push_back("RA,");
+        else {
+          QString str = "RA(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+    }
+    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
+    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+      if (i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (numberCamAngleCoefSolved == 1)
+          outputColumns.push_back("DEC,");
+        else {
+          QString str = "DEC(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+    }
+    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
+    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+      if (i == 0)
+        oStr << strCoeff;
+      else if (i == 1)
+        oStr << strCoeff << "t";
+      else
+        oStr << strCoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (numberCamAngleCoefSolved == 1 || !solveTwist) {
+          outputColumns.push_back("TWIST,");
+        }
+        else {
+          QString str = "TWIST(";
+          str += oStr.str().c_str();
+          str += "),";
+          outputColumns.push_back(str);
+        }
+      }
+      oStr.str("");
+      strCoeff--;
+      if (!solveTwist)
+        break;
+    }
+
+    // print first column header to buffer and output to file
+    int ncolumns = outputColumns.size();
+    for (int i = 0; i < ncolumns; i++) {
+      QString str = outputColumns.at(i);
+      sprintf(buf, "%s", (const char*)str.toLatin1().data());
+      fpOut << buf;
+    }
+    sprintf(buf, "\n");
+    fpOut << buf;
+
+    outputColumns.clear();
+    outputColumns.push_back("Filename,");
+
+    outputColumns.push_back("sample res,");
+    outputColumns.push_back("line res,");
+    outputColumns.push_back("total res,");
+
+    int nparams = 3;
+    if (numberCamPosCoefSolved)
+      nparams = 3 * numberCamPosCoefSolved;
+
+    int numCameraAnglesSolved = 2;
+    if (solveTwist) numCameraAnglesSolved++;
+    nparams += numCameraAnglesSolved*numberCamAngleCoefSolved;
+    if (!solveTwist) nparams += 1; // Report on twist only
+    for (int i = 0; i < nparams; i++) {
+      outputColumns.push_back("Initial,");
+      outputColumns.push_back("Correction,");
+      outputColumns.push_back("Final,");
+      outputColumns.push_back("Apriori Sigma,");
+      outputColumns.push_back("Adj Sigma,");
+    }
+
+    // print second column header to buffer and output to file
+    ncolumns = outputColumns.size();
+    for (int i = 0; i < ncolumns; i++) {
+      QString str = outputColumns.at(i);
+      sprintf(buf, "%s", (const char*)str.toLatin1().data());
+      fpOut << buf;
+    }
+    sprintf(buf, "\n");
+    fpOut << buf;
+
+    return true;
+  }
+
+
+
   /**
    * Output header for bundle results file.
    * 
@@ -899,6 +1117,84 @@ namespace Isis {
 
     return true;
   }
+
+
+  /**
+   * @brief Outputs the bundleout_images.csv file which contains Jigsaw data about the images
+   * within each observation.
+   * @return True upon success, False if something went wrong.
+   */
+  bool BundleSolutionInfo::outputImagesCSV() {
+
+    char buf[1056];
+    int imgIndex = 0;
+
+    QList<Statistics> rmsImageSampleResiduals = m_statisticsResults->rmsImageSampleResiduals();
+    QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
+    QList<Statistics> rmsImageResiduals = m_statisticsResults->rmsImageResiduals();
+
+    QString ofname = "bundleout_images.csv";
+    ofname = m_settings->outputFilePrefix() + ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+
+    BundleObservationQsp observation;
+
+    int nObservations = m_statisticsResults->observations().size();
+
+    outputImagesCSVHeader(fpOut);
+
+    bool errorProp = false;
+    if (m_statisticsResults->converged() && m_settings->errorPropagation()) {
+      errorProp = true;
+    }
+
+    for (int i = 0; i < nObservations;i++ ) {
+      observation = m_statisticsResults->observations().at(i);
+
+      if(!observation) {
+        continue;
+      }
+
+      int numImages = observation->size();
+
+      for (int j = 0; j < numImages; j++) {
+
+        BundleImageQsp image = observation->at(j);
+
+        sprintf(buf,image->fileName().toLatin1().data());
+        fpOut << buf;
+        sprintf(buf,",");
+        fpOut << buf;
+
+        sprintf(buf,"%0.8f,",rmsImageSampleResiduals[imgIndex].Rms());
+        fpOut << buf;
+
+        sprintf(buf,"%0.8f,",rmsImageLineResiduals[imgIndex].Rms());
+        fpOut << buf;
+
+        sprintf(buf,"%0.8f,",rmsImageResiduals[imgIndex].Rms());
+        fpOut << buf;
+
+        QString observationString =
+            observation->formatBundleOutputString(errorProp,true);
+
+        fpOut << (const char*) observationString.toLatin1().data();
+        sprintf(buf,"\n");
+        fpOut << buf;
+        imgIndex++;
+
+      }
+  }
+
+    fpOut.close();
+    return true;
+  }
+
 
 
   /**

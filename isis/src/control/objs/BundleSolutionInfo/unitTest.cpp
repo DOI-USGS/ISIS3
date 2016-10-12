@@ -255,6 +255,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing output methods";
     
     results.outputText();
+    results.outputImagesCSV();
     results.outputPointsCSV();
     results.outputResiduals();
 

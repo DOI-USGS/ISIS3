@@ -69,6 +69,9 @@ namespace Isis {
    *                           BundleSettings::solveMethod. References #4162.
    *   @history 2016-08-23 Jesse Mapel - Removed output() method.  Individual output
    *                           file methods must be called.  Fixes #4279.
+   *   @history 2016-10-06  Tyler Wilson - Added methods outputImagesCSV()
+   *                           and outputImagesCSVHeader which enables jigsaw users to output
+   *                           the bundleout_images.csv file.  Fixes #4314.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -94,8 +97,11 @@ namespace Isis {
       BundleResults bundleResults();
       QString runTime() const;
 
+
+      bool outputImagesCSVHeader(std::ofstream &fpOut);
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
+      bool outputImagesCSV();
       bool outputPointsCSV();
       bool outputResiduals();
 
