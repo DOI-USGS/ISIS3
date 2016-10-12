@@ -126,6 +126,13 @@ void IsisMain() {
   editLockedPoints = NULL;
   editLockedMeasures = NULL;
 
+  // Test if file exists, throw exception if it does not, continue otherwise.
+  FileName cnetInput(ui.GetFileName("CNET"));
+  if (!cnetInput.fileExists()) {
+    QString msg = "The control network [" + cnetInput.expanded() + "] entered for CNET does not exist.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
   ControlNet cnet(ui.GetFileName("CNET"));
