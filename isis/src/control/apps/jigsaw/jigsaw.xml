@@ -212,6 +212,11 @@
       When running jigsaw with error propagation turned on, the correlation matrix file,
       inverseMatrix.dat, is no longer generated. Fixes #4315.
     </change>
+    <change name="Tyler Wilson" date="2016-10-06">
+      Added the IMAGES_CSV parameter to the "Output Options" group
+      so that the user can now request the bundleout_images.csv file
+      in addition to the other output files such as bundleout.txt.  Fixes #4314.
+    </change>
   </history>
 
   <groups>
@@ -1107,6 +1112,19 @@
           <description> 
             Selection of this parameter flags generation of the standard
             bundle output file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
+        </parameter>
+
+        <parameter name="IMAGES_CSV">
+          <brief> Outputs image data (body-fixed) to csv file - bundleout_images.csv
+          </brief>
+          <description>
+            Selection of this parameter flags output of image data
+            (in body-fixed coordinates) to a csv file.
           </description>
           <type>boolean</type>
           <default>

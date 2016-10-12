@@ -71,6 +71,11 @@ void IsisMain() {
     if (ui.GetBoolean("BUNDLEOUT_TXT")) {
       bundleSolution.outputText();
     }
+
+    if (ui.GetBoolean("IMAGES_CSV")) {
+      bundleSolution.outputImagesCSV();
+    }
+
     if (ui.GetBoolean("OUTPUT_CSV")) {
       bundleSolution.outputPointsCSV();
     }
