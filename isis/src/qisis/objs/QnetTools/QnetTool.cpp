@@ -35,7 +35,9 @@
 #include "PvlEditDialog.h"
 #include "SerialNumber.h"
 #include "SpecialPixel.h"
+#include "Spice.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 #include "ViewportMainWindow.h"
@@ -190,7 +192,7 @@ namespace Isis {
                              "a projected basemap or an unprojected cube with "
                              "corrected camera pointing.  This will be used "
                              "to set the apriori latitude, longitude.");
-    m_radiusFileNameLabel = new QLabel("Radius Source File: ");
+    m_radiusFileNameLabel = new QLabel("Radius Source: ");
     m_radiusFileNameLabel->setToolTip("Dem used to set the radius of ground "
                              "control points, Fixed or Constrained.  This must "
                              "be a Dem and is strictly used to set the apriori "
@@ -2231,7 +2233,9 @@ namespace Isis {
    *                          will not be the fileName if the Instrument group is retained in the
    *                          labels.  Fixes #1018
    *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to 
-   *                           findPointLocation() and createTemporaryGroundMeasure().
+   *                          findPointLocation() and createTemporaryGroundMeasure().
+   *   @history 2016-10-07 Makayla Shepherd - Added radius source handling if there is a ground 
+   *                          source and there is not a radius source already open. 
    */
   void QnetTool::loadPoint () {
 
@@ -2280,6 +2284,11 @@ namespace Isis {
         // TODO:  Does open ground source match point ground source
         createTemporaryGroundMeasure();
       }
+    }
+    
+    //  Load a radius source if there isn't a radius source already open, and there is a ground source
+    if (m_groundOpen && !m_demOpen) {
+      openReferenceRadius();
     }
 
 
@@ -3632,12 +3641,15 @@ namespace Isis {
    *                           information.
    *   @history 2012-10-05 Tracie Sucharski - Re-factored most of this method, attempting to clean
    *                           up logic, error checking and recovery.
+   *   @history 2016-09-26 Makayla Shepherd - Changed the logic for determining the radius source
+   *                           when there is not a radius source already open.
    */
   void QnetTool::openGround() {
 
     QString filter = "Isis cubes (*.cub *.cub.*);;";
     filter += "Detached labels (*.lbl);;";
     filter += "All (*)";
+    
     QString ground = QFileDialog::getOpenFileName((QWidget*)parent(),
                                                   "Open ground source",
                                                   ".",
@@ -3738,73 +3750,69 @@ namespace Isis {
                 this, SLOT(groundViewportClosed(CubeViewport *)), Qt::UniqueConnection);
       }
     }
-
-    //  Determine file type of ground for setting AprioriSurfacePointSource
-    //  and AprioriRadiusSource.
-    if (m_groundCube->hasTable("ShapeModelStatistics")) {
-      m_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
-      if (!m_demOpen) {
-        m_groundRadiusSource = ControlPoint::RadiusSource::DEM;
-        m_radiusSourceFile = ground;
+    
+    if (!m_demOpen) {
+      //  If there isn't a radius source already open and there is a point selected
+      if (m_editPoint != NULL) {
+        openReferenceRadius();
       }
-    }
-    // Is this a level 1 or level 2?
-    else {
-      try {
-        ProjectionFactory::CreateFromCube(*m_groundCube);
+      
+      //  Determine file type of ground for setting AprioriSurfacePointSource
+      //  and AprioriRadiusSource.
+      else if (m_groundCube->hasTable("ShapeModelStatistics")) {
         m_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
-        // TODO  Add Basemap to ControlPoint::RadiusSource
         if (!m_demOpen) {
-          // TODO m_groundRadiusSource = ControlPoint::RadiusSource::Basemap;
-          m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
-          PvlGroup mapping = m_groundCube->group("Mapping");
-          m_demFile = mapping ["EquatorialRadius"][0]
-                         + ", " + mapping ["PolarRadius"][0];
-          //
-          m_radiusSourceFile = "";
+          m_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+          m_radiusSourceFile = ground;
         }
       }
-      catch (IException &) {
+      // Is this a level 1 or level 2?
+      else {
         try {
-          CameraFactory::Create(*m_groundCube);
-          m_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
+          ProjectionFactory::CreateFromCube(*m_groundCube);
+          m_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
           if (!m_demOpen) {
-            //  If level 1, determine the shape model
-            PvlGroup kernels = m_groundCube->group("Kernels");
-            QString shapeFile = kernels ["ShapeModel"];
-            if (shapeFile.contains("dem")) {
-              m_groundRadiusSource = ControlPoint::RadiusSource::DEM;
-              m_radiusSourceFile = shapeFile;
-              //  Open shape file for reading radius later
-              initDem(shapeFile);
-            }
-            else {
-              m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
-              m_demFile = "Ellipsoid";
-              //  Find pck file from Kernels group
-              m_radiusSourceFile = (QString) kernels["TargetAttitudeShape"];
-            }
+            m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
+            m_radiusSourceFile = "";
           }
         }
         catch (IException &) {
-          QString message = "Cannot create either Camera or Projections ";
-          message += "for the ground source file.  Check the validity of the ";
-          message += " cube labels.  The cube must either be projected or ";
-          message += " run through spiceinit.";
-          QMessageBox::critical(m_qnetTool, "Error", message);
-          //  Clear out everything relating to ground source
-          clearGroundSource ();
-          QApplication::restoreOverrideCursor();
-          emit refreshNavList();
-          return;
+          try {
+            CameraFactory::Create(*m_groundCube);
+            m_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
+            if (!m_demOpen) {
+              PvlGroup kernels = m_groundCube->group("Kernels");
+              QString shapeFile = kernels ["ShapeModel"];
+              if (shapeFile.contains("dem")) {
+                m_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+                m_radiusSourceFile = shapeFile;
+              }
+              else {
+                m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
+                //  Find pck file from Kernels group
+                m_radiusSourceFile = (QString) kernels["TargetAttitudeShape"];
+              }
+            }
+          }
+          catch (IException &) {
+            QString message = "Cannot create either Camera or Projections ";
+            message += "for the ground source file.  Check the validity of the ";
+            message += " cube labels.  The cube must either be projected or ";
+            message += " run through spiceinit.";
+            QMessageBox::critical(m_qnetTool, "Error", message);
+            //  Clear out everything relating to ground source
+            clearGroundSource ();
+            QApplication::restoreOverrideCursor();
+            emit refreshNavList();
+            return;
+          }
         }
       }
     }
 
     if (m_editPoint != NULL &&
         (m_editPoint->GetType() != ControlPoint::Free)) loadPoint();
-    m_groundFileNameLabel->setText("Ground Source File:  " + m_groundFile);
-    m_radiusFileNameLabel->setText("Radius Source File:  " + m_demFile);
+    
 
     emit refreshNavList();
     QApplication::restoreOverrideCursor();
@@ -3838,7 +3846,56 @@ namespace Isis {
       initDem(dem);
 
   }
-
+  
+  /** 
+   * Open a radius source using the shape model of the reference measure of m_editPoint
+   * 
+   * @author 2016-10-07 Makayla Shepherd - Changed radius source handling and moved it from OpenGround.
+   * 
+   * 
+   */
+  void QnetTool::openReferenceRadius() {
+    //Get the reference image's shape model
+    QString referenceSN = m_editPoint->GetReferenceSN();
+    QString referenceFileName = m_serialNumberList->fileName(referenceSN);
+    QScopedPointer<Cube> referenceCube(new Cube(referenceFileName, "r"));
+    PvlGroup kernels = referenceCube->group("Kernels");
+    QString shapeFile = kernels["ShapeModel"];
+    
+    //  If the reference measure has a shape model cube then set that as the radius
+    //  This will NOT WORK for shape model files (not the default of Null or Ellipsoid)
+    //  that are not cubes
+    if (shapeFile.contains(".cub")) {
+      if (shapeFile.contains("dem")) {
+        m_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+      }
+      else {
+        m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
+      }
+      
+      m_radiusSourceFile = shapeFile;
+      
+      //  Open shape file for reading radius later
+      initDem(shapeFile);  //This will write the labels for us
+    }
+    
+    //  If no shape model then use the ABC of the target body
+    else {
+      m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
+      Spice *refSpice = new Spice(*referenceCube);
+      Distance refRadii[3];
+      refSpice->radii(refRadii);
+      m_demFile = QString::number(refRadii[0].meters()) + ", " + 
+                  QString::number(refRadii[1].meters()) + ", " +
+                  QString::number(refRadii[2].meters());
+                  
+      m_radiusSourceFile = "";
+      
+      //  Write out the labels
+      m_groundFileNameLabel->setText("Ground Source File:  " + m_groundFile);
+      m_radiusFileNameLabel->setText("Radius Source:  " + m_demFile);
+    }
+  }
 
   void QnetTool::initDem (QString demFile) {
 

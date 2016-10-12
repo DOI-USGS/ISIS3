@@ -234,6 +234,15 @@ namespace Isis {
    *   @history 2016-03-17 Makayla Shepherd - Modified addMeasures so that new measures use the
    *                           Reference Measure in order to keep the behavior consistent. 
    *                           Fixes #2326.
+   *   @history 2016-10-07 Makayla Shepherd - Modified the Radius Source File label behavior on the 
+   *                           Qnet Tool. When there is not a radius source open, a point is 
+   *                           selected, and a ground source is opened, the radius source will be 
+   *                           the ShapeModel of the reference measure if the ShapeModel is a cube. 
+   *                           If the ShapeModel is not a cube, the ABC of the target body will be 
+   *                           displayed as the Radius Source on the Qnet Tool. If there is not a 
+   *                           radius source open, there is not a point selected, and a ground 
+   *                           source is opened, the tool will exhibit the same behavior as before. 
+   *                           Fixes #2099.
    *                           
    */
   class QnetTool : public Tool {
@@ -344,6 +353,7 @@ namespace Isis {
       void openGround();
       void groundViewportClosed(CubeViewport *);
       void openDem();
+      void openReferenceRadius();
       void showHideTemplateEditor();
       void saveTemplateFile();
       void saveTemplateFileAs();
