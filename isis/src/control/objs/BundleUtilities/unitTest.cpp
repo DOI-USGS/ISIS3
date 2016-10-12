@@ -466,7 +466,8 @@ int main(int argc, char *argv[]) {
     pvl = bossFromBo.pvlObject("NoCamAngles");
     cout << pvl << endl << endl;
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
     qDebug().noquote() << bo2.formatBundleOutputString(false);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
@@ -474,8 +475,11 @@ int main(int argc, char *argv[]) {
     pvl = bossFromBo.pvlObject("NoTwist");
     cout << pvl << endl << endl;
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
     qDebug().noquote() << bo2.formatBundleOutputString(false);
+
+    
     qDebug() << "    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...";
     bo3.setSolveSettings(bsFromEmptyXml);
 
@@ -521,8 +525,9 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
+    qDebug().noquote() << bo3.formatBundleOutputString(false,true);
     qDebug().noquote() << bo3.formatBundleOutputString(false);
-    qDebug().noquote() << bo3.formatBundleOutputString(true);
+    qDebug().noquote() << bo3.formatBundleOutputString(true,true);
     qDebug() << "init exterior orientiation successful?  " 
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation

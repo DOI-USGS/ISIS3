@@ -782,15 +782,19 @@ namespace Isis {
 
 
   /**
-   * Creates and returns a formatted QString representing the bundle coefficients and 
+   * @brief Creates and returns a formatted QString representing the bundle coefficients and
    * parameters
    *
-   * @param errorPropagation Boolean indicating whether or not to attach more information 
+   * @param errorPropagation Boolean indicating whether or not to attach more information
    *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   * @param imageCSV Boolean which is set to true if the function is being
+   * called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
+   * for backwards compatibility.
    *
-   * @return @b QString Returns a formatted QString representing the BundleObservation 
+   * @return @b QString Returns a formatted QString representing the BundleObservation
    */
-  QString BundleObservation::formatBundleOutputString(bool errorPropagation) {
+  QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+
     std::vector<double> coefX;
     std::vector<double> coefY;
     std::vector<double> coefZ;
@@ -823,7 +827,11 @@ namespace Isis {
     // for convenience, create vectors of parameters names and values in the correct sequence
     std::vector<double> finalParameterValues;
     QStringList parameterNamesList;
+
+    if(!imageCSV) {
+
     QString str("%1(t%2)");
+
     if (nPositionCoefficients > 0) {
       for (int i = 0; i < nPositionCoefficients; i++) {
         finalParameterValues.push_back(coefX[i]);
@@ -871,11 +879,48 @@ namespace Isis {
       }
     }
 
+    }// end if(!imageCSV)
+
+    else {
+
+      if (nPositionCoefficients > 0) {
+
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefX[i]);
+
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefY[i]);
+
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefZ[i]);
+
+        }
+      }
+      if (nPointingCoefficients > 0) {
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+
+        }
+      }
+
+
+    }//end else
+
     m_parameterNamesList = parameterNamesList;
     QString finalqStr = "";
     QString qStr = "";
     QString sigma = "";
-
+    if (!imageCSV) {
     // position parameters
     for (int i = 0; i < nPositionParameters; i++) {
 
@@ -928,8 +973,65 @@ namespace Isis {
       }
 
       finalqStr += qStr;
+     }
+
     }
 
+    else {
+
+      // position parameters
+      for (int i = 0; i < nPositionParameters; i++) {
+
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+
+        if (errorPropagation) {
+          qStr = QString("%1,%2,%3,%4,%5,").
+              //arg( parameterNamesList.at(i) ).
+              arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+              arg(m_corrections(i), 21, 'f', 8).
+              arg(finalParameterValues[i], 20, 'f', 8).
+              arg(sigma, 18).
+              arg(m_adjustedSigmas[i], 18, 'f', 8);
+        }
+        else {
+          qStr = QString("%1,%2,%3,%4,%5,").
+              //arg( parameterNamesList.at(i) ).
+              arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+              arg(m_corrections(i), 21, 'f', 8).
+              arg(finalParameterValues[i], 20, 'f', 8).
+              arg(sigma, 18).
+              arg("N/A", 18);
+        }
+
+        finalqStr += qStr;
+      }
+
+      // pointing parameters
+      for (int i = nPositionParameters; i < nParameters; i++) {
+
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+
+        if (errorPropagation) {
+          qStr = QString("%1,%2,%3,%4,%5,").
+              arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+              arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+              arg(finalParameterValues[i], 20, 'f', 8).
+              arg(sigma, 18).
+              arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
+        }
+        else {
+          qStr = QString("%1,%2,%3,%4,%5,").
+              arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+              arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+              arg(finalParameterValues[i], 20, 'f', 8).
+              arg(sigma, 18).
+              arg("N/A", 18);
+        }
+
+        finalqStr += qStr;
+      }
+
+    }
     return finalqStr;
   }
 

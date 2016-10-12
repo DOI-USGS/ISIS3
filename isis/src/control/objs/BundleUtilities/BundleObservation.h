@@ -63,6 +63,9 @@ namespace Isis {
    *                           bundle image.  References #4159.
    *   @history 2016-08-23 Ian Humphrey - The applyParameterCorrections() method now throws the
    *                           last exception. Fixes #4153.
+   *   @history 2016-10-06 Tyler Wilson - Modified the function formatBundleOutputString so
+   *                           that it can be used by BundleSolutionInfo::outputCSVImages()
+   *                           function.  Fixes #4314.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -119,7 +122,7 @@ namespace Isis {
       void initializeBodyRotation();
       void updateBodyRotation();
 
-      QString formatBundleOutputString(bool errorPropagation);
+      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();
 
