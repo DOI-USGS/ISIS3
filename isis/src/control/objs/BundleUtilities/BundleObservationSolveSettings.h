@@ -24,6 +24,7 @@
  */
 
 #include <QList>
+#include <QSet>
 #include <QString>
 
 #include "SpicePosition.h"
@@ -40,7 +41,8 @@ namespace Isis {
   class PvlObject;
   class XmlStackedHandlerReader;
   /**
-   * This class is used to modify and manage solve settings for a BundleObservation. 
+   * This class is used to modify and manage solve settings for 1 to many BundleObservations. These
+   * settings indicate how any associated observations should be solved.
    *
    * @ingroup ControlNetworks
    *
@@ -68,6 +70,10 @@ namespace Isis {
    *   @history 2016-08-03 Ian Humphrey - Updated documentation and reviewed coding standards.
    *                           Fixes #4078.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
+   *   @history 2016-10-13 Ian Humphrey - Added m_observationNumbers, addObservationNumber(), and
+   *                           observationNumbers() members to associate multiple observation types
+   *                           with these settings. Removed the setFromPvl() method. When re-
+   *                           implemented, it should be put in jigsaw. References #4293.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
@@ -89,11 +95,12 @@ class BundleObservationSolveSettings {
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
       void initialize();
 
-      bool setFromPvl(PvlGroup &scParameterGroup);
       PvlObject pvlObject(QString name = "") const; // Default name is instrument ID.
 
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;
+      void addObservationNumber(QString observationNumber);
+      QSet<QString> observationNumbers() const;
 
 
 
@@ -198,6 +205,7 @@ class BundleObservationSolveSettings {
        */
       QUuid *m_id;
       QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
+      QSet<QString> m_observationNumbers;  //!< Associated observation numbers for these settings.
 
       // pointing related parameters
       //! Option for how to solve for instrument pointing.

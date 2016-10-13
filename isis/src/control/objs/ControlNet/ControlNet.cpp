@@ -1584,8 +1584,14 @@ namespace Isis {
    * @internal
    *   @history 2009-01-06 Jeannie Walldren - Fixed typo in
    *            exception output.
+   *   @history 2016-10-13 Ian Humphrey - Added initial check to see if cameras have already been
+   *                           set, and immediately return if yes. References #4293.
    */
   void ControlNet::SetImages(SerialNumberList &list, Progress *progress) {
+    // First check if cameras have already been setup via another SetImages call
+    if (p_cameraList.size() > 0) {
+      return;
+    }
     // Prep for reporting progress
     if (progress != NULL) {
       progress->SetText("Setting input images...");

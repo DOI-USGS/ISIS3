@@ -79,7 +79,7 @@ namespace Isis {
     m_abort = false;
     Progress progress;
     // initialize constructor dependent settings...
-    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList
     // m_bundleSettings
     m_bPrintSummary = bPrintSummary;
     m_bCleanUp = true;
@@ -87,31 +87,6 @@ namespace Isis {
     m_pCnet = ControlNetQsp( new Isis::ControlNet(cnetFile, &progress) );
     m_bundleResults.setOutputControlNet(m_pCnet);
     m_pSnList = new Isis::SerialNumberList(cubeList);
-    m_pHeldSnList = NULL;
-    m_bundleSettings = bundleSettings;
-    m_bundleTargetBody = bundleSettings->bundleTargetBody();
-
-    init(&progress);
-  }
-
-
-  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
-                             const QString &cnetFile,
-                             const QString &cubeList,
-                             const QString &heldList,
-                             bool bPrintSummary) {
-    m_abort = false;
-    Progress progress;
-    // initialize constructor dependent settings...
-    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
-    // m_bundleSettings
-    m_bPrintSummary = bPrintSummary;
-    m_bCleanUp = true;
-    m_strCnetFileName = cnetFile;
-    m_pCnet = ControlNetQsp( new Isis::ControlNet(cnetFile, &progress) );
-    m_bundleResults.setOutputControlNet(m_pCnet);
-    m_pSnList = new Isis::SerialNumberList(cubeList);
-    m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -124,7 +99,7 @@ namespace Isis {
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
     // initialize constructor dependent settings...
-    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList
     // m_bundleSettings
     m_abort = false;
     Progress progress;
@@ -134,7 +109,6 @@ namespace Isis {
     m_pCnet = ControlNetQsp( new Isis::ControlNet(cnet, &progress) );
     m_bundleResults.setOutputControlNet(m_pCnet);
     m_pSnList = &snlist;
-    m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -147,7 +121,7 @@ namespace Isis {
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
     // initialize constructor dependent settings...
-    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList
     // m_bundleSettings
     m_abort = false;
     Progress progress;
@@ -157,7 +131,6 @@ namespace Isis {
     m_pCnet = ControlNetQsp( new Isis::ControlNet(cnet.fileName(), &progress) );
     m_bundleResults.setOutputControlNet(m_pCnet);
     m_pSnList = &snlist;
-    m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -170,7 +143,7 @@ namespace Isis {
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
     // initialize constructor dependent settings...
-    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList
     // m_bundleSettings
     m_abort = false;
     m_bPrintSummary = bPrintSummary;
@@ -179,10 +152,35 @@ namespace Isis {
     m_pCnet = ControlNetQsp( new ControlNet(cnet) );
     m_bundleResults.setOutputControlNet(m_pCnet);
     m_pSnList = &snlist;
-    m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
+    init();
+  }
+
+
+  /**
+   * Constructs a BundleAdjust from an already created ControlNet within a shared pointer.
+   * 
+   * @param bundleSettings QSharedPointer to the bundle settings to use.
+   * @param cnet QSharedPointer to the control net to adjust.
+   * @param cubeList QString name of list of cubes to create serial numbers for.
+   * @param bPrintSummary Boolean indicating whether to print application output summary.
+   */
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
+                             ControlNetQsp cnet,
+                             const QString &cubeList,
+                             bool bPrintSummary) {
+    m_abort = false;
+    m_bPrintSummary = bPrintSummary;
+    m_bCleanUp = false;
+    m_strCnetFileName = "";
+    m_pCnet = cnet;
+    m_bundleResults.setOutputControlNet(m_pCnet);
+    m_pSnList = new SerialNumberList(cubeList);
+    m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
+    
     init();
   }
 
@@ -216,7 +214,6 @@ namespace Isis {
 
     m_bPrintSummary = bPrintSummary;
 
-    m_pHeldSnList = NULL;
     m_bCleanUp = false;
     m_strCnetFileName = control.fileName();
     
@@ -226,17 +223,16 @@ namespace Isis {
 
   /** 
    * Destroys BundleAdjust object, deallocates pointers (if we have ownership), 
-   * and frees variables from cholmod library. 
+   * and frees variables from cholmod library.
+   * 
+   * @internal
+   *   @history 2016-10-13 Ian Humphrey - Removed deallocation of m_pHeldSnList, since this
+   *                           member was removed. References #4293.
    */
   BundleAdjust::~BundleAdjust() {
     // If we have ownership
     if (m_bCleanUp) {
       delete m_pSnList;
-
-      if (m_bundleResults.numberHeldImages() > 0) {
-        delete m_pHeldSnList;
-      }
-
     }
 
     freeCHOLMODLibraryVariables();
@@ -262,8 +258,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-08-14 Debbie A. Cook - Opt out of network validation
-   *                      for deltack network in order to allow
-   *                      a single measure on a point
+   *                           for deltack network in order to allow
+   *                           a single measure on a point
+   *   @history 2016-10-13 Ian Humphrey - Removed verification of held images in the from list
+   *                           and counting of the number of held images. References #4293.
    *  
    *   @todo remove printf statements
    *   @todo answer comments with questions, TODO, ???, and !!!
@@ -293,17 +291,6 @@ namespace Isis {
 
     // initialize held variables
     int nImages = m_pSnList->size();
-
-    // get count of held image and ensure they're in the control net
-    if (m_pHeldSnList != NULL) {
-      checkHeldList();
-
-      for (int i = 0; i < nImages; i++) {
-        if (m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i))) {
-          m_bundleResults.incrementHeldImages();
-        }
-      }
-    }
 
     // matrix stuff
     m_Normals.clear();
@@ -358,7 +345,7 @@ namespace Isis {
         }
 
         BundleObservationQsp observation =
-            m_bundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
+            m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
           QString msg = "In BundleAdjust::init(): observation " + observationNumber + "is null" + "\n";
@@ -537,20 +524,6 @@ namespace Isis {
     return true;
   }
 
-
-  /**
-   * This method checks all cube files in the held list to make sure they are in the
-   * input list.
-   */
-  void BundleAdjust::checkHeldList() {
-    for (int ih = 0; ih < m_pHeldSnList->size(); ih++) {
-      if (!(m_pSnList->hasSerialNumber(m_pHeldSnList->serialNumber(ih)))) {
-        QString msg = "Held image [" + m_pHeldSnList->serialNumber(ih)
-                          + "not in FROMLIST";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-    }
-  }
 
   /**
    * Least squares bundle adjustment solution using Cholesky decomposition.
@@ -3058,18 +3031,6 @@ namespace Isis {
   // TODO: probably don't need this, can get from BundleObservation
   QString BundleAdjust::fileName(int i) {
     return m_pSnList->fileName(i);
-  }
-
-
-  /**
-   * Return whether the ith file in the cube list is held.
-   *
-   */
-  bool BundleAdjust::isHeld(int i) {
-    if ( m_bundleResults.numberHeldImages() > 0 )
-         if ((m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i))))
-           return true;
-    return false;
   }
 
 

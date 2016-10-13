@@ -503,27 +503,27 @@ namespace Isis {
 
   /** 
    * Retrieves solve settings for the observation corresponding to the given 
-   * instrument ID. 
+   * observation number.
    *  
-   * @param instrumentId The instrument ID of the BundleObservationSolveSettings 
-   *                     object to be accessed.
+   * @param observationNumber The observation number associated with the 
+   *                          BundleObservationSolveSettings object to be accessed.
    *  
-   * @return @b BundleObservationSolveSettings The observation settings object mapped 
-   *                                           to the given instrument ID.
+   * @return @b BundleObservationSolveSettings The observation settings object that contains
+   *                                           the observation number passed.
    *  
    * @throw IException::Unknown "Unable to find BundleObservationSolveSettings 
-   *                             with given InstrumentId"
+   *                             for given observation number"
    */
   BundleObservationSolveSettings 
-      BundleSettings::observationSolveSettings(QString instrumentId) const {
+      BundleSettings::observationSolveSettings(QString observationNumber) const {
 
     for (int i = 0; i < numberSolveSettings(); i++) {
-      if (m_observationSolveSettings[i].instrumentId() == instrumentId) {
+      if (m_observationSolveSettings[i].observationNumbers().contains(observationNumber)) {
         return m_observationSolveSettings[i];
       }
     }
-    QString msg = "Unable to find BundleObservationSolveSettings with InstrumentId = ["
-                  + instrumentId + "].";
+    QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
+                  + observationNumber + "].";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 

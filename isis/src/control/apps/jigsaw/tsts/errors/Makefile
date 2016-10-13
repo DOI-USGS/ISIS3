@@ -4,9 +4,11 @@
 #     TEST B: "Unable to bundle adjust network"
 #   TEST C: "Input Target parameters file missing main Target object."
 #   TEST D: "Must solve for at least one target body option."
-#   TEST E: "Input SC_PARAMETERS file missing SensorParameters object."
 #
 # 2016-08-22 Ian Humphrey - Original version. Fixes #4269.
+# 2016-10-13 Ian Humphrey - Removed TEST E: "Input SC_PARAMETERS file missing SensorParameters
+#                object," as USEPVL and SC_PARAMETERS have been turned off. References #4292,
+#                #4293."
 APPNAME = jigsaw
 
 include $(ISISROOT)/make/isismake.tsts
@@ -53,17 +55,3 @@ commands:
 	then \
 	  true; \
 	fi;
-# TEST E: USEPVL=yes and SC_PARAMETERS is missing SensorParameters object
-	echo -e "Error Test E:" >> $(OUTPUT)/error.txt;
-	if [[ `$(APPNAME) \
-	  fromlist=$(INPUT)/empty.lis \
-	  cnet=$(INPUT)/empty.net \
-	  onet=$(OUTPUT)/out.net \
-	  usepvl=yes \
-	  sc_parameters=$(INPUT)/invalidSensorParameters.pvl \
-	  2>> $(OUTPUT)/error.txt \
-	  > /dev/null` ]]; \
-	then \
-	  true; \
-	fi;
-	$(RM) $(OUTPUT)/cubes.lis > /dev/null;

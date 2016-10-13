@@ -96,7 +96,9 @@ namespace Isis {
    *                           setCreateInverseMatrix() so that bundle settings stores whether or
    *                           not the inverse correlation matrix file (inverseMatrix.dat) will be
    *                           generated during error propagation in the adjustment. Fixes #4315.
-   *  
+   *   @history 2016-10-13 Ian Humphrey - Updated documentation and variable names for
+   *                           observationSolveSettings(), as BundleObservationSolveSettings
+   *                           are acquired by an associated observation number. References #4293.
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)

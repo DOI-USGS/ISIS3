@@ -234,6 +234,13 @@ namespace Isis {
    *   @history 2016-10-05 Ian Humphrey - Modified errorPropagation_CHOLMOD() to check bundle
    *                           settings to see if it should generate the inverseMatrix.dat file.
    *                           References #4315.
+   *   @history 2016-10-13 Ian Humphrey - Added constructor that takes a ControlNetQsp, so that
+   *                           when jigsaw modifies a control net for a held image, the control
+   *                           net can be passed as a shared pointer. Removed m_pHeldSnList,
+   *                           isHeld(), checkHeldList(), applyHeldList(), two constructors that
+   *                           used heldList parameters. Modified destructor to not delete
+   *                           m_pHeldSnList, since it was removed. Fixes #4293.
+>>>>>>> .r7156
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -241,11 +248,6 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile, 
                    const QString &cubeList,
-                   bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
-                   const QString &cnetFile, 
-                   const QString &cubeList,
-                   const QString &heldList, 
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet, 
@@ -259,10 +261,9 @@ namespace Isis {
                    ControlNet &cnet, 
                    SerialNumberList &snlist, 
                    bool printSummary = true);
-      BundleAdjust(BundleSettings bundleSettings, 
-                   ControlNet &cnet, 
-                   SerialNumberList &snlist, 
-                   SerialNumberList &heldsnlist, 
+      BundleAdjust(BundleSettingsQsp bundleSettings,
+                   ControlNetQsp cnet,
+                   const QString &cubeList,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &control,
@@ -283,7 +284,6 @@ namespace Isis {
       int              numberOfImages() const;
 //      int              observations() const;
       QString          fileName(int index);
-      bool             isHeld(int index);
       Table            cMatrix(int index);
       Table            spVector(int index);
       double           error() const;
@@ -307,16 +307,12 @@ namespace Isis {
 
       void init(Progress *progress = 0);
 
-      void checkHeldList(); // unnecessary?
-
       bool validateNetwork();
       // use bundle settings to initialize more variables
       // JWB - should I make a public method resetBundle(BundleSettings bundleSettings);
       // that calls these methods to allow rerun with new params???
       // max likelihood says it may be called multiple times...
       // where does this happen ???
-
-      void applyHeldList();
 
       // output methods
       void iterationSummary();
@@ -440,7 +436,6 @@ namespace Isis {
       //!< pointers to...
       ControlNetQsp m_pCnet;                              //!< 'ControlNet' object
       SerialNumberList *m_pSnList;                      //!< list of image serial numbers
-      SerialNumberList *m_pHeldSnList;                  //!< list of held image serial numbers
 
       // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
       // as 'CHOLMOD' (sparse solution) in the interim;

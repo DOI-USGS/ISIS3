@@ -34,7 +34,12 @@ using namespace Isis;
   *   @history 2016-08-12 Jeannie Backer - Removed references to solve method. References #4162.
   *   @history 2016-08-18 Jeannie Backer - Removed references to BundleSettings solve method.
   *                           References #4162.
+  *   @history 2016-10-13 Ian Humphrey - Replaced setInstrumentId() with addObservationNumber()
+  *                           to associate the bundle observation solve settings with an
+  *                           observation number. References #4293.
   *
+  *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
+  *         this should be fixed as part of #4292.
   *   @todo Test hdf5 methods when added.
   *   @todo Test setBundleTargetBody()
   *   @todo Test non-null bundleTargetBody()
@@ -159,7 +164,7 @@ int main(int argc, char *argv[]) {
     copySettings.setOutlierRejection(true, 4.0);
     // create and fill the list of observation solve settings... then set
     BundleObservationSolveSettings boss1;
-    boss1.setInstrumentId("Instrument1");
+    boss1.addObservationNumber("Instrument1");
     boss1.setInstrumentPositionSettings(BundleObservationSolveSettings::AllPositionCoefficients,
                                         5, 6, true, 7000.0, 8000.0, 9000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors, 
@@ -169,7 +174,7 @@ int main(int argc, char *argv[]) {
 //    cout << pvl << endl << endl;
     QList<BundleObservationSolveSettings> observationSolveSettings;
     observationSolveSettings.append(boss1);
-    boss1.setInstrumentId("Instrument2");
+    boss1.addObservationNumber("Instrument2");
     boss1.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionOnly,
                                         15, 16, true, 17000.0, 18000.0, 19000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients, 
@@ -295,7 +300,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing error throws..."; // ??? weird error if i move this after read from empty???
     try {
-      settings.observationSolveSettings("NoSuchInstrumentId");
+      settings.observationSolveSettings("UnassociatedObservationNumber");
     } 
     catch (IException &e) {
       e.print();

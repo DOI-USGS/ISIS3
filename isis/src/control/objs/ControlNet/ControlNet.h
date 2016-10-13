@@ -200,6 +200,9 @@ namespace Isis {
    *                           to Target::radiiGroup(). References #3934
    *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2016-06-08 Jesse Mapel - Merged changes from IPCE to ISIS.  Fixes #3948.
+   *   @history 2016-10-13 Ian Humphrey - Added check to SetImages() to make sure it isn't called
+   *                           more than once, which messes up the p_cameraList member. References
+   *                           #4293.
    */
   class ControlNet : public QObject {
       Q_OBJECT

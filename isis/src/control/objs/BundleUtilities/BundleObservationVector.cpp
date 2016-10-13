@@ -58,22 +58,29 @@ namespace Isis {
 
 
   /**
-   * Adds a new BundleObservation.
+   * Adds a new BundleObservation to this vector or fetches an existing BundleObservation if this
+   * vector already contains the passed observation number.
    *
-   * Adds a new BundleObservation to this vector. If a BundleObservation has already been added
-   * with the passed observationNumber, the passed BundleImage is added to the existing 
-   * BundleObservation.
+   * If observation mode is off, adds a new BundleObservation to this vector. Otherwise, if
+   * observation mode is on and the BundleObservation has already been added with the same
+   * observation number, the passed BundleImage is added to the existing BundleObservation.
    *
-   * @param bundleImage QSharedPointer to the BundleImage in the observation to add
-   * @param observationNumber Observation number of the observation to add
-   * @param instrumentId Instrument id of the observation to add
-   * @param bundleSettings Qsp to BundleSettings for the observation being added
+   * @param bundleImage QSharedPointer to the BundleImage to create or fetch a BundleObservation
+   *                    from
+   * @param observationNumber Observation number of the observation to add or fetch
+   * @param instrumentId Instrument id of the observation
+   * @param bundleSettings Qsp to BundleSettings for the observation
    * 
    * @throws IException::Programmer "Unable to allocate new BundleObservation"
    *
    * @return @b BundleObservationQsp Returns a pointer to the BundleObservation that was added
+   * 
+   * @internal
+   *   @history 2016-10-13 Ian Humphrey - When appending a new BundleObservation and there are 
+   *                           multiple BundleObservationSolveSettings, we set the settings 
+   *                           according to the observation number passed. References #4293.
    */
-  BundleObservationQsp BundleObservationVector::addnew(BundleImageQsp bundleImage,
+  BundleObservationQsp BundleObservationVector::addNew(BundleImageQsp bundleImage,
                                                        QString observationNumber,
                                                        QString instrumentId,
                                                        BundleSettingsQsp bundleSettings) {
@@ -83,10 +90,8 @@ namespace Isis {
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
-
-      if (bundleObservation->instrumentId() == instrumentId) {
-        addToExisting = true;
-      }
+    
+      addToExisting = true;
     }
 
     if (addToExisting) {
@@ -116,15 +121,17 @@ namespace Isis {
       }
 
       bundleImage->setParentObservation(bundleObservation);
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // TODO: problem when using settings from jigsaw app - no instrument id is set
-      //
+  
+      // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
+      // When there is only one bundle observation solve setting, use it for all observations
       if ( bundleSettings->numberSolveSettings() == 1) {
         solveSettings = bundleSettings->observationSolveSettings(0);
       }
+      // Otherwise, we want to grab the bundle observation solve settings that is associated with
+      // the observation number for this new observation
       else {
-        solveSettings = bundleSettings->observationSolveSettings(instrumentId);
+        solveSettings = bundleSettings->observationSolveSettings(observationNumber);        
       }
 
       bundleObservation->setSolveSettings(solveSettings);

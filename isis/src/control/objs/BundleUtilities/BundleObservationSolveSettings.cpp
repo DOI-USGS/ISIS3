@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QList>
+#include <QSet>
 #include <QString>
 #include <QUuid>
 #include <QXmlInputSource>
@@ -118,6 +119,7 @@ namespace Isis {
 
     m_instrumentId = other.m_instrumentId;
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
+    m_observationNumbers = other.m_observationNumbers;
     m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
     m_ckDegree = other.m_ckDegree;
     m_ckSolveDegree = other.m_ckSolveDegree;
@@ -162,6 +164,7 @@ namespace Isis {
       m_id = new QUuid(other.m_id->toString());
       
       m_instrumentId = other.m_instrumentId;
+      m_observationNumbers = other.m_observationNumbers;
       
       // pointing related
       m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
@@ -229,153 +232,6 @@ namespace Isis {
   // =============================================================================================//
   // =============================================================================================//
 
-
-  /**
-   * Set bundle solve parameters for an observation.
-   *
-   * @param scParameterGroup PvlGroup the obtain the solve parameters from
-   *
-   * @throws IException::User "The TWIST parameter must be a valid boolean value."
-   * @throws IException::User "OVEREXISTING parameter must be a valid boolean value."
-   * @throws IException::User "The OVERHERMITE parameter must be a valid boolean value."
-   * @throws IException::User "Unable to set bundle adjust options from the given PVL."
-   *
-   * @return @b bool Returns true when settings are set successfully
-   */
-  bool BundleObservationSolveSettings::setFromPvl(PvlGroup &scParameterGroup) {
-    // reset defaults
-    initialize();
-
-    try {
-      // group name must be instrument id
-      setInstrumentId((QString)scParameterGroup.nameKeyword());
-
-      // set up pointing settings
-      InstrumentPointingSolveOption pointingOption
-          = stringToInstrumentPointingSolveOption(scParameterGroup.findKeyword("CAMSOLVE")[0]);
-
-      // If CKDEGREE is not specified, then a default of 2 is used
-      int ckDegree = 2;
-      if (scParameterGroup.hasKeyword("CKDEGREE")) {
-        ckDegree = (int)(scParameterGroup.findKeyword("CKDEGREE"));
-      }
-
-      // If CKSOLVEDEGREE is not specified, then a default of 2 is used
-      int ckSolveDegree = 2;
-      if (scParameterGroup.hasKeyword("CKSOLVEDEGREE")) {
-        ckSolveDegree = (int) (scParameterGroup.findKeyword("CKSOLVEDEGREE"));
-      }
-
-      // If TWIST is not specified, then a default of YES is used
-      bool solveTwist = true;
-      if (scParameterGroup.hasKeyword("TWIST")) {
-        try {
-          solveTwist = toBool(scParameterGroup.findKeyword("TWIST")[0]);
-        } 
-        catch (IException &e) {
-          QString msg = "The TWIST parameter must be a valid boolean value.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-
-      // If OVEREXISTING is not specified, then a default of NO is used
-      bool solvePolynomialOverExisting = false;
-      if (scParameterGroup.hasKeyword("OVEREXISTING")) {
-        try {
-          solvePolynomialOverExisting = toBool(scParameterGroup.findKeyword("OVEREXISTING")[0]);
-        } 
-        catch (IException &e) {
-          QString msg = "OVEREXISTING parameter must be a valid boolean value.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-
-      double anglesAprioriSigma = Isis::Null;
-      double angularVelocityAprioriSigma = Isis::Null;
-      double angularAccelerationAprioriSigma = Isis::Null;
-      if (pointingOption != NoPointingFactors) {
-        if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA")) {
-          anglesAprioriSigma = (double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA"));
-        }
-        if (pointingOption != AnglesOnly) {
-          if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")) {
-            angularVelocityAprioriSigma = 
-                (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA"));
-          }
-          if (pointingOption != AnglesVelocity) {
-            if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
-              angularAccelerationAprioriSigma = 
-                  (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
-            }
-          }
-        }
-      }
-
-      setInstrumentPointingSettings(pointingOption, solveTwist, ckDegree, ckSolveDegree, 
-                                    solvePolynomialOverExisting, anglesAprioriSigma, 
-                                    angularVelocityAprioriSigma, angularAccelerationAprioriSigma);
-
-      // Now set up position settings
-      InstrumentPositionSolveOption positionOption
-          = stringToInstrumentPositionSolveOption(scParameterGroup.findKeyword("SPSOLVE")[0]);
-
-      //  If SPKDEGREE is not specified, then a default of 2 is used
-      int spkDegree = 2;
-      if (scParameterGroup.hasKeyword("SPKDEGREE")) {
-        spkDegree = (int)(scParameterGroup.findKeyword("SPKDEGREE"));
-      }
-
-      // If SPKSOLVEDEGREE is not specified, then a default of 2 is used
-      int spkSolveDegree = 2;
-      if (scParameterGroup.hasKeyword("SPKSOLVEDEGREE")) {
-        spkSolveDegree = (int)(scParameterGroup.findKeyword("SPKSOLVEDEGREE"));
-      }
-
-      // If OVERHERMITE is not specified, then a default of NO is used
-      bool positionOverHermite = false;
-      if (scParameterGroup.hasKeyword("OVERHERMITE")) {
-        try {
-          positionOverHermite = toBool(scParameterGroup.findKeyword("OVERHERMITE")[0]);
-        } 
-        catch (IException &e) {
-          QString msg = "The OVERHERMITE parameter must be a valid boolean value.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-
-      double positionAprioriSigma = Isis::Null;
-      double velocityAprioriSigma = Isis::Null;
-      double accelerationAprioriSigma = Isis::Null;
-      if (positionOption != NoPositionFactors) {
-        if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA")) {
-          positionAprioriSigma
-              = (double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA"));
-        }
-        if (positionOption != PositionOnly) {
-          if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA")) {
-            velocityAprioriSigma = 
-                (double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA"));
-          }
-          if (positionOption != PositionVelocity) {
-            if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA")) {
-              accelerationAprioriSigma = 
-                  (double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA"));
-            }
-          }
-        }
-      }
-      setInstrumentPositionSettings(positionOption, spkDegree, spkSolveDegree,
-                                    positionOverHermite, positionAprioriSigma,
-                                    velocityAprioriSigma, accelerationAprioriSigma);
-    } 
-    catch (IException &e) {
-      QString msg = "Unable to set bundle adjust options from the given PVL.";
-      throw IException(e, IException::User, msg, _FILEINFO_);
-    }
-    return true;
-  }
-
-
   /**
    * Sets the instrument id for this observation.
    *
@@ -393,6 +249,28 @@ namespace Isis {
    */
   QString BundleObservationSolveSettings::instrumentId() const {
     return m_instrumentId;
+  }
+
+
+  /**
+   * Associates an observation number with these solve settings.
+   * 
+   * These solve settings are to be applied to any associated observations.
+   * 
+   * @param observationNumber QString observation number to associate with these settings.
+   */
+  void BundleObservationSolveSettings::addObservationNumber(QString observationNumber) {
+    m_observationNumbers.insert(observationNumber);
+  }
+
+
+  /**
+   * Returns a list of observation numbers associated with these solve settings.
+   * 
+   * @return @b QSet<QString> Returns a QSet containing the associated observation numbers.
+   */
+  QSet<QString> BundleObservationSolveSettings::observationNumbers() const {
+    return m_observationNumbers;
   }
 
 

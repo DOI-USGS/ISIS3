@@ -47,16 +47,8 @@ void printBundleMeasure(BundleMeasure &);
  * @author 2014 Jeannie Backer
  *
  * @internal
- *   @history 2014-12-11 Jeannie Backer - Added test for BundleControlPoint.
- *                           Updated truth file, improved overall test coverage.
- *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
- *                           References #4163.
- *   @history 2016-08-18 Jeannie Backer - Removed references to BundleSettings solve method.
- *                           References #4162.
+ *   @history 2014-12-11 - Original version.
  */
-
-
-
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
     public:
@@ -89,7 +81,20 @@ namespace Isis {
 }
 
 
-
+/**
+ * Unit test for BundleObservationSolveSettings.
+ *
+ * @internal
+ *   @history 2014-12-11 Jeannie Backer - Added test for BundleControlPoint.
+ *                           Updated truth file, improved overall test coverage.
+ *   @history 2016-08-10 Jeannie Backer - Replaced boost vector with Isis::LinearAlgebra::Vector.
+ *                           References #4163.
+ *   @history 2016-08-18 Jeannie Backer - Removed references to BundleSettings solve method.
+ *                           References #4162.
+ *   @history 2016-10-13 Ian Humphrey - Removed references to setFromPvl(), as
+ *                           BundleObservationSolveSettings::setFromPvl() was moved to jigsaw as
+ *                           setSettingsFromPvl(). References #4293.
+ */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
@@ -133,50 +138,41 @@ int main(int argc, char *argv[]) {
     pvl = boss.pvlObject();// using MyInstrumentId as PvlObject name
     cout << pvl << endl << endl;
     
-    qDebug() << "setFromPvl()";
-    PvlGroup settingsGroup1("SettingsGroupId1");
-    settingsGroup1 += PvlKeyword("CAMSOLVE", "NONE");
-    settingsGroup1 += PvlKeyword("SPSOLVE", "NONE");
-    BundleObservationSolveSettings settingsFromGroup1;
-    settingsFromGroup1.setFromPvl(settingsGroup1);
-    pvl = settingsFromGroup1.pvlObject("SettingsFromPvlGroup-SolveForNone");
+    qDebug() << "Testing pvlObject()...";
+    BundleObservationSolveSettings solveNone;
+    solveNone.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
+                                               true);
+    solveNone.setInstrumentPositionSettings(BundleObservationSolveSettings::NoPositionFactors);
+    pvl = solveNone.pvlObject("SettingsFromPvlGroup-SolveForNone");
     cout << pvl << endl << endl;
-    settingsGroup1.findKeyword("CAMSOLVE").setValue("ANGLES");
-    settingsGroup1.findKeyword("SPSOLVE").setValue("POSITIONS");
-    BundleObservationSolveSettings settingsFromGroup2;
-    settingsFromGroup2.setFromPvl(settingsGroup1);
-    pvl = settingsFromGroup2.pvlObject("SettingsFromPvlGroup-SolveForAnglesPositions");
+
+    BundleObservationSolveSettings solveAnglesPositions;
+    solveAnglesPositions.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesOnly,
+                                                       true);
+    solveAnglesPositions.setInstrumentPositionSettings(
+        BundleObservationSolveSettings::PositionOnly);
+    pvl = solveAnglesPositions.pvlObject("SettingsFromPvlGroup-SolveForAnglesPositions");
     cout << pvl << endl << endl;
-    settingsGroup1.findKeyword("CAMSOLVE").setValue("VELOCITIES");
-    settingsGroup1.findKeyword("SPSOLVE").setValue("VELOCITIES");
-    BundleObservationSolveSettings settingsFromGroup3;
-    settingsFromGroup3.setFromPvl(settingsGroup1);
-    pvl = settingsFromGroup3.pvlObject("SettingsFromPvlGroup-SolveForVelocities");
+
+    BundleObservationSolveSettings solveVelocities;
+    solveVelocities.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesVelocity,
+                                                  true);
+    solveVelocities.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionVelocity);
+    pvl = solveVelocities.pvlObject("SettingsFromPvlGroup-SolveForVelocities");
     cout << pvl << endl << endl;
-    settingsGroup1.findKeyword("CAMSOLVE").setValue("ACCELERATIONS");
-    settingsGroup1.findKeyword("SPSOLVE").setValue("ACCELERATIONS");
-    BundleObservationSolveSettings settingsFromGroup4;
-    settingsFromGroup4.setFromPvl(settingsGroup1);
-    pvl = settingsFromGroup4.pvlObject("SettingsFromPvlGroup-SolveForAccelerations");
+
+    BundleObservationSolveSettings solveAccelerations;
+    solveAccelerations.setInstrumentPointingSettings(
+        BundleObservationSolveSettings::AnglesVelocityAcceleration, true);
+    solveAccelerations.setInstrumentPositionSettings(
+        BundleObservationSolveSettings::PositionVelocityAcceleration);
+    pvl = solveAccelerations.pvlObject("SettingsFromPvlGroup-SolveForAccelerations");
     cout << pvl << endl << endl;
     
-    PvlGroup settingsGroup2("SettingsGroupId2");
-    settingsGroup2 += PvlKeyword("CAMSOLVE", "All");
-    settingsGroup2 += PvlKeyword("TWIST", "No");
-    settingsGroup2 += PvlKeyword("CKDEGREE", "4");
-    settingsGroup2 += PvlKeyword("CKSOLVEDEGREE", "5");
-    settingsGroup2 += PvlKeyword("OVEREXISTING", "true");
-    settingsGroup2 += PvlKeyword("CAMERA_ANGLES_SIGMA", "1.0");
-    settingsGroup2 += PvlKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA", "-1.0");
-    settingsGroup2 += PvlKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA", "3.0");
-    settingsGroup2 += PvlKeyword("SPSOLVE", "All");
-    settingsGroup2 += PvlKeyword("SPKDEGREE", "6");
-    settingsGroup2 += PvlKeyword("SPKSOLVEDEGREE", "7");
-    settingsGroup2 += PvlKeyword("OVERHERMITE", "true");
-    settingsGroup2 += PvlKeyword("SPACECRAFT_POSITION_SIGMA", "8.0");
-    settingsGroup2 += PvlKeyword("SPACECRAFT_VELOCITY_SIGMA", "9.0");
-    settingsGroup2 += PvlKeyword("SPACECRAFT_ACCELERATION_SIGMA", "-1.0");
-    boss.setFromPvl(settingsGroup2);
+    boss.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients,
+                                       false, 4, 5, true, 1.0, -1.0, 3.0);
+    boss.setInstrumentPositionSettings(BundleObservationSolveSettings::AllPositionCoefficients,
+                                       6, 7, true, 8.0, 9.0, -1.0);
     pvl = boss.pvlObject("SettingsFromPvlGroup-SolveForAllCoefficients");
     cout << pvl << endl << endl;
 
@@ -249,7 +245,7 @@ int main(int argc, char *argv[]) {
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
     Project *project = NULL;
-    settingsFromGroup1.save(writer, project);
+    solveNone.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml    
@@ -266,7 +262,7 @@ int main(int argc, char *argv[]) {
     }
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
-    settingsFromGroup2.save(writer, project);
+    solveAnglesPositions.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml    
@@ -282,7 +278,7 @@ int main(int argc, char *argv[]) {
     }
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
-    settingsFromGroup3.save(writer, project);
+    solveVelocities.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml    
@@ -298,7 +294,7 @@ int main(int argc, char *argv[]) {
     }
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
-    settingsFromGroup4.save(writer, project);
+    solveAccelerations.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml    
@@ -360,27 +356,6 @@ int main(int argc, char *argv[]) {
     try {
       BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
           BundleObservationSolveSettings::InstrumentPositionSolveOption(-2));
-    } 
-    catch (IException &e) {
-      e.print();
-    }
-    settingsGroup1 += PvlKeyword("OVERHERMITE", "Nonsense");
-    try {
-      boss.setFromPvl(settingsGroup1);
-    } 
-    catch (IException &e) {
-      e.print();
-    }
-    settingsGroup1 += PvlKeyword("OVEREXISTING", "Nonsense");
-    try {
-      boss.setFromPvl(settingsGroup1);
-    } 
-    catch (IException &e) {
-      e.print();
-    }
-    settingsGroup1 += PvlKeyword("TWIST", "Nonsense");
-    try {
-      boss.setFromPvl(settingsGroup1);
     } 
     catch (IException &e) {
       e.print();
@@ -461,7 +436,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing mutators and accessors...";
     qDebug() << "    Set/get solve settings using with CAMESOLVE=NONE...";
-    bo2.setSolveSettings(settingsFromGroup1);
+    bo2.setSolveSettings(solveNone);
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     pvl = bossFromBo.pvlObject("NoCamAngles");
     cout << pvl << endl << endl;
@@ -611,10 +586,10 @@ int main(int argc, char *argv[]) {
     #endif               
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
-    // BundleObservation *obs1 = bov.addnew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
+    // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
     //qDebug() << obs1->formatBundleOutputString(true);
     //obs1 = bov.observationByCubeSerialNumber("obs1");
-    //BundleObservation *obs2 = bov.addnew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
+    //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
     //qDebug() << obs2->formatBundleOutputString(true);
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());

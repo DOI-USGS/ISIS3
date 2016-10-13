@@ -58,6 +58,9 @@ namespace Isis {
    *                           getObservationByCubeSerialNumber with observationByCubeSerialNumber.
    *   @history 2016-08-11 Jesse Mapel - Defined assignment operator and copy constructor.
    *                           Fixes #4159.
+   *   @history 2016-10-13 Ian Humphrey - Modified addnew so that we set solve settings based
+   *                           on the BundleObsevation's observation number. Renamed addnew to
+   *                           addNew(). References #4293.
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 
@@ -67,8 +70,10 @@ namespace Isis {
       ~BundleObservationVector();
 
       BundleObservationVector &operator=(const BundleObservationVector &src);
-      BundleObservationQsp addnew(BundleImageQsp image, QString observationNumber,
-                                QString instrumentId, BundleSettingsQsp bundleSettings);
+      BundleObservationQsp addNew(BundleImageQsp image,
+                                  QString observationNumber,
+                                  QString instrumentId,
+                                  BundleSettingsQsp bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();

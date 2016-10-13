@@ -219,7 +219,7 @@ Object = ResetAllOptions
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
 
-  Object = Instrument1
+  Object = Null
     InstrumentPointingSolveOption       = None
     NumberAngleCoefficientsSolved       = N/A
     CKDegree                            = N/A
@@ -237,7 +237,7 @@ Object = ResetAllOptions
     InstrumentPositionInterpolationType = 4
   End_Object
 
-  Object = Instrument2
+  Object = Null
     InstrumentPointingSolveOption       = AllPolynomialCoefficients
     NumberAngleCoefficientsSolved       = 2
     CKDegree                            = 21
@@ -350,7 +350,7 @@ End_Object
 
 Testing accessor methods...
 Get BundleObservationSolveSettings with name InstrumentId = Instrument1
-Object = Instrument1
+Object = Null
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
   CKDegree                            = N/A
@@ -369,7 +369,7 @@ Object = Instrument1
 End_Object
 
 Now get BundleObservationSolveSettings at index 1
-Object = Instrument2
+Object = Null
   InstrumentPointingSolveOption       = AllPolynomialCoefficients
   NumberAngleCoefficientsSolved       = 2
   CKDegree                            = 21
@@ -428,7 +428,7 @@ Object = BundleSettings
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
 
-  Object = Instrument1
+  Object = Null
     InstrumentPointingSolveOption       = None
     NumberAngleCoefficientsSolved       = N/A
     CKDegree                            = N/A
@@ -446,7 +446,7 @@ Object = BundleSettings
     InstrumentPositionInterpolationType = 4
   End_Object
 
-  Object = Instrument2
+  Object = Null
     InstrumentPointingSolveOption       = AllPolynomialCoefficients
     NumberAngleCoefficientsSolved       = 2
     CKDegree                            = 21
@@ -547,7 +547,7 @@ Object = BundleSettingsFromXml
 End_Object
 
 Testing error throws...
-**ERROR** Unable to find BundleObservationSolveSettings with InstrumentId = [NoSuchInstrumentId].
+**ERROR** Unable to find BundleObservationSolveSettings for observation number [UnassociatedObservationNumber].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [32].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [-1].
 **PROGRAMMER ERROR** Unknown bundle convergence criteria [Pickles].

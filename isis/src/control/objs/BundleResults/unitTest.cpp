@@ -35,7 +35,6 @@ namespace Isis {
    * 
    * @internal
    *   @history 2014-07-28 Jeannie Backer - Original version.
-   *   @history 2016-07-01 Jesse Mapel - Added TargetBody tests.
    */
   class BundleResultsXmlHandlerTester : public BundleResults {
     public:
@@ -79,6 +78,13 @@ namespace Isis {
 
 
 
+/**
+ * Unit test for BundleResults.
+ *
+ * @internal
+ *   @history 2016-07-01 Jesse Mapel - Added TargetBody tests.
+ *   @history 2016-10-13 Ian Humphrey - Changed call from addnew to addNew(). References #4293.
+ */
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
@@ -234,7 +240,7 @@ int main(int argc, char *argv[]) {
                             "TestImageSerialNumber",
                             "TestImageFileName");
     BundleObservationVector observationVector;
-    observationVector.addnew(BundleImageQsp(new BundleImage(bundleImage)),
+    observationVector.addNew(BundleImageQsp(new BundleImage(bundleImage)),
                              "ObservationNumber1",
                              "InstrumentId1",
                              BundleSettingsQsp(new BundleSettings()));

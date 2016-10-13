@@ -1,30 +1,37 @@
 #include "Isis.h"
 
 #include <QDir>
-#include <QObject>
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
-#include <QChar>
 
 #include "BundleAdjust.h"
-#include "BundleResults.h"
 #include "BundleObservationSolveSettings.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "CubeAttribute.h"
 #include "IException.h"
 #include "iTime.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Process.h"
+#include "SerialNumber.h"
+#include "SerialNumberList.h"
 #include "Table.h"
 
 using namespace std;
 using namespace Isis;
 
 BundleSettingsQsp bundleSettings(UserInterface &ui);
+void checkImageList(SerialNumberList &heldSerialList, SerialNumberList &cubeSerialList);
 QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui);
+ControlNetQsp fixHeldImages(const QString &cnetFile,
+                            const QString &heldList,
+                            const QString &imageList);
 
 void IsisMain() {
 
@@ -46,13 +53,15 @@ void IsisMain() {
   QString cubeList = ui.GetFileName("FROMLIST");
   
   // retrieve settings from jigsaw gui
+  
   BundleSettingsQsp settings = bundleSettings(ui);
   BundleAdjust *bundleAdjustment = NULL;
-
-  // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
+  // Get the held list if entered and prep for bundle adjustment
   if (ui.WasEntered("HELDLIST")) {
     QString heldList = ui.GetFileName("HELDLIST");
-    bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, heldList);
+    // Update the control network so that any control points intersecting a held image are fixed
+    ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
+    bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
   }
   else {
     bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
@@ -116,7 +125,6 @@ void IsisMain() {
 
           //  Get Kernel group and add or replace LastModifiedInstrumentPointing
           //  keyword.
-          if (bundleAdjustment->isHeld(i)) continue;   // Don't update held images at all
           Table cmatrix = bundleAdjustment->cMatrix(i);
           QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
           cmatrix.Label().addComment(jigComment);
@@ -249,83 +257,200 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
 }
 
 
+/**
+ * Checks that all the first serial numbers are in the second serial numbers list (FROMLIST).
+ *
+ * Note: This function is used for verifying HELDLIST is in the FROMLIST.
+ *
+ * @param imageList List of image serial numbers to check to make sure they're in the second list.
+ * @param fromList List of input image serial numbers to check against.
+ *
+ * @throws IException::User "The following images are not in the FROMLIST:"
+ */
+  void checkImageList(SerialNumberList &imageList, SerialNumberList &fromList) {
+  // Keep track of which held images are not in the FROMLIST
+  QString imagesNotFound;
+
+  for (int img = 0; img < imageList.size(); img++) {
+    // When the FROMLIST does not have the current image, record the image's filename 
+    if ( !fromList.hasSerialNumber(imageList.serialNumber(img)) ) {
+      imagesNotFound += " [" + imageList.fileName(img) + "]";
+    }
+  }
+
+  // Inform the user which images are not in the second list
+  if (!imagesNotFound.isEmpty()) {
+    QString msg = "The following images are not in the FROMLIST:";
+    msg += imagesNotFound + ".";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+}
+
+
 QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui) {
   //************************************************************************************************
   QList<BundleObservationSolveSettings> observationSolveSettingsList;
-  bool usePvl = ui.GetBoolean("USEPVL");
-  PvlObject obj;
-  if (usePvl) {
-    ui.GetFileName("SC_PARAMETERS");
-    Pvl scParPvl(FileName(ui.GetFileName("SC_PARAMETERS")).expanded());
-    if (!scParPvl.hasObject("SensorParameters")) {
-      QString msg = "Input SC_PARAMETERS file missing SensorParameters object";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
 
-    // loop over parameter groups, read settings for each sensor into a
-    // BundleObservationSolveSettings object, and append to observationSolveSettingsList
-    obj = scParPvl.findObject("SensorParameters");
-    PvlObject::PvlGroupIterator g;
-    BundleObservationSolveSettings solveSettings;
-    for(g = obj.beginGroup(); g != obj.endGroup(); ++g) {
-      solveSettings.setFromPvl(*g);
-      observationSolveSettingsList.append(solveSettings);
-    }
+  // We are not using the PVL, so get what will be solve settings for all images from gui
+  BundleObservationSolveSettings observationSolveSettings;
+
+  BundleObservationSolveSettings::InstrumentPointingSolveOption pointingSolveOption =
+      BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+          ui.GetString("CAMSOLVE"));
+
+  double anglesAprioriSigma, angularVelocityAprioriSigma, angularAccelerationAprioriSigma;
+  anglesAprioriSigma = angularVelocityAprioriSigma = angularAccelerationAprioriSigma = Isis::Null;
+  if (ui.WasEntered("CAMERA_ANGLES_SIGMA")) {
+    anglesAprioriSigma = ui.GetDouble("CAMERA_ANGLES_SIGMA");
   }
-  else { // we're not using the pvl, so get what will be solve settings for all images from gui
-    BundleObservationSolveSettings observationSolveSettings;
+  if (ui.WasEntered("CAMERA_ANGULAR_VELOCITY_SIGMA")) {
+    angularVelocityAprioriSigma = ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA");
+  }
+  if (ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
+    angularAccelerationAprioriSigma = ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA");
+  }
 
-    BundleObservationSolveSettings::InstrumentPointingSolveOption pointingSolveOption =
+  observationSolveSettings.setInstrumentPointingSettings(pointingSolveOption,
+                                                          ui.GetBoolean("TWIST"),
+                                                          ui.GetInteger("CKDEGREE"),
+                                                          ui.GetInteger("CKSOLVEDEGREE"),
+                                                          ui.GetBoolean("OVEREXISTING"),
+                                                          anglesAprioriSigma,
+                                                          angularVelocityAprioriSigma,
+                                                          angularAccelerationAprioriSigma);
+
+  BundleObservationSolveSettings::InstrumentPositionSolveOption positionSolveOption =
+      BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+          ui.GetString("SPSOLVE"));
+
+  double positionAprioriSigma, positionVelocityAprioriSigma, positionAccelerationAprioriSigma;
+  positionAprioriSigma = positionVelocityAprioriSigma = positionAccelerationAprioriSigma
+                        = Isis::Null;
+  if ( ui.WasEntered("SPACECRAFT_POSITION_SIGMA") ) {
+    positionAprioriSigma = ui.GetDouble("SPACECRAFT_POSITION_SIGMA");
+  }
+  if ( ui.WasEntered("SPACECRAFT_VELOCITY_SIGMA") ) {
+    positionVelocityAprioriSigma = ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA");
+  }
+  if ( ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA") ) {
+    positionAccelerationAprioriSigma = ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA");
+  }
+
+  observationSolveSettings.setInstrumentPositionSettings(positionSolveOption,
+                                                          ui.GetInteger("SPKDEGREE"),
+                                                          ui.GetInteger("SPKSOLVEDEGREE"),
+                                                          ui.GetBoolean("OVERHERMITE"),
+                                                          positionAprioriSigma,
+                                                          positionVelocityAprioriSigma,
+                                                          positionAccelerationAprioriSigma);
+
+  // If we are holding any images, then we need a BundleObservationSolveSettings for the held
+  // images, and another one for the non-held images
+  if (ui.WasEntered("HELDLIST")) {
+    // Check that the held images are present in the input image list
+    QString heldList = ui.GetFileName("HELDLIST");
+    QString fromList = ui.GetFileName("FROMLIST");
+    SerialNumberList heldSNs(heldList);
+    SerialNumberList cubeSNs(fromList);
+    checkImageList(heldSNs, cubeSNs);
+
+    // The settings for the held images will have no pointing or position factors considered
+    BundleObservationSolveSettings heldSettings;
+    BundleObservationSolveSettings::InstrumentPointingSolveOption noPointing = 
         BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
-            ui.GetString("CAMSOLVE"));
-
-    double anglesAprioriSigma, angularVelocityAprioriSigma, angularAccelerationAprioriSigma;
-    anglesAprioriSigma = angularVelocityAprioriSigma = angularAccelerationAprioriSigma = Isis::Null;
-    if (ui.WasEntered("CAMERA_ANGLES_SIGMA")) {
-      anglesAprioriSigma = ui.GetDouble("CAMERA_ANGLES_SIGMA");
-    }
-    if (ui.WasEntered("CAMERA_ANGULAR_VELOCITY_SIGMA")) {
-      angularVelocityAprioriSigma = ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA");
-    }
-    if (ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
-      angularAccelerationAprioriSigma = ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA");
-    }
-
-    observationSolveSettings.setInstrumentPointingSettings(pointingSolveOption,
-                                                           ui.GetBoolean("TWIST"),
-                                                           ui.GetInteger("CKDEGREE"),
-                                                           ui.GetInteger("CKSOLVEDEGREE"),
-                                                           ui.GetBoolean("OVEREXISTING"),
-                                                           anglesAprioriSigma,
-                                                           angularVelocityAprioriSigma,
-                                                           angularAccelerationAprioriSigma);
-
-    BundleObservationSolveSettings::InstrumentPositionSolveOption positionSolveOption =
+            "NoPointingFactors");
+    heldSettings.setInstrumentPointingSettings(noPointing,
+                                                ui.GetBoolean("TWIST"),
+                                                ui.GetInteger("CKDEGREE"),
+                                                ui.GetInteger("CKSOLVEDEGREE"),
+                                                ui.GetBoolean("OVEREXISTING"),
+                                                positionAprioriSigma,
+                                                angularVelocityAprioriSigma,
+                                                angularAccelerationAprioriSigma);
+    BundleObservationSolveSettings::InstrumentPositionSolveOption noPosition =
         BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
-            ui.GetString("SPSOLVE"));
+            "NoPositionFactors");
+    heldSettings.setInstrumentPositionSettings(noPosition,
+                                                ui.GetInteger("SPKDEGREE"),
+                                                ui.GetInteger("SPKSOLVEDEGREE"),
+                                                ui.GetBoolean("OVERHERMITE"),
+                                                positionAprioriSigma,
+                                                positionVelocityAprioriSigma,
+                                                positionAccelerationAprioriSigma);
 
-    double positionAprioriSigma, positionVelocityAprioriSigma, positionAccelerationAprioriSigma;
-    positionAprioriSigma = positionVelocityAprioriSigma = positionAccelerationAprioriSigma
-                         = Isis::Null;
-    if ( ui.WasEntered("SPACECRAFT_POSITION_SIGMA") ) {
-      positionAprioriSigma = ui.GetDouble("SPACECRAFT_POSITION_SIGMA");
+    // Add the held images' observationNumbers to the held observation solve settings
+    for (int sn = 0; sn < cubeSNs.size(); sn++) {
+      if ( heldSNs.hasSerialNumber(cubeSNs.serialNumber(sn)) ) {
+        // For held images, we want to set pointing and position settings to NONE, effectively
+        // ensuring that the number of pointing and position parameters for the holds are 0
+        heldSettings.addObservationNumber(cubeSNs.observationNumber(sn));
+      }
+      else {
+        observationSolveSettings.addObservationNumber(cubeSNs.observationNumber(sn));
+      }
     }
-    if ( ui.WasEntered("SPACECRAFT_VELOCITY_SIGMA") ) {
-      positionVelocityAprioriSigma = ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA");
-    }
-    if ( ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA") ) {
-      positionAccelerationAprioriSigma = ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA");
-    }
-
-    observationSolveSettings.setInstrumentPositionSettings(positionSolveOption,
-                                                           ui.GetInteger("SPKDEGREE"),
-                                                           ui.GetInteger("SPKSOLVEDEGREE"),
-                                                           ui.GetBoolean("OVERHERMITE"),
-                                                           positionAprioriSigma,
-                                                           positionVelocityAprioriSigma,
-                                                           positionAccelerationAprioriSigma);
+    // Add both the non-held and held observation solve settings to the list of solve settings
+    // for the BundleAdjust
+    observationSolveSettingsList.append(observationSolveSettings);
+    observationSolveSettingsList.append(heldSettings);
+  }
+  // If not using a held list, we just append the GUI acquired solve parameters
+  else {
     observationSolveSettingsList.append(observationSolveSettings);
   }
   //************************************************************************************************
   return observationSolveSettingsList;
+}
+
+
+/**
+ * Control points that intersect the held images are set to fixed. The points' a priori values
+ * are each set to the corresponding surface points of the associated held image's measures.
+ * 
+ * Note that this returns a ControlNetQsp to the modified input control network.
+ * 
+ * @param cnetFile QString name of the control network file.
+ * @param heldList QString name of the held list file.
+ * @param imageLise QString name of the input image list file.
+ * 
+ * @throws IException::User "Cannot compute surface point for control point [], measure [].
+ * 
+ * @return @b ControlNetQsp Returns a shared pointer to the modified control network.
+ * 
+ * @internal
+ *   @todo Currently only works for NON-overlapping held images. Any control points that intersect
+ *         the held images are set to FIXED and have their apriori surface points set to
+ *         corresponding surface points for the held image's measures. 
+ */
+ControlNetQsp fixHeldImages(const QString &cnetFile, 
+                            const QString &heldList, 
+                            const QString &snList) {
+  ControlNetQsp cnet(new ControlNet(cnetFile));
+  // Set up the cameras for all the input images in the control net
+  cnet->SetImages(snList);
+
+  // For all held images' measures, set their parent control points' a priori values,
+  // and set their types to Fixed
+  SerialNumberList heldSNs(heldList);
+  for (int sn = 0; sn < heldSNs.size(); sn++) {
+    // Get the measures in the held image
+    QList<ControlMeasure *> measures = cnet->GetMeasuresInCube(heldSNs.serialNumber(sn));
+    
+    foreach (ControlMeasure *cm, measures) {
+      Camera *cam = cm->Camera();
+      ControlPoint *pt = cm->Parent();
+      pt->SetType(ControlPoint::Fixed);
+      // If possible, set the apriori surface point for the current measure's control point
+      if ( cam->SetImage(cm->GetSample(), cm->GetLine()) ) {
+        pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
+      }
+      else {
+        QString msg = "Cannot compute surface point for control point [" + pt->GetId() +
+            "], measure [" + cm->GetCubeSerialNumber() + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+    
+  }
+  return cnet;
 }

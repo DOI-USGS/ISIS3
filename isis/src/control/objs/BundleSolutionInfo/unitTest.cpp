@@ -75,6 +75,7 @@ namespace Isis {
  * @internal
  *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
  *                           we will keep this code.
+ *   @history 2016-10-13 Ian Humphrey - Changed addnew call to addNew(). References #4293.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -125,9 +126,9 @@ int main(int argc, char *argv[]) {
                             "TestImageFileName");
     BundleObservationVector observationVector;
     QObject *parent = NULL;
-    observationVector.addnew(BundleImageQsp(new BundleImage(bundleImage)),
+    observationVector.addNew(BundleImageQsp(new BundleImage(bundleImage)),
                              "ObservationNumber1",
-                             "InstrumentId1",
+                             "Instrument1",
                              BundleSettingsQsp(new BundleSettings));
 
     statistics.setBundleControlPoints(bundleControlPointVector);

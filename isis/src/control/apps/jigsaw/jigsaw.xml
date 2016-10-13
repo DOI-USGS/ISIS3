@@ -201,7 +201,7 @@
     <change name="Ian Humphrey" date="2016-08-22">
       Reviewed documentation and updated small spelling and grammar errors. References #4226.
     </change>
-    <change name="Adam Paquette" data="2016-08-31">
+    <change name="Adam Paquette" date="2016-08-31">
       Updated how jigsaw handles its prefix parameter  along with a small documentation change. Fixes #4309.
     </change>
     <change name="Ian Humphrey" date="2016-09-22">
@@ -216,6 +216,11 @@
       Added the IMAGES_CSV parameter to the "Output Options" group
       so that the user can now request the bundleout_images.csv file
       in addition to the other output files such as bundleout.txt.  Fixes #4314.
+    </change>
+    <change name="Ian Humphrey" date="2016-10-13">
+      Implemented HELDLIST functionality for non-overlapping held images. Any control points that 
+      intersect the held images are fixed, and a priori surface points for these control points are
+      set to the held images' measures' surface points. Disabled USEPVL/SC_PARAMETERS. Fixes #4293.
     </change>
   </history>
 
@@ -241,7 +246,7 @@
         <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
-          List of cubes to hold in the adjustment
+          List of (non-overlapping) cubes to hold in the adjustment
         </brief>
         <description>
           This file contains a list of all <def>cube</def>s whose orientation and position
@@ -249,6 +254,7 @@
           in the solution, but their camera orientation and spacecraft position
           will be constrained to keep the values from changing.  This is an
           optional parameter and the default is to not hold any of the images.
+          <i>Note that held images must not overlap each other to work properly.</i>
         </description>
         <filter>
           *.txt *.lis
@@ -286,6 +292,14 @@
         </filter>
       </parameter>
 
+ <!-- Turning off USEPVL and SC_PARAMETERS for now. Since we are now using observation numbers
+      to obtain the BundleObservationSolveSettings for a BundleObservation (instead of inst. id),
+      this would require using a PVL that contains names of lists of images to group by.
+      E.g. Group = "listA." would create a BundleObservationSolveSettings object that is associated
+      with the images' observation numbers. Group = "listB.lis" would create another BOSS object
+      that is associated with listB's images' observation numbers. Use of these lists could
+      introduce unintended behaviors if not properly verified (e.g. would need to make sure the
+      lists are sublists of the FROMLIST, that these sublists are all mutually exclusive ...).
       <parameter name="USEPVL">
         <type>boolean</type>
         <default><item>false</item></default>
@@ -296,13 +310,14 @@
           This option indicates that the Camera and Spacecraft parameters are to be
           obtained from the PVL file specified by SC_PARAMETERS. All of the following
           parameters must be entered through the PVL file if this option is chosen:
-          CKDEGREE, CKSOLVEDEGREE, CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE,
+          HELDLIST, CKDEGREE, CKSOLVEDEGREE, CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE,
           SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE, SPACECRAFT_POSITION_SIGMA,
           SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA, CAMERA_ANGLES_SIGMA,
           CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA. An example
           template is located at $base/templates/jigsaw/SC_Parameters.pvl.
         </description>
         <exclusions>
+          <item>HELDLIST</item>
           <item>CKDEGREE</item>
           <item>CKSOLVEDEGREE</item>
           <item>CAMSOLVE</item>
@@ -348,7 +363,7 @@
         <filter>
           *.pvl
         </filter>
-      </parameter>
+      </parameter>-->
     </group>
 
     <group name="Solve Options">

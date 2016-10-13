@@ -99,7 +99,7 @@ Object = MyInstrumentId
   InstrumentPositionInterpolationType = 4
 End_Object
 
-setFromPvl()
+Testing pvlObject()...
 Object = SettingsFromPvlGroup-SolveForNone
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
@@ -341,12 +341,6 @@ Testing error throws...
 **PROGRAMMER ERROR** Unknown pointing solve option enum [-1].
 **ERROR** Unknown bundle instrument position solve option Nonsense.
 **PROGRAMMER ERROR** Unknown position solve option enum [-2].
-**USER ERROR** Unable to set bundle adjust options from the given PVL.
-**USER ERROR** The OVERHERMITE parameter must be a valid boolean value.
-**USER ERROR** Unable to set bundle adjust options from the given PVL.
-**USER ERROR** OVEREXISTING parameter must be a valid boolean value.
-**USER ERROR** Unable to set bundle adjust options from the given PVL.
-**USER ERROR** The TWIST parameter must be a valid boolean value.
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
