@@ -2,7 +2,7 @@
 
 <application name="fx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Generalized arithmetic operations using multiple cube files
+    Apply generalized arithmetic operations using multiple cube files
   </brief>
 
   <description>
@@ -15,7 +15,7 @@
     equation is applied to all the bands within the file.
     </p>
     <p>    
-    Up to five files can be entered for parameters F1 to F5 under the "Input 
+    Five files or fewer can be entered for parameters F1 to F5 under the "Input 
     Cube Files" section to specify the input data.  A second method to specify
     data is to include an arbitrary number of 
     files in a file list and enter the list name in the fromlist parameter that 
@@ -61,7 +61,7 @@
       </p>
 
       <p>   
-	An escape chararter "\" has been added to differentiate a first parenthesis 
+	An escape character "\" has been added to differentiate a first parenthesis 
 	from the beginning of an array sequence.
       </p>
 
@@ -112,7 +112,7 @@
      
       <p>
         <b>Note:</b> The use of negative numbers within an equation could cause 
-	problems in the latest version of ISIS3.  The "--" or "neg" operators are 
+	problems in the latest version of ISIS 3.  The "--" or "neg" operators are 
 	specifically designed to handle negative numbers within an equation. If an 
 	equation includes a negative number, prefix the value with a "--" instead 
 	of "-" in the equation.
@@ -205,9 +205,10 @@
      </blockquote>
     </p>
     <p>
-      In order to use the operators below, images must be processed through <i>
+      In order to use the camera operators, images must be processed through <i>
       spiceinit</i> so that the NAIF camera model information is stored in the image 
-      labels: 
+      labels. <b>These operators calculate values on a band-by-band basis so that band-dependent
+      images have correctly calculated camera-related values</b>.
     </p>
     <p>
      <blockquote>
@@ -519,13 +520,6 @@
 
       <tr>
         <td>1</td>
-        <td>emal</td>
-        <td><def>Local emission angle</def> on DTM</td>
-        <td>emal(f1)</td>
-      </tr>   
-
-      <tr>
-        <td>1</td>
         <td>rads</td>
         <td>Convert degrees to radians</td>
         <td>f1 / cos(rads(pha(f1)))</td>
@@ -700,6 +694,13 @@
       Fixed bug where the cube attributes on files in the fromlist were
       ignored.  Fixes #1926."
     </change>
+    <change name="Moses Milazzo and Ian Humphrey" date="2016-10-13">
+      Fixed bug where camera related operators produce incorrect calculations for band-dependent
+      images. The camera operators now make calculations on a band-by-band basis, meaning
+      band-dependent images are now supported with correct calculations. Fixes #1301.
+      Backward Compatibility Issue: The changes made will impact any scripts that use the
+      fx camera operators on band-dependent images, producing different output for each band.
+    </change>
   </history>
 
   <groups>     
@@ -709,7 +710,7 @@
         <fileMode>input</fileMode>
         <brief>Input filename</brief>
         <description>
-          Input ISIS3 cube filename.
+          Input ISIS 3 cube filename.
         </description>
         <filter>
           *.cub
@@ -722,7 +723,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS3 cube filename.
+          Input ISIS 3 cube filename.
         </description>
         <filter>
           *.cub
@@ -735,7 +736,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS3 cube filename.
+          Input ISIS 3 cube filename.
         </description>
         <filter>
           *.cub
@@ -748,7 +749,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS3 cube filename.
+          Input ISIS 3 cube filename.
         </description>
         <filter>
           *.cub
@@ -761,7 +762,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS3 cube filename.
+          Input ISIS 3 cube filename.
         </description>
         <filter>
           *.cub
