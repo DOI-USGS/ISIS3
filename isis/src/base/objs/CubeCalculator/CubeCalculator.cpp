@@ -19,26 +19,24 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "CubeCalculator.h"
 
 #include <QVector>
 
-#include "CubeCalculator.h"
-#include "IString.h"
-#include "Statistics.h"
+#include "Angle.h"
 #include "Camera.h"
 #include "Distance.h"
-#include "Angle.h"
+#include "IString.h"
+#include "Statistics.h"
 
 using namespace std;
 
 namespace Isis {
 
-  //! Constructor
+  //! Constructs a CubeCalculator.
   CubeCalculator::CubeCalculator() {
     m_calculations    = NULL;
     m_methods         = NULL;
-    // m_data was never used anywhere
-//     m_data            = NULL;
     m_dataDefinitions = NULL;
     m_cubeStats       = NULL;
     m_cubeCameras     = NULL;
@@ -46,8 +44,6 @@ namespace Isis {
 
     m_calculations    = new QVector<Calculations>();
     m_methods         = new QVector<void (Calculator:: *)(void)>();
-    // m_data was never used anywhere
-//     m_data            = new QVector<QVector<double> >();
     m_dataDefinitions = new QVector<DataValue>();
     m_cubeStats       = new QVector<Statistics *>();
     m_cubeCameras     = new QVector<Camera *>();
@@ -57,8 +53,10 @@ namespace Isis {
   }
 
   
-  //! Destroys the CubeCalculator object
+  //! Destroys the CubeCalculator object.
   CubeCalculator::~CubeCalculator() {
+    Clear(); // free dynamic memory in container members
+
     delete m_calculations;
     delete m_methods;
     delete m_dataDefinitions;
@@ -75,6 +73,9 @@ namespace Isis {
   }
   
   
+  /**
+   * Frees dynamic memory in container members.
+   */
   void CubeCalculator::Clear() {
     Calculator::Clear();
 
@@ -85,10 +86,6 @@ namespace Isis {
     if (m_methods) {
       m_methods->clear();
     }
-
-//     if (m_data) {
-//       m_data->clear();
-//     }
 
     if (m_dataDefinitions) {
       m_dataDefinitions->clear();
@@ -127,14 +124,17 @@ namespace Isis {
    *
    * @return std::vector<double> The results of the calculations (with Isis Special Pixels)
    *
-   * @throws iException::Math
+   * @throws IException::Unknown "Too many operands in the equation."
    */
-  QVector<double> CubeCalculator::runCalculations(QVector<Buffer *> &cubeData, int curLine, int curBand) {
+  QVector<double> CubeCalculator::runCalculations(QVector<Buffer *> &cubeData,
+                                                  int curLine, 
+                                                  int curBand) {
     // For now we'll only process a single line in this method for our results. In order
     //    to do more powerful indexing, passing a list of cubes and the output cube will
     //    be necessary.
     int methodIndex = 0;
     int dataIndex = 0;
+
     for (int currentCalculation = 0; currentCalculation < m_calculations->size();
         currentCalculation++) {
       if ((*m_calculations)[currentCalculation] == CallNextMethod) {
@@ -144,16 +144,16 @@ namespace Isis {
       }
       else {
         DataValue &data = (*m_dataDefinitions)[dataIndex];
-        if (data.getType() == DataValue::Constant) {
-          Push(data.getConstant());
+        if (data.type() == DataValue::Constant) {
+          Push(data.constant());
         }
-        else if (data.getType() == DataValue::Band) {
+        else if (data.type() == DataValue::Band) {
           Push(curBand);
         }
-        else if (data.getType() == DataValue::Line) {
+        else if (data.type() == DataValue::Line) {
           Push(curLine);
         }
-        else if (data.getType() == DataValue::Sample) {
+        else if (data.type() == DataValue::Sample) {
           QVector<double> samples;
           samples.resize(m_outputSamples);
 
@@ -163,38 +163,73 @@ namespace Isis {
 
           Push(samples);
         }
-        else if (data.getType() == DataValue::CubeData) {
-          Push(*cubeData[data.getCubeIndex()]);
+        else if (data.type() == DataValue::CubeData) {
+          Push(*cubeData[data.cubeIndex()]);
         }
-        else if (data.getType() == DataValue::InaData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getInaBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::InaData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->inaBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::EmaData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getEmaBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::EmaData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->emaBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::PhaData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getPhaBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::PhaData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->phaBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::InalData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getInalBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::InalData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->inalBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
         }
-        else if (data.getType() == DataValue::EmalData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getEmalBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::EmalData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->emalBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
         }
-        else if (data.getType() == DataValue::PhalData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getPhalBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::PhalData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->phalBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
         }
-        else if (data.getType() == DataValue::LatData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getLatBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::LatData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->latBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::LonData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getLonBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::LonData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->lonBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::ResData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getResBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::ResData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->resBuffer(curLine,
+                                                                 m_outputSamples,
+                                                                 curBand)));
         }
-        else if (data.getType() == DataValue::RadiusData) {
-          Push(*((*m_cameraBuffers)[data.getCubeIndex()]->getRadiusBuffer(curLine,m_outputSamples)));
+        else if (data.type() == DataValue::RadiusData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->radiusBuffer(curLine,
+                                                                    m_outputSamples,
+                                                                    curBand)));
+        }
+        else if (data.type() == DataValue::InacData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->inacBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
+        }
+        else if (data.type() == DataValue::EmacData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->emacBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
+        }
+        else if (data.type() == DataValue::PhacData) {
+          Push(*((*m_cameraBuffers)[data.cubeIndex()]->phacBuffer(curLine,
+                                                                  m_outputSamples,
+                                                                  curBand)));
         }
         else {
         }
@@ -222,10 +257,13 @@ namespace Isis {
    * @param equation The equation in postfix notation
    * @param inCubes The input cubes
    * @param outCube The output cube
+   *
+   * @throws IException::Unknown "Invalid file number"
+   * @throws IException::Unknown "Unidentified operator"
    */
   void CubeCalculator::prepareCalculations(QString equation,
-      QVector<Cube *> &inCubes,
-      Cube *outCube) {
+                                           QVector<Cube *> &inCubes,
+                                           Cube *outCube) {
     Clear();
 
     m_outputSamples = outCube->sampleCount();
@@ -531,31 +569,31 @@ namespace Isis {
         //TODO: Test for NULL standard deviation
       }
 
-      // Center phase in a cube
-      else if ((token == "phac") || (token == "inac") || (token == "emac")) {
+      // Center incidence
+      else if (token == "inac") {
         int cubeIndex = lastPushToCubeCameras(inCubes);
+        (*m_cameraBuffers)[cubeIndex]->enableInacBuffer();
+        
+        m_calculations->push_back(PushNextData);
+        m_dataDefinitions->push_back(DataValue(DataValue::InacData, cubeIndex));
+      }
 
-        double centerLine = inCubes[cubeIndex]->lineCount() / 2.0 + 0.5;
-        double centerSamp = inCubes[cubeIndex]->sampleCount() / 2.0 + 0.5;
-        Camera *cam = (*m_cubeCameras)[cubeIndex];
+      // Center emission
+      else if (token == "emac") {
+        int cubeIndex = lastPushToCubeCameras(inCubes);
+        (*m_cameraBuffers)[cubeIndex]->enableEmacBuffer();
+        
+        m_calculations->push_back(PushNextData);
+        m_dataDefinitions->push_back(DataValue(DataValue::EmacData, cubeIndex));
+      }
 
-        if (cam->SetImage(centerSamp, centerLine)) {
-          m_calculations->push_back(PushNextData);
-          if (token == "inac") {
-            m_dataDefinitions->push_back(DataValue(DataValue::Constant, cam->IncidenceAngle()));
-          }
-          else if (token == "emac") {
-            m_dataDefinitions->push_back(DataValue(DataValue::Constant, cam->EmissionAngle()));
-          }
-          else {
-            m_dataDefinitions->push_back(DataValue(DataValue::Constant, cam->PhaseAngle()));
-          }
-        }
-        else {
-          string msg = "Unable to compute illumination angles at image center for operator [";
-          msg += token + "] using input file [f" + IString(cubeIndex + 1) + "]";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
+      // Center phase
+      else if (token == "phac") {
+        int cubeIndex = lastPushToCubeCameras(inCubes);
+        (*m_cameraBuffers)[cubeIndex]->enablePhacBuffer();
+        
+        m_calculations->push_back(PushNextData);
+        m_dataDefinitions->push_back(DataValue(DataValue::PhacData, cubeIndex));
       }
 
       // Incidence on the ellipsoid
@@ -660,6 +698,19 @@ namespace Isis {
     } // while loop
   }
 
+
+  /**
+   * Creates statistics internally for the last cube data pushed to the data definitions.
+   *
+   * This method is used for setting up internal statistics for the input cubes. This allows 
+   * access to the statistics for each of the input cube when adding statistics related values
+   * to the calculator.
+   *
+   * @throws IException::Unknown "This function must not contain constants, only input cubes may
+   *                              be specified"
+   *
+   * @return @b int Returns the index of the last pushed cube data.
+   */
   int CubeCalculator::lastPushToCubeStats(QVector<Cube *> &inCubes) {
     if (!m_calculations->size()) {
       string msg = "Not sure which file to get statistics from";
@@ -677,13 +728,13 @@ namespace Isis {
     // This must have data if calculations had data that equaled push data
     DataValue lastData = (*m_dataDefinitions)[m_dataDefinitions->size() - 1];
 
-    if (lastData.getType() != DataValue::CubeData) {
+    if (lastData.type() != DataValue::CubeData) {
       string msg = "This function must not contain constants,";
       msg += " only input cubes may be specified.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    int cubeStatsIndex = lastData.getCubeIndex();
+    int cubeStatsIndex = lastData.cubeIndex();
     m_dataDefinitions->pop_back();
 
     // Member variables are now cleaned up, we need to verify the stats exists
@@ -703,6 +754,23 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates internal camera for the last pushed cube data.
+   *
+   * This method is used to set up cameras for the input cubes.
+   *
+   * @throws IException::Unknown "Not sure which files to get cameras from"
+   * @throws IException::Unknown "This function must not contain calcuations, only input cubes may
+   *                              be specified."
+   * @throws IException::Unknown "This function must not contain constants, only input cubes may
+   *                              be specified."
+   * @throws IException::Unknown "This function requires a camera and the input cube does not have
+   *                              one. You may need to run spiceinit"
+   * @throws IException::Unknown "This function requires a camera and the input cube does not have
+   *                              one. You may need to run spiceinit"
+   *
+   * @return @b int Returns the index of the last pushed cube data.
+   */
   int CubeCalculator::lastPushToCubeCameras(QVector<Cube *> &inCubes) {
     if (!m_calculations->size()) {
       string msg = "Not sure which file to get cameras from";
@@ -720,13 +788,13 @@ namespace Isis {
     // This must have data if calculations had data that equaled push data
     DataValue lastData = (*m_dataDefinitions)[m_dataDefinitions->size() - 1];
 
-    if (lastData.getType() != DataValue::CubeData) {
+    if (lastData.type() != DataValue::CubeData) {
       string msg = "This function must not contain constants,";
       msg += " only input cubes may be specified.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    int cubeIndex = lastData.getCubeIndex();
+    int cubeIndex = lastData.cubeIndex();
     m_dataDefinitions->pop_back();
 
     // Member variables are now cleaned up, we need to verify the camera exists
@@ -778,9 +846,105 @@ namespace Isis {
   }
 
 
+  /**
+   * Constructs a default DataValue. 
+   *
+   * This method constructs a default DataValue with its type, cube index, and constant value
+   * set to -1, -1, and 0.0, respectively.
+   */
+  DataValue::DataValue() {
+    m_type = (DataValueType) - 1;
+    m_cubeIndex = -1;
+    m_constantValue = 0.0;
+  }
 
 
+  /**
+   * Constructs a DataValue with a given type.
+   *
+   * This method constructs a DataValue with the passed type. The DataValue's constant value
+   * is set to 0.0 and its cube index is set to -1.
+   *
+   * @param type The DataValueType for the DataValue.
+   */
+  DataValue::DataValue(DataValueType type) {
+    m_type = type;
+    m_constantValue = 0.0;
+    m_cubeIndex = -1;
+  }
 
+
+  /**
+   * Constructs a DataValue with a given type and associated cube index.
+   *
+   * This method constructs a DataValue with the passed type and a cube index corresponding to 
+   * the data's associated cube. The DataValue's constant value is set to 0.0.
+   *
+   * @param type The DataValueType for the DataValue.
+   * @param cubeIndex Index of the associated cube the data corresponds with.
+   */
+  DataValue::DataValue(DataValueType type, int cubeIndex) {
+    m_type = type;
+    m_constantValue = 0.0;
+    m_cubeIndex = cubeIndex;
+  }
+
+
+  /**
+   * Constructs a DataValue with a given type and constant value.
+   *
+   * This method constructs a DataValue with the passed type and passed constant value.
+   * The DataValue's cube index is set to -1. If the type passed is DataValue::Constant,
+   * then its constant value is set to the passed value.
+   *
+   * @param type The DataValueType for the DataValue.
+   * @param value The constant value for the DataValue.
+   */
+  DataValue::DataValue(DataValueType type, double value) {
+    m_type = type;
+    m_cubeIndex = -1;
+
+    if (type == Constant) {
+      m_constantValue = value;
+    }
+  }
+
+
+  /**
+   * Accesses the type of the DataValue.
+   *
+   * @return @b DataValue::DataValueType Returns the DataValue's type.
+   */
+  DataValue::DataValueType DataValue::type() {
+    return m_type;
+  }
+
+
+  /**
+   * Accesses the cube index of the DataValue.
+   *
+   * @return @b int Returns the DataValue's cube index.
+   */
+  int DataValue::cubeIndex() {
+    return m_cubeIndex;
+  }
+
+
+  /**
+   * Accesses the constant value of the DataValue.
+   *
+   * @return @b double Returns the DataValue's constant value.
+   */
+  double DataValue::constant() {
+    return m_constantValue;
+  }
+
+
+  /**
+   * Constructs a CameraBuffers object.
+   *
+   * @param camera Pointer to the Camera the CameraBuffers will use.
+   */
   CameraBuffers::CameraBuffers(Camera *camera) {
     m_camera = camera;
     m_phaBuffer  = NULL;
@@ -789,6 +953,9 @@ namespace Isis {
     m_phalBuffer = NULL;
     m_inalBuffer = NULL;
     m_emalBuffer = NULL;
+    m_phacBuffer = NULL;
+    m_inacBuffer = NULL;
+    m_emacBuffer = NULL;
     m_resBuffer  = NULL;
     m_latBuffer  = NULL;
     m_lonBuffer  = NULL;
@@ -797,6 +964,10 @@ namespace Isis {
     m_lastLine = -1;
   }
 
+
+  /**
+   * Destroys the CameraBuffers.
+   */
   CameraBuffers::~CameraBuffers() {
     delete m_phaBuffer;
     delete m_inaBuffer;
@@ -804,6 +975,9 @@ namespace Isis {
     delete m_phalBuffer;
     delete m_inalBuffer;
     delete m_emalBuffer;
+    delete m_phacBuffer;
+    delete m_inacBuffer;
+    delete m_emacBuffer;
     delete m_resBuffer;
     delete m_latBuffer;
     delete m_lonBuffer;
@@ -815,103 +989,173 @@ namespace Isis {
     m_phalBuffer = NULL;
     m_inalBuffer = NULL;
     m_emalBuffer = NULL;
+    m_phacBuffer = NULL;
+    m_inacBuffer = NULL;
+    m_emacBuffer = NULL;
     m_resBuffer  = NULL;
     m_latBuffer  = NULL;
     m_lonBuffer  = NULL;
     m_radiusBuffer = NULL;
   }
 
+
+  //! Enables the phase angle buffer for use.
   void CameraBuffers::enablePhaBuffer() {
     if (!m_phaBuffer) m_phaBuffer = new QVector<double>;
   }
 
+
+  //! Enables the incidence angle buffer for use.
   void CameraBuffers::enableInaBuffer() {
     if (!m_inaBuffer) m_inaBuffer = new QVector<double>;
   }
 
+
+  //! Enables the emission angle buffer for use.
   void CameraBuffers::enableEmaBuffer() {
     if (!m_emaBuffer) m_emaBuffer = new QVector<double>;
   }
 
+
+  //! Enables the latitude buffer for use.
   void CameraBuffers::enableLatBuffer() {
     if (!m_latBuffer) m_latBuffer = new QVector<double>;
   }
 
+
+  //! Enables the longitude buffer for use.
   void CameraBuffers::enableLonBuffer() {
     if (!m_lonBuffer) m_lonBuffer = new QVector<double>;
   }
 
+
+  //! Enables the resolution buffer for use.
   void CameraBuffers::enableResBuffer() {
     if (!m_resBuffer) m_resBuffer = new QVector<double>;
   }
 
+
+  //! Enables the radius buffer for use.
   void CameraBuffers::enableRadiusBuffer() {
     if (!m_radiusBuffer) m_radiusBuffer = new QVector<double>;
   }
 
+
+  //! Enables the local phase angle buffer for use.
   void CameraBuffers::enablePhalBuffer() {
     if (!m_phalBuffer) m_phalBuffer = new QVector<double>;
   }
 
+
+  //! Enables the local incidence angle buffer for use.
   void CameraBuffers::enableInalBuffer() {
     if (!m_inalBuffer) m_inalBuffer = new QVector<double>;
   }
 
+
+  //! Enables the local emission angle buffer for use.
   void CameraBuffers::enableEmalBuffer() {
     if (!m_emalBuffer) m_emalBuffer = new QVector<double>;
   }
 
-  QVector<double> *CameraBuffers::getPhaBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  //! Enables the center phase angle buffer for use.
+  void CameraBuffers::enablePhacBuffer() {
+    if (!m_phacBuffer) m_phacBuffer = new QVector<double>;
+  }
+
+
+  //! Enables the center incidence angle buffer for use.
+  void CameraBuffers::enableInacBuffer() {
+    if (!m_inacBuffer) m_inacBuffer = new QVector<double>;
+  }
+
+
+  //! Enables the center emission angle buffer for use.
+  void CameraBuffers::enableEmacBuffer() {
+    if (!m_emacBuffer) m_emacBuffer = new QVector<double>;
+  }
+
+
+  QVector<double> *CameraBuffers::phaBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_phaBuffer;
   }
 
-  QVector<double> *CameraBuffers::getInaBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::inaBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_inaBuffer;
   }
 
-  QVector<double> *CameraBuffers::getEmaBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::emaBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_emaBuffer;
   }
 
-  QVector<double> *CameraBuffers::getLatBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::latBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_latBuffer;
   }
 
-  QVector<double> *CameraBuffers::getLonBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::lonBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_lonBuffer;
   }
 
-  QVector<double> *CameraBuffers::getResBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::resBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_resBuffer;
   }
 
-  QVector<double> *CameraBuffers::getRadiusBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::radiusBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine,ns,currentBand);
     return m_radiusBuffer;
   }
 
-  QVector<double> *CameraBuffers::getPhalBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::phalBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_phalBuffer;
   }
 
-  QVector<double> *CameraBuffers::getInalBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::inalBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_inalBuffer;
   }
 
-  QVector<double> *CameraBuffers::getEmalBuffer(int currentLine, int ns) {
-    loadBuffers(currentLine,ns);
+
+  QVector<double> *CameraBuffers::emalBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
     return m_emalBuffer;
   }
 
-  void CameraBuffers::loadBuffers(int currentLine, int ns) {
+
+  QVector<double> *CameraBuffers::phacBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
+    return m_phacBuffer;
+  }
+
+
+  QVector<double> *CameraBuffers::inacBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
+    return m_inacBuffer;
+  }
+
+
+  QVector<double> *CameraBuffers::emacBuffer(int currentLine, int ns, int currentBand) {
+    loadBuffers(currentLine, ns, currentBand);
+    return m_emacBuffer;
+  }
+
+
+  void CameraBuffers::loadBuffers(int currentLine, int ns, int currentBand) {
     if (currentLine != m_lastLine) {
       m_lastLine = currentLine;
 
@@ -927,42 +1171,78 @@ namespace Isis {
       if (m_inalBuffer) m_inalBuffer->resize(ns);
       if (m_emalBuffer) m_emalBuffer->resize(ns);
 
-      for (int i = 0; i < ns; i++) {
-        if (m_camera->SetImage(i + 1, currentLine)) {
-          if (m_phaBuffer) (*m_phaBuffer)[i] = m_camera->PhaseAngle();
-          if (m_inaBuffer) (*m_inaBuffer)[i] = m_camera->IncidenceAngle();
-          if (m_emaBuffer) (*m_emaBuffer)[i] = m_camera->EmissionAngle();
-          if (m_latBuffer) (*m_latBuffer)[i] = m_camera->UniversalLatitude();
-          if (m_lonBuffer) (*m_lonBuffer)[i] = m_camera->UniversalLongitude();
-          if (m_resBuffer) (*m_resBuffer)[i] = m_camera->PixelResolution();
-          if (m_radiusBuffer) (*m_radiusBuffer)[i] = m_camera->LocalRadius().meters();
-          if (m_phalBuffer || m_inalBuffer || m_emalBuffer) {
-            Angle phal, inal, emal;
-            bool okay;
-            m_camera->LocalPhotometricAngles(phal, inal, emal, okay);
-            if (okay) {
-              if (m_phalBuffer) (*m_phalBuffer)[i] = phal.degrees();
-              if (m_inalBuffer) (*m_inalBuffer)[i] = inal.degrees();
-              if (m_emalBuffer) (*m_emalBuffer)[i] = emal.degrees();
+      // Center angle buffers will only ever have one item, the center angle value
+      if (m_phacBuffer) m_phacBuffer->resize(1);
+      if (m_inacBuffer) m_inacBuffer->resize(1);
+      if (m_emacBuffer) m_emacBuffer->resize(1);
+
+      m_camera->SetBand(currentBand);
+
+      if (m_phacBuffer || m_inacBuffer || m_emacBuffer) {
+          QString tokenName; // used for exception
+          double centerLine = m_camera->Lines() / 2.0 + 0.5;
+          double centerSamp = m_camera->Samples() / 2.0 + 0.5;
+
+          if (m_camera->SetImage(centerSamp, centerLine)) {
+            if (m_phacBuffer) {
+              tokenName = "phac";
+              (*m_phacBuffer)[0] = m_camera->PhaseAngle();
             }
-            else {
-              if (m_phalBuffer) (*m_phalBuffer)[i] = NAN;
-              if (m_inalBuffer) (*m_inalBuffer)[i] = NAN;
-              if (m_emalBuffer) (*m_emalBuffer)[i] = NAN;
+            if (m_inacBuffer) {
+              tokenName = "inac";
+              (*m_inacBuffer)[0] = m_camera->IncidenceAngle();
+            }
+            if (m_emacBuffer) {
+              tokenName = "emac";
+              (*m_emacBuffer)[0] = m_camera->EmissionAngle();
             }
           }
-        }
-        else {
-          if (m_phaBuffer) (*m_phaBuffer)[i] = NAN;
-          if (m_inaBuffer) (*m_inaBuffer)[i] = NAN;
-          if (m_emaBuffer) (*m_emaBuffer)[i] = NAN;
-          if (m_latBuffer) (*m_latBuffer)[i] = NAN;
-          if (m_lonBuffer) (*m_lonBuffer)[i] = NAN;
-          if (m_resBuffer) (*m_resBuffer)[i] = NAN;
-          if (m_radiusBuffer) (*m_radiusBuffer)[i] = NAN;
-          if (m_phalBuffer) (*m_phalBuffer)[i] = NAN;
-          if (m_inalBuffer) (*m_inalBuffer)[i] = NAN;
-          if (m_emalBuffer) (*m_emalBuffer)[i] = NAN;
+          else {
+            QString msg = "Unable to compute illumination angles at image center for operator ["
+                          + tokenName + "].";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+      }
+
+      else {
+        for (int i = 0; i < ns; i++) {
+        
+          if (m_camera->SetImage(i + 1, currentLine)) {
+            if (m_phaBuffer) (*m_phaBuffer)[i] = m_camera->PhaseAngle();
+            if (m_inaBuffer) (*m_inaBuffer)[i] = m_camera->IncidenceAngle();
+            if (m_emaBuffer) (*m_emaBuffer)[i] = m_camera->EmissionAngle();
+            if (m_latBuffer) (*m_latBuffer)[i] = m_camera->UniversalLatitude();
+            if (m_lonBuffer) (*m_lonBuffer)[i] = m_camera->UniversalLongitude();
+            if (m_resBuffer) (*m_resBuffer)[i] = m_camera->PixelResolution();
+            if (m_radiusBuffer) (*m_radiusBuffer)[i] = m_camera->LocalRadius().meters();
+            if (m_phalBuffer || m_inalBuffer || m_emalBuffer) {
+              Angle phal, inal, emal;
+              bool okay;
+              m_camera->LocalPhotometricAngles(phal, inal, emal, okay);
+              if (okay) {
+                if (m_phalBuffer) (*m_phalBuffer)[i] = phal.degrees();
+                if (m_inalBuffer) (*m_inalBuffer)[i] = inal.degrees();
+                if (m_emalBuffer) (*m_emalBuffer)[i] = emal.degrees();
+              }
+              else {
+                if (m_phalBuffer) (*m_phalBuffer)[i] = NAN;
+                if (m_inalBuffer) (*m_inalBuffer)[i] = NAN;
+                if (m_emalBuffer) (*m_emalBuffer)[i] = NAN;
+              }
+            }
+          }
+          else {
+            if (m_phaBuffer) (*m_phaBuffer)[i] = NAN;
+            if (m_inaBuffer) (*m_inaBuffer)[i] = NAN;
+            if (m_emaBuffer) (*m_emaBuffer)[i] = NAN;
+            if (m_latBuffer) (*m_latBuffer)[i] = NAN;
+            if (m_lonBuffer) (*m_lonBuffer)[i] = NAN;
+            if (m_resBuffer) (*m_resBuffer)[i] = NAN;
+            if (m_radiusBuffer) (*m_radiusBuffer)[i] = NAN;
+            if (m_phalBuffer) (*m_phalBuffer)[i] = NAN;
+            if (m_inalBuffer) (*m_inalBuffer)[i] = NAN;
+            if (m_emalBuffer) (*m_emalBuffer)[i] = NAN;
+          }
         }
       }
     }

@@ -27,6 +27,7 @@
 #include "Calculator.h"
 #include "Cube.h"
 
+class QString;
 template<class T> class QVector;
 
 namespace Isis {
@@ -62,6 +63,11 @@ namespace Isis {
    *                          ISIS coding standards
    *  @history 2015-01-30 Ian Humphrey - Removed unused variable m_data. Deallocated
    *                          unfreed dynamic memory. Added destructor. Fixes #2082.
+   *  @history 2016-10-13 Ian Humphrey - Updated to correctly calculate center camera angles for
+   *                          band-depedent images. Integrated Moses Milazzo's (moses@usgs.gov)
+   *                          changes for correctly calculating camera angles for band-dependent
+   *                          images. Quick documentation and coding standards review (moved
+   *                          inline implementations to cpp). Fixes #1301.
    */
   class CubeCalculator : Calculator {
     public:
@@ -107,116 +113,88 @@ namespace Isis {
        */
       QVector<Calculations> *m_calculations;
 
-      /**
-       * This stores the addresses to the methods RunCalculations(...)
-       * will call
-       */
+      //! This stores the addresses to the methods RunCalculations(...) will call.
       QVector<void (Calculator:: *)(void)> *m_methods;
 
-      /**
-       * This stores the addressed to the methods RunCalculations(...)
-       * will push (constants), along with placeholders for simplicity to
-       * keep synchronized with the data definitions.
-       */
-      // m_data is never used anywhere
-//       QVector< QVector<double> > *m_data;
-
-      /**
-       * This defines what kind of data RunCalculations(...) will push
-       * onto the calculator. Constants will be taken from p_data, which
-       * is synchronized (index-wise) with this vector.
-       */
+      //! This defines what kind of data RunCalculations(...) will push onto the calculator.
       QVector<DataValue> *m_dataDefinitions;
 
+      //! Stores the cube statistics for the input cubes. 
       QVector<Statistics *> *m_cubeStats;
 
       /**
-       * This two are used for keeping cameras and camera buffers 
-       * internalized for quick computations
+       * Stores the cameras for the input cubes. This is synchronized with m_cameraBuffers
+       * so that the camera buffers are loaded with data from the appropriate camera. 
        */
       QVector<Camera *> *m_cubeCameras;
 
+      /**
+       * Stores the camera buffers that are enabled for camera related calculations.
+       * This is used for quickly computing camera related information.
+       */
       QVector<CameraBuffers *> *m_cameraBuffers;
 
-      int m_outputSamples;
+      int m_outputSamples; //!< Number of samples in the output cube.
   };
 
+
   /**
+   * This class is used to define what kind of data is being pushed onto the cube calculator
    * @author ????-??-?? Unknown
    *
    * @internal
    */
   class DataValue {
     public:
-      /**
-       * This is used to tell what kind of data to
-       *   push onto the RPN calculator.
-       */
+      //! This is used to tell what kind of data to push onto the RPN calculator.
       enum DataValueType {
-        Constant, //!< a single constant value
-        Sample, //!< current sample number
-        Line, //!< current line number
-        Band, //!< current band number
-        CubeData, //!< a brick of cube data
-        InaData, //!< incidence camera data
-        EmaData, //!< emission camera data
-        PhaData, //!< phase camera data
-        LatData, //!< Latitude camera data
-        LonData, //!< Longitude camera data
-        ResData, //!< Pixel resolution camera data
-        RadiusData, //!< DEM radius
-        InalData, //!< local incidence camera data
-        EmalData, //!< local emission camera data
-        PhalData //!< local phase camera data
+        Constant, //!< A single constant value.
+        Sample, //!< Current sample number.
+        Line, //!< Current line number.
+        Band, //!< Current band number.
+        CubeData, //!< A brick of cube data.
+        InaData, //!< Incidence camera data.
+        EmaData, //!< Emission camera data.
+        PhaData, //!< Phase camera data.
+        LatData, //!< Latitude camera data.
+        LonData, //!< Longitude camera data.
+        ResData, //!< Pixel resolution camera data.
+        RadiusData, //!< DEM radius.
+        InalData, //!< Local incidence camera data.
+        EmalData, //!< Local emission camera data.
+        PhalData, //!< Local phase camera data.
+        InacData, //!< Center incidence camera data.
+        EmacData, //!< Center emission camera data.
+        PhacData  //!< Center phase camera data.
       };
 
-      DataValue() {
-        m_type = (DataValueType) - 1;
-        m_cubeIndex = -1;
-        m_constantValue = 0.0;
-      }
+      DataValue();
+      DataValue(DataValueType type);
+      DataValue(DataValueType type, int cubeIndex);
+      DataValue(DataValueType type, double value);
 
-      DataValue(DataValueType type) {
-        m_type = type;
-        m_constantValue = 0.0;
-        m_cubeIndex = -1;
-      }
-
-      DataValue(DataValueType type, int cubeIndex) {
-        m_type = type;
-        m_constantValue = 0.0;
-        m_cubeIndex = cubeIndex;
-      }
-
-      DataValue(DataValueType type, double value) {
-        m_type = type;
-        m_cubeIndex = -1;
-
-        if(type == Constant) {
-          m_constantValue = value;
-        }
-      }
-
-      DataValueType getType() {
-        return m_type;
-      }
-
-      int getCubeIndex() {
-        return m_cubeIndex;
-      }
-
-      double getConstant() {
-        return m_constantValue;
-      }
+      DataValueType type();
+      int cubeIndex();
+      double constant();
 
     private:
-      int m_cubeIndex;
-      double m_constantValue;
+      int m_cubeIndex;        //!< The index of the associated cube
+      double m_constantValue; //!< Stored constant value
 
-      DataValueType m_type;
+      DataValueType m_type;   //!< Type of data stored.
   };
 
+
   /**
+   * This class is used to manage buffers for calculating camera related information, such
+   * as angles, radii, and resolution. It uses internal buffers for each of the camera related
+   * operators that CubeCalculator recognizes as valid tokens. Each of the enableBuffer methods
+   * can be used to dynamically allocate buffers for the camera operators that are being pushed
+   * onto the CubeCalculator. Buffers can be loaded with appropriate camera data using the 
+   * accessor methods.
+   *
+   * Note that memory is not allocated for buffers that are not enabled.
+   *
    * @author 2012-02-02 Jeff Anderson
    *
    * @internal
@@ -236,35 +214,45 @@ namespace Isis {
        void enablePhalBuffer();
        void enableInalBuffer(); 
        void enableEmalBuffer(); 
+       void enablePhacBuffer();
+       void enableInacBuffer();
+       void enableEmacBuffer();
 
-       QVector<double> *getPhaBuffer (int currentLine, int ns);
-       QVector<double> *getInaBuffer (int currentLine, int ns);
-       QVector<double> *getEmaBuffer (int currentLine, int ns);
-       QVector<double> *getLatBuffer (int currentLine, int ns);
-       QVector<double> *getLonBuffer (int currentLine, int ns);
-       QVector<double> *getResBuffer (int currentLine, int ns);
-       QVector<double> *getRadiusBuffer (int currentLine, int ns);
-       QVector<double> *getPhalBuffer (int currentLine, int ns);
-       QVector<double> *getInalBuffer (int currentLine, int ns);
-       QVector<double> *getEmalBuffer (int currentLine, int ns);
+       // Accessors
+       QVector<double> *phaBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *inaBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *emaBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *latBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *lonBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *resBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *radiusBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *phalBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *inalBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *emalBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *phacBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *inacBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *emacBuffer(int currentLine, int ns, int currentBand);
 
 
     private:
-      void loadBuffers (int currentLine, int ns);
+      void loadBuffers(int currentLine, int ns, int currentBand);
 
-      Camera *m_camera;
-      int m_lastLine;
+      Camera *m_camera; //!< Camera to obtain camera-related information from.
+      int m_lastLine; //!< The number of the last line loaded into the enabled camera buffers.
 
-      QVector<double> *m_phaBuffer;
-      QVector<double> *m_inaBuffer;
-      QVector<double> *m_emaBuffer;
-      QVector<double> *m_phalBuffer;
-      QVector<double> *m_inalBuffer;
-      QVector<double> *m_emalBuffer;
-      QVector<double> *m_resBuffer;
-      QVector<double> *m_latBuffer;
-      QVector<double> *m_lonBuffer;
-      QVector<double> *m_radiusBuffer;
+      QVector<double> *m_phaBuffer;    //!< Phase angle buffer.
+      QVector<double> *m_inaBuffer;    //!< Incidence angle buffer.
+      QVector<double> *m_emaBuffer;    //!< Emission angle buffer.
+      QVector<double> *m_phalBuffer;   //!< Local phase angle buffer.
+      QVector<double> *m_inalBuffer;   //!< Local incidence angle buffer.
+      QVector<double> *m_emalBuffer;   //!< Local emission angle buffer.
+      QVector<double> *m_phacBuffer;   //!< Center phase angle buffer.
+      QVector<double> *m_inacBuffer;   //!< Center incidence angle buffer.
+      QVector<double> *m_emacBuffer;   //!< Center emission angle buffer.
+      QVector<double> *m_resBuffer;    //!< Resolution buffer.
+      QVector<double> *m_latBuffer;    //!< Latitude buffer.
+      QVector<double> *m_lonBuffer;    //!< Longitude buffer.
+      QVector<double> *m_radiusBuffer; //!< Radius buffer.
   };
 }
 #endif

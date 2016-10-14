@@ -22,15 +22,12 @@
 
 #include "Isis.h"
 
-#include <string>
-
-#include "IString.h"
+#include "Camera.h"
 #include "CubeCalculator.h"
 #include "CubeInfixToPostfix.h"
 #include "FileList.h"
 #include "FileName.h"
 #include "ProcessByLine.h"
-
 
 using namespace std;
 using namespace Isis;
@@ -45,14 +42,30 @@ void IsisMain() {
   ProcessByLine p;
   QVector<Cube *> cubes;
   Cube *outCube;
+  Cube *inCube;
+  int bands = 1;
 
   if (ui.GetString("MODE") == "CUBES") {
     // Require atleast one file to be specified
-    cubes.push_back(p.SetInputCube("F1", Isis::AllMatchOrOne));
-    if (ui.WasEntered("F2")) cubes.push_back(p.SetInputCube("F2", Isis::AllMatchOrOne));
-    if (ui.WasEntered("F3")) cubes.push_back(p.SetInputCube("F3", Isis::AllMatchOrOne));
-    if (ui.WasEntered("F4")) cubes.push_back(p.SetInputCube("F4", Isis::AllMatchOrOne));
-    if (ui.WasEntered("F5")) cubes.push_back(p.SetInputCube("F5", Isis::AllMatchOrOne));
+    inCube = p.SetInputCube("F1", Isis::AllMatchOrOne);
+    cubes.push_back(inCube);
+    if (ui.WasEntered("F2")){
+        inCube = p.SetInputCube("F2", Isis::AllMatchOrOne);
+        cubes.push_back(inCube);
+    }
+    if (ui.WasEntered("F3")){
+        inCube = p.SetInputCube("F3", Isis::AllMatchOrOne);
+        cubes.push_back(inCube);
+    }
+    if (ui.WasEntered("F4")){
+        inCube = p.SetInputCube("F4", Isis::AllMatchOrOne);
+        cubes.push_back(inCube);
+    }
+    if (ui.WasEntered("F5")){
+        inCube = p.SetInputCube("F5", Isis::AllMatchOrOne);
+        cubes.push_back(inCube);
+    }
+    bands = cubes[0]->bandCount();
     outCube = p.SetOutputCube("TO");
   }
   else if (ui.GetString("MODE") == "LIST") {
@@ -61,14 +74,16 @@ void IsisMain() {
     // Run through file list and set its entries as input cubes
     for (int i = 0; i < list.size(); i++) {
       CubeAttributeInput att(list[i].original());
-      cubes.push_back(p.SetInputCube(list[i].original(), att, Isis::AllMatchOrOne));
+      inCube = p.SetInputCube(list[i].original(), att, Isis::AllMatchOrOne);
+      cubes.push_back(inCube);
     }
+    bands = cubes[0]->bandCount();
     outCube = p.SetOutputCube("TO");
   }
   else {
     int lines = ui.GetInteger("LINES");
     int samples = ui.GetInteger("SAMPLES");
-    int bands = ui.GetInteger("BANDS");
+    bands = ui.GetInteger("BANDS");
     outCube = p.SetOutputCube("TO", samples, lines, bands);
   }
 
@@ -77,6 +92,7 @@ void IsisMain() {
   p.StartProcess(Evaluate);
   p.EndProcess();
 }
+
 
 /**
  * Take in the input buffer, apply the user-defined equation to
@@ -90,7 +106,7 @@ void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
 
   QVector<Buffer *> inputCopy;
 
-  for(int i = 0; i < (int)input.size(); i++) {
+  for (int i = 0; i < (int)input.size(); i++) {
     inputCopy.push_back(input[i]);
   }
 
@@ -99,15 +115,16 @@ void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
 
   // If final result is a scalar, set all pixels to that value.
   if (results.size() == 1) {
-    for(int i = 0; i < (int)outBuffer.size(); i++) {
+    for (int i = 0; i < (int)outBuffer.size(); i++) {
       outBuffer[i] = results[0];
     }
   }
   // Final result is a valid vector, write to output buffer
   else {
-    for(int i = 0; i < (int)results.size(); i++) {
+    for (int i = 0; i < (int)results.size(); i++) {
       outBuffer[i] = results[i];
     }
   }
 
 }
+
