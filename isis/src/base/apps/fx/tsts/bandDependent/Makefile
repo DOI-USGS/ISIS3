@@ -3,7 +3,12 @@
 # various camera functions.
 #
 # 2016-10-13 Ian Humphrey - Original version. References #1301.
+# 2016-10-14 Ian Humphrey - Added a tolerance for emalTruth.cub. On the macs, cubediff between the
+#                output and truth emalTruth.cub reported a difference at 15,10,5 (S,L,B). This
+#                tolerance allows the macs to pass the test. References #1301.
 APPNAME = fx
+
+emalTruth.cub.TOLERANCE = 0.00001
 
 include $(ISISROOT)/make/isismake.tsts
 
