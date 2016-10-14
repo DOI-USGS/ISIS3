@@ -92,6 +92,8 @@ namespace Isis {
    *                           results. Fixes #4162.
    *   @history 2016-08-23 Jesse Mapel - Modified to no longer determine which output files
    *                           BundleAdjust and BundleSolutionInfo create.  Fixes #4279.
+   *   @history 2016-09-02 Jesse Mapel - Added m_SCPVLFilename member for storing multi-sensor
+   *                           settings from jigsaw.  Fixes #4316.
    *   @history 2016-10-05 Ian Humphrey - Added m_createInverseMatrix, createInverseMatrix(), and
    *                           setCreateInverseMatrix() so that bundle settings stores whether or
    *                           not the inverse correlation matrix file (inverseMatrix.dat) will be
@@ -264,7 +266,9 @@ namespace Isis {
       //================== Output Options ??? (from Jigsaw only)=============// 
       //=====================================================================// 
       void setOutputFilePrefix(QString outputFilePrefix);
+      void setSCPVLFilename(QString SCParamFilename);
       QString outputFilePrefix() const;
+      QString SCPVLFilename() const;
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
@@ -392,6 +396,10 @@ namespace Isis {
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
                                           output files to be written to the current directory, the 
                                           output directory path should be included in this prefix.*/
+
+      QString m_SCPVLFilename;       /** The filename for the PVL file used by jigsaw to
+                                         generate the observation solve settings.  This should be
+                                         empty unless SC_PARAMETERS was used in jigsaw.*/
  };
   // typedefs
   //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.

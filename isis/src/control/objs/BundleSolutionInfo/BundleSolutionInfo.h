@@ -69,6 +69,8 @@ namespace Isis {
    *                           BundleSettings::solveMethod. References #4162.
    *   @history 2016-08-23 Jesse Mapel - Removed output() method.  Individual output
    *                           file methods must be called.  Fixes #4279.
+   *   @history 2016-09-02 Jesse Mapel - Added camera point and position input parameters to output
+   *                           files when using only one set of solve settings.  Fixes #4316.
    *   @history 2016-10-06  Tyler Wilson - Added methods outputImagesCSV()
    *                           and outputImagesCSVHeader which enables jigsaw users to output
    *                           the bundleout_images.csv file.  Fixes #4314.

@@ -188,6 +188,9 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
 
   QList<BundleObservationSolveSettings> solveSettingsList = observationSolveSettings(ui);
   settings->setObservationSolveOptions(solveSettingsList);
+  if (ui.GetBoolean("USEPVL")) {
+    settings->setSCPVLFilename(FileName(ui.GetFileName("SC_PARAMETERS")).expanded());
+  }
   // convergence criteria
   settings->setConvergenceCriteria(BundleSettings::Sigma0,
                                   ui.GetDouble("SIGMA0"),
