@@ -215,24 +215,18 @@ test:
 	  $(ECHO) -ne "Scope Coverage:      ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Scope Coverage"            \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage -h scopecoverage;                              \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      -h scopecoverage;                                                     \
 	  $(ECHO) -ne "Line Coverage:       ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Line Coverage"             \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --line-coverage -h linecoverage;                                      \
 	  $(ECHO) -ne "Function Coverage:   ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Function Coverage"         \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --function-coverage -h functioncoverage;       \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --function-coverage -h functioncoverage;                              \
 	fi;
 
 testdir:

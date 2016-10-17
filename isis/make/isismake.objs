@@ -5,7 +5,7 @@ error:\
 endif
 
 include $(ISISROOT)/make/isismake.os
- 
+
 
 INCS  := $(wildcard *.h)
 
@@ -286,48 +286,34 @@ test: unitTest
 	  $(ECHO) -ne "Scope Coverage:      ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Scope Coverage"                   \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage -h scopecoverage;                              \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      -h scopecoverage;                                                     \
 	  $(ECHO) -ne "Line Coverage:       ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Line Coverage"                    \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --line-coverage -h linecoverage;                                      \
 	  $(ECHO) -ne "Function Coverage:   ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Function Coverage"                \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --function-coverage -h functioncoverage;       \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --function-coverage -h functioncoverage;                              \
 	fi;
 
 # The .a file is copied in Darwin because the ar command does not like
 #   to extract the same archive twice, regardless of permissions or symlink
 unitTest: $(OBJS) unitTest.o
-	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
-	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
-	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
-	      libisis$(ISISLIBVERSION).a;                                            \
-	  if [ -f "$(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes" ]; then         \
-	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                   \
-	      libisis$(ISISLIBVERSION).a.csmes;                                      \
-	  fi;                                                                        \
-	  $(AR) $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);              \
-	  $(RANLIB) libisis$(ISISLIBVERSION).a;                                      \
-	  $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                             \
-	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a \
-	      $(ISISSHAREDOFF);                                                      \
-	  $(RM) libisis$(ISISLIBVERSION).a libisis$(ISISLIBVERSION).a.csmes;         \
-	  dollar='$$';                                                               \
-	  $(CXX) $(ALLLIBDIRS)                                                       \
-	      -Xlinker "-rpath"                                                      \
-	      -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                             \
-	      -o $@ unitTest.o $(ALLLIBS);                                           \
+	if [ "$(HOST_ARCH)" == "Linux" ]; then                                        \
+	    $(AR) $(ISISARFLAGS) -crs $(LIBRARY).a *.o;                               \
+	    $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                            \
+	        -o $(LIBRARY).$(SHAREDLIBEXT) $(LIBRARY).a                            \
+	        $(ISISSHAREDOFF);                                                     \
+	    $(RM) $(LIBRARY).a $(LIBRARY).a.csmes;                                    \
+	    dollar='$$';                                                              \
+	    $(CXX) $(ALLLIBDIRS)                                                      \
+	        -Xlinker "-rpath"                                                     \
+	        -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                            \
+	        -o $@ unitTest.o -l:$(LIBRARY).$(SHAREDLIBEXT) $(ALLLIBS);            \
 	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                    \
 	  $(MKDIR) .objs;                                                            \
 	  cd .objs;                                                                  \
