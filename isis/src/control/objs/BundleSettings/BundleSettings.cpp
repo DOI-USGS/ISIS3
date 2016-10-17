@@ -76,7 +76,6 @@ namespace Isis {
 
     // Output Options
     m_outputFilePrefix = "";
-    m_SCPVLFilename = "";
   }
 
 
@@ -191,8 +190,7 @@ namespace Isis {
         m_maximumLikelihood(other.m_maximumLikelihood),
         m_solveTargetBody(other.m_solveTargetBody),
         m_bundleTargetBody(other.m_bundleTargetBody),
-        m_outputFilePrefix(other.m_outputFilePrefix),
-        m_SCPVLFilename(other.m_SCPVLFilename){
+        m_outputFilePrefix(other.m_outputFilePrefix){
   }
 
 
@@ -238,7 +236,6 @@ namespace Isis {
       m_bundleTargetBody = other.m_bundleTargetBody;
       m_maximumLikelihood = other.m_maximumLikelihood;
       m_outputFilePrefix = other.m_outputFilePrefix;
-      m_SCPVLFilename = other.m_SCPVLFilename;
     }
     return *this;
   }
@@ -1001,16 +998,6 @@ namespace Isis {
 
 
   /**
-   * Set the filename of the PVL file used to generate bundle observation settings in jigsaw.
-   * 
-   * @param outputFilePrefix The absolute filename of the PVL file
-   */
-  void BundleSettings::setSCPVLFilename(QString SCParamFilename) {
-    m_SCPVLFilename = SCParamFilename;
-  }
-
-
-  /**
    * Retrieve the output file prefix. This string will be 
    * appended to all of the output files created by the bundle 
    * adjustment. 
@@ -1021,16 +1008,6 @@ namespace Isis {
    */
   QString BundleSettings::outputFilePrefix() const {
     return m_outputFilePrefix;
-  }
-
-
-  /**
-   * Retrieve the filename of the PVL file used to generate bundle observation settings in jigsaw.
-   * 
-   * @return @b QString The absolute filename of the PVL file
-   */
-  QString BundleSettings::SCPVLFilename() const {
-    return m_SCPVLFilename;
   }
 
 

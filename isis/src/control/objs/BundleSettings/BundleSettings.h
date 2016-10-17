@@ -101,6 +101,8 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Updated documentation and variable names for
    *                           observationSolveSettings(), as BundleObservationSolveSettings
    *                           are acquired by an associated observation number. References #4293.
+   *   @history 2016-10-17 Jesse Mapel - Removed m_SCPVLFilename parameter in accordance with
+   *                           USEPVL being removed from jigsaw.  References #4316.
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
@@ -396,10 +398,6 @@ namespace Isis {
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
                                           output files to be written to the current directory, the 
                                           output directory path should be included in this prefix.*/
-
-      QString m_SCPVLFilename;       /** The filename for the PVL file used by jigsaw to
-                                         generate the observation solve settings.  This should be
-                                         empty unless SC_PARAMETERS was used in jigsaw.*/
  };
   // typedefs
   //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.

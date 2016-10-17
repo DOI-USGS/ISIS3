@@ -747,6 +747,8 @@ namespace Isis {
    * 
    * @throws IException::Io "Failed to output residual percentiles for bundleout"
    * @throws IException::Io "Failed to output residual box plot for bundleout"
+   * 
+   * @todo Determine how multiple sensor solve settings should be output.
    */
   bool BundleSolutionInfo::outputHeader(std::ofstream &fpOut) {
 
@@ -874,155 +876,125 @@ namespace Isis {
                   m_settings->convergenceCriteriaMaximumIterations());
     fpOut << buf;
 
-    // Single Sensor Output
-    if (m_settings->numberSolveSettings() == 1) {
+    //TODO Should it be checked that positionSigmas.size() == positionSolveDegree and
+    //     pointingSigmas.size() == pointingSolveDegree somewhere? JAM
 
-      //TODO Should it be checked that positionSigmas.size() == positionSolveDegree and
-      //     pointingSigmas.size() == pointingSolveDegree somewhere? JAM
+    //TODO How do we output this information when using multiple solve settings? JAM
 
-      BundleObservationSolveSettings globalSettings = m_settings->observationSolveSettings(0);
-      int pointingSolveDegree = globalSettings.numberCameraAngleCoefficientsSolved();
-      QList<double> pointingSigmas = globalSettings.aprioriPointingSigmas();
-      int positionSolveDegree = globalSettings.numberCameraPositionCoefficientsSolved();
-      QList<double> positionSigmas = globalSettings.aprioriPositionSigmas();
+    BundleObservationSolveSettings globalSettings = m_settings->observationSolveSettings(0);
+    int pointingSolveDegree = globalSettings.numberCameraAngleCoefficientsSolved();
+    QList<double> pointingSigmas = globalSettings.aprioriPointingSigmas();
+    int positionSolveDegree = globalSettings.numberCameraPositionCoefficientsSolved();
+    QList<double> positionSigmas = globalSettings.aprioriPositionSigmas();
 
-      sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
-      fpOut << buf;
-      switch (pointingSolveDegree) {
-        case 0:
-          sprintf(buf,"\n                          CAMSOLVE: NONE");
-          break;
-        case 1:
-          sprintf(buf,"\n                          CAMSOLVE: ANGLES");
-          break;
-        case 2:
-          sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES");
-          break;
-        case 3:
-          sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
-          break;
-        default:
-          sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-                  pointingSolveDegree);
-          break;
-      }
-      fpOut << buf;
-      globalSettings.solveTwist() ?
-          sprintf(buf, "\n                             TWIST: ON"):
-          sprintf(buf, "\n                             TWIST: OFF");
-      fpOut << buf;
-      globalSettings.solvePolyOverPointing() ?
-          sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
-          sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
-      fpOut << buf;
-
-      sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
-      fpOut << buf;
-      switch (positionSolveDegree) {
-        case 0:
-          sprintf(buf,"\n                        SPSOLVE: NONE");
-          break;
-        case 1:
-          sprintf(buf,"\n                        SPSOLVE: POSITION");
-          break;
-        case 2:
-          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES");
-          break;
-        case 3:
-          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
-          break;
-        default:
-          sprintf(buf,"\n                        CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-                  positionSolveDegree);
-          break;
-      }
-      fpOut << buf;
-      globalSettings.solvePositionOverHermite() ?
-          sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
-          sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
-      fpOut << buf;
-
-      sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
-      fpOut << buf;
-      (m_settings->globalLatitudeAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
-          sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",
-                  m_settings->globalLatitudeAprioriSigma());
-      fpOut << buf;
-      (m_settings->globalLongitudeAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
-          sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",
-                  m_settings->globalLongitudeAprioriSigma());
-      fpOut << buf;
-      (m_settings->globalRadiusAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
-          sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",
-                  m_settings->globalRadiusAprioriSigma());
-      fpOut << buf;
-      (positionSolveDegree < 1 || positionSigmas[0] == Isis::Null) ?
-          sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A"):
-          sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",
-                  positionSigmas[0]);
-      fpOut << buf;
-
-      (positionSolveDegree < 2 || positionSigmas[1] == Isis::Null) ?
-          sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A"):
-          sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",
-                  positionSigmas[1]);
-      fpOut << buf;
-
-      (positionSolveDegree < 3 || positionSigmas[2] == Isis::Null) ?
-          sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A"):
-          sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",
-                  positionSigmas[2]);
-      fpOut << buf;
-
-      (pointingSolveDegree < 1 || pointingSigmas[0] == Isis::Null) ?
-          sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A"):
-          sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",
-                  pointingSigmas[0]);
-      fpOut << buf;
-
-      (pointingSolveDegree < 2 || pointingSigmas[1] == Isis::Null) ?
-          sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A"):
-          sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",
-                  pointingSigmas[1]);
-      fpOut << buf;
-
-      (pointingSolveDegree < 3 || pointingSigmas[2] == Isis::Null) ?
-          sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A"):
-          sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",
-                  pointingSigmas[2]);
-      fpOut << buf;
+    sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
+    fpOut << buf;
+    switch (pointingSolveDegree) {
+      case 0:
+        sprintf(buf,"\n                          CAMSOLVE: NONE");
+        break;
+      case 1:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES");
+        break;
+      case 2:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES");
+        break;
+      case 3:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
+        break;
+      default:
+        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
+                pointingSolveDegree);
+        break;
     }
+    fpOut << buf;
+    globalSettings.solveTwist() ?
+        sprintf(buf, "\n                             TWIST: ON"):
+        sprintf(buf, "\n                             TWIST: OFF");
+    fpOut << buf;
+    globalSettings.solvePolyOverPointing() ?
+        sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
+        sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
+    fpOut << buf;
 
-    // Multiple Sensor Output
-    else {
-      sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
-      fpOut << buf;
-      (m_settings->globalLatitudeAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
-          sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",
-                  m_settings->globalLatitudeAprioriSigma());
-      fpOut << buf;
-      (m_settings->globalLongitudeAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
-          sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",
-                  m_settings->globalLongitudeAprioriSigma());
-      fpOut << buf;
-      (m_settings->globalRadiusAprioriSigma() == Isis::Null) ?
-          sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
-          sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",
-                  m_settings->globalRadiusAprioriSigma());
-      fpOut << buf;
-
-      if (!m_settings->SCPVLFilename().isEmpty()) {
-        sprintf(buf, "\n\nSensor apriori sigmas and solve settings from PVL file:\n");
-        fpOut << buf;
-        sprintf(buf, m_settings->SCPVLFilename().toLatin1().data());
-        fpOut << buf;
-      }
+    sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
+    fpOut << buf;
+    switch (positionSolveDegree) {
+      case 0:
+        sprintf(buf,"\n                        SPSOLVE: NONE");
+        break;
+      case 1:
+        sprintf(buf,"\n                        SPSOLVE: POSITION");
+        break;
+      case 2:
+        sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES");
+        break;
+      case 3:
+        sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
+        break;
+      default:
+        sprintf(buf,"\n                        CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
+                positionSolveDegree);
+        break;
     }
+    fpOut << buf;
+    globalSettings.solvePositionOverHermite() ?
+        sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
+        sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
+    fpOut << buf;
+
+    sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
+    fpOut << buf;
+    (m_settings->globalLatitudeAprioriSigma() == Isis::Null) ?
+        sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
+        sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",
+                m_settings->globalLatitudeAprioriSigma());
+    fpOut << buf;
+    (m_settings->globalLongitudeAprioriSigma() == Isis::Null) ?
+        sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
+        sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",
+                m_settings->globalLongitudeAprioriSigma());
+    fpOut << buf;
+    (m_settings->globalRadiusAprioriSigma() == Isis::Null) ?
+        sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
+        sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",
+                m_settings->globalRadiusAprioriSigma());
+    fpOut << buf;
+    (positionSolveDegree < 1 || positionSigmas[0] == Isis::Null) ?
+        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A"):
+        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",
+                positionSigmas[0]);
+    fpOut << buf;
+
+    (positionSolveDegree < 2 || positionSigmas[1] == Isis::Null) ?
+        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A"):
+        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",
+                positionSigmas[1]);
+    fpOut << buf;
+
+    (positionSolveDegree < 3 || positionSigmas[2] == Isis::Null) ?
+        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A"):
+        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",
+                positionSigmas[2]);
+    fpOut << buf;
+
+    (pointingSolveDegree < 1 || pointingSigmas[0] == Isis::Null) ?
+        sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A"):
+        sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",
+                pointingSigmas[0]);
+    fpOut << buf;
+
+    (pointingSolveDegree < 2 || pointingSigmas[1] == Isis::Null) ?
+        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A"):
+        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",
+                pointingSigmas[1]);
+    fpOut << buf;
+
+    (pointingSolveDegree < 3 || pointingSigmas[2] == Isis::Null) ?
+        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A"):
+        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",
+                pointingSigmas[2]);
+    fpOut << buf;
 
     if (m_settings->solveTargetBody()) {
       sprintf(buf, "\n\nINPUT: TARGET BODY OPTIONS\n==============================\n");

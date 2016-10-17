@@ -74,6 +74,8 @@ namespace Isis {
    *   @history 2016-10-06  Tyler Wilson - Added methods outputImagesCSV()
    *                           and outputImagesCSVHeader which enables jigsaw users to output
    *                           the bundleout_images.csv file.  Fixes #4314.
+   *   @history 2016-10-17 Jesse Mapel - Removed multiple solve settings output in accordance with
+   *                           USEPVL being removed from jigsaw.  References #4316.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
