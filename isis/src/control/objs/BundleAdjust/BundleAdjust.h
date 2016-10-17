@@ -240,7 +240,8 @@ namespace Isis {
    *                           isHeld(), checkHeldList(), applyHeldList(), two constructors that
    *                           used heldList parameters. Modified destructor to not delete
    *                           m_pHeldSnList, since it was removed. Fixes #4293.
->>>>>>> .r7156
+   *   @history 2016-10-17 Adam Paquette - Cleaned up terminal output for readability and cohesion
+   *                           Fixes #4263, #4311, #4312.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

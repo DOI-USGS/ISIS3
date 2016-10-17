@@ -613,7 +613,7 @@ namespace Isis {
         }
         // testing
 
-        emit statusUpdate( QString("\n starting iteration %1 \n").arg(m_nIteration) );
+        emit statusUpdate( QString("\n starting iteration %1 ").arg(m_nIteration) );
 
         clock_t iterationclock1 = clock();
 
@@ -737,7 +737,7 @@ namespace Isis {
             }
             else {  // otherwise iterations are complete
               m_bundleResults.setConverged(true);
-              emit statusUpdate("\n Bundle has converged");
+              emit statusUpdate("Bundle has converged\n");
               break;
             }
           }
@@ -793,7 +793,7 @@ namespace Isis {
 
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
         clock_t terror1 = clock();
-        emit statusUpdate("Starting Error Propagation");
+        printf("Starting Error Propagation");
         errorPropagation();
         emit statusUpdate("Error Propagation Complete");
         clock_t terror2 = clock();
@@ -812,7 +812,7 @@ namespace Isis {
       BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
       emit resultsReady(results);
 
-      emit statusUpdate("\n Bundle Complete");
+      emit statusUpdate("\nBundle Complete");
 
       iterationSummary();
     }
@@ -900,7 +900,7 @@ namespace Isis {
 //  m_fp_log << buf;
 //  printf("%s", buf);
 
-    printf("\n\n");
+    printf("\n");
 
     for (int i = 0; i < n3DPoints; i++) {
 
@@ -2545,7 +2545,7 @@ namespace Isis {
 
       mad = 1.4826 * mediandev;
 
-      std::cout << "mad: " << mad << std::endl;
+      std::cout << "mad: " << mad << "\n";
 
 //      double dLow = median - m_bundleSettings->rejectionMultiplier() * mad;
 //      double dHigh = median + m_bundleSettings->rejectionMultiplier() * mad;
@@ -2667,11 +2667,11 @@ namespace Isis {
 
     int numberRejectedObservations = 2*ntotalrejected;
 
-    printf("\n\t       Rejected Observations:%10d (Rejection Limit:%12.5lf\n",
+    printf("\nRejected Observations:%10d (Rejection Limit:%12.5lf)\n",
            numberRejectedObservations, dUsedRejectionLimit);
     m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
-    std::cout << "Measures that came back: " << nComingBack << std::endl;
+    std::cout << "Measures that came back: " << nComingBack << "\n" << std::endl;
 
     return true;
 }
@@ -2903,6 +2903,7 @@ namespace Isis {
           try {
             cv += T;
           }
+
           catch (std::exception &e) {
             printf("\n\n");
             QString msg = "Input data and settings are not sufficiently stable "
@@ -2927,9 +2928,9 @@ namespace Isis {
     // free b (right-hand side vector
     cholmod_free_dense(&b,&m_cm);
 
-    printf("\n\n");
+    printf("\n");
     strTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-    printf("\rFilling point covariance matrices: Time %s", strTime.c_str());
+    printf("\nFilling point covariance matrices: Time %s", strTime.c_str());
     printf("\n\n");
 
     // now loop over points again and set final covariance stuff
@@ -3143,14 +3144,18 @@ namespace Isis {
                       toString( m_bundleResults.numberConstrainedPointParameters() ) );
     gp += PvlKeyword( "Constrained_Image_Parameters",
                       toString( m_bundleResults.numberConstrainedImageParameters() ) );
-    gp += PvlKeyword( "Constrained_Target_Parameters",
-                      toString( m_bundleResults.numberConstrainedTargetParameters() ) );
+    if (m_bundleSettings->bundleTargetBody()) {
+      gp += PvlKeyword( "Constrained_Target_Parameters",
+                        toString( m_bundleResults.numberConstrainedTargetParameters() ) );
+    }
     gp += PvlKeyword( "Unknown_Parameters",
                       toString( m_bundleResults.numberUnknownParameters() ) );
     gp += PvlKeyword( "Degrees_of_Freedom",
                       toString( m_bundleResults.degreesOfFreedom() ) );
-    gp += PvlKeyword( "Rejected_Measures",
-                      toString( m_bundleResults.numberRejectedObservations()/2) );
+    if (m_bundleSettings->outlierRejection()) {
+      gp += PvlKeyword( "Rejected_Measures",
+                        toString( m_bundleResults.numberRejectedObservations()/2) );
+    }
 
 
     if ( m_bundleResults.numberMaximumLikelihoodModels() >
