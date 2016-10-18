@@ -304,6 +304,25 @@ test: unitTest
 #   to extract the same archive twice, regardless of permissions or symlink
 unitTest: $(OBJS) unitTest.o
 	if [ "$(HOST_ARCH)" == "Linux" ]; then                                        \
+	  if [ "$(CODE_COVERAGE_BIN_DIR)" == "" ]; then                                \
+	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                        \
+	    libisis$(ISISLIBVERSION).a;                                             \
+	    if [ -f "$(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes" ]; then      \
+	      $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                \
+	      libisis$(ISISLIBVERSION).a.csmes;                                     \
+	    fi;                                                                     \
+	    $(AR) $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);           \
+	    $(RANLIB) libisis$(ISISLIBVERSION).a;                                   \
+	    $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                          \
+	    -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a  \
+	    $(ISISSHAREDOFF);                                                       \
+	    $(RM) libisis$(ISISLIBVERSION).a libisis$(ISISLIBVERSION).a.csmes;      \
+	    dollar='$$';                                                            \
+	    $(CXX) $(ALLLIBDIRS)                                                    \
+	      -Xlinker "-rpath"                                                     \
+	      -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                            \
+	      -o $@ unitTest.o $(ALLLIBS);                                          \
+	  else                                                                      \
 	    $(AR) $(ISISARFLAGS) -crs $(LIBRARY).a *.o;                               \
 	    $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                            \
 	        -o $(LIBRARY).$(SHAREDLIBEXT) $(LIBRARY).a                            \
@@ -314,6 +333,7 @@ unitTest: $(OBJS) unitTest.o
 	        -Xlinker "-rpath"                                                     \
 	        -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                            \
 	        -o $@ unitTest.o -l:$(LIBRARY).$(SHAREDLIBEXT) $(ALLLIBS);            \
+	  fi;                                                                       \
 	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                    \
 	  $(MKDIR) .objs;                                                            \
 	  cd .objs;                                                                  \
