@@ -803,7 +803,7 @@ namespace Isis {
     std::vector<double> coefRA;
     std::vector<double> coefDEC;
     std::vector<double> coefTWI;
-    int precision = 11;
+    
 
     int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
