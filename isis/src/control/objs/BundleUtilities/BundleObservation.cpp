@@ -12,6 +12,8 @@
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 
+using namespace std;
+
 namespace Isis {
 
   /**
@@ -801,6 +803,7 @@ namespace Isis {
     std::vector<double> coefRA;
     std::vector<double> coefDEC;
     std::vector<double> coefTWI;
+    int precision = 11;
 
     int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -982,56 +985,50 @@ namespace Isis {
       // position parameters
       for (int i = 0; i < nPositionParameters; i++) {
 
-        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
-
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "-1.0" : toString(m_aprioriSigmas[i]));
+        qStr="";
         if (errorPropagation) {
-          qStr = QString("%1,%2,%3,%4,%5,").
-              //arg( parameterNamesList.at(i) ).
-              arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
-              arg(m_corrections(i), 21, 'f', 8).
-              arg(finalParameterValues[i], 20, 'f', 8).
-              arg(sigma, 18).
-              arg(m_adjustedSigmas[i], 18, 'f', 8);
+          qStr += toString(finalParameterValues[i] - m_corrections(i))+",";
+          qStr += toString(m_corrections(i))+",";
+          qStr += toString(finalParameterValues[i])+",";
+          qStr += sigma+",";
+          qStr += toString(m_adjustedSigmas[i]);
         }
-        else {
-          qStr = QString("%1,%2,%3,%4,%5,").
-              //arg( parameterNamesList.at(i) ).
-              arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
-              arg(m_corrections(i), 21, 'f', 8).
-              arg(finalParameterValues[i], 20, 'f', 8).
-              arg(sigma, 18).
-              arg("N/A", 18);
+        else {       
+          qStr += toString(finalParameterValues[i] - m_corrections(i))+",";
+          qStr += toString(m_corrections(i))+",";
+          qStr += toString(finalParameterValues[i])+",";
+          qStr += sigma+",";
+          qStr += "N/A,";
         }
-
         finalqStr += qStr;
       }
 
       // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {
+      for (int i = nPositionParameters; i < nParameters; i++) {        
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "-1.0" : toString(m_aprioriSigmas[i]) );
+        qStr="";
 
-        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
-
-        if (errorPropagation) {
-          qStr = QString("%1,%2,%3,%4,%5,").
-              arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
-              arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
-              arg(finalParameterValues[i], 20, 'f', 8).
-              arg(sigma, 18).
-              arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
+        if (errorPropagation) {        
+          qStr+=toString(finalParameterValues[i] - m_corrections(i) * RAD2DEG)+",";
+          qStr+=toString(m_corrections(i) * RAD2DEG)+",";
+          qStr+=toString(finalParameterValues[i])+",";
+          qStr+=sigma+",";
+          qStr+=toString(m_adjustedSigmas[i] * RAD2DEG)+",";
         }
         else {
-          qStr = QString("%1,%2,%3,%4,%5,").
-              arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
-              arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
-              arg(finalParameterValues[i], 20, 'f', 8).
-              arg(sigma, 18).
-              arg("N/A", 18);
+
+          qStr+=toString(finalParameterValues[i] - m_corrections(i) * RAD2DEG)+",";
+          qStr+=toString(m_corrections(i) * RAD2DEG)+",";
+          qStr+=toString(finalParameterValues[i])+",";
+          qStr+=sigma+",";
+          qStr+="N/A,";
         }
 
         finalqStr += qStr;
       }
-
     }
+
     return finalqStr;
   }
 

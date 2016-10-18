@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QStringList>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -518,6 +519,7 @@ namespace Isis {
                        _FILEINFO_);
     }
   }
+
 
 
 
@@ -1291,17 +1293,26 @@ namespace Isis {
         sprintf(buf,",");
         fpOut << buf;
 
-        sprintf(buf,"%0.8f,",rmsImageSampleResiduals[imgIndex].Rms());
+        fpOut << toString(rmsImageSampleResiduals[imgIndex].Rms()).toLatin1().data();
+        sprintf(buf,",");
         fpOut << buf;
 
-        sprintf(buf,"%0.8f,",rmsImageLineResiduals[imgIndex].Rms());
+        fpOut << toString(rmsImageLineResiduals[imgIndex].Rms()).toLatin1().data();
+        sprintf(buf,",");
         fpOut << buf;
 
-        sprintf(buf,"%0.8f,",rmsImageResiduals[imgIndex].Rms());
+        fpOut << toString(rmsImageResiduals[imgIndex].Rms()).toLatin1().data();
+        sprintf(buf,",");
         fpOut << buf;
+
 
         QString observationString =
             observation->formatBundleOutputString(errorProp,true);
+
+        //Removes trailing commas
+        if (observationString.right(1)==",") {
+            observationString.truncate(observationString.length()-1);
+        }
 
         fpOut << (const char*) observationString.toLatin1().data();
         sprintf(buf,"\n");

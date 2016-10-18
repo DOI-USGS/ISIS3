@@ -102,7 +102,7 @@ namespace Isis {
       QString runTime() const;
 
 
-      bool outputImagesCSVHeader(std::ofstream &fpOut);
+      bool outputImagesCSVHeader(std::ofstream &fpOut);     
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
       bool outputImagesCSV();
