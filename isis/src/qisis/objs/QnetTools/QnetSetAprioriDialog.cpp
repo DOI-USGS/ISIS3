@@ -566,7 +566,7 @@ namespace Isis {
 //    * Populates the apriori lat/lon/radius line edits with the ground source values, if there is a 
 //    * ground source. This only works on single points and is disabled for multiple points.
 //    * 
-//    * @author 2016-02-05 Makayla Shepherd
+//    * @author 2016-08-05 Makayla Shepherd
 //    * 
 //    */
 //   void QnetSetAprioriDialog::fillGroundSourceAprioriLineEdits() {
@@ -815,6 +815,8 @@ namespace Isis {
    *                        only takes the values in the line edits and uses them to set the
    *                        Apriori values. The calculations for reference and average values
    *                        are made and populated in the fill methods.
+   * @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be set 
+   *                        to NULL. You can now set the apriori sigmas.
    *                        
    */
   void QnetSetAprioriDialog::setApriori() {
@@ -856,6 +858,16 @@ namespace Isis {
         lineEditModified = true;
       }
     }
+    if (m_latSigmaLineEdit->text() != "") {
+      latSigma = m_latSigmaLineEdit->text().toDouble();
+    }
+    if (m_lonSigmaLineEdit->text() != "") {
+      lonSigma = m_lonSigmaLineEdit->text().toDouble();
+    }
+    if (m_radiusSigmaLineEdit->text() != "") {
+      radiusSigma = m_radiusSigmaLineEdit->text().toDouble();
+    }
+    
     
     //if any of the line edits have been modified then the AprioriSurfacePointSource and 
     //RadiusSource are the user

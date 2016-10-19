@@ -28,6 +28,8 @@ namespace Isis {
    * @internal
    *   @history 2016-08-09 Makayla Shepherd - Complete redesign of the user interface. 
    *                           Fixes #2325, #2383.
+   *   @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be 
+   *                           set to NULL. You can now set the apriori sigmas. Fixes #4457.
    */
   class QnetSetAprioriDialog : public QDialog {
       Q_OBJECT
