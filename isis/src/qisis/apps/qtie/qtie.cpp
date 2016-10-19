@@ -84,7 +84,22 @@ int main(int argc, char *argv[]) {
 
     vw->show();
 
-    return app->exec();
+    int status = app->exec();
+
+    //Clean up the objects allocated onto the heap
+   
+    delete ftool;
+    ftool = NULL;
+    delete stool;
+    stool = NULL;
+    delete tieTool;
+    tieTool = NULL;
+    delete vw;
+    vw = NULL;
+    delete app;
+    app = NULL;
+
+    return status;
   }
   catch (IException &e) {
     e.print();
