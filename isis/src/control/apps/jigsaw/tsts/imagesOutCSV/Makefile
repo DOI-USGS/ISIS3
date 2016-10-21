@@ -18,6 +18,9 @@ commands:
 			   bundleout_txt=no \
 			   output_csv=no \
 			   residuals_csv=no \
-	           file_prefix=$(OUTPUT)/ > /dev/null;
+	           file_prefix=$(OUTPUT)/;
+	$(CAT) $(OUTPUT)/bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       > $(OUTPUT)/bundleout_images.csv;           
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) $(OUTPUT)/*.net > /dev/null;
