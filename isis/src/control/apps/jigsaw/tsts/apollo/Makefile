@@ -50,10 +50,10 @@ commands:
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/apollo_residuals.csv;
-#	$(CAT) bundleout_images.csv \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
-	#$(RM) bundleout_images.csv > /dev/null;
+	$(CAT) $(OUTPUT)/bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       > $(OUTPUT)/apollo_bundleout_images.csv;
+	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/apollo_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
