@@ -61,6 +61,12 @@ namespace Isis {
   class ImageList;
 
   /**
+   * @brief An image bundle adjustment object.
+   * 
+   * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS 3 cubes.
+   * Using the collineariy condition, BundleAdjust can construct a system of normal equations
+   * and then using the CHOLMOD library, solve that system.
+   * 
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
    *
    * @internal
@@ -143,19 +149,20 @@ namespace Isis {
    *                           single ControlPoint and ControlMeasure.
    *   @history 2011-08-08 Tracie Sucharski - Added method to return the iteration summary to be
    *                           used in qtie which does not have a log file. In SetImages, clear the
-   *                           cameraMavtpv_targetBodyp and cameraList.  Added this back in (was originally added
-   *                           on 2011-01-19), was deleted somewhere along the line.
+   *                           cameraMavtpv_targetBodyp and cameraList.  Added this back in (was 
+   *                           originally added on 2011-01-19), was deleted somewhere along the
+   *                           line.
    *   @history 2011-09-28 Debbie A. Cook - Renamed SPARSE solve method to OLDSPARSE and CHOLMOD to
    *                           SPARSE. 
    *   @history 2011-10-14 Ken Edmundson - Added call to m_pCnet->ClearJigsawRejected() to the
    *                           init() method to set all measure/point JigsawRejected flags to false
    *                           prior to bundle.
-   *   @history 2011-12-09 Ken Edmundson - Memory leak fix in method cholmod_Inverse. Need call to
-   *                           "cholmod_free_dense(&x,&m_cm)" inside loop.
+   *   @history 2011-12-09 Ken Edmundson - Memory leak fix in method cholmodInverse. Need call to
+   *                           "cholmod_free_dense(&x,&m_cholmodCommon)" inside loop.
    *   @history 2011-12-20 Ken Edmundson - Fixes to outlier rejection. Added rejection multiplier
    *                           member variable, can be set in jigsaw interface.
    *   @history 2012-02-02 Debbie A. Cook - Added SetSolvePolyOverHermite method and members
-   *                           m_bSolvePolyOverHermite and m_nPositionType.
+   *                           m_bSolvePolyOverHermite and m_positionType.
    *   @history 2012-03-26 Orrin Thomas - Added maximum likelihood capabilities.
    *   @history 2012-05-21 Debbie A. Cook - Added initialization of m_dRejectionMultiplier.
    *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
@@ -166,11 +173,11 @@ namespace Isis {
    *   @history 2013-11-12 Ken Edmundson - Programmers Note. References #813, #1521, #1653
    *                           #813 - Info echoed to screen when using Maximum Likelihood
    *                                  methods are now printed to print.prt file.
-   *                           #1521 - The cout debug statements that appear on screen when updating
-   *                                   images were removed from SpiceRotation.cpp
+   *                           #1521 - The cout debug statements that appear on screen when
+   *                                   updating images were removed from SpiceRotation.cpp
    *                           #1653 - Constraints were being applied for "Free" points that have
-   *                                   constrained coordinates. Also found that a priori coordinates
-   *                                   for these points were not being computed in
+   *                                   constrained coordinates. Also found that a priori
+   *                                   coordinates for these points were not being computed in
    *                                   ControlPoint::ComputeApriori, this has also been fixed.
    *   @history 2013-12-18 Tracie Sucharski - The ControlNet::GetNumberOfMeasuresInImage was
    *                           renamed to ControlNet::GetNumberOfValidMeasuresInImage and only
@@ -227,6 +234,8 @@ namespace Isis {
    *   @history 2016-08-23 Jesse Mapel - Removed output file calls.  Apps and objects that use
    *                           BundleAdjust must call output methods from BundleSolutionInfo.
    *                           Fixes #4279.
+   *   @history 2016-08-24 Jesse Mapel - Updated documentation and member variable names.  Brought
+   *                           closer to ISIS 3 coding standards.  Fixes #4183, #4188, #4235.
    *   @history 2016-08-28 Kelvin Rodriguez - Remvoed useless register keywords to squash warnigns
    *                         in clang. Part of porting to OS X 10.11. 
    *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
@@ -269,29 +278,26 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &control,
                    QList<ImageList *> imgList,
-                   bool bPrintSummary);
+                   bool printSummary);
       ~BundleAdjust();
-    
-      double           solve();
       BundleSolutionInfo    solveCholeskyBR();
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
     public slots:
-      bool             solveCholesky();
-      void             abortBundle();
-///////////////////////////////////////////////////////////////////////////////////////////////////
+      bool solveCholesky();
+      void abortBundle();
+      void outputBundleStatus(QString status);
+
       // accessors
+
       ControlNetQsp    controlNet();
       SerialNumberList *serialNumberList();
-      int              numberOfImages() const;
-//      int              observations() const;
       QString          fileName(int index);
+      QString          iterationSummaryGroup() const;
+      bool             isConverged();
       Table            cMatrix(int index);
       Table            spVector(int index);
-      double           error() const;
+      int              numberOfImages() const;
       double           iteration() const;
-
-      bool isConverged();
-      QString iterationSummaryGroup() const;
 
     signals:
       void statusUpdate(QString);
@@ -301,180 +307,151 @@ namespace Isis {
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 
-    public slots:
-      void outputBundleStatus(QString status);
-
     private:
-
+      //TODO Should there be a resetBundle(BundleSettings bundleSettings) method
+      //     that allows for rerunning with new settings? JWB
       void init(Progress *progress = 0);
-
       bool validateNetwork();
-      // use bundle settings to initialize more variables
-      // JWB - should I make a public method resetBundle(BundleSettings bundleSettings);
-      // that calls these methods to allow rerun with new params???
-      // max likelihood says it may be called multiple times...
-      // where does this happen ???
-
-      // output methods
+      bool solveSystem();
       void iterationSummary();
-      bool wrapUp();
       BundleSolutionInfo bundleSolveInformation();
       bool computeBundleStatistics();
-
-      bool formNormalEquations();
       void applyParameterCorrections();
       bool errorPropagation();
-      bool solveSystem();
-
-      // solution, error propagation, and matrix methods for cholmod approach
-      bool formNormalEquations_CHOLMOD();
-
-      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix<
-                                    double, boost::numeric::ublas::upper >  &N22,
-                                SparseBlockColumnMatrix  &N12,
-                                boost::numeric::ublas::compressed_vector< double >  &n1,
-                                LinearAlgebra::Vector  &n2,
-                                LinearAlgebra::Matrix  &coeff_target,
-                                LinearAlgebra::Matrix  &coeff_image,
-                                LinearAlgebra::Matrix  &coeff_point3D,
-                                LinearAlgebra::Vector  &coeff_RHS,
-                                int observationIndex);
-
-      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix<
-                                    double, boost::numeric::ublas::upper >  &N22,
-                                SparseBlockColumnMatrix  &N12,
-                                LinearAlgebra::Vector  &n2,
-                                LinearAlgebra::Vector  &nj,
-                                BundleControlPointQsp &point);
-
-      bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double >  &n1,
-                                LinearAlgebra::Vector  &nj);
-
-      bool solveSystem_CHOLMOD();
-
-      void AmultAdd_CNZRows_CHOLMOD(double alpha, SparseBlockColumnMatrix &A,
-                                    SparseBlockRowMatrix &B);
-
-      void transA_NZ_multAdd_CHOLMOD(double alpha, SparseBlockRowMatrix &A,
-                                     LinearAlgebra::Vector &B,
-                                     LinearAlgebra::Vector &C);
-
-      void applyParameterCorrections_CHOLMOD();
-
-      bool errorPropagation_CHOLMOD();
-
-//      bool computePartials_DC(LinearAlgebra::Matrix  &coeff_image,
-//                              LinearAlgebra::Matrix  &coeff_point3D,
-//                              LinearAlgebra::Vector  &coeff_RHS,
-//                              const ControlMeasure &measure, const ControlPoint &point);
-      bool computePartials_DC(LinearAlgebra::Matrix  &coeff_target,
-                              LinearAlgebra::Matrix  &coeff_image,
-                              LinearAlgebra::Matrix  &coeff_point3D,
-                              LinearAlgebra::Vector  &coeff_RHS,
-                              BundleMeasure &measure, BundleControlPoint &point);
-
-//      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower> &m, vector<double> &s, vector<double> &rhs);
       double computeResiduals();
-
-      // dedicated matrix functions
-      void AmulttransBNZ(LinearAlgebra::Matrix  &A,
-                         boost::numeric::ublas::compressed_matrix< double >  &B,
-                         LinearAlgebra::Matrix  &C, double alpha = 1.0);
-      void ANZmultAdd(boost::numeric::ublas::compressed_matrix< double >  &A,
-                      boost::numeric::ublas::symmetric_matrix< 
-                          double, 
-                          boost::numeric::ublas::upper,
-                          boost::numeric::ublas::column_major >  &B,
-                      LinearAlgebra::Matrix  &C, double alpha = 1.0);
-
-      bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< 
-                          double, boost::numeric::ublas::upper >  &m);
-
-      bool product_ATransB(boost::numeric::ublas::symmetric_matrix< 
-                               double, boost::numeric::ublas::upper >  &N22,
-                           SparseBlockColumnMatrix  &N12,
-                           SparseBlockRowMatrix  &Q);
-      void product_AV(double alpha, 
-                      boost::numeric::ublas::bounded_vector< double, 3 > &v2,
-                      SparseBlockRowMatrix &Q, 
-                      LinearAlgebra::Vector &v1);
-
       bool computeRejectionLimit();
       bool flagOutliers();
 
+      // normal equation matrices methods
+
+      bool formNormalEquations();
+      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,
+                           LinearAlgebra::Matrix  &coeffImage,
+                           LinearAlgebra::Matrix  &coeffPoint3D,
+                           LinearAlgebra::Vector  &coeffRHS,
+                           BundleMeasure          &measure,
+                           BundleControlPoint     &point);
+      bool formMeasureNormals(boost::numeric::ublas::symmetric_matrix<
+                                  double, boost::numeric::ublas::upper >         &N22,
+                              SparseBlockColumnMatrix                            &N12,
+                              boost::numeric::ublas::compressed_vector< double > &n1,
+                              LinearAlgebra::Vector                              &n2,
+                              LinearAlgebra::Matrix                              &coeffTarget,
+                              LinearAlgebra::Matrix                              &coeffImage,
+                              LinearAlgebra::Matrix                              &coeffPoint3D,
+                              LinearAlgebra::Vector                              &coeffRHS,
+                              int                                                observationIndex);
+      bool formPointNormals(boost::numeric::ublas::symmetric_matrix<
+                                double, boost::numeric::ublas::upper >  &N22,
+                            SparseBlockColumnMatrix                     &N12,
+                            LinearAlgebra::Vector                       &n2,
+                            LinearAlgebra::Vector                       &nj,
+                            BundleControlPointQsp                       &point);
+      bool formWeightedNormals(boost::numeric::ublas::compressed_vector< double >  &n1,
+                               LinearAlgebra::Vector                               &nj);
+
+      // dedicated matrix functions
+      
+      void productAB(SparseBlockColumnMatrix &A,
+                     SparseBlockRowMatrix    &B);
+      void accumProductAlphaAB(double                alpha,
+                               SparseBlockRowMatrix  &A,
+                               LinearAlgebra::Vector &B,
+                               LinearAlgebra::Vector &C);
+      bool invert3x3(boost::numeric::ublas::symmetric_matrix< 
+                          double, boost::numeric::ublas::upper >  &m);
+      bool productATransB(boost::numeric::ublas::symmetric_matrix< 
+                              double, boost::numeric::ublas::upper >  &N22,
+                          SparseBlockColumnMatrix                     &N12,
+                          SparseBlockRowMatrix                        &Q);
+      void productAlphaAV(double alpha, 
+                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
+                          SparseBlockRowMatrix                                &Q, 
+                          LinearAlgebra::Vector                               &v1);
+
+      // CHOLMOD library methods
+
       bool initializeCHOLMODLibraryVariables();
       bool freeCHOLMODLibraryVariables();
-      bool cholmod_Inverse();
+      bool cholmodInverse();
       bool loadCholmodTriplet();
+      bool wrapUp();
 
-      // JWB - member data should be reorganized... by type possibly? by use
-      //       probably better??? !< flags...
-      //       we can probably remove several that are unused ???
-      bool m_abort;                                     //!< to abort threaded bundle
-      bool m_bPrintSummary;                             //!< to print summary
-      bool m_bCleanUp;                                  //!< for cleanup (i.e. in destructor)
+      // member variables
 
-      int m_nIteration;                                 //!< current iteration
-      int m_nNumImagePartials;                          //!< number of image-related partials
-      int m_nNumPointPartials;                          //!< number of point-related partials
-      int m_nNumberCamAngleCoefSolved;                  //!< number of camera angle coefficients in solution
-      int m_nNumberCamPosCoefSolved;                    //!< number of camera position coefficients in solution
-      SpicePosition::Source m_nPositionType;            //!< type of SpicePosition interpolation
-      SpiceRotation::Source m_nPointingType;            //!< type of SpiceRotation interpolation
+      BundleSettingsQsp m_bundleSettings;                    //!< Contains the solve settings.
+      BundleResults  m_bundleResults;                        //!< Stores the results of the
+                                                             //!< bundle adjust.
+      Statistics m_xResiduals;                               //!< x residual statistics.
+      Statistics m_yResiduals;                               //!< y residual statistics.
+      Statistics m_xyResiduals;                              //!< xy residual statistics.
+      ControlNetQsp m_controlNet;                            //!< Output control net.
+      QString m_cnetFileName;                                //!< The control net filename.
+      QVector <BundleControlPointQsp> m_bundleControlPoints; /**!< Vector of control points.
+                                                                   Contains only non-ignored
+                                                                   control points from the control
+                                                                   net.*/
+      BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
+                                                                   Each observation contains one or
+                                                                   more images.*/
+      SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
+      BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
+                                                                   target body.*/
+      Distance m_bodyRadii[3];                               //!< Triaxial body radii in meters.
+      bool m_abort;                                          //!< If the bundle should abort.
+      QString m_iterationSummary;                            /**!< Summary of the most recently
+                                                                   completed iteration.*/
+      bool m_printSummary;                                   /**!< If the iteration summaries
+                                                                   should be output to the log
+                                                                   file.*/
+      bool m_cleanUp;                                        /**!< If the serial number lists
+                                                                   need to be deleted by
+                                                                   the destructor.*/
+      int m_rank;                                            //!< The rank of the system.
+      int m_iteration;                                       //!< The current iteration.
+      int m_numberOfImagePartials;                           //!< number of image-related partials.
+      double m_radiansToMeters;                              /**!< The body specific radians to
+                                                                   meters conversion factor.*/
+      double m_metersToRadians;                              /**!< The body specific meters to
+                                                                   radians conversion factor.*/
 
-      double m_dError;                                  //!< error
+      // ==========================================================================================
+      // === BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution.     ===
+      // === Currently, everything uses the CHOLMOD library,                                    ===
+      // === there is no dependence on the least-squares class.                                 ===
+      // ==========================================================================================
 
-      BundleObservationVector m_bundleObservations;
-      QVector <BundleControlPointQsp> m_bundleControlPoints;
-      BundleTargetBodyQsp m_bundleTargetBody;
-
-      double m_dRTM;                                    //!< radians to meters conversion factor (body specific)
-      double m_dMTR;                                    //!< meters to radians conversion factor (body specific)
-      Distance m_bodyRadii[3];                          //!< body radii i meters
-
-      QString m_strCnetFileName;                        //!< Control Net file specification
-
-      //!< pointers to...
-      ControlNetQsp m_pCnet;                              //!< 'ControlNet' object
-      SerialNumberList *m_pSnList;                      //!< list of image serial numbers
-
-      // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
-      // as 'CHOLMOD' (sparse solution) in the interim;
-      // there is no dependence on the least-squares class.
-
-      int m_nRank;
-
-      //! reduced normal equations matrix
+      //! Inverse of the normal equations matrix.  Set by cholmodInverse.
       boost::numeric::ublas::symmetric_matrix< 
-          double, boost::numeric::ublas::upper, boost::numeric::ublas::column_major > m_Normals;
-      LinearAlgebra::Vector m_nj;
-
-      LinearAlgebra::Vector m_imageSolution; //!< image parameter solution vector
-
-
-      QString m_iterationSummary;
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // variables for cholmod
-      cholmod_common  m_cm;
-      cholmod_factor *m_L;
-      cholmod_sparse *m_N;
-
-      SparseBlockMatrix m_SparseNormals;
-      cholmod_triplet  *m_pTriplet;
-
-      BundleSettingsQsp m_bundleSettings;
-
-      BundleResults  m_bundleResults;
-//    BundleSolutionInfo m_bundleSolveInformation;
-
-
-// ??? moved to bundle stats class    //!< vectors for statistical computations...
-Statistics m_Statsx;                       //!<  x errors
-Statistics m_Statsy;                       //!<  y errors
-Statistics m_Statsrx;                      //!<  x residuals
-Statistics m_Statsry;                      //!<  y residuals
-Statistics m_Statsrxy;                     //!< xy residuals
+          double,
+          boost::numeric::ublas::upper,
+          boost::numeric::ublas::column_major > m_normalInverse;
+      cholmod_common  m_cholmodCommon;                       /**!< Contains object parameters,
+                                                                   statistics, and workspace used
+                                                                   by the CHOLMOD library.*/
+      LinearAlgebra::Vector m_RHS;                           /**!< The right hand side of the
+                                                                   normal equations.*/
+      SparseBlockMatrix m_sparseNormals;                     /**!< The sparse block normal
+                                                                   equations matrix.  Used to
+                                                                   populate m_cholmodTriplet and
+                                                                   for error propagation.*/
+      cholmod_triplet  *m_cholmodTriplet;                    /**!< The CHOLMOD triplet
+                                                                   representation of the sparse
+                                                                   normal equations matrix.
+                                                                   Created from m_sparseNormals
+                                                                   and then used to create
+                                                                   m_cholmodNormal.*/
+      cholmod_sparse *m_cholmodNormal;                       /**!< The CHOLMOD sparse normal
+                                                                   equations matrix used by
+                                                                   cholmod_factorize to solve the
+                                                                   system. Created from
+                                                                   m_cholmodTriplet.*/
+      cholmod_factor *m_L;                                   /**!< The lower triangular L matrix
+                                                                   from Cholesky decomposition.
+                                                                   Created from m_cholmodNormal by
+                                                                   cholmod_factorize.*/
+      LinearAlgebra::Vector m_imageSolution;                 /**!< The image parameter solution
+                                                                   vector.*/
   };
 }
 

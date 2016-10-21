@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 Code not currently covered by jigsaw app tests
 
 These methods are never called
- static void cholmod_error_handler();
+ static void cholmodErrorHandler();
  BundleAdjust(BundleSettings bundleSettings, QString &cnet, SerialNumberList &snlist, bool bPrintSummary);
  BundleAdjust(BundleSettings bundleSettings, Control &cnet, SerialNumberList &snlist, bool bPrintSummary);
  BundleAdjust(BundleSettings bundleSettings, ControlNet &cnet, SerialNumberList &snlist, bool bPrintSummary);
@@ -32,14 +32,14 @@ These methods are never called
 
 These have partial coverage
  void BundleAdjust::init(Progress *progress) {
-    (pCamera==false) for Camera *pCamera = m_pCnet->Camera(0);
+    (pCamera==false) for Camera *pCamera = m_controlNet->Camera(0);
     (m_bodyRadii[0] < 0 && pCamera==true)
     (image==false) for BundleImage* image = new BundleImage(camera, serialNumber, fileName);
     (m_bundleSettings.validateNetwork()==false) -- this is never the case for jigsaw, need to test elsewhere
 
 
  bool BundleAdjust::initializeCHOLMODLibraryVariables() {
-    ( m_nRank <= 0 )
+    ( m_rank <= 0 )
 
 Errors:
  void BundleAdjust::init(Progress *progress) {
@@ -50,12 +50,12 @@ Errors:
 
 
  bool BundleAdjust::validateNetwork() {
-    ( nMeasures <= 1 ) for int nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
+    ( numMeasures <= 1 ) for int numMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(m_serialNumberList->SerialNumber(i));
     ( nimagesWithInsufficientMeasures > 0 )
           QString msg = "Images with one or less measures:\n";
 
  void BundleAdjust::checkHeldList() {
-    (m_pSnList->HasSerialNumber(m_pHeldSnList->SerialNumber(ih))==false)
+    (m_serialNumberList->HasSerialNumber(m_heldImageSerialNumberList->SerialNumber(ih))==false)
           QString msg = "Held image not in FROMLIST";
 
 #endif
