@@ -27,6 +27,9 @@ commands:
 	$(CAT) residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/hold_residuals.csv;
+	$(CAT) bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       > bundleout_images.csv;  
 	$(MV) bundleout_points.csv $(OUTPUT)/hold_bundleout_points.csv;
 	$(MV) bundleout_images.csv $(OUTPUT)/hold_bundleout_images.csv;
 	$(RM) bundleout.txt residuals.csv $(OUTPUT)/cubes.lis $(OUTPUT)/hold-green.lis;
