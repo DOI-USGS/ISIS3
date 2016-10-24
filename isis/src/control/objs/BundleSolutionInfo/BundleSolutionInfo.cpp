@@ -1288,6 +1288,7 @@ namespace Isis {
 
         BundleImageQsp image = observation->at(j);
 
+
         sprintf(buf,image->fileName().toLatin1().data());
         fpOut << buf;
         sprintf(buf,",");

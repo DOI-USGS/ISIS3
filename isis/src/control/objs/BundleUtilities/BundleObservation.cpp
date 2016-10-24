@@ -833,158 +833,140 @@ namespace Isis {
 
     if(!imageCSV) {
 
-    QString str("%1(t%2)");
+      QString str("%1(t%2)");
 
-    if (nPositionCoefficients > 0) {
-      for (int i = 0; i < nPositionCoefficients; i++) {
-        finalParameterValues.push_back(coefX[i]);
-        if (i == 0)
-          parameterNamesList.append( str.arg("  X  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
-      }
-      for (int i = 0; i < nPositionCoefficients; i++) {
-        finalParameterValues.push_back(coefY[i]);
-        if (i == 0)
+      if (nPositionCoefficients > 0) {
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefX[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  X  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefY[i]);
+          if (i == 0)
           parameterNamesList.append( str.arg("  Y  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.push_back(coefZ[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  Z  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+          }
       }
-      for (int i = 0; i < nPositionCoefficients; i++) {
-        finalParameterValues.push_back(coefZ[i]);
-        if (i == 0)
-          parameterNamesList.append( str.arg("  Z  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
+      if (nPointingCoefficients > 0) {
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg(" RA  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("DEC  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("TWI  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
       }
-    }
-    if (nPointingCoefficients > 0) {
-      for (int i = 0; i < nPointingCoefficients; i++) {
-        finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-        if (i == 0)
-          parameterNamesList.append( str.arg(" RA  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
-      }
-      for (int i = 0; i < nPointingCoefficients; i++) {
-        finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-        if (i == 0)
-          parameterNamesList.append( str.arg("DEC  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
-      }
-      for (int i = 0; i < nPointingCoefficients; i++) {
-        finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-        if (i == 0)
-          parameterNamesList.append( str.arg("TWI  ").arg("0") );
-        else
-          parameterNamesList.append( str.arg("     ").arg(i) );
-      }
-    }
 
     }// end if(!imageCSV)
 
     else {
-
       if (nPositionCoefficients > 0) {
-
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefX[i]);
-
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefY[i]);
-
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefZ[i]);
-
         }
       }
       if (nPointingCoefficients > 0) {
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-
+          }
         }
-      }
-
-
     }//end else
 
     m_parameterNamesList = parameterNamesList;
     QString finalqStr = "";
     QString qStr = "";
     QString sigma = "";
+
     if (!imageCSV) {
-    // position parameters
-    for (int i = 0; i < nPositionParameters; i++) {
-
-      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
-
-      if (errorPropagation) {
-        qStr = QString("%1%2%3%4%5%6\n").
-            arg( parameterNamesList.at(i) ).
-            arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
-            arg(m_corrections(i), 21, 'f', 8).
-            arg(finalParameterValues[i], 20, 'f', 8).
-            arg(sigma, 18).
-            arg(m_adjustedSigmas[i], 18, 'f', 8);
-      }
-      else {
-        qStr = QString("%1%2%3%4%5%6\n").
-            arg( parameterNamesList.at(i) ).
-            arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
-            arg(m_corrections(i), 21, 'f', 8).
-            arg(finalParameterValues[i], 20, 'f', 8).
-            arg(sigma, 18).
-            arg("N/A", 18);
-      }
-
-      finalqStr += qStr;
-    }
-
-    // pointing parameters
-    for (int i = nPositionParameters; i < nParameters; i++) {
-
-      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
-
-      if (errorPropagation) {
-        qStr = QString("%1%2%3%4%5%6\n").
-            arg( parameterNamesList.at(i) ).
-            arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
-            arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
-            arg(finalParameterValues[i], 20, 'f', 8).
-            arg(sigma, 18).
-            arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
-      }
-      else {
-        qStr = QString("%1%2%3%4%5%6\n").
-            arg( parameterNamesList.at(i) ).
-            arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
-            arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
-            arg(finalParameterValues[i], 20, 'f', 8).
-            arg(sigma, 18).
-            arg("N/A", 18);
-      }
-
-      finalqStr += qStr;
-     }
-
-    }
-
-    else {
-
       // position parameters
       for (int i = 0; i < nPositionParameters; i++) {
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+        if (errorPropagation) {
+          qStr = QString("%1%2%3%4%5%6\n").
+          arg( parameterNamesList.at(i) ).
+          arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+          arg(m_corrections(i), 21, 'f', 8).
+          arg(finalParameterValues[i], 20, 'f', 8).
+          arg(sigma, 18).
+          arg(m_adjustedSigmas[i], 18, 'f', 8);
+        }
+        else {
+          qStr = QString("%1%2%3%4%5%6\n").
+          arg( parameterNamesList.at(i) ).
+          arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+          arg(m_corrections(i), 21, 'f', 8).
+          arg(finalParameterValues[i], 20, 'f', 8).
+          arg(sigma, 18).
+          arg("N/A", 18);
+        }
+        finalqStr += qStr;
+      }
 
+    // pointing parameters
+      for (int i = nPositionParameters; i < nParameters; i++) {
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+        if (errorPropagation) {
+          qStr = QString("%1%2%3%4%5%6\n").
+          arg( parameterNamesList.at(i) ).
+          arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+          arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+          arg(finalParameterValues[i], 20, 'f', 8).
+          arg(sigma, 18).
+          arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
+        }
+        else {
+          qStr = QString("%1%2%3%4%5%6\n").
+          arg( parameterNamesList.at(i) ).
+          arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+          arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+          arg(finalParameterValues[i], 20, 'f', 8).
+          arg(sigma, 18).
+          arg("N/A", 18);
+        }
+        finalqStr += qStr;
+      }
+
+    }
+    else {
+      // position parameters
+      for (int i = 0; i < nPositionParameters; i++) {
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "-1.0" : toString(m_aprioriSigmas[i]));
         qStr="";
         if (errorPropagation) {
@@ -992,7 +974,7 @@ namespace Isis {
           qStr += toString(m_corrections(i))+",";
           qStr += toString(finalParameterValues[i])+",";
           qStr += sigma+",";
-          qStr += toString(m_adjustedSigmas[i]);
+          qStr += toString(m_adjustedSigmas[i])+",";
         }
         else {       
           qStr += toString(finalParameterValues[i] - m_corrections(i))+",";
@@ -1008,7 +990,6 @@ namespace Isis {
       for (int i = nPositionParameters; i < nParameters; i++) {        
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "-1.0" : toString(m_aprioriSigmas[i]) );
         qStr="";
-
         if (errorPropagation) {        
           qStr+=toString(finalParameterValues[i] - m_corrections(i) * RAD2DEG)+",";
           qStr+=toString(m_corrections(i) * RAD2DEG)+",";
@@ -1017,14 +998,12 @@ namespace Isis {
           qStr+=toString(m_adjustedSigmas[i] * RAD2DEG)+",";
         }
         else {
-
           qStr+=toString(finalParameterValues[i] - m_corrections(i) * RAD2DEG)+",";
           qStr+=toString(m_corrections(i) * RAD2DEG)+",";
           qStr+=toString(finalParameterValues[i])+",";
           qStr+=sigma+",";
           qStr+="N/A,";
         }
-
         finalqStr += qStr;
       }
     }
