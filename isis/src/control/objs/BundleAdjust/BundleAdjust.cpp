@@ -627,6 +627,10 @@ namespace Isis {
    * Compute the least squares bundle adjustment solution using Cholesky decomposition.
    * 
    * @return @b bool If the solution was successfully computed.
+   *
+   * @internal
+   *   @history 2016-10-25 Ian Humphrey - Spacing and precision for Sigma0 and Elapsed Time match
+   *                           ISIS production's jigsaw std output. References #4463."
    */
   bool BundleAdjust::solveCholesky() {
     try {
@@ -696,7 +700,7 @@ namespace Isis {
         }
         // testing
 
-        emit statusUpdate( QString("\n starting iteration %1 ").arg(m_iteration) );
+        emit statusUpdate( QString("starting iteration %1\n").arg(m_iteration) );
 
         clock_t iterationStartClock = clock();
 
@@ -769,10 +773,18 @@ namespace Isis {
         // variance of unit weight (also reference variance, variance factor, etc.)
         m_bundleResults.computeSigma0(vtpv, m_bundleSettings->convergenceCriteria());
 
+        // Set up formatting for status updates with doubles (e.g. Sigma0, Elapsed Time)
+        int fieldWidth = 20;
+        char format = 'f';
+        int precision = 10;
+
         emit statusUpdate(QString("Iteration: %1")
                                   .arg(m_iteration));
         emit statusUpdate(QString("Sigma0: %1")
-                                  .arg(m_bundleResults.sigma0()));
+                                  .arg(m_bundleResults.sigma0(),
+                                       fieldWidth,
+                                       format,
+                                       precision));
         emit statusUpdate(QString("Observations: %1")
                                   .arg(m_bundleResults.numberObservations()));
         emit statusUpdate(QString("Constrained Parameters:%1")
@@ -835,7 +847,10 @@ namespace Isis {
         double iterationTime = (iterationStopClock - iterationStartClock)
                                 / (double)CLOCKS_PER_SEC;
         emit statusUpdate( QString("End of Iteration %1").arg(m_iteration) );
-        emit statusUpdate( QString("Elapsed Time: %1").arg(iterationTime) );
+        emit statusUpdate( QString("Elapsed Time: %1").arg(iterationTime,
+                                                           fieldWidth,
+                                                           format,
+                                                           precision) );
 
         // check for maximum iterations
         if (m_iteration >= m_bundleSettings->convergenceCriteriaMaximumIterations()) {
@@ -2312,6 +2327,10 @@ namespace Isis {
    * @return @b bool If the rejection limit was successfully computed and set.
    * 
    * @TODO should this be in BundleResults?
+   *
+   * @internal
+   *   @history 2016-10-25 Ian Humphrey - "Rejection Limit" is output to std out again immediately
+   *                           after "mad." References #4463.
    */
   bool BundleAdjust::computeRejectionLimit() {
       double vx, vy;
@@ -2389,6 +2408,8 @@ namespace Isis {
 
       m_bundleResults.setRejectionLimit(median
                                         + m_bundleSettings->outlierRejectionMultiplier() * mad);
+
+      std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
 
       return true;
   }
@@ -2890,6 +2911,11 @@ namespace Isis {
 
   /**
    * Creates an iteration summary and an iteration group for the solution summary
+   *
+   * @internal
+   *   @history 2016-10-18 Ian Humphrey - Always output Rejection_Measures keyword regardless
+   *                           of outlier rejection so we can match ISIS jigsaw output.
+   *                           Fixes #4461.
    */
   void BundleAdjust::iterationSummary() {
     QString iterationNumber;
@@ -2919,11 +2945,8 @@ namespace Isis {
                                toString( m_bundleResults.numberUnknownParameters() ) );
     summaryGroup += PvlKeyword("Degrees_of_Freedom",
                                toString( m_bundleResults.degreesOfFreedom() ) );
-    if (m_bundleSettings->outlierRejection()) {
-      summaryGroup += PvlKeyword("Rejected_Measures",
+    summaryGroup += PvlKeyword( "Rejected_Measures",
                                 toString( m_bundleResults.numberRejectedObservations()/2) );
-    }
-
 
     if ( m_bundleResults.numberMaximumLikelihoodModels() >
          m_bundleResults.maximumLikelihoodModelIndex() ) {

@@ -1,5 +1,7 @@
 #include "Isis.h"
 
+#include <iostream>
+
 #include <QDir>
 #include <QList>
 #include <QObject>
@@ -76,6 +78,8 @@ void IsisMain() {
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     BundleSolutionInfo bundleSolution = bundleAdjustment->solveCholeskyBR();
     
+    cout << "\nGenerating report files\n" << endl;
+
     // write output files
     if (ui.GetBoolean("BUNDLEOUT_TXT")) {
       bundleSolution.outputText();

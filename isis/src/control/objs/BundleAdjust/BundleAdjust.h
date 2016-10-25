@@ -251,6 +251,15 @@ namespace Isis {
    *                           m_pHeldSnList, since it was removed. Fixes #4293.
    *   @history 2016-10-17 Adam Paquette - Cleaned up terminal output for readability and cohesion
    *                           Fixes #4263, #4311, #4312.
+   *   @history 2016-10-18 Ian Humphrey - Modified iterationSummary() to always output
+   *                           Rejected_Measures kewyord, regardless of outlier rejection being on
+   *                           or off. Fixes #4461.
+   *   @history 2016-10-25 Ian Humphrey - Modified iterationSumary() to always output
+   *                           Rejected_Measures keyword, regarldess of outlier rjection being on
+   *                           or off. Fixes #4461. Modified solveCholesky() and
+   *                           computeRejectionLimit() so jigsaw's std out for Rejection Limit,
+   *                           Sigma0, and Elapsed Time match ISIS production's jigsaw std out.
+   *                           Fixes #4463.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
