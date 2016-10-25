@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>DeletePointDialog</class>
- <widget class="QDialog" name="DeletePointDialog" >
+ <class>DeleteControlPointDialog</class>
+ <widget class="QDialog" name="DeleteControlPointDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -195,7 +195,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>DeletePointDialog</receiver>
+   <receiver>DeleteControlPointDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -211,7 +211,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>DeletePointDialog</receiver>
+   <receiver>DeleteControlPointDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >

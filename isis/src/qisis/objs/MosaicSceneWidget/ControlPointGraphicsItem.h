@@ -31,6 +31,8 @@ namespace Isis {
    *                           to appropriately apply colors. Fixes #479.
    *   @history 2016-05-18 Ian Humphrey - Updated the control point crosses to be cosmetic so that
    *                           they always appear on screen (Qt4 to Qt5).
+   *   @history 2016-10-20 Tracie Sucharski - Remove obsolete code that was commented out.
+   *                           Fixes #4479.
    *                   
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
@@ -47,13 +49,9 @@ namespace Isis {
 
       void setArrowVisible(bool visible, bool colorByMeasureCount, int measureCount,
                            bool colorByResidualMagnitude, double residualMagnitude);
-//  signals:
-//    void newControlPointSelected(ControlPoint *controlPoint);
 
     protected:
       void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
-      virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-//    virtual bool eventFilter(QObject *obj, QEvent *ev);
 
     private:
       QRectF calcRect() const;

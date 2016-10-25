@@ -16,7 +16,10 @@ namespace Isis {
    *
    * @author 2012-09-17 Steven Lambright
    *
-   * @internal
+   * @internal 
+   *   @history 2014-06-02 Tracie Sucharski - Added IPCE functionality including saving the
+   *                           parent in order to determine if the Control Net tool is active in
+   *                           which case mouse events are passed on rather than accepted.
    */
   class MosaicGraphicsScene : public QGraphicsScene {
       Q_OBJECT

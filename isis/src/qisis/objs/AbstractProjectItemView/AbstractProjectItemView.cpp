@@ -23,6 +23,7 @@
 #include "AbstractProjectItemView.h"
 
 #include <QAction>
+#include <QDebug>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
@@ -72,6 +73,27 @@ namespace Isis {
       return proxyModel->sourceModel();
     }
     return internalModel();
+  }
+
+
+  /**
+   * Sets the internal model of the view.
+   *
+   * @param[in] model (ProjectItemModel *) The new internal model
+   */
+  void AbstractProjectItemView::setInternalModel(ProjectItemModel *model) {
+    m_internalModel = model;
+  }
+
+
+  /**
+   * Returns the internal model of the view. By default it is a proxy
+   * model.
+   *
+   * @return @b ProjectItemModel * The internal model
+   */
+  ProjectItemModel *AbstractProjectItemView::internalModel() {
+    return m_internalModel;
   }
 
 
@@ -249,7 +271,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to add.
    */
   void AbstractProjectItemView::addItem(ProjectItem *item) {
-        if (ProjectItemProxyModel *proxyModel = 
+        if (ProjectItemProxyModel *proxyModel =
         qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       proxyModel->addItem(item);
     }
@@ -267,25 +289,33 @@ namespace Isis {
       addItem(item);
     }
   }
-  
+
 
   /**
-   * Returns the internal model of the view. By default it is a proxy
-   * model.
+   * Removes an item to the view. The item must be part of the view's
+   * model. This method can be overriden in a subclass to filter out
+   * unneeded items.
    *
-   * @return @b ProjectItemModel * The internal model
+   * @param[in] item (ProjectItem *) The item to remove.
    */
-  ProjectItemModel *AbstractProjectItemView::internalModel() {
-    return m_internalModel;
+  void AbstractProjectItemView::removeItem(ProjectItem *item) {
+    if (ProjectItemProxyModel *proxyModel = 
+            qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+//    qDebug()<<"AbstractProjectItemView::removeItem";
+      proxyModel->removeItem(item);
+    }
   }
 
 
   /**
-   * Sets the internal model of the view.
+   * Removes several items from the view. The items must be a part of the
+   * view's model.
    *
-   * @param[in] model (ProjectItemModel *) The new internal model
+   * @param[in] items (QList<ProjectItem *>) The items to remove.
    */
-  void AbstractProjectItemView::setInternalModel(ProjectItemModel *model) {
-    m_internalModel = model;
+  void AbstractProjectItemView::removeItems(QList<ProjectItem *> items) {
+    foreach (ProjectItem *item, items) {
+      removeItem(item);
+    }
   }
 }

@@ -22,6 +22,7 @@
  */
 #include "CNetSuiteMainWindow.h"
 
+#include <QObject>
 #include <QtWidgets>
 #include <QSettings>
 #include <QTreeView>
@@ -36,7 +37,6 @@
 #include "Project.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemTreeView.h"
-//#include "ProjectTreeWidget.h"
 #include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
 
@@ -469,7 +469,7 @@ namespace Isis {
         QPixmap(FileName("$base/icons/contexthelp.png").expanded()));
     activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
         "this program to see more information about them");
-    connect(activateWhatsThisAct, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(activateWhatsThisAct, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_helpMenuActions.append(activateWhatsThisAct);
   }
@@ -514,7 +514,11 @@ namespace Isis {
         QSettings::NativeFormat);
 
     settings.setValue("geometry", saveGeometry());
-    settings.setValue("windowState", saveState());
+    // TODO 2016-08-03 TLS  saveState giving the following errors:
+    //QMainWindow::saveState(): 'objectName' not set for QToolBar 0x1d79070 ''
+    //QMainWindow::saveState(): 'objectName' not set for QToolBar 0x1d5bea0 ''
+    //QMainWindow::saveState(): 'objectName' not set for QToolBar 0x19aa7f0 ''
+//  settings.setValue("windowState", saveState());
     settings.setValue("size", size());
     settings.setValue("pos", pos());
 

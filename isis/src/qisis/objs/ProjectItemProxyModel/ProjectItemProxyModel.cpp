@@ -30,6 +30,7 @@
 #include <QMimeData>
 #include <QModelIndex>
 #include <QObject>
+#include <QtDebug>
 
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -178,6 +179,7 @@ namespace Isis {
    * @return @b ProjectItem* The item in the proxy model.
    */
   ProjectItem *ProjectItemProxyModel::addItem(ProjectItem *sourceItem) {
+//  qDebug()<<"ProjectItemProxyModel::addItem";
     if (!sourceItem) {
       return 0;
     }
@@ -206,6 +208,7 @@ namespace Isis {
    *                                              source model.                                              
    */
   void ProjectItemProxyModel::addItems(QList<ProjectItem *> sourceItems) {
+//  qDebug()<<"ProjectItemProxyModel::addItem";
     foreach (ProjectItem *item, sourceItems) {
       addItem(item);
     }
@@ -221,6 +224,7 @@ namespace Isis {
     if (item) {
       m_sourceProxyMap.remove( mapItemToSource(item) );
     }
+//  qDebug()<<"ProjectItemProxyModel::removeItem  item= "<<item;
     ProjectItemModel::removeItem(item);
   }
   
@@ -244,27 +248,28 @@ namespace Isis {
 
     m_sourceModel = sourceModel;
 
+    //  If current item changes on the Source Model, update this proxy model's current item
     connect(sourceModel->selectionModel(),
             SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
-            this,
-            SLOT( updateProxyCurrent() ) );
-
+            this, SLOT( updateProxyCurrent() ) );
+    //  If current item changes on this proxy model, update the source model's current item
     connect(selectionModel(),
             SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
-            this,
-            SLOT( updateSourceCurrent() ) );
-
+            this, SLOT( updateSourceCurrent() ) );
+    //  If selection changes on the Source Model, update this proxy model's selection
     connect(sourceModel->selectionModel(),
             SIGNAL( selectionChanged(const QItemSelection &, const QItemSelection &) ),
-            this,
-            SLOT( updateProxySelection() ) );
-    
+            this, SLOT( updateProxySelection() ) );
+    //  If the selection changes on this proxy model, update the source model's selection
     connect(selectionModel(),
             SIGNAL( selectionChanged(const QItemSelection &, const QItemSelection &) ),
-            this,
-            SLOT( updateSourceSelection() ) );
+            this, SLOT( updateSourceSelection() ) );
+
     connect(sourceModel, SIGNAL( itemChanged(QStandardItem *) ),
             this, SLOT( onItemChanged(QStandardItem *) ) );
+
+    connect(sourceModel, SIGNAL(itemRemoved(ProjectItem *)),
+            this, SIGNAL(itemRemoved(ProjectItem *)));
   }
 
 

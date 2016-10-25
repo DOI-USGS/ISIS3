@@ -10,7 +10,6 @@
  *
  * @internal
  */
-// TODO: Replace QnetDeleteControlPointDialog with this class??
 class DeleteControlPointDialog : public QDialog, public Ui::DeleteControlPointDialog {
     Q_OBJECT
 

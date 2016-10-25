@@ -210,12 +210,6 @@ namespace Isis {
   }
 
 
-  void ControlPointGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    //qDebug()<<"ControlPointGraphicsItem::mouseReleaseEvent pointId = "<<m_controlPoint->GetId();
-//  emit newControlPointSelected(m_controlPoint);
-  }
-
-
   QRectF ControlPointGraphicsItem::calcRect() const {
     QRectF pointRect(calcCrosshairRect());
 

@@ -36,8 +36,9 @@
 #include "Image.h"
 #include "ImageList.h"
 #include "Project.h"
-#include "ProjectItem.h"
 #include "ProjectItemModel.h"
+#include "Shape.h"
+#include "ShapeList.h"
 
 namespace Isis {
   /**
@@ -186,6 +187,42 @@ namespace Isis {
 
   
   /**
+   * Constructs an item from an Shape.
+   *
+   * @param[in] shape (Shape *) The Shape to construct from.
+   */
+  ProjectItem::ProjectItem(Shape *shape) {
+    setShape(shape);
+  }
+
+
+  /**
+   * Constructs an item from an ShapeList.
+   *
+   * @param[in] shapeList (ShapeList *) The ShapeList to construct from.
+   */
+  ProjectItem::ProjectItem(ShapeList *shapeList) {
+    setShapeList(shapeList);
+    foreach (Shape *shape, *shapeList) {
+      appendRow(new ProjectItem(shape));
+    }
+  }
+
+
+  /**
+   * Constructs an item from a list of ShapeList.
+   *
+   * @param[in] shapes (QList<ShapeList *>) The list to construct from.
+   */
+  ProjectItem::ProjectItem(QList<ShapeList *> shapes) {
+    setShapes();
+    foreach (ShapeList *shapeList, shapes) {
+      appendRow( new ProjectItem(shapeList) );
+    }
+  }
+
+
+  /**
    * Constructs an item from a GuiCameraQsp
    *
    * @param[in] guiCamera (GuiCameraQsp) The camera to construct from.
@@ -216,14 +253,13 @@ namespace Isis {
    */
   ProjectItem::ProjectItem(Project *project) {
     setProject(project);
-
+//  qDebug()<<"ProjectItem::ProjectItem(Project *project)  rowCount() = "<<rowCount();
     appendRow( new ProjectItem( project->controls() ) );
+//  qDebug()<<"                                            rowCount() afterControls = "<<rowCount();
     appendRow( new ProjectItem( project->images() ) );
-    
-    ProjectItem *shapeModelsItem = new ProjectItem();
-    shapeModelsItem->setShapeModels();
-    appendRow(shapeModelsItem);
-
+//  qDebug()<<"                                            rowCount() afterImages = "<<rowCount();
+    appendRow( new ProjectItem( project->shapes() ) );
+        
     ProjectItem *targetBodyListItem = new ProjectItem();
     targetBodyListItem->setTargetBodyList();
     appendRow(targetBodyListItem);
@@ -330,6 +366,26 @@ namespace Isis {
    */
   ImageList *ProjectItem::imageList() const {
     return data().value<ImageList *>();
+  }
+
+
+  /**
+   * Returns the Shape stored in the data of the item.
+   *
+   * @return (Shape *) The Shape of the item.
+   */
+  Shape *ProjectItem::shape() const {
+    return data().value<Shape *>();
+  }
+
+
+  /**
+   * Returns the ShapeList stored in the data of the item.
+   *
+   * @return (ShapeList *) The ShapeList of the item.
+   */
+  ShapeList *ProjectItem::shapeList() const {
+    return data().value<ShapeList *>();
   }
 
 
@@ -446,6 +502,28 @@ namespace Isis {
    */
   bool ProjectItem::isImageList() const {
     return data().canConvert<ImageList *>();
+  }
+
+
+  /**
+   * Returns true if an Shape is stored in the data of the item. Returns false
+   * otherwise.
+   *
+   * @return (bool) If an Shape is stored in the data of the item or not.
+   */
+  bool ProjectItem::isShape() const {
+    return data().canConvert<Shape *>();
+  }
+
+
+  /**
+   * Returns true if an ShapeList is stored in the data of the item.
+   * Returns false otherwise.
+   *
+   * @return (bool) If an ShapeList is stored in the data of the item or not.
+   */
+  bool ProjectItem::isShapeList() const {
+    return data().canConvert<ShapeList *>();
   }
 
 
@@ -599,6 +677,40 @@ namespace Isis {
 
 
   /**
+   * Sets the text, icon, and data corresponding to an Shape.
+   *
+   * @param[in] shape (Shape *) The Shape.
+   */
+  void ProjectItem::setShape(Shape *shape) {
+    setText( QFileInfo( shape->fileName() ).fileName() );
+    setIcon( QIcon(":dem") );
+    setData( QVariant::fromValue<Shape *>(shape) );
+  }
+
+
+  /**
+   * Sets the text, icon, and data corresponding to an ShapeList.
+   *
+   * @param[in] shapeList (ShapeList *) The ShapeList.
+   */
+  void ProjectItem::setShapeList(ShapeList *shapeList) {
+    setText( shapeList->name() );
+    setIcon( QIcon(":dem") );
+    setData( QVariant::fromValue<ShapeList *>(shapeList) );
+  }
+
+
+  /**
+   * Sets the text, icon, and data corresponding to a list of ShapeList.
+   */
+  void ProjectItem::setShapes() {
+    setText("Shapes");
+    setIcon( QIcon(":dem") );
+    setData( QVariant() );
+  }
+
+
+  /**
    * Sets the text, icon, and data corresponding to a Control.
    *
    * @param[in] control (Control *) The Control.
@@ -684,16 +796,6 @@ namespace Isis {
   void ProjectItem::setGuiCameraList() {
     setText("Sensors");
     setIcon( QIcon(":camera") );
-    setData( QVariant() );
-  }
-  
-  
-  /**
-   * Sets the text, icon, and data corresponding to ShapeModels.
-   */
-  void ProjectItem::setShapeModels() {
-    setText("Shape Models");
-    setIcon( QIcon(":dem") );
     setData( QVariant() );
   }
   

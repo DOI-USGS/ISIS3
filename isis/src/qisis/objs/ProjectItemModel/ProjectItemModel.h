@@ -34,6 +34,7 @@ class QVariant;
 
 namespace Isis {
 
+  class ShapeList;
   class BundleSolutionInfo;
   class Control;
   class ControlList;
@@ -81,12 +82,13 @@ namespace Isis {
    * @ingroup
    *
    * @author 2015-10-21 Jeffrey Covington
-   *
-   * @internal
+   *  
+   * @internal 
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-01-13 Jeffrey Covington - Added canDropMimeData() method.
    *   @history 2016-06-27 Ian Humphrey - Added documentation to canDropMimeData(), checked coding
    *                           standards. Fixes #4006.
+   *   @history 2016-07-18 Tracie Sucharski - Added Project Item slots for adding shape models. 
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    */
   class ProjectItemModel : public QStandardItemModel {
@@ -106,7 +108,7 @@ namespace Isis {
       virtual bool canDropMimeData(const QMimeData *data,
                                    Qt::DropAction action,
                                    int row, int column,
-                                   const QModelIndex &parent) const;
+                                   const QModelIndex& parent) const;
       
       virtual void removeItem(ProjectItem *item);
       virtual void removeItems(QList<ProjectItem *> items);
@@ -127,6 +129,7 @@ namespace Isis {
        * This signal is emitted when a ProjectItem is added to the model.
        */
       void itemAdded(ProjectItem *);
+      void itemRemoved(ProjectItem *);
 
     protected slots:
       void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -135,11 +138,13 @@ namespace Isis {
       void onNameChanged(QString newName);
       void onBundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo);
       void onImagesAdded(ImageList *images);
+      void onShapesAdded(ShapeList *shapes);
       void onControlAdded(Control *control);
       void onControlListAdded(ControlList *controlList);
       void onTargetsAdded(TargetBodyList *targets);
       void onGuiCamerasAdded(GuiCameraList *cameras);
       void onRowsInserted(const QModelIndex &parent, int start, int end);
+      void onRowsRemoved(const QModelIndex &parent, int start, int end);
 
     private:
       QItemSelectionModel *m_selectionModel; //!< The internal selection model.

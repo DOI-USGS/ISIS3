@@ -9,6 +9,7 @@
 #include "ImageListActionWorkOrder.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
+#include "ImportShapesWorkOrder.h"
 #include "IString.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixViewWorkOrder.h"
@@ -17,6 +18,7 @@
 #include "MoveToTopSceneWorkOrder.h"
 #include "MoveUpOneSceneWorkOrder.h"
 #include "OpenProjectWorkOrder.h"
+#include "RemoveImagesWorkOrder.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
@@ -48,6 +50,7 @@ namespace Isis {
     tryType<ImageListActionWorkOrder>(type, project, result);
     tryType<ImportControlNetWorkOrder>(type, project, result);
     tryType<ImportImagesWorkOrder>(type, project, result);
+    tryType<ImportShapesWorkOrder>(type, project, result);
     tryType<JigsawWorkOrder>(type, project, result);
     tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);
@@ -55,6 +58,7 @@ namespace Isis {
     tryType<MoveToTopSceneWorkOrder>(type, project, result);
     tryType<MoveUpOneSceneWorkOrder>(type, project, result);
     tryType<OpenProjectWorkOrder>(type, project, result);
+    tryType<RemoveImagesWorkOrder>(type, project, result);
     tryType<RenameProjectWorkOrder>(type, project, result);
     tryType<SaveProjectAsWorkOrder>(type, project, result);
     tryType<SaveProjectWorkOrder>(type, project, result);

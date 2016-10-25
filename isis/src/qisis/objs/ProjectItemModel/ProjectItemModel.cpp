@@ -39,6 +39,7 @@
 #include "ImageList.h"
 #include "Project.h"
 #include "ProjectItem.h"
+#include "ShapeList.h"
 #include "TargetBodyList.h"
 
 namespace Isis {
@@ -49,17 +50,16 @@ namespace Isis {
    */
   ProjectItemModel::ProjectItemModel(QObject *parent) : QStandardItemModel(parent) {
     m_selectionModel = new QItemSelectionModel(this, this);
-    connect(m_selectionModel,
-            SIGNAL(selectionChanged(const QItemSelection &,
-                                    const QItemSelection &) ),
-            this, 
-            SLOT(onSelectionChanged(const QItemSelection &,
-                                    const QItemSelection &) ) );
+    connect(m_selectionModel, SIGNAL(selectionChanged(const QItemSelection &,
+                                                      const QItemSelection &) ),
+            this, SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &) ) );
                                     
-    connect( this,
-             SIGNAL( rowsInserted(const QModelIndex &, int, int) ), 
-             this,
-             SLOT( onRowsInserted(const QModelIndex &, int, int) ) );
+    connect( this, SIGNAL(rowsInserted(const QModelIndex &, int, int)), 
+             this, SLOT(onRowsInserted(const QModelIndex &, int, int)) );
+
+    connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), 
+             this, SLOT(onRowsRemoved(const QModelIndex &, int, int)) );
+
   }
 
 
@@ -123,13 +123,15 @@ namespace Isis {
             this, SLOT( onControlListAdded(ControlList *) ) );
     connect(project, SIGNAL( imagesAdded(ImageList *) ),
             this, SLOT( onImagesAdded(ImageList *) ) );
+    connect(project, SIGNAL( shapesAdded(ShapeList *) ),
+            this, SLOT( onShapesAdded(ShapeList *) ) );
     connect(project, SIGNAL( targetsAdded(TargetBodyList *) ),
             this, SLOT( onTargetsAdded(TargetBodyList *) ) );
     connect(project, SIGNAL( guiCamerasAdded(GuiCameraList *) ),
             this, SLOT( onGuiCamerasAdded(GuiCameraList *) ) );
-  
     ProjectItem *projectItem = new ProjectItem(project);
     appendRow(projectItem);
+//  qDebug()<<"ProjectItem::addProject after appendRow projectItem rowCount = "<<rowCount();
     return projectItem;
   }
 
@@ -192,11 +194,13 @@ namespace Isis {
     if (!item) {
       return;
     }
-
+//  qDebug()<<"ProjectItemModel::removeItem item= "<<item;
     if ( ProjectItem *parentItem = item->parent() ) {
+//    qDebug()<<"ProjectItemModel::removeItem  ParentItem ";
       removeRow( item->row(), parentItem->index() );
     }
     else {
+//    qDebug()<<"ProjectItemModel::removeItem item row =  "<<item->row();
       removeRow( item->row() );
     }
   }
@@ -385,6 +389,7 @@ namespace Isis {
         }
       }
     }
+//  qDebug()<<"ProjectItemModel::onControlAdded rowCount = "<<rowCount();
   }
 
 
@@ -428,6 +433,7 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList added to the Project.
    */
   void ProjectItemModel::onImagesAdded(ImageList * imageList) {
+//  qDebug()<<"ProjectItemModel::onImagesAdded  before add rowCount = "<<rowCount();
     Project *project = qobject_cast<Project *>( sender() );
     
     if (!project) {
@@ -441,6 +447,34 @@ namespace Isis {
           ProjectItem *imagesItem = projectItem->child(j);
           if (imagesItem->text() == "Images") {
             imagesItem->appendRow( new ProjectItem(imageList) );
+          }
+        }
+      }
+    }
+//  qDebug()<<"ProjectItemModel::onImagesAdded  after add rowCount = "<<rowCount();
+  }
+
+
+  /**
+   * Slot to connect to the shapesAdded() signal from a Project. Adds a ProjectItem that corresponds
+   * to the ShapeList to the model. The item is added to the item named "Shape Models" of the item
+   * that corresponds to the Project that sent the signal. 
+   *
+   * @param[in] shapes (ShapeList *) The ShapeList added to the Project.
+   */
+  void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
+    Project *project = qobject_cast<Project *>( sender() );
+    
+    if (!project) {
+      return;
+    }
+    for (int i=0; i<rowCount(); i++) {
+      ProjectItem *projectItem = item(i);
+      if (projectItem->project() == project) {
+        for (int j=0; j < projectItem->rowCount(); j++) {
+          ProjectItem *shapesItem = projectItem->child(j);
+          if (shapesItem->text() == "Shapes") {
+            shapesItem->appendRow( new ProjectItem(shapes) );
           }
         }
       }
@@ -580,6 +614,26 @@ namespace Isis {
       ProjectItem *item = itemFromIndex(newIndex);
       emit itemAdded(item);
     }
+  }
+
+
+  /**
+   * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a 
+   * corresponding itemRemoved() signal for each row inserted. 
+   *
+   * @param[in] parent (const QModelIndex &) The parent index where rows are to be removed.
+   *                                         
+   * @param[in] start (int) The first row to be removed (inclusive).
+   * @param[in] end (int) The last row to be removed (inclusive).
+   */
+  void ProjectItemModel::onRowsRemoved(const QModelIndex &parent, int start, int end) {
+    for (int row=start; row <= end; row++) {
+      QModelIndex newIndex = index(row, 0, parent);
+      ProjectItem *item = itemFromIndex(newIndex);
+//    qDebug()<<"ProjectItemModel::onRowsRemoved this = "<<this<<"   item = "<<item;
+      emit itemRemoved(item);
+    }
+//  qDebug()<<"ProjectItemModel::onRowsRemoved  Source model : "<<this<<"  row count = "<<rowCount();
   }
 }
 

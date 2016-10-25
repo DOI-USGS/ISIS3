@@ -54,10 +54,10 @@ namespace Isis {
    *
    * @author 2015-10-21 Jeffrey Covington
    * @internal
-   *
    *   @history 2015-10-21 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards. 
    *                           Fixes #4004.
+   *   @history 2016-07-28 Tracie Sucharski - Implemented removeItem and removeItems methods.
    *   @history 2016-08-25 Adam Paquette - Minor updates to documentation.
    *                           Fixes #4299.
    */
@@ -97,6 +97,9 @@ namespace Isis {
     public slots:
       virtual void addItem(ProjectItem *item);
       virtual void addItems(QList<ProjectItem *> items);
+
+      virtual void removeItem(ProjectItem *item);
+      virtual void removeItems(QList<ProjectItem *> items);
 
     private:
       ProjectItemModel *m_internalModel; //!< The internal model used by the view

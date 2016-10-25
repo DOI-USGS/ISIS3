@@ -35,6 +35,8 @@ class QWidgetAction;
 
 namespace Isis {
   
+  class ControlPoint;
+  class Directory;
   class Image;
   class MosaicSceneWidget;
   class ToolPad;
@@ -49,26 +51,39 @@ namespace Isis {
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation, checked coding standards.
    *                           Fixes #4004.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2016-09-14 Tracie Sucharski - Added signals for mouse clicks for modifying, deleting
+   *                           and creating control points.  These are passed on to Directory slots.
+   *   @history 2016-10-20 Tracie Sucharski -  Added back the capability for choosing either a new
+   *                           view or using an existing view.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
     Q_OBJECT
 
     public:
-      Footprint2DView(QWidget *parent=0);
+      Footprint2DView(Directory *directory, QWidget *parent=0);
       ~Footprint2DView();
 
+      MosaicSceneWidget *mosaicSceneWidget();
       virtual QList<QAction *> permToolBarActions();
       virtual QList<QAction *> activeToolBarActions();
       virtual QList<QAction *> toolPadActions();
  
       QSize sizeHint() const;
 
+    signals:
+      void modifyControlPoint(ControlPoint *controlPoint);
+      void deleteControlPoint(ControlPoint *controlPoint);
+      void createControlPoint(double latitude, double longitude);
+
+      void controlPointAdded(QString newPointId);
+
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
 
     private slots:
       void onItemAdded(ProjectItem *item);
+      void onItemRemoved(ProjectItem *item);
       void onQueueSelectionChanged();
 
     private:

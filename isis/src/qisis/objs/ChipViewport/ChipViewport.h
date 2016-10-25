@@ -79,6 +79,7 @@ namespace Isis {
    *   @history 2014-09-05 Kim Oyama - Added default initialization of Image to ChipViewport
    *                           construtor.
    *   @history 2015-12-08 Jeannie Backer - Fixed whitespace per ISIS coding standards.
+   *   @history 2016-03-31 Tracie Sucharski - Added method to return the chip cube.
    *   @history 2016-06-07 Ian Humphrey - Updated documentation and coding standards. Fixes #3958.
    */
   class ChipViewport : public QWidget {
@@ -100,6 +101,10 @@ namespace Isis {
       //!  Return chip
       Chip *chip() const {
         return m_chip;
+      };
+
+      Cube *chipCube() const {
+        return m_chipCube;
       };
 
       //! Return the number of samples in the chip

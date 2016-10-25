@@ -56,6 +56,9 @@
 #include "ImageReader.h"
 #include "IException.h"
 #include "ProgressBar.h"
+#include "Shape.h"
+#include "ShapeList.h"
+#include "ShapeReader.h"
 #include "Target.h"
 #include "TargetBodyList.h"
 #include "WorkOrder.h"
@@ -76,21 +79,31 @@ namespace Isis {
     m_cnetRoot = NULL;
     m_idToControlMap = NULL;
     m_idToImageMap = NULL;
+    m_idToShapeMap = NULL;
     m_idToTargetBodyMap = NULL;
     m_idToGuiCameraMap = NULL;
     m_images = NULL;
     m_imageReader = NULL;
+    m_shapeReader = NULL;
+    m_shapes = NULL;
     m_warnings = NULL;
     m_workOrderHistory = NULL;
     m_isTemporaryProject = true;
+    m_activeControl = NULL;
+    m_activeImageList = NULL;
 
     m_numImagesCurrentlyReading = 0;
 
     m_mutex = NULL;
     m_imageReadingMutex = NULL;
 
+    m_numShapesCurrentlyReading = 0;
+    m_shapeMutex = NULL;
+    m_shapeReadingMutex = NULL;
+
     m_idToControlMap = new QMap<QString, Control *>;
     m_idToImageMap = new QMap<QString, Image *>;
+    m_idToShapeMap = new QMap<QString, Shape *>;
     m_idToTargetBodyMap = new QMap<QString, TargetBody *>;
     m_idToGuiCameraMap = new QMap<QString, GuiCamera *>;
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
@@ -151,11 +164,12 @@ namespace Isis {
       throw IException(IException::Programmer,
           tr("Error creating project folders [%1]").arg( e.what() ), _FILEINFO_);
     }
-
-    // image reader
+    //  TODO TLS 2016-07-13  This seems to only be used by ControlNet when SetTarget is called.
+    //     This needs to be better documented, possibly renamed or redesigned??
     m_mutex = new QMutex;
 
-    m_imageReader = new ImageReader(m_mutex, false);
+    // image reader
+    m_imageReader = new ImageReader(m_mutex, true);
 
     connect( m_imageReader, SIGNAL( imagesReady(ImageList) ),
              this, SLOT( imagesReady(ImageList) ) );
@@ -167,6 +181,16 @@ namespace Isis {
              this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
 
     m_images = new QList<ImageList *>;
+
+    // Shape reader
+    m_shapeMutex = new QMutex;
+
+    m_shapeReader = new ShapeReader(m_shapeMutex, false);
+
+    connect( m_shapeReader, SIGNAL( shapesReady(ShapeList) ),
+             this, SLOT( shapesReady(ShapeList) ) );
+
+    m_shapes = new QList<ShapeList *>;
 
     m_controls = new QList<ControlList *>;
 
@@ -180,6 +204,8 @@ namespace Isis {
     m_workOrderHistory = new QList< QPointer<WorkOrder> >;
 
     m_imageReadingMutex = new QMutex;
+
+    m_shapeReadingMutex = new QMutex;
 
     // TODO: ken testing
 //    m_bundleSettings = NULL;
@@ -226,6 +252,19 @@ namespace Isis {
       m_images = NULL;
     }
 
+    if (m_shapes) {
+      foreach (ShapeList *shapeList, *m_shapes) {
+        foreach (Shape *shape, *shapeList) {
+          delete shape;
+        }
+
+        delete shapeList;
+      }
+
+      delete m_shapes;
+      m_shapes = NULL;
+    }
+
     if (m_controls) {
       foreach (ControlList *controlList, *m_controls) {
         foreach (Control *control, *controlList) {
@@ -237,6 +276,9 @@ namespace Isis {
       delete m_controls;
       m_controls = NULL;
     }
+
+    m_activeControl = NULL;
+    m_activeImageList = NULL;
 
     if (m_bundleSolutionInfo) {
       foreach (BundleSolutionInfo *bundleSolutionInfo, *m_bundleSolutionInfo) {
@@ -252,6 +294,9 @@ namespace Isis {
 
     delete m_idToImageMap;
     m_idToImageMap = NULL;
+
+    delete m_idToShapeMap;
+    m_idToShapeMap = NULL;
 
     delete m_idToTargetBodyMap;
     m_idToTargetBodyMap = NULL;
@@ -271,6 +316,7 @@ namespace Isis {
     m_cnetRoot = NULL;
 
     delete m_imageReader;
+    delete m_shapeReader;
 
     delete m_warnings;
     m_warnings = NULL;
@@ -310,6 +356,13 @@ namespace Isis {
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
+//      qDebug()<<"shape directory = "<<shapeDataRoot();
+      if ( !dir.mkdir( shapeDataRoot() ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( shapeDataRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
 
       if ( !dir.mkdir( resultsRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
@@ -343,7 +396,23 @@ namespace Isis {
                this, SLOT( imageListDeleted(QObject *) ) );
       //TODO  07-29-14  Kim & Tracie commented this out.  Didn't seem like it was necessary.
       //      If problems, need to understand this code better.
-   m_images->append(result);
+      m_images->append(result);
+    }
+    return result;
+  }
+
+
+  ShapeList *Project::createOrRetrieveShapeList(QString name) {
+    ShapeList *result = shapeList(name);
+    if (!result) {
+      result = new ShapeList;
+
+      result->setName(name);
+      result->setPath(name);
+
+      connect( result, SIGNAL( destroyed(QObject *) ),
+               this, SLOT( shapeListDeleted(QObject *) ) );
+      m_shapes->append(result);
     }
     return result;
   }
@@ -382,6 +451,16 @@ namespace Isis {
 
       for (int i = 0; i < m_images->count(); i++) {
         m_images->at(i)->save(stream, this, newProjectRoot);
+      }
+
+      stream.writeEndElement();
+    }
+
+    if ( !m_shapes->isEmpty() ) {
+      stream.writeStartElement("shapeLists");
+
+      for (int i = 0; i < m_shapes->count(); i++) {
+        m_shapes->at(i)->save(stream, this, newProjectRoot);
       }
 
       stream.writeEndElement();
@@ -633,6 +712,7 @@ namespace Isis {
    * Read the given cube file names as Images and add them to the project.
    */
   void Project::addImages(QStringList imageFiles) {
+//  qDebug()<<"Project::addImages(QStringList imageFiles)";
     if (m_numImagesCurrentlyReading == 0) {
       m_imageReadingMutex->lock();
     }
@@ -643,7 +723,56 @@ namespace Isis {
 
 
   void Project::addImages(ImageList newImages) {
+//  qDebug()<<"Project::addImages(ImageList newImages";
     imagesReady(newImages);
+  }
+
+
+  /**
+   * Create and return the name of a folder for placing shape models.
+   *
+   * This can be called from multiple threads, but should only be called by one thread at a time.
+   */
+  QDir Project::addShapeFolder(QString prefix) {
+    QDir shapeFolder = shapeDataRoot();
+    prefix += "%1";
+    int prefixCounter = 0;
+
+    QString numberedPrefix;
+    do {
+      prefixCounter++;
+      numberedPrefix = prefix.arg( QString::number(prefixCounter) );
+    }
+    while ( shapeFolder.exists(numberedPrefix) );
+
+    if ( !shapeFolder.mkpath(numberedPrefix) ) {
+      throw IException(IException::Io,
+          tr("Could not create shape directory [%1] in [%2].")
+            .arg(numberedPrefix).arg( shapeFolder.absolutePath() ),
+          _FILEINFO_);
+    }
+
+    shapeFolder.cd(numberedPrefix);
+
+    return shapeFolder;
+  }
+
+
+  /**
+   * Read the given shape model cube file names as Images and add them to the project.
+   */
+  void Project::addShapes(QStringList shapeFiles) {
+    if (m_numShapesCurrentlyReading == 0) {
+      m_shapeReadingMutex->lock();
+    }
+
+    m_numShapesCurrentlyReading += shapeFiles.count();
+    m_shapeReader->read(shapeFiles);
+  }
+
+
+  void Project::addShapes(ShapeList newShapes) {
+    shapesReady(newShapes);
   }
 
 
@@ -839,6 +968,25 @@ namespace Isis {
   }
 
 
+  Shape *Project::shape(QString id) {
+    return (*m_idToShapeMap)[id];
+  }
+
+
+  ShapeList *Project::shapeList(QString name) {
+    QListIterator<ShapeList *> it(*m_shapes);
+
+    ShapeList *result = NULL;
+    while (it.hasNext() && !result) {
+      ShapeList *list = it.next();
+
+      if (list->name() == name) result = list;
+    }
+
+    return result;
+  }
+
+
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
@@ -950,15 +1098,13 @@ namespace Isis {
   }
 
 
-//   void Project::removeImages(ImageList &imageList) {
-//     foreach (Image *image, imageList) {
-//       removeImage(image);
-//     }
-//   }
-
-
   void Project::waitForImageReaderFinished() {
     QMutexLocker locker(m_imageReadingMutex);
+  }
+
+
+  void Project::waitForShapeReaderFinished() {
+    QMutexLocker locker(m_shapeReadingMutex);
   }
 
 
@@ -972,6 +1118,62 @@ namespace Isis {
     }
 
     return result;
+  }
+
+
+  /**
+   * @brief Set the Active Control (control network) 
+   *  
+   * @description Set the active control (control network) for views which need to operate on the 
+   * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   *  
+   * @internal 
+   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   */
+  void Project::setActiveControl(Control *control) {
+    m_activeControl = control;
+  }
+
+
+  /**
+   * @brief Return the Active Control (control network) 
+   *  
+   * @description Returns the active control (control network) for views which need to operate on 
+   * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   *  
+   * @internal 
+   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   */
+  Control *Project::activeControl() {
+    return m_activeControl;
+  }
+
+
+  /**
+   * @brief Set the Active ImageList
+   *  
+   * @description Set the active ImageList for views which need to operate on the 
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   *  
+   * @internal 
+   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   */
+  void Project::setActiveImageList(ImageList *imageList) {
+    m_activeImageList = imageList;
+  }
+
+
+  /**
+   * @brief  Returns the active ImageList
+   *  
+   * @description Returns the active ImageList for views which need to operate on the 
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   *  
+   * @internal 
+   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   */
+  ImageList *Project::activeImageList() {
+    return m_activeImageList;
   }
 
 
@@ -1032,6 +1234,31 @@ namespace Isis {
    */
   QString Project::imageDataRoot() const {
     return imageDataRoot( m_projectRoot->path() );
+  }
+
+
+  /**
+   * Appends the root directory name 'shapes' to the project .
+   *
+   * @return The path to the root directory of the shape models data.
+   */
+  QString Project::shapeDataRoot(QString projectRoot) {
+    return projectRoot + "/shapes";
+  }
+
+
+  /**
+   * Accessor for the root directory of the shape model data.
+   *
+   * @return The path to the root directory of the shape model data.
+   */
+  QString Project::shapeDataRoot() const {
+    return shapeDataRoot( m_projectRoot->path() );
+  }
+
+
+  QList<ShapeList *> Project::shapes() {
+    return *m_shapes;
   }
 
 
@@ -1120,6 +1347,11 @@ namespace Isis {
 
     if ( !m_projectRoot->rmdir( imageDataRoot() ) ) {
       warn( tr("Did not properly clean up images folder [%1] in project").arg( imageDataRoot() ) );
+    }
+
+    if ( !m_projectRoot->rmdir( shapeDataRoot() ) ) {
+      warn( tr("Did not properly clean up shapes folder [%1] in project").
+            arg( shapeDataRoot() ) );
     }
 
     if ( !m_projectRoot->rmdir( cnetRoot() ) ) {
@@ -1374,6 +1606,7 @@ namespace Isis {
     foreach (Image *image, *imageList) {
 
       // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
+      //   2016-07-25  TLS The cube is created if it doesn't exist (or isn't open)
       Target *target = image->cube()->camera()->target();
 
       // construct TargetBody QSharedPointer from this images cameras Target
@@ -1433,10 +1666,10 @@ namespace Isis {
 
       if (!found) {
         m_guiCameras->append(guiCamera);
-        connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
-                 this, SLOT( guiCameraClosed(QObject *) ) );
-        connect( this, SIGNAL( projectRelocated(Project *) ),
-                 guiCamera.data(), SLOT( updateFileName(Project *) ) );
+//      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
+//               this, SLOT( guiCameraClosed(QObject *) ) );
+//      connect( this, SIGNAL( projectRelocated(Project *) ),
+//               guiCamera.data(), SLOT( updateFileName(Project *) ) );
 
         (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
       }
@@ -1446,10 +1679,21 @@ namespace Isis {
   }
 
 
+  void Project::removeImages(ImageList &imageList) {
+    foreach (Image *image, imageList) {
+      delete image;
+    }
+
+    //  If imageList part of project, remove list
+
+  }
+
+
   /**
    * An image is being deleted from the project
    */
   void Project::imageClosed(QObject *imageObj) {
+//  qDebug()<<"Project::imageClosed";
     QMutableListIterator<ImageList *> it(*m_images);
     while (it.hasNext()) {
       ImageList *list = it.next();
@@ -1462,6 +1706,17 @@ namespace Isis {
     }
 
     m_idToImageMap->remove(m_idToImageMap->key((Image *)imageObj));
+  }
+
+
+  /**
+   * An image list is being deleted from the project.
+   */
+  void Project::imageListDeleted(QObject *imageListObj) {
+    int indexToRemove = m_images->indexOf(static_cast<ImageList *>(imageListObj));
+    if (indexToRemove != -1) {
+      m_images->removeAt(indexToRemove);
+    }
   }
 
 
@@ -1496,12 +1751,12 @@ namespace Isis {
 
 
   /**
-   * An image list is being deleted from the project.
+   * A shape model list is being deleted from the project.
    */
-  void Project::imageListDeleted(QObject *imageListObj) {
-    int indexToRemove = m_images->indexOf(static_cast<ImageList *>(imageListObj));
+  void Project::shapeListDeleted(QObject *shapeListObj) {
+    int indexToRemove = m_shapes->indexOf(static_cast<ShapeList *>(shapeListObj));
     if (indexToRemove != -1) {
-      m_images->removeAt(indexToRemove);
+      m_shapes->removeAt(indexToRemove);
     }
   }
 
@@ -1555,6 +1810,58 @@ namespace Isis {
 
 
 
+  void Project::shapesReady(ShapeList shapes) {
+
+    m_numShapesCurrentlyReading -= shapes.count();
+
+    foreach (Shape *shape, shapes) {
+      connect(shape, SIGNAL(destroyed(QObject *)),
+              this, SLOT(shapeClosed(QObject *)));
+      connect(this, SIGNAL(projectRelocated(Project *)),
+              shape, SLOT(updateFileName(Project *)));
+
+      (*m_idToShapeMap)[shape->id()] = shape;
+      createOrRetrieveShapeList(
+         FileName(shapes[0]->fileName()).dir().dirName())->append(shape);
+    }
+
+    // We really can't have all of the cubes in memory before
+    //   the OS stops letting us open more files.
+    // Assume cameras are being used in other parts of code since it's
+    //   unknown
+    QMutexLocker lock(m_shapeMutex);
+    emit shapesAdded(m_shapes->last());
+
+    Shape *openShape;
+    foreach (openShape, shapes) {
+      openShape->closeCube();
+    }
+
+    if (m_numShapesCurrentlyReading == 0) {
+      m_shapeReadingMutex->unlock();
+    }
+  }
+
+
+  /**
+   * A shape model is being deleted from the project
+   */
+  void Project::shapeClosed(QObject *imageObj) {
+    QMutableListIterator<ShapeList *> it(*m_shapes);
+    while (it.hasNext()) {
+      ShapeList *list = it.next();
+
+      int foundElement = list->indexOf((Shape *)imageObj);
+
+      if (foundElement != -1) {
+        list->removeAt(foundElement);
+      }
+    }
+
+    m_idToShapeMap->remove(m_idToShapeMap->key((Shape *)imageObj));
+  }
+
+
   Project::XmlHandler::XmlHandler(Project *project) {
     m_project = project;
     m_workOrder = NULL;
@@ -1576,7 +1883,11 @@ namespace Isis {
         m_controls.append(new ControlList(m_project, reader()));
       }
       else if (localName == "imageList") {
+//      qDebug()<<"Project::XmlHandler::startElement localName = imageList";
         m_imageLists.append(new ImageList(m_project, reader()));
+      }
+      else if (localName == "shapeLists") {
+        m_shapeLists.append(new ShapeList(m_project, reader()));
       }
       else if (localName == "workOrder") {
         QString type = atts.value("type");
@@ -1621,6 +1932,10 @@ namespace Isis {
     if (localName == "project") {
       foreach (ImageList *imageList, m_imageLists) {
         m_project->imagesReady(*imageList);
+      }
+      // TODO does this go here under project or should it be under shapes?
+      foreach (ShapeList *shapeList, m_shapeLists) {
+        m_project->shapesReady(*shapeList);
       }
     }
     else if (localName == "workOrder") {

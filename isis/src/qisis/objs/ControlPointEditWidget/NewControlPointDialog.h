@@ -7,14 +7,16 @@ class QLabel;
 class QLineEdit;
 class QListWidget;
 class QPushButton;
+class QRadioButton;
 class QString;
 class QStringList;
 
 namespace Isis {
+  class ControlNet;
   class SerialNumberList;
 
   /**
-   * @author ????-??-?? Unknown
+   * @author ????-??-?? Tracie Sucharski
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added functionality
    *                          to show the last Point ID entered
@@ -23,29 +25,40 @@ namespace Isis {
    *                          in constructor.  Removed "std::" in
    *                          header and .cpp files.
    *   @history 2010-12-03 Eric Hyer - Selected points now go to the top!
-   *   @history 2014-07-21 Tracie Sucharski & Kimberly Oyama - Refactored from
-   *                          QnetToolNewPointDialog.
+   *   @history 2016-09-16 Tracie Sucharski - Renamed to NewControlPointDialog in anticipation of
+   *                          creating a parent class that QnetNewPointDialog and
+   *                          MatchToolNewPointDialog can inherit.
+   *   @history 2016-10-18 Tracie Sucharski - Added method to return value of the
+   *                          subpixelRegister radio button.  If set, all measures in the control
+   *                          point created will be subpixel registered.
    */
   class NewControlPointDialog : public QDialog {
 
       Q_OBJECT
 
     public:
-      NewControlPointDialog(QString defaultPointId, QWidget *parent = 0);
+      NewControlPointDialog(ControlNet *controlNet, SerialNumberList *serialNumberList, 
+                            QString defaultPointId, QWidget *parent = 0);
 
       QString pointId() const;
       QStringList selectedFiles() const;
-      void setFiles(QStringList pointFiles, SerialNumberList *snList);
+      void setFiles(QStringList pointFiles);
+      bool subpixelRegisterPoint();
     
     private slots:
       void enableOkButton(const QString &text);
 
     private:
+      ControlNet *m_controlNet;
+      SerialNumberList *m_serialNumberList;
+
       QLabel *m_ptIdLabel;
+      QRadioButton *m_subpixelRegisterButton;
       QPushButton *m_okButton;
       QLineEdit *m_ptIdEdit;
       QListWidget *m_fileList;
       QStringList *m_pointFiles;
+
   };
 };
 

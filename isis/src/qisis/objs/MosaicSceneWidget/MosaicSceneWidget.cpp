@@ -18,7 +18,7 @@
 #include <QToolButton>
 #include <QToolTip>
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 
 #include "Camera.h"
@@ -63,8 +63,8 @@ namespace Isis {
    * Create a scene widget.
    */
   MosaicSceneWidget::MosaicSceneWidget(QStatusBar *status, bool showTools,
-      bool internalizeToolBarsAndProgress, Directory *directory,
-      QWidget *parent) : QWidget(parent) {
+                                       bool internalizeToolBarsAndProgress, Directory *directory,
+                                       QWidget *parent) : QWidget(parent) {
     m_projectImageZOrders = NULL;
     m_projectViewTransform = NULL;
     m_directory = directory;
@@ -115,22 +115,39 @@ namespace Isis {
     m_tools->append(new MosaicSelectTool(this));
     m_tools->append(new MosaicZoomTool(this));
     m_tools->append(new MosaicPanTool(this));
-    m_tools->append(new MosaicControlNetTool(this));
-    connect( this, SIGNAL( controlPointChanged(QString) ), 
-             m_tools->last(), SLOT( displayChangedControlPoint(QString) ) );
-    connect( this, SIGNAL( controlPointAdded(QString) ), 
-             m_tools->last(), SLOT( displayNewControlPoint(QString) ) );
+    MosaicControlNetTool *cnetTool = new MosaicControlNetTool(this);
+    m_tools->append(cnetTool);
 
-    // Tell the editor that we want to delete a point.
-    connect( m_tools->last(), SIGNAL( deleteControlPoint(QString) ),
-             this, SIGNAL( deleteControlPoint(QString) ) );
-    
-    // Tell the tool that the editor deleted the point and it can redraw.
-    connect( this, SIGNAL( controlPointDeleted() ),
-             m_tools->last(), SLOT( displayUponControlPointDeletion() ) );
+    //  Pass on Signals emitted from IpceTool
+    //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
+    connect(cnetTool, SIGNAL(modifyControlPoint(ControlPoint *)),
+            this, SIGNAL(modifyControlPoint(ControlPoint *)));
 
+    connect(cnetTool, SIGNAL(deleteControlPoint(ControlPoint *)),
+            this, SIGNAL(deleteControlPoint(ControlPoint *)));
+
+    connect(cnetTool, SIGNAL(createControlPoint(double, double)),
+            this, SIGNAL(createControlPoint(double, double)));
+
+    // Pass on signals to the MosaicControlNetTool
+    connect(this, SIGNAL(controlPointAdded(QString)),
+            cnetTool, SLOT(displayNewControlPoint(QString)));
+
+//
+//  connect( this, SIGNAL( controlPointChanged(QString) ),
+//           m_tools->last(), SLOT( displayChangedControlPoint(QString) ) );
+//
+//  // Tell the editor that we want to delete a point.
+//  connect( m_tools->last(), SIGNAL( deleteControlPoint(QString) ),
+//           this, SIGNAL( deleteControlPoint(QString) ) );
+//
+//  // Tell the tool that the editor deleted the point and it can redraw.
+//  connect( this, SIGNAL( controlPointDeleted() ),
+//           m_tools->last(), SLOT( displayUponControlPointDeletion() ) );
+//
 //     delete control point from scene
     
+        
     m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));
     m_tools->append(new MosaicGridTool(this));
@@ -1401,7 +1418,7 @@ namespace Isis {
 
       QPoint projectScrollPos(toInt(positionInfo["ScrollPosition"][0]),
                               toInt(positionInfo["ScrollPosition"][1]));
-
+        
       getView()->horizontalScrollBar()->setValue(projectScrollPos.x());
       getView()->verticalScrollBar()->setValue(projectScrollPos.y());
     }
@@ -1413,9 +1430,25 @@ namespace Isis {
       delete m_projectViewTransform;
       m_projectViewTransform = NULL;
     }
-
+    
     m_progress->setVisible(false);
     emit cubesChanged();
+  }
+
+
+  void MosaicSceneWidget::removeImages(ImageList images) {
+    // TODO:  2016-08-02 TLS  Should this be done similarly to addImages. Re-do Image list
+    //  then redo scene?
+    foreach(Image *image, images) {
+      try {
+        MosaicSceneItem *item = cubeToMosaic(image);
+        item->deleteLater();
+        removeMosItem(item);
+      }
+      catch (IException &e) {
+        e.print();
+      }
+    }
   }
 
 
@@ -1468,6 +1501,7 @@ namespace Isis {
 
   void MosaicSceneWidget::removeMosItem(QObject *mosItem) {
     MosaicSceneItem *castedMosItem = (MosaicSceneItem *) mosItem;
+//  qDebug()<<"MosaicSceneWidget::removeMosItem mosItem = "<<castedMosItem;
     m_mosaicSceneItems->removeAll(castedMosItem);
     m_displayPropsToMosaicSceneItemMap.remove(
         m_displayPropsToMosaicSceneItemMap.key(castedMosItem));

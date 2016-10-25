@@ -25,6 +25,10 @@ namespace Isis {
    *                           I'm leaving it alone due to time constraints. Fixes #479.
    *   @history 2014-06-02 Tracie Sucharski - Added documentation to the header file regarding
    *                           pointToScene method and member variable.
+   *   @history 2016-10-20 Tracie Sucharski & Kim Oyama - Added functionality for IPCE, including
+   *                           findClosestControlPoint method and making buildChildren and
+   *                           clearControlPointGraphicsItem public slots.
+   *                           Fixes #4479
    */
   class ControlNetGraphicsItem : public QGraphicsObject {
       Q_OBJECT

@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QList>
 #include <QMetaType>
+#include <QSharedPointer>
 
 #include "Image.h"
 #include "ImageDisplayProperties.h"
@@ -35,6 +36,10 @@ namespace Isis {
    * @history 2014-06-13 Tracie Sucharski - Added serialNumberList method.
    * @history 2016-06-08 Jesse Mapel - Updated documentation and merged from IPCE to ISIS branch.
    *                         Fixes #3961.
+   * @history 2016-09-19 Tracie Sucharski - Changed serialNumberList method to return a shared 
+   *                         pointer. TODO:  Currently, serialNumberList created the list on the
+   *                         fly.  For speed, this needs to change so that when the ImageList
+   *                         changes, update the serial number list.
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT
@@ -51,7 +56,8 @@ namespace Isis {
       ImageList(const ImageList &);
       ~ImageList();
 
-      SerialNumberList serialNumberList();
+//    QSharedPointer<SerialNumberList> serialNumberList();
+      SerialNumberList *serialNumberList();
 
       // These are overridden (-ish) in order to add notifications to the list changing
       void append(Image * const & value);

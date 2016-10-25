@@ -62,6 +62,9 @@ namespace Isis {
    *                          regular QActions can be used in menus and toolbars. Views can
    *                          now be detached from the main window into their own independent
    *                          window with internalized menus and toolbars.
+   *   @history 2016-10-20 Tracie Sucharski - Clean up included headers that are commented out,
+   *                          updated for Qt5, comment call to saveState for window which caused
+   *                          errors.  TODO:  Determine problem with saveState call.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT

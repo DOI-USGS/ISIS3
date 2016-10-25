@@ -300,11 +300,11 @@ namespace Isis {
         result->fromPvl(imageObj);
       }
 
-      try {
-        result->initFootprint(m_mutex);
-      }
-      catch (IException &) {
-        if (m_requireFootprints) {
+      if (m_requireFootprints) {
+        try {
+          result->initFootprint(m_mutex);
+        }
+        catch (IException &) {
           throw;
         }
       }

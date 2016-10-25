@@ -276,13 +276,13 @@ namespace Isis {
   }
 
 
-  QWidget *Workspace::imageToMdiWidget(Image *image) {
+  QWidget *Workspace::cubeToMdiWidget(Cube *cube) {
     QWidget *result = NULL;
 
     for (int i = 0; !result && i < m_cubeViewportList->count(); i++) {
       MdiCubeViewport *viewport = (*m_cubeViewportList)[i];
 
-      if (viewport->cube() == image->cube()) {
+      if (viewport->cube() == cube) {
         result = qobject_cast<QWidget *>(viewport->parent());
       }
     }

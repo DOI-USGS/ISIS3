@@ -1,11 +1,17 @@
 #include "NewControlPointDialog.h"
 
-#include <QtWidgets>
 #include <algorithm>
+
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QString>
 
 #include "ControlNet.h"
 #include "IString.h"
-#include "QnetTool.h"
 #include "SerialNumberList.h"
 
 namespace Isis {
@@ -25,10 +31,17 @@ namespace Isis {
    *                          creation if the point was never saved.
    *
    */
-  NewControlPointDialog::NewControlPointDialog(QString defaultPointId,
-                                         QWidget *parent) : QDialog(parent) {
+  NewControlPointDialog::NewControlPointDialog(ControlNet *controlNet,
+                                               SerialNumberList *serialNumberList,
+                                               QString defaultPointId, QWidget *parent)
+                       : QDialog(parent) {
+
+    m_controlNet = controlNet;
+    m_serialNumberList = serialNumberList;
 
     m_ptIdEdit = NULL;
+
+    m_subpixelRegisterButton = NULL;
     m_fileList = NULL;
     m_ptIdLabel = NULL;
     m_okButton = NULL;
@@ -39,7 +52,12 @@ namespace Isis {
     m_ptIdEdit->setText(defaultPointId);
     m_ptIdEdit->selectAll();
     connect(m_ptIdEdit, SIGNAL(textChanged(const QString &)),
-        this, SLOT(enableOkButton(const QString &)));
+            this, SLOT(enableOkButton(const QString &)));
+
+    m_subpixelRegisterButton = new QRadioButton("Subpixel Register Measures");
+    m_subpixelRegisterButton->setChecked(true);
+    m_subpixelRegisterButton->setToolTip("Each measure will be subpixel registered to the reference"
+                                         " as it is created.");
 
     QLabel *listLabel = new QLabel("Select Files:");
 
@@ -66,6 +84,7 @@ namespace Isis {
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addLayout(ptIdLayout);
+    vLayout->addWidget(m_subpixelRegisterButton);
     vLayout->addWidget(listLabel);
     vLayout->addWidget(m_fileList);
     vLayout->addLayout(buttonLayout);
@@ -92,6 +111,11 @@ namespace Isis {
   }
 
 
+  bool NewControlPointDialog::subpixelRegisterPoint() {
+    return m_subpixelRegisterButton->isChecked();
+  }
+
+
   /**
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
@@ -99,14 +123,14 @@ namespace Isis {
    *   @history 2010-10-29 Tracie Sucharski - Changed std::vector<std::string>
    *            to QSringList
    */
-  void NewControlPointDialog::setFiles(QStringList pointFiles, SerialNumberList *snList) {
+  void NewControlPointDialog::setFiles(QStringList pointFiles) {
 
     int bottomMostSelectedItemIndex = 0;
 
-    for (int i = 0; i < snList->size(); i++) {
+    for (int i = 0; i < m_serialNumberList->size(); i++) {
 
       // build new item...
-      QString label = snList->fileName(i);
+      QString label = m_serialNumberList->fileName(i);
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then
@@ -131,9 +155,7 @@ namespace Isis {
    *            to the ptIdValue
    */
   void NewControlPointDialog::enableOkButton(const QString &) {
-//  m_okButton->setEnabled(!m_ptIdEdit->text().isEmpty() &&
-//                         !m_qnetTool->controlNet()->ContainsPoint(m_ptIdEdit->text()));
+    m_okButton->setEnabled(!m_ptIdEdit->text().isEmpty() &&
+                           !m_controlNet->ContainsPoint(m_ptIdEdit->text()));
   }
-
-
 }

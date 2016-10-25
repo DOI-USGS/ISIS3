@@ -92,7 +92,7 @@ namespace Isis {
    *                           data.
    *   @history 2012-10-03 Steven Lambright - Removed createReferenceFootprint() - this was dead
    *                           code that the grid tool handles now.
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
    *                           #775 and #1114.
    *   @history 2012-10-19 Steven Lambright and Stuart Sides - Added moveUpOne(),
    *                           moveDownOne(), moveToTop(), and moveToBottom() methods with new,
@@ -109,13 +109,14 @@ namespace Isis {
    *                           Removed unused private member, m_projectionFootprint.  The
    *                           uninitialized values were causing the qmos selection tool to not
    *                           work properly.  Fixes #1742.
-   *   @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Added selectedCubes() and  .
+   *   @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Added selectedCubes() and other
+   *                           control net functionality for IPCE.
    *   @history 2016-04-22 Jeannie Backer - Added label parameter to setProjection(mapGroup, label).
    *                           The default value for label is an empty Pvl. Also, modified
    *                           addImage() to pass the label from the cube of the image to be added
    *                           into setProjection(mapGroup, label). This was done to be able to call
    *                           TProjection::TargetRadii(label,mapGroup), which will
-   *                           in turn will now call Target::radiiGroup(targetName), if needed.
+   *                           in turn will now call Target::radiiGroup(targetName), if needed. 
    *                           References #3892
    *   @history 2016-08-28 Kelvin Rodriguez - Added using QWidget::contextMenuEvent to avoid
    *                           hidden virtual function warnings in clang. Part of porting to OS X 10.11.
@@ -127,7 +128,11 @@ namespace Isis {
    *                           into setProjection(mapGroup, label). This was done to be able to call
    *                           TProjection::TargetRadii(label,mapGroup), which will
    *                           in turn will now call Target::radiiGroup(targetName), if needed. 
-   *                           References #3892   
+   *                           References #3892
+   *   @history 2016-08-02 Tracie Sucharski - Added public method to remove an Image from scene. 
+   *   @history 2016-09-14 Tracie Sucharski - Added signals for mouse clicks for modifying, deleting
+   *                           and creating control points.  These are passed on to Footprint2DView
+   *                           signals, then on to Directory slots.
    * 
    */
   class MosaicSceneWidget : public QWidget {
@@ -245,6 +250,10 @@ namespace Isis {
 
       void queueSelectionChanged();
 
+      void modifyControlPoint(ControlPoint *controlPoint);
+      void deleteControlPoint(ControlPoint *controlPoint);
+      void createControlPoint(double latitude, double longitude);
+
       void controlPointSelected(ControlPoint *);
 
       void controlPointChanged(QString pointId);
@@ -255,6 +264,7 @@ namespace Isis {
 
     public slots:
       void addImages(ImageList);
+      void removeImages(ImageList);
       void refit();
       void setCubesSelectable(bool);
       void setProjection(Projection *);
@@ -365,9 +375,10 @@ namespace Isis {
 
       double m_currentMinimumFootprintZ;
       double m_currentMaximumFootprintZ;
-
+      
       PvlObject *m_projectViewTransform;
   };
 }
 
 #endif
+

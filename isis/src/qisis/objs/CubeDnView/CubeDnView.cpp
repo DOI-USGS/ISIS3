@@ -31,6 +31,7 @@
 #include <QModelIndex>
 #include <QSize>
 #include <QSizePolicy>
+#include <QStatusBar>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidgetAction>
@@ -50,19 +51,19 @@
 #include "HistogramTool.h"
 #include "Image.h"
 #include "ImageList.h"
+#include "IpceTool.h"
 #include "IString.h"
 #include "MatchTool.h"
 #include "MdiCubeViewport.h"
 #include "MeasureTool.h"
 #include "PanTool.h"
+#include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemProxyModel.h"
 #include "RubberBandTool.h"
-#include "QnetFileTool.h"
-#include "QnetNavTool.h"
-#include "QnetTool.h"
 #include "ScatterPlotTool.h"
+#include "Shape.h"
 #include "SpatialPlotTool.h"
 #include "SpecialPixelTool.h"
 #include "SpectralPlotTool.h"
@@ -84,7 +85,8 @@ namespace Isis {
    *
    * @param parent (QWidget *) Pointer to parent widget
    */
-  CubeDnView::CubeDnView(QWidget *parent) : AbstractProjectItemView(parent) {
+  CubeDnView::CubeDnView(Directory *directory, QWidget *parent) :
+                 AbstractProjectItemView(parent) {
     connect( internalModel()->selectionModel(), 
         SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
              this, SLOT( onCurrentChanged(const QModelIndex &) ) );
@@ -136,15 +138,35 @@ namespace Isis {
     Tool *defaultActiveTool = NULL;
 
     tools->append(new RubberBandTool(this));
-    QnetTool *qnetTool = new QnetTool(m_workspace);
+//  QnetTool *qnetTool = new QnetTool(m_workspace);
     //tools->append(new FileTool(this));
     //tools->append(new QnetFileTool(qnetTool, this));
     tools->append(NULL);
     tools->append(new BandTool(this));
 
-    defaultActiveTool = new ZoomTool(this);
+    IpceTool *ipceTool = new IpceTool(directory, this);
+    defaultActiveTool = ipceTool;
     tools->append(defaultActiveTool);
 
+    if (directory->project()->activeControl()) {
+      ipceTool->setControlNet(directory->project()->activeControl()->controlNet()); 
+    }
+    //  Pass on Signals emitted from IpceTool
+    //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
+    connect(ipceTool, SIGNAL(modifyControlPoint(ControlPoint *)),
+            this, SIGNAL(modifyControlPoint(ControlPoint *)));
+
+    connect(ipceTool, SIGNAL(deleteControlPoint(ControlPoint *)),
+            this, SIGNAL(deleteControlPoint(ControlPoint *)));
+
+    connect(ipceTool, SIGNAL(createControlPoint(double, double, Cube *, bool)),
+            this, SIGNAL(createControlPoint(double, double, Cube *, bool)));
+
+    // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
+    // This is done to redraw the control points on the cube viewports
+    connect(this, SIGNAL(controlPointAdded(QString)), ipceTool, SLOT(refresh()));
+
+    tools->append(new ZoomTool(this));
     tools->append(new PanTool(this));
     tools->append(new StretchTool(this));
     tools->append(new FindTool(this));
@@ -162,15 +184,17 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    //tools->append(new MatchTool(this));
     tools->append(new HelpTool(this));
-    //tools->append(new TrackTool(statusBar));
 
-    QnetNavTool *ntool = new QnetNavTool(qnetTool, this);
-    tools->append(ntool);
-    tools->append(qnetTool);
+    QStatusBar *statusBar = new QStatusBar(this);
+    layout->addWidget(statusBar);
+    tools->append(new TrackTool(statusBar));
 
-    connect(qnetTool, SIGNAL(showNavTool()), ntool, SLOT(showNavTool()));
+//  QnetNavTool *ntool = new QnetNavTool(qnetTool, this);
+//  tools->append(ntool);
+//  tools->append(qnetTool);
+//
+//  connect(qnetTool, SIGNAL(showNavTool()), ntool, SLOT(showNavTool()));
 
     //QMenuBar *menuBar = new QMenuBar;
     //QMap<QString, QMenu *> subMenus;
@@ -247,13 +271,14 @@ namespace Isis {
 
 
   /**
-   * Adds an item to the view. Filters out items that are not Images
+   * Adds an item to the view. Filters out items that are not Images or Shapes
    * or ImageLists.
    *
    * @param[in] item (ProjectItem *) The item to add.
    */
   void CubeDnView::addItem(ProjectItem *item) {
-    if ( !item->isImageList() && !item->isImage() ) {
+//  qDebug()<<"CubeDnView::addItem ";
+    if ( !item->isImageList() && !item->isImage() && !item->isShapeList() && !item->isShape()) {
       return;
     }
 
@@ -268,6 +293,18 @@ namespace Isis {
    */
   QSize CubeDnView::sizeHint() const {
     return QSize(800, 600);
+  }
+
+
+  bool CubeDnView::viewportContainsShape(MdiCubeViewport *viewport) {
+
+    ProjectItem *item = m_cubeItemMap.value( viewport->cube() );
+
+    if (!item) {
+      return false;
+    }
+
+    return item->isShape();
   }
 
 
@@ -381,11 +418,11 @@ namespace Isis {
       return;
     }
 
-    if ( !item->isImage() ) {
+    if (!item->isImage()) {
       return;
     }
 
-    setWorkspaceActiveCube( item->image() );
+    setWorkspaceActiveCube(item->image());
   }
 
 
@@ -451,23 +488,32 @@ namespace Isis {
 
   /**
    * Slot to connect to the itemAdded signal from a
-   * ProjectItemModel. Adds the image to the Workspace and the item to
+   * ProjectItemModel. Adds the image or shape to the Workspace and the item to
    * an internal map.
    *
    * @param[in] item (ProjectItem *) The added item
    */
   void CubeDnView::onItemAdded(ProjectItem *item) {
+
     if (!item) {
       return;
     }
-    if ( !item->isImage() ) {
+
+    Cube *cube;
+    if (item->isImage()) {
+      cube = item->image()->cube();
+    }
+    else if (item->isShape()) {
+      cube = item->shape()->cube();
+    }
+    else {
       return;
     }
-    if ( m_workspace->imageToMdiWidget( item->image() ) ) {
+    if (m_workspace->cubeToMdiWidget(cube)) {
       return;
     }
-    m_workspace->addCubeViewport( item->image()->cube() );
-    m_cubeItemMap.insert( item->image()->cube(), item);
+    m_workspace->addCubeViewport(cube);
+    m_cubeItemMap.insert(cube, item);
   }
 
 
@@ -496,7 +542,7 @@ namespace Isis {
       return;
     }
 
-    QWidget *mdiWidget = m_workspace->imageToMdiWidget(image);
+    QWidget *mdiWidget = m_workspace->cubeToMdiWidget(image->cube());
 
     if (!mdiWidget) {
       return;

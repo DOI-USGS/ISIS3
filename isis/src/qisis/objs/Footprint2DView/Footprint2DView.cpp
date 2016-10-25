@@ -37,11 +37,14 @@
 #include <QWidget>
 #include <QWidgetAction>
 
+#include "ControlPoint.h"
+#include "Cube.h"
 #include "Image.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
+#include "Shape.h"
 #include "ToolPad.h"
 
 namespace Isis {
@@ -50,19 +53,38 @@ namespace Isis {
    * 
    * @param parent Pointer to parent QWidget
    */
-  Footprint2DView::Footprint2DView(QWidget *parent) : AbstractProjectItemView(parent) {
-    m_sceneWidget = new MosaicSceneWidget(NULL, true, false, NULL, this);
+  Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) : 
+                      AbstractProjectItemView(parent) {
+    m_sceneWidget = new MosaicSceneWidget(NULL, true, false, directory, this);
     m_sceneWidget->getScene()->installEventFilter(this);
     m_sceneWidget->setAcceptDrops(false);
     MosaicGraphicsView *graphicsView = m_sceneWidget->getView();
     graphicsView->installEventFilter(this);
     graphicsView->setAcceptDrops(false);
-
+//  qDebug()<<"Footprint2DView::Footprint2DView  internalModel() = "<<internalModel();
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
+    connect( internalModel(), SIGNAL( itemRemoved(ProjectItem *) ),
+             this, SLOT( onItemRemoved(ProjectItem *) ) );
 
     connect(m_sceneWidget, SIGNAL(queueSelectionChanged() ),
             this, SLOT(onQueueSelectionChanged() ) );
+
+    //  Pass on Signals emitted from ControlNetTool, through the MosaicSceneWidget
+    //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
+    connect(m_sceneWidget, SIGNAL(modifyControlPoint(ControlPoint *)),
+            this, SIGNAL(modifyControlPoint(ControlPoint *)));
+
+    connect(m_sceneWidget, SIGNAL(deleteControlPoint(ControlPoint *)),
+            this, SIGNAL(deleteControlPoint(ControlPoint *)));
+
+    connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
+            this, SIGNAL(createControlPoint(double, double)));
+
+    // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
+    // This is done to redraw the control points on the cube viewports
+    connect(this, SIGNAL(controlPointAdded(QString)),
+            m_sceneWidget, SIGNAL(controlPointAdded(QString)));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -125,6 +147,11 @@ namespace Isis {
   }
 
 
+  MosaicSceneWidget *Footprint2DView::mosaicSceneWidget() {
+    return m_sceneWidget;
+  }
+
+
   /**
    * Event filter to filter out drag and drop events. 
    *
@@ -158,6 +185,41 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item
    */
   void Footprint2DView::onItemAdded(ProjectItem *item) {
+    if (!item || (!item->isImage() && !item->isShape())) {
+      return;
+    }
+    //TODO 2016-09-09 TLS  Handle Shapes-Create image from shape since qmos only handles images?
+    //                   Still don't know if shape should inherit from image or contain an image?
+    // 
+    Image *image;
+    ImageList images;
+    if (item->isShape()) {
+      //TEMPORARY UNTIL SHAPE IS FIXED TO HOLD IMAGE, once Shape holds image go back to old code
+      // previous to 10-21-16
+      image = new Image(item->shape()->cube());
+    }
+    else if (item->isImage()) {
+      image = item->image();
+    }
+    images.append(image);
+    m_sceneWidget->addImages(images);
+      
+    if (!m_imageItemMap.value(image)) {
+      m_imageItemMap.insert(image, item);
+    }
+  }
+
+
+  /**
+   * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
+   * from the scene. 
+   *
+   * @param[in] item (ProjectItem *) The item to be removed
+   */
+  void Footprint2DView::onItemRemoved(ProjectItem *item) {
+//  qDebug()<<"Footprint2DView::onItemRemoved item= "<<item;
+//  qDebug()<<"                               source model: "<<internalModel()->sourceModel()<<"  rows = "<<internalModel()->sourceModel()->rowCount();
+//  qDebug()<<"                               proxy model: "<<internalModel()<<"  rows = "<<internalModel()->rowCount();
     if (!item) {
       return;
     }
@@ -166,11 +228,12 @@ namespace Isis {
 
       ImageList images;
       images.append(item->image());
+//    qDebug()<<"       image count = "<<images.size();
 
-      m_sceneWidget->addImages(images);
-      
-      if ( !m_imageItemMap.value( item->image() ) ) {
-        m_imageItemMap.insert( item->image(), item);
+      m_sceneWidget->removeImages(images);
+
+      if ( m_imageItemMap.value( item->image() ) ) {
+        m_imageItemMap.remove( item->image());
       }
     }
   }
