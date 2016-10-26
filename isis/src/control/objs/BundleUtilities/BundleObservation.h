@@ -66,6 +66,9 @@ namespace Isis {
    *   @history 2016-10-06 Tyler Wilson - Modified the function formatBundleOutputString so
    *                           that it can be used by BundleSolutionInfo::outputCSVImages()
    *                           function.  Fixes #4314.
+   *   @history 2016-10-26 Ian Humphrey - Modified formatBundleOutputString() to provided default
+   *                           values for all solve parameters, whether they are being solved for
+   *                           or not. Fixes #4464.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 

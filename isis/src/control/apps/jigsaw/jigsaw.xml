@@ -230,6 +230,12 @@
       Added the "Generating report files" and Rejected_Measures keyword back to jigsaw's standard
       output. Fixes #4461. Fixed spacing in standard output. Fixes #4462, #4463."
     </change>
+    <change name="Ian Humphrey" date="2016-10-26">
+      The bundleout.txt output file will record default values for unsolved parameters. The default
+      position will be the instrument position's center coordinate, and the default pointing will
+      be the pointing's (rotation's) center angles. The bundleout_images.csv file will also have
+      these defaults provided. Fixes #4464.
+    </change>
   </history>
 
   <groups>
