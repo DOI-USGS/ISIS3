@@ -85,7 +85,7 @@ void IsisMain() {
       bundleSolution.outputText();
     }
 
-    if (ui.GetBoolean("IMAGES_CSV")) {
+    if (ui.GetBoolean("IMAGESCSV")) {
       bundleSolution.outputImagesCSV();
     }
 
@@ -222,8 +222,8 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
   // target body options
   if (ui.GetBoolean("SOLVETARGETBODY") == true) {
     PvlObject obj;
-    ui.GetFileName("TB_PARAMETERS");
-    Pvl tbParPvl(FileName(ui.GetFileName("TB_PARAMETERS")).expanded());
+    ui.GetFileName("TBPARAMETERS");
+    Pvl tbParPvl(FileName(ui.GetFileName("TBPARAMETERS")).expanded());
     if (!tbParPvl.hasObject("Target")) {
       QString msg = "Input Target parameters file missing main Target object";
       throw IException(IException::User, msg, _FILEINFO_);

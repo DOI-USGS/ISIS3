@@ -29,14 +29,14 @@ commands:
 	fi;
 # TEST B: exception occurs when performing bundle adjust
 #         TODO: This still needs to be tested.
-# TEST C: SOLVETARGETBODY=yes and TB_PARAMETERS file missing Target object
+# TEST C: SOLVETARGETBODY=yes and TBPARAMETERS file missing Target object
 	echo -e "Error Test C:" >> $(OUTPUT)/error.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
-	  tb_parameters=$(INPUT)/invalidTargetParameters.pvl \
+	  tbparameters=$(INPUT)/invalidTargetParameters.pvl \
 	  2>> $(OUTPUT)/error.txt \
 	  > /dev/null` ]]; \
 	then \
@@ -49,7 +49,7 @@ commands:
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
-	  tb_parameters=$(INPUT)/zeroTargetParameters.pvl \
+	  tbparameters=$(INPUT)/zeroTargetParameters.pvl \
 	  2>> $(OUTPUT)/error.txt \
 	  > /dev/null` ]]; \
 	then \

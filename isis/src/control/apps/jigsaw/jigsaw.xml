@@ -236,6 +236,9 @@
       be the pointing's (rotation's) center angles. The bundleout_images.csv file will also have
       these defaults provided. Fixes #4464.
     </change>
+    <change name="Makayla Shepherd" date="2016-10-26"> 
+      Removed the underscores from the new parameters IMAGESCSV and TBPARAMETERS.
+    </change>
   </history>
 
   <groups>
@@ -974,16 +977,16 @@
         <brief>Enter target body parameters and a priori values using a PVL file</brief>
         <description>
           This option indicates that target body parameters are to be input via the PVL file specified
-          by TB_PARAMETERS. All of the following values for coefficients must be in the PVL file:
+          by TBPARAMETERS. All of the following values for coefficients must be in the PVL file:
           body pole RA and DEC; prime meridian; triaxial radii and/or mean radius. An example template
           PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
         </description>
         <inclusions>
-          <item>TB_PARAMETERS</item>
+          <item>TBPARAMETERS</item>
         </inclusions>
       </parameter>
 
-      <parameter name="TB_PARAMETERS">
+      <parameter name="TBPARAMETERS">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -1148,7 +1151,7 @@
           </default>
         </parameter>
 
-        <parameter name="IMAGES_CSV">
+        <parameter name="IMAGESCSV">
           <brief> Outputs image data (body-fixed) to csv file - bundleout_images.csv
           </brief>
           <description>
