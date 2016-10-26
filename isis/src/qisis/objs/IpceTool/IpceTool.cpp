@@ -181,8 +181,9 @@ namespace Isis {
 
   void IpceTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 //  qDebug()<<"IpceTool::paintViewport";
-
-    drawAllMeasurements(vp, painter);
+    if (m_controlNet) {
+      drawAllMeasurements(vp, painter);
+    }
   }
 
 

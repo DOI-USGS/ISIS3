@@ -36,7 +36,9 @@ namespace Isis {
    *
    * @internal 
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
-   *                           query for shapes and other data from the project. 
+   *                           query for shapes and other data from the project.
+   *   @history 2016-10-25 Tracie Sucharski - Check for existence of Control net in the
+   *                           paintViewport method.
    *                           
    */
   class IpceTool : public Tool {
@@ -76,7 +78,7 @@ namespace Isis {
       Directory *m_directory;
       CubeDnView *m_view;
 
-      ControlNet *m_controlNet;
+      QPointer<ControlNet> m_controlNet;
 
       QPointer<Workspace> m_workspace;
   };
