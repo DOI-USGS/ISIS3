@@ -800,7 +800,7 @@ namespace Isis {
       QList<BundleObservationSolveSettings> observationSolveSettingsList;
       BundleObservationSolveSettings observationSolveSettings;
 
-      //************************************************************************************************
+      //********************************************************************************************
       // use defaults
       //       pointing option sigmas -1.0
       //       ckDegree = ckSolveDegree = 2
@@ -830,6 +830,9 @@ namespace Isis {
       // =========================================================================================//
 
       BundleAdjust bundleAdjust(settings, inNet, *p_serialNumberList, false);
+      QObject::connect( &bundleAdjust, SIGNAL( statusUpdate(QString) ),
+                        &bundleAdjust, SLOT( outputBundleStatus(QString) ) );
+
       bundleAdjust.solveCholesky();
       // bundleAdjust.solveCholeskyBR();
 
