@@ -451,7 +451,8 @@ namespace Isis {
    * @return @b QString The formatted output detailed string.
    */
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
-                                                             double RTM) const {
+                                                             double RTM,
+                                                             bool solveRadius) const {
 
     int numRays     = numberOfMeasures();
     int numGoodRays = numRays - numberOfRejectedMeasures();
@@ -508,7 +509,7 @@ namespace Isis {
                       .arg(formatValue(cor_lat_dd, 21, 8))                            // deg
                       .arg(formatValue(cor_lat_m, 20, 8))                             // m 
                       .arg(formatValue(lat, 20, 8))                                   // deg
-                      .arg(formatLatitudeAprioriSigmaString(18,8))                    // m 
+                      .arg(formatLatitudeAprioriSigmaString(18,8))                    // m
                       .arg(formatLatitudeAdjustedSigmaString(18,8,errorPropagation)); // m 
 
     output += QString(" LONGITUDE%1%2%3%4%5%6\n")
@@ -524,7 +525,7 @@ namespace Isis {
                       .arg(formatValue(m_corrections(2), 21, 8))                    // km
                       .arg(formatValue(cor_rad_m, 20, 8))                           // m
                       .arg(formatValue(rad, 20, 8))                                 // km
-                      .arg(formatRadiusAprioriSigmaString(18,8))                    // m
+                      .arg(formatRadiusAprioriSigmaString(18,8,solveRadius))        // m
                       .arg(formatRadiusAdjustedSigmaString(18,8,errorPropagation)); // m
 
     return output;
@@ -561,12 +562,16 @@ namespace Isis {
    * 
    * @return @b QString The formatted value, as a string.
    */
-  QString BundleControlPoint::formatAprioriSigmaString(int type, int fieldWidth, 
-                                                       int precision) const {
+  QString BundleControlPoint::formatAprioriSigmaString(int version, int fieldWidth,
+                                                       int precision, bool solveRadius) const {
     QString aprioriSigmaStr;
-    double sigma = m_aprioriSigmas[type];
+    QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
+    if (pointType == "CONSTRAINED"||!solveRadius) {
+        pointType = "N/A";
+    }
+    double sigma = m_aprioriSigmas[version];
     if (IsSpecial(sigma)) { // if globalAprioriSigma <= 0 (including Isis::NUll), then m_aprioriSigmas = Null
-      aprioriSigmaStr = QString("%1").arg("N/A", fieldWidth);
+      aprioriSigmaStr = QString("%1").arg(pointType, fieldWidth);
     }
     else {
       aprioriSigmaStr = QString("%1").arg(sigma, fieldWidth, 'f', precision);
@@ -587,7 +592,7 @@ namespace Isis {
    */
   QString BundleControlPoint::formatLatitudeAprioriSigmaString(int fieldWidth, 
                                                                int precision) const {
-    return formatAprioriSigmaString(0, fieldWidth, precision);
+    return formatAprioriSigmaString(0, fieldWidth, precision, true);
   }
 
 
@@ -603,7 +608,7 @@ namespace Isis {
    */
   QString BundleControlPoint::formatLongitudeAprioriSigmaString(int fieldWidth, 
                                                                 int precision) const {
-    return formatAprioriSigmaString(1, fieldWidth, precision);
+    return formatAprioriSigmaString(1, fieldWidth, precision, true);
   }
 
 
@@ -617,8 +622,10 @@ namespace Isis {
    *  
    * @see formatAprioriSigmaString() 
    */
-  QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth, int precision) const {
-    return formatAprioriSigmaString(2, fieldWidth, precision);
+  QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth,
+                                                             int precision,
+                                                             bool solveRadius) const {
+    return formatAprioriSigmaString(2, fieldWidth, precision, solveRadius);
   }
 
 

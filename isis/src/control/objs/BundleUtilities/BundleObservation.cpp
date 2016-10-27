@@ -970,7 +970,7 @@ namespace Isis {
         if (!useDefaultPosition) {
           correction = m_corrections(i);
           adjustedSigma = m_adjustedSigmas(i);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
         }
         if (errorPropagation) {
           qStr = QString("%1%2%3%4%5%6\n").
@@ -1014,8 +1014,8 @@ namespace Isis {
           else {
             correction = m_corrections(i - offset);
             adjustedSigma = m_adjustedSigmas(i - offset);
-            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? 
-                "N/A" : toString(m_aprioriSigmas[i - offset], 8) );
+            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
+                    toString(m_aprioriSigmas[i-offset], 8) );
           }
         }
         // We are using default pointing, so provide default correction and sigma values to output
@@ -1052,7 +1052,7 @@ namespace Isis {
         if (!useDefaultPosition) {
           correction = m_corrections(i);
           adjustedSigma = m_adjustedSigmas[i];
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "-1.0" : toString(m_aprioriSigmas[i]));
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
         }
         // Provide default values for position if not solving position
         else {
@@ -1098,8 +1098,9 @@ namespace Isis {
           else {
             correction = m_corrections(i - offset);
             adjustedSigma = m_adjustedSigmas[i - offset];
-            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? 
-                "-1.0" : toString(m_aprioriSigmas[i - offset]) );
+        sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+                   toString(m_aprioriSigmas[i-offset], 8) );
+
           }
         }
         // Provide default values for pointing if not solving pointing

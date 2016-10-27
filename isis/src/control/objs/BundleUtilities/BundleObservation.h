@@ -69,6 +69,9 @@ namespace Isis {
    *   @history 2016-10-26 Ian Humphrey - Modified formatBundleOutputString() to provided default
    *                           values for all solve parameters, whether they are being solved for
    *                           or not. Fixes #4464.
+   *   @history 2016-10-27 Tyler Wilson Modified formatBundleOutputString to change N/A to FREE 
+   *                           in the ouptut under POINTS DETAL when no lat/lon sigmas were entered.
+   *                           Fixes #4317.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 

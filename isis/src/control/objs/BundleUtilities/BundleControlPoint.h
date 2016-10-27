@@ -64,6 +64,9 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Changed contained member data type to a shared pointer.
    *                           Added wrapper methods for several ControlPoint methods.
    *                           Fixes #4159.
+   *   @history 2016-10-27 Tyler Wilson - Modified formatRadiusAprioriSigmaString, formatAprioriSigmaString,
+   *                          and formatBundleOutputDetailString to accept a third argument (bool solveRadius)
+   *                          with a default value = false.  References #4317.
    */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
@@ -103,12 +106,12 @@ namespace Isis {
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
-      QString formatBundleOutputDetailString(bool errorPropagation, double RTM) const;
+      QString formatBundleOutputDetailString(bool errorPropagation, double RTM, bool solveRadius=false) const;
       QString formatValue(double value, int fieldWidth, int precision) const;
-      QString formatAprioriSigmaString(int type, int fieldWidth, int precision) const;
+      QString formatAprioriSigmaString(int type, int fieldWidth, int precision, bool solveRadius=false) const;
       QString formatLatitudeAprioriSigmaString(int fieldWidth, int precision) const;
       QString formatLongitudeAprioriSigmaString(int fieldWidth, int precision) const;
-      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision) const;
+      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision, bool solveRadius=false) const;
       QString formatAdjustedSigmaString(int type, int fieldWidth, int precision,
                                         bool errorPropagation) const;
       QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
