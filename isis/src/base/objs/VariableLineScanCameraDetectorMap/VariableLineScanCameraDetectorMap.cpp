@@ -53,7 +53,7 @@ namespace Isis {
     double currEt = p_camera->time().Et();
     int rateIndex = p_lineRates.size() - 1;
 
-    while(rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt() - 0.5) {
+    while(rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt()) {
       rateIndex --;
     }
 
