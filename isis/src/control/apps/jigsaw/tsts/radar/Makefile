@@ -58,11 +58,11 @@ commands:
 	       > $(OUTPUT)/radar_sparse_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/radar_sparse_residuals.csv
-#	$(CAT) bundleout_images.csv \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-#	       > $(OUTPUT)/radar_sparse_bundleout_images.csv
-#	$(RM) bundleout_images.csv > /dev/null;
+	$(CAT) bundleout_images.csv \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+	       > $(OUTPUT)/radar_sparse_bundleout_images.csv
+	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
