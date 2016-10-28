@@ -38,9 +38,9 @@ commands:
 	# 5. remove number of iterations
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/obsmode_cholmod_residuals.csv
-#	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-#	       > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
-#	$(RM) bundleout_images.csv > /dev/null;
+	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	       > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
+	$(RM) bundleout_images.csv > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/obsmode_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
