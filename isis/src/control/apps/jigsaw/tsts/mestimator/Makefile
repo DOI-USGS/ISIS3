@@ -33,11 +33,11 @@ commands:
 	       > $(OUTPUT)/mEstimator_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/mEstimator_residuals.csv
-#	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-#	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-#	       | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-#	       > $(OUTPUT)/mEstimator_bundleout_images.csv
-#	$(RM) bundleout_images.csv > /dev/null;
+	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+	       > $(OUTPUT)/mEstimator_bundleout_images.csv
+	$(RM) bundleout_images.csv > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/mEstimator_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
