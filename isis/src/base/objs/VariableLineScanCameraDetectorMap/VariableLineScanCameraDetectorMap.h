@@ -44,6 +44,9 @@ namespace Isis {
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
    *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards
+   *   @history 2016-10-27 Jeannie Backer - Fixed bug in SetDetector() that was subtracting 1/2
+   *                           second from each line rate start ET when trying to find the
+   *                           appropriate rate index for this line. Fixes #4435.
    *
    */
   class VariableLineScanCameraDetectorMap : public LineScanCameraDetectorMap {
