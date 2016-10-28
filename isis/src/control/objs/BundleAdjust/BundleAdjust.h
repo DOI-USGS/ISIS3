@@ -260,6 +260,9 @@ namespace Isis {
    *                           computeRejectionLimit() so jigsaw's std out for Rejection Limit,
    *                           Sigma0, and Elapsed Time match ISIS production's jigsaw std out.
    *                           Fixes #4463.
+   *   @history 2016-10-28 Ian Humphrey - Modified solveCholesky() and errorPropagation() to change
+   *                           spacing in terminal output, so that it matches production.
+   *                           References #4463.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

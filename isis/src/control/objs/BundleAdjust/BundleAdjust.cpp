@@ -631,6 +631,8 @@ namespace Isis {
    * @internal
    *   @history 2016-10-25 Ian Humphrey - Spacing and precision for Sigma0 and Elapsed Time match
    *                           ISIS production's jigsaw std output. References #4463."
+   *   @history 2016-10-28 Ian Humphrey - Updated spacing for Error Propagation Complete message.
+   *                           References #4463."
    */
   bool BundleAdjust::solveCholesky() {
     try {
@@ -883,7 +885,7 @@ namespace Isis {
         clock_t errorPropStartClock = clock();
         printf("Starting Error Propagation");
         errorPropagation();
-        emit statusUpdate("Error Propagation Complete");
+        emit statusUpdate("\n\nError Propagation Complete");
         clock_t errorPropStopClock = clock();
         m_bundleResults.setElapsedTimeErrorProp((errorPropStopClock - errorPropStartClock)
                                                 / (double)CLOCKS_PER_SEC);
@@ -2540,6 +2542,8 @@ namespace Isis {
    * @internal
    *   @history 2016-10-05 Ian Humphrey - Updated to check to see if bundle settings is allowing
    *                           us to create the inverse matrix correlation file. References #4315.
+   *   @history 2016-10-28 Ian Humphrey - Added extra newline between Error Propagation: Inverse
+   *                           Blocking and Filling point covariance messages. References #4463.
    */
   bool BundleAdjust::errorPropagation() {
 
@@ -2777,7 +2781,7 @@ namespace Isis {
     // free b (right-hand side vector
     cholmod_free_dense(&b,&m_cholmodCommon);
 
-    printf("\n");
+    printf("\n\n");
     currentTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
     printf("\rFilling point covariance matrices: Time %s", currentTime.c_str());
     printf("\n\n");
