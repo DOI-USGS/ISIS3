@@ -76,6 +76,8 @@ namespace Isis {
    *                           the bundleout_images.csv file.  Fixes #4314.
    *   @history 2016-10-17 Jesse Mapel - Removed multiple solve settings output in accordance with
    *                           USEPVL being removed from jigsaw.  References #4316.
+   *   @history 2016-10-28 Tyler Wilson - Modified outputText() to check and output if the solution
+   *                           is solving for the radius.  References #4317.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

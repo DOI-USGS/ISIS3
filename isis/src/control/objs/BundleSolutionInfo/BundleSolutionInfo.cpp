@@ -1490,12 +1490,15 @@ namespace Isis {
     sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
     fpOut << buf;
 
+    bool solveRadius = m_settings->solveRadius();
+
     for (int i = 0; i < nPoints; i++) {
       BundleControlPointQsp bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
 
       QString pointDetailString =
           bundleControlPoint->formatBundleOutputDetailString(berrorProp,
-                                                           m_statisticsResults->radiansToMeters());
+                                                           m_statisticsResults->radiansToMeters(),
+                                                           solveRadius);
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
 
