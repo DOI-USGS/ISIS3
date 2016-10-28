@@ -31,6 +31,8 @@ commands:
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/apollo_rejection_residuals.csv;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_rejection_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null;
+	$(RM) bundleout.txt > /dev/null;
+	$(RM) print.prt > /dev/null;
+	$(RM) bundleout_images.csv > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
