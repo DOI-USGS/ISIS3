@@ -9,6 +9,7 @@ using namespace Isis;
 // Global variables
 Camera *cam;
 Cube *icube;
+bool usedem;
 double minPhase;
 double maxPhase;
 double minEmission;
@@ -39,6 +40,13 @@ void IsisMain() {
   maxEmission = ui.GetDouble("MAXEMISSION");
   minIncidence = ui.GetDouble("MININCIDENCE");
   maxIncidence = ui.GetDouble("MAXINCIDENCE");
+  
+  usedem = ui.GetBoolean("USEDEM");
+  
+  if (!usedem) {
+    cam->IgnoreElevationModel(true);
+    
+  }
 
   // Start the processing
   lastBand = 0;
@@ -50,7 +58,7 @@ void IsisMain() {
 // Line processing routine
 void photrim(Buffer &in, Buffer &out) {
   // See if there is a change in band which would change the camera model
-  if(in.Band() != lastBand) {
+  if (in.Band() != lastBand) {
     lastBand = in.Band();
     cam->SetBand(icube->physicalBand(lastBand));
   }
@@ -58,18 +66,18 @@ void photrim(Buffer &in, Buffer &out) {
   // Loop for each pixel in the line.
   double samp, phase, emission, incidence;
   double line = in.Line();
-  for(int i = 0; i < in.size(); i++) {
+  for (int i = 0; i < in.size(); i++) {
     samp = in.Sample(i);
     cam->SetImage(samp, line);
-    if(cam->HasSurfaceIntersection()) {
-      if(((phase = cam->PhaseAngle()) < minPhase) || (phase > maxPhase)) {
+    if (cam->HasSurfaceIntersection()) {
+      if (((phase = cam->PhaseAngle()) < minPhase) || (phase > maxPhase)) {
         out[i] = Isis::NULL8;
       }
-      else if(((emission = cam->EmissionAngle()) < minEmission) ||
+      else if (((emission = cam->EmissionAngle()) < minEmission) ||
               (emission > maxEmission)) {
         out[i] = Isis::NULL8;
       }
-      else if(((incidence = cam->IncidenceAngle()) < minIncidence) ||
+      else if (((incidence = cam->IncidenceAngle()) < minIncidence) ||
               (incidence > maxIncidence)) {
         out[i] = Isis::NULL8;
       }
