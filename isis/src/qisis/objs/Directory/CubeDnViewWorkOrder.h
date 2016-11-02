@@ -41,6 +41,8 @@ namespace Isis {
    *   @history 2016-07-27 Tracie Sucharski - Added support for shape models.
    *   @history 2016-09-09 Tracie Sucharski - Put option to choose either creating a new view or
    *                          adding images to an existing view.
+   *   @history 2016-11-02 Makayla Shepherd - Changed the display text from View Raw Cubes to 
+   *                          Display Images. Fixes #4494. 
    */
   class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -47,7 +47,7 @@ namespace Isis {
    */
   CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
-    QAction::setText(tr("View Raw &Cubes..."));
+    QAction::setText(tr("Display &Images..."));
   }
 
   /**
