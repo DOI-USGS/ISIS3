@@ -93,8 +93,43 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+
   //! Destroys the HiriseCamera object
-  HrscCamera::~HrscCamera() {}
+  HrscCamera::~HrscCamera() {
+  }
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *  
+   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *         Kernel Frame ID
+   */
+  int HrscCamera::CkFrameId() const { 
+    return (-41001); 
+  }
+
+
+  /** 
+   * CK Reference ID - J2000
+   * 
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int HrscCamera::CkReferenceId() const { 
+    return (1); 
+  }
+
+
+  /** 
+   * SPK Reference ID - J2000
+   * 
+   * @return @b int The appropriate instrument code for the Spacecraft
+   *         Kernel Reference ID
+   */
+  int HrscCamera::SpkReferenceId() const { 
+    return (1); 
+  }
 
 
   /**

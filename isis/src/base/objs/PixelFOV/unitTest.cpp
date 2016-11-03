@@ -30,7 +30,7 @@
 #include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
-#include "PixelIfov.h"
+#include "PixelFOV.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -38,14 +38,18 @@ using namespace std;
 using namespace Isis;
 
 /**
+ * Unit test for PixelFOV class
+ *
+ * @author ????-??-?? Unknown
+ *
  * @internal
- */
+ *   @history 2016-10-27 Jesse Mapel - Adapted from old PixelIfov unit test.
+ */   
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for PixelIfov..." << endl;
+  cout << "Unit Test for PixelFOV..." << endl;
   try {
-//  char file[1024] = "$cassini/testData/CM_1515951157_1.ir.cub";
     char file[1024] = "$dawn/testData/FC21B0001010_09049002212F5D.cub";
     QList<double> knownLat;
     knownLat << 48.366139970 <<  48.365525166 << 48.366769868 << 48.367384602;
@@ -59,7 +63,7 @@ int main(void) {
 
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
-    PixelIfov pifov;
+    PixelFOV pifov;
 
     //  Test center pixel
     cout << "Pixel IFOV for center pixel position ..." << endl;
@@ -70,23 +74,32 @@ int main(void) {
       cout << "ERROR" << endl;
       return 0;
     }
-    QList<QPointF> pifovVertices = pifov.latLonVertices(*cam);
-    int numVertices = pifovVertices.size();
+    QList< QList<QPointF> > pifovVertices = pifov.latLonVertices(*cam, samp, line);
+    QList<QPointF> iFOVPointCloud = pifovVertices[0];
+    int numVertices = iFOVPointCloud.size();
     if (numVertices != knownLat.size()) {
-      cout << "ERROR - PixelIfov returning " << numVertices << " vertices.  Should be returning " <<
+      cout << "ERROR - PixelFOV returning " << numVertices << " vertices.  Should be returning " <<
          knownLat.size() << " vertices.";
       return 0;
     }
     //  Get lat/lon for each vertex of the ifov
     for (int j = 0; j < numVertices; j++) {
-      if (abs(pifovVertices.at(j).x() - knownLat.at(j)) < 1E-8) {
+      if (abs(iFOVPointCloud.at(j).x() - knownLat.at(j)) < 1E-8) {
         cout << "Vertex " << j+1 << " Latitude OK" << endl;
       }
-      if (abs(pifovVertices.at(j).y() - knownLon.at(j)) < 1E-8) {
+      else {
+        cout << "Vertex " << j+1 << " Latitude " << iFOVPointCloud.at(j).x() << ", expected latitude " << knownLat.at(j) << endl;
+      }
+      if (abs(iFOVPointCloud.at(j).y() - knownLon.at(j)) < 1E-8) {
         cout << "Vertex " << j+1 << " Longitude OK" << endl;
+      }
+      else {
+        cout << "Vertex " << j+1 << " Longitude " << iFOVPointCloud.at(j).y() << ", expected longitude " << knownLon.at(j) << endl;
       }
     }
     cout << endl;
+
+    cout << "Full FOV functionality is tested by pixel2map's app test." << endl;
   }
   catch(IException &e) {
     e.print();

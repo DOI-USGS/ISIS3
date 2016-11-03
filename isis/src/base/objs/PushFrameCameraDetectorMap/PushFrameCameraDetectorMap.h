@@ -52,16 +52,30 @@ namespace Isis {
    *                           SetFrameletsGeometricallyFlipped, respectively.  Moved
    *                           method implementations to cpp file.
    *                           References #1659.
+   *   @history 2016-10-18 Kristin Berry - Added additional SetParent method with time offset.
+   *                           Added detltaT variable to SetFramelet method. Updated unitTest.
+   *                           References #4476.
+   *   @history 2016-10-19 Jesse Mapel - Added exposureDuration method for accessing a pixel's
+   *                           exposure duration. Updated documentation and unit test.
+   *                           References #4476.
    */
   class PushFrameCameraDetectorMap : public CameraDetectorMap {
     public:
-      PushFrameCameraDetectorMap(Camera *parent, const double etStart,
-                                 const double frameletRate, int frameletHeight);
+      PushFrameCameraDetectorMap(Camera *parent, 
+                                 const double etStart,
+                                 const double frameletRate, 
+                                 int frameletHeight);
 
       virtual ~PushFrameCameraDetectorMap();
 
-      virtual bool SetParent(const double sample, const double line);
-      virtual bool SetDetector(const double sample, const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line, 
+                             const double deltaT);
+
+      virtual bool SetDetector(const double sample, 
+                               const double line);
 
       double FrameletRate() const;
       void SetFrameletRate(const double frameletRate);
@@ -69,7 +83,7 @@ namespace Isis {
       int FrameletOffset() const;
       void SetFrameletOffset(int frameletOffset);
 
-      void SetFramelet(int framelet);
+      void SetFramelet(int framelet, const double deltaT=0);
       int Framelet();
       
       void SetBandFirstDetectorLine(int firstLine);
@@ -79,6 +93,10 @@ namespace Isis {
       double StartEphemerisTime() const;
 
       void SetExposureDuration(double exposureDuration);
+      virtual double exposureDuration(const double sample,
+                                      const double line,
+                                      const int band) const;
+
       void SetFrameletOrderReversed(bool frameletOrderReversed, int nframelets);
       void SetFrameletsGeometricallyFlipped(bool frameletsFlipped);
 
@@ -89,20 +107,20 @@ namespace Isis {
       bool timeAscendingFramelets();
 
     private:
-      double p_etStart;      //!< Starting time at the top of the 1st parent line
-      double p_exposureDuration; //!< Exposure duration in secs
-      double p_frameletRate;    //!< iTime between framelets in parent cube
-      int    p_frameletHeight; //!< Height of a framelet in detector lines
-      int    p_bandStartDetector; //!< The first detector line of current band
-      int    p_frameletOffset; //!< The numner of framelets padding the top of the band
-      int    p_framelet;  //!< The current framelet
-      int    p_nframelets; //!< If flipped framelets, the number of framelets in this band
+      double p_etStart;           //!< Starting time at the top of the first parent line.
+      double p_exposureDuration;  //!< Exposure duration in secs.
+      double p_frameletRate;      //!< iTime between framelets in parent cube.
+      int    p_frameletHeight;    //!< Height of a framelet in detector lines.
+      int    p_bandStartDetector; //!< The first detector line of current band.
+      int    p_frameletOffset;    //!< The numner of framelets padding the top of the band.
+      int    p_framelet;          //!< The current framelet.
+      int    p_nframelets;        //!< If flipped framelets, the number of framelets in this band.
 
-      double p_frameletSample; //!< The sample in the current framelet
-      double p_frameletLine; //!< The line in the current framelet
+      double p_frameletSample; //!< The sample in the current framelet.
+      double p_frameletLine;   //!< The line in the current framelet.
 
-      bool   p_flippedFramelets;  //!< Indicates whether the geometry in a framelet is flipped
-      bool   p_timeAscendingFramelets;  //!< Are framelets reversed from top-to-bottom in file
+      bool   p_flippedFramelets;       //!< Indicates whether the geometry in a framelet is flipped.
+      bool   p_timeAscendingFramelets; //!< Are framelets reversed from top-to-bottom in file.
 
   };
 };

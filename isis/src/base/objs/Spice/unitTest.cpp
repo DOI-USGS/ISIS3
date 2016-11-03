@@ -21,6 +21,8 @@
  *
  * @internal
  *  @history 2012-10-11 Debbie A. Cook - Updated to use new Target and Shape Model classes.
+ *  @history 2016-10-19 Kristin Berry - Updated to test new hasTime() function and new exception for
+ *                                      unset time. 
  */
 #include <iostream>
 #include <iomanip>
@@ -47,9 +49,10 @@ using namespace std;
  * UnitTest for Spice class.
  *
  * @internal
- * @history 2009-03-23  Tracie Sucharski - Removed old keywords
- *          SpacecraftPosition and SpacecraftPointing with the corrected
- *          InstrumentPosition and InstrumentPointing.
+ *   @history 2009-03-23 Tracie Sucharski - Removed old keywords SpacecraftPosition and
+ *                           SpacecraftPointing with the corrected InstrumentPosition and
+ *                           InstrumentPointing.
+ *   @history 2016-10-27 Kristin Berry - 
  */
 class MySpice : public Spice {
   public:
@@ -184,6 +187,17 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
+  // Test attempt to get time before time has been set
+  try {
+    cout << "Testing time() before time has been set... " << endl;
+    cout << "Has time been set? " << spi.isTimeSet() << endl; 
+    spi.time(); 
+  } 
+  catch (IException &e) {
+    e.print();
+    cout << endl;
+  }
+
   // Test good gets
   cout << "Testing convience get methods ... " << endl;
   cout << "Label has kernels? " << spi.hasKernels(lab) << endl;
@@ -249,6 +263,17 @@ int main(int argc, char *argv[]) {
     cout << "Target Center Distance = " << spi.targetCenterDistance() << endl;
   }
   cout << endl;
+
+  // Test attempt to get time after time has been set
+  try {
+    cout << "Testing time() after time has been set... " << endl;
+    cout << "Has time been set? " << spi.isTimeSet() << endl; 
+    cout << "The time is: " << spi.time().EtString() << endl << endl;; 
+  } 
+  catch (IException &e) {
+    e.print();
+    cout << endl;
+  }
 
   cout << "Testing Utility methods" << endl;
   cout << "Target Name = " << spi.target()->name() << endl;

@@ -6,12 +6,16 @@
   </brief>
 
   <description>
-    This specialized program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
-    <def link="Cube">cube</def> to a <def link="MAP">map</def> projected (ISIS <def link="Level2">level2</def>) cube.  
+    This specialized program projects an ISIS <def link="Level0">level0</def> or 
+    <def link="Level1">level1</def> <def link="Cube">cube</def> to a 
+    <def link="MAP">map</def> projected (ISIS <def link="Level2">level2</def>) cube.  
     <p>
-    The program, <i>cam2map</i>, also projects a cube, and is recommended for most mapping applications. Use
-    <i>pixel2map</i> to project cubes where pixels do not overlap, for instance in data from a point instrument such
-    as Cassini VIMS, or the Mars Reconnaissance Orbiter CRISM instrument where scan lines may not overlap.
+      The program, <i>cam2map</i> also projects a cube, and is recommended for most mapping 
+      applications. Use <i>pixel2map</i> to project cubes where pixels do not overlap.
+      For instance, this program is used to project Cassini VIMS, a point instrument. It is
+      also used for line scan instruments whose lines may not overlap, such as 
+      Mars Reconnaissance Orbiter CRISM and Dawn VIR.
+      
     </p>
     <p>
     Note: <i>pixel2map</i> cannot currently process the input <b>pixel</b> which contains either pole
@@ -218,6 +222,10 @@
     </change>
     <change name="Sasha Brownsberger" date="2015-01-19">
       Updated function calls to reflect changes to ProcessGroundPolygons object.
+    </change>
+    <change name="Jeannie Backer" date="2016-10-24">
+      Added feature to allow user to use full exposure duration to get polygons corresponding to
+      real FOV. Improved coding standards. Fixes #4476.
     </change>
   </history>
 
@@ -563,6 +571,33 @@
           longitude are not parallel to image lines and sample columns.
         </description>
       </parameter>
+      <parameter name="FOVRANGE">
+        <type>string</type>
+        <brief>The time range to be used to determine the FOV.</brief>
+        <default><item>INSTANTANEOUS</item></default>
+        <description>
+          The field of view for each pixel is determined by the time range specified.
+        </description>
+        <list>
+           <option value="INSTANTANEOUS">
+              <brief>Uses the IFOV corresponding to the center pixel time.</brief>
+              <description>
+                The instantaneous field of view (IFOV) at the center of the exposure will be used
+                to map each pixel.
+              </description>
+            </option>
+           <option value="FULLEXPOSURE">
+              <brief>Uses the full FOV for the entire exposure time.</brief>
+              <description>
+                The full field of view will be used to map each pixel. This is determined by
+                finding IFOVs at three times: beginning exposure, center exposure, 
+                and end exposure. The maximum ground coverage area found by combining all
+                three of these IFOVs is used as the full FOV.  <b>NOTE:</b> This option is
+                currently not available for framing cameras.
+              </description>
+            </option>
+        </list>
+      </parameter>
     </group>
 
     <group name="Longitude Seam Options">
@@ -605,8 +640,8 @@
                </description>
              </option>
         </list>
-
       </parameter>
     </group>
+
   </groups>
 </application>

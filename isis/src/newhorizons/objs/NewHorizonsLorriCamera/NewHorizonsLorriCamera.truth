@@ -33,5 +33,53 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
+Testing SetImage without deltaT...
+Sample: 358.000000000
+Line: 534.000000000
+RightAscension: 283.210921080
+Declination: -16.043606158
+PlanetocentricLatitude: -8.271158614
+PositiveEast360Longitude: 210.202299602
+EphemerisTime: 225787161.551323384
+NorthAzimuth: 359.217580727
+SunAzimuth: 82.539531219
+SpacecraftAzimuth: 251.351022349
+OffNadirAngle: 0.000668744
+CelestialNorthClockAngle: 81.991210878
+RaDecResolution: 0.000283854
+BodyFixedCoordinate: -1562.244751303
+BodyFixedCoordinate: -909.332100893
+BodyFixedCoordinate: -262.774167442
+LocalRadius: 1826620.868095986
+SampleResolution: 15054.295387028
+LineResolution: 15054.295387028
+ObliqueDetectorResolution: 15055.710968497
+ObliqueLineResolution: 15055.710968497
+ObliqueSampleResolution: 15055.710968497
+ObliquePixelResolution: 15055.710968497
+Testing SetImage with deltaT...
+Sample: 358.000000000
+Line: 534.000000000
+RightAscension: 283.210921080
+Declination: -16.043606158
+PlanetocentricLatitude: -8.271158614
+PositiveEast360Longitude: 210.202299602
+EphemerisTime: 225792161.551323384
+NorthAzimuth: 359.217580727
+SunAzimuth: 82.539531219
+SpacecraftAzimuth: 251.351022349
+OffNadirAngle: 0.000668744
+CelestialNorthClockAngle: 81.991210878
+RaDecResolution: 0.000283854
+BodyFixedCoordinate: -1562.244751303
+BodyFixedCoordinate: -909.332100893
+BodyFixedCoordinate: -262.774167442
+LocalRadius: 1826620.868095986
+SampleResolution: 15054.295387028
+LineResolution: 15054.295387028
+ObliqueDetectorResolution: 15055.710968497
+ObliqueLineResolution: 15055.710968497
+ObliqueSampleResolution: 15055.710968497
+ObliquePixelResolution: 15055.710968497
 Latitude off by: 0.0255589466259298
 Longitude off by: 0.0032366246724109

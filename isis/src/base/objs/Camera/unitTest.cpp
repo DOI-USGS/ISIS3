@@ -30,7 +30,6 @@
 #include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "PixelIfov.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
@@ -52,6 +51,8 @@ using namespace Isis;
  *                           References #2335.
  *   @history 2016-08-19 Tyler Wilson - Updated to test ObliquePixel/ObliqueLine/ObliqueSample
  *                           and ObliqueDetector resolutions.  References #476.
+ *   @history 2016-10-19 Kristin Berry - Added test for new SetParent with deltaT.
+ *  
  *   testcoverage 2015-04-30 - 43.262% scope, 61.561% line, 87.5% function
  */
 
@@ -136,6 +137,9 @@ int main() {
     cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 6.671, -20.0, 355.0) << endl;
     cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 6.671, -20.0, 6.671) << endl << endl;
 
+    cout << "PlanetocentricLatitude: " << c->UniversalLatitude() << endl; 
+    cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl;
+
     cout << "SetUniversalGround(lat, lon): "
          << c->SetGround(lat, lon) << endl;
 
@@ -147,7 +151,63 @@ int main() {
     cout << "HasReferenceBand: " << c->HasReferenceBand() << endl;
     cam.SetBand(7);
     cout << "Sample: " << setprecision(3) << c->Sample() << endl;
-    cout << "Line: " << setprecision(3) << c->Line() << endl;
+    cout << "Line: " << setprecision(3) << c->Line() << endl << endl;
+
+    // Test time-shift SetImage 
+    double deltaT = 500.0;
+    try {
+      cout << "Testing SetImage with positive time offset..." << endl; 
+
+      cout << "Line: " << line << ", Sample: " << sample << endl;
+      cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
+      cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
+
+      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT))
+           << endl << endl;
+
+      cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
+      cout << "SunAzimuth: " << c->SunAzimuth() << endl;
+      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
+      cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
+      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
+      cout << "RaDecResolution: " << c->RaDecResolution()  << endl;
+      cout << "PlanetocentricLatitude: " << c->UniversalLatitude() << endl; 
+      cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl; 
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+
+   // Test time-shift SetImage 
+    deltaT = -500.0;
+    try {
+      cout << "Testing SetImage with negative time offset..." << endl;
+
+      cout << "Line: " << line << ", Sample: " << sample << endl;
+      cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
+      cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
+
+      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT))
+           << endl << endl;
+
+      cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
+      cout << "SunAzimuth: " << c->SunAzimuth() << endl;
+      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
+      cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
+      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
+      cout << "RaDecResolution: " << c->RaDecResolution()  << endl;
+      cout << "PlanetocentricLatitude: " << c->UniversalLatitude() << endl; 
+      cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl;
+
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+
+    // Reset to original setimage: 
+    c->SetImage(sample, line); 
+    c->SetGround(lat, lon);
+    c->SetRightAscensionDeclination(ra, dec);
 
     try {
       double lat = 0, lon = 0;
@@ -162,6 +222,8 @@ int main() {
     }
 
     cout << "PixelResolution: " << c->PixelResolution() << endl;
+    cout << "ExposureDuration: " << c->exposureDuration() << endl;
+
     cout << "ObliquePixelResolution: " << c->ObliquePixelResolution() << endl;
     cout << "LineResolution: " << c->LineResolution() << endl;
     cout << "ObliqueLineResolution: " << c->ObliqueLineResolution() << endl;

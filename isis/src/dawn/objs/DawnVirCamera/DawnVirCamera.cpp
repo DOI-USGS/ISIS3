@@ -1,3 +1,5 @@
+ #include "DawnVirCamera.h"
+
 #include <cctype>
 #include <iostream>
 #include <iomanip>
@@ -7,208 +9,281 @@
 #include <QRegExp>
 #include <QString>
 
-#include "DawnVirCamera.h"
+#include <tnt/tnt_array2d_utils.h>
+
 #include "Camera.h"
-#include "NaifStatus.h"
-#include "IString.h"
-#include "IException.h"
-#include "iTime.h"
-#include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "IException.h"
+#include "IString.h"
+#include "iTime.h"
+#include "Kernels.h"
+#include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
+#include "NaifStatus.h"
 #include "NumericalApproximation.h"
-#include "Kernels.h"
-
-#include "tnt/tnt_array2d_utils.h"
 
 // #define DUMP_INFO 1
 
 using namespace std;
 namespace Isis {
     // constructors
-    DawnVirCamera::DawnVirCamera(Cube &cube) : LineScanCamera(cube) {
-      
-      m_instrumentNameLong = "Visual and Infrared Spectrometer";
-      m_instrumentNameShort = "VIR";
-      m_spacecraftNameLong = "Dawn";
-      m_spacecraftNameShort = "Dawn";
+  /**
+   * Creates a camera for a Dawn VIR cube
+   * 
+   * @param cube The cube to make a camera for
+   * 
+   */
+  DawnVirCamera::DawnVirCamera(Cube &cube) : LineScanCamera(cube) {
+    
+    m_instrumentNameLong = "Visual and Infrared Spectrometer";
+    m_instrumentNameShort = "VIR";
+    m_spacecraftNameLong = "Dawn";
+    m_spacecraftNameShort = "Dawn";
 
  //     cout << "Testing DawnVirCamera...\n";
 
-      Pvl &lab = *cube.label();
-      PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
-      int procLevel = archive["ProcessingLevelId"];
-      m_is1BCalibrated = (procLevel > 2) ? true : false;
+    Pvl &lab = *cube.label();
+    PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
+    int procLevel = archive["ProcessingLevelId"];
+    m_is1BCalibrated = (procLevel > 2) ? true : false;
 
-      // Get the start time from labels
-      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
-      QString channelId = inst["ChannelId"];
+    // Get the start time from labels
+    PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
+    QString channelId = inst["ChannelId"];
 
-      QString instMode = inst["InstrumentModeId"];
-      m_slitMode = instMode[14].toAscii();   // "F" for full slit, Q for quarter slit
+    QString instMode = inst["InstrumentModeId"];
+    m_slitMode = instMode[14].toAscii();   // "F" for full slit, Q for quarter slit
 
-      // Check for presence of articulation kernel
-      bool hasArtCK = hasArticulationKernel(lab);
+    // Check for presence of articulation kernel
+    bool hasArtCK = hasArticulationKernel(lab);
 
-      // Set proper end frame
-      int virFrame(0);
-      if (channelId == "VIS") {
-        // Frame DAWN_VIR_VIS : DAWN_VIR_VIS_ZERO
-        virFrame = (hasArtCK) ? -203211 : -203221;
-      }
-      else { // (channelId == "IR)
-        // Frame DAWN_VIR_IR : DAWN_VIR_IR_ZERO
-        virFrame = (hasArtCK) ? -203213 : -203223;
-      }
-
-      instrumentRotation()->SetFrame(virFrame);
-
-      // We do not want to downsize the cache
-      instrumentRotation()->MinimizeCache(SpiceRotation::No);
-
-      // Set up the camera info from ik/iak kernels
-      SetFocalLength();
-      SetPixelPitch();
-
-      // Get other info from labels
-      PvlKeyword &frameParam = inst["FrameParameter"];
-      m_exposureTime = toDouble(frameParam[0]);
-      m_summing  = toDouble(frameParam[1]);
-      m_scanRate = toDouble(frameParam[2]);
-
-      // Setup detector map
-      //  Get the line scan rates/times
-      readHouseKeeping(lab.fileName(), m_scanRate);
-      new VariableLineScanCameraDetectorMap(this, m_lineRates);
-      DetectorMap()->SetDetectorSampleSumming(m_summing);
-
-      // Setup focal plane map
-      new CameraFocalPlaneMap(this, naifIkCode());
-
-      //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-      QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
-      double sampleBoreSight = getDouble(ikernKey);
-
-      ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
-      double lineBoreSight = getDouble(ikernKey);
-
-      FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
-
-      // Setup distortion map
-      new CameraDistortionMap(this);
-
-      // Setup the ground and sky map
-      new LineScanCameraGroundMap(this);
-      new LineScanCameraSkyMap(this);
-
-      // Set initial start time always (label start time is inaccurate)
-      setTime(iTime(startTime()));    // Isis3nightly
-//      SetEphemerisTime(startTime());  // Isis3.2.1
-
-      //  Now check to determine if we have a cache already.  If we have a cache
-      //  table, we are beyond spiceinit and have already computed the proper
-      //  point table from the housekeeping data or articulation kernel.
-      if (!instrumentRotation()->IsCached() && !hasArtCK) {
-
-        // Create new table here prior to creating normal caches
-        Table quats = getPointingTable(channelId, virFrame);
-
-        // Create all system tables - all kernels closed after this
-        LoadCache();
-        instrumentRotation()->LoadCache(quats);
-      }
-      else {
-        LoadCache();
-      }
-
-#if defined(DUMP_INFO)
-      Table cache = instrumentRotation()->Cache("Loaded");
-      cout << "Total Records: " << cache.Records() << "\n";
-
-      for (int i = 0 ; i < cache.Records() ; i++) {
-        TableRecord rec = cache[i];
-        string separator("");
-        for (int f = 0 ; f < rec.Fields() ; f++) {
-          cout << separator << (double) rec[f];
-          separator = ", ";
-        }
-        cout << "\n";
-      }
-#endif
+    // Set proper end frame
+    int virFrame(0);
+    if (channelId == "VIS") {
+      // Frame DAWN_VIR_VIS : DAWN_VIR_VIS_ZERO
+      virFrame = (hasArtCK) ? -203211 : -203221;
+    }
+    else { // (channelId == "IR)
+      // Frame DAWN_VIR_IR : DAWN_VIR_IR_ZERO
+      virFrame = (hasArtCK) ? -203213 : -203223;
     }
 
-    /** Returns CK frame identifier  */
-    int DawnVirCamera::CkFrameId() const {  return (-203000); }
-    /** Returns CK reference frame */
-    int DawnVirCamera::CkReferenceId() const { return (1); }
-    /** Return PK reference frame */
-    int DawnVirCamera::SpkReferenceId() const { return (1); }
+    instrumentRotation()->SetFrame(virFrame);
 
-   /**
-    * @brief Scrubs a string coming out of the housekeeping table
-    *
-    * This routine is needed to clean up strings from the housekeeping table.
-    * There apparently are extraneous characters in the text fields in this
-    * table.
-    *
-    * This method removes all non-printable characters and the space character.
-    *
-    * @param text         String to scrub
-    *
-    * @return QString Returns scrubs strings
-    */
-   QString DawnVirCamera::scrub(const QString &text) const {
-     QString ostr;
-     for (int i = 0 ; i < text.size() ; i++) {
-       if ((text[i] > ' ') &&  (text[i] <= 'z')) ostr += text[i];
-     }
-     return (ostr);
-   }
+    // We do not want to downsize the cache
+    instrumentRotation()->MinimizeCache(SpiceRotation::No);
 
-   /** Return the pixel summing rate */
-   int DawnVirCamera::pixelSumming() const {
-     return (m_summing);
-   }
+    // Set up the camera info from ik/iak kernels
+    SetFocalLength();
+    SetPixelPitch();
 
-   /** Return the exposure time */
-   double DawnVirCamera::exposureTime() const {
-     return (m_exposureTime);
-   }
+    // Get other info from labels
+    PvlKeyword &frameParam = inst["FrameParameter"];
+    m_exposureTime = toDouble(frameParam[0]);
+    m_summing  = toDouble(frameParam[1]);
+    m_scanRate = toDouble(frameParam[2]);
 
-   /** Return the line scan rate */
-   double DawnVirCamera::scanLineTime() const {
-     return (m_scanRate);
-   }
+    // Setup detector map
+    //  Get the line scan rates/times
+    readHouseKeeping(lab.fileName(), m_scanRate);
+    new VariableLineScanCameraDetectorMap(this, m_lineRates);
+    DetectorMap()->SetDetectorSampleSumming(m_summing);
 
-  /** Return the start time for a given line exposure time  */
-   double DawnVirCamera::lineStartTime(const double midExpTime) const {
-     return (midExpTime-(exposureTime()/2.0));
-   }
+    // Setup focal plane map
+    new CameraFocalPlaneMap(this, naifIkCode());
 
-  /** Return the start time for a given line exposure time  */
-   double DawnVirCamera::lineEndTime(const double midExpTime) const {
-     return (midExpTime+(exposureTime()/2.0));
-   }
+    //  Retrieve boresight location from instrument kernel (IK) (addendum?)
+    QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    double sampleBoreSight = getDouble(ikernKey);
 
-   /** Return start time */
-   double DawnVirCamera::startTime() const {
-     return (lineStartTime(m_mirrorData[0].m_scanLineEt));
-   }
+    ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    double lineBoreSight = getDouble(ikernKey);
+
+    FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
+
+    // Setup distortion map
+    new CameraDistortionMap(this);
+
+    // Setup the ground and sky map
+    new LineScanCameraGroundMap(this);
+    new LineScanCameraSkyMap(this);
+
+    // Set initial start time always (label start time is inaccurate)
+    setTime(iTime(startTime()));    // Isis3nightly
+//      SetEphemerisTime(startTime());  // Isis3.2.1
+
+    //  Now check to determine if we have a cache already.  If we have a cache
+    //  table, we are beyond spiceinit and have already computed the proper
+    //  point table from the housekeeping data or articulation kernel.
+    if (!instrumentRotation()->IsCached() && !hasArtCK) {
+
+      // Create new table here prior to creating normal caches
+      Table quats = getPointingTable(channelId, virFrame);
+
+      // Create all system tables - all kernels closed after this
+      LoadCache();
+      instrumentRotation()->LoadCache(quats);
+    }
+    else {
+      LoadCache();
+    }
+
+#if defined(DUMP_INFO)
+    Table cache = instrumentRotation()->Cache("Loaded");
+    cout << "Total Records: " << cache.Records() << "\n";
+
+    for (int i = 0 ; i < cache.Records() ; i++) {
+      TableRecord rec = cache[i];
+      string separator("");
+      for (int f = 0 ; f < rec.Fields() ; f++) {
+        cout << separator << (double) rec[f];
+        separator = ", ";
+      }
+      cout << "\n";
+    }
+#endif
+  }
+
+  /**
+   * Destructor.
+   */
+  DawnVirCamera::~DawnVirCamera() {
+  }
+
+  /** 
+   *  Returns CK frame identifier
+   * 
+   * @return @b int The CK frame identifier.
+   */
+  int DawnVirCamera::CkFrameId() const {  
+    return (-203000); 
+  }
 
 
-   /** Return end time after all lines are acquired */
-   double DawnVirCamera::endTime() const {
-    return (lineEndTime(m_mirrorData[hkLineCount()-1].m_scanLineEt));
-   }
+  /** 
+   *  Returns CK reference frame identifier
+   * 
+   * @return @b int The CK reference frame identifier.
+   */
+  int DawnVirCamera::CkReferenceId() const { 
+    return (1); 
+  }
 
 
-   /** Returns number of housekeeping records found in the cube Table */
-   int DawnVirCamera::hkLineCount() const {
-     return (m_mirrorData.size());
-   }
+  /** 
+   *  Return PK reference frame identifier
+   * 
+   * @return @b int The PK reference frame identifier
+   */
+  int DawnVirCamera::SpkReferenceId() const { 
+    return (1); 
+  }
 
-   /**
+
+  /**
+   * @brief Scrubs a string coming out of the housekeeping table
+   *
+   * This routine is needed to clean up strings from the housekeeping table.
+   * There apparently are extraneous characters in the text fields in this
+   * table.
+   *
+   * This method removes all non-printable characters and the space character.
+   *
+   * @param text String to scrub
+   *
+   * @return @b QString The scrubbed string.
+   */
+  QString DawnVirCamera::scrub(const QString &text) const {
+    QString ostr;
+    for (int i = 0 ; i < text.size() ; i++) {
+      if ((text[i] > ' ') &&  (text[i] <= 'z')) ostr += text[i];
+    }
+    return (ostr);
+  }
+
+
+  /** 
+   *  Return the pixel summing rate
+   * 
+   * @return @b int The pixel summing rate.
+   */
+  int DawnVirCamera::pixelSumming() const {
+    return (m_summing);
+  }
+
+
+  /** 
+   *  Return the exposure time
+   * 
+   * @return @b double The exposure time for a pixel.
+   */
+  double DawnVirCamera::exposureTime() const {
+    return (m_exposureTime);
+  }
+
+
+  /** 
+   *  Return the line scan rate
+   * 
+   * @return @b double The time between lines in the cube.
+   */
+  double DawnVirCamera::scanLineTime() const {
+    return (m_scanRate);
+  }
+
+
+  /** 
+   *  Return the start time for a given line exposure time
+   * 
+   * @return @b double The et time at the start of the line's exposure.
+   */
+  double DawnVirCamera::lineStartTime(const double midExpTime) const {
+    return (midExpTime-(exposureTime()/2.0));
+  }
+
+
+  /** 
+   *  Return the end time for a given line exposure time
+   * 
+   * @return @b double The et time at the end of the line's exposure.
+   */
+  double DawnVirCamera::lineEndTime(const double midExpTime) const {
+    return (midExpTime+(exposureTime()/2.0));
+  }
+
+
+  /** 
+   *  Return start time for the entire cube.
+   * 
+   * @return @b double The et time at the start of the cube.
+   */
+  double DawnVirCamera::startTime() const {
+    return (lineStartTime(m_mirrorData[0].m_scanLineEt));
+  }
+
+
+  /** 
+   *  Return end time for the entire cube.
+   * 
+   * @return @b double The et time at the end of the cube.
+   */
+  double DawnVirCamera::endTime() const {
+   return (lineEndTime(m_mirrorData[hkLineCount()-1].m_scanLineEt));
+  }
+
+
+  /** 
+   *  Returns number of housekeeping records found in the cube Table
+   * 
+   * @return @b int The number of housekeeping records.
+   */
+  int DawnVirCamera::hkLineCount() const {
+    return (m_mirrorData.size());
+  }
+
+
+  /**
    * @brief Read the VIR houskeeping table from cube
    *
    * This method reads an ISIS Table object from the cube.  This table named,
@@ -216,38 +291,41 @@ namespace Isis {
    * MirrorSin, and MirrorCos.  These fields contain the scan line time in
    * SCLK, status of shutter - open, closed (dark), sine and cosine of the
    * scan mirror, respectively.
+   * 
+   * @param filename The filename of the cube with the house keeping table.
+   * @param linerate The linerate for the cube.
    *
    * @history 2011-07-22 Kris Becker
    */
-   void DawnVirCamera::readHouseKeeping(const QString &filename,
-                                        double lineRate) {
-    //  Open the ISIS table object
-    Table hktable("VIRHouseKeeping", filename);
+  void DawnVirCamera::readHouseKeeping(const QString &filename,
+                                       double lineRate) {
+   //  Open the ISIS table object
+   Table hktable("VIRHouseKeeping", filename);
 
-    m_lineRates.clear();
-    int lineno(1);
-    NumericalApproximation angFit;
-    for (int i = 0; i < hktable.Records(); i++) {
-      TableRecord &trec = hktable[i];
-      QString scet = scrub(trec["ScetTimeClock"]);
-      QString shutterMode = scrub(trec["ShutterStatus"]);
+   m_lineRates.clear();
+   int lineno(1);
+   NumericalApproximation angFit;
+   for (int i = 0; i < hktable.Records(); i++) {
+     TableRecord &trec = hktable[i];
+     QString scet = scrub(trec["ScetTimeClock"]);
+     QString shutterMode = scrub(trec["ShutterStatus"]);
 
-      // Compute the optical mirror angle
-      double mirrorSin = trec["MirrorSin"];
-      double mirrorCos = trec["MirrorCos"];
-      double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
-      double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
-      optAng /= 1000.0;
+     // Compute the optical mirror angle
+     double mirrorSin = trec["MirrorSin"];
+     double mirrorCos = trec["MirrorCos"];
+     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
+     double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
+     optAng /= 1000.0;
 
 
-      ScanMirrorInfo smInfo;
-      double lineMidTime;
-      //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
-      lineMidTime = getClockTime(scet, naifSpkCode()).Et();
-      bool isDark = shutterMode.toLower() == "closed";
+     ScanMirrorInfo smInfo;
+     double lineMidTime;
+     //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
+     lineMidTime = getClockTime(scet, naifSpkCode()).Et();
+     bool isDark = shutterMode.toLower() == "closed";
 
-      // Add fit data for all open angles
-      if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
+     // Add fit data for all open angles
+     if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
 
 #if defined(DUMP_INFO)
       cout << "Line(" << ((isDark) ? "C): " : "O): ") << i
@@ -267,7 +345,7 @@ namespace Isis {
       if ((!m_is1BCalibrated) || (!(m_is1BCalibrated && isDark))) {
         m_lineRates.push_back(LineRateChange(lineno,
                                              lineStartTime(lineMidTime),
-                                             lineRate));
+                                             exposureTime()));
         m_mirrorData.push_back(smInfo);
         lineno++;
       }
@@ -275,6 +353,18 @@ namespace Isis {
 
     // Adjust the last time
     LineRateChange  lastR = m_lineRates.back();
+
+    // Normally the line rate changes would store the line scan rate instead of exposure time.
+    // Storing the exposure time instead allows for better time calculations within a line.
+    // In order for the VariableLineScanCameraDetectorMap to work correctly with this change,
+    // every line in the cube must have a LineRateChange object.  This is because determining
+    // the start time for one line based on another line requires the line scan rate.  Having
+    // a LineRateChange for every line means never needing to calculate the start time for a line
+    // because the start time is stored in that line's LineRateChange.  So, the detector map only
+    // calculates times within a given line.
+    // See VariableLineScanCameraDetectorMap::exposureDuration() for a description of the
+    // difference between exposure time and line scan rate.
+
     m_lineRates.back() = LineRateChange(lastR.GetStartLine(),
                                         lastR.GetStartEt(),
                                         exposureTime());
@@ -298,14 +388,16 @@ namespace Isis {
     }
   }
 
-   /**
+
+  /**
    * @brief Compute the pointing table for each line
    *
    * From the VIR housekeeping data, compute the pointing table for each line
    *  in the image.  This table is for instrumentRotation(Table &) to establish
    *  line/sample pointing information.
-   *
-   * @history 2011-07-22 Kris Becker
+   *  
+   * @internal
+   *   @history 2011-07-22 Kris Becker 
    */
   Table DawnVirCamera::getPointingTable(const QString &virChannel,
                                         const int zeroFrame)  {
@@ -413,7 +505,8 @@ namespace Isis {
     return (quats);
   }
 
-   /**
+
+  /**
    * @brief Compute the state rotation at a given time for given frames
    *
    *  Compute a 6x6 rotation state matrix between the two frames at the
@@ -425,8 +518,8 @@ namespace Isis {
    *  rotation properties are retrived from the CK kernels.  The
    *  acceleration vectors are then set to 0.
    *
-   *
-   * @history 2011-07-22 Kris Becker
+   * @internal
+   *   @history 2011-07-22 Kris Becker 
    */
 
   DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const QString &frame1,
@@ -461,20 +554,21 @@ namespace Isis {
     return (state);
   }
 
-  /**
-  * @brief determine if the CK articulation kernels are present/given
-  *
-  *  This method will determine if the CK articulation kernels are present in
-  *  the labels.  If a kernel with the file pattern "dawn_vir_?????????_?.bc"
-  *  is present as a CK kernel, then that kernel contains mirror scan angles
-  *  for each line.
 
-  *  If the kernel does not exist, this camera model will provide these angles
-  *  from the VIR housekeeping data.
-  *
-  * @history 2011-07-22 Kris Becke
-  *
-  */
+  /**
+   * @brief determine if the CK articulation kernels are present/given
+   *
+   *  This method will determine if the CK articulation kernels are present in
+   *  the labels.  If a kernel with the file pattern "dawn_vir_?????????_?.bc"
+   *  is present as a CK kernel, then that kernel contains mirror scan angles
+   *  for each line.
+   *  
+   *  If the kernel does not exist, this camera model will provide these angles
+   *  from the VIR housekeeping data.
+   *
+   * @internal
+   *   @history 2011-07-22 Kris Becker 
+   */
   bool DawnVirCamera::hasArticulationKernel(Pvl &label) const {
     Kernels kerns(label);
     QStringList cks = kerns.getKernelList("CK");
@@ -488,7 +582,9 @@ namespace Isis {
 
 }
 
-/** Instantiate a new DawnVirCamera model for the given label content */
+/** 
+ *  Instantiate a new DawnVirCamera model for the given label content
+ */
 extern "C" Isis::Camera *DawnVirCameraPlugin(Isis::Cube &cube) {
   return new Isis::DawnVirCamera(cube);
 }

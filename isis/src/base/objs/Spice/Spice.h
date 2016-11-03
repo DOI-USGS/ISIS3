@@ -273,7 +273,11 @@ namespace Isis {
    *                           have been pulled from the cube labels, so we can find target
    *                           body codes that are defined in kernels and not just body codes
    *                           build into spicelib. References #3934
-
+   *   @history 2016-10-19 Kristin Berry - Added exception to Spice::time() to throw if m_et is
+   *                           NULL. Also added isTimeSet(), a function that will return true if
+   *                           m_et is set. References #4476. 
+   *   @history 2016-10-21 Jeannie Backer - Reorder method signatures and member variable
+   *                           declarations to fit ISIS coding standards. References #4476.
    */
   class Spice {
     public:
@@ -320,6 +324,7 @@ namespace Isis {
       SpiceRotation *instrumentRotation() const;
 
       bool hasKernels(Pvl &lab);
+      bool isTimeSet(); 
 
       SpiceInt naifBodyCode() const;
       SpiceInt naifSpkCode() const;
@@ -371,6 +376,10 @@ namespace Isis {
 
 
     private:
+      // Don't allow copies
+      Spice(const Spice &other);
+      Spice &operator=(const Spice &other);
+
       void init(Pvl &lab, bool noTables);
 
       void load(PvlKeyword &key, bool notab);
@@ -406,18 +415,14 @@ namespace Isis {
       SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
       SpiceInt *m_sclkCode;        //!< Spacecraft clock correlation kernel (SCLK) code
       SpiceInt *m_spkBodyCode;     //!< Spacecraft and planet ephemeris kernel (SPK) body code
-      SpiceInt *m_bodyFrameCode; /**< Naif's BODY_FRAME_CODE value. It is read 
-                                      from the labels, if it exists. Otherwise, 
-                                      it's calculated by the init() method.*/
+      SpiceInt *m_bodyFrameCode;   /**< Naif's BODY_FRAME_CODE value. It is read 
+                                        from the labels, if it exists. Otherwise, 
+                                        it's calculated by the init() method.*/
 
-      PvlObject *m_naifKeywords;
+      PvlObject *m_naifKeywords; //!< NaifKeywords PvlObject from cube
 
-      bool m_usingNaif;
-
-      // Don't allow copies
-      Spice(const Spice &other);
-      Spice &operator=(const Spice &other);
-
+      bool m_usingNaif; /**< Indicates whether we are reading values from the 
+                             NaifKeywords PvlObject in cube*/
   };
 }
 

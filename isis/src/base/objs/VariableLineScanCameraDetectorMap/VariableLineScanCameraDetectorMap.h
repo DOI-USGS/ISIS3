@@ -43,43 +43,59 @@ namespace Isis {
    *   @history 2008-08-08 Steven Lambright Original version
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
    *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards
-   *   @history 2016-10-27 Jeannie Backer - Fixed bug in SetDetector() that was subtracting 1/2
-   *                           second from each line rate start ET when trying to find the
-   *                           appropriate rate index for this line. Fixes #4435.
+   *                           
+   *                           coding standards
+   *   @history 2016-10-18 Kristin Berry - Added new SetParent method to include time offset.
+   *                           Updated test. References #4476.
+   *   @history 2016-10-19 Jesse Mapel - Added exposureDuration method for accessing
+   *                           a pixel's exposure duration. Updated test. References #4476.
+   *   @history 2016-10-21 Jesse Mapel - Moved the LineRateChange look up to a separate method.
+   *                           References #4476.
+   *   @history 2016-10-21 Jesse Mapel and Kristin Berry - Fixed bug in SetDetector() and
+   *                           SetParent() methods so that we now subtract 1/2 pixel from the
+   *                           rateStartLine to calculate the p_parentLine and et variables,
+   *                           respectively. This was needed since rateStartLine is the integer
+   *                           value for the first line that uses the current rate. The integer
+   *                           value indicates the center of the line, vertically, so we
+   *                           subtract 0.5 to get the top of the needed start pixel. References
+   *                           #4476.
+   *   @history 2016-10-27 Jeannie Backer - Moved constructor documentation and destructor to
+   *                           cpp file. References #4476.
    *
    */
   class VariableLineScanCameraDetectorMap : public LineScanCameraDetectorMap {
     public:
-      /**
-       * Constructs a VariableLineScanCameraDetectorMap.
-       *
-       * @param parent The camera
-       * @param p_lineRates This should be a vector with an entry for every
-       *          scan rate change in it. The pair consists of the line number and
-       *          ET of the changed time; the first entry should be line 1 and the last
-       *          entry should be one line past the end of the image. See
-       *          HrscCamera for an example.
-       */
       VariableLineScanCameraDetectorMap(Camera *parent, std::vector< LineRateChange > &lineRates);
 
-      //! Destructor
-      virtual ~VariableLineScanCameraDetectorMap() {};
+      virtual ~VariableLineScanCameraDetectorMap();
 
-      virtual bool SetParent(const double sample, const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line, 
+                             const double deltaT);
 
-      virtual bool SetDetector(const double sample, const double line);
+      virtual bool SetDetector(const double sample, 
+                               const double line);
+
+      virtual double exposureDuration(const double sample,
+                                      const double line,
+                                      const int band) const;
+      LineRateChange &lineRate(const double line) const;
 
     private:
-      std::vector< LineRateChange > &p_lineRates;
+      std::vector< LineRateChange > &p_lineRates; /**!< Timing information for the
+                                                        sections of the image.*/
   };
 
 
   /**
-   *
+   * Container class for storing timing information for a section of an image.
+   * 
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2016-10-28 Jesse Mapel - Added documentation.
    */
   class LineRateChange {
     public:
@@ -100,9 +116,9 @@ namespace Isis {
       }
 
     private:
-      int p_line;
-      double p_stime;
-      double p_rate;
+      int p_line;     //!< The first line in the section.
+      double p_stime; //!< The time at the beginning of exposure of the first line.
+      double p_rate;  //!< The time between lines in the section.
   };
 };
 #endif

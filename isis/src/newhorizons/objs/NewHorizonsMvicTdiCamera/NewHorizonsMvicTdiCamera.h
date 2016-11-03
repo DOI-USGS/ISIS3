@@ -46,6 +46,7 @@ namespace Isis {
    *                           mamber to a return false. The cases were the member was throwing
    *                           were way outside the array, so this is not expexted to cause any
    *                           problems. These routines should not ever throw. The calling
+   *   @history 2016-10-21 Kristin Berry - Updated unitTest. References #4476.
    */
   class NewHorizonsMvicTdiCamera : public LineScanCamera {
     public:
