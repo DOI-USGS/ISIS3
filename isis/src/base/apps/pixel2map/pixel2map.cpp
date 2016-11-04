@@ -37,6 +37,7 @@ map <QString, void *> GuiHelpers() {
 
 // Global variables
 ProcessGroundPolygons g_processGroundPolygons;
+UniversalGroundMap *g_groundMap;
 Camera *g_incam;
 int g_numIFOVs = 0;
 
@@ -81,7 +82,7 @@ void IsisMain() {
   QString lastBandString;
 
   // Get the combined lat/lon range for all input cubes
-  int bands;
+  int bands = 1;
   for (int i = 0; i < list.size(); i++) {
     // Open the input cube and get the camera
     CubeAttributeInput atts0(list[i]);
@@ -292,11 +293,10 @@ void IsisMain() {
  
   g_processGroundPolygons.SetIntersectAlgorithm(useCenter);
 
-  UniversalGroundMap *groundMap;
   for (int f = 0; f < list.size(); f++) {
 
     Cube cube(list[f].toString(), "r");
-    groundMap = new UniversalGroundMap(cube);
+    g_groundMap = new UniversalGroundMap(cube);
     // Loop through the input cube and get the all pixels values for all bands
     ProcessByBrick processBrick;
     processBrick.Progress()->SetText("Working on file:  " + list[f].toString());
