@@ -1886,7 +1886,6 @@ void photomet(Buffer &in, Buffer &out) {
 
     // otherwise, compute angle values
     else {
-
       bool success = true;
       if (angleSource == "CENTER_FROM_IMAGE" ||
           angleSource == "CENTER_FROM_LABEL" ||
@@ -1918,22 +1917,34 @@ void photomet(Buffer &in, Buffer &out) {
       if(!success) {
         out[i] = NULL8;
       }
-      else if(deminc >= 90.0 || demema >= 90.0) {
-        out[i] = NULL8;
-      }
-      // if angles greater than max allowed by user, set to null
-      else if(usedem && (deminc > maxinc || demema > maxema)) {
-        out[i] = NULL8;
-      }
-      else if(!usedem && (ellipsoidinc > maxinc || ellipsoidema > maxema)) {
-        out[i] = NULL8;
-      }
       // otherwise, do photometric correction
       else {
         pho->Compute(ellipsoidpha, ellipsoidinc, ellipsoidema, deminc, demema, in[i], out[i], mult, base);
       }
     }
   }
+  // Trim
+  if (!usedem) {
+    cam->IgnoreElevationModel(true);
+  }
+  double trimInc = 0, trimEma = 0;
+  //bool success = true;
+  for (int i = 0; i < in.size(); i++) {
+    // if off the target, set to null
+    if(!cam->SetImage(in.Sample(i), in.Line(i))) {
+      out[i] = NULL8;
+      //success = false;
+    }
+    else {
+      trimInc = cam->IncidenceAngle();
+      trimEma = cam->EmissionAngle();
+    }
+    
+    if(trimInc > maxinc || trimEma > maxema) {
+        out[i] = NULL8;
+    }
+  }
+  cam->IgnoreElevationModel(false);
 }
 
 /**
