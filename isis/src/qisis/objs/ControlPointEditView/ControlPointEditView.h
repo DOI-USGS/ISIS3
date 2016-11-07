@@ -38,8 +38,8 @@ namespace Isis {
   /**
    * View for editing a single ControlPoint
    *
-   * @author Tracie Sucharski  2016-04-06 
-   *  
+   * @author 2016-04-06 Tracie Sucharski
+   *    
    * @internal 
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
    *                           query for shapes and other data from the project. 
