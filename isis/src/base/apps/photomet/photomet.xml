@@ -3041,7 +3041,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <internalDefault>None Specified</internalDefault>
         <description>
           This is the empirically derived coefficient for the albedo dependent 
-	  phase function normalization parameter.
+          phase function normalization parameter.
         </description>
       </parameter>
 
@@ -3054,7 +3054,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <internalDefault>None Specified</internalDefault>
         <description>
           This is the empirically derived coefficient for the albedo dependent 
-	  phase function normalization parameter.
+          phase function normalization parameter.
         </description>
       </parameter>
       </group>
@@ -3066,14 +3066,14 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
       <description>
         This example shows the photometric correction of a cube file using the 
         hapkehen (Hapkehen) photometric model and the albedo normalization model 
-	without trimming the image data based on incidence or emission angle.
+        without trimming the image data based on incidence or emission angle.
       </description>
       <terminalInterface>
         <commandLine>
-	 from=EW0131773041G_cal.cub to=EW0131773041G_cal_hapkehen_albedo.cub 
+         from=EW0131773041G_cal.cub to=EW0131773041G_cal_hapkehen_albedo.cub 
          frompvl=photomG.pvl phtname=hapkehen theta=9 wh=0.218651 hg1=0.178965 
          hg2=0.971493 hh=0.085 b0=2.7 normname=albedo incref=0 thresh=1e+31 
-	 albedo=1.0
+         albedo=1.0
         </commandLine>
         <description>Run photomet with default maximum angles</description>
       </terminalInterface>
@@ -3084,8 +3084,8 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
             <description>
               Screenshot of GUI version of the application.  The default
               value for the MAXEMISSION and MAXINCIDENCE parameters is 90.0.  
-	      The parameter values were loaded into the appropriate parameter 
-	      names using the drop-down menu for the "FROMPVL" parameter name.
+              The parameter values were loaded into the appropriate parameter 
+              names using the drop-down menu for the "FROMPVL" parameter name.
             </description>
             <thumbnail src="assets/thumbs/photomet_ex1_gui_thumb.png" caption="photomet GUI" width="183" height="300"/>
           </image>
@@ -3097,7 +3097,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           <description>
             The PVL file contains the photometric parameters to be applied to the input 
             cube file.  Load the PVL file parameters using the photomet GUI drop-down
-	    menu and add the additional required parameter value for "ALBEDO."
+            menu and add the additional required parameter value for "ALBEDO."
           </description>
           <parameterName>
             FROMPVL
@@ -3347,9 +3347,75 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           <description> 
             Screenshot of the output image after the photometric correction.  Notice 
             the output image has been trimmed based on the photometric angles 
-	    defined by the user.
+            defined by the user.
           </description>
           <thumbnail src="assets/thumbs/output4thumb.jpg" caption="Output image" width="199" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    
+    <example>
+      <brief>Photometric correction using maximum emission and incidence angle parameters as 
+        well as anglesource and usedem parameters.</brief>
+      <description>
+        <p>
+        This example shows the photometric correction of a cube file by setting the maximum 
+        emission angle to 75.0 degrees and the maximum incidence angle to 85.0 degrees.  The photometric
+        model being used is MINNAERT and the normilization model is ALBEDO.
+        The usedem parameter is describing how to trim the image. In this case the trimming is being done using the
+        radius obtained from the DEM. The anglesource parameter describes how to calculate the photometric angles. In
+        this example the calculation is also being done using the DEM.
+      </p>
+      </description>
+      <terminalInterface>
+        <commandLine>
+          photomet from=uncropped.cub to=TrimmedTestAngleSourceDemUsedemFalse.cub maxemission=87.0 anglesource=dem 
+          phtname=minnaert k=0.5 normname=albedo incref=0 incmat=80 thresh=30 albedo=1.0
+        </commandLine>
+        <description>
+          Run photomet with maximum incidence at 90 degrees and maximum emission less than 90 degrees.
+          Photometric model is MINNAERT and normilization model is ALBEDO.
+          Usedem is false and anglesource is set to DEM.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/Example5GUI.png " width="772" height="1229">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.  Notice the 
+              MAXEMISSION has changed from the default value of 90.0, usedem is set to it's default, 
+              and anglesource is set to DEM.
+            </description>
+            <thumbnail src="assets/thumbs/Example5GUI_thumb.png" caption="photomet GUI" width="176" height="300"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/usedemInput.png" width="497" height="497">
+          <brief>Input file </brief>
+          <description>
+            Screenshot of the input image before the photometric correction has been 
+            performed. 
+          </description>
+          <thumbnail src="assets/thumbs/usedemInput_thumb.png" caption="Input image" width="200" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/photometUsedem.png" width="497" height="497">
+          <brief>Output file </brief>
+          <description> 
+            Screenshot of the output image after the photometric correction.  Notice 
+            the output image has been trimmed based on the photometric angles 
+            defined by the user.
+          </description>
+          <thumbnail src="assets/thumbs/photometUsedem_thumb.png" caption="Output image" width="200" height="200"/>
           <parameterName>
             TO
           </parameterName>
@@ -3419,68 +3485,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
        </image>
       </outputImages>
     </example>
-       <example>
-      <brief>Photometric corrections using a three-step approach for MDIM2.1 of Mars</brief>
-      <description>
-        A multistep process is used to apply photometric correction to Mars images: 
-        <ol>
-          <li>
-            Photomet is run in albedo mode, which decreases brightness variations across 
-            the individual image and removes the additive atmospheric contribution, if any; 
-          </li>
-          <li>
-            The output image from step 1 is divided by a low-pass-filtered version of itself, 
-            which removes albedo variations if they have broader spatial scales than topographic 
-            shading as is often the case; and 
-          </li>
-          <li>
-            Photomet is run again on the output image of step 2 in topography mode, which 
-            undoes the albedo normalization of the first pass and then applies the topographic 
-            normalization.
-          </li>
-        </ol> 
-        The final result would need to be equalized and  mosaicked together.
-      </description>
-      <dataFiles>
-        <dataFile path="assets/photomet_3_steps_processing.cmd">
-          <brief>Sample script</brief>
-          <description>
-            This script contains the three-step processing sequence of programs that need to 
-            be executed for the three test images.
-          </description>
-          <parameterName>
-            Not applicable
-          </parameterName>
-        </dataFile>
-      </dataFiles>
-      <outputImages>
-        <image src="assets/images/photomet_ex5_3step_process.png" width="1226" height="1334">
-          <brief>Collage of images</brief>
-          <description>
-            The images shown are subareas at 1:1 scale to emphasize the result of the 
-            photometric correction at each stage.  There are four rows in the image 
-            collage containing the following:<br/>
-            <ul>
-              <li>
-                Row 1 - Calibrated images without photometric correction<br/>
-              </li>
-              <li>
-                Row 2 - Applied Hapkehen photometric model, albedoatm normalization 
-                model and an hapkeatm2 atmospheric model<br/>
-              </li>
-              <li>
-                Row 3 - Applied a divide filter
-              </li>
-              <li>
-                Row 4 - Applied Hapkehen photometric model, topoatm normalization 
-                model and an hapkeatm2 atmospheric model<br/>
-              </li>
-            </ul>
-         </description>
-         <thumbnail src="assets/thumbs/photomet_ex5_3step_process_thumb.png" caption="Input and output images" width="276" height="300"/>
-       </image>
-      </outputImages>
-    </example>
+
   </examples>
 </application>
 
