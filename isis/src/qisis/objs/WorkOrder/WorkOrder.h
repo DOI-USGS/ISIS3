@@ -66,7 +66,7 @@ namespace Isis {
    *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
    *   work order to not function properly when saved/restored from disk.
    *
-   * @author 2012-??-?? ???
+   * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
    * @internal
    *   @history 2012-08-23 Steven Lambright and Stuart Sides - Updated the class to be much more

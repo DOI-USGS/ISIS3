@@ -1,6 +1,7 @@
 #include "WorkOrderFactory.h"
 
 #include "CnetEditorViewWorkOrder.h"
+#include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
 #include "Footprint2DViewWorkOrder.h"
@@ -23,6 +24,8 @@
 #include "SaveProjectAsWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
 #include "SensorGetInfoWorkOrder.h"
+#include "SetActiveControlWorkOrder.h"
+#include "SetActiveImageListWorkOrder.h"
 #include "TargetGetInfoWorkOrder.h"
 
 namespace Isis {
@@ -43,6 +46,7 @@ namespace Isis {
     WorkOrder *result = NULL;
 
     tryType<CnetEditorViewWorkOrder>(type, project, result);
+    tryType<CubeDnViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);
     tryType<ExportControlNetWorkOrder>(type, project, result);
     tryType<Footprint2DViewWorkOrder>(type, project, result);
@@ -63,6 +67,8 @@ namespace Isis {
     tryType<SaveProjectAsWorkOrder>(type, project, result);
     tryType<SaveProjectWorkOrder>(type, project, result);
     tryType<SensorGetInfoWorkOrder>(type, project, result);
+    tryType<SetActiveControlWorkOrder>(type, project, result);
+    tryType<SetActiveImageListWorkOrder>(type, project, result);
     tryType<TargetGetInfoWorkOrder>(type, project, result);
 
     if (!result) {
