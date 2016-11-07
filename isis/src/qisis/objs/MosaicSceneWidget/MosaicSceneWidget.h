@@ -133,6 +133,9 @@ namespace Isis {
    *   @history 2016-09-14 Tracie Sucharski - Added signals for mouse clicks for modifying, deleting
    *                           and creating control points.  These are passed on to Footprint2DView
    *                           signals, then on to Directory slots.
+   *   @history 2016-11-07 Ian Humphrey - Restored the startElement() functionality so footprints
+   *                           can be correctly loaded from an XML storing the MosaicScenWidget's
+   *                           state. Fixes #4486.
    * 
    */
   class MosaicSceneWidget : public QWidget {

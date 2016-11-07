@@ -4,6 +4,7 @@
 #include <QProgressDialog>
 
 #include "Directory.h"
+#include "Footprint2DView.h"
 #include "MosaicSceneWidget.h"
 
 namespace Isis {
@@ -30,21 +31,31 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   MosaicSceneWorkOrder::~MosaicSceneWorkOrder() {
   }
 
 
+  /**
+   * Returns the MosaicSceneWidget corresponding to this work order's interal data
+   * (the MosaicSceneWidget's window title).
+   * 
+   * @return @b MosaicSceneWidget* Returns a pointer to the MosaicSceneWidget with a window title
+   *                               that matches this work order's internal data's window title.
+   * 
+   * @see MosaicSceneWorkOrder::MosaicSceneWorkOrder()
+   */
   MosaicSceneWidget *MosaicSceneWorkOrder::scene() {
 
     MosaicSceneWidget *result = NULL;
-    /*  //tjw
 
-    foreach (MosaicSceneWidget *scene, directory()->footprint2DViews()) {
-      if (internalData().first() == scene->windowTitle()) {
-        result = scene;
+    foreach (Footprint2DView *scene, directory()->footprint2DViews()) {
+      if (internalData().first() == scene->mosaicSceneWidget()->windowTitle()) {
+        result = scene->mosaicSceneWidget();
       }
     }
-    */
     return result;
   }
 

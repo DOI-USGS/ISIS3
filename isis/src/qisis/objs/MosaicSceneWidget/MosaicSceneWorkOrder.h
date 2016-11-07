@@ -22,6 +22,7 @@ namespace Isis {
    * @author 2012-10-18 Stuart Sides and Steven Lambright
    *
    * @internal
+   *   @history 2016-11-07 Ian Humphrey - Restored the functionality in scene(). References #4486.
    */
   class MosaicSceneWorkOrder : public WorkOrder {
       Q_OBJECT

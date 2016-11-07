@@ -1104,6 +1104,10 @@ namespace Isis {
    * @brief Save the directory to an XML file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
+   * 
+   * @internal
+   *   @history 2016-11-07 Ian Humphrey - Restored saving of footprints (footprint2view).
+   *                           References #4486.
    */
   void Directory::save(QXmlStreamWriter &stream, FileName newProjectRoot) const {
     stream.writeStartElement("directory");
@@ -1118,16 +1122,17 @@ namespace Isis {
       stream.writeEndElement();
     }
 
-    //if ( !m_footprint2DViewWidgets.isEmpty() ) {
-    //  //qDebug()<<"Writing footprints";
-    //  stream.writeStartElement("footprintViews");
+    // Save footprints
+    if ( !m_footprint2DViewWidgets.isEmpty() ) {
+      //qDebug()<<"Writing footprints";
+      stream.writeStartElement("footprintViews");
 
-    //  foreach (MosaicSceneWidget *footprint2DViewWidget, m_footprint2DViewWidgets) {
-    //    footprint2DViewWidget->save(stream, project(), newProjectRoot);
-    //  }
+      foreach (Footprint2DView *footprint2DViewWidget, m_footprint2DViewWidgets) {
+        footprint2DViewWidget->mosaicSceneWidget()->save(stream, project(), newProjectRoot);
+      }
 
-    //  stream.writeEndElement();
-    //}
+      stream.writeEndElement();
+    }
 
     stream.writeEndElement();
   }
@@ -1170,7 +1175,7 @@ namespace Isis {
 
     if (result) {
       if (localName == "footprint2DView") {
-        //m_directory->addFootprint2DView()->load( reader() );
+        m_directory->addFootprint2DView()->mosaicSceneWidget()->load( reader() );
       }
       else if (localName == "imageFileList") {
         m_directory->addImageFileListView()->load( reader() );

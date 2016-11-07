@@ -98,6 +98,9 @@ namespace Isis {
    *   @history 2016-08-02 Tracie Sucharski - Added RemoveImagesWorkOrder.
    *   @history 2016-09-14 Tracie Sucharski - Added slots for mouse clicks on Footprint2DView and
    *                           CubeDnViews for modifying, deleting and creating control points.
+   *   @history 2016-11-07 Ian Humphrey - Restored saving and loading Footprint2DViews when saving
+   *                           and opening a project (modified save() and startElement()).
+   *                           Fixes #4486.
    */
   class Directory : public QObject {
     Q_OBJECT

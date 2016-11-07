@@ -2172,7 +2172,6 @@ namespace Isis {
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
 
-    /*
     m_characterData = "";
 
     if (result) {
@@ -2191,7 +2190,7 @@ namespace Isis {
         m_scrollBarYValue = atts.value("scrollBarYValue").toInt();
       }
     }
-    */
+
     return result;
   }
 
