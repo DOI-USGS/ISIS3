@@ -8,7 +8,7 @@
 
   <description>
     The photrim program trims pixels outside of the phase, incidence, and emission
-    angles by setting them to “null” within all bands of the cube. A user can either
+    angles by setting them to "null" within all bands of the cube. A user can either
     trim using the program's default method or the USEDEM method.<br/>
     <br/>
     By default, photrim uses the angles calculated from the ellipsoidal surface to 
