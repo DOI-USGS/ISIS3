@@ -16,5 +16,12 @@
     <change name="Ken Edmundson" date="2012-04-03">
       Original version
     </change>
+    <change name="Ian Humphrey" date="2016-11-09">
+      The main window state is now saved properly when running cnetsuite. If running cnetsuite
+      without opening a project, the config files are saved as cnetsuite_Project.config (Project is
+      the default project name). Otherwise, when a project is loaded, config files are saved as
+      cnetsuite_ProjectName.config, where ProjectName is the name of the loaded project.
+      Fixes #4358.
+    </change>
   </history>
 </application>

@@ -70,6 +70,15 @@ namespace Isis {
    *                          GUI, and it wasn't outputting warnings/errors to the warnings/error tab
    *                          when the project was loaded because it was being called before the GUI
    *                          was created.  Fixes #4488.  References #4526, ##4487.
+   *   @history 2016-11-09 Ian Humphrey - Modified readSettings() and writeSettings() to take in
+   *                           Project pointers to be used to properly read and write settings
+   *                           for the CNetSuiteMainWindow. Note that when running cnetsuite without
+   *                           opening a Project, the config file cnetsuite_Project.config is used.
+   *                           Otherwise, when a project is open, the config file
+   *                           cnetsuite_ProjectName will be used to restore window geom.
+   *                           The m_permToolBar, m_activeToolBar, and m_toolPad now have object
+   *                           names set, so the saveState() call within writeSettings() now works.
+   *                           Fixes #4358.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT
@@ -105,7 +114,7 @@ namespace Isis {
 
       void applyMaxThreadCount();
       void createMenus();
-      void writeSettings();
+      void writeSettings(const Project *project) const;
 
       void initializeActions();
 

@@ -44,7 +44,9 @@ int main(int argc, char *argv[]) {
 
     CNetSuiteMainWindow *mainWindow = new CNetSuiteMainWindow();
 
-    mainWindow->showMaximized();
+    // We do not want a showMaximized call, as that will negate the settings read during the main
+    // window's initialization. References #4358.
+    mainWindow->show();
     int status = app->exec();
 
     delete mainWindow;
