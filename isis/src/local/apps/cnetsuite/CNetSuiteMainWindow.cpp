@@ -74,14 +74,12 @@ namespace Isis {
     }
 
     QStringList args = QCoreApplication::arguments();
-
-    if (args.count() == 2) {
-//    connect(this, SIGNAL(openProjectFromCommandLine(QString)),
-//            project, SLOT(open(QString)), Qt::QueuedConnection);
-//    emit openProjectFromCommandLine(args.last());
+/**
+    if (args.count() == 2) {    
+      qDebug() << args.last();
       m_directory->project()->open(args.last());
     }
-
+*/
     m_projectDock = new QDockWidget("Project", this, Qt::SubWindow);
     m_projectDock->setObjectName("projectDock");
     m_projectDock->setFeatures(QDockWidget::DockWidgetMovable |
@@ -167,6 +165,11 @@ namespace Isis {
     // ken testing
     setActiveView(projectTreeView);
     // ken testing
+
+    if (args.count() == 2) {
+      qDebug() << args.last();
+      m_directory->project()->open(args.last());
+    }
   }
 
 

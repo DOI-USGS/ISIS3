@@ -65,6 +65,11 @@ namespace Isis {
    *   @history 2016-10-20 Tracie Sucharski - Clean up included headers that are commented out,
    *                          updated for Qt5, comment call to saveState for window which caused
    *                          errors.  TODO:  Determine problem with saveState call.
+   *  @history 2016-11-09  Tyler Wilson - Move a segment of code in the constructor from the beginning
+   *                          to the end.  This code loads a project from the command line instead of the 
+   *                          GUI, and it wasn't outputting warnings/errors to the warnings/error tab
+   *                          when the project was loaded because it was being called before the GUI
+   *                          was created.  Fixes #4488.  References #4526, ##4487.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT
