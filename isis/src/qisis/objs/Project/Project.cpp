@@ -830,7 +830,7 @@ namespace Isis {
    * Open the project at the given path.
    */
   void Project::open(QString projectPathStr) {
-    //qDebug()<<"Project::open    projectPathStr = "<<projectPathStr;
+  
     m_isTemporaryProject = false;
 
     FileName projectPath(projectPathStr);
@@ -842,7 +842,6 @@ namespace Isis {
 
     QString projectXmlPath = projectPath.toString() + "/project.xml";
     QFile file(projectXmlPath);
-//qDebug()<<"Project::open     before opening project.xml";
     if ( !file.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
@@ -854,12 +853,24 @@ namespace Isis {
     *m_projectRoot = projectPath.expanded();
 
     QXmlInputSource xmlInputSource(&file);
-//qDebug()<<"Project::open     before parsing project.xml";
-    if (!reader.parse(xmlInputSource)) {
-      warn(tr("Failed to open project [%1]").arg(projectPath.original()));
+
+    //This prevents the project from not loading if everything
+    //can't be loaded, and outputs the warnings/errors to the
+    //Warnings Tab
+    try {
+      reader.parse(xmlInputSource);
+        }
+    catch (IException &e) {
+      directory()->showWarning(QString("Failed to open project completely [%1]")
+                               .arg(projectPath.original()));
+      directory()->showWarning(e.toString());
+      }
+    catch (std::exception &e) {
+      directory()->showWarning(QString("Failed to open project completely[%1]")
+                               .arg(projectPath.original()));
+      directory()->showWarning(e.what());
     }
 
-    //qDebug()<<"Project::open     before opening history.xml";
     QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
     QFile historyFile(projectXmlHistoryPath);
 
@@ -871,17 +882,26 @@ namespace Isis {
     }
 
     reader.pushContentHandler(&handler);
-
     QXmlInputSource xmlHistoryInputSource(&historyFile);
-//qDebug()<<"Project::open     before parsing history.xml";
-    if (!reader.parse(xmlHistoryInputSource)) {
-      warn(tr("Failed to read history from project [%1]").arg(projectPath.original()));
+   
+    try {
+        reader.parse(xmlHistoryInputSource);
+        }
+
+    catch (IException &e) {
+      directory()->showWarning(QString("Failed to read history from project[%1]")
+                               .arg(projectPath.original()));
+      directory()->showWarning(e.toString());
+      }
+    catch (std::exception &e) {
+       directory()->showWarning(QString("Failed to read history from project[%1]")
+                                .arg(projectPath.original()));
+      directory()->showWarning(e.what());
     }
 
     QString projectXmlWarningsPath = projectPath.toString() + "/warnings.xml";
     QFile warningsFile(projectXmlWarningsPath);
 
-//qDebug()<<"Project::open     before opening warnings.xml";
     if (!warningsFile.open(QFile::ReadOnly)) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
@@ -892,14 +912,13 @@ namespace Isis {
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
-//qDebug()<<"Project::open     before parsing warnings.xml";
     if (!reader.parse(xmlWarningsInputSource)) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectPath.original()));
     }
 
     QString directoryXmlPath = projectPath.toString() + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
-//qDebug()<<"Project::open      before opening directory.xml";
+   
 
     if (!directoryFile.open(QFile::ReadOnly)) {
       throw IException(IException::Io,
@@ -911,9 +930,20 @@ namespace Isis {
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
-//qDebug()<<"Project::open  Before parsing xml";
-    if (!reader.parse(xmlDirectoryInputSource)) {
-      warn(tr("Failed to read GUI state from project [%1]").arg(projectPath.original()));
+   
+    try {
+      reader.parse(xmlDirectoryInputSource);
+         }
+    catch (IException &e) {
+      directory()->showWarning(QString("Failed to read GUI state from project[%1]")
+                               .arg(projectPath.original()));
+      directory()->showWarning(e.toString());
+
+      }
+    catch (std::exception &e) {
+      directory()->showWarning(QString("Failed to read GUI state from project[%1]")
+                               .arg(projectPath.original()));
+      directory()->showWarning(e.what());
     }
 
     QDir bundleRoot(bundleSolutionInfoRoot());
@@ -940,7 +970,6 @@ namespace Isis {
     }
 
     emit projectLoaded(this);
-    //qDebug()<<"Project::open   After emit projectLoaded";
   }
 
 

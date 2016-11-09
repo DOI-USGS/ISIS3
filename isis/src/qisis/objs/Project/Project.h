@@ -97,6 +97,10 @@ namespace Isis {
    *                           ImageReader class was changed so that footprints are no longer
    *                           created if not required.
    *   @history 2016-07-06 Tracie Sucharski - Add import shape models to project. 
+   *   @history 2016-11-09 Tyler Wilson - Added try-catch blocks around reader.parse calls in
+   *                           the open function, so that warnings/errors are output to the
+   *                           warnings tab of the GUI instead of causing the application 
+   *                           to exit.  Fixes #4488.
    */
   class Project : public QObject {
     Q_OBJECT
