@@ -45,6 +45,14 @@ namespace Isis {
    * Construct the main window. This will create a Directory, the menus, and the dock areas.
    *
    * @param parent The Qt-relationship parent widget (usually NULL in this case)
+   *
+   * @internal
+   *   @history 2016-11-09 Tyler Wilson - Moved the if-block which loads a project from the
+   *                             command line from the start of the constructor to the end
+   *                             because if there were warnings and errors, they were not
+   *                             being output to the Warnings widget since the project is loaded
+   *                             before the GUI is constructed.  Fixes #4488
+   *
    */
   CNetSuiteMainWindow::CNetSuiteMainWindow(QWidget *parent) :
       QMainWindow(parent) {
