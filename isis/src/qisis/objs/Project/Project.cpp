@@ -828,7 +828,13 @@ namespace Isis {
 
   /**
    * Open the project at the given path.
-   */
+   * @param The path to the project folder
+   * @internal
+   *   @history Tyler Wilson - Added try-catch blocks around all reader.parse
+   *                  calls.  The exception information is not piped to the Warnings tab 
+   *                  in the GUI instead of the command line, and the application starts
+   *                  instead of executing prematurely.  Fixes #4488.
+   * */
   void Project::open(QString projectPathStr) {
   
     m_isTemporaryProject = false;
