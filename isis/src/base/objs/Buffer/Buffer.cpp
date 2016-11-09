@@ -42,6 +42,7 @@ namespace Isis {
     p_band(0), p_nbands(0), p_npixels(0), p_buf(0),
     p_pixelType(None), p_rawbuf(0) { }
 
+
   /**
    * Creates a Buffer object.  Note that the number of pixels in the buffer
    * can not exceed 2GB.
@@ -78,6 +79,7 @@ namespace Isis {
     Allocate();
   }
 
+
   //! Destroys the Buffer object and frees shape buffer.
   Buffer::~Buffer() {
     try {
@@ -93,6 +95,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * @brief Assign the entire buffer to a constant double value
    * @param d Value to assign to the buffer
@@ -105,6 +108,7 @@ namespace Isis {
     }
     return (*this);
   }
+
 
   /**
    * This method is used to set the base position of the shape buffer.  In general
@@ -140,6 +144,7 @@ namespace Isis {
     return (index % p_nsamps) + p_sample;
   }
 
+
   /**
    * Returns the line position associated with a shape buffer index.  The
    * shape buffer is one dimensional.  Let us assume a nsamps=2, nlines=3, and
@@ -158,6 +163,7 @@ namespace Isis {
     return sub_index / p_nsamps + p_line;
   }
 
+
   /**
    * Returns the band position associated with a shape buffer index.  The
    * shape buffer is one dimensional.  Let us assume a nsamps=2, nlines=3, and
@@ -172,6 +178,7 @@ namespace Isis {
   int Buffer::Band(const int index) const {
     return index / (p_nsamps * p_nlines) + p_band;
   }
+
 
   /**
    * Returns the sample, line, and band position associated with a
@@ -189,6 +196,7 @@ namespace Isis {
     i_line = Line(index);
     i_band = Band(index);
   }
+
 
   /**
    * Given a sample, line, and band position, this returns the appropriate index
@@ -226,6 +234,7 @@ namespace Isis {
     return (index);
   }
 
+
   /**
    * Returns the value in the shape buffer at the given index.
    *
@@ -247,6 +256,7 @@ namespace Isis {
 
     return p_buf[index];
   }
+
 
   /**
    * Allows copying of the buffer contents to another Buffer
@@ -277,6 +287,7 @@ namespace Isis {
       memcpy(p_rawbuf, in.p_rawbuf, n);
     }
   }
+
 
   /**
    * Allows copying of the buffer contents of a larger buffer to another same size or smaller
@@ -313,6 +324,7 @@ namespace Isis {
     return isSubareaOfIn;
   }
 
+
   /**
    * The copy constructor. Allows a new Buffer object to be created using
    * an existing Buffer object.
@@ -332,6 +344,7 @@ namespace Isis {
     Allocate();
     Copy(rhs);
   }
+
 
   /**
    * Size or resize the memory buffer.

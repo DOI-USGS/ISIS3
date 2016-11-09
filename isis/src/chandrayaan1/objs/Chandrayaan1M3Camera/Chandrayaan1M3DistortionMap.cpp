@@ -100,10 +100,6 @@ namespace Isis {
    */
   bool Chandrayaan1M3DistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
 
-    // image coordinates prior to introducing distortion
-    p_undistortedFocalPlaneX = ux;
-    p_undistortedFocalPlaneY = uy;
-
     double xt = ux;
     double yt = uy;
 
@@ -162,6 +158,9 @@ namespace Isis {
     }
 
     if (bConverged) {
+      p_undistortedFocalPlaneX = ux;
+      p_undistortedFocalPlaneY = uy;
+
       p_focalPlaneX = xdistorted;
       p_focalPlaneY = ydistorted;
     }

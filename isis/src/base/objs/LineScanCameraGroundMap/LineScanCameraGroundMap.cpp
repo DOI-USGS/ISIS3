@@ -62,7 +62,7 @@ class LineOffsetFunctor :
 
     LineOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
       m_camera = camera;
-      surfacePoint = surPt;
+      m_surfacePoint = surPt;
     }
 
 
@@ -96,7 +96,7 @@ class LineOffsetFunctor :
       m_camera->Sensor::setTime(et);
  
       // Set ground
-      if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
+      if (!m_camera->Sensor::SetGround(m_surfacePoint, false)) {
         IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                       " LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -112,22 +112,22 @@ class LineOffsetFunctor :
       // SetUndistortedFocalPlane was failing a majority of the time, causing most SetGround calls
       // to fail. Even when it did succeed, it was producing non-continous return values.
         // Set the undistorted focal plane coordinates
-//        if (!m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
-//          IString msg = "DistortionMap::SetUndistoredFocalPlane failed for surface point in "
-//                        "LineScanCameraGroundMap.cpp LineOffsetFunctor";
-//          throw IException(IException::Programmer, msg, _FILEINFO_);
-//        }
+      //  if (!m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
+      //    IString msg = "DistortionMap::SetUndistoredFocalPlane failed for surface point in "
+      //                  "LineScanCameraGroundMap.cpp LineOffsetFunctor";
+      //    throw IException(IException::Programmer, msg, _FILEINFO_);
+      //  }
 
         // Get the natural (distorted focal plane coordinates)
-//        dx = m_camera->DistortionMap()->FocalPlaneX();
-//        dy = m_camera->DistortionMap()->FocalPlaneY();
-//        std::cout << "use dist" << std::endl;
-//      }
+      //  dx = m_camera->DistortionMap()->FocalPlaneX();
+      //  dy = m_camera->DistortionMap()->FocalPlaneY();
+      //  std::cout << "use dist" << std::endl;
+      //}
 
 
       // Try to use SetUndistortedFocalPlane, if that does not work use the distorted x,y
       // under the assumption (bad|good) that extrapolating the distortion
-      // is causing the distorted x to be way off the sensor, and thus not very good anyway.
+      // is causing the distorted x,y to be way off the sensor, and thus not very good anyway.
       if (m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
         // Get the natural (distorted focal plane coordinates)
         dx = m_camera->DistortionMap()->FocalPlaneX();
@@ -151,7 +151,7 @@ class LineOffsetFunctor :
 
 
   private:
-    SurfacePoint surfacePoint;
+    SurfacePoint m_surfacePoint;
     Camera* m_camera;
 };
 
@@ -187,7 +187,7 @@ class SensorSurfacePointDistanceFunctor :
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       m_camera->Sensor::setTime(et);
-      if(!m_camera->Sensor::SetGround(surfacePoint, false)) {
+      if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
          IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                        "SensorSurfacePointDistanceFunctor";
       }
@@ -289,8 +289,8 @@ namespace Isis {
     //CameraDistortionMap *distortionMap = p_camera->DistortionMap();
     //CameraFocalPlaneMap *focalMap = p_camera->FocalPlaneMap();
 
-    double approxTime=0;
-    double approxOffset=0;
+    double approxTime = 0;
+    double approxOffset = 0;
     double lookC[3] = {0.0, 0.0, 0.0};
     double ux = 0.0;
     double uy = 0.0;
@@ -306,19 +306,20 @@ namespace Isis {
     LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
-    /*********************************************************************************************
-    if an approximate point is given use that as a start point for the secant method root search
-    *********************************************************************************************/
-    if (approxLine > 0) {  
-      //convert the approxLine to an approximate time and offset
-      p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, approxLine);
+    // METHOD #1
+    // Use the line given as a start point for the secant method root search. 
+    if (approxLine >= 0.5) {
+
+      // convert the approxLine to an approximate time and offset
+      p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
       approxTime = p_camera->time().Et();
   
       approxOffset = offsetFunc(approxTime);
 
-      if (fabs(approxOffset) < 1e-2) { //no need to iteratively improve this root, it's good enough
+      // Check to see if there is no need to improve this root, it's good enough
+      if (fabs(approxOffset) < 1e-2) { 
         p_camera->Sensor::setTime(approxTime);
-        //check to make sure the point isn't behind the planet
+        // check to make sure the point isn't behind the planet
         if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
           return Failure;
         } 
@@ -334,7 +335,7 @@ namespace Isis {
 
       double fl, fh, xl, xh;
 
-      //starting times for the secant method, kept within the domain of the cache
+      // starting times for the secant method, kept within the domain of the cache
       xh = approxTime;
       if (xh + lineRate < cacheEnd) {
         xl = xh + lineRate;
@@ -343,7 +344,7 @@ namespace Isis {
         xl = xh - lineRate;
       }
 
-      //starting offsets
+      // starting offsets
       fh = approxOffset;  //the first is already calculated
       fl = offsetFunc(xl);
 
@@ -360,7 +361,7 @@ namespace Isis {
         double f = offsetFunc(etGuess);
 
 
-        //elliminate the node farthest away from the current best guess
+        // elliminate the node farthest away from the current best guess
         if (fabs( xl- etGuess) > fabs( xh - etGuess)) {  
           xl = etGuess;
           fl = f;
@@ -370,11 +371,10 @@ namespace Isis {
           fh = f;
         }
 
-        //See if we converged on the point so set up the undistorted
-        //  focal plane values and return
+        // See if we converged on the point so set up the undistorted focal plane values and return
         if (fabs(f) < 1e-2) {
           p_camera->Sensor::setTime(approxTime);
-          //check to make sure the point isn't behind the planet
+          // check to make sure the point isn't behind the planet
           if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
             return Failure;
           } 
@@ -387,14 +387,13 @@ namespace Isis {
 
           return Success;       
         }
-      }
-      return Failure;
-    }
+      } // End itteration using a guess
+      // return Failure; // Removed to let the lagrange method try to find the line if secant fails
+    } // End use a guess
 
 
-    /**********************************************************************************************
-    no estimate given for the approximate line--quadratic approximation root finding
-    **********************************************************************************************/
+    // METHOD #2
+    // The guess or middle line did not work so try estimating with a quadratic
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
     // as a first order attempt to find the root location(s)
 
@@ -409,7 +408,7 @@ namespace Isis {
 
     timeNodes[0] = cacheStart;
     timeNodes[2] = cacheEnd;
-    timeNodes[1] = (cacheStart+cacheEnd) / 2.0; //middle time
+    timeNodes[1] = (cacheStart+cacheEnd) / 2.0; // middle time
 
     double quadPoly[3];
     double temp;
@@ -418,7 +417,7 @@ namespace Isis {
       offsetNodes[i] = offsetFunc(timeNodes[i]);
     }
    
-    //centralize and normalize the data for stability in root finding
+    // centralize and normalize the data for stability in root finding
     timeAverage = (timeNodes[0] + timeNodes[1] + timeNodes[2]) / 3.0;
     timeNodes[0] -= timeAverage;
     timeNodes[1] -= timeAverage;
@@ -460,8 +459,10 @@ namespace Isis {
     // Now that we have the coefficients of the quadratic look for roots 
     // (see Numerical Recipes Third Edition page 227)
     temp = quadPoly[1] * quadPoly[1] - 4.0 * quadPoly[0] * quadPoly[2];  //discriminant
+
+    // THIS IS A PREMATURE FAILURE RETURN. IT SHOULD TRY THE NEXT METHON BEFORE FAILING
     if (temp < 0.0) {
-      return Failure;  //there are apparently not any real roots on this image
+      return Failure;  // there are apparently not any real roots on this image
     }
 
     if (quadPoly[1] >= 0.0) {
@@ -479,41 +480,44 @@ namespace Isis {
       root.push_back(quadPoly[2]/temp);
     }
 
-    //check to see if the roots are in the time interval of the cache
+    // check to see if the roots are in the time interval of the cache
     for (int i=root.size()-1; i>=0; i--) {
       if ( root[i] < timeNodes[0] || root[i] > timeNodes[2] ) {
         root.removeAt(i);
       }
     }
      
-    //return the calculated roots to the original system
+    // return the calculated roots to the original system
     for (int i=0; i<root.size(); i++) {
       root[i] = root[i]/scale + timeAverage;
     }
 
+    // THIS IS A PREMATURE FAILURE RETURN. IT SHOULD TRY THE NEXT METHON BEFORE FAILING
     if (root.size() == 0) {
-      return Failure;  //there are apparently not any roots on this image
+      return Failure;  // there are apparently not any roots on this image
     }
 
     // At the time of this writing ISIS made no attempt to support any sensors that were not "1 to 1".
-    // Meaning that imaged the same point on the ground in multiple lines of the image
+    // Meaning they imaged the same point on the ground in multiple lines of the image
     // therefore we must somehow reduce multiple possible roots to a single one,  the legacy 
     // code (replaced with this code) did this based on distance from the sensor to the target
     // the shortest distance being the winner.  For legacy consistency I have used the same logic below.  
 
-    for (int i=0; i<root.size(); i++) {  //Offset/dist calculation loop
+    for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
       dist << distanceFunc(root[i]);
       offset << offsetFunc(root[i]);
     }
 
     // Save the root with the smallest dist
-    int j=0;   
-    for (int i=1, j=0; i<root.size(); i++) {
-      if (dist[i] < dist[j]) j=i;
-    }      
-      
-    approxTime = root[j];  // Now we have our time
-    approxOffset = offset[j];  // The offsets are saved to avoid recalculating it later
+    {
+      int j=0;   
+      for (int i=1; i<root.size(); i++) {
+        if (dist[i] < dist[j]) j=i;
+      }      
+        
+      approxTime = root[j];  // Now we have our time
+      approxOffset = offset[j];  // The offsets are saved to avoid recalculating it later
+    }
 
     if (fabs(approxOffset) < 1.0e-2) { // No need to iteratively improve this root, it's good enough
       p_camera->Sensor::setTime(approxTime);
@@ -533,10 +537,9 @@ namespace Isis {
       return Success;
     }
 
-    /**********************************************************************************************
-    no estimate given for the approximate line, quadratic approximation insufficient, use Brent's
-    method
-    **********************************************************************************************/
+
+    // METHOD #3
+    // Estimated line and quadratic approximation insufficient, try Brent's method
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
     // as a first order attempt to find the root location(s)
 
@@ -559,14 +562,14 @@ namespace Isis {
       pt << offsetNodes[i] / scale;
       pts << pt; 
     }
- 
+
     for (int i=0; i<root.size(); i++) {
       QList <double> pt;
       pt << root[i];
       pt << offset[i];
       pts << pt; 
     }
-  
+
     qSort(pts.begin(), pts.end(), ptXLessThan);
     
     root.clear();
@@ -577,7 +580,6 @@ namespace Isis {
         if (FunctionTools::brentsRootFinder <LineOffsetFunctor> (offsetFunc, pts[i-1], pts[i],
                                                                  1.0e-3, 200, temp)) {
           root << temp;
-
         }
       }      
     }
@@ -605,11 +607,14 @@ namespace Isis {
     }
 
     // Save the root with the smallest dist
-    for (int i=1, j=0; i<root.size(); i++) {
-      if (dist[i] < dist[j]) j=i;
-    }
+    {
+      int j=0;   
+      for (int i=1; i<root.size(); i++) {
+        if (dist[i] < dist[j]) j=i;
+      }
 
-    p_camera->Sensor::setTime(root[j]);
+      p_camera->Sensor::setTime(root[j]);
+    }
 
     // No need to make sure the point isn't behind the planet, it was done above
     p_camera->Sensor::LookDirection(lookC);
