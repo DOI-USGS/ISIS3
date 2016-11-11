@@ -1,1 +1,6 @@
 This class will be tested by the applications and the individual Camera models.
+Testing unset exposure duration...
+ExposureDuration: 2
+
+Testing set exposure duration...
+ExposureDuration: 0.2

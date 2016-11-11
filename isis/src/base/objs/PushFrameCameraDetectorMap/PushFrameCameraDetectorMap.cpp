@@ -70,7 +70,7 @@ namespace Isis {
    * @param sample Sample number in the detector
    * @param line Line number in the detector
    *
-   * @return conversion successful
+   * @return @b bool conversion successful
    */
   bool PushFrameCameraDetectorMap::SetDetector(const double sample,
                                                const double line) {
@@ -119,7 +119,6 @@ namespace Isis {
   }
 
 
-
   /** Compute detector position from a parent image coordinate
    *
    * This method will compute the detector position and framelet position
@@ -129,10 +128,28 @@ namespace Isis {
    * @param sample Sample number in the parent image
    * @param line Line number in the parent image
    *
-   * @return conversion successful
+   * @return @b bool conversion successful
+   */
+  bool PushFrameCameraDetectorMap::SetParent(const double sample, const double line) {
+    return SetParent(sample, line, 0.0);
+  }
+
+
+  /** Compute detector position from a parent image coordinate
+   *
+   * This method will compute the detector position and framelet position
+   * from the parent line/sample coordinate. The parent line will be used
+   * to set the appropriate time in the parent camera.
+   *
+   * @param sample Sample number in the parent image
+   * @param line Line number in the parent image 
+   * @param deltaT offset from center time in seconds
+   *
+   * @return @b bool conversion successful
    */
   bool PushFrameCameraDetectorMap::SetParent(const double sample,
-                                             const double line) {
+                                             const double line, 
+                                             const double deltaT) {
     // Compute the height of a framelet taking into account the summing mode
     int actualFrameletHeight = (int)(p_frameletHeight / LineScaleFactor());
 
@@ -141,14 +158,14 @@ namespace Isis {
     // changes the time for the observation. Line starts at 0.5 (top of first framelet)
     // and framelet needs to start at 1.
     int framelet             = (int)((line - 0.5) / actualFrameletHeight) + 1;
-    SetFramelet(framelet);
+    SetFramelet(framelet, deltaT);
 
     // Convert the parent line/sample to a framelet line/sample
     p_frameletLine = line - actualFrameletHeight * (framelet - 1);
     p_frameletSample = sample;
 
     // Convert the framelet line/sample to an unsummed framelet line/sample
-    if (!CameraDetectorMap::SetParent(p_frameletSample, p_frameletLine)) return false;
+    if (!CameraDetectorMap::SetParent(p_frameletSample, p_frameletLine, deltaT)) return false;
     double unsummedFrameletLine = p_detectorLine;
 
     // Sometime folks want to write the framelets flipped in the EDR so
@@ -176,8 +193,9 @@ namespace Isis {
    *   will be updated to the center of the framelet.
    *
    * @param framelet Current Framelet
+   * @param deltaT offset from center time in seconds
    */
-  void PushFrameCameraDetectorMap::SetFramelet(int framelet) {
+  void PushFrameCameraDetectorMap::SetFramelet(int framelet, const double deltaT) {
     p_framelet = framelet;
 
     // We can add framelet padding to each band.  Compute the adjusted framelet
@@ -194,7 +212,7 @@ namespace Isis {
     }
 
     etTime += p_exposureDuration / 2.0;
-    p_camera->setTime(etTime);
+    p_camera->setTime(etTime + deltaT);
   }
 
 
@@ -221,7 +239,8 @@ namespace Isis {
    *  Use this method to change the exposure duration of each
    *  framelet which may be different than the framelet rate.
    *
-   * @param exposureDuration
+   * @param exposureDuration The time from the start of a framelet's exposure
+   *                         to the end of the framlet's exposure duration.
    */
   void PushFrameCameraDetectorMap::SetExposureDuration(double exposureDuration) {
     p_exposureDuration = exposureDuration;
@@ -235,7 +254,7 @@ namespace Isis {
    * this will not need to be done unless the rate changes between
    * bands.
    *
-   * @param frameletRate the time in seconds between framelets
+   * @param frameletRate the time from the start of a framelet to the start of the next framlet.
    *
    */
   void PushFrameCameraDetectorMap::SetFrameletRate(const double frameletRate) {
@@ -244,7 +263,12 @@ namespace Isis {
 
 
 
-  //! Return the time in seconds between framelets
+  /**
+   * Return the time in seconds between framelets
+   * 
+   * @return @b double The time from the start of a framelet's exposure
+   *                   to the end of the framlet's exposure duration.
+   */
   double PushFrameCameraDetectorMap::FrameletRate() const {
     return p_frameletRate;
   }
@@ -265,7 +289,11 @@ namespace Isis {
 
 
 
-  //! Return the frame offset
+  /**
+   * Return the frame offset
+   * 
+   * @return @b int The number of framelets padding the top of the band.
+   */
   int PushFrameCameraDetectorMap::FrameletOffset() const {
     return p_frameletOffset;
   }
@@ -275,7 +303,7 @@ namespace Isis {
    * This method returns the current framelet. This framelet is
    * calculated when SetParent is called.
    *
-   * @return int The current framelet
+   * @return @b int The current framelet
    */
   int PushFrameCameraDetectorMap::Framelet() {
     return p_framelet;
@@ -299,7 +327,11 @@ namespace Isis {
 
 
 
-  //! Return the starting line in the detector for the current band
+  /**
+   * Return the starting line in the detector for the current band
+   * 
+   * @return @b int The starting line in the detector for the current band
+   */
   int PushFrameCameraDetectorMap::GetBandFirstDetectorLine() {
     return p_bandStartDetector;
   }
@@ -349,8 +381,7 @@ namespace Isis {
   /**
    * This returns the starting ET of this band
    *
-   *
-   * @return double Starting time (often band-dependant)
+   * @return @b double Starting time (often band-dependant)
    */
   double PushFrameCameraDetectorMap::StartEphemerisTime() const {
     return p_etStart;
@@ -361,7 +392,7 @@ namespace Isis {
   /**
    * Return the total number of framelets including padding
    *
-   * @return int
+   * @return @b int The total number of framelets including padding
    */
   int PushFrameCameraDetectorMap::TotalFramelets() const {
     return (int)(p_camera->ParentLines() / (p_frameletHeight / LineScaleFactor()));
@@ -372,7 +403,7 @@ namespace Isis {
   /**
    * This returns the calculated framelet sample
    *
-   * @return double Current framelet sample
+   * @return @b double Current framelet sample
    */
   double PushFrameCameraDetectorMap::frameletSample() const {
     return p_frameletSample;
@@ -383,7 +414,7 @@ namespace Isis {
   /**
    * This returns the calculated framelet line
    *
-   * @return double Current framelet line
+   * @return @b double Current framelet line
    */
   double PushFrameCameraDetectorMap::frameletLine() const {
     return p_frameletLine;
@@ -394,7 +425,7 @@ namespace Isis {
   /**
    * This returns how many lines are considered a single framelet
    *
-   * @return int Number of lines in a framelet
+   * @return @b int Number of lines in a framelet
    */
   int PushFrameCameraDetectorMap::frameletHeight() const {
     return p_frameletHeight;
@@ -402,8 +433,32 @@ namespace Isis {
 
 
 
+  /**
+   * Returns if the framelets are reversed from top-to-bottom.
+   * 
+   * @return @b bool if the framelets are reversed from top-to-bottom.
+   */
   bool PushFrameCameraDetectorMap::timeAscendingFramelets() {
     return p_timeAscendingFramelets;
+  }
+
+
+  /**
+   * This virtual method is for returning the exposure duration of a given pixel.
+   * 
+   * @param sample The sample of the desired pixel.
+   * @param line The line of the desired pixel.
+   * @param band The band of the desired pixel.
+   * 
+   * @return @b double The exposure duration for the desired pixel in seconds.
+   */
+  double PushFrameCameraDetectorMap::exposureDuration(const double sample,
+                                                      const double line,
+                                                      const int band) const {
+    if (p_exposureDuration > 0) {
+      return p_exposureDuration;
+    }
+    return p_frameletRate;
   }
 
 }

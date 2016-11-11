@@ -35,6 +35,16 @@ using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
 
+/**
+ *
+ * Unit test for DawnVirCamera.
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ *   @history 2016-10-28 Kristin Berry - Updated known latitude, longitude, image start time,
+ *                           and image stop time. References #4476.
+ */  
 int main(void) {
   Preference::Preferences(true);
 
@@ -43,8 +53,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 10.0378774577082908;
-    double knownLon = 272.2778420892259419;
+    double knownLat = 10.0318264323263371;
+    double knownLon = 272.0561372647773055;
 
     Cube c("$ISIS3TESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub", "r");
     DawnVirCamera *cam = (DawnVirCamera *) CameraFactory::Create(c);
@@ -79,10 +89,10 @@ int main(void) {
     TestLineSamp(cam, 134.0, 26.0);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 130.0, 40.0);
+    TestLineSamp(cam, 130.0, 30.0);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 134.0, 40.0);
+    TestLineSamp(cam, 134.0, 30.0);
 
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;

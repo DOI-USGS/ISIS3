@@ -35,6 +35,9 @@ GroundAzimuth in South: 101.049
 GroundAzimuth in South: 258.951
 GroundAzimuth in South: 180
 
+PlanetocentricLatitude: 26.8158
+PositiveEast360Longitude: 228.968
+
 SetUniversalGround(lat, lon): 1
 SetRightAscensionDeclination(ra, dec): 1
 HasProjection: 1
@@ -44,9 +47,43 @@ HasReferenceBand: 0
 SetBand called, band: 7
 Sample: 408
 Line: 962
+
+Testing SetImage with positive time offset...
+Line: 453, Sample: 534
+Lat: 18.2, Lon: 227
+RightAscension: 347, Declination: -51.3
+
+SetImage (sample, line, deltaT): Yes
+
+NorthAzimuth: 270
+SunAzimuth: 168
+SpacecraftAzimuth: 185
+OffNadirAngle: 44.4
+CelestialNorthClockAngle: 186
+RaDecResolution: 0.0216
+PlanetocentricLatitude: 26.8
+PositiveEast360Longitude: 229
+
+Testing SetImage with negative time offset...
+Line: 453, Sample: 534
+Lat: 18.2, Lon: 227
+RightAscension: 347, Declination: -51.3
+
+SetImage (sample, line, deltaT): Yes
+
+NorthAzimuth: 270
+SunAzimuth: 168
+SpacecraftAzimuth: 185
+OffNadirAngle: 44.4
+CelestialNorthClockAngle: 186
+RaDecResolution: 0.0216
+PlanetocentricLatitude: 26.8
+PositiveEast360Longitude: 229
+
 GroundRange: 0
 IntersectsLongitudeDomain: 0
 PixelResolution: 628
+ExposureDuration: 0.4
 ObliquePixelResolution: 685
 LineResolution: 628
 ObliqueLineResolution: 685

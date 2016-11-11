@@ -27,6 +27,8 @@
 #include <QDebug>
 #include <QVector>
 
+#include <getSpkAbCorrState.hpp>
+
 #include "Constants.h"
 #include "Distance.h"
 #include "EllipsoidShape.h"
@@ -41,8 +43,6 @@
 #include "ShapeModel.h"
 #include "SpacecraftPosition.h"
 #include "Target.h"
-
-#include "getSpkAbCorrState.hpp"
 
 using namespace std;
 
@@ -701,6 +701,7 @@ namespace Isis {
 
     if (m_et == NULL) {
       m_et = new iTime();
+
       // Before the Spice is cached, but after the camera aberration correction
       // is set, check to see if the instrument position kernel was created
       // by spkwriter.  If so turn off aberration corrections because the camera
@@ -790,15 +791,25 @@ namespace Isis {
     v[2] = vB[5];
   }
 
+
   /**
     * Returns the ephemeris time in seconds which was used to obtain the
     * spacecraft and sun positions.
     *
-    * @return double
+    * @return @b iTime the currently set ephemeris time
+    *  
+    * @throws IException::Programmer "Unable to retrieve the time Spice::setTime must be called 
+    *         first." 
     */
   iTime Spice::time() const {
+    if (m_et == NULL) {
+      QString msg = "Unable to retrieve the time."
+                    " Spice::SetTime must be called first.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return *m_et;
   }
+
 
   /**
    * Fills the input vector with sun position information, in either body-fixed
@@ -986,7 +997,7 @@ namespace Isis {
    *   attached kernels and a NaifKeywords label object we will grab it from
    *   there instead. This allows us to not furnish kernels after spiceinit.
    *
-   * @param key The naif keyword/value name
+   * @param key The naif keyword,value name
    * @param type The naif value's primitive type
    * @param index The index into the naif keyword array to read
    */
@@ -1408,6 +1419,19 @@ namespace Isis {
     }
     return true;
   }
+
+
+  /**
+   * Returns true if time has been initialized.
+   * 
+   * @author 2016-10-19 Kristin Berry
+   * 
+   * @return @b bool true if time has been set
+   */
+  bool Spice::isTimeSet(){
+    return !(m_et == NULL);
+  }
+
 
   /**
    * Accessor method for the sun position.

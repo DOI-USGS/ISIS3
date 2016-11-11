@@ -45,71 +45,42 @@ namespace Isis {
    *   @history 2013-02-11 E. Howington-Kraus - Added accessor method  StartTime().
    *                           This is tested by application socetlinescankeywords since no
    *                           unitTest exists. References #1490.
-   *
+   *   @history 2016-10-18 Kristin Berry - Added additional SetParent method with time offset
+   *                           deltaT. Updated unitTest. References #4476.
+   *   @history 2016-10-19 Jesse Mapel - Added exposureDuration method for accessing
+   *                           a pixel's exposure duration. Updated unitTest. References #4476.
+   *   @history 2016-10-27 Jeannie Backer - Moved method implementation to cpp file.
+   *                           References #4476.
    */
   class LineScanCameraDetectorMap : public CameraDetectorMap {
     public:
 
-      /** Construct a detector map for line scan cameras
-       *
-       * @param parent    The parent camera model for the detector map
-       * @param etStart   starting ephemeris time in seconds
-       *                  at the top of the first line
-       * @param lineRate  the time in seconds between lines
-       *
-       */
-      LineScanCameraDetectorMap(Camera *parent, const double etStart,
-                                const double lineRate) :
-        CameraDetectorMap(parent) {
-        p_etStart = etStart;
-        p_lineRate = lineRate;
-      }
+      LineScanCameraDetectorMap(Camera *parent, 
+                                const double etStart,
+                                const double lineRate);
+      virtual ~LineScanCameraDetectorMap();
 
+      void SetStartTime(const double etStart);
+      void SetLineRate(const double lineRate);
+      double LineRate() const;
 
-      //! Destructor
-      virtual ~LineScanCameraDetectorMap() {};
+      virtual double exposureDuration(const double sample,
+                                      const double line,
+                                      const int band) const;
 
-      /** Reset the starting ephemeris time
-       *
-       * Use this method to reset the starting time of the top edge of
-       * the first line in the parent image.  That is the time, prior
-       * to cropping, scaling, or padding.  Usually this will not need
-       * to be done unless the time changes between bands.
-       *
-       * @param etStart starting ephemeris time in seconds
-       *
-       */
-      void SetStartTime(const double etStart) {
-        p_etStart = etStart;
-      };
+      virtual bool SetParent(const double sample, 
+                             const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line, 
+                             const double deltaT);
 
-
-      /** Reset the line rate
-       *
-       * Use this method to reset the time between lines.  Usually this
-       * will not need to be done unless the rate changes between bands.
-       *
-       * @param lineRate the time in seconds between lines
-       *
-       */
-      void SetLineRate(const double lineRate) {
-        p_lineRate = lineRate;
-      };
-
-
-      //! Return the time in seconds between scan lines
-      double LineRate() const {
-        return p_lineRate;
-      };
-
-
-      virtual bool SetParent(const double sample, const double line);
-      virtual bool SetDetector(const double sample, const double line);
+      virtual bool SetDetector(const double sample, 
+                               const double line);
       double StartTime() const;
 
     private:
-      double p_etStart;     //!< Starting time at the top of the 1st parent line
-      double p_lineRate;    //!< iTime between lines in parent cube
+      double p_etStart;     //!< Starting time at the top of the first parent line.
+      double p_lineRate;    //!< Time, in seconds, between lines in parent cube.
   };
 };
 #endif

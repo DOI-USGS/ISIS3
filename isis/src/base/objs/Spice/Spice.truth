@@ -22,6 +22,10 @@ Testing unknown double keyword ...
 Testing unknown string keyword ... 
 **I/O ERROR** Can not find [BadString] in text kernels.
 
+Testing time() before time has been set... 
+Has time been set? 0
+**PROGRAMMER ERROR** Unable to retrieve the time. Spice::SetTime must be called first.
+
 Testing convience get methods ... 
 Label has kernels? 1
 -94031
@@ -578,6 +582,10 @@ BP is
 Cache Start Time = -69382784.89
 Cache End Time   = -69382546.11
 Target Center Distance = 3696.796238
+
+Testing time() after time has been set... 
+Has time been set? 1
+The time is: -69382512.0
 
 Testing Utility methods
 Target Name = Mars

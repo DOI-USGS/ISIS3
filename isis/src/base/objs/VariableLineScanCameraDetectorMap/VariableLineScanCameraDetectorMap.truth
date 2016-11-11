@@ -1,1 +1,14 @@
 This class will be tested by the applications and the individual Camera models.
+Testing line rate change accessor...
+    First line rate change...
+        Start Line: 1
+        Start ET: 0
+        Scan Rate: 2.7
+
+    Second line rate change...
+        Start Line: 20
+        Start ET: 54
+        Scan Rate: 0.3
+
+Testing exposure duration accessor:...
+Exposure duration at line 110: 5.2

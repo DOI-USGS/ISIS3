@@ -7,19 +7,26 @@
   </brief>
 
   <description>
-    Given a camera based cube and minimum and maximum ranges for the phase,
-    incidence, and emission angles, this program sets any pixels outside these
-    ranges to NULL.  Photrim uses angles calculated from the spheroid; it does
-    not use local slopes.<br/>
+    The photrim program trims pixels outside of the phase, incidence, and emission
+    angles by setting them to "null" within all bands of the cube. A user can either
+    trim using the program's default method or the USEDEM method.<br/>
+    <br/>
+    By default, photrim uses the angles calculated from the ellipsoidal surface to 
+    trim an image. The ellipsoid is retrieved from the IAU/NAIF target body file,
+    which is defined within the cube's kernel group as the TargetAttitudeShape. If 
+    the USEDEM option is selected, then photrim will use the angles calculated from the 
+    digital elevation model (DEM) to perform the trim instead. The DEM is referenced 
+    in the ShapeModel keyword within the input cube's kernel group. <i>Note that 
+    photrim does not trim using local slopes.</i><br/>
     <br/>
     Angle Definitions:<br/>
     <br/>
-    Phase Angle - The angle between the sun vector to a point on the spheroid 
+    Phase Angle - The angle between the sun vector to a point on the ellipsoid
     and the instrument vector to the same point.<br/>
     Incidence Angle - The angle between the sun vector to a point on the 
-    spheroid and the normal at that point.<br/>
+    ellipsoid and the normal at that point.<br/>
     Emission Angle - The angle between the instrument vector to a point on the 
-    spheroid and the normal at that point.<br/>
+    ellipsoid and the normal at that point.<br/>
     <br/>
     Examples of special cases:<br/>
     <br/>
@@ -32,10 +39,10 @@
     illuminating the point, then the emission angle is 0 and the incidence and 
     phase angles will be in the range of 0 to 90 and equal to each other.<br/>
     <br/>
-    3) A point on the surface of a spherical body cannot be illuminated if the 
+    3) A point on the surface of an ellipsoidal body cannot be illuminated if the 
     incidence angle is greater than 90 degrees.<br/>
     <br/>
-    4) A point on the surface of spherical body cannot be visible if the 
+    4) A point on the surface of an ellipsoidal body cannot be visible if the 
     emission angle is greater than 90 degrees.<br/>
     <br/>
     5) If a point is both illuminated and visible, then the phase angle ranges 
@@ -60,7 +67,11 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
-</history>
+    <change name="Marjorie Hahn" date="2016-08-05">
+      Added the option to use the digital elevation model when trimming the image.
+      Created examples for using the DEM and not using the DEM. Fixes #4181.
+    </change>
+  </history>
 
   <category>
     <categoryItem>Trim and Mask</categoryItem>
@@ -92,6 +103,24 @@
         </brief>
         <description>
           This file will contain the results of the trim.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Digital Elevation Model">
+      <parameter name="USEDEM">
+        <type>boolean</type>
+        <brief>
+          Specify if DEM photometric angles will be used to trim image
+        </brief>
+        <default>
+          <item>FALSE</item>
+        </default>
+        <description>
+          This specifies if the image will be trimmed based on the photometric 
+          angles obtained from the DEM surface or the ellipsoid. If this parameter 
+          is set to false, then the photometric angles will be obtained from the
+          ellipsoidal surface. 
         </description>
       </parameter>
     </group>
@@ -139,7 +168,7 @@
         <type>double</type>
         <brief>Maximum emission angle to trim</brief>
         <description>
-          Pixels which have a emission angle greater than this value will be
+          Pixels which have an emission angle greater than this value will be
           trimmed.
         </description>
         <minimum inclusive="yes">0.0</minimum>
@@ -164,7 +193,7 @@
         <default><item>90.0</item></default>
         <brief>Maximum incidence angle to trim</brief>
         <description>
-          Pixels which have a incidence angle greater than this value will be
+          Pixels which have an incidence angle greater than this value will be
           trimmed.
         </description>
         <minimum inclusive="yes">0.0</minimum>
@@ -173,4 +202,102 @@
       </parameter>
     </group>
   </groups>
+  
+  <examples>
+    <example>
+      <brief>Trimming an ISIS cube using the ellipsoid model</brief>
+      <description>
+        This is an example of trimming an ISIS cube without accounting for the DEM. Instead,
+        the program will trim the cube based on the ellipsoid.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          FROM=AS15-M-1499_msk-L2_1250mpp.cub TO=photrim_no_dem MAXEMISSION=88
+        </commandLine> 
+        <description>
+          Run photrim with a max emission value of 88.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/no_dem_gui.png" width="710" height="758">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of the photrim GUI with a max emission angle of 88. 
+              The reset of the parameters are set to the program defaults.
+            </description>
+            <thumbnail src="assets/thumbs/no_dem_gui_thumb.png" caption="Example Gui" width="188" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/input_cube.png" width="500" height="500">
+          <brief>Input Cube</brief>
+          <description>
+            The untrimmed cube. This is an oblique view of the moon acquired by the Apollo Metric camera.
+          </description>
+          <thumbnail src="assets/thumbs/input_cube_thumb.png" caption="Input Cube" width="188" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/photrim_no_dem.png" width="500" height="500">
+          <brief>Output Cube</brief>
+          <description>
+            The result of trimming the cube using the ellipsoid model and a max emission angle of 88.
+          </description>
+          <thumbnail src="assets/thumbs/photrim_no_dem_thumb.png" caption="Output Cube" width="188" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Trimming an ISIS cube using the digital elevation model.</brief>
+      <description>
+        This example shows the result of trimming an ISIS cube while accounting for
+        the digital elevation model of the cube.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          FROM=AS15-M-1499_msk-L2_1250mpp.cub TO=photrim_dem USEDEM=TRUE MAXEMISSION=88
+        </commandLine>  
+        <description>
+          Run photrim using the digital elevation model and a max emission value of 88.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/dem_gui.png" width="710" height="758">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of the photrim GUI with a max emission angle of 88 degrees and with
+              the option to use the digital elevation model selected. The rest of the parameters
+              are set to the defaults.
+            </description>
+            <thumbnail src="assets/thumbs/dem_gui_thumb.png" caption="Example Gui" width="188" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/input_cube.png" width="500" height="500">
+          <brief>Input Cube</brief>
+          <description>
+            The untrimmed cube. This is an oblique view of the moon acquired by the Apollo Metric camera.
+          </description>
+          <thumbnail src="assets/thumbs/input_cube_thumb.png" caption="Input Cube" width="188" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/photrim_dem.png" width="500" height="500">
+          <brief>Output Cube</brief>
+          <description>
+            The result of trimming the input cube using the DEM and a max emission angle of 88 degrees.
+          </description>
+          <thumbnail src="assets/thumbs/photrim_dem_thumb.png" caption="Output Cube" width="188" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>

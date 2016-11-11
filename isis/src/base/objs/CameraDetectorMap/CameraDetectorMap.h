@@ -53,42 +53,36 @@ namespace Isis {
    *                           of history entries.  References #1490.
    *   @history 2014-04-17 Jeannie Backer - Added padding for ISIS coding standards
    *                           compliance. References #1659.
-   *
+   *   @history 2016-10-18 Kristin Berry - Added additional SetParent with a time offset and
+   *                           added unitTest coverage. References #4476.
+   *   @histroy 2016-10-19 Jesse Mapel - Added exposureDuration method for accessing
+   *                           a pixel's exposure duration. Updated test. References #4476.
+   *   @history 2016-10-27 Jeannie Backer - Moved method implementation to cpp file.
+   *                           Added some variable documentation. References #4476.
    */
   class CameraDetectorMap {
     public:
       CameraDetectorMap(Camera *parent = 0);
 
-      //! Destructor
-      virtual ~CameraDetectorMap() {};
+      virtual ~CameraDetectorMap();
 
-      virtual bool SetParent(const double sample, const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line);
+      virtual bool SetParent(const double sample, 
+                             const double line, 
+                             const double deltaT);
 
-      virtual bool SetDetector(const double sample, const double line);
+      virtual bool SetDetector(const double sample, 
+                               const double line);
 
       double AdjustedStartingSample() const;
 
       double AdjustedStartingLine() const;
 
-      //! Return parent sample
-      inline double ParentSample() const {
-        return p_parentSample;
-      }
-
-      //! Return parent line
-      inline double ParentLine() const {
-        return p_parentLine;
-      }
-
-      //! Return detector sample
-      inline double DetectorSample() const {
-        return p_detectorSample;
-      }
-
-      //! Return detector line
-      inline double DetectorLine() const {
-        return p_detectorLine;
-      }
+      double ParentSample() const;
+      double ParentLine() const;
+      double DetectorSample() const;
+      double DetectorLine() const;
 
       /** Set the starting detector sample
        *
@@ -103,6 +97,7 @@ namespace Isis {
         Compute();
       }
 
+
       /** Set the starting detector line
        *
        * Use this method to specify the starting detector that represents
@@ -115,6 +110,7 @@ namespace Isis {
         p_startingDetectorLine = line;
         Compute();
       }
+
 
       /** Set sample summing mode
        *
@@ -130,6 +126,7 @@ namespace Isis {
         Compute();
       }
 
+
       /** Set line summing mode
        *
        * Use this method to specify if detector lines are summed/averaged.
@@ -144,36 +141,30 @@ namespace Isis {
         Compute();
       }
 
-      //! Return scaling factor for computing sample resolution
-      virtual double SampleScaleFactor() const {
-        return p_detectorSampleSumming;
-      }
 
-      //! Return scaling factor for computing line resolution
-      virtual double LineScaleFactor() const {
-        return p_detectorLineSumming;
-      }
+      virtual double SampleScaleFactor() const;
+      virtual double LineScaleFactor() const;
+      virtual double LineRate() const;
 
-      //! Return the line collection rate (0 for framing cameras)
-      virtual double LineRate() const {
-        return 0.0;
-      }
+      virtual double exposureDuration(const double sample,
+                                      const double line,
+                                      const int band) const;
 
     protected:
-      Camera *p_camera;
+      Camera *p_camera;               /**< Pointer to the camera.*/
 
-      double p_parentSample;
-      double p_parentLine;
-      double p_detectorLine;
-      double p_detectorSample;
+      double p_parentSample;          /**< */
+      double p_parentLine;            /**< */
+      double p_detectorLine;          /**< Detector coordinate line value.*/
+      double p_detectorSample;        /**< Detector coordinate sample value.*/
 
-      double p_detectorSampleSumming;
-      double p_detectorLineSumming;
-      double p_startingDetectorSample;
-      double p_startingDetectorLine;
+      double p_detectorSampleSumming; /**< */
+      double p_detectorLineSumming;   /**< */
+      double p_startingDetectorSample;/**< Detector start coordinate sample value.*/
+      double p_startingDetectorLine;  /**< Detector start coordinate line value.*/
 
-      double p_ss;
-      double p_sl;
+      double p_ss;                    /**< Start sample.*/
+      double p_sl;                    /**< Start line.*/
 
     private:
       void Compute();

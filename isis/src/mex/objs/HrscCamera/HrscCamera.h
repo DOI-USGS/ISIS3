@@ -60,6 +60,13 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2016-10-21 Kristin Berry - Backward Compatibility Issue: Updates to improve
+   *                           VariableLineScanCameraDetectorMap's time-accuracy will cause
+   *                           HrscCamera to calculate updated (lat,lon) values.
+   *                           The unitTest was updated to reflect this. References #4476.
+   *   @history 2016-10-21 Kristin Berry - Updated unitTest. References #4476.
+   *   @history 2016-10-27 Jeannie Backer - Moved method implementation to cpp file.
+   *                           Added some variable documentation. References #4476.
    */
   class HrscCamera : public LineScanCamera {
     public:
@@ -69,34 +76,15 @@ namespace Isis {
       // Destroys the HiriseCamera object
       ~HrscCamera();
 
-      /**
-       * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
-       *         Kernel Frame ID
-       */
-      virtual int CkFrameId() const { return (-41001); }
-
-      /** 
-       * CK Reference ID - J2000
-       * 
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
-       */
-      virtual int CkReferenceId() const { return (1); }
-
-      /** 
-       * SPK Reference ID - J2000
-       * 
-       * @return @b int The appropriate instrument code for the Spacecraft
-       *         Kernel Reference ID
-       */
-      virtual int SpkReferenceId() const { return (1); }
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkReferenceId() const;
 
     private:
       void ReadLineRates(QString filename);
 
-      std::vector<LineRateChange> p_lineRates;
+      std::vector<LineRateChange> p_lineRates; /**< Vector of the variable line rates for this 
+                                                    camera model.*/
   };
 };
 #endif

@@ -34,16 +34,14 @@ using namespace Isis;
 void TestLineSamp(Camera *cam, double samp, double line);
 /**
  * @internal
- *   @history 2009-08-03 Jeannie Walldren - Changed known lat
- *            and lon.
- *   @history 2009-08-06 Jeannie Walldren - Added cmath include
- *            and changed calls to abs() to fabs() since the
- *            abs() function takes integer values while the
- *            fabs() takes floats. Changed Center Lat tolerance
- *            from 4E-10 to 4.1E-10 since the difference on
- *            Darwin powerpc was 4.07E-10.
- *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
- *            for new methods.
+ *   @history 2009-08-03 Jeannie Walldren - Changed known lat and lon.
+ *   @history 2009-08-06 Jeannie Walldren - Added cmath include and changed calls to abs() 
+ *                           to fabs() since the abs() function takes integer values while the
+ *                           fabs() takes floats. Changed Center Lat tolerance 
+ *                           from 4E-10 to 4.1E-10 since the difference on 
+ *                           Darwin powerpc was 4.07E-10.
+ *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new methods.
+ *   @history 2016-10-27 Kristin Berry - Updated known latitude and longitude.  References #4476.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -56,8 +54,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -62.4812045312284781;
-    double knownLon = 48.4111512000971160;
+    double knownLat = -62.4809504564515166;
+    double knownLon = 48.4111258061244243;
 
     Cube c("$mex/testData/h2254_0000_s12.cub", "r");
     Camera *cam = CameraFactory::Create(c);

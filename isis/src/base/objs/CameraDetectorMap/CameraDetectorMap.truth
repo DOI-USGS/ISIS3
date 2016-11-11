@@ -1,1 +1,3 @@
 This class will be tested by the applications and the individual Camera models.
+Testing framing camera exposureDuration error throw.
+**PROGRAMMER ERROR** Exposure duration is only available for LineScan, VariableLineScan, and PushFrame Cameras.
