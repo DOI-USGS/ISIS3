@@ -158,6 +158,7 @@ Group = DataDirectory
   Apollo17     = $ISIS3DATA/apollo17
   Base         = $ISIS3DATA/base
   Cassini      = $ISIS3DATA/cassini
+  Chan1        = $ISIS3DATA/chan1
   Chandrayaan1 = $ISIS3DATA/chandrayaan1
   Clementine1  = $ISIS3DATA/clementine1
   Control      = $ISIS3DATA/control
