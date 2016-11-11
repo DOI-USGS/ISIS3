@@ -26,9 +26,9 @@
 #include "IException.h"
 #include "IString.h"
 #include "PvlGroup.h"
+#include "QString"
 #include "SpecialPixel.h"
 #include "Target.h"
-#include "QString"
 
 namespace Isis {
   

@@ -136,6 +136,10 @@
     <change name="Kristin Berry" date="2015-07-22">
       Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248
     </change>
+    <change name="Jeannie Backer" date="2016-05-10">
+      Replaced calls to NAIF routines (bodn2c and bodvar) with call to static method
+      Isis::Target::radiiGroup. References #3934
+    </change>
     <change name="Curtis Rose" date="2016-05-16">
       Fixed an issue with small cubes (9x9 or less) causing application to become stuck in an infinite loop. References #2284.
       Also added to the description a message about why the application fails on small cubes (5x1, 1x5, or less).
