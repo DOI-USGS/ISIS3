@@ -546,148 +546,80 @@ namespace Isis {
     outputColumns.push_back("rms,");
     outputColumns.push_back("rms,");
 
-
     BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
 
     int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
     int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
     bool solveTwist = obsSettings.solveTwist();
 
-    char strCoeff = 'a' + numberCamPosCoefSolved -1;
-    std::ostringstream oStr;
     int nCoeff = 1;
     if (numberCamPosCoefSolved > 0)
       nCoeff = numberCamPosCoefSolved;
 
     for (int i = 0; i < nCoeff; i++) {
-      if (i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (nCoeff == 1)
           outputColumns.push_back("X,");
         else {
-          QString str = "X(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "X(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
     }
-    strCoeff = 'a' + numberCamPosCoefSolved - 1;
     for (int i = 0; i < nCoeff; i++) {
-      if (i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (nCoeff == 1)
           outputColumns.push_back("Y,");
         else {
-          QString str = "Y(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "Y(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
     }
-    strCoeff = 'a' + numberCamPosCoefSolved - 1;
     for (int i = 0; i < nCoeff; i++) {
-      if (i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (nCoeff == 1) {
           outputColumns.push_back("Z,");
         }
         else {
-          QString str = "Z(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "Z(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
       if (!i)
         break;
     }
 
-    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
     for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      if(i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (numberCamAngleCoefSolved == 1)
           outputColumns.push_back("RA,");
         else {
-          QString str = "RA(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "RA(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
     }
-    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
     for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      if (i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (numberCamAngleCoefSolved == 1)
           outputColumns.push_back("DEC,");
         else {
-          QString str = "DEC(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "DEC(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
     }
-    strCoeff = 'a' + numberCamAngleCoefSolved - 1;
     for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      if (i == 0)
-        oStr << strCoeff;
-      else if (i == 1)
-        oStr << strCoeff << "t";
-      else
-        oStr << strCoeff << "t" << i;
       for (int j = 0; j < 5; j++) {
         if (numberCamAngleCoefSolved == 1 || !solveTwist) {
           outputColumns.push_back("TWIST,");
         }
         else {
-          QString str = "TWIST(";
-          str += oStr.str().c_str();
-          str += "),";
+          QString str = "TWIST(t" + toString(i) + "),";
           outputColumns.push_back(str);
         }
       }
-      oStr.str("");
-      strCoeff--;
       if (!solveTwist)
         break;
     }
@@ -905,8 +837,12 @@ namespace Isis {
         sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
         break;
       default:
-        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-                pointingSolveDegree);
+        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)"
+                    "\n                          CKDEGREE: %d"
+                    "\n                     CKSOLVEDEGREE: %d",
+                pointingSolveDegree,
+                globalSettings.ckDegree(),
+                globalSettings.ckSolveDegree());
         break;
     }
     fpOut << buf;
@@ -935,8 +871,12 @@ namespace Isis {
         sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
         break;
       default:
-        sprintf(buf,"\n                        CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-                positionSolveDegree);
+        sprintf(buf,"\n                        SPSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)"
+                    "\n                      SPKDEGREE: %d"
+                    "\n                 SPKSOLVEDEGREE: %d",
+                positionSolveDegree,
+                globalSettings.spkDegree(),
+                globalSettings.spkSolveDegree());
         break;
     }
     fpOut << buf;
@@ -1396,21 +1336,21 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
-      }
 
-      sprintf(buf, "\n    Image         Initial              Total               "
-                   "Final             Initial           Final\n"
-                   "Parameter         Value              Correction            "
-                   "Value             Accuracy          Accuracy\n");
-      fpOut << buf;
+        sprintf(buf, "\n    Image         Initial              Total               "
+                     "Final             Initial           Final\n"
+                     "Parameter         Value              Correction            "
+                     "Value             Accuracy          Accuracy\n");
+        fpOut << buf;
 
-      QString observationString =
-          observation->formatBundleOutputString(berrorProp);
-      fpOut << (const char*)observationString.toLatin1().data();
+        QString observationString =
+            observation->formatBundleOutputString(berrorProp);
+        fpOut << (const char*)observationString.toLatin1().data();
 
-      // Build list of images and parameters for correlation matrix.
-      foreach ( QString image, observation->imageNames() ) {
-        imagesAndParameters.insert( image, observation->parameterList() );
+        // Build list of images and parameters for correlation matrix.
+        foreach ( QString image, observation->imageNames() ) {
+          imagesAndParameters.insert( image, observation->parameterList() );
+        }
       }
     }
         

@@ -959,9 +959,10 @@ namespace Isis {
 
     // Set up default values when we are using default position
     QString sigma = "N/A";
-    double adjustedSigma = 0.0;
+    QString adjustedSigma = "N/A";
     double correction = 0.0;
 
+    // this implies we're writing to bundleout.txt
     if (!imageCSV) {
       // position parameters
       for (int i = 0; i < nPositionParameters; i++) {
@@ -969,7 +970,7 @@ namespace Isis {
         // members
         if (!useDefaultPosition) {
           correction = m_corrections(i);
-          adjustedSigma = m_adjustedSigmas(i);
+          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
           sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
         }
         if (errorPropagation) {
@@ -979,7 +980,7 @@ namespace Isis {
           arg(correction, 21, 'f', 8).
           arg(finalParameterValues[i], 20, 'f', 8).
           arg(sigma, 18).
-          arg(adjustedSigma, 18, 'f', 8);
+          arg(adjustedSigma, 18);
         }
         else {
           qStr = QString("%1%2%3%4%5%6\n").
@@ -1008,12 +1009,12 @@ namespace Isis {
           // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
           if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
             correction = 0.0;
-            adjustedSigma = 0.0;
+            adjustedSigma = "N/A";
             sigma = "N/A";
           }
           else {
             correction = m_corrections(i - offset);
-            adjustedSigma = m_adjustedSigmas(i - offset);
+            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
             sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
                     toString(m_aprioriSigmas[i-offset], 8) );
           }
@@ -1021,7 +1022,7 @@ namespace Isis {
         // We are using default pointing, so provide default correction and sigma values to output
         else {
           correction = 0.0;
-          adjustedSigma = 0.0;
+          adjustedSigma = "N/A";
           sigma = "N/A";
         }
         if (errorPropagation) {
@@ -1031,7 +1032,7 @@ namespace Isis {
           arg(correction * RAD2DEG, 21, 'f', 8).
           arg(finalParameterValues[i], 20, 'f', 8).
           arg(sigma, 18).
-          arg(adjustedSigma * RAD2DEG, 18, 'f', 8);
+          arg(adjustedSigma, 18);
         }
         else {
           qStr = QString("%1%2%3%4%5%6\n").
@@ -1046,19 +1047,20 @@ namespace Isis {
       }
 
     }
+    // this implies we're writing to images.csv
     else {
       // position parameters
       for (int i = 0; i < nPositionParameters; i++) {
         if (!useDefaultPosition) {
           correction = m_corrections(i);
-          adjustedSigma = m_adjustedSigmas[i];
-        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
         }
         // Provide default values for position if not solving position
         else {
           correction = 0.0;
-          adjustedSigma = 0.0;
-          sigma = "-1.0";
+          adjustedSigma = "N/A";
+          sigma = "N/A";
         }
         qStr = "";
         if (errorPropagation) {
@@ -1066,7 +1068,7 @@ namespace Isis {
           qStr += toString(correction) + ",";
           qStr += toString(finalParameterValues[i]) + ",";
           qStr += sigma + ",";
-          qStr += toString(adjustedSigma) + ",";
+          qStr += adjustedSigma + ",";
         }
         else {       
           qStr += toString(finalParameterValues[i] - correction) + ",";
@@ -1092,22 +1094,21 @@ namespace Isis {
           // into m_corrections and m_*sigmas
           if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
             correction = 0.0;
-            adjustedSigma = 0.0;
-            sigma = "-1.0";
+            adjustedSigma = "N/A";
+            sigma = "N/A";
           }
           else {
             correction = m_corrections(i - offset);
-            adjustedSigma = m_adjustedSigmas[i - offset];
-        sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
-                   toString(m_aprioriSigmas[i-offset], 8) );
-
+            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+            sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+                toString(m_aprioriSigmas[i-offset], 8) );
           }
         }
         // Provide default values for pointing if not solving pointing
         else {
           correction = 0.0;
-          adjustedSigma = 0.0;
-          sigma = "-1.0";
+          adjustedSigma = "N/A";
+          sigma = "N/A";
         }
         qStr = "";
         if (errorPropagation) {        
@@ -1115,7 +1116,7 @@ namespace Isis {
           qStr += toString(correction * RAD2DEG) + ",";
           qStr += toString(finalParameterValues[i]) + ",";
           qStr += sigma + ",";
-          qStr += toString(adjustedSigma * RAD2DEG) + ",";
+          qStr += adjustedSigma + ",";
         }
         else {
           qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";

@@ -78,6 +78,17 @@ namespace Isis {
    *                           USEPVL being removed from jigsaw.  References #4316.
    *   @history 2016-10-28 Tyler Wilson - Modified outputText() to check and output if the solution
    *                           is solving for the radius.  References #4317.
+   *   @history 2016-11-14 Ken Edmundson Modified the following...
+   *                           -Changed column headers in images.csv to match row headers in bundleout.txt
+   *                            (instead of at2, bt, c to indicate coefficients, now using t2, t1, t0, etc)
+   *                           -Added output of CKDEGREE, CKSOLVEDEGREE, SPKDEGREE, SPKSOLVEDEGREE to
+   *                            bundleout.txt header when CAMSOLVE=ALL and/or SPSOLVE=ALL
+   *                           -Fixed typo under SPACECRAFT OPTIONS; what should have said
+   *                            "SPSOLVE: All POLYNOMIAL COEFFICIENTS" was
+   *                            "CAMSOLVE: All POLYNOMIAL COEFFICIENTS"
+   *                           -modified output of image EO in bundleout.txt for images solved with
+   *                            observation mode; previously one entry per observation was written,
+   *                            now all images in the observation are written separately. 
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

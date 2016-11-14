@@ -70,8 +70,13 @@ namespace Isis {
    *                           values for all solve parameters, whether they are being solved for
    *                           or not. Fixes #4464.
    *   @history 2016-10-27 Tyler Wilson Modified formatBundleOutputString to change N/A to FREE 
-   *                           in the ouptut under POINTS DETAL when no lat/lon sigmas were entered.
+   *                           in the output under POINTS DETAIL when no lat/lon sigmas were entered.
    *                           Fixes #4317.
+   *   @history 2016-11-14 Ken Edmundson Modified the following...
+   *                           -changed adjustedSigma from 0.0 to N/A if error propagation is off
+   *                            when writing bundleout.txt OR images.csv.
+   *                           -changed sigma default from -1.0 to N/A for position and pointing
+   *                            parameters when writing images.csv. 
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
