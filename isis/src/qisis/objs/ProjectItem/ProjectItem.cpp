@@ -760,10 +760,15 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a Project.
    *
    * @param[in] project (Project *) The Project.
+   * @internal
+   *     @history  2016-11-10 - Tyler Wilson  Changed the reference
+   *               to the icon from ':data' to ':data-management'
+   *               due to a naming conflict causing strange errors
+   *               to appear on the command line.  Fixes #3982.   
    */
   void ProjectItem::setProject(Project *project) {
     setText( project->name() );
-    setIcon( QIcon(":data") );
+    setIcon( QIcon(":data-management") );
     setData( QVariant::fromValue<Project *>(project) );
   }
 

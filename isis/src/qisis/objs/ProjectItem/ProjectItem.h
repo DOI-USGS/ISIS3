@@ -103,6 +103,12 @@ namespace Isis {
    *                             BundleSettingsQsp.
    *     @history 2016-07-25 Tracie Sucharksi - Added support for Shapes.
    *     @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the 
+   *                               the data management icon from 'data' to 
+   *                               'data-management' in the setProject function.
+   *                               A naming conflict was causing strange warnings 
+   *                               to show up on the command line when cnetsuite is launched, 
+   *                               and this fixed it.  Fixes #3982.
    */
   class ProjectItem : public QStandardItem {
     public:
