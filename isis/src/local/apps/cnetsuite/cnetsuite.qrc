@@ -1,6 +1,6 @@
 <RCC>
   <qresource>
-    <file alias="data">icons/data_management.png</file>
+    <file alias="data-management">icons/data_management.png</file>
     <file alias="jigsaw">icons/jigsaw.png</file>
     <file alias="results">icons/results.png</file>
     <file alias="pointReg">icons/PointReg.png</file>
