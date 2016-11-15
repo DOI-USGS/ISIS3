@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QComboBox;
+class QHBoxLayout;
 class QLabel;
 class QLineEdit;
 class QListWidget;
@@ -41,11 +43,15 @@ namespace Isis {
                             QString defaultPointId, QWidget *parent = 0);
 
       QString pointId() const;
+      int pointType() const;
+      void setGroundSource(QStringList groundFiles, int numberShapesWithPoint);
+      QString groundSource() const;
       QStringList selectedFiles() const;
       void setFiles(QStringList pointFiles);
       bool subpixelRegisterPoint();
     
     private slots:
+      void pointTypeChanged(int pointType);
       void enableOkButton(const QString &text);
 
     private:
@@ -53,6 +59,9 @@ namespace Isis {
       SerialNumberList *m_serialNumberList;
 
       QLabel *m_ptIdLabel;
+      QComboBox *m_pointTypeCombo;
+      QComboBox *m_groundSourceCombo;
+      QHBoxLayout *m_groundSourceLayout;
       QRadioButton *m_subpixelRegisterButton;
       QPushButton *m_okButton;
       QLineEdit *m_ptIdEdit;

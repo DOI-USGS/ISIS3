@@ -1,4 +1,4 @@
-APPNAME = a.out
+APPNAME = cnetsuite
 
 include $(ISISROOT)/make/isismake.tsts
 

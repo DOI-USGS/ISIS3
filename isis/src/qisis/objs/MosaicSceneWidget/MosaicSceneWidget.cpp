@@ -2242,6 +2242,7 @@ namespace Isis {
       }
       else if (localName == "images" && m_imagesToAdd->count()) {
         ASSERT(m_imagesToAdd->count() == m_imageZValues.count());
+        qDebug()<<"MosaicSceneWidget::endElement before m_scene->addImages";
         m_scene->addImages(*m_imagesToAdd);
 
         for (int i = 0; i < m_imageZValues.count(); i++) {

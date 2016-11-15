@@ -101,6 +101,7 @@ namespace Isis {
    *   @history 2016-11-07 Ian Humphrey - Restored saving and loading Footprint2DViews when saving
    *                           and opening a project (modified save() and startElement()).
    *                           Fixes #4486.
+   *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews. 
    */
   class Directory : public QObject {
     Q_OBJECT

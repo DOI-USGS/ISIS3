@@ -174,8 +174,12 @@ namespace Isis {
    * @return @b ProjectItem* First project item found.
    */
   ProjectItem *ProjectItemModel::findItemData(const QVariant &data, int role) {
+
+//  qDebug()<<"ProjectItemModel::findItemData  incoming data = "<<data;
     for (int i=0; i<rowCount(); i++) {
+//    qDebug()<<"ProjectItemModel::findItemData  BEFORE call: item(i)->findItemData...";
       ProjectItem *projectItem = item(i)->findItemData(data, role);
+//    qDebug()<<"ProjectItemModel::findItemData  AFTER call: item(i)->findItemData...";
       if (projectItem) {
         return projectItem;
       }

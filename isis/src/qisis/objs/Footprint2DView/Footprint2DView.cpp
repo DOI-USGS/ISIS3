@@ -185,6 +185,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item
    */
   void Footprint2DView::onItemAdded(ProjectItem *item) {
+    qDebug()<<"Footprint2DView::onItemAdded";
     if (!item || (!item->isImage() && !item->isShape())) {
       return;
     }

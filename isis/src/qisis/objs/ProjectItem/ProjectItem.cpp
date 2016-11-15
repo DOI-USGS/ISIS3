@@ -856,12 +856,16 @@ namespace Isis {
    * @return @b ProjectItem* The found item.
    */
   ProjectItem *ProjectItem::findItemData(const QVariant &value, int role) {
+//  qDebug()<<"ProjectItem::findItemData  incoming value = "<<value;
+//  qDebug()<<"ProjectItem::findItemData  ProjectItem::data(role) = "<<data(role);
     if ( data(role) == value ) {
-      return 0;
+      return this;
     }
     
     for (int i=0; i<rowCount(); i++) {
+//    qDebug()<<"ProjectItem::findItemData  BEFORE call: child(i)->findItemData...";
       ProjectItem *item = child(i)->findItemData(value, role);
+//    qDebug()<<"ProjectItem::findItemData  AFTER call: child(i)->findItemData...";
       if (item) {
         return item;
       }

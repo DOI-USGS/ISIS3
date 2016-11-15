@@ -179,7 +179,6 @@ namespace Isis {
     // ken testing
 
     if (args.count() == 2) {
-      qDebug() << args.last();
       m_directory->project()->open(args.last());
     }
   }

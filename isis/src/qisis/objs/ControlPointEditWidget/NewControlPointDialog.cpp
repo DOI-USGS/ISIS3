@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <QComboBox>
+
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -9,8 +11,10 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QString>
+#include <QtDebug>
 
 #include "ControlNet.h"
+#include "ControlPoint.h"
 #include "IString.h"
 #include "SerialNumberList.h"
 
@@ -33,8 +37,8 @@ namespace Isis {
    */
   NewControlPointDialog::NewControlPointDialog(ControlNet *controlNet,
                                                SerialNumberList *serialNumberList,
-                                               QString defaultPointId, QWidget *parent)
-                       : QDialog(parent) {
+                                               QString defaultPointId,
+                                               QWidget *parent) : QDialog(parent) {
 
     m_controlNet = controlNet;
     m_serialNumberList = serialNumberList;
@@ -53,6 +57,25 @@ namespace Isis {
     m_ptIdEdit->selectAll();
     connect(m_ptIdEdit, SIGNAL(textChanged(const QString &)),
             this, SLOT(enableOkButton(const QString &)));
+
+    m_pointTypeCombo = new QComboBox;
+    for (int i=0; i<ControlPoint::PointTypeCount; i++) {
+      m_pointTypeCombo->insertItem(i, ControlPoint::PointTypeToString(
+                                   (ControlPoint::PointType) i));
+    }
+    m_pointTypeCombo->setCurrentIndex(2);
+    QHBoxLayout *pointTypeLayout = new QHBoxLayout;
+    QLabel *pointTypeLabel = new QLabel("PointType:");
+    pointTypeLayout->addWidget(pointTypeLabel);
+    pointTypeLayout->addWidget(m_pointTypeCombo);
+    connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(pointTypeChanged(int)));
+
+    m_groundSourceCombo = new QComboBox;
+    QHBoxLayout *m_groundSourceLayout = new QHBoxLayout;
+    QLabel *groundSourceLabel = new QLabel("Ground Source:");
+    m_groundSourceLayout->addWidget(groundSourceLabel);
+    m_groundSourceLayout->addWidget(m_groundSourceCombo);
+    m_groundSourceCombo->setVisible(false);
 
     m_subpixelRegisterButton = new QRadioButton("Subpixel Register Measures");
     m_subpixelRegisterButton->setChecked(true);
@@ -84,6 +107,8 @@ namespace Isis {
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addLayout(ptIdLayout);
+    vLayout->addLayout(pointTypeLayout);
+    vLayout->addLayout(m_groundSourceLayout);
     vLayout->addWidget(m_subpixelRegisterButton);
     vLayout->addWidget(listLabel);
     vLayout->addWidget(m_fileList);
@@ -100,6 +125,11 @@ namespace Isis {
   }
 
 
+  int NewControlPointDialog::pointType() const {
+    return m_pointTypeCombo->currentIndex();
+  }
+
+
   QStringList NewControlPointDialog::selectedFiles() const {
     QStringList result;
 
@@ -113,6 +143,27 @@ namespace Isis {
 
   bool NewControlPointDialog::subpixelRegisterPoint() {
     return m_subpixelRegisterButton->isChecked();
+  }
+
+
+  QString NewControlPointDialog::groundSource() const {
+    return m_groundSourceCombo->currentText();
+  }
+
+
+  void NewControlPointDialog::pointTypeChanged(int pointType) {
+    if (pointType == ControlPoint::Constrained || pointType == ControlPoint::Fixed) {
+      m_groundSourceCombo->setVisible(true);
+    }
+  }
+
+
+  void NewControlPointDialog::setGroundSource(QStringList groundFiles, int numberShapesWithPoint) {
+    m_groundSourceCombo->addItems(groundFiles);
+    for (int i = 0; i < numberShapesWithPoint; i++) {
+      m_groundSourceCombo->setItemData(i, QColor(Qt::red), Qt::ForegroundRole);
+    }
+    m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
   }
 
 

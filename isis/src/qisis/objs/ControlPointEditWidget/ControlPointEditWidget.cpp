@@ -72,6 +72,7 @@ namespace Isis {
     m_addMeasuresButton = addMeasures;
     m_netChanged = false;
     m_templateModified = false;
+    m_serialNumberList = NULL;
 
 //  qDebug()<<"ControlPointEditWidget::ControlPointEditWidget  #shapes = "<<m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
 
@@ -507,6 +508,13 @@ namespace Isis {
   void ControlPointEditWidget::setSerialNumberList(SerialNumberList *snList) {
 
     // TODO   If network & snList already exists do some error checking
+    // Make copy;  we add ground source files to the list, and we don't want to cause problems for
+    //  other cnetsuite entities that are using
+//  if (m_serialNumberList) {
+//    delete m_serialNumberList;
+//    m_serialNumberList = NULL;
+//  }
+//  m_serialNumberList = new SerialNumberList(snList);
     m_serialNumberList = snList;
   }
 
@@ -531,7 +539,88 @@ namespace Isis {
 
 
   /**
-   * Sets the control point to edit
+   * @brief Create a temporary measure to hold the ground point info for ground source
+   *
+   * @return ControlMeasure* the created ground measure
+   *
+   * @internal
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Original version adapted from
+   *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
+   *   @history 2016-11-04 Tracie Sucharski - Combined findPointLocation and
+   *                           createTemporaryGroundMeasure so that ground information doesn't need
+   *                           to be re-created
+   */
+  ControlMeasure *ControlPointEditWidget::createTemporaryGroundMeasure() {
+
+    ControlMeasure *groundMeasure = NULL;
+    FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
+    if (!groundFile.fileExists()) {
+      //  simply print error for now, need to prompt
+      //  for new location or new source, either a Shape in the project, or import a new shape,
+      //  or simplay choose file?
+      QString message = "Ground Source file " + groundFile.expanded();
+      message += " doesn't exist";
+      QMessageBox::critical(this, "Warning", message);
+    }
+    else {
+
+      //  If ground file exists, open, create cube and ground map.  If doesn't exist, prompt
+      //  for new location or new source, either a Shape in the project, or import a new shape,
+      //  or simplay choose file?   
+      //  THIS SHOULD BE MOVED TO ::LOADPOINT AND info needs to be saved
+      QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
+      QScopedPointer<UniversalGroundMap> groundMap(new UniversalGroundMap(*groundCube));
+
+      // Use apriori surface point to find location on ground source.  If
+      // apriori surface point does not exist use reference measure
+      double lat = 0.;
+      double lon = 0.;
+      if (m_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+        lat = sPt.GetLatitude().degrees();
+        lon = sPt.GetLongitude().degrees();
+      }
+      else {
+        ControlMeasure m = *(m_editPoint->GetRefMeasure());
+        int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
+        Camera *cam;
+        cam = m_controlNet->Camera(camIndex);
+        cam->SetImage(m.GetSample(),m.GetLine());
+        lat = cam->UniversalLatitude();
+        lon = cam->UniversalLongitude();
+      }
+
+      //  Try to locate point position on current ground source,
+      //  TODO ???if doesn't exist,???
+      if (!groundMap->SetUniversalGround(lat,lon)) {
+        QString message = "This point does not exist on the ground source.\n";
+        message += "Latitude = " + QString::number(lat);
+        message += "  Longitude = " + QString::number(lon);
+        message += "\n A ground measure will not be created.";
+        QMessageBox::warning(this, "Warning", message);
+      }
+      else {
+        // This measure will be deleted when the ControlPoint is saved to the
+        // ControlNet.
+        groundMeasure = new ControlMeasure;
+        QString groundSN = SerialNumber::Compose(*groundCube);
+        groundMeasure->SetCubeSerialNumber(groundSN);
+        groundMeasure->SetType(ControlMeasure::Candidate);
+        groundMeasure->SetCoordinate(groundMap->Sample(), groundMap->Line());
+        groundMeasure->SetChooserName("GroundMeasureTemporary");
+        //  Add serial number to serial number list if  not already there
+        if (!m_serialNumberList->hasSerialNumber(groundSN)) {
+          m_serialNumberList->add(groundFile.expanded(), true);
+        }
+      }
+    }
+
+    return groundMeasure;
+  }
+
+
+  /**
+   * Slot called by Directory to set the control point for editing
    * 
    * @param controlPoint Pointer to the ControlPoint to edit
    */
@@ -542,6 +631,8 @@ namespace Isis {
       delete m_editPoint;
       m_editPoint = NULL;
     }
+
+    //  Create copy of ControlPoint.  It will not be saved to net until "Save Point" is selected
     m_editPoint = new ControlPoint;
     *m_editPoint = *controlPoint;
     //qDebug()<<"ControlPointEditWidget::setEditPoint m_editPoint Id = "<<m_editPoint->GetId();
@@ -553,6 +644,155 @@ namespace Isis {
 
     // New point loaded, make sure Save Measure Button text is default
     m_savePoint->setPalette(m_saveDefaultPalette);
+  }
+
+
+  /**
+   * @brief Load point into ControlPointEditWidget.
+   * 
+   * @internal
+   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
+   *                           ControlPointEditWidget point information.
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                          namespace std"
+   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
+   *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
+   *   @history 2011-07-18 Tracie Sucharski - Fixed bug with loading
+   *                          ground measure-use AprioriSurface point, not lat,lon
+   *                          of reference measure unless there is no apriori
+   *                          surface point.
+   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
+   *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
+   *                          clicked on first on the left side, use m_leftFile.
+   */
+  void ControlPointEditWidget::loadPoint () {
+
+    //  Write pointId
+    QString CPId = m_editPoint->GetId();
+    QString ptId("Point ID:  ");
+    ptId += (QString) CPId;
+    m_ptIdValue->setText(ptId);
+
+    m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+    QString groundFile;
+    if (m_editPoint->GetType() != ControlPoint::Free) {
+      groundFile = m_editPoint->GetAprioriSurfacePointSourceFile();
+    }
+
+    //  Write number of measures
+    QString ptsize = "Number of Measures:  " +
+                   QString::number(m_editPoint->GetNumMeasures());
+    m_numMeasures->setText(ptsize);
+
+    //  Set EditLock box correctly
+    m_lockPoint->setChecked(m_editPoint->IsEditLocked());
+
+    //  Set ignore box correctly
+    m_ignorePoint->setChecked(m_editPoint->IsIgnored());
+
+    // Clear combo boxes
+    m_leftCombo->clear();
+    m_rightCombo->clear();
+    m_pointFiles.clear();
+
+    m_pointCubes.clear();
+
+
+        //  If fixed, add ground source file to combos, create a measure for
+    //  the ground source, load reference on left, ground source on right
+    if (m_editPoint->GetType() != ControlPoint::Free) {
+      // Create a temporary measure to hold the ground point info for ground source
+      // This measure will be deleted when the ControlPoint is saved to the
+      // ControlNet.
+      // TODO:  Does open ground source match point ground source
+      ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
+      if (groundMeasure) {
+        m_editPoint->Add(groundMeasure);
+      }
+      else {
+        QString message = "Cannot create ground measure on ground source file ";
+        message += groundFile;
+        QMessageBox::warning(this, "Warning", message);
+      }
+    }
+
+    //  Need all files for this point
+    for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+      ControlMeasure &m = *(*m_editPoint)[i];
+      QString file;
+      if (m.GetChooserName() == "GroundMeasureTemporary") {
+        file = groundFile;
+      }
+      else {
+        file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
+      }
+      m_pointFiles<<file;
+      QString tempFileName = FileName(file).name();
+
+      QStandardItem *item = new QStandardItem(tempFileName);
+//    qDebug()<<"before item flags = "<<item->flags();
+      item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);
+      m_model->appendRow(item);
+
+      m_leftCombo->addItem(tempFileName);
+//    m_rightCombo->addItem(tempFileName);
+      if (m_editPoint->IsReferenceExplicit() &&
+          (QString)m.GetCubeSerialNumber() == m_editPoint->GetReferenceSN()) {
+        m_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+        m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+      }
+    }
+
+    //TODO   IPCE  2016-06-08    TEMPORARY for prototype,   
+    m_measureEditor->setPoint(m_editPoint, m_serialNumberList);
+
+
+
+
+
+
+
+
+    //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
+    // Assuming combo loaded in same order as measures in the control point-is
+    // this a safe assumption???
+    //
+    //  Find the file from the cubeViewport that was originally used to select
+    //  the point, this will be displayed on the left ChipViewport, unless the
+    //  point was selected on the ground source image.  In this case, simply
+    //  load the first measure on the left.
+    int leftIndex = 0;
+    int rightIndex = 0;
+    //  Check for reference
+    if (m_editPoint->IsReferenceExplicit()) {
+      leftIndex = m_editPoint->IndexOfRefMeasure();
+    }
+    else {
+      if (!m_leftFile.isEmpty()) {
+        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
+        //  Sanity check
+        if (leftIndex < 0 ) leftIndex = 0;
+        m_leftFile.clear();
+      }
+    }
+
+    if (leftIndex == 0) {
+      rightIndex = 1;
+    }
+    else {
+      rightIndex = 0;
+    }
+
+    //  Handle pts with a single measure, for now simply put measure on left/right
+    //  Evenutally put on left with black on right??
+    if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
+    m_rightCombo->setCurrentIndex(rightIndex);
+    m_leftCombo->setCurrentIndex(leftIndex);
+    //  Initialize pointEditor with measures
+    selectLeftMeasure(leftIndex);
+    selectRightMeasure(rightIndex);
+
+//     loadMeasureTable();
   }
 
 
@@ -580,9 +820,35 @@ namespace Isis {
       }
     }
 
+    // Get shapes from project to fill dialog, changing the font for shapes the point is located in.
+    QStringList shapeNames;
+    QStringList shapeNamesNoPoint;
+    // Create map between the Shape display name & Shape
+    QMap<QString, Shape *> nameToShapeMap;
+    QList<ShapeList *> shapeLists = m_directory->project()->shapes();
+    foreach (ShapeList *shapeList, shapeLists) {
+      foreach (Shape *shape, *shapeList) {
+        UniversalGroundMap *gmap = new UniversalGroundMap(*(shape->cube()));
+        if (gmap->SetUniversalGround(latitude, longitude)) {
+          shapeNames<<shape->displayProperties()->displayName();
+        }
+        else {
+          shapeNamesNoPoint<<shape->displayProperties()->displayName();
+        }
+        nameToShapeMap[shape->displayProperties()->displayName()] = shape;
+        delete gmap;
+      }
+    }
+
+    int numberShapesWithPoint = shapeNames.count();
+    shapeNames<<shapeNamesNoPoint;
+
+    //m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
+
     NewControlPointDialog *newPointDialog =
         new NewControlPointDialog(m_controlNet, m_serialNumberList, m_lastUsedPointId, this);
     newPointDialog->setFiles(pointFiles);
+    newPointDialog->setGroundSource(shapeNames, numberShapesWithPoint);
     if (newPointDialog->exec()) {
       m_lastUsedPointId = newPointDialog->pointId();
       ControlPoint *newPoint =
@@ -600,7 +866,7 @@ namespace Isis {
         createControlPoint(latitude, longitude);
         return;
       }
-
+      
       newPoint->SetChooserName(Application::UserName());
 
       QStringList selectedFiles = newPointDialog->selectedFiles();
@@ -622,18 +888,22 @@ namespace Isis {
         newPoint->Add(m);
       }
 
-      if (isGroundSource) {
-        // TODO  Ground Map needs to be handled similar to QnetTools?
-        // This measure will be deleted when the ControlPoint is saved to the
-        // ControlNet.
-        UniversalGroundMap *groundMap = new UniversalGroundMap(*cube);
-        ControlMeasure *groundMeasure = new ControlMeasure;
-        groundMeasure->SetCubeSerialNumber(SerialNumber::Compose(*cube, true));
-        groundMeasure->SetType(ControlMeasure::Candidate);
-        groundMeasure->SetCoordinate(groundMap->Sample(),groundMap->Line());
-        newPoint->Add(groundMeasure);
-        newPoint->SetType(ControlPoint::Fixed);
-        delete groundMap;
+      //  Get point type from dialog
+      bool isGroundPoint = (newPointDialog->pointType() != ControlPoint::Free);
+      newPoint->SetType((ControlPoint::PointType) newPointDialog->pointType());
+
+      if (isGroundPoint) {
+        Shape *shape = nameToShapeMap[newPointDialog->groundSource()];
+        //  Save ground source information in control point
+        if (shape->shapeType() == Shape::Dem ||
+            shape->shapeType() == Shape::Basemap) {
+          newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+        }
+        else if (shape->shapeType() == Shape::Unprojected) {
+          // TODO  Determine if unprojected shape has been bundle adjusted or is simply ??
+//        newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::???
+        }
+        newPoint->SetAprioriSurfacePointSourceFile(shape->fileName());                    
       }
 
       setEditPoint(newPoint);
@@ -658,7 +928,6 @@ namespace Isis {
 //  if (cube) {
 //
 //  }
-
 
 
       emit controlPointAdded(newPoint->GetId());
@@ -1159,6 +1428,21 @@ namespace Isis {
     ControlPoint *updatePoint = new ControlPoint;
     *updatePoint = *m_editPoint;
 
+    //  If this is a fixed or constrained point, see if there is a temporary
+    //  measure holding the coordinate information from the ground source.
+    //  If so, delete this measure before saving point.  Clear out the
+    //  fixed Measure variable (memory deleted in ControlPoint::Delete).
+    if (updatePoint->GetType() != ControlPoint::Free) {
+      // Find measure with chooser name = GroundMeasureTemporary
+      for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+        ControlMeasure &m = *(*m_editPoint)[i];
+        QString file;
+        if (m.GetChooserName() == "GroundMeasureTemporary") {
+          updatePoint->Delete(&m);
+        }
+      }
+    }
+
     //  If edit point exists in the network, save the updated point.  If it
     //  does not exist, add it.
     if (m_controlNet->ContainsPoint(updatePoint->GetId())) {
@@ -1431,125 +1715,6 @@ namespace Isis {
       }
     }
     emit measureChanged();
-  }
-
-
-  /**
-   * @brief Load point into ControlPointEditWidget.
-   * 
-   * @internal
-   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
-   *                           ControlPointEditWidget point information.
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
-   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
-   *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
-   *   @history 2011-07-18 Tracie Sucharski - Fixed bug with loading
-   *                          ground measure-use AprioriSurface point, not lat,lon
-   *                          of reference measure unless there is no apriori
-   *                          surface point.
-   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
-   *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
-   *                          clicked on first on the left side, use m_leftFile.
-   */
-  void ControlPointEditWidget::loadPoint () {
-
-    //  Write pointId
-    QString CPId = m_editPoint->GetId();
-    QString ptId("Point ID:  ");
-    ptId += (QString) CPId;
-    m_ptIdValue->setText(ptId);
-
-    m_pointType->setCurrentIndex((int) m_editPoint->GetType());
-
-    //  Write number of measures
-    QString ptsize = "Number of Measures:  " +
-                   QString::number(m_editPoint->GetNumMeasures());
-    m_numMeasures->setText(ptsize);
-
-    //  Set EditLock box correctly
-    m_lockPoint->setChecked(m_editPoint->IsEditLocked());
-
-    //  Set ignore box correctly
-    m_ignorePoint->setChecked(m_editPoint->IsIgnored());
-
-    // Clear combo boxes
-    m_leftCombo->clear();
-    m_rightCombo->clear();
-    m_pointFiles.clear();
-
-    m_pointCubes.clear();
-    //  Need all files for this point
-    for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
-      ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
-      m_pointFiles<<file;
-      QString tempFileName = FileName(file).name();
-
-      QStandardItem *item = new QStandardItem(tempFileName);
-//    qDebug()<<"before item flags = "<<item->flags();
-      item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);
-      m_model->appendRow(item);
-
-      m_leftCombo->addItem(tempFileName);
-//    m_rightCombo->addItem(tempFileName);
-      if (m_editPoint->IsReferenceExplicit() &&
-          (QString)m.GetCubeSerialNumber() == m_editPoint->GetReferenceSN()) {
-        m_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
-        m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
-      }
-    }
-
-    //TODO   IPCE  2016-06-08    TEMPORARY for prototype,   
-    m_measureEditor->setPoint(m_editPoint, m_serialNumberList);
-
-
-
-
-
-
-
-
-    //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
-    // Assuming combo loaded in same order as measures in the control point-is
-    // this a safe assumption???
-    //
-    //  Find the file from the cubeViewport that was originally used to select
-    //  the point, this will be displayed on the left ChipViewport, unless the
-    //  point was selected on the ground source image.  In this case, simply
-    //  load the first measure on the left.
-    int leftIndex = 0;
-    int rightIndex = 0;
-    //  Check for reference
-    if (m_editPoint->IsReferenceExplicit()) {
-      leftIndex = m_editPoint->IndexOfRefMeasure();
-    }
-    else {
-      if (!m_leftFile.isEmpty()) {
-        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
-        //  Sanity check
-        if (leftIndex < 0 ) leftIndex = 0;
-        m_leftFile.clear();
-      }
-    }
-
-    if (leftIndex == 0) {
-      rightIndex = 1;
-    }
-    else {
-      rightIndex = 0;
-    }
-
-    //  Handle pts with a single measure, for now simply put measure on left/right
-    //  Evenutally put on left with black on right??
-    if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
-    m_rightCombo->setCurrentIndex(rightIndex);
-    m_leftCombo->setCurrentIndex(leftIndex);
-    //  Initialize pointEditor with measures
-    selectLeftMeasure(leftIndex);
-    selectRightMeasure(rightIndex);
-
-//     loadMeasureTable();
   }
 
 
@@ -1830,7 +1995,7 @@ namespace Isis {
 
     QString serial;
     try {
-      serial = m_serialNumberList->serialNumber(file);
+      serial = m_serialNumberList->serialNumber(file); 
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -1846,15 +2011,11 @@ namespace Isis {
       return;
     }
 
-    // Make sure to clear out leftMeasure before making a copy of the selected
-    // measure.
     if (m_leftMeasure != NULL) {
-      delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
-    m_leftMeasure = new ControlMeasure();
-    //  Find measure for each file
-    *m_leftMeasure = *((*m_editPoint)[serial]);
+    //  Find measure for each file    
+    m_leftMeasure = (*m_editPoint)[serial];
 
     //  If m_leftCube is not null, delete before creating new one
     m_leftCube.reset(new Cube(file, "r"));
@@ -1899,15 +2060,12 @@ namespace Isis {
       return;
     }
 
-    // Make sure to clear out rightMeasure before making a copy of the selected
-    // measure.
     if (m_rightMeasure != NULL) {
-      delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = new ControlMeasure();
+
     //  Find measure for each file
-    *m_rightMeasure = *((*m_editPoint)[serial]);
+    m_rightMeasure = (*m_editPoint)[serial];
 
     //  If m_rightCube is not null, delete before creating new one
     m_rightCube.reset(new Cube(file, "r"));

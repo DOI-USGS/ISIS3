@@ -23,6 +23,7 @@
 #include "CubeDnView.h"
 
 #include <QAction>
+#include <QDataStream>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMdiArea>
@@ -35,6 +36,7 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidgetAction>
+#include <QXmlStreamWriter>
 
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
@@ -77,6 +79,7 @@
 #include "ViewportMdiSubWindow.h"
 #include "Workspace.h"
 #include "WindowTool.h"
+#include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
 
 namespace Isis {
@@ -277,7 +280,6 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to add.
    */
   void CubeDnView::addItem(ProjectItem *item) {
-//  qDebug()<<"CubeDnView::addItem ";
     if ( !item->isImageList() && !item->isImage() && !item->isShapeList() && !item->isShape()) {
       return;
     }
@@ -498,7 +500,6 @@ namespace Isis {
     if (!item) {
       return;
     }
-
     Cube *cube;
     if (item->isImage()) {
       cube = item->image()->cube();
@@ -558,5 +559,80 @@ namespace Isis {
 
     // Activating the subwindow activates the view, which is annoying
     //m_workspace->mdiArea()->setActiveSubWindow(subWindow);
+  }
+
+
+  void CubeDnView::load(XmlStackedHandlerReader *xmlReader, Project *project) {
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+  }
+
+
+  void CubeDnView::save(QXmlStreamWriter &stream, Project *, FileName) const {
+    stream.writeStartElement("cubeDnView");
+
+    foreach (MdiCubeViewport *cvp, *(m_workspace->cubeViewportList())) {
+      ProjectItem *item = m_cubeItemMap.value(cvp->cube());
+      if (item->isImage()) {
+        stream.writeStartElement("image"); 
+        stream.writeAttribute("id", item->image()->id()); 
+      }
+      else if (item->isShape()) {
+        stream.writeStartElement("shape"); 
+        stream.writeAttribute("id", item->shape()->id()); 
+      }
+      stream.writeEndElement();
+    }
+    stream.writeEndElement();
+  }
+
+
+  CubeDnView::XmlHandler::XmlHandler(CubeDnView *cubeDnView, Project *project) {
+
+    m_cubeDnView = cubeDnView;
+    m_project = project;
+  }
+
+
+  CubeDnView::XmlHandler::~XmlHandler() {
+  }
+
+
+  bool CubeDnView::XmlHandler::startElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
+    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
+
+    if (result) {
+      ProjectItemProxyModel *proxy = (ProjectItemProxyModel *) m_cubeDnView->internalModel();
+      ProjectItemModel *source = proxy->sourceModel();
+      QString id = atts.value("id");
+
+      ProjectItem *item = NULL;
+      if (localName == "image") {
+        Image *image = m_project->image(id);
+        if (image) {
+          // Find ProjectItem and append to list
+          item = source->findItemData(qVariantFromValue(image));
+        }
+      }
+      else if (localName == "shape") {
+        Shape *shape = m_project->shape(id);
+        if (shape) {
+          item = source->findItemData(qVariantFromValue(shape));
+        }
+      }
+      if (item) {
+        proxy->addItem(item);
+      }
+    }
+
+    return result;
+  }
+
+
+  bool CubeDnView::XmlHandler::endElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName) {
+    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
+
+    return result;
   }
 }

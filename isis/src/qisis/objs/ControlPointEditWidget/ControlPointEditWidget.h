@@ -170,6 +170,7 @@ namespace Isis {
       bool IsMeasureLocked(QString serialNumber);
       bool validateMeasureChange(ControlMeasure *m);
 
+      ControlMeasure *createTemporaryGroundMeasure();
 
 
     private:
@@ -231,13 +232,12 @@ namespace Isis {
       SerialNumberList *m_serialNumberList; //!< Serial number list for the loaded cubes
       QPointer<ControlNet> m_controlNet; //!< Current control net
 
-//    QPointer<NewPointDialog> m_newPointDialog;
       QPointer<ControlPoint> m_newPoint; //!< New control point
       QString m_lastUsedPointId; //!< Point id of the last used control point
 
       QStringList m_pointFiles; //!< Associated files for current control point
 
-      QString m_leftFile; //<! Filename of left measure
+      QString m_leftFile; //!< Filename of left measure
       QPointer<ControlMeasure> m_leftMeasure; //!< Left control measure
       QPointer<ControlMeasure> m_rightMeasure; //!< Right control measure
       QScopedPointer<Cube> m_leftCube; //!< Left cube

@@ -1124,11 +1124,21 @@ namespace Isis {
 
     // Save footprints
     if ( !m_footprint2DViewWidgets.isEmpty() ) {
-      //qDebug()<<"Writing footprints";
       stream.writeStartElement("footprintViews");
 
       foreach (Footprint2DView *footprint2DViewWidget, m_footprint2DViewWidgets) {
         footprint2DViewWidget->mosaicSceneWidget()->save(stream, project(), newProjectRoot);
+      }
+
+      stream.writeEndElement();
+    }
+
+    // Save cubeDnViews
+    if ( !m_cubeDnViewWidgets.isEmpty() ) {
+      stream.writeStartElement("cubeDnViews");
+
+      foreach (CubeDnView *cubeDnView, m_cubeDnViewWidgets) {
+        cubeDnView->save(stream, project(), newProjectRoot);
       }
 
       stream.writeEndElement();
@@ -1175,10 +1185,13 @@ namespace Isis {
 
     if (result) {
       if (localName == "footprint2DView") {
-        m_directory->addFootprint2DView()->mosaicSceneWidget()->load( reader() );
+        m_directory->addFootprint2DView()->mosaicSceneWidget()->load(reader());
       }
       else if (localName == "imageFileList") {
-        m_directory->addImageFileListView()->load( reader() );
+        m_directory->addImageFileListView()->load(reader());
+      }
+      else if (localName == "cubeDnView") {
+        m_directory->addCubeDnView()->load(reader(), m_directory->project());
       }
     }
 
