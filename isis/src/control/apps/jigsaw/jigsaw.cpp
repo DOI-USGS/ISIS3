@@ -74,8 +74,6 @@ void IsisMain() {
 
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
-    QObject::connect( bundleAdjustment, SIGNAL( bundleException(QString) ),
-                      bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     BundleSolutionInfo bundleSolution = bundleAdjustment->solveCholeskyBR();
     
     cout << "\nGenerating report files\n" << endl;

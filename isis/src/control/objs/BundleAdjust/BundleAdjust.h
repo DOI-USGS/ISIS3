@@ -263,6 +263,8 @@ namespace Isis {
    *   @history 2016-10-28 Ian Humphrey - Modified solveCholesky() and errorPropagation() to change
    *                           spacing in terminal output, so that it matches production.
    *                           References #4463.
+   *   @history 2016-11-16 Ian Humphrey - Modified solveCholesky() to throw caught exceptions that
+   *                           occur. Removed bundleException(QString) signal. Fixes #4483.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -315,7 +317,6 @@ namespace Isis {
       void statusUpdate(QString);
       void error(QString);
       void iterationUpdate(int, double);
-      void bundleException(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 

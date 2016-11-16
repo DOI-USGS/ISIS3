@@ -633,6 +633,9 @@ namespace Isis {
    *                           ISIS production's jigsaw std output. References #4463."
    *   @history 2016-10-28 Ian Humphrey - Updated spacing for Error Propagation Complete message.
    *                           References #4463."
+   *   @history 2016-11-16 Ian Humphrey - Modified catch block to throw the caught exception, so
+   *                           a message box will appear to the user when running jigsaw in GUI
+   *                           mode. Fixes #4483.
    */
   bool BundleAdjust::solveCholesky() {
     try {
@@ -909,12 +912,11 @@ namespace Isis {
       iterationSummary();
     }
     catch (IException &e) {
-      QString exceptionStr = e.what();
-      emit bundleException(exceptionStr);
       m_bundleResults.setConverged(false);
       emit statusUpdate("\n aborting...");
       emit finished();
-      return false;
+      QString msg = "Could not solve bundle adjust.";
+      throw IException(e, e.errorType(), msg, _FILEINFO_);
     }
 
     return true;
