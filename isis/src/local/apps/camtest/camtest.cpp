@@ -2,14 +2,14 @@
 #include "ProcessByLine.h"
 #include "Camera.h"
 #include "SpecialPixel.h"
+#include "Pvl.h"
 
 using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
-Camera *cam;
 
-void doIt(Buffer &in, Buffer &out);
+//void doIt(Buffer &in, Buffer &out);
 
 enum OutputType {
   Lat,
@@ -17,40 +17,140 @@ enum OutputType {
   Err,
   Samp,
   Line
-} OutputFormat;
+};
+
+class CamTestFunctor {
+public:
+  CamTestFunctor() {};
+  ~CamTestFunctor() {};  
+  void setCamera(Camera* cam);
+  void setOutType(OutputType outType);
+  void setResults(Statistics* results);
+  void operator()(Buffer &in, Buffer &out) const;
+  
+private:
+  Camera* m_cam;
+  OutputType m_outType;
+  Statistics* m_resultsStats;
+};
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  ProcessByLine p;
+  ProcessByBrick p;
 
   // Open the input cube
-  Cube *icube = p.SetInputCube("FROM");
-  cam = icube->camera();
+  Cube *iCube = p.SetInputCube("FROM");
+  Camera *cam = iCube->camera();
   p.SetOutputCube("TO");
-
+  
+  // Set to process by line
+  p.SetBrickSize(iCube->sampleCount(), 1, 1);
+  
   IString format = ui.GetString("FORMAT");
 
-  if(format == "LAT") {
-    OutputFormat = Lat;
+  OutputType outFormat = Lat;
+  if (format == "LAT") {
+    outFormat = Lat;
   }
-  else if(format == "LON") {
-    OutputFormat = Lon;
+  else if (format == "LON") {
+    outFormat = Lon;
   }
-  else if(format == "ERR") {
-    OutputFormat = Err;
+  else if (format == "ERR") {
+    outFormat = Err;
   }
-  else if(format == "SAMP") {
-    OutputFormat = Samp;
+  else if (format == "SAMP") {
+    outFormat = Samp;
   }
-  else if(format == "LINE") {
-    OutputFormat = Line;
+  else if (format == "LINE") {
+    outFormat = Line;
   }
 
-  p.StartProcess(doIt);
+  // Create process functor
+  CamTestFunctor func;
+  func.setCamera(cam);
+  func.setOutType(outFormat);
+  Statistics resultsStats;
+  func.setResults(&resultsStats);
+  
+  p.ProcessCube(func, false);
+  
+  // Collect results
+  PvlGroup results = PvlGroup("CamTestResults");
+  results += PvlKeyword("FailedConversionsToLatLong", toString(resultsStats.LrsPixels()));
+  results += PvlKeyword("FailedConversionsToSampleLine", toString(resultsStats.HrsPixels()));
+  results += PvlKeyword("SuccessfulConversions", toString(resultsStats.ValidPixels()));
+  if (outFormat == Err) {
+    results += PvlKeyword("Average", toString(resultsStats.Average()));
+    results += PvlKeyword("StandardDeviation", toString(resultsStats.StandardDeviation()));
+    results += PvlKeyword("Minimum", toString(resultsStats.Minimum()));
+    results += PvlKeyword("Maximum", toString(resultsStats.Maximum()));
+  }
+  
+  // Log output results
+  Application::Log(results);
+  
   p.EndProcess();
 }
 
+// Functor Definitions
+  
+void CamTestFunctor::setCamera(Camera* cam) {
+  m_cam = cam;
+}
+
+void CamTestFunctor::setOutType(OutputType outType) {
+  m_outType = outType;
+}
+
+void CamTestFunctor::setResults(Statistics* resultsStats) {
+  m_resultsStats = resultsStats;
+}
+
+void CamTestFunctor::operator()(Buffer &in, Buffer &out) const {
+  if (in.Line() == 1) {
+    m_cam->SetBand(in.Band());
+  }
+
+  double line = in.Line();
+  for (int samp = 0; samp < in.SampleDimension(); samp++) {
+    double sample = in.Sample(samp);
+    if (!m_cam->SetImage(sample, line)) {
+      out[samp] = Lrs;
+      continue;
+    }
+
+    if (m_outType == Lat) {
+      out[samp] = m_cam->UniversalLatitude();
+    }
+    else if (m_outType == Lon) {
+      out[samp] = m_cam->UniversalLongitude();
+    }
+    else {
+      if (!m_cam->SetUniversalGround(m_cam->UniversalLatitude(), m_cam->UniversalLongitude())) {
+        out[samp] = Hrs;
+        continue;
+      }
+
+
+      if (m_outType == Samp) {
+        out[samp] = m_cam->Sample();
+      }
+      else if (m_outType == Line) {
+        out[samp] = m_cam->Line();
+      }
+      else {
+        double deltaS = m_cam->Sample() - sample;
+        double deltaL = m_cam->Line()   - line;
+        out[samp] = sqrt(deltaS * deltaS + deltaL * deltaL);
+      }
+
+    }
+  }
+  
+  m_resultsStats->AddData(out.DoubleBuffer(), out.size());
+}
+/* Old Processing Routine
 // Line processing routine
 void doIt(Buffer &in, Buffer &out) {
   if(in.Line() == 1) {
@@ -93,3 +193,4 @@ void doIt(Buffer &in, Buffer &out) {
     }
   }
 }
+*/

@@ -11,7 +11,12 @@
       special pixel values.  If a call to SetImage(sample, line) fails, the 
       output image is set to the Low Representation Saturation (Lrs) special 
       value.  Failures in calls to SetUniversalGround(lat, lon) are set to High 
-      Representation Saturation (Hrs) value.
+      Representation Saturation (Hrs) value.  The number of pixels for which
+      SetImage(sample, line) fails is output as FailedConversionsToLatLong.
+      The number of pixels for which SetImage(sample, line) succeeded but then
+      SetUniversalGround(lat, lon) failed is output as
+      FailedConversionsToSampleLine.  If ERROR is chosen for FORMAT, then
+      statistics on the error will also be output.
     </description>
 
   <category>
@@ -32,6 +37,11 @@
           index instead of 1-based);  Set failures in calls to SetImage (Lrs) 
           and SetUniversalGround (Hrs) to special pixel values so they are 
           distinguishable.  Documented this behaviour.
+      </change>
+      <change name="Jesse Mapel" date="2016-03-25">
+	Now outputs statistics on the number of failed calls to SetImage and
+	SetUniversalGround.  For FROMAT=ERROR, statistics on the
+	error are also output.
       </change>
   </history>
 
