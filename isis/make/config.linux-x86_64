@@ -274,11 +274,12 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
 OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib
-OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
-               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
-               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
-               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
-               -lopencv_video -lopencv_videostab
+OPENCVLIBS   = -lopencv_calib3d -lopencv_core -lopencv_features2d \
+	       -lopencv_flann -lopencv_highgui -lopencv_imgproc \
+	       -lopencv_ml -l opencv_objdetect \
+	       -lopencv_photo -lopencv_stitching -lopencv_superres \
+	       -lopencv_video -lopencv_videostab \
+	       -lopencv_xfeatures2d
 
 #---------------------------------------------------------------------------
 # Set up for Natural Neigbor Library (NN)
