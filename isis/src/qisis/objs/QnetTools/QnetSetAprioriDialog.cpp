@@ -99,10 +99,15 @@ namespace Isis {
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
     
+    connect(m_aprioriDialog, SIGNAL(rejected()), this, SLOT(reject()));
+    
     connect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+    connect(m_okButton, SIGNAL(clicked()), this, SLOT(closeEvent()));
     connect(m_okButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
+    
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
-    connect(m_cancelButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));    
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(closeEvent()));   
+    connect(m_cancelButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
   }
 
 
@@ -249,6 +254,44 @@ namespace Isis {
     m_aprioriDialog->setLayout(m_aprioriGridLayout);
    
     setVisiblity();
+  }
+  
+  
+  /**
+   * This is called when the user selects the X button on the top right or they hit ESC.
+   * Disconnect all slots on close event.
+   * 
+   * @author 2016-11-18 Makayla Shepherd
+   * 
+   */
+  void QnetSetAprioriDialog::reject() {
+    closeEvent();
+    QDialog::reject();
+  }
+  
+  
+  /**
+   * Disconnect all of the slots on a close event
+   * 
+   * @author 2016-11-18 Makayla Shepherd
+   */
+  void QnetSetAprioriDialog::closeEvent() {
+    
+      disconnect(m_currentAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillCurrentAprioriLineEdits()));
+      disconnect(m_referenceAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillReferenceAprioriLineEdits()));
+      disconnect(m_averageAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillAverageAprioriLineEdits()));
+      
+      disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
+      disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
+      
+      disconnect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+      disconnect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+      
+      emit aprioriDialogClosed();
+    
   }
   
   
@@ -699,7 +742,7 @@ namespace Isis {
       }
       if (m_multiPointsFixedCount > 0 || m_multiPointsFreeCount > 0) {
         m_aprioriDialog->setDisabled(true);
-        QString msg = "Sigmas can only be set on Contrained points. Use Filters to filter by";
+        QString msg = "Sigmas can only be set on Constrained points. Use Filters to filter by";
         msg = msg + " Constrained points.";
         QMessageBox::warning((QWidget *)parent(), "Warning", msg);
         return;
@@ -827,9 +870,11 @@ namespace Isis {
    *                        are made and populated in the fill methods.
    * @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be set 
    *                        to NULL. You can now set the apriori sigmas.
+   * @history 2016-11-16 Makayla Shepherd - Fixed the sigma setting for Fixed and Free points.
    *                        
    */
   void QnetSetAprioriDialog::setApriori() {
+    
     if (m_points.size() == 0) {
       QString msg = "There are no Points selected. Please select a Point.";
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
@@ -927,11 +972,11 @@ namespace Isis {
         spt.SetRadii(Distance(targetRadii[0]),
                      Distance(targetRadii[1]),
                      Distance(targetRadii[2]));
-        if (pt->GetPointTypeString() == "Constrained") {
-          spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
-                                         Distance(lonSigma,Distance::Meters),
-                                         Distance(radiusSigma,Distance::Meters));
-        }
+
+        spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
+                                        Distance(lonSigma,Distance::Meters),
+                                        Distance(radiusSigma,Distance::Meters));
+
         //  Write the surface point back out to the controlPoint
         pt->SetAprioriSurfacePoint(spt);
 

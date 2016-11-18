@@ -30,6 +30,10 @@ namespace Isis {
    *                           Fixes #2325, #2383.
    *   @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be 
    *                           set to NULL. You can now set the apriori sigmas. Fixes #4457.
+   *   @history 2016-11-18 Makayla Shepherd - Corrected the deletion of this dialog. The incorrect
+   *                           deletion caused an error message to pop up when selecting multiple 
+   *                           Free or Fixed points after closing the Set Apriori dialog. Fixes 
+   *                           #4490.
    */
   class QnetSetAprioriDialog : public QDialog {
       Q_OBJECT
@@ -37,13 +41,16 @@ namespace Isis {
     public:
       QnetSetAprioriDialog(QnetTool *qnetTool, QWidget *parent = 0);
       void setPoints(QList<QListWidgetItem *> selectedPoints);
+      
     
     public slots:
       void setVisiblity();
+      virtual void reject();
       
     signals:
       void pointChanged(QString pointId);
       void netChanged();
+      void aprioriDialogClosed();
 
     private slots:
       void fillCurrentAprioriLineEdits();
@@ -54,6 +61,8 @@ namespace Isis {
       void clearLineEdits();
       void resetInfoLabels();
       void setApriori();
+      void closeEvent();
+      
       
     private:
       

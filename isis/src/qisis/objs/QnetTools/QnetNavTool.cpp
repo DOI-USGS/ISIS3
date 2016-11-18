@@ -843,7 +843,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Delete selected Points from control network
    *
@@ -936,14 +935,16 @@ namespace Isis {
     return;
   }
 
-
-
+  
   /**
    * Bring up apriori dialog
    *
    * @author 2011-04-19 Tracie Sucharski 
    *  
    * @internal 
+   *   @history 2016-11-18 Makayla Shepherd - Added a connection to disconnectAprioriDialog() which
+   *                           will disconnect the dialog and delete it.
+   * 
    * @todo  This method should be temporary until the control point editor 
    *           comes online.  If this stick around, needs to be re-designed-
    *           put in a separate class??
@@ -963,12 +964,13 @@ namespace Isis {
               this, SIGNAL(pointChanged(QString)));
       connect(m_aprioriDialog, SIGNAL(netChanged()),
               this, SIGNAL(netChanged()));
+      connect(m_aprioriDialog, SIGNAL(aprioriDialogClosed()),
+              this, SLOT(disconnectAprioriDialog()));
     }
     m_aprioriDialog->setVisiblity();
   }
-
-
-
+  
+  
   /**
    * Slot to pass points selected in Nav List Widget to Apriori Dialog 
    *  
@@ -991,7 +993,24 @@ namespace Isis {
 
   }
   
+  
+  /**
+   * Apriori dialog has been closed and needs to be disconnected and deleted so a new dialog can 
+   * be brought up next time.
+   * 
+   * @author 2016-11-14 Makayla Shepherd
+   *
+   */
+  void QnetNavTool::disconnectAprioriDialog() {
+    if (m_aprioriDialog) {
+      disconnect(m_listBox, SIGNAL(itemSelectionChanged()),
+                 this, SLOT(setAprioriDialogPoints()));
+      disconnect(m_aprioriDialog, 0, 0, 0);
+      m_aprioriDialog = NULL;
+    }
+  }
 
+  
   /**
    * Figures out what type of widget the filter was selected for and calls the
    * filter method for that filter class
