@@ -94,10 +94,8 @@ void IsisMain() {
       bundleSolution.outputResiduals();
     }
     
-    // write updated control net if bundle has converged
-    if (bundleAdjustment->isConverged()) {
-      bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
-    }
+    // write updated control net
+    bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
     PvlGroup gp("JigsawResults");
     

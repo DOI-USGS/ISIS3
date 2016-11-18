@@ -243,6 +243,9 @@
       Exceptions that occur during the solving of the bundle adjustment will now pop up as
       message boxes when running jigsaw in GUI mode. Fixes #4483.
     </change>
+    <change name="Ken Edmundson" date="2016-11-17">
+      Output control net will be now be written regardless of whether bundle converges. Fixes #4533.
+    </change>
   </history>
 
   <groups>
