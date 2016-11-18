@@ -55,7 +55,8 @@ void IsisMain() {
 
   FileList list;
   if (ui.GetString("FROMTYPE") == "FROM") {
-    list.push_back(FileName(ui.GetFileName("FROM")));
+    // GetAsString will capture the entire string, including attributes
+    list.push_back(FileName(ui.GetAsString("FROM")));
   }
   else {
     list.read(ui.GetFileName("FROMLIST"));
@@ -301,7 +302,8 @@ void IsisMain() {
     ProcessByBrick processBrick;
     processBrick.Progress()->SetText("Working on file:  " + list[f].toString());
     processBrick.SetBrickSize(1, 1, bands);
-    CubeAttributeInput atts0(list[f].toString());
+    // Recall list[f] is a FileName, which stores the attributes
+    CubeAttributeInput atts0(list[f]);
     icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
     g_incam = icube->camera();
 
