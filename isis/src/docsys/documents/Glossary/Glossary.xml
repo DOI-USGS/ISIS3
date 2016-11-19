@@ -975,11 +975,11 @@
 
           <definition name="Universal Coordinate">
             The ISIS default coordinate system
-   <pre>
-     LatitudeType = Planetocentric
-     LongitudeDirection = East
-     LongitudeDomain = 360
-   </pre>
+            <pre>
+              LatitudeType = Planetocentric
+              LongitudeDirection = East
+              LongitudeDomain = 360
+            </pre>
           </definition>
 
           <definition name="Scale">
@@ -994,6 +994,45 @@
           <definition name="Equatorial Radius">
             The distance from the geometric center of an ellipsoid to its
             equator.
+          </definition>
+
+          <definition name="Look Direction">
+            The look direction is the direction that the instrument is pointing. 
+            In ISIS, it is represented as a mathematical unit vector. 
+            For images that have a body (i.e. not star fields), 
+            this vector is parallel to the line from the sensor to the observed point 
+            on the surface of the target. The look direction can be represented in 
+            any of several coordinate systems, including: <a href="#Body-FixedCoordinateSystem">
+            Body-fixed coordinate system</a>, <a href="#CameraCoordinateSystem">Camera coordinate system</a>,
+            <a href="#J2000CoordinateSystem">J2000 coordinate system</a>.
+          </definition>
+
+          <definition name="Body-Fixed Coordinate System">
+            A body-fixed coordinate system is used to determine positions and directions 
+            of objects and vectors with respect to a target body. The origin is at the 
+            center of mass for the target and the axes rotate and move through space with 
+            the body. These systems are non-inertial, meaning the velocity of the origin 
+            is non-constant. Many body-fixed coordinate systems, or reference frames, are 
+            defined in NAIF PCK files.
+          </definition>
+
+          <definition name="Camera Coordinate System">
+            A camera coordinate system is used to determine positions and directions 
+            of objects and vectors with respect to a sensor (i.e. camera). The origin
+            is at the center of the sensor and the axes rotate and move through space 
+            with the sensor. These systems are non-inertial, meaning the velocity of the origin 
+            is non-constant. The location of the center of a spacecraft and its instruments 
+            at a given time are defined in NAIF SPK files. Generally, one or more frames are 
+            associated with a particular instrument.
+          </definition>
+
+          <definition name="J2000 Coordinate System">
+            The J2000 coordinate system (also known as EME2000) is based on the earth 
+            mean equator and dynamical equinox at midnight January 1, 2000. The origin 
+            is at the solar system barycenter. This system is inertial, since it does not 
+            rotate with respect to stars and the origin is not accelerating (i.e it has a 
+            constant velocity). This coordinate system is the root reference for NAIF's SPICE 
+            files and software.
           </definition>
 
         </definitions>
@@ -1052,6 +1091,12 @@
     <change name="Ella Mae Lee" date="2013-12-17">
       Changed Brief description to "ISIS and Image Processing Terms 
       and Definitions" and fixed misspellings.
+    </change>
+    <change name="Curtis Rose" date="2016-08-05">
+      Added definitions for Look Direction, Body-Fixed Coordinate System, Camera
+      Coordinate System and J2000 Coordinate System.
+      The coordinate systems are highly related to the look direction so they are also
+      linked in that location.
     </change>
   </history>
 </documentation>
