@@ -8,5 +8,5 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) from=$(INPUT)/BIPtestData.LBL \
-	to=$(OUTPUT)/testBIPtruth.cub+32bit \
-	> /dev/null;
+	to=$(OUTPUT)/testBIPtruth.cub+32bit > /dev/null;
+	catlab from=$(OUTPUT)/testBIPtruth.cub to=$(OUTPUT)/testBIPtruth.pvl > /dev/null;
