@@ -30,6 +30,9 @@ namespace Isis {
    *                                            function to better reflect the command functionality 
    *                                            and to avoid conflicts with Process::SetOutputCube 
    *                                            virtual function.  References #2215.
+   *   @history 2016-11-30 Ian Humphrey - Modified SetStatCubes(5args) to attach the AlphaCube
+   *                           group to the output cubes if it exists in the passed PVL.
+   *                           References #4433.
    */
   class ProcessGroundPolygons : public ProcessPolygons {
     public:

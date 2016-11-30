@@ -97,6 +97,12 @@ Record Size = 8
 Testing Table propagation (off) ...
 Group Table does not exist
 
+Testing Table propagation with list of table names to propagate (Table2) ...
+Does output cube have "Table"  ? false
+Does output cube have "Table2" ? true
+Number of records = 1
+Record Size = 4
+
 Testing Polygon propagation (on) ...
 Image Polygon does exist
 Size: 60

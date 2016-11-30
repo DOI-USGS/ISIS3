@@ -240,6 +240,29 @@ void IsisMain() {
   p5.EndProcess();
   cout << endl;
 
+  cout << "Testing Table propagation with list of table names to propagate (Table2) ..." << endl;
+  Isis::Process pTableNames;
+  pTableNames.SetInputCube("FROM");
+  pTableNames.PropagateTables(false);
+  Isis::Cube *ocubeTableNames = pTableNames.SetOutputCube("TO");
+
+  // Create the list of tables to copy from the unitTest.cub (only copy Table2)
+  QList<QString> tables;
+  tables << "Table2";
+  pTableNames.PropagateTables("unitTest.cub", tables);
+  cout << "Does output cube have \"Table\"  ? " << std::boolalpha
+       << ocubeTableNames->hasTable("Table") << endl;
+  cout << "Does output cube have \"Table2\" ? " << std::boolalpha
+       << ocubeTableNames->hasTable("Table2") << endl;
+
+  Isis::Table table2("Table2");
+  ocubeTableNames->read(table2);
+  cout << "Number of records = " << table2.Records() << endl;
+  cout << "Record Size = " << table2.RecordSize() << endl;
+  
+  pTableNames.EndProcess();
+  cout << endl;
+
   cout << "Testing Polygon propagation (on) ..." << endl;
   Isis::Process p6;
   p6.SetInputCube("FROM");

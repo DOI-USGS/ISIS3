@@ -286,6 +286,11 @@ namespace Isis {
    * @param atts
    * @param map
    * @param bands
+   *
+   * @internal
+   *   @history 2016-11-30 Ian Humphrey - The passed PVL is now checked for the AlphaCube group.
+   *                           If it exists, the AlphaCube group is attached to the output cubes.
+   *                           References #4433.
    */
   void ProcessGroundPolygons::SetStatCubes(const QString &avgFileName,
       const QString &countFileName,
@@ -308,6 +313,13 @@ namespace Isis {
 
     OutputCubes[0]->putGroup(group);
     OutputCubes[1]->putGroup(group);
+
+    // If there is an alpha cube in the label passed, attach to output cubes
+    if (map.hasGroup("AlphaCube")) {
+      PvlGroup alpha = map.findGroup("AlphaCube", Pvl::Traverse);
+      OutputCubes[0]->putGroup(alpha);
+      OutputCubes[1]->putGroup(alpha);
+    }
 
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
     p_groundMap = new UniversalGroundMap(*OutputCubes[0]);
