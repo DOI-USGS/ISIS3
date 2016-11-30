@@ -7,6 +7,7 @@
 #include "Pvl.h"
 
 template <typename A> class QList;
+
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;
 class QGraphicsScene;
@@ -19,6 +20,7 @@ class QToolBar;
 class QToolButton;
 
 namespace Isis {
+  class ControlPoint;
   class Directory;
   class Image;
   class MosaicGraphicsView;
@@ -107,13 +109,33 @@ namespace Isis {
    *                           Removed unused private member, m_projectionFootprint.  The
    *                           uninitialized values were causing the qmos selection tool to not
    *                           work properly.  Fixes #1742.
+   *   @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Added selectedCubes() and other
+   *                           control net functionality for IPCE.
    *   @history 2016-04-22 Jeannie Backer - Added label parameter to setProjection(mapGroup, label).
    *                           The default value for label is an empty Pvl. Also, modified
    *                           addImage() to pass the label from the cube of the image to be added
    *                           into setProjection(mapGroup, label). This was done to be able to call
    *                           TProjection::TargetRadii(label,mapGroup), which will
    *                           in turn will now call Target::radiiGroup(targetName), if needed. 
-   *                           References #3892   
+   *                           References #3892
+   *   @history 2016-08-28 Kelvin Rodriguez - Added using QWidget::contextMenuEvent to avoid
+   *                           hidden virtual function warnings in clang. Part of porting to OS X 10.11.
+   *   @history 2016-09-14 Ian Humphrey - Replaced deprecated QPixmap::grabWidget with
+   *                           QWidget::grab. Fixes #4304.
+   *   @history 2016-04-22 Jeannie Backer - Added label parameter to setProjection(mapGroup, label).
+   *                           The default value for label is an empty Pvl. Also, modified
+   *                           addImage() to pass the label from the cube of the image to be added
+   *                           into setProjection(mapGroup, label). This was done to be able to call
+   *                           TProjection::TargetRadii(label,mapGroup), which will
+   *                           in turn will now call Target::radiiGroup(targetName), if needed. 
+   *                           References #3892
+   *   @history 2016-08-02 Tracie Sucharski - Added public method to remove an Image from scene. 
+   *   @history 2016-09-14 Tracie Sucharski - Added signals for mouse clicks for modifying, deleting
+   *                           and creating control points.  These are passed on to Footprint2DView
+   *                           signals, then on to Directory slots.
+   *   @history 2016-11-07 Ian Humphrey - Restored the startElement() functionality so footprints
+   *                           can be correctly loaded from an XML storing the MosaicScenWidget's
+   *                           state. Fixes #4486.
    * 
    */
   class MosaicSceneWidget : public QWidget {
@@ -145,6 +167,8 @@ namespace Isis {
       void addTo(ToolPad *toolPad);
       void addToPermanent(QToolBar *toolBar);
       void addTo(QToolBar *toolBar);
+
+      using QWidget::contextMenuEvent;
       bool contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
       MosaicSceneItem *cubeToMosaic(Image *);
@@ -166,10 +190,13 @@ namespace Isis {
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+//    QPointF currentLatLonPosition();
       QRectF cubesBoundingRect() const;
       QStringList cubeFileNames();
       Directory *directory() const;
+
       ImageList images();
+      ImageList selectedImages();
 
       QList<QAction *> getExportActions();
       QList<QAction *> getViewActions();
@@ -178,15 +205,18 @@ namespace Isis {
       double moveDownOne(MosaicSceneItem *);
       double moveDownOne(Image *);
       QList<double> moveDownOne(ImageList *);
+
       double moveToBottom(MosaicSceneItem *);
       double moveToBottom(Image *);
       QList<double> moveToBottom(ImageList *);
-      double moveToTop(MosaicSceneItem *);
-      double moveToTop(Image *);
-      QList<double> moveToTop(ImageList *);
+
       double moveUpOne(MosaicSceneItem *);
       double moveUpOne(Image *);
       QList<double> moveUpOne(ImageList *);
+
+      double moveToTop(MosaicSceneItem *);
+      double moveToTop(Image *);
+      QList<double> moveToTop(ImageList *);
 
       double moveZ(MosaicSceneItem *sceneItem, double newZ, bool newZValueMightExist = true);
       double moveZ(Image *image, double newZ, bool newZValueMightExist = true);
@@ -198,6 +228,8 @@ namespace Isis {
       QList<QAction *> supportedActions(DataType) {
         return QList<QAction *>();
       }
+
+      bool isControlNetToolActive();
 
       static QWidget *getControlNetHelp(QWidget *cnetToolContainer = NULL);
       static QWidget *getGridHelp(QWidget *gridToolContainer = NULL);
@@ -221,8 +253,21 @@ namespace Isis {
 
       void queueSelectionChanged();
 
+      void modifyControlPoint(ControlPoint *controlPoint);
+      void deleteControlPoint(ControlPoint *controlPoint);
+      void createControlPoint(double latitude, double longitude);
+
+      void controlPointSelected(ControlPoint *);
+
+      void controlPointChanged(QString pointId);
+      void controlPointAdded(QString pointId);
+
+      void deleteControlPoint(QString pointId);
+      void controlPointDeleted();
+
     public slots:
       void addImages(ImageList);
+      void removeImages(ImageList);
       void refit();
       void setCubesSelectable(bool);
       void setProjection(Projection *);
@@ -263,8 +308,6 @@ namespace Isis {
       PvlGroup createInitialProjection(Image *cube);
 
       MosaicSceneItem *cubeToMosaic(DisplayProperties *props);
-
-      ImageList getSelectedCubes() const;
 
       static bool zOrderGreaterThan(MosaicSceneItem *first,
                                     MosaicSceneItem *second);

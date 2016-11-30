@@ -1,8 +1,8 @@
 #ifndef LroWideAngleCamera_h
 #define LroWideAngleCamera_h
-/** 
- * @file 
- *  
+/**
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -29,11 +29,11 @@ namespace Isis {
   /**
    * @brief LRO Wide Angle Camera Model
    *
-   * This is the camera model for the Lunar Reconnaissance Orbiter wide angle 
-   * camera. Much work has been put into this model by the ASU LROC team. 
-   *  
-   * The current best model (2013-02-19) has the following items changing per 
-   * band: 
+   * This is the camera model for the Lunar Reconnaissance Orbiter wide angle
+   * camera. Much work has been put into this model by the ASU LROC team.
+   *
+   * The current best model (2013-02-19) has the following items changing per
+   * band:
    *     - FOCAL_LENGTH
    *     - BORESIGHT_SAMPLE
    *     - BORESIGHT_LINE
@@ -41,11 +41,11 @@ namespace Isis {
    *     - TRANSX
    *     - TRANSY
    *     - ITRANSS
-   *     - ITRANSL 
-   *  
-   *  
-   * These values are incorporated in the SPICE kernels (FK, IK and IAK). 
-   *  
+   *     - ITRANSL
+   *
+   *
+   * These values are incorporated in the SPICE kernels (FK, IK and IAK).
+   *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup LunarReconnaissanceOrbiter
    *
@@ -89,7 +89,7 @@ namespace Isis {
    *   @history 2015-08-25 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
    */
@@ -111,9 +111,7 @@ namespace Isis {
       typedef QVector<int>    IntParameterList;
       typedef QVector<double> DblParameterList;
       double p_etStart;              //!< Ephemeris Start iTime
-      double p_bandTimeOffset;       //!< Offset iTime for Band
       double p_exposureDur;          //!< Exposure Duration value from labels
-      double p_interframeDelay;      //!< Interframe Delay value from labels
       int p_nframelets;                 //!< Number of framelets in whole image
       IntParameterList p_detectorStartLines;
       IntParameterList p_frameletOffsets;
@@ -126,4 +124,3 @@ namespace Isis {
   };
 }  // namespace Isis
 #endif
-

@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 7229 $
+ * $Date: 2016-11-10 21:04:46 -0700 (Thu, 10 Nov 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -302,7 +302,7 @@ namespace Isis {
 
         if (!found) {
           QString naifTarget = "IAU_" + m_target->name().toUpper();
-          namfrm_c(naifTarget.toAscii().data(), &frameCode);
+          namfrm_c(naifTarget.toLatin1().data(), &frameCode);
           if (frameCode == 0) {
             QString msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
                          + m_target->name() + "]";
@@ -417,7 +417,7 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       QString fileName = file.expanded();
-      furnsh_c(fileName.toAscii().data());
+      furnsh_c(fileName.toLatin1().data());
       m_kernels->push_back(key[i]);
     }
 
@@ -524,7 +524,7 @@ namespace Isis {
     for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
       QString fileName = file.expanded();
-      unload_c(fileName.toAscii().data());
+      unload_c(fileName.toLatin1().data());
     }
 
     if (m_kernels != NULL) {
@@ -644,7 +644,7 @@ namespace Isis {
     for (int i = 0; i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
       QString fileName = file.expanded();
-      unload_c(fileName.toAscii().data());
+      unload_c(fileName.toLatin1().data());
     }
 
     m_kernels->clear();
@@ -979,7 +979,7 @@ namespace Isis {
     if (storedClockTime.isNull()) {
       SpiceDouble timeOutput;
       NaifStatus::CheckErrors();
-      scs2e_c(sclkCode, clockValue.toAscii().data(), &timeOutput);
+      scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput);
       NaifStatus::CheckErrors();
       storedClockTime = timeOutput;
       storeResult(key, SpiceDoubleType, timeOutput);
@@ -1016,7 +1016,7 @@ namespace Isis {
 
       if (type == SpiceDoubleType) {
         SpiceDouble kernelValue;
-        gdpool_c(key.toAscii().data(), (SpiceInt)index, 1,
+        gdpool_c(key.toLatin1().data(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
 
         if (found)
@@ -1024,7 +1024,7 @@ namespace Isis {
       }
       else if (type == SpiceStringType) {
         char kernelValue[512];
-        gcpool_c(key.toAscii().data(), (SpiceInt)index, 1, sizeof(kernelValue),
+        gcpool_c(key.toLatin1().data(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
 
         if (found)
@@ -1032,7 +1032,7 @@ namespace Isis {
       }
       else if (type == SpiceIntType) {
         SpiceInt kernelValue;
-        gipool_c(key.toAscii().data(), (SpiceInt)index, 1, &numValuesRead,
+        gipool_c(key.toLatin1().data(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
 
         if (found)
@@ -1145,7 +1145,7 @@ namespace Isis {
           result = storedKeyword[index];
         }
         else if (type == SpiceByteCodeType || SpiceStringType) {
-          result = storedKeyword[index].toAscii();
+          result = storedKeyword[index].toLatin1();
         }
         else if (type == SpiceIntType) {
           result = toInt(storedKeyword[index]);

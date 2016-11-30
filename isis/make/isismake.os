@@ -63,26 +63,12 @@ ifndef ISISCPPFLAGS
 endif
 
 
-# Set up Xalan's command-line option names. Some version of Xalan use different
-# option names (e.g. Ubuntu's and Debian's Xalan).
+# Set up Xalan's command-line option names.
 XALAN_VALIDATE_OPTION := -v
 XALAN_OUTFILE_OPTION := -o
 XALAN_PARAM_OPTION := -p
 XALAN_INFILE_OPTION :=
 XALAN_XSL_OPTION :=
-
-# Ubuntu and Debian have a different executable name for Xalan, and it also
-# does not accept the same command-line argument names as the version of Xalan
-# available on the other systems. So, set up some variables to match the
-# argument names that this version of Xalan is expecting.
-ifneq "$(or $(findstring Ubuntu10_04, $(HOST_OS)), $(findstring Debian, $(HOST_OS)))" ""
-  XALAN := xalan
-  XALAN_VALIDATE_OPTION := -validate
-  XALAN_OUTFILE_OPTION := -out
-  XALAN_PARAM_OPTION := -param
-  XALAN_INFILE_OPTION := -in
-  XALAN_XSL_OPTION := -xsl
-endif
 
 ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
   XALAN = $(ISIS3LOCAL)/bin/Xalan
@@ -100,15 +86,15 @@ endif
 # NOTE: XTRAstuff comes from the make file of specific applications
 #---------------------------------------------------------------------------
 ALLINCDIRS  = -I.
-ALLINCDIRS += $(XTRAINCDIRS) 
-ALLINCDIRS += $(ISISINCDIR) 
-ALLINCDIRS += $(CWDINCDIR) 
-ALLINCDIRS += $(QTINCDIR) 
-ALLINCDIRS += $(QWTINCDIR) 
-ALLINCDIRS += $(XERCESINCDIR) 
-ALLINCDIRS += $(GEOTIFFINCDIR) 
-ALLINCDIRS += $(TIFFINCDIR) 
-ALLINCDIRS += $(NAIFINCDIR) 
+ALLINCDIRS += $(XTRAINCDIRS)
+ALLINCDIRS += $(ISISINCDIR)
+ALLINCDIRS += $(CWDINCDIR)
+ALLINCDIRS += $(QTINCDIR)
+ALLINCDIRS += $(QWTINCDIR)
+ALLINCDIRS += $(XERCESINCDIR)
+ALLINCDIRS += $(GEOTIFFINCDIR)
+ALLINCDIRS += $(TIFFINCDIR)
+ALLINCDIRS += $(NAIFINCDIR)
 ALLINCDIRS += $(TNTINCDIR)
 ALLINCDIRS += $(JAMAINCDIR)
 ALLINCDIRS += $(GEOSINCDIR)
@@ -124,14 +110,14 @@ ALLINCDIRS += $(OPENCVINCDIR)
 ALLINCDIRS += $(NNINCDIR)
 ALLINCDIRS += $(DEFAULTINCDIR)
 
-ALLLIBDIRS  = -L. 
+ALLLIBDIRS  = -L.
 ALLLIBDIRS += $(XTRALIBDIRS)
-ALLLIBDIRS += $(ISISLIBDIR) 
-ALLLIBDIRS += $(QTLIBDIR) 
-ALLLIBDIRS += $(QWTLIBDIR) 
-ALLLIBDIRS += $(XERCESLIBDIR) 
-ALLLIBDIRS += $(GEOTIFFLIBDIR) 
-ALLLIBDIRS += $(TIFFLIBDIR) 
+ALLLIBDIRS += $(ISISLIBDIR)
+ALLLIBDIRS += $(QTLIBDIR)
+ALLLIBDIRS += $(QWTLIBDIR)
+ALLLIBDIRS += $(XERCESLIBDIR)
+ALLLIBDIRS += $(GEOTIFFLIBDIR)
+ALLLIBDIRS += $(TIFFLIBDIR)
 ALLLIBDIRS += $(NAIFLIBDIR)
 ALLLIBDIRS += $(TNTLIBDIR)
 ALLLIBDIRS += $(JAMALIBDIR)
@@ -145,18 +131,18 @@ ALLLIBDIRS += $(CHOLMODLIBDIR)
 ALLLIBDIRS += $(HDF5LIBDIR)
 ALLLIBDIRS += $(SUPERLULIBDIR)
 
-ALLLIBS  = $(ISISLIB) 
+ALLLIBS  = $(ISISLIB)
 ifeq ($(findstring STATIC, $(MODE)),STATIC)
   ALLLIBS = $(ISISSTATIC) $(ISISLIB) $(ISISDYNAMIC)
 endif
 ALLLIBS += $(ISISSYSLIBS)
 ALLLIBS += $(XTRALIBS)
-ALLLIBS += $(QTLIB) 
-ALLLIBS += $(QWTLIB) 
+ALLLIBS += $(QTLIB)
+ALLLIBS += $(QWTLIB)
 ALLLIBS += $(XERCESLIB)
 ALLLIBS += $(GEOTIFFLIB)
 ALLLIBS += $(TIFFLIB)
-ALLLIBS += $(NAIFLIB) 
+ALLLIBS += $(NAIFLIB)
 ALLLIBS += $(TNTLIB)
 ALLLIBS += $(JAMALIB)
 ALLLIBS += $(GEOSLIB)
@@ -169,4 +155,3 @@ ALLLIBS += $(KAKADULIB)
 ALLLIBS += $(CHOLMODLIB)
 ALLLIBS += $(HDF5LIB)
 ALLLIBS += $(SUPERLULIB)
-

@@ -7,12 +7,13 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QString>
 #include <QStringList>
+#include <QtWidgets>
 #include <QVBoxLayout>
-#include <QtGui>
 
 #include "Camera.h"
 #include "CameraDistortionMap.h"
@@ -98,11 +99,17 @@ namespace Isis {
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
     
+    connect(m_aprioriDialog, SIGNAL(rejected()), this, SLOT(reject()));
+    
     connect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+    connect(m_okButton, SIGNAL(clicked()), this, SLOT(closeEvent()));
     connect(m_okButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
+    
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
-    connect(m_cancelButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));    
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(closeEvent()));   
+    connect(m_cancelButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
   }
+
 
   /**
    * Creates the dialog box for the set apriori tool
@@ -251,6 +258,44 @@ namespace Isis {
   
   
   /**
+   * This is called when the user selects the X button on the top right or they hit ESC.
+   * Disconnect all slots on close event.
+   * 
+   * @author 2016-11-18 Makayla Shepherd
+   * 
+   */
+  void QnetSetAprioriDialog::reject() {
+    closeEvent();
+    QDialog::reject();
+  }
+  
+  
+  /**
+   * Disconnect all of the slots on a close event
+   * 
+   * @author 2016-11-18 Makayla Shepherd
+   */
+  void QnetSetAprioriDialog::closeEvent() {
+    
+      disconnect(m_currentAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillCurrentAprioriLineEdits()));
+      disconnect(m_referenceAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillReferenceAprioriLineEdits()));
+      disconnect(m_averageAprioriButton, SIGNAL(clicked()), this, 
+                SLOT(fillAverageAprioriLineEdits()));
+      
+      disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
+      disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
+      
+      disconnect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+      disconnect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
+      
+      emit aprioriDialogClosed();
+    
+  }
+  
+  
+  /**
    * Shows the dialog box 
    * 
    * @author 2016-02-05 Makayla Shepherd
@@ -288,6 +333,7 @@ namespace Isis {
     }
   }
   
+
   /**
    * Populates the apriori lat/lon/radius line edits with the current values. If
    * there are no current values, the line edits are empty. This only works on single points
@@ -339,6 +385,7 @@ namespace Isis {
     }
   }
   
+
   /**
    * Populates the apriori lat/lon/radius line edits with the reference measure values. 
    * This only works on single points and is disabled for multiple points. The calculations
@@ -407,6 +454,7 @@ namespace Isis {
     }
   }
   
+
   /**
    * Populates the apriori lat/lon/radius line edits with the average measure values. 
    * This only works on single points and is disabled for multiple points. The calculations
@@ -580,6 +628,7 @@ namespace Isis {
 //     }
 //   }
   
+
   /**
    * Populates the sigma lat/lon/radius line edits with the current values. If
    * there are no current sigma values, the line edits are empty. This only works on
@@ -621,6 +670,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Switches what information is visible based on how many points are selected. Defaults to single point
    * information.
@@ -637,6 +687,7 @@ namespace Isis {
     }
   }
   
+
   /**
    * Enables/Disables features based on if there are multiple points selected or not. If multiple points are
    * selected it also counts how many are EditLocked, Ignored, the number of each type of point, and the total 
@@ -691,7 +742,7 @@ namespace Isis {
       }
       if (m_multiPointsFixedCount > 0 || m_multiPointsFreeCount > 0) {
         m_aprioriDialog->setDisabled(true);
-        QString msg = "Sigmas can only be set on Contrained points. Use Filters to filter by";
+        QString msg = "Sigmas can only be set on Constrained points. Use Filters to filter by";
         msg = msg + " Constrained points.";
         QMessageBox::warning((QWidget *)parent(), "Warning", msg);
         return;
@@ -724,6 +775,7 @@ namespace Isis {
     }
   }
   
+
   /**
    * Clears the line edits
    * 
@@ -741,6 +793,7 @@ namespace Isis {
     m_radiusSigmaLineEdit->clear();
   }
   
+
   /**
    * Resets and populates the information stack labels
    * 
@@ -817,9 +870,11 @@ namespace Isis {
    *                        are made and populated in the fill methods.
    * @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be set 
    *                        to NULL. You can now set the apriori sigmas.
+   * @history 2016-11-16 Makayla Shepherd - Fixed the sigma setting for Fixed and Free points.
    *                        
    */
   void QnetSetAprioriDialog::setApriori() {
+    
     if (m_points.size() == 0) {
       QString msg = "There are no Points selected. Please select a Point.";
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
@@ -917,11 +972,11 @@ namespace Isis {
         spt.SetRadii(Distance(targetRadii[0]),
                      Distance(targetRadii[1]),
                      Distance(targetRadii[2]));
-        if (pt->GetPointTypeString() == "Constrained") {
-          spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
-                                         Distance(lonSigma,Distance::Meters),
-                                         Distance(radiusSigma,Distance::Meters));
-        }
+
+        spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
+                                        Distance(lonSigma,Distance::Meters),
+                                        Distance(radiusSigma,Distance::Meters));
+
         //  Write the surface point back out to the controlPoint
         pt->SetAprioriSurfacePoint(spt);
 

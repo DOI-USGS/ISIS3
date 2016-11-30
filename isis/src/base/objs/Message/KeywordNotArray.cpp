@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include "Message.h"
+
+using namespace std;
 
 QString Isis::Message::KeywordNotArray(const QString &key) {
   return "Keyword [" + key + "] is not an array";

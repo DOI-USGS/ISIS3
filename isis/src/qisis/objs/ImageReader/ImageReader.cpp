@@ -16,6 +16,7 @@
 #include "IException.h"
 #include "Image.h"
 #include "ImageDisplayProperties.h"
+#include "IString.h"
 #include "FileName.h"
 #include "ProgressBar.h"
 #include "PvlObject.h"
@@ -299,11 +300,11 @@ namespace Isis {
         result->fromPvl(imageObj);
       }
 
-      try {
-        result->initFootprint(m_mutex);
-      }
-      catch (IException &) {
-        if (m_requireFootprints) {
+      if (m_requireFootprints) {
+        try {
+          result->initFootprint(m_mutex);
+        }
+        catch (IException &) {
           throw;
         }
       }

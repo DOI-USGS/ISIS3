@@ -1,11 +1,11 @@
 ifneq ($(SRCS), $(BLANK))
-error:
+error:\
 	echo "Please use an updated makefile.";
 	echo "This can be found at $$ISISROOT/make/Makefile.objs";
 endif
 
 include $(ISISROOT)/make/isismake.os
- 
+
 
 INCS  := $(wildcard *.h)
 
@@ -85,7 +85,7 @@ object: $(UIHEADERS) protos
 
 .cc.o:
 	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
-	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
+	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) $(ISIS_PROTOBUF_FLAGS) -c -o $@ $?
 
 ui_%.h: %.ui
 	$(UIC) -o $@ $^
@@ -159,7 +159,7 @@ moc_%.cpp: %.h
 
 qrc_%.cpp: %.qrc
 	$(RCC) $(RCCDEFINES) -o $@ $(<F);
-	
+
 help:
 	echo "Isis Make Object Commands"
 	echo "------------------------ "
@@ -181,7 +181,7 @@ help:
 	echo "make test                       : Runs the unitTests and print result"
 	echo "make test MODE=TC               : Run test, print result, and create test coverage"
 	echo "                                    reports"
-	echo "make test MODE=NOCLEAN          : Run test and print result, leave output" 
+	echo "make test MODE=NOCLEAN          : Run test and print result, leave output"
 	echo "make truthdata                  : Runs the unitTest and creates <Objectname>.truth"
 	echo "make ostruthdata                : Runs the unitTest and creates OS specific truth"
 	echo "make protos                     : Builds the object of google protocol buffer(*.proto) files"
@@ -215,7 +215,7 @@ html: force
 	  echo "WARN_IF_UNDOCUMENTED   = YES"                            >> docbuild/ProgTester_temp.conf;   \
 	  echo "WARN_IF_DOC_ERROR      = YES"                            >> docbuild/ProgTester_temp.conf;   \
 	  echo "WARN_NO_PARAMDOC       = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	fi 
+	fi
 
 	if [[ "$(DOT_PATH)" != "" ]];                                          \
 	then                                                                   \
@@ -286,48 +286,54 @@ test: unitTest
 	  $(ECHO) -ne "Scope Coverage:      ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Scope Coverage"                   \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage -h scopecoverage;                              \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      -h scopecoverage;                                                     \
 	  $(ECHO) -ne "Line Coverage:       ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Line Coverage"                    \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --line-coverage -h linecoverage;                                      \
 	  $(ECHO) -ne "Function Coverage:   ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Unit Test Function Coverage"                \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --function-coverage -h functioncoverage;       \
-	fi; 
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --function-coverage -h functioncoverage;                              \
+	fi;
 
 # The .a file is copied in Darwin because the ar command does not like
 #   to extract the same archive twice, regardless of permissions or symlink
 unitTest: $(OBJS) unitTest.o
-	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
-	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
-	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
-	      libisis$(ISISLIBVERSION).a;                                            \
-	  if [ -f "$(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes" ]; then         \
-	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                   \
-	      libisis$(ISISLIBVERSION).a.csmes;                                      \
-	  fi;                                                                        \
-	  $(AR) $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);               \
-	  $(RANLIB) libisis$(ISISLIBVERSION).a;                                      \
-	  $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                             \
-	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a \
-	      $(ISISSHAREDOFF);                                                      \
-	  $(RM) libisis$(ISISLIBVERSION).a libisis$(ISISLIBVERSION).a.csmes;         \
-	  dollar='$$';                                                               \
-	  $(CXX) $(ALLLIBDIRS)                                                       \
-	      -Xlinker "-rpath"                                                      \
-	      -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                             \
-	      -o $@ unitTest.o $(ALLLIBS);                                           \
+	if [ "$(HOST_ARCH)" == "Linux" ]; then                                        \
+	  if [ "$(CODE_COVERAGE_BIN_DIR)" == "" ]; then                                \
+	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                        \
+	    libisis$(ISISLIBVERSION).a;                                             \
+	    if [ -f "$(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes" ]; then      \
+	      $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                \
+	      libisis$(ISISLIBVERSION).a.csmes;                                     \
+	    fi;                                                                     \
+	    $(AR) $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);           \
+	    $(RANLIB) libisis$(ISISLIBVERSION).a;                                   \
+	    $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                          \
+	    -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a  \
+	    $(ISISSHAREDOFF);                                                       \
+	    $(RM) libisis$(ISISLIBVERSION).a libisis$(ISISLIBVERSION).a.csmes;      \
+	    dollar='$$';                                                            \
+	    $(CXX) $(ALLLIBDIRS)                                                    \
+	      -Xlinker "-rpath"                                                     \
+	      -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                            \
+	      -o $@ unitTest.o $(ALLLIBS);                                          \
+	  else                                                                      \
+	    $(AR) $(ISISARFLAGS) -crs $(LIBRARY).a *.o;                               \
+	    $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                            \
+	        -o $(LIBRARY).$(SHAREDLIBEXT) $(LIBRARY).a                            \
+	        $(ISISSHAREDOFF);                                                     \
+	    $(RM) $(LIBRARY).a $(LIBRARY).a.csmes;                                    \
+	    dollar='$$';                                                              \
+	    $(CXX) $(ALLLIBDIRS)                                                      \
+	        -Xlinker "-rpath"                                                     \
+	        -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                            \
+	        -o $@ unitTest.o -l:$(LIBRARY).$(SHAREDLIBEXT) $(ALLLIBS);            \
+	  fi;                                                                       \
 	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                    \
 	  $(MKDIR) .objs;                                                            \
 	  cd .objs;                                                                  \
@@ -353,7 +359,7 @@ plugin: $(OBJS)
 
 truthdata: unitTest
 	./unitTest >& `basename $(CURDIR)`.truth;
-	
+
 ostruthdata: unitTest
 	if [ "$(HOST_OS)" = "" ]; then \
 	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_MACH).truth; \
@@ -362,5 +368,3 @@ ostruthdata: unitTest
 	fi
 
 include $(ISISROOT)/make/isismake.print
-
-

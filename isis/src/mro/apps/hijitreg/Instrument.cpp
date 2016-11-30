@@ -1,4 +1,4 @@
-/*	HiRISE Instrument
+/*  HiRISE Instrument
 
 PIRL CVS ID: $Id: Instrument.cpp,v 1.2 2009/02/23 16:36:10 slambright Exp $
 
@@ -19,33 +19,33 @@ You should have received a copy of the GNU Lesser General Public License
 along with this library; if not, write to the Free Software Foundation,
 Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 */
-#include	"Instrument.hh"
+#include  "Instrument.hh"
 
-#include	<cmath>
-#include	<iostream>
-#include	<iomanip>
+#include  <cmath>
+#include  <iostream>
+#include  <iomanip>
 using std::endl;
 
-#include	<sstream>
+#include  <sstream>
 using std::ostringstream;
 
 
 namespace UA {
   namespace HiRISE {
     /*=*****************************************************************************
-    	Instrument
+      Instrument
     */
     /*==============================================================================
-    	Constants:
+      Constants:
     */
     const char *const
     Instrument::ID = "UA::HiRISE::Instrument ($Revision: 1.2 $ $Date: 2009/02/23 16:36:10 $)";
 
     const unsigned int
-    Instrument::CCDS							= 14;
+    Instrument::CCDS = 14;
 
     const unsigned int
-    Instrument::CCD_UNKNOWN						= 99;
+    Instrument::CCD_UNKNOWN = 99;
 
     const char *const
     Instrument::CCD_NAMES[] = {
@@ -120,7 +120,7 @@ namespace UA {
 
 
     const char
-    * const Instrument::WAVELENGTH_UNITS		= "NANOMETERS";
+    * const Instrument::WAVELENGTH_UNITS    = "NANOMETERS";
 
     const unsigned int
     Instrument::CCD_CENTER_WAVELENGTHS[] = {
@@ -196,30 +196,30 @@ namespace UA {
     };
 
     const double
-    Instrument::CCD_PIXEL_SIZE_MM					= 0.012;
+    Instrument::CCD_PIXEL_SIZE_MM          = 0.012;
 
 
     const unsigned int
-    Instrument::CCD_CHANNELS					= 2;
+    Instrument::CCD_CHANNELS          = 2;
 
     const unsigned int
-    Instrument::CCD_CHANNEL_UNKNOWN				= 9;
+    Instrument::CCD_CHANNEL_UNKNOWN        = 9;
 
 
     const unsigned int
-    Instrument::CCD_IMAGE_SENSORS				= 1024;
+    Instrument::CCD_IMAGE_SENSORS        = 1024;
 
     const unsigned int
-    Instrument::MAX_BYTES_PER_PIXEL				= 2;
+    Instrument::MAX_BYTES_PER_PIXEL        = 2;
 
     const unsigned int
     Instrument::MAX_PIXEL_VALUES[MAX_BYTES_PER_PIXEL] = {
       254,
-      0x3FFF	//	14 bits.
+      0x3FFF  //  14 bits.
     };
 
 
-    /*	The maximum number of image lines: CPMM RAM limited.
+    /*  The maximum number of image lines: CPMM RAM limited.
 
         Subject: Re: Maximum HiRISE image lines
            Date: Mon, 21 Feb 2005 11:53:20 -0800
@@ -260,15 +260,15 @@ namespace UA {
 
                                     Nathan
     */
-    /*	The upper limit (exclusive) of the number of image lines based on the
-    	available number of line header line number field bits.
+    /*  The upper limit (exclusive) of the number of image lines based on the
+      available number of line header line number field bits.
     */
     const unsigned int
-    Instrument::MAX_IMAGE_LINES					= (1 << 23);
+    Instrument::MAX_IMAGE_LINES          = (1 << 23);
 
 
     const unsigned int
-    Instrument::TOTAL_TDI_STAGES				= 4;
+    Instrument::TOTAL_TDI_STAGES        = 4;
 
     const unsigned int
     Instrument::TDI_STAGES[TOTAL_TDI_STAGES] = {
@@ -280,7 +280,7 @@ namespace UA {
 
 
     const unsigned int
-    Instrument::TOTAL_BINNING_FACTORS			= 6;
+    Instrument::TOTAL_BINNING_FACTORS      = 6;
 
     const unsigned int
     Instrument::BINNING_FACTORS[TOTAL_BINNING_FACTORS] = {
@@ -304,11 +304,11 @@ namespace UA {
 
 
     const unsigned int
-    Instrument::STORED_LUTS						= 28;
+    Instrument::STORED_LUTS            = 28;
 
 
     const unsigned int
-    Instrument::STIMULATOR_LEDS					= 3;
+    Instrument::STIMULATOR_LEDS          = 3;
 
     const char *const
     Instrument::STIMULATOR_LED_NAMES[] = {
@@ -319,64 +319,64 @@ namespace UA {
 
 
     const double
-    Instrument::EXPOSURE_SETUP_MICROS			= 99.48;
+    Instrument::EXPOSURE_SETUP_MICROS      = 99.48;
 
     const unsigned int
-    Instrument::DELTA_LINE_TIME_MAX				= 4194303;
+    Instrument::DELTA_LINE_TIME_MAX        = 4194303;
 
     const double
-    Instrument::DELTA_LINE_TIME_TICK_NANOS		= 62.5;
+    Instrument::DELTA_LINE_TIME_TICK_NANOS    = 62.5;
 
     const double
-    Instrument::LINE_TIME_PRE_OFFSET			= 74.0;
+    Instrument::LINE_TIME_PRE_OFFSET      = 74.0;
 
     const unsigned int
-    Instrument::TRIM_ADDITION_LINES				= 180,
-                   Instrument::REVERSE_READOUT_LINES			= 20,
-                                 Instrument::MASKED_LINES					= 20;
+    Instrument::TRIM_ADDITION_LINES        = 180,
+                   Instrument::REVERSE_READOUT_LINES      = 20,
+                                 Instrument::MASKED_LINES          = 20;
 
 
     const unsigned int
-    Instrument::DLL_LOCKED						= 0x11,
-                      Instrument::DLL_NOT_LOCKED					= 0x5A;
+    Instrument::DLL_LOCKED            = 0x11,
+                      Instrument::DLL_NOT_LOCKED          = 0x5A;
 
 
 #ifndef MRO_EPOCH
-#define MRO_EPOCH		1980
+#define MRO_EPOCH    1980
 #endif
     const unsigned int
-    Instrument::SPACECRAFT_EPOCH				= MRO_EPOCH;
+    Instrument::SPACECRAFT_EPOCH        = MRO_EPOCH;
 
     const double
-    Instrument::MRO_CLOCK_SUBTICK_MICROS		= (1000000.0 / (1 << 16)),
-                  Instrument::HIRISE_CLOCK_SUBTICK_MICROS		= 16.0;
+    Instrument::MRO_CLOCK_SUBTICK_MICROS    = (1000000.0 / (1 << 16)),
+                  Instrument::HIRISE_CLOCK_SUBTICK_MICROS    = 16.0;
 
     const int
-    Instrument::SPACECRAFT_NAIF_ID				= -74;
+    Instrument::SPACECRAFT_NAIF_ID        = -74;
 
 
     const unsigned int
-    Instrument::SSR_BYTE_BOUNDARY				= 4;
+    Instrument::SSR_BYTE_BOUNDARY        = 4;
 
 
     const int
-    Instrument::UNKNOWN_NUMBER			= -9999,
-                   Instrument::NOT_APPLICABLE_NUMBER	= -9998;
+    Instrument::UNKNOWN_NUMBER      = -9999,
+                   Instrument::NOT_APPLICABLE_NUMBER  = -9998;
     const char
-    * const Instrument::UNKNOWN_STRING			= "UNKNOWN";
+    * const Instrument::UNKNOWN_STRING      = "UNKNOWN";
     const char
-    * const Instrument::NOT_APPLICABLE_STRING	= "N/A";
+    * const Instrument::NOT_APPLICABLE_STRING  = "N/A";
 
     /*==============================================================================
-    	Functions
+      Functions
     */
     unsigned int
     Instrument::calibration_lines_minimum
     (
-      unsigned int	TDI,
-      unsigned int	binning
+      unsigned int  TDI,
+      unsigned int  binning
     ) {
-      if(binning == 0)
+      if (binning == 0)
         binning = 1;
       return
         REVERSE_READOUT_LINES
@@ -384,15 +384,14 @@ namespace UA {
                                          / static_cast<double>(binning)));
     }
 
-
     int
     Instrument::focal_plane_x_offset
     (
-      unsigned int	CPMM,
-      unsigned int	binning
+      unsigned int  CPMM,
+      unsigned int  binning
     )
     throw(Out_of_Range, Invalid_Argument) {
-      if((CPMM < 0) || (CPMM >= CCDS)) {
+      if (CPMM >= CCDS) {
         ostringstream
         message;
         message << "Unable to determine the focal plane offset" << endl

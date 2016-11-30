@@ -2,13 +2,17 @@
 
 #include "AbstractPlotTool.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPen>
+#include <QStackedWidget>
+
 #include "Cube.h"
 #include "CubePlotCurve.h"
 #include "MdiCubeViewport.h"
 #include "PlotWindow.h"
 
-#include <QComboBox>
-#include <QPen>
 
 namespace Isis {
 

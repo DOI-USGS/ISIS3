@@ -1,20 +1,20 @@
 /*
- *	THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
- *	IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
- *	CLEMENTINE (DSPSE) PROGRAM.
+ *      THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
+ *      IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
+ *      CLEMENTINE (DSPSE) PROGRAM.
  *
- *	IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
- *	Dr. Erick Malaret at ACT Corp.
- *			tel: (703) 742-0294
- *			     (703) 683-7431
- *                       email:	nrlvax.nrl.navy.mil
+ *      IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
+ *      Dr. Erick Malaret at ACT Corp.
+ *                      tel: (703) 742-0294
+ *                           (703) 683-7431
+ *                       email: nrlvax.nrl.navy.mil
  *
  *      Dec 11 2006 KJB Changed malloc.h to stdlib.h for the Mac port again.
  *                      malloc.h is deprecated.
  *
  */
 /*
-	Program to calculate the Discrete Cosine Transform of a 8x8 block of data
+        Program to calculate the Discrete Cosine Transform of a 8x8 block of data
 */
 
 #include <stdio.h>
@@ -30,13 +30,13 @@
 #define TRUE 1
 #define FALSE 0
 
-long	*DCTHist[64];
-float	*Rn[64];
-float	Q[64];
-float	q_table[64];
+long    *DCTHist[64];
+float   *Rn[64];
+float   Q[64];
+float   q_table[64];
 float   U[64];
 short   ULS[64];
-int	zzseq[] = {0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5, 12, 19, 26, 33, 40,
+int     zzseq[] = {0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5, 12, 19, 26, 33, 40,
                48, 41, 34, 27, 20, 13, 6, 7, 14, 21, 28, 35, 42, 49, 56, 57, 50, 43, 36, 29,
                22, 15, 23, 30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54,
                47, 55, 62, 63
@@ -134,8 +134,8 @@ void decomp(BitStream *bs, CHARH *Image, long rows, long cols) {
 }
 
 void getDCTHist(BitStream *bs, long rows, long cols) {
-  short	Pred, i;
-  long	nblocks;
+  short Pred, i;
+  long  nblocks;
 
   nblocks = (rows * cols) / 64;
   Pred = 0;
@@ -153,9 +153,9 @@ void getDCTHist(BitStream *bs, long rows, long cols) {
 }
 
 void getRn() {
-  short	i, j;
-  float	lb, ub, a, b, num, den, phi;
-  float	m, pa, pap, pb, pbp, pm, pmp;
+  short i, j;
+  float lb, ub, a, b, num, den, phi;
+  float m, pa, pap, pb, pbp, pm, pmp;
 
   for(i = 0; i < 64; i++) {
     Rn[i][-256] = (float) - 256;

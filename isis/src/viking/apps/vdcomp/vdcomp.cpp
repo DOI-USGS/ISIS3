@@ -1244,18 +1244,18 @@ NODE *huff_tree(int * hist)
   int freq_list[512];      /* Histogram frequency list */
   NODE **node_list;             /* DN pointer array list */
 
-  register int *fp;        /* Frequency list pointer */
-  register NODE **np;           /* Node list pointer */
+int *fp;        /* Frequency list pointer */
+NODE **np;           /* Node list pointer */
 
-  register int num_freq;   /* Number non-zero frequencies in histogram */
+int num_freq;   /* Number non-zero frequencies in histogram */
   //int sum;                 /* Sum of all frequencies */
 
-  register short int num_nodes; /* Counter for DN initialization */
-  register short int cnt;       /* Miscellaneous counter */
+short int num_nodes; /* Counter for DN initialization */
+short int cnt;       /* Miscellaneous counter */
 
   short int znull = -1;         /* Null node value */
 
-  register NODE *temp;          /* Temporary node pointer */
+NODE *temp;          /* Temporary node pointer */
 
   /* Functions called */
   void sort_freq(int *freq_list, NODE **node_list, int num_freq);
@@ -1373,16 +1373,16 @@ void sort_freq(int *freq_list, NODE **node_list, int num_freq)
 
 {
   /* Local Variables */
-  register int *i;       /* primary pointer into freq_list */
-  register int *j;       /* secondary pointer into freq_list */
+int *i;       /* primary pointer into freq_list */
+int *j;       /* secondary pointer into freq_list */
 
-  register NODE **k;          /* primary pointer to node_list */
-  register NODE **l;          /* secondary pointer into node_list */
+NODE **k;          /* primary pointer to node_list */
+NODE **l;          /* secondary pointer into node_list */
 
   int temp1;             /* temporary storage for freq_list */
   NODE *temp2;                /* temporary storage for node_list */
 
-  register int cnt;      /* count of list elements */
+int cnt;      /* count of list elements */
 
   /*********************************************************************
     Save the current element - starting with the second - in temporary
@@ -1422,11 +1422,11 @@ void dcmprs(char *ibuf, char *obuf, int *nin, int *nout, NODE *root)
 
 {
   /* Local Variables */
-  register NODE *ptr = root;        /* pointer to position in tree */
-  register unsigned char test;      /* test byte for bit set */
-  register unsigned char idn;       /* input compressed byte */
+NODE *ptr = root;        /* pointer to position in tree */
+unsigned char test;      /* test byte for bit set */
+unsigned char idn;       /* input compressed byte */
 
-  register char odn;                /* last dn value decompressed */
+char odn;                /* last dn value decompressed */
 
   char *ilim = ibuf + *nin;         /* end of compressed bytes */
   char *olim = obuf + *nout;        /* end of output buffer */

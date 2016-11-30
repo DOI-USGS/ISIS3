@@ -78,7 +78,7 @@ namespace Isis {
     }
 
 
-    QSize TreeViewContent::sizeHint() {
+    QSize TreeViewContent::sizeHint() const {
       return minimumSizeHint();
     }
 

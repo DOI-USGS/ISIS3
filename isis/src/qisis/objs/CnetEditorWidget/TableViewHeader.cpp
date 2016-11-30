@@ -71,7 +71,7 @@ namespace Isis {
     }
 
 
-    QSize TableViewHeader::sizeHint() {
+    QSize TableViewHeader::sizeHint() const {
       return minimumSizeHint();
     }
 

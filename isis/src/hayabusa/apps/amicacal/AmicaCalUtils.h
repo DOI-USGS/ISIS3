@@ -73,13 +73,13 @@ static void loadNaifTiming() {
     QString pckName3(pck3.expanded());
     QString pckName4(pck4.expanded());
 
-    furnsh_c(leapsecondsName.toAscii().data());
-    furnsh_c(sclkName.toAscii().data());
+    furnsh_c(leapsecondsName.toLatin1().data());
+    furnsh_c(sclkName.toLatin1().data());
 
-    furnsh_c(pckName1.toAscii().data());
-    furnsh_c(pckName2.toAscii().data());
-    furnsh_c(pckName3.toAscii().data());
-    furnsh_c(pckName4.toAscii().data());
+    furnsh_c(pckName1.toLatin1().data());
+    furnsh_c(pckName2.toLatin1().data());
+    furnsh_c(pckName3.toLatin1().data());
+    furnsh_c(pckName4.toLatin1().data());
 
 
 //  Ensure it is loaded only once
@@ -107,20 +107,20 @@ static bool sunDistanceAU(const QString &scStartTime,
   //  Determine if the target is a valid NAIF target
   SpiceInt tcode;
   SpiceBoolean found;
-  bodn2c_c(target.toAscii().data(), &tcode, &found);
+  bodn2c_c(target.toLatin1().data(), &tcode, &found);
 
   if (!found) return (false);
 
   //  Convert starttime to et
   double obsStartTime;
-  scs2e_c(-130, scStartTime.toAscii().data(), &obsStartTime);
+  scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
 
 
 
   //  Get the vector from target to sun and determine its length
   double sunv[3];
   double lt;
-  spkpos_c(target.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
+  spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                   sunv, &lt);
   NaifStatus::CheckErrors();
 

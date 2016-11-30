@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Isis;
 
-void ratio(vector<Buffer *> &in,
+void do_ratio(vector<Buffer *> &in,
            vector<Buffer *> &out);
 
 void IsisMain() {
@@ -13,12 +13,12 @@ void IsisMain() {
   p.SetInputCube("NUMERATOR");
   p.SetInputCube("DENOMINATOR");
   p.SetOutputCube("TO");
-  p.StartProcess(ratio);
+  p.StartProcess(do_ratio);
   p.EndProcess();
 }
 
 // Line processing routine
-void ratio(vector<Buffer *> &in,
+void do_ratio(vector<Buffer *> &in,
            vector<Buffer *> &out) {
   Buffer &num = *in[0];
   Buffer &den = *in[1];

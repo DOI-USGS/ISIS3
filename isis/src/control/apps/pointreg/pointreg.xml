@@ -56,7 +56,7 @@
 
     <p>
       Once "pointreg" has a reference measure for a point, it attempts to
-      register every other measure in the point to that reference location.  An
+every other measure in the point to that reference location.  An
       implicit reference will then be made explicit, and if any of the
       registrations succeed, the reference will also be made valid.
     </p>

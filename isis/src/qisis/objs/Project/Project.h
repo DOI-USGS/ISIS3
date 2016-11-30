@@ -36,16 +36,23 @@ class QXmlStreamWriter;
 
 #include "ControlList.h"
 #include "Directory.h"
+#include "GuiCameraList.h"
 #include "ImageList.h"
+#include "ShapeList.h"
+#include "TargetBody.h"
 #include "XmlStackedHandler.h"
 
 namespace Isis {
+  class BundleSolutionInfo;
+  class BundleSettings;
   class Control;
   class ControlList;
+  class CorrelationMatrix;
   class FileName;
-  class Image;
+  class Shape;
   class ImageReader;
   class ProgressBar;
+  class ShapeReader;
   class WorkOrder;
 
   /**
@@ -74,6 +81,26 @@ namespace Isis {
    *                           save their project.
    *   @history 2013-05-14 Jeannie Backer - Used return status of c++ system() in the constructor
    *                           to verify that the call was successful.
+   *   @history 2014-07-14 Kimberly Oyama - Updated to better meet programming standards. Added
+   *                           support for correlation matrix.
+   *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
+   *                           BundleSolutionInfo and BundleStatistics references with BundleResults
+   *                           due to class name changes.
+   *   @history 2015-09-03 Jeannie Backer - Removed svn merge conflict comment lines. Removed call
+   *                           to save BundleSolutionInfo as an xml file. Added hdf5 preliminary
+   *                           serialization calls. Some ISIS coding standards improvements.
+   *   @history 2015-10-14 Jeffrey Covington - Declared Project * as a Qt
+   *                           metatype for use with QVariant.
+   *   @history 2016-06-23 Tracie Sucharski - Added a member variable for active control network
+   *                           and active image list, along with accessor methods.
+   *   @history 2016-07-06 Tracie Sucharski - Changed the ImageReader to require footprints, because
+   *                           ImageReader class was changed so that footprints are no longer
+   *                           created if not required.
+   *   @history 2016-07-06 Tracie Sucharski - Add import shape models to project. 
+   *   @history 2016-11-09 Tyler Wilson - Added try-catch blocks around reader.parse calls in
+   *                           the open function, so that warnings/errors are output to the
+   *                           warnings tab of the GUI instead of causing the application 
+   *                           to exit.  Fixes #4488.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -82,21 +109,29 @@ namespace Isis {
       ~Project();
 
       static QStringList images(QStringList);
+      static QStringList shapes(QStringList);
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+      QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
+      QDir addShapeFolder(QString prefix);
+      void addShapes(QStringList shapeFiles);
+      void addShapes(ShapeList newShapes);
+      void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
       ImageList *imageList(QString name);
+      Shape *shape(QString id);
+      ShapeList *shapeList(QString name);
+//       CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
-      static QString targetBodyRoot(QString projectRoot);
-      QString targetBodyRoot() const;
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
@@ -105,7 +140,13 @@ namespace Isis {
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
+      void waitForShapeReaderFinished();
       QList<WorkOrder *> workOrderHistory();
+
+      void setActiveControl(Control *);
+      Control  *activeControl();
+      void setActiveImageList(ImageList *);
+      ImageList *activeImageList();
 
       static QString cnetRoot(QString projectRoot);
       QString cnetRoot() const;
@@ -116,35 +157,104 @@ namespace Isis {
       QString imageDataRoot() const;
       QList<ImageList *> images();
 
+      static QString shapeDataRoot(QString projectRoot);
+      QString shapeDataRoot() const;
+      QList<ShapeList *> shapes();
+
+      static QString targetBodyRoot(QString projectRoot);
+      QString targetBodyRoot() const;
+      TargetBodyList targetBodies();
+
+      static QString resultsRoot(QString projectRoot);
+      QString resultsRoot() const;
+      static QString bundleSolutionInfoRoot(QString projectRoot);
+      QString bundleSolutionInfoRoot() const;
+      QList<BundleSolutionInfo *> bundleSolutionInfo();
+
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
 
+      BundleSettings *bundleSettings() {return m_bundleSettings;}
+
       QProgressBar *progress();
 
-//       void removeImages(ImageList &imageList);
+      void removeImages(ImageList &imageList);
 
       void save();
       void save(FileName newPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);
 
-      template<typename Data>
-      void warn(QString text, Data relevantData) {
-        storeWarning(text, relevantData);
-        directory()->showWarning(text, relevantData);
-      }
+      template<typename Data> void warn(QString text, Data relevantData);
 
       void warn(QString text);
 
     signals:
-      void allImagesClosed();
+      /**
+       * apparently not used?
+       */
+//      void allImagesClosed();
+
+      /**
+       * Emitted when new ControlList added to Project
+       * receivers: ProjectTreeWidget
+       */
       void controlListAdded(ControlList *controls);
+
+      /**
+       * Emitted when new Control added to Project
+       * receivers: ProjectTreeWidget
+       */
       void controlAdded(Control *control);
-      // Emitted when new images are available.
+
+      /**
+       * Emitted when new images are available.
+       * receivers: Directory, Project, WorkOrder
+       */
       void imagesAdded(ImageList *images);
+
+      /**
+       * Emitted when new shape model images are available.
+       * receivers: Directory, Project, WorkOrder
+       */
+      void shapesAdded(ShapeList *shapes);
+
+      /**
+       * Emitted when new BundleSolutionInfo available from jigsaw
+       * receivers: ProjectTreeWidget (TODO: should this be the Directory?)
+       */
+      void bundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo);
+
+      /**
+       * Emitted when new TargetBody objects added to project
+       * receivers: Directory
+       */
+      void targetsAdded(TargetBodyList *targets);
+
+      /**
+       * Emitted when new GuiCamera objects added to project
+       * receivers: Directory
+       */
+      void guiCamerasAdded(GuiCameraList *targets);
+
+      /**
+       * Emitted when project name is changed
+       * receivers: ProjectTreeWidget
+       */
       void nameChanged(QString newName);
+
+      /**
+       * Emitted when project loaded
+       * receivers: CNetSuiteMainWindow, Directory, HistoryTreeWidget
+       */
       void projectLoaded(Project *);
+
+      /**
+       * Emitted when project location moved
+       * receivers: Control, BundleSolutionInfo, Image, TargetBody
+       */
       void projectRelocated(Project *);
+
       void workOrderStarting(WorkOrder *);
       void workOrderFinished(WorkOrder *);
 
@@ -155,8 +265,15 @@ namespace Isis {
       void controlClosed(QObject *control);
       void controlListDeleted(QObject *controlList);
       void imagesReady(ImageList);
+      void addTargetsFromImportedImagesToProject(ImageList *imageList);
+      void addCamerasFromImportedImagesToProject(ImageList *imageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
+      void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);
+      void targetBodyClosed(QObject *targetBodyObj);
+      void shapesReady(ShapeList shapes);
+      void shapeClosed(QObject *shape);
+      void shapeListDeleted(QObject *shapeList);
 
     private:
       Project(const Project &other);
@@ -164,6 +281,7 @@ namespace Isis {
       void createFolders();
       ControlList *createOrRetrieveControlList(QString name);
       ImageList *createOrRetrieveImageList(QString name);
+      ShapeList *createOrRetrieveShapeList(QString name);
 
 
       QString nextImageListGroupName();
@@ -196,6 +314,7 @@ namespace Isis {
 
           Project *m_project;
           QList<ImageList *> m_imageLists;
+          QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           WorkOrder *m_workOrder;
       };
@@ -207,8 +326,33 @@ namespace Isis {
       QPointer<Directory> m_directory;
       QList<ImageList *> *m_images;
       QList<ControlList *> *m_controls;
+      QList<ShapeList *> *m_shapes;
+      TargetBodyList *m_targets;
+      GuiCameraList *m_guiCameras;
+
+      QPointer<Control> m_activeControl;
+      QPointer<ImageList> m_activeImageList;
+
+      QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
+
+      // TODO: kle testing - this will almost certainly be changed
+      BundleSettings *m_bundleSettings;
+      /**
+       * This variable will probably go away when we add the bundle results object because it will
+       *  be under:
+       *           BundleSolutionInfo
+       *                 BundleResults
+       *                       CorrelationMatrix
+       */
+//       CorrelationMatrix *m_correlationMatrix;
+
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;
+      QMap<QString, Shape *> *m_idToShapeMap;
+      QMap<QString, BundleSolutionInfo *> *m_idToBundleSolutionInfoMap;
+      QMap<QString, TargetBody *> *m_idToTargetBodyMap;
+      QMap<QString, GuiCamera *> *m_idToGuiCameraMap;
+
       QString m_name;
       QStringList *m_warnings;
       QList< QPointer<WorkOrder> > *m_workOrderHistory;
@@ -222,9 +366,16 @@ namespace Isis {
       QMutex *m_mutex;
       QMutex *m_imageReadingMutex;
 
+      int m_numShapesCurrentlyReading;
+      QMutex *m_shapeMutex;
+      QPointer<ShapeReader> m_shapeReader;
+      QMutex *m_shapeReadingMutex;
+
       QUndoStack m_undoStack;
 
   };
 }
+
+Q_DECLARE_METATYPE(Isis::Project *);
 
 #endif // Project_H

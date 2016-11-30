@@ -37,10 +37,10 @@ namespace Isis {
   /**
    * @brief  Byte swapper
    *
-   * This class is used to import an image into Isis. It is a powerful base 
-   * class which can be used to skip over header bytes, trailer bytes, prefix 
-   * and/or suffix bytes. By deriving off of this class it can be used to Import 
-   * vicar, PDS, fits, or many other standard format images. 
+   * This class is used to import an image into Isis. It is a powerful base
+   * class which can be used to skip over header bytes, trailer bytes, prefix
+   * and/or suffix bytes. By deriving off of this class it can be used to Import
+   * vicar, PDS, fits, or many other standard format images.
    *
    * Here is an example of how to use ProcessImport
    * @code
@@ -154,13 +154,13 @@ namespace Isis {
    */
   class ProcessImport : public Isis::Process {
     public:
-      enum VAXDataType { 
-        VAX_REAL,  
+      enum VAXDataType {
+        VAX_REAL,
         VAX_INT
       };
 
 
-      enum VAXSpecialPixel { 
+      enum VAXSpecialPixel {
         VAX_MIN4,
         VAX_NULL4,
         VAX_LRS4,
@@ -171,6 +171,8 @@ namespace Isis {
 
       ProcessImport();
       virtual ~ProcessImport();
+
+      using Isis::Process::StartProcess;  // make parent functions visable
       virtual void StartProcess();
       virtual void StartProcess(void funct(Isis::Buffer &out));
       void SetInputFile(const QString &file);
@@ -179,6 +181,8 @@ namespace Isis {
       // SetOutputCube() is not virtual in the Process class, so the following
       // definitions for this method are the only ones that are allowed for
       // ProcessImport objects and child objects
+
+      using Isis::Process::SetOutputCube;  // make parent functions visable
       Isis::Cube *SetOutputCube(const QString &parameter);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
@@ -273,15 +277,15 @@ namespace Isis {
         InterleaveUndefined, /**< Undefined */
         JP2,                 /**< Jpeg 2000 Format (always band sequential).*/
         BSQ,                /**< Band Sequential Format (i.e. Band Interleaved).
-                                 The first line of data is followed immediately 
+                                 The first line of data is followed immediately
                                  by the next line in the same spectral band.*/
-        BIL,                 /**< Band Interleaved By Line Format 
-                                  (i.e. Row Interleaved).  The first line of 
+        BIL,                 /**< Band Interleaved By Line Format
+                                  (i.e. Row Interleaved).  The first line of
                                   data is followed immediately by the first line
                                   of data in the next band.*/
-        BIP                  /**< Band Interleaved By Pixel Format 
+        BIP                  /**< Band Interleaved By Pixel Format
                                   (i.e. Pixel Interleaved).  The first pixel for
-                                  all bands is followed by the second pixel for 
+                                  all bands is followed by the second pixel for
                                   all bands.*/
       };
 
@@ -338,33 +342,33 @@ namespace Isis {
                                         headers.*/
       int p_fileTrailerBytes;      /**< The number of bytes of non-image data at
                                         the end of a file. This does not
-                                        include any section trailers such as 
+                                        include any section trailers such as
                                         band trailers.*/
-      int p_dataHeaderBytes;       /**< Number of bytes of non-image data after 
-                                        the file header and before the image 
-                                        data of each data block, such as band 
+      int p_dataHeaderBytes;       /**< Number of bytes of non-image data after
+                                        the file header and before the image
+                                        data of each data block, such as band
                                         header data in a band sequential file.*/
-      int p_dataTrailerBytes;      /**< Number of bytes of non-image data after 
-                                        the image data of each data block, such 
-                                        as band trailer data in a band 
+      int p_dataTrailerBytes;      /**< Number of bytes of non-image data after
+                                        the image data of each data block, such
+                                        as band trailer data in a band
                                         sequential file.*/
-      int p_dataPreBytes;          /**< Number of bytes of non-image data 
+      int p_dataPreBytes;          /**< Number of bytes of non-image data
                                         preceding each data record, such as line
                                         prefix data in a band sequential file.*/
-      int p_dataPostBytes;         /**< Number of bytes of non-image data 
+      int p_dataPostBytes;         /**< Number of bytes of non-image data
                                         following each data record, such as line
                                         suffix data in a band sequential file.*/
-      bool p_saveFileHeader;       /**< Flag indicating whether to save the file 
+      bool p_saveFileHeader;       /**< Flag indicating whether to save the file
                                         header or not. */
-      bool p_saveDataHeader;       /**< Flag indicating whether to save the data 
+      bool p_saveDataHeader;       /**< Flag indicating whether to save the data
                                         header or not. */
-      bool p_saveDataTrailer;      /**< Flag indicating whether to save the data 
+      bool p_saveDataTrailer;      /**< Flag indicating whether to save the data
                                         trailer or not. */
-      bool p_saveDataPre;          /**< Flag indicating whether to save the data 
+      bool p_saveDataPre;          /**< Flag indicating whether to save the data
                                         prefix or not. */
-      bool p_saveDataPost;         /**< Flag indicating whether to save the data 
+      bool p_saveDataPost;         /**< Flag indicating whether to save the data
                                         suffix or not */
-      bool p_saveFileTrailer;      /**< Flag indicating whether to save the file 
+      bool p_saveFileTrailer;      /**< Flag indicating whether to save the file
                                         trailer or not. */
       char *p_fileHeader;                          //!< The file header
       std::vector<char *>p_dataHeader;             //!< The data header
@@ -375,57 +379,57 @@ namespace Isis {
 
       bool p_vax_convert;
 
-      ProcessImport::Interleave p_organization; /**< The format of the input 
-                                                     file. Possible values are 
-                                                     BSQ for band sequential, 
+      ProcessImport::Interleave p_organization; /**< The format of the input
+                                                     file. Possible values are
+                                                     BSQ for band sequential,
                                                      BIL for band interleaved
-                                                     by line and BIP for band 
+                                                     by line and BIP for band
                                                      interleaved by pixel.*/
 
-      std::vector<double> p_base; /**< An array containing the core base for 
-                                       each band. If there is only one value in 
-                                       the vector then that base applies to all 
+      std::vector<double> p_base; /**< An array containing the core base for
+                                       each band. If there is only one value in
+                                       the vector then that base applies to all
                                        bands.*/
-      std::vector<double> p_mult; /**< An array containing the core multiplier 
+      std::vector<double> p_mult; /**< An array containing the core multiplier
                                        for each band. If there is only one value
-                                       in the vector then that multiplier 
+                                       in the vector then that multiplier
                                        applies to all bands.*/
 
-      double p_null_min;     /**< The pixel value which is the lower bound of 
+      double p_null_min;     /**< The pixel value which is the lower bound of
                                   NULL data. All pixels between this value and
-                                  the max will be converted to the Isis NULL 
+                                  the max will be converted to the Isis NULL
                                   value.*/
-      double p_null_max;     /**< The pixel value which is the upper bound of 
+      double p_null_max;     /**< The pixel value which is the upper bound of
                                   NULL data. All pixels between this value and
-                                  the min will be converted to the Isis NULL 
+                                  the min will be converted to the Isis NULL
                                   value.*/
-      double p_hrs_min;     /**< The pixel value which is the lower bound of 
+      double p_hrs_min;     /**< The pixel value which is the lower bound of
                                   HRS data. All pixels between this value and
-                                  the max will be converted to the Isis HRS 
+                                  the max will be converted to the Isis HRS
                                   value.*/
-      double p_hrs_max;     /**< The pixel value which is the upper bound of 
+      double p_hrs_max;     /**< The pixel value which is the upper bound of
                                   HRS data. All pixels between this value and
-                                  the min will be converted to the Isis HRS 
+                                  the min will be converted to the Isis HRS
                                   value.*/
-      double p_his_min;     /**< The pixel value which is the lower bound of 
+      double p_his_min;     /**< The pixel value which is the lower bound of
                                   HIS data. All pixels between this value and
-                                  the max will be converted to the Isis HIS 
+                                  the max will be converted to the Isis HIS
                                   value.*/
-      double p_his_max;     /**< The pixel value which is the upper bound of 
+      double p_his_max;     /**< The pixel value which is the upper bound of
                                   HIS data. All pixels between this value and
-                                  the min will be converted to the Isis HIS 
+                                  the min will be converted to the Isis HIS
                                   value.*/
-      double p_lrs_min;     /**< The pixel value which is the lower bound of 
+      double p_lrs_min;     /**< The pixel value which is the lower bound of
                                   LRS data. All pixels between this value and
-                                  the max will be converted to the Isis LRS 
+                                  the max will be converted to the Isis LRS
                                   value.*/
-      double p_lrs_max;     /**< The pixel value which is the upper bound of 
+      double p_lrs_max;     /**< The pixel value which is the upper bound of
                                   LRS data. All pixels between this value and
-                                  the min will be converted to the Isis LRS 
+                                  the min will be converted to the Isis LRS
                                   value.*/
-      double p_lis_min;     /**< The pixel value which is the lower bound of 
+      double p_lis_min;     /**< The pixel value which is the lower bound of
                                   LIS data. All pixels between this value and
-                                  the max will be converted to the Isis LIS 
+                                  the max will be converted to the Isis LIS
                                   value.*/
       double p_lis_max;     /**< The pixel value which is the upper bound of LIS
                                  data. All pixels between this value and the min

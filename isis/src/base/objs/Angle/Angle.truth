@@ -18,7 +18,7 @@ Testing mutators
   setRadians:  3.14159265 radians
 
 Testing operators
-  QDebug operator:   0.785398 <radians> (45 <degrees>) 
+  QDebug operator:   0.785398 <radians> (45 <degrees>)
   Assignment operator:  45 degrees
   + and - operators...
     angle + angle: 90 degrees
@@ -39,13 +39,13 @@ Testing logical operators
   angle1 <  (angle1 + epsilon)?  0
   angle2 >  (angle2 - epsilon)?  0
   angle1 <= angle2?  1
-**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
-**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
-**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
+  angle1 <  angle2?  **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
+  angle1 <  angle2?  **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
+  angle1 <=  angle2?  **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
   angle1 >  angle2?  0
-**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator.
+  angle1 >  angle2?  **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator.
   angle1 >= angle2?  0
-**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator.
+  angle1 >= angle2?  **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator.
 
 Testing protected methods
   Degree wrap value = 360

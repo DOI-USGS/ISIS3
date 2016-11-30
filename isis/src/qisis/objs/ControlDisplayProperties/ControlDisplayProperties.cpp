@@ -233,7 +233,7 @@ namespace Isis {
   bool ControlDisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
       const QString &localName, const QString &qName) {
     if (localName == "displayProperties") {
-      QByteArray hexValues(m_hexData.toAscii());
+      QByteArray hexValues(m_hexData.toLatin1());
       QDataStream valuesStream(QByteArray::fromHex(hexValues));
       valuesStream >> *m_displayProperties->m_propertyValues;
     }

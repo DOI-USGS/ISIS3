@@ -119,6 +119,8 @@ namespace Isis {
    *                          Points to Cubes, and vice versa, and then back to the original type, 
    *                          the filtered data is saved rather than forcing the user to refilter
    *                          the data. Fixes #2144.
+   *   @history 2016-11-18 Makayla Shepherd - Added disconnection and deletion of the Set Apriori
+   *                          Dialog on close. Fixes #4490.
    *
    *
    */
@@ -167,6 +169,7 @@ namespace Isis {
       void resetList();
       void refreshList();
       void updateEditPoint(QString pointId);
+      void disconnectAprioriDialog();
 
     private slots:
       void load();

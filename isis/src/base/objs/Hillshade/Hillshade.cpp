@@ -256,7 +256,7 @@ namespace Isis {
 
                             1 + p0*p + q0*q
       shade =  -------------------------------------------------
-                 sqrt(1 + p*p + Q*q) + sqrt(1 + p0*p0 + q0*q0)
+                 sqrt(1 + p*p + q*q) * sqrt(1 + p0*p0 + q0*q0)
 
       where p0 = -cos( sun azimuth ) * tan( solar elevation ) and
             q0 = -sin( sun azimuth ) * tan( solar elevation )
@@ -273,7 +273,7 @@ namespace Isis {
 
       double numerator = 1.0 + p0 * p + q0 * q;
 
-      double denominator = sqrt(1 + p * p + q * q) + sqrt(1 + p0 * p0 + q0 * q0);
+      double denominator = sqrt(1 + p * p + q * q) * sqrt(1 + p0 * p0 + q0 * q0);
 
       result = numerator / denominator;
     }
@@ -311,9 +311,9 @@ namespace Isis {
     if (!IsSpecial(hillshade.resolution()))
       resolution = toString(hillshade.resolution());
 
-    debug << "Hillshade[ azimuth =" << hillshade.azimuth().toString().toAscii().data()
-          << "zenith =" << hillshade.zenith().toString().toAscii().data()
-          << "resolution =" << resolution.toAscii().data() << "]";
+    debug << "Hillshade[ azimuth =" << hillshade.azimuth().toString().toLatin1().data()
+          << "zenith =" << hillshade.zenith().toString().toLatin1().data()
+          << "resolution =" << resolution.toLatin1().data() << "]";
 
     return debug;
   }

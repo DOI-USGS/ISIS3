@@ -62,10 +62,10 @@ void IsisMain(){
   if (logCamStats) {
     FileName logFile(logFileName);
     if (logFile.fileExists()) {
-      logFileos.open(logFileName.toAscii().data(),ios::app);
+      logFileos.open(logFileName.toLatin1().data(),ios::app);
     }
     else {
-      logFileos.open(logFileName.toAscii().data(),ios::out);
+      logFileos.open(logFileName.toLatin1().data(),ios::out);
       logFileos << "Filename," << "Duration," << "Summing,"<< "IncidenceAverage," <<
               "ResolutionAverage,"<< "IncidenceMinimum," << "IncidenceMaximum," <<  "Gaps,"<<endl;
     }
@@ -244,19 +244,19 @@ void IsisMain(){
 
     // if do not process night and incidence angle > 90, then exit
     if (!processNight && incAngle >= 90) {
-      remove (tstat1.expanded().toAscii().data());
+      remove (tstat1.expanded().toLatin1().data());
       if (rmHiIncInput) {
         if (reportHiInc) {
           hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
-          remove(inFileStr.toAscii().data());
-          remove(input.toAscii().data());
+          remove(inFileStr.toLatin1().data());
+          remove(input.toLatin1().data());
         }
       }
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because average incidence angle >= 90 and DAY images requested" << endl;
-        remove(output.toAscii().data());
+        remove(output.toLatin1().data());
       }
       QString msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -264,19 +264,19 @@ void IsisMain(){
 
     // if process night and incidence angle < 90, then exit
     if (processNight && incAngle < 90) {
-      remove (tstat1.expanded().toAscii().data());
+      remove (tstat1.expanded().toLatin1().data());
       if (rmHiIncInput) {
         if (reportHiInc) {
           hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
-          remove(inFileStr.toAscii().data());
-          remove(input.toAscii().data());
+          remove(inFileStr.toLatin1().data());
+          remove(input.toLatin1().data());
         }
       }
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because average incidence angle < 90 and NIGHT images requested" << endl;
-        remove(output.toAscii().data());
+        remove(output.toLatin1().data());
       }
       QString msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User,msg,_FILEINFO_);
@@ -290,13 +290,13 @@ void IsisMain(){
       parameters = "FROM=" + input + "+" + toString(procBand) +
                    " ATM=" + input + "+" + toString(atmosBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("thmdriftcor", parameters);
-      remove (input.toAscii().data());
+      remove (input.toLatin1().data());
     }
     else {
       output = (infile.baseName()) + "_no_driftcorr.cub";
       parameters = "FROM=" + input + "+" + toString(procBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("stretch", parameters);
-      remove (input.toAscii().data());
+      remove (input.toLatin1().data());
     }
 
     // Run cosi, for incidence < 90 (day images)
@@ -306,7 +306,7 @@ void IsisMain(){
       output = (infile.baseName()) + "_cosi.cub";
       parameters = "FROM=" + input + " TO=" + output;
       ProgramLauncher::RunIsisProgram("cosi", parameters);
-      remove (input.toAscii().data());
+      remove (input.toLatin1().data());
     }
 
     // Run cubenorm
@@ -314,16 +314,16 @@ void IsisMain(){
     output = (infile.baseName()) + "cubenorm.cub";
     parameters = "FROM=" + input + " TO=" + output;
     ProgramLauncher::RunIsisProgram("cubenorm", parameters);
-    remove (input.toAscii().data());
+    remove (input.toLatin1().data());
 
     //Run lineeq
     input=output;
     outFile = pathName + infile.baseName() + ".lev1.cub";
     parameters ="FROM=" + input + " TO=" + outFile;
     ProgramLauncher::RunIsisProgram("lineeq", parameters);
-    remove (input.toAscii().data());
+    remove (input.toLatin1().data());
 
-    remove (tstat1.expanded().toAscii().data());
+    remove (tstat1.expanded().toLatin1().data());
 
     //************************************
     // Run findgaps
@@ -352,7 +352,7 @@ void IsisMain(){
         imageGapListos << infile.baseName() << endl;
       }
     }
-    remove (tgaps.expanded().toAscii().data());
+    remove (tgaps.expanded().toLatin1().data());
 
     // Create temporary pvl and fill with camstats
     FileName tstat2;
@@ -370,7 +370,7 @@ void IsisMain(){
     QString  resavg = p2.findGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
     QString incmin = p2.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
     QString incmax = p2.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
-    remove (tstat2.expanded().toAscii().data());
+    remove (tstat2.expanded().toLatin1().data());
 
     double summing = 1;
     FileName tosum = FileName(outFile);
@@ -396,7 +396,7 @@ void IsisMain(){
     }
 
     if (rmInput && !pdsSanFile) {
-      remove(inFileStr.toAscii().data());
+      remove(inFileStr.toLatin1().data());
     }
   }
   catch(IException &e) {

@@ -120,18 +120,18 @@ namespace Isis {
       const AffineRadio &getAffineRadio() const { return (m_affine);  }
 
       /**
-       * @brief Returns the register state of the last successful Gruen match 
-       *  
-       * This method returns the full match condition of the last call to Gruen 
-       * Register function that was successful. 
-       *  
-       * BEWARE:  This is only valid if Register returns successfully!  This is 
-       * due to AutoReg returning conditions that occur prior to the actual 
+       * @brief Returns the register state of the last successful Gruen match
+       *
+       * This method returns the full match condition of the last call to Gruen
+       * Register function that was successful.
+       *
+       * BEWARE:  This is only valid if Register returns successfully!  This is
+       * due to AutoReg returning conditions that occur prior to the actual
        * Gruen algorithm being called.
-       * 
+       *
        * @author Kris Becker - 6/4/2011
-       * 
-       * @return MatchPoint 
+       *
+       * @return MatchPoint
        */
       MatchPoint getLastMatch() const { return (m_point);   }
 
@@ -141,9 +141,9 @@ namespace Isis {
         return ("Gruen");
       }
 
-      int algorithm(Chip &pattern, Chip &subsearch, const Radiometric &radio, 
-                    BigInt &ptsUsed, double &resid, GMatrix &atai, 
-                    AffineRadio &affrad); 
+      int algorithm(Chip &pattern, Chip &subsearch, const Radiometric &radio,
+                    BigInt &ptsUsed, double &resid, GMatrix &atai,
+                    AffineRadio &affrad);
 
       Analysis errorAnalysis(const BigInt &npts, const double &resid,
                              const GMatrix &atai);
@@ -183,12 +183,12 @@ namespace Isis {
         ErrorCounter() : m_gerrno(0), m_keyname("Unknown"), m_count(0) { }
         ErrorCounter(int gerrno, const QString &keyname) : m_gerrno(gerrno),
           m_keyname(keyname), m_count(0) { }
-    
+
         inline int  Errno() const {  return (m_gerrno); }
         inline BigInt Count() const { return (m_count); }
         inline void BumpIt() { m_count++; }
         PvlKeyword LogIt() const { return (PvlKeyword(m_keyname, toString(m_count))); }
-    
+
         int         m_gerrno;
         QString m_keyname;
         BigInt      m_count;
@@ -215,14 +215,14 @@ namespace Isis {
       double       m_shearTol;          //  Affine shear tolerance
       double       m_spiceTol;          // SPICE tolerance
       double       m_affineTol;         // Affine Tolerance
-      
+
       double       m_shiftTol;          // Radiometric shift tolerance
       double       m_rgainMinTol;       // Radiometric Gain minimum
       double       m_rgainMaxTol;       // Radiometric Gain maximum
 
       double       m_defGain;           // Default Radiometric gain
       double       m_defShift;          // Default Radiometric shift
-      
+
       // These are for recomputing SMTK points
       AffineRadio  m_defAffine;         // Default affine/radiometric settings
       AffineRadio  m_affine;            // Incoming affine setting
@@ -299,6 +299,7 @@ namespace Isis {
         return (value);
       };
 
+
       /**
        * @brief Keyword formatter for Gruen parameters
        *
@@ -367,14 +368,14 @@ namespace Isis {
 
       GMatrix Identity(const int &ndiag = 3) const;
       GMatrix Choldc(const GMatrix &a, GVector &p) const;
-      GMatrix Cholsl(const GMatrix &a, const GVector &p, 
+      GMatrix Cholsl(const GMatrix &a, const GVector &p,
                      const GMatrix &b, const GMatrix &x) const;
       int Jacobi(const GMatrix &a, GVector &evals, GMatrix &evecs,
                   const int &MaxIters = 50) const;
       void EigenSort(GVector &evals, GMatrix &evecs) const;
       BigInt MinValidPoints(BigInt totalPoints) const;
       bool ValidPoints(BigInt totalPoints, BigInt nPoints) const;
- 
+
       int CheckConstraints(MatchPoint &point);
       Coordinate getChipUpdate(Chip &sChip, MatchPoint &point) const;
       AutoReg::RegisterStatus Status(const MatchPoint &result);

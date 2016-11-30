@@ -25,6 +25,7 @@
 
 #include <algorithm>
 
+#include <QObject>
 #include <QString>
 
 #include "Displacement.h"

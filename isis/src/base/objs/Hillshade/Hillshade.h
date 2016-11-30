@@ -25,6 +25,8 @@ namespace Isis {
    * @author 2012-10-25 Steven Lambright
    *
    * @internal
+   *   @history 2016-11-21 Makayla Shepherd - Corrected the shaded value algorithm in shadedValue. 
+   *                           Fixes #4326.
    */
   class Hillshade {
     public:

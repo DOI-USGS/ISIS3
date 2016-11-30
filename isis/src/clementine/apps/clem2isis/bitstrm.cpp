@@ -1,13 +1,13 @@
 /*
- *	THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
- *	IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
- *	CLEMENTINE (DSPSE) PROGRAM.
+ *      THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
+ *      IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
+ *      CLEMENTINE (DSPSE) PROGRAM.
  *
- *	IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
- *	Dr. Erick Malaret at ACT Corp.
- *			tel: (703) 742-0294
- *			     (703) 683-7431
- *                       email:	nrlvax.nrl.navy.mil
+ *      IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
+ *      Dr. Erick Malaret at ACT Corp.
+ *                      tel: (703) 742-0294
+ *                           (703) 683-7431
+ *                       email: nrlvax.nrl.navy.mil
  *
  *
  */
@@ -129,13 +129,13 @@ void *dByteStream(ByteStream *Bs) {
 
 short ByteStream_read(ByteStream *Bs) {
   short     c;
-  char	cval;
-  int	n;
+  char  cval;
+  int   n;
 
   if(Bs->mode == INPUT) {
     /* c = fgetc( Bs->file ); */
     n = fread(&cval, sizeof(char), 1, Bs->file);
-    c	= cval;
+    c   = cval;
     if(n != 1) Bs->stat = EOF;
     return c;
   }

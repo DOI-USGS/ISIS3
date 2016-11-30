@@ -254,6 +254,7 @@ namespace Isis {
    *                           this cube, return.
    */
   void ChipViewport::paintEvent(QPaintEvent *e) {
+
     QPainter painter(this);
 
     if (m_tempView != NULL) {

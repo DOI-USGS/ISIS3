@@ -29,7 +29,7 @@ namespace Isis {
 
       virtual ExportControlNetWorkOrder *clone() const;
 
-      bool isExecutable(QList<Control *> controls);
+      bool isExecutable(ControlList *controls);
 
 
       bool execute();

@@ -13,10 +13,11 @@ namespace Isis {
 
     p_resizeZooming = true;
 
-//     setRenderHint(QPainter::SmoothPixmapTransform,false);
-//     setRenderHint(QPainter::HighQualityAntialiasing,false);
-//     setRenderHint(QPainter::NonCosmeticDefaultPen,true);
-//     setOptimizationFlag(QGraphicsView::DontSavePainterState);
+//    setRenderHint(QPainter::SmoothPixmapTransform,false);
+//    setRenderHint(QPainter::HighQualityAntialiasing,false);
+//    setRenderHint(QPainter::NonCosmeticDefaultPen,true);
+//    setOptimizationFlag(QGraphicsView::DontSavePainterState);
+//    setRenderHint(QPainter::Qt4CompatiblePainting, true);
     setCacheMode(QGraphicsView::CacheBackground);
   }
 

@@ -24,7 +24,7 @@ Set to 45 degrees
 0.25*pi radians universal
 45 degrees after assignment
 Set to 25 degrees Planetographic
-**PROGRAMMER ERROR** Latitude [25.0] cannot be converted to Planetocentic without the planetary radii, please use the other Latitude constructor.
+**PROGRAMMER ERROR** Latitude [25.0 degrees] cannot be converted to Planetocentic without the planetary radii, please use the other Latitude constructor.
 Set to 25 degrees Planetographic with radii
 28.160239385449 degrees
 

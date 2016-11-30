@@ -167,7 +167,7 @@ int main(void) {
   Inheritor *aml;
   QString xmlFile = FileName("./unitTest.xml").expanded();
   try {
-    aml = new Inheritor(xmlFile.toAscii().data());
+    aml = new Inheritor(xmlFile.toLatin1().data());
   }
   catch(IException &error) {
     error.print();

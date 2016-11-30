@@ -71,7 +71,7 @@ void IsisMain() {
   // Write grid to well known text output
   QString out = FileName(ui.GetFileName("TO")).expanded();
   std::ofstream os;
-  os.open(out.toAscii().data(), std::ios::out);
+  os.open(out.toLatin1().data(), std::ios::out);
 
   // Display the progress...10% 20% etc.
   Progress prog;

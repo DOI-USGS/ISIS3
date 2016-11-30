@@ -328,7 +328,7 @@ void IsisMain() {
     QString fFile = ui.GetFileName("FLATFILE");
     ofstream os;
     QString fFileExpanded = FileName(fFile).expanded();
-    os.open(fFileExpanded.toAscii().data(), ios::out);
+    os.open(fFileExpanded.toLatin1().data(), ios::out);
     dumpResults(os, reglist, jparms, *ar);
   }
 

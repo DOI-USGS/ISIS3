@@ -129,12 +129,12 @@ namespace Isis {
    * 
    * @return @b SerialNumberList The list of serial numbers for the cubes in the ImageList.
    */
-  SerialNumberList ImageList::serialNumberList() {
+  SerialNumberList *ImageList::serialNumberList() {
 
-    SerialNumberList result;
+    SerialNumberList *result = new SerialNumberList();
 
     for (int i = 0; i < count(); i++) {
-      result.add((*this)[i]->fileName());
+      result->add((*this)[i]->fileName());
     }
     return result;
   }

@@ -79,7 +79,7 @@ namespace Isis {
 //bool NewHorizonsMvicFrameCameraDistortionMap::outputDeltas() {
 //
 //  QString ofname("mvic_frame_deltas.csv");
-//  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+//  std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
 //  if (!fp_out)
 //    return false;
 //

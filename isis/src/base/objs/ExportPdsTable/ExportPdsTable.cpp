@@ -292,7 +292,7 @@ namespace Isis {
         // copy each character and count each byte individually
         for(int i = 0; i < field.size(); i++) {
           if(i < (int)val.length()) {
-            buffer[startByte] = val[i].toAscii();
+            buffer[startByte] = val[i].toLatin1();
           }
           else {
             // this line is not covered by unitTest since this is a case that

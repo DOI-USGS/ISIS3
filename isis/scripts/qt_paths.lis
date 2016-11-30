@@ -8,5 +8,6 @@
 /opt/local/libexec/qt4-mac/lib @loader_path/../../..
 /opt/local/lib                 @loader_path/../../..
 #  Add MacPorts new structure
+/opt/usgs(.*?)/qt5/lib            @loader_path/../../..
 /opt/usgs(.*?)lib                 @loader_path/../../..
 /opt/usgs(.*?)Frameworks          @loader_path/../../..

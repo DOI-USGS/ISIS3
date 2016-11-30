@@ -46,6 +46,7 @@ class QDebug;
  * @author 2015-08-18 Kris Becker 
  * @internal 
  *   @history 2015-08-18 Kris Becker - Original Version 
+ *   @history 2016-10-05 Ian Humphrey & Makayla Shepherd - Changed headers to OpenCV2.
  */
   class RobustMatcher : public QLogger {
   

@@ -6,14 +6,15 @@
 
 #include <QLabel>
 #include <QMargins>
+#include <QSettings>
 #include <QVBoxLayout>
 
 #include "AbstractTableModel.h"
+#include "IException.h"
 #include "TableViewHeader.h"
 #include "TableViewContent.h"
 #include "TableColumn.h"
 #include "TableColumnList.h"
-#include <QSettings>
 
 
 namespace Isis {
@@ -201,6 +202,7 @@ namespace Isis {
     //       m_header->update();
     //     }
     //   }
+    
 
     void TableView::displayWarning(AbstractTableModel::Warning warning) {
       switch (warning) {
@@ -224,6 +226,7 @@ namespace Isis {
           break;
       }
     }
+
 
     void TableView::handleModelSelectionChanged() {
       m_content->refresh();

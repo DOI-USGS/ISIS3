@@ -14,7 +14,7 @@
 
   <history>
     <change name="Mike Martin" date="1989-12-01">
-      Original Version 
+      Original Version
     </change>
     <change name="Jeff Anderson" date="2004-06-08">
       Removed compilation warnings under Linux
@@ -29,11 +29,15 @@
         64-bit Solaris port required replacing long with int and adding malloc.h
     </change>
     <change name="Jeannie Walldren" date="2009-03-23">
-      Modified code to allow string length of 1024 characters for input and 
+      Modified code to allow string length of 1024 characters for input and
       output filenames.
     </change>
     <change name="Eric Hyer" date="2009-06-23">
       Increased buffer sizes for ibuf and obuf.  Also added some error checking.
+    </change>
+    <change name="Kelvin Rodriguez" date="2016-08-28">
+      Removed some unnecessary uses to register keyword. The keyword is ignored by modern compilers
+      and causes warnings in clang. Part of porting to OS X 10.11.
     </change>
   </history>
 

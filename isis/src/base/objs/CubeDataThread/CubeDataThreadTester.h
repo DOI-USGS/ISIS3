@@ -4,7 +4,7 @@
 #include <QThread>
 
 template<typename T> class QList;
-template<typename A, typename B> class QPair;
+template<typename A, typename B> struct QPair;
 
 namespace Isis {
   class Brick;
@@ -14,6 +14,7 @@ namespace Isis {
    * @author ????-??-?? Steven Lambright
    *
    * @internal
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    */
   class CubeDataThreadTester : public QThread {
       Q_OBJECT

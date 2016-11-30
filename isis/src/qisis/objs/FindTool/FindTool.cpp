@@ -5,10 +5,12 @@
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QToolButton>
 #include <QValidator>
 
 #include <float.h>
@@ -206,7 +208,7 @@ namespace Isis {
    * @return QWidget*
    */
   QWidget *FindTool::createToolBarWidget(QStackedWidget *parent) {
-    QWidget *hbox = new QWidget(parent);
+    QWidget *hbox = new QWidget;
 
     p_showDialogButton = new QToolButton(hbox);
     p_showDialogButton->setIcon( QPixmap(toolIconDir() + "/find.png") );

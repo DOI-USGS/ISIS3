@@ -27,11 +27,14 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-//tjw
-//#include "CubeDnView.h"
+
+#include "CubeDnView.h"
 #include "Directory.h"
+#include "ImageList.h"
 #include "MdiCubeViewport.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 #include "Workspace.h"
 
 namespace Isis {
@@ -44,7 +47,7 @@ namespace Isis {
    */
   CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
-    QAction::setText(tr("View Raw &Cubes..."));
+    QAction::setText(tr("Display &Images..."));
   }
 
   /**
@@ -81,12 +84,70 @@ namespace Isis {
   }
 
   /**
+   * This check is used by Directory::supportedActions(DataType data).
+   *
+   * @param images ShapeList we are checking
+   * 
+   * @return @b bool True if the number of shapes is greater than 0 and less than 20.
+   */
+  bool CubeDnViewWorkOrder::isExecutable(ShapeList *shapes) {
+    return (shapes->count() > 0 && shapes->count() < 20);
+  }
+
+  /**
    * If WorkOrder::execute() returns true, then this method returns true.
    * 
    * @return @b bool True if WorkOrder::execute() returns true.
    */
   bool CubeDnViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
+
+
+
+
+    if (success) {
+      QStringList viewOptions;
+
+      QList<CubeDnView *> existingViews = project()->directory()->cubeDnViews();
+      int viewToUse = -1;
+
+      if (existingViews.count()) {
+        for (int i = 0; i < existingViews.count(); i++) {
+          viewOptions.append(existingViews[i]->windowTitle());
+        }
+      }
+
+      viewOptions.append(tr("New Cube DN View"));
+
+      if (viewOptions.count() > 1) {
+        QString selected = QInputDialog::getItem(NULL, tr("View to see cubes in"),
+            tr("Which view would you like your\nimage's DN data to be put into?"),
+            viewOptions, viewOptions.count() - 1, false, &success);
+
+        viewToUse = viewOptions.indexOf(selected);
+      }
+      else {
+        viewToUse = viewOptions.count() - 1;
+      }
+
+      bool newView = false;
+      if (viewToUse == viewOptions.count() - 1) {
+        newView = true;
+        QUndoCommand::setText(tr("View image DN data of list in new cube DN view"));
+      }
+      else if (viewToUse != -1) {
+        QUndoCommand::setText(tr("View image DN data in cube DN view [%1]")
+            .arg(existingViews[viewToUse]->windowTitle()));
+      }
+
+      QStringList internalData;
+      internalData.append(QString::number(viewToUse));
+      internalData.append(newView? "new view" : "existing view");
+      setInternalData(internalData);
+    }
+
+
+
     return success;
   }
 
@@ -108,10 +169,19 @@ namespace Isis {
    * that. 
    */
   void CubeDnViewWorkOrder::syncRedo() {
-    // tjw
-    //ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    //CubeDnView *view = project()->directory()->addCubeDnView();
-    //view->addItem( currentItem );
+    QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
+
+    int viewToUse = internalData().first().toInt();
+
+    CubeDnView *view = NULL;
+    if (viewToUse == project()->directory()->cubeDnViews().count()) {
+      view = project()->directory()->addCubeDnView();
+    }
+    else {
+      view = project()->directory()->cubeDnViews()[viewToUse];
+    }
+   
+    view->addItems(selectedItems);
   }
 }
 

@@ -10,11 +10,16 @@ class QPushButton;
 namespace Isis {
   class ControlNet;
   class ControlNetGraphicsItem;
+  class ControlPoint;
+//   class ControlPointEdit;
   class Image;
   class ImageList;
 
   /**
    * //TODO: Remove debug printout & comment
+   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal. 
+   *                           Is there a better design?  This might go away if we emit signals,
+   *                           which only IPCE classes would connect to.
    * @brief Handles Control Net displays
    *
    * @ingroup Visualization Tools
@@ -40,6 +45,13 @@ namespace Isis {
    *                           and fromMovementColorSourceString(). Fixes #479.
    *   @history 2013-01-31 Steven Lambright - Removed some debugging statements that were left
    *                           around from the last change. Fixes #1459.
+   *   @history 2016-09-14 Tracie Sucharski - Added signals for mouse clicks for modifying, deleting
+   *                           and creating control points.  These are passed on to
+   *                           MosaicSceneWidget signals, then on to Directory slots.
+   *   @history 2016-08-25 Tracie Sucharski - Fixed IPCE code which caused qmos to segfault.  Added
+   *                           checks for the existence of a Directory pointer in the openControlNet
+   *                           and mouseButtonRelease methods.  If Directory point is NULL, IPCE
+   *                           code not executed.  Fixes #4063.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -84,7 +96,18 @@ namespace Isis {
       static QString toString(MovementColorSource);
       static MovementColorSource fromMovementColorSourceString(QString);
 
+    signals:
+      void modifyControlPoint(ControlPoint *controlPoint);
+      void deleteControlPoint(ControlPoint *controlPoint);
+      void createControlPoint(double latitude, double longitude);
+
+      void controlPointSelected(ControlPoint *);
+      void deleteControlPoint(QString controlPointId);
+
     public slots:
+      void displayNewControlPoint(QString pointId);
+      void displayChangedControlPoint(QString pointId);
+      void displayUponControlPointDeletion();
 
     protected:
       QAction *getPrimaryAction();
@@ -95,8 +118,8 @@ namespace Isis {
       void configMovement();
       void updateTool();
       void openControlNet();
-      void displayConnectivity();
       void displayControlNet();
+      void displayConnectivity();
       void closeNetwork();
       void loadNetwork();
       void randomizeColors();
@@ -119,6 +142,7 @@ namespace Isis {
       ControlNetGraphicsItem *m_controlNetGraphics;
       QLabel *m_controlNetFileLabel;
       QString m_controlNetFile;
+//       ControlPointEdit *m_pointEditor;
 
       //! This defines the drawing mode of the apriori to adjusted arrows
       MovementColorSource m_movementArrowColorSource;

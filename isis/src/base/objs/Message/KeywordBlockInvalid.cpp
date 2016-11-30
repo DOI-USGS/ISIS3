@@ -21,9 +21,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include "Message.h"
+
+using namespace std;
 
 QString Isis::Message::KeywordBlockInvalid(const QString &block) {
   return "Keyword block [" + block + "] is invalid";

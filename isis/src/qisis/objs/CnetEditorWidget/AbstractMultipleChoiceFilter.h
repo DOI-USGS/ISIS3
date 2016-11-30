@@ -37,7 +37,7 @@ namespace Isis {
       protected:
         void createWidget(QStringList options);
         QString const &getCurrentChoice() const;
-
+        using Isis::CnetViz::AbstractFilter::evaluate;
 
       private:
         void nullify();

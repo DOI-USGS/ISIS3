@@ -65,8 +65,8 @@ namespace Isis {
    * 
    * @return bool True if this work order functions with the given control list
    */
-  bool ExportControlNetWorkOrder::isExecutable(QList<Control *> controls) {
-    return (controls.count() == 1);
+  bool ExportControlNetWorkOrder::isExecutable(ControlList *controls) {
+    return (controls->count() == 1);
   }
 
 

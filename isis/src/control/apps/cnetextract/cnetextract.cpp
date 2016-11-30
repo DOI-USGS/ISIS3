@@ -32,16 +32,16 @@ using namespace std;
 using namespace Isis;
 
 void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints);
-void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
-                        QVector<QString> cannotGenerateLatLonPoints,
+void ExtractLatLonRange(ControlNet &outNet, QVector<QString> &nonLatLonPoints,
+                        QVector<QString> &cannotGenerateLatLonPoints,
                         QMap<QString, QString> sn2filename);
 bool NotInLatLonRange(SurfacePoint surfacePt, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon);
-void WriteCubeOutList(ControlNet cnet, 
+void WriteCubeOutList(ControlNet cnet,
                       QMap<QString, QString> sn2file,
                       PvlGroup &summary);
-void WriteResults(QString filename, 
-                  QVector<QString> notExtracted, 
+void WriteResults(QString filename,
+                  QVector<QString> notExtracted,
                   PvlGroup &results);
 void omit(ControlNet &cnet, int cp);
 void omit(ControlPoint *point, int cm);
@@ -122,7 +122,7 @@ void IsisMain() {
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
-// 
+//
 //  QVector<QString> noMeasurePoints;
   QVector<QString> nonListedPoints;
   QVector<QString> nonLatLonPoints;
@@ -362,7 +362,7 @@ void IsisMain() {
                        "measures extracted.");
     if (ui.WasEntered("TOLIST")) {
       summary.addComment("The output cube list file, ["
-                         + ui.GetFileName("TOLIST") + 
+                         + ui.GetFileName("TOLIST") +
                          "], was not created. "
                          "The provided filters have resulted in an empty"
                          "Control Network.");
@@ -395,7 +395,7 @@ void IsisMain() {
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
-// 
+//
 //  if(noMeasurePoints.size() != 0) {
 //    summary.addKeyword(PvlKeyword("NoCubeMeasure", toString((int)noMeasurePoints.size())));
 //  }
@@ -465,48 +465,48 @@ void IsisMain() {
         QString name = FileName(prefix + "NonReferenceMeasures.txt").expanded();
         WriteResults(name, nonReferenceMeasures, results);
       }
-  
+
       resultsProgress.CheckStatus();
-  
+
       if(fixed) {
         QString name = FileName(prefix + "NonFixedPoints.txt").expanded();
         WriteResults(name, nonFixedPoints, results);
       }
-  
+
       resultsProgress.CheckStatus();
-  
+
       if(cubePoints) {
         QString name = FileName(prefix + "NonCubePoints.txt").expanded();
         WriteResults(name, nonCubePoints, results);
       }
-  
+
       resultsProgress.CheckStatus();
 
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
-//   
+//
 //      if(noMeasurePoints.size() != 0) {
 //        QString name = FileName(prefix + "NoMeasurePoints.txt").expanded();
 //        WriteResults(name, noMeasurePoints);
 //      }
-  
+
       resultsProgress.CheckStatus();
-  
+
       if(cubeMeasures) {
         QString name = FileName(prefix + "NonCubeMeasures.txt").expanded();
         WriteResults(name, noCubeMeasures, results);
       }
-  
+
       resultsProgress.CheckStatus();
-  
+
       if(pointsEntered) {
         QString name = FileName(prefix + "NonListedPoints.txt").expanded();
         WriteResults(name, nonListedPoints, results);
       }
-  
+
       resultsProgress.CheckStatus();
-  
+
       if(latLon) {
         QString namenon = FileName(prefix + "LatLonOutOfRange.txt").expanded();
         WriteResults(namenon, nonLatLonPoints, results);
@@ -531,14 +531,14 @@ void IsisMain() {
  * @param outNet The output control net being removed from
  * @param nonListedPoints The keyword recording all of the control points
  *                        removed due to not being listed
- * @history 2012-06-22 - Jeannie Backer - Changed nonListedPoints parameter to 
+ * @history 2012-06-22 - Jeannie Backer - Changed nonListedPoints parameter to
  *                           reference so that this information could be
  *                           accessed in the main program.
  */
 void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints) {
   UserInterface &ui = Application::GetUserInterface();
 
-  // Use the file list class for functionality 
+  // Use the file list class for functionality
   // (even though this is a list of point IDs)
   FileList listedPoints(ui.GetFileName("POINTLIST"));
 
@@ -547,7 +547,7 @@ void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints) {
     ControlPoint *controlpt = outNet.GetPoint(cp);
     // flag to determine if this controlpoint is in the pointlist
     bool isInList = false;
-    // loop through line numbers of POINTLIST until we find a point ID in the 
+    // loop through line numbers of POINTLIST until we find a point ID in the
     // list that matches this control point's ID
     for(int i = 0; i < (int)listedPoints.size()  &&  !isInList; i++) {
       QString pointId = listedPoints[i].toString();
@@ -564,18 +564,26 @@ void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints) {
 
 
 /**
- * Removes control points not in the lat/lon range provided in the unput
+ * Removes control points not in the lat/lon range provided in the input
  * parameters.
  *
- * @param outNet The output control net being removed from
- * @param noLanLonPoint The keyword recording all of the control points removed
- *                      due to the provided lat/lon range
- * @param noLanLonPoint The keyword recording all of the control points removed
- *                      due to the inability to calculate the lat/lon for that
- *                      point
+ * @param outNet[in] The output control net being removed from
+ * @param noLanLonPoint[out] The keyword recording all of the control points removed
+ *            due to the control point being out of the lat/lon range.
+ * @param cannotGenerateLatLonPoints[out] The keyword recording all of the control points removed
+ *            due to the inability to find a cube to calculate the lat/lon for that point.
+ * @param sn2filename[in] QMap that maps the serial numbers to (input) file names.
+ * 
+ * @internal
+ *   @history 2016-09-29 Ian Humphrey - Reverted r6597, which had reveresed the logic for
+ *                           checking the reference measure and other measures (see lines 635,643).
+ *                           Modified the QVector parameters to be pass-by-reference OUT parameters,
+ *                           since the cnetextract main uses them for summary output.
  */
-void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
-                        QVector<QString> cannotGenerateLatLonPoints,  QMap<QString, QString> sn2filename) {
+void ExtractLatLonRange(ControlNet &outNet, 
+                        QVector<QString> &nonLatLonPoints,
+                        QVector<QString> &cannotGenerateLatLonPoints,  
+                        QMap<QString, QString> sn2filename) {
   if(outNet.GetNumPoints() == 0) {
     return;
   }
@@ -624,8 +632,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
       Distance radius;
 
       // First check the reference Measure
-      //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-      if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
+      if(sn2filename[controlPt->GetReferenceSN()].length() != 0) {
         sn = controlPt->GetReferenceSN();
       }
 
@@ -633,13 +640,13 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
       if(sn.isEmpty()) {
         // Find the Serial Number if it exists
         for(int cm = 0; (cm < controlPt->GetNumMeasures()) && sn.isEmpty(); cm ++) {
-          if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
+          if(sn2filename[controlPt->GetReferenceSN()].length() != 0) {
             sn = controlPt->GetReferenceSN();
           }
         }
       }
 
-      // Connot fine a cube to get the lat/lon from
+      // Cannot find a cube to get the lat/lon from
       if(sn.isEmpty()) {
         cannotGenerateLatLonPoints.push_back(controlPt->GetId());
         omit(outNet, cp);
@@ -718,8 +725,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
 
 
 /**
- * Checks whether the given surface point is in the given lat/lon range, 
- * handling the meridian correctly 
+ * Checks whether the given surface point is in the given lat/lon range,
+ * handling the meridian correctly
  *
  * @param lat The latitude to check
  * @param lon The longitude to check
@@ -750,16 +757,16 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
 
 /**
  * Creates the output list, [TOLIST], if the parameter is entered. This method
- * finds all cubes contained within the given Control Network and lists the 
- * corresponding file names for these cubes in the [TOLIST] output file. 
+ * finds all cubes contained within the given Control Network and lists the
+ * corresponding file names for these cubes in the [TOLIST] output file.
  *
- * @param cnet The Control Network from which the cube list will be found and 
+ * @param cnet The Control Network from which the cube list will be found and
  *             created.
  * @param sn2file The map for converting the Control Network's serial numbers
  *                to filenames.
  */
-void WriteCubeOutList(ControlNet cnet, 
-                      QMap<QString, QString> sn2file, 
+void WriteCubeOutList(ControlNet cnet,
+                      QMap<QString, QString> sn2file,
                       PvlGroup &summary) {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -787,7 +794,7 @@ void WriteCubeOutList(ControlNet cnet,
   // Don't create file if it will be empty
   if (outputsn.size() == 0) {
     summary.addComment("The output cube list file, ["
-                       + ui.GetFileName("TOLIST") + 
+                       + ui.GetFileName("TOLIST") +
                        "], was not created. "
                        "The provided filters have resulted in an empty"
                        "Control Network.");
@@ -796,13 +803,13 @@ void WriteCubeOutList(ControlNet cnet,
 
   QString toList = ui.GetFileName("TOLIST");
   std::ofstream out_stream;
-  out_stream.open(toList.toAscii().data(), std::ios::out);
+  out_stream.open(toList.toLatin1().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   for(std::set<QString>::iterator sn = outputsn.begin(); sn != outputsn.end(); sn ++) {
     // moved the "if" statement to the previous for loop to prevent creating
     // an empty file
-    //if(!sn2file[(*sn)].length() == 0) { 
+    //if(!sn2file[(*sn)].length() == 0) {
       out_stream << sn2file[(*sn)] << std::endl;
     //}
   }
@@ -813,16 +820,16 @@ void WriteCubeOutList(ControlNet cnet,
 
 
 /**
- * Creates the results report using the given file name and vector of measures 
- * or points that were not extracted. 
+ * Creates the results report using the given file name and vector of measures
+ * or points that were not extracted.
  *
- * @param filename The name of the report file to create. 
- * @param notExtracted  A vector of points and/or measures to be listed in the 
- *                      report. 
+ * @param filename The name of the report file to create.
+ * @param notExtracted  A vector of points and/or measures to be listed in the
+ *                      report.
  * @param results  A reference to the results PvlGroup address.
  */
-void WriteResults(QString filename, 
-                  QVector<QString> notExtracted, 
+void WriteResults(QString filename,
+                  QVector<QString> notExtracted,
                   PvlGroup &results) {
   // if no points or measures are being extracted,
   // we will not create the filter report.
@@ -835,7 +842,7 @@ void WriteResults(QString filename,
 
   // Set up the output file for writing
   std::ofstream out_stream;
-  out_stream.open(filename.toAscii().data(), std::ios::out);
+  out_stream.open(filename.toLatin1().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   out_stream << notExtracted[0];
@@ -848,9 +855,9 @@ void WriteResults(QString filename,
   return;
 }
 
-/** 
+/**
  * This method removes the given control point from the given control network.
- */ 
+ */
 void omit(ControlNet &cnet, int cp) {
   ControlPoint *point = cnet.GetPoint(cp);
   if (point->IsEditLocked()) point->SetEditLock(false);

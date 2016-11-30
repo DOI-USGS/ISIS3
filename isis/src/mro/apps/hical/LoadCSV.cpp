@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
+ * $Id: LoadCSV.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -76,7 +76,7 @@ namespace Isis {
     csv.setComment(comments);
     csv.setSkip(skip);
     csv.setHeader(colHeader);
-    csv.setDelimiter(separator[0].toAscii());
+    csv.setDelimiter(separator[0].toLatin1());
     if (separator[0] == ' ') csv.setSkipEmptyParts();
 
     //  Now read the file

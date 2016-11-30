@@ -78,7 +78,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Set up program debugging and logging
-  QDebugStream logger( QDebugLogger::null() ); 
+  QDebugStream logger( QDebugLogger::null() );
   bool p_debug( ui.GetBoolean("DEBUG") );
   if ( p_debug ) {
     // User specified a file by name
@@ -134,16 +134,16 @@ void IsisMain() {
   // Get individual parameters if provided
   QStringList parmlist;
   parmlist << "RATIO" << "EPITOLERANCE" << "EPICONFIDENCE" << "HMGTOLERANCE"
-           << "MAXPOINTS" << "FASTGEOM" << "FASTGEOMPOINTS" << "GEOMTYPE" 
-           << "FILTER"; 
+           << "MAXPOINTS" << "FASTGEOM" << "FASTGEOMPOINTS" << "GEOMTYPE"
+           << "FILTER";
   BOOST_FOREACH (QString p, parmlist ) {
     if ( ui.WasEntered(p) ) {
       parameters.add(p, ui.GetAsString(p));
-    } 
+    }
   }
 
   // Got all parameters.  Add them now and they don't need to be considered
-  // from here on.  Parameters specified in input algorithm specs take 
+  // from here on.  Parameters specified in input algorithm specs take
   // precedence (in MatchMaker)
   factory->setGlobalParameters(parameters);
 
@@ -171,16 +171,16 @@ void IsisMain() {
 
   // Create the algorithms and list if requested
   if ( !aspec.isEmpty() ) {
-    algorithms = factory->create(aspec); 
+    algorithms = factory->create(aspec);
 
     if ( ui.GetBoolean("LISTSPEC") ) {
-      info.addObject(factory->info(algorithms)); 
+      info.addObject(factory->info(algorithms));
       gotInfo = true;
     }
   }
   else {
     if ( ui.GetBoolean("LISTSPEC") || ( !gotInfo) ) {
-      QString mess = "Matching ALGORITHM/ALGOSPECFILE must be provided!"; 
+      QString mess = "Matching ALGORITHM/ALGOSPECFILE must be provided!";
       throw IException(IException::User, mess, _FILEINFO_);
     }
   }
@@ -191,11 +191,11 @@ void IsisMain() {
     if ( ui.WasEntered("TOINFO") ) {
       FileName toinfo = ui.GetFileName("TOINFO");
       QString fname = toinfo.expanded();
-      info.write(fname); 
+      info.write(fname);
     }
     else {
       if ( !ui.IsInteractive()  ) {
-        std::cout << info << "\n"; 
+        std::cout << info << "\n";
       }
       else {
         Application::GuiLog(info);
@@ -206,7 +206,7 @@ void IsisMain() {
 
 
   // First see what we can do about threads if your user is resource conscience
-  int nCPUs = cv::getNumberOfCPUs(); 
+  int nCPUs = cv::getNumberOfCPUs();
   int nthreads = cv::getNumThreads();
   logger->dbugout() << "\nSystem Environment...\n";
   logger->dbugout() << "Number available CPUs:     " << nCPUs << "\n";
@@ -217,10 +217,10 @@ void IsisMain() {
   if ( ui.WasEntered("MAXTHREADS") ) {
     uthreads = ui.GetInteger("MAXTHREADS");
     if (uthreads < nthreads) cv::setNumThreads(uthreads);
-    logger->dbugout() << "User restricted threads:   " << uthreads << "\n"; 
+    logger->dbugout() << "User restricted threads:   " << uthreads << "\n";
   }
-  int total_threads = cv::getNumThreads(); 
-  logger->dbugout() << "Total threads:             " << total_threads << "\n"; 
+  int total_threads = cv::getNumThreads();
+  logger->dbugout() << "Total threads:             " << total_threads << "\n";
   logger->flush();
 
 
@@ -247,8 +247,8 @@ void IsisMain() {
 
   // Got to have both file names provided at this point
   if ( matcher.size() <= 0 ) {
-    throw IException(IException::User, 
-                     "Must provide both a FROM/FROMLIST and MATCH cube or image filename", 
+    throw IException(IException::User,
+                     "Must provide both a FROM/FROMLIST and MATCH cube or image filename",
                      _FILEINFO_);
   }
 
@@ -257,7 +257,7 @@ void IsisMain() {
   if ( "match" == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Query); }
   if ( "from"  == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Train); }
 
-  // Check for FASTGEOM option 
+  // Check for FASTGEOM option
   if ( ui.GetBoolean("FASTGEOM") ) {
     FastGeom geom( factory->getGlobalParameters() );
     matcher.foreachPair( geom );
@@ -291,13 +291,13 @@ void IsisMain() {
   // If all failed, we're done
   if ( !best ) {
     logger->dbugout() << "Bummer! No matches were found!\n";
-    QString mess = "NO MATCHES WERE FOUND!!!"; 
+    QString mess = "NO MATCHES WERE FOUND!!!";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 
   // Not valid results
   if ( best->size() <= 0 ) {
-    logger->dbugout() << "Shucks! Insufficient matches were found (" 
+    logger->dbugout() << "Shucks! Insufficient matches were found ("
                       << best->size() << ")\n";
     QString mess = "Shucks! Insufficient matches were found (" +
                    QString::number(best->size()) + ")";
@@ -311,14 +311,14 @@ void IsisMain() {
   bestinfo += PvlKeyword("MinEfficiency",  toString(quality.Minimum()));
   bestinfo += PvlKeyword("MaxEfficiency",  toString(quality.Maximum()));
   if ( quality.ValidPixels() > 1 ) {
-    bestinfo += PvlKeyword("StdDevEfficiency", 
-                           toString(quality.StandardDeviation())); 
+    bestinfo += PvlKeyword("StdDevEfficiency",
+                           toString(quality.StandardDeviation()));
   }
   Application::Log(bestinfo);
 
 
-  // If a cnet file was entered, write the ControlNet file of the specified 
-  // type.  Note that it was created as an image-to-image network. Must make 
+  // If a cnet file was entered, write the ControlNet file of the specified
+  // type.  Note that it was created as an image-to-image network. Must make
   // adjustments if a ground network is requested.
   if ( ui.WasEntered("ONET") ) {
     ControlNet cnet;
@@ -351,20 +351,20 @@ void IsisMain() {
     }
 
     // Write out control network
-    cnet.Write( ui.GetFileName("ONET") ); 
+    cnet.Write( ui.GetFileName("ONET") );
     Application::Log(cnetinfo);
   }
 
   // If user wants a list of matched images, write the list to the TOLIST filename
   if ( ui.WasEntered("TOLIST") ) {
     QLogger fout( QDebugLogger::create( ui.GetAsString("TOLIST"),
-                                             (QIODevice::WriteOnly | 
+                                             (QIODevice::WriteOnly |
                                               QIODevice::Truncate) ) );
     fout.logger() << matcher.query().name() << "\n";
     MatcherSolution::MatchPairConstIterator mpair = best->begin();
     while ( mpair != best->end() ) {
       if ( mpair->size() > 0 ) {
-         fout.logger() << mpair->train().source().name() << "\n"; 
+         fout.logger() << mpair->train().source().name() << "\n";
       }
       ++mpair;
     }
@@ -376,12 +376,12 @@ void IsisMain() {
   // failed matches)
   if ( ui.WasEntered("TONOTMATCHED") ) {
     QLogger fout( QDebugLogger::create( ui.GetAsString("TONOTMATCHED"),
-                                             (QIODevice::WriteOnly | 
+                                             (QIODevice::WriteOnly |
                                               QIODevice::Append) ) );
     MatcherSolution::MatchPairConstIterator mpair = best->begin();
     while ( mpair != best->end() ) {
       if ( mpair->size() == 0 ) {
-         fout.logger() << mpair->train().source().name() << "\n"; 
+         fout.logger() << mpair->train().source().name() << "\n";
       }
       ++mpair;
     }

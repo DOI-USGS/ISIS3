@@ -8,7 +8,7 @@ class QFont;
 template <typename A> class QFutureWatcher;
 class QModelIndex;
 class QMutex;
-template< typename A, typename B > class QPair;
+template< typename A, typename B > struct QPair;
 class QSize;
 class QString;
 
@@ -35,6 +35,7 @@ namespace Isis {
      *
      * @internal
      *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+     *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
      */
     class AbstractTreeModel : public QObject {
         Q_OBJECT

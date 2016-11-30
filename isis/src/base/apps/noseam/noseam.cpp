@@ -74,18 +74,18 @@ void IsisMain() {
   //Will remove all of the temp files by default
   if(ui.GetBoolean("REMOVETEMP")) {
     QString file("HighPassList.lis");
-    remove(file.toAscii().data());
+    remove(file.toLatin1().data());
     file = pathName + "HighpassMosaic.cub";
-    remove(file.toAscii().data());
+    remove(file.toLatin1().data());
     file = pathName + "LowpassMosaic.cub";
-    remove(file.toAscii().data());
+    remove(file.toLatin1().data());
     file = pathName + "OriginalMosaic.cub";
-    remove(file.toAscii().data());
+    remove(file.toLatin1().data());
 
     for(int i = 0; i < cubes.size(); i++) {
       inFile = cubes[i];
       file = pathName + inFile.baseName() + "_highpass.cub";
-      remove(file.toAscii().data());
+      remove(file.toLatin1().data());
     }
   }
 

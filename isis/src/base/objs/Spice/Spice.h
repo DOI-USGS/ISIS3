@@ -2,8 +2,8 @@
 #define Spice_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 7229 $
+ * $Date: 2016-11-10 21:04:46 -0700 (Thu, 10 Nov 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   intellectual property information,user agreements, and related information.

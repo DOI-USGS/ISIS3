@@ -52,7 +52,7 @@ namespace Isis {
    *                            try to load from current working directory,
    *                            then from $ISISROOT/lib.
    */
-  void *Plugin::GetPlugin(const QString &group) {
+  QFunctionPointer Plugin::GetPlugin(const QString &group) {
     // Get the library and plugin to load
     PvlGroup &g = findGroup(group);
     QString library = g["Library"];
@@ -72,10 +72,11 @@ namespace Isis {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;
     }
+
     lib.setFileName(libraryFile.expanded());
 
-    void *plugin = lib.resolve(pluginName.toAscii().data());
-    if(plugin == 0) {
+    QFunctionPointer plugin = lib.resolve(pluginName.toLatin1().data());
+    if (plugin == 0) {
       QString msg = "Unable to find plugin [" + pluginName +
                     "] in shared library [" + lib.fileName() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -84,4 +85,3 @@ namespace Isis {
     return plugin;
   }
 } // end namespace isis
-

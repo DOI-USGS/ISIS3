@@ -2,9 +2,7 @@
 #include "SpecialPixel.h"
 #include "IException.h"
 #include "IString.h"
-
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
+#include "NormModel.h"
 
 namespace Isis {
   Albedo::Albedo(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
@@ -49,6 +47,7 @@ namespace Isis {
     p_normPsurfref = GetPhotoModel()->CalcSurfAlbedo(p_normPharef, p_normIncref, p_normEmaref);
     GetPhotoModel()->SetStandardConditions(false);
   }
+
 
   void Albedo::NormModelAlgorithm(double phase, double incidence,
                                   double emission, double demincidence, double dememission,

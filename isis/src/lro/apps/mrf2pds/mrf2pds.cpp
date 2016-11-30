@@ -150,7 +150,7 @@ void IsisMain() {
 
   int iFound = outFileName.indexOf(".lbl");
   outFileName.replace(iFound, 4, ".img");
-  ofstream oCube(outFileName.toAscii().data());
+  ofstream oCube(outFileName.toLatin1().data());
   cProcess.OutputDetachedLabel();
   //cProcess.OutputLabel(oCube);
   cProcess.StartProcess(oCube);
@@ -240,7 +240,7 @@ void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLbl)
   // ID's - add directly to the PvlKeyword
   else {
     ifstream inIdFile;
-    inIdFile.open(psSrcListFile.toAscii().data(), std::ios::in);
+    inIdFile.open(psSrcListFile.toLatin1().data(), std::ios::in);
     char buff[501];
     inIdFile.getline(buff, 500);
     while(!inIdFile.eof()) {

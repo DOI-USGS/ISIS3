@@ -2,8 +2,8 @@
 #define SpkKernelWriter_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -22,7 +22,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  *
- *   $Id$
+ *   $Id: SpkKernelWriter.h 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  */
 #include <string>
 #include "SpiceKernel.h"
@@ -96,12 +96,12 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       FileName kf(kfile);
       if ( kf.fileExists() ) {
         QString full_kf = kf.expanded();
-        std::remove(full_kf.toAscii().data());
+        std::remove(full_kf.toLatin1().data());
       }
       SpiceInt  myHandle;
 
       NaifStatus::CheckErrors();
-      spkopn_c(kf.expanded().toAscii().data(), "USGS_SPK_FILE", comsize, &myHandle);
+      spkopn_c(kf.expanded().toLatin1().data(), "USGS_SPK_FILE", comsize, &myHandle);
       NaifStatus::CheckErrors();
       return (myHandle);
     }
@@ -150,8 +150,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
 
-        spkw09_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
-                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
+        spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
 
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
@@ -184,8 +184,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
-        spkw13_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
-                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
+        spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
         return;

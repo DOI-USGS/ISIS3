@@ -44,12 +44,12 @@ int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
     qDebug() << "Unit test for Intercept.";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Default constructor.";
     Intercept i;
     qDebug() << "default object is valid?" << i.isValid();
-    qDebug();
+    qDebug() << "";
 
 
     qDebug() << "Construct Intercept object from ";
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "normal   = " << i2.normal();
     qDebug() << "emission = " << i2.emission();
     qDebug() << "sepAngle = " << i2.separationAngle(raydir);
-    qDebug();
+    qDebug() << "";
 
 
     qDebug() << "================================= Error Throws ==================================";
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Invalid because look direction(empty) is not valid NaifVector:";
     try {
       NaifVector invalidLookDir;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Invalid because surface point is null:";
     try {
       SurfacePoint *invalidSP = NULL;
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Invalid because shape is null:";
     try {
       TriangularPlate *invalidShape = NULL;
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
 
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     IException(e, IException::Programmer,
               "\n------------Unit Test Failed.------------",
               _FILEINFO_).print();

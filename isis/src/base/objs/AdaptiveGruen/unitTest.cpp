@@ -54,9 +54,9 @@ int main() {
     ar->PatternChip()->Load(p);
 
     std::cout << "Register = " << ar->Register() << std::endl;
-    std::cout << "Goodness = " << std::setprecision(3) 
+    std::cout << "Goodness = " << std::setprecision(3)
               << ar->GoodnessOfFit() << std::endl;
-    std::cout << "Position = " << std::setprecision(6) 
+    std::cout << "Position = " << std::setprecision(6)
               << ar->CubeSample() << " " << ar->CubeLine() << std::endl;
 
 

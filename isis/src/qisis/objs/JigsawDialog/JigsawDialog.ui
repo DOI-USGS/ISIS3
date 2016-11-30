@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>JigsawDialog</class>
+ <widget class="QDialog" name="JigsawDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>520</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Jigsaw</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/jigsaw.png</normaloff>icons/jigsaw.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>260</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="jigsawButtonsLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>10</y>
+     <width>189</width>
+     <height>94</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="JigsawSetupButton">
+      <property name="text">
+       <string>&amp;Setup</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="JigsawRunButton">
+      <property name="text">
+       <string>&amp;Run</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="useLastSettings">
+      <property name="text">
+       <string>Use Last Settings</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>301</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="statusUpdatesLayout">
+    <item row="0" column="0">
+     <widget class="QScrollArea" name="statusUpdateScrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QLabel" name="statusUpdatesLabel">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>297</width>
+         <height>237</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Welcome to Jigsaw</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="iterationLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>321</x>
+     <y>110</y>
+     <width>188</width>
+     <height>59</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="iterationSigma0Layout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="iterationLabel">
+      <property name="text">
+       <string>Iteration</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::PlainText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="sigma0Label">
+      <property name="text">
+       <string>sigma0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLCDNumber" name="iterationLcdNumber">
+      <property name="minimumSize">
+       <size>
+        <width>90</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLCDNumber" name="sigma0LcdNumber">
+      <property name="minimumSize">
+       <size>
+        <width>90</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>JigsawDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>JigsawDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

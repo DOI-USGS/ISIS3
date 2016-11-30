@@ -53,9 +53,9 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 void reorder(int16 *block)
 {
   int16 temp[256];
-  register int16 *scanBlock, *scanTemp;
-  register uint8 *scanTrans;
-  register uint32 i;
+int16 *scanBlock, *scanTemp;
+uint8 *scanTrans;
+uint32 i;
 
   scanBlock = block;
   scanTrans = trans;

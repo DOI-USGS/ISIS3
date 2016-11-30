@@ -30,7 +30,8 @@ namespace Isis {
    *
    * @author 2012-09-19 Steven Lambright
    *
-   * @internal
+   * @internal 
+   *   @history 2016-06-23 Tyler Wilson - Replaced QList<Control *> with ControlList *.
    */
   class CnetEditorViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -41,7 +42,7 @@ namespace Isis {
 
       virtual CnetEditorViewWorkOrder *clone() const;
 
-      virtual bool isExecutable(QList<Control *> controls);
+      virtual bool isExecutable(ControlList *controls);
       bool execute();
 
     protected:

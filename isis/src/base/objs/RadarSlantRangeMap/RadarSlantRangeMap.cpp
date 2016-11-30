@@ -278,7 +278,7 @@ namespace Isis {
       // TODO:  Test array size to be 4 if not throw error
       std::vector<QString> array = seq[i];
       double et;
-      utc2et_c(array[0].toAscii().data(), &et);
+      utc2et_c(array[0].toLatin1().data(), &et);
       p_time.push_back(et);
       p_a0.push_back(toDouble(array[1]));
       p_a1.push_back(toDouble(array[2]));

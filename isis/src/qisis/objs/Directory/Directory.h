@@ -43,10 +43,10 @@ class QSplitter;
 class QTabWidget;
 
 namespace Isis {
+  class ChipViewportsWidget;
   class CnetEditorWidget;
   class ControlNet;
-  class ControlNetEditor;
-  class ControlPointEditWidget;
+  class ControlPointEditView;
   class CubeDnView;
   class Footprint2DView;
   class HistoryTreeWidget;
@@ -93,6 +93,15 @@ namespace Isis {
    *   @history 2016-01-04 Jeffrey Covington - Added support for CubeDnView and
    *                           Footprint2DView, replacing old classes.
    *   @history 2016-06-17 Tyler Wilson - Added documentation for member functions/variables.
+   *   @history 2016-07-06 Tracie Sucharski - Added ImportShapesWorkOrder, changed ControlNetEditor
+   *                           to ControlPointEditView.
+   *   @history 2016-08-02 Tracie Sucharski - Added RemoveImagesWorkOrder.
+   *   @history 2016-09-14 Tracie Sucharski - Added slots for mouse clicks on Footprint2DView and
+   *                           CubeDnViews for modifying, deleting and creating control points.
+   *   @history 2016-11-07 Ian Humphrey - Restored saving and loading Footprint2DViews when saving
+   *                           and opening a project (modified save() and startElement()).
+   *                           Fixes #4486.
+   *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews. 
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -107,18 +116,18 @@ namespace Isis {
       QStringList recentProjectsList();
 
       CnetEditorWidget *addCnetEditorView(Control *network);
-      //CubeDnView *addCubeDnView();  //tjw
-      //Footprint2DView *addFootprint2DView();  //tjw
-      //MatrixSceneWidget *addMatrixView();  //tjw
-      //TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);  //tjw
+      CubeDnView *addCubeDnView();
+      Footprint2DView *addFootprint2DView();
+      MatrixSceneWidget *addMatrixView();
+      TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
       ImageFileListWidget *addImageFileListView();
-      void addControlPointEditor(ControlNet *cnet, QString cnetFilename);
+      ControlPointEditView *addControlPointEditView();
 
 
-      //ProjectItemTreeView *addProjectItemTreeView();  //tjw
+      ProjectItemTreeView *addProjectItemTreeView();
 
-      //ProjectItemModel *model();  //tjw
+      ProjectItemModel *model();
 
       Project *project() const;
 
@@ -134,15 +143,15 @@ namespace Isis {
       QList<QAction *> toolPadActions();
       
       QList<CnetEditorWidget *> cnetEditorViews();
-      //QList<CubeDnView *> cubeDnViews();  //tjw
-      //QList<Footprint2DView *> footprint2DViews();  //tjw
-      //QList<MatrixSceneWidget *> matrixViews();  //tjw
+      QList<CubeDnView *> cubeDnViews();
+      QList<Footprint2DView *> footprint2DViews();
+      QList<MatrixSceneWidget *> matrixViews();
       QList<SensorInfoWidget *> sensorInfoViews();
-      //QList<TargetInfoWidget *> targetInfoViews();  //tjw
+      QList<TargetInfoWidget *> targetInfoViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
-      //ControlPointEditWidget *controlPointEditorView();  //tjw
-      //ControlNetEditor *controlNetEditor();  //tjw
+      ControlPointEditView *controlPointEditView();
+      ChipViewportsWidget *controlPointChipViewports();
 
 
 
@@ -194,8 +203,8 @@ namespace Isis {
 
       QWidget *warningWidget();
 
-      //QAction *redoAction();  //tjw
-      //QAction *undoAction();  //tjw
+      QAction *redoAction();
+      QAction *undoAction();
 
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
@@ -203,17 +212,26 @@ namespace Isis {
     signals:
       void newWidgetAvailable(QWidget *newWidget);
 
+      void controlPointAdded(QString newPointId);
+
     public slots:
       void cleanupCnetEditorViewWidgets();
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
       void cleanupFootprint2DViewWidgets();
-      void cleanupControlPointEditorWidget();
+      void cleanupControlPointEditViewWidget();
       void cleanupMatrixViewWidgets();
       void cleanupSensorInfoWidgets();
       void cleanupTargetInfoWidgets();
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
+
+      //  Slots in response to mouse clicks on CubeDnView (IpceTool) and
+      //    Footprint2DView (MosaicControlNetTool)
+      void modifyControlPoint(ControlPoint *controlPoint);
+      void deleteControlPoint(ControlPoint *controlPoint);
+      void createControlPoint(double latitude, double longitude, Cube *cube = 0,
+                              bool isGroundSource = false);
 
       void updateRecentProjects(Project *project);
 
@@ -249,7 +267,6 @@ namespace Isis {
        *   This will create a new ImageFileListViewWorkOrder and append it to m_workOrders.
        * @return @b A pointer to the WorkOrder created by this function.
        */
-      /*
       template <typename WorkOrderType>
       WorkOrderType *createWorkOrder() {
         WorkOrderType *newWorkOrder = new WorkOrderType(m_project);
@@ -257,7 +274,6 @@ namespace Isis {
         return newWorkOrder;
       }
 
-      */
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
 
@@ -274,9 +290,8 @@ namespace Isis {
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
-      QPointer<ControlPointEditWidget> m_controlPointEditWidget; //!< Pointer to a
-                                                                 //!< ControlPointEditWidget.
-
+      QPointer <ControlPointEditView> m_controlPointEditViewWidget;
+      QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
       QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets; //!< List of SensorInfoWidgets
       QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets
@@ -291,6 +306,7 @@ namespace Isis {
       QPointer<WorkOrder> m_exportImagesWorkOrder; //!< The export images WorkOrder.
       QPointer<WorkOrder> m_importControlNetWorkOrder; //!< The import ControlNetwork WorkOrder.
       QPointer<WorkOrder> m_importImagesWorkOrder; //!< The import images WorkOrder.
+      QPointer<WorkOrder> m_importShapesWorkOrder; //!< The import shapes WorkOrder.
       QPointer<WorkOrder> m_openProjectWorkOrder; //!< The Open Project WorkOrder.
       QPointer<WorkOrder> m_saveProjectWorkOrder; //!< The Save Project WorkOrder.
       QPointer<WorkOrder> m_saveProjectAsWorkOrder; //!< The Save Project As WorkOrder.
@@ -299,10 +315,6 @@ namespace Isis {
 
       QPointer<WorkOrder> m_runJigsawWorkOrder; //!< The Run Jigsaw WorkOrder
       QPointer<WorkOrder> m_renameProjectWorkOrder; //!< The Rename Project WorkOrder
-
-
-
-      QPointer<ControlNetEditor> m_cnetEditor;  //!< Pointer to the ControlNetEditor
 
       QList<QAction *> m_fileMenuActions;  //!< List of file menu actions.
       QList<QAction *> m_projectMenuActions; //!< List of project menu actions.

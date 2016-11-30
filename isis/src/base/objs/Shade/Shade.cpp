@@ -1,8 +1,6 @@
 #include "Shade.h"
 #include "IException.h"
 
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
 namespace Isis {
   Shade::Shade(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {

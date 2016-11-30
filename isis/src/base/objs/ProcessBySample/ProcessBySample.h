@@ -30,11 +30,11 @@ namespace Isis {
    * @brief Process cubes by sample
    *
    * This class allows a programmer to develop a program which process input and
-   * output cubes sequentially by sample. That is, receive the input data for 
-   * sample one, manipulate the data, and pass back the data for output sample 
-   * one. Then proceed to the sample two and so one. This class is derived from 
-   * the Process class which give many functions for setting up input and output 
-   * cubes. 
+   * output cubes sequentially by sample. That is, receive the input data for
+   * sample one, manipulate the data, and pass back the data for output sample
+   * one. Then proceed to the sample two and so one. This class is derived from
+   * the Process class which give many functions for setting up input and output
+   * cubes.
    *
    *
    * @ingroup HighLevelCubeIO
@@ -56,6 +56,7 @@ namespace Isis {
         SetWrap(true);
       };
 
+      using Isis::ProcessByBrick::SetInputCube;
       Isis::Cube *SetInputCube(const QString &parameter,
                                int requirements = 0);
       Isis::Cube *SetInputCube(const QString &file,

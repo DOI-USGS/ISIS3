@@ -2,8 +2,8 @@
 #define Camera_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 7234 $
+ * $Date: 2016-11-12 14:04:38 -0700 (Sat, 12 Nov 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -497,9 +497,7 @@ namespace Isis {
     private:
       void GroundRangeResolution();
       void ringRangeResolution();
-      double ComputeAzimuth(Distance radius,
-                            const double lat, 
-                            const double lon);
+      double ComputeAzimuth(const double lat, const double lon);
       bool RawFocalPlanetoImage();
       // SetImage helper functions: 
       // bool SetImageNoProjection(const double sample, const double line); 

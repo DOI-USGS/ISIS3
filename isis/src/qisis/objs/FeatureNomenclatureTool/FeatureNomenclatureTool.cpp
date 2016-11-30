@@ -17,7 +17,11 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
-#include <QWebView>
+#if defined(__APPLE__)
+#include <QtWebEngineWidgets/QWebEngineView>
+#else
+#include <QWebEngineView>
+#endif
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>

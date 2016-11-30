@@ -6,7 +6,9 @@
 #include <QMetaType>
 #include <QSettings>
 #include <QSignalSpy>
-#include <QtGui>
+#include <QStatusBar>
+#include <QTest>
+#include <QtWidgets>
 #include <QTreeWidgetItem>
 
 #include "FileName.h"
@@ -24,7 +26,7 @@ namespace Isis {
 
     MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
-    QTest::qWaitForWindowShown(&widget);
+    QTest::qWaitForWindowExposed(widget.windowHandle());
     QVERIFY(widget.getProgress());
     QVERIFY(widget.getView());
     QVERIFY(widget.getScene());
@@ -44,7 +46,7 @@ namespace Isis {
     QVERIFY(widget.cubesSelectable());
 
     // Check that the bounding rect is approx. the same
-    QRectF expected(QPointF(2376269.37351469, -964957.418535598), QSize(109739.587494429, 48049.2250501961));
+    QRectF expected(QPointF(2376269.37351469, -964957.418535598), QSize(109739, 48049));
 
     QVERIFY(qAbs(widget.cubesBoundingRect().top() - expected.top()) < 0.0001);
     QVERIFY(qAbs(widget.cubesBoundingRect().left() - expected.left()) < 0.0001);
@@ -58,7 +60,7 @@ namespace Isis {
 
     MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
-    QTest::qWaitForWindowShown(&widget);
+    QTest::qWaitForWindowExposed(widget.windowHandle());
 
     Image *image = new Image(QString("./lub3994m.342.lev1.cub"));
     QScopedPointer<QMutex> cameraMutex(new QMutex);

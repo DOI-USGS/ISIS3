@@ -1,9 +1,17 @@
 #include "StereoTool.h"
-#include <QtGui>
 
 #include <iomanip>
 #include <cmath>
 #include <vector>
+
+#include <QAction>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QStackedWidget>
 
 #include "AbstractPlotTool.h"
 #include "Application.h"
@@ -174,7 +182,7 @@ namespace Isis {
     QString whatsThis =
       "<b>Function:</b> Saves the elevation calulations to current file.";
     m_save->setWhatsThis(whatsThis);
-    connect( m_save, SIGNAL( activated() ), this, SLOT( saveElevations() ) );
+    connect( m_save, SIGNAL( triggered() ), this, SLOT( saveElevations() ) );
     m_save->setDisabled(true);
 
     QAction *saveAs = new QAction(m_stereoTool);
@@ -182,7 +190,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Saves the elevation calulations to a file.";
     saveAs->setWhatsThis(whatsThis);
-    connect( saveAs, SIGNAL( activated() ), this, SLOT( saveAsElevations() ) );
+    connect( saveAs, SIGNAL( triggered() ), this, SLOT( saveAsElevations() ) );
 
     QAction *closeStereoTool = new QAction(m_stereoTool);
     closeStereoTool->setText("&Close");
@@ -191,7 +199,7 @@ namespace Isis {
       "<b>Function:</b> Closes the Stereo Tool window for this point \
        <p><b>Shortcut:</b> Alt+F4 </p>";
     closeStereoTool->setWhatsThis(whatsThis);
-    connect( closeStereoTool, SIGNAL( activated() ), m_stereoTool, SLOT( close() ) );
+    connect( closeStereoTool, SIGNAL( triggered() ), m_stereoTool, SLOT( close() ) );
 
     QMenu *fileMenu = m_stereoTool->menuBar()->addMenu("&File");
     fileMenu->addAction(m_save);
@@ -203,7 +211,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Allows user to select a new file to set as the registration template";
     templateFile->setWhatsThis(whatsThis);
-    connect( templateFile, SIGNAL( activated() ), this, SLOT( setTemplateFile() ) );
+    connect( templateFile, SIGNAL( triggered() ), this, SLOT( setTemplateFile() ) );
 
     QAction *viewTemplate = new QAction(m_stereoTool);
     viewTemplate->setText("&View/edit registration template");
@@ -211,7 +219,7 @@ namespace Isis {
       "<b>Function:</b> Displays the curent registration template.  \
        The user may edit and save changes under a chosen filename.";
     viewTemplate->setWhatsThis(whatsThis);
-    connect( viewTemplate, SIGNAL( activated() ), this, SLOT( viewTemplateFile() ) );
+    connect( viewTemplate, SIGNAL( triggered() ), this, SLOT( viewTemplateFile() ) );
 
 
     QMenu *optionMenu = m_stereoTool->menuBar()->addMenu("&Options");
@@ -223,7 +231,7 @@ namespace Isis {
 
     QAction *showHelpAct = new QAction("stereo tool &Help", m_stereoTool);
     showHelpAct->setIcon(QPixmap(toolIconDir() + "/help-contents.png") );
-    connect( showHelpAct, SIGNAL( activated() ), this, SLOT( showHelp() ));
+    connect( showHelpAct, SIGNAL( triggered() ), this, SLOT( showHelp() ));
 
     QMenu *helpMenu = m_stereoTool->menuBar()->addMenu("&Help");
     helpMenu->addAction(showHelpAct);
@@ -716,7 +724,7 @@ namespace Isis {
         if (response == QMessageBox::Yes) {
           saveAsElevations();
         }
-        m_stereoTool->setShown(false);
+        m_stereoTool->setVisible(false);
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(*m_linkedViewports.at(0)->cube()->label());
@@ -750,7 +758,7 @@ namespace Isis {
    *                           to the StereoFileTool::open.
    */
   void StereoTool::clearFiles() {
-    m_stereoTool->setShown(false);
+    m_stereoTool->setVisible(false);
 
     if (m_leftGM) {
       delete m_leftGM;
@@ -795,7 +803,7 @@ namespace Isis {
       m_serialNumberList->add( m_rightCube->fileName() );
     }
 
-    vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
+    std::vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
     m_targetRadius = Distance(targetRadius[0]);
     //  If radius combo box set to ellipsoid, update the radius line edit
     if ( !m_targetRadius.isValid() ) {
@@ -1264,7 +1272,7 @@ namespace Isis {
     m_editPoint = m_controlNet->GetPoint( (QString) newPoint->GetId() );
     //  Load new point in StereoTool
     loadPoint();
-    m_stereoTool->setShown(true);
+    m_stereoTool->setVisible(true);
     m_stereoTool->raise();
 
     emit editPointChanged();
@@ -1292,7 +1300,7 @@ namespace Isis {
     //loadPoint();
 
     m_controlNet->DeletePoint( m_editPoint->GetId() );
-    m_stereoTool->setShown(false);
+    m_stereoTool->setVisible(false);
     m_editPoint = NULL;
 
     emit editPointChanged();
@@ -1309,7 +1317,7 @@ namespace Isis {
 
     m_editPoint = point;
     loadPoint();
-    m_stereoTool->setShown(true);
+    m_stereoTool->setVisible(true);
     m_stereoTool->raise();
     emit editPointChanged();
   }

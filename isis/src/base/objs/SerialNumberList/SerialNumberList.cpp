@@ -37,8 +37,8 @@ namespace Isis {
    *   @history 2009-10-20 Jeannie Walldren - Added Progress flag
    *   @history 2009-11-05 Jeannie Walldren - Modified number of maximum steps for Progress flag
    */
-  SerialNumberList::SerialNumberList(const QString &listfile, 
-                                     bool checkTarget, 
+  SerialNumberList::SerialNumberList(const QString &listfile,
+                                     bool checkTarget,
                                      Progress *progress) {
     m_checkTarget = checkTarget;
     m_target.clear();
@@ -75,9 +75,9 @@ namespace Isis {
   /**
    * Remove the specified serial number from the list
    *
-   * @author 2010-09-09 Sharmila Prasad
-   *
    * @param sn Name of serial number to remove
+   *
+   * @author 2010-09-09 Sharmila Prasad
    */
   void SerialNumberList::Delete(const QString &sn) {
     int index = serialNumberIndex(sn);
@@ -276,7 +276,7 @@ namespace Isis {
       else if (hasSerialNumber(serialNumber)) {
         int index = serialNumberIndex(serialNumber);
         QString msg = "Duplicate, serial number [" + serialNumber + "] from files ["
-                      + SerialNumberList::fileName(serialNumber) 
+                      + SerialNumberList::fileName(serialNumber)
                       + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -315,8 +315,8 @@ namespace Isis {
       m_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(m_pairs.size() - 1)));
     }
     catch (IException &e) {
-      QString msg = "[SerialNumber, FileName] = [" + serialNumber + ", " 
-                    + Isis::FileName(filename).expanded() 
+      QString msg = "[SerialNumber, FileName] = [" + serialNumber + ", "
+                    + Isis::FileName(filename).expanded()
                     + "] can not be added to serial number list.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -409,7 +409,7 @@ namespace Isis {
       return m_pairs[index].serialNumber;
     }
     else {
-      QString msg = "Unable to get the SerialNumber. The given index [" 
+      QString msg = "Unable to get the SerialNumber. The given index ["
                     + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -431,7 +431,7 @@ namespace Isis {
       return m_pairs[index].observationNumber;
     }
     else {
-      QString msg = "Unable to get the ObservationNumber. The given index [" 
+      QString msg = "Unable to get the ObservationNumber. The given index ["
                     + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -453,7 +453,7 @@ namespace Isis {
       return m_serialMap.find(sn)->second;
     }
     else {
-      QString msg = "Unable to get the SerialNumber index. The given serial number [" 
+      QString msg = "Unable to get the SerialNumber index. The given serial number ["
                     + sn + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -500,7 +500,7 @@ namespace Isis {
       return m_pairs[index].filename;
     }
     else {
-      QString msg = "Unable to get the FileName. The given index [" 
+      QString msg = "Unable to get the FileName. The given index ["
                     + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -520,11 +520,13 @@ namespace Isis {
   QString SerialNumberList::spacecraftInstrumentId(int index) {
     if (index >= 0 && index < (int) m_pairs.size()) {
       QString scid = (m_pairs[index].spacecraftName + "/" + m_pairs[index].instrumentId).toUpper();
-      scid.simplified();
+
+      // silence 'unused-result' warnings with arbitrary cast
+      (void)scid.simplified();
       return scid.replace(" ","");
     }
     else {
-      QString msg = "Unable to get the Spacecraft InstrumentId. The given index [" 
+      QString msg = "Unable to get the Spacecraft InstrumentId. The given index ["
                     + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -534,7 +536,7 @@ namespace Isis {
   /**
    * Return the spacecraftname/instrumentid given a serial number
    *
-   * @param sn The serial number of the desired spacecraftname/instrumentid 
+   * @param sn  The serial number of the desired spacecraftname/instrumentid
    *
    * @throws IException::Programmer "Unable to get the Spacecraft InstrumentId. The given serial
    *                                 number does not exist in the list."
@@ -545,11 +547,13 @@ namespace Isis {
     if (hasSerialNumber(sn)) {
       int index = m_serialMap.find(sn)->second;
       QString scid = (m_pairs[index].spacecraftName + "/" + m_pairs[index].instrumentId).toUpper();
-      scid.simplified();
+
+      // silence 'unused-result' warnings with arbitrary cast
+      (void)scid.simplified();
       return scid.replace(" ","");
     }
     else {
-      QString msg = "Unable to get the Spacecraft InstrumentId. The given serial number [" 
+      QString msg = "Unable to get the Spacecraft InstrumentId. The given serial number ["
                     + sn + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -578,7 +582,7 @@ namespace Isis {
       return numbers;
     }
     else {
-      QString msg = "Unable to get the possible serial numbers. The given observation number [" 
+      QString msg = "Unable to get the possible serial numbers. The given observation number ["
                     + on + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

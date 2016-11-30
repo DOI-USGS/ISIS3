@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     cout << "Clean-up" << endl;
     delete importer;
-    remove(outputName.expanded().toAscii().data());
+    remove(outputName.expanded().toLatin1().data());
 
     cout << endl << "Done" << endl;
   }

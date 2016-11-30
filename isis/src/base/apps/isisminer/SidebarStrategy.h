@@ -1,9 +1,9 @@
 #ifndef SidebarStrategy_h
 #define SidebarStrategy_h
 /**
- * @file                                                                  
- * $Revision: 6513 $ 
- * $Date: 2016-01-14 16:04:44 -0700 (Thu, 14 Jan 2016) $ 
+ * @file
+ * $Revision: 6513 $
+ * $Date: 2016-01-14 16:04:44 -0700 (Thu, 14 Jan 2016) $
  * $Id: SidebarStrategy.h 6513 2016-01-14 23:04:44Z kbecker@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
@@ -48,7 +48,7 @@ namespace Isis {
    * any resources that are deleted in the configuration with the "SaveDelete"
    * parameter.
    *
-   * @code 
+   * @code
    * Object = Strategy
    *   Name = SetUpResources
    *   Type = SideBar
@@ -58,8 +58,8 @@ namespace Isis {
    * EndObject
    * @endcode
    *
-   * @author 2012-07-15 Kris Becker 
-   * @internal 
+   * @author 2012-07-15 Kris Becker
+   * @internal
    *   @history 2012-07-15 Kris Becker - Original version.
    *   @history 2015-03-18 Jeannie Backer - Brought class files closer to ISIS coding standards.
    *   @history 2015-04-07 Jeffrey Covinton - Documented the class, methods, and members.
@@ -68,36 +68,40 @@ namespace Isis {
    *   @history 2015-05-08 Kris Becker - Modify constructor to take a global
    *                          resources list; modified apply() method to accept
    *                          a global resource list.
+   *   @history 2016-08-28 Kelvin Rodriguez - Added using Strategy::apply; to avoid
+   *                           hidden virtual function warnings in clang.
+   *                           Part of porting to OS X 10.11.
    */
   class SidebarStrategy : public Strategy {
-  
+
     public:
       SidebarStrategy();
       SidebarStrategy(const PvlObject &definition, const ResourceList &globals);
       virtual ~SidebarStrategy();
-  
+
       virtual int apply(ResourceList &resources, const ResourceList &globals);
-  
+
     protected:
       virtual int preRunProcess(ResourceList &resources, const ResourceList &globals);
       virtual int preStrategyProcess(const int &nth, const Strategy *strategy,
-                                     ResourceList &resources, 
+                                     ResourceList &resources,
                                      const ResourceList &globals);
 
+      using Strategy::apply; // make parent functions visable
       virtual int apply(SharedStrategy &strategy, ResourceList &resources,
                         const ResourceList &globals);
 
       virtual int postStrategyProcess(const int &nth, const Strategy *strategy,
-                                      ResourceList &resources, 
+                                      ResourceList &resources,
                                       const ResourceList &globals);
       virtual int postRunProcess(ResourceList &resources, const ResourceList &globals);
-  
+
     private:
       bool         m_savepoint;   //!< If true the activeness of the resources is maintained
       bool         m_savedeletes; /**!< If true any resources that are deleted
                                         in the configuration will be restored. */
       StrategyList m_strategies;  //!< The list of strategies to be applied to the resoruces.
-      
+
   };
 
 } // Namespace Isis

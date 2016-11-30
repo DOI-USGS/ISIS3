@@ -62,14 +62,14 @@ void initReverse(trans) uint8 *trans;
   *  The array "tran" contains the bit reversal of each index in that
   *  index's location (e.g. trans[0x05] = 0xa0).
   */
-  register uint32 t;    /* Current index */
+uint32 t;    /* Current index */
 
   /* Do all 8 bit numbers */
   for(t = 0; t < 256; t++) {
-    register uint8 r;  /* Reversed byte */
-    register uint8 b;  /* Bit count */
-    register uint8 mask;  /* Current bit in index */
-    register uint8 bit;  /* Current bit in reversed byte */
+uint8 r;  /* Reversed byte */
+uint8 b;  /* Bit count */
+uint8 mask;  /* Current bit in index */
+uint8 bit;  /* Current bit in reversed byte */
 
     /* Reverse all 8 bits */
     r = 0;

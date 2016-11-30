@@ -42,7 +42,7 @@ void IsisMain() {
     tempFile = true;
     QString command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " +
                      temp.expanded() + " > /dev/null 2>&1";
-    int returnValue = system(command.toAscii().data()) >> 8;
+    int returnValue = system(command.toLatin1().data()) >> 8;
     if(returnValue) {
       QString msg = "Error running vdcomp";
       IException::ErrorType msgTarget = IException::Programmer;
@@ -97,7 +97,7 @@ void IsisMain() {
   TranslateVikingLabels(pdsLabel, ocube);
   p.EndProcess();
 
-  if(tempFile) remove(temp.expanded().toAscii().data());
+  if(tempFile) remove(temp.expanded().toLatin1().data());
   return;
 }
 

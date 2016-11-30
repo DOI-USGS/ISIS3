@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
+ * $Id: SpkSegment.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -231,7 +231,7 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
     NaifStatus::CheckErrors();
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.toAscii().data(), m_refFrame.toAscii().data(), epochs[n], xform);
+      sxform_c(j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[n], xform);
       mxvg_c(xform, states[n], 6, 6, states[n]);
     }
     NaifStatus::CheckErrors();

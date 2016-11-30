@@ -1,5 +1,8 @@
 #include "FileTool.h"
 
+#include <cmath>
+
+#include <QAction>
 #include <QApplication>
 #include <QFileDialog>
 #include <QImage>
@@ -9,8 +12,7 @@
 #include <QPixmap>
 #include <QPrinter>
 #include <QPrintDialog>
-
-#include <cmath>
+#include <QToolBar>
 
 #include "Brick.h"
 #include "BrowseDialog.h"
@@ -53,7 +55,7 @@ namespace Isis {
        <p><b>Hint:</b> Use Ctrl or Shift in file dialog to open \
        multiple cubes</p>";
     p_open->setWhatsThis(whatsThis);
-    connect(p_open, SIGNAL(activated()), this, SLOT(open()));
+    connect(p_open, SIGNAL(triggered()), this, SLOT(open()));
 
     p_browse = new QAction(parent);
     p_browse->setShortcut(Qt::CTRL + Qt::Key_B);
@@ -63,7 +65,7 @@ namespace Isis {
       "<b>Function:</b> Browse a <i>Isis cubes</i> in new viewport \
        <p><b>Shortcut:</b>  Ctrl+B\n</p>";
     p_browse->setWhatsThis(whatsThis);
-    connect(p_browse, SIGNAL(activated()), this, SLOT(browse()));
+    connect(p_browse, SIGNAL(triggered()), this, SLOT(browse()));
 
     p_save = new QAction(parent);
     p_save->setShortcut(Qt::CTRL + Qt::Key_S);
@@ -74,7 +76,7 @@ namespace Isis {
       "<b>Function:</b> Save changes to the current Cube \
        <p><b>Shortcut:</b> Ctrl+S</p>";
     p_save->setWhatsThis(whatsThis);
-    connect(p_save, SIGNAL(activated()), this, SLOT(save()));
+    connect(p_save, SIGNAL(triggered()), this, SLOT(save()));
     p_save->setEnabled(false);
 
     p_saveAs = new QAction(parent);
@@ -84,7 +86,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Save the current Cube to the specified location";
     p_saveAs->setWhatsThis(whatsThis);
-    connect(p_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
+    connect(p_saveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
     p_saveAs->setEnabled(false);
 
     p_saveInfo = new QAction(parent);
@@ -94,7 +96,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Save the current Cube's Whatsthis Info to the specified location";
     p_saveInfo->setWhatsThis(whatsThis);
-    connect(p_saveInfo, SIGNAL(activated()), this, SLOT(saveInfo()));
+    connect(p_saveInfo, SIGNAL(triggered()), this, SLOT(saveInfo()));
     p_saveInfo->setEnabled(false);
 
     p_exportView = new QAction(parent);
@@ -107,7 +109,7 @@ namespace Isis {
        <p><b>Hint:</b>  Your local installation of Qt may not support \
        all formats.  Reinstall Qt if necessary</p>";
     p_exportView->setWhatsThis(whatsThis);
-    connect(p_exportView, SIGNAL(activated()), this, SLOT(exportView()));
+    connect(p_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
     p_exportView->setEnabled(false);
 
     p_print = new QAction(parent);
@@ -119,7 +121,7 @@ namespace Isis {
       "<b>Function:</b> Print visible contents of the active viewport \
       <p><b>Shortcut:</b> Ctrl+P</b>";
     p_print->setWhatsThis(whatsThis);
-    connect(p_print, SIGNAL(activated()), this, SLOT(print()));
+    connect(p_print, SIGNAL(triggered()), this, SLOT(print()));
     p_print->setEnabled(false);
 
     p_closeAll = new QAction(parent);
@@ -137,7 +139,7 @@ namespace Isis {
         "<b>Function:</b>  Quit qview \
         <p><b>Shortcut:</b> Ctrl+Q</p>";
     p_exit->setWhatsThis(whatsThis);
-    connect(p_exit, SIGNAL(activated()), this, SLOT(exit()));
+    connect(p_exit, SIGNAL(triggered()), this, SLOT(exit()));
 
     p_lastViewport = NULL;
 
@@ -173,7 +175,7 @@ namespace Isis {
     connect(this, SIGNAL(fileSelected(QString)),
             ws, SLOT(addCubeViewport(QString)));
 
-    connect(p_closeAll, SIGNAL(activated()), ws->mdiArea(), SLOT(closeAllSubWindows()));
+    connect(p_closeAll, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeAllSubWindows()));
   }
 
   /**
@@ -789,7 +791,7 @@ namespace Isis {
       return;
     }
 
-    QPixmap pm = QPixmap::grabWidget(cubeViewport()->viewport());
+    QPixmap pm = cubeViewport()->viewport()->grab();
 
     //if (!cubeViewport()->pixmap().save(output,format)) {
 
@@ -820,7 +822,7 @@ namespace Isis {
     QPrintDialog printDialog(printer, (QWidget *)parent());
     if (printDialog.exec() == QDialog::Accepted) {
       // Get display widget as a pixmap and convert to an image
-      QPixmap pixmap = QPixmap::grabWidget(cubeViewport()->viewport());
+      QPixmap pixmap = cubeViewport()->viewport()->grab();
       QImage img = pixmap.toImage();
 
       // C++ Gui Programmign with Qt, page 201

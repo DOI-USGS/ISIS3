@@ -1,9 +1,12 @@
 #include "Gui.h"
 
+#include <clocale>
+
 #include <sstream>
 #include <string>
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QFrame>
 #include <QIcon>
@@ -79,7 +82,7 @@ namespace Isis {
     new QApplication(argc, argv);
     // When QApplication is initialized, it will reset the locale to the shells locale. As a result
     // the locale needs to be reset after QApplications initialization.
-    std::setlocale(LC_ALL, "en_US");
+    setlocale(LC_ALL, "en_US");
     QCoreApplication::setApplicationName(FileName(argv[0]).baseName());
     QApplication::setQuitOnLastWindowClosed(true);
 
@@ -295,6 +298,8 @@ namespace Isis {
    *  @internal
    *  @history  2007-05-16 Tracie Sucharski - Change cursor to wait while
    *                                   processing.
+   *  @history 2016-02-08 Ian Humphrey - Changed exit(0) to QApplication's quit(),
+   *                          since this code is within the QApplication's exec event loop.
    *
    */
   void Gui::StartProcess() {
@@ -345,8 +350,11 @@ namespace Isis {
       }
       else {
         Isis::iApp->FunctionError(e);
-        if(ShowWarning()) exit(0);
         ProgressText("Error");
+        // When the warning is rejected (i.e. Abort), clean up from within qApp's exec event loop
+        if(ShowWarning()) {
+          qApp->quit();
+        }
       }
     }
 
@@ -588,7 +596,7 @@ namespace Isis {
         Progress(0);
       }
     }
-    return FALSE;
+    return false;
   }
 
   //! The user pressed the stop button ... see what they want to do
@@ -653,7 +661,14 @@ namespace Isis {
     UpdateHistory();
   }
 
-  //! Changed the parameters based on the history pointer
+
+  /**
+   * Changed the parameters based on the history pointer
+   *
+   * @internal
+   * @history 2016-02-08 Ian Humphrey - Changed exit(0) to QApplication's quit(),
+   *                          since this code is within the QApplication's exec event loop.
+   */
   void Gui::UpdateHistory() {
     if(p_historyEntry < -1) {
       p_historyEntry = -1;
@@ -689,7 +704,10 @@ namespace Isis {
       QString msg = "A corrupt parameter history file [" + progHist.expanded() +
                         "] has been detected. Please fix or remove this file";
       LoadMessage(msg);
-      if(ShowWarning()) exit(0);
+      // When the warning is rejected (i.e. Abort), clean up from within qApp's exec event loop
+      if (ShowWarning()) {
+        qApp->quit();
+      }
       return;
     }
 

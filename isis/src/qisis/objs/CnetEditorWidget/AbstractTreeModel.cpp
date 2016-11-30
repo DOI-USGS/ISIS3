@@ -569,7 +569,8 @@ namespace Isis {
     void AbstractTreeModel::rebuildItemsDone() {
       clear();
 
-      QAtomicPointer< RootItem > newRoot = m_rebuildWatcher->future();
+      QAtomicPointer< RootItem > newRootPtr = m_rebuildWatcher->future();
+      RootItem *newRoot = newRootPtr.loadAcquire();
 
       if (newRoot && newRoot->childCount()) {
         ASSERT(rootItem);
@@ -577,10 +578,11 @@ namespace Isis {
         rootItem = NULL;
         rootItem = newRoot;
       }
-      else {
+      // Not safe - if newRoot == NULL, the condition fails - delete (NULL) is undefined
+      /*else {
         delete newRoot;
         newRoot = NULL;
-      }
+      }*/
 
       applyFilter();
 
@@ -677,24 +679,27 @@ namespace Isis {
     void AbstractTreeModel::FilterFunctor::updateTopLevelLinks(
       QAtomicPointer< AbstractTreeItem > & root,
       AbstractTreeItem *const &item) {
-      if (!root) {
-        root = item->parent();
-        root->setFirstVisibleChild(NULL);
-        root->setLastVisibleChild(NULL);
-        root->setLastVisibleFilteredItem(NULL);
+      // We will update the root if it is NULL
+      if ( root.testAndSetOrdered(NULL, item->parent()) ) {
+        AbstractTreeItem *loadedRoot = root.loadAcquire();
+        loadedRoot->setFirstVisibleChild(NULL);
+        loadedRoot->setLastVisibleChild(NULL);
+        loadedRoot->setLastVisibleFilteredItem(NULL);
       }
 
+      // Let's get that root ptr again
+      AbstractTreeItem *loadedRoot = root.loadAcquire();
       if (item->isVisible()) {
-        if (!root->getFirstVisibleChild()) {
-          root->setFirstVisibleChild(item);
-          root->setLastVisibleChild(item);
+        if (!loadedRoot->getFirstVisibleChild()) {
+          loadedRoot->setFirstVisibleChild(item);
+          loadedRoot->setLastVisibleChild(item);
         }
         else {
-          root->getLastVisibleChild()->setNextVisiblePeer(item);
-          root->setLastVisibleChild(item);
+          loadedRoot->getLastVisibleChild()->setNextVisiblePeer(item);
+          loadedRoot->setLastVisibleChild(item);
         }
 
-        root->setLastVisibleFilteredItem(item);
+        loadedRoot->setLastVisibleFilteredItem(item);
       }
     }
   }

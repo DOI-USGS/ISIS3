@@ -1,3 +1,5 @@
+# @history 2016-09-29 Ian Humphrey - Modified the SED command to leave "input" in the resulting
+#                         edit, so we don't need to worry about properly matching comma groups.
 APPNAME = cnetstats
 
 include $(ISISROOT)/make/isismake.tsts
@@ -9,5 +11,5 @@ commands:
 	  filter=yes \
 	  deffile=$(INPUT)/deffile.def \
 	  flatfile=$(OUTPUT)/out.txt > /dev/null;
-	$(SED) 's/, \/.*\/input\//, /' $(OUTPUT)/out.txt > $(OUTPUT)/truth.txt;
-	$(RM) $(OUTPUT)/cube.lis $(OUTPUT)/out.txt;
+	$(SED) 's#/.*/input/#input/#' $(OUTPUT)/out.txt > $(OUTPUT)/truth.txt;
+	$(RM) $(OUTPUT)/cube.lis $(OUTPUT)/out.txt $(OUTPUT)/out1.txt;

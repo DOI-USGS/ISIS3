@@ -280,7 +280,7 @@ void RemoveFurrows_Version_1_42(void)
     procSample.EndProcess();
 
     // clean up
-    remove(sTempFile.toAscii().data());
+    remove(sTempFile.toLatin1().data());
   }
 }
 

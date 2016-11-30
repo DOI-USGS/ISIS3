@@ -2,7 +2,6 @@
 #define GridGraphicsItem_h
 
 #include <QGraphicsItem>
-
 #include <QScopedPointer>
 
 class QPointF;
@@ -35,6 +34,8 @@ namespace Isis {
    *   @history 2013-03-06 Steven Lambright - Added support for getting target radii from the
    *                           TargetName mapping keyword if the target radii keywords are missing.
    *                           References #1534.
+   *   @history 2016-05-18 Ian Humphrey - Made the latitude and longitude lines explicitly cosmetic
+   *                           so they always appear as 1 pixel wide on screen (Qt4 to Qt5).
    */
   class GridGraphicsItem : public QGraphicsItem {
     public:

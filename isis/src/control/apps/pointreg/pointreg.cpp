@@ -363,7 +363,7 @@ void IsisMain() {
     QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
 
     ofstream os;
-    os.open(fFile.toAscii().data(), ios::out);
+    os.open(fFile.toLatin1().data(), ios::out);
     os <<
       "PointId,Filename,MeasureType,Reference,EditLock,Ignore,Registered," <<
       "OriginalMeasurementSample,OriginalMeasurementLine," <<
@@ -452,7 +452,7 @@ void IsisMain() {
   if (logFalsePositives) {
     QString filename = FileName(ui.GetFileName("FALSEPOSITIVES")).expanded();
     ofstream os;
-    os.open(filename.toAscii().data(), ios::out);
+    os.open(filename.toLatin1().data(), ios::out);
 
     os << Validation::getHeader() << endl;
     for (int i = 0; i < falsePositives->size(); i++) {

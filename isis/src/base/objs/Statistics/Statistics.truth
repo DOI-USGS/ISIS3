@@ -1,314 +1,314 @@
-Unit test for Statistics... 
-For data set:    5, 5 
-Average:         5 
-ZScore(5.0):     0 
+Unit test for Statistics...
+For data set:    5, 5
+Average:         5
+ZScore(5.0):     0
 
-Testing Reset... 
-Average:              -1.79769e+308 
-Variance:             -1.79769e+308 
-Rms:                  -1.79769e+308 
-Std Deviation:        -1.79769e+308 
-Minimum:              -1.79769e+308 
-Maximum:              -1.79769e+308 
-ChebyShev Min:        -1.79769e+308 
-ChebyShev Max:        -1.79769e+308 
-Best Minimum:         -1.79769e+308 
-Best Maximum:         -1.79769e+308 
-Valid Minimum:        -1.79769e+308 
-Valid Maximum:        1.79769e+308 
-Total Pixels:         0 
-Valid Pixels:         0 
-Null Pixels:          0 
-Lis Pixels:           0 
-Lrs Pixels:           0 
-His Pixels:           0 
-Hrs Pixels:           0 
-Out of Range Pixels:  0 
-Over Range Pixels:    0 
-Under Range Pixels:   0 
-Sum:                  0 
-SumSquare:            0 
-Removed Data?         false 
-Z-Score at 1.0        -1 
+Testing Reset...
+Average:              -1.79769e+308
+Variance:             -1.79769e+308
+Rms:                  -1.79769e+308
+Std Deviation:        -1.79769e+308
+Minimum:              -1.79769e+308
+Maximum:              -1.79769e+308
+ChebyShev Min:        -1.79769e+308
+ChebyShev Max:        -1.79769e+308
+Best Minimum:         -1.79769e+308
+Best Maximum:         -1.79769e+308
+Valid Minimum:        -1.79769e+308
+Valid Maximum:        1.79769e+308
+Total Pixels:         0
+Valid Pixels:         0
+Null Pixels:          0
+Lis Pixels:           0
+Lrs Pixels:           0
+His Pixels:           0
+Hrs Pixels:           0
+Out of Range Pixels:  0
+Over Range Pixels:    0
+Under Range Pixels:   0
+Sum:                  0
+SumSquare:            0
+Removed Data?         false
+Z-Score at 1.0        -1
 
-SetValidRange(1, 6) and AddData( 1, 2, 3, Null, HRS, LRS, HIS, LIS, 10, -1) 
-InRange(0.0)?         false 
-InRange(2.0)?         true 
-InRange(7.0)?         false 
-Average:              2 
-Variance:             1 
-Rms:                  2.16025 
-Std Deviation:        1 
-Minimum:              1 
-Maximum:              3 
-ChebyShev Min:        -12.1421 
-ChebyShev Max:        16.1421 
-Best Minimum:         1 
-Best Maximum:         3 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         10 
-Valid Pixels:         3 
-Null Pixels:          1 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  6 
-SumSquare:            14 
-Removed Data?         false 
-Z-Score at 1.0        -1 
+SetValidRange(1, 6) and AddData( 1, 2, 3, Null, HRS, LRS, HIS, LIS, 10, -1)
+InRange(0.0)?         false
+InRange(2.0)?         true
+InRange(7.0)?         false
+Average:              2
+Variance:             1
+Rms:                  2.16025
+Std Deviation:        1
+Minimum:              1
+Maximum:              3
+ChebyShev Min:        -12.1421
+ChebyShev Max:        16.1421
+Best Minimum:         1
+Best Maximum:         3
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         10
+Valid Pixels:         3
+Null Pixels:          1
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  6
+SumSquare:            14
+Removed Data?         false
+Z-Score at 1.0        -1
 
-AddData( 4, 5, 6, Null) 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+AddData( 4, 5, 6, Null)
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing copy constructor... 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+Testing copy constructor...
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing assignment operator=... 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+Testing assignment operator=...
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing Pvl serialization methods 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
- 
-Testing RemoveData(3, Null, HRS, LRS, HIS, LIS, 10, -1) 
-Average:              3.6 
-Variance:             4.3 
-Rms:                  4.04969 
-Std Deviation:        2.07364 
-ChebyShev Min:        -25.7258 
-ChebyShev Max:        32.9258 
-Total Pixels:         6 
-Valid Pixels:         5 
-Null Pixels:          1 
-Lis Pixels:           0 
-Lrs Pixels:           0 
-His Pixels:           0 
-Hrs Pixels:           0 
-Out of Range Pixels:  0 
-Over Range Pixels:    0 
-Under Range Pixels:   0 
-Sum:                  18 
-SumSquare:            82 
-Removed Data?         true 
-Z-Score at 1.0        -1.25383 
+Testing Pvl serialization methods
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing serialization from copy constructor object... 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+Testing RemoveData(3, Null, HRS, LRS, HIS, LIS, 10, -1)
+Average:              3.6
+Variance:             4.3
+Rms:                  4.04969
+Std Deviation:        2.07364
+ChebyShev Min:        -25.7258
+ChebyShev Max:        32.9258
+Total Pixels:         6
+Valid Pixels:         5
+Null Pixels:          1
+Lis Pixels:           0
+Lrs Pixels:           0
+His Pixels:           0
+Hrs Pixels:           0
+Out of Range Pixels:  0
+Over Range Pixels:    0
+Under Range Pixels:   0
+Sum:                  18
+SumSquare:            82
+Removed Data?         true
+Z-Score at 1.0        -1.25383
 
-Testing XML: write XML from Statistics object... 
-Testing XML: read XML to Statistics object... 
-Average:              3.5 
-Variance:             3.5 
-Rms:                  3.89444 
-Std Deviation:        1.87083 
-Minimum:              1 
-Maximum:              6 
-ChebyShev Min:        -22.9575 
-ChebyShev Max:        29.9575 
-Best Minimum:         1 
-Best Maximum:         6 
-Valid Minimum:        1 
-Valid Maximum:        6 
-Total Pixels:         14 
-Valid Pixels:         6 
-Null Pixels:          2 
-Lis Pixels:           1 
-Lrs Pixels:           1 
-His Pixels:           1 
-Hrs Pixels:           1 
-Out of Range Pixels:  2 
-Over Range Pixels:    1 
-Under Range Pixels:   1 
-Sum:                  21 
-SumSquare:            91 
-Removed Data?         false 
-Z-Score at 1.0        -1.33631 
+Testing serialization from copy constructor object...
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing XML: read XML with no attributes or values to Statistics object... 
-Average:              -1.79769e+308 
-Variance:             -1.79769e+308 
-Rms:                  -1.79769e+308 
-Std Deviation:        -1.79769e+308 
-Minimum:              -1.79769e+308 
-Maximum:              -1.79769e+308 
-ChebyShev Min:        -1.79769e+308 
-ChebyShev Max:        -1.79769e+308 
-Best Minimum:         -1.79769e+308 
-Best Maximum:         -1.79769e+308 
-Valid Minimum:        -1.79769e+308 
-Valid Maximum:        1.79769e+308 
-Total Pixels:         0 
-Valid Pixels:         0 
-Null Pixels:          0 
-Lis Pixels:           0 
-Lrs Pixels:           0 
-His Pixels:           0 
-Hrs Pixels:           0 
-Out of Range Pixels:  0 
-Over Range Pixels:    0 
-Under Range Pixels:   0 
-Sum:                  0 
-SumSquare:            0 
-Removed Data?         false 
-Z-Score at 1.0        -1 
+Testing XML: write XML from Statistics object...
+Testing XML: read XML to Statistics object...
+Average:              3.5
+Variance:             3.5
+Rms:                  3.89444
+Std Deviation:        1.87083
+Minimum:              1
+Maximum:              6
+ChebyShev Min:        -22.9575
+ChebyShev Max:        29.9575
+Best Minimum:         1
+Best Maximum:         6
+Valid Minimum:        1
+Valid Maximum:        6
+Total Pixels:         14
+Valid Pixels:         6
+Null Pixels:          2
+Lis Pixels:           1
+Lrs Pixels:           1
+His Pixels:           1
+Hrs Pixels:           1
+Out of Range Pixels:  2
+Over Range Pixels:    1
+Under Range Pixels:   1
+Sum:                  21
+SumSquare:            91
+Removed Data?         false
+Z-Score at 1.0        -1.33631
 
-Testing error throws... 
+Testing XML: read XML with no attributes or values to Statistics object...
+Average:              -1.79769e+308
+Variance:             -1.79769e+308
+Rms:                  -1.79769e+308
+Std Deviation:        -1.79769e+308
+Minimum:              -1.79769e+308
+Maximum:              -1.79769e+308
+ChebyShev Min:        -1.79769e+308
+ChebyShev Max:        -1.79769e+308
+Best Minimum:         -1.79769e+308
+Best Maximum:         -1.79769e+308
+Valid Minimum:        -1.79769e+308
+Valid Maximum:        1.79769e+308
+Total Pixels:         0
+Valid Pixels:         0
+Null Pixels:          0
+Lis Pixels:           0
+Lrs Pixels:           0
+His Pixels:           0
+Hrs Pixels:           0
+Out of Range Pixels:  0
+Over Range Pixels:    0
+Under Range Pixels:   0
+Sum:                  0
+SumSquare:            0
+Removed Data?         false
+Z-Score at 1.0        -1
+
+Testing error throws...
 **PROGRAMMER ERROR** You are removing non-existant data in [Statistics::RemoveData].
 **PROGRAMMER ERROR** Minimum is invalid since you removed data.
 **PROGRAMMER ERROR** Maximum is invalid since you removed data.

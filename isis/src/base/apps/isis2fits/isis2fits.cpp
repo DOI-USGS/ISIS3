@@ -182,14 +182,14 @@ void IsisMain() {
   // open the cube for writing
   QString to = ui.GetFileName("TO", "fits");
   ofstream fout;
-  fout.open(to.toAscii().data(), ios::out | ios::binary);
+  fout.open(to.toLatin1().data(), ios::out | ios::binary);
   if (!fout.is_open()) {
     QString msg = "Cannot open fits output file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   fout.seekp(0);
-  fout.write(header.toAscii().data(), header.length());
+  fout.write(header.toLatin1().data(), header.length());
   // write the raw cube data
   p.StartProcess(fout);
 

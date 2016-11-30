@@ -30,7 +30,7 @@
         Fixed problem on MacOSX that caused bus errors.
     </change>
     <change name="Chris Austin" date="2007-12-19">
-      Changed "static char label[256]" to "static char label[1024]", which keeps 
+      Changed "static char label[256]" to "static char label[1024]", which keeps
       this program working on more systems.
     </change>
     <change name="Steven Lambright" date="2009-02-23">
@@ -40,6 +40,10 @@
       Replaced all occurences of bcopy() with memmove() as bcopy() is
       deprecated and memmove() is the preferred, portable alternative. This
       change was necessary to get this application to work in Suse 10.3 (roma).
+    </change>
+    <change name="Kelvin Rodriguez" date="2016-08-28">
+      Removed some unnecessary uses to register keyword. The keyword is ignored by modern compilers
+      and causes warnings in clang. Part of porting to OS X 10.11.
     </change>
   </history>
 

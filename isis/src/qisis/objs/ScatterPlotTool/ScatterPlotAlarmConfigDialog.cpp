@@ -10,6 +10,7 @@
 #include <QDoubleSpinBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
 

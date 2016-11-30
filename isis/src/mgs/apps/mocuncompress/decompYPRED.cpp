@@ -48,9 +48,9 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 void decompYPRED(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
 {
-  register uint32 bitCount;
-  register uint8 *data;
-  register uint8 cur;
+uint32 bitCount;
+uint8 *data;
+uint8 cur;
 
   data     = bitStuff->output;
   bitCount = bitStuff->bitCount;
@@ -59,7 +59,7 @@ void decompYPRED(register uint8 *curLine, register uint8 *prevLine, register uin
 
   /* Decode and decompress all pixels in this line */
   while(size > 0) {
-    register uint8 prev;    /* The previous pixel */
+uint8 prev;    /* The previous pixel */
 
     /* Decode and decompress this pixel */
     nextValue(prev, code, left, right, cur, bitCount, data);
@@ -91,14 +91,14 @@ void initReverse(trans) uint8 *trans;
   *  The array "tran" contains the bit reversal of each index in that
   *  index's location (e.g. trans[0x05] = 0xa0).
   */
-  register uint32 t;    /* Current index */
+uint32 t;    /* Current index */
 
   /* Do all 8 bit numbers */
   for(t = 0; t < 256; t++) {
-    register uint8 r;  /* Reversed byte */
-    register uint8 b;  /* Bit count */
-    register uint8 mask;  /* Current bit in index */
-    register uint8 bit;  /* Current bit in reversed byte */
+uint8 r;  /* Reversed byte */
+uint8 b;  /* Bit count */
+uint8 mask;  /* Current bit in index */
+uint8 bit;  /* Current bit in reversed byte */
 
     /* Reverse all 8 bits */
     r = 0;

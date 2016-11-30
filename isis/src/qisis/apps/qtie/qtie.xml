@@ -212,5 +212,14 @@
       Prevented qtie from crashing when user attempts to select a registration template. 
       Fixes #2375.
     </change>
+    <change name="Jeannie Backer" date="2016-08-18">
+      Modified to use the CholMod sparse decomposition matrix solve method instead of the 
+      "SpecialK" solve method (deprecated). Results are expected to be identical. References #4162.
+    </change>
+    <change name="Tyler Wilson" date="2016-10-19">
+        Cleaned up heap allocated objects after the program returns in the main function of qtie.cpp.  
+        This was not being done before like it is in  other qisis apps such as qnet and qview, 
+        and was causing a segfault due to the new Qt5 libraries IPCE uses.  Fixes #4471.
+   </change>
   </history>
 </application>

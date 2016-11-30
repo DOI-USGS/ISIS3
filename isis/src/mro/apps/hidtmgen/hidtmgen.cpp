@@ -455,7 +455,7 @@ void setRangeAndPixels(const UserInterface &ui,
 
 
 void processCube(ProcessExportPds &pdsExportProcess, const FileName  &outputPdsFile) {
-  ofstream pdsOut(outputPdsFile.expanded().toAscii().data());
+  ofstream pdsOut(outputPdsFile.expanded().toLatin1().data());
   pdsExportProcess.OutputLabel(pdsOut);
   pdsExportProcess.StartProcess(pdsOut);
   pdsOut.close();

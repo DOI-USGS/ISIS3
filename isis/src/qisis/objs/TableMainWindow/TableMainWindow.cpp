@@ -1,9 +1,17 @@
+#include "TableMainWindow.h"
+
+#include <iostream>
+
+#include <QAction>
 #include <QStatusBar>
 #include <QDockWidget>
+#include <QFileDialog>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QSettings>
-#include <iostream>
-#include "TableMainWindow.h"
+#include <QTableWidget>
+#include <QToolBar>
+
 
 namespace Isis {
   /**
@@ -14,7 +22,7 @@ namespace Isis {
    */
   TableMainWindow::TableMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     p_parent = parent;
-    
+
     p_title = title;
     p_table = NULL;
     p_visibleColumns = -1;
@@ -40,7 +48,7 @@ namespace Isis {
   }
 
 
-  QList<QListWidgetItem *> TableMainWindow::itemList() {
+  QList<QListWidgetItem *> TableMainWindow::itemList() const {
     QList<QListWidgetItem *> result;
 
     if (p_listWidget)
@@ -89,29 +97,29 @@ namespace Isis {
     p_save = new QAction(this);
     p_save->setText("Save...");
     p_save->setShortcut(Qt::CTRL + Qt::Key_S);
-    connect(p_save, SIGNAL(activated()), this, SLOT(saveTable()));
+    connect(p_save, SIGNAL(triggered()), this, SLOT(saveTable()));
     p_save->setDisabled(true);
 
     QAction *saveas = new QAction(this);
     saveas->setText("Save As...");
-    connect(saveas, SIGNAL(activated()), this, SLOT(saveAsTable()));
+    connect(saveas, SIGNAL(triggered()), this, SLOT(saveAsTable()));
 
     QAction *load = new QAction(this);
     load->setText("Load...");
-    connect(load, SIGNAL(activated()), this, SLOT(loadTable()));
+    connect(load, SIGNAL(triggered()), this, SLOT(loadTable()));
 
     QAction *del = new QAction(this);
     del->setText("Delete Selected Row(s)");
     del->setShortcut(Qt::Key_Delete);
-    connect(del, SIGNAL(activated()), this, SLOT(deleteRows()));
+    connect(del, SIGNAL(triggered()), this, SLOT(deleteRows()));
 
     QAction *clear = new QAction(this);
     clear->setText("Clear table");
-    connect(clear, SIGNAL(activated()), this, SLOT(clearTable()));
+    connect(clear, SIGNAL(triggered()), this, SLOT(clearTable()));
 
     QAction *close = new QAction(this);
     close->setText("Close");
-    connect(close, SIGNAL(activated()), this, SLOT(hide()));
+    connect(close, SIGNAL(triggered()), this, SLOT(hide()));
 
     fileMenu->addAction(p_save);
     fileMenu->addAction(saveas);
@@ -141,7 +149,7 @@ namespace Isis {
     QMenu *viewMenu = menuBar->addMenu("&View");
     QAction *cols = new QAction(this);
     cols->setText("Columns");
-    connect(cols, SIGNAL(activated()), p_dock, SLOT(show()));
+    connect(cols, SIGNAL(triggered()), p_dock, SLOT(show()));
     viewMenu->addAction(cols);
 
     this->setMenuBar(menuBar);
@@ -211,7 +219,9 @@ namespace Isis {
       }
 
       p_table->setColumnWidth(destinationColumn,
-          qRound(QFontMetrics(header->font()).width(header->text()) + 20));
+          QFontMetrics(header->font()).width(header->text()) + 20);
+          // Removed: rounding and int?
+          // qRound(QFontMetrics(header->font()).width(header->text()) + 20));
     }
 
     int endCol = p_table->columnCount() - 1;
@@ -543,7 +553,7 @@ namespace Isis {
    * home directory.
    *
    */
-  void TableMainWindow::writeSettings() {
+  void TableMainWindow::writeSettings() const {
     if (p_listWidget) {
       QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
@@ -814,4 +824,3 @@ namespace Isis {
   }
 
 }
-

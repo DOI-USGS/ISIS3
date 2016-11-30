@@ -5,6 +5,7 @@
 SHELL=bash
 .SILENT:
 
+ISISLOCALVERSION := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
 QMAKE ?= $(shell which qmake 2 >& /dev/null)
 
 ifeq ($(QMAKE),)
@@ -12,8 +13,12 @@ ifeq ($(QMAKE),)
 endif
 
 ifeq ($(QMAKE),)
-  ISISLOCALVERSION := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
   QMAKE := $(wildcard /opt/usgs/$(ISISLOCALVERSION)/ports/bin/qmake)
+endif
+
+ifeq ($(QMAKE),)
+  QMAKE := $(wildcard /opt/usgs/$(ISISLOCALVERSION)/ports/libexec/qt5/bin/qmake)
+#  QMAKEPARMS := -nocache
 endif
 
 ifeq ($(QMAKE),)
@@ -32,7 +37,7 @@ config: Makefile
 
 Makefile: FORCE config.pro
 	if [ -f "$(QMAKE)" ]; then       \
-	  $(QMAKE) -o Makefile config.pro 2>&1 | grep -v MESSAGE; \
+	  $(QMAKE) $(QMAKEPARMS) -o Makefile config.pro 2>&1 | grep -v MESSAGE; \
 	  $(MAKE) isis_conf;               \
 	fi;
 

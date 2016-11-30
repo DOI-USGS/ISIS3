@@ -153,6 +153,7 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2.0);
     return shuttertimes;
   }
+
 } // End Apollo namespace
 
 

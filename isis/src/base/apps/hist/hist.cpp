@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include <QDockWidget>
+#include <QMenuBar>
+#include <QString>
 
 #include "CubePlotCurve.h"
 #include "Histogram.h"
@@ -10,10 +13,6 @@
 #include "Progress.h"
 #include "QHistogram.h"
 #include "UserInterface.h"
-
-
-#include <QString>
-#include <QMenuBar>
 
 
 using namespace std;
@@ -56,7 +55,7 @@ void IsisMain() {
     // Write the results
     QString outfile = ui.GetFileName("TO");
     ofstream fout;
-    fout.open(outfile.toAscii().data() );
+    fout.open(outfile.toLatin1().data());
 
     fout << "Cube:           " << ui.GetFileName("FROM") << endl;
     fout << "Band:           " << icube->bandCount() << endl;
@@ -113,25 +112,25 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    HistogramPlotWindow *plot = new HistogramPlotWindow(title.toAscii().data(),
+    HistogramPlotWindow *plot = new HistogramPlotWindow(title.toLatin1().data(),
                                                         ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS") ) {
       QString xaxis(ui.GetString("XAXIS"));
-      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toAscii().data());
+      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toLatin1().data());
     }
 
     // Set the yLeft axis title if they entered one
     if(ui.WasEntered("FREQAXIS") ) {
       QString yaxis(ui.GetString("FREQAXIS"));
-      plot->setAxisLabel(QwtPlot::yRight, yaxis.toAscii().data());
+      plot->setAxisLabel(QwtPlot::yRight, yaxis.toLatin1().data());
     }
 
     // Set the yRight axis title if they entered one
     if(ui.WasEntered("PERCENTAXIS") ) {
       QString y2axis(ui.GetString("PERCENTAXIS") );
-      plot->setAxisLabel(QwtPlot::yLeft, y2axis.toAscii().data() );
+      plot->setAxisLabel(QwtPlot::yLeft, y2axis.toLatin1().data());
     }
 
     //Transfer data from histogram to the plotcurve
@@ -183,9 +182,7 @@ void IsisMain() {
     QPen percentagePen(Qt::red);
     percentagePen.setWidth(2);
     cdfCurve->setColor(Qt::red);
-    QwtSymbol symbol(cdfCurve->markerSymbol());
-    symbol.setStyle(QwtSymbol::NoSymbol);
-    cdfCurve->setMarkerSymbol(symbol);
+    cdfCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
 
     histCurve->setData(QwtIntervalSeriesData(intervals));
     cdfCurve->setData(new QwtPointSeriesData(cumPctData));

@@ -34,7 +34,7 @@ namespace Isis {
    *   This is the camera model for the MRO CRISM instrument.  It provides
    *   support for band independent geometry for the instrument.
    *
-   * @ingroup SpiceInstrumentsAndCameras 
+   * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsReconnaissanceOrbiter
    *
    * @see Camera
@@ -47,9 +47,12 @@ namespace Isis {
    *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2016-09-14 Kelvin Rodriguez - Enforced the order in which BORESIGHT_LINE and
+   *                           BORESIGHT_SAMPLE are added to the PVL. Part of porting to
+   *                           OSX 10.11 
    */
   class CrismCamera : public LineScanCamera {
     public:
@@ -63,33 +66,33 @@ namespace Isis {
 
       /**
        * @brief This is a band-dependant instrument
-       * 
+       *
        * @author kbecker (4/12/2012)
-       * 
-       * @return bool 
+       *
+       * @return bool
        */
       bool IsBandIndependent ();
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-74000); }
 
-      /** 
+      /**
        * CK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (-74900); }
 
-      /** 
+      /**
        *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }

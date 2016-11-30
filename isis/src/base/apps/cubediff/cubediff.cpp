@@ -123,7 +123,7 @@ void IsisMain() {
   }
   if(doTable) {
     QString filename = FileName(ui.GetFileName("TO", "txt")).expanded();
-    ofstream ofile(filename.toAscii().data(), ios_base::app);
+    ofstream ofile(filename.toLatin1().data(), ios_base::app);
     diffTable(ofile, ui.GetInteger("PRECISION"));
   }
 

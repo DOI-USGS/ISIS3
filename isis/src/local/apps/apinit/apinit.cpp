@@ -98,7 +98,7 @@ void IsisMain() {
   QString startTime = ui.GetString("DateTime");
   // Validate the observation date format.  See naif required reading for time format
   // http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/str2et_c.html
-  ConstSpiceChar *spiceStartTime = startTime.toAscii().data();
+  ConstSpiceChar *spiceStartTime = startTime.toLatin1().data();
   SpiceDouble junk;
   SpiceChar errmsg[500];
   tparse_c (spiceStartTime, 500, &junk, errmsg);
@@ -116,10 +116,10 @@ void IsisMain() {
   FileName lsk("$base/kernels/lsk/naif0010.tls");
 
   NaifStatus::CheckErrors(); 
-  furnsh_c(lsk.expanded().toAscii().constData());
+  furnsh_c(lsk.expanded().toLatin1().constData());
 
   double et;
-  spiceStartTime = startTime.toAscii().data();
+  spiceStartTime = startTime.toLatin1().data();
   str2et_c(spiceStartTime, &et);
 
   keyword.setName("EphemerisTime");
@@ -268,9 +268,9 @@ void IsisMain() {
   // Create table with rotation matrices from bodyfixed to J2000 and write to the labels.  
   // Need to load the appropriatespk and pck kernels for this to work.  
   FileName pck("$base/kernels/pck/pck00009.tpc");
-  furnsh_c(pck.expanded().toAscii().constData());
+  furnsh_c(pck.expanded().toLatin1().constData());
   FileName tspk("$base/kernels/spk/de405.bsp");
-  furnsh_c(tspk.expanded().toAscii().constData());
+  furnsh_c(tspk.expanded().toLatin1().constData());
 
   SpiceRotation bodyRotation(10013);
   bodyRotation.LoadCache(et-1.0, et+1.0, 2); // Get a small window about the observation time

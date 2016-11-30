@@ -70,7 +70,7 @@ namespace Isis {
     outputName = outputName.addExtension(extension());
     
     // Open the output image
-    m_image = TIFFOpen(outputName.expanded().toAscii().data(), "w");
+    m_image = TIFFOpen(outputName.expanded().toLatin1().data(), "w");
 
     if (m_image == NULL) {
       throw IException(IException::Programmer,

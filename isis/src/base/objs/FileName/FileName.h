@@ -29,7 +29,7 @@ class QDate;
 class QDir;
 class QString;
 
-template<typename A, typename B> class QPair;
+template<typename A, typename B> struct QPair;
 
 namespace Isis {
   /**
@@ -106,6 +106,7 @@ namespace Isis {
    *                           test to include tests of operator== and operator!=. Fixes #903.
    *   @history 2014-07-23 Jeannie Backer - Moved ifndef to top of file to bring class closer to
    *                           ISIS coding standards and removed include for std::string.
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    */
   class FileName {
     public:

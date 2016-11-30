@@ -51,12 +51,14 @@ namespace Isis {
    *                           the base class.
    *   @history 2008-11-05 Jeannie Walldren - Added documentation
    *                           from Isis2 files
-   *   @history 2012-10-15 Janet Barrett - Shortened the ZEROB0STANDARD 
+   *   @history 2012-10-15 Janet Barrett - Shortened the ZEROB0STANDARD
    *                           parameter name to ZEROB0ST. This was done so that
    *                           the GUI interface does not have to be resized every
    *                           time it is opened. The shortened name helps to keep
    *                           the parameters within the default GUI size when it is
    *                           first opened. References #453. Fixes #1288.
+   *   @history 2016-08-28 Kelvin Rodriguez - SetPhoto0B0Standard now uses QString.
+   *                           Part of porting to OS X 10.11
    */
   class Hapke : public PhotoModel {
     public:
@@ -115,16 +117,8 @@ namespace Isis {
         p_photoThetaold = theta;
       }
 
-      void SetPhoto0B0Standard(const QString &b0standard);
-      //! Return photometric B0 standardization value
-/*      inline QString Photo0B0Standard() const {
-        return p_photo0B0Standard;
-      }*/
 
-      //! Hapke's approximation to Chandra's H function
-/*      inline double Hfunc(double u, double gamma) {
-        return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
-      }*/
+      void SetPhoto0B0Standard(const QString &b0standard);
 
       void SetStandardConditions(bool standard);
 
@@ -132,26 +126,7 @@ namespace Isis {
                                          double emission);
 
     protected:
-      
     private:
-/*      double p_photoHg1;
-      double p_photoHg2;
-      double p_photoBh;
-      double p_photoCh;
-      double p_photoCott;
-      double p_photoCot2t;
-      double p_photoTant;
-      double p_photoSr;
-      double p_photoOsr;
-      QString p_algName;
-      QString p_photo0B0Standard;
-      double p_photoWh;
-      double p_photoHh;
-      double p_photoB0;
-      double p_photoB0save;
-      double p_photoTheta;
-      double p_photoThetaold;*/
-
   };
 };
 

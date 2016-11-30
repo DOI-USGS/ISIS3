@@ -218,19 +218,23 @@ namespace Isis {
       //  Destroys the Mosaic object. It will close all opened cubes.
       virtual ~ProcessMosaic();
 
+      using Isis::Process::StartProcess; // make parent funtions visable
+
       // Line Processing method for one input and output cube
       virtual void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
       // Accessor for the placed images.
       PvlObject imagePositions();
 
+      using Process::SetInputCube;
+
       // Set input cube to specified image name at the starting and count of
       // samples, lines, bands
       virtual Isis::Cube *SetInputCube(const QString &parameter,
-                               const int ss = 1, const int sl = 1,
-                               const int sb = 1,
-                               const int ns = -1, const int nl = -1,
-                               const int nb = -1);
+                               const int ss, const int sl,
+                               const int sb,
+                               const int ns, const int nl,
+                               const int nb);
 
       // Set input cube to specified image name with specified attributes at the
       // starting and count of samples, lines, bands
@@ -320,12 +324,12 @@ namespace Isis {
       // Match DEM between Input & Mosaic if MatchDEM Flag is enabled
       void MatchDEMShapeModel();
 
-      bool m_trackingEnabled;         //!< 
-      bool m_createOutputMosaic;      //!< 
-      int  m_bandPriorityBandNumber;  //!< 
-      QString m_bandPriorityKeyName;  //!< 
-      QString m_bandPriorityKeyValue; //!< 
-      bool m_bandPriorityUseMaxValue; //!< 
+      bool m_trackingEnabled;         //!<
+      bool m_createOutputMosaic;      //!<
+      int  m_bandPriorityBandNumber;  //!<
+      QString m_bandPriorityKeyName;  //!<
+      QString m_bandPriorityKeyValue; //!<
+      bool m_bandPriorityUseMaxValue; //!<
 
 
       int m_iss; //!< The starting sample within the input cube
@@ -340,14 +344,14 @@ namespace Isis {
       int m_osb; //!< The starting band within the output cube
       int m_onb; //!< The number of bands in the output cube
 
-      bool m_enforceBandBinMatch; /**< True/False value to determine whether to 
-                                       enforce the input cube bandbin matches 
+      bool m_enforceBandBinMatch; /**< True/False value to determine whether to
+                                       enforce the input cube bandbin matches
                                        the mosaic bandbin group*/
 
       bool m_enforceMatchDEM; //!< DEM of the input and mosaic should match
 
-      ImageOverlay m_imageOverlay; //!< 
-      
+      ImageOverlay m_imageOverlay; //!<
+
       PvlObject m_imagePositions; //!< List of images placed on the mosaic.
 
       /*
@@ -355,11 +359,10 @@ namespace Isis {
        * True- allow the special pixel to be passed onto the mosaic.
        * Holds good for input and band priority
        */
-      bool m_placeHighSatPixels; //!< 
-      bool m_placeLowSatPixels;  //!< 
-      bool m_placeNullPixels;    //!< 
+      bool m_placeHighSatPixels; //!<
+      bool m_placeLowSatPixels;  //!<
+      bool m_placeNullPixels;    //!<
   };
 };
 
 #endif
-

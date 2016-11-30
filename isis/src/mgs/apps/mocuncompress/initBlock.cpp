@@ -60,8 +60,8 @@ BITTREE *encodeTrees[MAXCODES];
 
 static uint32 bitReverse(register uint32 num)
 {
-  register uint32 rev;
-  register uint32 i;
+uint32 rev;
+uint32 i;
 
   rev = 0;
 
@@ -85,7 +85,7 @@ static int compare(const void *v1, const void *v2)
 {
   BITTREE *e1 = (BITTREE *)v1;
   BITTREE *e2 = (BITTREE *)v2; 
-  register uint32 c1, c2;
+uint32 c1, c2;
   c1 = e1->code;
   c2 = e2->code;
 

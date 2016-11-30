@@ -73,7 +73,7 @@ static double cosineDouble[16] = {
 static void DCTinv16Double(double *in, double *out)
 {
   double tmp[16];
-  register double tmp1, tmp2;
+double tmp1, tmp2;
 
   tmp[0]  =  in[0];
   tmp[1]  =  in[8];

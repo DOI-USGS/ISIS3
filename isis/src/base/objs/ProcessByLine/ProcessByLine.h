@@ -107,6 +107,7 @@ namespace Isis {
         SetWrap(true);
       };
 
+      using Isis::ProcessByBrick::SetInputCube; // make parents SetInputCube visable
       Isis::Cube *SetInputCube(const QString &parameter,
                                const int requirements = 0);
       Isis::Cube *SetInputCube(const QString &file,
@@ -117,11 +118,9 @@ namespace Isis {
 
 
       void StartProcess(void funct(Isis::Buffer &inout));
-
       void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out));
-
       void StartProcess(void
-                        funct(std::vector<Isis::Buffer *> &in, 
+                        funct(std::vector<Isis::Buffer *> &in,
                               std::vector<Isis::Buffer *> &out));
 
 
@@ -130,65 +129,65 @@ namespace Isis {
 
 
       /**
-       * Same functionality as StartProcess(void funct(Isis::Buffer &inout)) 
-       * using Functors. The Functor operator(), takes the parameter 
+       * Same functionality as StartProcess(void funct(Isis::Buffer &inout))
+       * using Functors. The Functor operator(), takes the parameter
        * (Isis::Buffer &)
-       * 
+       *
        * @author 2011-04-22 Sharmila Prasad
-       * 
+       *
        * @param funct - Functor with overloaded operator()(Isis::Buffer &)
        * @param threaded @see ProcessByBrick::ProcessCubeInPlace()
        */
 
-      template <typename Functor> 
+      template <typename Functor>
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
 
         VerifyCubes(InPlace);
-        SetBricks(InPlace);       
+        SetBricks(InPlace);
         ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
 
 
 
       /**
-       * Same functionality as 
-       * StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) using 
-       * Functors. The Functor operator(), takes parameters 
+       * Same functionality as
+       * StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) using
+       * Functors. The Functor operator(), takes parameters
        * (Isis::Buffer &, Isis::Buffer &)
-       * 
+       *
        * @author 2011-04-22 Sharmila Prasad
-       * 
-       * @param funct - Functor with overloaded 
+       *
+       * @param funct - Functor with overloaded
        *                operator()(Isis::Buffer &, Isis::Buffer &)
        * @param threaded @see ProcessByBrick::ProcessCube()
        */
-      template <typename Functor> 
+      template <typename Functor>
       void ProcessCube(const Functor & funct, bool threaded = true) {
 
         VerifyCubes(InputOutput);
-        SetBricks(InputOutput);      
+        SetBricks(InputOutput);
         ProcessByBrick::ProcessCube(funct, threaded);
       }
 
 
       /**
-       * Same functionality as StartProcess(std::vector<Isis::Buffer *> &in, 
-       * std::vector<Isis::Buffer *> &out) using Functors. The Functor operator(), 
-       * takes parameters (std::vector<Isis::Buffer *> &, 
+       * Same functionality as StartProcess(std::vector<Isis::Buffer *> &in,
+       * std::vector<Isis::Buffer *> &out) using Functors. The Functor operator(),
+       * takes parameters (std::vector<Isis::Buffer *> &,
        * std::vector<Isis::Buffer *> &)
-       * 
+       *
        * @author 2011-04-22 Sharmila Prasad
-       * 
-       * @param funct - Functor with overloaded operator() 
-       *              (Istd::vector<Isis::Buffer *> &, 
+       *
+       * @param funct - Functor with overloaded operator()
+       *              (Istd::vector<Isis::Buffer *> &,
        *                std::vector<Isis::Buffer *> &)
        * @param threaded @see ProcessByBrick::ProcessCubes()
        */
-      template <typename Functor> 
+      template <typename Functor>
       void ProcessCubes(const Functor & funct, bool threaded = true) {
 
         VerifyCubes(InputOutputList);
-        SetBricks(InputOutputList);      
+        SetBricks(InputOutputList);
         ProcessByBrick::ProcessCubes(funct, threaded);
       }
   };

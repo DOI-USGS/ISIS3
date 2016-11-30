@@ -65,7 +65,7 @@ void IsisMain() {
     }
     catch(IException &ie) {
       QString tempName(temp.expanded());
-      remove(tempName.toAscii().data());
+      remove(tempName.toLatin1().data());
       throw IException(ie, IException::User,
                        "Failed to execute mdis2isis/spiceinit", _FILEINFO_);
     }
@@ -100,7 +100,7 @@ void IsisMain() {
 
       // Get the keylist source line
       QString kmapName(kmap.expanded());
-      ifstream ifile(kmapName.toAscii().data(), ios::in);
+      ifstream ifile(kmapName.toLatin1().data(), ios::in);
       if(!ifile) {
         QString mess = "Unable to open key map source file " + kmap.expanded();
         throw IException(IException::User, mess, _FILEINFO_);
@@ -125,10 +125,10 @@ void IsisMain() {
         bool toExists = tomap.fileExists();
         ofstream ofile;
         if(toExists) {
-          ofile.open(tomapName.toAscii().data(), std::ios::out | std::ios::app);
+          ofile.open(tomapName.toLatin1().data(), std::ios::out | std::ios::app);
         }
         else {
-          ofile.open(tomapName.toAscii().data(), std::ios::out);
+          ofile.open(tomapName.toLatin1().data(), std::ios::out);
         }
 
         if(!ofile) {
@@ -162,12 +162,12 @@ void IsisMain() {
   }
   catch(IException &) {
     QString fromName(from.expanded());
-    if(delete_from) remove(fromName.toAscii().data());
+    if(delete_from) remove(fromName.toLatin1().data());
     throw;
   }
 
 // Delete the from file if it was temporarily created from an EDR
   QString fromName(from.expanded());
-  if(delete_from) remove(fromName.toAscii().data());
+  if(delete_from) remove(fromName.toLatin1().data());
 }
 

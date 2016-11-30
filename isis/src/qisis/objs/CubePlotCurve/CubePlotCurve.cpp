@@ -10,9 +10,11 @@
 #include <QByteArray>
 #include <QClipboard>
 #include <QDataStream>
+#include <QDrag>
 #include <QFileInfo>
 #include <QEvent>
 #include <QMenu>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QString>
@@ -39,8 +41,8 @@ namespace Isis {
    */
   CubePlotCurve::CubePlotCurve(Units xUnits, Units yUnits) :
       PlotCurve(xUnits, yUnits) {
+    m_legendItem = NULL;
     m_renameAutomatically = true;
-    updateLegendItemWidget();
   }
 
 
@@ -53,9 +55,8 @@ namespace Isis {
    */
     CubePlotCurve::CubePlotCurve(const QByteArray &parentAndChildData) :
       PlotCurve(Unknown, Unknown) {
+    // Copy will get a new legend item widget when attached to the plot in PlotWindow
     m_legendItem = NULL;
-    m_legendItem = PlotCurve::legendItem();
-    m_legendItem->installEventFilter(this);
 
     QByteArray classData = fromByteArray(parentAndChildData);
 
@@ -333,13 +334,15 @@ namespace Isis {
   /**
    * This creates a legend item and overrides events from it.
    */
-  void CubePlotCurve::updateLegendItemWidget() {
-    if (!m_legendItem) {
-      m_legendItem = PlotCurve::legendItem();
-      m_legendItem->installEventFilter(this);
-      connect(m_legendItem, SIGNAL(destroyed(QObject *)),
-              this, SLOT(updateLegendItemWidget()));
-    }
+  void CubePlotCurve::updateLegendItemWidget(QWidget *legendItem) {
+    m_legendItem = legendItem;
+    m_legendItem->installEventFilter(this);
+  //  if (!m_legendItem) {
+     //// m_legendItem = PlotCurve::legendItem();
+     // m_legendItem->installEventFilter(this);
+     // connect(m_legendItem, SIGNAL(destroyed(QObject *)),
+     //         this, SLOT(updateLegendItemWidget()));
+    //}
   }
 
 
@@ -414,7 +417,7 @@ namespace Isis {
   void CubePlotCurve::mousePressEvent(QMouseEvent *event) {
     bool deleteThisCurve = false;
     if (event->button() == Qt::LeftButton) {
-      QDrag *drag = new QDrag(plot()->legend()->contentsWidget());
+      QDrag *drag = new QDrag(m_legendItem);
 
       // The icon for drag & drop sometimes gets in the way of the image,
       //   so let's move the image a little more to the right of the cursor
@@ -424,7 +427,7 @@ namespace Isis {
       drag->setHotSpot(newHotSpot);
 
       drag->setMimeData(createMimeData());
-      drag->setPixmap(QPixmap::grabWidget(m_legendItem));
+      drag->setPixmap( m_legendItem->grab(m_legendItem->rect()) );
 
       Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction,
           Qt::CopyAction);

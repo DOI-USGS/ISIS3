@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <QString>
 
 #include "Ransac.h"
 #include "FileName.h"
@@ -12,7 +14,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
   Isis::Preference::Preferences(true);
-
+  
   try {
     cout << "Unit test for Isis::Ransac" << endl;
   }

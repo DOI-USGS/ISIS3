@@ -1,5 +1,7 @@
 #include "Workspace.h"
 
+#include <QMenuBar>
+#include <QMessageBox>
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
@@ -274,13 +276,13 @@ namespace Isis {
   }
 
 
-  QWidget *Workspace::imageToMdiWidget(Image *image) {
+  QWidget *Workspace::cubeToMdiWidget(Cube *cube) {
     QWidget *result = NULL;
 
     for (int i = 0; !result && i < m_cubeViewportList->count(); i++) {
       MdiCubeViewport *viewport = (*m_cubeViewportList)[i];
 
-      if (viewport->cube() == image->cube()) {
+      if (viewport->cube() == cube) {
         result = qobject_cast<QWidget *>(viewport->parent());
       }
     }
@@ -400,7 +402,7 @@ namespace Isis {
   void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
     if (m_mdi->subWindowList().size()) {
-      QWeakPointer<QMdiSubWindow> windowToRemove =
+      QPointer<QMdiSubWindow> windowToRemove =
           m_mdi->subWindowList().last();
 
       m_mdi->removeSubWindow(windowToRemove.data());

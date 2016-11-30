@@ -31,12 +31,15 @@
 #include <QTimer>
 #include <QXmlStreamWriter>
 
+#include "ControlList.h"
 #include "CorrelationMatrix.h"
 #include "IException.h"
+#include "ImageList.h"
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
-//#include "ProjectItem.h"
+#include "ProjectItem.h"
+#include "ShapeList.h"
 #include "TargetBody.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -54,6 +57,7 @@ namespace Isis {
 
     m_context = NoContext;
     m_imageList = new ImageList;
+    m_shapeList = new ShapeList;
     m_controlList = NULL;
     m_correlationMatrix = CorrelationMatrix();
     m_guiCamera = GuiCameraQsp();
@@ -92,6 +96,7 @@ namespace Isis {
    */
   WorkOrder::~WorkOrder() {
     delete m_imageList;
+    delete m_shapeList;
     delete m_futureWatcher;
     delete m_progressBar;
     delete m_progressBarDeletionTimer;
@@ -120,6 +125,8 @@ namespace Isis {
     m_context = other.m_context;
     m_imageIds = other.m_imageIds;
     m_imageList = new ImageList(*other.m_imageList);
+    m_shapeIds = other.m_shapeIds;
+    m_shapeList = new ShapeList(*other.m_shapeList);
     m_correlationMatrix = other.m_correlationMatrix;
     m_controlList = other.m_controlList;
     m_guiCamera = other.m_guiCamera;
@@ -156,6 +163,7 @@ namespace Isis {
             this, SLOT(asyncFinished()));
 
     listenForImageDestruction();
+    listenForShapeDestruction();
   }
 
 
@@ -185,6 +193,32 @@ namespace Isis {
   bool WorkOrder::isExecutable(ImageList *images) {
     return false;
   }
+
+
+  /**
+   * @brief Re-implement this method if your work order utilizes shapes for data in order to
+   *  operate. For example, "ImportShapeWorkOrder" works on shapes - the logic
+   * in side of ImportShapeWorkOrder::isExecutable(ShapeList) determines whethere or not a user is 
+   * prompted with this work order as a possibility. 
+   * @param shapes A shape list that this work order should execute on
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
+   */
+  bool WorkOrder::isExecutable(ShapeList *shapes) {
+    return false;
+  }
+
+
+  /**
+   * @brief Re-implement this method if your work order utilizes a control
+   * for data in order to operate.
+   * @param control A control networks.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
+   */
+//bool WorkOrder::isExecutable(Control *control) {
+//  return false;
+//}
 
 
   /**
@@ -224,6 +258,28 @@ namespace Isis {
     m_imageList = new ImageList(*images);
     listenForImageDestruction();
   }
+
+
+  /**
+   * @brief Sets the ShapeList data for this WorkOrder
+   * @param images A pointer to the updated ShapeList.
+   */
+  void WorkOrder::setData(ShapeList *shapes) {
+    m_shapeIds.clear();
+    delete m_shapeList;
+
+    m_shapeList = new ShapeList(*shapes);
+    listenForShapeDestruction();
+  }
+
+
+  /**
+   * @brief Sets the Control data for this WorkOrder.
+   * @param controls.  A pointer to the Control
+   */
+//void WorkOrder::setData(Control *control) {
+//  m_control = control;
+//}
 
 
   /**
@@ -267,7 +323,6 @@ namespace Isis {
    * @brief Sets the internal data to the data stored in a ProjectItem.
    * @param item The item containing the data.
    */
-/*
   void WorkOrder::setData(ProjectItem *item) {
     if ( item->isProject() ) {
       setData( ProjectContext );
@@ -280,15 +335,22 @@ namespace Isis {
       imageList->append( item->image() );
       setData(imageList);
     }
-    else if ( item->isControlList() ) {
+    else if ( item->isShapeList() ) {
+      setData( item->shapeList() );
+    }
+    else if ( item->isShape() ) {
+      ShapeList *shapeList = new ShapeList(this);
+      shapeList->append( item->shape() );
+      setData(shapeList);
+    }
+    else if (item->isControlList()) {
       setData( item->controlList() );
-      //setData( *item->controlList() );
     }
     else if ( item->isControl() ) {
       ControlList *controlList = new ControlList(this);
       controlList->append( item->control() );
       setData(controlList);
-      //setData(*controlList);
+//    //setData(*controlList);
     }
     else if ( item->isCorrelationMatrix() ) {
       setData( item->correlationMatrix() );
@@ -301,7 +363,7 @@ namespace Isis {
     }
   }
 
-*/
+
   /**
    * @brief Re-implement this method if your work order utilizes a control list (a list of control
    * networks) for data in order to operate.
@@ -333,7 +395,6 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder is executable on data
    * stored in a ProjectItem.
    */
-/*
   bool WorkOrder::isExecutable(ProjectItem *item) {
     if ( !item ) {
       return false;
@@ -351,9 +412,18 @@ namespace Isis {
       imageList->deleteLater();
       return ret;
     }
+    else if ( item->isShapeList() ) {
+      return isExecutable( item->shapeList() );
+    }
+    else if ( item->isShape() ) {
+      ShapeList *shapeList = new ShapeList();
+      shapeList->append( item->shape() );
+      bool ret = isExecutable(shapeList);
+      shapeList->deleteLater();
+      return ret;
+    }
     else if ( item->isControlList() ) {
-      //return isExecutable( item->controlList() ) || isExecutable( *item->controlList() );
-        return isExecutable (item -> controlList() );
+      return isExecutable (item -> controlList() );
     }
     else if ( item->isControl() ) {
       ControlList *controlList = new ControlList();
@@ -377,7 +447,7 @@ namespace Isis {
     return false;
   }
 
-*/
+
   /**
    * @brief Read this work order's data from disk.
    */
@@ -427,6 +497,18 @@ namespace Isis {
       foreach (QString imageId, m_imageIds) {
         stream.writeStartElement("image");
         stream.writeAttribute("id", imageId);
+        stream.writeEndElement();
+      }
+
+      stream.writeEndElement();
+    }
+
+    if (m_shapeIds.count()) {
+      stream.writeStartElement("shapes");
+
+      foreach (QString shapeId, m_shapeIds) {
+        stream.writeStartElement("shape");
+        stream.writeAttribute("id", shapeId);
         stream.writeEndElement();
       }
 
@@ -508,6 +590,38 @@ namespace Isis {
 
 
   /**
+   * @briefReturns a pointer to the ShapeList for this WorkOrder.
+   * @return @b (ShapeList*) A pointer to the ShapeList.
+   */
+  ShapeList *WorkOrder::shapeList() {
+    if (!m_shapeList) {
+      bool anyShapesAreNull = false;
+
+      m_shapeList = new ShapeList;
+
+      foreach (QString id, m_shapeIds) {
+        Shape *shape = project()->shape(id);
+        m_shapeList->append(shape);
+
+        if (!shape) {
+          anyShapesAreNull = true;
+        }
+      }
+
+      if (anyShapesAreNull) {
+        delete m_shapeList;
+      }
+      else {
+        listenForShapeDestruction();
+      }
+    }
+
+    return 
+      m_shapeList;
+  }
+
+
+  /**
    * @brief Returns the CorrleationMatrix for this WorkOrder
    * @return A CorrelationMatrix.
    */
@@ -532,6 +646,16 @@ namespace Isis {
   const ImageList *WorkOrder::imageList() const {
     QMutexLocker lock(m_transparentConstMutex);
     return const_cast<WorkOrder *>(this)->imageList();
+  }
+
+
+  /**
+   * @brief A thread-safe method for retrieving a pointer to the shapeList.
+   * @return @b (ShapeList *) A pointer to the shape list for this WorkOrder.
+   */
+  const ShapeList *WorkOrder::shapeList() const {
+    QMutexLocker lock(m_transparentConstMutex);
+    return const_cast<WorkOrder *>(this)->shapeList();
   }
 
 
@@ -804,6 +928,12 @@ namespace Isis {
         mustQueueThisRedo = true;
       }
 
+      if (!shapeList()) {
+        connect(project(), SIGNAL(shapesAdded(ShapeList *)),
+                this, SLOT(attemptQueuedAction()));
+        mustQueueThisRedo = true;
+      }
+
       if (mustQueueThisRedo && !isUndoing() && !isRedoing()) {
         m_queuedAction = RedoQueuedAction;
 
@@ -820,6 +950,9 @@ namespace Isis {
         }
         else if (!imageList()) {
           queueStatusText = tr("Wait for images");
+        }
+        else if (!shapeList()) {
+          queueStatusText = tr("Wait for shapes");
         }
 
         resetProgressBar();
@@ -1201,6 +1334,29 @@ namespace Isis {
 
 
   /**
+   * @description Checks to see if we have lost any shapes in the ShapeList.  If we have, then
+   * destroy the entire list.  This will send a signal that the list needs to be rebuilt if
+   * requested. 
+   *  
+   * TODO 2016-07-26 TLS Combine this with listenForImageDestruction() - Basically duplicate 
+   *    code. 
+   */
+  void WorkOrder::listenForShapeDestruction() {
+    m_shapeIds.clear();
+    foreach (Shape *shape, *m_shapeList) {
+      if (shape) {
+        m_shapeIds.append(shape->id());
+
+        // If we lose any shapes, destroy the entire list. This will let us know that we need to
+        //   rebuild it, if needed, when requested.
+        connect(shape, SIGNAL(destroyed(QObject *)),
+                this, SLOT(clearShapeList()));
+      }
+    }
+  }
+
+
+  /**
    * @brief Resets the ProgressBar
    */
   void WorkOrder::resetProgressBar() {
@@ -1310,6 +1466,14 @@ namespace Isis {
    */
   void WorkOrder::clearImageList() {
     delete m_imageList;
+  }
+
+
+  /**
+   * @brief Clears the list of shapes.
+   */
+  void WorkOrder::clearShapeList() {
+    delete m_shapeList;
   }
 
 

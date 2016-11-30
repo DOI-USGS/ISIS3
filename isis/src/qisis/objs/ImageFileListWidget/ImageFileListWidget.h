@@ -44,6 +44,8 @@ namespace Isis {
    *   @history 2014-09-05 Kim Oyama - Modified XmlHandler::startElement and save().
    *   @history 2016-04-28 Tracie Sucharski - Modified to use Qt5 and v006 libraries.
    *   @history 2016-06-07 Makayla Shepherd - Updated documentation. Fixes #3962.
+   *   @history 2016-09-14 Ian Humphrey - Modified getLongHelp() - replaced deprecated static
+   *                           QPixmap::grabWidget with QWidget::grab (Qt5). Fixes #4304.
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT

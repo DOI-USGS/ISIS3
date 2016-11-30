@@ -37,13 +37,15 @@ class QwtPlot;
 class QwtPlotGrid;
 class QwtPlotSpectrogram;
 class QwtPlotZoomer;
+class QwtLegend;
 
 class QDockWidget;
 class QListWidgetItem;
 class QLineEdit;
 class QComboBox;
+class QCheckBox;
 
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class MdiCubeViewport;
@@ -69,15 +71,17 @@ namespace Isis {
    *                           units.
    *   @history 2013-02-21 Steven Lambright - Added methods requestFillTable(), scheduleFillTable()
    *                           in order to increase performance. References #710.
-   *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
+   *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to
    *                           relative pathnames. Fixes #2054.
-   *   @history 2014-07-02 Ian Humphrey - Added method configurePlotCurves() to create a configure 
+   *   @history 2014-07-02 Ian Humphrey - Added method configurePlotCurves() to create a configure
    *                           tool that allows user to select which curve to configure from a combo
    *                           box. Added MenuOption ConfigurePlotMenuOption. Fixes #2089.
    *   @history 2014-07-24 Ian Humphrey - Modified plotCurves() and plotSpectrograms() methods to
    *                           return a list of curves/spectrograms in the order they appear in
    *                           the plot (instead of reversed). Used for refactoring. References
    *                           #2089.
+   *   @history 2016-09-14 Ian Humphrey - Modified printPlot() and save() - replaced deprecated
+   *                           static QPixmap::grabWidget with QWidget::grab. References #4304.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT
@@ -155,12 +159,12 @@ namespace Isis {
          *   allows the user to create new plot curves.
          */
         LineFitMenuOption          = 8192,
-        
+
         /**
-         * This option allows the user to change the curve name, color, style size, and 
+         * This option allows the user to change the curve name, color, style size, and
          *   symbol of the curve.
          */
-        ConfigurePlotMenuOption    = 16384, 
+        ConfigurePlotMenuOption    = 16384,
         /**
          * This is all of the available menu options.
          */
@@ -172,8 +176,8 @@ namespace Isis {
                          ResetScaleMenuOption | ClearPlotMenuOption |
                          DefaultHelpMenuOption | LineFitMenuOption |
                          ConfigurePlotMenuOption
-                         
-                          
+
+
       };
 
       PlotWindow(QString title, PlotCurve::Units xAxisUnits,
@@ -245,6 +249,8 @@ namespace Isis {
       virtual void dragEnterEvent(QDragEnterEvent *event);
       virtual void dropEvent(QDropEvent *event);
       virtual bool eventFilter(QObject *o, QEvent *e);
+
+      using QWidget::mousePressEvent;
       void mousePressEvent(QObject *object, QMouseEvent *e);
 
       QwtPlot *plot();
@@ -320,6 +326,9 @@ namespace Isis {
       bool m_autoscaleAxes;
 
       QwtPlot *m_plot;//!< The plot in this window
+      QwtLegend *m_legend; //!< The legend inserted in this plot
+      bool m_plotXLogScale; //!< Tracks if the plot X axis is using a log (true) or linear (false) scale
+      bool m_plotYLogScale; //!< Tracks if the plot Y axis is using a log (true) or linear (false) scale
       TableMainWindow *m_tableWindow;//!< Table window
       QToolBar *m_toolBar;//!< Tool bar on the plot window
 
@@ -333,7 +342,7 @@ Q_DECLARE_METATYPE(Isis::PlotWindow *);
 // There isn't a great place to put this currently since it's not a class we
 //   can manage the header for.
 //! We have scatter plot types as QVariant data types, so here it's enabled.
+Q_DECLARE_OPAQUE_POINTER(QwtPlotSpectrogram *);
 Q_DECLARE_METATYPE(QwtPlotSpectrogram *);
 
 #endif
-

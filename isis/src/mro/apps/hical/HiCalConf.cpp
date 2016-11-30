@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
+ * $Id: HiCalConf.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -315,7 +315,7 @@ bool HiCalConf::_naifLoaded = false;
 
     QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
     double obsStartTime;
-    scs2e_c (-74999,scStartTime.toAscii().data(),&obsStartTime);
+    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
 
     QString targetName = getKey("TargetName", "Instrument");
     if ( targetName.toLower() == "sky" ||
@@ -326,7 +326,7 @@ bool HiCalConf::_naifLoaded = false;
     }
     double sunv[3];
     double lt;
-    (void) spkpos_c(targetName.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
     NaifStatus::CheckErrors(); 
@@ -421,9 +421,9 @@ void HiCalConf::loadNaifTiming( ) {
     QString lsk = leapseconds.expanded();
     QString sClock = sclk.expanded();
     QString pConstants = pck.expanded();
-    furnsh_c(lsk.toAscii().data());
-    furnsh_c(sClock.toAscii().data());
-    furnsh_c(pConstants.toAscii().data());
+    furnsh_c(lsk.toLatin1().data());
+    furnsh_c(sClock.toLatin1().data());
+    furnsh_c(pConstants.toLatin1().data());
     NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once

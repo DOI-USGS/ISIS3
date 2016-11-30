@@ -70,12 +70,12 @@ namespace Isis {
 
     QLabel *styleLabel = new QLabel("Style:");
     m_styleCombo = new QComboBox;
-    m_styleCombo->addItem("No Line", Qt::NoPen);
-    m_styleCombo->addItem("Solid Line", Qt::SolidLine);
-    m_styleCombo->addItem("Dash Line", Qt::DashLine);
-    m_styleCombo->addItem("Dot Line", Qt::DotLine);
-    m_styleCombo->addItem("Dash Dot Line", Qt::DashDotLine);
-    m_styleCombo->addItem("Dash Dot Dot Line", Qt::DashDotDotLine);
+    m_styleCombo->addItem("No Line", static_cast<int>(Qt::NoPen));
+    m_styleCombo->addItem("Solid Line", static_cast<int>(Qt::SolidLine));
+    m_styleCombo->addItem("Dash Line", static_cast<int>(Qt::DashLine));
+    m_styleCombo->addItem("Dot Line", static_cast<int>(Qt::DotLine));
+    m_styleCombo->addItem("Dash Dot Line", static_cast<int>(Qt::DashDotLine));
+    m_styleCombo->addItem("Dash Dot Dot Line", static_cast<int>(Qt::DashDotDotLine));
     optionsLayout->addWidget(styleLabel, row, 0);
     optionsLayout->addWidget(m_styleCombo, row, 1);
     row++;
@@ -195,9 +195,7 @@ namespace Isis {
 
     QwtSymbol::Style symbolStyle = (QwtSymbol::Style)m_symbolCombo->itemData(
         m_symbolCombo->currentIndex() ).toInt();
-    QwtSymbol newSymbol( m_plotCurve->markerSymbol() );
-    newSymbol.setStyle(symbolStyle);
-    m_plotCurve->setMarkerSymbol(newSymbol);
+    m_plotCurve->setMarkerSymbol(symbolStyle);
 
     m_plotCurve->show();
     m_plotCurve->plot()->replot();
@@ -254,7 +252,7 @@ namespace Isis {
     if ( m_styleCombo->count() ) {
       m_styleCombo->setCurrentIndex(0);
       for (int i = 0; i < m_styleCombo->count(); i++) {
-        if ( m_styleCombo->itemData(i) == m_plotCurve->pen().style() )
+        if ( m_styleCombo->itemData(i) == static_cast<int>(m_plotCurve->pen().style()) )
           m_styleCombo->setCurrentIndex(i);
       }
     }
@@ -262,9 +260,9 @@ namespace Isis {
     if ( m_symbolCombo->count() ) {
       m_symbolCombo->setCurrentIndex(0);
       for (int i = 0; i < m_symbolCombo->count(); i++) {
-        if ( m_symbolCombo->itemData(i).toInt() == m_plotCurve->markerSymbol().style() ) {
-          m_symbolCombo->setCurrentIndex(i);
-        }
+          if ( m_symbolCombo->itemData(i).toInt() == m_plotCurve->markerSymbol()->style() ) {
+            m_symbolCombo->setCurrentIndex(i);
+          }
       }
     }
   }

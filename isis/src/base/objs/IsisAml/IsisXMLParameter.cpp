@@ -21,8 +21,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include <string>
 
 #include <xercesc/util/PlatformUtils.hpp>
@@ -34,6 +32,7 @@ using namespace std;
 #include "IsisXMLParameter.h"
 #include "IsisXMLChTrans.h"
 
+using namespace std;
 
 // Constructors
 
@@ -296,7 +295,3 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
                                       (string)XERCES::XMLString::transcode(localname));
   }
 }
-
-
-
-

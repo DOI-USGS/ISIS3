@@ -29,12 +29,13 @@
 #include <QMessageBox>
 
 #include "Directory.h"
-//#include "Footprint2DView.h"
+#include "Footprint2DView.h"
+#include "ImageList.h"
 #include "MosaicSceneItem.h"
 #include "MosaicSceneWidget.h"
 #include "Project.h"
-//#include "ProjectItem.h"
-//#include "ProjectItemModel.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
   
@@ -46,6 +47,7 @@ namespace Isis {
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View &Footprints..."));
+    QUndoCommand::setText(tr("View &Footprints..."));
   }
 
   /**
@@ -88,13 +90,89 @@ namespace Isis {
     return result;
   }
 
+
+  /**
+   * This check is used by Directory::supportedActions(DataType data).
+   *
+   * @param images ShapeList we are checking
+   *
+   * @return @b bool True if one of the images in ImagesList images isFootprintable
+   */
+  bool Footprint2DViewWorkOrder::isExecutable(ShapeList *shapes) {
+    bool result = false;
+
+    foreach (Shape *shape, *shapes) {
+      result = result || shape->isFootprintable();
+    }
+
+    return result;
+  }
+
+
   /**
    * This method calls WorkOrder's execute.
    * 
-   * @return @b bool True if WorkOrder::execute() returns true.
+   * @return @b bool True if WorkOrder::execute() returns true 
    */
   bool Footprint2DViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
+
+    int maxRecommendedFootprints = 50000;
+    if (success && imageList()->count() > maxRecommendedFootprints) {
+      QMessageBox::StandardButton selectedOpt = QMessageBox::warning(NULL,
+          tr("Potentially Slow Operation"),
+          tr("You are asking to open %L1 images in a 2D footprint view at once. This is possible, "
+             "but will take a significant amount of time and cause overall slowness. Working with "
+             "more than %L2 footprints is not recommended. Are you sure you want to view these "
+             "%L1 footprints?").arg(imageList()->count()).arg(maxRecommendedFootprints),
+           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+      if (selectedOpt == QMessageBox::No) {
+        success = false;
+      }
+    }
+
+    if (success) {
+      QStringList viewOptions;
+
+      QList<Footprint2DView *> existingViews = project()->directory()->footprint2DViews();
+      int viewToUse = -1;
+
+      if (existingViews.count()) {
+        for (int i = 0; i < existingViews.count(); i++) {
+          viewOptions.append(existingViews[i]->windowTitle());
+        }
+      }
+
+      viewOptions.append(tr("New Footprint View"));
+
+      if (viewOptions.count() > 1) {
+        QString selected = QInputDialog::getItem(NULL, tr("View to see footprints in"),
+            tr("Which view would you like your\nimage's footprints to be put into?"),
+            viewOptions, viewOptions.count() - 1, false, &success);
+
+        viewToUse = viewOptions.indexOf(selected);
+      }
+      else {
+        viewToUse = viewOptions.count() - 1;
+      }
+
+      bool newView = false;
+      if (viewToUse == viewOptions.count() - 1) {
+        newView = true;
+        QUndoCommand::setText(tr("View footprints in new 2D footprint view"));
+      }
+      else if (viewToUse != -1) {
+         QUndoCommand::setText(tr("View footprints in footprint view [%1]")
+              .arg(existingViews[viewToUse]->windowTitle()));
+      }
+
+      QStringList internalData;
+      internalData.append(QString::number(viewToUse));
+      internalData.append(newView? "new view" : "existing view");
+      setInternalData(internalData);
+    }
+
     return success;
   }
 
@@ -115,11 +193,26 @@ namespace Isis {
    * 
    */
   void Footprint2DViewWorkOrder::syncRedo() {
-    /*  //tjw
-    ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    Footprint2DView *view = project()->directory()->addFootprint2DView();
-    view->addItem( currentItem );
-   */
+    QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
+
+    int viewToUse = internalData().first().toInt();
+
+    Footprint2DView *view = NULL;
+    if (viewToUse == project()->directory()->footprint2DViews().count()) {
+      view = project()->directory()->addFootprint2DView();
+    }
+    else {
+      view = project()->directory()->footprint2DViews()[viewToUse];
+    }
+
+    view->addItems( selectedItems );
+
+    //  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  source model: "<<project()->directory()->model()<<"  rows = "<<project()->directory()->model()->rowCount();
+//  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  proxy model: "<<view->internalModel()<<"  rows = "<<view->internalModel()->rowCount();
+  }
+
+  void Footprint2DViewWorkOrder::syncUndo() {
+    delete project()->directory()->footprint2DViews().last();
   }
 }
 

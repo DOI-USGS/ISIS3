@@ -480,8 +480,15 @@ namespace Isis {
 
     if (isDateVersioned()) {
       QString fileDatePattern = FileName(expanded()).name();
-      fileDatePattern = "'" + fileDatePattern.replace(QRegExp("[{}]"), "'") + "'";
 
+      // {} needs to be removed from the fileDatePattern (i.e. an empty date version sequence).
+      // This prevents the replacement of {} with '' in the pattern, since
+      // Qt5's QDate.toString(pattern) handles these two adjacent single quotes in the pattern
+      // differently than Qt4 did.
+      fileDatePattern.replace(QRegExp("\\{\\}"), "");
+
+      fileDatePattern = "'" + fileDatePattern.replace(QRegExp("[{}]"), "'") + "'";
+   
       QString dated = QDate::currentDate().toString(fileDatePattern);
       if (file.contains("'")) {
         throw IException(IException::Unknown,

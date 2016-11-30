@@ -31,7 +31,9 @@ namespace Isis {
       public:
         TreeView(QWidget *parent = 0);
         virtual ~TreeView();
-        QSize sizeHint();
+
+        QSize sizeHint() const;
+
         QFont getContentFont() const;
         void setModel(AbstractTreeModel *someModel);
         AbstractTreeModel *getModel() const;

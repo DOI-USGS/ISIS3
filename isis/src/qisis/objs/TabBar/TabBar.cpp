@@ -18,12 +18,12 @@ namespace Isis
   TabBar::TabBar()
   {
     tabs = NULL;
-  
+
     tabs = new QVector< Tab * > ();
     radioStyleTabs = false;
   }
-  
-  
+
+
   //! destruct a TabBar
   TabBar::~TabBar()
   {
@@ -33,8 +33,8 @@ namespace Isis
       tabs = NULL;
     }
   }
-  
-  
+
+
   /**
    * Adds a Tab to the TabBar.  Note that The TabBar takes ownership of Tabs
    * once they are added!
@@ -48,12 +48,12 @@ namespace Isis
     connect(newTab, SIGNAL(clicked(const int &)), this,
         SLOT(tabClicked(const int &)));
     tabs->push_back(newTab);
-  
+
     newTab->setSelected(false);
     addAction(newTab);
   }
-  
-  
+
+
   /**
    * If set to true then the effect is that Tabs in the same radio group can
    * only be selected one at a time.  When a Tab is selected all other Tabs in
@@ -67,8 +67,8 @@ namespace Isis
   {
     radioStyleTabs = radioStyle;
   }
-  
-  
+
+
   /**
    * @returns The current radio style being used
    */
@@ -76,17 +76,17 @@ namespace Isis
   {
     return radioStyleTabs;
   }
-  
-  
+
+
   /**
    * @returns The number of Tabs currently in the TabBar
    */
-  const int TabBar::size() const
+  int TabBar::size() const
   {
     return tabs->size();
   }
-  
-  
+
+
   /**
    * Sets whether the Tab at the specified index is selected or not
    *
@@ -100,8 +100,8 @@ namespace Isis
     if (index >= 0 && index < tabs->size())
       (*tabs)[index]->setSelected(status);
   }
-  
-  
+
+
   /**
    * @param index Index of the Tab.  The first Tab added to the bar has an index
    *              of 0.  The last Tab added has an index of size() - 1.
@@ -112,11 +112,11 @@ namespace Isis
   {
     if (index >= 0 && index < tabs->size() && (*tabs)[index]->isSelected())
       return true;
-  
+
     return false;
   }
-  
-  
+
+
   /**
    * @returns True if no Tabs are currently selected, false otherwise
    */
@@ -125,11 +125,11 @@ namespace Isis
     for (int i = 0; i < tabs->size(); i++)
       if ((*tabs)[i]->isSelected())
         return false;
-  
+
     return true;
   }
-  
-  
+
+
   /**
    * Custom setEnabled method that also calls setEnabled for each of our Tabs
    *
@@ -139,12 +139,12 @@ namespace Isis
   void TabBar::setEnabled(bool newEnabledStatus)
   {
     QToolBar::setEnabled(newEnabledStatus);
-    
+
     for (int i = 0; i < size(); i++)
       (*tabs)[i]->setEnabled(newEnabledStatus);
   }
-  
-  
+
+
   /**
    * SLOT which performs actions that need to be done when we get a SIGNAL from
    * a Tab telling us that it has been clicked.  What happens is that first the
@@ -172,8 +172,8 @@ namespace Isis
       (*tabs)[index]->setSelected(true);
     }
   }
-  
-  
+
+
   /**
    * @param index Index of the Tab.  The first Tab added to the bar has an index
    *              of 0.  The last Tab added has an index of size() - 1.
@@ -195,8 +195,8 @@ namespace Isis
     }
     return true;
   }
-  
-  
+
+
   /**
    * @param index Index of the Tab.  The first Tab added to the bar has an index
    *              of 0.  The last Tab added has an index of size() - 1.

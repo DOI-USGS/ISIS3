@@ -229,7 +229,7 @@ namespace Isis {
 
     delete m_lastProcessByLineChunks;
     m_lastProcessByLineChunks = NULL;
-    
+
     delete m_writeThreadMutex;
     m_writeThreadMutex = NULL;
   }
@@ -283,7 +283,7 @@ namespace Isis {
       int bufferEndSample = bufferStartSample + bufferSampleCount - 1;
       int bufferEndLine = bufferStartLine + bufferLineCount - 1;
       int bufferEndBand = bufferStartBand + bufferBandCount - 1;
-    
+
       // make sure we access the correct band
       int startBand = bufferStartBand - 1;
       if (m_virtualBands)
@@ -464,20 +464,6 @@ namespace Isis {
     if(virtualBandList && !virtualBandList->empty())
       m_virtualBands = new QList<int>(*virtualBandList);
   }
-
-
-  /**
-   * Children should probably implement this method. This is called to allow the
-   *   IO Handling algorithm to change the labels to include things like
-   *   TileSamples/TileLines for example.
-   *
-   * @param labels The PVL cube label to be updated to reflect information
-   *                  that the child IO handlers need to properly re-read the
-   *                  cube.
-   */
-  void CubeIoHandler::updateLabels(Pvl &labels) {
-  }
-
 
   /**
    * Get the mutex that this IO handler is using around I/Os on the given
@@ -855,7 +841,7 @@ namespace Isis {
         int initialChunkYPos = (areaStartLine - 1)   / m_linesInChunk;
         int initialChunkZPos = (actualBand - 1) / m_bandsInChunk;
         int initialChunkBand = initialChunkZPos * m_bandsInChunk + 1;
-        
+
 
         QRect chunkRect(initialChunkXPos * m_samplesInChunk + 1,
                       initialChunkYPos * m_linesInChunk + 1,
@@ -875,7 +861,7 @@ namespace Isis {
               (chunkYPos * getChunkCountInSampleDimension()) +
               (chunkZPos * getChunkCountInSampleDimension() *
                           getChunkCountInLineDimension());
-            
+
           RawCubeChunk * newChunk = getChunk(chunkIndex, true);
 
           results.append(newChunk);
@@ -1586,7 +1572,7 @@ namespace Isis {
       const int &bandIntoChunk = z - outputStartBand;
       int virtualBand = index;
 
-      
+
       if(m_virtualBands) {
         virtualBand = m_virtualBands->indexOf(virtualBand) + 1;
       }
@@ -1901,4 +1887,3 @@ namespace Isis {
     m_ioHandler->m_dataFile->flush();
   }
 }
-

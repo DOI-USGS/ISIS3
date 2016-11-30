@@ -339,7 +339,7 @@ namespace Isis {
       };
 
       QMap<int, QVariant> oldProps;
-      QByteArray oldHexValues(oldDisplayPropsValues[0].toAscii());
+      QByteArray oldHexValues(oldDisplayPropsValues[0].toLatin1());
       QDataStream oldValuesStream(QByteArray::fromHex(oldHexValues));
       oldValuesStream >> oldProps;
 

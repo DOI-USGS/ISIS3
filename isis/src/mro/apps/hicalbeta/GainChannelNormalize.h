@@ -52,10 +52,9 @@ namespace Isis {
 
     public:
       //  Constructors and Destructor
-      GainChannelNormalize() : Module("GainChannelNormalize"),
-                               _normalizer(0.0) { }
+      GainChannelNormalize() : Module("GainChannelNormalize") { }
       GainChannelNormalize(const HiCalConf &conf) :
-                           Module("GainChannelNormalize"), _normalizer(0.0) {
+                           Module("GainChannelNormalize") {
         init(conf);
       }
 
@@ -63,7 +62,6 @@ namespace Isis {
       virtual ~GainChannelNormalize() { }
 
     private:
-      double   _normalizer;
 
       void init(const HiCalConf &conf) {
         _history.clear();
@@ -101,4 +99,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

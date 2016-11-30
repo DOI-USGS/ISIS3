@@ -1,14 +1,25 @@
 #include "MosaicMainWindow.h"
 
+#include <QApplication>
 #include <QDockWidget>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QSettings>
+#include <QScrollArea>
+#include <QStatusBar>
+#include <QVBoxLayout>
 #include <QWhatsThis>
 
 #include "Camera.h"
 #include "FileDialog.h"
 #include "MosaicController.h"
 #include "ImageFileListWidget.h"
+#include "IString.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -166,40 +177,40 @@ namespace Isis {
     QAction *open = new QAction(this);
     open->setText("Open Cube...");
     open->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/fileopen.png"));
-    connect(open, SIGNAL(activated()), this, SLOT(open()));
+    connect(open, SIGNAL(triggered()), this, SLOT(open()));
 
     QAction *openList = new QAction(this);
     openList->setText("Open Cube List...");
     openList->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionHelpContents.png"));
-    connect(openList, SIGNAL(activated()), this, SLOT(openList()));
+    connect(openList, SIGNAL(triggered()), this, SLOT(openList()));
 
     QAction *saveProject = new QAction(this);
     saveProject->setText("Save Project");
     saveProject->setShortcut(Qt::CTRL + Qt::Key_S);
     saveProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSave.png"));
     m_actionsRequiringOpen.append(saveProject);
-    connect(saveProject, SIGNAL(activated()), this, SLOT(saveProject()));
+    connect(saveProject, SIGNAL(triggered()), this, SLOT(saveProject()));
 
     QAction *saveProjectAs = new QAction(this);
     saveProjectAs->setText("Save Project As...");
     saveProjectAs->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSaveAs.png"));
     m_actionsRequiringOpen.append(saveProjectAs);
-    connect(saveProjectAs, SIGNAL(activated()), this, SLOT(saveProjectAs()));
+    connect(saveProjectAs, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
     QAction *loadProject = new QAction(this);
     loadProject->setText("Load Project...");
     loadProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionExportMapServer.png"));
-    connect(loadProject, SIGNAL(activated()), this, SLOT(loadProject()));
+    connect(loadProject, SIGNAL(triggered()), this, SLOT(loadProject()));
 
     QAction *closeProject = new QAction(this);
     closeProject->setText("Close Project");
     m_actionsRequiringOpen.append(closeProject);
-    connect(closeProject, SIGNAL(activated()), this, SLOT(closeMosaic()));
+    connect(closeProject, SIGNAL(triggered()), this, SLOT(closeMosaic()));
 
     QAction *exit = new QAction(this);
     exit->setText("Exit");
     exit->setIcon(QIcon::fromTheme("window-close"));
-    connect(exit, SIGNAL(activated()), this, SLOT(close()));
+    connect(exit, SIGNAL(triggered()), this, SLOT(close()));
 
     QAction *actionRequiringOpen = NULL;
     foreach(actionRequiringOpen, m_actionsRequiringOpen) {
@@ -241,7 +252,7 @@ namespace Isis {
         QPixmap(FileName("$base/icons/contexthelp.png").expanded()));
     activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
         "this program to see more information about them");
-    connect(activateWhatsThisAct, SIGNAL(activated()),
+    connect(activateWhatsThisAct, SIGNAL(triggered()),
             this, SLOT(enterWhatsThisMode()));
 
     QAction *showHelpAct = new QAction("qmos &Help", this);
@@ -636,8 +647,8 @@ namespace Isis {
    * and location and the tool bar location.
    *
    */
-  void MosaicMainWindow::readSettings() {
-    MainWindow::readSettings(QSize(800, 600));
+  void MosaicMainWindow::readSettings(QSize defaultSize) {
+    MainWindow::readSettings(defaultSize);
   }
 
 
@@ -702,7 +713,7 @@ namespace Isis {
     QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
                   QDir::currentPath(),
                   "Mosaic (*.mos)");
-      
+
     if (!fn.isEmpty()) {
       closeMosaic();
 

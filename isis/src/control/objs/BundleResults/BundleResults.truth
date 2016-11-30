@@ -1,0 +1,449 @@
+Unit test for BundleResults...
+Printing PVL group with results from the default constructor...
+Object = DefaultResultsObject
+  NumberFixedPoints                 = 0
+  NumberIgnoredPoints               = 0
+  NumberHeldImages                  = 0
+  RMSResidualX                      = 0.0
+  RMSResidualY                      = 0.0
+  RMSResidualXY                     = 0.0
+  RejectionLimit                    = 0.0
+  RadiansToMeters                   = 0.0
+  NumberRejectedObservations        = 0
+  NumberObservations                = 0
+  NumberImageParameters             = 0
+  NumberConstrainedPointParameters  = 0
+  NumberConstrainedImageParameters  = 0
+  NumberConstrainedTargetParameters = 0
+  NumberUnknownParameters           = 0
+  DegreesOfFreedom                  = -1
+  Sigma0                            = 0.0
+  ElapsedTime                       = 0.0
+  ElapsedTimeErrorProp              = 0.0
+  Iterations                        = 0
+  Converged                         = No
+  MinSigmaLatitude                  = 1000000000000.0
+  MinSigmaLatitudePointId           = Null
+  MaxSigmaLatitude                  = 0.0
+  MaxSigmaLatitudePointId           = Null
+  MinSigmaLongitude                 = 1000000000000.0
+  MinSigmaLongitudePointId          = Null
+  MaxSigmaLongitude                 = 0.0
+  MaxSigmaLongitudePointId          = Null
+  MinSigmaRadius                    = 1000000000000.0
+  MinSigmaRadiusPointId             = Null
+  MaxSigmaRadius                    = 0.0
+  MaxSigmaRadiusPointId             = Null
+  RmsSigmaLat                       = 0.0
+  RmsSigmaLon                       = 0.0
+  RmsSigmaRad                       = 0.0
+  NumberMaximumLikelihoodModels     = 0
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+Testing copy constructor...
+Object = CopyResultsObject
+  NumberFixedPoints                 = 0
+  NumberIgnoredPoints               = 0
+  NumberHeldImages                  = 0
+  RMSResidualX                      = 0.0
+  RMSResidualY                      = 0.0
+  RMSResidualXY                     = 0.0
+  RejectionLimit                    = 0.0
+  RadiansToMeters                   = 0.0
+  NumberRejectedObservations        = 0
+  NumberObservations                = 0
+  NumberImageParameters             = 0
+  NumberConstrainedPointParameters  = 0
+  NumberConstrainedImageParameters  = 0
+  NumberConstrainedTargetParameters = 0
+  NumberUnknownParameters           = 0
+  DegreesOfFreedom                  = -1
+  Sigma0                            = 0.0
+  ElapsedTime                       = 0.0
+  ElapsedTimeErrorProp              = 0.0
+  Iterations                        = 0
+  Converged                         = No
+  MinSigmaLatitude                  = 1000000000000.0
+  MinSigmaLatitudePointId           = Null
+  MaxSigmaLatitude                  = 0.0
+  MaxSigmaLatitudePointId           = Null
+  MinSigmaLongitude                 = 1000000000000.0
+  MinSigmaLongitudePointId          = Null
+  MaxSigmaLongitude                 = 0.0
+  MaxSigmaLongitudePointId          = Null
+  MinSigmaRadius                    = 1000000000000.0
+  MinSigmaRadiusPointId             = Null
+  MaxSigmaRadius                    = 0.0
+  MaxSigmaRadiusPointId             = Null
+  RmsSigmaLat                       = 0.0
+  RmsSigmaLon                       = 0.0
+  RmsSigmaRad                       = 0.0
+  NumberMaximumLikelihoodModels     = 0
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+Add maximum likelihood models, then test the assignment operator...
+
+Testing assignment operator=...
+Maximum Likelihood Tier: 0
+Median of R^2 residuals:  0.495050
+Maximum Likelihood Tier: 1
+Median of R^2 residuals:  0.495050
+Maximum Likelihood Tier: 2
+Median of R^2 residuals:  0.495050
+Maximum Likelihood Tier: 3
+
+Object = SelfAssignedResultsObject
+  NumberFixedPoints                  = 0
+  NumberIgnoredPoints                = 0
+  NumberHeldImages                   = 0
+  RMSResidualX                       = 0.0
+  RMSResidualY                       = 0.0
+  RMSResidualXY                      = 0.0
+  RejectionLimit                     = 0.0
+  RadiansToMeters                    = 0.0
+  NumberRejectedObservations         = 0
+  NumberObservations                 = 0
+  NumberImageParameters              = 0
+  NumberConstrainedPointParameters   = 0
+  NumberConstrainedImageParameters   = 0
+  NumberConstrainedTargetParameters  = 0
+  NumberUnknownParameters            = 0
+  DegreesOfFreedom                   = -1
+  Sigma0                             = 0.0
+  ElapsedTime                        = 0.0
+  ElapsedTimeErrorProp               = 0.0
+  Iterations                         = 0
+  Converged                          = No
+  MinSigmaLatitude                   = 1000000000000.0
+  MinSigmaLatitudePointId            = Null
+  MaxSigmaLatitude                   = 0.0
+  MaxSigmaLatitudePointId            = Null
+  MinSigmaLongitude                  = 1000000000000.0
+  MinSigmaLongitudePointId           = Null
+  MaxSigmaLongitude                  = 0.0
+  MaxSigmaLongitudePointId           = Null
+  MinSigmaRadius                     = 1000000000000.0
+  MinSigmaRadiusPointId              = Null
+  MaxSigmaRadius                     = 0.0
+  MaxSigmaRadiusPointId              = Null
+  RmsSigmaLat                        = 0.0
+  RmsSigmaLon                        = 0.0
+  RmsSigmaRad                        = 0.0
+  NumberMaximumLikelihoodModels      = 3
+  MaximumLikelihoodModels            = (Huber, Welsch, Chen)
+  MaximumLikelihoodQuantiles         = (0.1, 0.2, 0.3)
+  MaximumLikelihoodMedianR2Residuals = 0.49504950495049
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+Object = AssignedNewResultsObject
+  NumberFixedPoints                  = 0
+  NumberIgnoredPoints                = 0
+  NumberHeldImages                   = 0
+  RMSResidualX                       = 0.0
+  RMSResidualY                       = 0.0
+  RMSResidualXY                      = 0.0
+  RejectionLimit                     = 0.0
+  RadiansToMeters                    = 0.0
+  NumberRejectedObservations         = 0
+  NumberObservations                 = 0
+  NumberImageParameters              = 0
+  NumberConstrainedPointParameters   = 0
+  NumberConstrainedImageParameters   = 0
+  NumberConstrainedTargetParameters  = 0
+  NumberUnknownParameters            = 0
+  DegreesOfFreedom                   = -1
+  Sigma0                             = 0.0
+  ElapsedTime                        = 0.0
+  ElapsedTimeErrorProp               = 0.0
+  Iterations                         = 0
+  Converged                          = No
+  MinSigmaLatitude                   = 1000000000000.0
+  MinSigmaLatitudePointId            = Null
+  MaxSigmaLatitude                   = 0.0
+  MaxSigmaLatitudePointId            = Null
+  MinSigmaLongitude                  = 1000000000000.0
+  MinSigmaLongitudePointId           = Null
+  MaxSigmaLongitude                  = 0.0
+  MaxSigmaLongitudePointId           = Null
+  MinSigmaRadius                     = 1000000000000.0
+  MinSigmaRadiusPointId              = Null
+  MaxSigmaRadius                     = 0.0
+  MaxSigmaRadiusPointId              = Null
+  RmsSigmaLat                        = 0.0
+  RmsSigmaLon                        = 0.0
+  RmsSigmaRad                        = 0.0
+  NumberMaximumLikelihoodModels      = 3
+  MaximumLikelihoodModels            = (Huber, Welsch, Chen)
+  MaximumLikelihoodQuantiles         = (0.1, 0.2, 0.3)
+  MaximumLikelihoodMedianR2Residuals = 0.49504950495049
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+Testing mutator methods...
+Object = MutatedResultsObject
+  NumberFixedPoints                  = 1
+  NumberIgnoredPoints                = 1
+  NumberHeldImages                   = 1
+  RMSResidualX                       = 4.0
+  RMSResidualY                       = 5.0
+  RMSResidualXY                      = 6.0
+  RejectionLimit                     = 7.0
+  RadiansToMeters                    = 23.68
+  NumberRejectedObservations         = 8
+  NumberObservations                 = 9
+  NumberImageParameters              = 10
+  NumberConstrainedPointParameters   = 11
+  NumberConstrainedImageParameters   = 10
+  NumberConstrainedTargetParameters  = 2
+  NumberUnknownParameters            = 13
+  DegreesOfFreedom                   = 14
+  Sigma0                             = 15.0
+  ElapsedTime                        = 16.0
+  ElapsedTimeErrorProp               = 17.0
+  Iterations                         = 6
+  Converged                          = Yes
+  MinSigmaLatitude                   = 0.5
+  MinSigmaLatitudePointId            = MinLatId
+  MaxSigmaLatitude                   = 89.6
+  MaxSigmaLatitudePointId            = MaxLatId
+  MinSigmaLongitude                  = 0.7
+  MinSigmaLongitudePointId           = MinLonId
+  MaxSigmaLongitude                  = 179.2
+  MaxSigmaLongitudePointId           = MaxLonId
+  MinSigmaRadius                     = 0.9
+  MinSigmaRadiusPointId              = MinRadId
+  MaxSigmaRadius                     = 354.4
+  MaxSigmaRadiusPointId              = MaxRadId
+  RmsSigmaLat                        = 0.123
+  RmsSigmaLon                        = 0.456
+  RmsSigmaRad                        = 0.789
+  NumberMaximumLikelihoodModels      = 3
+  MaximumLikelihoodModels            = (Huber, Welsch, Chen)
+  MaximumLikelihoodQuantiles         = (0.1, 0.2, 0.3)
+  MaximumLikelihoodMedianR2Residuals = 0.49504950495049
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+
+Testing more computation methods...
+sigma0 =  "1.2139539573338"
+sigma0 =  "0.0"
+
+Testing storage for output methods...
+
+Testing accessor methods...
+maximum likelihood index =  "4"
+maximum likelihood median r2 residuals =  "0.49504950495049"
+maximum likelihood index,model,quantile = [ "0" ,  "Huber" ,  "0.1" ]
+maximum likelihood index,model,quantile = [ "1" ,  "Welsch" ,  "0.2" ]
+maximum likelihood index,model,quantile = [ "2" ,  "Chen" ,  "0.3" ]
+bundle control points...
+       FreePoint           FREE    1 of 1  3.54            Null            Null            Null             N/A             N/A             N/A
+
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+output control network
+2
+2
+bundle observations
+"InstrumentId1"
+("TestImageFileName")
+
+Testing serialization...
+Object = BundleResults
+  NumberFixedPoints                  = 1
+  NumberIgnoredPoints                = 1
+  NumberHeldImages                   = 1
+  RMSResidualX                       = 4.0
+  RMSResidualY                       = 5.0
+  RMSResidualXY                      = 6.0
+  RejectionLimit                     = 7.0
+  RadiansToMeters                    = 0.0
+  NumberRejectedObservations         = 8
+  NumberObservations                 = 9
+  NumberImageParameters              = 10
+  NumberConstrainedPointParameters   = 11
+  NumberConstrainedImageParameters   = 10
+  NumberConstrainedTargetParameters  = 2
+  NumberUnknownParameters            = 32
+  DegreesOfFreedom                   = 0
+  Sigma0                             = 0.0
+  ElapsedTime                        = 16.0
+  ElapsedTimeErrorProp               = 17.0
+  Iterations                         = 0
+  Converged                          = Yes
+  MinSigmaLatitude                   = 0.5
+  MinSigmaLatitudePointId            = MinLatId
+  MaxSigmaLatitude                   = 89.6
+  MaxSigmaLatitudePointId            = MaxLatId
+  MinSigmaLongitude                  = 0.7
+  MinSigmaLongitudePointId           = MinLonId
+  MaxSigmaLongitude                  = 179.2
+  MaxSigmaLongitudePointId           = MaxLonId
+  MinSigmaRadius                     = 0.9
+  MinSigmaRadiusPointId              = MinRadId
+  MaxSigmaRadius                     = 354.4
+  MaxSigmaRadiusPointId              = MaxRadId
+  RmsSigmaLat                        = 0.123
+  RmsSigmaLon                        = 0.456
+  RmsSigmaRad                        = 0.789
+  NumberMaximumLikelihoodModels      = 3
+  MaximumLikelihoodModels            = (Huber, Welsch, Chen)
+  MaximumLikelihoodQuantiles         = (0.1, 0.2, 0.3)
+  MaximumLikelihoodMedianR2Residuals = 0.49504950495049
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = covariance.dat
+    CorrelationMatrixFileName = covariance.dat
+
+    Group = ImagesAndParameters
+      img1 = "param1,param2"
+      img2 = "param3,param4,param5"
+    End_Group
+  End_Object
+End_Object
+
+Testing XML write/read...
+Object = BundleResultsFromXml
+  NumberFixedPoints                  = 1
+  NumberIgnoredPoints                = 1
+  NumberHeldImages                   = 1
+  RMSResidualX                       = 4.0
+  RMSResidualY                       = 5.0
+  RMSResidualXY                      = 6.0
+  RejectionLimit                     = 7.0
+  RadiansToMeters                    = 0.0
+  NumberRejectedObservations         = 8
+  NumberObservations                 = 9
+  NumberImageParameters              = 10
+  NumberConstrainedPointParameters   = 11
+  NumberConstrainedImageParameters   = 10
+  NumberConstrainedTargetParameters  = 2
+  NumberUnknownParameters            = 32
+  DegreesOfFreedom                   = 0
+  Sigma0                             = 0.0
+  ElapsedTime                        = 16.0
+  ElapsedTimeErrorProp               = 17.0
+  Iterations                         = 0
+  Converged                          = Yes
+  MinSigmaLatitude                   = 0.5
+  MinSigmaLatitudePointId            = MinLatId
+  MaxSigmaLatitude                   = 89.6
+  MaxSigmaLatitudePointId            = MaxLatId
+  MinSigmaLongitude                  = 0.7
+  MinSigmaLongitudePointId           = MinLonId
+  MaxSigmaLongitude                  = 179.2
+  MaxSigmaLongitudePointId           = MaxLonId
+  MinSigmaRadius                     = 0.9
+  MinSigmaRadiusPointId              = MinRadId
+  MaxSigmaRadius                     = 354.4
+  MaxSigmaRadiusPointId              = MaxRadId
+  RmsSigmaLat                        = 0.123
+  RmsSigmaLon                        = 0.456
+  RmsSigmaRad                        = 0.789
+  NumberMaximumLikelihoodModels      = 3
+  MaximumLikelihoodModels            = (Huber, Welsch, Chen)
+  MaximumLikelihoodQuantiles         = (0.1, 0.2, 0.3)
+  MaximumLikelihoodMedianR2Residuals = 0.49504950495049
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = covariance.dat
+    CorrelationMatrixFileName = covariance.dat
+
+    Group = ImagesAndParameters
+      img1 = "param1,param2"
+      img2 = "param3,param4,param5"
+    End_Group
+  End_Object
+End_Object
+
+Object = BundleResultsFromEmptyXml
+  NumberFixedPoints                 = 0
+  NumberIgnoredPoints               = 0
+  NumberHeldImages                  = 0
+  RMSResidualX                      = 0.0
+  RMSResidualY                      = 0.0
+  RMSResidualXY                     = 0.0
+  RejectionLimit                    = 0.0
+  RadiansToMeters                   = 0.0
+  NumberRejectedObservations        = 0
+  NumberObservations                = 0
+  NumberImageParameters             = 0
+  NumberConstrainedPointParameters  = 0
+  NumberConstrainedImageParameters  = 0
+  NumberConstrainedTargetParameters = 0
+  NumberUnknownParameters           = 0
+  DegreesOfFreedom                  = -1
+  Sigma0                            = 0.0
+  ElapsedTime                       = 0.0
+  ElapsedTimeErrorProp              = 0.0
+  Iterations                        = 0
+  Converged                         = No
+  MinSigmaLatitude                  = 1000000000000.0
+  MinSigmaLatitudePointId           = Null
+  MaxSigmaLatitude                  = 0.0
+  MaxSigmaLatitudePointId           = Null
+  MinSigmaLongitude                 = 1000000000000.0
+  MinSigmaLongitudePointId          = Null
+  MaxSigmaLongitude                 = 0.0
+  MaxSigmaLongitudePointId          = Null
+  MinSigmaRadius                    = 1000000000000.0
+  MinSigmaRadiusPointId             = Null
+  MaxSigmaRadius                    = 0.0
+  MaxSigmaRadiusPointId             = Null
+  RmsSigmaLat                       = 0.0
+  RmsSigmaLon                       = 0.0
+  RmsSigmaRad                       = 0.0
+  NumberMaximumLikelihoodModels     = 0
+
+  Object = CorrelationMatrixData
+    CovarianceMatrixFileName  = Null
+    CorrelationMatrixFileName = Null
+
+    Group = ImagesAndParameters
+    End_Group
+  End_Object
+End_Object
+
+Testing error throws...
+**I/O ERROR** Computed degrees of freedom [-1] is invalid.
+**I/O ERROR** Computed degrees of freedom [0] is invalid.
+**PROGRAMMER ERROR** Output Control Network has not been set.

@@ -21,12 +21,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include <sstream>
 
 #include "IString.h"
 #include "Message.h"
+
+using namespace std;
 
 QString Isis::Message::ArraySubscriptNotInRange(int index) {
   return "Array subscript [" + toString(index) + "] is out of array bounds";

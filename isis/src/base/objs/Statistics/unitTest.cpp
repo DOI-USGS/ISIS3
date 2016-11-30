@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QDataStream>
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "For data set:    5, 5";
     qDebug() << "Average:        " << s.Average();
     qDebug() << "ZScore(5.0):    " << s.ZScore(5.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing Reset...";
     s.Reset();
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << s.SumSquare();
     qDebug() << "Removed Data?        " << s.RemovedData();
     qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     double a[10];
     a[0] = 1.0;
@@ -142,7 +143,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << s.SumSquare();
     qDebug() << "Removed Data?        " << s.RemovedData();
     qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     double b[4];
     b[0] = 4.0;
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << s.SumSquare();
     qDebug() << "Removed Data?        " << s.RemovedData();
     qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing copy constructor...";
     Statistics copyStats(s);
@@ -208,7 +209,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << copyStats.SumSquare();
     qDebug() << "Removed Data?        " << copyStats.RemovedData();
     qDebug() << "Z-Score at 1.0       " << copyStats.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing assignment operator=...";
     s = s;
@@ -238,7 +239,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << s.SumSquare();
     qDebug() << "Removed Data?        " << s.RemovedData();
     qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
     Statistics assignedStats;
     assignedStats = s;
     qDebug() << "Average:             " << assignedStats.Average();
@@ -267,7 +268,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << assignedStats.SumSquare();
     qDebug() << "Removed Data?        " << assignedStats.RemovedData();
     qDebug() << "Z-Score at 1.0       " << assignedStats.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing Pvl serialization methods";
     PvlGroup toStats = s.toPvl();
@@ -322,7 +323,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << s.SumSquare();
     qDebug() << "Removed Data?        " << s.RemovedData();
     qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing serialization from copy constructor object...";
     QByteArray byteArray;
@@ -357,7 +358,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << serializedStats.SumSquare();
     qDebug() << "Removed Data?        " << serializedStats.RemovedData();
     qDebug() << "Z-Score at 1.0       " << serializedStats.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     // write xml 
     qDebug() << "Testing XML: write XML from Statistics object...";
@@ -406,7 +407,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << statsFromXml.SumSquare();
     qDebug() << "Removed Data?        " << statsFromXml.RemovedData();
     qDebug() << "Z-Score at 1.0       " << statsFromXml.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to Statistics object...";
@@ -438,7 +439,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "SumSquare:           " << statsFromEmptyXml.SumSquare();
     qDebug() << "Removed Data?        " << statsFromEmptyXml.RemovedData();
     qDebug() << "Z-Score at 1.0       " << statsFromEmptyXml.ZScore(1.0);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing error throws...";
     try {

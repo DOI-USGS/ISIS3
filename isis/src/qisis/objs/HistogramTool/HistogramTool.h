@@ -31,6 +31,8 @@ namespace Isis {
   *                          checks the start sample and end sample for the
   *                          plot and starts the plot at the minimum of the 
   *                          2 samples. Fixes #1760.
+  *  @history 2016-04-28 Tracie Sucharski - Removed qwt refernces to merge with
+  *                          Qt5 library changes.
   *  @history 2016-07-06 Adam Paquette - Fixed the histogram tool to analyze the
   *                          appropriate pixels selected when using box banding
   *                          

@@ -30,7 +30,7 @@ namespace Isis {
         TableView(AbstractTableModel *someModel,
             QString pathForSettigs, QString objName);
         virtual ~TableView();
-        QSize sizeHint();
+        // QSize sizeHint() const;
         QFont getContentFont() const;
         TableViewHeader *getHorizontalHeader();
 

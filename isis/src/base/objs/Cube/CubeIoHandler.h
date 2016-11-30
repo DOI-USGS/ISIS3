@@ -36,7 +36,7 @@ class QMutex;
 class QTime;
 template <typename A> class QList;
 template <typename A, typename B> class QMap;
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class Buffer;
@@ -101,17 +101,20 @@ namespace Isis {
    *                           in ProcessByBoxcar and ProcessRubbersheet.  The
    *                           internal cache was always checked to be minimized
    *                           which is slow for every read.  Now the cache is
-   *                           only mimimized if it changed in size.  
+   *                           only mimimized if it changed in size.
    *                           Reference #894.
    *   @history 2014-04-07 Kimberly Oyama and Stuart Sides - Modified the findCubeChunks,
    *                            writeIntoDouble, and writeIntoRaw methods to handle
    *                            repeating virtual bands. Fixes #1927.
    *   @history 2014-09-30 Ian Humphrey - Modified read method to correctly access virtual bands
    *                           when cube dimensions and buffer shape are same size. Fixes #1689.
-   *   @history 2015-01-30 Ian Humphrey - Modified destructor to free m_writThreadMutex to 
+   *   @history 2015-01-30 Ian Humphrey - Modified destructor to free m_writThreadMutex to
    *                           prevent memory leaks upon destruction. Fixes #2082.
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
-   *
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
+   *   @history 2016-08-28 Kelvin Rodriguez - updateLabels now a pure virtual, it had no
+   *                           implementation causing warnings in clang. Part of OS X 10.11 porting.
+   *                           QPair forward declaration now properly claims it as a struct. 
    */
   class CubeIoHandler {
     public:
@@ -126,7 +129,7 @@ namespace Isis {
       void clearCache(bool blockForWriteCache = true) const;
       BigInt getDataSize() const;
       void setVirtualBands(const QList<int> *virtualBandList);
-      virtual void updateLabels(Pvl &labels);
+      virtual void updateLabels(Pvl &labels) = 0;
 
       QMutex *dataFileMutex();
 
@@ -366,4 +369,3 @@ namespace Isis {
 }
 
 #endif
-

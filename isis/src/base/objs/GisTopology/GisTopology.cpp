@@ -116,12 +116,12 @@ namespace Isis {
    */  
   GEOSGeometry *GisTopology::geomFromWKB(const QString &wkb) {
   #if 0
-    QByteArray wkb_data = wkb.toAscii();
+    QByteArray wkb_data = wkb.toLatin1();
     const unsigned char *footy = reinterpret_cast<const unsigned char *> (wkb_data.data());
     GEOSGeometry *geom = GEOSWKBReader_readHEX(wkbReader(), footy, wkb.size()); 
   #else
     GEOSGeometry *geom = GEOSWKBReader_readHEX(wkbReader(),
-                 reinterpret_cast<const unsigned char *> (wkb.toAscii().data()),
+                 reinterpret_cast<const unsigned char *> (wkb.toLatin1().data()),
                                                wkb.size());
   #endif
     if (!geom) {
@@ -143,7 +143,7 @@ namespace Isis {
    * @throw IException::Programmer "Unable convert the given well-known text to a GEOSGeometry.
    */  
   GEOSGeometry *GisTopology::geomFromWKT(const QString &wkt) {
-    QByteArray wkt_data = wkt.toAscii();
+    QByteArray wkt_data = wkt.toLatin1();
     const char *footy = wkt_data.data();
     GEOSGeometry *geom = GEOSWKTReader_read(wktReader(), footy);
     if (!geom) {
@@ -203,7 +203,7 @@ namespace Isis {
   QString GisTopology::wkt(const GEOSGeometry *geom, 
                            const GisTopology::Disposition &disp) {
     char *wkt_h = GEOSWKTWriter_write(wktWriter(), geom);
-    QString thegeom = QString::fromAscii(reinterpret_cast<const char *> (wkt_h));
+    QString thegeom = QString::fromLatin1(reinterpret_cast<const char *> (wkt_h));
   
     if (disp == DestroyGeometry) { 
       destroy(geom); 
@@ -230,7 +230,7 @@ namespace Isis {
                            const GisTopology::Disposition &disp) {
     size_t length;
     unsigned char *wkt_h = GEOSWKBWriter_writeHEX(wkbWriter(), geom, &length);
-    QString thegeom = QString::fromAscii(reinterpret_cast<const char *> (wkt_h), length);
+    QString thegeom = QString::fromLatin1(reinterpret_cast<const char *> (wkt_h), length);
   
     if (disp == DestroyGeometry) { 
       destroy(geom); 

@@ -72,7 +72,7 @@ namespace Isis {
     initialize(desc);
     checkDataSize(samples(), lines(), 1);
     m_qimage = new QImage(samples(), lines(), QImage::Format_Indexed8);
-    m_qimage->setNumColors(256);
+    m_qimage->setColorCount(256);
 
     // Create the color table (black = 0 to white = 255)
     QVector<QRgb> colors;
@@ -198,7 +198,7 @@ namespace Isis {
 
     // The return status is wrong for JPEG images, so the code will always
     // continue
-    if (!m_qimage->save(outputName.expanded(), m_format.toAscii().data(),
+    if (!m_qimage->save(outputName.expanded(), m_format.toLatin1().data(),
           quality)) {
 
       QString err = "Unable to save [" + outputName.expanded() +

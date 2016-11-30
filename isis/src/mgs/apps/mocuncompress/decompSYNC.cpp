@@ -48,8 +48,8 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 void decompSYNC(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint16 sync, BITSTRUCT *bitStuff)
 {
-  register uint32 count;    /* Pixel counter */
-  register uint8 *scan;    /* Pixel copying pointer */
+uint32 count;    /* Pixel counter */
+uint8 *scan;    /* Pixel copying pointer */
 
   /* Skip sync pattern (assumes alignment) */
   bitStuff->output += 2;
@@ -59,7 +59,7 @@ void decompSYNC(register uint8 *curLine, register uint8 *prevLine, register uint
 
   /* Copy all pixels on this line */
   for(count = 0; count < size; count++) {
-    register uint8 cur;    /* Current pixel value */
+uint8 cur;    /* Current pixel value */
 
     /* Get current pixel value */
     cur = *(scan++);

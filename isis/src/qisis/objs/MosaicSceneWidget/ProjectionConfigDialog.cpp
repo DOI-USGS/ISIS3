@@ -331,7 +331,7 @@ namespace Isis {
 
       if (outputFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QString mapFileInfo = m_mapFileEdit->toPlainText() + "\n";
-        if (outputFile.write(mapFileInfo.toAscii()) == -1) {
+        if (outputFile.write(mapFileInfo.toLatin1()) == -1) {
           QMessageBox::warning(this, tr("Failed to Write Text to File"),
               tr("Failed to write the map file to [%1] due to an I/O failure").arg(mapFile));
         }

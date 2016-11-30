@@ -8,7 +8,7 @@ using namespace std;
 using namespace Isis;
 /* qmini.f -- translated by f2c (version 19980913).
    You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
+        -lf2c -lm   (in that order)
 */
 
 //#include "f2c.h"

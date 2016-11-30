@@ -2,25 +2,41 @@
 
 #include <iostream>
 
+#include <QGraphicsScene>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLabel>
 #include <QMenu>
+#include <QPointF>
+#include <QMessageBox>
+#include <QPushButton>
 
+#include "ChipViewportsWidget.h"
 #include "Control.h"
 #include "ControlList.h"
 #include "ControlNet.h"
 #include "ControlNetGraphicsItem.h"
+#include "ControlPoint.h"
+#include "ControlPointEditView.h"
+#include "ControlPointEditWidget.h"
 #include "Directory.h"
 #include "FileDialog.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Image.h"
 #include "ImageDisplayProperties.h"
-#include "ImageList.h"
 #include "IString.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "MosaicControlNetToolMovementConfigDialog.h"
+#include "MosaicSceneItem.h"
 #include "MosaicSceneWidget.h"
+#include "MosaicGraphicsView.h"
 #include "Project.h"
+#include "Projection.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 
 namespace Isis {
 
@@ -38,6 +54,7 @@ namespace Isis {
     m_displayConnectivity = NULL;
     m_closeNetwork = NULL;
     m_controlNetFileLabel = NULL;
+//     m_pointEditor = NULL;
     m_randomizeColors = NULL;
 
     m_movementArrowColorSource = NoMovement;
@@ -97,6 +114,9 @@ namespace Isis {
         "control network");
     connect(m_controlNetFileLabel, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
+
+    connect(this, SIGNAL(controlPointSelected(ControlPoint *)),
+            getWidget(), SIGNAL(controlPointSelected(ControlPoint *)));
   }
 
 
@@ -364,9 +384,29 @@ namespace Isis {
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
+    if (isActive()) {
+      getWidget()->setCubesSelectable(true);
+      getWidget()->getView()->setContextMenuPolicy(Qt::NoContextMenu);
+      getWidget()->enableRubberBand(false);
+    }
+    else {
+      getWidget()->setCubesSelectable(true);
+      getWidget()->getView()->setContextMenuPolicy(Qt::DefaultContextMenu);
+      getWidget()->enableRubberBand(false);
+    }
     if (isActive() && m_controlNetFile == "") {
       openControlNet();
     }
+  }
+
+
+  /**
+   * The user toggled the cnet visibility - re-sync the graphics item visibility
+   *   with the action.
+   */
+  void MosaicControlNetTool::displayControlNet() {
+    if (m_controlNetGraphics && m_displayControlNetButton)
+      m_controlNetGraphics->setVisible( m_displayControlNetButton->isChecked() );
   }
 
 
@@ -416,6 +456,27 @@ namespace Isis {
       }
     }
   }
+  
+
+  void MosaicControlNetTool::displayChangedControlPoint(QString changedControlPoint) {
+    m_controlNetGraphics->clearControlPointGraphicsItem(changedControlPoint);
+    m_controlNetGraphics->buildChildren();
+  }
+
+
+  void MosaicControlNetTool::displayNewControlPoint(QString newControlPoint) {
+    m_controlNetGraphics->buildChildren();
+  }
+
+
+/*
+ * remove deleted point from display
+ * removeControlPointFromDisplay
+ */
+  void MosaicControlNetTool::displayUponControlPointDeletion() {
+    m_controlNetGraphics->clearControlPointGraphicsItem( QString("Point ID") );
+    m_controlNetGraphics->buildChildren();
+  }
 
 
   /**
@@ -425,11 +486,10 @@ namespace Isis {
   void MosaicControlNetTool::closeNetwork() {
     if (m_controlNetGraphics) {
       getWidget()->getScene()->removeItem(m_controlNetGraphics);
-
       delete m_controlNetGraphics;
     }
 
-    if (m_controlNet) {
+    if (m_controlNet && !getWidget()->directory()) {
       delete m_controlNet;
       m_controlNet = NULL;
     }
@@ -502,43 +562,24 @@ namespace Isis {
       if (!netFile.isEmpty()) {
         FileName controlNetFile(netFile);
         m_controlNetFile = controlNetFile.expanded();
-        loadNetwork();
-
-        if (m_displayControlNetButton)
-          m_displayControlNetButton->setChecked(true);
       }
     }
     else {
-      QList<ControlList *> controls = getWidget()->directory()->project()->controls();
-      bool ok = false;
-      if (controls.count() > 0) {
-        QMap<Control *, QString> cnetChoices;
-        foreach (ControlList *list, controls) {
-          foreach (Control *control, *list) {
-            cnetChoices[control] = tr("%1/%2").arg(list->name())
-                .arg(control->displayProperties()->displayName());
-          }
+        Control *activeControl = getWidget()->directory()->project()->activeControl();
+        if (activeControl == NULL) {
+          // Error and return to Select Tool
+          QString message = "No active control network chosen.  Choose active control network on "
+                            "project tree.\n";
+          QMessageBox::critical(getWidget(), "Error", message);
+          return;
         }
+        m_controlNet = activeControl->controlNet();
+        m_controlNetFile = activeControl->fileName(); 
+    }
 
-        QStringList cnetNames = cnetChoices.values();
-        qSort(cnetNames);
-
-        QString selected = QInputDialog::getItem(NULL, tr("Select control network"),
-                                                 tr("Select control network"), cnetNames, 0, false,
-                                                 &ok);
-        if (ok && !selected.isEmpty()) {
-          m_controlNetFile = cnetChoices.key(selected)->fileName();
-          loadNetwork();
-          if (m_displayControlNetButton)
-            m_displayControlNetButton->setChecked(true);
-        }
-      }
-      else if (controls.count() == 1 && controls.at(0)->count() == 1) {
-        m_controlNetFile = controls.first()->first()->fileName();
-        loadNetwork();
-        if (m_displayControlNetButton)
-          m_displayControlNetButton->setChecked(true);
-      }
+    if (!m_controlNetFile.isEmpty()) {
+      loadNetwork(); 
+      if (m_displayControlNetButton) m_displayControlNetButton->setChecked(true);
     }
   }
 
@@ -555,8 +596,9 @@ namespace Isis {
 
     if (m_controlNetFile.size() > 0) {
       try {
-        m_controlNet = new ControlNet(
-            m_controlNetFile);
+        if (!getWidget()->directory()) {
+          m_controlNet = new ControlNet(m_controlNetFile);
+        }
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
 
@@ -565,6 +607,17 @@ namespace Isis {
 
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
                 this, SLOT(objectDestroyed(QObject *)));
+
+        // TODO:  TLS 2014-06-04
+        //  Use Directory to add control point editor for now.  Should this be done from Directory
+        //  similarly to addFootprint2DView, addImageFileListView, etc.  It was done here because
+        //  the infrastructure for opening, displaying control nets was already in place.  
+        //  However for cnetsuite, if we want to follow the Directory/WorkOrder design paradigm this 
+        //  is probably not the best place to implement this.
+        //  Also, once we figure out how to determine the active control network, this will change.
+//      if (getWidget()->directory()) {
+//        getWidget()->directory()->addControlPointEditor(m_controlNet, netFile);
+//      }
       }
       catch(IException &e) {
         QString message = "Invalid control network.\n";
@@ -599,20 +652,86 @@ namespace Isis {
   }
 
 
-  /**
-   * The user toggled the cnet visibility - re-sync the graphics item visibility
-   *   with the action.
-   */
-  void MosaicControlNetTool::displayControlNet() {
-    if (m_controlNetGraphics && m_displayControlNetButton)
-      m_controlNetGraphics->setVisible(m_displayControlNetButton->isChecked());
-  }
+  // TODO: why did we remove the error checks? 
+  void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton mouseButton) {
 
-
-  void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton s) {
     if (!isActive() || !m_controlNet) return;
 
-    //  Find closes point
+    // If not IPCE, return, qmos does not use this code
+    if (!getWidget()->directory()) return;
 
+    ControlPoint *cp = NULL;
+
+    //  Modify closest control point
+    if (mouseButton == Qt::LeftButton) {
+
+      //  Find closes point
+      cp = m_controlNetGraphics->findClosestControlPoint();
+
+      // TODO  move the emit into the if so that we do not need to do early return.
+      // The user did not click close enough to a point for findClosestControlPoint to find a point.
+      if (!cp) {
+        return;
+      }
+      emit modifyControlPoint(cp);
+//    getWidget()->directory()->controlPointEditView()->controlPointEditWidget()->setEditPoint(cp);
+//    getWidget()->directory()->controlPointChipViewports()->setPoint(cp);
+
+    }
+    else if (mouseButton == Qt::MidButton) {
+      
+
+      cp = m_controlNetGraphics->findClosestControlPoint();
+      if (!cp) {
+      // TODO Figure out how to get this error message in the right place
+        QString message = "No points exist for deleting. Create points "
+                          "using the right mouse button.";
+        QMessageBox::warning(getWidget(), "Warning", message);
+        return;
+      }
+      
+      emit deleteControlPoint(cp);
+      //       deletePoint(point); // what should happen here?
+    }
+
+    //   Create control point at cursor location
+    else if (mouseButton == Qt::RightButton) {
+      //  TODO  For now simply take the first image in the list
+      // Find all Images under mouse position ... already doing this with the foreach loop?
+      //  TODO  should this imagesUnderMousePosition be implemented in MosaicSceneWidget?
+      //      Similar code is found in MosaicSceneWidget::contextMenuEvent.
+      ImageList imagesAtMousePosition;
+      QList<QGraphicsItem *> itemsAtMousePosition = getWidget()->getScene()->items(point);
+      foreach (QGraphicsItem *graphicsItem, itemsAtMousePosition) {
+        MosaicSceneItem *sceneImageItem = dynamic_cast<MosaicSceneItem *>(graphicsItem);
+
+        if (!sceneImageItem) {
+          sceneImageItem = dynamic_cast<MosaicSceneItem *>(graphicsItem->parentItem());
+        }
+
+        if (sceneImageItem && sceneImageItem->image()) {
+          imagesAtMousePosition.append(sceneImageItem->image());
+        }
+      }
+
+      if (imagesAtMousePosition.count()) {
+//      Image *image = imagesAtMousePosition.at(0);
+        Projection *proj = getWidget()->getProjection();
+        Projection::ProjectionType ptype = proj->projectionType();
+
+        if (ptype == Projection::Triaxial) {
+          TProjection *tproj = (TProjection *) proj;
+          if (tproj && getWidget()->getView()->sceneRect().contains(point)) {
+            if ( tproj->SetCoordinate( point.x(), -1 * point.y() ) ) {
+              //  Create Latitude and Longitude objects so there is a signature different from
+              //     createPoint(serialnumber, double, double).
+              Latitude lat(tproj->Latitude(), Angle::Degrees);
+              Longitude lon(tproj->Longitude(), Angle::Degrees);
+              emit createControlPoint(lat.degrees(), lon.degrees());
+            }
+          }
+        }
+      }
+    }
   }
 }

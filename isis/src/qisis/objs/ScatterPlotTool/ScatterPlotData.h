@@ -8,7 +8,7 @@
 
 #include "Stretch.h"
 
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 template <typename T> class QVector;
 
 class QwtInterval;
@@ -23,6 +23,7 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    */
   class ScatterPlotData : public QwtRasterData {
     public:

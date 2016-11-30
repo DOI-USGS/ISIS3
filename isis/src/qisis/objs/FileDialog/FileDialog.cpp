@@ -2,7 +2,10 @@
 
 #include <iostream>
 
+#include <QComboBox>
 #include <QFile>
+#include <QLineEdit>
+#include <QPushButton>
 
 #include "FileName.h"
 #include "IString.h"
@@ -12,6 +15,9 @@ namespace Isis {
     QFileDialog(parent), p_filterList(filterList), p_dir(directory) {
 
     p_parent = parent;
+
+    // We want to use Qt's dialog so we can find the children widgets
+    this->setOptions(QFileDialog::DontUseNativeDialog);
 
     this->setWindowTitle(title);
     this->setFileMode(QFileDialog::ExistingFiles);
@@ -52,7 +58,7 @@ namespace Isis {
       if(p_allPButtons[i]->text().contains("Open", Qt::CaseInsensitive)) {
         connect(p_allPButtons[i], SIGNAL(clicked()), this, SLOT(done()));
       }
-      if(p_allPButtons[i]->text() == "Cancel") {
+      if(p_allPButtons[i]->text().contains("Cancel", Qt::CaseInsensitive)) {
         ///I had to disconnect this buttons signal because I overwrote the
         //done method from QDialog which is what this used to be connected to.
         connect(p_allPButtons[i], SIGNAL(clicked()), this, SLOT(cancel()));
@@ -116,7 +122,14 @@ namespace Isis {
   void FileDialog::done() {
     close();
     sendSignal();
+  }
 
+  /**
+   * Called when the user presses OK.
+   *
+   */
+  void FileDialog::done(int r) {
+    QFileDialog::done(r);
   }
 
 
@@ -202,4 +215,3 @@ namespace Isis {
   }
 
 }
-

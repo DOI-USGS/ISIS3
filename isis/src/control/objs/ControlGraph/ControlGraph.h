@@ -24,7 +24,7 @@
 
 template< class A, class B > class QHash;
 template< class A, class B > class QMap;
-template< class A, class B > class QPair;
+template< class A, class B > struct QPair;
 template< class A> class QVector;
 class QString;
 
@@ -51,6 +51,8 @@ namespace Isis {
    *   @history 2009-10-15 Eric Hyer Added GetCubeList Method
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                       removing includes from ControlNet.h.
+   *   @history 2016-08-28 Kelvin Rodriguez Qpair now properly forward declared as a struct to
+   *                                       squash warnings in clang
    */
   class ControlGraph {
     public:
@@ -58,8 +60,8 @@ namespace Isis {
       ControlGraph(const ControlGraph &other);
       ~ControlGraph();
 
-      const bool IsConnected() const;
-      const int GetIslandCount() const;
+      bool IsConnected() const;
+      int GetIslandCount() const;
       const QVector< QString > GetCubesOnIsland(const int &island) const;
       const QVector< QString > GetCubeList() const;
       const GroupedStatistics &GetMeasureStats(const QString &
@@ -135,4 +137,3 @@ namespace Isis {
 };
 
 #endif
-

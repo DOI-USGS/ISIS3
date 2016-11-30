@@ -9,6 +9,7 @@
 #include <QtCore/qmath.h>
 
 #include "IException.h"
+#include "LinearAlgebra.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "SparseBlockMatrix.h"
@@ -234,7 +235,7 @@ namespace Isis {
       }
 
       // compute correlations
-      QMapIterator<int, boost::numeric::ublas::matrix<double>*> block(sbcm);
+      QMapIterator<int, LinearAlgebra::Matrix *> block(sbcm);
 
       while ( block.hasNext() ) { // each block in the column
         block.next();

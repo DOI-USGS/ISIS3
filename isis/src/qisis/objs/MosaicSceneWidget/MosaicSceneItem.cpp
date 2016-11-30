@@ -7,7 +7,9 @@
 #include <QBrush>
 #include <QEvent>
 #include <QGraphicsItem>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QList>
+#include <QMenu>
 #include <QPainter>
 #include <QPen>
 #include <QStyleOptionGraphicsItem>
@@ -244,7 +246,8 @@ namespace Isis {
         }
       }
 
-      setFlag(QGraphicsItem::ItemIsSelectable);
+      setFlag(QGraphicsItem::ItemIsSelectable, true);
+      setFlag(QGraphicsItem::ItemIsFocusable, true);
 
       QGraphicsPolygonItem *polyItem = NULL;
 
@@ -271,7 +274,7 @@ namespace Isis {
 
         QRectF boundingRect = polyItem->boundingRect();
         if(boundingRect.width() < boundingRect.height())
-          label->rotate(90);
+          label->setRotation(90.0);
       }
 
       m_polygons->append(polyItem);
@@ -477,6 +480,7 @@ namespace Isis {
       return QGraphicsObject::sceneEvent(event);
     }
     else {
+//    //qDebug()<<"MosaicSceneItem::sceneEvent  Ignore event";
       event->ignore();
       return true;
     }
@@ -627,7 +631,10 @@ namespace Isis {
         QColor opaqueColor(color());
         opaqueColor.setAlpha(255);
         if (m_image->displayProperties()->getValue(ImageDisplayProperties::ShowOutline).toBool()) {
-          polygon->setPen(opaqueColor);
+          // Make sure the outline is cosmetic (i.e. is always 1 pixel width on screen)
+          QPen pen(opaqueColor);
+          pen.setCosmetic(true);
+          polygon->setPen(pen);
         }
         else {
           polygon->setPen(Qt::NoPen);

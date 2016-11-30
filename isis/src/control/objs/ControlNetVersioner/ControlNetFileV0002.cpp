@@ -56,7 +56,7 @@ namespace Isis {
     BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
     BigInt headerLength = protoBufferCore["HeaderBytes"];
 
-    fstream input(file.expanded().toAscii().data(), ios::in | ios::binary);
+    fstream input(file.expanded().toLatin1().data(), ios::in | ios::binary);
     if (!input.is_open()) {
       IString msg = "Failed to open control network file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -100,7 +100,7 @@ namespace Isis {
 
         if (pointInStream == NULL) {
           input.close();
-          input.open(file.expanded().toAscii().data(), ios::in | ios::binary);
+          input.open(file.expanded().toLatin1().data(), ios::in | ios::binary);
           input.seekg(filePos, ios::beg);
 
           pointInStream = new IstreamInputStream(&input);
@@ -158,7 +158,7 @@ namespace Isis {
     streampos coreHeaderSize = p_networkHeader->ByteSize();
 
     const int labelBytes = 65536;
-    fstream output(file.expanded().toAscii().data(),
+    fstream output(file.expanded().toLatin1().data(),
                    ios::out | ios::trunc | ios::binary);
 
     char *blankLabel = new char[labelBytes];

@@ -103,7 +103,7 @@ inline void writeBand(ProcessExportPds &process, ofstream &out,
 void IsisMain() {
   const QString mdisddrProgram = "mdisddr";
   const QString mdisddrVersion = "1.0";
-  const QString mdisddrRevision = "$Revision$";
+  const QString mdisddrRevision = "$Revision: 6715 $";
   const QString mdisddrRuntime = Application::DateTime();
   const QString dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 
@@ -361,7 +361,7 @@ void IsisMain() {
     // All done...write result.
     pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
     QString ofile(output.expanded());
-    ofstream outstream(ofile.toAscii().data());
+    ofstream outstream(ofile.toLatin1().data());
     processPds.OutputLabel(outstream);
 
     // Writing out the 5 bands is a bit tricky for this product.  The bands
@@ -379,14 +379,14 @@ void IsisMain() {
     writeBand(processPds, outstream, pfile, bandmap.get("Phase Angle"));
     outstream.close();
     processPds.EndProcess();
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
   }
   catch (IException &) {
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
     throw;
   }
   catch (...) {
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
     throw IException(IException::Unknown, "Unexpected exception caught!",
                      _FILEINFO_);
   }

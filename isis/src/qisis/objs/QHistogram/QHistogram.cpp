@@ -150,7 +150,7 @@ namespace Isis {
     QPrintDialog printDialog(printer, (QWidget *)parent());
     if(printDialog.exec() == QDialog::Accepted) {
       // Get display widget as a pixmap and convert to an image
-      QPixmap pixmap = QPixmap::grabWidget(this);
+      QPixmap pixmap = this->grab();
       QImage img = pixmap.toImage();
 
       // C++ Gui Programmign with Qt, page 201
@@ -180,7 +180,7 @@ namespace Isis {
     if(output.isEmpty()) return;
 
     QString format = QFileInfo(output).suffix();
-    QPixmap pixmap = QPixmap::grabWidget(this);
+    QPixmap pixmap = this->grab();
     std::string formatString = format.toStdString();
     if(!pixmap.save(output, formatString.c_str())) {
       QMessageBox::information((QWidget *)parent(), "Error", "Unable to save" + output);

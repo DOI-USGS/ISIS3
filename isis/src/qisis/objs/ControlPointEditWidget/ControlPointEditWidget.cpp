@@ -10,6 +10,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -18,6 +19,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QShortcut>
 #include <QSplitter>
 #include <QTableWidget>
 #include <QTextEdit>
@@ -25,33 +27,37 @@
 
 #include "Application.h"
 #include "Camera.h"
-#include "ControlMeasure.h"
+#include "Control.h"
 #include "ControlMeasureEditWidget.h"
+#include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "DeleteControlPointDialog.h"
+#include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
+#include "NewControlPointDialog.h"
+#include "Project.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
+#include "Shape.h"
+#include "ShapeList.h"
 #include "SpecialPixel.h"
 #include "ToolPad.h"
+#include "UniversalGroundMap.h"
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 
 using namespace std;
 
 namespace Isis {
- // These aren't used??
- // const int VIEWSIZE = 301;
- // const int CHIPVIEWPORT_WIDTH = 310;
-
   /**
    * Consructs the ControlPointEditWidget widget
    *
@@ -59,12 +65,16 @@ namespace Isis {
    * @param addMeasures Whether or not to add the Add Measure to Point button
    *
    */
-  ControlPointEditWidget::ControlPointEditWidget (QWidget *parent,
+  ControlPointEditWidget::ControlPointEditWidget (Directory *directory, QWidget *parent,
                                                   bool addMeasures) : QWidget(parent) {
 
+    m_directory = directory;
     m_addMeasuresButton = addMeasures;
     m_netChanged = false;
     m_templateModified = false;
+    m_serialNumberList = NULL;
+
+//  qDebug()<<"ControlPointEditWidget::ControlPointEditWidget  #shapes = "<<m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
 
     m_parent = parent;
 
@@ -75,11 +85,9 @@ namespace Isis {
   }
 
 
-  /**
-   * Destructor
-   */
   ControlPointEditWidget::~ControlPointEditWidget () {
-    //TODO Don't write settings in destructor, must do this earlier in close event
+
+    // TODO: Don't write settings in destructor, must do this earlier in close event
 //  writeSettings();
 
   }
@@ -92,23 +100,23 @@ namespace Isis {
    * @param addMeasures Whether or not to add the Add Measure to Point button
    * 
    * @internal
-   *   @history 2008-11-24 Jeannie Walldren - Added "Goodness of Fit" to right
-   *                            and left measure info.
-   *   @history 2008-11-26 Jeannie Walldren - Added "Number of Measures" to
+   *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
+   *                           and left measure info.
+   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
    *                           QnetTool point information. Moved setWindowTitle()
    *                           command to updateNet() method. Added connection
    *                           between Ignore checkbox toggle() slot and
    *                           ignoreChanged() signal
    *   @history 2008-12-29 Jeannie Walldren - Disabled ground point check box and
-   *                           commented out connection between check box and
-   *                           setGroundPoint() method.
+   *                          commented out connection between check box and
+   *                          setGroundPoint() method.
    *   @history 2008-12-30 Jeannie Walldren - Added connections to toggle
-   *                           measures' Ignore check boxes if ignoreLeftChanged()
-   *                           and ignoreRightChanged() are emitted. Replaced
-   *                           reference to ignoreChanged() with
-   *                           ignorePointChanged().
+   *                          measures' Ignore check boxes if ignoreLeftChanged()
+   *                          and ignoreRightChanged() are emitted. Replaced
+   *                          reference to ignoreChanged() with
+   *                          ignorePointChanged().
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                           namespace std"
+   *                          namespace std"
    */
   void ControlPointEditWidget::createPointEditor(QWidget *parent, bool addMeasures) {
 
@@ -122,15 +130,15 @@ namespace Isis {
     // later
     m_measureEditor = new ControlMeasureEditWidget(parent, true, true);
 
-    //TODO Does this need to be moved to ControlNetEditMainWindow???  
+    //  TODO Does this need to be moved to ControlNetEditMainWindow???  
     connect(this, SIGNAL(newControlNetwork(ControlNet *)),
-            m_measureEditor, SIGNAL(newControlNetwork(ControlNet *)));
+        m_measureEditor, SIGNAL(newControlNetwork(ControlNet *)));
 
 
     connect(this, SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
             m_measureEditor, SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
     connect(m_measureEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
-    connect(this, SIGNAL(measureChanged()), m_measureEditor, SLOT(colorizeSavePointButton()));
+//  connect(this, SIGNAL(measureChanged()), m_measureEditor, SLOT(colorizeSavePointButton()));
     connect(this, SIGNAL(netChanged()), this, SLOT(colorizeSaveNetButton()));
 
     QPushButton *addMeasure = NULL;
@@ -166,7 +174,7 @@ namespace Isis {
 //  The saveNet slot will simply emit a signal with the ControlNet as the argument.
     connect (m_saveNet, SIGNAL(clicked()), this, SLOT(saveNet()));
 
-    QHBoxLayout *saveMeasureLayout = new QHBoxLayout;
+    QHBoxLayout * saveMeasureLayout = new QHBoxLayout;
     if (m_addMeasuresButton) {
       saveMeasureLayout->addWidget(addMeasure);
     }
@@ -191,7 +199,7 @@ namespace Isis {
                   "PatternMatch/PatternMatch.html for a description of the "
                   "contents of this file.");
 
-    QVBoxLayout *centralLayout = new QVBoxLayout;
+    QVBoxLayout * centralLayout = new QVBoxLayout;
 
     centralLayout->addWidget(m_cnetFileNameLabel);
     centralLayout->addWidget(m_templateFileNameLabel);
@@ -224,27 +232,27 @@ namespace Isis {
    * 
    * @return @b QSplitter * The splitter containing the widgets above
    */
-  QSplitter *ControlPointEditWidget::createTopSplitter() {
+  QSplitter * ControlPointEditWidget::createTopSplitter() {
 
-    QHBoxLayout *measureLayout = new QHBoxLayout;
+    QHBoxLayout * measureLayout = new QHBoxLayout;
     measureLayout->addWidget(createLeftMeasureGroupBox());
     measureLayout->addWidget(createRightMeasureGroupBox());
 
-    QVBoxLayout *groupBoxesLayout = new QVBoxLayout;
+    QVBoxLayout * groupBoxesLayout = new QVBoxLayout;
     groupBoxesLayout->addWidget(createControlPointGroupBox());
     groupBoxesLayout->addStretch();
     groupBoxesLayout->addLayout(measureLayout);
 
-    QWidget *groupBoxesWidget = new QWidget;
+    QWidget * groupBoxesWidget = new QWidget;
     groupBoxesWidget->setLayout(groupBoxesLayout);
 
     createTemplateEditorWidget();
 
-    QSplitter *topSplitter = new QSplitter;
+    QSplitter * topSplitter = new QSplitter;
     topSplitter->addWidget(groupBoxesWidget);
     topSplitter->addWidget(m_templateEditorWidget);
-    topSplitter->setStretchFactor(0, 4);
-    topSplitter->setStretchFactor(1, 3);
+//  topSplitter->setStretchFactor(0, 4);
+//  topSplitter->setStretchFactor(1, 3);
 
     m_templateEditorWidget->hide();
 
@@ -257,66 +265,53 @@ namespace Isis {
    *
    * @return @b QGroupBox * The groupbox labeled "Control Point"
    */
-  QGroupBox *ControlPointEditWidget::createControlPointGroupBox() {
+  QGroupBox * ControlPointEditWidget::createControlPointGroupBox() {
 
     // create left vertical layout
     m_ptIdValue = new QLabel;
 
 //TODO 2014-07-22 TLS cnetsuite Handle ground control points SOON
-    m_pointType = new QComboBox;
-    for (int i = 0; i < ControlPoint::PointTypeCount; i++) {
-      m_pointType->insertItem(i, ControlPoint::PointTypeToString((ControlPoint::PointType) i));
-    }
-    QHBoxLayout *pointTypeLayout = new QHBoxLayout;
-    QLabel *pointTypeLabel = new QLabel("PointType:");
-    pointTypeLayout->addWidget(pointTypeLabel);
-    pointTypeLayout->addWidget(m_pointType);
-    connect(m_pointType, SIGNAL(activated(int)),
-        this, SLOT(setPointType(int)));
     m_numMeasures = new QLabel;
-    m_pointAprioriLatitude = new QLabel;
-    m_pointAprioriLongitude = new QLabel;
-    m_pointAprioriRadius = new QLabel;
-    m_pointAprioriLatitudeSigma = new QLabel;
-    m_pointAprioriLongitudeSigma = new QLabel;
-    m_pointAprioriRadiusSigma = new QLabel;
-    QVBoxLayout *leftLayout = new QVBoxLayout;
-    leftLayout->addWidget(m_ptIdValue);
-    leftLayout->addLayout(pointTypeLayout);
-    leftLayout->addWidget(m_pointAprioriLatitude);
-    leftLayout->addWidget(m_pointAprioriLongitude);
-    leftLayout->addWidget(m_pointAprioriRadius);
-    leftLayout->addWidget(m_pointAprioriLatitudeSigma);
-    leftLayout->addWidget(m_pointAprioriLongitudeSigma);
-    leftLayout->addWidget(m_pointAprioriRadiusSigma);
+//  QHBoxLayout *pointInfoLayout = new QHBoxLayout;
+//  pointInfoLayout->addWidget(m_ptIdValue);
+//  pointInfoLayout->addWidget(m_numMeasures);
 
     // create right vertical layout's top layout
     m_lockPoint = new QCheckBox("Edit Lock Point");
     connect(m_lockPoint, SIGNAL(clicked(bool)), this, SLOT(setLockPoint(bool)));
     m_ignorePoint = new QCheckBox("Ignore Point");
     connect(m_ignorePoint, SIGNAL(clicked(bool)),
-        this, SLOT(setIgnorePoint(bool)));
+      this, SLOT(setIgnorePoint(bool)));
     connect(this, SIGNAL(ignorePointChanged()), m_ignorePoint, SLOT(toggle()));
-    m_pointLatitude = new QLabel;
-    m_pointLongitude = new QLabel;
-    m_pointRadius = new QLabel;
 
-    QVBoxLayout *rightLayout = new QVBoxLayout;
-    rightLayout->addWidget(m_numMeasures);
-    rightLayout->addWidget(m_lockPoint);
-    rightLayout->addWidget(m_ignorePoint);
-    rightLayout->addWidget(m_pointLatitude);
-    rightLayout->addWidget(m_pointLongitude);
-    rightLayout->addWidget(m_pointRadius);
+//  QHBoxLayout * pointStatusLayout = new QHBoxLayout;
+//  pointStatusLayout->addWidget(m_lockPoint);
+//  pointStatusLayout->addWidget(m_ignorePoint);
 
+    m_pointType = new QComboBox;
+    for (int i=0; i<ControlPoint::PointTypeCount; i++) {
+      m_pointType->insertItem(i, ControlPoint::PointTypeToString(
+            (ControlPoint::PointType) i));
+    }
+    QFormLayout *pointTypeLayout = new QFormLayout;
+//  QLabel *pointTypeLabel = new QLabel("PointType:");
+    pointTypeLayout->addRow("PointType:", m_pointType);
+//  pointTypeLayout->addWidget(m_pointType);
+//  connect(m_pointType, SIGNAL(activated(int)),
+//    this, SLOT(setPointType(int)));
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addLayout(leftLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(rightLayout);
+    QVBoxLayout * mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(m_ptIdValue);
+    mainLayout->addWidget(m_numMeasures);
+    mainLayout->addWidget(m_lockPoint);
+    mainLayout->addWidget(m_ignorePoint);
+    mainLayout->addLayout(pointTypeLayout);
+//  mainLayout->addLayout(pointInfoLayout);
+//  mainLayout->addLayout(pointStatusLayout);
+//  mainLayout->addLayout(pointTypeLayout);
 
     // create the groupbox
-    QGroupBox *groupBox = new QGroupBox("Control Point");
+    QGroupBox * groupBox = new QGroupBox("Control Point");
     groupBox->setLayout(mainLayout);
 
     return groupBox;
@@ -347,44 +342,14 @@ namespace Isis {
             m_ignoreLeftMeasure, SLOT(toggle()));
     m_leftReference = new QLabel();
     m_leftMeasureType = new QLabel();
-    m_leftSampError = new QLabel();
-    m_leftSampError->setToolTip("<strong>Jigsaw</strong> sample residual.");
-    m_leftSampError->setWhatsThis("This is the sample residual for the left "
-        "measure calculated by the application, "
-        "<strong>jigsaw</strong>.");
-    m_leftLineError = new QLabel();
-    m_leftLineError->setToolTip("<strong>Jigsaw</strong> line residual.");
-    m_leftLineError->setWhatsThis("This is the line residual for the left "
-        "measure calculated by the application, "
-        "<strong>jigsaw</strong>.");
-    m_leftSampShift = new QLabel();
-    m_leftSampShift->setToolTip("Sample shift between apriori and current");
-    m_leftSampShift->setWhatsThis("The shift between the apriori sample and "
-         "the current sample.  The apriori sample is set "
-         "when creating a new measure.");
-    m_leftLineShift = new QLabel();
-    m_leftLineShift->setToolTip("Line shift between apriori and current");
-    m_leftLineShift->setWhatsThis("The shift between the apriori line and "
-         "the current line.  The apriori line is set "
-         "when creating a new measure.");
-    m_leftGoodness = new QLabel();
-    m_leftGoodness->setToolTip("Goodness of Fit result from sub-pixel "
-             "registration.");
-    m_leftGoodness->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
-         "registration.");
-    QVBoxLayout *leftLayout = new QVBoxLayout;
+    QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(m_leftCombo);
     leftLayout->addWidget(m_lockLeftMeasure);
     leftLayout->addWidget(m_ignoreLeftMeasure);
     leftLayout->addWidget(m_leftReference);
     leftLayout->addWidget(m_leftMeasureType);
-    leftLayout->addWidget(m_leftSampError);
-    leftLayout->addWidget(m_leftLineError);
-    leftLayout->addWidget(m_leftSampShift);
-    leftLayout->addWidget(m_leftLineShift);
-    leftLayout->addWidget(m_leftGoodness);
 
-    QGroupBox *leftGroupBox = new QGroupBox("Left Measure");
+    QGroupBox * leftGroupBox = new QGroupBox("Left Measure");
     leftGroupBox->setLayout(leftLayout);
 
     return leftGroupBox;
@@ -396,14 +361,30 @@ namespace Isis {
    * 
    * @return @b QGroupBox * The groupbox labeled "Right Measure"
    */
-  QGroupBox *ControlPointEditWidget::createRightMeasureGroupBox() {
+  QGroupBox * ControlPointEditWidget::createRightMeasureGroupBox() {
 
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
+    m_model = new QStandardItemModel();
+    m_rightCombo->setModel(m_model);
     m_rightCombo->view()->installEventFilter(this);
     m_rightCombo->setToolTip("Choose right control measure");
     m_rightCombo->setWhatsThis("Choose right control measure identified by "
                                "cube filename.");
+
+    m_rightCombo->view()->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_rightCombo->view()->setDragEnabled(true);
+    m_rightCombo->view()->setAcceptDrops(true);
+    m_rightCombo->view()->setDropIndicatorShown(true);
+    m_rightCombo->view()->setDragDropMode(QAbstractItemView::InternalMove);
+
+    // Attach shortcuts to Qnet Tool's window for selecting right measures
+    // Note: Qt handles this memory for us since m_qnetTool is the parent of these shortcuts
+    QShortcut *nextMeasure = new QShortcut(Qt::Key_PageDown, this);
+    connect(nextMeasure, SIGNAL(activated()), this, SLOT(nextRightMeasure()));
+    QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, this);
+    connect(prevMeasure, SIGNAL(activated()), this, SLOT(previousRightMeasure()));
+
     connect(m_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     m_lockRightMeasure = new QCheckBox("Edit Lock Measure");
@@ -416,25 +397,6 @@ namespace Isis {
             m_ignoreRightMeasure, SLOT(toggle()));
     m_rightReference = new QLabel();
     m_rightMeasureType = new QLabel();
-    m_rightSampError = new QLabel();
-    m_rightSampError->setToolTip("<strong>Jigsaw</strong> sample residual.");
-    m_rightSampError->setWhatsThis("This is the sample residual for the right "
-        "measure which was calculated by the application, "
-        "<strong>jigsaw</strong>.");
-    m_rightLineError = new QLabel();
-    m_rightLineError->setToolTip("<strong>Jigsaw</strong> line residual.");
-    m_rightLineError->setWhatsThis("This is the line residual for the right "
-        "measure which was calculated by the application, "
-        "<strong>jigsaw</strong>.");
-    m_rightSampShift = new QLabel();
-    m_rightSampShift->setToolTip(m_leftSampShift->toolTip());
-    m_rightSampShift->setWhatsThis(m_leftSampShift->whatsThis());
-    m_rightLineShift = new QLabel();
-    m_rightLineShift->setToolTip(m_leftLineShift->toolTip());
-    m_rightLineShift->setWhatsThis(m_leftLineShift->whatsThis());
-    m_rightGoodness = new QLabel();
-    m_rightGoodness->setToolTip(m_leftGoodness->toolTip());
-    m_rightGoodness->setWhatsThis(m_leftGoodness->whatsThis());
 
     // create right groupbox
     QVBoxLayout * rightLayout = new QVBoxLayout;
@@ -443,11 +405,6 @@ namespace Isis {
     rightLayout->addWidget(m_ignoreRightMeasure);
     rightLayout->addWidget(m_rightReference);
     rightLayout->addWidget(m_rightMeasureType);
-    rightLayout->addWidget(m_rightSampError);
-    rightLayout->addWidget(m_rightLineError);
-    rightLayout->addWidget(m_rightSampShift);
-    rightLayout->addWidget(m_rightLineShift);
-    rightLayout->addWidget(m_rightGoodness);
 
     QGroupBox * rightGroupBox = new QGroupBox("Right Measure");
     rightGroupBox->setLayout(rightLayout);
@@ -487,14 +444,14 @@ namespace Isis {
   void ControlPointEditWidget::createActions() {
 
     m_closePointEditor = new QAction(QIcon(FileName("base/icons/fileclose.png").expanded()),
-                                     "&Close", this);
+                                   "&Close", this);
     m_closePointEditor->setToolTip("Close this window");
     m_closePointEditor->setStatusTip("Close this window");
     m_closePointEditor->setShortcut(Qt::ALT + Qt::Key_F4);
     QString whatsThis = "<b>Function:</b> Closes the Match Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closePointEditor->setWhatsThis(whatsThis);
-    connect(m_closePointEditor, SIGNAL(activated()), this, SLOT(close()));
+    connect(m_closePointEditor, SIGNAL(triggered()), this, SLOT(close()));
 
     m_showHideTemplateEditor = new QAction(QIcon(FileName("base/icons/view_text.png").expanded()),
                                            "&View/edit registration template", this);
@@ -504,7 +461,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     m_showHideTemplateEditor->setWhatsThis(whatsThis);
-    connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
+    connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
     m_saveChips = new QAction(QIcon(FileName("base/icons/window_new.png").expanded()),
@@ -514,7 +471,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
     m_saveChips->setWhatsThis(whatsThis);
-    connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+    connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
     m_openTemplateFile = new QAction(QIcon(FileName("base/icons/fileopen.png").expanded()),
                                      "&Open registration template", this);
@@ -523,7 +480,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
     m_openTemplateFile->setWhatsThis(whatsThis);
-    connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
+    connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
     m_saveTemplateFile = new QAction(QIcon(FileName("base/icons/mActionFileSave.png").expanded()),
                                      "&Save template file", this);
@@ -550,7 +507,14 @@ namespace Isis {
    */
   void ControlPointEditWidget::setSerialNumberList(SerialNumberList *snList) {
 
-    //TODO  If network & snList already exists do some error checking
+    // TODO   If network & snList already exists do some error checking
+    // Make copy;  we add ground source files to the list, and we don't want to cause problems for
+    //  other cnetsuite entities that are using
+//  if (m_serialNumberList) {
+//    delete m_serialNumberList;
+//    m_serialNumberList = NULL;
+//  }
+//  m_serialNumberList = new SerialNumberList(snList);
     m_serialNumberList = snList;
   }
 
@@ -560,23 +524,103 @@ namespace Isis {
    *
    * @param cnet (ControlNet *) The control network to edit 
    * @param filename (Qstring) Need filename to write to widget label.  ControlNet doesn't 
-   *                           contain a filename. 
+   *                       contain a filename. 
    * @internal
   */  
-  void ControlPointEditWidget::setControlNet(ControlNet *cnet, QString cnetFilename) {
+  void ControlPointEditWidget::setControl(Control *control) {
     //qDebug()<<"ControlPointEditWidget::setControlNet cnet = "<<cnet<<"   filename = "<<cnetFilename;
-    //TODO  more error checking
-    m_controlNet = cnet;
-    m_cnetFileName = cnetFilename;
-//  setWindowTitle("Control Point Editor- Control Network File: " + cnetFilename);
+    //  TODO  more error checking
+    m_controlNet = control->controlNet();
+    m_cnetFileName = control->fileName();
+    setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
 
-    //qDebug()<<"ControlPointEditWidget::setControlNet  cnetFilename = "<<cnetFilename<<"  cnet = "<<cnet;
-    emit newControlNetwork(cnet);
+    emit newControlNetwork(m_controlNet);
   }
 
 
   /**
-   * Sets the control point to edit
+   * @brief Create a temporary measure to hold the ground point info for ground source
+   *
+   * @return ControlMeasure* the created ground measure
+   *
+   * @internal
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Original version adapted from
+   *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
+   *   @history 2016-11-04 Tracie Sucharski - Combined findPointLocation and
+   *                           createTemporaryGroundMeasure so that ground information doesn't need
+   *                           to be re-created
+   */
+  ControlMeasure *ControlPointEditWidget::createTemporaryGroundMeasure() {
+
+    ControlMeasure *groundMeasure = NULL;
+    FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
+    if (!groundFile.fileExists()) {
+      //  simply print error for now, need to prompt
+      //  for new location or new source, either a Shape in the project, or import a new shape,
+      //  or simplay choose file?
+      QString message = "Ground Source file " + groundFile.expanded();
+      message += " doesn't exist";
+      QMessageBox::critical(this, "Warning", message);
+    }
+    else {
+
+      //  If ground file exists, open, create cube and ground map.  If doesn't exist, prompt
+      //  for new location or new source, either a Shape in the project, or import a new shape,
+      //  or simplay choose file?   
+      //  THIS SHOULD BE MOVED TO ::LOADPOINT AND info needs to be saved
+      QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
+      QScopedPointer<UniversalGroundMap> groundMap(new UniversalGroundMap(*groundCube));
+
+      // Use apriori surface point to find location on ground source.  If
+      // apriori surface point does not exist use reference measure
+      double lat = 0.;
+      double lon = 0.;
+      if (m_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+        lat = sPt.GetLatitude().degrees();
+        lon = sPt.GetLongitude().degrees();
+      }
+      else {
+        ControlMeasure m = *(m_editPoint->GetRefMeasure());
+        int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
+        Camera *cam;
+        cam = m_controlNet->Camera(camIndex);
+        cam->SetImage(m.GetSample(),m.GetLine());
+        lat = cam->UniversalLatitude();
+        lon = cam->UniversalLongitude();
+      }
+
+      //  Try to locate point position on current ground source,
+      //  TODO ???if doesn't exist,???
+      if (!groundMap->SetUniversalGround(lat,lon)) {
+        QString message = "This point does not exist on the ground source.\n";
+        message += "Latitude = " + QString::number(lat);
+        message += "  Longitude = " + QString::number(lon);
+        message += "\n A ground measure will not be created.";
+        QMessageBox::warning(this, "Warning", message);
+      }
+      else {
+        // This measure will be deleted when the ControlPoint is saved to the
+        // ControlNet.
+        groundMeasure = new ControlMeasure;
+        QString groundSN = SerialNumber::Compose(*groundCube);
+        groundMeasure->SetCubeSerialNumber(groundSN);
+        groundMeasure->SetType(ControlMeasure::Candidate);
+        groundMeasure->SetCoordinate(groundMap->Sample(), groundMap->Line());
+        groundMeasure->SetChooserName("GroundMeasureTemporary");
+        //  Add serial number to serial number list if  not already there
+        if (!m_serialNumberList->hasSerialNumber(groundSN)) {
+          m_serialNumberList->add(groundFile.expanded(), true);
+        }
+      }
+    }
+
+    return groundMeasure;
+  }
+
+
+  /**
+   * Slot called by Directory to set the control point for editing
    * 
    * @param controlPoint Pointer to the ControlPoint to edit
    */
@@ -587,6 +631,8 @@ namespace Isis {
       delete m_editPoint;
       m_editPoint = NULL;
     }
+
+    //  Create copy of ControlPoint.  It will not be saved to net until "Save Point" is selected
     m_editPoint = new ControlPoint;
     *m_editPoint = *controlPoint;
     //qDebug()<<"ControlPointEditWidget::setEditPoint m_editPoint Id = "<<m_editPoint->GetId();
@@ -602,62 +648,492 @@ namespace Isis {
 
 
   /**
+   * @brief Load point into ControlPointEditWidget.
+   * 
+   * @internal
+   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
+   *                           ControlPointEditWidget point information.
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                          namespace std"
+   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
+   *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
+   *   @history 2011-07-18 Tracie Sucharski - Fixed bug with loading
+   *                          ground measure-use AprioriSurface point, not lat,lon
+   *                          of reference measure unless there is no apriori
+   *                          surface point.
+   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
+   *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
+   *                          clicked on first on the left side, use m_leftFile.
+   */
+  void ControlPointEditWidget::loadPoint () {
+
+    //  Write pointId
+    QString CPId = m_editPoint->GetId();
+    QString ptId("Point ID:  ");
+    ptId += (QString) CPId;
+    m_ptIdValue->setText(ptId);
+
+    m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+    QString groundFile;
+    if (m_editPoint->GetType() != ControlPoint::Free) {
+      groundFile = m_editPoint->GetAprioriSurfacePointSourceFile();
+    }
+
+    //  Write number of measures
+    QString ptsize = "Number of Measures:  " +
+                   QString::number(m_editPoint->GetNumMeasures());
+    m_numMeasures->setText(ptsize);
+
+    //  Set EditLock box correctly
+    m_lockPoint->setChecked(m_editPoint->IsEditLocked());
+
+    //  Set ignore box correctly
+    m_ignorePoint->setChecked(m_editPoint->IsIgnored());
+
+    // Clear combo boxes
+    m_leftCombo->clear();
+    m_rightCombo->clear();
+    m_pointFiles.clear();
+
+    m_pointCubes.clear();
+
+
+        //  If fixed, add ground source file to combos, create a measure for
+    //  the ground source, load reference on left, ground source on right
+    if (m_editPoint->GetType() != ControlPoint::Free) {
+      // Create a temporary measure to hold the ground point info for ground source
+      // This measure will be deleted when the ControlPoint is saved to the
+      // ControlNet.
+      // TODO:  Does open ground source match point ground source
+      ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
+      if (groundMeasure) {
+        m_editPoint->Add(groundMeasure);
+      }
+      else {
+        QString message = "Cannot create ground measure on ground source file ";
+        message += groundFile;
+        QMessageBox::warning(this, "Warning", message);
+      }
+    }
+
+    //  Need all files for this point
+    for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+      ControlMeasure &m = *(*m_editPoint)[i];
+      QString file;
+      if (m.GetChooserName() == "GroundMeasureTemporary") {
+        file = groundFile;
+      }
+      else {
+        file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
+      }
+      m_pointFiles<<file;
+      QString tempFileName = FileName(file).name();
+
+      QStandardItem *item = new QStandardItem(tempFileName);
+//    qDebug()<<"before item flags = "<<item->flags();
+      item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);
+      m_model->appendRow(item);
+
+      m_leftCombo->addItem(tempFileName);
+//    m_rightCombo->addItem(tempFileName);
+      if (m_editPoint->IsReferenceExplicit() &&
+          (QString)m.GetCubeSerialNumber() == m_editPoint->GetReferenceSN()) {
+        m_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+        m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+      }
+    }
+
+    //TODO   IPCE  2016-06-08    TEMPORARY for prototype,   
+    m_measureEditor->setPoint(m_editPoint, m_serialNumberList);
+
+
+
+
+
+
+
+
+    //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
+    // Assuming combo loaded in same order as measures in the control point-is
+    // this a safe assumption???
+    //
+    //  Find the file from the cubeViewport that was originally used to select
+    //  the point, this will be displayed on the left ChipViewport, unless the
+    //  point was selected on the ground source image.  In this case, simply
+    //  load the first measure on the left.
+    int leftIndex = 0;
+    int rightIndex = 0;
+    //  Check for reference
+    if (m_editPoint->IsReferenceExplicit()) {
+      leftIndex = m_editPoint->IndexOfRefMeasure();
+    }
+    else {
+      if (!m_leftFile.isEmpty()) {
+        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
+        //  Sanity check
+        if (leftIndex < 0 ) leftIndex = 0;
+        m_leftFile.clear();
+      }
+    }
+
+    if (leftIndex == 0) {
+      rightIndex = 1;
+    }
+    else {
+      rightIndex = 0;
+    }
+
+    //  Handle pts with a single measure, for now simply put measure on left/right
+    //  Evenutally put on left with black on right??
+    if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
+    m_rightCombo->setCurrentIndex(rightIndex);
+    m_leftCombo->setCurrentIndex(leftIndex);
+    //  Initialize pointEditor with measures
+    selectLeftMeasure(leftIndex);
+    selectRightMeasure(rightIndex);
+
+//     loadMeasureTable();
+  }
+
+
+  void ControlPointEditWidget::createControlPoint(double latitude, double longitude, Cube *cube,
+                                                  bool isGroundSource) {
+//  qDebug()<<"ControlPointEditWidget::createControlPoint cube = "<<cube->fileName()<<"  isGroundSource = "<<isGroundSource;
+    //  TODO:   CHECK SUBPIXEL REGISTER RADIO BUTTON OPTION (CHECKBOX?)
+
+    //  Create list box of all files highlighting those that
+    //  contain the point.
+    QStringList pointFiles;
+
+    Camera *cam;
+    for (int i = 0; i < m_serialNumberList->size(); i++) {
+//    if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
+      cam = m_controlNet->Camera(i);
+      if (cam->SetUniversalGround(latitude, longitude)) {
+        //  Make sure point is within image boundary
+        double samp = cam->Sample();
+        double line = cam->Line();
+        if (samp >= 1 && samp <= cam->Samples() &&
+            line >= 1 && line <= cam->Lines()) {
+          pointFiles<<m_serialNumberList->fileName(i);
+        }
+      }
+    }
+
+    // Get shapes from project to fill dialog, changing the font for shapes the point is located in.
+    QStringList shapeNames;
+    QStringList shapeNamesNoPoint;
+    // Create map between the Shape display name & Shape
+    QMap<QString, Shape *> nameToShapeMap;
+    QList<ShapeList *> shapeLists = m_directory->project()->shapes();
+    foreach (ShapeList *shapeList, shapeLists) {
+      foreach (Shape *shape, *shapeList) {
+        UniversalGroundMap *gmap = new UniversalGroundMap(*(shape->cube()));
+        if (gmap->SetUniversalGround(latitude, longitude)) {
+          shapeNames<<shape->displayProperties()->displayName();
+        }
+        else {
+          shapeNamesNoPoint<<shape->displayProperties()->displayName();
+        }
+        nameToShapeMap[shape->displayProperties()->displayName()] = shape;
+        delete gmap;
+      }
+    }
+
+    int numberShapesWithPoint = shapeNames.count();
+    shapeNames<<shapeNamesNoPoint;
+
+    //m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
+
+    NewControlPointDialog *newPointDialog =
+        new NewControlPointDialog(m_controlNet, m_serialNumberList, m_lastUsedPointId, this);
+    newPointDialog->setFiles(pointFiles);
+    newPointDialog->setGroundSource(shapeNames, numberShapesWithPoint);
+    if (newPointDialog->exec()) {
+      m_lastUsedPointId = newPointDialog->pointId();
+      ControlPoint *newPoint =
+          new ControlPoint(m_lastUsedPointId);
+
+      // If this ControlPointId already exists, message box pops up and user is
+      // asked to enter a new value.
+      if (m_controlNet->ContainsPoint(newPoint->GetId())) {
+        QString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
+        message += "] already exists.  Re-enter Point Id for this ControlPoint.";
+        QMessageBox::warning(this, "New Point Id", message);
+        pointFiles.clear();
+        delete newPoint;
+        newPoint = NULL;
+        createControlPoint(latitude, longitude);
+        return;
+      }
+      
+      newPoint->SetChooserName(Application::UserName());
+
+      QStringList selectedFiles = newPointDialog->selectedFiles();
+      foreach (QString selectedFile, selectedFiles) {
+        //  Create measure for any file selected
+        ControlMeasure *m = new ControlMeasure;
+        //  Find serial number for this file
+        QString sn = m_serialNumberList->serialNumber(selectedFile);
+        m->SetCubeSerialNumber(sn);
+        int camIndex = m_serialNumberList->fileNameIndex(selectedFile);
+        cam = m_controlNet->Camera(camIndex);
+        cam->SetUniversalGround(latitude, longitude);
+        m->SetCoordinate(cam->Sample(),cam->Line());
+        m->SetAprioriSample(cam->Sample());
+        m->SetAprioriLine(cam->Line());
+        m->SetType(ControlMeasure::Manual);
+        m->SetChooserName(Application::UserName());
+        m->SetCamera(cam);
+        newPoint->Add(m);
+      }
+
+      //  Get point type from dialog
+      bool isGroundPoint = (newPointDialog->pointType() != ControlPoint::Free);
+      newPoint->SetType((ControlPoint::PointType) newPointDialog->pointType());
+
+      if (isGroundPoint) {
+        Shape *shape = nameToShapeMap[newPointDialog->groundSource()];
+        //  Save ground source information in control point
+        if (shape->shapeType() == Shape::Dem ||
+            shape->shapeType() == Shape::Basemap) {
+          newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+        }
+        else if (shape->shapeType() == Shape::Unprojected) {
+          // TODO  Determine if unprojected shape has been bundle adjusted or is simply ??
+//        newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::???
+        }
+        newPoint->SetAprioriSurfacePointSourceFile(shape->fileName());                    
+      }
+
+      setEditPoint(newPoint);
+//    if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
+//      delete m_editPoint;
+//      m_editPoint = NULL;
+//    }
+//    m_editPoint = newPoint;
+//
+//    //  If the image that the user clicked on to select the point is not
+//    //  included, clear out the leftFile value.
+//    if (!m_leftFile.isEmpty()) {
+//      if (selectedFiles.indexOf(m_leftFile) == -1) {
+//        m_leftFile.clear();
+//      }
+//    }
+//
+//    //  Load new point in QnetTool
+//    loadPoint();
+//
+//  // If cube valid, use as reference
+//  if (cube) {
+//
+//  }
+
+
+      emit controlPointAdded(newPoint->GetId());
+    }
+  }
+
+
+  void ControlPointEditWidget::deletePoint(ControlPoint *controlPoint) {
+
+    //  TODO  2016-09-16 TLS   IMPLEMENT!
+//  QString message = "Deleting control point not implemented yet";
+//  QMessageBox::critical(this, "NOT IMPLEMENTED YET", message);
+
+    // Make a copy and make sure editPoint is a copy (which means it does not
+    // have a parent network.
+    if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
+      delete m_editPoint;
+      m_editPoint = NULL;
+    }
+    m_editPoint = new ControlPoint;
+    *m_editPoint = *controlPoint;
+    loadPoint();
+
+    //  Change point in viewport to red so user can see what point they are
+    //  about to delete.
+    // the nav tool will update edit point
+    emit controlPointChanged(m_editPoint->GetId());
+
+    DeleteControlPointDialog *deletePointDialog = new DeleteControlPointDialog;
+    QString CPId = m_editPoint->GetId();
+    deletePointDialog->pointIdValue->setText(CPId);
+
+    //  Need all files for this point
+    for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+      ControlMeasure &m = *(*m_editPoint)[i];
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
+      deletePointDialog->fileList->addItem(file);
+    }
+
+    if (deletePointDialog->exec()) {
+
+      int numDeleted = deletePointDialog->fileList->selectedItems().count();
+
+      //  Delete entire control point, either through deleteAllCheckBox or all measures selected
+      if (deletePointDialog->deleteAllCheckBox->isChecked() ||
+          numDeleted == m_editPoint->GetNumMeasures()) {
+
+        //  If all measures being deleted, let user know and give them the option to quit operation
+        if (!deletePointDialog->deleteAllCheckBox->isChecked()) {
+          QString message = "You have selected all measures in this point to be deleted.  This "
+            "control point will be deleted.  Do you want to delete this control point?";
+          int  response = QMessageBox::question(this,
+                                    "Delete control point", message,
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::Yes);
+          // If No, do nothing
+          if (response == QMessageBox::No) {
+            return;
+          }
+        }
+
+        //  First get rid of deleted point from m_filteredPoints list
+        //  need index in control net for pt
+        //int i = m_controlNet->
+        //m_filteredPoints.
+        // remove this point from the control network
+        if (m_controlNet->DeletePoint(m_editPoint->GetId()) ==
+                                          ControlPoint::PointLocked) {
+          QMessageBox::information(this, "EditLocked Point",
+              "This point is EditLocked and cannot be deleted.");
+          return;
+        }
+        if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
+          delete m_editPoint;
+          m_editPoint = NULL;
+        }
+        //  emit signal so the nav tool refreshes the list
+//      emit refreshNavList();
+      }
+
+      //  Delete specific measures from control point
+      else {
+        //  Keep track of editLocked measures for reporting
+        int lockedMeasures = 0;
+        for (int i=0; i<deletePointDialog->fileList->count(); i++) {
+          QListWidgetItem *item = deletePointDialog->fileList->item(i);
+          if (!deletePointDialog->fileList->isItemSelected(item)) continue;
+
+          //  Do not delete reference without asking user
+          if (m_editPoint->IsReferenceExplicit() &&
+                (m_editPoint->GetRefMeasure()->GetCubeSerialNumber() ==
+                (*m_editPoint)[i]->GetCubeSerialNumber())) {
+            QString message = "You are trying to delete the Reference measure."
+                "  Do you really want to delete the Reference measure?";
+            switch (QMessageBox::question(this,
+                                          "Delete Reference measure?", message,
+                                          "&Yes", "&No", 0, 0)) {
+              //  Yes:  skip to end of switch todelete the measure
+              case 0:
+                break;
+              //  No:  continue to next measure in the loop
+              case 1:
+                //  if only a single measure and it's reference and user chooses not to delete,
+                //  simply return.  The point has not changed.
+                if (numDeleted == 1) {
+                  return;
+                }
+                continue;
+            }
+          }
+
+          if (m_editPoint->Delete(i) == ControlMeasure::MeasureLocked) {
+            lockedMeasures++;
+          }
+        }
+
+        if (lockedMeasures > 0) {
+          QMessageBox::information(this,"EditLocked Measures",
+                QString::number(lockedMeasures) + " / "
+                + QString::number(
+                  deletePointDialog->fileList->selectedItems().size()) +
+                " measures are EditLocked and were not deleted.");
+        }
+
+        loadPoint();
+
+//      loadTemplateFile(m_pointEditor->templateFileName());
+      }
+
+      // emit a signal to alert user to save when exiting
+      emit netChanged();
+
+      // emit signal so the nav tool can update edit point
+      if (m_editPoint != NULL) {
+//      emit editPointChanged(m_editPoint->GetId());
+        //  Change Save Point button text to red
+        colorizeSaveNetButton();
+      }
+      else {
+        // if the entire point is deleted, update with point Id = ""
+        // this signal is connected to QnetTool::paintAllViewports
+        // and QnetNavTool::updateEditPoint
+//      emit editPointChanged("");
+      }
+    }
+
+  }
+
+
+  /**
    * This method is connected with the measureSaved() signal from ControlMeasureEditWidget.
    *
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added message box to warn the user
-   *                           that they are saving an "Ignore" point and ask
-   *                           whether they would like to set Ignore=false. This
-   *                           emits an ignoreChanged() signal so the "Ignore" box
-   *                           in the window is unchecked.
+   *                          that they are saving an "Ignore" point and ask
+   *                          whether they would like to set Ignore=false. This
+   *                          emits an ignoreChanged() signal so the "Ignore" box
+   *                          in the window is unchecked.
    *   @history 2008-12-30 Jeannie Walldren - Modified to set measures in
-   *                           viewports to Ignore=False if when saving, the user
-   *                           chooses to set a point's Ignore=False. Replaced
-   *                           reference to ignoreChanged() with
-   *                           ignorePointChanged().
+   *                          viewports to Ignore=False if when saving, the user
+   *                          chooses to set a point's Ignore=False. Replaced
+   *                          reference to ignoreChanged() with
+   *                          ignorePointChanged().
    *   @history 2008-12-31 Jeannie Walldren - Added question box to ask user
-   *                           whether the current reference measure should be
-   *                           replaced with the measure in the left viewport.
+   *                          whether the current reference measure should be
+   *                          replaced with the measure in the left viewport.
    *   @history 2010-01-27 Jeannie Walldren - Added question box to warn the user
-   *                           that they are saving an "Ignore" measure and ask
-   *                           whether they would like to set Ignore=False. This
-   *                           emits an ignoreRightChanged() signal so the "Ignore"
-   *                           box in the window is unchecked. Modified Ignore
-   *                           Point message for clarity.
+   *                          that they are saving an "Ignore" measure and ask
+   *                          whether they would like to set Ignore=False. This
+   *                          emits an ignoreRightChanged() signal so the "Ignore"
+   *                          box in the window is unchecked. Modified Ignore
+   *                          Point message for clarity.
    *   @history 2010-11-19 Tracie Sucharski - Renamed from pointSaved.
    *   @history 2011-03-03 Tracie Sucharski - Do not save left measure unless
-   *                           the ignore flag was changed, that is the only
-   *                           change allowed on the left measure.
+   *                          the ignore flag was changed, that is the only
+   *                          change allowed on the left measure.
    *   @history 2011-04-20 Tracie Sucharski - If left measure equals right
-   *                           measure, copy right into left.  Also if EditLock
-   *                           true and user does not want to change, then
-   *                           do not save measure.  Remove signals
-   *                           EditPointChanged and netChanged, since these
-   *                           should only happen when the point is saved.
+   *                          measure, copy right into left.  Also if EditLock
+   *                          true and user does not want to change, then
+   *                          do not save measure.  Remove signals
+   *                          EditPointChanged and netChanged, since these
+   *                          should only happen when the point is saved.
    *   @history 2011-07-01 Tracie Sucharski - Fixed bug where the edit measure
-   *                           EditLocked=True, but the original measure was
-   *                           False, and we woouldn't allow the measure to be
-   *                           saved.
+   *                          EditLocked=True, but the original measure was
+   *                          False, and we woouldn't allow the measure to be
+   *                          saved.
    *   @history 2011-07-25 Tracie Sucharski - Removed editPointChanged signal
-   *                           since the editPoint is not changed.  This helped
-   *                           with match windows blinking due to refresh.
+   *                          since the editPoint is not changed.  This helped
+   *                          with match windows blinking due to refresh.
    *   @history 2011-09-22 Tracie Sucharski - When checking ignore status
-   *                           on right measure, check both original and edit
-   *                           measure.
+   *                          on right measure, check both original and edit
+   *                          measure.
    *   @history 2012-04-09 Tracie Sucharski - When checking if left measure
-   *                           editLock has changed, use measure->IsEditLocked()
-   *                           instead of this classes IsMeasureLocked() because
-   *                           it checks the m_editPoint measure instead of
-   *                           the measure loaded into the point editor.
+   *                          editLock has changed, use measure->IsEditLocked()
+   *                          instead of this classes IsMeasureLocked() because
+   *                          it checks the m_editPoint measure instead of
+   *                          the measure loaded into the point editor.
    *   @history 2012-04-26 Tracie Sucharski - cleaned up, moved reference checking
-   *                           and updating ground surface point to new methods.
+   *                          and updating ground surface point to new methods.
    *   @history 2012-05-07 Tracie Sucharski - Removed code to re-load left measure if
-   *                           left and right are the same, this is already handled in
-   *                           ControlPointEdit::saveMeasure.
+   *                          left and right are the same, this is already handled in
+   *                          ControlPointEdit::saveMeasure.
    *   @history 2012-06-12 Tracie Sucharski - Change made on 2012-04-26 caused a bug where
-   *                           if no ground is loaded the checkReference was not being called and
-   *                           reference measure could not be changed and there was no warning
-   *                           printed.
+   *                          if no ground is loaded the checkReference was not being called and
+   *                          reference measure could not be changed and there was no warning
+   *                          printed.
    */
   void ControlPointEditWidget::measureSaved() {
 
@@ -878,16 +1354,15 @@ namespace Isis {
   }
 
 
-  
   /**
-   * Change which measure is the reference.
-   *  
-   * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
-   *
-   * @internal
-   *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
-   *                           measureSaved method.
-   */
+  * Change which measure is the reference.
+  *  
+  * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
+  *
+  * @internal
+  *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
+  *                          measureSaved method.
+  */
   void ControlPointEditWidget::checkReference() {
 
     // Check if ControlPoint has reference measure, if reference Measure is
@@ -939,46 +1414,34 @@ namespace Isis {
    * @author 2010-11-19 Tracie Sucharski
    *
    * @internal
-   *   @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing
-   *                          and do not save point if editLock not changed.
-   *   @history 2011-07-05 Tracie Sucharski - Move point EditLock error checking
-   *                          to individual point parameter setting methods, ie.
-   *                          SetPointType, SetIgnorePoint.
+   * @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing
+   *                        and do not save point if editLock not changed.
+   * @history 2011-07-05 Tracie Sucharski - Move point EditLock error checking
+   *                        to individual point parameter setting methods, ie.
+   *                        SetPointType, SetIgnorePoint.
    *
    */
   void ControlPointEditWidget::savePoint() {
-
-    if (m_editPoint->HasAprioriCoordinates()) {
-      vector<Distance> targetRadii = m_controlNet->GetTargetRadii();
-
-      ControlMeasure *refMeasure = m_editPoint->GetRefMeasure();
-
-      refMeasure->Camera()->SetImage(refMeasure->GetSample(), refMeasure->GetLine());
-
-      double lat = refMeasure->Camera()->UniversalLatitude();
-      double lon = refMeasure->Camera()->UniversalLongitude();
-      double radius = refMeasure->Camera()->LocalRadius().meters();
-
-      SurfacePoint aprioriPt = m_editPoint->GetAprioriSurfacePoint();
-      aprioriPt.SetRadii(Distance(targetRadii[0]),
-                         Distance(targetRadii[1]),
-                         Distance(targetRadii[2]));
-      Distance latSigma = aprioriPt.GetLatSigmaDistance();
-      Distance lonSigma = aprioriPt.GetLonSigmaDistance();
-      Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
-      aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
-                                        Longitude(lon, Angle::Degrees),
-                                        Distance(radius, Distance::Meters));
-      aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
-      m_editPoint->SetAprioriSurfacePoint(aprioriPt);
-
-      updateSurfacePointInfo ();
-    }
 
     //  Make a copy of edit point for updating the control net since the edit
     //  point is still loaded in the point editor.
     ControlPoint *updatePoint = new ControlPoint;
     *updatePoint = *m_editPoint;
+
+    //  If this is a fixed or constrained point, see if there is a temporary
+    //  measure holding the coordinate information from the ground source.
+    //  If so, delete this measure before saving point.  Clear out the
+    //  fixed Measure variable (memory deleted in ControlPoint::Delete).
+    if (updatePoint->GetType() != ControlPoint::Free) {
+      // Find measure with chooser name = GroundMeasureTemporary
+      for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+        ControlMeasure &m = *(*m_editPoint)[i];
+        QString file;
+        if (m.GetChooserName() == "GroundMeasureTemporary") {
+          updatePoint->Delete(&m);
+        }
+      }
+    }
 
     //  If edit point exists in the network, save the updated point.  If it
     //  does not exist, add it.
@@ -993,7 +1456,7 @@ namespace Isis {
     }
     else {
       m_controlNet->AddPoint(updatePoint);
-      //qDebug()<<"ControlPOintEditWidget::savePoint before point added signal";
+//    qDebug()<<"ControlPOintEditWidget::savePoint before point added signal ptId = "<<m_editPoint->GetId();
       emit controlPointAdded(m_editPoint->GetId());
     }
 
@@ -1053,7 +1516,7 @@ namespace Isis {
     //  If ground loaded, read temporary ground measure to the point
     if (pointType != ControlPoint::Free && m_groundOpen) {
 //    loadGroundMeasure();
-//    m_measureEditor->colorizeSaveButton();
+//    m_measureEditor->colorizeSaveNetButton();
     }
     //  If going from constrained or fixed to free, unload the ground measure.
     else if (unloadGround) {
@@ -1064,7 +1527,7 @@ namespace Isis {
       }
 
       loadPoint();
-      m_measureEditor->colorizeSaveButton();
+      m_measureEditor->colorizeSaveNetButton();
     }
 
   }
@@ -1081,6 +1544,7 @@ namespace Isis {
    * @internal
    */
   void ControlPointEditWidget::setLockPoint (bool lock) {
+
     if (m_editPoint == NULL) return;
 
     m_editPoint->SetEditLock(lock);
@@ -1094,11 +1558,12 @@ namespace Isis {
    * @param ignore Boolean value that determines the Ignore value for this point.
    *
    * @internal
-   *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
-   *                          not changed in the net unless "Save Point" is
-   *                          selected.
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
+   *                        not changed in the net unless "Save Point" is
+   *                        selected.
    */
   void ControlPointEditWidget::setIgnorePoint (bool ignore) {
+
     if (m_editPoint == NULL) return;
 
     ControlPoint::Status status = m_editPoint->SetIgnored(ignore);
@@ -1122,10 +1587,10 @@ namespace Isis {
    * @author 2011-03-07 Tracie Sucharski
    *
    * @internal
-   *   @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
-   *                           parameter has changed.
-   *   @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
-   *                          print error if point is locked.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
+   * @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
+   *                        print error if point is locked.
    */
   void ControlPointEditWidget::setLockLeftMeasure (bool lock) {
 
@@ -1157,17 +1622,18 @@ namespace Isis {
    *
    * @param ignore Boolean value that determines the Ignore value for the left measure.
    * @internal
-   *   @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
-   *                           Moved the check whether m_rightMeasure is null
-   *                           before the check whether m_rightMeasure equals
-   *                           m_leftMeasure.
-   *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
-   *                           not changed in the net unless "Save Point" is
-   *                           selected.
-   *   @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
-   *                           parameter has changed.
+   * @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
+   *                          Moved the check whether m_rightMeasure is null
+   *                          before the check whether m_rightMeasure equals
+   *                          m_leftMeasure.
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
+   *                        not changed in the net unless "Save Point" is
+   *                        selected.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
    */
   void ControlPointEditWidget::setIgnoreLeftMeasure (bool ignore) {
+
     if (m_leftMeasure != NULL) m_leftMeasure->SetIgnored(ignore);
 
     //  If the right chip is the same as the left chip , update the right
@@ -1191,10 +1657,10 @@ namespace Isis {
    * @author 2011-03-07 Tracie Sucharski
    *
    * @internal
-   *   @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
-   *                           parameter has changed.
-   *   @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
-   *                           print error if point is locked.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
+   * @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
+   *                        print error if point is locked.
    */
   void ControlPointEditWidget::setLockRightMeasure (bool lock) {
 
@@ -1226,17 +1692,18 @@ namespace Isis {
    * @param ignore Boolean value that determines the Ignore value for the right measure.
    * 
    * @internal
-   *   @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
-   *                           Moved the check whether m_leftMeasure is null before
-   *                           the check whether m_rightMeasure equals
-   *                           m_leftMeasure.
-   *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
-   *                           not changed in the net unless "Save Point" is
-   *                           selected.
-   *   @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
-   *                           parameter has changed.
+   * @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
+   *                          Moved the check whether m_leftMeasure is null before
+   *                          the check whether m_rightMeasure equals
+   *                          m_leftMeasure.
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
+   *                        not changed in the net unless "Save Point" is
+   *                        selected.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
    */
   void ControlPointEditWidget::setIgnoreRightMeasure (bool ignore) {
+
     if (m_rightMeasure != NULL) m_rightMeasure->SetIgnored(ignore);
 
     //  If the right chip is the same as the left chip , update the right
@@ -1252,115 +1719,13 @@ namespace Isis {
 
 
   /**
-   * @brief Load point into ControlPointEditWidget.
-   * 
-   * @internal
-   *   @history 2008-11-26 Jeannie Walldren - Added "Number of Measures" to
-   *                           ControlPointEditWidget point information.
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                           namespace std"
-   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
-   *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
-   *   @history 2011-07-18 Tracie Sucharski - Fixed bug with loading
-   *                           ground measure-use AprioriSurface point, not lat,lon
-   *                           of reference measure unless there is no apriori
-   *                           surface point.
-   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
-   *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
-   *                           clicked on first on the left side, use m_leftFile.
-   */
-  void ControlPointEditWidget::loadPoint() {
-
-    //  Write pointId
-    QString CPId = m_editPoint->GetId();
-    QString ptId("Point ID:  ");
-    ptId += (QString) CPId;
-    m_ptIdValue->setText(ptId);
-
-    //  Write number of measures
-    QString ptsize = "Number of Measures:  " +
-                   QString::number(m_editPoint->GetNumMeasures());
-    m_numMeasures->setText(ptsize);
-
-    //  Set EditLock box correctly
-    m_lockPoint->setChecked(m_editPoint->IsEditLocked());
-
-    //  Set ignore box correctly
-    m_ignorePoint->setChecked(m_editPoint->IsIgnored());
-
-    // Clear combo boxes
-    m_leftCombo->clear();
-    m_rightCombo->clear();
-    m_pointFiles.clear();
-
-    //  Need all files for this point
-    for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
-      ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
-      m_pointFiles<<file;
-      QString tempFileName = FileName(file).name();
-      m_leftCombo->addItem(tempFileName);
-      m_rightCombo->addItem(tempFileName);
-      if (m_editPoint->IsReferenceExplicit() &&
-          (QString)m.GetCubeSerialNumber() == m_editPoint->GetReferenceSN()) {
-        m_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
-        m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
-      }
-    }
-
-    //TODO  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
-    // Assuming combo loaded in same order as measures in the control point-is
-    // this a safe assumption???
-    //
-    //  Find the file from the cubeViewport that was originally used to select
-    //  the point, this will be displayed on the left ChipViewport, unless the
-    //  point was selected on the ground source image.  In this case, simply
-    //  load the first measure on the left.
-    int leftIndex = 0;
-    int rightIndex = 0;
-    //  Check for reference
-    if (m_editPoint->IsReferenceExplicit()) {
-      leftIndex = m_editPoint->IndexOfRefMeasure();
-    }
-    else {
-      if (!m_leftFile.isEmpty()) {
-        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
-        //  Sanity check
-        if (leftIndex < 0 ) leftIndex = 0;
-        m_leftFile.clear();
-      }
-    }
-
-    if (leftIndex == 0) {
-      rightIndex = 1;
-    }
-    else {
-      rightIndex = 0;
-    }
-
-    //  Handle pts with a single measure, for now simply put measure on left/right
-    //  Evenutally put on left with black on right??
-    if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
-    m_rightCombo->setCurrentIndex(rightIndex);
-    m_leftCombo->setCurrentIndex(leftIndex);
-    //  Initialize pointEditor with measures
-    selectLeftMeasure(leftIndex);
-    selectRightMeasure(rightIndex);
-
-    updateSurfacePointInfo();
-
-//     loadMeasureTable();
-  }
-
-
-  /**
    * @brief Load measure information into the measure table
    * 
    * @internal
    *   @history 2011-12-05 Tracie Sucharski - Turn off sorting until table is loaded.
    *
    */
-  void ControlPointEditWidget::loadMeasureTable() {
+  void ControlPointEditWidget::loadMeasureTable () {
     if (m_measureWindow == NULL) {
       m_measureWindow = new QMainWindow(m_parent);
       m_measureTable = new QTableWidget();
@@ -1376,13 +1741,13 @@ namespace Isis {
     m_measureTable->setColumnCount(NUMCOLUMNS);
 
     QStringList labels;
-    for (int i = 0; i < NUMCOLUMNS; i++) {
+    for (int i=0; i<NUMCOLUMNS; i++) {
       labels<<measureColumnToString((MeasureColumns)i);
     }
     m_measureTable->setHorizontalHeaderLabels(labels);
 
     //  Fill in values
-    for (int row = 0; row < m_editPoint->GetNumMeasures(); row++) {
+    for (int row=0; row<m_editPoint->GetNumMeasures(); row++) {
       int column = 0;
       ControlMeasure &m = *(*m_editPoint)[row];
 
@@ -1531,6 +1896,7 @@ namespace Isis {
    */
   QString ControlPointEditWidget::measureColumnToString(
       ControlPointEditWidget::MeasureColumns column) {
+
     switch (column) {
       case FILENAME:
         return "FileName";
@@ -1571,23 +1937,65 @@ namespace Isis {
 
 
   /**
+   * @brief Selects the next right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the next right measure when the attached shortcut 
+   * (PageDown) is activated. This slot checks if the next index is in bounds.
+   *
+   * @internal
+   *   @history 2015-10-29 Ian Humphrey - Created slot. References #2324.
+   */
+  void ControlPointEditWidget::nextRightMeasure() {
+
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex < m_rightCombo->count() - 1) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex + 1);
+      selectRightMeasure(curIndex+1);
+    }
+  }
+
+
+  /**
+   * @brief Selects the previous right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the previous right measure when the attached
+   * shortcut (PageUp) is activated. This slot checks if the previous index is in bounds.
+   *
+   * @internal
+   *   @history 2015-10-29 Ian Humphrey - Created slot. References #2324.
+   */
+  void ControlPointEditWidget::previousRightMeasure() {
+
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex > 0) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex - 1);
+      selectRightMeasure(curIndex-1);
+    }
+  }
+
+
+
+  /**
    * Select left measure
    *
    * @param index Index of file from the point files vector
    *
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using namespace std"
-   *   @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is
-   *                           reference, lock the measure.
-   *   @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
-   *                           make sure old measure is retained. 
+   * @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is
+   *                          reference, lock the measure.
+   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
+   *                          make sure old measure is retained. 
    */
   void ControlPointEditWidget::selectLeftMeasure(int index) {
+
     QString file = m_pointFiles[index];
 
     QString serial;
     try {
-      serial = m_serialNumberList->serialNumber(file);
+      serial = m_serialNumberList->serialNumber(file); 
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -1603,15 +2011,11 @@ namespace Isis {
       return;
     }
 
-    // Make sure to clear out leftMeasure before making a copy of the selected
-    // measure.
     if (m_leftMeasure != NULL) {
-      delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
-    m_leftMeasure = new ControlMeasure();
-    //  Find measure for each file
-    *m_leftMeasure = *((*m_editPoint)[serial]);
+    //  Find measure for each file    
+    m_leftMeasure = (*m_editPoint)[serial];
 
     //  If m_leftCube is not null, delete before creating new one
     m_leftCube.reset(new Cube(file, "r"));
@@ -1631,8 +2035,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using namespace std"
-   *   @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
-   *                           make sure old measure is retained. 
+   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
+   *                          make sure old measure is retained. 
    */
   void ControlPointEditWidget::selectRightMeasure(int index) {
 
@@ -1656,15 +2060,12 @@ namespace Isis {
       return;
     }
 
-    // Make sure to clear out rightMeasure before making a copy of the selected
-    // measure.
     if (m_rightMeasure != NULL) {
-      delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = new ControlMeasure();
+
     //  Find measure for each file
-    *m_rightMeasure = *((*m_editPoint)[serial]);
+    m_rightMeasure = (*m_editPoint)[serial];
 
     //  If m_rightCube is not null, delete before creating new one
     m_rightCube.reset(new Cube(file, "r"));
@@ -1681,20 +2082,20 @@ namespace Isis {
    * Update the left measure information
    * 
    * @internal
-   *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left
-   *                            measure info.
-   *   @history 2010-07-22  Tracie Sucharski - Updated new measure types
-   *                            associated with implementation of binary
-   *                            control networks.
-   *   @history 2010-12-27  Tracie Sucharski - Write textual Null instead of
-   *                            the numeric Null for sample & line residuals.
-   *   @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly
-   *   @history 2011-05-20  Tracie Sucharski - Added Reference output
-   *   @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added
-   *                            sample/line shifts.
+   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left
+   *                         measure info.
+   * @history 2010-07-22  Tracie Sucharski - Updated new measure types
+   *                           associated with implementation of binary
+   *                           control networks.
+   * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of
+   *                           the numeric Null for sample & line residuals.
+   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly
+   * @history 2011-05-20  Tracie Sucharski - Added Reference output
+   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added
+   *                           sample/line shifts.
    *
    */
-  void ControlPointEditWidget::updateLeftMeasureInfo() {
+  void ControlPointEditWidget::updateLeftMeasureInfo () {
 
     //  Set editLock measure box correctly
     m_lockLeftMeasure->setChecked(IsMeasureLocked(
@@ -1718,49 +2119,6 @@ namespace Isis {
     if (m_leftMeasure->GetType() == ControlMeasure::RegisteredPixel) s += "RegisteredPixel";
     if (m_leftMeasure->GetType() == ControlMeasure::RegisteredSubPixel) s += "RegisteredSubPixel";
     m_leftMeasureType->setText(s);
-
-    if (m_leftMeasure->GetSampleResidual() == Null) {
-      s = "Sample Residual: Null";
-    }
-    else {
-      s = "Sample Residual: " + QString::number( m_leftMeasure->GetSampleResidual() );
-    }
-    m_leftSampError->setText(s);
-
-    if (m_leftMeasure->GetLineResidual() == Null) {
-      s = "Line Residual: Null";
-    }
-    else {
-      s = "Line Residual: " + QString::number( m_leftMeasure->GetLineResidual() );
-    }
-    m_leftLineError->setText(s);
-
-    if (m_leftMeasure->GetSampleShift() == Null) {
-      s = "Sample Shift: Null";
-    }
-    else {
-      s = "Sample Shift: " + QString::number( m_leftMeasure->GetSampleShift() );
-    }
-    m_leftSampShift->setText(s);
-
-    if (m_leftMeasure->GetLineShift() == Null) {
-      s = "Line Shift: Null";
-    }
-    else {
-      s = "Line Shift: " + QString::number( m_leftMeasure->GetLineShift() );
-    }
-    m_leftLineShift->setText(s);
-
-    double goodnessOfFit = m_leftMeasure->GetLogData(
-                    ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-    if (goodnessOfFit == Null) {
-      s = "Goodness of Fit: Null";
-    }
-    else {
-      s = "Goodness of Fit: " + QString::number(goodnessOfFit);
-    }
-    m_leftGoodness->setText(s);
-
   }
 
 
@@ -1768,19 +2126,19 @@ namespace Isis {
    * Update the right measure information
    * 
    * @internal
-   *   @history 2008-11-24 Jeannie Walldren - Added "Goodness of Fit" to right
+   * @history 2008-11-24 Jeannie Walldren - Added "Goodness of Fit" to right
    *                         measure info.
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                         namespace std"
-   *   @history 2010-07-22 Tracie Sucharski - Updated new measure types
-   *                           associated with implementation of binary
-   *                           control networks.
-   *   @history 2010-12-27 Tracie Sucharski - Write textual Null instead of
-   *                           the numeric Null for sample & line residuals.
-   *   @history 2011-04-20 Tracie Sucharski - Set EditLock check box correctly
-   *   @history 2011-05-20 Tracie Sucharski - Added Reference output
-   *   @history 2011-07-19 Tracie Sucharski - Did some re-arranging and added
-   *                           sample/line shifts.
+   * @history 2010-07-22 Tracie Sucharski - Updated new measure types
+   *                         associated with implementation of binary
+   *                         control networks.
+   * @history 2010-12-27 Tracie Sucharski - Write textual Null instead of
+   *                         the numeric Null for sample & line residuals.
+   * @history 2011-04-20 Tracie Sucharski - Set EditLock check box correctly
+   * @history 2011-05-20 Tracie Sucharski - Added Reference output
+   * @history 2011-07-19 Tracie Sucharski - Did some re-arranging and added
+   *                         sample/line shifts.
    *
    */
   void ControlPointEditWidget::updateRightMeasureInfo() {
@@ -1808,160 +2166,8 @@ namespace Isis {
     if (m_rightMeasure->GetType() == ControlMeasure::RegisteredPixel) s+= "RegisteredPixel";
     if (m_rightMeasure->GetType() == ControlMeasure::RegisteredSubPixel) s+= "RegisteredSubPixel";
     m_rightMeasureType->setText(s);
-
-    if (m_rightMeasure->GetSampleResidual() == Null) {
-      s = "Sample Residual: Null";
-    }
-    else {
-      s = "Sample Residual: " + QString::number(m_rightMeasure->GetSampleResidual());
-    }
-    m_rightSampError->setText(s);
-
-    if (m_rightMeasure->GetLineResidual() == Null) {
-      s = "Line Residual: Null";
-    }
-    else {
-      s = "Line Residual: " + QString::number(m_rightMeasure->GetLineResidual());
-    }
-    m_rightLineError->setText(s);
-
-    if (m_rightMeasure->GetSampleShift() == Null) {
-      s = "Sample Shift: Null";
-    }
-    else {
-      s = "Sample Shift: " + QString::number(m_rightMeasure->GetSampleShift());
-    }
-    m_rightSampShift->setText(s);
-
-    if (m_rightMeasure->GetLineShift() == Null) {
-      s = "Line Shift: Null";
-    }
-    else {
-      s = "Line Shift: " + QString::number(m_rightMeasure->GetLineShift());
-    }
-    m_rightLineShift->setText(s);
-
-    double goodnessOfFit = m_rightMeasure->GetLogData(
-                    ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-    if (goodnessOfFit == Null) {
-      s = "Goodness of Fit: Null";
-    }
-    else {
-      s = "Goodness of Fit: " + QString::number(goodnessOfFit);
-    }
-    m_rightGoodness->setText(s);
-
   }
 
-
-  /**
-   * Update the Surface Point Information in the QnetTool window
-   *
-   * @author 2011-03-01 Tracie Sucharski
-   *
-   * @internal
-   *   @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values
-   *   @history 2011-05-24 Tracie Sucharski - Set target radii on apriori
-   *                           surface point, so that sigmas can be converted to
-   *                           meters.
-   */
-  void ControlPointEditWidget::updateSurfacePointInfo() {
-
-    QString s;
-
-    SurfacePoint aprioriPoint = m_editPoint->GetAprioriSurfacePoint();
-    if (aprioriPoint.GetLatitude().degrees() == Null) {
-      s = "AprioriLatitude:  Null";
-    }
-    else {
-      s = "Apriori Latitude:  " +
-          QString::number(aprioriPoint.GetLatitude().degrees());
-    }
-    m_pointAprioriLatitude->setText(s);
-    if (aprioriPoint.GetLongitude().degrees() == Null) {
-      s = "Apriori Longitude:  Null";
-    }
-    else {
-      s = "Apriori Longitude:  " +
-          QString::number(aprioriPoint.GetLongitude().degrees());
-    }
-    m_pointAprioriLongitude->setText(s);
-    if (aprioriPoint.GetLocalRadius().meters() == Null) {
-      s = "Apriori Radius:  Null";
-    }
-    else {
-      s = "Apriori Radius:  " +
-          QString::number(aprioriPoint.GetLocalRadius().meters(),'f',2) +
-          " <meters>";
-    }
-    m_pointAprioriRadius->setText(s);
-
-    if (aprioriPoint.Valid()) {
-      vector<Distance> targRadii = m_controlNet->GetTargetRadii();
-      aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
-
-      if (aprioriPoint.GetLatSigmaDistance().meters() == Null) {
-        s = "Apriori Latitude Sigma:  Null";
-      }
-      else {
-        s = "Apriori Latitude Sigma:  " +
-            QString::number(aprioriPoint.GetLatSigmaDistance().meters()) +
-            " <meters>";
-      }
-      m_pointAprioriLatitudeSigma->setText(s);
-      if (aprioriPoint.GetLonSigmaDistance().meters() == Null) {
-        s = "Apriori Longitude Sigma:  Null";
-      }
-      else {
-        s = "Apriori Longitude Sigma:  " +
-            QString::number(aprioriPoint.GetLonSigmaDistance().meters()) +
-            " <meters>";
-      }
-      m_pointAprioriLongitudeSigma->setText(s);
-      if (aprioriPoint.GetLocalRadiusSigma().meters() == Null) {
-        s = "Apriori Radius Sigma:  Null";
-      }
-      else {
-        s = "Apriori Radius Sigma:  " +
-            QString::number(aprioriPoint.GetLocalRadiusSigma().meters()) +
-            " <meters>";
-      }
-      m_pointAprioriRadiusSigma->setText(s);
-    }
-    else {
-      s = "Apriori Latitude Sigma:  Null";
-      m_pointAprioriLatitudeSigma->setText(s);
-      s = "Apriori Longitude Sigma:  Null";
-      m_pointAprioriLongitudeSigma->setText(s);
-      s = "Apriori Radius Sigma:  Null";
-      m_pointAprioriRadiusSigma->setText(s);
-    }
-
-
-    SurfacePoint point = m_editPoint->GetAdjustedSurfacePoint();
-    if (point.GetLatitude().degrees() == Null) {
-      s = "Adjusted Latitude:  Null";
-    }
-    else {
-      s = "Adjusted Latitude:  " + QString::number(point.GetLatitude().degrees());
-    }
-    m_pointLatitude->setText(s);
-    if (point.GetLongitude().degrees() == Null) {
-      s = "Adjusted Longitude:  Null";
-    }
-    else {
-      s = "Adjusted Longitude:  " + QString::number(point.GetLongitude().degrees());
-    }
-    m_pointLongitude->setText(s);
-    if (point.GetLocalRadius().meters() == Null) {
-      s = "Adjusted Radius:  Null";
-    }
-    else {
-      s = "Adjusted Radius:  " +
-          QString::number(point.GetLocalRadius().meters(),'f',2) + " <meters>";
-    }
-    m_pointRadius->setText(s);
-  }
 
 
   /**
@@ -1975,6 +2181,7 @@ namespace Isis {
    *
    */
   bool ControlPointEditWidget::eventFilter(QObject *o, QEvent *e) {
+
     if(e->type() != QEvent::Leave) return false;
     if(o == m_leftCombo->view()) {
       updateLeftMeasureInfo();
@@ -2067,6 +2274,7 @@ namespace Isis {
    * Called when the template file is modified by the template editor
    */
   void ControlPointEditWidget::setTemplateModified() {
+
     m_templateModified = true;
     m_saveTemplateFile->setEnabled(true);
   }
@@ -2119,7 +2327,7 @@ namespace Isis {
       Pvl pvl;
       ss >> pvl;
     }
-    catch (IException &e) {
+    catch(IException &e) {
       QString message = e.toString();
       QMessageBox::warning(this, "Error", message);
       return;
@@ -2156,12 +2364,13 @@ namespace Isis {
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original Version
    *   @history 2008-12-10 Jeannie Walldren - Added "" namespace to
-   *                           PvlEditDialog reference and changed
-   *                           registrationDialog from pointer to object
+   *                          PvlEditDialog reference and changed
+   *                          registrationDialog from pointer to object
    *   @history 2008-12-15 Jeannie Walldren - Added QMessageBox warning in case
-   *                           Template File cannot be read.
+   *                          Template File cannot be read.
    */
   void ControlPointEditWidget::viewTemplateFile() {
+
     try{
       // Get the template file from the ControlPointEditWidget object
       Pvl templatePvl(m_measureEditor->templateFileName());
@@ -2187,6 +2396,7 @@ namespace Isis {
    */
 
   void ControlPointEditWidget::saveChips() {
+
     m_measureEditor->saveChips();
   }
 
@@ -2216,8 +2426,8 @@ namespace Isis {
    *        of ControlPointEditWidget, this method will need to be updated.
    *       *** THIS METHOD SHOULD GO AWAY WHEN CONTROLpOINTEDITOR IS INCLUDED
    *           IN MATCH ***
-   *       TODO  THIS IS ONLY CONNECTED IN qnet.cpp FROM THE NAV TOOL.  REFACTOR WILL
-   *             NEED TO CONNECT CORRECT SIGNALS FROM OTHER WIDGETS TO THIS SLOT.
+   *       TODO:  THIS IS ONLY CONNECTED IN qnet.cpp FROM THE NAV TOOL.  REFACTOR WILL
+   *                  NEED TO CONNECT CORRECT SIGNALS FROM OTHER WIDGETS TO THIS SLOT.
    */
   void ControlPointEditWidget::updatePointInfo(ControlPoint &updatedPoint) {
     if (m_editPoint == NULL) return;
@@ -2234,8 +2444,8 @@ namespace Isis {
 
     //  Set ignore box correctly
     m_ignorePoint->setChecked(m_editPoint->IsIgnored());
-
   }
+
 
 
   /**
@@ -2245,15 +2455,15 @@ namespace Isis {
    * @author 2008-12-09 Tracie Sucharski
    *
    * @internal
-   *   @history 2010-12-15 Tracie Sucharski - Before setting m_editPoint to NULL,
-   *                          release memory.  TODO Why is the first if statement
-   *                          being done???
-   *   @history 2011-10-20 Tracie Sucharski - If no control points exist in the
-   *                          network, emit proper signal and make sure editor
-   *                          and measure table are hidden.
+   * @history 2010-12-15 Tracie Sucharski - Before setting m_editPoint to NULL,
+   *                        release memory.  TODO: Why is the first if statement
+   *                        being done???
+   * @history 2011-10-20 Tracie Sucharski - If no control points exist in the
+   *                        network, emit proper signal and make sure editor
+   *                        and measure table are hidden.
    *
    */
-//TODO  Is this needed?  
+//  TODO  Is this needed?  
 // 
 //  void ControlPointEditWidget::refresh() {
 //
@@ -2286,7 +2496,6 @@ namespace Isis {
     QPalette p = m_savePoint->palette();
     p.setColor(QPalette::ButtonText,qc);
     m_savePoint->setPalette(p);
-
   }
 
 
@@ -2315,17 +2524,17 @@ namespace Isis {
    * for implicit Lock on Reference measures does not work because there is
    * not a parent point.
    *
-   * @param[in] serialNumber (QString)  Serial number of measure to be checked
+   * @param[in] serialNumber (QString)   Serial number of measure to be checked
    *
    * @author 2011-07-06 Tracie Sucharski
    */
-  bool ControlPointEditWidget::IsMeasureLocked(QString serialNumber) {
+  bool ControlPointEditWidget::IsMeasureLocked (QString serialNumber) {
 
     if (m_editPoint == NULL) return false;
 
     // Reference implicitly editLocked
     if (m_editPoint->IsEditLocked() && m_editPoint->IsReferenceExplicit() &&
-       (m_editPoint->GetReferenceSN() == serialNumber)) {
+        (m_editPoint->GetReferenceSN() == serialNumber)) {
       return true;
     }
     // Return measures explicit editLocked value
@@ -2337,13 +2546,18 @@ namespace Isis {
 
 
   /**
-   * This slot is needed because we cannot directly emit a signal with a ControlNet
-   * argument after the "Save Net" push button is selected.
-   * 
-   * @internal
+  *  This slot is needed because we cannot directly emit a signal with a ControlNet
+  *  argument after the "Save Net" push button is selected.
+  * 
+  * @internal
    *   @history 2014-07-11 Tracie Sucharski - Original version.
-   */
+  */
   void ControlPointEditWidget::saveNet() {
+
+    m_controlNet->Write(m_cnetFileName);
+
+    //  Change Save Measure button text back to default
+    m_saveNet->setPalette(m_saveDefaultPalette);
 
     emit saveControlNet();
   }

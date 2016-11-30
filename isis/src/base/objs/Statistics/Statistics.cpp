@@ -939,12 +939,11 @@ namespace Isis {
     return statistics.read(stream);
   }
 
-#if 0
 //??? not working for prog14/15???
-dyld: Symbol not found: __ZN2H58PredType12NATIVE_INT64E
-  Referenced from: /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
-  Expected in: flat namespace
- in /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
+// dyld: Symbol not found: __ZN2H58PredType12NATIVE_INT64E
+//   Referenced from: /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
+//   Expected in: flat namespace
+//  in /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
 
   /** 
    *  H5 compound data type uses the offesets from the QDataStream returned by
@@ -1015,13 +1014,11 @@ dyld: Symbol not found: __ZN2H58PredType12NATIVE_INT64E
 
     // offset += sizeof(m_overRangePixels);
     offset += sizeof(BigInt);
-    // compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
-    // mac osx has problem with commented lines. will consider this later when
-    // ready to add serialization.
-    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_INT64);
+    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
+    // mac osx has problem with "sizeof" commented lines and the native data
+    // types too... will consider this later when ready to add serialization.
 
     return compoundDataType;
   }
-#endif
 
 } // end namespace isis

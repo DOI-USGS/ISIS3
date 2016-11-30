@@ -14,7 +14,7 @@ void CreateBase(Buffer &buf);
 void IsisMain() {
   // We will be use a mosaic technique so get the size of the input file
   ProcessMosaic p;
-  Cube *icube = p.SetInputCube("FROM");
+  Cube *icube = p.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
   int ins = icube->sampleCount();
   int inl = icube->lineCount();
   int inb = icube->bandCount();

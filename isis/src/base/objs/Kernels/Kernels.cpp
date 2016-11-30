@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
+ * $Id: Kernels.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -516,7 +516,7 @@ namespace Isis {
         SpiceBoolean found;
 
         NaifStatus::CheckErrors();
-        kinfo_c(_kernels[i].fullpath.toAscii().data(), sizeof(ktype), sizeof(source),
+        kinfo_c(_kernels[i].fullpath.toLatin1().data(), sizeof(ktype), sizeof(source),
                  ktype,source, &handle, &found);
         NaifStatus::CheckErrors();
 
@@ -793,7 +793,7 @@ namespace Isis {
       if (!kfile.loaded) {
         NaifStatus::CheckErrors();
         try {
-          furnsh_c(kfile.fullpath.toAscii().data());
+          furnsh_c(kfile.fullpath.toLatin1().data());
           NaifStatus::CheckErrors();
           kfile.loaded = true;
           kfile.managed = true;
@@ -835,7 +835,7 @@ namespace Isis {
       if (kfile.managed) {
          NaifStatus::CheckErrors();
          try {
-           unload_c(kfile.fullpath.toAscii().data());
+           unload_c(kfile.fullpath.toLatin1().data());
            NaifStatus::CheckErrors();
          }
          catch (IException &) {
@@ -1083,7 +1083,7 @@ namespace Isis {
         SpiceBoolean found;
 
         NaifStatus::CheckErrors();
-        kinfo_c(kf.fullpath.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
+        kinfo_c(kf.fullpath.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
                 source, &handle, &found);
         NaifStatus::CheckErrors();
 
@@ -1125,7 +1125,7 @@ namespace Isis {
   QString Kernels::resolveType(const QString &kfile) const {
     FileName kernFile(kfile);
     QString kpath = kernFile.expanded();
-    ifstream ifile(kpath.toAscii().data(), ios::in | ios::binary);
+    ifstream ifile(kpath.toLatin1().data(), ios::in | ios::binary);
     QString ktype("UNKNOWN");
     if (ifile) {
       char ibuf[10];

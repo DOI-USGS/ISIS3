@@ -1,10 +1,13 @@
 #include "HistogramTool.h"
 
-#include <qwt_legend_item.h>
-
 #include <geos/geom/Point.h>
 
 #include <QDebug>
+#include <QDockWidget>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QVBoxLayout>
 
 #include "Brick.h"
 #include "CubePlotCurve.h"
@@ -76,7 +79,7 @@ namespace Isis {
    * @return QWidget*
    */
   QWidget *HistogramTool::createToolBarWidget(QStackedWidget *parent) {
-    QWidget *wrapper = new QWidget(parent);
+    QWidget *wrapper = new QWidget;
 
     m_rubberBandCombo = new RubberBandComboBox(this,
       RubberBandComboBox::Rectangle|
@@ -449,9 +452,7 @@ namespace Isis {
       if (!m_percentageCurve) {
         m_percentageCurve = createCurve("Percentage", percentagePen,
             CubePlotCurve::CubeDN, CubePlotCurve::Percentage);
-        QwtSymbol symbol(m_percentageCurve->markerSymbol());
-        symbol.setStyle(QwtSymbol::NoSymbol);
-        m_percentageCurve->setMarkerSymbol(symbol);
+        m_percentageCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
         targetWindow->add(m_percentageCurve);
       }
     }

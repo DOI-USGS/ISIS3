@@ -458,7 +458,7 @@ void IsisMain() {
   if (ui.WasEntered("ERRORS") && errorNum > 0) {
     QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
-    errorsfile.open(errorname.toAscii().data());
+    errorsfile.open(errorname.toLatin1().data());
     errorsfile << errors.str();
     errorsfile.close();
   }

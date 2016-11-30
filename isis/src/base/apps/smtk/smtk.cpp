@@ -94,6 +94,11 @@ void WriteCnet(const QString &netfile, SmtkQStack &points,
 
 /** The ISIS smtk main application */
 void IsisMain() {
+  // 2016-10-14 Ian Humphrey -
+  // Set the QHash seed, otherwise output is ALWAYS slightly different.
+  // Note that in Qt4, the seed was constant, but in Qt5, the seed is created differently for each
+  // process. Fixes #4058.
+  qSetGlobalQHashSeed(1031);
   UserInterface &ui = Application::GetUserInterface();
 
   // Open the first cube.  It is the left hand image.

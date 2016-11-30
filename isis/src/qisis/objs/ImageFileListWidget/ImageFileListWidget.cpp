@@ -260,15 +260,15 @@ namespace Isis {
     if (!fileListContainer) {
 //      QWeakPointer<ImageFileListWidget> tmp = new ImageFileListWidget;
 //      tmp.data()->resize(QSize(500, 200));
-//      preview = QPixmap::grabWidget(tmp.data());
+//      preview = tmp.data().grab();
 //      delete tmp.data();
       ImageFileListWidget *tmp = new ImageFileListWidget;
       tmp->resize(QSize(500, 200));
-      preview = QPixmap::grabWidget(tmp);
+      preview = tmp->grab();
       delete tmp;
     }
     else {
-      QPixmap previewPixmap = QPixmap::grabWidget(fileListContainer).scaled(
+      QPixmap previewPixmap = fileListContainer->grab().scaled(
           QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       QLabel *previewWrapper = new QLabel;

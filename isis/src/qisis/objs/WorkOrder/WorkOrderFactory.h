@@ -47,6 +47,9 @@ namespace Isis {
    *   @history 2015-09-05 Ken Edmundson - Added support for new WorkOrders: SaveProjectWorkOrder,
    *                         SensorGetInforWorkOrder, and TargetGetInfoWorkOrder.
    *   @history 2016-06-09 Makayla Shepherd - Updated documentation. Fixes #3957.
+   *   @history 2016-07-26 Tracie Sucharski - Added support for Importing shapes.
+   *   @history 2016-11-07 Tracie Sucharski - Added the CubeDnViewWorkOrder,
+   *                         SetActiveControlWorkOrder, SetActiveImageListWorkOrder.  Fixes #4485.
    */
   class WorkOrderFactory {
     public:

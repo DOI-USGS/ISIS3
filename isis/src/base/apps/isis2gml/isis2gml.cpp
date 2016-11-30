@@ -79,12 +79,12 @@ void IsisMain() {
 
   // Write the gml file.
   ofstream fout;
-  fout.open(outgml.toAscii().data());
+  fout.open(outgml.toLatin1().data());
   fout << polyString << endl;
   fout.close();
 
   // Write the xsd file.
-  fout.open(outxsd.toAscii().data());
+  fout.open(outxsd.toLatin1().data());
   fout << PolygonTools::GMLSchema() << endl;
   fout.close();
 }

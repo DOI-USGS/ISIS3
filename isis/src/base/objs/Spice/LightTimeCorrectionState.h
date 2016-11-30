@@ -2,8 +2,8 @@
 #define LightTimeCorrectionState_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 6314 $
+ * $Date: 2015-08-12 15:30:27 -0700 (Wed, 12 Aug 2015) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   intellectual property information,user agreements, and related information.

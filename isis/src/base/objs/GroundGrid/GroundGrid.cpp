@@ -29,8 +29,10 @@ namespace Isis {
    * @param width The width of the grid; often cube samples
    * @param height The height of the grid; often cube samples
    */
-  GroundGrid::GroundGrid(UniversalGroundMap *gmap, bool splitLatLon,
-                         unsigned int width, unsigned int height) {
+  GroundGrid::GroundGrid(UniversalGroundMap *gmap, 
+                         bool splitLatLon,
+                         unsigned int width, 
+                         unsigned int height) {
     p_width = width;
     p_height = height;
 
@@ -43,7 +45,7 @@ namespace Isis {
     //   initialize
     p_gridSize = (unsigned long)(ceil(width * height / 8.0) + 0.5);
 
-    if(!splitLatLon) {
+    if (!splitLatLon) {
       p_grid = new char[p_gridSize];
     }
     else {
@@ -51,10 +53,10 @@ namespace Isis {
       p_lonLinesGrid = new char[p_gridSize];
     }
 
-    for(unsigned long i = 0; i < p_gridSize; i++) {
-      if(p_grid) p_grid[i] = 0;
-      if(p_latLinesGrid) p_latLinesGrid[i] = 0;
-      if(p_lonLinesGrid) p_lonLinesGrid[i] = 0;
+    for (unsigned long i = 0; i < p_gridSize; i++) {
+      if (p_grid) p_grid[i] = 0;
+      if (p_latLinesGrid) p_latLinesGrid[i] = 0;
+      if (p_lonLinesGrid) p_lonLinesGrid[i] = 0;
     }
 
     // The first call of CreateGrid doesn't have to reinitialize
@@ -71,7 +73,7 @@ namespace Isis {
 
     p_mapping = new PvlGroup;
 
-    if(p_groundMap->Camera()) {
+    if (p_groundMap->Camera()) {
       Pvl tmp;
       p_groundMap->Camera()->BasicMapping(tmp);
       *p_mapping = tmp.findGroup("Mapping");
@@ -85,44 +87,45 @@ namespace Isis {
     Distance radius2 = Distance((double)(*p_mapping)["PolarRadius"],
         Distance::Meters);
 
-    if(p_mapping->hasKeyword("MinimumLatitude")) {
-      p_minLat = new Latitude(
-          toDouble((*p_mapping)["MinimumLatitude"][0]), *p_mapping,
-          Angle::Degrees);
+    if (p_mapping->hasKeyword("MinimumLatitude")) {
+      p_minLat = new Latitude(toDouble((*p_mapping)["MinimumLatitude"][0]), 
+                              *p_mapping,
+                              Angle::Degrees, 
+                              Latitude::AllowPastPole);
     }
     else {
       p_minLat = new Latitude;
     }
 
-    if(p_mapping->hasKeyword("MaximumLatitude")) {
-      p_maxLat = new Latitude(
-          toDouble((*p_mapping)["MaximumLatitude"][0]), *p_mapping,
-          Angle::Degrees);
+    if (p_mapping->hasKeyword("MaximumLatitude")) {
+      p_maxLat = new Latitude(toDouble((*p_mapping)["MaximumLatitude"][0]), 
+                              *p_mapping,
+                              Angle::Degrees);
     }
     else {
       p_maxLat = new Latitude;
     }
 
-    if(p_mapping->hasKeyword("MinimumLongitude")) {
-      p_minLon = new Longitude(
-          toDouble((*p_mapping)["MinimumLongitude"][0]), *p_mapping,
-          Angle::Degrees);
+    if (p_mapping->hasKeyword("MinimumLongitude")) {
+      p_minLon = new Longitude(toDouble((*p_mapping)["MinimumLongitude"][0]), 
+                               *p_mapping,
+                               Angle::Degrees);
     }
     else {
       p_minLon = new Longitude;
     }
 
-    if(p_mapping->hasKeyword("MaximumLongitude")) {
-      p_maxLon = new Longitude(
-          toDouble((*p_mapping)["MaximumLongitude"][0]), *p_mapping,
-          Angle::Degrees);
+    if (p_mapping->hasKeyword("MaximumLongitude")) {
+      p_maxLon = new Longitude(toDouble((*p_mapping)["MaximumLongitude"][0]), 
+                               *p_mapping,
+                               Angle::Degrees);
     }
     else {
       p_maxLon = new Longitude;
     }
 
-    if(p_minLon->isValid() && p_maxLon->isValid()) {
-      if(*p_minLon > *p_maxLon) {
+    if (p_minLon->isValid() && p_maxLon->isValid()) {
+      if (*p_minLon > *p_maxLon) {
         Longitude tmp(*p_minLon);
         *p_minLon = *p_maxLon;
         *p_maxLon = tmp;
@@ -133,7 +136,7 @@ namespace Isis {
 
     // p_defaultResolution is in degrees/pixel
 
-    if(p_groundMap->HasCamera()) {
+    if (p_groundMap->HasCamera()) {
       p_defaultResolution =
         (p_groundMap->Camera()->HighestImageResolution() /
          largerRadius.meters()) * 10;
@@ -143,7 +146,7 @@ namespace Isis {
         largerRadius.meters()) * 10;
     }
 
-    if(p_defaultResolution < 0) {
+    if (p_defaultResolution < 0) {
       p_defaultResolution = 10.0 / largerRadius.meters();
     }
   }
@@ -152,43 +155,43 @@ namespace Isis {
    * Delete the object
    */
   GroundGrid::~GroundGrid() {
-    if(p_minLat) {
+    if (p_minLat) {
       delete p_minLat;
       p_minLat = NULL;
     }
 
-    if(p_minLon) {
+    if (p_minLon) {
       delete p_minLon;
       p_minLon = NULL;
     }
 
-    if(p_maxLat) {
+    if (p_maxLat) {
       delete p_maxLat;
       p_maxLat = NULL;
     }
 
-    if(p_maxLon) {
+    if (p_maxLon) {
       delete p_maxLon;
       p_maxLon = NULL;
     }
 
-    if(p_mapping) {
+    if (p_mapping) {
       delete p_mapping;
       p_mapping = NULL;
     }
 
-    if(p_grid) {
-      delete [] p_grid;
+    if (p_grid) {
+      delete[] p_grid;
       p_grid = NULL;
     }
 
-    if(p_latLinesGrid) {
-      delete [] p_latLinesGrid;
+    if (p_latLinesGrid) {
+      delete[] p_latLinesGrid;
       p_latLinesGrid = NULL;
     }
 
-    if(p_lonLinesGrid) {
-      delete [] p_lonLinesGrid;
+    if (p_lonLinesGrid) {
+      delete[] p_lonLinesGrid;
       p_lonLinesGrid = NULL;
     }
   }
@@ -202,8 +205,10 @@ namespace Isis {
    * @param lonInc  Distance between longitude lines
    * @param progress If passed in, this progress will be used
    */
-  void GroundGrid::CreateGrid(Latitude baseLat, Longitude baseLon,
-                              Angle latInc,  Angle lonInc,
+  void GroundGrid::CreateGrid(Latitude baseLat, 
+                              Longitude baseLon,
+                              Angle latInc,  
+                              Angle lonInc,
                               Progress *progress) {
     CreateGrid(baseLat, baseLon, latInc, lonInc, progress, Angle(), Angle());
   }
@@ -221,52 +226,55 @@ namespace Isis {
    * @param latRes  Resolution of latitude lines (in degrees/pixel)
    * @param lonRes  Resolution of longitude lines (in degrees/pixel)
    */
-  void GroundGrid::CreateGrid(Latitude baseLat, Longitude baseLon,
-                              Angle latInc,  Angle lonInc,
+  void GroundGrid::CreateGrid(Latitude baseLat, 
+                              Longitude baseLon,
+                              Angle latInc,  
+                              Angle lonInc,
                               Progress *progress,
-                              Angle latRes, Angle lonRes) {
-    if(p_groundMap == NULL ||
+                              Angle latRes, 
+                              Angle lonRes) {
+    if (p_groundMap == NULL ||
         (p_grid == NULL && p_latLinesGrid == NULL && p_lonLinesGrid == NULL)) {
       IString msg = "GroundGrid::CreateGrid missing ground map or grid array";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_reinitialize) {
-      for(unsigned long i = 0; i < p_gridSize; i++) {
-        if(p_grid) p_grid[i] = 0;
-        if(p_latLinesGrid) p_latLinesGrid[i] = 0;
-        if(p_lonLinesGrid) p_lonLinesGrid[i] = 0;
+    if (p_reinitialize) {
+      for (unsigned long i = 0; i < p_gridSize; i++) {
+        if (p_grid) p_grid[i] = 0;
+        if (p_latLinesGrid) p_latLinesGrid[i] = 0;
+        if (p_lonLinesGrid) p_lonLinesGrid[i] = 0;
       }
     }
 
     // Verify lat/lon range is okay
     bool badLatLonRange = false;
     QVector<IString> badLatLonValues;
-    if(!p_minLat || !p_minLat->isValid()) {
+    if (!p_minLat || !p_minLat->isValid()) {
       badLatLonValues.append("MinimumLatitude");
       badLatLonRange = true;
     }
 
-    if(!p_maxLat || !p_maxLat->isValid()) {
+    if (!p_maxLat || !p_maxLat->isValid()) {
       badLatLonValues.append("MaximumLatitude");
       badLatLonRange = true;
     }
 
-    if(!p_minLon || !p_minLon->isValid()) {
+    if (!p_minLon || !p_minLon->isValid()) {
       badLatLonValues.append("MinimumLongitude");
       badLatLonRange = true;
     }
 
-    if(!p_maxLon || !p_maxLon->isValid()) {
+    if (!p_maxLon || !p_maxLon->isValid()) {
       badLatLonValues.append("MaximumLongitude");
       badLatLonRange = true;
     }
 
 
-    if(badLatLonRange) {
+    if (badLatLonRange) {
       IString msg = "Could not determine values for [";
-      for(int i = 0; i < badLatLonValues.size(); i++) {
-        if(i != 0)
+      for (int i = 0; i < badLatLonValues.size(); i++) {
+        if (i != 0)
           msg += ",";
 
         msg += badLatLonValues[i];
@@ -283,32 +291,32 @@ namespace Isis {
     p_reinitialize = true;
 
     // Find starting points for lat/lon
-    Latitude startLat = Latitude(
-        baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
-        *GetMappingGroup());
+    Latitude startLat = Latitude(baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
+                                 *GetMappingGroup(), 
+                                 Latitude::AllowPastPole);
 
-    Longitude startLon = Longitude(
-        baseLon - Angle(floor((baseLon - *p_minLon) / lonInc) * lonInc));
+    Longitude startLon = Longitude(baseLon - Angle(floor((baseLon - *p_minLon) / lonInc) * lonInc));
 
-    if(!latRes.isValid() || latRes <= Angle(0, Angle::Degrees)) {
-      latRes = Angle(p_defaultResolution, Angle::Degrees);
+    if (!latRes.isValid() || latRes <= Angle(0, Angle::Degrees)) {
+      latRes = Angle(p_defaultResolution, 
+                     Angle::Degrees);
     }
 
-    if(!lonRes.isValid() || lonRes <= Angle(0, Angle::Degrees)) {
-      lonRes = Angle(p_defaultResolution, Angle::Degrees);
+    if (!lonRes.isValid() || lonRes <= Angle(0, Angle::Degrees)) {
+      lonRes = Angle(p_defaultResolution, 
+                     Angle::Degrees);
     }
 
-    Latitude endLat = Latitude(
-        (long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
-        *GetMappingGroup());
+    Latitude endLat = Latitude((long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
+                               *GetMappingGroup());
     Longitude endLon =
         (long)((*p_maxLon - startLon) / lonInc) * lonInc + startLon;
 
-    if(progress) {
+    if (progress) {
       double numSteps = (double)((endLat - startLat) / latInc) + 1;
       numSteps += (double)((endLon - startLon) / lonInc) + 1;
 
-      if(numSteps <= 0) {
+      if (numSteps <= 0) {
         IString msg = "No gridlines would intersect the image";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -317,18 +325,18 @@ namespace Isis {
       progress->CheckStatus();
     }
 
-    for(Latitude lat = startLat; lat <= endLat + latInc / 2; lat += latInc) {
+    for (Latitude lat = startLat; lat <= endLat + latInc / 2; lat += latInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(Longitude lon = *p_minLon; lon <= *p_maxLon; lon += latRes) {
+      for (Longitude lon = *p_minLon; lon <= *p_maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
         bool valid = GetXY(lat, lon, x, y);
 
-        if(valid && havePrevious) {
-          if(previousX != x || previousY != y) {
+        if (valid && havePrevious) {
+          if (previousX != x || previousY != y) {
             DrawLineOnGrid(previousX, previousY, x, y, true);
           }
         }
@@ -338,24 +346,24 @@ namespace Isis {
         previousY = y;
       }
 
-      if(progress) {
+      if (progress) {
         progress->CheckStatus();
       }
     }
 
-    for(Longitude lon = startLon; lon <= endLon + lonInc / 2; lon += lonInc) {
+    for (Longitude lon = startLon; lon <= endLon + lonInc / 2; lon += lonInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(Latitude lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
+      for (Latitude lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
 
         bool valid = GetXY(lat, lon, x, y);
 
-        if(valid && havePrevious) {
-          if(previousX == x && previousY == y) {
+        if (valid && havePrevious) {
+          if (previousX == x && previousY == y) {
             continue;
           }
 
@@ -367,7 +375,7 @@ namespace Isis {
         previousY = y;
       }
 
-      if(progress) {
+      if (progress) {
         progress->CheckStatus();
       }
     }
@@ -384,18 +392,18 @@ namespace Isis {
    */
   void GroundGrid::SetGroundLimits(Latitude minLat, Longitude minLon,
                                    Latitude maxLat, Longitude maxLon) {
-    if(minLat.isValid()) *p_minLat = minLat;
-    if(maxLat.isValid()) *p_maxLat = maxLat;
-    if(minLon.isValid()) *p_minLon = minLon;
-    if(maxLon.isValid()) *p_maxLon = maxLon;
+    if (minLat.isValid()) *p_minLat = minLat;
+    if (maxLat.isValid()) *p_maxLat = maxLat;
+    if (minLon.isValid()) *p_minLon = minLon;
+    if (maxLon.isValid()) *p_maxLon = maxLon;
 
-    if(p_minLat->isValid() && p_maxLat->isValid() && *p_minLat > *p_maxLat) {
+    if (p_minLat->isValid() && p_maxLat->isValid() && *p_minLat > *p_maxLat) {
       Latitude tmp(*p_minLat);
       *p_minLat = *p_maxLat;
       *p_maxLat = tmp;
     }
 
-    if(p_minLon->isValid() && p_maxLon->isValid() && *p_minLon > *p_maxLon) {
+    if (p_minLon->isValid() && p_maxLon->isValid() && *p_minLon > *p_maxLon) {
       Longitude tmp(*p_minLon);
       *p_minLon = *p_maxLon;
       *p_maxLon = tmp;
@@ -415,18 +423,18 @@ namespace Isis {
     const Longitude &maxLon = *p_maxLon;
 
     // Walk the minLat/maxLat lines
-    for(Latitude lat = minLat; lat <= maxLat; lat += (maxLat - minLat)) {
+    for (Latitude lat = minLat; lat <= maxLat; lat += (maxLat - minLat)) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(Longitude lon = minLon; lon <= maxLon; lon += latRes) {
+      for (Longitude lon = minLon; lon <= maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
         bool valid = GetXY(lat, lon, x, y);
 
-        if(valid && havePrevious) {
-          if(previousX != x || previousY != y) {
+        if (valid && havePrevious) {
+          if (previousX != x || previousY != y) {
             DrawLineOnGrid(previousX, previousY, x, y, true);
           }
         }
@@ -438,18 +446,18 @@ namespace Isis {
     }
 
     // Walk the minLon/maxLon lines
-    for(Longitude lon = minLon; lon <= maxLon; lon += (maxLon - minLon)) {
+    for (Longitude lon = minLon; lon <= maxLon; lon += (maxLon - minLon)) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(Latitude lat = minLat; lat <= maxLat; lat += lonRes) {
+      for (Latitude lat = minLat; lat <= maxLat; lat += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
         bool valid = GetXY(lat, lon, x, y);
 
-        if(valid && havePrevious) {
-          if(previousX != x || previousY != y) {
+        if (valid && havePrevious) {
+          if (previousX != x || previousY != y) {
             DrawLineOnGrid(previousX, previousY, x, y, false);
           }
         }
@@ -474,11 +482,11 @@ namespace Isis {
    * @return bool Pixel lies on grid
    */
   bool GroundGrid::PixelOnGrid(int x, int y, bool latGrid) {
-    if(x < 0) return false;
-    if(y < 0) return false;
+    if (x < 0) return false;
+    if (y < 0) return false;
 
-    if(x >= (int)p_width) return false;
-    if(y >= (int)p_height) return false;
+    if (x >= (int)p_width) return false;
+    if (y >= (int)p_height) return false;
 
     return GetGridBit(x, y, latGrid);
   }
@@ -493,15 +501,25 @@ namespace Isis {
    * @return bool Pixel lies on grid
    */
   bool GroundGrid::PixelOnGrid(int x, int y) {
-    if(x < 0) return false;
-    if(y < 0) return false;
+    if (x < 0) return false;
+    if (y < 0) return false;
 
-    if(x >= (int)p_width) return false;
-    if(y >= (int)p_height) return false;
+    if (x >= (int)p_width) return false;
+    if (y >= (int)p_height) return false;
 
     return GetGridBit(x, y, true); // third argument shouldnt matter
   }
 
+
+  /**
+   * Returns a mapping group representation of the projection or camera.
+   * This is useful for matching units with lat/lons.
+   *
+   * @returns Returns a mapping group representation of the projection or camera
+   */
+  PvlGroup *GroundGrid::GetMappingGroup() { 
+    return p_mapping; 
+  }
 
   /**
    * This method converts a lat/lon to an X/Y. This implementation converts to
@@ -516,17 +534,26 @@ namespace Isis {
    */
   bool GroundGrid::GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
-    if(!GroundMap()) return false;
-    if(!GroundMap()->SetGround(lat, lon)) return false;
-    if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
-    if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
+    if (!GroundMap()) return false;
+    if (!GroundMap()->SetGround(lat, lon)) return false;
+    if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
+    if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
 
     x = (int)(p_groundMap->Sample() - 0.5);
     y = (int)(p_groundMap->Line() - 0.5);
 
-    if(x >= p_width || y >= p_height) return false;
+    if (x >= p_width || y >= p_height) return false;
 
     return true;
+  }
+
+
+  /** 
+   * Returns the ground map for children
+   * 
+   */
+  UniversalGroundMap *GroundGrid::GroundMap() {
+    return p_groundMap;
   }
 
 
@@ -542,17 +569,17 @@ namespace Isis {
     unsigned long byteContainer = bitPosition / 8;
     unsigned int bitOffset = bitPosition % 8;
 
-    if(byteContainer < 0 || byteContainer > p_gridSize) return;
+    if (byteContainer > p_gridSize) return;
 
-    if(p_grid) {
+    if (p_grid) {
       char &importantByte = p_grid[byteContainer];
       importantByte |= (1 << bitOffset);
     }
-    else if(latGrid && p_latLinesGrid) {
+    else if (latGrid && p_latLinesGrid) {
       char &importantByte = p_latLinesGrid[byteContainer];
       importantByte |= (1 << bitOffset);
     }
-    else if(!latGrid && p_lonLinesGrid) {
+    else if (!latGrid && p_lonLinesGrid) {
       char &importantByte = p_lonLinesGrid[byteContainer];
       importantByte |= (1 << bitOffset);
     }
@@ -578,19 +605,19 @@ namespace Isis {
     unsigned long byteContainer = bitPosition / 8;
     unsigned int bitOffset = bitPosition % 8;
 
-    if(byteContainer < 0 || byteContainer > p_gridSize) return false;
+    if (byteContainer > p_gridSize) return false;
 
     bool result = false;
 
-    if(p_grid) {
+    if (p_grid) {
       char &importantByte = p_grid[byteContainer];
       result = (importantByte >> bitOffset) & 1;
     }
-    else if(latGrid && p_latLinesGrid) {
+    else if (latGrid && p_latLinesGrid) {
       char &importantByte = p_latLinesGrid[byteContainer];
       result = (importantByte >> bitOffset) & 1;
     }
-    else if(!latGrid && p_lonLinesGrid) {
+    else if (!latGrid && p_lonLinesGrid) {
       char &importantByte = p_lonLinesGrid[byteContainer];
       result = (importantByte >> bitOffset) & 1;
     }
@@ -620,12 +647,12 @@ namespace Isis {
 
     SetGridBit(x1, y1, isLatLine);
 
-    if(dx != 0) {
+    if (dx != 0) {
       double m = (double)dy / (double)dx;
       double b = y1 - m * x1;
 
       dx = (x2 > x1) ? 1 : -1;
-      while(x1 != x2) {
+      while (x1 != x2) {
         x1 += dx;
         y1 = (int)(m * x1 + b + 0.5);
         SetGridBit(x1, y1, isLatLine);

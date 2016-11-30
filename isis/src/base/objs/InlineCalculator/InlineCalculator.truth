@@ -1,21 +1,22 @@
 Testing empty constrctor...
 Testing constrctor with argument...
 Testing eval right away
-The empty size is:  "0" 
-The size is:  "3" 
-The empty equation is:  "" 
-The equation is:  "1 + 2" 
+The empty size is:  "0"
+The size is:  "3"
+The empty equation is:  ""
+The equation is:  "1 + 2"
 Does the empty one compile correctly: 1
 Did this compile correctly: 1
 Testing compile's exception.
-"**USER ERROR** Missing an operator before @." 
+Did this compile correctly: 
+"**USER ERROR** Missing an operator before @."
 This should throw an exception: 
-"**USER ERROR** Missing an operator before 2." 
-1 + 2 to postfix:  "1 2 +" 
-(1 + 2) * (3+4) to postfix:  "1 2 + 3 4 + *" 
-1*2*4*5*0 to postfix:  "1 2 * 4 * 5 * 0 *" 
-1+2 * 3+4 to postfix:  "1 2 3 * + 4 +" 
-1+a *4 to postfix:  "1 a 4 * +" 
+"**USER ERROR** Missing an operator before 2."
+1 + 2 to postfix:  "1 2 +"
+(1 + 2) * (3+4) to postfix:  "1 2 + 3 4 + *"
+1*2*4*5*0 to postfix:  "1 2 * 4 * 5 * 0 *"
+1+2 * 3+4 to postfix:  "1 2 3 * + 4 +"
+1+a *4 to postfix:  "1 a 4 * +"
 IsScalar: 0
 IsScalar: 1
 IsScalar: 0
@@ -46,6 +47,6 @@ CVP's default value is true: 1
 Expected exception
 Expected add exception
 Testing evaluate(1+2) =...
-"3" 
+"3"
 Testing evaluate(3*5) with a CalculatorVariablePool...
-"15" 
+"15"

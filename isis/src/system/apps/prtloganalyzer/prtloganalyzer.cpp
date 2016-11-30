@@ -68,7 +68,7 @@ void IsisMain() {
     ofstream ostm;
 
     // Open the file
-    ostm.open(file.toAscii().data(), std::ios::out);
+    ostm.open(file.toLatin1().data(), std::ios::out);
     if(!ostm) {
       QString message = "Cannot open/create output file " + file;
       throw IException(IException::Io, message, _FILEINFO_);

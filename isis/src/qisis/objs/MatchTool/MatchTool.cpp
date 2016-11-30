@@ -4,8 +4,20 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QAction>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QScrollBar>
+#include <QShortcut>
+#include <QSplitter>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QtWidgets>
+#include <QWhatsThis>
 
 #include "Application.h"
 #include "ControlMeasure.h"
@@ -32,10 +44,6 @@
 using namespace std;
 
 namespace Isis {
-
-  const int VIEWSIZE = 301;
-  const int CHIPVIEWPORT_WIDTH = 310;
-
 
   /**
    * Consructs the Match Tool window
@@ -93,7 +101,7 @@ namespace Isis {
     m_parent = parent;
     connect(this, SIGNAL(toolActivated()), this, SLOT(activateTool()));
 
-    // Connect the ViewportMainWindow's (parent) closeWindow signal to a exit slot for 
+    // Connect the ViewportMainWindow's (parent) closeWindow signal to a exit slot for
     // prompting user to save net
     ViewportMainWindow *parentMainWindow = qobject_cast<ViewportMainWindow *>(parent);
 
@@ -353,9 +361,9 @@ namespace Isis {
 
   /**
    * Creates the right measure group box.
-   * 
+   *
    * @returns The groupbox labeled "Right Measure"
-   * 
+   *
    * @internal
    *   @history 2015-11-08 Ian Humphrey - Added the shorcuts (PageUp/PageDown) for selecting
    *                           previous or next measure in right measures box. Referecnes #2324.
@@ -365,14 +373,14 @@ namespace Isis {
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
     m_rightCombo->view()->installEventFilter(this);
-    
+
     // Attach shortcuts to Match TOol's window for selecting right measures
     // Note: Qt handles this memory for us since m_matchTool is the parent of these shortcuts
     QShortcut *nextMeasure = new QShortcut(Qt::Key_PageDown, m_matchTool);
     connect(nextMeasure, SIGNAL(activated()), this, SLOT(nextRightMeasure()));
     QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, m_matchTool);
     connect(prevMeasure, SIGNAL(activated()), this, SLOT(previousRightMeasure()));
-    
+
     m_rightCombo->setToolTip("Choose right control measure. "
                              "<strong>Shorcuts: PageUp/PageDown</strong>");
     m_rightCombo->setWhatsThis("Choose right control measure identified by "
@@ -460,7 +468,7 @@ namespace Isis {
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
                         "control network</i>";
     m_saveNet->setWhatsThis(whatsThis);
-    connect(m_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(m_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
                               "Save Control Network &As...",
@@ -470,7 +478,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i> under chosen filename";
     m_saveAsNet->setWhatsThis(whatsThis);
-    connect(m_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
+    connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
 
     m_closeMatchTool = new QAction(QPixmap(toolIconDir() + "/fileclose.png"),
                                    "&Close",
@@ -481,7 +489,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Closes the Match Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeMatchTool->setWhatsThis(whatsThis);
-    connect(m_closeMatchTool, SIGNAL(activated()), m_matchTool, SLOT(close()));
+    connect(m_closeMatchTool, SIGNAL(triggered()), m_matchTool, SLOT(close()));
 
     m_showHideTemplateEditor = new QAction(QPixmap(toolIconDir() + "/view_text.png"),
                                            "&View/edit registration template",
@@ -492,7 +500,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     m_showHideTemplateEditor->setWhatsThis(whatsThis);
-    connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
+    connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
     m_saveChips = new QAction(QPixmap(toolIconDir() + "/window_new.png"),
@@ -503,7 +511,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
     m_saveChips->setWhatsThis(whatsThis);
-    connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+    connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
     m_openTemplateFile = new QAction(QPixmap(toolIconDir() + "/fileopen.png"),
                                      "&Open registration template",
@@ -513,7 +521,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
     m_openTemplateFile->setWhatsThis(whatsThis);
-    connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
+    connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
     m_saveTemplateFile = new QAction(QPixmap(toolIconDir() + "/mActionFileSave.png"),
                                      "&Save template file",
@@ -539,11 +547,11 @@ namespace Isis {
     m_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     m_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");
-    connect(m_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(m_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_showHelp = new QAction(QPixmap(toolIconDir() + "/help-contents.png"), "Help", m_matchTool);
     m_showHelp->setToolTip("Help");
-    connect(m_showHelp, SIGNAL(activated()), this, SLOT(showHelp()));
+    connect(m_showHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 
   }
 
@@ -615,7 +623,7 @@ namespace Isis {
 
   QWidget *MatchTool::createToolBarWidget(QStackedWidget *parent) {
 
-    QWidget *hbox = new QWidget(parent);
+    QWidget *hbox = new QWidget;
 
     QToolButton *openNetButton = new QToolButton(hbox);
     openNetButton->setIcon(QPixmap(toolIconDir() + "/fileopen.png"));
@@ -661,10 +669,10 @@ namespace Isis {
 
   /**
    * Creates a serial number list based on open cube viewports
-   *  
-   * @return SerialNumberList The serial number list based on currently opened cube viewports 
-   *  
-   * @author 2012-10-02  Tracie Sucharski 
+   *
+   * @return SerialNumberList The serial number list based on currently opened cube viewports
+   *
+   * @author 2012-10-02  Tracie Sucharski
    *
    * @internal
    */
@@ -680,7 +688,7 @@ namespace Isis {
         if (list.hasSerialNumber(sn)) {
           // TODO  Before removing serial number, make sure current network does not have
           // measures with old serial number.  If it does, now what?  Print error?
-          // 
+          //
           // Remove old serial number & change to filename
           FileName fileName = Isis::FileName(list.fileName(sn));
           list.Delete(sn);
@@ -986,7 +994,7 @@ namespace Isis {
       }
     }
     else {
-      //  No explicit reference, If left, set explicit reference 
+      //  No explicit reference, If left, set explicit reference
       if (side == "left") {
         m_editPoint->SetRefMeasure(m->GetCubeSerialNumber());
       }
@@ -1002,7 +1010,7 @@ namespace Isis {
 
   /*
   * Change which measure is the reference.
-  *  
+  *
   * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
   *
   * @internal
@@ -1289,7 +1297,7 @@ namespace Isis {
 
 
   void MatchTool::openNet() {
-    
+
     if (m_controlNet) {
       if (m_controlNet->GetNumPoints() != 0 && m_netChanged) {
         QString message = "A control net has already been created.  Do you want to save before "
@@ -1302,7 +1310,7 @@ namespace Isis {
         if (response == QMessageBox::Yes) {
           saveAsNet();
         }
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
       }
       delete m_controlNet;
       m_controlNet = NULL;
@@ -1354,9 +1362,9 @@ namespace Isis {
 
     paintAllViewports();
   }
-  
-  
-  
+
+
+
   /**
    * Signal to save control net
    *
@@ -1431,10 +1439,10 @@ namespace Isis {
    *                          "Save Point To Control Network".
    * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon
    *                          when creating new control point.
-   * @history 2012-05-08 Tracie Sucharski - Clear m_leftFile, only set if creating 
+   * @history 2012-05-08 Tracie Sucharski - Clear m_leftFile, only set if creating
    *                          new point. Change m_leftFile from a QString to
    *                          a QString.
-   * @history 2012-10-02 Tracie Sucharski - The member variable leftFile was never set. It is now 
+   * @history 2012-10-02 Tracie Sucharski - The member variable leftFile was never set. It is now
    *                          set when a new point is created and cleared after all measures have
    *                          been selected.
    *
@@ -1589,7 +1597,7 @@ namespace Isis {
     m->SetDateTime();
     m->SetChooserName(Application::UserName());
     m_newPoint->Add(m);
-    
+
     paintAllViewports();
   }
 
@@ -1631,10 +1639,10 @@ namespace Isis {
     m_newPoint = NULL;
     delete m_newPointDialog;
     m_newPointDialog = NULL;
-    
+
     //  Load new point in MatchTool
     loadPoint();
-    m_matchTool->setShown(true);
+    m_matchTool->setVisible(true);
     m_matchTool->raise();
 
     emit editPointChanged();
@@ -1695,7 +1703,7 @@ namespace Isis {
         return;
       }
       else {
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
       }
 
     }
@@ -1757,7 +1765,7 @@ namespace Isis {
           }
         }
 
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) == ControlPoint::PointLocked) {
           QMessageBox::information(m_matchTool, "EditLocked Point",
@@ -1816,7 +1824,7 @@ namespace Isis {
 
         if (mCubes.size() == 0) {
           loadPoint();
-          m_matchTool->setShown(true);
+          m_matchTool->setVisible(true);
           m_matchTool->raise();
 
           loadTemplateFile(
@@ -1891,7 +1899,7 @@ namespace Isis {
     *m_editPoint = *point;
 
     loadPoint();
-    m_matchTool->setShown(true);
+    m_matchTool->setVisible(true);
     m_matchTool->raise();
     loadTemplateFile(
         m_pointEditor->templateFileName());
@@ -2217,7 +2225,7 @@ namespace Isis {
   /**
    * @brief Selects the next right measure when activated by key shortcut
    *
-   * This slot is intended to handle selecting the next right measure when the attached shortcut 
+   * This slot is intended to handle selecting the next right measure when the attached shortcut
    * (PageDown) is activated. This slot checks if the next index is in bounds.
    *
    * @internal
@@ -2263,8 +2271,8 @@ namespace Isis {
    *                          namespace std"
    * @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is
    *                          reference, lock the measure.
-   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
-   *                          make sure old measure is retained. 
+   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and
+   *                          make sure old measure is retained.
    */
   void MatchTool::selectLeftMeasure(int index) {
     QString file = m_pointFiles[index];
@@ -2318,8 +2326,8 @@ namespace Isis {
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and 
-   *                          make sure old measure is retained. 
+   * @history 2012-10-02 Tracie Sucharski - If measure's cube is not viewed, print error and
+   *                          make sure old measure is retained.
    */
   void MatchTool::selectRightMeasure(int index) {
 
@@ -2781,7 +2789,7 @@ namespace Isis {
     if (!m_templateModified)
       return;
 
-    QString filename = 
+    QString filename =
         m_pointEditor->templateFileName();
 
     writeTemplateFile(filename);
@@ -2968,8 +2976,8 @@ namespace Isis {
         delete m_editPoint;
         m_editPoint = NULL;
         emit editPointChanged();
-//      m_matchTool->setShown(false);
-//      m_measureWindow->setShown(false);
+//      m_matchTool->setVisible(false);
+//      m_measureWindow->setVisible(false);
       }
     }
 
@@ -3290,7 +3298,7 @@ namespace Isis {
     QLabel *coregDesc = new QLabel("<p>When opening control networks created by <i>coreg</i>, "
       "there are some things to keep in mind.  First, all control points must have the same "
       "reference measure (this is the image filename passed to the <i>coreg</i> 'match' parameter)."
-      "<p>In order to retain the integrity of the input <i>coreg</i> network, you cannot change " 
+      "<p>In order to retain the integrity of the input <i>coreg</i> network, you cannot change "
       "which image is the reference measure on any of the existing points. "
       "<p>When creating a new control point to add to the <i>coreg</i> network, this tool will "
       "automatically set the reference measure to the same image as the other control points in "
@@ -3330,16 +3338,16 @@ namespace Isis {
     mainLayout->addLayout(buttonsLayout);
 
     helpDialog->show();
-   
+
 
   }
 
 
 
   /**
-   * This called when qview is exiting.  We need to possibly prompt user for saving the edit point 
-   * and network 
-   * 
+   * This called when qview is exiting.  We need to possibly prompt user for saving the edit point
+   * and network
+   *
    * @author 2012-07-20 Tracie Sucharski
    */
   void MatchTool::exiting() {
@@ -3371,4 +3379,3 @@ namespace Isis {
     }
   }
 }
-

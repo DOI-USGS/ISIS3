@@ -12,6 +12,7 @@
 #include <QNetworkReply>
 #include <QPair>
 #include <QUrl>
+#include <QUrlQuery>
 
 #include "Distance.h"
 #include "IException.h"
@@ -822,14 +823,14 @@ namespace Isis {
                            "from the nomenclature database. "
                            "The XML result was invalid. The parse is [" +
                            errorMsg + "] on line [" +
-                           QString(errorLine) +"], column [" +
-                           QString(errorCol) + "]");
+                           QString::number(errorLine) +"], column [" +
+                           QString::number(errorCol) + "]");
       }
     }
     else {
       QMessageBox::warning(NULL, "Failed to query nomenclature database",
                            "An error occurred when querying the nomenclature "
-                           "database for features that intersect the qeuried "
+                           "database for features that intersect the queried "
                            "ground range. Please make sure you have an active "
                            "internet connection. The error returned was [" +
                            reply->errorString() + "]");
@@ -901,61 +902,61 @@ namespace Isis {
                                      Latitude startLat, Longitude startLon,
                                      Latitude endLat, Longitude endLon) {
 
-    QUrl encodedFormData;
+    QUrlQuery formQuery;
 
     // List of XML fields we want from the server
-    encodedFormData.addQueryItem("additionalInfoColumn", "true");
-    encodedFormData.addQueryItem("approvalDateColumn", "true");
-    encodedFormData.addQueryItem("approvalStatusColumn", "true");
-    encodedFormData.addQueryItem("centerLatLonColumn", "true");
-    encodedFormData.addQueryItem("cleanFeatureNameColumn", "true");
-    encodedFormData.addQueryItem("contEthColumn", "true");
-    encodedFormData.addQueryItem("coordSystemColumn", "true");
-    encodedFormData.addQueryItem("diameterColumn", "true");
-    encodedFormData.addQueryItem("featureIDColumn", "true");
-    encodedFormData.addQueryItem("featureNameColumn", "true");
-    encodedFormData.addQueryItem("featureTypeCodeColumn", "true");
-    encodedFormData.addQueryItem("featureTypeColumn", "true");
-    encodedFormData.addQueryItem("lastUpdatedColumn", "true");
-    encodedFormData.addQueryItem("latLonColumn", "true");
-    encodedFormData.addQueryItem("originColumn", "true");
-    encodedFormData.addQueryItem("quadColumn", "true");
-    encodedFormData.addQueryItem("referenceColumn", "true");
-    encodedFormData.addQueryItem("targetColumn", "true");
+    formQuery.addQueryItem("additionalInfoColumn", "true");
+    formQuery.addQueryItem("approvalDateColumn", "true");
+    formQuery.addQueryItem("approvalStatusColumn", "true");
+    formQuery.addQueryItem("centerLatLonColumn", "true");
+    formQuery.addQueryItem("cleanFeatureNameColumn", "true");
+    formQuery.addQueryItem("contEthColumn", "true");
+    formQuery.addQueryItem("coordSystemColumn", "true");
+    formQuery.addQueryItem("diameterColumn", "true");
+    formQuery.addQueryItem("featureIDColumn", "true");
+    formQuery.addQueryItem("featureNameColumn", "true");
+    formQuery.addQueryItem("featureTypeCodeColumn", "true");
+    formQuery.addQueryItem("featureTypeColumn", "true");
+    formQuery.addQueryItem("lastUpdatedColumn", "true");
+    formQuery.addQueryItem("latLonColumn", "true");
+    formQuery.addQueryItem("originColumn", "true");
+    formQuery.addQueryItem("quadColumn", "true");
+    formQuery.addQueryItem("referenceColumn", "true");
+    formQuery.addQueryItem("targetColumn", "true");
 
     // Data units
-    encodedFormData.addQueryItem("is_0_360", "true");
-    encodedFormData.addQueryItem("is_planetographic", "false");
-    encodedFormData.addQueryItem("is_positive_east", "true");
+    formQuery.addQueryItem("is_0_360", "true");
+    formQuery.addQueryItem("is_planetographic", "false");
+    formQuery.addQueryItem("is_positive_east", "true");
 
     // Format parameters
-    encodedFormData.addQueryItem("displayType", "XML");
-    encodedFormData.addQueryItem("sort_asc", "true");
-    encodedFormData.addQueryItem("sort_column", "name");
+    formQuery.addQueryItem("displayType", "XML");
+    formQuery.addQueryItem("sort_asc", "true");
+    formQuery.addQueryItem("sort_column", "name");
 
     // Search critera (required even if blank)
-    encodedFormData.addQueryItem("approvalStatus", "");
-    encodedFormData.addQueryItem("beginDate", "");
-    encodedFormData.addQueryItem("continent", "");
-    encodedFormData.addQueryItem("endDate", "");
-    encodedFormData.addQueryItem("ethnicity", "");
-    encodedFormData.addQueryItem("feature", "");
-    encodedFormData.addQueryItem("featureType", "");
-    encodedFormData.addQueryItem("minFeatureDiameter", "");
-    encodedFormData.addQueryItem("maxFeatureDiameter", "");
-    encodedFormData.addQueryItem("reference", "");
-    encodedFormData.addQueryItem("system", "");
+    formQuery.addQueryItem("approvalStatus", "");
+    formQuery.addQueryItem("beginDate", "");
+    formQuery.addQueryItem("continent", "");
+    formQuery.addQueryItem("endDate", "");
+    formQuery.addQueryItem("ethnicity", "");
+    formQuery.addQueryItem("feature", "");
+    formQuery.addQueryItem("featureType", "");
+    formQuery.addQueryItem("minFeatureDiameter", "");
+    formQuery.addQueryItem("maxFeatureDiameter", "");
+    formQuery.addQueryItem("reference", "");
+    formQuery.addQueryItem("system", "");
 
-    encodedFormData.addQueryItem("target", target.toUpper());
-    encodedFormData.addQueryItem("easternLongitude",
+    formQuery.addQueryItem("target", target.toUpper());
+    formQuery.addQueryItem("easternLongitude",
                                 QString::number(endLon.degrees()));
-    encodedFormData.addQueryItem("westernLongitude",
+    formQuery.addQueryItem("westernLongitude",
                                 QString::number(startLon.degrees()));
-    encodedFormData.addQueryItem("northernLatitude",
+    formQuery.addQueryItem("northernLatitude",
                                  QString::number(endLat.degrees()));
-    encodedFormData.addQueryItem("southernLatitude",
+    formQuery.addQueryItem("southernLatitude",
                                  QString::number(startLat.degrees()));
 
-    m_networkMgr->post(*m_request, QByteArray(encodedFormData.encodedQuery()));
+    m_networkMgr->post(*m_request, formQuery.query(QUrl::FullyEncoded).toUtf8()); 
   }
 }

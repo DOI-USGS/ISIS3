@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "PvlGroup.h" // protected data member object (m_mappingGrp) 
+#include "PvlGroup.h" // protected data member object (m_mappingGrp)
 
 namespace Isis {
   class Displacement;
@@ -127,7 +127,7 @@ namespace Isis {
    *                           iterations for vesta (an asteroid). Fixes #279
    *   @history 2012-03-01 Jeff Anderson - Fixed bug in SetUpperLeftCorner by
    *                           adding Pvl::Replace when updating the mapping
-   *                           labels 
+   *                           labels
    *   @history 2012-03-30 Steven Lambright and Stuart Sides - To360Domain() and
    *                           To180Domain() are now constant time operations.
    *                           Fixes #656.
@@ -159,7 +159,7 @@ namespace Isis {
    *                           method which sometimes erroneously threw an exception. Added caching
    *                           to the TargetRadii(QString) method for performance reasons.
    *                           Fixes #1534.
-   *  
+   *
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
    *         "Get" from methods GetX and GetY, change methods to lower camel
@@ -175,11 +175,11 @@ namespace Isis {
       bool operator!= (const Projection &proj);
 
       /**
-       * This enum defines the subclasses of Projection supported in Isis 
+       * This enum defines the subclasses of Projection supported in Isis
        */
-      enum ProjectionType { Triaxial, /**< These projections are used to map 
+      enum ProjectionType { Triaxial, /**< These projections are used to map
                                                    triaxial and irregular-shaped bodies. */
-                                RingPlane  /**< These projections are used to map 
+                                RingPlane  /**< These projections are used to map
                                                    ring planes.*/
                               };
 
@@ -192,8 +192,8 @@ namespace Isis {
 
       // These return or change properties of the projection, independent of calculations
       /**
-       * This method returns the name of the map projection.  It is a pure 
-       * virtual method (requires all subclasses to override). 
+       * This method returns the name of the map projection.  It is a pure
+       * virtual method (requires all subclasses to override).
        *
        * @return string The name of the map projection.
        */
@@ -203,7 +203,7 @@ namespace Isis {
       virtual double LocalRadius() const = 0; // requires SetGround or SetCoordinate
 
       /**
-       * This method returns the Version of the map projection.  It is a pure 
+       * This method returns the Version of the map projection.  It is a pure
        * virtual method (requires all subclasses to override).
        *
        * @return string The Version number of the map projection.
@@ -211,7 +211,7 @@ namespace Isis {
       virtual QString Version() const = 0;
       virtual bool IsEquatorialCylindrical();
 
-      // Check azimuth /longitude domain or get domain as a string  
+      // Check azimuth /longitude domain or get domain as a string
       // TODO** check implementation to see if this can be generalized to
       // work for azimuth and longitude and go in Projection
 
@@ -264,7 +264,7 @@ namespace Isis {
       virtual double Scale() const = 0;
 
       // Return the x/y range which covers the lat/lon range in the labels
-      virtual bool XYRange(double &minX, double &maxX, 
+      virtual bool XYRange(double &minX, double &maxX,
                            double &minY, double &maxY) = 0;
 
       // set UpperLeftCornerX and UpperLeftCornerY in mapping group
@@ -277,50 +277,50 @@ namespace Isis {
       static double ToHours(double angle);
       static QString ToDMS(double angle);
       static QString ToHMS(double angle);
- 
+
     protected:
       virtual void XYRangeCheck(const double latitude, const double longitude) = 0;
-      //      bool xyRangeOblique(double &minX, double &maxX, 
+      //      bool xyRangeOblique(double &minX, double &maxX,
       //                          double &minY, double &maxY);
       void SetXY(double x, double y);
       void SetComputedXY(double x, double y);
       double GetX() const;
       double GetY() const;
-      double PixelResolution() const; 
+      double PixelResolution() const;
 
     private:
       // This is currently only used in triaxial projections.  In the future it may be needed by other types
-      /*      virtual void doSearch(double minBorder, double maxBorder, 
+      /*      virtual void doSearch(double minBorder, double maxBorder,
                     double &extremeVal, const double constBorder,
                     bool searchX, bool searchLongitude, bool findMin) = 0;
-      virtual void findExtreme(double &minBorder,  double &maxBorder, 
-                       double &minBorderX, double &minBorderY, 
-                       double &maxBorderX, double &maxBorderY, 
-                       const double constBorder, bool searchX, 
+      virtual void findExtreme(double &minBorder,  double &maxBorder,
+                       double &minBorderX, double &minBorderY,
+                       double &maxBorderX, double &maxBorderY,
+                       const double constBorder, bool searchX,
                        bool searchLongitude, bool findMin) = 0;
-      virtual void setSearchGround(const double variableBorder, 
+      virtual void setSearchGround(const double variableBorder,
                            const double constBorder, bool variableIsLat) = 0;
       */
     protected:
       WorldMapper *m_mapper;  /**< This points to a mapper passed into the
                                    SetWorldMapper method. This mapper allows the
-                                   programmer to specify a different world 
-                                   coordinate system. Thus the programmer could 
-                                   pass in line/sample positions in order to 
-                                   obtain a latitude/longitude or set a lat/lon 
+                                   programmer to specify a different world
+                                   coordinate system. Thus the programmer could
+                                   pass in line/sample positions in order to
+                                   obtain a latitude/longitude or set a lat/lon
                                    and get a line/sample.*/
 
       bool m_good;         /**< Indicates if the contents of m_x, m_y, 
                                 m_latitude, and m_longitude are valid.*/
 
       // TODO** Can this be generalized for both longitude and azimuth???
-      //            int m_longitudeDomain; /**< This integer is either 180 or 360 and is read 
-      //                                  from the labels. It represents the longitude 
+      //            int m_longitudeDomain; /**< This integer is either 180 or 360 and is read
+      //                                  from the labels. It represents the longitude
       //                                  domain when returning values through Longitude
       //                                  method. The domain is either -180 to 180 or
       //                                  0 to 360.**/
 
-      bool m_sky;                 /**< Indicates whether projection is sky or 
+      bool m_sky;                 /**< Indicates whether projection is sky or
                                        land.**/
 
       bool m_groundRangeGood;     /**< Indicates if the ground range (min/max
@@ -359,4 +359,3 @@ namespace Isis {
   };
 };
 #endif
-

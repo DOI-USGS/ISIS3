@@ -1,7 +1,10 @@
 #include "Environment.h"
 
+#include <iostream>
 #include <stdlib.h>
 
+#include <QString>
+#include <QStringList>
 #include <QCoreApplication>
 
 #ifndef __APPLE__
@@ -12,21 +15,57 @@
 #include "IString.h"
 #include "TextFile.h"
 
+ /**
+  *
+  *
+  */
+  static void QStartup() {
+    // Set the Qt plugin directory
+    QStringList pluginPaths;
+
+    Isis::IString root = Isis::Environment::getEnvironmentValue("ISISROOT", "");
+    QCoreApplication *core = QCoreApplication::instance();
+    if ( !core ) {
+      std::cout << "****  Qt Plugin Path is not set because no instance of QCoreApplication ****\n";
+    }
+    else {
+      Isis::IString thirdPartyPluginPath = root + "/3rdParty/plugins";
+      pluginPaths << thirdPartyPluginPath.ToQt();
+      core->setLibraryPaths(pluginPaths);
+    }
+   
+    return;
+  }
+
+// Add this to ensure Qt is set up properly
+Q_COREAPP_STARTUP_FUNCTION(QStartup);
 
 namespace Isis {
+
+
   Environment Environment::automaticEnvironmentSetup;
 
   Environment::Environment() {
+
+#if 0
     // Set the Qt plugin directory
     QStringList pluginPaths;
 
     IString root = getEnvironmentValue("ISISROOT", "");
+    std::cout << "ISISROOT=" << root << "\n";
 
     if (root != "") {
+
+      QCoreApplication *core = QCoreApplication::instance();
+      if ( !core ) {
+        std::cout << "QCoreApplication doesn't exist yet!\n";
+      }
       IString thirdPartyPluginPath = root + "/3rdParty/plugins";
       pluginPaths << thirdPartyPluginPath.ToQt();
+      std::cout << "PluginPaths=" << pluginPaths.join(";") << "\n";
       QCoreApplication::setLibraryPaths(pluginPaths);
     }
+#endif
 
 #ifndef __APPLE__
     // We need to force the correct QDBus library to be loaded... to do that, just
@@ -85,7 +124,7 @@ namespace Isis {
       
     QString value = defaultValue;
     
-    char *envValue = getenv(variable.toAscii().data());
+    char *envValue = getenv(variable.toLatin1().data());
     if (envValue)
       value = envValue;
       
@@ -131,4 +170,6 @@ namespace Isis {
 
     return line1 + " " + line4 + " | " + line2;
   }
+
+
 }

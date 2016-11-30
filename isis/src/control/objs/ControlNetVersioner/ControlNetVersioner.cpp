@@ -159,12 +159,12 @@ namespace Isis {
 
     ControlNetFileHeaderV0002 &header = latest->GetNetworkHeader();
 
-    header.set_networkid(network.findKeyword("NetworkId")[0].toAscii().data());
-    header.set_targetname(network.findKeyword("TargetName")[0].toAscii().data());
-    header.set_created(network.findKeyword("Created")[0].toAscii().data());
-    header.set_lastmodified(network.findKeyword("LastModified")[0].toAscii().data());
-    header.set_description(network.findKeyword("Description")[0].toAscii().data());
-    header.set_username(network.findKeyword("UserName")[0].toAscii().data());
+    header.set_networkid(network.findKeyword("NetworkId")[0].toLatin1().data());
+    header.set_targetname(network.findKeyword("TargetName")[0].toLatin1().data());
+    header.set_created(network.findKeyword("Created")[0].toLatin1().data());
+    header.set_lastmodified(network.findKeyword("LastModified")[0].toLatin1().data());
+    header.set_description(network.findKeyword("Description")[0].toLatin1().data());
+    header.set_username(network.findKeyword("UserName")[0].toLatin1().data());
     header.add_pointmessagesizes(0); // Just to pass the "IsInitialized" test
 
     if (!header.IsInitialized()) {

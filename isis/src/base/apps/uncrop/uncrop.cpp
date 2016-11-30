@@ -10,7 +10,8 @@ void IsisMain() {
   p.SetBandBinMatch(false);
 
   // Set the input cube for the process object
-  Cube *icube = p.SetInputCube("FROM");
+  // ihumphrey -- SetInputCube explicitly uses parameters for ProcessMosaic
+  Cube *icube = p.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
 
   // Set up the mosaic priority
   UserInterface &ui = Application::GetUserInterface();

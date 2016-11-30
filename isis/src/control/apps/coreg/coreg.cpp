@@ -240,7 +240,7 @@ void IsisMain() {
   if (ui.WasEntered("FLATFILE")) {
     QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
     ofstream os;
-    os.open(fFile.toAscii().data(), ios::out);
+    os.open(fFile.toLatin1().data(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
        "SampleDifference,LineDifference,GoodnessOfFit" << endl;
     for (int i = 0; i < cn.GetNumPoints(); i++) {

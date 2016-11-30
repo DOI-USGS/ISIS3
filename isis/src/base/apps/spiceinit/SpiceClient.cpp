@@ -2,12 +2,13 @@
 
 #include <sstream>
 
-#include <QUrl>
+#include <QDomElement>
+#include <QFile>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QFile>
-#include <QDomElement>
+#include <QUrl>
+#include <QUrlQuery>
 
 #include "Application.h"
 #include "Constants.h"
@@ -55,7 +56,7 @@ namespace Isis {
     raw = "<input_label>\n";
     raw += "  <isis_version>\n";
     QString version = Application::Version();
-    QByteArray isisVersionRaw(version.toAscii());
+    QByteArray isisVersionRaw(version.toLatin1());
     raw += QString(isisVersionRaw.toHex().constData()) + "\n";
     raw += "  </isis_version>\n";
 
@@ -80,7 +81,7 @@ namespace Isis {
     raw += "  </label>\n";
     raw += "</input_label>";
 
-    *p_xml = QString(QByteArray(raw.toAscii()).toHex().constData());
+    *p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
 
     int contentLength = p_xml->length();
     QString contentLengthStr = toString((BigInt)contentLength);
@@ -141,8 +142,10 @@ namespace Isis {
 
     QByteArray data;
     QUrl params;
-    params.addQueryItem("name", *p_xml);
-    data.append(params.encodedQuery());
+    QUrlQuery query;
+    query.addQueryItem("name", *p_xml);
+    params.setQuery(query);
+    data.append(params.toEncoded());
 
     p_networkMgr->post(*p_request, data);
     exec();
@@ -162,7 +165,7 @@ namespace Isis {
 
     try {
       *p_response = QString(
-          QByteArray::fromHex(QByteArray(p_rawResponse->toAscii())).constData());
+          QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
 
       // Make sure we can get the log out of it before continuing
       applicationLog();
@@ -194,10 +197,6 @@ namespace Isis {
             case QNetworkReply::NoError:
               break;
 
-            case QNetworkReply::TemporaryNetworkFailureError:
-              *p_error += ". There was a temporary network failure";
-              break;
-
             case QNetworkReply::ConnectionRefusedError:
               *p_error += ". The server refused the connection";
               break;
@@ -220,6 +219,26 @@ namespace Isis {
 
             case QNetworkReply::SslHandshakeFailedError:
               *p_error += ". Could not establish an encrypted connection";
+              break;
+
+            case QNetworkReply::TemporaryNetworkFailureError:
+              *p_error += ". There was a temporary network failure";
+              break;
+
+            case QNetworkReply::NetworkSessionFailedError:
+              *p_error += ". The connection was broken";
+              break;
+
+            case QNetworkReply::BackgroundRequestNotAllowedError:
+              *p_error += ". The background request is not allowed";
+              break;
+
+            case QNetworkReply::TooManyRedirectsError:
+              *p_error += ". The maximum limit of redirects was reached";
+              break;
+
+            case QNetworkReply::InsecureRedirectError:
+              *p_error += ". A redirect from https to http occurred";
               break;
 
             case QNetworkReply::ProxyConnectionRefusedError:
@@ -263,6 +282,27 @@ namespace Isis {
               *p_error += ". The server requests for you to try again";
               break;
 
+            case QNetworkReply::ContentConflictError:
+              *p_error += ". There is a conflict with the current state of the resource";
+              break;
+
+            case QNetworkReply::ContentGoneError:
+              *p_error += ". The requested resource is no longer available";
+              break;
+
+            case QNetworkReply::InternalServerError:
+              *p_error += ". The server encountered an unexpected error";
+              break;
+
+            case QNetworkReply::OperationNotImplementedError:
+              *p_error += ". The server does not support the functionality required to "
+                          "the request";
+              break;
+
+            case QNetworkReply::ServiceUnavailableError:
+              *p_error += ". The server is unable to handle the request at this time.";
+              break;
+
             case QNetworkReply::ProtocolUnknownError:
               *p_error += ". The attempted network protocol is unknown";
               break;
@@ -286,6 +326,10 @@ namespace Isis {
 
             case QNetworkReply::ProtocolFailure:
               *p_error += ". A breakdown in the protocol was detected";
+              break;
+
+            case QNetworkReply::UnknownServerError:
+              *p_error += ". An unknown error related to the server occurred.";
               break;
           }
 
@@ -372,7 +416,7 @@ namespace Isis {
     int errorLine, errorCol;
 
     if(!p_response->isEmpty() &&
-        document.setContent(QString(p_response->toAscii()),
+        document.setContent(QString(p_response->toLatin1()),
                             &errorMsg, &errorLine, &errorCol)) {
       return document.firstChild().toElement();
     }
@@ -423,7 +467,7 @@ namespace Isis {
     QDomElement kernelsLabel = findTag(root, "kernels_label");
     QString kernelsLabels = elementContents(kernelsLabel);
 
-    QString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
+    QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -447,7 +491,7 @@ namespace Isis {
     QDomElement logLabel = findTag(root, "application_log");
     QString logLabels = elementContents(logLabel);
 
-    QString unencoded(QByteArray::fromHex(logLabels.toAscii()).constData());
+    QString unencoded(QByteArray::fromHex(logLabels.toLatin1()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -543,7 +587,7 @@ namespace Isis {
     QDomElement kernelsLabel = findTag(root, "kernels_label");
     QString kernelsLabels = elementContents(kernelsLabel);
 
-    QString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
+    QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;

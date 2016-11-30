@@ -30,6 +30,7 @@
 
 #include "CnetEditorWidget.h"
 #include "Control.h"
+#include "ControlList.h"
 #include "ControlDisplayProperties.h"
 #include "Directory.h"
 #include "MosaicSceneItem.h"
@@ -58,8 +59,12 @@ namespace Isis {
   }
 
 
-  bool CnetEditorViewWorkOrder::isExecutable(QList<Control *> controls) {
-    return (controls.count() == 1);
+  bool CnetEditorViewWorkOrder::isExecutable(ControlList * controls) {
+
+    if (controls->count() >= 1)
+      return true;
+    else
+      return false;
   }
 
 
@@ -68,10 +73,7 @@ namespace Isis {
 
     if (success) {
       QUndoCommand::setText(tr("View control network [%1] in new cnet editor view")
-             //tjw
-            .arg(controlList()->first()->displayProperties()->displayName()));
-          //.arg(controlList().first()->displayProperties()->displayName()));
-
+          .arg(controlList()->first()->displayProperties()->displayName()));
     }
 
     return success;
@@ -85,11 +87,11 @@ namespace Isis {
 
 
   void CnetEditorViewWorkOrder::syncRedo() {
-    //project()->directory()->addCnetEditorView(controlList().first());
-    project()->directory()->addCnetEditorView(controlList()->first());
-
+    for (int i = 0; i < controlList()->size(); i++) {
+      //project()->directory()->addCnetEditorView(controlList().first());
+      project()->directory()->addCnetEditorView(controlList()->at(i));
+    }
   }
-
 
   void CnetEditorViewWorkOrder::syncUndo() {
     delete project()->directory()->cnetEditorViews().last();

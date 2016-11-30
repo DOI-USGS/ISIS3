@@ -1,0 +1,42 @@
+<RCC>
+  <qresource>
+    <file alias="data-management">icons/data_management.png</file>
+    <file alias="jigsaw">icons/jigsaw.png</file>
+    <file alias="results">icons/results.png</file>
+    <file alias="pointReg">icons/PointReg.png</file>
+    <file alias="spacecraft">icons/near_spacecraft.png</file>
+    <file alias="camera">icons/Camera-32.png</file>
+    <file alias="wifi">icons/wifi.png</file>
+    <file alias="lroLola">icons/lro_lola.jpg</file>
+    <file alias="folder">icons/folder_green_mypictures.png</file>
+    <file alias="pictures">icons/pictures.png</file>
+    <file alias="fileServer">icons/file_server.png</file>
+    <file alias="layers">icons/layers.png</file>
+    <file alias="moonPhase">icons/moon_phase_full.png</file>
+    <file alias="enceladus">icons/enceladus.png</file>
+    <file alias="moon">icons/moon.png</file>
+    <file alias="mars">icons/mars.png</file>
+    <file alias="titan">icons/titan.png</file>
+    <file alias="dem">icons/DEM.png</file>
+    <file alias="open">icons/open.png</file>
+    <file alias="save">icons/save.png</file>
+    <file alias="saveAs">icons/saveAs.png</file>
+    <file alias="close">icons/close.png</file>
+    <file alias="quit">icons/quit.png</file>
+    <file alias="add">icons/add.png</file>
+    <file alias="sort">icons/sort.png</file>
+    <file alias="ice">icons/ice.png</file>
+    <file alias="statistics">icons/statistics.png</file>
+    <file alias="settings">icons/settings.png</file>
+    <file alias="run">icons/run.png</file>
+    <file alias="enceladus-large">images/enceladus-large.png</file>
+    <file alias="enceladus-saturn">images/enceladus-saturn.png</file>
+    <file alias="europa-large">images/europa-large.png</file>
+    <file alias="moon-large">images/moon-large.png</file>
+    <file alias="mars-large">images/mars-large.png</file>
+    <file alias="titan-large">images/titan-large.png</file>
+    <file alias="hirise-camera">images/hirise-camera.png</file>
+    <file alias="apollo-metric-camera">images/apollo-metric-camera.png</file>
+    <file alias="cassini-iss-nac">images/cassini-iss-nac.png</file>
+  </qresource>
+</RCC>

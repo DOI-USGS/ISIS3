@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="amica2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
-<!-- $Id$ -->
+<!-- $Id: amica2isis.xml 6226 2015-06-09 20:46:13Z jwbacker@GS.DOI.NET $ -->
 
   <brief>Import PDS/FITS formatted Hayabusa image into ISIS cube</brief>
 

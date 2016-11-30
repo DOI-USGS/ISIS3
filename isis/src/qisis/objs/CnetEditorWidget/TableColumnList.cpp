@@ -6,7 +6,9 @@
 
 #include <QList>
 #include <QPair>
+#include <QString>
 
+#include "IException.h"
 #include "TableColumn.h"
 
 
@@ -53,8 +55,8 @@ namespace Isis {
         if (m_cols->at(i)->getTitle() == title)
           return (*m_cols)[i];
 
-      IString msg = "There is no column with a title of [";
-      msg += IString(title);
+      QString msg = "There is no column with a title of [";
+      msg += title;
       msg += "] inside this column list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -62,7 +64,7 @@ namespace Isis {
 
     void TableColumnList::append(TableColumn *newCol) {
       if (!newCol) {
-        IString msg = "Attempted to add NULL column to the columnlist";
+        QString msg = "Attempted to add NULL column to the columnlist";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -116,9 +118,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::lower(int visibleColumnIndex, bool emitSortOutDated) {
-      lower(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
-    }
+    //void TableColumnList::lower(int visibleColumnIndex, bool emitSortOutDated) {
+    //  lower(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
+    //}
 
 
     void TableColumnList::raise(TableColumn *col, bool emitSortOutDated) {
@@ -136,9 +138,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::raise(int visibleColumnIndex, bool emitSortOutDated) {
-      raise(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
-    }
+    //void TableColumnList::raise(int visibleColumnIndex, bool emitSortOutDated) {
+    //  raise(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
+    //}
 
 
     void TableColumnList::raiseToTop(TableColumn *col) {
@@ -149,9 +151,9 @@ namespace Isis {
     }
 
 
-    void TableColumnList::raiseToTop(int visibleColumnIndex) {
-      raiseToTop(indexOf(getVisibleColumns()[visibleColumnIndex]));
-    }
+    //void TableColumnList::raiseToTop(int visibleColumnIndex) {
+    //  raiseToTop(indexOf(getVisibleColumns()[visibleColumnIndex]));
+    //}
 
 
     int TableColumnList::size() const {
@@ -262,7 +264,7 @@ namespace Isis {
       ASSERT(m_cols);
 
       if (index < 0 || index >= m_cols->size()) {
-        IString msg = "index [";
+        QString msg = "index [";
         msg += index;
         msg += "] is out of range.  Size of list is: ";
         msg += m_cols->size();

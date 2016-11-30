@@ -1,16 +1,18 @@
 #include "MosaicGridToolConfigDialog.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDialog>
 #include <QDoubleValidator>
+#include <QElapsedTimer>
 #include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QtGui>
-#include <QElapsedTimer>
+#include <QSlider>
+#include <QtWidgets>
 
 #include "Angle.h"
 #include "IException.h"

@@ -1183,7 +1183,7 @@ namespace Isis {
       Projection *proj = InputCubes[0]->projection();
       proj->SetWorld(1.0, 1.0);
       ofstream os;
-      os.open(worldFile.toAscii().data(), ios::out);
+      os.open(worldFile.toLatin1().data(), ios::out);
 
       // X resolution
       os << std::fixed << setprecision(15)

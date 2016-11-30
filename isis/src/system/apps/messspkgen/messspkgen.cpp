@@ -80,7 +80,7 @@ QString convertUtcToTdb(QString utcTime) {
   // Remove any surrounding whitespace and the trailing " UTC", then replace
   // with TDB syntax
   QString orbitCutoffRaw = utcTime;
-  orbitCutoffRaw.trimmed();
+  (void)orbitCutoffRaw.trimmed();  // cast to void to silence unused reult warning
   orbitCutoffRaw.remove(QRegExp(" UTC$"));
 
   // We need to swap around the day and the year in order to go from UTC to TDB.
@@ -106,4 +106,3 @@ QString convertUtcToTdb(QString utcTime) {
   orbitCutoff += ".000 TDB";
   return orbitCutoff;
 }
-

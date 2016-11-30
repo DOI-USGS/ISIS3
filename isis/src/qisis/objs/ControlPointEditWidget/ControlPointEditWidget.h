@@ -4,30 +4,42 @@
 
 #include "ControlPoint.h"
 
+#include <QCloseEvent>
+#include <QHideEvent>
 #include <QPalette>
 #include <QPointer>
+#include <QStatusBar>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
 
 class QAction;
+class QBoxLayout;
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
 class QLabel;
 class QMainWindow;
 class QObject;
+class QPainter;
+class QPoint;
 class QPushButton;
 class QSplitter;
+class QStackedWidget;
+class QStandardItemModel;
+class QString;
 class QTableWidget;
 class QTextEdit;
+class QWidget;
 
 namespace Isis {
+  class Control;
   class ControlMeasureEditWidget;
   class ControlMeasure;
   class ControlNet;
   class Cube;
   class CubeViewport;
+  class Directory;
   class MdiCubeViewport;
   class SerialNumberList;
   class Stretch;
@@ -43,12 +55,14 @@ namespace Isis {
    *
    * @internal 
    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
+   *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
+   *                           query for shapes and other data from the project.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
 
     public:
-      ControlPointEditWidget(QWidget *parent, bool addMeasures = false);
+      ControlPointEditWidget(Directory *directory, QWidget *parent, bool addMeasures = false);
       virtual ~ControlPointEditWidget();
 
       //! Measure column values for the measure table
@@ -90,8 +104,12 @@ namespace Isis {
 
     public slots:
       void setSerialNumberList(SerialNumberList *snList);
-      void setControlNet(ControlNet *cnet, QString cnetFilename);
+      void setControl(Control *control);
       void setEditPoint(ControlPoint *controlPoint);
+      void deletePoint(ControlPoint *controlPoint);
+
+      void createControlPoint(double latitude, double longitude, Cube *cube = 0,
+                              bool isGroundSource = false);
 
       void updatePointInfo(ControlPoint &updatedPoint);
 //    void refresh();
@@ -111,13 +129,13 @@ namespace Isis {
       void setIgnoreLeftMeasure (bool ignore);
       void setLockRightMeasure (bool ignore);
       void setIgnoreRightMeasure (bool ignore);
-//    void updateSurfacePointInfo ();
 
       void selectLeftMeasure (int index);
       void selectRightMeasure (int index);
+      void nextRightMeasure();
+      void previousRightMeasure();
       void updateLeftMeasureInfo ();
       void updateRightMeasureInfo ();
-      void updateSurfacePointInfo ();
 
       void measureSaved();
       void checkReference();
@@ -152,11 +170,13 @@ namespace Isis {
       bool IsMeasureLocked(QString serialNumber);
       bool validateMeasureChange(ControlMeasure *m);
 
+      ControlMeasure *createTemporaryGroundMeasure();
 
 
     private:
 
       QPointer<QWidget> m_parent; //!< Parent widget
+      Directory *m_directory;
       bool m_addMeasuresButton;   //!< Indicates whether or not to add "Add Measures(s) to Point"
 
       QString m_cnetFileName; //!< Filename of the control network that is being modified
@@ -171,6 +191,7 @@ namespace Isis {
       QPointer<QAction> m_openTemplateFile; //!< Action to open a registration template file to disk
       QPointer<QAction> m_saveTemplateFile; //!< Action to save a registration template file to disk
       QPointer<QAction> m_saveTemplateFileAs; //!< Action to save a new registration template
+
 
       //! Pointer to control measure editor widget
       QPointer<ControlMeasureEditWidget> m_measureEditor;
@@ -187,36 +208,14 @@ namespace Isis {
       QPointer<QLabel> m_templateFileNameLabel; //!< Label for the template filename
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
-      QPointer<QLabel> m_numMeasures; //!< Label for number of measures in the current point
-      QPointer<QLabel> m_pointAprioriLatitude; //!< Label for current point's apriori latitude
-      QPointer<QLabel> m_pointAprioriLongitude; //!< Label for current point's apriori longitude
-      QPointer<QLabel> m_pointAprioriRadius; //!< Label for current point's apriori radius
-      //! Label for current point's apriori latitude radius sigma
-      QPointer<QLabel> m_pointAprioriLatitudeSigma;
-      //! Label for current point's apriori longitude sigma
-      QPointer<QLabel> m_pointAprioriLongitudeSigma;
-      //! Label for current point's apriori radius sigma
-      QPointer<QLabel> m_pointAprioriRadiusSigma;
-      QPointer<QLabel> m_pointLatitude; //!< Label for current point's latitude
-      QPointer<QLabel> m_pointLongitude; //!< Label for current point's longitude
-      QPointer<QLabel> m_pointRadius; //!< Label for current point's radius
+      QPointer<QLabel> m_numMeasures;
       
       QPointer<QCheckBox> m_lockPoint; //!< Checkbox that locks/unlocks the current point
       QPointer<QCheckBox> m_ignorePoint; //!< Checkbox to ignore the current point
       QPointer<QLabel> m_leftReference; //!< Label indicating if left measure is the reference
       QPointer<QLabel> m_leftMeasureType; //!< Label for the left measure's adjustment type
-      QPointer<QLabel> m_leftSampError; //!< Label for left measure's sample residual
-      QPointer<QLabel> m_leftLineError; //!< Label for left measure's line residual
-      QPointer<QLabel> m_leftSampShift; //!< Label for left measure's sample shift
-      QPointer<QLabel> m_leftLineShift; //!< Label for left measure's line shift
-      QPointer<QLabel> m_leftGoodness;  //!< Label for left measure's goodness of fit
-      QPointer<QLabel> m_rightGoodness; //!< Label for right measure's goodness of fit
       QPointer<QLabel> m_rightReference; //!< Label indicating if right measure is the reference
       QPointer<QLabel> m_rightMeasureType; //!< Label for the right measure's adjustment type
-      QPointer<QLabel> m_rightSampError; //!< Label for right measure's sample residual
-      QPointer<QLabel> m_rightLineError; //!< Label for right measure's line residual
-      QPointer<QLabel> m_rightSampShift; //!< Label for right measure's sample shift
-      QPointer<QLabel> m_rightLineShift; //!< Label for right measure's line shift
       QPointer<QCheckBox> m_lockLeftMeasure; //!< Checkbox to edit lock/unlock the left measure
       QPointer<QCheckBox> m_ignoreLeftMeasure; //!< Checkbox to ignore the left measure
       QPointer<QCheckBox> m_lockRightMeasure; //!< Checkbox to edit lock/unlock the right measure
@@ -224,6 +223,7 @@ namespace Isis {
 
       QPointer<QComboBox> m_leftCombo; //!< Combobox to load left measure into left chip viewport
       QPointer<QComboBox> m_rightCombo; //!< Combobox to load right measure into right chip viewport
+      QPointer<QStandardItemModel> m_model;
 
       QPointer<QMainWindow> m_measureWindow; //!< Main window for the the measure table widget
       QPointer<QTableWidget> m_measureTable; //!< Table widget for the measures
@@ -232,18 +232,18 @@ namespace Isis {
       SerialNumberList *m_serialNumberList; //!< Serial number list for the loaded cubes
       QPointer<ControlNet> m_controlNet; //!< Current control net
 
-//    QPointer<NewPointDialog> m_newPointDialog;
       QPointer<ControlPoint> m_newPoint; //!< New control point
       QString m_lastUsedPointId; //!< Point id of the last used control point
 
       QStringList m_pointFiles; //!< Associated files for current control point
 
-      QString m_leftFile; //<! Filename of left measure
+      QString m_leftFile; //!< Filename of left measure
       QPointer<ControlMeasure> m_leftMeasure; //!< Left control measure
       QPointer<ControlMeasure> m_rightMeasure; //!< Right control measure
       QScopedPointer<Cube> m_leftCube; //!< Left cube
       QScopedPointer<Cube> m_rightCube; //!< Right cube
 
+      QList<Cube *> m_pointCubes;
   };
 };
 #endif

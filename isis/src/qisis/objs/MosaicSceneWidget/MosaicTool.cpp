@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <QDebug>
 #include <QLabel>
 
 #include "FileName.h"
@@ -131,6 +132,7 @@ namespace Isis {
 
 
   void MosaicTool::mouseButtonRelease(QPointF, Qt::MouseButton s) {
+    //qDebug()<<"MosaicTool::mouseButtonRelease";
   }
 
 

@@ -254,7 +254,7 @@ void IsisMain() {
   if (ui.WasEntered("ERRORS")) {
     QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
-    errorsfile.open(errorname.toAscii().data());
+    errorsfile.open(errorname.toLatin1().data());
     errorsfile << errors.str();
     errorsfile.close();
   }
@@ -271,7 +271,7 @@ void IsisMain() {
   if (full) {
     QString outname = ui.GetFileName("TO");
     std::ofstream outfile;
-    outfile.open(outname.toAscii().data());
+    outfile.open(outname.toLatin1().data());
     outfile << output.str();
     outfile.close();
     if (outfile.fail()) {

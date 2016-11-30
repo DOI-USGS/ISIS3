@@ -31,6 +31,7 @@
 #include <string>
 
 #include <QMap>
+#include <QObject>
 
 #include "IException.h"
 #include "SpecialPixel.h"
@@ -39,11 +40,11 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Global function to convert from a string to a boolean. Known string values 
-   * include anything that remotely looks like a true or false.  For example, 
+   * Global function to convert from a string to a boolean. Known string values
+   * include anything that remotely looks like a true or false.  For example,
    * the following strings will return true:
    * "true", "t", "yes", "y", "on", "1".
-   * 
+   *
    * This function will throw an IException if the conversion is unsuccessful.
    *
    * @param string QString to be converted to a boolean.
@@ -97,8 +98,8 @@ namespace Isis {
 
 
   /**
-   * Global function to convert from a string to an integer. This function is 
-   * preferred over the QString::toInt() method since this function will throw an 
+   * Global function to convert from a string to an integer. This function is
+   * preferred over the QString::toInt() method since this function will throw an
    * IException if the conversion is unsuccessful.
    *
    * @param string QString to be converted to an integer.
@@ -152,17 +153,17 @@ namespace Isis {
   /**
    * Global function to convert from a string to a double. If the string begins
    * with 16# and ends with #, the function will assume it is hexadecimal and
-   * attempt to convert to a double. This function is preferred over the 
-   * QString::toDouble() method since this function will throw an IException 
+   * attempt to convert to a double. This function is preferred over the
+   * QString::toDouble() method since this function will throw an IException
    * if the conversion is unsuccessful.
    *
-   * @param string QString to be converted to a double. This may be a 
+   * @param string QString to be converted to a double. This may be a
    *               hexadecimal string.
    * @return The double equivalent to the string
    */
   double toDouble(const QString &string) {
     double result = 0.0;
-    
+
     if (string.startsWith("16#") && string.endsWith("#")) {
       try {
         stringstream s;
@@ -216,9 +217,9 @@ namespace Isis {
 
 
   /**
-   * Global function to convert a boolean to a string. The resulting string will 
+   * Global function to convert a boolean to a string. The resulting string will
    * be "Yes" (true) or "No" (false).
-   *  
+   *
    * @param boolToConvert Boolean value to be converted to a QString.
    * @return string Converted QString (Yes or No).
    */
@@ -228,10 +229,10 @@ namespace Isis {
 
 
   /**
-   * Global function to convert a character to a string. The resulting string will 
-   * be a string with length 1 which contains only the given ASCII 
-   * character. 
-   *  
+   * Global function to convert a character to a string. The resulting string will
+   * be a string with length 1 which contains only the given ASCII
+   * character.
+   *
    * @param charToConvert Character value to be converted to a QString.
    * @return string Converted QString.
    */
@@ -243,10 +244,10 @@ namespace Isis {
 
 
   /**
-   * Global function to convert an integer to a string. 
-   * 
+   * Global function to convert an integer to a string.
+   *
    * @param intToConvert Integer value to be converted to a QString.
-   * @return string Converted QString. 
+   * @return string Converted QString.
    */
   QString toString(const int &intToConvert) {
     return QString::number(intToConvert);
@@ -254,10 +255,10 @@ namespace Isis {
 
 
   /**
-   * Global function to convert an unsigned integer to a string. 
-   * 
+   * Global function to convert an unsigned integer to a string.
+   *
    * @param intToConvert Unsigned integer value to be converted to a QString.
-   * @return string Converted QString.  
+   * @return string Converted QString.
    */
   QString toString(const unsigned int &intToConvert) {
     return QString::number(intToConvert);
@@ -265,10 +266,10 @@ namespace Isis {
 
 
   /**
-   * Global function to convert a big integer to a string. 
-   * 
+   * Global function to convert a big integer to a string.
+   *
    * @param intToConvert Big integer value to be converted to a QString.
-   * @return string Converted QString.  
+   * @return string Converted QString.
    */
   QString toString(const BigInt &intToConvert) {
     return QString::number(intToConvert);
@@ -283,10 +284,10 @@ namespace Isis {
    *   If (log10(num) > 13.0) it is presented in scientific notation
    *   If (log10(num) >= -3 && log10(num) <= 13) it is presented in normal notation
    *   Trailing zeros are removed such that 5.000 is presented as 5.0
-   * 
+   *
    * @param doubleToConvert Double value to be converted to a QString.
    * @param precision Number of significant figures to convert.
-   * @return string Converted QString. 
+   * @return string Converted QString.
    */
   QString toString(double doubleToConvert, int precision) {
     // If number is zero, then it is not valid to do a log10 on it. To avoid this,
@@ -1396,7 +1397,7 @@ namespace Isis {
    * @return The modified output stream
    */
   std::ostream &operator<<(std::ostream &outputStream, const QString &string) {
-    return (outputStream << string.toAscii().data());
+    return (outputStream << string.toLatin1().data());
   }
 
 
@@ -1412,6 +1413,6 @@ namespace Isis {
    * @return The modified output stream
    */
   std::ostream &operator<<(std::ostream &outputStream, const QStringRef &string) {
-    return (outputStream << string.toString().toAscii().data());
+    return (outputStream << string.toString().toLatin1().data());
   }
 }

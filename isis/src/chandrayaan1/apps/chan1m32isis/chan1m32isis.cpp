@@ -65,6 +65,7 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
   g_oBuff = NULL;
   g_totalLinesAdded = 0;
   g_utcTable = NULL;
+  double calcOutputLines = 0;
 
   ProcessImportPds importPds;
   importPds.Progress()->SetText((QString)"Writing " + outputParamName + " file");
@@ -100,10 +101,13 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
     // acquisition processing needs to be removed. There are four possible flip/mirror mode 
     // combinations.
     // 1.  Descending yaw / Forward orbit limb - No changes in sample or line
-    // 2.  Descending yaw / Reverse orbit limb - Samples are reversed, first sample on west side of image
-    // 3.  Ascending yaw / Forward orbit limb - Lines/times are reversed so northernmost image line first,
-    //                                          Samples are reversed, first sample on west side of image
-    // 4.  Ascending yaw / Reverse orbit limb - Lines/times are reversed so northernmost image line first,
+    // 2.  Descending yaw / Reverse orbit limb - Samples are reversed, first sample on west side 
+    //                                           of image
+    // 3.  Ascending yaw / Forward orbit limb - Lines/times are reversed so northernmost image 
+    //                                          line first, Samples are reversed, first sample on
+    //                                          west side of image
+    // 4.  Ascending yaw / Reverse orbit limb - Lines/times are reversed so northernmost image 
+    //                                          line first,
     QString yawDirection = (QString) pdsLabel["CH1:SPACECRAFT_YAW_DIRECTION"];
     QString limbDirection = (QString) pdsLabel["CH1:ORBIT_LIMB_DIRECTION"];
     samplesNeedFlipped = ( ((yawDirection == "REVERSE") && (limbDirection == "DESCENDING")) ||
@@ -128,16 +132,37 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
 
         QString instMode = (QString) pdsLabel["INSTRUMENT_MODE_ID"];
         // Initialize to the value for a GLOBAL mode observation
-        g_expectedLineRate = .10176;
+        g_expectedLineRate = 0.10176;
         if (instMode == "TARGET") {
-          g_expectedLineRate = .05088;
+          g_expectedLineRate = 0.05088;
         }
 
-        iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
-        iTime lastEt((QString)(*g_utcTable)[importPds.Lines()-1]["UtcTime"]);
-
         // The UTC line time table has been flipped in the same manner as the image lines, thus fabs
-        outputLines = ceil(fabs(lastEt - firstEt) / g_expectedLineRate + 1.0);
+        // Search the time table for gaps to come up with an output cube number of lines
+        // The times in the table are documented as the time at the center of the exposure/frame, so
+        // consecutive records in the time table should differ by the exposure rate, if not then
+        // there is a potential gap.
+        // This was calculated in the previous version of this code, but there is a minor difference 
+        // between the calculation and the following brute force method.
+        outputLines = 0;
+        for (int rec = 0; rec < g_utcTable->Records() - 1; rec++) {
+          outputLines++; // One for this line
+
+          iTime thisEt((QString)(*g_utcTable)[rec]["UtcTime"]); 
+          iTime nextEt((QString)(*g_utcTable)[rec+1]["UtcTime"]);
+          double delta = fabs(nextEt - thisEt); // Time table may be assending or decenting times
+
+          while (delta > g_expectedLineRate * 1.9) {
+            outputLines++; // Big enough gap to need more line(s)
+            delta -= g_expectedLineRate;
+          }
+        }
+        outputLines++; // One more for the last line
+
+        iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]); 
+        iTime lastEt((QString)(*g_utcTable)[g_utcTable->Records()-1]["UtcTime"]);
+        calcOutputLines = fabs((lastEt + g_expectedLineRate / 2.0) - 
+                               (firstEt - g_expectedLineRate / 2.0)) / g_expectedLineRate;
       }
       else {
         QString msg = "Input file [" + in.expanded() +
@@ -147,6 +172,7 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
     }
     else {
       outputLines = importPds.Lines();
+      calcOutputLines = outputLines;
     }
 
     // Since the output cube possibly has more lines then the input PDS image, due to dropped 
@@ -168,14 +194,18 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
     }
     else {
       importPds.StartProcess(writeCubeWithDroppedLines);
-      g_results += PvlKeyword("LinesAdded", toString(g_totalLinesAdded));
       g_results += PvlKeyword("LinesFlipped", toString(linesNeedFlipped));
       g_results += PvlKeyword("SamplesFlipped", toString(samplesNeedFlipped));
+      g_results += PvlKeyword("LinesAdded", toString(g_totalLinesAdded));
+      g_results += PvlKeyword("OutputLines", toString(outputLines));
+      g_results += PvlKeyword("CalculatedOutputLines", toString(calcOutputLines));
     }
 
     delete g_oBuff;
 
     // If the image lines need flipped then so does the UTC table, if it exists.
+    // This does not need to be done before the main processing because the flipping of 
+    // the image is done after the main processing.
     if (fileType != ProcessImportPds::L0) {
       if (linesNeedFlipped) {
         flipUtcTable(*g_utcTable);
@@ -213,6 +243,8 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
 }
 
 
+// Processing function for writing all input PDS lines to the output cube.
+// No dropped lines are inserted.
 void writeCube(Buffer &in) {
 
   for (int i = 0; i < in.size(); i++) {
@@ -224,7 +256,8 @@ void writeCube(Buffer &in) {
 }
 
 
-
+// Processing function for writing all input PDS lines to the output cube with dropped lines
+// inserted where the time table shows gaps.
 void writeCubeWithDroppedLines(Buffer &in) {
 
   // Always write the current line to the output cube first
@@ -236,12 +269,16 @@ void writeCubeWithDroppedLines(Buffer &in) {
   (*g_oBuff)++;
 
   // Now check the UTC_TIME table and see if there is a gap (missing lines) after the TIME record
-  // for the current line. If there are, add as many line as are necessary to fill the gap. 
+  // for the current line. If there are, add as many lines as are necessary to fill the gap. 
   // Since the PDS files are in BIL order we are writeing to the ISIS cube in that order, so we 
   // do not need to write NULL lines to fill a gap until we have written the last band of line N,
   // and we don't have to check for gaps after the last lines of the PDS file. 
 
   if (in.Band() == g_oCube->bandCount() && in.Line() < g_utcTable->Records()) {
+
+    QString tt = (QString)(*g_utcTable)[in.Line() - 1]["UtcTime"];
+    QString ttt = (QString)(*g_utcTable)[in.Line()]["UtcTime"];
+
     iTime thisEt((QString)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
     iTime nextEt((QString)(*g_utcTable)[in.Line()]["UtcTime"]);
 
@@ -270,8 +307,7 @@ void writeCubeWithDroppedLines(Buffer &in) {
 }
 
 
-
-
+// Transfere the needed PDS labels to the ISIS Cube and update them where necessary
 void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
                                    ProcessImportPds::PdsFileType fileType) {
   Pvl outLabel;
@@ -304,30 +340,62 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
     QString lsk = "$base/kernels/lsk/naif????.tls";
     FileName lskName(lsk);
     lskName = lskName.highestVersion();
-    furnsh_c(lskName.expanded().toAscii().data());
+    furnsh_c(lskName.expanded().toLatin1().data());
 
     QString sclk = "$chandrayaan1/kernels/sclk/aig_ch1_sclk_complete_biased_m1p???.tsc";
     FileName sclkName(sclk);
     sclkName = sclkName.highestVersion();
-    furnsh_c(sclkName.expanded().toAscii().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
 
     SpiceInt sclkCode = -86;
 
-    QString startTime = inst["SpacecraftClockStartCount"];
-    double et;
-    scs2e_c(sclkCode, startTime.toAscii().data(), &et);
-    iTime startEt(et);
-    inst.findKeyword("StartTime").setValue(startEt.UTC());
+    // Remmoved when we found out the lable counts are not as correct as we need. We use the time
+    // tables instead (see below)
+    //QString startTime = inst["SpacecraftClockStartCount"];
+    //double et;
+    //scs2e_c(sclkCode, startTime.toAscii().data(), &et);
+    //iTime startEt(et);
+    //inst.findKeyword("StartTime").setValue(startEt.UTC());
 
-    QString stopTime = inst["SpacecraftClockStopCount"];
-    scs2e_c(sclkCode, stopTime.toAscii().data(), &et);
-    iTime stopEt(et);
-    inst.findKeyword("StopTime").setValue(stopEt.UTC());
+    //QString stopTime = inst["SpacecraftClockStopCount"];
+    //scs2e_c(sclkCode, stopTime.toAscii().data(), &et);
+    //iTime stopEt(et);
+    //inst.findKeyword("StopTime").setValue(stopEt.UTC());
+
+    // Replace code above with this
+    // The start and stop times in the PDS labels do not match the UTC table times.
+    // Assume the UTC table times are better, so change the labels to match the table
+    // The start and stop clock counts need to match the start/stop time, so convert the times
+    // to new clock counts.
+    iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
+    iTime lastEt((QString)(*g_utcTable)[utcTable.Records()-1]["UtcTime"]);
+
+    // The table is in assending order
+    // The table contains the middle of the exposure. include times to cover the beginning of
+    // line 1 and the end of line NL
+    if (firstEt < lastEt) {
+      firstEt = firstEt - (g_expectedLineRate / 2.0);
+      lastEt = lastEt + (g_expectedLineRate / 2.0);
+    }
+    else {
+      firstEt = lastEt - (g_expectedLineRate / 2.0);
+      lastEt = firstEt + (g_expectedLineRate / 2.0);
+    }
+
+    inst.findKeyword("StartTime").setValue(firstEt.UTC());
+    SpiceChar startClockString[100];
+    sce2s_c (sclkCode, firstEt.Et(), 100, startClockString);
+    QString startClock(startClockString);
+    inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
+
+    inst.findKeyword("StopTime").setValue(lastEt.UTC());
+    SpiceChar stopClockString[100];
+    sce2s_c (sclkCode, lastEt.Et(), 100, stopClockString);
+    QString stopClock(stopClockString);
+    inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
   }
 
   ocube->putGroup(inst);
-
-
 
   if (fileType == ProcessImportPds::L0 || fileType == ProcessImportPds::Rdn) {
     // Setup the band bin group

@@ -141,8 +141,8 @@ namespace Isis {
   }
 
   /**
-   * Returns the latitude of true scale, in degrees.  In the case of 
-   * PointPerspective it is the center latitude. 
+   * Returns the latitude of true scale, in degrees.  In the case of
+   * PointPerspective it is the center latitude.
    *
    * @return double The center latitude.
    */
@@ -316,11 +316,9 @@ namespace Isis {
 
     // Walk top and bottom edges
     for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
-      lat = lat;
       lon = m_minimumLongitude;
       XYRangeCheck(lat, lon);
 
-      lat = lat;
       lon = m_maximumLongitude;
       XYRangeCheck(lat, lon);
     }
@@ -328,11 +326,9 @@ namespace Isis {
     // Walk left and right edges
     for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
       lat = m_minimumLatitude;
-      lon = lon;
       XYRangeCheck(lat, lon);
 
       lat = m_maximumLatitude;
-      lon = lon;
       XYRangeCheck(lat, lon);
     }
 
@@ -405,11 +401,11 @@ namespace Isis {
 } // end namespace isis
 
 /**
- * This is the function that is called in order to instantiate a 
- * PointPerspectve object. 
+ * This is the function that is called in order to instantiate a
+ * PointPerspectve object.
  *
- * @param lab The Pvl from the cube labels 
- * @param allowDefaults Indicates whether defaults are allowed. 
+ * @param lab The Pvl from the cube labels
+ * @param allowDefaults Indicates whether defaults are allowed.
  *
  * @return Isis::Projection* PointPerspective
  */
@@ -417,4 +413,3 @@ extern "C" Isis::Projection *PointPerspectivePlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::PointPerspective(lab, allowDefaults);
 }
-

@@ -46,8 +46,8 @@ using namespace std;
 namespace Isis {
 
 
-  /** 
-   * Default constructor. This constructor initializes the PDS table name to 
+  /**
+   * Default constructor. This constructor initializes the PDS table name to
    * TABLE.
    *
    * If this constructor is used, the load() method will need to be called to
@@ -65,12 +65,12 @@ namespace Isis {
   /**
    * @brief This constructor automatically loads the given label and table files.
    *
-   * This constructor takes the name of the label file describing the PDS 
-   * table, the table data file name, and the name of the PDS table object.  
-   * It will extract the description of the columns and read the contents of the 
+   * This constructor takes the name of the label file describing the PDS
+   * table, the table data file name, and the name of the PDS table object.
+   * It will extract the description of the columns and read the contents of the
    * table data file.
    *
-   * If no table file is given or an empty QString is given for the table file, 
+   * If no table file is given or an empty QString is given for the table file,
    * the table location will be read from the label file.
    *
    * If no table name is given, the default name for the object is TABLE.
@@ -80,7 +80,7 @@ namespace Isis {
    * @param pdsLabFile Name of table label file
    * @param pdsTableFile Name of table data file
    * @param pdsTableName The name of the table object in the PDS file.
-   * 
+   *
    * @internal
    *   @history 2016-02-24 Ian Humphrey - pdsTableName param is now being passed to load
    *                           method. References #2397.
@@ -95,19 +95,19 @@ namespace Isis {
 
   /**
    * Destructs the ImportPdsTable object.
-   */ 
+   */
   ImportPdsTable::~ImportPdsTable() {
   }
 
 
   /** Return the name of the PDS table */
-  QString ImportPdsTable::name() const { 
+  QString ImportPdsTable::name() const {
     return (m_tableName);
   }
 
   /**
    * Set the name of the PDS table object
-   * 
+   *
    * @param name New name for the PDS table object
    */
   void ImportPdsTable::setName(const QString &name) {
@@ -124,16 +124,16 @@ namespace Isis {
    * otherwise, the location of the table data is extracted from the ^TABLE_NAME
    * keyword in the provided labels.  The table data is then loaded.
    *
-   * This method needs to be called if the default constructor is used. 
-   * Otherwise, it is invoked in the constructor that takes the label, table 
-   * file, and table name. This method may be used to overwrite the label and 
+   * This method needs to be called if the default constructor is used.
+   * Otherwise, it is invoked in the constructor that takes the label, table
+   * file, and table name. This method may be used to overwrite the label and
    * table file used. When it is invoked, the current contents of the object are
    * discarded.
    *
    * This method is used for ASCII or BINARY PDS tables.
    *
    * @param pdsLabFile Name of PDS table label file
-   * @param pdsTableFile Name of PDS table data file to be imported into Isis 
+   * @param pdsTableFile Name of PDS table data file to be imported into Isis
    *                (optional)
    * @param pdsTableName Name of the table object in the PDS file (optional)
    *
@@ -166,13 +166,13 @@ namespace Isis {
       // file name, not a location in the label file.
       if (!tableFile.fileExists()) {
         // if the table file name doesn't exist, try lowercased version...
-        FileName tableFileLowercase(tableFile.path() + "/" 
+        FileName tableFileLowercase(tableFile.path() + "/"
                                     + tableFile.name().toLower());
         if (!tableFileLowercase.fileExists()) {
           IString msg = "Unable to import PDS table.  Neither of the following "
-                        "possible table files were found: [" 
-                        + tableFile.expanded() + "]  or [" 
-                        + tableFileLowercase.expanded() + "]";  
+                        "possible table files were found: ["
+                        + tableFile.expanded() + "]  or ["
+                        + tableFileLowercase.expanded() + "]";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
         tableFile = tableFileLowercase.expanded();
@@ -188,8 +188,8 @@ namespace Isis {
   }
 
 
-  /** 
-   * This method determines whether the PDS table has a column with the given 
+  /**
+   * This method determines whether the PDS table has a column with the given
    * name.
    *
    * This method can be called for ASCII or BINARY PDS tables.
@@ -206,10 +206,10 @@ namespace Isis {
   /**
    * @brief Returns the name of the specifed column
    *
-   * This method will return the name of a specified column by index. It also 
-   * has the option to format the column name to Camel-Case.  This will remove 
-   * all left and right parens, convert white space to spaces, compress 
-   * consecutive spaces to only one space.  It then removes the spaces 
+   * This method will return the name of a specified column by index. It also
+   * has the option to format the column name to Camel-Case.  This will remove
+   * all left and right parens, convert white space to spaces, compress
+   * consecutive spaces to only one space.  It then removes the spaces
    * converting the next character to uppercase.
    *
    * This method can be called for ASCII or BINARY PDS tables.
@@ -226,9 +226,9 @@ namespace Isis {
   QString ImportPdsTable::getColumnName(const unsigned int &index,
                                         const bool &formatted) const {
     if ((int) index >= columns() - 1) {
-      QString msg = "Unable to import the binary PDS table [" + m_tableName 
-                    + "] into Isis. The requested column index [" 
-                    + toString((int) index) + "] exceeds the last column index [" 
+      QString msg = "Unable to import the binary PDS table [" + m_tableName
+                    + "] into Isis. The requested column index ["
+                    + toString((int) index) + "] exceeds the last column index ["
                     + toString(columns() - 1) + "]";
       throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
     }
@@ -268,7 +268,7 @@ namespace Isis {
   /**
    * @brief Get the type associated with the specified column
    *
-   * This method returns the datatype associated with the specfied column.  If 
+   * This method returns the datatype associated with the specfied column.  If
    * the column does not exist, an empty QString is returned.
    *
    * This method can be called for ASCII or BINARY PDS tables.
@@ -293,7 +293,7 @@ namespace Isis {
   /**
    * @brief Change the datatype for a column
    *
-   * This method changes the data type the specified column. If the column can not be found, 
+   * This method changes the data type the specified column. If the column can not be found,
    * false is returned (indicating an unsuccessful change).
    *
    * This method can be called for ASCII or BINARY PDS tables.
@@ -338,7 +338,7 @@ namespace Isis {
       return (table);
     }
     catch (IException &e) {
-      QString msg = "Unable to import the PDS table [" + m_tableName 
+      QString msg = "Unable to import the PDS table [" + m_tableName
                     + "] from the PDS file [" + m_pdsTableFile + "] into Isis.";
       throw IException(e, IException::Unknown, msg.toStdString(), _FILEINFO_);
 
@@ -353,8 +353,8 @@ namespace Isis {
    * typically used for a single column, but any number of columns can be
    * provided.  colnames is a comma delimited QString that contains the name of
    * the columns that will be exported in the table.
-   *  
-   * This method should only be called for ASCII PDS tables. If needed for 
+   *
+   * This method should only be called for ASCII PDS tables. If needed for
    * BINARY tables, implementation should be added and tested.
    *
    * @param colNames String containing comma delimited column names to export
@@ -374,14 +374,14 @@ namespace Isis {
    * This method extracts columns specified by the caller.  If the requested
    * column does not exist, an exception is thrown.
    *
-   * This method should only be called for ASCII PDS tables. If needed for 
+   * This method should only be called for ASCII PDS tables. If needed for
    * BINARY tables, implementation should be added and tested.
    *
    * @param colNames QStringList of column names to convert to a table.
    * @param isisTableName  Name of the table to create.
    *
    * @return Table Table containing the specified columns
-   * 
+   *
    * @throws IException::Programmer "Unable to import the PDS table into Isis. The requested
    *                                 column name does not exist in table."
    */
@@ -391,10 +391,10 @@ namespace Isis {
     for (int i = 0 ; i < colnames.size() ; i++) {
       const ColumnDescr *descr = findColumn(colnames[i]);
       if (!descr) {
-        QString msg = "Unable to import the PDS table [" + m_tableName 
-                      + "] into Isis. The requested column name [" 
+        QString msg = "Unable to import the PDS table [" + m_tableName
+                      + "] into Isis. The requested column name ["
                       + colnames[i] + "] does not "
-                      "exist in table."; 
+                      "exist in table.";
         throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
       }
       ctypes.push_back(*descr);
@@ -408,7 +408,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Initialize object variables.
    *
    * This method is used for ASCII or BINARY PDS tables.
@@ -431,11 +431,11 @@ namespace Isis {
    *
    * The pdsLabFile parameter contains the name of a PDS label describing the
    * contents of a PDS table data file.  The label will be loaded and parsed by this
-   * method. The name of the table data file is returned in the pdsTableFile 
+   * method. The name of the table data file is returned in the pdsTableFile
    * parameter. The table data file is not loaded.
    *
    * If the tblname parameter is not provided or is empty, the table's name set
-   * during construction or with the setName() method will be used to find the 
+   * during construction or with the setName() method will be used to find the
    * table object in the PDS label file.
    *
    * This method is used for ASCII or BINARY PDS tables.
@@ -450,7 +450,7 @@ namespace Isis {
    *                           The PDS INTERCHANGE_FORMAT is not supported. Valid values are
    *                           ASCII or BINARY."
    */
-  void ImportPdsTable::loadLabel(const QString &pdsLabFile, 
+  void ImportPdsTable::loadLabel(const QString &pdsLabFile,
                                  QString &pdsTableFile,
                                  const QString &tblname) {
 
@@ -476,21 +476,21 @@ namespace Isis {
     PvlObject *tableDetails = &tabObj;
     if (label.hasKeyword("^" + tableName)) {
       trueTableName = tableName;
-      pdsTableFile = FileName(pdsLabFile).path() + "/" 
+      pdsTableFile = FileName(pdsLabFile).path() + "/"
                      + label["^" + tableName][0];
     }
     else if (tabObj.objects() == 1) {
       trueTableName = tabObj.object(0).name();
       tableDetails = &tabObj.object(0);
-      pdsTableFile = FileName(pdsLabFile).path() + "/" 
+      pdsTableFile = FileName(pdsLabFile).path() + "/"
                      + tabObj["^" + trueTableName][0];
     }
     m_trows = (int) tableDetails->findKeyword("ROWS");
     int ncols =  (int) tableDetails->findKeyword("COLUMNS");
     m_pdsTableType = QString(tableDetails->findKeyword("INTERCHANGE_FORMAT"));
     if (m_pdsTableType != "ASCII" && m_pdsTableType.toUpper() != "BINARY") {
-      QString msg = "Unable to import the PDS table [" + tableName 
-                    + "] from the PDS file [" 
+      QString msg = "Unable to import the PDS table [" + tableName
+                    + "] from the PDS file ["
                     + pdsTableFile + "] into Isis. "
                     "The PDS INTERCHANGE_FORMAT [" + m_pdsTableType
                     + "] is not supported. Valid values are ASCII or BINARY.";
@@ -524,12 +524,12 @@ namespace Isis {
   /**
    * @brief Loads the contents of a PDS table data file
    *
-   * This method opens and reads the contents of a PDS table data file.  Values 
-   * for each column are extracted from each row according to the label 
-   * description. The entire table contents are stored internally. 
+   * This method opens and reads the contents of a PDS table data file.  Values
+   * for each column are extracted from each row according to the label
+   * description. The entire table contents are stored internally.
    *
-   * Note that the table label description must already be loaded in this 
-   * object. 
+   * Note that the table label description must already be loaded in this
+   * object.
    *
    * This method is called by the load() method if the PDS file is ASCII.
    *
@@ -574,7 +574,7 @@ namespace Isis {
    * @return ImportPdsTable::ColumnType Returns internal struct of column
    *         description
    */
-  ImportPdsTable::ColumnDescr 
+  ImportPdsTable::ColumnDescr
       ImportPdsTable::getColumnDescription(PvlObject &colobj, int nth) const {
     ColumnDescr cd;
     cd.m_name = colobj["NAME"][0];
@@ -601,18 +601,18 @@ namespace Isis {
       cd.m_items = (int) colobj["ITEMS"];
     }
 
-    return (cd); 
+    return (cd);
   }
 
 
   /**
    * @brief Retrieve a column description by index
-   * 
+   *
    * @author 2015-07-17 Kris Becker
-   * 
+   *
    * @param nth Index of column description to retrieve, starting at 0
-   * 
-   * @return const ImportPdsTable::ColumnDescr& Reference to requested column 
+   *
+   * @return const ImportPdsTable::ColumnDescr& Reference to requested column
    *                                            description
    *
    * @throws IException::Programmer "Index ([nth]) into Columns invalid (max: [columns])"
@@ -621,7 +621,7 @@ namespace Isis {
 
     // Ensure the nrequested column is valid
     if ( (nth >= columns()) || ( nth < 0) ) {
-      QString mess = "Index (" + QString::number(nth) + 
+      QString mess = "Index (" + QString::number(nth) +
       ") into Columns invalid (max: " + QString::number(columns()) + ")";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
@@ -634,7 +634,7 @@ namespace Isis {
   /**
    * @brief Searches internal column descriptors for a named column
    *
-   * This method converts the column names to a formatted name for consistency 
+   * This method converts the column names to a formatted name for consistency
    * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
@@ -660,7 +660,7 @@ namespace Isis {
   /**
    * @brief Searches internal column descriptors for a named column
    *
-   * This method converts the column names to a formatted name for consistency 
+   * This method converts the column names to a formatted name for consistency
    * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
@@ -710,7 +710,7 @@ namespace Isis {
    * @param delimiter Delimiter used to delimit column fields (optional)
    *
    * @return QStringList Returns the extracted column fields as a QStringList
-   * 
+   *
    * @internal
    *   @history 2016-02-24 Ian Humphrey - Modified logic to correctly determine when item size is
    *                           not specified. References #2397.
@@ -723,7 +723,7 @@ namespace Isis {
     QString value = getColumnValue(tline, cdesc, delimiter);
     if ( 1 == cdesc.m_items) return ( QStringList(value) );
 
-    // If there is no item size specified, see if we should seperate with 
+    // If there is no item size specified, see if we should seperate with
     // delimiter
     if ( 0 == cdesc.m_itemBytes ) {
       if ( delimiter.isEmpty() ) return ( QStringList(value));
@@ -747,14 +747,14 @@ namespace Isis {
    * @brief Converts a column name to a camel-case after it has been cleansed
    *
    * This method will convert a column name to camel-case after some character
-   * cleaning is performed.  All white space characters as defined by the 
-   * IString class are converted to spaces.  Spaces are then compressed to one 
-   * space. Any left/right parens are removed.  Then the conversion to 
+   * cleaning is performed.  All white space characters as defined by the
+   * IString class are converted to spaces.  Spaces are then compressed to one
+   * space. Any left/right parens are removed.  Then the conversion to
    * camel-case is performed.
    *
-   * Camel case always converts the first character in a QString to uppercase. 
-   * Any space or '_' character are removed and the following character is 
-   * converted to uppercase.  All other characters are converted to lowercase. 
+   * Camel case always converts the first character in a QString to uppercase.
+   * Any space or '_' character are removed and the following character is
+   * converted to uppercase.  All other characters are converted to lowercase.
    *
    * This method can be called for ASCII or BINARY PDS tables.
    *
@@ -815,9 +815,9 @@ namespace Isis {
    *
    * All PDS data types that have INTEGER in their type are stored as an Integer
    * field type.  PDS columns with DOUBLE, REAL or FLOAT are stored as Doubles.
-   * All other types are Text types. 
-   *  
-   * This method is called for ASCII or BINARY PDS tables. 
+   * All other types are Text types.
+   *
+   * This method is called for ASCII or BINARY PDS tables.
    *
    * @param cdesc Column description to create the TableField from
    *
@@ -830,7 +830,7 @@ namespace Isis {
       if ( dtype == "INTEGER" ) {
         return (TableField(name, TableField::Integer));
       }
-      else if ( ((dtype == "DOUBLE") 
+      else if ( ((dtype == "DOUBLE")
               || (dtype == "REAL")
               || (dtype == "FLOAT")) ) {
         return (TableField(name, TableField::Double));
@@ -848,13 +848,13 @@ namespace Isis {
   /**
    * @brief Creates a TableRecord for columns
    *
-   * This method creates a TableRecord for each column in the table.  This 
-   * record should be provided when creating the ISIS Table object.  It can also 
-   * be used to populate the table.  TableFields are added in the order provided 
-   * in ctypes. 
+   * This method creates a TableRecord for each column in the table.  This
+   * record should be provided when creating the ISIS Table object.  It can also
+   * be used to populate the table.  TableFields are added in the order provided
+   * in ctypes.
    *
-   * This method is called for ASCII or BINARY PDS tables. 
-   *  
+   * This method is called for ASCII or BINARY PDS tables.
+   *
    * @param ctypes  Columns to create fields for and add to record
    *
    * @return TableRecord Returns TableRecord of columns/fields
@@ -875,8 +875,8 @@ namespace Isis {
    * This routine will extract the column and convert to a TableField with the
    * appropriate type to contain the field.
    *
-   * This method is only called for ASCII PDS tables. 
-   *  
+   * This method is only called for ASCII PDS tables.
+   *
    * @param cols Columns for a given row
    * @param cdesc Column description used to create TableField
    * @param tfield Isis3 TableField used to determine the data type to be imported.
@@ -945,7 +945,7 @@ namespace Isis {
    * fields.
    *
    * This method is used for ASCII or BINARY PDS tables.
-   *  
+   *
    * @param table   ISIS Table object to populate
    * @param cols PDS Column map to extract data
    * @param record  ISIS TableRecord with fields to contain PDS columns
@@ -953,7 +953,7 @@ namespace Isis {
    * @throws IException::Programmer "Failed to convert data in row [row number]"
    * @throws IException::Unknown "Unable to open file containing PDS table [table file]."
    */
-  void ImportPdsTable::fillTable(Table &table, 
+  void ImportPdsTable::fillTable(Table &table,
                                  const ColumnTypes &cols,
                                  TableRecord &record) const {
     if (m_pdsTableType == "ASCII") {
@@ -970,10 +970,10 @@ namespace Isis {
 
     else {
       QString tempTblFile = m_pdsTableFile;
-      ifstream pdsFileStream(tempTblFile.toAscii().data(), ifstream::binary);
+      ifstream pdsFileStream(tempTblFile.toLatin1().data(), ifstream::binary);
 
       if (!pdsFileStream) {
-        IString msg = "Unable to open file containing PDS table [" 
+        IString msg = "Unable to open file containing PDS table ["
                       + tempTblFile + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1002,8 +1002,8 @@ namespace Isis {
    *
    * @return int The number of columns.
    */
-  int ImportPdsTable::columns() const { 
-    return (m_coldesc.size()); 
+  int ImportPdsTable::columns() const {
+    return (m_coldesc.size());
   }
 
 
@@ -1014,24 +1014,24 @@ namespace Isis {
    *
    * @return int The number of rows.
    */
-  int ImportPdsTable::rows() const { 
-    return (m_rows.size()); 
+  int ImportPdsTable::rows() const {
+    return (m_rows.size());
   }
 
 
-  /** 
-   * This method is used to set the field values for the given record. These 
-   * values are extracted from the given binary buffer containing the PDS 
-   * table data for the corresponding row. 
-   *  
-   * This method is only called for BINARY PDS tables. 
-   *  
-   * @param rowBuffer Buffer containing the binary information for one row of 
+  /**
+   * This method is used to set the field values for the given record. These
+   * values are extracted from the given binary buffer containing the PDS
+   * table data for the corresponding row.
+   *
+   * This method is only called for BINARY PDS tables.
+   *
+   * @param rowBuffer Buffer containing the binary information for one row of
    *                  the table.
-   * @param record The TableRecord containing fields with correct names and 
+   * @param record The TableRecord containing fields with correct names and
    *               types but no values. The field values will be set by this
    *               method.
-   * @return TableRecord TableRecord containing the field values extracted from the row 
+   * @return TableRecord TableRecord containing the field values extracted from the row
    *         buffer.
    */
   TableRecord ImportPdsTable::extractBinary(char *rowBuffer, TableRecord &record) const {
@@ -1088,12 +1088,12 @@ namespace Isis {
    * table column description. This method also determines whether the pds table
    * has byte order LSB or MSB.
    *
-   * This method is only called for BINARY PDS tables. 
-   *  
+   * This method is only called for BINARY PDS tables.
+   *
    * @param cdesc The ColumnDescr reference used to determine the column keyword
    *              values NAME, BYTES, and DATA_TYPE from the PDS file.
-   *  
-   * @return TableField object with the correct field name and field type, but 
+   *
+   * @return TableField object with the correct field name and field type, but
    *         no value.
    *
    * @throws IException::Unknown "Only 4 byte integer values are supported in Isis.
@@ -1102,19 +1102,19 @@ namespace Isis {
    * @throws IException::Unknown "Only 4 byte or 8 byte real values are supported in Isis.
    *                              PDS column [column name] has a real DATA_TYPE with
    *                              [BYTES = column's number of bytes].
-   * @throws IException::Unknown "PDS column [column name] has an unsupported DATA_TYPE 
+   * @throws IException::Unknown "PDS column [column name] has an unsupported DATA_TYPE
    *                              [data type]."
    */
   TableField ImportPdsTable::makeFieldFromBinaryTable(const ColumnDescr &cdesc){
     QString dataType = cdesc.m_dataType;
     // For binary tables, we will not reformat the name of the column
     QString name = cdesc.m_name;
-    if (dataType == "MSB_INTEGER" || dataType == "INTEGER"    
+    if (dataType == "MSB_INTEGER" || dataType == "INTEGER"
         || dataType == "SUN_INTEGER" || dataType == "MAC_INTEGER") {
       if (cdesc.m_numBytes != 4) {
         QString msg = "Only 4 byte integer values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
-                      + "] has an integer DATA_TYPE with [BYTES = " 
+                      + "] has an integer DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1126,7 +1126,7 @@ namespace Isis {
       if (cdesc.m_numBytes != 4) {
         QString msg = "Only 4 byte integer values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
-                      + "] has an integer DATA_TYPE with [BYTES = " 
+                      + "] has an integer DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1148,7 +1148,7 @@ namespace Isis {
       else {
         IString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
-                      + "] has a real DATA_TYPE with [BYTES = " 
+                      + "] has a real DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1164,7 +1164,7 @@ namespace Isis {
       else {
         QString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
-                      + "] has a real DATA_TYPE with [BYTES = " 
+                      + "] has a real DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1177,8 +1177,8 @@ namespace Isis {
     // Isis3 tables currently don't support any of the following PDS DATA_TYPE:
     // BIT_STRING, COMPLEX, N/A, BOOLEAN, UNSIGNED_INTEGER, IBM types, some VAX types
     IString msg = "PDS Column [" + cdesc.m_name
-                  + "] has an unsupported DATA_TYPE [" 
-                  + dataType + "]."; 
+                  + "] has an unsupported DATA_TYPE ["
+                  + dataType + "].";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -1188,10 +1188,10 @@ namespace Isis {
    *
    * This method is only used for BINARY PDS tables.
    *
-   * @param byteOrder The byte order of the PDS binary table. Valid values are 
+   * @param byteOrder The byte order of the PDS binary table. Valid values are
    *                  "LSB" or "MSB".
    *
-   * @throws IException::Unknown "Unable to import the binary PDS table [table name]. The column 
+   * @throws IException::Unknown "Unable to import the binary PDS table [table name]. The column
    *                              DATA_TYPE values indicate differing byte orders."
    */
   void ImportPdsTable::setPdsByteOrder(QString byteOrder) {
@@ -1207,12 +1207,12 @@ namespace Isis {
 
   /**
    * @brief Process a freshly read PDS table line of data
-   * 
+   *
    * @author 2015-07-17 Kris Becker
-   * 
+   *
    * @param row      Row number being processed
    * @param rowdata  Character line of data
-   * 
+   *
    * @return bool True if succssful, false if error
    */
   bool ImportPdsTable::processRow(const int &row, const QString &rowdata) {
@@ -1220,10 +1220,9 @@ namespace Isis {
     for (int i = 0 ; i < columns() ; i++) {
       cols.push_back(getColumnValue(rowdata, m_coldesc[i]));
     }
-    m_rows.append(cols); 
+    m_rows.append(cols);
 
     return (true);
   }
 
 }  //  namespace Isis
-

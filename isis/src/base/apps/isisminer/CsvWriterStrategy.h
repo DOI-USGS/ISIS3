@@ -45,37 +45,37 @@ namespace Isis {
 
   /**
    * @brief CsvWriterStrategy - Writes resources to a CSV file.
-   * 
+   *
    * This strategy is used to write Resources to a Comma-Separated-Value
    * format (CSV) file. Each resources is written as a row, separated by new
    * lines, and the specified keyword values are writen to the columns,
    * separated by the delimiter character. If the header is selected the first
-   * row written to the CSV file will contain the keyword names. 
+   * row written to the CSV file will contain the keyword names.
    *
    * Here is an example of the CsvWriter Strategy object definition:
    *
-   * @code 
+   * @code
    * Object = Strategy
    *   Type = CsvWriter
    *   Name = mdismla
    *   Filename = "mdis_mla_ridelong.lis"
    *   Mode = Create
    *   Header = true
-   *   Keywords = (YearDoy, SourceProductId, StartTime, EtStartTime, 
+   *   Keywords = (YearDoy, SourceProductId, StartTime, EtStartTime,
    *               ExposureDuration, CenterLongitude, CenterLatitude,
    *               PixelResolution, MeanGroundResolution,
-   *               IncidenceAngle, EmissionAngle, PhaseAngle, 
-   *               SubSolarGroundAzimuth, SubSpacecraftGroundAzimuth, 
+   *               IncidenceAngle, EmissionAngle, PhaseAngle,
+   *               SubSolarGroundAzimuth, SubSpacecraftGroundAzimuth,
    *               ParallaxX, ParallaxY, ShadowX, ShadowY")
    *   Delimiter = ","
    *   DefaultValue = "NULL"
    * EndObject
-   * @endcode  
-   *  
+   * @endcode
+   *
    * @author 2012-07-15 Kris Becker
    * @internal
-   *   @history 2012-07-15 Kris Becker - Original version. 
-   *   @history 2015-02-26 Jeffrey Covington - Added documentation. 
+   *   @history 2012-07-15 Kris Becker - Original version.
+   *   @history 2015-02-26 Jeffrey Covington - Added documentation.
    *   @history 2015-03-18 Jeannie Backer - Brought class files closer to ISIS coding standards.
    *   @history 2015-04-16 Jeffrey Covington - Added the ability to write Resource
    *                           geometries to the CSV file. Updated documentation and test.
@@ -84,21 +84,25 @@ namespace Isis {
    *                          a global resource list.
    *   @history 2015-06-11 Kris Becker - Ensure GIS keyword takes precidence
    *                          over any other Resource keyword
+   *   @history 2016-08-28 Kelvin Rodriguez - Added using Strategy::apply; to avoid
+   *                           hidden virtual function warnings in clang.
+   *                           Part of porting to OS X 10.11.
    */
   class CsvWriterStrategy : public Strategy {
-  
+
     public:
       CsvWriterStrategy();
       CsvWriterStrategy(const PvlObject &definition, const ResourceList &globals);
       virtual ~CsvWriterStrategy();
-  
+
       virtual int apply(ResourceList &resources, const ResourceList &globals);
-  
+
     protected:
+      using Strategy::apply;
       int apply(SharedResource &resource, std::ofstream &os);
-  
+
     private:
-      void csvwrite(std::ofstream &os, SharedResource &resource, 
+      void csvwrite(std::ofstream &os, SharedResource &resource,
                     const QStringList &keywords, const QString &delimiter,
                     const QString &defValue, const QString &gisKey,
                     const QString &gisType, const ResourceList &globals);
@@ -109,14 +113,14 @@ namespace Isis {
       bool        m_header;         /**< Indicates whether to write a header to the file. Defaults
                                          to true on construction.*/
       QString     m_delimiter;      //!< The delimiter character for columns.
-      QString     m_default;        /**< The default value to write. Defaults to "NULL" on 
+      QString     m_default;        /**< The default value to write. Defaults to "NULL" on
                                          construction.*/
-      bool        m_skipEmptyLists; /**< Indicates whether to skip empty resources. 
+      bool        m_skipEmptyLists; /**< Indicates whether to skip empty resources.
                                          Defaults to false on construction.*/
       QString     m_gisKey;         //!< Keyword to reference the geometry.
       QString     m_gisType;        /**< The text format to write the geometry. Defaults to "wkb"
                                          on construction.*/
-  
+
   };
 
 } // Namespace Isis

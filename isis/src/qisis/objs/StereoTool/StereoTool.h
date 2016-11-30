@@ -50,6 +50,8 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
    *                           ControlNet's target instead of the TargetName.
    *                           References #3892
+   *   @history 2016-08-10 Jeannie Backer - Added std:: scope to vector to distinguish with boost
+   *                           vectors. References #4163.
    *
    */
   class StereoTool : public AbstractPlotTool {

@@ -1,4 +1,4 @@
-// $Id$
+// $Id: mdis2isis.cpp 5059 2013-03-11 16:37:00Z slambright@GS.DOI.NET $
 #include "Isis.h"
 
 #include <cfloat>

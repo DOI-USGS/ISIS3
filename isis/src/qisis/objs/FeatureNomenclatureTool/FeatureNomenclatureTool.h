@@ -18,7 +18,7 @@ class QPushButton;
 class QString;
 
 template <typename A, typename B> class QMap;
-template <typename A, typename B> class QPair;
+template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class MdiCubeViewport;
@@ -50,6 +50,7 @@ namespace Isis {
    *                          coding standards. References #972
    *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
    *                           #775 and #1114.
+   *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    * 
    */
   class FeatureNomenclatureTool : public Tool {

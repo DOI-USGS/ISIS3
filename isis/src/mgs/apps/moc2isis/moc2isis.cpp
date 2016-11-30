@@ -66,7 +66,7 @@ void IsisMain() {
 
     QString command = "mocuncompress " + in.expanded() + " " +
                       uncompressed.expanded();
-    if(system(command.toAscii().data()) == 1) {
+    if(system(command.toLatin1().data()) == 1) {
       QString msg = "Unable to execute [mocuncompress]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -84,7 +84,7 @@ void IsisMain() {
 
   if(compressed) {
     QString uncompressedName(uncompressed.expanded());
-    remove(uncompressedName.toAscii().data());
+    remove(uncompressedName.toLatin1().data());
   }
 
   return;

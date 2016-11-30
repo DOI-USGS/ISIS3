@@ -148,6 +148,11 @@ namespace Isis {
    *                                           inheritance between Process and its
    *                                           child classes.  Fixes #2215.
    *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
+   *  @history 2016-11-30 Ian Humphrey - Added second parameter, tableNames, to PropagateTables()
+   *                          to specifiy which tables will be propagated when calling
+   *                          PropagateTables(QString, QList<QString>). A default value of an
+   *                          empty QList is provided to this parameter which will propagate all
+   *                          tables. Updated unitTest to test this change. References #4433.
    */
   class Process {
     protected:
@@ -251,7 +256,7 @@ namespace Isis {
       void PropagateLabels(const bool prop);
       void PropagateLabels(const QString &cube);
       void PropagateTables(const bool prop);
-      void PropagateTables(const QString &fromName);
+      void PropagateTables(const QString &fromName, const QList<QString>& tableNames = QList<QString>());
       void PropagatePolygons(const bool prop);
       void PropagateHistory(const bool prop);
       void PropagateOriginalLabel(const bool prop);

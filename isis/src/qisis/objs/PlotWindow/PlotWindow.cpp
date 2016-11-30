@@ -12,9 +12,23 @@
 #include <qwt_scale_engine.h>
 
 #include <QAction>
+#include <QApplication>
+#include <QCheckBox>
+#include <QFileDialog>
+#include <QGridLayout>
 #include <QIcon>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMap>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QProgressDialog>
+#include <QPushButton>
 #include <QSet>
+#include <QTableWidget>
+#include <QToolBar>
 
 #include "Cube.h"
 #include "CubePlotCurve.h"
@@ -80,7 +94,7 @@ namespace Isis {
 
     setPlotBackground(Qt::black);
 
-    connect(QApplication::clipboard(), SIGNAL(changed(QClipboard::Mode)),
+    connect(QGuiApplication::clipboard(), SIGNAL(changed(QClipboard::Mode)),
             this, SLOT(onClipboardChanged()));
     connect(this, SIGNAL(plotChanged()),
             this, SLOT(scheduleFillTable()));
@@ -139,18 +153,18 @@ namespace Isis {
     m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignRight);
 
     /*Plot Legend*/
-    QwtLegend *legend = new QwtLegend();
-    legend->setItemMode(QwtLegend::ClickableItem);
-    legend->setWhatsThis("Right Click on a legend item to display the context "
+    m_legend = new QwtLegend();
+    m_legend->setDefaultItemMode(QwtLegendData::Clickable);
+    m_legend->setWhatsThis("Right Click on a legend item to display the context "
                          "menu.");
-    m_plot->insertLegend(legend, QwtPlot::RightLegend, 1.0);
-    legend->installEventFilter(this);
+    m_plot->insertLegend(m_legend, QwtPlot::RightLegend, 1.0);
+    m_legend->installEventFilter(this);
 
     /*Plot Grid*/
     m_grid = new QwtPlotGrid;
     m_grid->enableXMin(true);
-    m_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
-    m_grid->setMinPen(QPen(Qt::gray, 1, Qt::DotLine));
+    m_grid->setMajorPen(QPen(Qt::white, 1, Qt::DotLine));
+    m_grid->setMinorPen(QPen(Qt::gray, 1, Qt::DotLine));
     m_grid->attach(m_plot);
     m_grid->setVisible(false);
 
@@ -461,6 +475,10 @@ namespace Isis {
       connect(pc, SIGNAL(destroyed(QObject *)),
               this, SLOT(resetScale()));
 
+      // Get the legend widget for the recently attached plotcurve and give to the plotcurve
+      QWidget *legendWidget = m_legend->legendWidget( plot()->itemToInfo(pc) );
+      pc->updateLegendItemWidget(legendWidget);
+      
       replot();
     }
   }
@@ -564,7 +582,7 @@ namespace Isis {
 
     if (printDialog.exec() == QDialog::Accepted) {
       /* Get display widget as a pixmap and convert to an image*/
-      pixmap = QPixmap::grabWidget(m_plot);
+      pixmap = m_plot->grab();
       QImage img = pixmap.toImage();
       /* C++ Gui Programming with Qt, page 201*/
       QPainter painter(printer);
@@ -600,7 +618,7 @@ namespace Isis {
     }
 
     QString format = QFileInfo(output).suffix();
-    pixmap = QPixmap::grabWidget(m_plot);
+    pixmap = m_plot->grab();
 
     std::string formatString = format.toStdString();
     if (!pixmap.save(output, formatString.c_str())) {
@@ -619,12 +637,12 @@ namespace Isis {
 
     if (m_plot->canvasBackground() == Qt::white) {
       m_plot->setCanvasBackground(Qt::black);
-      m_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
+      m_grid->setMajorPen(QPen(Qt::white, 1, Qt::DotLine));
     }
     else {
       m_plot->setCanvasBackground(Qt::white);
       pen->setColor(Qt::black);
-      m_grid->setMajPen(QPen(Qt::black, 1, Qt::DotLine));
+      m_grid->setMajorPen(QPen(Qt::black, 1, Qt::DotLine));
     }
 
     m_zoomer->setRubberBandPen(*pen);
@@ -675,17 +693,21 @@ namespace Isis {
    */
   void PlotWindow::setUserValues() {
     if (m_xLogCheckBox->isChecked()) {
-      m_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+      m_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+      m_plotXLogScale = true;
     }
     else {
       m_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+      m_plotXLogScale = false;
     }
 
     if (m_yLogCheckBox->isChecked()) {
-      m_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+      m_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
+      m_plotYLogScale = true;
     }
     else {
       m_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+      m_plotYLogScale = false;
     }
 
     m_autoscaleAxes = m_autoScaleCheckBox->isChecked();
@@ -743,7 +765,7 @@ namespace Isis {
     QLabel *xMinLabel = new QLabel("Minimum: ");
     dialogLayout->addWidget(xMinLabel, row, 0);
 
-    double xMin = plot()->axisScaleDiv(QwtPlot::xBottom)->lowerBound();
+    double xMin = plot()->axisScaleDiv(QwtPlot::xBottom).lowerBound();
     m_xMinEdit = new QLineEdit(QString::number(xMin));
     dialogLayout->addWidget(m_xMinEdit, row, 1);
     row++;
@@ -751,7 +773,7 @@ namespace Isis {
     QLabel *xMaxLabel = new QLabel("Maximum: ");
     dialogLayout->addWidget(xMaxLabel, row, 0);
 
-    double xMax = plot()->axisScaleDiv(QwtPlot::xBottom)->upperBound();
+    double xMax = plot()->axisScaleDiv(QwtPlot::xBottom).upperBound();
     m_xMaxEdit = new QLineEdit(QString::number(xMax));
     dialogLayout->addWidget(m_xMaxEdit, row, 1);
     row++;
@@ -760,9 +782,10 @@ namespace Isis {
     dialogLayout->addWidget(xLogLabel, row, 0);
 
     m_xLogCheckBox = new QCheckBox;
-    m_xLogCheckBox->setChecked(
-        m_plot->axisScaleEngine(QwtPlot::xBottom)->transformation()->type() ==
-        QwtScaleTransformation::Log10);
+    m_xLogCheckBox->setChecked(m_plotXLogScale);
+//    m_xLogCheckBox->setChecked(
+//        m_plot->axisScaleEngine(QwtPlot::xBottom)->transformation()->type() ==
+//        QwtScaleTransformation::Log10);
     dialogLayout->addWidget(m_xLogCheckBox, row, 1);
     row++;
 
@@ -773,7 +796,7 @@ namespace Isis {
     QLabel *yMinLabel = new QLabel("Minimum: ");
     dialogLayout->addWidget(yMinLabel, row, 0);
 
-    double yMin = plot()->axisScaleDiv(QwtPlot::yLeft)->lowerBound();
+    double yMin = plot()->axisScaleDiv(QwtPlot::yLeft).lowerBound();
     m_yMinEdit = new QLineEdit(QString::number(yMin));
     dialogLayout->addWidget(m_yMinEdit, row, 1);
     row++;
@@ -781,7 +804,7 @@ namespace Isis {
     QLabel *yMaxLabel = new QLabel("Maximum: ");
     dialogLayout->addWidget(yMaxLabel, row, 0);
 
-    double yMax = plot()->axisScaleDiv(QwtPlot::yLeft)->upperBound();
+    double yMax = plot()->axisScaleDiv(QwtPlot::yLeft).upperBound();
     m_yMaxEdit = new QLineEdit(QString::number(yMax));
     dialogLayout->addWidget(m_yMaxEdit, row, 1);
     row++;
@@ -790,9 +813,10 @@ namespace Isis {
     dialogLayout->addWidget(yLogLabel, row, 0);
 
     m_yLogCheckBox = new QCheckBox;
-    m_yLogCheckBox->setChecked(
-        m_plot->axisScaleEngine(QwtPlot::yLeft)->transformation()->type() ==
-        QwtScaleTransformation::Log10);
+    m_yLogCheckBox->setChecked(m_plotYLogScale);
+//    m_yLogCheckBox->setChecked(
+//        m_plot->axisScaleEngine(QwtPlot::yLeft)->transformation()->type() ==
+//        QwtScaleTransformation::Log10);
     dialogLayout->addWidget(m_yLogCheckBox, row, 1);
     row++;
 
@@ -1037,7 +1061,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Save the plot as a png, jpg, or tif file.";
       save->setWhatsThis(text);
-      connect(save, SIGNAL(activated()), this, SLOT(savePlot()));
+      connect(save, SIGNAL(triggered()), this, SLOT(savePlot()));
       fileMenu->addAction(save);
       actions.push_back(save);
     }
@@ -1049,7 +1073,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Sends the plot image to the printer";
       prt->setWhatsThis(text);
-      connect(prt, SIGNAL(activated()), this, SLOT(printPlot()));
+      connect(prt, SIGNAL(triggered()), this, SLOT(printPlot()));
       fileMenu->addAction(prt);
       actions.push_back(prt);
     }
@@ -1063,14 +1087,14 @@ namespace Isis {
           "<b>Function:</b>  Activates the table which displays the data of the "
                             "current plot";
       table->setWhatsThis(text);
-      connect(table, SIGNAL(activated()), this, SLOT(showTable()));
+      connect(table, SIGNAL(triggered()), this, SLOT(showTable()));
       fileMenu->addAction(table);
       actions.push_back(table);
     }
 
     QAction *close = new QAction(QIcon::fromTheme("document-close"), "&Close",
                                  m_plot);
-    connect(close, SIGNAL(activated()), this, SLOT(close()));
+    connect(close, SIGNAL(triggered()), this, SLOT(close()));
     fileMenu->addAction(close);
 
     if ((optionsToProvide & TrackMenuOption) == TrackMenuOption) {
@@ -1083,7 +1107,7 @@ namespace Isis {
           "<b>Function:</b>  Displays the x,y coordinates as the cursor moves "
           "around on the plot.";
       track->setWhatsThis(text);
-      connect(track, SIGNAL(activated()), this, SLOT(trackerEnabled()));
+      connect(track, SIGNAL(triggered()), this, SLOT(trackerEnabled()));
       optionsMenu->addAction(track);
     }
 
@@ -1097,7 +1121,7 @@ namespace Isis {
           "<b>Function:</b>  Switch the background color between black and "
                             "white.";
       backgrdSwitch->setWhatsThis(text);
-      connect(backgrdSwitch, SIGNAL(activated()),
+      connect(backgrdSwitch, SIGNAL(triggered()),
               this, SLOT(switchBackground()));
       optionsMenu->addAction(backgrdSwitch);
       actions.push_back(backgrdSwitch);
@@ -1111,7 +1135,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Display grid lines on the plot.";
       m_showHideGrid->setWhatsThis(text);
-      connect(m_showHideGrid, SIGNAL(activated()), this, SLOT(showHideGrid()));
+      connect(m_showHideGrid, SIGNAL(triggered()), this, SLOT(showHideGrid()));
       optionsMenu->addAction(m_showHideGrid);
       actions.push_back(m_showHideGrid);
     }
@@ -1124,7 +1148,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Edit the plot title, x and y axis labels.";
       changeLabels->setWhatsThis(text);
-      connect(changeLabels, SIGNAL(activated()),
+      connect(changeLabels, SIGNAL(triggered()),
               this, SLOT(changePlotLabels()));
       optionsMenu->addAction(changeLabels);
       actions.push_back(changeLabels);
@@ -1140,7 +1164,7 @@ namespace Isis {
           "<b>Function:</b>  Adjust the scale for the x and y axis on the "
           "plot.";
       changeScale->setWhatsThis(text);
-      connect(changeScale, SIGNAL(activated()), this, SLOT(setDefaultRange()));
+      connect(changeScale, SIGNAL(triggered()), this, SLOT(setDefaultRange()));
       optionsMenu->addAction(changeScale);
       actions.push_back(changeScale);
     }
@@ -1155,7 +1179,7 @@ namespace Isis {
           "<b>Function:</b>  Displays or hides all the curves currently "
                             "displayed on the plot.";
       m_showHideAllCurves->setWhatsThis(text);
-      connect(m_showHideAllCurves, SIGNAL(activated()),
+      connect(m_showHideAllCurves, SIGNAL(triggered()),
               this, SLOT(showHideAllCurves()));
       optionsMenu->addAction(m_showHideAllCurves);
       actions.push_back(m_showHideAllCurves);
@@ -1170,7 +1194,7 @@ namespace Isis {
       QString text = "<b>Function:</b>  Displays or hides a symbol for each "
                      "data point plotted on a plot.";
       m_showHideAllMarkers->setWhatsThis(text);
-      connect(m_showHideAllMarkers, SIGNAL(activated()),
+      connect(m_showHideAllMarkers, SIGNAL(triggered()),
               this, SLOT(showHideAllMarkers()));
       optionsMenu->addAction(m_showHideAllMarkers);
       actions.push_back(m_showHideAllMarkers);
@@ -1184,7 +1208,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Reset the plot's scale.";
       resetScaleButton->setWhatsThis(text);
-      connect(resetScaleButton, SIGNAL(activated()), this, SLOT(resetScale()));
+      connect(resetScaleButton, SIGNAL(triggered()), this, SLOT(resetScale()));
       actions.push_back(resetScaleButton);
     }
 
@@ -1196,7 +1220,7 @@ namespace Isis {
       QString text =
           "<b>Function:</b>  Removes all the curves from the plot.";
       clear->setWhatsThis(text);
-      connect(clear, SIGNAL(activated()), this, SLOT(clearPlot()));
+      connect(clear, SIGNAL(triggered()), this, SLOT(clearPlot()));
       actions.push_back(clear);
     }
 
@@ -1208,7 +1232,7 @@ namespace Isis {
       QString text = "<b>Function:</b>  Calculates a best fit line from an "
                      "existing curve.";
       lineFit->setWhatsThis(text);
-      connect(lineFit, SIGNAL(activated()), this, SLOT( createBestFitLine() ) );
+      connect(lineFit, SIGNAL(triggered()), this, SLOT( createBestFitLine() ) );
       optionsMenu->addAction(lineFit);
       actions.push_back(lineFit);
     }
@@ -1221,7 +1245,7 @@ namespace Isis {
       QString text = "<b>Function:</b> Change the name, color, style, and vertex symbol of the "
                      "curves.";
       configurePlot->setWhatsThis(text);
-      connect( configurePlot, SIGNAL( activated() ),
+      connect( configurePlot, SIGNAL( triggered() ),
                this, SLOT( configurePlotCurves() ) );
       optionsMenu->addAction(configurePlot);
       actions.push_back(configurePlot);
@@ -1238,7 +1262,7 @@ namespace Isis {
     
 //     QAction *basicHelp = new QAction(m_plot);
 //     basicHelp->setText("Basic Help");
-//     connect( basicHelp, SIGNAL( activated() ),
+//     connect( basicHelp, SIGNAL( triggered() ),
 //              this, SLOT( showHelp() ) );
 //     helpMenu->addAction(basicHelp);
 
@@ -1794,9 +1818,9 @@ namespace Isis {
    * @param event The drag event to test
    */
   void PlotWindow::dragEnterEvent(QDragEnterEvent *event) {
-    QWidget *source = event->source();
+    QObject *source = event->source();
 
-    if (source != m_plot->legend()->contentsWidget() &&
+    if (source != m_legend->contentsWidget() &&
         userCanAddCurve(event->mimeData())) {
       event->acceptProposedAction();
     }

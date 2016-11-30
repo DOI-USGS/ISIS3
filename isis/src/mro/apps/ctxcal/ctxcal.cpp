@@ -134,14 +134,14 @@ void IsisMain() {
     // Get the distance between Mars and the Sun at the given time in
     // Astronomical Units (AU)
     QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-    furnsh_c(bspKernel.toAscii().data());
+    furnsh_c(bspKernel.toLatin1().data());
     QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-    furnsh_c(pckKernel.toAscii().data());
+    furnsh_c(pckKernel.toLatin1().data());
     double sunpos[6], lt;
     spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
     double dist1 = vnorm_c(sunpos);
-    unload_c(bspKernel.toAscii().data());
-    unload_c(pckKernel.toAscii().data());
+    unload_c(bspKernel.toLatin1().data());
+    unload_c(pckKernel.toLatin1().data());
 
     double dist = 2.07E8;
     double w0 = 3660.5;

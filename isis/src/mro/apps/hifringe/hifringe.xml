@@ -5,10 +5,10 @@
   </brief>
 
   <description>
-    Gathers several statistics on the "fringe" of a channel file. These 
+    Gathers several statistics on the "fringe" of a channel file. These
   statistics are then output to a pvl file that can be viewed to see if several
-  channel files, based upon those statistics, are suitable for stitching 
-  together. The number of lines that are gathered is a function of the binning 
+  channel files, based upon those statistics, are suitable for stitching
+  together. The number of lines that are gathered is a function of the binning
   mode of the channel file being input as follows:
   <pre>
   binning mode 1          48 rightmost and 48 leftmost samples gathered
@@ -17,7 +17,7 @@
   binning mode 4          12 rightmost and 12 leftmost samples gathered
   binning mode 8           6 rightmost and  6 leftmost samples gathered
   </pre>
-  
+
   The following statistics are gathered:
   <pre>
   Valid Pixels
@@ -41,7 +41,10 @@
       Added the ability to sample multiple sections
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
+    </change>
+    <change name="Kelvin Rodriguez" date="2016-08-28">
+      Removed unused const ID
     </change>
   </history>
 
@@ -76,8 +79,8 @@
           Output file to contain statistics
         </brief>
         <description>
-          This pvl file will contain two groups. The first group will be 
-			 statistics for the leftmost samples, and the second group will be 
+          This pvl file will contain two groups. The first group will be
+			 statistics for the leftmost samples, and the second group will be
 			 statistics for the rightmost samples.
         </description>
         <filter>
@@ -85,21 +88,21 @@
         </filter>
       </parameter>
     </group>
-	 
+
 	 <group name="sections">
-	   <parameter name="SECTIONS"> 
+	   <parameter name="SECTIONS">
 		  <type>integer</type>
 		  <brief>Number of sections</brief>
                   <default><item>5</item></default>
 		  <description>
 		    This is the number of sub-areas that are extracted from each side of
-			 the cube. They will be spaced in such a way that there will be a 
-			 section starting at the <pre>l/n</pre>th line where <pre>l</pre> is 
+			 the cube. They will be spaced in such a way that there will be a
+			 section starting at the <pre>l/n</pre>th line where <pre>l</pre> is
 			 the total number of lines in the cube and <pre>n</pre> is the number
 			 of sections specified.
-		  </description> 
+		  </description>
 		</parameter>
-		
+
 		<parameter name="LINESIZE">
 		  <type>integer</type>
 		  <brief>Number of lines in each section</brief>
@@ -113,7 +116,7 @@
 		  </description>
 		</parameter>
      </group>
-	  
+
   </groups>
 
   <examples>

@@ -49,6 +49,7 @@ namespace Isis {
   class ProgressBar;
   class Project;
   class ProjectItem;
+  class ShapeList;
   class XmlStackedHandlerReader;
 
   /**
@@ -65,7 +66,7 @@ namespace Isis {
    *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
    *   work order to not function properly when saved/restored from disk.
    *
-   * @author 2012-??-?? ???
+   * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
    * @internal
    *   @history 2012-08-23 Steven Lambright and Stuart Sides - Updated the class to be much more
@@ -96,8 +97,9 @@ namespace Isis {
    *   @history 2016-01-04 Jeffrey Covington - Improved support for ProjectItem.
    *   @history 2016-06-13 Tyler Wilson - Added documentation to many of the member functions
    *                          in this class.  Fixes #3956.
-   *   @history 2016-06-22  Tyler Wilson - Removed all references to deprecated functions/member
+   *   @history 2016-06-22 Tyler Wilson - Removed all references to deprecated functions/member
    *                          variables.  Fixes #4052.
+   *   @history 2016-07-26 Tracie Sucharski - Added functionality for ShapeList.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -139,36 +141,24 @@ namespace Isis {
 
       virtual bool isExecutable(Context);
       virtual bool isExecutable(ImageList *images);
+      virtual bool isExecutable(ShapeList *shapes);
       virtual bool isExecutable(ControlList *controls);
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
-      //virtual bool isExecutable(ProjectItem *item);  //tjw
-
-      //Deprecated
-      //virtual bool isExecutable(QList<Control *> controls);
-      //virtual bool isExecutable(CorrelationMatrix *correlationMatrix);
-      //virtual bool isExecutable(GuiCamera* guiCamera);
-      //virtual bool isExecutable(TargetBody* targetBody);
-
+      virtual bool isExecutable(ProjectItem *item);
 
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
 
       virtual void setData(Context);
       virtual void setData(ImageList *images);
+      virtual void setData(ShapeList *shapes);
       virtual void setData(ControlList *controls);
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
-      //virtual void setData(ProjectItem *item);  //tjw
-
-      //Deprecated
-      //virtual void setData(QList<Control *> controls);
-      //virtual void setData(CorrelationMatrix *correlationMatrix);
-      //virtual void setData(GuiCamera *camera);
-      //virtual void setData(TargetBody *targetBody);
-
+      virtual void setData(ProjectItem *item);
 
 
       void setNext(WorkOrder *nextWorkOrder);
@@ -235,6 +225,9 @@ namespace Isis {
       ImageList *imageList();
       const ImageList *imageList() const;
 
+      ShapeList *shapeList();
+      const ShapeList *shapeList() const;
+
       CorrelationMatrix correlationMatrix();
       
       QPointer<ControlList> controlList();
@@ -272,6 +265,7 @@ namespace Isis {
     private:
       bool isInStableState() const;
       void listenForImageDestruction();
+      void listenForShapeDestruction();
       void resetProgressBar();
       void setProgressToFinalText();
 
@@ -279,6 +273,7 @@ namespace Isis {
       void attemptQueuedAction();
       void asyncFinished();
       void clearImageList();
+      void clearShapeList();
       void deleteProgress();
       void updateProgress();
       void startRedo();
@@ -354,6 +349,7 @@ namespace Isis {
 
       Context m_context;
       QPointer<ImageList> m_imageList;
+      QPointer<ShapeList> m_shapeList;
       QPointer<ControlList> m_controlList;
       CorrelationMatrix m_correlationMatrix;
       /**
@@ -375,6 +371,12 @@ namespace Isis {
        * with.
        */
       QStringList m_imageIds;
+
+      /**
+       * A QStringList of unique shape identifiers for all of the shapes this WorkOrder is dealing 
+       * with. 
+       */
+      QStringList m_shapeIds;
 
       /**
        * @brief A QStringList of internal properties for this WorkOrder.

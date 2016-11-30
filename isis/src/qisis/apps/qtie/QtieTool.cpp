@@ -1,32 +1,35 @@
 #include "QtieTool.h"
 
-#include <QDebug>
 #include <QApplication>
+#include <QCheckBox>
+#include <QDebug>
 #include <QDialog>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QList>
 #include <QMenuBar>
 #include <QMenu>
-#include <QToolButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTabWidget>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QPoint>
-#include <QStringList>
-#include <QSizePolicy>
-#include <QTimer>
 #include <QMessageBox>
-#include <QFileDialog>
-#include <QtGui>
-
-#include <vector>
+#include <QPoint>
+#include <QRadioButton>
+#include <QSizePolicy>
+#include <QSpinBox>
+#include <QStringList>
+#include <QTabWidget>
+#include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QtWidgets>
 
 #include "Application.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "BundleAdjust.h"
+#include "BundleObservationSolveSettings.h"
+#include "BundleResults.h"
+#include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
 #include "FileName.h"
@@ -39,11 +42,11 @@
 #include "MdiCubeViewport.h"
 #include "PvlEditDialog.h"
 #include "PvlObject.h"
-//#include "TProjection.h"
 #include "QIsisApplication.h"
 #include "SerialNumber.h"
 #include "Target.h"
 #include "ToolPad.h"
+//#include "TProjection.h"
 #include "UniversalGroundMap.h"
 
 
@@ -212,7 +215,7 @@ namespace Isis {
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
                         "control network</i> under chosen filename";
     p_saveNet->setWhatsThis(whatsThis);
-    connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(p_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     QAction *closeQtieTool = new QAction(p_tieTool);
     closeQtieTool->setText("&Close");
@@ -220,7 +223,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Closes the Qtie Tool window for this point \
                 <p><b>Shortcut:</b> Alt+F4 </p>";
     closeQtieTool->setWhatsThis(whatsThis);
-    connect(closeQtieTool, SIGNAL(activated()), p_tieTool, SLOT(close()));
+    connect(closeQtieTool, SIGNAL(triggered()), p_tieTool, SLOT(close()));
 
     QMenu *fileMenu = p_tieTool->menuBar()->addMenu("&File");
     fileMenu->addAction(p_saveNet);
@@ -231,14 +234,14 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Allows user to select a new file to set as the registration template";
     templateFile->setWhatsThis(whatsThis);
-    connect(templateFile, SIGNAL(activated()), this, SLOT(setTemplateFile()));
+    connect(templateFile, SIGNAL(triggered()), this, SLOT(setTemplateFile()));
 
     QAction *viewTemplate = new QAction(p_tieTool);
     viewTemplate->setText("&View/edit registration template");
     whatsThis = "<b>Function:</b> Displays the curent registration template.  \
                 The user may edit and save changes under a chosen filename.";
     viewTemplate->setWhatsThis(whatsThis);
-    connect(viewTemplate, SIGNAL(activated()), this, SLOT(viewTemplateFile()));
+    connect(viewTemplate, SIGNAL(triggered()), this, SLOT(viewTemplateFile()));
 
 
     QMenu *optionMenu = p_tieTool->menuBar()->addMenu("&Options");
@@ -254,7 +257,7 @@ namespace Isis {
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
                             "user interface to see more information.");
-    connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(p_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     QMenu *helpMenu = p_tieTool->menuBar()->addMenu("&Help");
     helpMenu->addAction(p_whatsThis);
@@ -344,7 +347,7 @@ namespace Isis {
    *                            
    */
   void QtieTool::clearFiles() {
-    p_tieTool->setShown(false);
+    p_tieTool->setVisible(false);
 
     delete p_serialNumberList;
     p_serialNumberList = NULL;
@@ -611,7 +614,7 @@ namespace Isis {
     p_controlPoint = p_controlNet->GetPoint((QString) newPoint->GetId());
     //  Load new point in QtieTool
     loadPoint();
-    p_tieTool->setShown(true);
+    p_tieTool->setVisible(true);
     p_tieTool->raise();
 
     emit editPointChanged();
@@ -642,7 +645,7 @@ namespace Isis {
     //loadPoint();
 
     p_controlNet->DeletePoint(p_controlPoint->GetId());
-    p_tieTool->setShown(false);
+    p_tieTool->setVisible(false);
     p_controlPoint = NULL;
 
     emit editPointChanged();
@@ -659,7 +662,7 @@ namespace Isis {
 
     p_controlPoint = point;
     loadPoint();
-    p_tieTool->setShown(true);
+    p_tieTool->setVisible(true);
     p_tieTool->raise();
     emit editPointChanged();
   }
@@ -762,10 +765,11 @@ namespace Isis {
       }
     }
 
-    //  Create temporary network for solution which will not contain measures for
+    //  Create temporary networks for solution which will not contain measures for
     //  the basemap.
-    ControlNet net;
-    net.SetTarget(*p_matchCube->label());
+    ControlNet inNet;
+    ControlNet outNet;
+    inNet.SetTarget(*p_matchCube->label());
 
     // Bundle adjust to solve for new pointing
     try {
@@ -773,28 +777,69 @@ namespace Isis {
       for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
         ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
         pt->Delete(p_baseSN);
-        net.AddPoint(pt);
+        inNet.AddPoint(pt);
       }
 
-      BundleAdjust b(net, *p_serialNumberList, false);
-      b.SetSolveTwist(p_twist);
-      b.SetSolveCmatrix(BundleAdjust::AnglesOnly);
-      b.SetSolveSpacecraftPosition(BundleAdjust::Nothing);
-      b.SetErrorPropagation(false);
-      b.SetOutlierRejection(false);
-      b.SetSolutionMethod("SPECIALK");
-      b.SetStandardOutput(false);
-      b.SetCSVOutput(false);
-      b.SetResidualOutput(false);
-      b.SetConvergenceThreshold(p_sigma0);
-      b.SetMaxIterations(p_maxIterations);
 
-      b.SetDecompositionMethod(BundleAdjust::SPECIALK);
-      b.SolveCholesky();
+      // =========================================================================================//
+      // ============= Use the bundle settings to initialize member variables ====================//
+      // =========================================================================================//
+      BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+      settings->setValidateNetwork(false);
+      // set the following:
+      //     solve observation mode = false
+      //     update cube label      = false
+      //     error propagation      = false
+      //     solve radius           = false
+      //     latitude sigma         = 1000.0
+      //     longitude sigma        = 1000.0
+      //     radius sigma           = Null since we are not solving for radius
+      //     outlier rejection      = false
+      settings->setSolveOptions(false, false, false, false, 1000.0, 1000.0, Isis::Null);
+  //************************************************************************************************
+      QList<BundleObservationSolveSettings> observationSolveSettingsList;
+      BundleObservationSolveSettings observationSolveSettings;
+
+      //********************************************************************************************
+      // use defaults
+      //       pointing option sigmas -1.0
+      //       ckDegree = ckSolveDegree = 2
+      //       fitOverExisting = false
+      //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+      observationSolveSettings.setInstrumentPointingSettings(
+          BundleObservationSolveSettings::AnglesOnly, p_twist);
+
+      // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
+      // position factors
+      //       position option sigmas default to -1.0
+      //       spkDegree = spkSolveDegree = 2
+      //       solveOverHermiteSpline = false
+      //       position sigma = velocity sigma = acceleration sigma = -1.0
+      observationSolveSettings.setInstrumentPositionSettings(
+          BundleObservationSolveSettings::NoPositionFactors);
+
+      observationSolveSettingsList.append(observationSolveSettings);
+
+      settings->setObservationSolveOptions(observationSolveSettingsList);
+
+      settings->setConvergenceCriteria(BundleSettings::ParameterCorrections,
+                                      p_sigma0, p_maxIterations);
+      settings->setOutputFilePrefix("");
+      // =========================================================================================//
+      // =============== End Bundle Settings =====================================================//
+      // =========================================================================================//
+
+      BundleAdjust bundleAdjust(settings, inNet, *p_serialNumberList, false);
+      QObject::connect( &bundleAdjust, SIGNAL( statusUpdate(QString) ),
+                        &bundleAdjust, SLOT( outputBundleStatus(QString) ) );
+
+      bundleAdjust.solveCholesky();
+      // bundleAdjust.solveCholeskyBR();
 
       // Print results and give user option of updating cube pointin
-      double maxError = net.GetMaximumResidual();
-      double avgError = net.AverageResidual();
+      outNet = *bundleAdjust.controlNet().data();
+      double maxError = outNet.GetMaximumResidual();
+      double avgError = outNet.AverageResidual();
 
       QString message = "Maximum Error = " + QString::number(maxError);
       message += "\nAverage Error = " + QString::number(avgError);
@@ -815,14 +860,14 @@ namespace Isis {
                           "this.  The camera pointing will not be updated.  "
                           "You can attempt to refine the control points and "
                           "attempt a new solution.");
-      msgBox.setDetailedText(b.IterationSummaryGroup());
+      msgBox.setDetailedText(bundleAdjust.iterationSummaryGroup());
       msgBox.setDefaultButton(close);
       msgBox.setMinimumWidth(5000);
       //msgBox.setSizeGripEnabled(true);
       msgBox.exec();
       if (msgBox.clickedButton() == update) {
         p_matchCube->reopen("rw");
-        Table cmatrix = b.Cmatrix(0);
+        Table cmatrix = bundleAdjust.cMatrix(0);
         //cmatrix = b.Cmatrix(0);
         emit newSolution(&cmatrix);
       }
@@ -832,13 +877,15 @@ namespace Isis {
 
     }
     catch (IException &e) {
-      QString message = "Bundle Solution failed.\n";
+      QString message = "Unable to bundle adjust. Solution failed.\n";
       QString errors = e.toString();
       message += errors;
-//      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());
-//      message += "\nAverage Error = " + QString::number(net.AverageResidual());
-      message += "\n\nMaximum Error = " + QString::number(net.GetMaximumResidual());
-      message += "\nAverage Error = " + QString::number(net.AverageResidual());
+//      message += "\n\nMaximum Error = " + QString::number(outNet.MaximumResiudal());
+//      message += "\nAverage Error = " + QString::number(outNet.AverageResidual());
+      message += "\n\nMaximum Error = " 
+               + QString::number(outNet.GetMaximumResidual());
+      message += "\nAverage Error = " 
+               + QString::number(outNet.AverageResidual());
       QMessageBox::warning((QWidget *)parent(), "Error", message);
       return;
     }

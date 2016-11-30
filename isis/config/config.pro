@@ -5,6 +5,7 @@
 #########################################################################
 TEMPLATE = app
 CONFIG -= app_bundle
+QMAKE_MACOSX_DEPLOYMENT_TARGET = $$QMAKE_MAC_SDK.macosx.version
 
 TARGET = $(ISISROOT)/make/isis.conf
 QMAKE_CLEAN += $${TARGET}
@@ -23,7 +24,7 @@ linux-g++-64 {
 
 macx {
   MAC_ARCH = -arch $$ISIS_ARCH
-  ISIS_MACOSX_TARGET = $$QMAKE_MACOSX_DEPLOYMENT_TARGET
+  ISIS_MACOSX_TARGET = $$QMAKE_MAC_SDK.macosx.version
   contains (ISIS_MACOSX_TARGET, 10.4) {
     ISIS_MACOSX_TARGET = 10.5
   }

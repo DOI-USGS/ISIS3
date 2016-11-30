@@ -20,6 +20,8 @@
  *                      of paramtrs.dat file.
  *      Dec 11 2006 KJB Changed malloc.h to stdlib.h for the Mac port again.
  *                      malloc.h is deprecated.
+ *      Jun 21 2016 Kris Becker - Clang compiler did not like how the *prt was
+ *                      initialized.
 */
 #include <stdio.h>
 #include <math.h>
@@ -68,7 +70,7 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
   int     bitpix;                 /* bits per pixel */
   int     record_bytes;
   int     hist_rec, brw_rec, image_rec, ns, brwsize;
-  char    cval, *sptr, *ptr = '\0';
+  char    cval, *sptr, *ptr = 0;
   char    record_type[20];
   int     COMPRESSED = 0;
   long    k, hdr_size;

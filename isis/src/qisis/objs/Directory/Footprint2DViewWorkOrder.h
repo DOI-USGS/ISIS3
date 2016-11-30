@@ -25,7 +25,9 @@
 #include "WorkOrder.h"
 
 namespace Isis {
-
+  class ImageList;
+  class Project;
+  class ShapeList;
   /**
    * View an image list's footprints in a footprint view.
    *
@@ -40,6 +42,9 @@ namespace Isis {
    *                           ControlPointEditWidget, CubeDnView, Footprint2DView.
    *                           Updated includes for CubeDnViewWorkOrder and
    *                           Footprint2DViewWorkOrder. Fixes #4004.
+   *   @history 2016-10-21 Tracie Sucharski - Added support for ShapeLists.  Added back the
+   *                           capability for choosing either a new view or using an existing view.
+   *  
    *   @todo Uncomment syncRedo() when IPCE is merged in fully. 
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
@@ -52,11 +57,13 @@ namespace Isis {
       virtual Footprint2DViewWorkOrder *clone() const;
 
       virtual bool isExecutable(ImageList *images);
+      virtual bool isExecutable(ShapeList *shapes);
       bool execute();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
       void syncRedo();
+      void syncUndo();
 
     private:
       Footprint2DViewWorkOrder &operator=(const Footprint2DViewWorkOrder &rhs);

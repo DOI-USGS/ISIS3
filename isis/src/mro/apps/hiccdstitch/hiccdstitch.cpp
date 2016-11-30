@@ -395,7 +395,7 @@ void IsisMain() {
   if(ui.WasEntered("PLACEMENT")) {
     QString placefile = ui.GetFileName("PLACEMENT");
     std::ofstream pfile;
-    pfile.open(placefile.toAscii().data(), std::ios::out | std::ios::trunc);
+    pfile.open(placefile.toLatin1().data(), std::ios::out | std::ios::trunc);
     pfile << results << endl;
     pfile.close();
   }

@@ -25,7 +25,7 @@ using namespace std;
 int main() {
   try {
     Preference::Preferences(true);
-    qDebug();
+    qDebug() << "";
     qDebug() << "Testing GisBlob's constructor from cube...";
     QString inputFile = "$messenger/testData/EW0211286081G.lev1.cub";
     Cube cube;
@@ -33,12 +33,12 @@ int main() {
     GisBlob cubeBlob(cube);
     qDebug() << "    Polygon = " << cubeBlob.polygon();
 
-    qDebug();
+    qDebug() << "";
     qDebug() << "Testing GisBlob's default constructor...";
     GisBlob blob;
     qDebug() << "    Polygon = " << blob.polygon();
     
-    qDebug();
+    qDebug() << "";
     qDebug() << "Adding WKT polygon to GisBlob...";
     /*
     QFile file("unitTest.wkt");
@@ -54,8 +54,8 @@ int main() {
     qDebug() << "    Polygon = " << blob.polygon();
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     QString msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }

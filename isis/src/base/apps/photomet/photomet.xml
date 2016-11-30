@@ -998,18 +998,19 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
       "Related Objects and Documents" section of the documentation.
       Fixes mantis ticket #1525.
     </change>
+    <change name="Kelvin Rodriguez" date="2016-08-24">
+      Added cast to void on 'changePar.simplified()' function call to silience unused return
+      value warnings on OS X
+    </change>
     <change name="Curtis Rose" date="2016-11-16">
       Decoupled ANGLESOURCE and USEDEM parameters. They were working incorrectly before 
       and were tangled together a bit. They are separated now and working as expected.
       Anglesource DEM makes the photometric calculations based on the DEM of the image
-        if it exists.
-      Anglesource ELLIPSOID makes the photometric calculations based on the radius 
-        obtained from the DEM shape model.
-      Usedem true trims the image using the photometric calculations on the radius 
-        obtained from the DEM shape model.
-      Usedem false trims the image using the from the IAU/NAIF target body file, 
-        which is defined within the cube's kernel group as the TargetAttitudeShape.
-      Fixes #4180.
+      if it exists. Anglesource ELLIPSOID makes the photometric calculations based on the radius 
+      obtained from the DEM shape model. Usedem true trims the image using the photometric 
+      calculations on the radius obtained from the DEM shape model. Usedem false trims the image 
+      using the from the IAU/NAIF target body file, which is defined within the cube's kernel group 
+      as the TargetAttitudeShape. Fixes #4180.
     </change>
   </history>
   
@@ -2551,10 +2552,10 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <list>
           <option value="FROMPVL">
             <brief>Get model from PVL file</brief>
-	    <description>
+	          <description>
               Get the normalization model from the PVL file.  Add missing parameters to 
               the PVL file, or enter the values at the command line, or use the GUI
-	      to enter the values.
+	            to enter the values.
             </description>
             <exclusions>
               <item>INCREF</item>
@@ -2794,7 +2795,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
             </brief>
             <description>
               Normalization with atmosphere. As with the topo atmospheric model, 
-	      this option is used in the final step of a three-step  process.
+	            this option is used in the final step of a three-step  process.
             </description>
             <inclusions>
               <item>ATMNAME</item>

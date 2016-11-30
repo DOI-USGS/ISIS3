@@ -35,8 +35,6 @@ namespace Isis {
   /**
    * Creates a Camera object using Pvl Specifications
    *
-   * @param lab Pvl label containing specifications for the Camera object
-   *
    * @return Camera* The Camera object created
    *
    * @throws Isis::iException::System - Unsupported camera model, unable to find
@@ -61,15 +59,14 @@ namespace Isis {
 
       PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
       // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
-      if(!kerns.hasKeyword("CameraVersion")) {
+      if (!kerns.hasKeyword("CameraVersion")) {
         kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
       }
 
       int cameraOriginalVersion = (int)kerns["CameraVersion"];
-
       int cameraNewestVersion = CameraVersion(cube);
 
-      if(cameraOriginalVersion != cameraNewestVersion) {
+      if (cameraOriginalVersion != cameraNewestVersion) {
         string msg = "The camera model used to create a camera for this cube is out of date, " \
                      "please re-run spiceinit on the file or process with an old Isis version " \
                      "that has the correct camera model.";
@@ -77,7 +74,7 @@ namespace Isis {
       }
 
       // See if we have a camera model plugin
-      void *ptr;
+      QFunctionPointer ptr;
       try {
         ptr = m_cameraPlugin.GetPlugin(group);
       }
@@ -103,13 +100,13 @@ namespace Isis {
 
 
   void CameraFactory::initPlugin() {
-    if(m_cameraPlugin.fileName() == "") {
+    if (m_cameraPlugin.fileName() == "") {
       FileName localFile("Camera.plugin");
-      if(localFile.fileExists())
+      if (localFile.fileExists())
         m_cameraPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Camera.plugin");
-      if(systemFile.fileExists())
+      if (systemFile.fileExists())
         m_cameraPlugin.read(systemFile.expanded());
     }
   }
@@ -153,7 +150,7 @@ namespace Isis {
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
-      if(!plugin.hasKeyword("Version")) {
+      if (!plugin.hasKeyword("Version")) {
         QString msg = "Camera model identified by [" + group + "] does not have a version number";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -166,5 +163,3 @@ namespace Isis {
     }
   }
 } // end namespace isis
-
-

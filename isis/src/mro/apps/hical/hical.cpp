@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: hical.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
 #include "Isis.h"
 
 #include <cstdio>
@@ -109,7 +109,7 @@ void IsisMain(){
 
   const QString hical_program = "hical";
   const QString hical_version = "5.0";
-  const QString hical_revision = "$Revision$";
+  const QString hical_revision = "$Revision: 6715 $";
   const QString hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
@@ -394,7 +394,7 @@ void IsisMain(){
       procStep = "logging/reporting phase";
       FileName hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
       QString hdumpFile = hdump.expanded();
-      ofstream ofile(hdumpFile.toAscii().data(), ios::out);
+      ofstream ofile(hdumpFile.toLatin1().data(), ios::out);
       if (!ofile) {
         QString mess = "Unable to open/create history dump file " +
                       hdump.expanded();
@@ -475,7 +475,7 @@ void IsisMain(){
     delete calVars;
     calVars = 0;
     QString mess = "Failed in " + procStep;
-    throw IException(ie, IException::User, mess.toAscii().data(), _FILEINFO_);
+    throw IException(ie, IException::User, mess.toLatin1().data(), _FILEINFO_);
   }
 
 // Clean up parameters

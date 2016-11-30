@@ -237,13 +237,13 @@ void translateLabels(Pvl &label, Cube *ocube) {
   QString lsk = "$ISIS3DATA/base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
-  furnsh_c(lskName.expanded().toAscii().data());
+  furnsh_c(lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
   QString sclk = "$ISIS3DATA/newhorizons/kernels/sclk/new_horizons_???.tsc";
   FileName sclkName(sclk);
   sclkName = sclkName.highestVersion();
-  furnsh_c(sclkName.expanded().toAscii().data());
+  furnsh_c(sclkName.expanded().toLatin1().data());
 
   SpiceInt sclkCode;
   if (label.hasKeyword("SPCSCID", Pvl::Traverse)) {
@@ -256,7 +256,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
 
   QString scTime = inst["SpacecraftClockStartCount"];
   double et;
-  scs2e_c(sclkCode, scTime.toAscii().data(), &et);
+  scs2e_c(sclkCode, scTime.toLatin1().data(), &et);
   SpiceChar utc[30];
   et2utc_c(et, "ISOC", 3, 30, utc);
   inst.addKeyword(PvlKeyword("StartTime", QString(utc)));

@@ -24,7 +24,6 @@
 
 
 #include <QMdiArea>
-
 #include <QPointer>
 
 template< class T > class QVector;
@@ -70,10 +69,14 @@ namespace Isis {
   *                           This allows us to show a work space without handling the tool and
   *                           status areas externally. No longer inherits from QMdiArea because
   *                           of the need to place widgets around the mdi area.
-  *   @hisotyr 2015-05-13 Ian Humphrey - Modified addCubeViewport(QString) to handle any exceptions
+  *   @history 2015-05-13 Ian Humphrey - Modified addCubeViewport(QString) to handle any exceptions
   *                           that are thrown within the slot. This prevents undefined behavior 
   *                           when an exception is not handled within a connected slot. 
   *                           References #2210.
+  *   @history 2016-09-08 Tracie Sucharski - Changed imageToMdiWidget to cubeToMdiWidget.  Workspace
+  *                           deals with cubes.  Since Image contains a cube, simply pass in cube
+  *                           instead of Image.  This was done to handle the new IPCE container
+  *                           class, Shape, which also contains a cube, but not an Image.
   */
   class Workspace : public QWidget {
       Q_OBJECT
@@ -87,7 +90,7 @@ namespace Isis {
 
       void addImages(ImageList *images);
       bool confirmClose();
-      QWidget *imageToMdiWidget(Image *image);
+      QWidget *cubeToMdiWidget(Cube *cube);
       QMdiArea *mdiArea();
 
     signals:

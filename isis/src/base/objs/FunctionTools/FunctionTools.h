@@ -189,16 +189,18 @@ namespace Isis {
       *  @returns bool  true if the solution converged, false otherwise
       */
     template <typename Functor> 
-    static bool brentsRootFinder(Functor &func, const QList<double> pt1, 
-                          const QList<double> pt2, double tol, int maxIter, double &root) {
-      double a=pt1[0], b=pt2[0], c, d=0, fa = pt1[1], fb = pt2[1], fc, p, q, r, s, t,tol1, bnew, fbnew, temp, deltaI,deltaF;
+    static bool brentsRootFinder(Functor &func, const QList<double> pt1, const QList<double> pt2, 
+                                 double tol, int maxIter, double &root) {
+      double a = pt1[0], b = pt2[0], c, d = 0;
+      double fa = pt1[1], fb = pt2[1], fc;
+      double p, q, r, s, t, tol1, bnew, fbnew, temp, deltaI, deltaF;
 
-      //offset used for improved numerical stability
+      // offset used for improved numerical stability
       double offset = (a + b) / 2.0;
       a -= offset;
       b -= offset;
 
-      //check to see if the points bracket a root(s), if the signs are equal they don't
+      // check to see if the points bracket a root(s), if the signs are equal they don't
       if ( (fa > 0) - (fa < 0) == (fb > 0) - (fb < 0) ) {
         QString msg = "The function evaluations of two bounding points passed to Brents Method "
                       "have the same sign.  Therefore, they don't necessary bound a root.  No "
@@ -207,11 +209,11 @@ namespace Isis {
         return false;
       }
 
-      bool mflag=true;
+      bool mflag = true;
 
       if (fabs(fa) < fabs(fb)) {
-        //if a is a better guess for the root than b, switch them
-          //b is always the current best guess for the root
+        // if a is a better guess for the root than b, switch them
+        // b is always the current best guess for the root
         temp = a;
         a = b;
         b = temp;
@@ -219,62 +221,62 @@ namespace Isis {
         fa = fb;
         fb = temp;
       }
-   
-      c=a;
-      fc=fa;
 
-      for (int iter=0;iter<maxIter; iter++) {
-        tol1 = DBL_EPSILON*2.0*fabs(b);  //numerical tolerance
+      c = a;
+      fc = fa;
+
+      for (int iter = 0; iter < maxIter; iter++) {
+        tol1 = DBL_EPSILON * 2.0 * fabs(b);  // numerical tolerance
         if (a != c && b != c) {
-          //inverse quadratic interpolation
-          r = fb/fc;
-          s = fb/fa;
-          t = fa/fc;
-          p = s*(t*(r-t)*(c-b)-(1-r)*(b-a));
-          q = (t-1)*(r-1)*(s-1);
-          bnew = b + p/q;     
+          // inverse quadratic interpolation
+          r = fb / fc;
+          s = fb / fa;
+          t = fa / fc;
+          p = s * (t * (r - t) * (c - b) - (1 - r) * (b - a));
+          q = (t - 1) * (r - 1) * (s - 1);
+          bnew = b + p / q;     
         }
         else {
-          //secant rule
+          // secant rule
           bnew = b - fb * (b - a) / (fb - fa);
         }
 
-        //five tests follow to determine if the iterpolation methods are working better than 
-          //bisection. p and q are setup as the bounds we want the new root guess to fall within.
-          //this enforces that the new root guess be withing the 3/4 of the interval closest to
-          //b, the current best guess.
-        temp = (3*a+b)/4.0;
+        // five tests follow to determine if the iterpolation methods are working better than 
+        // bisection. p and q are setup as the bounds we want the new root guess to fall within.
+        // this enforces that the new root guess be withing the 3/4 of the interval closest to
+        // b, the current best guess.
+        temp = (3 * a + b) / 4.0;
         p = temp < b ? temp : b;
         q = b > temp ? b : temp;
-        deltaI = fabs(b - bnew); //magnitude of the interpolated correctio
-        if ( //if the root isn't within the 3/4 of the interval closest to b (the current best guess)
+        deltaI = fabs(b - bnew); // magnitude of the interpolated correctio
+        if ( // if the root isn't within the 3/4 of the interval closest to b (the current best guess)
              (bnew < p || bnew > q )                     ||  
-             //or if the last iteration was a bisection 
-               //and the new correction is greater magnitude than half the magnitude of last
-               //correction, ie it's doing less to narrow the root than a bisection would
-             (mflag && deltaI >= fabs(b-c)/2.0)  ||
-             //or if the last iteration was an interpolation
-               //and the new correction magnitude is greater than 
-               //the half the magnitude of the correction from two iterations ago,
-               //i.e. it's not converging faster than bisection
-             (!mflag && deltaI >= fabs(c-d)/2.0) ||
-             //or if the last iteration was a bisection
-               //and the last correction was less than the numerical tolerance  
-               //ie we are reaching the limits of our numerical
-               //ability to find a better root so lets do bisection, it's numerical safer
-             (mflag && fabs(b-c) < tol1)                 ||
-             //or it the last iteration was an interpolation
-               //and the correction from two iteration ago was less than the current
-               //numerical tolerance, ie we are reaching the limits of our numerical
-               //ability to find a better root so lets do bisection, it's numerical safer
-             (!mflag && fabs(c-d) < tol1)            ) {
+             // or if the last iteration was a bisection 
+             // and the new correction is greater magnitude than half the magnitude of last
+             // correction, ie it's doing less to narrow the root than a bisection would
+             (mflag && deltaI >= fabs(b - c) / 2.0)  ||
+             // or if the last iteration was an interpolation
+             // and the new correction magnitude is greater than 
+             // the half the magnitude of the correction from two iterations ago,
+             // i.e. it's not converging faster than bisection
+             (!mflag && deltaI >= fabs(c - d) / 2.0) ||
+             // or if the last iteration was a bisection
+             // and the last correction was less than the numerical tolerance  
+             // ie we are reaching the limits of our numerical
+             // ability to find a better root so lets do bisection, it's numerical safer
+             (mflag && fabs(b - c) < tol1)                 ||
+             // or it the last iteration was an interpolation
+             // and the correction from two iteration ago was less than the current
+             // numerical tolerance, ie we are reaching the limits of our numerical
+             // ability to find a better root so lets do bisection, it's numerical safer
+             (!mflag && fabs(c - d) < tol1)            ) {
 
-          //bisection method
-          bnew = (a + b)/2.0;
-          mflag=true;
+          // bisection method
+          bnew = (a + b) / 2.0;
+          mflag = true;
         }
         else {
-          mflag=false;
+          mflag = false;
         }
         try {
           fbnew = func(bnew + offset);
@@ -284,25 +286,25 @@ namespace Isis {
                         "inorder to gaurentee brentsRootFinder will work.";
           throw IException(e, IException::Programmer, msg, _FILEINFO_);
         }
-        d = c;  //thus d always equals the best guess from two iterations ago
-        c = b;  //thus c always equals the best giess from the previous iteration
+        d = c;  // thus d always equals the best guess from two iterations ago
+        c = b;  // thus c always equals the best guess from the previous iteration
         fc = fb;
         
         if ( (fa > 0) - (fa < 0) == (fbnew > 0) - (fbnew < 0) ) {
-          //if b and bnew bracket the root
-          deltaF = fabs(a - bnew); //the Final magnitude of the correction
+          // if b and bnew bracket the root
+          deltaF = fabs(a - bnew); // the Final magnitude of the correction
           a = bnew;
           fa = fbnew;
         }
         else {
-          //a and bnew bracket the root
-          deltaF = fabs(b - bnew); //the Final magnitude of the correction
+          // a and bnew bracket the root
+          deltaF = fabs(b - bnew); // the Final magnitude of the correction
           b = bnew;
           fb = fbnew;
         }
     
         if (fabs(fa) < fabs(fb)) {
-          //if a is a better guess for the root than b, switch them
+          // if a is a better guess for the root than b, switch them
           temp = a;
           a = b;
           b = temp;
@@ -311,14 +313,14 @@ namespace Isis {
           fb = temp;
         }
         if (fabs(fb) < tol) {
-          //if the tolerance is meet
+          // if the tolerance is meet
           root = b + offset;
           return true;  
         }
-        else if ( deltaF < tol1 && fabs(b) < 100.0*tol) {
-          //we've reach the numerical limit to how well the root can be defined, and the function
-          //  is at least approaching zero
-          //This was added specifically for the apollo pan camera, the camera classes (and maybe
+        else if ( deltaF < tol1 && fabs(b) < 100.0 * tol) {
+          // we've reach the numerical limit to how well the root can be defined, and the function
+          // is at least approaching zero
+          // This was added specifically for the apollo pan camera, the camera classes (and maybe
           // NAIF as well can not actually converge to zero for the extreme edges of some pan
           // images (partial derivates WRT to line approach infinity).  They can get close 
           // 'enough' however
@@ -326,31 +328,33 @@ namespace Isis {
           return true;  
         }
         else if (deltaF < tol1) {
-          //we've reached the limit of the numerical ability to refine the root and the function
+          // we've reached the limit of the numerical ability to refine the root and the function
           // is not near zero.  This is a clasically ill defined root (nearly vertical function)
           // "This is not the [root] you're looking for"
           return false;
         }
       }
-      //maximum number of iteration exceeded
+      // maximum number of iteration exceeded
       return false;
-    } //end brentsRootFinder
+    } // end brentsRootFinder
 
 
     private:
       /** Constructor
        *
-       * This is private and to left undefined so this class cannot be instaniated
+       * This is private and left undefined so this class cannot be instaniated. The functions 
+       * are static and are intended to be used without an instance of the class. 
        */
-      FunctionTools(); //no definition to be supplied
+      FunctionTools();
      
       /** destructor
        *
        * This is private and to left undefined so this class cannot be instaniated
        */
-      ~FunctionTools(); //no definition to be supplied
-   }; //end FuntionTools class definition
+      ~FunctionTools();
 
-}; //End namespace Isis
+  }; // End FuntionTools class definition
+
+}; // End namespace Isis
 
 #endif

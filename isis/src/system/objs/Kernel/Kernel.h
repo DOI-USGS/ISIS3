@@ -27,14 +27,14 @@
 #include <QStringList>
 
 namespace Isis {
-  /** 
-   * This class stores Kernel information, including Type and kernel  
-   * file names. 
-   *  
+  /**
+   * This class stores Kernel information, including Type and kernel
+   * file names.
+   *
    * @ingroup System
    * @author ????-??-?? Unknown
    *
-   * @internal 
+   * @internal
    *   @history 2013-02-26 Jeannie Backer - Moved this class from the KernelDb
    *                           header file into it's own directory.  Moved
    *                           method implementation into a cpp file. Moved the
@@ -48,17 +48,17 @@ namespace Isis {
    */
   class Kernel {
     public:
-      /** 
+      /**
        * Enumeration for type of kernel
-       */ 
+       */
       enum Type {
         Predicted = 1,     /**< Predicted Kernels are based on predicted location
                                 of the spacecraft*/
         Nadir = 2,         /**< Nadir Kernels mimic spacecraft pointing*/
-        Reconstructed = 4, /**< Reconstructed Kernels are supplemented with 
-                                information on the actual position of targets 
+        Reconstructed = 4, /**< Reconstructed Kernels are supplemented with
+                                information on the actual position of targets
                                 and/or spacecrafts*/
-        Smithed = 8        /**< Smithed Kernels are generally reconstructed 
+        Smithed = 8        /**< Smithed Kernels are generally reconstructed
                                 kernels that have been corrected */
       };
 
@@ -76,13 +76,13 @@ namespace Isis {
       void setKernels(QStringList data);
       void setType(const Type &type);
       // kernels vector operations
-      const int size();
+      int size();
       void push_back(const QString &str);
       QString &operator[](const int index);
       QString operator[](const int index) const;
       // kernel type operations
       bool operator<(const Kernel &other) const;
-  
+
     private:
       QStringList m_kernels; //!< List of kernel file names
       Type m_kernelType;     //!< Enumeration value indicating the kernel type

@@ -31,7 +31,7 @@ namespace Isis {
         virtual ~TableViewHeader();
         virtual void setColumns(TableColumnList *);
         QSize minimumSizeHint() const;
-        QSize sizeHint();
+        QSize sizeHint() const;
 
         void setModel(AbstractTableModel *someModel);
 

@@ -29,19 +29,18 @@ namespace Isis {
    *
    * @internal
    *
-   *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
-   *                      removing includes from ControlNet.h.
-   *  @history 2011-05-07 Steven Lambright Refactored from MosaicItem to
-   *                      have far fewer responsibilities.
-   *  @history 2011-05-10 Steven Lambright Reduced the amount of useless code
-   *  @history 2011-05-11 Steven Lambright Reduced the amount of useless code,
-   *                      footprint is now gathered from the
-   *                      CubeDisplayProperties so duplicate work is not done.
-   *  @history 2011-05-17 Steven Lambright Labels auto-rotate by 90 degrees
-   *                      once again
-   *  @history 2015-05-27 Kristin Berry Updated to work with
-   *                      longitude domain = 180 correctly. Fixes
-   *                      #2208.
+   *  @history 2010-10-26 Tracie Sucharski - Added missing includes to cpp after removing includes
+   *                          from ControlNet.h.
+   *  @history 2011-05-07 Steven Lambright - Refactored from MosaicItem to have far fewer 
+   *                          responsibilities.
+   *  @history 2011-05-10 Steven Lambright - Reduced the amount of useless code
+   *  @history 2011-05-11 Steven Lambright - Reduced the amount of useless code, footprint is now
+   *                          gathered from the CubeDisplayProperties so duplicate work is not done.
+   *  @history 2011-05-17 Steven Lambright - Labels auto-rotate by 90 degrees once again
+   *  @history 2015-05-27 Kristin Berry - Updated to work with longitude domain = 180 correctly.
+   *                          Fixes #2208.
+   *  @history 2016-05-18 Ian Humphrey - Explicitly made outlines cosmetic so that they always
+   *                          appear as 1 pixel wide on screen (Qt4 to Qt5).
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT

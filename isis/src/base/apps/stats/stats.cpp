@@ -91,13 +91,13 @@ void IsisMain() {
     else {
       //if the format was not PVL, write out a flat file.
       if(append) {
-        os.open(outFile.toAscii().data(), ios::app);
+        os.open(outFile.toLatin1().data(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.toAscii().data(), ios::out);
+        os.open(outFile.toLatin1().data(), ios::out);
         writeHeader = true;
       }
 

@@ -19,25 +19,25 @@ extern short ByteStream_status(ByteStream *);
 #define MEMORY  1
 #define DISK    0
 #if defined(__BORLANDC__) && !defined(__WIN32__)
-#define MALLOC	farmalloc
-#define FREE	farfree
-#define CHARH	unsigned char huge
-#define FAR		far
+#define MALLOC  farmalloc
+#define FREE    farfree
+#define CHARH   unsigned char huge
+#define FAR             far
 #else
-#define MALLOC	malloc
-#define FREE	free
-#define CHARH	unsigned char
+#define MALLOC  malloc
+#define FREE    free
+#define CHARH   unsigned char
 #define FAR
 #endif
 
 struct BitStreamDef {
-  ByteStream	bytestream;
-  short		BitBuffer;      /* Bit I/O buffer */
-  short     	BitBuffMask;    /* Bit I/O buffer mask */
-  CHARH		*outstring;
+  ByteStream    bytestream;
+  short         BitBuffer;      /* Bit I/O buffer */
+  short         BitBuffMask;    /* Bit I/O buffer mask */
+  CHARH         *outstring;
   char    mode;
-  unsigned long	bytesout;
-  unsigned short	bitmask[17];
+  unsigned long bytesout;
+  unsigned short        bitmask[17];
 };
 typedef struct BitStreamDef BitStream;
 
@@ -47,10 +47,10 @@ extern short BitStream_write(BitStream *, short bits, short width);
 extern short BitStream_read(BitStream *, short bits);
 
 /* Global Tables */
-extern float	q_table[64];
-extern int	zzseq[64];
-extern short	dcbits[16], acbits[16];
-extern char	dchuffval[12], achuffval[162];
+extern float    q_table[64];
+extern int      zzseq[64];
+extern short    dcbits[16], acbits[16];
+extern char     dchuffval[12], achuffval[162];
 
 /* Function Declarations */
 extern void inithuffcode();

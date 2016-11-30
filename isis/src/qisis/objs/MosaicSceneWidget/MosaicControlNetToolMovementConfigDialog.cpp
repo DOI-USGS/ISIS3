@@ -3,6 +3,7 @@
 #include <float.h>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDialog>
 #include <QDoubleValidator>
@@ -11,7 +12,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QtGui>
+#include <QtWidgets>
 #include <QElapsedTimer>
 
 #include "Angle.h"

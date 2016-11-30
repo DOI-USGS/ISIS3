@@ -33,6 +33,10 @@
 #include <QDebug>
 #include <QPair>
 
+// Prevent Boost from outputing debug information to
+// standard error when throwing exceptions.
+#define BOOST_UBLAS_NO_STD_CERR
+
 namespace Isis {
   class Angle;
   class Distance;
@@ -63,6 +67,9 @@ namespace Isis {
    *   @history 2013-08-07 Kimberly Oyama - Updated documentation.
    *   @history 2016-07-25 Jeannie Backer - Updated documentation and test.
    *   @history 2016-08-05 Jeannie Backer - Replace std abs() function with qAbs() from QtGlobal.
+   *   @history 2016-08-16 Jesse Mapel - Added BOOST_UBLAS_NO_STD_CERR definition to
+   *                           prevent Boost from outputing debug information to standard out
+   *                           when throwing exceptions.  Fixes #2302.
    *  
    *  
    *   @todo document methods (a) add naif routine names to documentation where appropriate,

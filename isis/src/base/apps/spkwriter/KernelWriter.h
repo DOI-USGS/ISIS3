@@ -2,8 +2,8 @@
 #define KernelWriter_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -22,7 +22,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  *
- *   $Id$
+ *   $Id: KernelWriter.h 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
  */
 #include <string>
 
@@ -156,7 +156,7 @@ class KernelWriter {
         for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
-             dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
+             dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
              NaifStatus::CheckErrors();
              commOut.clear();
            }
@@ -168,7 +168,7 @@ class KernelWriter {
         // See if there is residual to write
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
+          dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
           NaifStatus::CheckErrors();
         }
       }

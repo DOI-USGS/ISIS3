@@ -598,7 +598,7 @@ void LoadPvl() {
             ui.PutAsString("HGA", os.str().c_str());
           }
         }
-  
+
         if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
             atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
             atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
@@ -621,7 +621,7 @@ void IsisMain() {
   // get QString of parameter changes to make
   QString changePar = (QString)ui.GetString("CHNGPAR");
   changePar = changePar.toUpper();
-  changePar.simplified();
+  (void)changePar.simplified();  // cast to void to silence unused result warning
   changePar.replace(" =","=");
   changePar.replace("= ","=");
   changePar.remove('"');
@@ -640,7 +640,7 @@ void IsisMain() {
         QString message = "The value you entered for CHNGPAR is invalid. You must enter pairs of ";
         message += "data that are formatted as parname=value and each pair is separated by spaces.";
         throw IException(IException::User, message, _FILEINFO_);
-      } 
+      }
       parMap[parvalList.at(0)] = parvalList.at(1);
     }
   }
@@ -1549,7 +1549,7 @@ void IsisMain() {
                  addKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
       }
     } else if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 hasKeyword("ZEROB0STANDARD")) { 
+                 hasKeyword("ZEROB0STANDARD")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                addKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
     }
@@ -1803,7 +1803,7 @@ void IsisMain() {
       phaseCai = ui.GetInputAttribute("PHASE_ANGLE_FILE");
       p.SetInputCube(ui.GetFileName("PHASE_ANGLE_FILE"), phaseCai);
       usePhasefile = true;
-    } 
+    }
     else {
       phaseAngle = ui.GetDouble("PHASE_ANGLE");
     }
@@ -1974,7 +1974,7 @@ void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Bu
   Buffer &emissionbp = *in[index];
 
   Buffer &outimage = *out[0];
-    
+
   double deminc=0., demema=0., mult=0., base=0.;
   double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
 
@@ -2011,7 +2011,7 @@ void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Bu
       }
       else {
         ellipsoidema = emissionAngle;
-      } 
+      }
       deminc = ellipsoidinc;
       demema = ellipsoidema;
 

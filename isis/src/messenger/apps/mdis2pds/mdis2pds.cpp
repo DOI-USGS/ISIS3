@@ -89,7 +89,7 @@ inline void fixLabels(PvlObject &obj) {
 void IsisMain() {
   const QString mdis2pdsProgram = "mdis2pds";
   const QString mdis2pdsVersion = "1.1";
-  const QString mdis2pdsRevision = "$Revision$";
+  const QString mdis2pdsRevision = "$Revision: 6715 $";
   const QString mdis2pdsRuntime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
@@ -369,7 +369,7 @@ void IsisMain() {
   // All done...write result.
   pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsCDR.pft");
   QString ofile(output.expanded());
-  ofstream outstream(ofile.toAscii().data());
+  ofstream outstream(ofile.toLatin1().data());
   processPds.OutputLabel(outstream);
 
   processPds.StartProcess(outstream);

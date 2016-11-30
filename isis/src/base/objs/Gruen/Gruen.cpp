@@ -653,7 +653,6 @@ namespace Isis {
     return (fit1 <= fit2);
   }
 
-
   /**
    * @brief Applies the adaptive Gruen algorithm to pattern and search chips
    *

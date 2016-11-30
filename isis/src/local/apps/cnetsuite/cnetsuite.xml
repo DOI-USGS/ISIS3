@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetsuite" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+  </brief>
+
+  <description>
+   </description>
+
+  <category>
+    <categoryItem>Display</categoryItem>
+  </category>
+
+  <history>
+    <change name="Ken Edmundson" date="2012-04-03">
+      Original version
+    </change>
+    <change name="Ian Humphrey" date="2016-11-09">
+      The main window state is now saved properly when running cnetsuite. If running cnetsuite
+      without opening a project, the config files are saved as cnetsuite_Project.config (Project is
+      the default project name). Otherwise, when a project is loaded, config files are saved as
+      cnetsuite_ProjectName.config, where ProjectName is the name of the loaded project.
+      Fixes #4358.
+    </change>
+   <change name="Tyler Wilson" date="2016-11-10">
+      Changed the alias reference for the data_management.png icon from 'data' to 'data-management'.  
+      Annoying errors were showing up on the command line when the application was launched due
+      to a naming conflict.  Fixes #3982.
+   </change>        
+  </history>
+</application>

@@ -1,10 +1,10 @@
 #include "IsisDebug.h"
 #include "ScatterPlotWindow.h"
 
+#include <QMenuBar>
 #include <QVector>
 
 #include <qwt_color_map.h>
-#include <qwt_double_range.h>
 #include <qwt_plot.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_panner.h>
@@ -120,21 +120,21 @@ namespace Isis {
     m_colorize = new QAction(this);
     m_colorize->setText("Colorize");
     m_colorize->setIcon(QPixmap(FileName("$base/icons/rgb.png").expanded()));
-    connect(m_colorize, SIGNAL(activated()),
+    connect(m_colorize, SIGNAL(triggered()),
             this, SLOT(colorPlot()));
 
     m_contour = new QAction(this);
     m_contour->setText("Hide Contour Lines");
     m_contour->setIcon(
         QPixmap(FileName("$base/icons/scatterplotcontour.png").expanded()));
-    connect(m_contour, SIGNAL(activated()),
+    connect(m_contour, SIGNAL(triggered()),
             this, SLOT(showHideContour()));
 
     QAction *configureAlarmingAct = new QAction(this);
     configureAlarmingAct->setText("Change Alarming");
     configureAlarmingAct->setIcon(
         QPixmap(FileName("$base/icons/scatterplotalarming.png").expanded()));
-    connect(configureAlarmingAct, SIGNAL(activated()),
+    connect(configureAlarmingAct, SIGNAL(triggered()),
             this, SLOT(configureAlarming()));
 
     foreach (QAction *menuAction, menuBar()->actions()) {

@@ -132,7 +132,7 @@ namespace Isis {
    *                          ControlMeasure header files.  Remove findPointFiles
    *                          method, the code is now in the createPoint method.
    *  @history 2010-11-19 Tracie Sucharski - Renamed pointSaved slot to measureSaved.
-   *  
+   *
    *
    *   @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for forwarding of SIGNAL
@@ -160,7 +160,7 @@ namespace Isis {
    *                          from a Dem if one is open.
    *   @history 2011-09-16 Tracie Sucharski - Added method to draw Fixed and
    *                          Constrained points on the ground source viewport.
-   *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, 
+   *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat,
    *                          lon when creating new control point.
    *   @history 2012-04-09 Tracie Sucharski - When checking if left measure
    *                          editLock has changed, use measure->IsEditLocked()
@@ -190,40 +190,40 @@ namespace Isis {
    *                          the right combo box, use the fileName, not the serial number.  The
    *                          ground source serial number will not be the fileName if the
    *                          Instrument group is retained in the labels.  Fixes #1018
-   *   @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in 
+   *   @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in
    *                          the serial number list, print error and clear out ground information.
    *                          Fixes #1018
-   *   @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   *   @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and
    *                          print warning that point will be deleted. Fixes #1491.
-   *   @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   *   @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button),
    *                          Swapped checking for empty network and not allowing mouse clicks on
    *                          the ground source. First check if there are any points in the network.
    *                          If not print message and return.  Fixes #1493.
-   *   @history 2013-05-16 Tracie Sucharski - Fixed some bugs when closing a ground source, opening 
+   *   @history 2013-05-16 Tracie Sucharski - Fixed some bugs when closing a ground source, opening
    *                          a new ground source, and printing errors when point does not exist
    *                          on current ground source.  Fixes #1655.
    *   @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
    *                          ::measureSaved to ControlPointEdit::saveMeasure.  The error checking now
    *                          forces the edit lock check box to be unchecked before the measure
    *                          can be saved.  Fixes #1624.
-   *   @history 2013-12-05 Tracie Sucharski - Added error check for an ignored reference measure 
+   *   @history 2013-12-05 Tracie Sucharski - Added error check for an ignored reference measure
    *                          when changing point type to constrained or fixed or when saving
    *                          constrained or fixed point with an ignored reference measure.
    *                          Added new method, loadGroundMeasure, so that loadPoint does not
    *                          need to be called from setPointType.  This avoids reloading the point
    *                          in case the ignored flag has been changed, but measure has not been
    *                          saved.  References #1603.
-   *   @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Modified mouseButtonRelease to 
+   *   @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Modified mouseButtonRelease to
    *                           correctly handle expections thrown when find the closest control point.
-   *                           Updated the message displayed to user to be more informative. 
+   *                           Updated the message displayed to user to be more informative.
    *                           Fixes #2210.
-   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Added two functions to encapsulate 
-   *                           duplicate code. Modified logic for changing a ground point between 
-   *                           fixed and constrained (or vice versa) to prevent adding a duplicate 
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Added two functions to encapsulate
+   *                           duplicate code. Modified logic for changing a ground point between
+   *                           fixed and constrained (or vice versa) to prevent adding a duplicate
    *                           ground measure, so no error is encountered. Fixes #2060.
-   *   @history 2015-06-05 Makayla Shepherd and Ian Humphrey - Modified checkReference() and 
-   *                           measureSaved() so that when the user selects no on the dialog box 
-   *                           when changing the reference, the action is properly canceled (as 
+   *   @history 2015-06-05 Makayla Shepherd and Ian Humphrey - Modified checkReference() and
+   *                           measureSaved() so that when the user selects no on the dialog box
+   *                           when changing the reference, the action is properly canceled (as
    *                           intended). Fixes #2172.
    *   @history 2015-10-07 Ian Humphrey - Updated icons and icons are no longer embedded as per
    *                           licensing terms. Fixes #1041.
@@ -232,8 +232,11 @@ namespace Isis {
    *                           measures and added slots to handle these shortcuts. Added save
    *                           control network shortcut. Fixes #2324.
    *   @history 2016-03-17 Makayla Shepherd - Modified addMeasures so that new measures use the
-   *                           Reference Measure in order to keep the behavior consistent. 
+   *                           Reference Measure in order to keep the behavior consistent.
    *                           Fixes #2326.
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed unused member variables to eliminate warnings
+   *                              in clang. Part of porting to OS X 10.11
+   *
    *   @history 2016-10-07 Makayla Shepherd - Modified the Radius Source File label behavior on the 
    *                           Qnet Tool. When there is not a radius source open, a point is 
    *                           selected, and a ground source is opened, the radius source will be 
@@ -412,7 +415,7 @@ namespace Isis {
       QPointer<QAction> m_saveTemplateFileAs;
 
       QPointer<QAction> m_whatsThis;
-      
+
       QPointer<QMainWindow> m_mw;
       QPointer<ControlPointEdit> m_pointEditor;
 
@@ -438,7 +441,7 @@ namespace Isis {
       QPointer<QLabel> m_pointLatitude;
       QPointer<QLabel> m_pointLongitude;
       QPointer<QLabel> m_pointRadius;
-      
+
       QPointer<QCheckBox> m_lockPoint;
       QPointer<QCheckBox> m_ignorePoint;
       QPointer<QLabel> m_leftReference;

@@ -328,7 +328,7 @@ namespace Isis {
   double Latitude::planetographic(Angle::Units units) const {
     
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      QString msg = "Latitude [" + toString(degrees()) + " degrees] cannot "
+      QString msg = "Latitude [" + toString(true) + "] cannot "
           "be converted to Planetographic without the planetary radii, please "
           "use the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -373,7 +373,7 @@ namespace Isis {
   void Latitude::setPlanetographic(double latitude, Angle::Units units) {
     
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      QString msg = "Latitude [" + Isis::toString(latitude) + "] cannot be "
+      QString msg = "Latitude [" + Isis::toString(latitude) + " degrees] cannot be "
           "converted to Planetocentic without the planetary radii, please use "
           "the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -425,9 +425,9 @@ namespace Isis {
     
     // Validity check on the range
     if (min > max) {
-      QString msg = "Minimum latitude [" + toString(min.degrees()) + 
-                    "] degrees is greater than maximum latitude [" + 
-                    toString(max.degrees()) + "] degrees";
+      QString msg = "Minimum latitude [" + min.toString(true) + 
+                    "] is greater than maximum latitude [" + 
+                    max.toString(true) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -470,7 +470,7 @@ namespace Isis {
 
     return *this;
   }
-  
+
 
   /**
    * Adds an angle to this latitude. The adding method is determined by the
@@ -523,7 +523,7 @@ namespace Isis {
     return add(angleToAdd, equatorialRadius, polarRadius, latType);
   }
 
-  
+
   /**
    * Adds another latitude to this one. Handles planetographic latitudes.
    *
@@ -534,10 +534,12 @@ namespace Isis {
    * 
    * @return The result of adding another latitude
    */
-  Latitude Latitude::add(Angle angleToAdd, Distance equatorialRadius, Distance polarRadius,
+  Latitude Latitude::add(Angle angleToAdd, 
+                         Distance equatorialRadius, 
+                         Distance polarRadius,
                          CoordinateType latType) {
     Latitude result;
-    
+
     switch (latType) {
       case Planetocentric:
         result = Latitude(planetocentric() + angleToAdd.radians(), equatorialRadius, polarRadius,
@@ -549,7 +551,7 @@ namespace Isis {
                           latType, Radians, m_errors);
         break;
     }
-    
+
     return result;
   }
 
@@ -563,7 +565,8 @@ namespace Isis {
    * @throws IException::Programmer "Latitudes past 90 degrees are not valid. 
    *     The latitude is not allowed"
    */
-  void Latitude::setAngle(double angle, const Angle::Units &units) {
+  void Latitude::setAngle(const double &angle, 
+                          const Angle::Units &units) {
     
     // Check for passing 90 degrees if that error checking is on
     if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
@@ -571,11 +574,10 @@ namespace Isis {
       if (tmpAngle > Angle(90, Angle::Degrees) ||
           tmpAngle < Angle(-90, Angle::Degrees)) {
         QString msg = "Latitudes past 90 degrees are not valid. The latitude [" 
-                      + toString(tmpAngle.degrees()) + " degrees] is not allowed";
+                      + Isis::toString(tmpAngle.degrees(), 8) + "] is not allowed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-
     Angle::setAngle(angle, units);
   }
 }

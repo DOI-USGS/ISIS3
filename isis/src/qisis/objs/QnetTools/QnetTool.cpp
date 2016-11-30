@@ -4,8 +4,17 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QScrollBar>
 #include <QShortcut>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QtWidgets>
+#include <QTableWidget>
+#include <QWhatsThis>
 
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
@@ -45,9 +54,6 @@
 using namespace std;
 
 namespace Isis {
-  const int VIEWSIZE = 301;
-  const int CHIPVIEWPORT_WIDTH = 310;
-
 
   /**
    * Consructs the Qnet Tool window
@@ -87,7 +93,7 @@ namespace Isis {
 
   QnetTool::~QnetTool () {
     writeSettings();
-   
+
     delete m_editPoint;
     delete m_leftMeasure;
     delete m_rightMeasure;
@@ -119,8 +125,8 @@ namespace Isis {
    *                           ignorePointChanged().
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
-   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for the addMeasure (A) and savePoint (P) 
-   *                           button. References #2324.                          
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for the addMeasure (A) and savePoint (P)
+   *                           button. References #2324.
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
@@ -389,7 +395,7 @@ namespace Isis {
    * Creates the right measure group box.
    *
    * @returns The groupbox labeled "Right Measure"
-   * 
+   *
    * @internal
    *   @history 2015-10-29 Ian Humphrey - Added shortcuts (PageUp/PageDown) for selecting previous
    *                           or next measure in right measures box. References #2324.
@@ -407,7 +413,7 @@ namespace Isis {
     QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, m_qnetTool);
     connect(prevMeasure, SIGNAL(activated()), this, SLOT(previousRightMeasure()));
 
-    m_rightCombo->setToolTip("Choose right control measure. " 
+    m_rightCombo->setToolTip("Choose right control measure. "
                              "<strong>Shortcuts: PageUp/PageDown</strong>");
     m_rightCombo->setWhatsThis("Choose right control measure identified by "
                                "cube filename. "
@@ -508,7 +514,7 @@ namespace Isis {
       "ground control points, both Fixed and Constrained."
       "This cube can be a level1, level2 or dem cube.";
     m_openGround->setWhatsThis(whatsThis);
-    connect (m_openGround,SIGNAL(activated()),this,SLOT(openGround()));
+    connect (m_openGround,SIGNAL(triggered()),this,SLOT(openGround()));
 
     m_openDem = new QAction(m_qnetTool);
     m_openDem->setText("Open &Radius Source");
@@ -520,7 +526,7 @@ namespace Isis {
       "displayed for visually picking points.  This is strictly used to "
       "determine the radius value for ground control points.";
     m_openDem->setWhatsThis(whatsThis);
-    connect (m_openDem,SIGNAL(activated()),this,SLOT(openDem()));
+    connect (m_openDem,SIGNAL(triggered()),this,SLOT(openDem()));
 
     m_saveNet = new QAction(QIcon(toolIconDir() + "/filesave.png"), "Save Control Network ...",
                             m_qnetTool);
@@ -530,7 +536,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i>";
     m_saveNet->setWhatsThis(whatsThis);
-    connect(m_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(m_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     m_saveAsNet = new QAction(QIcon(toolIconDir() + "/filesaveas.png"), "Save Control Network &As...",
                               m_qnetTool);
@@ -539,7 +545,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i> under chosen filename";
     m_saveAsNet->setWhatsThis(whatsThis);
-    connect(m_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
+    connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
 
     m_closeQnetTool = new QAction(QIcon(toolIconDir() + "/fileclose.png"), "&Close", m_qnetTool);
     m_closeQnetTool->setToolTip("Close this window");
@@ -548,7 +554,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Closes the Qnet Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeQnetTool->setWhatsThis(whatsThis);
-    connect(m_closeQnetTool, SIGNAL(activated()), m_qnetTool, SLOT(close()));
+    connect(m_closeQnetTool, SIGNAL(triggered()), m_qnetTool, SLOT(close()));
 
     m_showHideTemplateEditor = new QAction(QIcon(toolIconDir() + "/view_text.png"),
         "&View/edit registration template", m_qnetTool);
@@ -560,7 +566,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     m_showHideTemplateEditor->setWhatsThis(whatsThis);
-    connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
+    connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
     m_saveChips = new QAction(QIcon(toolIconDir() + "/savechips.png"), "Save registration chips",
@@ -570,7 +576,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
     m_saveChips->setWhatsThis(whatsThis);
-    connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+    connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
     m_openTemplateFile = new QAction(QIcon(toolIconDir() + "/fileopen.png"), "&Open registration "
         "template", m_qnetTool);
@@ -579,7 +585,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
     m_openTemplateFile->setWhatsThis(whatsThis);
-    connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
+    connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
     m_saveTemplateFile = new QAction(QIcon(toolIconDir() + "/filesave.png"), "&Save template file",
         m_qnetTool);
@@ -602,7 +608,7 @@ namespace Isis {
     m_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     m_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");
-    connect(m_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(m_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
   }
 
@@ -784,7 +790,7 @@ namespace Isis {
     // If this is a fixed or constrained point, and the right measure is the ground source,
     // update the lat,lon,radius.  Only the right measure can be moved, so only need to update
     // position if the ground measure is loaded on the right.
-    // 
+    //
     // If point is locked and it is not a new point, print error
     //  TODO::  Only update if the measure moved
     if (m_editPoint->GetType() != ControlPoint::Free && (m_groundOpen &&
@@ -842,21 +848,21 @@ namespace Isis {
 
   /**
    * Change which measure is the reference.
-   *  
+   *
    * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
-   * 
+   *
    * @return bool If false reset reference ChipViewport to original value.
    *
    * @internal
    *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
    *                          measureSaved method.
-   *   @history 2015-06-01 Makayla Shepherd and Ian Humphrey - Modified to return a boolean 
+   *   @history 2015-06-01 Makayla Shepherd and Ian Humphrey - Modified to return a boolean
    *                          value to indicate if the user wants to update the reference or not
    *                          and modified the case when the user clicks no to reload the left and
    *                          right ChipViewports to reset back to the previous locations.
    */
   bool QnetTool::checkReference() {
-    
+
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
@@ -923,11 +929,11 @@ namespace Isis {
 
   /*
   * Update the position of ground point
-  *  
+  *
   * @author 2012-04-26 Tracie Sucharski - moved functionality from measureSaved
   *
   * @internal
-  *  
+  *
   */
   void QnetTool::updateGroundPosition() {
 
@@ -952,7 +958,7 @@ namespace Isis {
     //  1.  If a dem has been opened, read radius from dem.
     //  2.  Get radius from reference measure
     //        If image has shape model, radius will come from shape model
-    // 
+    //
     if (m_demOpen) {
       radius = demRadius(lat,lon);
       if (radius == Null) {
@@ -1106,12 +1112,12 @@ namespace Isis {
    *
    * @author 2011-07-05 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2013-12-06 Tracie Sucharski - If changing point type to constrained or fixed make
    *                           sure reference measure is not ignored.
    *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - When changing a ground point between
    *                           fixed and constrained and vice versa, the ground measure will not be
-   *                           reloaded (otherwise m_editPoint->Add() will throw an exception 
+   *                           reloaded (otherwise m_editPoint->Add() will throw an exception
    *                           within a connected slot).
    */
   void QnetTool::setPointType (int pointType) {
@@ -1129,12 +1135,12 @@ namespace Isis {
     }
 
     bool unloadGround = false;
-    if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free) 
+    if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free)
       unloadGround = true;
 
     // save the old point's type
     int temp = m_editPoint->GetType();
-    
+
     ControlPoint::Status status = m_editPoint->SetType((ControlPoint::PointType) pointType);
     if (status == ControlPoint::PointLocked) {
       m_pointType->setCurrentIndex((int) m_editPoint->GetType());
@@ -1169,14 +1175,14 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    * Load ground measure into right side and add to file combo boxes.
    *
-   * @author 2013-12-06 Tracie Sucharski 
+   * @author 2013-12-06 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2013-12-06 Tracie Sucharski - Original version.
-   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to 
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to
    *                           findPointLocation() and createTemporaryGroundMeasure().
    *
    */
@@ -1186,12 +1192,12 @@ namespace Isis {
 
     if (findPointLocation()) {
       ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
-      
+
       // Add to measure combo boxes
       QString file = m_serialNumberList->fileName(groundMeasure->GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
-      
+
       m_leftCombo->addItem(tempFileName);
       m_rightCombo->addItem(tempFileName);
       int rightIndex = m_rightCombo->findText((QString)m_groundFile);
@@ -1499,18 +1505,18 @@ namespace Isis {
    *                          "Save Point To Control Network".
    * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon
    *                          when creating new control point.
-   * @history 2012-05-08 Tracie Sucharski - Clear m_leftFile, only set if creating 
+   * @history 2012-05-08 Tracie Sucharski - Clear m_leftFile, only set if creating
    *                          new point. Change m_leftFile from a std::string to
    *                          a QString.
-   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button),
    *                          Swapped checking for empty network and not allowing mouse clicks on
    *                          the ground source. First check if there are any points in the network.
    *                          If not print message and return.
-   * @history 2013-12-17 Tracie Sucharski - Check for valid serial number at beginning.  This 
+   * @history 2013-12-17 Tracie Sucharski - Check for valid serial number at beginning.  This
    *                          prevents seg fault if user opens a new cube list but clicks on a
    *                          cube that was open from a previous list.
-   * @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Add try/catch when trying to find 
-   *                          closest control point. Since FindClosest() can throw exceptions, 
+   * @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Add try/catch when trying to find
+   *                          closest control point. Since FindClosest() can throw exceptions,
    *                          we need to handle them within this connected slot to avoid undefined
    *                          behavior.
    */
@@ -1553,7 +1559,7 @@ namespace Isis {
 
       //  Find closest control point in network
       QString sn = m_serialNumberList->serialNumber(file);
-      
+
       // since we are in a connected slot, we need to handle exceptions thrown by FindClosest
       try {
         ControlPoint *point = m_controlNet->FindClosest(sn, samp, line);
@@ -1566,7 +1572,7 @@ namespace Isis {
         return;
       }
     }
-    
+
     else if (s == Qt::MidButton) {
       if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
         QString message = "No points exist for deleting.  Create points ";
@@ -1663,7 +1669,7 @@ namespace Isis {
    *   @history 2011-07-19 Tracie Sucharski - Remove call to
    *                           SetAprioriSurfacePoint, this should only be
    *                           done for constrained or fixed points.
-   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from std::string to QString. 
+   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from std::string to QString.
    *
    */
   void QnetTool::createPoint(double lat,double lon) {
@@ -1747,7 +1753,7 @@ namespace Isis {
 
       //  Load new point in QnetTool
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       loadTemplateFile(
@@ -1917,7 +1923,7 @@ namespace Isis {
 
       //  Load new point in QnetTool
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       delete fixedPointDialog;
@@ -1949,8 +1955,8 @@ namespace Isis {
    *                          selected, nothing else happens.
    * @history 2011-07-15 Tracie Sucharski - Print info about deleting editLock
    *                          points and reference measures.
-   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
-   *                          print warning that point will be deleted. 
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and
+   *                          print warning that point will be deleted.
    *
    */
   void QnetTool::deletePoint(ControlPoint *point) {
@@ -2007,7 +2013,7 @@ namespace Isis {
         //  need index in control net for pt
         //int i = m_controlNet->
         //m_filteredPoints.
-        m_qnetTool->setShown(false);
+        m_qnetTool->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) ==
                                           ControlPoint::PointLocked) {
@@ -2068,7 +2074,7 @@ namespace Isis {
         }
 
         loadPoint();
-        m_qnetTool->setShown(true);
+        m_qnetTool->setVisible(true);
         m_qnetTool->raise();
 
         loadTemplateFile(m_pointEditor->templateFileName());
@@ -2133,7 +2139,7 @@ namespace Isis {
     //  TODO: better way - have 2 slots
     if (sender() != this) m_leftFile.clear();
     loadPoint();
-    m_qnetTool->setShown(true);
+    m_qnetTool->setVisible(true);
     m_qnetTool->raise();
     loadTemplateFile(m_pointEditor->templateFileName());
 
@@ -2144,19 +2150,19 @@ namespace Isis {
     m_savePoint->setPalette(m_saveDefaultPalette);
   }
 
-  
+
   /**
    * @brief Attempt to find the control point's location on the ground source
-   * 
+   *
    * @return bool true if the location is found on the ground source
-   * 
+   *
    * @internal
    *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Orignal version adapted from
    *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
    */
   bool QnetTool::findPointLocation() {
     bool located = true;
-    
+
     // Use apriori surface point to find location on ground source.  If
       // apriori surface point does not exist use reference measure
       double lat = 0.;
@@ -2186,22 +2192,22 @@ namespace Isis {
         message += "\n A ground measure will not be created.";
         QMessageBox::warning(m_qnetTool, "Warning", message);
       }
-      
+
       return located;
   }
-  
-  
+
+
   /**
    * @brief Create a temporary measure to hold the ground point info for ground source
-   * 
+   *
    * @return ControlMeasure* the created ground measure
-   * 
+   *
    * @internal
    *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Original version adapted from
    *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
    */
   ControlMeasure *QnetTool::createTemporaryGroundMeasure() {
-     
+
      // This measure will be deleted when the ControlPoint is saved to the
      // ControlNet.
      ControlMeasure *groundMeasure = new ControlMeasure;
@@ -2209,11 +2215,11 @@ namespace Isis {
      groundMeasure->SetType(ControlMeasure::Candidate);
      groundMeasure->SetCoordinate(m_groundGmap->Sample(),m_groundGmap->Line());
      m_editPoint->Add(groundMeasure);
-     
+
      return groundMeasure;
   }
-  
-  
+
+
   /**
    * @brief Load point into QnetTool.
    * @internal
@@ -2232,7 +2238,7 @@ namespace Isis {
    *                          fileName, not the serial number.  The ground source serial number
    *                          will not be the fileName if the Instrument group is retained in the
    *                          labels.  Fixes #1018
-   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to 
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to
    *                          findPointLocation() and createTemporaryGroundMeasure().
    *   @history 2016-10-07 Makayla Shepherd - Added radius source handling if there is a ground 
    *                          source and there is not a radius source already open. 
@@ -2331,7 +2337,7 @@ namespace Isis {
       }
     }
 
-    //  Determine index for right measure.  
+    //  Determine index for right measure.
     //  First, try to find correct ground.  If no correct ground, set right index to either 0 or 1,
     //  depending on value of the left index.
     if (m_groundOpen && (m_editPoint->GetType() != ControlPoint::Free))  {
@@ -2570,8 +2576,8 @@ namespace Isis {
     throw IException(IException::Programmer,
         "Invalid measure column passed to measureColumnToString", _FILEINFO_);
   }
-  
-  
+
+
   ControlNet *QnetTool::controlNet() {
     return m_controlNet;
   }
@@ -2714,7 +2720,7 @@ namespace Isis {
   /**
    * @brief Selects the next right measure when activated by key shortcut
    *
-   * This slot is intended to handle selecting the next right measure when the attached shortcut 
+   * This slot is intended to handle selecting the next right measure when the attached shortcut
    * (PageDown) is activated. This slot checks if the next index is in bounds.
    *
    * @internal
@@ -3006,7 +3012,7 @@ namespace Isis {
    *                           implementation of binary control networks.
    * @history 2011-04-06  Tracie Sucharski - If not a fixed point, use the
    *                           Reference measure to get lat,lon.
-   * @history 2016-03-17  Makayla Shepherd - All new measures added use the 
+   * @history 2016-03-17  Makayla Shepherd - All new measures added use the
    *                           Reference Measure to get the lat, lon, in order
    *                           to make keep behavior consistant. Fixes #2326.
    *
@@ -3024,7 +3030,7 @@ namespace Isis {
     // Use lat/lon of first measure
     double lat;
     double lon;
-    
+
     ControlMeasure m = *(m_editPoint->GetRefMeasure());
     int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
     cam = m_controlNet->Camera(camIndex);
@@ -3069,7 +3075,7 @@ namespace Isis {
         m_editPoint->Add(m);
       }
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       loadTemplateFile(
@@ -3565,8 +3571,8 @@ namespace Isis {
         delete m_editPoint;
         m_editPoint = NULL;
         emit editPointChanged("");
-        m_qnetTool->setShown(false);
-        m_measureWindow->setShown(false);
+        m_qnetTool->setVisible(false);
+        m_measureWindow->setVisible(false);
       }
     }
 
@@ -3724,7 +3730,7 @@ namespace Isis {
       QMessageBox::critical(m_qnetTool, "Error", e.toString());
 
       m_groundFile.clear();
-      
+
       // Re-load point w/o ground source
       if (m_editPoint) {
         loadPoint();
@@ -3739,7 +3745,7 @@ namespace Isis {
     m_groundOpen = true;
 
     m_workspace->addCubeViewport(m_groundCube.data());
-    
+
     //  Get viewport so connect can be made when ground source viewport closed to clean up
     // ground source
     MdiCubeViewport *vp;
@@ -4142,4 +4148,3 @@ namespace Isis {
 
 
 }
-

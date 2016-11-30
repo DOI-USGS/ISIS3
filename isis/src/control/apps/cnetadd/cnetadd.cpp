@@ -5,6 +5,7 @@
 
 #include <QList>
 #include <QMap>
+#include <QScopedPointer>
 #include <QSet>
 #include <QString>
 
@@ -71,14 +72,14 @@ void IsisMain() {
   PvlKeyword pointsModified("PointsModified");
 
   bool checkMeasureValidity = ui.WasEntered("DEFFILE");
-  ControlNetValidMeasure validator;
+  QScopedPointer<ControlNetValidMeasure> validator;
   if (checkMeasureValidity) {
     Pvl deffile(ui.GetFileName("DEFFILE"));
-    validator = ControlNetValidMeasure(deffile);
+    validator.reset(new ControlNetValidMeasure(deffile));
   }
 
-  SerialNumberList *fromSerials = ui.WasEntered("FROMLIST") ?
-    new SerialNumberList(ui.GetFileName("FROMLIST")) : new SerialNumberList();
+  QScopedPointer<SerialNumberList> fromSerials( (ui.WasEntered("FROMLIST") ?
+    new SerialNumberList(ui.GetFileName("FROMLIST")) : new SerialNumberList()));
 
   ControlNet inNet = ControlNet(ui.GetFileName("CNET"));
   inNet.SetUserName(Application::UserName());
@@ -204,19 +205,19 @@ void IsisMain() {
 
           // Check the measure for DEFFILE validity
           if (checkMeasureValidity) {
-            if (!validator.ValidEmissionAngle(cam->EmissionAngle())) {
+            if (!validator->ValidEmissionAngle(cam->EmissionAngle())) {
               //TODO: log that it was Emission Angle that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator.ValidIncidenceAngle(cam->IncidenceAngle())) {
+            else if (!validator->ValidIncidenceAngle(cam->IncidenceAngle())) {
               //TODO: log that it was Incidence Angle that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator.ValidResolution(cam->resolution())) {
+            else if (!validator->ValidResolution(cam->resolution())) {
               //TODO: log that it was Resolution that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator.PixelsFromEdge((int)cam->Sample(), (int)cam->Line(), &cube)) {
+            else if (!validator->PixelsFromEdge((int)cam->Sample(), (int)cam->Line(), &cube)) {
               //TODO: log that it was Pixels from Edge that failed the check
               newCm->SetIgnored(true);
             }
@@ -224,7 +225,7 @@ void IsisMain() {
               Portal portal(1, 1, cube.pixelType());
               portal.SetPosition(cam->Sample(), cam->Line(), 1);
               cube.read(portal);
-              if (!validator.ValidDnValue(portal[0])) {
+              if (!validator->ValidDnValue(portal[0])) {
                 //TODO: log that it was DN that failed the check
                 newCm->SetIgnored(true);
               }
@@ -278,7 +279,7 @@ void IsisMain() {
 
     // Set up the output file for writing
     std::ofstream out_stream;
-    out_stream.open(pointList.expanded().toAscii().data(), std::ios::out);
+    out_stream.open(pointList.expanded().toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     QList<QString> modifiedPointsList = g_modifications.keys();
@@ -345,7 +346,7 @@ void IsisMain() {
 
   inNet.Write(outNetFile.expanded());
 
-  delete fromSerials;
+  // delete fromSerials;
 }
 
 

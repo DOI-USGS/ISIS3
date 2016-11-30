@@ -1,0 +1,272 @@
+#ifndef BundleObservationSolveSettings_h
+#define BundleObservationSolveSettings_h
+/**
+ * @file
+ * $Revision: 1.20 $
+ * $Date: 2014/5/28 09:31:00 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+
+#include <QList>
+#include <QSet>
+#include <QString>
+
+#include "SpicePosition.h"
+#include "SpiceRotation.h"
+#include "XmlStackedHandler.h"
+
+class QDataStream;
+class QUuid;
+class QXmlStreamWriter;
+
+namespace Isis {
+  class FileName;
+  class Project;  // TODO: does xml stuff need project???
+  class PvlObject;
+  class XmlStackedHandlerReader;
+  /**
+   * This class is used to modify and manage solve settings for 1 to many BundleObservations. These
+   * settings indicate how any associated observations should be solved.
+   *
+   * @ingroup ControlNetworks
+   *
+   * @author 2014-07-09 Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-07-09 Ken Edmundson - Original version.
+   *   @history 2014-07-23 Jeannie Backer - Replace QVectors with QLists. Moved copy
+   *                           constructor above destructor. Moved operator= implementation
+   *                           to cpp file. Added methods to set/get instrument Id. Created
+   *                           setInstrumentPointingSettings() and
+   *                           setInstrumentPositionSettings() methods to check for variable
+   *                           dependencies before setting. Reordered so that all position
+   *                           methods were together and all pointing methods were together.
+   *                           Updated documentation. Added QDataStream >> and << operators
+   *                           and read/write methods. Added unitTest for BundleUtilities
+   *                           BundleObservationSolveSettings class.
+   *   @history 2014-07-25 Jeannie Backer - For enums < 4, set solve degrees one less than
+   *                           enum value.
+   *   @history 2014-12-02 Jeannie Backer - Undo last modification. While it makes sense, it
+   *                           was causing jigsaw to fail. Brought test coverage of this
+   *                           class to 99.403% scope.
+   *   @history 2016-08-03 Jesse Mapel - Added BundleObservationSolveSettingsQsp definition.
+   *                           Fixes #4150.
+   *   @history 2016-08-03 Ian Humphrey - Updated documentation and reviewed coding standards.
+   *                           Fixes #4078.
+   *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
+   *   @history 2016-10-13 Ian Humphrey - Added m_observationNumbers, addObservationNumber(), and
+   *                           observationNumbers() members to associate multiple observation types
+   *                           with these settings. Removed the setFromPvl() method. When re-
+   *                           implemented, it should be put in jigsaw. References #4293.
+   *  
+   *  
+   *   @todo Figure out why solve degree and num coefficients does not match solve option.
+   *   @todo Determine whether xml stuff needs a Project pointer.
+   *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
+   */
+
+class BundleObservationSolveSettings {
+
+    public:
+      BundleObservationSolveSettings();
+      BundleObservationSolveSettings(Project *project, 
+                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
+      BundleObservationSolveSettings(FileName xmlFile, 
+                                     Project *project, 
+                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
+      BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
+      ~BundleObservationSolveSettings();
+      BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
+      void initialize();
+
+      PvlObject pvlObject(QString name = "") const; // Default name is instrument ID.
+
+      void setInstrumentId(QString instrumentId);
+      QString instrumentId() const;
+      void addObservationNumber(QString observationNumber);
+      QSet<QString> observationNumbers() const;
+
+
+
+      //! Options for how to solve for instrument pointing.
+      enum InstrumentPointingSolveOption {
+        NoPointingFactors          = 0, /**< Solve for none of the pointing factors.*/
+        AnglesOnly                 = 1, /**< Solve for pointing angles: right ascension, declination
+                                             and, optionally, twist.*/
+        AnglesVelocity             = 2, //!< Solve for pointing angles and their angular velocities.
+        AnglesVelocityAcceleration = 3, /**< Solve for pointing angles, their velocities and their
+                                             accelerations.*/
+        AllPointingCoefficients    = 4  /**< Solve for all coefficients in the polynomials fit to
+                                             the pointing angles.*/
+      };
+
+      static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
+      static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
+      void setInstrumentPointingSettings(InstrumentPointingSolveOption option, 
+                                         bool solveTwist, 
+                                         int ckDegree = 2, 
+                                         int ckSolveDegree = 2,
+                                         bool solvePolynomialOverExisting = false, 
+                                         double anglesAprioriSigma = -1.0,
+                                         double angularVelocityAprioriSigma = -1.0, 
+                                         double angularAccelerationAprioriSigma = -1.0);
+      InstrumentPointingSolveOption instrumentPointingSolveOption() const;
+      bool solveTwist() const;
+      int ckDegree() const;
+      int ckSolveDegree() const;
+      int numberCameraAngleCoefficientsSolved() const;
+      bool solvePolyOverPointing() const;
+      QList<double> aprioriPointingSigmas() const;
+      SpiceRotation::Source pointingInterpolationType() const;
+
+
+
+      //! Options for how to solve for instrument position
+      enum InstrumentPositionSolveOption {
+        NoPositionFactors            = 0, /**< Solve for none of the position factors.*/
+        PositionOnly                 = 1, /**< Solve for instrument positions only.*/
+        PositionVelocity             = 2, /**< Solve for instrument positions and velocities.*/
+        PositionVelocityAcceleration = 3, /**< Solve for instrument positions, velocities, and
+                                               accelerations.*/
+        AllPositionCoefficients      = 4  /**< Solve for all coefficients in the polynomials fit to
+                                               the instrument positions.*/
+      };
+
+      static InstrumentPositionSolveOption stringToInstrumentPositionSolveOption(QString option);
+      static QString instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option);
+      void setInstrumentPositionSettings(InstrumentPositionSolveOption option,
+                                         int spkDegree = 2,
+                                         int spkSolveDegree = 2,
+                                         bool positionOverHermite = false,
+                                         double positionAprioriSigma = -1.0,
+                                         double velocityAprioriSigma = -1.0,
+                                         double accelerationAprioriSigma = -1.0);
+      InstrumentPositionSolveOption instrumentPositionSolveOption() const;
+      int spkDegree() const;
+      int spkSolveDegree() const;
+      int numberCameraPositionCoefficientsSolved() const;
+      bool solvePositionOverHermite() const;
+      QList<double> aprioriPositionSigmas() const;
+      SpicePosition::Source positionInterpolationType() const;
+
+      // TODO: does xml stuff need project???
+      void save(QXmlStreamWriter &stream, const Project *project) const;  
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
+
+    private:
+      /**
+       *
+       * @author 2014-07-28 Jeannie Backer
+       *
+       * @internal
+       *   @todo To be docuemnted if XML handler code is used for serialization.
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          // TODO: does xml stuff need project???
+          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
+          ~XmlHandler();
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                  const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
+          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
+          QStringList m_xmlHandlerAprioriSigmas;
+      };
+
+      /**
+       * A unique ID for this object (useful for others to reference this object
+       *   when saving to disk).
+       */
+      QUuid *m_id;
+      QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
+      QSet<QString> m_observationNumbers;  //!< Associated observation numbers for these settings.
+
+      // pointing related parameters
+      //! Option for how to solve for instrument pointing.
+      InstrumentPointingSolveOption m_instrumentPointingSolveOption;
+      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in
+                                                       solution.*/
+      int m_ckDegree;                             /**< Degree of the polynomial fit to the original
+                                                       camera angles. **/
+      int m_ckSolveDegree;                        /**< Degree of the camera angles polynomial being
+                                                       fit to in the bundle adjustment. **/
+      bool m_solveTwist;                          //!< Solve for "twist" angle.
+      bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing 
+                                                       pointing polynomial.*/
+      QList<double> m_anglesAprioriSigma; /**< The image position a priori sigmas.The size of the
+                                               list is equal to the number of coefficients in the
+                                               solution. An Isis::Null value implies no weighting 
+                                               will be applied.*/ 
+      SpiceRotation::Source
+          m_pointingInterpolationType;    /**< SpiceRotation interpolation type.
+                                               Defined in SpiceRotation.cpp, these types are:
+                                               1) Spice: directly from kernels,
+                                               2) Nadir: Nadir pointing,
+                                               3) Memcache: from cached table,
+                                               4) PolyFunction: from nth degree polynomial,
+                                               5) PolyFunctionOverSpice: kernels plus nth degree
+                                                  polynomial.*/
+
+      // position related parameters
+      //! Option for how to solve for instrument position
+      InstrumentPositionSolveOption m_instrumentPositionSolveOption;
+      int m_numberCamPosCoefSolved;          /**< The number of camera position coefficients in the
+                                                  solution.*/
+      int m_spkDegree;                       /**< Degree of the polynomial fit to the original
+                                                  camera position. **/
+      int m_spkSolveDegree;                  /**< Degree of the camera position polynomial being
+                                                  fit to in the bundle adjustment. **/
+      bool m_solvePositionOverHermiteSpline; /**< The polynomial will be fit over an existing
+                                                  Hermite spline.*/
+      QList<double> m_positionAprioriSigma; /**< The instrument pointing a priori sigmas. The
+                                                  size of the list is equal to the number of
+                                                  coefficients in the solution. An Isis:Null value
+                                                  implies no weighting will be applied.*/ 
+      SpicePosition::Source
+          m_positionInterpolationType;      /**< SpicePosition interpolation types.
+                                                 Defined in SpicePosition.cpp, these types are:
+                                                 1) Spice: read directly from kernels,
+                                                 2) Memcache: read from cached table,
+                                                 3) HermiteCache: read from splined table,
+                                                 4) PolyFunction: calced from nth degree polynomial,
+                                                 5) PolyFunctionOverHermiteConstant: read from
+                                                    splined table and adding nth degree 
+                                                    polynomial.*/ 
+
+  };
+  //!  Definition for BundleObservationSolveSettingsQsp, a QSharedPointer to a
+  //!< BundleObservationSolveSettings object.
+  typedef QSharedPointer<BundleObservationSolveSettings> BundleObservationSolveSettingsQsp;
+  
+  // Operators to read/write BundleResults to/from binary data.
+  QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings);
+  QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings);
+};
+
+#endif // BundleObservationSolveSettings_h

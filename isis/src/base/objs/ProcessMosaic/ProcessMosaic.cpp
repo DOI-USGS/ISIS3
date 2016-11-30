@@ -170,7 +170,7 @@ namespace Isis {
     imgPosition += PvlKeyword("StartSample", toString(m_oss));
     imgPosition += PvlKeyword("StartLine", toString(m_osl));
     m_imagePositions += imgPosition;
-          
+
     // Tests for completly off the mosaic
     if ((ins < 1) || (inl < 1)) {
       QString m = "The input cube does not overlap the mosaic";
@@ -293,7 +293,7 @@ namespace Isis {
       }
     }
 
-    
+
     // Process Band Priority with no tracking
     if (m_imageOverlay == UseBandPlacementCriteria && !m_trackingEnabled ) {
       BandPriorityWithNoTracking(iss, isl, isb, ins, inl, inb, bandPriorityInputBandNumber,
@@ -345,7 +345,7 @@ namespace Isis {
             // Band Priority
             else if (m_trackingEnabled && m_imageOverlay == UseBandPlacementCriteria) {
               int iPixelOrigin = qRound(origPortal[pixel]);
-              
+
               Portal iComparePortal( ins, 1, InputCubes[0]->pixelType() );
               Portal oComparePortal( ins, 1, OutputCubes[0]->pixelType() );
               iComparePortal.SetPosition(iss, il, bandPriorityInputBandNumber);
@@ -427,7 +427,7 @@ namespace Isis {
     }
   } // End StartProcess
 
-  
+
   /**
    * Accessor for the placed images and their locations.
    *
@@ -437,7 +437,7 @@ namespace Isis {
     return m_imagePositions;
   }
 
-  
+
   /**
    * Opens an input cube specified by the user. This method is overloaded and
    * adds the requirement that only one input cube can be specified.
@@ -626,9 +626,9 @@ namespace Isis {
   }
 
 
-  /** 
-   * 
-   */ 
+  /**
+   *
+   */
   void ProcessMosaic::SetBandBinMatch(bool enforceBandBinMatch) {
     m_enforceBandBinMatch = enforceBandBinMatch;
   }
@@ -739,7 +739,7 @@ namespace Isis {
 
             for (int i = 0;i < existingTableRecords;i++) {
               // Get the file name and trim out the characters filled due to resizing
-              QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toAscii().data());
+              QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toLatin1().data());
               int found = sTableFile.lastIndexOf(".cub");
               if (found != -1) {
                 // clear the packing characters - get only the file name
@@ -772,7 +772,7 @@ namespace Isis {
                 // otherwise, keep the original record size
                 record = cFileTable_Copy[i];
               }
-              
+
               // if this is the first record, initialize the new table with by adding the record
               // created above (this will also set the appropriate record size)
               if (i == 0) {
@@ -887,9 +887,9 @@ namespace Isis {
   }
 
   /**
-   * Set the DEM match flag. 
-   * @param matchDEM If true, the match is enforced between Input & Mosaic 
-   */ 
+   * Set the DEM match flag.
+   * @param matchDEM If true, the match is enforced between Input & Mosaic
+   */
   void ProcessMosaic::SetMatchDEM(bool matchDEM) {
     m_enforceMatchDEM = matchDEM;
   }
@@ -917,9 +917,9 @@ namespace Isis {
   }
 
 
-  /** 
-   *  
-   */ 
+  /**
+   *
+   */
   ProcessMosaic::ImageOverlay ProcessMosaic::GetImageOverlay() const {
     return m_imageOverlay;
   }
@@ -1360,9 +1360,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Get the Band Index in an image of type (input/output)
-   */ 
+   */
   int ProcessMosaic::GetBandIndex(bool inputFile) {
     bool bFound = false;
     int iBandIndex = 0;
@@ -1376,7 +1376,7 @@ namespace Isis {
           iBandIndex = m_bandPriorityBandNumber;
           bFound = true;
       }
-    }        
+    }
     else {
       cPvlLabel = *(OutputCubes[0]->label());
       if (m_bandPriorityBandNumber <= OutputCubes[0]->bandCount() &&

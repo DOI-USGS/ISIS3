@@ -20,8 +20,9 @@ namespace Isis {
    * properties.
    */
   PlotCurve::PlotCurve(Units xUnits, Units yUnits)  : QwtPlotCurve() {
-    m_markerSymbol.setStyle(QwtSymbol::NoSymbol);
-    m_markerSymbol.setSize(6, 6);
+    m_markerSymbol = new QwtSymbol();
+    m_markerSymbol->setStyle(QwtSymbol::NoSymbol);
+    m_markerSymbol->setSize(6, 6);
     m_color = QColor(Qt::white);
     m_xUnits = xUnits;
     m_yUnits = yUnits;
@@ -60,9 +61,9 @@ namespace Isis {
   /**
    * This method returns the shape of the markers.
    *
-   * @return QwtSymbol
+   * @return QwtSymbol *
    */
-  QwtSymbol PlotCurve::markerSymbol() const {
+  QwtSymbol *PlotCurve::markerSymbol() const {
     return m_markerSymbol;
   }
 
@@ -116,8 +117,8 @@ namespace Isis {
    *  This method sets the shape of the markers.
    * @param style
    */
-  void PlotCurve::setMarkerSymbol(QwtSymbol symbol) {
-    m_markerSymbol = symbol;
+  void PlotCurve::setMarkerSymbol(QwtSymbol::Style style) {
+    m_markerSymbol->setStyle(style);
     recreateMarkers();
   }
 
@@ -216,19 +217,19 @@ namespace Isis {
 
       QBrush markerBrush;
       markerSymbolDataStream >> markerBrush;
-      m_markerSymbol.setBrush(markerBrush);
+      m_markerSymbol->setBrush(markerBrush);
 
       QPen markerPen;
       markerSymbolDataStream >> markerPen;
-      m_markerSymbol.setPen(markerPen);
+      m_markerSymbol->setPen(markerPen);
 
       QSize markerSize;
       markerSymbolDataStream >> markerSize;
-      m_markerSymbol.setSize(markerSize);
+      m_markerSymbol->setSize(markerSize);
 
       int markerStyle;
       markerSymbolDataStream >> markerStyle;
-      m_markerSymbol.setStyle((QwtSymbol::Style)markerStyle);
+      m_markerSymbol->setStyle((QwtSymbol::Style)markerStyle);
 
       // Done reading the more advanced items, finish up with the data
       int plotDataSize = *((int *)(rawClassData + dataPos));
@@ -303,10 +304,10 @@ namespace Isis {
     markerSymbolDataBuffer.open(QIODevice::ReadWrite);
 
     QDataStream markerSymbolDataStream(&markerSymbolDataBuffer);
-    markerSymbolDataStream << m_markerSymbol.brush();
-    markerSymbolDataStream << m_markerSymbol.pen();
-    markerSymbolDataStream << m_markerSymbol.size();
-    markerSymbolDataStream << (int)m_markerSymbol.style();
+    markerSymbolDataStream << m_markerSymbol->brush();
+    markerSymbolDataStream << m_markerSymbol->pen();
+    markerSymbolDataStream << m_markerSymbol->size();
+    markerSymbolDataStream << (int)m_markerSymbol->style();
     markerSymbolDataBuffer.seek(0);
 
     size = markerSymbolDataBuffer.buffer().size();
@@ -363,16 +364,16 @@ namespace Isis {
     }
     clearMarkers();
 
-    QPen markerPen = m_markerSymbol.pen();
+    QPen markerPen = m_markerSymbol->pen();
     markerPen.setColor(m_color);
-    m_markerSymbol.setPen(markerPen);
+    m_markerSymbol->setPen(markerPen);
 
     const QwtSeriesData<QPointF> &plotData = *data();
     for(unsigned int i = 0; i < plotData.size(); i++) {
       QwtPlotMarker *newMarker = new QwtPlotMarker();
       newMarker->setValue(plotData.sample(i).x(), plotData.sample(i).y());
       newMarker->setAxes(xAxis(), yAxis());
-      newMarker->setSymbol(&m_markerSymbol);
+      newMarker->setSymbol(m_markerSymbol);
       newMarker->setVisible(markersVisible);
       newMarker->attach(plot());
       m_valuePointMarkers.append(newMarker);

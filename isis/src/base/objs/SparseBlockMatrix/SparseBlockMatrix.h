@@ -20,14 +20,20 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+// std library
+#include <iostream>
 
+// Qt library
 #include <QMap>
 #include <QList>
 
-#include <iostream>
-
+// boost library
 #include <boost/numeric/ublas/fwd.hpp>
 
+// Isis library
+#include "LinearAlgebra.h"
+
+// Qt library
 class QDebug;
 
 namespace Isis {
@@ -36,11 +42,11 @@ namespace Isis {
    * @brief SparseBlockColumnMatrix
    *
    * The SparseBlockMatrix class is a QList of SparseBlockColumnMatrix objects. Each
-   *  SparseBlockColumnMatrix is a QMap of square matrix blocks and represents a column of square
-   *  matrix blocks in the reduced normal equations matrix. The key into each column map is the
-   *  block’s row index. The value at each key is a square dense matrix (Boost matrix) with a
-   *  dimension equivalent to the number of exterior orientation parameters used for the image.
-   *  Zero blocks are not stored.
+   * SparseBlockColumnMatrix is a QMap of square matrix blocks and represents a column of square
+   * matrix blocks in the reduced normal equations matrix. The key into each column map is the
+   * block's row index. The value at each key is a square dense matrix (Boost matrix) with a
+   * dimension equivalent to the number of exterior orientation parameters used for the image.
+   * Zero blocks are not stored.
    *
    * @ingroup Utility
    *
@@ -54,9 +60,11 @@ namespace Isis {
    *                           as recommended by Qt documentation.
    *   @history 2015-12-18 Ken Edmundson - 1) added more detailed documentation; 2) brought up to
    *                           ISIS coding standards.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost matrix with Isis::LinearAlgebra::Matrix.
+   *                           References #4163.
    */
   class SparseBlockColumnMatrix :
-      public QMap< int, boost::numeric::ublas::matrix<double>* > {
+      public QMap< int, LinearAlgebra::Matrix * > {
 
   public:
     SparseBlockColumnMatrix(){} // default constructor
@@ -115,7 +123,7 @@ namespace Isis {
    *                           to ISIS coding standards.
    */
   class SparseBlockRowMatrix :
-      public QMap< int, boost::numeric::ublas::matrix<double>* > {
+      public QMap< int, LinearAlgebra::Matrix  * > {
 
   public:
     SparseBlockRowMatrix(){} // default constructor
@@ -193,7 +201,7 @@ namespace Isis {
     bool setNumberOfColumns( int n );
     void zeroBlocks();
     bool insertMatrixBlock(int nColumnBlock, int nRowBlock, int nRows, int nCols);
-    boost::numeric::ublas::matrix<double>* getBlock(int column, int row);
+    LinearAlgebra::Matrix *getBlock(int column, int row);
     int numberOfBlocks();
     int numberOfDiagonalBlocks();
     int numberOfOffDiagonalBlocks();

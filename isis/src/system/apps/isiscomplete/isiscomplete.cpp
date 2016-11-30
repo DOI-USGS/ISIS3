@@ -37,7 +37,7 @@ void MakeCompletion(const QString &appName) {
   char *argv[2] = { 0, 0 };
   int argc = 2;
 
-  QByteArray appNameBytes = appName.toAscii();
+  QByteArray appNameBytes = appName.toLatin1();
   argv[0] = appNameBytes.data();
   argv[1] = new char[16];
   strcpy(argv[1], "-nogui");

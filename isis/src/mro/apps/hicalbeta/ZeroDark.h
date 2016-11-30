@@ -1,28 +1,28 @@
 #ifndef ZeroDark_h
 #define ZeroDark_h
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision: 1.5 $
  * $Date: 2008/06/13 22:28:55 $
  * $Id: ZeroDark.h,v 1.5 2008/06/13 22:28:55 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <cmath>
 #include <string>
 #include <vector>
@@ -42,26 +42,26 @@ namespace Isis {
 
   /**
    * @brief Computes a complex dark subtraction component (ZeroDark module)
-   * 
-   * This class computes the HiRISE dark correction component using a 
-   * combination of the B matrix, slope/intercept components and temperature 
-   * profiles. 
-   * 
+   *
+   * This class computes the HiRISE dark correction component using a
+   * combination of the B matrix, slope/intercept components and temperature
+   * profiles.
+   *
    * @ingroup Utility
-   * 
-   * @author 2008-01-10 Kris Becker 
+   *
+   * @author 2008-01-10 Kris Becker
    * @internal
-   * @history 2008-06-13 Kris Becker - Added PrintOn method to produce more 
+   * @history 2008-06-13 Kris Becker - Added PrintOn method to produce more
    *          detailed data dump;  Added computation of statistics
-   * @history 2010-04-16 Kris Becker - Implemented standardized access to CSV 
+   * @history 2010-04-16 Kris Becker - Implemented standardized access to CSV
    *          files.
    * @history 2010-10-28 Kris Becker Renamed parameters replacing "Zb" with
    *            "ZeroDark"
-   *  
+   *
    */
   class ZeroDark : public Module {
 
-    public: 
+    public:
       //  Constructors and Destructor
       ZeroDark() : Module("ZeroDark") { }
       ZeroDark(const HiCalConf &conf) : Module("ZeroDark") {
@@ -71,9 +71,9 @@ namespace Isis {
       /** Destructor */
       virtual ~ZeroDark() { }
 
-      /** 
+      /**
        * @brief Return statistics for filtered - raw Buffer
-       * 
+       *
        * @return const Statistics&  Statistics class with all stats
        */
       const Statistics &Stats() const { return (_stats); }
@@ -81,8 +81,6 @@ namespace Isis {
     private:
       int _tdi;
       int _bin;
-      int _ccd;
-      int _channel;
 
       HiVector _BM;
       HiVector _slope;
@@ -139,8 +137,8 @@ namespace Isis {
 
         HiVector dc(samples);
         double linetime = ToDouble(prof("ScanExposureDuration"));
-        double scale = linetime * 1.0E-6 * (_bin*_bin) * 
-                       (20.0*103.0/89.0 + _tdi); 
+        double scale = linetime * 1.0E-6 * (_bin*_bin) *
+                       (20.0*103.0/89.0 + _tdi);
         double baseT = HiTempEqn(_refTemp);
         for (int j = 0 ; j < samples ; j++) {
           dc[j] = _BM[j] * scale * HiTempEqn(_tempProf[j]) / baseT;
@@ -181,4 +179,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

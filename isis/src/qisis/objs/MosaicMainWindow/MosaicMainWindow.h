@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 
 class QString;
+class QProgressBar;
 
 namespace Isis {
   class Cube;
@@ -34,7 +35,7 @@ namespace Isis {
    *                           dialogs to always open to '/' which was undesired
    *                           behavior. This has been fixed by initializing it
    *                           to '.' and updating its value  when a cube is
-   *                           opened. Fixes #752. 
+   *                           opened. Fixes #752.
    *   @history 2012-06-18 Steven Lambright - m_lastOpenedFile was being overly
    *                           aggresively when remembering paths from previously
    *                           opened files - it followed the cube paths inside of
@@ -104,9 +105,9 @@ namespace Isis {
       bool eventFilter(QObject *o, QEvent *e);
 
     private:
+      void readSettings(QSize defaultSize = QSize(800, 600));
       void setupMenus();
       void setupPvlToolBar();
-      void readSettings();
       void saveSettings2();
       void openFiles(QStringList cubeNames);
       bool updateMenuVisibility(QMenu *menu);
@@ -140,4 +141,3 @@ namespace Isis {
 };
 
 #endif
-

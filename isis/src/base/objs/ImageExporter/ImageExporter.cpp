@@ -388,11 +388,11 @@ namespace Isis {
     if (TiffExporter::canWriteFormat(format)) {
       exporter = new TiffExporter();
     }
-    else if (QtExporter::canWriteFormat(format)) {
-      exporter = new QtExporter(format);
-    }
     else if (JP2Exporter::canWriteFormat(format)) {
       exporter = new JP2Exporter();
+    }
+    else if (QtExporter::canWriteFormat(format)) {
+      exporter = new QtExporter(format);
     }
     else {
       throw IException(IException::Programmer,

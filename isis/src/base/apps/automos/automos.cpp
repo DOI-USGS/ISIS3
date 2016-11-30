@@ -36,7 +36,7 @@ void IsisMain() {
   if (ui.WasEntered("TOLIST")){
     QString olist = ui.GetFileName("TOLIST");
     olistFlag = true;
-    os.open(olist.toAscii().data(), std::ios::out);
+    os.open(olist.toLatin1().data(), std::ios::out);
   }
 
   ProcessMapMosaic m;

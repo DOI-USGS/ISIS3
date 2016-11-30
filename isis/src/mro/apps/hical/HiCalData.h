@@ -2,9 +2,9 @@
 #define HiCalData_h
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 4941 $
+ * $Date: 2013-01-03 13:02:20 -0700 (Thu, 03 Jan 2013) $
+ * $Id: HiCalData.h 4941 2013-01-03 20:02:20Z slambright@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions

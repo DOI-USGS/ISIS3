@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundleSettings>
+    <globalSettings>
+        <id></id>
+        <validateNetwork></validateNetwork>
+        <solveOptions></solveOptions>
+        <aprioriSigmas></aprioriSigmas>
+        <outlierRejectionOptions></outlierRejectionOptions>
+        <convergenceCriteriaOptions></convergenceCriteriaOptions>
+        <maximumLikelihoodEstimation>
+          <model type="" />
+          <model type="Huber" quantile=""/>
+        </maximumLikelihoodEstimation>
+        <outputFileOptions/>
+    </globalSettings>
+    <observationSolveSettingsList>
+        <bundleObservationSolveSettings>
+            <id></id>
+            <instrumentId></instrumentId>
+            <instrumentPointingOptions>
+            </instrumentPointingOptions>
+            <instrumentPositionOptions>
+            </instrumentPositionOptions>
+        </bundleObservationSolveSettings>
+    </observationSolveSettingsList>
+</bundleSettings>

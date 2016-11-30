@@ -518,7 +518,7 @@ void IsisMain() {
     excludeFile.write(FileName(ui.GetFileName("EXCLUDE")).expanded());
   }
 
-  remove(outTmpName.toAscii().data());
+  remove(outTmpName.toLatin1().data());
 
   // Clean up settings
   ResetGlobals();

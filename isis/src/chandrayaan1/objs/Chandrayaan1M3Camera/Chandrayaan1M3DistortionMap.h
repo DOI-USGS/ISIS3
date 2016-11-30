@@ -33,8 +33,8 @@ namespace Isis {
   /**
    * @brief Distortion map for the Chandrayaan1 M3 camera
    *
-   * This class is used by the Chandrayaan1 M3 camera model as its distortion map. Equations 
-   * provided by Randy Kirk and code provided by Ken Edmundson. 
+   * This class is used by the Chandrayaan1 M3 camera model as its distortion map. Equations
+   * provided by Randy Kirk and code provided by Ken Edmundson.
    *
    * @ingroup Camera
    *
@@ -42,13 +42,15 @@ namespace Isis {
    *
    * @internal
    *   @history 2013-11-24 Stuart Sides - Modified from ApolloMetricDistortionMap
-   *   
+   *   @history 2016-08-28 Kelvin Rodriguez - Removed unused member variable p_p3 to squash warnings
+   *                              in clang. Part of porting to OS X 10.11 
+   *
    */
 
   class Chandrayaan1M3DistortionMap : public CameraDistortionMap {
     public:
-      Chandrayaan1M3DistortionMap(Camera *parent, double xp, double yp, 
-                                  double k1, double k2, double k3, 
+      Chandrayaan1M3DistortionMap(Camera *parent, double xp, double yp,
+                                  double k1, double k2, double k3,
                                   double p1, double p2);
       ~Chandrayaan1M3DistortionMap() {};
 
@@ -58,7 +60,7 @@ namespace Isis {
     private: // parameters below are from camera calibration report
       double p_xp, p_yp;       //!< principal point coordinates
       double p_k1, p_k2, p_k3; //!< coefficients of radial distortion
-      double p_p1, p_p2, p_p3; //!< coefficients of decentering distortion
+      double p_p1, p_p2; //!< coefficients of decentering distortion
   };
 };
 #endif

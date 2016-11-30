@@ -1,9 +1,9 @@
 #ifndef TableColumnList_H
 #define TableColumnList_H
-#include <SpecialPixel.h>
 
+#include <QObject>
 
-template<typename A, typename B> class QPair;
+template<typename A, typename B> struct QPair;
 
 
 namespace Isis {
@@ -15,6 +15,9 @@ namespace Isis {
      *
      * @internal
      *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+     *   @history 2016-08-28 Kelvin Rodriguez - Removed unused member functions that are would
+     *                           cause infinite recursion if called. Caught by clang diagnostics.
+     *                           Part of porting to OS X 10.11
      */
     class TableColumnList : public QObject {
         Q_OBJECT
@@ -43,11 +46,11 @@ namespace Isis {
         QStringList getSortingOrderAsStrings() const;
         void setSortingOrder(QStringList newOrder);
         void lower(TableColumn *col, bool emitSortOutDated = true);
-        void lower(int visibleColumnIndex, bool emitSortOutDated = true);
+        // void lower(int visibleColumnIndex, bool emitSortOutDated = true);
         void raise(TableColumn *col, bool emitSortOutDated = true);
-        void raise(int visibleColumnIndex, bool emitSortOutDated = true);
+        // void raise(int visibleColumnIndex, bool emitSortOutDated = true);
         void raiseToTop(TableColumn *col);
-        void raiseToTop(int visibleColumnIndex);
+        // void raiseToTop(int visibleColumnIndex);
 
         int size() const;
 
@@ -71,4 +74,3 @@ namespace Isis {
 }
 
 #endif
-

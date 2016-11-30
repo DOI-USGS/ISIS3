@@ -47,7 +47,7 @@ namespace Isis {
    */
   void ProcessImportVicar::SetVicarFile(const QString &vicarFile, Pvl &vicarLab) {
     //  Open vicar file
-    ifstream vicFile(vicarFile.toAscii().data(), ios::in);
+    ifstream vicFile(vicarFile.toLatin1().data(), ios::in);
 
     if(!vicFile) {
       QString msg = "Cannot open vicar file [" + vicarFile + "]";
@@ -120,7 +120,7 @@ namespace Isis {
                           (int) vLab["NLB"] * (int) vLab["RECSIZE"] +
                           (int) vLab["NL"] * (int) vLab["NB"] *
                           (int) vLab["RECSIZE"];
-          ifstream vicFile(vicarFile.toAscii().data(), ios::in);
+          ifstream vicFile(vicarFile.toLatin1().data(), ios::in);
 
           QString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
           stringstream lbl;

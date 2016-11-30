@@ -2,27 +2,29 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include <iomanip>
 #include <iostream>
 
 #include <QList>
 #include <QString>
 
+#include "CubeManager.h"
 #include "ApolloMetricCamera.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -38,9 +40,8 @@ using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
 
-int main(void) {
+int main(int argc, char **argv) {
   Preference::Preferences(true);
-
   cout << "Unit Test for ApolloCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
@@ -56,24 +57,24 @@ int main(void) {
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 
-    // Test kernel IDs
+    // Test kernel IDsq
     cout << "Kernel IDs: " << endl;
     cout << "CK Frame ID = " << cam->CkFrameId() << endl;
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-    
-    // Test Shutter Open/Close 
+
+    // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toAscii().data(), &et);
-    // approximate 1 tenth of a second since Apollo did not provide
-    double exposureDuration = .1; 
+    str2et_c(stime.toLatin1().data(), &et);
+    // approximate 1 tenth of a second since Apollo did not
+    double exposureDuration = .1;
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     cout << "Shutter open = " << shuttertimes.first.Et() << endl;
     cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
-      
+
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
     TestLineSamp(cam, 1.0, 1.0);
@@ -109,13 +110,13 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
-    
+
     // Test name methods
     QList<QString> files;
     files.append("$apollo15/testData/AS15-M-0533.cropped.cub");
     files.append("$apollo16/testData/AS16-M-0533.reduced.cub");
     files.append("$apollo17/testData/AS17-M-0543.reduced.cub");
-    
+
     cout << endl << endl << "Testing name methods ..." << endl;
     for (int i = 0; i < files.size(); i++) {
       Cube n(files[i], "r");
@@ -125,7 +126,7 @@ int main(void) {
       cout << "Instrument Name Long: " << nCam->instrumentNameLong() << endl;
       cout << "Instrument Name Short: " << nCam->instrumentNameShort() << endl << endl;
     }
-    
+
     // Test exception
     cout << endl << "Testing exceptions:" << endl << endl;
     Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
@@ -156,4 +157,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = ERROR" << endl << endl;
   }
 }
-

@@ -31,4 +31,3 @@ commands:
 	  > $(OUTPUT)/residuals.csv
 	$(RM) bundleout.txt > /dev/null;
 	$(RM) residuals.csv > /dev/null;
-	$(RM) print.prt > /dev/null;

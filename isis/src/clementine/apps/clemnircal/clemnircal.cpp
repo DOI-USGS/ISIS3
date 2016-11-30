@@ -278,7 +278,7 @@ void NirCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &ou
 
   for(int iSample = 0; iSample < incube.SampleDimension(); iSample ++) {
     // If the bad pixel cube has 0.0 as a value, then this is a known bad pixel
-    if((badpixelcube[iSample] == 0.0)) {
+    if(badpixelcube[iSample] == 0.0) {
       outcube[iSample] = Isis::Null;
       continue;
     }

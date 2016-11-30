@@ -39,7 +39,7 @@ namespace Isis {
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength = protoBufferCore["Bytes"];
 
-    fstream input(file.expanded().toAscii().data(), ios::in | ios::binary);
+    fstream input(file.expanded().toLatin1().data(), ios::in | ios::binary);
     if (!input.is_open()) {
       IString msg = "Failed to open PB file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);

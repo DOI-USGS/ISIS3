@@ -35,35 +35,44 @@ namespace Isis {
    *
    * @internal
    *   @history 2008-11-19 Tracie Sucharski - Addition option to constructor
-   *                           to allow mouse events on leftChipViewport.
+   *                            to allow mouse events on leftChipViewport.
    *   @history 2009-06-10 Tracie Sucharski - Added new slot, clearFiles which
-   *                           allow new files to be opened.
+   *                            allow new files to be opened.
    *   @history 2010-05-18 Jeannie Walldren - Modified createPoint() method
-   *                           Point ID Dialog to return if "Cancel" is
-   *                           clicked.
+   *                            Point ID Dialog to return if "Cancel" is
+   *                            clicked.
    *   @history 2010-05-18 Tracie Sucharski - Added pointId to the Tie tool
-   *                           Dialog.
+   *                            Dialog.
    *   @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
-   *                           forwarding of SIGNAL from StretchTool to
-   *                           ChipViewport
+   *                            forwarding of SIGNAL from StretchTool to
+   *                            ChipViewport
    *   @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
-   *                           registration template now in this class, not in
-   *                           ControlPointEdit
+   *                            registration template now in this class, not in
+   *                            ControlPointEdit
    *   @history 2012-05-10 Tracie Sucharski - Reset pointers to NULL, when creating
-   *                           new control point, if doesn't exist on basemap, return.
+   *                            new control point, if doesn't exist on basemap, return.
    *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
-   *                           and into the QtieFileTool class.
+   *                            and into the QtieFileTool class.
    *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                           coding standards. References #972.
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
-   *                             #775 and #1114.
-   *   @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
-   *                             ticket #775. 
+   *                            coding standards. References #972.
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis
+   *                            tickets #775 and #1114.
+   *   @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References
+   *                            Mantis ticket #775.
    *   @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
-   *                             network immediately print warning and return.  References #1493.
+   *                            network immediately print warning and return.  References #1493.
+   *   @history 2014-07-23 Jeannie Backer - Updated to create a BundleSettings and
+   *                            BundleObservationSolveSettings to pass into the BundleAdjust
+   *                            constructor.
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
-   *                           ControlNet's target instead of the TargetName.
-   *                           References #3892
+   *                            ControlNet's target instead of the TargetName.
+   *                            References #3892
+   *   @history 2016-08-18 Jeannie Backer - Removed all references to the "SpecialK" solve
+   *                            method (deprecated). This program now uses what was
+   *                            previously called the "Sparse" method instead. Results are
+   *                            expected to be identical. References #4162.
+   *   @history 2016-10-26 Tyler Wilson - Enabled iteration information output to the
+   *                            terminal (including Sigma0).  Fixes #4470.
    */
   class QtieTool : public Tool {
       Q_OBJECT

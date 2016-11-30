@@ -33,6 +33,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
+   *   @history 2016-08-25 Adam Paqeutte - Updated documentation. Fixes #4299.
    */
   class CloseProjectWorkOrder : public WorkOrder {
       Q_OBJECT

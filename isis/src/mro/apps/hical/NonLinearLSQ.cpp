@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 7140 $
+ * $Date: 2016-09-27 15:40:47 -0700 (Tue, 27 Sep 2016) $
+ * $Id: NonLinearLSQ.cpp 7140 2016-09-27 22:40:47Z jwbacker@GS.DOI.NET $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -21,19 +21,22 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+// std lib
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <sstream>
 
-#include <gsl/gsl_errno.h>
+// gsl lib
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_multifit_nlin.h>
 
-#include "NonLinearLSQ.h"
+// Isis lib
 #include "IException.h"
 #include "IString.h"
+#include "NonLinearLSQ.h"
 
 using namespace std;
 
@@ -68,13 +71,15 @@ int NonLinearLSQ::curvefit() {
                   gsl_blas_dnrm2(s->f), GSL_CONTINUE);
 
 
+  gsl_matrix *J = gsl_matrix_alloc(n, p);
   do {
     _nIters++;
 
     _status = gsl_multifit_fdfsolver_iterate(s);
     _fitParms = gslToNlsq(s->x);
 
-    gsl_multifit_covar(s->J, 0.0, covar);
+    gsl_multifit_fdfsolver_jac(s, J);
+    gsl_multifit_covar(J, 0.0, covar);
     _uncert = getUncertainty(covar);
 
     _status = checkIteration(_nIters, _fitParms, _uncert, gsl_blas_dnrm2(s->f),
@@ -88,6 +93,7 @@ int NonLinearLSQ::curvefit() {
   // Clean up
   gsl_multifit_fdfsolver_free(s);
   gsl_matrix_free(covar);
+  gsl_matrix_free(J);
 
   return (_status);
 }

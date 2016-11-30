@@ -101,7 +101,7 @@ namespace Isis {
       if(!tmp->isValid()) {
         delete tmp;
         tmp = NULL;
-        IString msg = "The image [" + sns.fileName(sns.serialNumber(i)) +
+        QString msg = "The image [" + sns.fileName(sns.serialNumber(i)) +
                       "] has an invalid footprint";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -168,7 +168,7 @@ namespace Isis {
    * @param outputFile The output ImageOverlapSet file
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
-      
+    
     // Do a common sense programmer check, this should be empty before we start
     if (!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on " \
@@ -327,12 +327,13 @@ namespace Isis {
    */
   void ImageOverlapSet::ReadImageOverlaps(const QString &filename) {
     
-    IString file = FileName(filename).expanded();
+    QString file = FileName(filename).expanded();
 
     try {
       // Let's get an istream pointed at our file
       std::ifstream inStream;
-      inStream.open(file.c_str(), fstream::in | fstream::binary);
+      QByteArray fileArray = file.toLatin1();
+      inStream.open(fileArray.constData(), fstream::in | fstream::binary);
 
       while (!inStream.eof()) {
         p_lonLatOverlapsMutex.lock();
@@ -343,12 +344,14 @@ namespace Isis {
       inStream.close();
     }
     catch (IException &e) {
-      IString msg = "The overlap file [" + filename + "] does not contain a "
+      p_lonLatOverlapsMutex.unlock();
+      QString msg = "The overlap file [" + filename + "] does not contain a "
                     "valid list of image overlaps";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     catch (...) {
-      IString msg = "The overlap file [" + filename + "] does not contain a "
+      p_lonLatOverlapsMutex.unlock();
+      QString msg = "The overlap file [" + filename + "] does not contain a "
                     "valid list of image overlaps";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -387,7 +390,7 @@ namespace Isis {
       delete multiPolygon;
       multiPolygon = Isis::globalFactory.createMultiPolygon();
     }
-    
+
     if (position > p_lonLatOverlaps.size()) {
       position = p_lonLatOverlaps.size();
     }
@@ -422,7 +425,7 @@ namespace Isis {
         }
 
         // Insert could cause a reallocation of the overlap list, so lock it with
-        //   the writing code so that we don't conflict
+        // the writing code so that we don't conflict
         p_lonLatOverlapsMutex.lock();
         p_lonLatOverlaps.insert(p_lonLatOverlaps.begin() + position, imageOverlap);
         p_lonLatOverlapsMutex.unlock();
@@ -442,7 +445,7 @@ namespace Isis {
    */
   void ImageOverlapSet::WriteImageOverlaps(const QString &filename) {
         
-    IString file = FileName(filename).expanded();
+    QString file = FileName(filename).expanded();
     bool failed = false;
     bool noOverlaps = false;
     
@@ -454,11 +457,12 @@ namespace Isis {
       // Let's get an ostream pointed at our file
       std::ofstream outStream;
 
+      QByteArray fileArray = file.toLatin1();
       if (p_writtenSoFar == 0) {
-        outStream.open(file.c_str(), fstream::out | fstream::trunc | fstream::binary);
+        outStream.open(fileArray.constData(), fstream::out | fstream::trunc | fstream::binary);
       }
       else {
-        outStream.open(file.c_str(), fstream::out | fstream::app | fstream::binary);
+        outStream.open(fileArray.constData(), fstream::out | fstream::app | fstream::binary);
       }
       
       failed |= outStream.fail();
@@ -486,7 +490,7 @@ namespace Isis {
 
             delete p_lonLatOverlaps[overlap];
             p_lonLatOverlaps[overlap] = NULL;
-            p_writtenSoFar ++;                
+            p_writtenSoFar ++;
           }
         }
         
@@ -513,11 +517,13 @@ namespace Isis {
     }
 
     if (failed) {
-      IString msg = "Unable to write the image overlap list to [" + filename + "]";
+      p_calculatePolygonMutex.unlock();
+      QString msg = "Unable to write the image overlap list to [" + filename + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if (noOverlaps) {
-      IString msg = "No overlaps were found.";
+      p_calculatePolygonMutex.unlock();
+      QString msg = "No overlaps were found.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -546,7 +552,7 @@ namespace Isis {
       p_calculatedSoFar = outside - 1;
 
       // unblock the writing process after every 10 polygons if we need to write
-      if (p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > snlist->size())) {
+      if (p_calculatedSoFar % 10 == 0 && (!snlist || (p_lonLatOverlaps.size() > snlist->size()))) {
         if (p_threadedCalculate) {
           p_calculatePolygonMutex.unlock();
         }
@@ -798,6 +804,9 @@ namespace Isis {
     }
     
     // unblock the writing process
+    // Check first if the the thread is still locked
+    // to avoid undefined behavior
+    p_calculatePolygonMutex.tryLock();
     p_calculatePolygonMutex.unlock();
   }
 

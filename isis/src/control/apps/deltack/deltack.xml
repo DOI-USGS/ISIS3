@@ -96,6 +96,9 @@
       Modified to use the FROM cube labels to set output control net's 'target instead of the TargetName. 
       Removed check for TargetName since this happens when the ControlNet target is set. References #3892
     </change>
+    <change name="Jeannie Backer" date="2016-08-18">
+      Removed deprecated parameter from call to BundleSettings::setSolveOptions. References #4162.
+    </change>
   </history>
 
   <groups>

@@ -60,7 +60,7 @@ namespace Isis {
    *
    * @internal
    *  @history 2003-04-03 Jeff Anderson - Added unit test
-   *  @history 2003-04-04 Jeff Anderson - Updated documentation for 
+   *  @history 2003-04-04 Jeff Anderson - Updated documentation for
    *                          SetInputRange methods
    *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
    *                          isis.astrogeology...
@@ -108,7 +108,6 @@ namespace Isis {
    *                                            to destructor.  References #2215. 
    *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *  
-   *  
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
    *                                  method
    *  @todo 2005-02-09 Jeff Anderson - add coded example to class file and
@@ -119,8 +118,8 @@ namespace Isis {
     public:
 
       //! Storage order enumeration
-      enum ExportFormat { 
-        BSQ, //!< Band sequential 
+      enum ExportFormat {
+        BSQ, //!< Band sequential
         BIL, //!< Band interleaved by line
         BIP, //!< Band interleaved by pixel
         JP2  //!< Compressed JPEG2000
@@ -128,6 +127,7 @@ namespace Isis {
 
       ProcessExport();
       virtual ~ProcessExport();
+      using Isis::Process::StartProcess;  // make parents virtual function visable
       virtual void StartProcess(void funct(Isis::Buffer &in));
       virtual void StartProcess(void funct(std::vector<Isis::Buffer *> &in));
       virtual void StartProcess(std::ofstream &fout);
@@ -194,7 +194,7 @@ namespace Isis {
 
             // Stretch the pixels into the desired range
             for (int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
-              (*imgrs[cubeIndex])[sampleIndex] = 
+              (*imgrs[cubeIndex])[sampleIndex] =
                   p_str[cubeIndex]->Map((*imgrs[cubeIndex])[sampleIndex]);
             }
 
@@ -225,14 +225,14 @@ namespace Isis {
       double p_outputMaximum; //!< Desired maximum pixel value in the Buffer
 
       std::vector<double> p_inputMinimum; /**< Minimum pixel value in the input
-                                          cube to be mapped to the minimum 
+                                          cube to be mapped to the minimum
                                           value in the Buffer */
-      std::vector<double> p_inputMiddle;  /**< Middle pixel value in the input 
-                                          cube to be mapped to the 
-                                          (minimum+maximum)/2.0 value in the 
+      std::vector<double> p_inputMiddle;  /**< Middle pixel value in the input
+                                          cube to be mapped to the
+                                          (minimum+maximum)/2.0 value in the
                                           Buffer */
-      std::vector<double> p_inputMaximum; /**< Maximum pixel value in the input 
-                                          cube to be mapped to the maximum 
+      std::vector<double> p_inputMaximum; /**< Maximum pixel value in the input
+                                          cube to be mapped to the maximum
                                           value in the Buffer */
       EndianSwapper *p_endianSwap; /**< Object to swap the endianness of the
                                         raw output to either MSB or LSB */
@@ -241,28 +241,28 @@ namespace Isis {
       PixelType p_pixelType;  /**< The bits per pixel of the output image*/
 
       std::vector<Stretch *> p_str; /**< Stretch object to ensure a reasonable
-                                         range of pixel values in the output 
+                                         range of pixel values in the output
                                          data**/
 
       double p_Null; /**< The output value for pixels whose input DNs are Null values.*/
-      double p_Lis;  /**< The output value for pixels whose input DNs are 
+      double p_Lis;  /**< The output value for pixels whose input DNs are
                           Low Instrument Saturation values.*/
-      double p_Lrs;  /**< The output value for pixels whose input DNs are 
+      double p_Lrs;  /**< The output value for pixels whose input DNs are
                           Low Representation Saturation values.*/
-      double p_His;  /**< The output value for pixels whose input DNs are 
+      double p_His;  /**< The output value for pixels whose input DNs are
                           High Instrument Saturation values.*/
-      double p_Hrs;  /**< The output value for pixels whose input DNs are 
+      double p_Hrs;  /**< The output value for pixels whose input DNs are
                           High Representation Saturation values.*/
 
-      bool p_Null_Set; /**< Indicates whether p_Null has been set 
+      bool p_Null_Set; /**< Indicates whether p_Null has been set
                             (i.e. if setNull() has been called).*/
-      bool p_Lis_Set;  /**< Indicates whether p_Lis has been set 
+      bool p_Lis_Set;  /**< Indicates whether p_Lis has been set
                             (i.e. if setLis() has been called).*/
-      bool p_Lrs_Set;  /**< Indicates whether p_Lrs has been set 
+      bool p_Lrs_Set;  /**< Indicates whether p_Lrs has been set
                             (i.e. if setLrs() has been called).*/
-      bool p_His_Set;  /**< Indicates whether p_His has been set 
+      bool p_His_Set;  /**< Indicates whether p_His has been set
                             (i.e. if setHis() has been called).*/
-      bool p_Hrs_Set;  /**< Indicates whether p_Hrs has been set 
+      bool p_Hrs_Set;  /**< Indicates whether p_Hrs has been set
                             (i.e. if setHrs() has been called).*/
 
     private:

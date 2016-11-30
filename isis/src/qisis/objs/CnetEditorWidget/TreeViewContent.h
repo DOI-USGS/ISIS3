@@ -33,7 +33,7 @@ namespace Isis {
         TreeViewContent(QWidget *parent);
         virtual ~TreeViewContent();
         QSize minimumSizeHint() const;
-        QSize sizeHint();
+        QSize sizeHint() const;
         AbstractTreeModel *getModel();
         void setModel(AbstractTreeModel *someModel);
 
@@ -108,4 +108,3 @@ namespace Isis {
 }
 
 #endif
-

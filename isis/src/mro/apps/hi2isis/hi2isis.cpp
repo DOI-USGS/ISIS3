@@ -355,4 +355,3 @@ void FixDns16(Buffer &buf) {
     }
   }
 }
-

@@ -1884,8 +1884,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
     hasVelocity = true;
     lightTime = 0.0;
-    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
-            abcorr.toAscii().data(), (SpiceInt) observer, state, &lightTime);
+    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(), 
+            abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
 
     // If Naif fails attempting to get the entire state, assume the velocity vector is
     // not available and just get the position.  First turn off Naif error reporting and
@@ -1895,8 +1895,8 @@ namespace Isis {
     if ( spfailure ) {
       hasVelocity = false;
       lightTime = 0.0;
-      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
-               abcorr.toAscii().data(), (SpiceInt) observer, state, &lightTime);
+      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(), 
+               abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
     }
     NaifStatus::CheckErrors();
     return;

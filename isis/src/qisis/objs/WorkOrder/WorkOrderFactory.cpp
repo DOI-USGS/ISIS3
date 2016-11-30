@@ -1,24 +1,32 @@
 #include "WorkOrderFactory.h"
 
 #include "CnetEditorViewWorkOrder.h"
-#include "CubeViewportViewWorkOrder.h"
+#include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
 #include "Footprint2DViewWorkOrder.h"
 #include "IException.h"
 #include "ImageFileListViewWorkOrder.h"
 #include "ImageListActionWorkOrder.h"
-#include "IString.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
-#include "OpenProjectWorkOrder.h"
-#include "RenameProjectWorkOrder.h"
-#include "SaveProjectAsWorkOrder.h"
-#include "SaveProjectWorkOrder.h"
+#include "ImportShapesWorkOrder.h"
+#include "IString.h"
+#include "JigsawWorkOrder.h"
+#include "MatrixViewWorkOrder.h"
 #include "MoveDownOneSceneWorkOrder.h"
 #include "MoveToBottomSceneWorkOrder.h"
 #include "MoveToTopSceneWorkOrder.h"
 #include "MoveUpOneSceneWorkOrder.h"
+#include "OpenProjectWorkOrder.h"
+#include "RemoveImagesWorkOrder.h"
+#include "RenameProjectWorkOrder.h"
+#include "SaveProjectAsWorkOrder.h"
+#include "SaveProjectWorkOrder.h"
+#include "SensorGetInfoWorkOrder.h"
+#include "SetActiveControlWorkOrder.h"
+#include "SetActiveImageListWorkOrder.h"
+#include "TargetGetInfoWorkOrder.h"
 
 namespace Isis {
   /**
@@ -37,23 +45,31 @@ namespace Isis {
   WorkOrder *WorkOrderFactory::create(Project *project, QString type) {
     WorkOrder *result = NULL;
 
-    tryType<CubeViewportViewWorkOrder>(type, project, result);
     tryType<CnetEditorViewWorkOrder>(type, project, result);
+    tryType<CubeDnViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);
     tryType<ExportControlNetWorkOrder>(type, project, result);
+    tryType<Footprint2DViewWorkOrder>(type, project, result);
     tryType<ImageFileListViewWorkOrder>(type, project, result);
     tryType<ImageListActionWorkOrder>(type, project, result);
-    tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportControlNetWorkOrder>(type, project, result);
-    tryType<Footprint2DViewWorkOrder>(type, project, result);
+    tryType<ImportImagesWorkOrder>(type, project, result);
+    tryType<ImportShapesWorkOrder>(type, project, result);
+    tryType<JigsawWorkOrder>(type, project, result);
+    tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);
     tryType<MoveToBottomSceneWorkOrder>(type, project, result);
     tryType<MoveToTopSceneWorkOrder>(type, project, result);
     tryType<MoveUpOneSceneWorkOrder>(type, project, result);
     tryType<OpenProjectWorkOrder>(type, project, result);
+    tryType<RemoveImagesWorkOrder>(type, project, result);
     tryType<RenameProjectWorkOrder>(type, project, result);
-    tryType<SaveProjectWorkOrder>(type, project, result);
     tryType<SaveProjectAsWorkOrder>(type, project, result);
+    tryType<SaveProjectWorkOrder>(type, project, result);
+    tryType<SensorGetInfoWorkOrder>(type, project, result);
+    tryType<SetActiveControlWorkOrder>(type, project, result);
+    tryType<SetActiveImageListWorkOrder>(type, project, result);
+    tryType<TargetGetInfoWorkOrder>(type, project, result);
 
     if (!result) {
       throw IException(IException::Unknown,

@@ -1,34 +1,34 @@
 /*
- * 	This is the C++ implementation of the MD5 Message-Digest
- * 	Algorithm desrcipted in RFC 1321.
- * 	I translated the C code from this RFC to C++.
- * 	There is no warranty.
+ *      This is the C++ implementation of the MD5 Message-Digest
+ *      Algorithm desrcipted in RFC 1321.
+ *      I translated the C code from this RFC to C++.
+ *      There is no warranty.
  *
- * 	Feb. 12. 2005
- * 	Benjamin Gr�delbach
+ *      Feb. 12. 2005
+ *      Benjamin Gr�delbach
  */
 
 /*
- *	Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
- *	rights reserved.
+ *      Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
+ *      rights reserved.
  *
- *	License to copy and use this software is granted provided that it
- *	is identified as the "RSA Data Security, Inc. MD5 Message-Digest
- *	Algorithm" in all material mentioning or referencing this software
- *	or this function.
+ *      License to copy and use this software is granted provided that it
+ *      is identified as the "RSA Data Security, Inc. MD5 Message-Digest
+ *      Algorithm" in all material mentioning or referencing this software
+ *      or this function.
  *
- *	License is also granted to make and use derivative works provided
- *	that such works are identified as "derived from the RSA Data
- *	Security, Inc. MD5 Message-Digest Algorithm" in all material
- *	mentioning or referencing the derived work.
+ *      License is also granted to make and use derivative works provided
+ *      that such works are identified as "derived from the RSA Data
+ *      Security, Inc. MD5 Message-Digest Algorithm" in all material
+ *      mentioning or referencing the derived work.
  *
- *	RSA Data Security, Inc. makes no representations concerning either
- *	the merchantability of this software or the suitability of this
- *	software for any particular purpose. It is provided "as is"
- *	without express or implied warranty of any kind.
+ *      RSA Data Security, Inc. makes no representations concerning either
+ *      the merchantability of this software or the suitability of this
+ *      software for any particular purpose. It is provided "as is"
+ *      without express or implied warranty of any kind.
  *
- *	These notices must be retained in any copies of any part of this
- *	documentation and/or software.
+ *      These notices must be retained in any copies of any part of this
+ *      documentation and/or software.
  */
 
 //md5 class include
@@ -104,9 +104,9 @@ void MD5::MD5Init(MD5_CTX *context) {
 }
 
 /*
-	 MD5 block update operation. Continues an MD5 message-digest
-	 operation, processing another message block, and updating the
-	 context.
+         MD5 block update operation. Continues an MD5 message-digest
+         operation, processing another message block, and updating the
+         context.
 */
 void MD5::MD5Update(MD5_CTX *context, uint8_t *input, uint32_t inputLen) {
   uint32_t i, index, partLen;

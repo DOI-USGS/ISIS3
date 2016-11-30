@@ -90,7 +90,7 @@ void IsisMain () {
     FileName tempFile;
     tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
     QString tempFileName(tempFile.expanded());
-    ofstream temporaryFile(tempFileName.toAscii().data());
+    ofstream temporaryFile(tempFileName.toLatin1().data());
 
     pe.StartProcess(temporaryFile);
     temporaryFile.close();
@@ -100,8 +100,8 @@ void IsisMain () {
 
     FileName outFile(ui.GetFileName("TO"));
     QString outFileName(outFile.expanded());
-    ifstream inFile(tempFileName.toAscii().data());
-    ofstream pdsFile(outFileName.toAscii().data());
+    ifstream inFile(tempFileName.toLatin1().data());
+    ofstream pdsFile(outFileName.toLatin1().data());
 
     // Output the label
     OutputLabel(pdsFile, inCube);
@@ -113,8 +113,8 @@ void IsisMain () {
 
     pe.EndProcess();
 
-    remove((scaledCube.expanded()).toAscii().data());
-    remove(tempFileName.toAscii().data());
+    remove((scaledCube.expanded()).toLatin1().data());
+    remove(tempFileName.toLatin1().data());
     return;
 }
 

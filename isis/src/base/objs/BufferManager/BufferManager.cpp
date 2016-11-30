@@ -62,9 +62,9 @@ namespace Isis {
                                int maxbands, int bufsamps,
                                int buflines, int bufbands,
                                Isis::PixelType type, bool reverse) :
-    Isis::Buffer(bufsamps, buflines, bufbands, type),
-    p_maxSamps(maxsamps), p_maxLines(maxlines),
-    p_maxBands(maxbands) {
+                                   Isis::Buffer(bufsamps, buflines, bufbands, type),
+                                   p_maxSamps(maxsamps), p_maxLines(maxlines),
+                                   p_maxBands(maxbands) {
     SetIncrements(bufsamps, buflines, bufbands);
     p_reverse = reverse;
   }
@@ -152,6 +152,7 @@ namespace Isis {
                (BigInt)((p_maxBands - 1) / p_binc + 1));
   }
 
+
   /**
    * Sets the offset of the buffer. By default (if this method is not invoked)
    * the offsets are (0,0,0). Offsets are applied when computing the top-left
@@ -178,6 +179,7 @@ namespace Isis {
     p_loff = loff;
     p_boff = boff;
   }
+
 
   /**
    * Sets the position of the shape in the cube.  This shape fits

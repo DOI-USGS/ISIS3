@@ -37,7 +37,7 @@ namespace Isis {
         TableViewContent(AbstractTableModel *someModel);
         virtual ~TableViewContent();
         QSize minimumSizeHint() const;
-        QSize sizeHint();
+        QSize sizeHint() const;
         AbstractTableModel *getModel();
         //       void setModel(AbstractTableModel * someModel);
 
@@ -167,4 +167,3 @@ namespace Isis {
 }
 
 #endif
-

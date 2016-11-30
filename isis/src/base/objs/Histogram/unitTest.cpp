@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
       cout << "Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,numbins)" << endl;
       cout << endl;
       cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
-      histogramMembers(hist1);      
+      histogramMembers(hist1);
       statCounters(hist1);
       cout << "Resetting bin range to (0.1469787,0.3299682)" << endl;
       hist1 ->SetValidRange(0.1469787,0.3299682);
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    Isis::FileName cubeFile("$base/testData/isisTruth.cub"); 
+    Isis::FileName cubeFile("$base/testData/isisTruth.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -404,19 +404,19 @@ void histogramMembers(Isis::Histogram *h){
        << endl;
   cout << "Bin Range:              (" << h->BinRangeStart() <<","<< h->BinRangeEnd()<<")"
        << endl;
-  cout << "Average:               " <<  h-> Average() << endl;
-  cout << "Std Deviation:         " <<  h->StandardDeviation() << endl;
-  cout << "Variance:              " <<  h->Variance() <<endl;
-  cout << "Median:                " <<  h->Median() << endl;
-  cout << "Mode:                  " <<  h->Mode() << endl;
-  cout << "Skew:                  " <<  h->Skew() << endl;
-  cout << "Percent(0.5):          " <<  h->Percent(0.5) << endl;
-  cout << "Percent(99.5):         " <<  h->Percent(99.5) << endl;
-  cout << "Minimum:               " <<  h-> Minimum() << endl;
-  cout << "Maximum:               " <<  h-> Maximum() << endl;
-  cout << "# Bins:                " <<  h->Bins() << endl;
-  cout << "BinWidth:              " <<  h->BinSize() << endl;
-  cout << "MaxBinCount:           " <<  h->MaxBinCount() << endl;
+  cout << "Average:               "; cout <<  h-> Average() << endl;
+  cout << "Std Deviation:         "; cout <<  h->StandardDeviation() << endl;
+  cout << "Variance:              "; cout <<  h->Variance() <<endl;
+  cout << "Median:                "; cout <<  h->Median() << endl;
+  cout << "Mode:                  "; cout <<  h->Mode() << endl;
+  cout << "Skew:                  "; cout <<  h->Skew() << endl;
+  cout << "Percent(0.5):          "; cout <<  h->Percent(0.5) << endl;
+  cout << "Percent(99.5):         "; cout <<  h->Percent(99.5) << endl;
+  cout << "Minimum:               "; cout <<  h-> Minimum() << endl;
+  cout << "Maximum:               "; cout <<  h-> Maximum() << endl;
+  cout << "# Bins:                "; cout <<  h->Bins() << endl;
+  cout << "BinWidth:              "; cout <<  h->BinSize() << endl;
+  cout << "MaxBinCount:           "; cout <<  h->MaxBinCount() << endl;
   cout << endl;
   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
   }
@@ -457,5 +457,3 @@ void statCounters(Isis::Histogram *h){
 
 
 }
-
-

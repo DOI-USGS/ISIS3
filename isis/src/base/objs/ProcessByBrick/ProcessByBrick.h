@@ -84,11 +84,12 @@ namespace Isis {
    *   @history 2013-03-27 Jeannie Backer - Modified SetBrickSize() code to call
    *                           existing methods rather than duplicating code.
    *                           Added SetOutputCube() method.References #1248.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                            functions to ensure successful 
-   *                                            inheritance between Process and its
-   *                                            child classes.  Also made destructor
-   *                                            virtual.  Fixes #2215.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
+   *                           functions to ensure successful inheritance between Process and its
+   *                           child classes.  Also made destructor virtual.  Fixes #2215.
+   *   @history 2016-04-26 Ian Humphrey - Modified BlockingReportProgress() so that it unlocks
+   *                           the local QMutex before it goes out of scope (Qt5 issues a warning
+   *                           if a locked QMutex is destroyed).
    */
   class ProcessByBrick : public Process {
     public:
@@ -129,8 +130,8 @@ namespace Isis {
       // Overload the SetOutputCube() method to allow the user to pass in the
       // file name and attributes without the lines and samples.
       // Any other calls to this method will use the prototypes found in the
-      //process class due to the using statement below. 
-      using Process::SetOutputCube;
+      //process class due to the using statement below.
+      using Isis::Process::SetOutputCube;
       virtual Cube *SetOutputCube(const QString &fname,
                                   const CubeAttributeOutput &att);
 
@@ -141,6 +142,7 @@ namespace Isis {
       void SetWrap(bool wrap);
       bool Wraps();
 
+      using Isis::Process::StartProcess;  // make parents virtual function visable
       virtual void StartProcess(void funct(Buffer &in));
       virtual void StartProcess(void funct(Buffer &in, Buffer &out));
       virtual void StartProcess(void funct(std::vector<Buffer *> &in,

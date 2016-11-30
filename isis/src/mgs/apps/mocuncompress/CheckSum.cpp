@@ -80,7 +80,7 @@ uint8 CS8EAC(register uint8 *d, register uint32 l)
   *  CHECK CS METHOD 2:
   *    if(CS8EAC(data,n) != 0xff)bad();
   */
-  register uint32 cs = 0;
+uint32 cs = 0;
   while(l--) {
     cs += *d++;
   };
@@ -92,12 +92,12 @@ uint8 CS8EAC(register uint8 *d, register uint32 l)
 
 #if defined(TEST)
 uint8 tcs8eac(d, l)register uint8 *d;
-register uint32 l;
+uint32 l;
 {
   /*
   * Canonical version of CS8EAC().  Used to test the fast version.
   */
-  register uint32 cs = 0;
+uint32 cs = 0;
   while(l--) {
     cs += *d++;
     if(cs > 255)cs -= 255;
@@ -210,9 +210,9 @@ uint16 CS16EAC(register uint8 *d, uint32 len)
   *  CHECK CS METHOD 2:
   *    if(CS16EAC(data,n) != 0xffff)bad();
   */
-  register uint32 cs = 0;
-  register uint32 l;
-  register uint16 t;
+uint32 cs = 0;
+uint32 l;
+uint16 t;
   do {
     l = (len < 100) ? len : 100;
     len -= l;
@@ -230,12 +230,12 @@ uint16 CS16EAC(register uint8 *d, uint32 len)
 
 #if defined(TEST)
 uint16 tcs16eac(d, l)register uint8 *d;
-register uint32 l;
+uint32 l;
 {
   /*
   * Canonical version of CS16EAC().  Used to test the fast version.
   */
-  register uint32 cs = 0;
+uint32 cs = 0;
   for(; l > 1; l -= 2) {
     cs += (uint16)(*d | (*(d + 1) << 8));
     if(cs > 0xffff)cs -= 0xffff;
@@ -339,8 +339,8 @@ unsigned int ParityOf(register uint8 *d, register uint32 l)
   *  data is odd parity, and zero if it is even parity.
   *  REFINE make ParityOf() faster if used often or with large l endREFINE
   */
-  register unsigned int cs = 0;
-  register uint8 t;
+unsigned int cs = 0;
+uint8 t;
   while(l--) {
     t = *d++;
     while(t) {

@@ -274,7 +274,7 @@ void tableOut(const QString &StatFile) {
   // Open output file
   // TODO check status and throw error
   ofstream out;
-  out.open(StatFile.toAscii().data(), std::ios::out);
+  out.open(StatFile.toLatin1().data(), std::ios::out);
 
   // Output a header
   out << std::setw(8)  << "Band";
@@ -352,7 +352,7 @@ void PVLIn(const Isis::FileName &filename) {
 void tableIn(const Isis::FileName &filename) {
   ifstream in;
   QString expanded(filename.expanded());
-  in.open(expanded.toAscii().data(), std::ios::in);
+  in.open(expanded.toLatin1().data(), std::ios::in);
 
 
   if(!in) {

@@ -80,14 +80,14 @@ namespace Isis {
    * @ingroup HighLevelCubeIO
    *
    * @author 2009-12-18 Janet Barrett
-   * 
+   *
    * @internal
    *  @history 2009-12-18 Janet Barrett - Original version.
    *  @history 2012-04-06 Kris Becker - Fixed condition compilation where
    *                        support for JP2K is disabled
-   *  
-   *  
-   *
+   *  @history 2016-08-28 Kelvin Rodriguez - Moved member variables to be placed properly
+   *                        within the if ENABLEJP2K preprocessor block in order to stop
+   *                        unused member variable warnings in clang. Part of porting to OS X 10.11.
    */
   class JP2Decoder {
     public:
@@ -137,26 +137,30 @@ namespace Isis {
 
     private:
       QString p_jp2File;          //!<Input file name
-      unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed
-      //!<at. Always full resolution.
       unsigned int p_numSamples;      //!<Number of samples in JP2 file
       unsigned int p_numLines;        //!<Number of lines in JP2 file
       unsigned int p_numBands;        //!<Number of bands in JP2 file
-      unsigned int p_pixelBits;       //!<Number of bits per pixel in JP2 file.
       unsigned int p_pixelBytes;      //!<Number of bytes per pixel in JP2 file.
       bool p_signedData;              //!<Set to true if data in JP2 file is signed.
+
+#if ENABLEJP2K
+      unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed
+      //!<at. Always full resolution.
       unsigned int p_highestResLevel; //!<Total number of available resolution levels in
       //!<JP2 file.
-      int *p_stripeHeights;           //!<Determines how many lines are read at a time
-      //!<from the JP2 file.
       int *p_maxStripeHeights;        //!<Determines the maximum number of lines that can
       //!<be read at a time from the JP2 file.
       int *p_precisions;              //!<Determines the bit precision of each band in
       //!<the JP2 file.
       bool *p_isSigned;               //!<Determines if the data is signed/unsigned for
       //!<each band in the JP2 file.
+      int *p_stripeHeights;           //!<Determines how many lines are read at a time
+      //!<from the JP2 file.
 
-#if ENABLEJP2K
+      unsigned int p_pixelBits;       //!<Number of bits per pixel in JP2 file.
+      bool p_readStripes;             //!<Number of lines read per call to Read methods
+
+
       kdu_dims p_imageDims;           //!<Image dimensions of JP2 file
       jp2_family_src *JP2_Stream;     //!<JP2 file input stream
       jp2_source *JP2_Source;         //!<JP2 content source
@@ -165,7 +169,6 @@ namespace Isis {
       //!<JP2 file.
 #endif
       JP2Error *Kakadu_Error;         //!<JP2 Error handling facility
-      bool p_readStripes;             //!<Number of lines read per call to Read methods
 
       void SetResolutionAndRegion();  //!<Sets resolution of data that will be decompressed.
       //!<Also determines the image dimensions at the requested

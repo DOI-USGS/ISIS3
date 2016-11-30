@@ -1,15 +1,16 @@
 #include <iostream>
 #include <exception>
 
+#include <geos/util/GEOSException.h>
+#include <geos/geom/Polygon.h>
+#include <geos/geom/LinearRing.h>
+#include <geos/geom/CoordinateArraySequence.h>
+
 #include "IException.h"
 #include "SerialNumberList.h"
 #include "PolygonTools.h"
 #include "ImageOverlapSet.h"
 #include "Preference.h"
-#include "geos/util/GEOSException.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/CoordinateArraySequence.h"
 
 using namespace Isis;
 using namespace std;
@@ -203,4 +204,3 @@ void PrintImageOverlap(const ImageOverlap *poi) {
   cout << endl;
   return;
 }
-

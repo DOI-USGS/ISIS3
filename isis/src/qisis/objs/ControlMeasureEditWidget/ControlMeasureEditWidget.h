@@ -11,6 +11,7 @@ class QDoubleSpinBox;
 class QHBoxLayout;
 class QLabel;
 class QLCDNumber;
+class QListWidget;
 class QPalette;
 class QPushButton;
 class QRadioButton;
@@ -26,8 +27,10 @@ namespace Isis {
   class ChipViewport;
   class ControlMeasure;
   class ControlNet;
+  class ControlPoint;
   class Cube;
   class CubeViewport;
+  class SerialNumberList;
   class Stretch;
   class Tool;
   class UniversalGroundMap;
@@ -130,8 +133,9 @@ namespace Isis {
     *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In saveChips(), added single quotes
     *                           around the file names in case there are spaces or other special
     *                           characters in them. Fixes #1551.
-    *   @history 2014-07-03 Tracie Sucharski - Renamed from ControlPointEdit. 
-    *
+    *   @history 2014-07-03 Tracie Sucharski - Renamed from ControlPointEdit for IPCE.
+    *   @history 2016-04-28 Tracie Sucharski - Removed position information, this will be shown
+    *                           in ControlNetEditor type view.  Added blink capability.
     *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
@@ -164,6 +168,7 @@ namespace Isis {
       void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
+      void setPoint(ControlPoint *editPoint, SerialNumberList *snList);
       void setLeftMeasure(ControlMeasure *leftMeasure,
                           Cube *leftCube, QString pointId);
       void setRightMeasure(ControlMeasure *rightMeasure,
@@ -194,6 +199,13 @@ namespace Isis {
       void changeBlinkTime(double interval);
       void updateBlink();
 
+      void showBlinkExtension();
+      void blinkStartRight();
+      void blinkStopRight();
+      void changeBlinkTimeRight(double interval);
+      void updateBlinkRight();
+
+
     private:
       void createMeasureEditor(QWidget *parent);
 
@@ -213,10 +225,9 @@ namespace Isis {
       QToolButton *m_rightZoomOut;     //!< Button for zooming out right chip viewport
       QToolButton *m_rightZoom1;       //!< Button for 1:1 zoom on right chip viewport
 
-
       bool m_timerOn;  //!< Indicates if the blink timer is on
       QTimer *m_timer; //!< Timer on the blinking
-      std::vector<ChipViewport *> m_blinkList; //!< List of chip viewports to blink
+      QList<ChipViewport *> m_blinkList; //!< List of chip viewports to blink
       unsigned char m_blinkIndex; //!< Index of the chip to load in the left chip viewport
 
       QDial *m_dial;                  //!< Rotation dial 
@@ -254,6 +265,21 @@ namespace Isis {
       int m_rotation;  //!< Amount to rotate right chip viewport TODO Is this used??
       bool m_geomIt;   //!< Apply geometry to the right chip viewport
       bool m_linkZoom; //!< Link zoom factors between chip viewports 
+
+
+
+      ControlPoint *m_editPoint;
+      SerialNumberList *m_serialNumberList;
+      QWidget *m_blinkExtension;
+      QListWidget *m_blinkListWidget;
+
+
+      QDoubleSpinBox *m_blinkTimeBoxRight;
+      bool m_timerOnRight;
+      QTimer *m_timerRight;
+      QList<ChipViewport *> m_blinkChipViewportListRight;
+      unsigned char m_blinkIndexRight;
+
   };
 };
 

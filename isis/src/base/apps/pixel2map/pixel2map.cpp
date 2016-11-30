@@ -37,7 +37,6 @@ map <QString, void *> GuiHelpers() {
 
 // Global variables
 ProcessGroundPolygons g_processGroundPolygons;
-UniversalGroundMap *g_groundMap;
 Camera *g_incam;
 int g_numIFOVs = 0;
 
@@ -55,7 +54,8 @@ void IsisMain() {
 
   FileList list;
   if (ui.GetString("FROMTYPE") == "FROM") {
-    list.push_back(FileName(ui.GetFileName("FROM")));
+    // GetAsString will capture the entire string, including attributes
+    list.push_back(FileName(ui.GetAsString("FROM")));
   }
   else {
     list.read(ui.GetFileName("FROMLIST"));
@@ -78,7 +78,6 @@ void IsisMain() {
   double minlon = 360.0;
   double maxlon = 0;
   PvlGroup camGrp;
-  PvlGroup bandBinGrp;
   QString lastBandString;
 
   // Get the combined lat/lon range for all input cubes
@@ -106,14 +105,10 @@ void IsisMain() {
       lastBandString = atts0.bandsString();
     }
 
-    // Get the mapping group and the BandBin group
+    // Get the mapping group
     Pvl camMap;
     g_incam->BasicMapping(camMap);
     camGrp = camMap.findGroup("Mapping");
-    if (icube->hasGroup("BandBin")) {
-      bandBinGrp = icube->group("BandBin");
-
-    }
 
     g_incam->GroundRange(newminlat, newmaxlat, newminlon, newmaxlon, userMap);
     //set min lat/lon
@@ -281,8 +276,26 @@ void IsisMain() {
 
   Pvl pvl;
   pvl.addGroup(userGrp);
-  pvl.addGroup(bandBinGrp);
+
+  // If there is only one input cube, we need to attach an AlphaCube to the outputs.
+  if (list.size() == 1) {
+    Cube parent(list[0].toString());
+    if (!parent.hasGroup("AlphaCube")) {
+      PvlGroup alpha("AlphaCube");
+      alpha += PvlKeyword("AlphaSamples", toString(parent.sampleCount()));
+      alpha += PvlKeyword("AlphaLines", toString(parent.lineCount()));
+      alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
+      alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
+      alpha += PvlKeyword("AlphaEndingSample", toString(parent.sampleCount() + 0.5));
+      alpha += PvlKeyword("AlphaEndingLine", toString(parent.lineCount() + 0.5));
+      alpha += PvlKeyword("BetaSamples", toString(parent.sampleCount()));
+      alpha += PvlKeyword("BetaLines", toString(parent.lineCount()));
+      pvl.addGroup(alpha);
+    }
+  }
+
   g_processGroundPolygons.SetStatCubes("TO", pvl, bands);
+
   bool useCenter = true;
   if (ui.GetString("METHOD") == "CENTER") {
     useCenter = true;
@@ -296,17 +309,28 @@ void IsisMain() {
   for (int f = 0; f < list.size(); f++) {
 
     Cube cube(list[f].toString(), "r");
-    g_groundMap = new UniversalGroundMap(cube);
     // Loop through the input cube and get the all pixels values for all bands
     ProcessByBrick processBrick;
     processBrick.Progress()->SetText("Working on file:  " + list[f].toString());
     processBrick.SetBrickSize(1, 1, bands);
-    CubeAttributeInput atts0(list[f].toString());
+    // Recall list[f] is a FileName, which stores the attributes
+    CubeAttributeInput atts0(list[f]);
     icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
     g_incam = icube->camera();
 
     processBrick.StartProcess(rasterizePixel);
     processBrick.EndProcess();
+  }
+  
+  // When there is only one input cube, we want to propagate IsisCube labels to output cubes
+  if (list.size() == 1) {
+    // Note that polygons and original labels are not propagated
+    g_processGroundPolygons.PropagateLabels(list[0].toString());
+    // Tell Process which tables we want to propagate
+    QList<QString> tablesToPropagate;
+    tablesToPropagate << "InstrumentPointing" << "InstrumentPosition" << "BodyRotation"
+        << "SunPosition";
+    g_processGroundPolygons.PropagateTables(list[0].toString(), tablesToPropagate);
   }
   g_processGroundPolygons.EndProcess();
 

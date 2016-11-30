@@ -76,7 +76,7 @@ void IsisMain() {
   //  Open output text file
   UserInterface &ui = Application::GetUserInterface();
   QString to = ui.GetFileName("TO", "txt");
-  fout.open(to.toAscii().data());
+  fout.open(to.toLatin1().data());
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {

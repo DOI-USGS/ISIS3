@@ -52,7 +52,7 @@ struct TemporaryCubeDeleter {
 
        FileName filename( cube->fileName() );
        delete cube;
-       remove( filename.expanded().toAscii().data() );
+       remove( filename.expanded().toLatin1().data() );
      }
    }
 };
@@ -267,7 +267,7 @@ if (startline ==0 && startsample == 0){
       ProgramLauncher::RunIsisProgram("reduce", parameters);
     }
     catch (IException& ie) {
-      remove(reducedFlat.toAscii().data());
+      remove(reducedFlat.toLatin1().data());
       throw ie;
     }
     QScopedPointer<Cube, TemporaryCubeDeleter> reduced(new Cube(reducedFlat, "r"));
@@ -593,7 +593,7 @@ void loadCalibrationVariables()  {
 
   loadNaifTiming();  //Ensure the proper kernels are loaded
 
-  scs2e_c(g_HayabusaNaifCode,g_startTime.toAscii().data(), &obsStartTime);  
+  scs2e_c(g_HayabusaNaifCode,g_startTime.toLatin1().data(), &obsStartTime);  
   tsecs = obsStartTime - g_launchTime.Et();
   tdays = tsecs/86400;
   g_bias = g_b0+g_b1*tdays+g_b2*(tdays*tdays);

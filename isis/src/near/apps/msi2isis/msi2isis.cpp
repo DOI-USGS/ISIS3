@@ -171,8 +171,8 @@ void IsisMain() {
   catch(IException &e) {
     delete enlarge;
     delete interp;
-    remove(importProcessOutCube.expanded().toAscii());
-    remove(enlargeProcessOutCube.expanded().toAscii());
+    remove(importProcessOutCube.expanded().toLatin1());
+    remove(enlargeProcessOutCube.expanded().toLatin1());
     QString msg = "Unable to translate the labels from [" + from.expanded() 
                   + "] to ISIS3 format using msi2isis.";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -185,8 +185,8 @@ void IsisMain() {
   // clean up temp files and "new" pointers 
   delete enlarge;
   delete interp;
-  remove(importProcessOutCube.expanded().toAscii());
-  remove(enlargeProcessOutCube.expanded().toAscii());
+  remove(importProcessOutCube.expanded().toLatin1());
+  remove(enlargeProcessOutCube.expanded().toLatin1());
 }
 
 /**

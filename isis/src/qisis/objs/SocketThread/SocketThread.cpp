@@ -13,6 +13,8 @@
 #include <QObject>
 #include <QThread>
 
+#include "IString.h"
+
 namespace Isis {
 
   /**
@@ -31,7 +33,7 @@ namespace Isis {
 
   //! Starts the socket thread
   void SocketThread::run() {
-    std::string p_socketFile = ("/tmp/isis_qview_" + Application::UserName()).toAscii().data();
+    std::string p_socketFile = ("/tmp/isis_qview_" + Application::UserName()).toLatin1().data();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.c_str());

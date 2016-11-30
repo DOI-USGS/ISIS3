@@ -596,9 +596,20 @@ namespace Isis {
   /**
    * Propagate the tables from the cube with the given filename to the output
    * cube.  This is done at the time this method is called, not during normal
-   * processing.
+   * processing. The names of the tables to propagate can be provided through the second paramter,
+   * by specifing a list of table names. Not providing any list (or providing an empty list) will
+   * propagate all tables.
+   *
+   * @param fromName QString of the name of the cube containing the tables to propagate.
+   * @param tableNames List of QStrings of the names of the tables to propagate; default is empty,
+   *                   which indicates that all tables will be propagated.
+   *
+   * @internal
+   *   @history 2016-11-30 Ian Humphrey - Added tableNames parameter so that only specified tables
+   *                           will be propagated when calling this method. Note that a default of
+   *                           an empty QList is used to propagate all tables. References #4433.
    */
-  void Process::PropagateTables(const QString &fromName) {
+  void Process::PropagateTables(const QString &fromName, const QList<QString> &tableNames) {
     Cube *fromCube = new Isis::Cube;
     fromCube->open(fromName);
     const Pvl *fromLabels = fromCube->label();
@@ -608,9 +619,11 @@ namespace Isis {
         const PvlObject &object = fromLabels->object(j);
 
         if (object.isNamed("Table")) {
-          Blob table((QString) object["Name"], object.name());
-          fromCube->read(table);
-          OutputCubes[i]->write(table);
+          if (tableNames.isEmpty() || tableNames.contains(object["Name"])) { 
+            Blob table((QString) object["Name"], object.name());
+            fromCube->read(table);
+            OutputCubes[i]->write(table);
+          }
         }
       }
     }

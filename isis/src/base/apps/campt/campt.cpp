@@ -196,13 +196,13 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
         ofstream os;
         bool writeHeader = false;
         if (append || p > 0) {
-          os.open(outFile.toAscii().data(), ios::app);
+        os.open(outFile.toLatin1().data(), ios::app);
           if (!fileExists) {
             writeHeader = true;
           }
         }
         else {
-          os.open(outFile.toAscii().data(), ios::out);
+          os.open(outFile.toLatin1().data(), ios::out);
           writeHeader = true;
         }
         

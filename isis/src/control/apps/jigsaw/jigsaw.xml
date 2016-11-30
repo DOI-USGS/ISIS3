@@ -6,9 +6,9 @@
 
   <description>
     <p>
-      <b>jigsaw</b> performs a bundle adjustment on a group of overlapping Isis 3, level 
-      1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment simultaneously 
-      refines the selected image geometry information (camera pointing, spacecraft 
+      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3, 
+      level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment 
+      simultaneously defines the selected image geometry information (camera pointing, spacecraft 
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce 
       boundary mismatches in mosaics of the images.
     </p>
@@ -24,28 +24,28 @@
     <img src='assets/images/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
 
     <p>
-      <b>jigsaw</b> assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that 
+      The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that 
       <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to 
       run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
       net</def>, the name of an output <def>control net</def>, and the adjustment parameters.  
       <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
-      points in the network and their final state after the adjustment.  The initial state of
+      points in the network and their final state after the adjustment.  The initial states of
       the points are tagged as <def>a priori</def> in the <def>control net</def>, and their final
-      state as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
+      states are tagged as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
       associated with the <def>control point</def>s in the net are not changed.  <def>SPICE</def> 
       in the <def>cube</def> labels is updated at the end of the adjustment only 
       if the bundle converges and the <b>UPDATE</b> parameter is selected.
     </p>
 
     <p>
-    Optional output files can be selected to provide more information for analyzing the 
-    results.  <b>BUNDLEOUT.TXT</b> provides an overall summary of the bundle adjustment.  
-    It lists the user input parameters selected and tables of statistics for both the
-    images and the points.   The image statistics can also be written to a separate
-    <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
-    option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
-    coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
-    in both millimeters and pixels.
+      Optional output files can be selected to provide more information for analyzing the 
+      results.  <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment.  
+      It lists the user input parameters selected and tables of statistics for both the
+      images and the points.   The image statistics can also be written to a separate
+      <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
+      option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
+      coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
+      in both millimeters and pixels.
     </p>
 
     <p>
@@ -68,7 +68,7 @@
       <blockquote>
       <b>Running jigsaw with a control net containing <i>JigsawRejected</i>
       flags may result in bundle failure</b>
-      <p>When running <b>jigsaw</b> with <i>Outlier Retection</i> turned on,
+      <p>When running <b>jigsaw</b> with <i>Outlier Rejection</i> turned on,
       control points and/or control measures may be flagged as
       <i>JigsawRejected</i> in the output control net file. If this output net
       file is then used in a subsequent <b>jigsaw</b> run, these points and
@@ -79,7 +79,7 @@
         <ol>
         <li>Run jigsaw with <i>Outlier Rejection</i> <b>off</b>.</li>
         <li>Do not use the output control net file in subsequent jigsaw runs.</li>
-        <li>Convert the output control net file from binary to pvl and back using
+        <li>Convert the output control net file from binary to PVL and back using
         <i><b>cnetbin2pvl</b></i> and <i><b>cnetpvl2bin</b></i>. This will
         clear the <i>JigsawRejected</i> flags.</li>
         </ol>
@@ -105,10 +105,11 @@
       Original version
     </change>
     <change name="Steven Lambright" date="2007-07-23">
-       Changed category to Control Networks and corrected XML bugs
+      Changed category to Control Networks and corrected XML bugs
     </change>
     <change name="Debbie A. Cook" date="2007-10-05">
-        Revised iteration report to list the errors and sigmas from the same iteration.  Previous version reported errors from previous iteration and sigmas from current iteration.
+      Revised iteration report to list the errors and sigmas from the same iteration.  Previous
+      version reported errors from previous iteration and sigmas from current iteration.
     </change>
     <change name="Christopher Austin" date="2008-07-03">
       Cleaned the Bundle Adjust memory leak and fixed the app tests.
@@ -176,6 +177,75 @@
       Added separate group for Error Propagation with option to write inverse matrix to binary
       file. For extremely large networks where memory/time for error propagation is limited.
     </change>
+    <change name="Ken Edmundson" date="2014-07-09">
+      Added USEPVL and SC_PARAMETERS parameters.
+    </change>
+    <change name="Jeannie Backer" date="2014-07-14">
+      Modified appTests to use SPARSE method only. Commented out bundleout_images.csv references.
+      Created observationSolveSettings() method to create an observation settings object from the user
+      entered values.
+    </change>
+    <change name="Ken Edmundson" date="2015-09-05">
+      Added preliminary target body functionality. Added SOLVETARGETBODY and TB_PARAMETERS.
+    </change>
+    <change name="Jesse Mapel" date="2016-08-16">
+      Added a connection to allow jigsaw to surface exceptions from BundleAdjust.  Fixes #2302
+    </change>
+    <change name="Jeannie Backer" date="2016-08-18">
+      Removed the user parameter called METHOD (i.e. the method used for solving the bundle matrix). 
+      This solve method is no longer user-selected. The program will now use what was called the SPARSE option
+      for the METHOD parameter (i.e. solve with CholMod sparse decomposition). This method should give
+      the same results as the other options and should run faster. So the other options were no longer needed.
+      References #4162.
+    </change>
+    <change name="Ian Humphrey" date="2016-08-22">
+      Reviewed documentation and updated small spelling and grammar errors. References #4226.
+    </change>
+    <change name="Adam Paquette" date="2016-08-31">
+      Updated how jigsaw handles its prefix parameter  along with a small documentation change. Fixes #4309.
+    </change>
+    <change name="Jesse Mapel" date="2016-09-02">
+      Updated how input parameters are output when using multiple sensor solve settings.
+      Fixes #4316.
+    </change>
+    <change name="Ian Humphrey" date="2016-09-22">
+      Output from jigsaw will again provide "Validating network" and "Validation complete" messages
+      to inform user that their control network has been validated. Fixes #4313.
+    </change>
+    <change name="Ian Humphrey" date="2016-10-05">
+      When running jigsaw with error propagation turned on, the correlation matrix file,
+      inverseMatrix.dat, is no longer generated. Fixes #4315.
+    </change>
+    <change name="Tyler Wilson" date="2016-10-06">
+      Added the IMAGES_CSV parameter to the "Output Options" group
+      so that the user can now request the bundleout_images.csv file
+      in addition to the other output files such as bundleout.txt.  Fixes #4314.
+    </change>
+    <change name="Ian Humphrey" date="2016-10-13">
+      Implemented HELDLIST functionality for non-overlapping held images. Any control points that 
+      intersect the held images are fixed, and a priori surface points for these control points are
+      set to the held images' measures' surface points. Disabled USEPVL/SC_PARAMETERS. Fixes #4293.
+    </change>
+    <change name="Ian Humphrey" date="2016-10-25">
+      Added the "Generating report files" and Rejected_Measures keyword back to jigsaw's standard
+      output. Fixes #4461. Fixed spacing in standard output. Fixes #4462, #4463."
+    </change>
+    <change name="Ian Humphrey" date="2016-10-26">
+      The bundleout.txt output file will record default values for unsolved parameters. The default
+      position will be the instrument position's center coordinate, and the default pointing will
+      be the pointing's (rotation's) center angles. The bundleout_images.csv file will also have
+      these defaults provided. Fixes #4464.
+    </change>
+    <change name="Makayla Shepherd" date="2016-10-26"> 
+      Removed the underscores from the new parameters IMAGESCSV and TBPARAMETERS.
+    </change>
+    <change name="Ian Humphrey" date="2016-11-16">
+      Exceptions that occur during the solving of the bundle adjustment will now pop up as
+      message boxes when running jigsaw in GUI mode. Fixes #4483.
+    </change>
+    <change name="Ken Edmundson" date="2016-11-17">
+      Output control net will be now be written regardless of whether bundle converges. Fixes #4533.
+    </change>
   </history>
 
   <groups>
@@ -185,7 +255,7 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          cube list
+          List of cubes in the input control network 
         </brief>
         <description>
           This file contains a list of all <def>cube</def>s in the <def>control network</def>
@@ -200,7 +270,7 @@
         <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
-          Held list
+          List of (non-overlapping) cubes to hold in the adjustment
         </brief>
         <description>
           This file contains a list of all <def>cube</def>s whose orientation and position
@@ -208,6 +278,7 @@
           in the solution, but their camera orientation and spacecraft position
           will be constrained to keep the values from changing.  This is an
           optional parameter and the default is to not hold any of the images.
+          <i>Note that held images must not overlap each other to work properly.</i>
         </description>
         <filter>
           *.txt *.lis
@@ -244,21 +315,94 @@
           *.net
         </filter>
       </parameter>
+
+ <!-- Turning off USEPVL and SC_PARAMETERS for now. Since we are now using observation numbers
+      to obtain the BundleObservationSolveSettings for a BundleObservation (instead of inst. id),
+      this would require using a PVL that contains names of lists of images to group by.
+      E.g. Group = "listA." would create a BundleObservationSolveSettings object that is associated
+      with the images' observation numbers. Group = "listB.lis" would create another BOSS object
+      that is associated with listB's images' observation numbers. Use of these lists could
+      introduce unintended behaviors if not properly verified (e.g. would need to make sure the
+      lists are sublists of the FROMLIST, that these sublists are all mutually exclusive ...).
+      <parameter name="USEPVL">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Enter Camera/Spacecraft parameters using a PVL file
+        </brief>
+        <description>
+          This option indicates that the Camera and Spacecraft parameters are to be
+          obtained from the PVL file specified by SC_PARAMETERS. All of the following
+          parameters must be entered through the PVL file if this option is chosen:
+          HELDLIST, CKDEGREE, CKSOLVEDEGREE, CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE,
+          SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE, SPACECRAFT_POSITION_SIGMA,
+          SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA, CAMERA_ANGLES_SIGMA,
+          CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA. An example
+          template is located at $base/templates/jigsaw/SC_Parameters.pvl.
+        </description>
+        <exclusions>
+          <item>HELDLIST</item>
+          <item>CKDEGREE</item>
+          <item>CKSOLVEDEGREE</item>
+          <item>CAMSOLVE</item>
+          <item>TWIST</item>
+          <item>OVEREXISTING</item>
+          <item>SPKDEGREE</item>
+          <item>SPKSOLVEDEGREE</item>
+          <item>SPSOLVE</item>
+          <item>OVERHERMITE</item>
+          <item>SPACECRAFT_POSITION_SIGMA</item>
+          <item>SPACECRAFT_VELOCITY_SIGMA</item>
+          <item>SPACECRAFT_ACCELERATION_SIGMA</item>
+          <item>CAMERA_ANGLES_SIGMA</item>
+          <item>CAMERA_ANGULAR_VELOCITY_SIGMA</item>
+          <item>CAMERA_ANGULAR_ACCELERATION_SIGMA</item>
+        </exclusions>
+        <inclusions>
+          <item>SC_PARAMETERS</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SC_PARAMETERS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing Camera/Spacecraft parameters
+        </brief>
+        <description>
+          This file contains the Camera/Spacecraft parameters to use when processing
+          images from different sensors. This file should be in PVL format. It should
+          contain an object called SensorParameters with one group per spacecraft/instrument
+          combination. The SpacecraftName and InstrumentId keywords in the Instrument group
+          of an image file are used to create the name of each group in the PVL file. The
+          group pertaining to each spacecraft/instrument should contain the keyword/value
+          pairs needed to process images taken with that sensor:  CKDEGREE, CKSOLVEDEGREE,
+          CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE, SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE,
+          SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
+          CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
+          If any of these keywords are missing, then their defaults will be used. There is
+          an example template at $base/templates/jigsaw/SensorParameters.pvl that can be
+          used as a guide.
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>-->
     </group>
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
         <brief> Keep instances of the same observation in different cube files the same</brief>
         <description>
-            This option will solve for <def>SPICE</def> on all cubes with a matching
-            observation number as though they were a single observation.  For 
-            most missions, the default observation number is equivalent to the 
-            <def>serial number</def> of the <def>cube</def>, and a single <def>cube</def> 
-            is an observation.  However, for the Lunar Orbiter mission an image has a defined 
-            observation number that is a substring of its <def>serial number</def>.  This
-            feature allows the three subframes of a Lunar Orbiter High
-            Resolution frame to be treated as a single observation when this 
-            option is used.  Otherwise each subframe is adjusted independently.
+          This option will solve for <def>SPICE</def> on all cubes with a matching
+          observation number as though they were a single observation.  For 
+          most missions, the default observation number is equivalent to the 
+          <def>serial number</def> of the <def>cube</def>, and a single <def>cube</def> 
+          is an observation.  However, for the Lunar Orbiter mission, an image has a defined 
+          observation number that is a substring of its <def>serial number</def>.  This
+          feature allows the three subframes of a Lunar Orbiter High
+          Resolution frame to be treated as a single observation when this 
+          option is used; otherwise, each subframe is adjusted independently.
         </description>
         <type>boolean</type>
         <default>
@@ -269,25 +413,30 @@
       <parameter name="RADIUS">
         <brief> Solve for local radii of points</brief>
         <description>
-            Select this option to solve for the local radius of each <def>control
-            point</def>.  If this button is not turned on, the radii of the points
-            will not change from the <def>cube</def>'s shape model.
+          Select this option to solve for the local radius of each <def>control
+          point</def>.  If this button is not turned on, the radii of the points
+          will not change from the <def>cube</def>'s shape model.
         </description>
         <type>boolean</type>
         <default>
           <item>No</item>
         </default>
+        <inclusions>
+          <item>
+            POINT_RADIUS_SIGMA
+          </item>
+        </inclusions>
       </parameter>
       
       <parameter name="UPDATE">
         <brief> Update cube label</brief>
         <description>
-            When this option is selected, the application will update the labels  
-            of the individual <def>cube</def>s in the FROMLIST with the final values 
-            from the solution if the adjustment converges.  The results are written 
-            to the <def>SPICE</def> blobs attached to the cube, overwriting the previous
-            values.  If this option is not selected, the <def>cube</def> files are not
-            changed.  All other output files are still created.
+          When this option is selected, the application will update the labels  
+          of the individual <def>cube</def>s in the FROMLIST with the final values 
+          from the solution if the adjustment converges.  The results are written 
+          to the <def>SPICE</def> blobs attached to the cube, overwriting the previous
+          values.  If this option is not selected, the <def>cube</def> files are not
+          changed.  All other output files are still created.
         </description>
         <type>boolean</type>
         <default>
@@ -295,74 +444,26 @@
         </default>
       </parameter>
 
-      <parameter name="METHOD">
-        <type>string</type>
-        <brief> Matrix solution method</brief>
-        <default>
-          <item>SPARSE</item>
-        </default>
-        <description>
-            Enter the desired method to use to solve the matrix.  Methods will
-            vary in speed and accuracy.   The default, SPARSE, is the preferred
-            method because of speed and memory usage.  
-        </description>
-        <list>
-        <option value="SPARSE">
-          <brief>CholMod </brief>
-          <description>
-            Solve with CholMod sparse decomposition.
-          </description>
-          </option>
-          <option value="SPECIALK">
-            <brief>SpecialK (dense)</brief>
-            <description>
-            Solve with Cholesky dense decomposition.
-            </description>
-          </option>
-<!--          <option value="SVD">
-            <brief> Single Value Decomposition</brief>
-            <description>
-                      Solve the matrix using the method of single value
-                      decomposition.  This method is very accurate, but slow.
-            </description>
-          </option>
-          <option value="QRD">
-            <brief> QR Decomposition</brief>
-            <description>
-                      Solve the matrix using the method of QR
-                      decomposition, where Q is an orthogonal matrix such that Q
-                      transpose * Q =I, and R is an upper triangular matrix. 
-            </description>
-          </option>
--->
-          <option value="OLDSPARSE">
-            <brief> Sparse matrix solver</brief>
-            <description> 
-              Solve the matrix using a sparse matrix solver.
-                Note:  Sparse solver will not work on Sun/Solaris, QRD will be 
-                          used.
-            </description>
-             <exclusions>
-               <item>MODEL1</item>
-               <item>MODEL2</item>
-               <item>MODEL3</item>
-               <item>MAX_MODEL1_C_QUANTILE</item>
-               <item>MAX_MODEL2_C_QUANTILE</item>
-               <item>MAX_MODEL3_C_QUANTILE</item>
-            </exclusions>
-          </option>
-        </list>
-      </parameter>
-
       <parameter name="OUTLIER_REJECTION">
       <brief> Auto-rejection of outliers</brief>
       <description>
-          Select this option to perform automatic outlier detection and rejection. 
+        Select this option to perform automatic outlier detection and rejection. 
       </description>
       <type>boolean</type>
       <default>
         <item>No</item>
       </default>
+      <exclusions>
+        <item>MODEL1</item>
+        <item>MODEL2</item>
+        <item>MODEL3</item>
+        <item>MAX_MODEL1_C_QUANTILE</item>
+        <item>MAX_MODEL2_C_QUANTILE</item>
+        <item>MAX_MODEL3_C_QUANTILE</item>
+      </exclusions>
+      <inclusions>
+        <item>REJECTION_MULTIPLIER</item>
+     </inclusions>
     </parameter>
 
      <parameter name="REJECTION_MULTIPLIER">
@@ -372,14 +473,17 @@
         <default>
           <item>3.0</item>
         </default>
+        <inclusions>
+          <item>OUTLIER_REJECTION</item>
+       </inclusions>
       </parameter>
 
     <parameter name="ERRORPROPAGATION">
       <brief> Compute variance-covariance matrix</brief>
       <description>
-          Select this option to compute the variance-covariance matrix of the
-          parameters.  The parameter uncertainties can be computed from this
-          matrix.
+        Select this option to compute the variance-covariance matrix of the
+        parameters.  The parameter uncertainties can be computed from this
+        matrix.
       </description>
       <type>boolean</type>
       <default>
@@ -391,15 +495,15 @@
    <group name="Maximum Likelihood Estimation">
       <parameter name="MODEL1">
         <type>string</type>
-        <brief>A maximum likelihood estimation model selection.</brief>
+        <brief>A maximum likelihood estimation model selection</brief>
         <description> A maximum likelihood estimation model selection.
         </description>
         <default><item>NONE</item></default>
         <list>
           <option value="NONE">
-            <brief>None: no tier one maximumlikelihood estimation</brief>
+            <brief>None: no tier one maximum likelihood estimation</brief>
             <description>
-              None: no tier one maximumlikelihood estimation
+              None: no tier one maximum likelihood estimation
             </description>
             <exclusions>
                <item>MODEL2</item>
@@ -410,9 +514,9 @@
             </exclusions>
           </option>
           <option value="HUBER">
-            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <brief>Huber: approximates the L2 norm near 0, and the L1 norm thereafter.  Has one continuous derivative.</brief>
             <description>
-               A highly recommend model, that works well in many situations.
+              A highly recommended model that works well in many situations.
             </description>
             <exclusions>
                <item>REJECTION_MULTIPLIER</item>
@@ -423,7 +527,7 @@
           <option value="HUBER_MODIFIED">
             <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
             <description>
-               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+              An adaptation of the highly recommended Huber model that has two continuous derivatives.
             </description>
             <exclusions>
                <item>REJECTION_MULTIPLIER</item>
@@ -435,12 +539,12 @@
       </parameter>
 
       <parameter name="MAX_MODEL1_C_QUANTILE">
-        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
         <description> 
-          The tweaking constant has differenct meaning depending on the model being used:
-            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
-            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
-            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+          The tweaking constant has different meanings depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
+            Chen model:    Residuals whose absolute value is greater than the tweaking constant are totally ignored.  Recommended quantile: > 0.9
         </description>
         <type>double</type>
         <default>
@@ -452,15 +556,15 @@
 
       <parameter name="MODEL2">
         <type>string</type>
-        <brief>A maximum likelihood estimation model selection.</brief>
+        <brief>A maximum likelihood estimation model selection</brief>
         <description> A maximum likelihood estimation model selection.
         </description>
         <default><item>NONE</item></default>
         <list>
           <option value="NONE">
-            <brief>None: no tier two maximumlikelihood estimation</brief>
+            <brief>None: no tier two maximum likelihood estimation</brief>
             <description>
-              None: no tier two maximumlikelihood estimation
+              None: no tier two maximum likelihood estimation
             </description>
             <exclusions>
                <item>MODEL3</item>
@@ -469,41 +573,41 @@
             </exclusions>
           </option>
           <option value="HUBER">
-            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <brief>Huber: approximates the L2 norm near 0, and the L1 norm thereafter.  Has one continuous derivative.</brief>
             <description>
-               A highly recommend model, that works well in many situations.
+              A highly recommended model that works well in many situations.
             </description>
           </option>
           <option value="HUBER_MODIFIED">
             <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
             <description>
-               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+              An adaptation of the highly recommended Huber model that has two continuous derivatives.
             </description>
           </option>
           <option value="WELSCH">
-            <brief>Welsch: aprroximates the L2 norm near 0, but then decays exponentially to zero.</brief>
+            <brief>Welsch: approximates the L2 norm near 0, but then decays exponentially to zero.</brief>
             <description>
-               This model reduces the significance of large residuals more agressively than Huber.  Large residuals will have less influence than small residuals,
-               and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
+              This model reduces the significance of large residuals more aggressively than Huber.  Large residuals will have less influence than small residuals,
+              and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
             </description>
           </option>
           <option value="CHEN">
-            <brief>Chen: a highly aggresive method that intentionally removes the largest few percent of residuals</brief>
+            <brief>Chen: a highly aggressive method that intentionally removes the largest few percent of residuals.</brief>
             <description>
-               This mehtod dramatically increases the influence of smaller residuals (beyond the L2 norm), while at the same time totally ignoring the largest few
-               percent of the residuals.
+              This method dramatically increases the influence of smaller residuals (beyond the L2 norm) while simultaneously totally ignoring the largest few
+              percent of the residuals.
             </description>
           </option>
         </list>
       </parameter>
 
       <parameter name="MAX_MODEL2_C_QUANTILE">
-        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
         <description> 
-          The tweaking constant has differenct meaning depending on the model being used:
-            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
-            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
-            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+          The tweaking constant has different meanings depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
+            Chen model:    Residuals whose absolute value is greater than the tweaking constant are totally ignored.  Recommended quantile: > 0.9
         </description>
         <type>double</type>
         <default>
@@ -515,55 +619,55 @@
 
       <parameter name="MODEL3">
         <type>string</type>
-        <brief>A maximum likelihood estimation model selection.</brief>
+        <brief>A maximum likelihood estimation model selection</brief>
         <description> A maximum likelihood estimation model selection.
         </description>
         <default><item>NONE</item></default>
         <list>
           <option value="NONE">
-            <brief>None: no tier three maximumlikelihood estimation</brief>
+            <brief>None: no tier three maximum likelihood estimation</brief>
             <description>
-              None: no tier three maximumlikelihood estimation
+              None: no tier three maximum likelihood estimation
             </description>
             <exclusions>
                <item>MAX_MODEL3_C_QUANTILE</item>
             </exclusions>
           </option>
           <option value="HUBER">
-            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <brief>Huber: approximates the L2 norm near 0, and the L1 norm thereafter.  Has one continuous derivative.</brief>
             <description>
-               A highly recommend model, that works well in many situations.
+              A highly recommended model that works well in many situations.
             </description>
           </option>
           <option value="HUBER_MODIFIED">
             <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
             <description>
-               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+              An adaptation of the highly recommended Huber model that has two continuous derivatives.
             </description>
           </option>
           <option value="WELSCH">
-            <brief>Welsch: aprroximates the L2 norm near 0, but then decays exponentially to zero.</brief>
+            <brief>Welsch: approximates the L2 norm near 0, but then decays exponentially to zero.</brief>
             <description>
-               This model reduces the significance of large residuals more agressively than Huber.  Large residuals will have less influence than small residuals,
-               and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
+              This model reduces the significance of large residuals more aggressively than Huber.  Large residuals will have less influence than small residuals,
+              and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
             </description>
           </option>
           <option value="CHEN">
-            <brief>Chen: a highly aggresive method that intentionally removes the largest few percent of residuals</brief>
+            <brief>Chen: a highly aggressive method that intentionally removes the largest few percent of residuals.</brief>
             <description>
-               This mehtod dramatically increases the influence of smaller residuals (beyond the L2 norm), while at the same time totally ignoring the largest residuals.
+              This method dramatically increases the influence of smaller residuals (beyond the L2 norm) while simultaneously totally ignoring the largest residuals.
             </description>
           </option>
         </list>
       </parameter>
 
       <parameter name="MAX_MODEL3_C_QUANTILE">
-        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
         <description> 
-          The tweaking constant has differenct meaning depending on the model being used:
-            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
-            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
-            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+          The tweaking constant has different meanings depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
+            Chen model:    Residuals whose absolute value is greater than the tweaking constant are totally ignored.  Recommended quantile: > 0.9
         </description>
         <type>double</type>
         <default>
@@ -576,7 +680,7 @@
 
     <group name="Convergence Criteria">
       <parameter name="SIGMA0">
-        <brief> standard deviation of unit weight
+        <brief> Standard deviation of unit weight
         </brief>
         <description>
           Converges on stabilization of Sigma0.  Convergence occurs when the change
@@ -590,7 +694,7 @@
       </parameter>
 
       <parameter name="MAXITS">
-        <brief> iterations
+        <brief> Maximum number of iterations
         </brief>
         <description>
           Maximum number of times to iterate.  The application stops iterating at
@@ -615,9 +719,9 @@
           Degree of polynomial fit to original camera angles
         </brief>
         <description>
-                The degree of the polynomial fit to the original camera angles 
-                and used to generate <def>a priori</def> camera angles for the first 
-                iteration.
+          The degree of the polynomial fit to the original camera angles 
+          and used to generate <def>a priori</def> camera angles for the first 
+          iteration.
         </description>
       </parameter>
       <parameter name="CKSOLVEDEGREE">
@@ -630,13 +734,13 @@
           The degree of the polynomial being fit to in the bundle adjustment
         </brief>
         <description>
-               The degree of the polynomial being fit to in the bundle adjust 
-               solution.  This polynomial can be different from the one used to 
-               generate the <def>a priori</def> camera angles used in the first
-               iteration. In the case of an instrument with a jitter problem, a
-               higher degree polynomial fit to each of the camera angles might
-               provide a better solution (smaller errors).  For framing cameras,
-               the application automatically sets degree to 0.
+          The degree of the polynomial being fit to in the bundle adjust 
+          solution.  This polynomial can be different from the one used to 
+          generate the <def>a priori</def> camera angles used in the first
+          iteration. In the case of an instrument with a jitter problem, a
+          higher degree polynomial fit to each of the camera angles might
+          provide a better solution (smaller errors).  For framing cameras,
+          the application automatically sets degree to 0.
         </description>
       </parameter>
       <parameter name="CAMSOLVE">
@@ -646,15 +750,15 @@
           <item>ANGLES</item>
         </default>
         <description>
-               This parameter is used to specify which, if any, camera 
-               pointing parameters to include in the adjustment.
+          This parameter is used to specify which, if any, camera 
+          pointing parameters to include in the adjustment.
         </description>
         <list>
           <option value="NONE">
             <brief> Don't solve for any camera pointing factors</brief>
             <description>
-                   If this option is selected, no camera pointing parameters  
-                   will be adjusted.
+              If this option is selected, no camera pointing parameters  
+              will be adjusted.
             </description>
           <exclusions>
             <item>CKDEGREE</item>
@@ -665,43 +769,55 @@
           </option>
 
           <option value="ANGLES">
-            <brief>Solve for camera angles: right ascension, declination and optionally 
-                   twist
+            <brief>
+              Solve for camera angles: right ascension, declination and optionally twist
             </brief>
             <description>
-                   Camera angles in each <def>cube</def> will be adjusted in the solution, 
-                   but not angular velocities or accelerations. Solving for the first two
-                   camera angles translates images in sample and line.  Adding the third
-                   angle to the solution (TWIST option) allows for rotation corrections.
-                   Adjustments are not applied unless the solution converges and UPDATE is 
-                   selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
+              Camera angles in each <def>cube</def> will be adjusted in the solution, 
+              but not angular velocities or accelerations. Solving for the first two
+              camera angles translates images in sample and line.  Adding the third
+              angle to the solution (TWIST option) allows for rotation corrections.
+              Adjustments are not applied unless the solution converges and UPDATE is 
+              selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
             </description>
+            <exclusions>
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
-                   Camera angles and their angular velocities will be adjusted in the
-                   solution.  Solving for angles and velocities is equivalent to using 
-                   CKSOLVEDEGREE=1.
+              Camera angles and their angular velocities will be adjusted in the
+              solution.  Solving for angles and velocities is equivalent to using 
+              CKSOLVEDEGREE=1.
             </description>
+            <exclusions>
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
-                   Camera angles, their angular velocities, and accelerations will be 
-                   adjusted in the solution.  Solving for angles, angular velocities, and 
-                   accelerations is equivalent to using CKSOLVEDEGREE=2.
+              Camera angles, their angular velocities, and accelerations will be 
+              adjusted in the solution.  Solving for angles, angular velocities, and 
+              accelerations is equivalent to using CKSOLVEDEGREE=2.
             </description>
+            <exclusions>
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
           </option>
 
           <option value="ALL">
             <brief>Solve for all coefficients in the polynomials fit to the camera angles.</brief>
             <description>
-                   If this option is selected, all coefficients of the solve
-                   equation will be adjusted in the solution (CKSOLVEDEGREE+1
-                   coefficients)
+              If this option is selected, all coefficients of the solve
+              equation will be adjusted in the solution (CKSOLVEDEGREE+1
+              coefficients)
             </description>
           </option>
         </list>
@@ -710,8 +826,8 @@
       <parameter name="TWIST">
         <brief> Solve for twist</brief>
         <description>
-               If this option is selected, the twist angle will be adjusted in the 
-               bundle adjustment solution.
+          If this option is selected, the twist angle will be adjusted in the 
+          bundle adjustment solution.
         </description>
         <type>boolean</type>
         <default>
@@ -721,13 +837,13 @@
       <parameter name="OVEREXISTING">
         <brief> Fit polynomial over the existing pointing</brief>
         <description>
-            This option will fit a polynomial over the existing pointing data.
-            This data is held constant in the adjustment, and the
-            initial value for the each of the coefficients in the polynomials
-            is 0.
+          This option will fit a polynomial over the existing pointing data.
+          This data is held constant in the adjustment, and the
+          initial value for the each of the coefficients in the polynomials
+          is 0.
 
-            When this option is used, the current pointing is used as a priori
-            in the adjustment.
+          When this option is used, the current pointing is used as a priori
+          in the adjustment.
         </description>
         <type>boolean</type>
         <default>
@@ -747,9 +863,9 @@
         Degree of polynomial fit to original camera position
       </brief>
       <description>
-              The degree of the polynomial fit to the original camera position
-              and used to generate <def>a priori</def> camera positions for the
-              first iteration.
+        The degree of the polynomial fit to the original camera position
+        and used to generate <def>a priori</def> camera positions for the
+        first iteration.
       </description>
     </parameter>
     <parameter name="SPKSOLVEDEGREE">
@@ -763,13 +879,13 @@
         adjustment.
       </brief>
       <description>
-             The degree of the polynomial being fit to in the bundle adjust
-             solution.  This polynomial can be different from the one used to
-             generate the <def>a priori</def> camera positions used in the first
-             iteration. In the case of an instrument with a jitter problem, a
-             higher degree polynomial fit for the camera position might provide
-             a better solution (smaller errors). For framing cameras, the
-             application automatically sets degree to 0.
+        The degree of the polynomial being fit to in the bundle adjust
+        solution.  This polynomial can be different from the one used to
+        generate the <def>a priori</def> camera positions used in the first
+        iteration. In the case of an instrument with a jitter problem, a
+        higher degree polynomial fit for the camera position might provide
+        a better solution (smaller errors). For framing cameras, the
+        application automatically sets degree to 0.
       </description>
     </parameter>
       <parameter name="SPSOLVE">
@@ -779,14 +895,14 @@
           <item>NONE</item>
         </default>
         <description>
-               This parameter is used to specify which, if any,  spacecraft 
-               position parameters to include in the adjustment.
+          This parameter is used to specify which, if any, spacecraft 
+          position parameters to include in the adjustment.
         </description>
         <list>
           <option value="NONE">
             <brief>Don't solve for any spacecraft position parameters</brief>
             <description>
-                   No spacecraft position parameters will be adjusted.
+              No spacecraft position parameters will be adjusted.
             </description>
             <exclusions>
               <item>SPKDEGREE</item>
@@ -795,36 +911,49 @@
             </exclusions>
           </option>
 
-          <option value="POSITION">
+          <option value="POSITIONS">
             <brief>Solve for the spacecraft positions</brief>
             <description>
-                   Spacecraft positions will be adjusted in the solution, but 
-                   not the velocity or the acceleration.
+              Spacecraft positions will be adjusted in the solution, but 
+              not the velocity or the acceleration.
             </description>
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for the spacecraft positions and velocities</brief>
             <description>
-                   Spacecraft positions will be adjusted in the solution, as 
-                   well as the velocities of the spacecraft at each instance.
+              Spacecraft positions will be adjusted in the solution, as 
+              well as the velocities of the spacecraft at each instance.
             </description>
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for the spacecraft positions, velocities, and accelerations</brief>
             <description>
-                   Spacecraft positions will be adjusted in the solution, as well 
-                   as the velocities and accelerations of the spacecraft at each 
-                   instance.
+              Spacecraft positions will be adjusted in the solution, as well 
+              as the velocities and accelerations of the spacecraft at each 
+              instance.
             </description>
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
           </option>
+
           <option value="ALL">
             <brief>Solve for all coefficients in the polynomials fit to the camera position.</brief>
             <description>
-                   If this option is selected, all coefficients of the solve
-                   equation will be adjusted in the solution (SPKSOLVEDEGREE+1
-                   coefficients)
+              If this option is selected, all coefficients of the solve
+              equation will be adjusted in the solution (SPKSOLVEDEGREE+1
+              coefficients)
             </description>
           </option>
         </list>
@@ -832,14 +961,14 @@
       <parameter name="OVERHERMITE">
         <brief> Fit polynomial over the existing Hermite spline</brief>
         <description>
-            This option will fit a polynomial over the existing Hermite cubic
-            spline used to interpolate the coordinates of the spacecraft 
-            position. The spline is held constant in the adjustment, and the
-            initial value for the each of the coefficients in the polynomials
-            is 0. 
+          This option will fit a polynomial over the existing Hermite cubic
+          spline used to interpolate the coordinates of the spacecraft 
+          position. The spline is held constant in the adjustment, and the
+          initial value for the each of the coefficients in the polynomials
+          is 0. 
 
-            When this option is used, the current positions are used as a priori
-            in the adjustment.  
+          When this option is used, the current positions are used as a priori
+          in the adjustment.  
         </description>
         <type>boolean</type>
         <default>
@@ -848,13 +977,54 @@
       </parameter>
       </group>
 
+    <group name="Target Body">
+      <parameter name="SOLVETARGETBODY">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Enter target body parameters and a priori values using a PVL file</brief>
+        <description>
+          This option indicates that target body parameters are to be input via the PVL file specified
+          by TBPARAMETERS. All of the following values for coefficients must be in the PVL file:
+          body pole RA and DEC; prime meridian; triaxial radii and/or mean radius. An example template
+          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+        </description>
+        <inclusions>
+          <item>TBPARAMETERS</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="TBPARAMETERS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing target body parameters to solve and a priori values
+        </brief>
+        <description>
+          This file contains target body parameters to use and solve for in the bundle adjustment.
+          File must be in PVL format. It should contain an object called TargetParameters.The
+          SpacecraftName and InstrumentId keywords in the Instrument group
+          of an image file are used to create the name of each group in the PVL file. The
+          group pertaining to each spacecraft/instrument should contain the keyword/value
+          pairs needed to process images taken with that sensor:  CKDEGREE, CKSOLVEDEGREE,
+          CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE, SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE,
+          SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
+          CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
+          If any of these keywords are missing, then their defaults will be used. An example template
+          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
+    </group>
+
       <group name="Parameter Uncertainties">
         <parameter name="POINT_LATITUDE_SIGMA">
           <brief> Global latitude uncertainty for all points (meters)
           </brief>
           <description> 
-                 This optional value will be used as the global latitude 
-                 uncertainty for all points.  Units are meters.
+            This optional value will be used as the global latitude 
+            uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -865,8 +1035,8 @@
           <brief> Global longitude uncertainty for all points (meters)
           </brief>
           <description> 
-                 This optional value will be used as the global longitude 
-                 uncertainty for all points. Units are meters. 
+            This optional value will be used as the global longitude 
+            uncertainty for all points. Units are meters. 
           </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -877,20 +1047,25 @@
           <brief> Global radius uncertainty for all points (meters)
           </brief>
           <description> 
-                 This value will be used as the global radius uncertainty for 
-                 all points.  Units are meters.
+            This value will be used as the global radius uncertainty for 
+            all points.  Units are meters.
           </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
+          <inclusions>
+            <item>
+              RADIUS
+            </item>
+          </inclusions>
         </parameter>
 
         <parameter name="SPACECRAFT_POSITION_SIGMA">
           <brief> Global uncertainty for spacecraft coordinates (meters)
           </brief>
           <description> 
-                 This value will be used as the global uncertainty for spacecraft 
-                 coordinates.  Units are meters.
+            This value will be used as the global uncertainty for spacecraft 
+            coordinates.  Units are meters.
           </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -901,9 +1076,9 @@
           <brief> Global uncertainty for spacecraft velocity (meters/second)
           </brief>
           <description> 
-                 This value will be used as the global uncertainty for spacecraft 
-                 velocity.  Units are meters/second.
-            (meters)</description> 
+            This value will be used as the global uncertainty for spacecraft 
+            velocity.  Units are meters/second.
+          </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
@@ -913,8 +1088,8 @@
           <brief> Global uncertainty for spacecraft acceleration 
             (meters/second/second)</brief>
           <description> 
-                 This value will be used as the global uncertainty for 
-                 spacecraft acceleration.  Units are meters/second/second.
+            This value will be used as the global uncertainty for 
+            spacecraft acceleration.  Units are meters/second/second.
           </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -925,8 +1100,8 @@
           <brief> global uncertainty for camera angles 
             (decimal degrees)</brief>
           <description> 
-                 This value will be used as the global uncertainty for camera 
-                 angles.  Units are decimal degrees.
+            This value will be used as the global uncertainty for camera 
+            angles.  Units are decimal degrees.
           </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -937,8 +1112,8 @@
           <brief> Global uncertainty for camera angular velocity 
             (decimal degrees/second)</brief>
           <description> 
-                 This value will be used as the global uncertainty for camera 
-                 angular velocity.  Units are decimal degrees/second.
+            This value will be used as the global uncertainty for camera 
+            angular velocity.  Units are decimal degrees/second.
           </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -946,11 +1121,11 @@
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_ACCELERATION_SIGMA">
-          <brief> global uncertainty for camera angular acceleration 
+          <brief> Global uncertainty for camera angular acceleration 
             (decimal degrees/second/second)</brief>
           <description> 
-                 This value will be used as the global uncertainty for camera 
-                 angular acceleration.  Units are decimal degrees/second/second.
+            This value will be used as the global uncertainty for camera 
+            angular acceleration.  Units are decimal degrees/second/second.
           </description> 
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -961,20 +1136,34 @@
         <group name="Output Options">
 
        <parameter name="FILE_PREFIX">
-            <type>string</type>
-            <internalDefault>none</internalDefault>
-            <brief>output file prefix</brief>
-            <description>
-                output file prefix
-            </description>
+         <type>string</type>
+         <internalDefault>none</internalDefault>
+         <brief>Output file prefix</brief>
+         <description>
+           File prefix to prepend for the generated output files. Any prefix that is not a 
+	   file path will have an underscore placed between the prefix and file name.
+         </description>
         </parameter>
 
         <parameter name="BUNDLEOUT_TXT">
           <brief> Standard bundle output file - bundleout.txt
           </brief>
           <description> 
-                 Selection of this parameter flags generation of the standard
-                 bundle output file
+            Selection of this parameter flags generation of the standard
+            bundle output file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
+        </parameter>
+
+        <parameter name="IMAGESCSV">
+          <brief> Outputs image data (body-fixed) to csv file - bundleout_images.csv
+          </brief>
+          <description>
+            Selection of this parameter flags output of image data
+            (in body-fixed coordinates) to a csv file.
           </description>
           <type>boolean</type>
           <default>
@@ -986,8 +1175,8 @@
           <brief> Outputs point and image data (body-fixed) to csv file - bundleout_points.csv
           </brief>
           <description> 
-                 Selection of this parameter flags output of point and image data
-                 (in body-fixed coordinates) to csv file.
+            Selection of this parameter flags output of point and image data
+            (in body-fixed coordinates) to csv file.
           </description>
           <type>boolean</type>
           <default>
@@ -998,8 +1187,8 @@
         <parameter name="RESIDUALS_CSV">
           <brief> Outputs image coordinate residuals to csv file - residuals.csv</brief>
           <description> 
-                 Selection of this parameter flags output of image coordinate 
-                 residuals to a csv file
+            Selection of this parameter flags output of image coordinate 
+            residuals to a csv file
           </description>
           <type>boolean</type>
           <default>

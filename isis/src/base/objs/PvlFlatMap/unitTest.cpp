@@ -62,7 +62,7 @@ int main() {
 
   qDebug() << "PvlFlatMap1 Source (PvlObject):";
   cout << pvlObject << endl;
-  qDebug();
+  qDebug() << "";
 
   // Constructed from PvlObject no constraints
   PvlFlatMap map1(pvlObject);
@@ -78,7 +78,7 @@ int main() {
   qDebug() << "    excludes: " << constraints.excludes();
   qDebug() << "    includes: " << constraints.includes();
   qDebug() << "    key list: " << constraints.keyList();
-  qDebug();
+  qDebug() << "";
   PvlFlatMap map1b(pvlObject, constraints);
   qDebug() << "Map1B - ExcludeGroup and ExcludeObject are excluded:";
   print(map1b);
@@ -95,7 +95,7 @@ int main() {
   qDebug() << "    ExcludeGroup is excluded? " << constraints.isExcluded("ExcludeGroup");
   qDebug() << "    cat is included? " << constraints.isIncluded("cat");
   qDebug() << "    Beasts is included? " << constraints.isIncluded("Beasts");
-  qDebug();
+  qDebug() << "";
   PvlFlatMap map1c(pvlObject, constraints);
   qDebug() << "Map1C - ExcludeGroup and ExcludeObject are excluded.\n"
               "        Beasts object is included:";
@@ -109,7 +109,7 @@ int main() {
   qDebug() << "    excludes: " << constraints.excludes();
   qDebug() << "    includes: " << constraints.includes();
   qDebug() << "    key list: " << constraints.keyList();
-  qDebug();
+  qDebug() << "";
   PvlFlatMap map1d(pvlObject, constraints);
   qDebug() << "Map1D - Fish group and Birds object are included.\n"
               "        However, parent object Beasts is not included,\n"
@@ -128,7 +128,7 @@ int main() {
   qDebug() << "    key list: " << keywordConstraints.keyList();
   qDebug() << "    cat is in list?  " << keywordConstraints.isKeyInList("cat");
   qDebug() << "    dog is in list?  " << keywordConstraints.isKeyInList("dog");
-  qDebug();
+  qDebug() << "";
   PvlFlatMap map1e(pvlObject, keywordConstraints);
   qDebug() << "Map1E - key list provided:";
   print(map1e);
@@ -153,7 +153,7 @@ int main() {
   qDebug() << "    key list: " << constraintsFromFile.keyList();
   qDebug() << "    cat is in list?  " << constraintsFromFile.isKeyInList("cat");
   qDebug() << "    dog is in list?  " << constraintsFromFile.isKeyInList("dog");
-  qDebug();
+  qDebug() << "";
   PvlFlatMap map1f(pvlObject, constraintsFromFile);
   qDebug() << "Map1F - key list file provided:";
   print(map1f);
@@ -170,7 +170,7 @@ int main() {
 
   qDebug() << "PvlFlatMap2 Source (PvlGroup):";
   cout << pvlGroup << endl;
-  qDebug();
+  qDebug() << "";
 
 
   PvlFlatMap map2(pvlGroup, keywordConstraints);
@@ -219,7 +219,7 @@ int main() {
            << map12.get("Climb", "KingKong", 3);
   cout << "    Get climb as PvlKeyword: " << map12.keyword("Climb") << endl;
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "Get map info for non-existent keys:";
   qDebug() << "    Map has keyword=pencil?" << map12.exists("pencil");
   qDebug() << "    All Values for pencil:" << map12.allValues("pencil");
@@ -228,7 +228,7 @@ int main() {
   qDebug() << "    Get value of pencil or return Lucy: " << map12.get("pencil", "Lucy");
   qDebug() << "    Get values for PvlKeyword('pencil', 'Linus'): " 
            << map12.keywordValues(PvlKeyword("Sally", "Linus"));
-  qDebug();
+  qDebug() << "";
 
   // erase...
   qDebug() << "Erasing climb keyword: " << map12.erase("Climb");
@@ -244,7 +244,7 @@ int main() {
     e.print();
   }
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "Try to get CAT keyword at non-existent index...";
   try {
     map12.get("CAT", 10);
@@ -253,7 +253,7 @@ int main() {
     e.print();
   }
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "Try to get non-existent pencil keyword...";
   try {
     map12.keyword("pencil");
@@ -281,5 +281,5 @@ static void print(const PvlFlatMap &map) {
     iterator.next();
     cout << "\t" << iterator.value() << endl;
   }
-  qDebug();
+  qDebug() << "";
 }

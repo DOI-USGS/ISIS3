@@ -86,7 +86,7 @@ namespace Isis {
       QString proj = mapGroup["ProjectionName"];
 
       // Now get the plugin for the projection
-      void *ptr;
+      QFunctionPointer ptr;
       try {
         ptr = m_projPlugin.GetPlugin(proj);
       }
@@ -154,7 +154,7 @@ namespace Isis {
       QString proj = mapGroup["ProjectionName"];
 
       // Now get the plugin for the projection
-      void *ptr;
+      QFunctionPointer ptr;
       try {
         ptr = m_projPlugin.GetPlugin(proj);
       }

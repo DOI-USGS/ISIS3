@@ -116,6 +116,13 @@ namespace Isis {
    * the pointers are owned by another "entity".
    */
   template <typename T> struct NoopRemoval {
+
+    // defines used for cross platform suppression of unused parameter warning. This will prevent
+    // distroy() from causing unused parameter warnings in clang. This is done for the purpose
+    // of porting ISIS to OSX 10.11
+    // #define MON_Internal_UnusedStringify(macro_arg_string_literal) #macro_arg_string_literal
+    // #define MONUnusedParameter(macro_arg_parameter) _Pragma(MON_Internal_UnusedStringify(unused(macro_arg_parameter)))
+
     protected:
 
       /**
@@ -124,6 +131,10 @@ namespace Isis {
        * @param element The CollectorMap to be destroyed
        */
       void destroy(T *element) {
+        // arbitrary cast type to suppress unused parameter warnings generated
+        // by clang when building on mac
+        (void)element;
+
         return;
       }
 
@@ -763,5 +774,3 @@ namespace Isis {
 
 };
 #endif
-
-

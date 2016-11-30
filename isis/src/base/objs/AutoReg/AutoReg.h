@@ -28,7 +28,7 @@
 
 #include "Chip.h"
 #include "Statistics.h"
-  
+
 class QString;
 
 namespace Isis {
@@ -168,7 +168,7 @@ namespace Isis {
    *    @history 2011-05-04 Jai Rideout - Added ability to save gradient-
    *             filtered chips after registration instead of just saving the
    *             original chips.
-   *    @history 2011-05-18 Steven Lambright - Fixed a bug with ReductionFactor 
+   *    @history 2011-05-18 Steven Lambright - Fixed a bug with ReductionFactor
    *    @history 2011-10-12 Jai Rideout - Removed Roberts gradient. It did not
    *             give useful results due to the 2x2 matrix it uses.
    *    @history 2012-01-05 Travis Addair - Added separate variables for Whole
@@ -286,7 +286,7 @@ namespace Isis {
         return p_reduceFactor;
       }
 
-      //! Return pattern chip valid percent.  The default value is 
+      //! Return pattern chip valid percent.  The default value is
       double PatternValidPercent() const {
         return p_patternValidPercent;
       };
@@ -427,6 +427,7 @@ namespace Isis {
       virtual AutoReg::RegisterStatus Registration(Chip &sChip, Chip &pChip,
           Chip &fChip, int startSamp, int startLine, int endSamp, int endLine,
           int bestSamp, int bestLine);
+
       void Parse(Pvl &pvl);
       virtual bool CompareFits(double fit1, double fit2);
       bool SetSubpixelPosition(Chip &window);
@@ -476,13 +477,13 @@ namespace Isis {
        * Empty copy constructor.
        * @param original AutoReg object
        */
-      AutoReg(const AutoReg &original) {};
-      void Match(Chip &sChip, 
-                 Chip &pChip, 
-                 Chip &fChip, 
-                 int startSamp, 
-                 int endSamp, 
-                 int startLine, 
+
+      void Match(Chip &sChip,
+                 Chip &pChip,
+                 Chip &fChip,
+                 int startSamp,
+                 int endSamp,
+                 int startLine,
                  int endLine);
       bool ComputeChipZScore(Chip &chip);
       void Init();

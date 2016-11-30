@@ -154,7 +154,7 @@ namespace Isis {
    * @param csvfile  Name of file to read
    */
   void CSVReader::read(const QString &csvfile) {
-    ifstream ifile(csvfile.toAscii().data(), ios::in);
+    ifstream ifile(csvfile.toLatin1().data(), ios::in);
     if(!ifile) {
       QString mess = "Unable to open file " + csvfile;
       throw IException(IException::User, mess, _FILEINFO_);

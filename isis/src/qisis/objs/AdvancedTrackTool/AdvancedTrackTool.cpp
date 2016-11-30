@@ -1,9 +1,18 @@
 #include "AdvancedTrackTool.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QLabel>
 #include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QScrollArea>
 #include <QSize>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QToolBar>
+#include <QVBoxLayout>
 
 #include "Angle.h"
 #include "Camera.h"
@@ -113,7 +122,7 @@ namespace Isis {
     QAction *recordAction = new QAction(parent);
     recordAction->setShortcut(Qt::Key_R);
     parent->addAction(recordAction);
-    connect(recordAction, SIGNAL(activated()), this, SLOT(record()));
+    connect(recordAction, SIGNAL(triggered()), this, SLOT(record()));
     p_tableWin->setStatusMessage("To record press the R key"
                                  "  ---  Double click on a cell to enable crtl+c (copy) and"
                                  " ctrl+v (paste).");
@@ -124,7 +133,7 @@ namespace Isis {
     QAction *help = new QAction(p_tableWin);
     help->setText("&Tool Help");
     help->setShortcut(Qt::CTRL + Qt::Key_H);
-    connect(help, SIGNAL(activated()), this, SLOT(helpDialog()));
+    connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     helpMenu->addAction(help);
     p_tableWin->setMenuBar(menuBar);
     installEventFilter(p_tableWin);

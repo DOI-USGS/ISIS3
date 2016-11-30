@@ -91,13 +91,14 @@ namespace Isis {
 
     void ImagePointTreeModel::CreateRootItemFunctor::addToRootItem(
       QAtomicPointer< RootItem > & root, ImageParentItem *const &item) {
-      if (!root) {
-        root = new RootItem;
-        root->moveToThread(item->thread());
+
+      // Allocate a new root item if our root is NULL
+      if (root.testAndSetOrdered(NULL, new RootItem)) {
+        root.loadAcquire()->moveToThread(item->thread());
       }
 
       if (item)
-        root->addChild(item);
+        root.loadAcquire()->addChild(item);
     }
 
 

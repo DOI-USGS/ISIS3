@@ -28,7 +28,7 @@ int main() {
       QString pdsFile = fname.expanded();
 
       ofstream out;
-      out.open(pdsFile.toAscii().data(), std::ios::out);
+      out.open(pdsFile.toLatin1().data(), std::ios::out);
 
       {
         PvlKeyword key("skey", "string");

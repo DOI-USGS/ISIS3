@@ -2,8 +2,8 @@
 #define MdisCalUtils_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -92,9 +92,9 @@ namespace Isis {
       QString leapsecondsName(leapseconds.expanded());
       QString sclkName(sclk.expanded());
       QString pckName(pck.expanded());
-      furnsh_c(leapsecondsName.toAscii().data());
-      furnsh_c(sclkName.toAscii().data());
-      furnsh_c(pckName.toAscii().data());
+      furnsh_c(leapsecondsName.toLatin1().data());
+      furnsh_c(sclkName.toLatin1().data());
+      furnsh_c(pckName.toLatin1().data());
 
 //  Ensure it is loaded only once
       naifLoaded = true;
@@ -121,17 +121,17 @@ namespace Isis {
     //  Determine if the target is a valid NAIF target
     SpiceInt tcode;
     SpiceBoolean found;
-    bodn2c_c(target.toAscii().data(), &tcode, &found);
+    bodn2c_c(target.toLatin1().data(), &tcode, &found);
     if (!found) return (false);
 
     //  Convert starttime to et
     double obsStartTime;
-    scs2e_c(-236, scStartTime.toAscii().data(), &obsStartTime);
+    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
 
     //  Get the vector from target to sun and determine its length
     double sunv[3];
     double lt;
-    spkpos_c(target.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
+    spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
 
@@ -381,7 +381,7 @@ namespace Isis {
 
     //  Convert s/c clock start time to et
     double obsStartTime;
-    scs2e_c(-236, scStartTime.toAscii().data(), &obsStartTime);
+    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
 
     // Set initial conditions and loop through all rows in the event table
     double evalue = 1.0;
@@ -391,7 +391,7 @@ namespace Isis {
       CSVReader::CSVAxis eRow = csv.getRow(i);
       QString utcTime = eRow[0];
       double eTime;
-      utc2et_c(utcTime.toAscii().data(), &eTime);
+      utc2et_c(utcTime.toLatin1().data(), &eTime);
 
       // If current time is greater than start time this is the post event case
       if (eTime > obsStartTime) {

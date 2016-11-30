@@ -11,6 +11,9 @@ namespace Isis {
      * @author ????-??-?? Unknown
      *
      * @internal
+     * @history 2016-08-28 Kelvin Rodriguez - Removed usused private member variables to
+     *                              eliminate unused member variable warnings in clang.
+     *                              Part of porting to OS X 10.11.
      */
     class MiCalibration {
       public:
@@ -116,14 +119,7 @@ namespace Isis {
         QString p_ActiveAreaImage;
         QString p_FlatImageOpen;
         QString p_FlatImageClosed;
-        double p_RPswitch;
-        double p_ZEswitch;
-        double p_AAswitch;
         double p_OmegaNaught;
-
-        double p_calPixel;
-        double p_DesmearPixel;
-        double p_outputPixel;
 
         void ReadLabels(Cube &image);
         void ReadKernel(Pvl &kernel);
@@ -133,4 +129,3 @@ namespace Isis {
   };
 };
 #endif
-

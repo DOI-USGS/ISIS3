@@ -22,7 +22,7 @@ void IsisMain() {
 
   ofstream os;
   QString outFile = FileName(ui.GetFileName("TO")).expanded();
-  os.open(outFile.toAscii().data(), ios::out);
+  os.open(outFile.toLatin1().data(), ios::out);
 
   int minobs = 1;
   int maxobs = 1000000;
@@ -75,7 +75,7 @@ void IsisMain() {
   }
 
   FILE *spcptr;
-  if ((spcptr = fopen(inFile.expanded().toAscii().data(),"rb")) == 0) {
+  if ((spcptr = fopen(inFile.expanded().toLatin1().data(),"rb")) == 0) {
     QString msg = "Error opening input Kaguya SP file [" + inFile.expanded() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }

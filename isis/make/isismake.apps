@@ -85,9 +85,9 @@ $(BINS): $(UIHEADERS) $(QTRESOURCEFILES) protos $(OBJS)
 	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CC) $(ALLINCDIRS) $(ISISCFLAGS) $(CFLAGS) -c -o $@ $?
 
-.cc.o: 
+.cc.o:
 	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
-	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
+	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) $(ISIS_PROTOBUF_FLAGS) -c -o $@ $?
 
 .xml.html :
 	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_OUTFILE_OPTION) $@ $(XALAN_INFILE_OPTION) $? $(XALAN_XSL_OPTION) $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl
@@ -95,7 +95,7 @@ $(BINS): $(UIHEADERS) $(QTRESOURCEFILES) protos $(OBJS)
 protos: $(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 
 %.pb.cc %.pb.h: %.proto
-	protoc -I$(<D) --cpp_out=$(<D) $^
+	protoc -I$(<D) --cpp_out=$(<D) $^ $(ISIS_PROTOBUF_FLAGS)
 
 ui_%.h: %.ui
 	$(UIC) -o $@ $^
@@ -141,7 +141,7 @@ localclean:
 sanitize: clean
 	$(RM) tttt* junk.* TEMP*
 
-install: app 
+install: app
 	if [ ! -d "$(ISISROOT)/bin/xml" ];                                    \
 	then                                                                  \
 	  mkdir -p $(ISISROOT)/bin/xml;                                       \
@@ -215,25 +215,19 @@ test:
 	  $(ECHO) -ne "Scope Coverage:      ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Scope Coverage"            \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage -h scopecoverage;                              \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      -h scopecoverage;                                                     \
 	  $(ECHO) -ne "Line Coverage:       ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Line Coverage"             \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --line-coverage -h linecoverage;                                      \
 	  $(ECHO) -ne "Function Coverage:   ";                                      \
 	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
 	      --title="`basename $$PWD` Application Test Function Coverage"         \
-	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
-	      --global=all --method=all --source=all --execution=all                \
-	      --method-sort=coverage --execution-sort=coverage                      \
-	      --source-sort=coverage --function-coverage -h functioncoverage;       \
-	fi; 
+	      -m "`basename $$PWD`.csmes" --stat                                    \
+	      --function-coverage -h functioncoverage;                              \
+	fi;
 
 testdir:
 	if [ ! -d "tsts" ];                                           \

@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -71,18 +71,19 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    
+    // lines and samples added to the pvl in the order you
+    // call getDouble()
+    double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
+    double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
-    focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) +
-                       "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) +
-                       "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(bSamples, bLines);
 
     // Setup detector map
     CameraDetectorMap *detMap =  new CameraDetectorMap(this);
     detMap->SetStartingDetectorSample((int) inst["FirstSample"] + 1);
     detMap->SetStartingDetectorLine((int) inst["FirstLine"] + 1);
-     
+
     // Handle summing
     int binning = inst["Binning"];
     detMap->SetDetectorLineSumming(binning);
@@ -137,7 +138,7 @@ namespace Isis {
  * @param lab Cube labels
  *
  * @return Isis::Camera* AmicaCamera
- * @internal 
+ * @internal
  *   @history 2013-11-27 Kris Becker - Original Version
  */
 extern "C" Isis::Camera *AmicaCameraPlugin(Isis::Cube &cube) {

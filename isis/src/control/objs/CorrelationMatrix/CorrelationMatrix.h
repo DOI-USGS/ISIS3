@@ -66,6 +66,8 @@ namespace Isis {
    *                           as well as the function computeCorrelationMatrix. Fixes #3997,3999.
    *   @history 2016-07-11 Jesse Mapel - Updated method names to meet coding standards.
    *                           Fixes #4112.
+   *   @history 2016-08-10 Jeannie Backer - Replaced boost matrix with Isis::LinearAlgebra::Matrix.
+   *                           References #4163.
    */
   class CorrelationMatrix {
     public:

@@ -1,7 +1,13 @@
 #include "QnetNewPointDialog.h"
 
-#include <QtGui>
 #include <algorithm>
+
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
+#include <QtWidgets>
 
 #include "ControlNet.h"
 #include "IString.h"

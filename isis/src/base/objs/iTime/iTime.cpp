@@ -58,7 +58,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
-    str2et_c(time.toAscii().data(), &et);
+    str2et_c(time.toLatin1().data(), &et);
 
     p_et = et;
     NaifStatus::CheckErrors();
@@ -83,7 +83,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
-    str2et_c(time.toAscii().data(), &et);
+    str2et_c(time.toLatin1().data(), &et);
 
     p_et = et;
     NaifStatus::CheckErrors();
@@ -454,7 +454,7 @@ namespace Isis {
     LoadLeapSecondKernel();
 
     double et;
-    utc2et_c(utcString.toAscii().data(), &et);
+    utc2et_c(utcString.toLatin1().data(), &et);
     setEt(et);
     NaifStatus::CheckErrors();
   }
@@ -478,7 +478,7 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
     QString leapSecondName(leapSecond.highestVersion().expanded());
-    furnsh_c(leapSecondName.toAscii().data());
+    furnsh_c(leapSecondName.toLatin1().data());
     NaifStatus::CheckErrors();
 
     p_lpInitialized = true;

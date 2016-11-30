@@ -64,7 +64,7 @@ namespace Isis {
           QFileDialog::getSaveFileName(NULL, QString("Project Location"), QString("."));
 
       if (!newDestination.isEmpty()) {
-        QUndoCommand::setText(tr("Save project to [%1]").arg(newDestination));
+        QUndoCommand::setText(tr("Save project to [%1]") .arg(newDestination));
         QString realPath = QFileInfo(newDestination + "/").absolutePath();
         project()->save(realPath);
 //      project()->relocateProjectRoot(realPath);

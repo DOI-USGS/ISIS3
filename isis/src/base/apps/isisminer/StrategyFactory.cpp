@@ -531,7 +531,7 @@ StrategyFactory *StrategyFactory::m_strategymaker = 0;
      // Plugin library is loaded, get creator routine
      typedef Strategy *(*StrategyCreator)(const PvlObject &object, const ResourceList &globals);
      QString routine = pluginkeys.get("Routine");
-     StrategyCreator maker = (StrategyCreator) plugin.resolve(routine.toAscii().data());
+     StrategyCreator maker = (StrategyCreator) plugin.resolve(routine.toLatin1().data());
      if ( !maker ) {
        QString mess = "Unable to resolve Routine name [" + routine +
                       "] in Strategy plugin [" + plugin.fileName() + "]";

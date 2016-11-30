@@ -1,58 +1,58 @@
-Unit test for NaifDskShape. 
+Unit test for NaifDskShape.
 
-Default constructor. 
-Shape name is  "DSK" 
-Shape is DEM type?  "No" 
+Default constructor.
+Shape name is  "DSK"
+Shape is DEM type?  "No"
 
-Construct NaifDskShape object from a plate model. 
-Try to intersect surface at obsPos (0,0,0) and lookDir (1,1,1) 
-Intersection successful?  "No" 
+Construct NaifDskShape object from a plate model.
+Try to intersect surface at obsPos (0,0,0) and lookDir (1,1,1)
+Intersection successful?  "No"
 
-Construct NaifDskShape object from cube labels with ShapeModel=DSK file. 
-Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1) 
-Intersection successful?      "No" 
+Construct NaifDskShape object from cube labels with ShapeModel=DSK file.
+Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1)
+Intersection successful?      "No"
 
-Construct NaifDskShape object from cube labels with ElevationModel=DSK file. 
-Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0) 
-Intersection successful?      "Yes" 
-Intersection valid?  true 
-Intercept is null?   "No" 
+Construct NaifDskShape object from cube labels with ElevationModel=DSK file.
+Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)
+Intersection successful?      "Yes"
+Intersection valid?  true
+Intercept is null?   "No"
 intercept surface point (location)   =  "( 289.110306976744, 0.0, 0.0 )" meters
 
-Find local radius given lat/lon 
-Local radius at ( 0 ,  0 ) is valid?  true 
-Local radius:                 289.11 meters 
+Find local radius given lat/lon
+Local radius at ( 0 ,  0 ) is valid?  true
+Local radius:                 289.11 meters
 
-Access the associated NaifDskPlateModel. 
-Plate is valid?               true 
-Plate file name:              "hay_a_amica_5_itokawashape_v1_0_512q" 
-Plate size:                   3145728 
-Number of plates:             3145728 
-Number of vertices:           1579014 
+Access the associated NaifDskPlateModel.
+Plate is valid?               true
+Plate file name:              "hay_a_amica_5_itokawashape_v1_0_512q"
+Plate size:                   3145728
+Number of plates:             3145728
+Number of vertices:           1579014
 
-Try to calculate norms using valid shape model... 
-Has intercept normal?                 true 
-Normal set from Intercept:            QVector(0.864171, -0.148718, 0.48072) 
-Has default normal?                   true 
-Default normal:                       QVector(1, 0, 0) 
-Has local normal?                     true 
-Local normal from neighbor points:    QVector(0.864171, -0.148718, 0.48072) 
+Try to calculate norms using valid shape model...
+Has intercept normal?                 true
+Normal set from Intercept:            QVector(0.864171, -0.148718, 0.48072)
+Has default normal?                   true
+Default normal:                       QVector(1, 0, 0)
+Has local normal?                     true
+Local normal from neighbor points:    QVector(0.864171, -0.148718, 0.48072)
 
-================================= Error Throws ================================== 
-Construct NaifDskShape object from cube labels with ShapeModel=Null. 
+================================= Error Throws ==================================
+Construct NaifDskShape object from cube labels with ShapeModel=Null.
 **USER ERROR** NAIF DSK file [Null] does not exist.
 
-Thrown by setLocalNormalFromIntercept() - Failed to find intercept.  
+Thrown by setLocalNormalFromIntercept() - Failed to find intercept. 
 **PROGRAMMER ERROR** Intercept point does not exist - cannot provide normal vector.
 
-Thrown by calculateLocalNormal() - Failed to find intercept for normal vector.  
+Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. 
 **PROGRAMMER ERROR** Intercept point does not exist - cannot provide normal vector.
 
-Thrown by ellipsoidNormal() - No intersection.  
+Thrown by ellipsoidNormal() - No intersection. 
 **PROGRAMMER ERROR** An intersection must be defined before computing the surface normal.
 
-Thrown by ellipsoidNormal() - Invalid intersection.  
+Thrown by ellipsoidNormal() - Invalid intersection. 
 **PROGRAMMER ERROR** The surface point intersection must be valid to compute the surface normal.
 
-Thrown by ellipsoidNormal() - Invalid target.  
+Thrown by ellipsoidNormal() - Invalid target. 
 **PROGRAMMER ERROR** A valid target must be defined before computing the surface normal.

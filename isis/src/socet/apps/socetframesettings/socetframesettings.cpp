@@ -243,7 +243,7 @@ void IsisMain() {
   double sizeY = numLines / pixelSize;
   
   // Make sure the Socet Set project name has the .prj extension
-  if (socetProject.endsWith(".prj", Qt::CaseInsensitive) == FALSE)  socetProject += ".prj";
+  if (socetProject.endsWith(".prj", Qt::CaseInsensitive) == false)  socetProject += ".prj";
   
   // Find cube base name w/o extensions & establish the Socet Set support file name 
   // Note: I'm using the QFileInfo class because the baseName method in the ISIS
@@ -257,7 +257,7 @@ void IsisMain() {
   //  the nominal focal lenghth stored in the SOCET Set camera calibration files
   ofstream toStrm;
 
-  toStrm.open (to.toAscii().data(), ios::trunc);
+  toStrm.open (to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
     QString msg = "Unable to open output settings file";
     throw IException(IException::User, msg, _FILEINFO_);

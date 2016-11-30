@@ -21,8 +21,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-using namespace std;
-
 #include <string>
 
 #include <xercesc/sax2/SAX2XMLReader.hpp>
@@ -33,6 +31,8 @@ using namespace std;
 #include "IsisXMLChTrans.h"
 
 #include "IString.h"
+
+using namespace std;
 
 // Constructors
 IsisXMLApplication::IsisXMLApplication(char *PencodingName,

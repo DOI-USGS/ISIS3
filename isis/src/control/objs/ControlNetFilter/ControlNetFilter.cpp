@@ -27,7 +27,7 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  extern QString sPointType [];
+  extern QString sPointType[];
 
   //! String values for Boolean
   extern QString sBoolean[];
@@ -57,7 +57,7 @@ namespace Isis {
   void ControlNetFilter::SetOutputFile(QString psPrintFile) {
     Isis::FileName outFile(psPrintFile);
     QString outName(outFile.expanded());
-    mOstm.open(outName.toAscii().data(), std::ios::out);
+    mOstm.open(outName.toLatin1().data(), std::ios::out);
     mOstm.precision(dbl::digits10);
   }
 
@@ -361,13 +361,13 @@ namespace Isis {
     double dGreater = 0;
 
     if (pvlGrp.hasKeyword("LessThan")) {
-      if (pvlGrp["LessThan"][0] != "") { 
+      if (pvlGrp["LessThan"][0] != "") {
         dLesser = fabs((double)pvlGrp["LessThan"]);
       }
     }
 
     if (pvlGrp.hasKeyword("GreaterThan")) {
-      if (pvlGrp["GreaterThan"][0] != "") { 
+      if (pvlGrp["GreaterThan"][0] != "") {
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
     }
@@ -493,13 +493,13 @@ namespace Isis {
     int  iLesser = VALID_MAX2, iGreater = 0;
 
     if (pvlGrp.hasKeyword("LessThan")) {
-      if (pvlGrp["LessThan"][0] != "") { 
+      if (pvlGrp["LessThan"][0] != "") {
         iLesser = toInt(pvlGrp["LessThan"][0]);
       }
     }
 
     if (pvlGrp.hasKeyword("GreaterThan")) {
-      if (pvlGrp["GreaterThan"][0] != "") { 
+      if (pvlGrp["GreaterThan"][0] != "") {
         iGreater = toInt(pvlGrp["GreaterThan"][0]);
       }
     }
@@ -558,7 +558,7 @@ namespace Isis {
     IString sTemp = "";
 
     if (pvlGrp.hasKeyword("PointType")) {
-      if (pvlGrp["PointType"][0] != "") { 
+      if (pvlGrp["PointType"][0] != "") {
         sType = pvlGrp["PointType"][0];
         sType = sType.DownCase(sType);
       }
@@ -632,25 +632,25 @@ namespace Isis {
     double dMinLon = Isis::ValidMinimum, dMaxLon = Isis::ValidMaximum;
 
     if (pvlGrp.hasKeyword("MinLat")) {
-      if (pvlGrp["MinLat"][0] != "") { 
+      if (pvlGrp["MinLat"][0] != "") {
         dMinLat = pvlGrp["MinLat"];
       }
     }
 
     if (pvlGrp.hasKeyword("MaxLat")) {
-      if (pvlGrp["MaxLat"][0] != "") { 
+      if (pvlGrp["MaxLat"][0] != "") {
         dMaxLat = pvlGrp["MaxLat"];
       }
     }
 
     if (pvlGrp.hasKeyword("MinLon")) {
-      if (pvlGrp["MinLon"][0] != "") { 
+      if (pvlGrp["MinLon"][0] != "") {
         dMinLon = pvlGrp["MinLon"];
       }
     }
 
     if (pvlGrp.hasKeyword("MaxLon")) {
-      if (pvlGrp["MaxLon"][0] != "") { 
+      if (pvlGrp["MaxLon"][0] != "") {
         dMaxLon = pvlGrp["MaxLon"];
       }
     }
@@ -686,6 +686,8 @@ namespace Isis {
             Longitude(camera->UniversalLongitude(), Angle::Degrees),
             Distance(camera->LocalRadius()));
         }
+        delete camera;
+        camera = NULL;
       }
       double latitude  = cPointSurfPt.GetLatitude().degrees();
       double longitude = cPointSurfPt.GetLongitude().degrees();
@@ -721,7 +723,7 @@ namespace Isis {
     QString sUnits = "pixels";
 
     if (pvlGrp.hasKeyword("MaxDistance")) {
-      if (pvlGrp["MaxDistance"][0] != "") { 
+      if (pvlGrp["MaxDistance"][0] != "") {
         dMaxDistance = pvlGrp["MaxDistance"];
       }
     }
@@ -761,6 +763,8 @@ namespace Isis {
               Distance(cam1->LocalRadius())
             );
           }
+          delete cam1;
+          cam1 = NULL;
         }
       }
       else
@@ -800,6 +804,8 @@ namespace Isis {
                 Distance(cam2->LocalRadius())
               );
             }
+            delete cam2;
+            cam2 = NULL;
           }
 
           dDist = surfacePt1.GetDistanceToPoint(surfacePt2,
@@ -859,13 +865,13 @@ namespace Isis {
     double dLesser=Isis::ValidMaximum, dGreater=0;
 
     if (pvlGrp.hasKeyword("LessThan")){
-      if (pvlGrp["LessThan"][0] != "") { 
+      if (pvlGrp["LessThan"][0] != "") {
         dLesser = fabs((double)(pvlGrp["LessThan"]));
       }
     }
 
     if (pvlGrp.hasKeyword("GreaterThan")){
-      if (pvlGrp["GreaterThan"][0] != "") { 
+      if (pvlGrp["GreaterThan"][0] != "") {
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
     }
@@ -1104,13 +1110,13 @@ namespace Isis {
     double dGreater = 0;
 
     if (pvlGrp.hasKeyword("LessThan")) {
-      if (pvlGrp["LessThan"][0] != "") { 
+      if (pvlGrp["LessThan"][0] != "") {
         dLesser = fabs((double)pvlGrp["LessThan"]);
       }
     }
 
     if (pvlGrp.hasKeyword("GreaterThan")) {
-      if (pvlGrp["GreaterThan"][0] != "") { 
+      if (pvlGrp["GreaterThan"][0] != "") {
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
     }
@@ -1228,12 +1234,12 @@ namespace Isis {
   void ControlNetFilter::CubeNumPointsFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     int iLessPoints = VALID_MAX2, iGreaterPoints = 0;
     if (pvlGrp.hasKeyword("LessThan")) {
-      if (pvlGrp["LessThan"][0] != "") { 
+      if (pvlGrp["LessThan"][0] != "") {
         iLessPoints = toInt(pvlGrp["LessThan"][0]);
       }
     }
     if (pvlGrp.hasKeyword("GreaterThan")) {
-      if (pvlGrp["GreaterThan"][0] != "") { 
+      if (pvlGrp["GreaterThan"][0] != "") {
         iGreaterPoints = toInt(pvlGrp["GreaterThan"][0]);
       }
     }
@@ -1284,7 +1290,7 @@ namespace Isis {
     QString sUnits = "pixels";
 
     if (pvlGrp.hasKeyword("MaxDistance")) {
-      if (pvlGrp["MaxDistance"][0] != "") { 
+      if (pvlGrp["MaxDistance"][0] != "") {
         dDistance = pvlGrp["MaxDistance"];
       }
     }
@@ -1466,4 +1472,3 @@ namespace Isis {
     GenerateImageStats();
   }
 }
-

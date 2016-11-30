@@ -163,7 +163,7 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     QString fFile = FileName(ui.GetFileName("TO")).expanded();
     ofstream os;
-    os.open(fFile.toAscii().data(), ios::out);
+    os.open(fFile.toLatin1().data(), ios::out);
     os << "OldSample,OldLine,NewSample,NewLine," <<
        "X,Y,XC,YC,"<<
        "GoodnessOfFit,Latitude,Longitude" << endl;
