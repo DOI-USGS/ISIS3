@@ -19,6 +19,13 @@ enum OutputType {
   Line
 };
 
+/**
+ * Functor for collecting camera statistics.
+ * 
+ * @author 2016-11-16 Jesse Mapel
+ * @internal
+ *   @history 2016-11-16 Original Version.
+ */
 class CamTestFunctor {
 public:
   CamTestFunctor() {};
