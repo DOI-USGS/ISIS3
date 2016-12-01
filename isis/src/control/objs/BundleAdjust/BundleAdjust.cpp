@@ -3009,10 +3009,14 @@ namespace Isis {
    * Slot for deltack and jigsaw to output the bundle status.
    * 
    * @param status The bundle status string to output.
+   *
+   * @internal
+   *   @history 2016-12-01 Ian Humphrey - Added %s as first paramter to prevent a
+   *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
     status += "\n";
-    printf(status.toStdString().c_str());
+    printf("%s", status.toStdString().c_str());
   }
 
 

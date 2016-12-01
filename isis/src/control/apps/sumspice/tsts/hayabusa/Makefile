@@ -1,5 +1,11 @@
 # this tests sumspice using a single cube and sumfile as inputs on a Hayabusa image
+# Set up a TABLEDUMP variable to use test preferences, since the make system
+# will only set up test preferences for APPNAME
+# @internal
+#   @history 2016-12-01 Ian Humphrey - Set up the TABLEDUMP variable so that ISIS's
+#                           TestPreferences are used when running the tabledump commands.
 APPNAME = sumspice
+TABLEDUMP = $(ISISROOT)/bin/tabledump -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -28,25 +34,25 @@ commands:
 	# save off tables from the first run
 	echo -e "InstrumentPointingTable" \
 	> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPointing" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nInstrumentPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nSunPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="SunPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nBodyRotation" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="BodyRotation" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
@@ -65,25 +71,25 @@ commands:
 	# save off tables from second run
 	echo -e "InstrumentPointingTable" \
 	> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPointing" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nInstrumentPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nSunPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="SunPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nBodyRotation" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="BodyRotation" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 

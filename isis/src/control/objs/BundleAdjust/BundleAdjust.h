@@ -265,6 +265,8 @@ namespace Isis {
    *                           References #4463.
    *   @history 2016-11-16 Ian Humphrey - Modified solveCholesky() to throw caught exceptions that
    *                           occur. Removed bundleException(QString) signal. Fixes #4483.
+   *   @history 2016-12-01 Ian Humphrey - Modified outputBundleStatus()'s printf() call so that
+   *                           there is no longer a -Wformat-security warning.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

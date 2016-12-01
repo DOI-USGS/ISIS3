@@ -1,5 +1,11 @@
 # this tests sumspice using cubelist and sumfilelist inputs on DAWN images
+# Set up a TABLEDUMP variable to use test preferences, since the make system
+# will only set up test preferences for APPNAME
+# @internal
+#   @history 2016-12-01 Ian Humphrey - Set up the TABLEDUMP variable so that we use ISIS's
+#                           TestPreferences when running the tabledump commands.
 APPNAME = sumspice
+TABLEDUMP = $(ISISROOT)/bin/tabledump -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -36,32 +42,32 @@ commands:
 
 	# save off tables from the first run
 	echo -e "InstrumentPointingTable" \
-	> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	> $(OUTPUT)/temp_updatedClocksTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="InstrumentPointing" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedClocksTables.txt;
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
 
 	echo -e "\nInstrumentPosition" \
-	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="InstrumentPosition" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedClocksTables.txt;
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
 
 	echo -e "\nSunPosition" \
-	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="SunPosition" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedClocksTables.txt;
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
 
 	echo -e "\nBodyRotation" \
-	>> $(OUTPUT)/updatedClocksTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="BodyRotation" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedClocksTables.txt;
+	>> $(OUTPUT)/temp_updatedClocksTables.txt;
 
 	# second run of sumspice updates the tables
 	$(APPNAME) fromlist=$(OUTPUT)/cubelist.txt \
@@ -78,31 +84,42 @@ commands:
 
 	# save off tables from second run
 	echo -e "InstrumentPointingTable" \
-	> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	> $(OUTPUT)/temp_updatedSpiceTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="InstrumentPointing" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
 
 	echo -e "\nInstrumentPosition" \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="InstrumentPosition" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
 
 	echo -e "\nSunPosition" \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="SunPosition" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
 
 	echo -e "\nBodyRotation" \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
-	tabledump from=$(OUTPUT)/\$$\1.cub \
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
+	$(TABLEDUMP) from=$(OUTPUT)/\$$\1.cub \
 	name="BodyRotation" \
 	-batchlist=$(OUTPUT)/cubeNames.txt \
-	>> $(OUTPUT)/updatedSpiceTables.txt;
+	>> $(OUTPUT)/temp_updatedSpiceTables.txt;
+
+	# Trim the tabledump path
+	$(SED) 's#.*tabledump#tabledump#' \
+	$(OUTPUT)/temp_updatedClocksTables.txt \
+	> $(OUTPUT)/updatedClocksTables.txt;
+
+	$(SED) 's#.*tabledump#tabledump#' \
+	$(OUTPUT)/temp_updatedSpiceTables.txt \
+	> $(OUTPUT)/updatedSpiceTables.txt;
 
 	$(RM) $(OUTPUT)/sumfilelist.txt;
+	$(RM) $(OUTPUT)/temp_updatedClocksTables.txt;
+	$(RM) $(OUTPUT)/temp_updatedSpiceTables.txt;

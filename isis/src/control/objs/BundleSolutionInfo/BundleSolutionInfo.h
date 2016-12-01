@@ -89,6 +89,8 @@ namespace Isis {
    *                           -modified output of image EO in bundleout.txt for images solved with
    *                            observation mode; previously one entry per observation was written,
    *                            now all images in the observation are written separately. 
+   *   @history 2016-12-01 Ian Humphrey - Modified an sprintf() call in outputImagesCSV() to
+   *                           prevent a -Wformat-security warning from occurring.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

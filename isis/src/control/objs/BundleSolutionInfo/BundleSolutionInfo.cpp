@@ -1185,6 +1185,12 @@ namespace Isis {
    * @brief Outputs the bundleout_images.csv file which contains Jigsaw data about the images
    * within each observation.
    * @return True upon success, False if something went wrong.
+   *
+   * @internal
+   *   @history 2016-12-01 Ian Humphrey - Added %s as second argument to sprintf() call to prevent
+   *                           -Wformat-security warning. Since image->fileName().toLatin1().data()
+   *                           returns a char* at runtime, the compiler does not know if it will
+   *                           contain format specifiers and produces the mentioned warning.
    */
   bool BundleSolutionInfo::outputImagesCSV() {
 
@@ -1229,7 +1235,7 @@ namespace Isis {
         BundleImageQsp image = observation->at(j);
 
 
-        sprintf(buf,image->fileName().toLatin1().data());
+        sprintf(buf, "%s", image->fileName().toLatin1().data());
         fpOut << buf;
         sprintf(buf,",");
         fpOut << buf;
