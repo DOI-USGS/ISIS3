@@ -29,11 +29,12 @@ commands:
 	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout.txt;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       > $(OUTPUT)/bundleout_images.csv;
+	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout_images.csv;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean_radius_residuals.csv;
-	$(MV) $(OUTPUT)/bundleout_images.csv $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout_images.csv > /dev/null;
+#$(MV) $(OUTPUT)/bundleout_images1.csv $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout_images.csv > /dev/null;
+	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cubes.lis > /dev/null;
 	$(MV) $(OUTPUT)/mean.net $(OUTPUT)/out-pole-ra-dec-w0-wDot-mean-radiius.net > /dev/null;
