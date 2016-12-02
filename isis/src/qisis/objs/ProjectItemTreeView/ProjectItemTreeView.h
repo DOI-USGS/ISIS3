@@ -1,5 +1,5 @@
 #ifndef ProjectItemTreeView_h
-#define ProjectTreeView_h
+#define ProjectItemTreeView_h
 /**
  * @file
  * $Date$
@@ -51,6 +51,8 @@ namespace Isis {
    *   @history 2016-06-27 Ian Humphrey - Added documentation (treeView() and onItemAdded()), 
    *                           checked coding standards. Fixes #4006.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2016-12-01 Ian Humphrey - Updated #define header guard to match #ifndef pattern.
+   *                           Resolves [-Wheader-guard] warnings for prog17 (clang).
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 

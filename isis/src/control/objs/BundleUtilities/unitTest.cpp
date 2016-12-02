@@ -94,6 +94,8 @@ namespace Isis {
  *   @history 2016-10-13 Ian Humphrey - Removed references to setFromPvl(), as
  *                           BundleObservationSolveSettings::setFromPvl() was moved to jigsaw as
  *                           setSettingsFromPvl(). References #4293.
+ *   @history 2016-12-01 Ian Humphrey - Added extra qDebug() stream so the "apply param
+ *                           corrections successful?" string will be in the unitTest output.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -512,8 +514,8 @@ int main(int argc, char *argv[]) {
     //TODO: We should not have to catch an exception here, we need to use an observation
     //      with a better (i.e. non-null) Camera. See ticket #4249.
     try {
-      qDebug() << "apply param corrections successful?     " 
-               << toString(bo3.applyParameterCorrections(paramCor));
+      qDebug() << "apply param corrections successful?";
+      qDebug() << toString(bo3.applyParameterCorrections(paramCor));
     }
     catch (IException &e) {
       e.print();

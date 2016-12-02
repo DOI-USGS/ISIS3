@@ -556,6 +556,7 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
 
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
 init exterior orientiation successful?   "Yes"
+apply param corrections successful?
 **ERROR** Unable to apply parameter corrections to BundleObservation.
 **ERROR** Instrument rotation is NULL, but pointing solve option is AnglesOnly.
 

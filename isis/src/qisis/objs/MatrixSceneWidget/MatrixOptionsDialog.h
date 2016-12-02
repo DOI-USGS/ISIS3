@@ -31,6 +31,8 @@ namespace Isis {
    *   @history 2014-07-14 Kimberly Oyama - Original Version
    *   @history 2014-07-21 Kimberly Oyama - Color options are now updated and applied in the scene.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2016-12-01 Ian Humphrey - Removed unused variables in readOptions() as they were
+   *                           causing warnings in the clang compiler.
    */
   
   class MatrixOptionsDialog : public QDialog {

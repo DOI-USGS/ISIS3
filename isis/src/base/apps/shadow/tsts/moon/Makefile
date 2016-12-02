@@ -7,6 +7,7 @@ A15.lowprec2.subtracted.cub.TOLERANCE = 0.00001
 A15.noshadow.subtracted.cub.TOLERANCE = 0.00001
 # Added tolerance for OS X 10.11   
 A15.accurate.shadow.subtracted.cub.TOLERANCE = 0.00001
+A15.shadow.subtracted.cub.TOLERANCE = 0.00001
 
 commands: A15 M1104295651RE
 
