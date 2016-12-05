@@ -22,7 +22,6 @@ help:
 	echo "Isis Make System Commands"
 	echo "------------------------ "
 	echo "make all        : Build and install the entire system (incs,api,apps,docs)"
-	echo "make config     : Generate preliminary config parameters"
 	echo "make thirdParty : Copy required 3rdParty libraries into distribution"
 	echo "make incs       : Install API include files"
 	echo "make api        : Build and install the Isis API"
@@ -44,19 +43,7 @@ help:
 # After the API is created then the applications can be individually built
 # and installed. Finally create the web documentation for the entire system.
 #----------------------------------------------------------------------------
-all: config incs thirdParty api apps docs
-
-#----------------------------------------------------------------------------
-# Target = config
-# Dependencies = none
-#
-# Set up any compile/link configuration dependancy files
-#----------------------------------------------------------------------------
-config: FORCE
-	echo $(CURTIMESTAMP) "Creating config files"
-	$(MAKE) --directory=config -f config.mak config
-	echo $(CURTIMESTAMP) "Finished creating config files"
-	echo $(CURTIMESTAMP) " "
+all: incs thirdParty api apps docs
 
 #----------------------------------------------------------------------------
 # Target = incs
@@ -67,7 +54,7 @@ config: FORCE
 # copy the include file from the individual object directory into the
 # system directory $(ISISROOT)/inc.
 #----------------------------------------------------------------------------
-incs: config
+incs: 
 	echo $(CURTIMESTAMP) "Installing include files"
 	mkdir -p inc
 	$(MAKE) --directory=src includes
@@ -240,7 +227,6 @@ quickclean:
 	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
 	  functioncoverage functioncoverage.html *.csmes *.csexe; \
 	$(MAKE) --directory=3rdParty clean;   \
-	$(MAKE) --directory=config -f config.mak clean; \
 	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 #----------------------------------------------------------------------------
@@ -267,7 +253,6 @@ clean:
 	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
 	  functioncoverage functioncoverage.html *.csmes *.csexe; \
 	$(MAKE) --directory=3rdParty clean;   \
-	$(MAKE) --directory=config -f config.mak clean; \
 	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 cleansrc:
@@ -321,7 +306,7 @@ catTest:
 HOST_ARCH ?= $(shell uname -s)
 HOST_MACH ?= $(shell uname -m)
 
-thirdParty: config
+thirdParty:
 	echo $(CURTIMESTAMP) "Installing 3rdParty libraries"
 	rm -f $(ISISROOT)/3rdParty/lib/lib*
 	$(MAKE) -C $(ISISROOT)/3rdParty install
