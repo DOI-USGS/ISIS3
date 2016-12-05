@@ -17,15 +17,15 @@ int main(int argc, char *argv[]) {
   Pvl lab;
   lab.addGroup(PvlGroup("Mapping"));
   PvlGroup &mapGroup = lab.findGroup("Mapping");
-  mapGroup += PvlKeyword("EquatorialRadius", toString(6371000.));
-  mapGroup += PvlKeyword("PolarRadius", toString(6371000.));
+  mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
+  mapGroup += PvlKeyword("PolarRadius", toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");
   mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
   mapGroup += PvlKeyword("LongitudeDomain", toString(180));
-  mapGroup += PvlKeyword("MinimumLatitude", toString(-90.0));
-  mapGroup += PvlKeyword("MaximumLatitude", toString(90.0));
-  mapGroup += PvlKeyword("MinimumLongitude", toString(-180.0));
-  mapGroup += PvlKeyword("MaximumLongitude", toString(180.0));
+  mapGroup += PvlKeyword("MinimumLatitude", toString(0.0));
+  mapGroup += PvlKeyword("MaximumLatitude", toString(80.0));
+  mapGroup += PvlKeyword("MinimumLongitude", toString(0.0));
+  mapGroup += PvlKeyword("MaximumLongitude", toString(80.0));
   mapGroup += PvlKeyword("ProjectionName", "PointPerspective");
 
   cout << "Test missing center longitude keyword ..." << endl;
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLongitude", toString(-77.0));
+  mapGroup += PvlKeyword("CenterLongitude", toString(0.0));
 
   cout << "Test missing center latitude keyword..." << endl;
   try {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLatitude", toString(39.0));
+  mapGroup += PvlKeyword("CenterLatitude", toString(0.0));
 
   cout << "Test missing distance keyword..." << endl;
   try {
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("Distance", toString(500000.0));
+  mapGroup += PvlKeyword("Distance", toString(.00562));
 
   try {
     TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
@@ -112,7 +112,10 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing Mapping() methods ... " << endl;
-
+    cout <<"This test outputs Table 27 (p.174) of Map Projections - A Working Manual" << endl;
+    cout << "USGS Professional Paper 1395" << endl;
+    cout << "Author:  John P. Snyder" << endl;
+    cout << endl;
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
@@ -128,10 +131,58 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
 
-    cout << "Unit test was obtained from:" << endl << endl;
-    cout << "  Map Projections - A Working Manual" << endl;
-    cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
-    cout << "  Pages 320-321" << endl;
+    cout<< "Testing SetGround..." <<endl;
+
+    double lat = 80.0;
+    double lon;
+
+    while (lat >= 0) {
+      lon = 80.0;
+      while (lon >=0.0) {
+      p->SetGround(lat,lon);
+      cout << "<" << setprecision(4) << fixed << lat << "," << lon <<"> = ";
+      cout << setprecision(4) << fixed << "<" << p->XCoord();
+      cout << setprecision(4) << fixed << "," << p->YCoord() << ">" << endl;
+      lon -= 10.0;
+      }
+      lat -=10.0;
+    }
+
+    cout << endl;
+    cout << "Testing SetCoordinate..." << endl;
+    cout <<"This is taken from the numerical example given on p. 321";
+    cout << " of Map Projections - A Working Manual" << endl;
+    cout << "USGS Professional Paper 1395" << endl;
+    cout << "Author:  John P. Snyder" << endl;
+    cout << endl;
+
+    double x = 247194.09;
+    double y = 222485.96;
+
+    Pvl lab1;
+    lab1.addGroup(PvlGroup("Mapping"));
+    PvlGroup &mapGroup = lab1.findGroup("Mapping");
+    mapGroup += PvlKeyword("EquatorialRadius", toString(6371000));
+    mapGroup+= PvlKeyword("PolarRadius",toString(6371000));
+    mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+    mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+    mapGroup += PvlKeyword("LongitudeDomain", toString(180));
+    mapGroup += PvlKeyword("MinimumLatitude", toString(-90.0));
+    mapGroup += PvlKeyword("MaximumLatitude", toString(90.0));
+    mapGroup += PvlKeyword("MinimumLongitude", toString(-180.0));
+    mapGroup += PvlKeyword("MaximumLongitude", toString(180.0));
+    mapGroup += PvlKeyword("CenterLongitude", toString(-77.0));
+    mapGroup += PvlKeyword("CenterLatitude", toString(39.0));
+    mapGroup += PvlKeyword("Distance", toString(500000));
+    mapGroup += PvlKeyword("ProjectionName", "PointPerspective");
+
+    TProjection *p1 = (TProjection *) ProjectionFactory::Create(lab1);
+
+    p1->SetCoordinate(x,y);
+    cout << "Latitude:                    " << p1->Latitude() << endl;
+    cout << "Longitude:                   " << p1->Longitude() << endl;
+    cout << "XCoord:                      " << p1->XCoord() << endl;
+    cout << "YCoord:                      " << p1->YCoord() << endl;
   }
   catch(IException &e) {
     e.print();

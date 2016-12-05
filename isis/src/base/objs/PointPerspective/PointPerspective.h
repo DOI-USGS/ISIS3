@@ -58,6 +58,10 @@ namespace Isis {
    *                           References #775.
    *   @history 2016-08-28 Kelvin Rodriguez - Removed useless var=var lines causing warnigns in
    *                           clang. Part of Porting to OSX 10.11
+   *   @history 2016-11-22 Tyler Wilson - Modified the XYRange() and SetGround() functions to eliminate
+   *                           clipping in the output map.  Also added new tests to
+   *                           the unit test to excercise the forward/reverse projection
+   *                           equations.  Fixes #3879.
    */
   class PointPerspective : public TProjection {
     public:
