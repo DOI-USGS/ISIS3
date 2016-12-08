@@ -91,6 +91,9 @@ namespace Isis {
    *                            now all images in the observation are written separately. 
    *   @history 2016-12-01 Ian Humphrey - Modified an sprintf() call in outputImagesCSV() to
    *                           prevent a -Wformat-security warning from occurring.
+   *   @history 2016-12-08 Ian Humphrey - Modified outputImagesCSVHeader() to treat TWIST the same
+   *                           as the other angles when determining how many headers to create.
+   *                           Fixes #4557.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

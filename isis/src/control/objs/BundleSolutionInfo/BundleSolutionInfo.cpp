@@ -529,6 +529,11 @@ namespace Isis {
    * @brief Outputs the header for the bundleout_images.csv file
    * @param fpOut The output file stream.
    * @return True if the write is successful, False otherwise.
+   *
+   * @internal
+   *   @history 2016-12-08 Ian Humphrey - Removed conditions that handle TWIST headers differently
+   *                           than the other headers. The number of TWIST headers will be the same
+   *                           as each of the other angle headers. Fixes #4557.
    */
   bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut) {
 
@@ -550,7 +555,6 @@ namespace Isis {
 
     int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
     int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
-    bool solveTwist = obsSettings.solveTwist();
 
     int nCoeff = 1;
     if (numberCamPosCoefSolved > 0)
@@ -612,7 +616,7 @@ namespace Isis {
     }
     for (int i = 0; i < numberCamAngleCoefSolved; i++) {
       for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1 || !solveTwist) {
+        if (numberCamAngleCoefSolved == 1) {
           outputColumns.push_back("TWIST,");
         }
         else {
@@ -620,8 +624,6 @@ namespace Isis {
           outputColumns.push_back(str);
         }
       }
-      if (!solveTwist)
-        break;
     }
 
     // print first column header to buffer and output to file
@@ -641,14 +643,16 @@ namespace Isis {
     outputColumns.push_back("line res,");
     outputColumns.push_back("total res,");
 
+    // Initially account for X,Y,Z (3)
     int nparams = 3;
+    // See how many position coeffients we solved for to make more headers (t0, t1, ...)
     if (numberCamPosCoefSolved)
       nparams = 3 * numberCamPosCoefSolved;
 
-    int numCameraAnglesSolved = 2;
-    if (solveTwist) numCameraAnglesSolved++;
+    // Initially account for RA,DEC,TWIST (3)
+    int numCameraAnglesSolved = 3;
+    // See how many angle coefficients we solved for to make more headers (t0, t1, ...)
     nparams += numCameraAnglesSolved*numberCamAngleCoefSolved;
-    if (!solveTwist) nparams += 1; // Report on twist only
     for (int i = 0; i < nparams; i++) {
       outputColumns.push_back("Initial,");
       outputColumns.push_back("Correction,");
