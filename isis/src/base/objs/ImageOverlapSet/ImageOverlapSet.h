@@ -93,6 +93,9 @@ namespace Isis {
    *   @history 2016-09-28 Jeannie Backer - Replaced deprecated IStrings with QStrings. Added mutex
    *                          unlock() calls immediately before exception calls to prevent warning
    *                          message by latest Qt library 5.7.
+   *   @history 2016-12-09 Marjorie Hahn - Added mutex tryLock() calls before unlocking to prevent
+   *                          undefined behavior caused by unlocking an unlocked mutex.
+   * 
    */
   class ImageOverlapSet : private QThread {
     public:
