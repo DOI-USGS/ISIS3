@@ -58,13 +58,14 @@ void IsisMain() {
     list.push_back(FileName(ui.GetAsString("FROM")));
   }
   else {
-    list.read(ui.GetFileName("FROMLIST"));
+    try {
+      list.read(ui.GetFileName("FROMLIST"));
+    }
+    catch (IException &e) {
+      throw IException(e);
+    }
   }
-  if (list.size() < 1) {
-    QString msg = "The list file [" + ui.GetFileName("FROMLIST") +
-                  "does not contain any data";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
+
   if (ui.GetString("FOVRANGE") == "INSTANTANEOUS") {
     g_numIFOVs = 1;
   }
@@ -97,7 +98,7 @@ void IsisMain() {
     }
 
     // Make sure all the bands for all the files match
-    if (i > 1 && atts0.bandsString() != lastBandString) {
+    if (i >= 1 && atts0.bandsString() != lastBandString) {
       QString msg = "The Band numbers for all the files do not match.";
       throw IException(IException::User, msg, _FILEINFO_);
     }

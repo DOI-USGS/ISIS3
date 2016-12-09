@@ -235,6 +235,10 @@
       IsisCube labels and tables are now attached to the output cubes if there is a single input
       image. Fixes #4433. Removed unused UniveralGroundMap instance. References #4495.
     </change>
+    <change name="Curtis Rose" date="2016-12-09">
+      Added tests to for all errors. Fixed a check so now all files in a list have to have the 
+      same number of bands selected. References #4535.
+    </change>
   </history>
 
   <groups>

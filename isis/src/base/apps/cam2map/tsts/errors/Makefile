@@ -1,10 +1,21 @@
-# This test will print errors thrown by the applicationName application.
+# This test will print errors thrown by the cam2map application.
 APPNAME = cam2map
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-#   TEST A: Test that an exception is thrown when targetnames of cube and map do not match.
+#   TEST A: Testing for an error when list file is empty.
+	echo -e "Error Test A:" > $(OUTPUT)/error_temp.txt;
+	if [[ `$(APPNAME) \
+	  from=$(INPUT)/vesta.cub \
+	  to=$(OUTPUT)/output.cub \
+	  map=$(INPUT)/marsEquirectangular.map \
+	  2>> $(OUTPUT)/error_temp.txt \
+	  > /dev/null` ]]; \
+	then \
+	  true; \
+	fi;
+#   TEST B: Test for an error if cube has instrument targetName as Sky.
 	echo -e "Error Test A:" > $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  from=$(INPUT)/vesta.cub \
