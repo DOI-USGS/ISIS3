@@ -1,10 +1,10 @@
 // $Id: sumspice.cpp 6565 2016-02-11 00:15:35Z kbecker@GS.DOI.NET $
 #include "Isis.h"
 
-
 #include <QDir>
 #include <QFile>
 #include <QScopedPointer>
+#include <QString>
 #include <QtAlgorithms>
 #include <QTextStream>
 
@@ -25,23 +25,39 @@
 #include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "SpecialPixel.h"
 #include "SumFile.h"
+#include "SumFinder.h"
 #include "Target.h"
 
 using namespace std;
 using namespace Isis;
 
+inline QString format(const double &d, const int &precision, 
+                      const QString &defValue = "NULL") {
+  if ( IsSpecial(d) ) {
+    return ( defValue );
+  }
+  return (toString(d, precision));
+}
+
+
 void IsisMain() {
+
+  typedef SumFinder::Options Options;
+  typedef SumFinder::TimeStamp TimeStamp;
 
   //  Program constants
   const QString sumspice_program = "sumspice";
-  const QString sumspice_version = "1.0";
+  const QString sumspice_version = "2.0";
   const QString sumspice_revision = "$Revision: 6565 $";
   const QString sumspice_runtime = Application::DateTime();
  
   UserInterface &ui = Application::GetUserInterface();
 
-  // get the list of input cubes to be processed
+
+   
+  //  Get the list of input cubes to be processed
   FileList cubeNameList;
   if ( ui.WasEntered("FROM") ) {
     cubeNameList.append(ui.GetFileName("FROM"));
@@ -67,6 +83,11 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
+  // Get the time as represented in the SUMFILE
+  QString sumtime = ui.GetString("SUMTIME").toLower();
+  TimeStamp tstamp = ( "start"  == sumtime ) ? SumFinder::Start : 
+                     ( "center" == sumtime)  ? SumFinder::Center :
+                                               SumFinder::Stop; 
 
   // Load any meta kernels if provided by user
   Kernels meta;
@@ -78,172 +99,140 @@ void IsisMain() {
 
   // Load sumfiles
   SumFileList sumFiles = loadSumFiles(sumFileNameList);
+
   // Sort the sum file list in ascending order by ET
   qSort(sumFiles.begin(), sumFiles.end(), SortEtAscending());
+
   // check for uniqueness of sum files
   PvlGroup duplicates("SumFileWarnings");
   duplicates.addComment("First file will be used to update cube.");
   for (int sumIndex = 1; sumIndex < sumFiles.size(); sumIndex++) {
-    if ( sumFiles[sumIndex]->et() == sumFiles[sumIndex-1]->et()) {
+    double tdiff = fabs(sumFiles[sumIndex]->et() - sumFiles[sumIndex-1]->et());
+    if ( qFuzzyCompare( tdiff+1.0, 0.0+1.0) ) {
       PvlKeyword filePair("SumFilesWithDuplicateTimes", sumFiles[sumIndex-1]->name());
       filePair.addValue(sumFiles[sumIndex]->name());
       duplicates += filePair; 
     }
   }
+
   if (duplicates.keywords() != 0) {
     Application::Log(duplicates);
   }
 
-  if (ui.GetString("MODE") == "UPDATETIMES") {
-    PvlGroup warnings("UpdateStartClockWarnings");
+  // Determine the update mode
+  QString update = ui.GetString("UPDATE").toLower();
+  unsigned int options(0);  // == SumFinder::None
+  if ( "times"    == update ) options |= (unsigned int) SumFinder::Times;
+  if ( "spice"    == update ) options |= (unsigned int) SumFinder::Spice;
+  // These are unnecessary if UPDATE=SPICE!
+  if ( "pointing" == update ) options |= (unsigned int) SumFinder::Pointing;
+  if ( "position" == update ) options |= (unsigned int) SumFinder::Position;
+  if ( "reset"    == update ) options |= (unsigned int) SumFinder::Reset;
+ 
 
-    // loop through the input cubes
-    Progress progress;
-    progress.SetText("Updating Times in Cube List");
-    progress.SetMaximumSteps(cubeNameList.size());
-    double deltaTime = ui.GetDouble("TIMEDIFF");
-    for (int cubeIndex = 0; cubeIndex < cubeNameList.size(); cubeIndex++) {
-      progress.CheckStatus();
-
-      Cube inputCube(cubeNameList[cubeIndex].expanded(), "rw");
-
-      Kernels kernels(inputCube);
-      kernels.Load();
-
-      SharedSumFile sumFile = findSumFile(inputCube, sumFiles, deltaTime);
-      // If findSumFile() returns a Null pointer, 
-      // then no sum file within the given tolerance (deltaTime) was found.
-      // Print a warning. 
-      if ( sumFile.isNull() ) {// create cube file list containing file names that were updated.
-        PvlKeyword file("CubeFileName", cubeNameList[cubeIndex].name());
-        file.addComment("Clocks and times for this cube were NOT updated. "
-                        "No sum file was found whose time was within a tolerance"
-                        " of [" + Isis::toString(deltaTime, 10) + "] of the cube's start time.");
-        warnings += file;
-
-      }
-      else {
-
-        // If findSumFile() returned a non-null pointer, we will adjust the clock time
-        // since findSumFile() has already verified that the new ET is within the given
-        // tolerance (deltaTime) of the original ET
-        //    1. copy original start/stop clock/time keyword values to Archive group
-        //    2. replace these values in the instrument group with the spaceccraft clock time
-        //       corresponding to the new time from the sum file.
-        //    3. Clean Kernels group because output cube from this run must be re-spiceinited
-        Pvl *cubeLabel = inputCube.label();
-        PvlGroup &instGrp = cubeLabel->findGroup("Instrument", Pvl::Traverse);
-        PvlKeyword origStartClock = instGrp["SpacecraftClockStartCount"];
-        PvlKeyword origStopClock  = instGrp["SpacecraftClockStopCount"];
-        PvlKeyword origStartTime  = instGrp["StartTime"];
-        PvlKeyword origStopTime   = instGrp["StopTime"];
-
-        PvlGroup &archGrp = cubeLabel->findGroup("Archive", Pvl::Traverse);
-        // add the sum file name to the archive group
-        PvlKeyword sumFileKeyword("SumFile", sumFile->name());
-        sumFileKeyword.addComment("The sum file used to update the start count in the instrument group.");
-        archGrp += sumFileKeyword;
-        // add original time it to the archive group
-        origStartClock.addComment("The original times, before sum file was applied.");
-        archGrp += origStartClock;
-        archGrp += origStopClock;
-        archGrp += origStartTime;
-        archGrp += origStopTime;
-
-        // now that we have found the appropriate sum file and new ET, convert back to sclk ticks
-        iTime newStartTime(sumFile->et());
-        instGrp["StartTime"][0] = newStartTime.UTC();
-
-        double exposureDuration = double(instGrp["ExposureDuration"]);
-        QString units = instGrp["ExposureDuration"].unit();
-        if (units.contains("m")) { //milliseconds, ms, millisecond, etc
-          exposureDuration/=1000;
-        }
-        iTime newStopTime = newStartTime + exposureDuration;
-        instGrp["StopTime"][0] = newStopTime.UTC();
-
-        NaifStatus::CheckErrors();
-        char newStartClock[80];
-        sce2s_c(inputCube.camera()->naifSclkCode(), newStartTime.Et() , 80, newStartClock);
-        NaifStatus::CheckErrors();
-        instGrp["SpacecraftClockStartCount"][0] = newStartClock;
-
-        char newStopClock[80];
-        sce2s_c(inputCube.camera()->naifSclkCode(), newStopTime.Et() , 80, newStopClock);
-        NaifStatus::CheckErrors();
-        instGrp["SpacecraftClockStopCount"][0] = newStopClock;
-
-        // force user to re-run spiceinit 
-        // by removing everything from the Kernels Group except NAIF Frame code.
-        PvlGroup kernels("Kernels");
-        kernels += cubeLabel->findObject("IsisCube").findGroup("Kernels")["NaifFrameCode"];
-        cubeLabel->findObject("IsisCube").deleteGroup("Kernels");
-        cubeLabel->findObject("IsisCube") += kernels;
-      }
-    }
-    if (warnings.keywords() != 0) {
-      Application::Log(warnings);
-    }
+  // Determine observation time tolerances. Default is to find the closest one
+  double tolerance = DBL_MAX;
+  if ( ui.WasEntered("TIMEDIFF") ) {
+    tolerance = ui.GetDouble("TIMEDIFF"); 
   }
-  else { // ui.GetString("MODE") == "UPDATESPICETABLES"
-    PvlGroup warnings("UpdateSpiceTablesWarnings");
 
-    // time should already be adjusted, so time in the given sum file (list)
-    // should have the exact time. However, due to rounding errors, we will
-    // allow very small time tolerance.
-    Progress progress;
-    progress.SetText("Updating Tables in Cube List");
-    progress.SetMaximumSteps(cubeNameList.size());
-    for (int cubeIndex = 0; cubeIndex < cubeNameList.size(); cubeIndex++) {
-      progress.CheckStatus();
+  // loop through the input cubes
+  Progress progress;
+  progress.SetText("Updating " + update + "...");
+  progress.SetMaximumSteps(cubeNameList.size());
+  progress.CheckStatus();
 
-      Cube inputCube(cubeNameList[cubeIndex].expanded(), "rw");
+  // Accumulate the results of the processing...
+  typedef QSharedPointer<SumFinder>  SharedFinder;
+  typedef QList<SharedFinder>        ListOfFinders;
 
-      PvlGroup &archGrp = inputCube.label()->findGroup("Archive", Pvl::Traverse);
-      if (archGrp.hasKeyword("SumFile")) {
-        PvlKeyword &sumFileKeyword = archGrp.findKeyword("SumFile");
-        QString sumFileName = sumFileKeyword[0];
-        SharedSumFile sumFile = findSumFile(inputCube, sumFiles, sumFileName);
-        
-        // If findSumFile() returns a Null pointer, 
-        // then no sum file was found in the Archive group
-        // Print a warning.
-        if ( sumFile.isNull() ) {
-          PvlKeyword file("CubeFileName", cubeNameList[cubeIndex].name());
-          file.addComment("SPICE tables for this cube were NOT updated. "
-                          "The sum file in the Archive group ["
-                          + sumFileName + "] was not found in the given sum file list.");
-          warnings += file;
-        }
-        else {
-          // If findSumFile() returned a non-null pointer, we will adjust the ck and spk
-          // tables in the cube's label
-          Kernels kernels(inputCube);
-          kernels.Load();
-          QStringList missing = kernels.getMissingList();
-          if (missing.size() != 0) {
-            PvlKeyword file("CubeFileName", cubeNameList[cubeIndex].name());
-            file.addComment("Missing kernel files. Have [" + Isis::toString(kernels.size())
-                            + "] files loaded with " + Isis::toString(kernels.Missing()) 
-                            + " missing (" + missing.join(",") + ").");
-            warnings += file;
-          }
-          // update instrument pointing and position
-          // Delete polygons if found in existing tables
-          sumFile->update(inputCube);
-          sumFileKeyword.addComment("The sum file used to update the SPICE tables.");
-        }
+  ListOfFinders resultSet;
+  QStringList warnings;
+
+  for (int cubeIndex = 0; cubeIndex < cubeNameList.size(); cubeIndex++) {
+   
+    // Find the proper SUMFILE for the cube   
+    QString filename(cubeNameList[cubeIndex].expanded());
+    SharedFinder cubesum( new SumFinder(filename, sumFiles, tolerance, tstamp) );
+
+    // Format a warning and save it off for later
+    if ( !cubesum->isFound() ) {
+      QString mess = "No SUMFILE found for " + cubesum->name() +
+                      " - closest time: " + 
+                      Isis::toString(cubesum->closest(), 10) +
+                      " <seconds>";
+      warnings <<  mess;
+    }
+    else {
+      if ( !cubesum->update(options) ) {
+        QString msg = "Failed to apply SUMFILE updates on cube " + filename;
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // This will close the cube but retain all the pertinent info
+    cubesum->setCube();
+    resultSet.append(cubesum);
+    progress.CheckStatus();
+  }
+
+  if (warnings.size() > 0) {
+    PvlKeyword message("Unmatched");
+    BOOST_FOREACH ( QString mess, warnings ) {
+      message.addValue(mess);
+    }
+    PvlGroup loggrp("Warnings");
+    loggrp.addKeyword(message);
+    Application::Log(loggrp);
+  }
+
+
+  // Log the results of processing
+  if ( ui.WasEntered("TOLOG") ) {
+    FileName filename( ui.GetFileName("TOLOG") );
+    bool exists = filename.fileExists();
+    QFile logfile(filename.expanded());
+    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Append | 
+                       QIODevice::Text | QIODevice::Unbuffered) ) {
+      QString mess = "Unable to open/create log file " + filename.name();
+      throw IException(IException::User, mess, _FILEINFO_);
+    }
+
+    QTextStream lout(&logfile);
+    if ( !exists) {
+      lout << "Filename,SUMFILE,SumTime,Update,CubeSumDeltaTime, "
+           << "ExposureTime,CubeStartTime,CubeCenterTime,CubeStopTime,"
+           << "SumStartTime,SumCenterTime,SumStopTime\n";
+    }
+
+    BOOST_FOREACH (SharedFinder &cubesum, resultSet ) {
+      lout << cubesum->name()<< ",";
+
+      if ( !cubesum->isFound() ) {
+        lout << "NULL," << sumtime << "," << update << "," 
+             << format(cubesum->closest(), 7) << ","
+             << format(cubesum->exposureTime(), 7) << ","
+             << cubesum->cubeStartTime().UTC() << "," 
+             << cubesum->cubeCenterTime().UTC() << "," 
+             << cubesum->cubeStopTime().UTC() << ","
+             << "NULL,NULL,NULL";
       }
       else {
-        PvlKeyword file("CubeFileName", cubeNameList[cubeIndex].name());
-        file.addComment("SPICE tables for this cube were NOT updated. "
-                        "No sum file was found in the Archive group.");
-        warnings += file;
+        lout << cubesum->sumfile()->name() << "," 
+             << sumtime << "," << update << ","
+             << format(cubesum->deltaT(), 7) << ","
+             << format(cubesum->exposureTime(), 7) << ","
+             << cubesum->cubeStartTime().UTC() << "," 
+             << cubesum->cubeCenterTime().UTC() << "," 
+             << cubesum->cubeStopTime().UTC() << ","
+             << iTime(cubesum->sumStartTime()).UTC() << "," 
+             << iTime(cubesum->sumCenterTime()).UTC() << "," 
+             << iTime(cubesum->sumStopTime()).UTC();
       }
+
+      lout << "\n";
     }
-    if (warnings.keywords() != 0) {
-      Application::Log(warnings);
-    }
+
   }
 
   // Unload meta kernels - automatic, but done for completeness

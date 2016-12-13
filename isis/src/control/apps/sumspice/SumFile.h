@@ -22,6 +22,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include <ostream>
+#include <cfloat>
+#include <cmath>
 
 #include <QMap>
 #include <QSharedPointer>
@@ -33,6 +35,7 @@
 #include "iTime.h"
 #include "Kernels.h"
 #include "Quaternion.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
 
@@ -42,15 +45,19 @@ namespace Isis {
    * This class will parse the contents of a R. Gaskell SUMFILE used in his 
    * stereo photoclinometry (SPC) system and provide access to the elements that 
    * are stored therein. 
-   *  
-   * @author 2015-02-02 Kris Becker
-   *  
-   * @internal 
-   *   @history 2015-02-02 Kris Becker - Original Version 
-   *   @history 2016-02-09 Kris Becker - Updated documentation 
+   * 
+   * @history 2015-02-02 Kris Becker Original Version 
+   * @history 2016-02-09 Kris Becker - Updated documentation 
+   * @history 2016-06-07 Kris Becker - Renamed getIlluminationPosition() to 
+   *                        getSunPosition(). updateIlluminationPosition() did
+   *                        not have an implementation so it was removed.
+   * @history 2016-09-14 Kris Becker - Moved updateTimes() to new SumFinder 
+   *                        class as there is not enough information to do it
+   *                        correctly in SumFile.
    */
   class SumFile {
     public:
+      
       SumFile();
       SumFile(const QString &sumfile);
       virtual ~SumFile() { }
@@ -59,21 +66,18 @@ namespace Isis {
       QString name() const;
       QString utc() const;
       double  et() const;
+      const iTime &time() const;
   
-      int loadKernels(Cube &cube, Kernels &kernels) const;
-      int loadKernels(const QString &kernfile, Kernels &kernels) const;
-  
-      bool update(Cube &cube, Camera *camera = 0) const;
+      bool updateSpice(Cube &cube, Camera *camera = 0) const;
       bool updatePointing(Cube &cube, Camera *camera = 0) const;
       bool updatePosition(Cube &cube, Camera *camera = 0) const;
-      bool updateIlluminatorPosition(Cube &cube, Camera *camera) const;
   
       Quaternion getPointing() const;
       std::vector<double> getPosition() const;
-      std::vector<double> getIlluminatorPosition()  const;
+      std::vector<double> getSunPosition()  const;
   
       std::ostream &brief(std::ostream &outs) const;
-  
+
     private:
       QString m_id;
       iTime   m_obsTime;
@@ -87,13 +91,12 @@ namespace Isis {
   
       double  m_spacecraftPosition[3];
       double  m_pointingMatrix[3][3];
-      double  m_sunDirection[3];
+      double  m_sunPosition[3];
       double  m_kmatrix[6];
       double  m_distortion[4];
       double  m_sigmaSCPos[3];
       double  m_sigmaPntg[3];
       // QList<ControlMeasure>   m_measures;
-  
   
       void parseSumFile(const QString &sumfile);
       QStringList getSumLine(const QString &data, const int &nexpected = 0, 
@@ -113,17 +116,11 @@ namespace Isis {
   
   ///!<  Define a resource list
   typedef QList<SharedSumFile> SumFileList;
-  
-  
+
+
   // Global methods
   SumFileList   loadSumFiles(const FileList &sumfiles);
-  SharedSumFile findSumFile(const QString &isisfile, const SumFileList &sumlist,
-                            const double &deltaT = 0.3E-3);
-  SharedSumFile findSumFile(Cube &cube, const SumFileList &sumlist,
-                            const double &deltaT = 1.0);
-  SharedSumFile findSumFile(Cube &cube, 
-                            const SumFileList &sumFiles,
-                            QString sumFileName);
+
 
   /**
    * @brief Ascending order sort functor
@@ -133,9 +130,6 @@ namespace Isis {
    * times of each is compared using the less than operator. 
    * 
    * @author 2015-07-28 Kris Becker
-   *  
-   * @internal 
-   *   @history 2015-07-28 Kris Becker - Original Version 
    */
   class SortEtAscending {
     public:
@@ -145,7 +139,6 @@ namespace Isis {
         return  ( a->et()<  b->et() );
       }
   };
-
 
 };  // namespace Isis
 #endif

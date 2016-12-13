@@ -1,11 +1,6 @@
 # this tests sumspice using a single cube and sumfile as inputs on a Hayabusa image
-# Set up a TABLEDUMP variable to use test preferences, since the make system
-# will only set up test preferences for APPNAME
-# @internal
-#   @history 2016-12-01 Ian Humphrey - Set up the TABLEDUMP variable so that ISIS's
-#                           TestPreferences are used when running the tabledump commands.
+# updated for addition of UPDATE, SUMTIME, and TOLOG 2016-12-06 Kristin Berry
 APPNAME = sumspice
-TABLEDUMP = $(ISISROOT)/bin/tabledump -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -16,7 +11,9 @@ commands:
 	# first run of sumspice updates the time
 	$(APPNAME) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	sumfile=$(INPUT)/N2395699394.SUM \
-	mode=updatetime \
+	sumtime=start \
+	update=times \
+	tolog=$(OUTPUT)/sumspiceUpdateClocksToLog.txt \
 	-log=$(OUTPUT)/sumspiceUpdateClocksLog.pvl \
 	> /dev/null;
 
@@ -34,32 +31,33 @@ commands:
 	# save off tables from the first run
 	echo -e "InstrumentPointingTable" \
 	> $(OUTPUT)/updatedClocksTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPointing" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nInstrumentPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nSunPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="SunPosition" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	echo -e "\nBodyRotation" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="BodyRotation" \
 	>> $(OUTPUT)/updatedClocksTables.txt;
 
 	# second run of sumspice updates the tables
 	$(APPNAME) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	sumfile=$(INPUT)/N2395699394.SUM \
-	mode=updatespice \
+	sumtime=start \
+	update=spice \
 	-log=$(OUTPUT)/sumspiceUpdateSpiceLog.pvl \
 	> /dev/null;
 
@@ -71,25 +69,25 @@ commands:
 	# save off tables from second run
 	echo -e "InstrumentPointingTable" \
 	> $(OUTPUT)/updatedSpiceTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPointing" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nInstrumentPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="InstrumentPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nSunPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="SunPosition" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 
 	echo -e "\nBodyRotation" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
-	$(TABLEDUMP) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
+	tabledump from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	name="BodyRotation" \
 	>> $(OUTPUT)/updatedSpiceTables.txt;
 

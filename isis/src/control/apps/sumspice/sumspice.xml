@@ -3,7 +3,7 @@
 <application name="sumspice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Update ISIS start times, pointing and spacecraft position with Gaskell 
+    Update ISIS start times, pointing and spacecraft position with Gaskell SPC
   SUMFILEs 
   </brief>
 
@@ -11,20 +11,69 @@
    <h3>Overview</h3>
     <p>
       This program allows the user to update a cube's labels, spaceraft attitude 
-      (pointing) and position with more accurate information found in the 
-      appropriate Gaskell SUMFILE. There are multiple options for the how the 
-      labels should be updated. See the MODE parameter documentation for a 
-      description of these options.
+      (pointing) and position with the information found in a corresponding 
+      Gaskell SUMFILE. SUMFILEs are a product of  Gaskell's stereo 
+      photoclinometry (SPC) digital elevation model (DEM) generation process. 
+      SUMFILEs are generated for each file included in the processing to 
+      generate the DEM. 
     </p>
     <p>
-      The Gaskell SUMFILEs provided are expected to have a format
-      described below:
+       Part of the SPC DEM processing flow is to control all the images. The 
+       SUMFILE is a direct product from the SPIC control process that 
+       (typically) corresponds to a single file. The SUMFILE contains updates to 
+       pointing attitude and spacecraft position, among other things. The 
+       contents of the SUMFILE and their purpose are described below.
+    </p>
+    <p>
+       The objective of this program is to (optionally) apply timing changes (as 
+       seen in Hayabusa 1 images), pointing and spacecraft updates directly to 
+       ISIS cubes. This provides ISIS users the ability to apply consistent 
+       control to ISIS images that have corresponding SUMFILEs and use the DEM 
+       generated from the SPC process for orthorectiifed cartographic 
+       mapping processes in ISIS. This includes creating CK and SPK kernels from 
+       the result of this application for more widely distributed use of SPC 
+       results.
+    </p>
+    <p>
+      Here is an example of the contents of a Gaskell SPC SUMFILE (<b>NOTE: </b> 
+      Line numbers are not part of the SUMFILE but are annotated here for 
+      documentation purposes which follows):
+      <pre>
+  1   W46908480918
+  2   2014 NOV 12 17:20:03.128
+  3     2048  2048   500 65535                                       NPX, NLN, THRSH
+  4       0.1356800000D+03    0.1044000000D+04    0.9380000000D+03   MMFL, CTR
+  5      -0.9665063720D+01    0.1326644487D+02   -0.6673084308D+01   SCOBJ    
+  6      -0.6442479111D+00   -0.1829032409D-01    0.7645979944D+00   CX       
+  7       0.5935707119D+00    0.6184779444D+00    0.5149357652D+00   CY       
+  8      -0.4823053379D+00    0.7855892670D+00   -0.3875965231D+00   CZ       
+  9       0.7254908676D+00   -0.3292717307D+00    0.6043534796D+00   SZ       
+ 10     74.07410   0.00000   0.00000   0.00000  74.07410   0.00000   K-MATRIX 
+ 11     0.00000D+00    0.00000D+00    0.00000D+00    0.00000D+00   DISTORTION 
+ 12     0.1007758363D-02    0.1482813397D-02    0.8902614968D-03   SIGMA_VSO  
+ 13     0.3071768580D-04    0.3093941486D-04    0.1565302183D-04   SIGMA_PTG  
+ 14 LANDMARKS                                                                       
+ 15 AO0001   2049.39    668.15                                                      
+ 16 AO0002   2020.70    644.81                                                      
+ 17 AO0003   2035.17    708.66
+ 18 BD0009   1902.39    884.05                                                      
+ 19 BD0010   1891.13    909.86                                                      
+ 20    ...
+ 21 EK0022    675.73   1371.97                                                      
+ 22 EQ0088    721.76    738.13                                                      
+ 23 FI0002    727.77    220.40                                                      
+ 24 LIMB FITS
+ 25 END FILE                          
+    </pre>
+      The lines of a Gaskell SUMFILEs are described as: 
       <ul>
         <li>
-          Line 1: An ID for the SUMFILE (usually the image name).
+          Line 1: An ID for the SUMFILE (occasionally, but not always, the image 
+          name). 
         </li>
         <li>
-          Line 2: The correct start UTC for the image.
+          Line 2: The potentially corrected start, center or stop time in UTC 
+          for the image. 
         </li>
         <li>
           Line 3: The number of pixels, the number of lines, the lower DN 
@@ -63,59 +112,55 @@
           Line 13: The formal spacecraft orientation uncertainty , ie. the sigma PTG.
         </li>
         <li>
-          A list of landmarks containing the ID, pixel center, and line center.
+          Line 14-23: A list of landmarks containing the ID, pixel sample 
+          center, and pixel line center. 
         </li>
         <li>
-          A list of limb fits containing the landmark-on-limb centers.
+          Line 24+: A list of limb fits containing the landmark-on-limb centers.
+        </li>
+        <li>
+          Line 25: Last line of a Gaskell SUMFILE ends with the END FILE 
+          statement. 
         </li>
       </ul>
-
-      Here is an example:
-      <pre>
-  W46908480918
-  2014 NOV 12 17:20:03.128
-    2048  2048   500 65535                                       NPX, NLN, THRSH
-      0.1356800000D+03    0.1044000000D+04    0.9380000000D+03   MMFL, CTR
-     -0.9665063720D+01    0.1326644487D+02   -0.6673084308D+01   SCOBJ    
-     -0.6442479111D+00   -0.1829032409D-01    0.7645979944D+00   CX       
-      0.5935707119D+00    0.6184779444D+00    0.5149357652D+00   CY       
-     -0.4823053379D+00    0.7855892670D+00   -0.3875965231D+00   CZ       
-      0.7254908676D+00   -0.3292717307D+00    0.6043534796D+00   SZ       
-    74.07410   0.00000   0.00000   0.00000  74.07410   0.00000   K-MATRIX 
-    0.00000D+00    0.00000D+00    0.00000D+00    0.00000D+00   DISTORTION 
-    0.1007758363D-02    0.1482813397D-02    0.8902614968D-03   SIGMA_VSO  
-    0.3071768580D-04    0.3093941486D-04    0.1565302183D-04   SIGMA_PTG  
-LANDMARKS                                                                       
-AO0001   2049.39    668.15                                                      
-AO0002   2020.70    644.81                                                      
-AO0003   2035.17    708.66
-BD0009   1902.39    884.05                                                      
-BD0010   1891.13    909.86                                                      
-   ...
-EK0022    675.73   1371.97                                                      
-EQ0088    721.76    738.13                                                      
-FI0002    727.77    220.40                                                      
-LIMB FITS
-END FILE                                                                        
-    </pre>
     </p>
    <h3>Usage</h3>
     <p>
-      <i>sumspice</i> has been used to apply Gaskell control to Hayabusa Itokawa 
-      AMICA images. There is up to 12 seconds of uncertainty in the start times 
-      of these images. The Hayabusa team improved the start time with brute 
-      force comparisons of the position of Itokawa in the AMICA field of view. 
-      The SUMFILEs contained the correction of the start time. This was the 
-      motivation behind adding support for the start time adjustment.
+      <i>sumspice</i> has been used to apply Gaskell SPC control to Hayabusa 
+      Itokawa AMICA images. There is up to 12 seconds of uncertainty in the 
+      start times of these images. The Hayabusa team improved the start time 
+      with brute force comparisons of the position of Itokawa in the AMICA field 
+      of view. The SUMFILEs contained the correction of the start time. 
+      Unfortunately, the PDS archive of the AMICA data has not been updated with 
+      the new start times. This was the motivation behind adding support for the 
+      start time adjustment.
     </p>
     <p>
+      The basic processing options are to update the start times (UPDATE=TIMES) 
+      and pointing (CK) (UPDATE=POINTING) and spacecraft position (SPK) 
+      (UPDATE=POSITION) data in the ISIS label/file with that contained in the 
+      SUMFILE. Both the pointing and spacecraft position can be updated in the 
+      same run (UPDATE=SPICE). And, finally, it may be useful to start over by 
+      resetting the times to their original values - UPDATE=RESET provides this 
+      option (and removes the SumTimeHistory and disables SPICE requiring a 
+      rerun of 
+               <i>spiceinit</i>.
+    </p> 
+    <p> 
       To apply the complete functionality of <i>sumspice</i>, the start time 
       must be updated first if required. Note that it is rather uncommon the 
-      start time will need to be updated. If it is, this option will recompute 
-      the SpacecraftClockStartTIme which is used primarily by most camera models 
-      for best accuracy of image acquisition times. This mode will require a 
-      rerun of  <i>spiceinit</i> mainly to reestablish the body orientation for 
-      the new start time. 
+      start time will need to be updated. If it needed/desired, 
+      the UPDATE=TIMES option will recompute the SpacecraftClockStartTime, which 
+      is used primarily by most camera models for best accuracy of image 
+      acquisition times. This option will force a rerun of <i>spiceinit</i> 
+      after observation times are updated mainly to reestablish the body 
+      orientation and solar illumination angles for the new start time. This 
+      option will reassign computed values, relative to the SUMFILE reference 
+      time (see SUMTIMES) to  SpacecraftClockStartCount, 
+      SpacecraftClockStopCount, StartTime and StopTime label keywords. Most 
+      camera models use at least one of these values to establish observation 
+      times. These times are used to associate the correct ephemeris data from 
+      SPICE kernels.
     </p>
     <p>
       The update of pointing attitude and spacecraft position requires 
@@ -127,6 +172,112 @@ END FILE
       transformations to retain the integrity of the data. Once the fidelity of 
       the updates are confirmed, new CK and SPK kernels can be created using the 
       ISIS <i>ckwriter</i> and <i>spkwriter</i> applications, respectively.
+    </p>
+    <h3>Activity Tracking</h3>
+    <p>
+      <i>sumspice</i> does supply some aid in tracking its activity in the ISIS 
+      label. When timing is updated, there is a group called 
+      <i>SumTimeHistory</i> that is created upon the first operation pertaining 
+      to  changes that were made to the timing keywords (typically) in the 
+      <i>Instrument</i> group in the ISIS label. Four keywords are affected by 
+      timing operations in <i>sumspice</i>. These are SpacecraftClockStartCount, 
+      SpacecraftClockStopCount, StartTime, and StopTime. The first two keywords, 
+      SpacecraftClockStartCount and pacecraftClockStopCount, are in the form of 
+      spacecraft clock, or SCLK, format. Manipulation of these two keywords 
+      requires the existance of an ISIS camera model to determine the 
+      appropriate SCLK NAIF id for conversion from UTC (as stored in the 
+      SUMFILE, line 2) to SCLK. The later two keywords, StartTime, and StopTime,  
+      are conversions of the times to UTC. These keywords are only updated if 
+      they exist in the <i>Instrument</i> group in the ISIS label.
+    </p>
+    <p>
+      When any of these keywords are updated in the ISIS label, previous values 
+      are recorded in the <i>SumTimeHistory</i> group created upon the first run 
+      of <i>sumspice</i> that modifies these keywords. Any subsequent run of 
+      <i>sumspice</i> that modifies times have previous values appended to the 
+      corresponding keywords, thus creating an running history of timing 
+      operations and enabling the UPDATE=RESET option to retain original timing 
+      values if needed. Using the reset option removes the 
+      <i>SumTimeHistory</i> group. Here is an example of the 
+      <i>SumTimeHistory</i> group after an update.
+    </p>
+    <PRE>
+  Group = SumTimeHistory
+    # SUMFILE(s) used to update the SCLK timing in the instrument group (SPC).
+    SUMFILE                   = N2395699394
+    SpacecraftClockStartCount = 2395694888 &lt;1/32sec&gt;
+    SpacecraftClockStopCount  = 2395695365 &lt;1/32sec&gt;
+    StartTime                 = 2005-09-21T10:44:07
+    StopTime                  = 2005-09-21T10:44:07
+  End_Group
+    </PRE>
+    <p>
+      Note that the TOLOG file, if specified, will also contain a record of the 
+      activities that were applied, including the timing values resulting from 
+      these operations. 
+    </p>
+    <p>
+       When updating pointing or spacecraft position, a keyword named SUMFILE is 
+      added to the <i> InstrumentPointing</i> and <i>InstrumentPosition</i> 
+      tables, respectively that records the name of the SUMFILE used to update 
+      the ephemeris data in those objects. When <i>spiceinit</i> is run, this 
+      table is replaced, thus removing the keyword, indicating original SPICE 
+      data is contained in those objects.
+    </p>
+    <h3>SUMTIME Considerations</h3>
+    <p>
+       Regarding the SUMFILE reference time, the SUMTIME parameter is provided 
+       for the user to specify that the UTC time in the SUMFILE represents the 
+       start, mid or end time of the image exposure time. The following table 
+       provides known reference times contained in SUMFILEs for 
+       spacecraft/instruments. Knowing the correct reference contained in the 
+       SUMFILE is critical to determine the correct SUMFILE for a given ISIS 
+       cube and updating the ISIS labels with the time and ephemeris data 
+       contained therein. 
+    </p>
+    <TABLE border = "1">
+        <CAPTION><h4>SUMFILE SUMTIME References</h4></CAPTION>
+        <TR>
+          <TH>Spacecraft</TH>
+          <TH>Instrument</TH>
+          <TH>Reference</TH>
+        </TR>
+        <TR>
+          <TD>Hayabusa 1</TD>
+          <TD>AMICA</TD>
+          <TD>Start</TD>
+        </TR>
+        <TR>
+          <TD>Dawn</TD>
+          <TD>FC</TD>
+          <TD>Center (Note: Dawn FC has a 193 ms delay from start time)</TD> 
+        </TR>
+       <TR>
+         <TD>OSIRIS-REx</TD>
+          <TD>OCAMS (MapCam, SamCam, PolyCam)</TD>
+          <TD>Center</TD> 
+        </TR>
+        <TR>
+          <TD>MESSENGER</TD>
+          <TD>MDIS</TD>
+          <TD>Center</TD>
+        </TR>
+    </TABLE>
+   <h3>Processing Sequences</h3>
+    <p>
+       Here is an example that shows the commonly used command sequence for the 
+       Hayabusa AMICA instrument. This process will update times and ephemeris 
+       data, which includes pointing and spacecraft position.
+      <PRE>
+# First transfer the SUMFILE timing to the ISIS cube labels
+sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=times sumtime=start  tolog=haya_amica.log 
+
+# Now rerun spiceinit as a timing update forces this
+spiceinit   from=st_2395699394_v.lev0.cub shape=user model='$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds' 
+
+# Finally, apply the pointing and spacecraft position update in a single run
+sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=spice sumtime=start  tolog=haya_amica.log
+      </PRE>
     </p>
   </description>
 
@@ -142,6 +293,22 @@ END FILE
     <change name="Kris Becker" date="2016-02-09">
       Added implementation to support NAIF META kernel files. Updated 
       documentation. 
+    </change>
+    <change name="Kris Becker" date="2016-09-19">
+      Refactored code to: 1) accomdate for different time references in 
+      SUMFILEs (start, center, stop - see SUMTIME parameter), 2) modified 
+      update options to be more flexible (see UPDATE parameter), 3) added more 
+      robust determination of observation times, 4) added start time delay 
+      options, particularly for Dawn FC, which has a 193 ms start time delay, 
+      5) added a log option that reports operations and timing operations for 
+      confirmation and analysis, 6) improved logging of timing activities to 
+      labels, 7) timing updates are no longer required before applying SPICE 
+      update options (not required for all instruments), 8) modified how 
+      SPICE/camera model is disabled (in Kernels group) after a timing update, 
+      9) added SUMTIME, UPDATE, TOLOG parameters and removed the MODE 
+      parameter, 10) changed the default for TIMEDIFF to INFINITY from 0 so 
+      success is guaranteed, and 11) added UPDATE=RESET option to restore 
+      original times. Some of these changes breaks backwards compatibility.
     </change>
   </history>
 
@@ -194,16 +361,15 @@ END FILE
           The name of the SUMFILE to be used to update the input cube(s).
         </brief>
         <description>
-          The name of a single Gaskell SUMFILE containing an updated start time 
-          and SPICE information. <b>Note: </b>Use the SUMFILELIST parameter 
-          instead of this one if the exact SUMFILE that should be used 
-          to update the cube(s) is unknown or if there are more than one.
+          The name of a single Gaskell SUMFILE containing time and SPICE 
+          information. <b>Note: </b>Use the SUMFILELIST parameter instead of 
+          this one if the exact SUMFILE that should be used to update the 
+          cube(s) is unknown or if there are more than one. 
         </description>
         <filter>*.SUM</filter>
         <default><item>None</item></default>
         <exclusions>
           <item>SUMFILELIST</item>
-          <item>TIMEDIFF</item>
         </exclusions>
       </parameter>
 
@@ -215,10 +381,10 @@ END FILE
         cube(s). 
         </brief>
         <description>
-          A text file containing a list of Gaskell SUMFILEs that each contain an 
-          updated start time and SPICE information.  <b>Note: </b>Use the 
-          SUMFILE parameter instead of this one if the exact SUMFILE is known 
-          for the given cube(s). 
+          A text file containing a list of Gaskell SUMFILEs that each contain 
+          time and SPICE information.  <b>Note: </b>Use the SUMFILE parameter 
+          instead of this one if the desired SUMFILE is known for the given 
+          cube(s).
         </description>
         <filter>*.lis</filter>
         <default><item>None</item></default>
@@ -227,80 +393,229 @@ END FILE
         </exclusions>
       </parameter>
 
-      <parameter name="MODE">
+      <parameter name="TOLOG">
+         <type>filename</type> <fileMode>output</fileMode> 
+         <brief>
+           Optional output log file of results 
+         </brief>
+         <description>
+           If a name is provided, the results of each cube
+           file is written to the specified file.
+         </description>
+         <filter>*.log</filter>
+         <default><item>None</item></default>
+       </parameter>
+
+      <parameter name="SUMTIME">
         <type>string</type>
         <brief>
-          Determines how the program will use the appropriate SUMFILE to update 
-          the labels. 
+          Specify what the time in the SUMFILE represents: start, center or 
+          end time
         </brief>
         <description>
-          Determines how the program will use the appropriate SUMFILE to update 
-          the labels. Note that there are input requirements for each option.
+          <p>
+            This parameter is provided to explicity specify what the time in the 
+            SUMFILE represents. Typically, this is the start time (default) but 
+            not always. The user must make this determination.
+          </p>
+          <p>
+            This may be important when searching for the SUMFILE associated with 
+            the ISIS cube when using the times from each source. <i>sumspice</i> 
+            will make adjustments based upon this value and the exposure 
+            duration as found in the ISIS cube file label.
+          </p>
         </description>
         <list>
-          <option value="UPDATETIMES">
+
+          <option value="START">
             <brief>
-              Update the start and end times in the cube's label.
+              Time contained in SUMFILE refers to start time
             </brief>
             <description>
-              If the UPDATETIMES option is selected, the program update the time 
-              and clock values in the cube's Instrument group. If a single 
-              SUMFILE is given, the program will use this file. If a SUMFILELIST 
-              was provided, the program will search for the file in the given 
-              list whose time is within the specified TIMEDIFF tolerance and is 
-              the closest to the SpacecraftClockStartCount in the cube. If 
-              multiple files in the SUMFILELIST have the same time, this program 
-              will choose to use the first one in the list with the closest 
-              time. If no SUMFILE is found within this tolerance, a warning will 
-              be printed to the output log and the program will exit without 
-              updating the input cube's labels. Otherwise, the UTC on the second 
-              line of the SUMFILE will replace the StartTime value in the cube's 
-              Instrument group. The ExposureDuration in the label is then used 
-              to find the new StopTime. These new start/stop time values are 
-              used to determine the new SpacecraftClockStartCount and the new 
-              SpacecraftClockStopCount. The original values of these keywords 
-              and the SUMFILE used to update the keywords will be saved in the 
-              cube's Archive group.
+               The UTC time stored in the SUMFILE refers to the start time of 
+               the observation.  
             </description>
           </option>
-          <option value="UPDATESPICETABLES">
+
+          <option value="CENTER">
             <brief>
-              Update the InstrumentPosition and InstrumentPointing tables in the cube's label.
+              Time contained in SUMFILE refers to center of the exposure time
             </brief>
             <description>
-              If the UPDATESPICETABLES option is selected, the program will 
-              search for the SumFile keyword in the cube's Archive group. If 
-              no such keyword exists or if the SumFile saved to the labels is 
-              not found in the given SUMFILELIST, a warning will be printed to 
-              the output log and the program will exit without updating the 
-              SPICE tables. Otherwise, the spacecraft position and pointing 
-              information will be updated using the information provided in the 
-              matching SUMFILE. Requirements: to run sumspice using the 
-              UPDATESPICETABLES option, the input cube must have already been 
-              run through sumspice with the UPDATETIMES option and then run 
-              through spiceinit.
+               The UTC time stored in the SUMFILE refers to the center of the 
+               exposure time of the observation. 
             </description>
-            <exclusions>
-              <item>TIMEDIFF</item>
-            </exclusions>
+          </option>
+
+          <option value="STOP">
+            <brief>
+              Time contained in SUMFILE refers to end of the exposure time 
+            </brief>
+            <description>
+               The UTC time stored in the SUMFILE refers to the stop time of 
+               the observation. This option is not common but may be used so is 
+               added for completeness.
+            </description>
           </option>
         </list>
-        <default><item>UPDATETIMES</item></default>
+        <default><item>CENTER</item></default>
+      </parameter>
+
+      <parameter name="UPDATE">
+        <type>string</type>
+        <brief>
+          Determines update operation to apply to ISIS file from SUMFILE data
+        </brief>
+        <description>
+          Determines which elements of the ISIS cube to update with the 
+          appropriate SUMFILE contents. Note that there are input 
+          requirements for each option. if a SUMFILELIST was provided, the 
+          program will search for the file in the given list whose time is 
+          within the specified TIMEDIFF tolerance and is the closest to the 
+          SpacecraftClockStartCount in the cube. If multiple files in the 
+          SUMFILELIST have the same time, this program will choose to use the 
+          first one in the list with the closest time. If no SUMFILE is found 
+          within this tolerance, a warning will be printed to the output log and 
+          the program will exit without updating the input cube. 
+        </description>
+        <list>
+
+          <option value="NONE">
+            <brief>
+              Essentailly a NOOP, but does determine cube/SUMFILE pairings
+            </brief>
+            <description>
+              <p>
+                If the NONE option is selected, the program will only determine 
+                which SUMFILE applies to each cube. This option is useful as a 
+                dryrun to ensure the pairings are good. You can also get a 
+                useful output log in TOLOG that will provide timing information.
+              </p>
+            </description>
+          </option>
+
+          <option value="TIMES">
+            <brief>
+              Update the start and end times in the ISIS cube label.
+            </brief>
+            <description>
+              <p>
+                If the TIMES option is selected, the program will update the 
+                UTC StartTime/EndTIme and 
+                SpacecraftClockStartCount/SpacecraftClockStopCount ISIS cube 
+                Instrument group. The UTC on the second line of the SUMFILE 
+                will replace the StartTime value in the cube's Instrument 
+                group. The ExposureDuration in the label is then used to find 
+                the new StopTime. These new start/stop time values are used to 
+                determine the new SpacecraftClockStartCount and the new 
+                SpacecraftClockStopCount. The original values of these 
+                keywords and the SUMFILE used to update the keywords will be 
+                saved in the cube's Archive group. 
+              </p>
+              <p>
+                Note that this option will effectively require 
+                <i>spiceinit</i> to be ran after it completes. <i>sumspice</i> 
+                 forces this by disabling existing geometry (by removing the 
+                NaifKeywords object and some keywords in the Kernels group). 
+                Changing start times will change positions of the spacecraft and 
+                target body. A rerun of spiceinit will update these relative 
+                positions. This step should be applied prior to using any other 
+                option of this application.
+              </p>
+            </description>
+          </option>
+
+          <option value="SPICE">
+            <brief>
+              Update the InstrumentPosition and InstrumentPointing tables in the 
+            cube file 
+            </brief>
+            <description>
+              If the SPICE option is selected, the program will search for the 
+              SumFile keyword in the cube's Archive group. If no such keyword 
+              exists or if the SumFile saved to the labels is not found in the 
+              given SUMFILELIST, a warning will be printed to the output log 
+              and the program will exit without updating the SPICE tables. 
+              Otherwise, the spacecraft position and pointing information will 
+              be updated using the information provided in the matching 
+              SUMFILE. This option is equivalent to running both the POINTING 
+              and POSITION option.
+            </description>
+          </option>
+
+          <option value="POINTING">
+            <brief>
+              Update the InstrumentPointing tables in the cube file. 
+            </brief>
+            <description>
+              If the POINTING option is selected, the program will update only 
+              the spacecraft pointing SPICE information with the data contained 
+              in the SUMFILE. The file must have be ran through spiceint 
+              previous and the SPICE data must be attached as a Table in the 
+              ISIS cube (i.e., spiceint must have ATTACH=TRUE)
+            </description>
+          </option>
+
+          <option value="POSITION">
+            <brief>
+              Update the InstrumentPosition tables in the cube file 
+            </brief>
+            <description>
+              If the POSITION option is selected, the program will update only 
+              the spacecraft position SPICE information with the data contained 
+              in the SUMFILE. The file must have be ran through spiceint 
+              previous and the SPICE data must be attached as a Table in the 
+              ISIS cube (i.e., spiceint must have ATTACH=TRUE)
+            </description>
+          </option>
+
+          <option value="RESET">
+            <brief>
+              Resets the timing to original times
+            </brief>
+            <description>
+              This option has been added to essentially reset the timing 
+              adjustments that were made back to the original values. This is to 
+              prevent one having to start over completely with a new version of 
+              the file. This will preserve any processing that has taken place. 
+              This option will use the keywords  in the SumtimeHistory group 
+              that record all timing <i>sumspice</i> operations that have taken 
+              place on the file to reset all existing keywords in the Instrument 
+              group related to observation timing. The final act of this option 
+              will also remove the SumtimeHistory group and disable SPICE 
+              operations until a run of 
+                             <i>spiceinit</i> is made.
+            </description>
+          </option>
+
+        </list>
+        <default><item>SPICE</item></default>
       </parameter>
 
       <parameter name="TIMEDIFF">
           <type>double</type>
         <brief>
-          The maximum allowed time difference between the cube's current start 
+          The maximum allowed time difference between the cube
           time and the time found in the SUMFILE.
         </brief>
         <description>
-          This value is used when the UPDATETIME option is selected and a 
-          SUMFILELIST is provided. The file in the SUMFILELIST with the time 
-          that is closest to the cube's start clock must be within this 
-          tolerance for the cube to be updated.
+          <p>
+            This value is always considered to specify the time differential when 
+            looking for matching SUMFILES. This tolerance is used when both the 
+            SUMFILE and  SUMFILELIST are given to constrain the difference in 
+            observation times contained in the cube label and the SUMFILE. If no 
+            value is provided, then the default behavior is to choose the SUMFILE 
+            that has the closest time as specified in  SUMTIME to the 
+            corresponding time contained in cube label, assertained in conjunction 
+            with the camera model.
+          </p>
+          <p>
+              Note that it is critical to provided a tolerance value here if 
+              known (e.g., ~12 seconds for Hayabusa/AMICA) so that the correct 
+              SUMFILE is determined.
+          </p>
         </description>
-        <default><item>0.0</item></default>
+        <internalDefault>INFINITY</internalDefault>
       </parameter>
 
       <parameter name="METAKERNEL">
@@ -309,14 +624,15 @@ END FILE
         <brief>List of SPICE kernels to support conversions</brief>
         <description>
             In some cases, additional kernels may be required in order to 
-            compute some of the data acquired from the NAIF toolkit. If the ISIS 
-            labels do not contain sufficient kernels, this parameter can specify 
-            a NAIF meta kernel, or a single kernel of any supported NAIF type 
-            that will be loaded prior to any computations. These kernels remain 
-            loaded for all files and for the entirety of the runtime of this 
-            application. See <a href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html">
-            SPICE Kernel Required Reading for additional</a> information about 
-            NAIF meta kernels.
+            compute some of the data acquired from the NAIF toolkit. If 
+            the ISIS labels do not contain sufficient kernels, this 
+            parameter can specify a NAIF meta kernel, or a single kernel 
+            of any supported NAIF type that will be loaded prior to any 
+            computations. These kernels remain loaded for all files and 
+            for the entirety of the runtime of this application. See <a 
+            href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html"> 
+            SPICE Kernel Required Reading for additional</a> information 
+            about NAIF meta kernels.
         </description>
         <filter>*.meta *.tm</filter>
         <default><item>None</item></default>

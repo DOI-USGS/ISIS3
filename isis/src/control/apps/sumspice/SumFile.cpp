@@ -24,6 +24,7 @@
 
 #include "SumFile.h"
 
+#include <cmath>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -86,9 +87,9 @@ namespace Isis {
   
 
   /** 
-   *  Returns the time found in the SUMFILE.
+   *  Returns the time found in the SUMFILE in UTC form
    *  
-   *  @return @b QString Start time found in SUMFILE
+   *  @return @b QString Time found in SUMFILE
    */
   QString SumFile::utc() const {
     return (m_obsTime.UTC());
@@ -99,42 +100,35 @@ namespace Isis {
   /** 
    *  Returns the SUMFILE time, in ET.
    *  
-   *  @return @b double Start time converted to ET
+   *  @return @b double Time converted to ET
    */
   double  SumFile::et() const {
     return (m_obsTime.Et());
   }
   
-
-  /** Loads kerneks for the given ISIS cube file from labels
-   *  
-   * @param cube     Cube to load kernels for
-   * @param kernels   Kernel object to use for loading
-   * 
-   * @return @b int  Number of kernels loaded
-   */
-  int SumFile::loadKernels(Cube &cube, Kernels &kernels) const {
-    Kernels mykernels(cube);
-    mykernels.Discover();
-    return ( kernels.Load() );
+/**
+ * @brief Returns the Time object found in SUMFILE 
+ * 
+ * @return const iTime& Time in SUMFILE
+ */
+  const iTime &SumFile::time() const {
+    return ( m_obsTime );
   }
-  
 
-  /**  Loads kernels from a given file
-   *  
-   * @param kernfile Name fo file to load kernels from
-   * @param kernels  Kernels object to use for loading kernels
-   * 
-   * @return @b int Number of kernels loaded
-   */
-  int SumFile::loadKernels(const QString &kernfile, Kernels &kernels) const {
-    kernels.Add(kernfile);
-    kernels.Discover();
-    return ( kernels.Load() );
-  }
-  
-
-  bool SumFile::update(Cube &cube, Camera *camera) const {
+/**
+ * @brief Update SPICE data in ISIS cube 
+ *  
+ * This method will update the SPICE blobs with the contents of the SUMSPICE. 
+ * The contents of the InstrumentPosition will be replaced with SUMSPICE SZ 
+ * vector and InstrumentPointing is replaced by the CX, CY, CZ matrix.
+ * 
+ * @param cube    An intialized ISIS Cube object
+ * @param camera  An option pointer to the camera. If not provided, it is 
+ *                retrieved from the Cube object
+ * 
+ * @return bool   True if succesful, false if the operation fails
+ */
+  bool SumFile::updateSpice(Cube &cube, Camera *camera) const {
     bool good = updatePointing(cube, camera);
     if ( good ) {
      good = updatePosition(cube, camera);
@@ -282,6 +276,7 @@ namespace Isis {
    }
   
 
+
   /**
    * @brief Return the point matrix, in body-fixed format. 
    *  
@@ -325,6 +320,25 @@ namespace Isis {
   }
   
 
+
+  /**
+   * @brief Get Sun postion in body-fixed coordinates
+   *  
+   * This method will return the vector found in the SUMFILE that represents 
+   * the coordinates of the Sun, in body fixed position. 
+   * 
+   * @return std::vector<double> The SUMFILE's Sun position
+   */
+  std::vector<double> SumFile::getSunPosition()  const{
+    std::vector<double> sunPosition;
+    sunPosition.reserve(3);
+    sunPosition.push_back(m_sunPosition[0]);
+    sunPosition.push_back(m_sunPosition[1]);
+    sunPosition.push_back(m_sunPosition[2]);
+    return (sunPosition);
+  }
+  
+
   /**
    * Adds information about the SUMFILE to the output stream: name, start time 
    * (UTC), start time (ET), number of lines, number of samples, DN minimum, DN 
@@ -341,7 +355,7 @@ namespace Isis {
     return (outs); 
   }
   
-  
+
   /**
    * @brief Opens and parses the contents of a SUMFILE.
    *  
@@ -403,7 +417,7 @@ namespace Isis {
   
     // Get sun position
     values = getSumLine(sumin.readLine(), 4, "SZ");
-    for (int i = 0; i < 3; i++) m_sunDirection[i] = cvtDouble(values[i]);
+    for (int i = 0; i < 3; i++) m_sunPosition[i] = cvtDouble(values[i]);
   
     // Get K-matrix
     values = getSumLine(sumin.readLine(), 7, "K-MATRIX");
@@ -549,162 +563,7 @@ namespace Isis {
     return (sum_list);
   }
 
-/** 
- * @brief Find sumfile by name
- *  
- * @param cube         Cube to associate with SUMFILE
- * @param sumFiles     List of SUMFILES
- * @param sumFileName  Name of SUMFILE to find
- * 
- * @return SharedSumFile Pointer to SUMFILE if found, otherwise 0
- */
-  SharedSumFile findSumFile(Cube &cube, 
-                            const SumFileList &sumFiles,
-                            QString sumFileName) {
-
-    for (int i = 0; i < sumFiles.size(); i++) {
-      if (QString::compare(sumFileName, sumFiles[i]->name(), Qt::CaseInsensitive) == 0) {
-        return sumFiles[i];
-      }
-    }
-
-    return SharedSumFile(0);
-  }
-
-
-  /**
-   * @brief Find SUMFILE for the given cube file
-    *  
-   * This method will find the appropriate SUMFILE associated with a Cube object 
-   * given a list of SumFile objects. The time the image was observed is compared 
-   * to the time of a SUMFILE. The SumFile that matches the cube is the one with 
-   * the time closest to the Cube observation time. 
-   * 
-   * @param Cube       Cube object to find a SumFile for.
-   * @param sumFiles   List of SharedSumFile objects to search, sorted in ascending order.
-   * @param deltaTime  Maximum time difference in ISIS cube file time and SumFile time.
-   * 
-   * @return SharedSumFile Pointer to SumFile for ISIS cube
-   */
-  SharedSumFile findSumFile(Cube &cube, 
-                            const SumFileList &sumFiles,
-                            const double &deltaTime) {
-
-    Kernels kernels(cube);
-    kernels.Load();
-
-    SharedSumFile sumFile = sumFiles[0];
-
-    // if a single sum file was given, assume that the user wants to use this sum file 
-    if (sumFiles.size() == 1) {
-      return sumFile;
-    }
-    
-    // Otherwise, find the sum file with start ET closest to the
-    // cube's ET Note that the sum files are already sorted by ET...
-
-    Pvl *cubeLabels = cube.label();
-    PvlGroup &instGrp = cubeLabels->findGroup("Instrument", Pvl::Traverse);
-    PvlKeyword origStartClock = instGrp["SpacecraftClockStartCount"];
-    QString originalClock = origStartClock[0];
-    double cubeStartEt = cube.camera()->getClockTime(originalClock).Et();
-
-    double sumFileEt = sumFile->et();
-
-    double etDiff = fabs(cubeStartEt - sumFileEt);
-
-    int sumIndex = 1;
-    while(fabs(cubeStartEt - sumFiles[sumIndex]->et()) <= etDiff) {
-      sumFile = sumFiles[sumIndex];
-      sumFileEt = sumFile->et();
-      etDiff = fabs(cubeStartEt - sumFileEt);
-      sumIndex++;
-    }
-    
-    if (etDiff <= deltaTime) {
-      return sumFile;
-    }
-
-    // if the tolerance is not met, return a null pointer
-    return SharedSumFile(0);
-  }
-
 }
 // namespace Isis
 
-//  /**
-//   * 
-//   * @param camera 
-//   * 
-//   * @return @b Quaternion 
-//   */
-//  Quaternion SumFile::getBFtoJ2000(Camera *camera) const {
-//    QString target = getFrameName((const int)camera->naifBodyFrameCode());
-//
-//    vector<double> rotation(9);
-//    pxform_c(target.toLatin1().data(), "J2000", camera->time().Et(), 
-//             (SpiceDouble (*)[3]) &rotation[0]);
-//    NaifStatus::CheckErrors();
-//  
-//    QString sep("");//???
-//    BOOST_FOREACH ( double v, rotation ) {
-//      cout << sep << v;
-//      sep = ", "; 
-//    }
-//    cout << "\n";
-//    return (Quaternion(rotation));
-//  }
-
-
-//  /**
-//   * 
-//   * @param fromId 
-//   * @param toId 
-//   * @param timeEt 
-//   * 
-//   * @return @b Quaternion 
-//   */
-//  Quaternion SumFile::getFrameRotation(const int &fromId, const int &toId,
-//                                       const double &timeEt) 
-//                                       const {
-//  
-//    QString fromFrame = getFrameName(fromId);
-//    QString toFrame   = getFrameName(toId);
-//  
-//    vector<double> rotation(9);
-//    pxform_c(fromFrame.toLatin1().data(), toFrame.toAscii().data(), 
-//             timeEt, (SpiceDouble (*)[3]) &rotation[0]);
-//    NaifStatus::CheckErrors();
-//    return (Quaternion(rotation));
-//  }
-  
-  
-//  /**
-//   * @brief Get character representation of the frame identifier
-//   * 
-//   * @param frameid NAIF frame ID to translate to character
-//   * 
-//   * @return QString Character value of the frame id
-//   */
-//  QString SumFile::getFrameName(const int &frameid) const {
-//    SpiceChar frameBuf[81];
-//    (void) frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
-//    return (QString(frameBuf));
-//  }
-  
-
-//  /**
-//   * @brief Get character representation of the frame identifier
-//   * 
-//   * @param frameName String frame name to translate to NAIF code
-//   * 
-//   * @return int NAIF frame code
-//   */
-//   int SumFile::getFrameCode(const QString &frameName) const {
-//     int frmcode;
-//     (void) namfrm_c(frameName.toLatin1().data(), &frmcode);
-//     return (frmcode);
-//   }
-  
-  
 
