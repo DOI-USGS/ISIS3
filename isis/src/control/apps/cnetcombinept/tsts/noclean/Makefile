@@ -9,6 +9,8 @@ commands:
 	           networkid=Equi065S355ED10 \
 	           description="Messenger data test" \
 	           imagetol=3000.0 \
+	           cleannet=false \
+	           cleanmeasures=false \
 	           > /dev/null;
 
 	$(RM) $(OUTPUT)/networks.lis;

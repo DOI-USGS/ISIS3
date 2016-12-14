@@ -7,11 +7,12 @@
 
 // boost library
 #include <boost/foreach.hpp>
+#include <boost/assert.hpp>
 
 #include "nanoflann/nanoflann.hpp"
 
 #include "ControlNet.h"
-#include "ControlPointCloudPt.h"
+#include "MeasurePoint.h"
 #include "ControlPointMerger.h"
 #include "FileList.h"
 #include "FileName.h"
@@ -28,32 +29,39 @@
 using namespace std;
 using namespace Isis;
 
-/** Format an incoming 3-point vector to a string */
-inline QString formatVector(const double *v, const QString &sep = "") {
-  QString s(sep);
-  QString data;
-  for ( int i = 0 ; i < 3 ; i++) {
-    data += (s +  QString::number(v[i]));
-    s = ",";
-  }
-  return (data);
+
+
+/** Check point for validity */
+inline bool isValid(const ControlPoint *point ) {
+  if ( !point ) { return ( false ); }
+  return ( !(point->IsIgnored() || point->IsInvalid() || point->IsRejected()) );
+}
+
+
+/** Check point for merging worthiness */
+inline bool isWorthy(const ControlPoint *point ) {
+  if ( !point ) { return ( false ); }
+  return ( isValid(point) && !point->IsEditLocked() );
+}
+
+/** Check measure for validity */
+inline bool isValid(const ControlMeasure *m)  {
+   return ( !( m->IsIgnored() || m->IsRejected() ) );
 }
 
 // Control network manager
 typedef QList<QSharedPointer<ControlNet> >    ControlNetList;
 
-// ControlNet point cloud types. Dist3d distance works for all types.
-typedef ControlPointCloudPt         PointType;
-typedef Dist3d<ControlPointCloudPt> DistanceType;
-
-typedef PointCloud<PointType, DistanceType>             CNetPointCloud;
-typedef PointCloudTree<PointType, DistanceType>         CNetPointCloudTree;
-typedef PointCloudSearchResult<PointType, DistanceType> ResultType;
+// ControlNet point cloud types.
+typedef MeasurePoint                       PointType;
+typedef PointCloud<PointType>              CNetPointCloud;
+typedef PointCloudTree<PointType>          CNetPointCloudTree;
+typedef QSharedPointer<CNetPointCloudTree> CubeMeasureTree;
 
 void IsisMain() {
  
   // We will be processing by line
-  ProcessByLine p;
+  ProcessByLine pbl;
   UserInterface &ui = Application::GetUserInterface();
 
   QStringList cnetfiles;
@@ -78,6 +86,7 @@ void IsisMain() {
       mess += "] is empty.";
       throw IException(IException::User, mess, _FILEINFO_);
     }
+
     BOOST_FOREACH ( FileName cfile, list_o_nets ) {
       cnetfiles.append( cfile.original() );
       nList++;
@@ -91,43 +100,33 @@ void IsisMain() {
     throw IException(IException::User, mess, _FILEINFO_);
   }
 
-  // Ok, if we end up with one net, it must be entered in CNETBASE.
-  if ( (cnetfiles.size() == 1) && (1 != nBase) ) {
-    QString mess = "It appears you are attempting to merge points from a "
-                   "single network, which is fine, but it must be specified "
-                   "in CNETBASE. Try again if that is your intent!";
-    throw IException(IException::User, mess, _FILEINFO_);
-  }
-
-  // Now establish the type of processing mode we are dealing with. Can be 
-  // IMAGE or GROUND.
-  QString cmode = ui.GetString("MODE").toLower();
-  ControlPointCloudPt::CoordinateType ctype = ( "image" == cmode) ? 
-                                                ControlPointCloudPt::Image :
-                                                ControlPointCloudPt::Ground ;
- 
-  // If image node is requested, get the image to use as a reference
-  QString serialno;
-  if ( "image" == cmode ) {
-    if ( ui.WasEntered("REFERENCE")) {
-      serialno = SerialNumber::Compose(ui.GetAsString("REFERENCE")); 
-    }
-  }
-
-  // Create the point cloud container and load the control networks
-  QScopedPointer<CNetPointCloud> cloud(new CNetPointCloud()); 
-  // ControlNetList cnetlist;
+  //---------------------------------------------------------------------------
+  //  Load all the input control networks
+  //---------------------------------------------------------------------------
+  Progress progress;
+  progress.SetText("Loading");
+  progress.SetMaximumSteps(cnetfiles.size() );
+  progress.CheckStatus();
 
   // Collect some stuff from input nets for the output net
   QString netid;
   QString target;
   QString description;
   QVector<Distance> radii;
+
   BigInt allPoints(0);
+  BigInt validPoints(0);
+  QHash<QString, QList<ControlMeasure *> > cube_measures;
+  QList<ControlPoint *> all_points;
+
   BOOST_FOREACH ( QString cfile, cnetfiles ) {
+#if defined(DEBUG)
     std::cout << "\nLoading " << cfile << "...\n";
-    Progress c_progress;
-    QScopedPointer<ControlNet> cnet( new ControlNet(cfile, &c_progress) );
+    Progress cnet_progress;
+    QScopedPointer<ControlNet> cnet( new ControlNet(cfile, &cnet_progress) );
+#else
+    QScopedPointer<ControlNet> cnet( new ControlNet(cfile) );
+#endif
     if ( netid.isEmpty() ) { 
       netid = cnet->GetNetworkId(); 
     }
@@ -141,176 +140,284 @@ void IsisMain() {
       radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii()); 
     }
 
-    // Get all control points by taking ownership from the control net
-    int npoints(0);
-    QList<ControlPoint *> points = cnet->take();
-    BOOST_FOREACH ( ControlPoint *point, points) {
-      ControlPointCloudPt cpt(point, ctype, ControlPointCloudPt::Exclusive, serialno);
-      if ( cpt.isValid() ) { 
-        cloud->addPoint(cpt); 
-        npoints++;
+    // Now get list of all cube serials and add all to list
+    QList<QString> serials = cnet->GetCubeSerials();
+    BOOST_FOREACH ( QString sn, serials) {
+      QList<ControlMeasure *> measures = cnet->GetMeasuresInCube(sn);
+      BOOST_ASSERT( measures.size() > 0 );
+
+      // Eliminate ignored measures (and its assocaited point)
+      QList<ControlMeasure *> goods;
+      BOOST_FOREACH (ControlMeasure *m, measures ) {
+        if ( isValid(m) ) {
+          ControlPoint *point = m->Parent();
+          if ( isWorthy(point) ) {
+            goods.append(m);
+          }
+        }
+      }
+
+      // Now insert valid measures associated with serial (cube) if we have any
+      if ( goods.size() > 0 ) {
+        cube_measures[sn].append(goods);
+        allPoints += goods.size();  // Measures count
       }
     }
-    std::cout << "Added " << npoints << " of " << points.size() << "\n";
-    allPoints += points.size();
 
-    // Instead of having to save the ControlNet instances, we take ownership
-    // of all the points from ControlNet and turn it over to the cloud...
-    // 
-    //  cnetlist.append( QSharedPointer<ControlNet> ( cnet.take() ) );
+    // Take ownership of all points and let the cnet file close
+    validPoints += cnet->GetNumValidPoints();
+    all_points.append( cnet->take() );
+    progress.CheckStatus();
   }
-  std::cout << "\nTotal " << cloud->size() << " of " << allPoints << "\n";
 
-  // Set up conditions for search 
-  double image_tolerance  = ui.GetDouble("IMAGETOL");
-  double ground_tolerance = ui.GetDouble("GROUNDTOL");
-  double search_distance  = ui.GetDouble("DISTANCE");
-  double search_radius_sq = search_distance * search_distance;
+  // Report status of network
+  int cube_measures_size = cube_measures.size();
+  std::cout << "\nTotal Points:   " << all_points.size() << "\n";
+  std::cout << "Valid Points:   " << validPoints << "\n";
+  std::cout << "Total Measures: " << allPoints << "\n";
+  std::cout << "Total Cubes:    " << cube_measures_size << "\n\n";
 
-  std::cout << "\nCreating cloud kd-tree..\n";
-  int kd_nodes = ui.GetInteger("KDNODES");
-  CNetPointCloudTree cloud_t( cloud.take(), kd_nodes );
+  // Now write out the list of SNs if requested
+  if ( ui.WasEntered("TOSN") ) {
 
-  // Get the cloud back to use in subsequent processing
-  const CNetPointCloud &v_cloud = cloud_t.cloud();
-  Progress progress;
-  progress.SetText("merging");
-  progress.SetMaximumSteps( v_cloud.size() );
+    FileName filename( ui.GetFileName("TOSN") );
+    QFile logfile(filename.expanded());
+    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Truncate | 
+                       QIODevice::Text | QIODevice::Unbuffered) ) {
+      QString mess = "Unable to open/create serial number file " + filename.name();
+      throw IException(IException::User, mess, _FILEINFO_);
+    }
+
+    QTextStream lout(&logfile);
+    QHashIterator<QString, QList<ControlMeasure *> > sns(cube_measures);
+    while ( sns.hasNext()  ) {
+      sns.next();
+      lout << sns.key() << "\n";
+    }
+    
+    logfile.close();
+  }
+
+
+  //---------------------------------------------------------------------------
+  // Construct the kd-trees that assocate all the measures with points for
+  // each cube.
+  //---------------------------------------------------------------------------
+  progress.SetText("making trees");
+  progress.SetMaximumSteps( cube_measures.size() );
   progress.CheckStatus();
 
+  // Create the kd-tree lookup for each measure in each cube
+  QHash<QString, CubeMeasureTree> measure_clouds;
+  QHashIterator<QString, QList<ControlMeasure *> > sn_m(cube_measures);
+  int kd_nodes = ui.GetInteger("KDNODES");
+  while ( sn_m.hasNext()  ) {
+    sn_m.next();
+
+    // Generate a kd-tree for all measures in each cube for distance comparisons
+    QScopedPointer<CNetPointCloud> cloud(new CNetPointCloud(sn_m.value(), sn_m.key()));
+    CubeMeasureTree cloud_t(new CNetPointCloudTree(cloud.take(), kd_nodes ) );
+    measure_clouds.insert(sn_m.key(), cloud_t);
+
+    progress.CheckStatus();
+  }
+
+  // Retain for future reference. We intend to release the trees when we are
+  // done with them as we may need the memory.
+  // int measure_clouds_size = measure_clouds.size();
+
+  //---------------------------------------------------------------------------
+  //  Now perform the merge. Iterate through all points evaluating each
+  //  measure  to see if same measure exists in any other point within
+  //  the IMAGETOL limit.
+  //---------------------------------------------------------------------------
+  progress.SetText("merging");
+  progress.SetMaximumSteps( all_points.size() );
+  progress.CheckStatus();
+
+  //  Measure distance tolerance
+  double image_tolerance  = ui.GetDouble("IMAGETOL");
+  double search_radius_sq = image_tolerance * image_tolerance;
 
   //  Run through all valid points. Note they may be invalided as processing
-  //  is done through mergers, so validity must be checked!!!
+  //  is done through mergers, so validity must be checked at each point.
   BigInt nfound(0);
   BigInt nMerged(0);
-  for (int n = 0 ; n < v_cloud.size() ; n++) {
-    const ControlPointCloudPt &point = v_cloud.point(n);
-    if ( point.isValid() ) {
-      ResultType results = cloud_t.radius_query(point, search_radius_sq); 
-      nfound += results.size();
-      ControlPointMerger merger(image_tolerance, ground_tolerance);
-      results.forEachPair(merger);
-      nMerged += merger.merge();
+  BOOST_FOREACH ( ControlPoint *point, all_points ) {
+    // Don't consider ignored or edit locked points
+    if ( isWorthy( point ) ) {
+
+      // Get all valid measures only in the point
+      QList<ControlMeasure *> v_measures = point->getMeasures( true );
+
+      int p_merged(0);
+      BOOST_FOREACH ( ControlMeasure *v_m, v_measures ) {
+        PointType m_p(v_m);     // This associates the measure to its point
+        if ( m_p.isValid() ) {  // Valid point? If not, its likely merged already
+          CubeMeasureTree m_cloud = measure_clouds[v_m->GetCubeSerialNumber()];
+          BOOST_ASSERT( m_cloud != 0 );
+          QList<PointType> m_points = m_cloud->radius_query(m_p, search_radius_sq);
+          ControlPointMerger merger(image_tolerance);
+          p_merged += merger.apply(point, m_points);
+          nfound   += merger.size();
+        }
+      }
+      nMerged += p_merged;
     }
     progress.CheckStatus();
   }
 
-  // Now check all remaining points by ignoring all points with less than
-  // MINMEASURES.
-  BigInt nMinMeasures(0);
-  bool setaprioribest = ui.GetBoolean("SETAPRIORIBEST");
-  QString rejectedmeasures = ui.GetString("REJECTEDMEASURES").toLower();
-  bool ignoreRejected = ( "ignore" == rejectedmeasures);
-  bool removeRejected = ( "remove" == rejectedmeasures);
+  // All done with the heavy lifting, so free resources as memory may be
+  // needed later.
+  cube_measures.clear();
+  measure_clouds.clear();
 
+  //---------------------------------------------------------------------------
+  //  Screen the control points for reduction of content in the output network
+  //  file but don't create it in this loop - its very expensive.
+  //---------------------------------------------------------------------------
+  progress.SetText("screening/cleaning/building network");
+  progress.SetMaximumSteps( all_points.size() );
+  progress.CheckStatus();
+
+  // User options
+  bool cleannet = ui.GetBoolean("CLEANNET");
+  bool cleanmeasures = ui.GetBoolean("CLEANMEASURES");
   int minmeasures = ui.GetInteger("MINMEASURES");
-  bool savemins = ui.GetBoolean("SAVEMINS");
 
-  // Now create the output control network
+  // Set up control net here so we can complete all processing in this step 
+  QScopedPointer<ControlNet> cnet;
+  if ( ui.WasEntered("ONET") ) {
+    // std::cout << "\nWriting network...\n";
+    // Set up the output control network
+    cnet.reset( new ControlNet() );
+    if ( ui.WasEntered("NETWORKID") ) {
+      netid = ui.GetString("NETWORKID");
+    }
+
+    cnet->SetNetworkId(netid); 
+    cnet->SetUserName(Application::UserName());
+
+    if ( ui.WasEntered("DESCRIPTION") ) {  
+      description = ui.GetString("DESCRIPTION"); 
+    }
+
+    cnet->SetDescription(description); 
+    cnet->SetCreatedDate(Application::DateTime());
+    cnet->SetTarget(target, radii);
+#if defined(HAS_WRITE_ONLY_OPTION)
+    cnet->setWriteOnly();
+#endif
+  }
+
+  // Check to see if we want to reset the apriori surface to the best
+  // available measure in the point
+  bool setaprioribest = ui.GetBoolean("SETAPRIORIBEST");
+
   BigInt oPoints(0);
-  BigInt nRejected(0);
+  BigInt nRemoved(0);
+  BigInt nMinMeasures(0);
+  BigInt vPoints(0);
+  QHash<QString, int> pointIds; // To protect against redundant point ids
+  for ( int i = 0 ; i < all_points.size() ; i++) {
 
-  ControlNet cnet;
-  if ( ui.WasEntered("NETWORKID") ) {
-    netid = ui.GetString("NETWORKID");
-  }
+    ControlPoint *m_p = all_points[i];
 
-  cnet.SetNetworkId(netid); 
-  cnet.SetUserName(Application::UserName());
+    // Check for redunant point id here
+    QString pid = m_p->GetId();
+    if (  pointIds.contains( pid ) ) {
+      int pcount = pointIds.value(pid);
+      QString id = pid +  "_" + QString::number(pcount);
+      m_p->SetId(id);
+      pointIds[pid] = ++pcount;
+    }
+    else {
+      pointIds.insert(pid, 1);
+    }
 
-  if ( ui.WasEntered("DESCRIPTION") ) {  
-    description = ui.GetString("DESCRIPTION"); 
-  }
-
-  cnet.SetDescription(description); 
-  cnet.SetCreatedDate(Application::DateTime());
-  cnet.SetTarget(target, radii);
-
-  // Gotta transfer all points/measures
-  for ( int i = 0 ; i < v_cloud.size() ; i++) {
-    ControlPointCloudPt point = v_cloud.point(i);
-
-    if ( point.isValid() ) {
+    if ( isValid(m_p) ) {
+      vPoints++;
       
-      // Set up a reference for convenience
-      ControlPoint &cp = point.getPoint();
-
       // Processes measures if requested
-      if ( true == removeRejected ) {
+      if ( true == cleanmeasures ) {
 
-        QList<ControlMeasure *> measures = cp.getMeasures( false );
-        ControlMeasure *refm = cp.GetRefMeasure();
-        bool removedRef = ( 0 == refm ) ? true : false;
-
+        QList<ControlMeasure *> measures = m_p->getMeasures( false );
         BOOST_FOREACH ( ControlMeasure *m, measures) {
-          if ( m->IsRejected() ) {  
-            if ( (0 != refm) && (*m == *refm)) { 
-              removedRef = true; 
-              refm = 0;
-            }
-            cp.Delete(m); 
-            nRejected++;
-          }
-        }
-
-        // If we removed the reference, simply set to the first measure
-        if ( removedRef && (cp.GetNumValidMeasures() > 0 ) ) {
-          cp.SetRefMeasure(0);
-        }
-      }
-      // Set rejected points to ignore
-      else if ( true == ignoreRejected ) {
-        QList<ControlMeasure *> measures = cp.getMeasures( false );
-        BOOST_FOREACH ( ControlMeasure *m, measures) {
-          if ( m->IsRejected() ) {  
-            m->SetIgnored( true ); 
-            nRejected++;
+          if ( !isValid(m) ) {  
+            m_p->Delete(m); 
+            nRemoved++;
           }
         }
       }
 
-      // Check to see if we want to reset the apriori surface to the best
-      // available measure.
-      if ( true == setaprioribest) {
-        cp.SetAdjustedSurfacePoint(cp.GetBestSurfacePoint());
-      }
-
-      //  Now save point if valid
-      if (point.size() < minmeasures) {
-        point.disable();
+      //  Check for valid measure constraints
+      if ( (m_p->GetNumValidMeasures() < minmeasures) && (!m_p->IsEditLocked()) ) {
+        m_p->SetIgnored( true );
         nMinMeasures++;
-        // Check if we are to save points that are less than the valid minimum
-        // measures.
-        if ( true == savemins ) {
-          cnet.AddPoint( point.take() ); 
-          oPoints++;
-        }
-      }
-      else {
-        cnet.AddPoint( point.take() ); 
-        oPoints++;
       }
     }
+
+    // Save invalid points?  We are not going to create the network if only if
+    // requested by the user with the good points as its a very expensive
+    // operation.
+    if ( true == cleannet ) {
+      if ( isValid(m_p) ) {  // Handle valid points
+        if ( !cnet.isNull() ) {
+          if ( (true == setaprioribest) && !m_p->IsEditLocked() ) {
+            m_p->SetAdjustedSurfacePoint(m_p->GetBestSurfacePoint());
+          }
+          cnet->AddPoint(m_p);
+          oPoints++;
+        }
+        else {  // If not creating control network, ensure points are deleted
+          delete (m_p);
+        }
+      }
+      else {  // Not a valid point, delete it
+        delete (m_p);
+      }
+    }
+    else {  // Handle points when not cleaning
+      if ( !cnet.isNull() ) {
+        if ( (true == setaprioribest) && !m_p->IsEditLocked() ) {
+          m_p->SetAdjustedSurfacePoint(m_p->GetBestSurfacePoint());
+        }
+
+        cnet->AddPoint(m_p); 
+        oPoints++;
+      }
+      else { // If not creating control network, ensure points are deleted
+        delete (m_p);
+      }
+    }
+
+    progress.CheckStatus();
   }
 
-
-  // Write the resulting control network to the specfied ONET file
+  //---------------------------------------------------------------------------
+  // Write the resulting control network to the specfied ONET file. We will now
+  //  create the network formally. If not requested, don't forget to free all
+  //  remaining points (done by ControlNet otherwise).
+  //---------------------------------------------------------------------------
   if ( ui.WasEntered("ONET") ) {
-    cnet.Write( ui.GetAsString("ONET") );
+    // Make it so!
+    cnet->Write( ui.GetAsString("ONET") );
   }
 
   // Write out a report
-  int pMerged = v_cloud.size() - oPoints;
+  int pMerged = validPoints - vPoints;
   PvlGroup summary("Summary");
-  summary += PvlKeyword("TotalInputPoints",  toString(v_cloud.size()));
+  summary += PvlKeyword("TotalCubes",        toString(cube_measures_size));
+  summary += PvlKeyword("TotalInputPoints",  toString(all_points.size()));
   summary += PvlKeyword("TotalOutputPoints", toString(oPoints));
-  summary += PvlKeyword("PointsEliminated",  toString(pMerged));
+  summary += PvlKeyword("PointsMerged",      toString(pMerged));
   summary += PvlKeyword("PointsEvaluated",   toString(nfound));
-  summary += PvlKeyword("RejectedMeasures",  toString(nRejected));
+  summary += PvlKeyword("TotalMeasures",     toString(allPoints));
   summary += PvlKeyword("MeasuresMerged",    toString(nMerged));
+  summary += PvlKeyword("MeasuresDeleted",   toString(nRemoved));
   summary += PvlKeyword("MinimumMeasures",   toString(nMinMeasures));
   Application::Log(summary);
 
-  p.EndProcess();
+  pbl.EndProcess();
 }
 

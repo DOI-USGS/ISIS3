@@ -22,13 +22,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QtGlobal>
 #include <QList>
 #include <QString>
+#include <QScopedPointer>
 #include <QSharedPointer>
 
 #include <opencv2/opencv.hpp>
+#include <boost/assert.hpp>
 
-#include "ControlPointCloudPt.h"
+#include "ControlMeasureLogData.h"
+#include "MeasurePoint.h"
 #include "Statistics.h"
 
 namespace Isis {
@@ -45,137 +49,32 @@ namespace Isis {
  * @author  2015-10-11 Kris Becker
  *  
  * @internal 
- *   @history 2015-10-11 Kris Becker - Original Version 
+ *   @history 2015-10-11 Kris Becker - Original Version
+ *   @history 2016-12-06 Jesse Mapel - Updated documentation.  References #4558.
+ *   @history 2016-12-06 Jesse Mapel - Moved implementation to cpp file.  References #4558.
  */
 
 class ControlPointMerger {
   public:
-    ControlPointMerger() : m_image_tolerance(DBL_MAX),
-                           m_ground_tolerance(DBL_MAX),
-                           m_ground_distance(DBL_MAX),
-                           m_source(), m_candidates() { }
-    ControlPointMerger(const double image_tolerance,
-                       const double ground_tolerance = -1.0) :
-                       m_image_tolerance(image_tolerance),
-                       m_ground_tolerance(ground_tolerance),
-                       m_ground_distance(DBL_MAX), 
-                       m_source(), m_candidates() { }
 
-    virtual ~ControlPointMerger() { }
+    ControlPointMerger();
+    ControlPointMerger(const double image_tolerance);
+    virtual ~ControlPointMerger();
 
-    int size() const {
-      return ( m_candidates.size() );
-    }
-
-    Statistics getImageStatistics(int index) const {
-      Q_ASSERT( index >= 0 );
-      Q_ASSERT ( index < size() );
-      return ( m_candidates[index].second );
-    }
-
-    double getGroundDistance() const {
-      return ( m_ground_distance );
-    }
-
-    void clear() {
-      m_candidates.clear();
-      return;
-    }
-
-    void apply(ControlPointCloudPt &source, ControlPointCloudPt &candidate,
-               const double distance)  {
-
-      if ( !source.isValid() ) { return; }
-      if ( !candidate.isValid() ) { return; }
-      m_source = source;
-
-      ControlPoint &point = source.getPoint();
-      m_ground_distance = ground_distance( point, candidate.getPoint() );
-
-      QList<ControlMeasure *> measures = point.getMeasures( true );
-      Statistics stats;
-      BOOST_FOREACH ( ControlMeasure *m, measures ) {
-        if ( isValid(*m) ) {
-          ControlMeasure *c = candidate.getMeasure(m->GetCubeSerialNumber()); 
-          if ( (0 != c) ) {  
-            if ( isValid(*c) ) { stats.AddData(image_distance(*m, *c)); }
-          }
-        }
-      }
-
-      // Test for conditions of a merger. If there are common image measures,
-      // use the statistics. If no common measures, use the ground distance.
-      if ( stats.ValidPixels() > 0 ) {
-        if (stats.Average() <= m_image_tolerance) {
-          m_candidates.append( qMakePair<ControlPointCloudPt, Statistics> (candidate, stats)); 
-        }
-      }
-      else if ( m_ground_distance <= m_ground_tolerance ) {
-         m_candidates.append( qMakePair<ControlPointCloudPt, Statistics> (candidate, stats)); 
-      }
-      return;
-    }
-
-    int merge() {
-      int nMerged(0);
-      ControlPoint &source = m_source.getPoint();
-      for ( int i = 0 ; i < m_candidates.size() ; i++) {
-        ControlPointCloudPt &cpt = m_candidates[i].first;
-        ControlPoint &candidate = cpt.getPoint();
-        QList<ControlMeasure *> ms = candidate.getMeasures(true);
-        for ( int m = 0 ; m < ms.size() ; m++) {
-          if ( !source.HasSerialNumber(ms[m]->GetCubeSerialNumber()) ) {
-            source.Add( new ControlMeasure(*ms[m]) );
-            nMerged++;
-          }
-        }
-        // Essentially disables this point
-        cpt.disable();
-      }
-
-      return ( nMerged );
-    }
+    int size() const;
+    void clear();
+    int apply(ControlPoint *point, QList<MeasurePoint> &candidates);
+    int merge(ControlPoint *source, ControlPoint *candidate, const Statistics &stats);
 
   private:
-    
-    double                                         m_image_tolerance;
-    double                                         m_ground_tolerance;
-    double                                         m_ground_distance;
-    ControlPointCloudPt                            m_source;
-    QList<QPair<ControlPointCloudPt, Statistics> > m_candidates;
+    double               m_image_tolerance; /**!< The image distance tolerance for determining
+                                                  if control points should be merged.*/
+    QList<MeasurePoint>  m_merged;          /**!< The number of control points that have been
+                                                  merged by the ControlPointMerger.*/
 
-    inline bool isValid(const ControlMeasure &m) const {
-       return ( !( m.IsIgnored() || m.IsRejected() ) );
-    }
-
+    inline bool isValid(const ControlMeasure &m) const;
     inline double image_distance(const ControlMeasure &source, 
-                                 const ControlMeasure &candidate) const {
-      double dx = source.GetSample() - candidate.GetSample();
-      double dy = source.GetLine() - candidate.GetLine();
-      return ( std::sqrt( dx*dx + dy*dy ) );
-    }
-
-    inline double ground_distance(const ControlPoint &source, 
-                                  const ControlPoint &candidate) const {
-      double spts[3], cpts[3];
-      getGroundVector(source, spts);
-      getGroundVector(candidate, cpts);
-
-      double dx = spts[0] - cpts[0];
-      double dy = spts[1] - cpts[1];
-      double dz = spts[2] - cpts[2];
-      return ( std::sqrt( dx*dx + dy*dy + dz*dz ) );
-    }
-
-    /** Compute ground point in meters */
-    inline void getGroundVector(const ControlPoint &point, double v[3]) const {
-      // Always use the best surface point available
-       point.GetBestSurfacePoint().ToNaifArray(v);
-       v[0] *= 1000.0;
-       v[1] *= 1000.0;
-       v[2] *= 1000.0;
-       return;
-    }
+                                 const ControlMeasure &candidate) const;
 };
 
 }  // namespace Isis

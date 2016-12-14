@@ -9,24 +9,18 @@
   <description>
     <p>
       This program will create a control network by combining control points
-      from one or more control networks into single points that satisfy either
-      ground or image distance criteria. It employs a more robust technique than
-      <em>cnetmerge</em>. This technique evaluates
-      each control point in the combined network by applying a search of radial 
-      spatial distance (in meters) to collect all points that may be of the same feature.
-      This search will find a list of <em>candidate</em> control points, i.e. points
-      that the algorithm has found might be matches. Distance statistics of common
-      control measures from the image are computed using the source point and each
-      candidate control point. The MODE parameter for this program specifies the
-      maximum distance, in IMAGE (pixel units) or GROUND (meter units), allowed 
-      to determine whether the two control points are measurements of the same 
-      image feature. If the average of all common measures is less than or equal to
-      the distance (in the given IMAGE or GROUND units), then all control 
-      measures from the candidate control point are copied to the source control 
-      point (increasing image match depth) and the candidate control point is 
-      disabled so that it will never be considered for another merger.  The now 
-      augmented control point is added back to the search pool for further merger 
-      considerations.
+      from one or more control networks into single points that satisfy image 
+      distance criteria. It employs a more robust/direct technique than
+      <em>cnetmerge</em>. This technique evaluates each control point in all 
+      input networks by finding all candidate merger control points who have a
+      measure within IMAGETOL. Then, for each candidate point, the average
+      distance of the measures in the candidate to a measure in the source
+      point is computed. If the average distance to any measure in the source
+      point is less than IMAGETOL, then the candidate point and source point
+      are merged. The candidate control point is disabled so that it will
+      never be considered for another merger and the now augmented control
+      point is added back to the search pool for further merger considerations,
+      which can occur when other common measures are considered.
     </p>
     <p>
        When all control points have been searched and all mergers have taken
@@ -64,6 +58,12 @@
     <change name="Jeannie Backer" date="2016-04-22">
       Modified to set the new control net's target and radii by using the input control net's 
       values. References #3892
+    </change>
+    <change name="Kris Becker" date="2016-12-05">
+      Modified merging algorithm and parameters. Fixes #4558.
+    </change>
+    <change name="Jesse Mapel" date="2016-12-06">
+      Created new tests and updated documentation. References #4558.
     </change>
   </history>
 
@@ -106,18 +106,6 @@
         </description>
         <filter>*.lis *.txt</filter>
       </parameter>
-
-
-      <parameter name="REFERENCE">
-          <type>cube</type>
-        <fileMode>input</fileMode>
-        <internalDefault>None</internalDefault>
-        <brief>Cube file to use as a reference image for IMAGE mode</brief>
-        <description>
-          The reference cube for matching by image. 
-        </description>
-        <filter>*.cub</filter>
-      </parameter>
     </group>
 
     <group name="Output">
@@ -133,6 +121,21 @@
           networks.
         </description>
         <filter>*.net *.cnet *.ctl</filter>
+      </parameter>
+
+      <parameter name="TOSN">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Write a list of all serial numbers contained in the network
+        </brief>
+        <description>
+           Provided with a filename in this option, all the cube serial numbers 
+           that are contained in the network are written to this file as soon as 
+           it is determined in the processing.
+        </description>
+        <filter>*.lis</filter>
       </parameter>
 
       <parameter name="NETWORKID">
@@ -159,65 +162,6 @@
     </group>
 
     <group name="Parameters">
-        <parameter name="MODE">
-            <type>string</type>
-           <default><item>GROUND</item></default>
-          <brief>Type of control point merger to apply</brief>
-          <description>
-            The MODE parameter indicates whether to use ground or image coordinates to determine
-            merge points. 
-          </description>
-            <list>
-               <option value="GROUND">
-                    <brief>
-                        Use ground coordinates to determine merge points 
-                    </brief>
-                    <description>
-                      Measure point distance in ground units (i.e. meters or kilometers).
-                    </description>
-                    <!--
-                    <inclusions>
-                      <item>GROUNDTOL</item>
-                    </inclusions>
-                    !-->
-                </option>
-               <option value="IMAGE">
-                    <brief>
-                        Use image coordinates from a specfied named reference 
-                        cube 
-                    </brief>
-                    <description>
-                      Measure point distance in pixel units.
-                    </description>
-                    <!--
-                    <inclusions>
-                      <item>REFERENCE</item>
-                      <item>IMAGETOL</item>
-                    </inclusions>
-                    !-->
-                </option>
-            </list>
-        </parameter>
-
-        <parameter name="DISTANCE">
-           <type>double</type>
-           <brief>
-               Specifies the radial search distance for merge candidates 
-           </brief> 
-           <description>
-               The radial search range from the source control point to find all 
-               candidate control points to consider for merging. This distance is 
-               specified in meters. Users must carefully consider this value as 
-               it must be large enough to include the maximum uncertainity in the 
-               SPICE ephemeris data for all images. Note if the adjusted 
-               latitude/longitude coordiate exists in the point, it will be used 
-               to determine the ground coordinate, otherwise apriori 
-               latitude/longitudes are used to compute distances from each 
-               control point. It also should not be so small that it will not 
-               find all the points of the same feature.
-           </description>
-        </parameter>
-
         <parameter name="IMAGETOL">
             <type>double</type>
             <default><item>1.0</item></default>
@@ -227,23 +171,12 @@
            </description>
         </parameter>
 
-        <parameter name="GROUNDTOL">
-            <type>double</type>
-            <default><item>0.0</item></default>
-          <brief>
-             Specifies distance on ground to merge point if no common image measures .
-          </brief> 
-          <description>
-             The acceptable distance, in ground measurements, for merging points.
-          </description>
-        </parameter>
-        
         <parameter name="KDNODES"> 
            <type>integer</type>
            <default><item>10</item></default>
            <brief>Specify the leaf size of the kd-tree</brief> 
            <description>
-              Number of leafs in the kd-tree structure.
+              Number of leaves in the kd-tree structure.
            </description>
         </parameter>
 
@@ -260,62 +193,67 @@
            <default><item>false</item></default>
        </parameter>
 
-       <parameter name="REJECTEDMEASURES">
-           <type>string</type>
-          <default><item>NOACTION</item></default>
-         <brief>Tweek rejected measures</brief>
-         <description>
-           Determeines how to deal with rejected measures.
-         </description>
-           <list>
-              <option value="NOACTION">
-                   <brief>
-                       Do not perform any action on non-normal measures
-                   </brief>
-                   <description>
-                     If selected, the program will leave rejected measures with their current settings.
-                   </description>
-               </option>
-              <option value="IGNORE">
-                   <brief>  Set (jigsaw) rejected measures to IGNORE</brief>
-                   <description>
-                     If selected, the program will set rejected measures to Ignore.
-                   </description>
-               </option>
-              <option value="REMOVE">
-                   <brief>  Remove (jigsaw) rejected measures from point</brief>
-                   <description>
-                     If selected, the program will remove rejected measures from the control point.
-                   </description>
-               </option>
-           </list>
+       <parameter name="CLEANNET">
+           <type>boolean</type>
+           <default><item>true</item></default>
+           <brief>Remove all invalid or ignored control points/measures</brief>
+           <description>
+             <p>
+                 When true, all invalid or ignored control points and measures 
+                 are removed from the output control network as one of 
+                 the main objectives of this application is to remove 
+                 redundancies and mimimize the size of networks. However, for 
+                 evaluation purposes, you can set this to false, which will 
+                 preserve all control points. 
+             </p>
+             <p>
+                 When specifying the minimum number of measures/control point 
+                 using the MINMEASURES parameter, any control point that does 
+                 not meet this criteria will also be removed from the netwrk 
+                 when CLEANNET=true, otherwise these points will be set to 
+                 ignored.
+             </p>
+           </description>
+       </parameter>
+
+       <parameter name="CLEANMEASURES">
+           <type>boolean</type>
+           <default><item>true</item></default>
+           <brief>Remove all invalid or ignored control measures</brief>
+           <description>
+             <p>
+                 When true, all invalid or ignored control points and measures 
+                 are removed from the output control network as one of 
+                 the main objectives of this application is to remove 
+                 redundancies and mimimize the size of networks. However, for 
+                 evaluation purposes, you can set this to false, which will 
+                 preserve all control points. 
+             </p>
+             <p>
+                 When specifying the minimum number of measures/control point 
+                 using the MINMEASURES parameter, any control point that does 
+                 not meet this criteria will also be removed from the netwrk 
+                 when CLEANNET=true, otherwise these points will be set to 
+                 ignored.
+             </p>
+           </description>
        </parameter>
 
         <parameter name="MINMEASURES">
             <type>integer</type>
             <default><item>0</item></default>
-            <brief>Select minimim number of measures that are valid</brief> 
+            <brief>Select minimim number of valid measures/point</brief> 
             <description>
-                 This allows users to disable (by setting measures as ignored) 
-                 points that have less than MINMEASURES control 
-                 measures/control point. For example, if you want to flag all 
-                 points as ignored with 2 measures or less, set MINMEASURES=3. 
+                 This allows users to disable points that have less than   
+                 MINMEASURES control measures/control point. For example, if you 
+                 want to flag all points as ignored with 2 measures or less, set 
+                 MINMEASURES=3. Points that don't meet this critieria are set to 
+                 ignore and are subject to the CLEANNET action requested by the 
+                 user (i.e., all ignored points are removed from the network if 
+                 CLEANNET=true).
             </description>
         </parameter>
-
-       <parameter name="SAVEMINS">
-           <type>boolean</type>
-           <brief>
-              Save points that have less than the mininum measures
-           </brief>
-           <description>
-               When TRUE, all points found to have the minimum number of            
-               measures are set to ignore and written to the output control 
-               network. When FALSE, they are excluded(removed) from the output 
-               network.
-           </description>
-           <default><item>false</item></default>
-       </parameter>
+      
     </group>
   </groups>
 </application>

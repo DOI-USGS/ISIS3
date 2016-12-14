@@ -8,7 +8,8 @@ commands:
 	           onet=$(OUTPUT)/Equi065S355ED10.net \
 	           networkid=Equi065S355ED10 \
 	           description="Messenger data test" \
-	           imagetol=3000.0 \
+	           imagetol=1000.0 \
+	           setaprioribest=true \
 	           > /dev/null;
 
 	$(RM) $(OUTPUT)/networks.lis;
