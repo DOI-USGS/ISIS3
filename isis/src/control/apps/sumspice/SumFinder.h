@@ -42,7 +42,14 @@ namespace Isis {
 
 
 
-  // Container class for the 
+  /**
+   * Container class for the sums.
+   * 
+   * @author 2016-09-14 Kris Becker
+   * 
+   * @internal 
+   *   @history 2016-09-14 Kris Becker - Original Version
+   */
   class SumFinder {
     public:
       enum Options   { None = 0, Times = 1, Spice = 2, Pointing = 4, 
@@ -143,8 +150,6 @@ namespace Isis {
  *  
  *  This method is designed to take a QSharedPointer, QScopedPointer and
  *  QPointer objects and potentially others that have the isNull() method.
- *  
- * @author 2016-09-14 Kris Becker
  * 
  * @param target     Pointer container to check
  * @param errmess    Error message to throw when null and thow 
@@ -154,7 +159,11 @@ namespace Isis {
  * 
  * @return bool True if container content is valid, false if 
  *              error
- *  
+ * 
+ * @author 2016-09-14 Kris Becker
+ * 
+ * @internal
+ *   @history 2016-09-14 Kris Becker - Original Version
  */
   template <class T> 
      bool SumFinder::confirmValidity(const T &target, const QString &errmess,

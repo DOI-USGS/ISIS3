@@ -44,16 +44,19 @@ namespace Isis {
    *  
    * This class will parse the contents of a R. Gaskell SUMFILE used in his 
    * stereo photoclinometry (SPC) system and provide access to the elements that 
-   * are stored therein. 
+   * are stored therein.
    * 
-   * @history 2015-02-02 Kris Becker Original Version 
-   * @history 2016-02-09 Kris Becker - Updated documentation 
-   * @history 2016-06-07 Kris Becker - Renamed getIlluminationPosition() to 
-   *                        getSunPosition(). updateIlluminationPosition() did
-   *                        not have an implementation so it was removed.
-   * @history 2016-09-14 Kris Becker - Moved updateTimes() to new SumFinder 
-   *                        class as there is not enough information to do it
-   *                        correctly in SumFile.
+   * @author 2015-02-02 Kris Becker
+   * 
+   * @internal
+   *   @history 2015-02-02 Kris Becker Original Version 
+   *   @history 2016-02-09 Kris Becker - Updated documentation 
+   *   @history 2016-06-07 Kris Becker - Renamed getIlluminationPosition() to 
+   *                           getSunPosition(). updateIlluminationPosition() did
+   *                           not have an implementation so it was removed.
+   *   @history 2016-09-14 Kris Becker - Moved updateTimes() to new SumFinder 
+   *                           class as there is not enough information to do it
+   *                           correctly in SumFile.
    */
   class SumFile {
     public:
@@ -130,6 +133,9 @@ namespace Isis {
    * times of each is compared using the less than operator. 
    * 
    * @author 2015-07-28 Kris Becker
+   * 
+   * @internal
+   *   @history 2015-07-28 Kris Becker Original Version 
    */
   class SortEtAscending {
     public:
