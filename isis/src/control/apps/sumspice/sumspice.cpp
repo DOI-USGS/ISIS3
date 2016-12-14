@@ -44,7 +44,7 @@ inline QString format(const double &d, const int &precision,
 
 void IsisMain() {
 
-  typedef SumFinder::Options Options;
+  //  typedef SumFinder::Options Options;
   typedef SumFinder::TimeStamp TimeStamp;
 
   //  Program constants

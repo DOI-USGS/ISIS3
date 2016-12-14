@@ -20,7 +20,7 @@ commands:
 	update=times \
 	timediff=1.0 \
 	tolog=$(OUTPUT)/sumspiceUpdateClocksToLog.txt \
-	-log=$(OUTPUT)/sumspiceUpdateClocksToLog.pvl \
+	-log=$(OUTPUT)/sumspiceUpdateClocksLog.pvl \
 	> /dev/null;
 
 	# re-spiceinit to get appropriate kernels and sun position table
