@@ -54,7 +54,7 @@ all: incs thirdParty api apps docs
 # copy the include file from the individual object directory into the
 # system directory $(ISISROOT)/inc.
 #----------------------------------------------------------------------------
-incs: 
+incs:
 	echo $(CURTIMESTAMP) "Installing include files"
 	mkdir -p inc
 	$(MAKE) --directory=src includes
@@ -81,6 +81,7 @@ incs:
 # Finally after the API is completed the shared libraries will be
 # constructed from libisis.a
 #----------------------------------------------------------------------------
+
 api:
 	echo $(CURTIMESTAMP) "Building Isis API"
 	mkdir -p lib
@@ -88,9 +89,25 @@ api:
 	echo $(CURTIMESTAMP) "Finished building Isis API"
 	echo $(CURTIMESTAMP) ""
 	echo $(CURTIMESTAMP) "Adding API objects"
-	$(MAKE) --directory=src api
+	if [ "$(HOST_ARCH)" == "Linux" ]; then            \
+		$(MAKE) --directory=src api;	                  \
+	elif [ "$(HOST_ARCH)" == "Darwin" ]; then         \
+		$(MAKE) osx_static;															\
+	fi;
 	echo $(CURTIMESTAMP) "Finished adding API objects"
 	echo $(CURTIMESTAMP) " "
+
+# Make the static library on Macos, faster then recursivly call make
+osx_static:
+	$(eval UNIT_TESTS=$(wildcard src/*/objs/*/unitTest.o))
+	$(eval PLUGIN_DIRS=$(dir $(wildcard src/*/objs/*/*.plugin)))
+	$(eval PLUGIN_FILES=$(foreach dir,$(PLUGIN_DIRS),$(wildcard $(dir)*.o)))
+	$(eval API_OBJS=$(filter-out $(PLUGIN_FILES),$(filter-out $(UNIT_TESTS),$(wildcard src/*/*/*/*.o))))
+	$(AR) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(API_OBJS);
+	echo $(CURTIMESTAMP) "Installing Plugins"
+	for i in $(PLUGIN_DIRS); do 			  					\
+		$(MAKE) --directory=$$i plugin install; 	  \
+	done
 
 #	echo "Building Isis API with debugging"
 #	cd src; $(MAKE) objects MODE=DEBUG
@@ -139,7 +156,7 @@ docs:
 
 
 #----------------------------------------------------------------------------
-# Target = coverage 
+# Target = coverage
 # Dependencies = none
 #
 # This target builds a report on how much of Isis is tested in the automated
@@ -211,7 +228,7 @@ coverage:
 # binary executables from the source tree.  It also, clears the running
 # areas under $ISISROOT (inc, doc, bin, bin/xml, and lib)
 #
-# Target = quickclean 
+# Target = quickclean
 # Dependencies = none
 #
 # This walks the src tree and removes ".o" files and binary files
@@ -332,4 +349,3 @@ FORCE:
 # Include the make file debugging targets
 #----------------------------------------------------------------------------
 include $(ISISROOT)/make/isismake.print
-

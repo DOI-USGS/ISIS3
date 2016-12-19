@@ -335,13 +335,8 @@ unitTest: $(OBJS) unitTest.o
 	        -o $@ unitTest.o -l:$(LIBRARY).$(SHAREDLIBEXT) $(ALLLIBS);          \
 	  fi;                                                                       \
 	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                   \
-		if [ "$(OBJS)" != "" ]; then 																	  					\
 			$(CXX) $(OBJS) $(ALLLIBDIRS) $(ISISLDFLAGS)                             \
 						 -o $@ unitTest.o $(ALLLIBS)	;     													    \
-		else 																																		  \
-			$(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS)                                     \
-						-o $@ unitTest.o $(ALLLIBS)	;     														    \
-		fi;
 	fi;
 
 plugin: $(OBJS)

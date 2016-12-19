@@ -30,7 +30,7 @@ cleanuplockfile:
 	fi;
 
 # When we make appname-print it should print the app's log. This acquires the
-# appropriate lock before printing. There is a 30s timeout on the lock before 
+# appropriate lock before printing. There is a 30s timeout on the lock before
 # breaking it.
 %-print:
 	APPNAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                               \
@@ -94,9 +94,9 @@ cleanuplockfile:
 api:
 	if [ "$(OBJECTS)" != "" ]; \
 	then \
-	for i in $(OBJECTS); do \
-	  echo $(CURTIMESTAMP) "    Adding API object [$$i]"; \
-	  cd $$i; $(MAKE) install; cd ..; \
+	for i in $(OBJECTS); do 																	\
+	  echo $(CURTIMESTAMP) "    Adding API object [$$i]"; 	  \
+	  cd $$i; $(MAKE) install; cd ..; 												\
 	done \
 	fi
 

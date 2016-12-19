@@ -1,7 +1,7 @@
 SHELL=bash
 
 #---------------------------------------------------------------------------
-# This include is designed to be run before any others in the ISIS make 
+# This include is designed to be run before any others in the ISIS make
 # system.
 #---------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ HOST_PROC := $(shell uname -p)
 
 
 #---------------------------------------------------------------------------
-# Set up some basic shell commands OS specific includes can override 
+# Set up some basic shell commands OS specific includes can override
 # these later. These are often necessary to remove any user aliases
 #---------------------------------------------------------------------------
 
@@ -47,6 +47,7 @@ MOC            := moc
 MV             := mv
 PRINTF         := /usr/bin/printf
 PROTOC         := protoc
+PYTHON         := python3
 RANLIB         := /usr/bin/true
 RM             := /bin/rm -f
 RMDIR          := rmdir -p
@@ -89,7 +90,6 @@ endif
 #---------------------------------------------------------------------------
 # Set up the Isis include and library directories
 #---------------------------------------------------------------------------
-ISISINCDIR = -I$(ISISROOT)/inc 
-ISISLIBDIR = -L$(ISISROOT)/lib 
+ISISINCDIR = -I$(ISISROOT)/inc
+ISISLIBDIR = -L$(ISISROOT)/lib
 ISISLIB    = -lisis$(ISISLIBVERSION)
-
