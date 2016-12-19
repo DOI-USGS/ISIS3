@@ -261,6 +261,12 @@
     <change name="Kimberly Oyama" date="2014-04-27">
       Added assets directory for web example. Updated Documentation. Fixes #1849.
     </change>
+    <change name="Tyler Wilson" date="2016-12-19">
+      Changed the URL for the spice server to https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi
+      and the default port to 443 (it was originally 80).  This is due to the recent https migration implementation
+      from within the Department of the Interior, which was causing people on the outside of the DOI network
+      to get an unrecognized server response error when attempting to download spice data.  Fixes #4552.
+    </change>
   </history>
 
   <oldName>
@@ -807,16 +813,15 @@
         <description>
           This is where a request for SPICE data is sent. The default is the USGS SPICE server.
         </description>
-        <default><item>http://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi</item></default>
+        <default><item>https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi</item></default>
       </parameter>
       <parameter name="PORT">
         <type>integer</type>
         <brief>The Spice Service Port</brief>
         <description>
-          This is the port on which a request for SPICE data is sent. The USGS server works on
-          port 80.
+          This is the port on which a request for SPICE data is sent.
         </description>
-        <default><item>80</item></default>
+        <default><item>443</item></default>
         <minimum inclusive="yes">0</minimum>
       </parameter>
     </group>
