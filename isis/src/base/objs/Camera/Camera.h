@@ -232,6 +232,9 @@ namespace Isis {
    *                           to using the band the camera is set to. References #4476.
    *   @history 2016-10-21 Jeannie Backer - Reorder method signatures and member variable
    *                           declarations to fit ISIS coding standards. References #4476.
+   *   @history 2016-12-02 Victor Silva - Made changes to GetLocalNormal to calculate local normal
+   *                           accurately for LRO by changing 4 corner surrounding points from adding
+   *                           0.5 to adding 0.5 - DBL_MIN. Fixes #4560.
    */
 
   class Camera : public Sensor {

@@ -1595,9 +1595,9 @@ namespace Isis {
       // order of points in vector is top, bottom, left, right
       QList< QPair< double, double > > surroundingPoints;
       surroundingPoints.append(qMakePair(samp, line - 0.5));
-      surroundingPoints.append(qMakePair(samp, line + 0.5));
+      surroundingPoints.append(qMakePair(samp, line + 0.5 - DBL_MIN));
       surroundingPoints.append(qMakePair(samp - 0.5, line));
-      surroundingPoints.append(qMakePair(samp + 0.5, line));
+      surroundingPoints.append(qMakePair(samp + 0.5 - DBL_MIN, line));
 
       // save input state to be restored on return
       double originalSample = samp;
