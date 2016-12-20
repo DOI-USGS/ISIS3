@@ -96,15 +96,19 @@ api:
 	fi;
 	echo $(CURTIMESTAMP) "Finished adding API objects"
 	echo $(CURTIMESTAMP) " "
+	echo $(CURTIMESTAMP) "Creating Shared Libraries ..."
+	cp make/Makefile.libs lib/Makefile
+	$(MAKE) --directory=lib shared
+	echo $(CURTIMESTAMP) "Finished creating Shared Libraries ..."
+	echo $(CURTIMESTAMP) " "
 
 # Make the static library on Macos, faster then recursivly call make
 osx_static:
 	$(eval UNIT_TESTS=$(wildcard src/*/objs/*/unitTest.o))
 	$(eval PLUGIN_DIRS=$(dir $(wildcard src/*/objs/*/*.plugin)))
 	$(eval PLUGIN_FILES=$(foreach dir,$(PLUGIN_DIRS),$(wildcard $(dir)*.o)))
-	$(eval API_OBJS=$(filter-out $(PLUGIN_FILES),$(filter-out $(UNIT_TESTS),$(wildcard src/*/*/*/*.o))))
+	$(eval API_OBJS=$(filter-out $(PLUGIN_FILES),$(filter-out $(UNIT_TESTS),$(wildcard src/*/objs/*/*.o))))
 	$(AR) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(API_OBJS);
-	echo $(CURTIMESTAMP) "Installing Plugins"
 	for i in $(PLUGIN_DIRS); do 			  					\
 		$(MAKE) --directory=$$i plugin install; 	  \
 	done
@@ -114,12 +118,6 @@ osx_static:
 #	cd src; $(MAKE) api MODE=DEBUG
 #	echo "Finished building Isis API with debugging"
 #	echo " "
-
-	echo $(CURTIMESTAMP) "Creating Shared Libraries ..."
-	cp make/Makefile.libs lib/Makefile
-	$(MAKE) --directory=lib shared
-	echo $(CURTIMESTAMP) "Finished creating Shared Libraries ..."
-	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = apps
