@@ -201,6 +201,11 @@
     <change name="Jeannie Backer" date="2013-03-16">
       Added new appTest to make sure that the dust ring file location is tested. References #775.
     </change>
+    <change name="Adam Paquette" data="2016-08-31">
+      Updated the pdf links to Cassini ISS Software Interface Specification, CISSCAL User Guide, 
+      Cassini ISS Image Calibration: Theoretical Basis, and In-flight Calibration of the Cassini Imaging Science Subsystem Cameras
+      to local assests in case the pdf sites are taken down. Fixes #2358.
+    </change>
   </history>
 
   <category>
@@ -223,7 +228,7 @@
         </title>
         <source>
           <filename>edrsis.pdf</filename>
-          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+          <path>assets/</path>
         </source>
         <author>Charles Avis and Carolyn Porco</author>
         <publisher>Cassini Electronic Library</publisher>
@@ -234,7 +239,7 @@
         </title>
         <source>
           <filename>cisscal_manual.pdf</filename>
-          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+          <path>assets/</path>
         </source>
         <publisher>Planetary Data System Rings Node</publisher>
       </document>
@@ -244,7 +249,7 @@
         </title>
         <source>
           <filename>theoretical_basis.pdf</filename>
-          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+          <path>assets/</path>
         </source>
         <author>R. West</author>
         <publisher>Planetary Data System Rings Node</publisher>
