@@ -16,11 +16,13 @@
     The following are supported instruments:
     <pre>
        CASSINI ISS
+       CLEMENTINE 1 UVVIS
        GALILEO SSI
        MESSENGER NAC
        MESSENGER WAC
+       OSIRIS-REX MapCam
+       OSIRIS-REX PolyCam
        VIKING ORBITER
-       CLEMENTINE 1 UVVIS
 <!--
        APOLLO 15 METRIC
        APOLLO 16 METRIC
@@ -61,8 +63,12 @@
       MEX-SRC, and THEMIS-VIS sensors until testing can be completed.  References #1526.
     </change>
     <change name="Raad A. Saleh" date="2013-09-09">
-      Added support for Clementine 1 UVVIS instrument and updated documentation to reflect the
+      Added support for CLEMENTINE1 UVVIS instrument and updated documentation to reflect the
       changes. Reference #1749.
+    </change>
+    <change name="Jeannie Backer" date="2016-12-24">
+      Added support for OSIRIS-REx instrument and updated documentation to reflect the
+      changes. Fixes #3898.
     </change>
 
 </history>
@@ -77,8 +83,8 @@
         </brief>
         <description>
           Level 1 input Framing Camera cube with SPICE data attached. Supported instruments are
-          CASSINI SSI, GALILEO ISS, MESSENGER NAC, MESSENGER WAC, VIKING ORBITER and CLEMENTINE 1
-          UVVIS.
+          CASSINI SSI, CLEMENTINE 1 UVVIS, GALILEO ISS, MESSENGER NAC, MESSENGER WAC, 
+          OSIRIS-REX MapCam, OSIRIS-REX PolyCam, and VIKING ORBITER.
         </description>
         <filter>
           *.cub
