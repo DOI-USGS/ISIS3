@@ -339,8 +339,10 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 #OPENCVINCDIR =  -I$(ISIS3OPT)/include
 #OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
-OPENCVLIBS   = -lopencv_calib3d -lopencv_core -lopencv_features2d \
-               -lopencv_flann -lopencv_highgui -lopencv_imgproc \
+OPENCVLIBS   = -lopencv_calib3d -lopencv_core \
+	       -lopencv_features2d -lopencv_xfeatures2d \
+               -lopencv_flann -lopencv_highgui \
+	        -lopencv_imgproc -lopencv_imgcodecs \
                -lopencv_ml -lopencv_objdetect \
                -lopencv_photo -lopencv_stitching -lopencv_superres \
                -lopencv_video -lopencv_videostab
