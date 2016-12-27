@@ -3,7 +3,7 @@
 /**                                                                       
  * @file                                                                  
  * $Revision $ 
- * $Date: 2016-03-09 10:31:51 -0700 (Wed, 09 Mar 2016) $ 
+ * $Date$ 
  *                                                                        
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for 
@@ -32,11 +32,11 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "AlgorithmParameters.h"
-#include "RobustMatcher.h"
 #include "IException.h"
+#include "FeatureInventory.h"
 #include "PvlFlatMap.h"
 #include "PvlObject.h"
+#include "RobustMatcher.h"
 
 namespace Isis {
 
@@ -105,7 +105,7 @@ namespace Isis {
  *   @history 2016-03-06 Kris Becker Completed documentation 
  *   @history 2016-10-05 Ian Humphrey & Makayla Shepherd - Changed headers to OpenCV2.
  */ 
-class FeatureAlgorithmFactory : public AlgorithmParameters {
+class FeatureAlgorithmFactory  {
   public:
     static FeatureAlgorithmFactory *getInstance();
 
@@ -113,54 +113,39 @@ class FeatureAlgorithmFactory : public AlgorithmParameters {
     void disableOpenCVErrorHandler();
 
     QStringList getListAll() const;
-    QStringList getListFeature2D() const;
-    QStringList getListDetectors() const;
-    QStringList getListExtractors() const;
-    QStringList getListMatchers() const;
 
     void setGlobalParameters(const PvlFlatMap &globals);
     void addGlobalParameters(const PvlFlatMap &globals);
     void addParameter(const QString &name, const QString &value);
-    const PvlFlatMap &getGlobalParameters() const;
+    const PvlFlatMap &globalParameters() const;
 
-    PvlObject info(const QString &name, 
-                   const QString &genericName = "") const;
-    PvlObject info(const QStringList &algorithms, 
-                   const QString &genericName = "") const;
-    PvlObject info(const RobustMatcherList &algorithms, 
-                   const QString &genericName = "") const;
+    PvlObject info(const QString &name) const;
+    PvlObject info(const QStringList &algorithms) const;
+    PvlObject info(const RobustMatcherList &algorithmList) const;
 
     RobustMatcherList create(const QString &specifications,
                              const bool &errorIfEmpty = true) const;
-    RobustMatcher *make(const QString &definition) const;
+    SharedRobustMatcher make(const QString &definition) const;
 
     unsigned int manufactured() const;
 
   private:
     static FeatureAlgorithmFactory *m_maker;
     mutable unsigned int m_nMade;
-
-    QString     m_Feature2DModuleName;
-    QString     m_DetectorModuleName;
-    QString     m_ExtractorModuleName;
-    QString     m_MatcherModuleName;
-    QStringList m_algorithmNameMap;
-    PvlFlatMap  m_parameters;
+    FeatureInventory m_algorithmInventory;
+    PvlFlatMap m_globalParameters;
 
     // The Singleton constructor/destructor are private
     FeatureAlgorithmFactory();
     ~FeatureAlgorithmFactory();
 
+    int initialize();
 
-    QStringList findWithPattern(const QStringList &flist, 
-                                const QString &pattern) const;
-    QString     mapAlgorithmName(const QString &name) const;
+    QStringList formatSpecifications(QString specification) const;
 
-    bool isFeature2D(const QString &name) const;
-    bool isDetector(const QString &name) const;
-    bool isExtractor(const QString &name) const;
-    bool isMatcher(const QString &name) const;
-    PvlFlatMap parseParameters(const QString &parameters) const;
+    MatcherAlgorithmPtr createMatcher(FeatureAlgorithmPtr extractor,
+                                      const QString &normalize = "NORM_L2", 
+                                      const QString &crossCheck = "false") const;
 
     static int handleOpenCVErrors( int status, const char* func_name, 
                                    const char* err_msg,const char* file_name, 

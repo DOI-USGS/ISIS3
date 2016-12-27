@@ -2,8 +2,8 @@
 #define MatcherSolution_h
 /**
  * @file
- * $Revision: 6563 $ 
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -60,19 +60,16 @@ class MatcherSolution : public QLogger {
 
     MatcherSolution() { }
     MatcherSolution(const SharedRobustMatcher &matcher, 
-                    const MatchPair &pair, 
-                    const PvlFlatMap &parameters = PvlFlatMap(),
+                    const MatchPair &pair,
                     const QLogger &logger = QLogger()) : QLogger(logger),
-                    m_matcher(matcher), m_pairs(), m_parameters(parameters) { 
+                    m_matcher(matcher), m_pairs() { 
       m_pairs.push_back(pair);
     } 
 
     MatcherSolution(const SharedRobustMatcher &matcher,
                     const MatchPairQList &pairs, 
-                    const PvlFlatMap &parameters = PvlFlatMap(),
                     const QLogger &logger = QLogger()) : QLogger(logger),
-                    m_matcher(matcher), m_pairs(pairs), 
-                    m_parameters(parameters) { } 
+                    m_matcher(matcher), m_pairs(pairs) { } 
 
     virtual ~MatcherSolution() { }
 
@@ -97,16 +94,16 @@ class MatcherSolution : public QLogger {
       return ( m_matcher );
     }
 
-    inline const PvlFlatMap &parameters() const {
-      return ( m_parameters );
-    }
-
-    Statistics quality() const {
+    Statistics qualityStatistics() const {
       Statistics stats;
       for (int i = 0 ; i < size() ; i++) {
         stats.AddData( m_pairs[i].efficiency() );
       }
       return ( stats );
+    }
+   
+    double quality() const {
+      return ( qualityStatistics().Average() );
     }
    
     MatchPairIterator begin() {
@@ -129,7 +126,7 @@ class MatcherSolution : public QLogger {
     template <class T> int forEachPair( T &process ) {
         int npairs( 0 );
         BOOST_FOREACH ( MatchPair &mpair, m_pairs ) {
-           process.apply(mpair, *m_matcher, m_parameters, *this);
+           process.apply(mpair, *m_matcher, *this);
            npairs++;
         }
         return ( npairs );
@@ -138,7 +135,7 @@ class MatcherSolution : public QLogger {
     template <class T> int forEachPair( const T &process ) const {
         int npairs( 0 );
         BOOST_FOREACH ( const MatchPair &mpair, m_pairs ) {
-           process.apply(mpair, *m_matcher, m_parameters, *this);
+           process.apply(mpair, *m_matcher, *this);
            npairs++;
         }
         return ( npairs );
@@ -160,7 +157,7 @@ class MatcherSolution : public QLogger {
 
     SharedMatcherSolution candidate(matches[0]);
     for (int i = 1 ; i < matches.size() ; i++) {
-      if ( matches[i] < candidate ) {
+      if ( matches[i]->quality() < candidate->quality() ) {
         candidate = matches[i];
       }
     }

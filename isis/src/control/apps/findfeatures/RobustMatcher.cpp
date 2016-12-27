@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision: 6563 $
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $
- * $Id: RobustMatcher.cpp 6563 2016-02-10 23:56:52Z kbecker@GS.DOI.NET $
+ * $Revision$
+ * $Date$
+ * $Id$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -36,14 +36,11 @@
 #include <QTime>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/nonfree/features2d.hpp>
 
 // boost library
 #include <boost/foreach.hpp>
 
 #include "Application.h"
-#include "AlgorithmParameters.h"
 #include "IException.h"
 #include "IString.h"
 #include "FileName.h"
@@ -58,307 +55,31 @@ namespace Isis {
  *  @see init(const QString &name, const PvlFlatMap(), const bool
  *       useDefaults(false)).
  */
-RobustMatcher::RobustMatcher()  {
-  init("RobustMatcher", PvlFlatMap(), true);
+RobustMatcher::RobustMatcher() : MatcherAlgorithms(), QLogger(),
+                                 m_name("RobustMatcher"), m_parameters() {
+  init();
 }
 
 
-RobustMatcher::RobustMatcher(const QString &name,
-                             const PvlFlatMap &parameters )  {
-  init("RobustMatcher", parameters, true);
+RobustMatcher::RobustMatcher(const QString &name) : 
+                             MatcherAlgorithms(), 
+                             QLogger(),m_name(name), 
+                             m_parameters() {
+  init();
 }
 
-/**
- * @brief Construct a matcher with specific componets and parameters
- *
- * @author 2015-08-28 Kris Becker
- *
- * @param name       Name of matcher being created.
- * @param detector   Feature detector
- * @param extractor  Feature extractor
- * @param bfNormType BFMatcher normalization parameter
- * @param crossCheck Do OpenCV ratio test.  NOT recommended.
- */
-RobustMatcher::RobustMatcher(const QString &name,
-                             cv::Ptr<cv::FeatureDetector> &detector,
-                             cv::Ptr<cv::DescriptorExtractor> &extractor,
+RobustMatcher::RobustMatcher(const QString &name, 
+                             const MatcherAlgorithms &algorithms,
                              const PvlFlatMap &parameters,
-                             const int &bfNormType,
-                             const bool &crossCheck) :
-                             QLogger() {
-  init(name, parameters, false);
-  m_detector  = detector;
-  m_extractor = extractor;
-  setDescriptorMatcher(bfNormType, crossCheck);
+                             const QLogger &logger) : 
+                             MatcherAlgorithms(algorithms),QLogger(logger),
+                             m_name(name), m_parameters() {
+  init(parameters);
 }
 
-/**
- * @brief Construct a matcher with all componets and parameters
- *
- * @author 2015-08-28 Kris Becker
- *
- * @param name       Name of matcher being created.
- * @param detector   Feature detector
- * @param extractor  Feature extractor
- * @param matcher    Feature matcher
- */
-RobustMatcher::RobustMatcher(const QString &name,
-                             cv::Ptr<cv::FeatureDetector> &detector,
-                             cv::Ptr<cv::DescriptorExtractor> &extractor,
-                             cv::Ptr<cv::DescriptorMatcher> &matcher,
-                             const PvlFlatMap &parameters) :
-                             QLogger() {
 
-  init(name, parameters, false);
-  m_detector  = detector;
-  m_extractor = extractor;
-  m_matcher   = matcher;
-}
-
-/** Desctructor requires no actions */
+/** Destructor requires no actions */
 RobustMatcher::~RobustMatcher() { }
-
-/** Set the feature detector  */
-void RobustMatcher::setFeatureDetector(cv::Ptr<cv::FeatureDetector>& detector) {
-   m_detector = detector;
-}
-
-
-/** Set the descriptor extractor  */
-void RobustMatcher::setDescriptorExtractor(cv::Ptr<cv::DescriptorExtractor>& extractor) {
-   m_extractor = extractor;
-}
-
-/** Set the descriptor matcher  */
-void RobustMatcher::setDescriptorMatcher(cv::Ptr<cv::DescriptorMatcher>& matcher) {
-  m_matcher = matcher;
-  return;
-}
-
-void RobustMatcher::setDescriptorMatcher(const int &normType,
-                                         const bool &crossCheck) {
-  m_matcher = allocateMatcher(m_extractor, normType, crossCheck);
-  return;
-}
-
-QString RobustMatcher::getMatcherDescription() const {
-  return ( m_matcherSpec );
-}
-
-
-void RobustMatcher::setDescription(const QString &description) {
-  m_description = description;
-  return;
-}
-
-QString RobustMatcher::getDescription() const {
-  return ( m_description );
-}
-
-
-  /**
-   * @brief Determines whether the PVL keyword with the given name at the given index is null.
-   *
-   * This method looks for the PVL keyword in this Resource's PvlFlatMap that is mapped to the
-   * given name and checks whether the value at the given index is null. If no index is given, by
-   * default this method checks the first value (i.e. index 0). If the keyword does not exist in
-   * the map, this method returns true.
-   *
-   * @param keywordName  Name of the PVL keyword whose values will be accessed.
-   * @param index        Zero-based index for the value to be checked.
-   *
-   * @return bool  Indicates whether the given PVL keyword is null at the given index.
-   */
-  bool RobustMatcher::isParameterNull(const QString &name, const int index) const {
-    return ( m_parameters.isNull(name, index) );
-  }
-
-  /**
-   * Adds the PVL keywords from the given map of keywords to this Resource.
-   * The new keywords are inserted into this Resource's existing PvlFlatMap.
-   *
-   * @param keys  A PvlFlatMap containing the PvlKeywords to be inserted into the existing
-   *              keyword list.
-   */
-  void RobustMatcher::addParameters(const PvlFlatMap &parameters,
-                                    const bool &precedence) {
-    if ( true == precedence) {
-      m_parameters = PvlFlatMap(m_parameters, parameters);
-    }
-    else {
-      m_parameters = PvlFlatMap(parameters, m_parameters);
-    }
-    return;
-  }
-
-  /**
-   * Adds a PVL keyword with the given name and value to this Resource. A PvlKeyword object
-   * is created and added to the PvlFlatMap belonging to this Resource.
-   *
-   * @param keywordName   A string containing the name of the keyword to be added.
-   * @param keywordValue  A string containing the value of the keyword to be added.
-   */
-  void RobustMatcher::addParameter(const QString &name,
-                                   const QString &value) {
-     m_parameters.add(name, value);
-     return;
-  }
-
-
-  /**
-   * Adds the given PVL keyword to this Resource. The PvlKeyword object is added to
-   * the PvlFlatMap belonging to this Resource.
-   *
-   * @param keyword  A reference to the PvlKeyword object to be added.
-   */
-  void RobustMatcher::addParameter(const PvlKeyword &keyword,
-                                   const QString &name)  {
-    if ( name.isEmpty() ) {
-      m_parameters.add(keyword);
-    }
-    else {
-      PvlKeyword temp = keyword;
-      temp.setName(name);
-      m_parameters.add(temp);
-    }
-  }
-
-  /**
-   * Determines whether a PVL keyword with the given name is in this Resource.
-   *
-   * @param name  A string containing the keyword name.
-   *
-   * @return bool  Indicates whether a PVL keyword in this RobustMatcher's
-   *               PvlFlatMap is mapped to the given name.
-   */
-  bool RobustMatcher::hasParameter(const QString &name) const {
-    return ( m_parameters.exists(name) );
-  }
-
-  /**
-   * @brief Gets the value of the PVL keyword with the given name at the given index.
-   *
-   * This method looks for the PVL keyword in this RobustMatcher's  PvlFlatMap
-   * that is mapped to the given name and accesses the value at the given
-   * index. If no index is given, by default this method returns the first
-   * value (i.e. index 0).
-   *
-   * Note: If the keyword does not exist in the map, PvlFlatMap throws an
-   *       exception. To avoid this, the isNull() method can be called before
-   *       invoking this method to verify whether a value exists at the given
-   *       index. Otherwise, the value(QString, QString, int) version of this
-   *       overloaded method can be called.
-   *
-   * @see isNull(QString, int)
-   * @see value(QString, QString, int)
-   *
-   * @param keywordName  A string containing the name of the PVL keyword in this Resource's
-   *                     list of keywords.
-   * @param index        Zero-based index for the value to be accessed.
-   *
-   * @return QString  A string containing the PVL keyword value at the given index.
-   */
-  QString RobustMatcher::getParameter(const QString &name, const int &index) const {
-    return ( m_parameters.get(name, index) );
-  }
-
-
-  /**
-   * @brief Gets the value of the PVL keyword at the given index, if found; otherwise it returns
-   *        the given default value.
-   *
-   * This method looks for the PVL keyword in this RobustMatcher's PvlFlatMap
-   * that is mapped to the given name and accesses the value at the given
-   * index. If no index is given, by default this method returns the first
-   * value (i.e. index 0).
-   *
-   * If the keyword does not exist in the map, the given default value will be
-   * returned.
-   *
-   * @see isNull(QString, int)
-   * @see value(QString, int)
-   *
-   * @param name   A string containing the name of the PVL keyword in this
-   *                      Resource's list of keywords.
-   * @param defaultValue  A string containing the default value for this
-   *                      keyword if not found in the PvlFlatMap.
-   * @param index         Zero-based index for the value to be accessed.
-   *
-   * @return QString  A string containing the PVL keyword value at the
-   *                  given index, if it exists; otherwise the given default
-   *                  value is returned.
-   */
-  QString RobustMatcher::getParameter(const QString &name,
-                                      const QString &defaultValue,
-                                      const int &index) const {
-    QString keywordValue(defaultValue);
-    if ( !isParameterNull(name, index) ) {
-      keywordValue = getParameter(name, index);
-    }
-    return (keywordValue);
-  }
-
-
-
-  /**
-   * Counts the number of values the PVL keyword with the given name has, if it exists
-   * in this Resource. Otherwise, it returns 0.
-   *
-   * @param keywordName  A string containing the keyword name.
-   *
-   * @return int  The size of the PvlKeyword object mapped to the given name in
-   *               this Resource's PvlFlatMap.
-   */
-  int RobustMatcher::getParameterCount(const QString &name) const {
-    return ( m_parameters.count(name) );
-  }
-
-void RobustMatcher::setRatio(const double ratio) {
-  m_ratio = ratio;
-  return;
-}
-
-void RobustMatcher::setEpiTolerance(const double tolerance) {
-  m_epiTolerance = tolerance;
-  return;
-}
-
-void RobustMatcher::setEpiConfidence(const double confidence) {
-  m_epiConfidence = confidence;
-  return;
-}
-
-void RobustMatcher::setHmgTolerance(const double tolerance) {
-  m_hmgTolerance = tolerance;
-  return;
-}
-
-void RobustMatcher::setMaxPoints(const int maxpoints) {
-  m_maxpoints = maxpoints;
-  return;
-}
-
-double RobustMatcher::getRatio() const {
-  return ( m_ratio );
-}
-
-double RobustMatcher::getEpiTolerance() const {
-  return ( m_epiTolerance );
-}
-
-double RobustMatcher::getEpiConfidence() const {
-  return ( m_epiConfidence );
-}
-
-double RobustMatcher::getHmgTolerance() const {
-  return ( m_hmgTolerance );
-}
-
-
-int RobustMatcher::getMaxPoints() const {
-  return ( m_maxpoints );
-}
-
 
 /**
  * @brief Construct required interface with match image pairs
@@ -407,7 +128,7 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
      logger() << "\n@@ matcher-pair started on " << Application::DateTime() << "\n";
      logger() << "\n+++++++++++++++++++++++++++++\n";
      logger() << "Entered RobustMatcher::match(MatchImage &query, MatchImage &trainer)...\n";
-     logger() << "  Specification:   " << getDescription() << "\n";
+     logger() << "  Specification:   " << name() << "\n";
      logger().flush();
    }
 
@@ -422,8 +143,8 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
    cv::Mat i_query = v_query.image();
    cv::Mat i_train = v_train.image();
 
-   if ( toBool(getParameter("SaveRenderedImages", "false")) ) {
-     QString savepath = getParameter("SavePath", "$PWD");
+   if ( toBool(m_parameters.get("SaveRenderedImages")) ) {
+     QString savepath = m_parameters.get("SavePath");
 
      FileName qfile(v_query.source().name());
      QString qfout = savepath + "/" + qfile.baseName() + "_query.png";
@@ -456,19 +177,20 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
    stime.start();
 
    // 1a. Detection of the features
-   m_detector->detect(i_query, v_query.keypoints());
-   m_detector->detect(i_train, v_train.keypoints());
+   detector().algorithm()->detect(i_query, v_query.keypoints());
+   detector().algorithm()->detect(i_train, v_train.keypoints());
 
    int v_query_points = v_query.size();
    int v_train_points = v_train.size();
    int allPoints = v_query_points + v_train_points;
 
    // Limit keypoints if requested by user
-   if ( m_maxpoints > 0 ) {
-     logger() << "  Keypoints restricted by user to " << m_maxpoints << " points...\n";
+   int v_maxpoints = toInt(m_parameters.get("MaxPoints"));
+   if ( v_maxpoints > 0 ) {
+     logger() << "  Keypoints restricted by user to " << v_maxpoints << " points...\n";
      logger().flush();
-     cv::KeyPointsFilter::retainBest(v_query.keypoints(), m_maxpoints);
-     cv::KeyPointsFilter::retainBest(v_train.keypoints(), m_maxpoints);
+     cv::KeyPointsFilter::retainBest(v_query.keypoints(), v_maxpoints);
+     cv::KeyPointsFilter::retainBest(v_train.keypoints(), v_maxpoints);
    }
 
    double v_time = elapsed(stime);  // Event timing
@@ -488,13 +210,14 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
 
    // 1b. Extraction of the descriptors
    cv::Mat queryDescriptors, trainerDescriptors;
-   m_extractor->compute(i_query, v_query.keypoints(), v_query.descriptors());
-   m_extractor->compute(i_train, v_train.keypoints(), v_train.descriptors());
+   extractor().algorithm()->compute(i_query, v_query.keypoints(), v_query.descriptors());
+   extractor().algorithm()->compute(i_train, v_train.keypoints(), v_train.descriptors());
    double d_time = elapsed(stime) - v_time;
    v_pair.addTime( v_time + d_time );
 
    // Do root sift normalization if requested
-   if ( m_doRootSift ) {
+   bool v_doRootSift = toBool(m_parameters.get("RootSift"));
+   if ( v_doRootSift ) {
      if ( isDebug() ) {
        logger() << "  Computing RootSift Descriptors...\n";
      }
@@ -574,7 +297,7 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
      logger() << "\n@@ matcher-multi started on " << Application::DateTime() << "\n";
      logger() << "\n+++++++++++++++++++++++++++++\n";
      logger() << "Entered RobustMatcher::match(MatchImage &query,""MatchImageList &trainer)...\n";
-     logger() << "  Specification:   " << getDescription() << "\n";
+     logger() << "  Specification:   " << name() << "\n";
      logger().flush();
   }
 
@@ -595,8 +318,8 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
   // Render images for efficiency
    cv::Mat i_query = v_query.image();
    std::vector<cv::Mat> i_trainers;
-   bool saveRendered = toBool(getParameter("SaveRenderedImages", "false"));
-   QString savepath = getParameter("SavePath", "$PWD");
+   bool saveRendered = toBool(m_parameters.get("SaveRenderedImages"));
+   QString savepath = m_parameters.get("SavePath");
 
    if ( true == saveRendered ) {
      // Save the query image first
@@ -643,8 +366,8 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
 
    // 1a. Run detection of features
    std::vector<std::vector<cv::KeyPoint> > trainerKeypoints;
-   m_detector->detect(i_query, v_query.keypoints());
-   m_detector->detect(i_trainers, trainerKeypoints);
+   detector().algorithm()->detect(i_query, v_query.keypoints());
+   detector().algorithm()->detect(i_trainers, trainerKeypoints);
 
    int v_query_points = v_query.size();
    int allPoints = v_query_points;
@@ -655,12 +378,13 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
    }
 
    // Limit keypoints if requested by user
-   if ( m_maxpoints > 0 ) {
-     logger() << "  Keypoints restricted by user to " << m_maxpoints << " points...\n";
+   int v_maxpoints = toInt(m_parameters.get("MaxPoints"));
+   if ( v_maxpoints > 0 ) {
+     logger() << "  Keypoints restricted by user to " << v_maxpoints << " points...\n";
      logger().flush();
-     cv::KeyPointsFilter::retainBest(v_query.keypoints(), m_maxpoints);
+     cv::KeyPointsFilter::retainBest(v_query.keypoints(), v_maxpoints);
      for (unsigned int i = 0 ; i < trainerKeypoints.size() ; i++) {
-       cv::KeyPointsFilter::retainBest(trainerKeypoints[i], m_maxpoints);
+       cv::KeyPointsFilter::retainBest(trainerKeypoints[i], v_maxpoints);
      }
    }
 
@@ -694,8 +418,8 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
 
    // 1b. Extraction of the descriptors
    std::vector<cv::Mat> trainerDescriptors;
-   m_extractor->compute(i_query, v_query.keypoints(), v_query.descriptors());
-   m_extractor->compute(i_trainers, trainerKeypoints, trainerDescriptors);
+   extractor().algorithm()->compute(i_query, v_query.keypoints(), v_query.descriptors());
+   extractor().algorithm()->compute(i_trainers, trainerKeypoints, trainerDescriptors);
 
     // Record time to detect features and extract descriptors for all images
    double e_time = elapsed(stime) - d_time;
@@ -705,7 +429,8 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
    v_query.addTime( (d_time  + e_time) * ( v_query.size() / allPoints ) );
 
    // Do root sift normalization if requested
-   if ( m_doRootSift ) {
+   bool v_doRootSift = toBool(m_parameters.get("RootSift"));
+   if ( v_doRootSift ) {
      if ( isDebug() ) {
        logger() << "  Computing RootSift Descriptors...\n";
      }
@@ -843,10 +568,10 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
       logger() << "  Computing query->train Matches...\n";
       logger().flush();
     }
-    m_matcher->knnMatch(queryDescriptors, trainDescriptors,
-                        matches1, // vector of matches (up to 2 per entry)
-                        2); // return 2 nearest neighbours
-  }
+    matcher().algorithm()->knnMatch(queryDescriptors, trainDescriptors,
+                                   matches1, // vector of matches (up to 2 per entry)
+                                   2); // return 2 nearest neighbours
+              }
   catch (cv::Exception &e) {
     QString mess = "RobustMatcher::MatcherFailed: "+ QString(e.what()) +
                    " - if its an assertion failure, you may be enabling "
@@ -875,7 +600,8 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
     logger() << "  Computing train->query Matches...\n";
     logger().flush();
   }
-  m_matcher->knnMatch(trainDescriptors, queryDescriptors,
+
+  matcher().algorithm()->knnMatch(trainDescriptors, queryDescriptors,
                       matches2, // vector of matches (up to 2 per entry)
                       2); // return 2 nearest neighbours
   v_time =  elapsed(stime) - mtime;
@@ -919,9 +645,10 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
 
   // 4) Compute the homography matrix with outlier removal options
   bool refineHomography(true);
+  double v_hmgTolerance = toDouble(m_parameters.get("HmgTolerance"));
   homography = computeHomography(queryKeypoints, trainKeypoints,
                                  symMatches, homography_matches,
-                                 mtime, CV_FM_RANSAC, getHmgTolerance(),
+                                 mtime, CV_FM_RANSAC, v_hmgTolerance,
                                  refineHomography, onErrorThrow);
 
   // 5) Compute the fundamental matrix with outliers
@@ -932,7 +659,7 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
   refineHomography = false;
   homography = computeHomography(queryKeypoints, trainKeypoints,
                                  epipolar_matches, matches,
-                                 mtime, CV_FM_RANSAC, getHmgTolerance(),
+                                 mtime, CV_FM_RANSAC, v_hmgTolerance,
                                  refineHomography, onErrorThrow);
 
 
@@ -945,10 +672,11 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
 // i.e. size will be 0)
 int RobustMatcher::ratioTest(std::vector<std::vector<cv::DMatch> > &matches,
                              double &mtime) const {
-
+  
+  double v_ratio = toDouble(m_parameters.get("Ratio"));
   if ( isDebug() ) {
     logger() << "Entered RobustMatcher::ratioTest(matches[2]) for 2 NearestNeighbors (NN)...\n";
-    logger() << "  RobustMatcher::Ratio:       " << getRatio() << "\n";
+    logger() << "  RobustMatcher::Ratio:       " << v_ratio << "\n";
     logger().flush();
   }
 
@@ -967,7 +695,7 @@ int RobustMatcher::ratioTest(std::vector<std::vector<cv::DMatch> > &matches,
     if (matchIterator->size() > 1) {
       // check distance ratio
       if ((*matchIterator)[0].distance/
-          (*matchIterator)[1].distance > getRatio()) {
+          (*matchIterator)[1].distance > v_ratio) {
          matchIterator->clear(); // remove match
          removed++;
          nfailed++;
@@ -1072,11 +800,13 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
 
 
   // Introduce ourselves
+  double v_epiTolerance = toDouble(m_parameters.get("EpiTolerance"));
+  double v_epiConfidence = toDouble(m_parameters.get("EpiConfidence"));
   if ( isDebug() ) {
     logger() << "Entered EpiPolar RobustMatcher::ransacTest(matches, keypoints1/2...)...\n";
     logger() << " -Running EpiPolar Constraints/Fundamental Matrix...\n";
-    logger() << "  RobustMatcher::EpiTolerance:    " << getEpiTolerance() << "\n";
-    logger() << "  RobustMatcher::EpiConfidence:   " << getEpiConfidence() << "\n";
+    logger() << "  RobustMatcher::EpiTolerance:    " << v_epiTolerance << "\n";
+    logger() << "  RobustMatcher::EpiConfidence:   " << v_epiConfidence << "\n";
     logger() << "  Number Initial Matches:         " << matches.size() << "\n";
     logger().flush();
   }
@@ -1087,11 +817,12 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   cv::Mat fundamental = cv::Mat::eye(3,3,CV_64F);
 
   // See if enough points to compute fundamental matrix. Minumum number needed
-  // for RANSAC is 8 points.
-  if ( (unsigned int) m_minEpiPoints > matches.size() ) {
+  // for RANSAC is 8 points. 
+  int v_minEpiPoints = toInt(m_parameters.get("MinimumFundamentalPoints"));
+  if ( (unsigned int) v_minEpiPoints > matches.size() ) {
     if ( isDebug() ) {
       logger() << "->ERROR - Not enough points (need at least "
-               << m_minEpiPoints << ") to proceed - returning identity!\n";
+               << v_minEpiPoints << ") to proceed - returning identity!\n";
       logger().flush();
     }
     return ( fundamental );
@@ -1117,8 +848,8 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   try {
     fundamental = cv::findFundamentalMat(cv::Mat(points1),cv::Mat(points2), // matching points
                                          CV_FM_RANSAC, // RANSAC method
-                                         getEpiTolerance(),   // distance to epipolar line
-                                         getEpiConfidence(), // confidence probability
+                                         v_epiTolerance,   // distance to epipolar line
+                                         v_epiConfidence, // confidence probability
                                          inliers);     // match status (inlier or outlier))
   }
   catch ( cv::Exception &e ) {
@@ -1150,11 +881,12 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
     logger().flush();
   }
 
-  if ( m_refineF  ) {
+  if ( toBool(m_parameters.get("RefineFundamentalMatrix"))  ) {
 
     // See if enough points to compute fundamental matrix. Minumum number needed
-    // for RANSAC is 8 points.
-    if ( (unsigned int) m_minEpiPoints <= outMatches.size() ) {
+    // for RANSAC is 8 points. 
+    int v_minEpiPoints = toInt(m_parameters.get("MinimumFundamentalPoints")); 
+    if ( (unsigned int) v_minEpiPoints <= outMatches.size() ) {
 
       // Make a copy of the inliers of the first fundamental processing
       std::vector<cv::DMatch> matches1(outMatches);
@@ -1179,8 +911,8 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
       try {
         fundamental2 = cv::findFundamentalMat(cv::Mat(points1), cv::Mat(points2), // matches
                                              CV_FM_LMEDS,  // Least squares method
-                                             getEpiTolerance(),   // distance to epipolar line
-                                             getEpiConfidence(), // confidence probability
+                                             v_epiTolerance,   // distance to epipolar line
+                                             v_epiConfidence, // confidence probability
                                              inliers2);   // New set of inliers
         fundamental = fundamental2;
       }
@@ -1218,7 +950,7 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
     else {
       if ( isDebug() ) {
         logger() << "  Not enough points (" << outMatches.size()
-                 << ", needs " << m_minEpiPoints
+                 << ", needs " << v_minEpiPoints
                  << ") for 2nd Epipolar - returning current state!!\n";
         logger().flush();
       }
@@ -1247,10 +979,11 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
                                          const {
 
   // Introduce ourselves
+  double v_hmgTolerance = toDouble(m_parameters.get("HmgTolerance"));
   if ( isDebug() ) {
     logger() << "Entered RobustMatcher::computeHomography(keypoints1/2, matches...)...\n";
     logger() << " -Running RANSAC Constraints/Homography Matrix...\n";
-    logger() << "  RobustMatcher::HmgTolerance:  " << getHmgTolerance() << "\n";
+    logger() << "  RobustMatcher::HmgTolerance:  " << v_hmgTolerance << "\n";
     logger() << "  Number Initial Matches:       " << matches.size() << "\n";
     logger().flush();
   }
@@ -1271,11 +1004,12 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
 
   // Test intial return condition
   inliers.clear();
-  if ( srcPoints.size() < (unsigned int) m_minHomoPoints ) {
+  int v_minHomoPoints = toInt(m_parameters.get("MinimumHomographyPoints"));
+  if ( srcPoints.size() < (unsigned int) v_minHomoPoints ) {
     if ( isDebug() ) {
       logger() << "  Not enough points  (" << srcPoints.size()
                 << ") to compute initial homography - need at least "
-                << m_minHomoPoints << "!\n";
+                << v_minHomoPoints << "!\n";
       logger().flush();
     }
     return ( homography );
@@ -1293,7 +1027,7 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
 
     // Pass only matches with low reprojection error (less than tolerance
     // value in pixels)
-    double tolSquared = getHmgTolerance() * getHmgTolerance();
+    double tolSquared = v_hmgTolerance * v_hmgTolerance;
     for (unsigned int i = 0; i < matches.size() ; i++) {
         cv::Point2f actual   = srcPoints[i];
         cv::Point2f expected = srcReprojected[i];
@@ -1312,12 +1046,12 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
 
     if ( true == refine ) {
       // Test for bad case
-      if ( inliers.size() <  (unsigned int) m_minHomoPoints ) {
+      if ( inliers.size() <  (unsigned int) v_minHomoPoints ) {
         inliers.clear();
         if ( isDebug() ) {
           logger() << "  Not enough points (" << inliers.size()
                     << ") to compute refined homography - need at least "
-                    << m_minHomoPoints << " - failure!\n";
+                    << v_minHomoPoints << " - failure!\n";
           logger().flush();
         }
 
@@ -1378,121 +1112,43 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
   return ( homography );
 }
 
-PvlObject RobustMatcher::info() const {
-  PvlObject info("FeatureAlgorithm");
-  info.addKeyword(PvlKeyword("Name", getDescription()));
-  info.addKeyword(PvlKeyword("OpenCVVersion", CV_VERSION));
-  info.addKeyword(PvlKeyword("Specification", getDescription()));
 
-  AlgorithmParameters params;
-  if ( !m_detector.empty() ) {
-    // logger() <<  "FeatureAlgorithm::info(detector): " << m_detector->name() << "\n";
-    info.addObject(params.getDescription(m_detector, "Detector"));
-  }
-
-  if ( !m_extractor.empty() ) {
-    // logger() <<  "FeatureAlgorithm::info(extractor): " << m_extractor->name() << "\n";
-    info.addObject(params.getDescription(m_extractor, "Extractor"));
-  }
-
-  if ( !m_matcher.empty() ) {
-   // logger() <<  "FeatureAlgorithm::info(matcher): " << m_matcher->name() << "\n";
-    info.addObject(params.getDescription(m_matcher, "Matcher"));
-  }
-
-  if (  m_parameters.size() > 0 ) {
-    PvlObject aparms("Parameters");
-    BOOST_FOREACH ( const PvlKeyword &key, m_parameters ) {
-      aparms.addKeyword(key);
-    }
-    info.addObject(aparms);
-  }
-  return ( info );
+const PvlFlatMap &RobustMatcher::parameters() const {
+  return ( m_parameters );
 }
 
 
-void RobustMatcher::init(const QString &name, const PvlFlatMap &parameters,
-                         const bool &allocateAlgorithms) {
-  m_name          = name;
-  m_description   = m_name;
-  m_parameters    = parameters;
-  m_matcherSpec   = "";
+PvlObject RobustMatcher::info(const QString &p_name) const {
+  PvlObject description = MatcherAlgorithms::info(p_name);
+  description.addKeyword(PvlKeyword("OpenCVVersion", CV_VERSION));
+  description.addKeyword(PvlKeyword("Name", name()));
+  // description.addKeyword(PvlKeyword("Specification", name()));
 
-  m_doRootSift    = toBool(getParameter("RootSift", "false"));
-  m_ratio         = toDouble(getParameter("RATIO", "0.65"));
-  m_epiConfidence = toDouble(getParameter("EPICONFIDENCE", "0.99"));
-  m_epiTolerance  = toDouble(getParameter("EPITOLERANCE", "3.0"));
-  m_hmgTolerance  = toDouble(getParameter("HMGTOLERANCE", "3.0"));
-  m_maxpoints     = toInt(getParameter("MAXPOINTS", "0"));
-  m_minEpiPoints  = toInt(getParameter("MinimumFundamentalPoints", "8"));
-  m_refineF       = toBool(getParameter("RefineFundamentalMatrix", "true"));
-  m_minHomoPoints = toInt(getParameter("MinimumHomographyPoints", "8"));
-
-  // SURF is the default feature detector and extractor. Use Bruteforce matcher
-  // with L-2 distance indexing.
-  if ( allocateAlgorithms ) {
-    m_detector  = new cv::SurfFeatureDetector();
-    m_extractor = new cv::SurfDescriptorExtractor();
-    m_matcher   = allocateMatcher(m_extractor, cv::NORM_L2, false);
+  PvlObject aparms("Parameters");
+  BOOST_FOREACH ( const PvlKeyword &key, m_parameters ) {
+    aparms.addKeyword(key);
   }
+  description.addObject(aparms);
+
+  return ( description );
+}
+
+
+void RobustMatcher::init(const PvlFlatMap &parameters) {
+  m_parameters.clear();
+  m_parameters.add("SaveRenderedImages",  "false");
+  m_parameters.add("SavePath",  "$PWD");
+  m_parameters.add("RootSift",  "false");
+  m_parameters.add("Ratio", "0.65");
+  m_parameters.add("EpiConfidence",  "0.99");
+  m_parameters.add("EpiTolerance",  "3.0");
+  m_parameters.add("HmgTolerance",  "3.0");
+  m_parameters.add("MaxPoints", "0");
+  m_parameters.add("MinimumFundamentalPoints", "8");
+  m_parameters.add("RefineFundamentalMatrix",  "true");
+  m_parameters.add("MinimumHomographyPoints",  "8");
+  m_parameters.merge(parameters);
   return;
-}
-
-/**
- * @brief Allocate a BruteForceMatcher algorithm based upon descriptor extractor
- *
- * See
- * http://docs.opencv.org/modules/features2d/doc/common_interfaces_of_descriptor_matchers.html#bfmatcher-bfmatcher
- * for details on this implementation.
- *
- * @author 2015-08-19 Kris Becker
- *
- * @param extractor  Descriptor extractor algorithm
- * @param crossCheck
- *
- * @return cv::Ptr<cv::DescriptorMatcher>
- */
-cv::Ptr<cv::DescriptorMatcher> RobustMatcher::allocateMatcher(cv::Ptr<cv::DescriptorExtractor> &extractor,
-                                                              const int &normalize,
-                                                              const bool &crossCheck) {
-
-  QString name(QString::fromStdString(extractor->name()).toUpper());
-  if ( isDebug() ) {
-    logger() << "\nDetermining Matcher for " << name << "\n";
-    logger().flush();
-  }
-
-  int normType(normalize);
-  if ( name.contains("SURF", Qt::CaseInsensitive) ) {
-    normType = cv::NORM_L2;
-  }
-  else if ( name.contains("SIFT", Qt::CaseInsensitive)  ) {
-    normType = cv::NORM_L2;
-  }
-  else if (name.contains("ORB", Qt::CaseInsensitive) ) {
-    normType = cv::NORM_HAMMING;
-    try {
-      if ( extractor->getInt("WTA_K") > 2) {
-        normType = cv::NORM_HAMMING2;
-      }
-    }
-    catch ( cv::Exception &e ) {
-      //  NOOP - use existing value
-    }
-  }
-  else if ( name.contains("BRISK", Qt::CaseInsensitive) ) {
-    normType = cv::NORM_HAMMING;
-  }
-  else if ( name.contains("BRIEF", Qt::CaseInsensitive) ) {
-    normType = cv::NORM_HAMMING;
-  }
-
-  // Update name and return matcher
-  cv::Ptr<cv::DescriptorMatcher> matcher(new cv::BFMatcher(normType, crossCheck));
-  m_matcherSpec = ("/" + QString::fromStdString(matcher->name()) +
-                   "@normType:" + QString::number(normType) +
-                   "@crossCheck:" + ( (crossCheck) ? "true" : "false" ) );
-  return ( matcher );
 }
 
 // Compute RootSift descriptors for better matching potential

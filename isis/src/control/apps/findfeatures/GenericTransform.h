@@ -2,8 +2,8 @@
 #define GenericTransform_h
 /**
  * @file
- * $Revision: 6601 $ 
- * $Date: 2016-03-09 10:31:51 -0700 (Wed, 09 Mar 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for

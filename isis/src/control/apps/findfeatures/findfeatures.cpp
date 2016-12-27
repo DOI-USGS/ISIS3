@@ -12,10 +12,7 @@
 #include <QTextStream>
 
 // OpenCV stuff
-#include "opencv2/core/core.hpp"
-#include "opencv2/nonfree/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/core.hpp"
 
 // boost library
 #include <boost/foreach.hpp>
@@ -66,16 +63,38 @@
 using namespace std;
 using namespace Isis;
 
+static void writeInfo(const QString &toname, Pvl &data,
+                      UserInterface &ui) {
+    if ( !toname.isEmpty() ) {
+      FileName toinfo(toname);
+      QString fname = toinfo.expanded();
+      data.write(fname);
+    }
+    else {
+      if ( !ui.IsInteractive()  ) {
+        std::cout << data << "\n";
+      }
+      else {
+        Application::GuiLog(data);
+      }
+    }
+    return;
+}
+
 void IsisMain() {
 
   //  Program constants
   const QString findfeatures_program = "findfeatures";
   const QString findfeatures_version = "0.1";
-  const QString findfeatures_revision = "$Revision: 6598 $";
+  const QString findfeatures_revision = "$Revision$";
   const QString findfeatures_runtime = Application::DateTime();
 
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  QString toinfo;
+  if ( ui.WasEntered("TOINFO")) {
+    toinfo = ui.GetAsString("TOINFO");
+  }
 
   // Set up program debugging and logging
   QDebugStream logger( QDebugLogger::null() );
@@ -101,25 +120,16 @@ void IsisMain() {
   logger->flush();
 
   // Set up for info requests
-  Pvl info;
-  bool gotInfo(false);
   FeatureAlgorithmFactory *factory = FeatureAlgorithmFactory::getInstance();
   if ( ui.GetBoolean("LISTALL") ) {
+    Pvl info;
     QStringList algorithms = factory->getListAll();
     // cout << algorithms.join("\n") << "\n";
     info.addObject( factory->info(algorithms) );
-    gotInfo = true;
+    writeInfo(toinfo, info, ui);
+    return;
   }
 
-  if ( ui.GetBoolean("LISTMATCHERS") ) {
-    QStringList algorithms = factory->getListFeature2D();
-    algorithms += factory->getListDetectors();
-    algorithms += factory->getListExtractors();
-    algorithms += factory->getListMatchers();
-    logger->dbugout() << algorithms.join("\n") << "\n";
-    info.addObject( factory->info(algorithms));
-    gotInfo = true;
-  }
 
   // Get parameters from user
   PvlFlatMap parameters;
@@ -133,13 +143,11 @@ void IsisMain() {
 
   // Get individual parameters if provided
   QStringList parmlist;
-  parmlist << "RATIO" << "EPITOLERANCE" << "EPICONFIDENCE" << "HMGTOLERANCE"
-           << "MAXPOINTS" << "FASTGEOM" << "FASTGEOMPOINTS" << "GEOMTYPE"
-           << "FILTER";
+  parmlist << "Ratio" << "EpiTolerance" << "EpiConfidence" << "HmgTolerance"
+           << "MaxPoints" << "FastGeom" << "FastGeomPoints" << "GeomType"
+           << "GeomSource" << "Filter";
   BOOST_FOREACH (QString p, parmlist ) {
-    if ( ui.WasEntered(p) ) {
-      parameters.add(p, ui.GetAsString(p));
-    }
+    parameters.add(p, ui.GetAsString(p));
   }
 
   // Got all parameters.  Add them now and they don't need to be considered
@@ -149,7 +157,6 @@ void IsisMain() {
 
   // Retrieve the ALGORITHM specification (if requested)
   QString aspec;
-  RobustMatcherList algorithms;
   if ( ui.WasEntered("ALGORITHM") ) {
     aspec = ui.GetString("ALGORITHM");
   }
@@ -169,41 +176,20 @@ void IsisMain() {
     aspec.append( algos.join("|") );
   }
 
-  // Create the algorithms and list if requested
-  if ( !aspec.isEmpty() ) {
-    algorithms = factory->create(aspec);
 
-    if ( ui.GetBoolean("LISTSPEC") ) {
-      info.addObject(factory->info(algorithms));
-      gotInfo = true;
+  // Create a list of algorithm specifications from user specs and log it
+  // if requested 
+  RobustMatcherList algorithms = factory->create(aspec);
+  if ( ui.GetBoolean("LISTSPEC") ) {
+    Pvl info;
+    info.addObject(factory->info(algorithms));
+    writeInfo(toinfo, info, ui);
+
+    // If no input files are provided exit here
+    if ( ! ( ui.WasEntered("FROM") && ui.WasEntered("FROMLIST") ) ) {
+      return;
     }
   }
-  else {
-    if ( ui.GetBoolean("LISTSPEC") || ( !gotInfo) ) {
-      QString mess = "Matching ALGORITHM/ALGOSPECFILE must be provided!";
-      throw IException(IException::User, mess, _FILEINFO_);
-    }
-  }
-
-  // Write information if requested, write to requested output target and exit
-  if ( gotInfo ) {
-    // Check for output options
-    if ( ui.WasEntered("TOINFO") ) {
-      FileName toinfo = ui.GetFileName("TOINFO");
-      QString fname = toinfo.expanded();
-      info.write(fname);
-    }
-    else {
-      if ( !ui.IsInteractive()  ) {
-        std::cout << info << "\n";
-      }
-      else {
-        Application::GuiLog(info);
-      }
-    }
-    return;
-  }
-
 
   // First see what we can do about threads if your user is resource conscience
   int nCPUs = cv::getNumberOfCPUs();
@@ -259,12 +245,12 @@ void IsisMain() {
 
   // Check for FASTGEOM option
   if ( ui.GetBoolean("FASTGEOM") ) {
-    FastGeom geom( factory->getGlobalParameters() );
+    FastGeom geom( factory->globalParameters() );
     matcher.foreachPair( geom );
   }
 
   // Check for Sobel/Scharr filtering options for both Train and Images
-  QString filter = factory->getGlobalParameters().get("FILTER", "").toLower();
+  QString filter = factory->globalParameters().get("FILTER", "").toLower();
   // Apply the Sobel filter to all image
   if ( "sobel" == filter ) {
     matcher.query().addTransform(new SobelTransform("SobelTransform"));
@@ -305,11 +291,11 @@ void IsisMain() {
   }
 
   // Got some matches so lets process them
-  Statistics quality = best->quality();
+  Statistics quality = best->qualityStatistics();
   PvlGroup bestinfo("MatchSolution");
+  bestinfo += PvlKeyword("Matcher", best->matcher()->name());
+  bestinfo += PvlKeyword("MatchedPairs", toString(best->size()));
   bestinfo += PvlKeyword("Efficiency",  toString(quality.Average()));
-  bestinfo += PvlKeyword("MinEfficiency",  toString(quality.Minimum()));
-  bestinfo += PvlKeyword("MaxEfficiency",  toString(quality.Maximum()));
   if ( quality.ValidPixels() > 1 ) {
     bestinfo += PvlKeyword("StdDevEfficiency",
                            toString(quality.StandardDeviation()));
@@ -324,7 +310,7 @@ void IsisMain() {
     ControlNet cnet;
     cnet.SetNetworkId(ui.GetString("NETWORKID"));
     cnet.SetUserName(Application::UserName());
-    cnet.SetDescription(best->matcher()->getDescription());
+    cnet.SetDescription(best->matcher()->name());
     cnet.SetCreatedDate(Application::DateTime());
     QString target = ( ui.WasEntered("TARGET") ) ? ui.GetString("TARGET") :
                                                    best->target();

@@ -2,8 +2,8 @@
 #define MatchMaker_h
 /**
  * @file
- * $Revision: 6563 $ 
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -74,6 +74,7 @@ class MatchMaker : public QLogger {
 
     const MatchImage &query() const;
     MatchImage &query();
+
     const MatchImage &train(const int &index = 0) const;
     MatchImage &train(const int &index = 0);
 
@@ -99,10 +100,8 @@ class MatchMaker : public QLogger {
     GeometrySourceFlag getGeometrySourceFlag() const;
     MatchImage getGeometrySource() const;
 
-    MatcherSolution *match(const SharedRobustMatcher &matcher,
-                           const PvlFlatMap &parameters = PvlFlatMap());
-    MatcherSolutionList match(const RobustMatcherList &matchers,
-                              const PvlFlatMap &parameters = PvlFlatMap());
+    MatcherSolution *match(const SharedRobustMatcher &algorithms);
+    MatcherSolutionList match(const RobustMatcherList &algorithms);
 
     PvlGroup network(ControlNet &cnet, const MatcherSolution &solution,
                      ID &pointMaker) const;

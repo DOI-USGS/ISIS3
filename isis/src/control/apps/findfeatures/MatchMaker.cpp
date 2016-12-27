@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 6563 $
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $
- * $Id: MatchMaker.cpp 6563 2016-02-10 23:56:52Z kbecker@GS.DOI.NET $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
@@ -125,41 +125,32 @@ MatchImage MatchMaker::getGeometrySource() const {
   return ( MatchImage() );  // Got none
 }
 
-MatcherSolution *MatchMaker::match(const SharedRobustMatcher &matcher,
-                                   const PvlFlatMap &parameters) {
+MatcherSolution *MatchMaker::match(const SharedRobustMatcher &matcher) {
 
   // Pass along logging status
   matcher->setDebugLogger( stream(), isDebug() );
-
-  PvlFlatMap matchParms(m_parameters, parameters);
-  matcher->setRatio(getParameter("Ratio", matchParms, matcher->getRatio()));
-  matcher->setEpiTolerance(getParameter("EpiTolerance", matchParms, matcher->getEpiTolerance()));
-  matcher->setEpiConfidence(getParameter("EpiConfidence", matchParms, matcher->getEpiConfidence()));
-  matcher->setHmgTolerance(getParameter("HmgTolerance", matchParms, matcher->getHmgTolerance()));
-  matcher->setMaxPoints(getParameter("MaxPoints", matchParms, matcher->getMaxPoints()));
 
   MatcherSolution *m(0);
   if ( m_trainers.size() == 1 ) {
     // Run a pair only matcher
     m = new MatcherSolution(matcher,
                             matcher->match(m_query, m_trainers[0]), 
-                            matchParms, *this /* MatchMaker and/or QLogger */ ); 
+                            *this /* MatchMaker and/or QLogger */ ); 
   }
   else {
     // Run the multi-matcher
     m = new MatcherSolution(matcher,
                             matcher->match(m_query, m_trainers), 
-                            matchParms, *this /* MatchMaker and/or QLogger */ );
+                            *this /* MatchMaker and/or QLogger */ );
   }
   return ( m ); 
 }
 
-MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers,
-                                      const PvlFlatMap &parameters) {
+MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   // Thread here!!!!
   MatcherSolutionList solutions;
   for (int i = 0 ; i < matchers.size() ; i++) {
-    solutions.push_back(SharedMatcherSolution( match(matchers[i], parameters) )); 
+    solutions.push_back(SharedMatcherSolution( match(matchers[i]) )); 
   }
   return ( solutions );
 }
@@ -306,9 +297,9 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
   // network. Use 2 * homography tolerance as a limit unless the user has added
   // a ResidualTolerance parameter to the matcher.
   double residual = std::sqrt( diff.x*diff.x + diff.y*diff.y);
-  double residTol = solution.matcher()->getHmgTolerance() * 2.0;
-  residTol = toDouble(solution.matcher()->getParameter("ResidualTolerance",
-                                                       toString(residTol)));
+  double residTol = toDouble(solution.matcher()->parameters().get("HmgTolerance")) * 2.0;
+  residTol = toDouble(solution.matcher()->parameters().get("ResidualTolerance",
+                                                          toString(residTol)));
 
   // Don't add the measure to the point if it exceeds tolerance
   if ( residual <= residTol ) {
@@ -336,8 +327,7 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   v_measure->SetCubeSerialNumber(image.id());
 
   // imgpt is unused variable, so it has been commented out
-  /*cv::Point2f imgpt = */
-  image.keypoint(keyindex).pt;
+  /*cv::Point2f imgpt = image.keypoint(keyindex).pt; */
   // std::cout << "ImageCoordinate: " << imgpt << "\n";
 
   cv::Point2f query = image.imageToSource(image.keypoint(keyindex).pt);

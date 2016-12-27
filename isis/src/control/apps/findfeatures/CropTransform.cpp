@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 6598 $
- * $Date: 2016-03-08 11:22:39 -0700 (Tue, 08 Mar 2016) $
- * $Id: CropTransform.cpp 6598 2016-03-08 18:22:39Z kbecker@GS.DOI.NET $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

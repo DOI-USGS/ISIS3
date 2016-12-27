@@ -2,8 +2,8 @@
 #define CropTransform_h
 /**
  * @file
- * $Revision: 6598 $ 
- * $Date: 2016-03-08 11:22:39 -0700 (Tue, 08 Mar 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for

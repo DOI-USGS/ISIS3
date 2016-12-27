@@ -2,8 +2,8 @@
 #define ScalingTransform_h
 /**
  * @file
- * $Revision: 6563 $ 
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for

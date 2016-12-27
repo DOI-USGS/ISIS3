@@ -1,8 +1,8 @@
 /**
  * @file
- * $Revision: 6600 $
- * $Date: 2016-03-09 10:30:30 -0700 (Wed, 09 Mar 2016) $
- * $Id: FeatureAlgorithmFactory.cpp 6600 2016-03-09 17:30:30Z kbecker@GS.DOI.NET $
+ * $Revision$
+ * $Date$
+ * $Id$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -31,6 +31,7 @@
 
 #include <QtGlobal>
 #include <QCoreApplication>
+#include <QRegularExpression>
 #include <QScopedPointer>
 #include <QString>
 #include <QStringList>
@@ -39,9 +40,6 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <opencv2/superres/superres.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
-
 #include "FileName.h"
 #include "IString.h"
 #include "IException.h"
@@ -49,6 +47,29 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "RobustMatcher.h"
+
+// List all the known algorithms
+#include "AgastAlgorithm.h"
+#include "AKAZEAlgorithm.h"
+#include "BlobDetectionAlgorithm.h"
+#include "BriefDescriptorAlgorithm.h"
+#include "BRISKAlgorithm.h"
+#include "DaisyAlgorithm.h"
+#include "FASTAlgorithm.h"
+#include "FREAKAlgorithm.h"
+#include "GFTTAlgorithm.h"
+#include "KAZEAlgorithm.h"
+#include "LATCHAlgorithm.h"
+#include "LUCIDAlgorithm.h"
+#include "MSDAlgorithm.h"
+#include "MSERAlgorithm.h"
+#include "ORBAlgorithm.h"
+#include "SIFTAlgorithm.h"
+#include "StarAlgorithm.h"
+#include "SURFAlgorithm.h"
+
+#include "BruteForceMatcher.h"
+#include "FlannBasedMatcher.h"
 
 using namespace std;
 
@@ -66,35 +87,22 @@ FeatureAlgorithmFactory *FeatureAlgorithmFactory::m_maker = 0;
  * handler to an ISIS handler method, and enabling all OpenCV algorithms for
  * parsing and resolving algorithms.
  */
-FeatureAlgorithmFactory::FeatureAlgorithmFactory() : AlgorithmParameters() {
+FeatureAlgorithmFactory::FeatureAlgorithmFactory()  {
 //  This ensures this singleton is shut down when the application exists
    qAddPostRoutine(DieAtExit);
    m_nMade = 0;
 
-   m_Feature2DModuleName = "Feature2D";
-   m_DetectorModuleName  = "Detector";
-   m_ExtractorModuleName = "Extractor";
-   m_MatcherModuleName   = "Matcher";
-
    // Disable OpenCV's error handler by default to suppress text on screen
    disableOpenCVErrorHandler();
 
-   // List here all those that require something other than uppercase names
-   // (OpenCV is very case-sensitive when it comes to algorithm names)
-   m_algorithmNameMap << "SimpleBlob" << "Dense" << "FlannBased"
-                      << "BruteForce-Hamming(2)" << "BruteForce-Hamming"
-                      << "BruteForce-L1" << "BruteForce" << "BFMatcher";
-
-   m_parameters = PvlFlatMap();
+   // Collection of global parameters
+   m_globalParameters = PvlFlatMap();
 
    // Initialize algorithms
-   cv::initModule_contrib();
-   cv::initModule_ml();
-   cv::initModule_video();
-   cv::superres::initModule_superres();
-   cv::initModule_nonfree();  // Initialize non-free algorithms
+   (void) initialize();
    return;
 }
+
 
 /**
  * @brief Destructor
@@ -104,6 +112,7 @@ FeatureAlgorithmFactory::FeatureAlgorithmFactory() : AlgorithmParameters() {
  *
  */
 FeatureAlgorithmFactory::~FeatureAlgorithmFactory() { }
+
 
 /**
  * @brief Retrieve reference to Singleton instance of this object
@@ -122,6 +131,40 @@ FeatureAlgorithmFactory *FeatureAlgorithmFactory::getInstance() {
   return (m_maker);
 }
 
+
+int FeatureAlgorithmFactory::initialize() {
+
+  int numAliases(0);
+
+  // The detector/extractor Feature2D
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<AgastAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<AKAZEAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<BlobDetectionAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<BriefDescriptorAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<BRISKAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<DaisyAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<FASTAlgorithm>();
+  numAliases += m_algorithmInventory.add("FASTX", FASTAlgorithm::create);
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<FREAKAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<GFTTAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<KAZEAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<LATCHAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<LUCIDAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<MSDAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<MSERAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<ORBAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<SIFTAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<StarAlgorithm>();
+  numAliases += m_algorithmInventory.addFeatureAlgorithm<SURFAlgorithm>();
+
+  // The matchers
+  numAliases += m_algorithmInventory.addMatcherAlgorithm<BruteForceMatcher>();
+  numAliases += m_algorithmInventory.addMatcherAlgorithm<FlannBasedMatcher>();
+
+  return ( numAliases );
+}
+
+
 /**
  * @brief Disable the OpenCV error handler and replace with ISIS exceptions
  *
@@ -138,6 +181,7 @@ void FeatureAlgorithmFactory::disableOpenCVErrorHandler() {
    return;
 }
 
+
 /**
  * @brief Re-enable OpenCV error handling
  *
@@ -150,6 +194,7 @@ void FeatureAlgorithmFactory::enableOpenCVErrorHandler() {
    return;
 }
 
+
 /**
  * @brief Retrieve a list of all available algorithms from OpenCV
  *
@@ -159,35 +204,9 @@ void FeatureAlgorithmFactory::enableOpenCVErrorHandler() {
  * @return QStringList List of all OpenCV algorithms
  */
 QStringList FeatureAlgorithmFactory::getListAll() const {
-  vector<string> algorithms;
-  cv::Algorithm::getList(algorithms);
-
-  QStringList qsAlgos;
-  BOOST_FOREACH ( string a, algorithms ) {
-    qsAlgos.push_back(QString::fromStdString(a));
-  }
-  return (qsAlgos);
+  return ( m_algorithmInventory.allNames() );
 }
 
-/** Return a list of all OpenCV Feature2D algorithms */
-QStringList FeatureAlgorithmFactory::getListFeature2D() const {
-  return (findWithPattern(getListAll(), m_Feature2DModuleName));
-}
-
-/** Return list of all OpenCV feature detector algorithms */
-QStringList FeatureAlgorithmFactory::getListDetectors() const {
-  return (findWithPattern(getListAll(), m_DetectorModuleName));
-}
-
-/** Return list of all OpenCV feature extractor algorithms */
-QStringList FeatureAlgorithmFactory::getListExtractors() const {
-  return (findWithPattern(getListAll(), m_ExtractorModuleName));
-}
-
-/** Return list of all OpenCV feature matcher algorithms */
-QStringList FeatureAlgorithmFactory::getListMatchers() const {
-  return (findWithPattern(getListAll(), m_MatcherModuleName));
-}
 
 /**
  * @brief Return reference to global matcher parameters
@@ -197,9 +216,10 @@ QStringList FeatureAlgorithmFactory::getListMatchers() const {
  *
  * @return const PvlFlatMap&  Reference to matcher algorithms
  */
-const PvlFlatMap &FeatureAlgorithmFactory::getGlobalParameters() const {
-  return ( m_parameters );
+const PvlFlatMap &FeatureAlgorithmFactory::globalParameters() const {
+  return ( m_globalParameters );
 }
+
 
 /**
  * @brief Set the global parameters to use in all matchers created
@@ -211,8 +231,9 @@ const PvlFlatMap &FeatureAlgorithmFactory::getGlobalParameters() const {
  * @param globals Global parameters to set for all RobustMatcher algorithms
  */
 void FeatureAlgorithmFactory::setGlobalParameters(const PvlFlatMap &globals) {
-  m_parameters = globals;
+  m_globalParameters = globals;
 }
+
 
 /**
  * @brief Add parameters to the global set of RobustMatcher parameters
@@ -224,8 +245,9 @@ void FeatureAlgorithmFactory::setGlobalParameters(const PvlFlatMap &globals) {
  * @param globals Set of new parameters to add to exist global parameters
  */
 void FeatureAlgorithmFactory::addGlobalParameters(const PvlFlatMap &globals) {
-  m_parameters = PvlFlatMap(m_parameters, globals);
+  m_globalParameters = PvlFlatMap(m_globalParameters, globals);
 }
+
 
 /**
  * @brief Add a single parameter to the global RobustMatcher parameters
@@ -238,52 +260,31 @@ void FeatureAlgorithmFactory::addGlobalParameters(const PvlFlatMap &globals) {
  */
 void FeatureAlgorithmFactory::addParameter(const QString &name,
                                            const QString &value) {
-  m_parameters.add(name, value);
+  m_globalParameters.add(name, value);
 }
+
 
 /**
  * @brief Provide Pvl Object describing parameters of an OpenCV algorithm
  *
  * The complete parameter list of the specified OpenCV algorithm is retrieved
- * and a Pvl Object is created that contains this description. In some cases,
- * callers may want to simplify ore replace the real name. Use of the
- * genericName parameter will be used as the name of the PvlObject return by
- * this method rather than the full name (which may cause Pvl parse problems).
+ * and a Pvl Object is created that contains this description.
  *
- * @param name        Name of the OpenCV algorithm to return parameters for
- * @param genericName Optional name to use instead of real algorithm name
+ * @param name Name of the OpenCV algorithm to return parameters for
  *
  * @return PvlObject Contains all parameters and values for the named algorithm
  */
-PvlObject FeatureAlgorithmFactory::info(const QString &name,
-                                        const QString &genericName) const {
-//  cout << "Creating algorithm parameter info for " << name << "\n";
-  QStringList candidates = getListAll().filter(name);
-  if ( (candidates.size() < 1) || ( name.isEmpty() ) ) {
-    QString mess = "Algorithm \"" + name + "\" does not exist or is invalid";
-    throw IException(IException::Programmer, mess, _FILEINFO_);
-  }
-
-  // If there is more than one algorithm that matches this name, defer it to
-  // the method for this purpose
- if ( candidates.size() > 1 )  return ( info(candidates, name) );
-
-  cv::Ptr<cv::Algorithm> a = cv::Algorithm::create<cv::Algorithm>(candidates[0].toStdString());
-  if ( a.empty() ) {
-    QString mess = "Failed to create algorithm " + name;
-    throw IException(IException::Programmer, mess, _FILEINFO_);
-  }
-
-  return ( getDescription(a, genericName) );
+PvlObject FeatureAlgorithmFactory::info(const QString &name) const {
+  return ( m_algorithmInventory.info( name ) );
 }
+
 
 /**
  * @brief Create Pvl Objects with parameters for list of OpenCV algorithms
  *
  * This method creates objects for each algorithm that contains parameters and
  * current default values. Each algorithm object is contained in the top level
- * object named "Algorithms". If a value is provided in genericName, it is added
- * as a keyword in the top level Algoriths object.
+ * object named "Algorithms".
  *
  * If an error should occur, the algorithm object is created but the name and a
  * description of the error (in the Error keyword) is recorded instead of
@@ -292,45 +293,15 @@ PvlObject FeatureAlgorithmFactory::info(const QString &name,
  * The OpenCV version is recorded in the "OpenCVVersion" keyword in the
  * Algorithms object.
  *
- * @param algorithms  List of algorithms to create parameter/value objects
- * @param genericName Optional name of top level object
+ * @param algorithms List of algorithms to create parameter/value objects
  *
  * @return PvlObject Top level Algorithms object contain algorithm
  *                   parameter/value objects
  */
-PvlObject FeatureAlgorithmFactory::info(const QStringList &algorithms,
-                                        const QString &genericName) const {
-  PvlObject pvlAlgo("Algorithms");
-  pvlAlgo.addKeyword(PvlKeyword("OpenCVVersion", CV_VERSION));
-  if ( !genericName.isEmpty() ) pvlAlgo.addKeyword(PvlKeyword("GenericName",
-                                                              genericName));
-
-  BOOST_FOREACH ( QString name,  algorithms ) {
-//    cout << "Getting list info for algorithm " << name << "\n";
-    try {
-      cv::Ptr<cv::Algorithm> a = cv::Algorithm::create<cv::Algorithm>(name.toStdString());
-      // Check success here if an exception is not thrown
-      if ( a.empty() ) {
-        QString mess = "Failed to create algorithm - returned null pointer";
-        PvlObject errout("Algorithm");
-        errout.addKeyword(PvlKeyword("Name", name));
-        errout.addKeyword(PvlKeyword("Error", mess));
-        pvlAlgo.addObject(errout);
-      }
-      else {
-        pvlAlgo.addObject( getDescription(a) );
-      }
-    }
-    catch (cv::Exception &e) {
-      PvlObject errout("Algorithm");
-      errout.addKeyword(PvlKeyword("Name", name));
-      errout.addKeyword(PvlKeyword("Error", toQt(e.what()) ));
-      pvlAlgo.addObject(errout);
-      continue;
-    }
-  }
-  return ( pvlAlgo );
+PvlObject FeatureAlgorithmFactory::info(const QStringList &algorithms) const {
+  return ( m_algorithmInventory.info( algorithms, "Algorithms" ) );
 }
+
 
 /**
  * @brief Create Pvl object of parameter/values for RobustMatcher algorithms
@@ -346,23 +317,22 @@ PvlObject FeatureAlgorithmFactory::info(const QStringList &algorithms,
  * algorithm (Specification) are also added to the object. These algorithms are
  * added to a top level object called "FeatureAlgorithms".
  *
- * @param algorithms  List of RobustMatcher algorithms to generate info for
- * @param genericName Genric name of the top level PvlObject
+ * @param algorithmList List of RobustMatcher algorithms to generate info for
  *
  * @return PvlObject Top level FeatureAlgorithms object containing current
  *                   parameter/values for each RobustMatcher algorithm
  */
-PvlObject FeatureAlgorithmFactory::info(const RobustMatcherList &algorithms,
-                                        const QString &genericName) const {
-  PvlObject pvlAlgo("FeatureAlgorithms");
-  if ( !genericName.isEmpty() ) pvlAlgo.addKeyword(PvlKeyword("GenericName",
-                                                              genericName));
+PvlObject FeatureAlgorithmFactory::info(const RobustMatcherList &algorithmList)
+                                        const {
+  PvlObject listPvl("FeatureAlgorithms");
 
-  BOOST_FOREACH ( SharedRobustMatcher a,  algorithms ) {
-    pvlAlgo.addObject( a->info() );
+  BOOST_FOREACH(SharedRobustMatcher algorithms, algorithmList) {
+    listPvl += algorithms->info();
   }
-  return ( pvlAlgo );
+
+  return ( listPvl );
 }
+
 
 /**
  * @brief Create a series of feature-based RobustMatcher algorithms
@@ -399,13 +369,12 @@ PvlObject FeatureAlgorithmFactory::info(const RobustMatcherList &algorithms,
  *                           algorithms
  */
 RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
-                                                  const bool &errorIfEmpty)
-                                                  const {
+                                                      const bool &errorIfEmpty)
+                                                      const {
   RobustMatcherList algoList;
 
   // Individual algorithm specifications are separated by vertical bars
   QStringList algorithms = specs.split("|", QString::SkipEmptyParts);
-  // cout << "create: got " << algorithms.size() << " algorithms...\n";
   if ( algorithms.size() == 0 ) {
     if ( errorIfEmpty ) {
       QString mess = "No feature matcher algorithms provided!";
@@ -414,18 +383,18 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
     return (algoList);
   }
 
-  //  Make all feature algorithms
-  BOOST_FOREACH ( QString matcher, algorithms ) {
-   // cout << "  making " << matcher << " algorithm...\n";
-    SharedRobustMatcher algo( make(matcher) );
+  // Make all feature algorithms
+  BOOST_FOREACH ( QString matcherSpec, algorithms ) {
+    SharedRobustMatcher algo( make(matcherSpec) );
     if ( algo.isNull() ) {
-      QString mess = "Failed to create feature matcher from spec " + matcher;
+      QString mess = "Failed to create feature matcher from spec " + matcherSpec + ".";
       throw IException(IException::User, mess, _FILEINFO_);
     }
-    algoList.push_back(algo);
+    algoList.append(algo);
   }
   return (algoList);
 }
+
 
 /**
  * @brief Create OpenCV feature-based RobustMatcher algorithm from string spec
@@ -445,250 +414,277 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
  *
  * @return RobustMatcher* Pointer to a RobustMatcher algorithm
  */
-RobustMatcher *FeatureAlgorithmFactory::make(const QString &definition) const {
+SharedRobustMatcher FeatureAlgorithmFactory::make(const QString &definition) const {
 
-  cv::Ptr<cv::FeatureDetector>     detector;
-  cv::Ptr<cv::DescriptorExtractor> extractor;
-  cv::Ptr<cv::DescriptorMatcher>   matcher;
+  // std::cout << "FeatureAlgorithmFactorty::make - Creating feature algorithms from spec: " << definition << "\n";
+  FeatureAlgorithmPtr detector;
+  FeatureAlgorithmPtr extractor;
+  MatcherAlgorithmPtr matcher;
 
-  QStringList featureName;
-  QString     description(definition);
+  QString fullspec(definition);
+  // Split the full config string up and check formatting
+  // Output order is always detector, extractor, matcher, parameters
+  QStringList formattedSpecs = formatSpecifications(fullspec);
 
-  QStringList parts = definition.split("/", QString::SkipEmptyParts);
-  if ( (parts.size() < 2) || (parts.size() > 4) ) {
-    QString mess = "Feature algorithm (" + definition +
-                   ") specification is  ill-formed.  Must be of the form: "
-                   "Detector/Extractor[/Matcher][/parameters@...] where "
-                   "Detector and Extractor can be a Feature2D algorithm or "
-                   "of its own type. The Matcher is optional and an "
-                   "appropriate one will be allocated based upon the type of "
-                   "Extractor descriptor. Parameters that pertain to the "
-                   "Robust matcher algorithm can be provided in the Parameters "
-                   "option. See findfeatures documentation for what is "
-                   "currently available as parameters.";
-    throw IException(IException::User, mess, _FILEINFO_);
+  // Merge parameters with global parameters
+  PvlFlatMap matcherParameters = globalParameters();
+  if ( !formattedSpecs[3].isEmpty() ) {
+    QStringList parametersList = m_algorithmInventory.parse(formattedSpecs[3], "@");
+    parametersList.removeFirst();
+    matcherParameters.merge( m_algorithmInventory.parameters( parametersList ) );
   }
 
-  QStringList allOfThem = getListAll();
-  int partno(0);
-  PvlFlatMap algoparms;  // Any algorithm parameters are in spec
-  BOOST_FOREACH ( QString specs, parts ) {
-    QStringList elements = specs.split("@", QString::SkipEmptyParts);
-    if ( elements.size() == 0 )  {
-      QString mess = "Ill-formed \"algorithm[@parameter:value]+]\" ALGORITHM "
-                     "specified in " + specs;
-      throw IException(IException::User, mess, _FILEINFO_);
+  // Construct the detector and extractor
+  try {
+    if ( !formattedSpecs[0].isEmpty() ) {
+      // std::cout << "Creating detector with " <<  formattedSpecs[0]<< "\n";
+      detector = m_algorithmInventory.getDetector(formattedSpecs[0]);
+      if ( formattedSpecs[1].isEmpty() ) {
+        // std::cout << "Equating extractor to detector\n";
+        extractor = detector;
+      }
     }
 
-    // First check if the spec is the algorithm parameters option and treat it
-    // special
-    QString feature = elements.takeFirst();
-    if ( "parameters" == feature.toLower() ) {
-      algoparms = parseParameters(specs);
-      continue;
+    if ( !formattedSpecs[1].isEmpty() ) {
+      // std::cout << "Creating extractor with " <<  formattedSpecs[1]<< "\n";
+      extractor = m_algorithmInventory.getExtractor(formattedSpecs[1]);
+      if ( formattedSpecs[0].isEmpty() ) {
+        // std::cout << "Equating detector to extractor\n";
+        detector = extractor;
+      }
     }
 
-    // Its a matcher component so parse it
-    partno++;
-    featureName.push_back(feature);
-    QStringList candidate = findWithPattern(allOfThem, feature);
-    if ( candidate.size() == 0  ) {
-      // If its not validated, assume the user knows what they are doing
-      candidate.push_back(feature);
-    }
-
-    // Got a single algorithm.  Determine which one
-    QString ftype = candidate.takeFirst();
-    QString realName = mapAlgorithmName(ftype.split(".").takeLast().toUpper());
-    string name = toStd(realName);
-    if ( isFeature2D(ftype)  ) {
-//      cout << "Got a Feature2D engine algorithm: " << ftype
-//           << ", Name(" << name << ")...\n";
-      if ( 1 == partno ) {
-        detector = cv::Feature2D::create(name);
-        checkPtr(detector, "Failed to create Feature2D algorithm for " + ftype,
-                 _FILEINFO_);
-        setFormattedParameter(detector, elements);
-      }
-      else if ( 2 == partno ) {
-        extractor = cv::Feature2D::create(name);
-        checkPtr(extractor, "Failed to create Feature2D algorithm for " + ftype,
-                 _FILEINFO_);
-        setFormattedParameter(extractor, elements);
-      }
-      else {
-        QString mess =  "Feature2D type " + ftype + " is not a valid Matcher type";
-        throw IException(IException::User, mess, _FILEINFO_);
-      }
-    }
-    else if ( isDetector( ftype ) ) {
-      if ( 1 != partno ) {
-        QString mess =  ftype + " is not a valid detector type";
-        throw IException(IException::User, mess, _FILEINFO_);
-      }
-//      cout << "Making Detector: " << name << "\n";
-      detector = cv::FeatureDetector::create(name);
-      checkPtr(detector, "Failed to create Detector algorithm for " + ftype,
-               _FILEINFO_);
-      setFormattedParameter(detector, elements);
-    }
-    else if ( isExtractor( ftype ) ) {
-     if ( 2 != partno ) {
-        QString mess =  ftype + " is not a valid Extractor type";
-        throw IException(IException::User, mess, _FILEINFO_);
-      }
-//      cout << "Making Extractor: " << name << "\n";
-      extractor = cv::DescriptorExtractor::create(name);
-      checkPtr(extractor, "Failed to create Extractor algorithm for " + ftype,
-               _FILEINFO_);
-      setFormattedParameter(extractor, elements);
-    }
-    else if ( isMatcher( ftype) ) {
-//      cout << "Got a matcher algorithm: " << ftype << " - RealName: " << name << "...\n";
-      if ( 3 != partno ) {
-        QString mess =  ftype + " is not a valid in this context must be a " +
-                        (( 1 == partno ) ? "Detector" : "Extractor");
-        throw IException(IException::User, mess, _FILEINFO_);
-      }
-      matcher = cv::DescriptorMatcher::create(name);
-      checkPtr(matcher, "Failed to create Matcher algorithm for " + ftype,
-               _FILEINFO_);
-      setFormattedParameter(matcher, elements);
-    }
-    else {
-      QString mess = "Algorithm feature \"" + feature + "\" not a valid feature. " +
-                     "Must be member of one of the following CV modules: " +
-                     m_Feature2DModuleName + ", " + m_DetectorModuleName + ", " +
-                     m_ExtractorModuleName + ", " + m_MatcherModuleName;
-      throw IException(IException::User, mess, _FILEINFO_);
+    if ( !formattedSpecs[2].isEmpty() ) {
+      // std::cout << "Creating matcher with " <<  formattedSpecs[2]<< "\n";
+      matcher = m_algorithmInventory.getMatcher( formattedSpecs[2] );
     }
   }
-
-  // Verify and construct the RobustMatcher. Parameters specified in each
-  // algorithm specification take precendence over the globals.
-  QScopedPointer<RobustMatcher> falgo;
-  PvlFlatMap mergedParms(m_parameters, algoparms);
-  if ( matcher.empty() ) {
-    falgo.reset (new RobustMatcher(featureName.join("+"), detector, extractor,
-                                   mergedParms));
-    description += falgo->getMatcherDescription(); }
-  else {
-    falgo.reset(new RobustMatcher(featureName.join("/"), detector, extractor,
-                                  matcher, mergedParms));
+  catch (IException &e) {
+    QString mess = "Failed to create algorithms for config:\n" + definition;
+    throw IException(e, IException::User, mess, _FILEINFO_);
   }
 
-  // Check for validity
-  if ( falgo.isNull()  ) {
-    QString mess = "RobustMatcher::" + featureName.join("/") +
-                   " was not created successfully!";
-    throw IException(IException::User, mess, _FILEINFO_);
+  // If no matcher was entered use a BruteForceMatcher
+  if ( formattedSpecs[2].isEmpty() ) {
+    // std::cout << "Creating matcher from extractor with " <<  formattedSpecs[1]<< "\n";
+    matcher = createMatcher(extractor);
+    fullspec += ("/" + matcher->config()); 
   }
 
-  // Set the specfication string
-  falgo->setDescription(description);
+  // Make the algorithms container
+  MatcherAlgorithms algos(detector, extractor, matcher, matcherParameters);
+  SharedRobustMatcher falgo( new RobustMatcher(fullspec, algos, matcherParameters) );
+
+  // Check for validity of matcher that has just been created
+  try {
+   falgo->validate(true);
+  } 
+  catch (IException &ie) {
+    QString mess = "MatcherAlgorithms were not created successfully!";
+    ie.append(IException(IException::User, mess, _FILEINFO_));
+    throw ie;
+  }
 
   m_nMade++;
-  return ( falgo.take() );
+  return ( falgo );
 }
+
+
+/**
+ * @brief Parses a full specification string for a set of algorithms.
+ * 
+ * Parses a full specification string for a set of algorithms and checks formatting.
+ * The specifications will be returned as a QStringList containing, in order: the detector
+ * specification, the extractor specification, the matcher specification, and the 
+ * parameters specification.  If the matcher and/or parameters are not specified they
+ * will be a null QString. 
+ *  
+ * Upon return, you can expect the following conditions: 
+ *  
+ *   1) All strings have content meaning the specification contained all
+ *      four (detector, extractor, matcher, parameters) algorithm specifications
+ *   2) Only one of detector *or* extractor was specified and it is a fully
+ *     capable Feature2D algorithm (i.e., it has both valid detector and
+ *     extractor capabilities).
+ *   3) May not have a matcher, so it must be allocated from the type of the
+ *      extractor which must be determined after it has been initialized (see
+ *      createMatcher(extractor))..
+ */
+QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification) const {
+  QStringList parts = specification.split("/", QString::SkipEmptyParts);
+
+  // Componenet specifications
+  QString feature2dSpec;
+  QString detectorSpec;
+  QString extractorSpec;
+  QString matcherSpec;
+  QString parametersSpec;
+
+  QStringList remains;
+  for (int i = 0 ; i < parts.size() ; i++) {
+    QString part = parts[i].simplified();
+    if ( part.contains(QRegularExpression("^feature2d\\.*", QRegularExpression::CaseInsensitiveOption)) ) {
+      // std::cout << "Setting feature2d: " << part << "\n";
+      // If we have a detector and extractor, this is an error
+      if ( !detectorSpec.isEmpty() && !extractorSpec.isEmpty() ) {
+        QString mess = "Too many Feature2Ds specified at " + part + " in specification " +
+                       specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+
+      // Check detector situation
+      if ( detectorSpec.isEmpty() ) {
+        detectorSpec = part;
+      }
+      else {
+        // Already have a detector so this must be extractor
+        extractorSpec = part;
+      }
+      // Also sets this for testing purposes
+      feature2dSpec = part;
+    }
+    // Check for explicit settin of detector
+    else if ( part.contains(QRegularExpression("^detector\\.*", QRegularExpression::CaseInsensitiveOption)) ) {
+      // std::cout << "Setting detector: " << part << "\n";
+      if ( !detectorSpec.isEmpty() ) {
+        QString mess = "Multiple Detector specs found - have \"" + detectorSpec + "\", but found \"" +
+                        part + "\" in specification: " + specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+      detectorSpec = part;
+    }
+    // Check for explicit setting of the extractor
+    else if ( part.contains(QRegularExpression("^extractor\\.*", QRegularExpression::CaseInsensitiveOption)) ) {
+      // std::cout << "Setting extractor: " << part << "\n";
+      if ( !extractorSpec.isEmpty() ) {
+        QString mess = "Multiple Extractor specs found - have \"" + extractorSpec + "\", but found \"" +
+                        part + "\" in specification: " + specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+      extractorSpec = part;
+    }
+    // Find matcher alorithm string specification
+    else if ( part.contains(QRegularExpression("^matcher\\.*", QRegularExpression::CaseInsensitiveOption)) ) {
+      // std::cout << "Setting matcher: " << part << "\n";
+      if ( !matcherSpec.isEmpty() ) {
+        QString mess = "Multiple Matcher specs found - have \"" + matcherSpec + "\", but found  \"" +
+                        part + "\" in specification: " + specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+      matcherSpec = part;
+    }
+    else if ( part.contains(QRegularExpression("^parameters*", QRegularExpression::CaseInsensitiveOption)) ) {
+      // std::cout << "Setting paramters: " << part << "\n";
+      if ( !parametersSpec.isEmpty() ) {
+        QString mess = "Multiple Parameter specs found - have \"" + parametersSpec + "\", but found \"" +
+                        part + "\" in specification: " + specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+      parametersSpec = part;
+    }
+    else {
+      // std::cout << "Setting algorithm[" << i << "] to " << part << "\n";
+      // Can't safely check for ill-formed qualifier, so let the allocation 
+      if ( detectorSpec.isEmpty() ) {
+        detectorSpec = part;
+      }
+      else if ( extractorSpec.isEmpty() ) {
+        extractorSpec = part;
+      }
+      else if ( matcherSpec.isEmpty() ) {
+        matcherSpec = part;
+      }
+      else {
+        // Should have had parameter already so there are too many parts of 
+        // the specification and its invalid. 
+        QString mess = "Invalid algorithm/part at or near \"" + part + 
+                       "\" - too many or invalid algorithm specs detected in specification: "
+                       + specification;
+        throw IException(IException::User, mess, _FILEINFO_);
+      }
+    }
+  }
+
+  // If a parameter specification was found get it
+  if ( !parametersSpec.isEmpty() ) {
+    if ( parametersSpec.split("@", QString::SkipEmptyParts).takeFirst().toLower() !=
+         "parameters" ) {
+      QString mess = "Invalid specification:\n" +
+                     specification + "\n" +
+                     "Invalid parameters specification:\n" +
+                     parametersSpec;
+      throw IException(IException::User, mess, _FILEINFO_);
+    }
+  }
+
+  QStringList formattedSpecs;
+  formattedSpecs.append(detectorSpec);
+  formattedSpecs.append(extractorSpec);
+  formattedSpecs.append(matcherSpec);
+  formattedSpecs.append(parametersSpec);
+  
+  return ( formattedSpecs );
+}
+
+
+/**
+ * @brief Allocate a BruteForceMatcher algorithm based upon descriptor extractor
+ * 
+ * See the OpenCV 3.1 BFMatcher documentation
+ * http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher.html
+ * for details on this implementation.
+ *
+ * @author 2016-12-19 Jesse Mapel
+ * @internal
+ *   @history 2016-12-19 Jesse Mapel - Adapted from Kris Becker's RobustMatcher::allocateMatcher
+ */
+MatcherAlgorithmPtr FeatureAlgorithmFactory::createMatcher(FeatureAlgorithmPtr extractor,
+                                                           const QString &normalize,
+                                                           const QString &crossCheck)
+                                                           const {
+
+  QString name( extractor->name().toLower() );
+
+  QString normType(normalize);
+  if ( name.contains("SURF", Qt::CaseInsensitive) ) {
+    normType = "NORM_L2";
+  }
+  else if ( name.contains("SIFT", Qt::CaseInsensitive)  ) {
+    normType = "NORM_L2";
+  }
+  else if (name.contains("ORB", Qt::CaseInsensitive) ) {
+    normType = "NORM_HAMMING";
+    try {
+      if ( toInt( extractor->getVariable("WTA_K") ) > 2 ) {
+        normType = "NORM_HAMMING2";
+      }
+    }
+    catch ( cv::Exception &e ) {
+      //  NOOP - use existing value
+    }
+  }
+  else if ( name.contains("BRISK", Qt::CaseInsensitive) ) {
+    normType = "NORM_HAMMING";
+  }
+  else if ( name.contains("BRIEF", Qt::CaseInsensitive) ) {
+    normType = "NORM_HAMMING";
+  }
+
+  // Create the matcher and return
+  QString matcherSpecs = "BFMatcher";
+  matcherSpecs + "@NormType:" + normType;
+  matcherSpecs + "@CrossCheck:" + crossCheck;
+  MatcherAlgorithmPtr matcher = m_algorithmInventory.getMatcher(matcherSpecs);
+  return ( matcher );
+}
+
 
 /** Returns the number of algorithms created by this object */
 unsigned int FeatureAlgorithmFactory::manufactured() const {
   return (m_nMade);
 }
 
-/** Find a subset of strings that contain a particular pattern */
-QStringList FeatureAlgorithmFactory::findWithPattern(const QStringList &flist,
-                                                     const QString &pattern)
-                                                     const {
-  return ( flist.filter(pattern, Qt::CaseInsensitive) );
-}
 
-/** Check for special algorithm cases */
-QString FeatureAlgorithmFactory::mapAlgorithmName(const QString &name) const {
-  // Ok, special check for a specific case:  FlannBasedMatcher = FlannBased
-  QString target = name.contains("Flann", Qt::CaseInsensitive) ? "Flann" : name;
-  QStringList algoMap = findWithPattern(m_algorithmNameMap, target);
-  if ( !algoMap.empty() ) {
-    return ( algoMap.takeLast() );
-  }
-
-  return ( name );
-}
-
-/** Determine if the string contains an OpenCV Feature2D algorithm spec */
-bool FeatureAlgorithmFactory::isFeature2D(const QString &name) const {
-  return (name.contains(m_Feature2DModuleName, Qt::CaseInsensitive));
-}
-
-/** Determine if the string contains an OpenCV detector algorithm spec */
-bool FeatureAlgorithmFactory::isDetector(const QString &name) const {
-  return (name.contains(m_DetectorModuleName, Qt::CaseInsensitive));
-}
-
-/** Determine if the string contains an OpemCV extractor algorithm spec */
-bool FeatureAlgorithmFactory::isExtractor(const QString &name) const {
-  return (name.contains(m_ExtractorModuleName, Qt::CaseInsensitive));
-}
-
-/** Detemine if the string contains an OpenCV matcher algorithm spec */
-bool FeatureAlgorithmFactory::isMatcher(const QString &name) const {
-  return (name.contains(m_MatcherModuleName, Qt::CaseInsensitive));
-}
-
-
-/**
- * @brief Parse a parameter string for values and return in parameter map
- *
- * This method parses the parameter section of the RobustMatcher specification
- * of the matcher algorithm. The general form of the string specification is
- * "/parameter@name:value[@name1:value1...]". This will result in a Pvl map
- * entry of the form "name = value".
- *
- * @param parameters Parameter specification part of the feature matcher string
- *
- * @return PvlFlatMap Pvl map of the parameters parsed from the string
- */
-PvlFlatMap FeatureAlgorithmFactory::parseParameters(const QString &parameters)
-                                                    const {
-  PvlFlatMap pmap;
-
-  // If the string is empty, return an empty paramter list
-  QStringList parts = parameters.split("@");
-  if ( parts.size() == 0 ) { return (pmap); }
-
-  // Ensure the first part of the parameter list is "parameters" or an error
-  // is assumed.
-  QString parmtag = parts.takeFirst();
-  if ( "parameters" != parmtag.toLower() ) {
-    QString mess = "Illformed parameters string [" + parameters + "] - must be "
-                   "of the form \"parameters@parm1:value1@parm2:value2...\"";
-    throw IException(IException::User, mess, _FILEINFO_);
-  }
-
-  // All good so far, parse each parameter string
-  BOOST_FOREACH ( QString specs, parts ) {
-
-    // Is it valid?
-    QStringList parmvaltag = specs.split(":");
-    if ( 2 != parmvaltag.size() ) {
-      QString mess = "Invalid parameter at or near [" + specs + "] in \"" +
-                     parameters + "\" - must be of the form "
-                     "\"parameters@parm1:value1@parm2:value2...\"";
-      throw IException(IException::User, mess, _FILEINFO_);
-    }
-
-    // Looks good, set the parameters
-    pmap.add(parmvaltag[0], parmvaltag[1]);
-  }
-
-  // All done...
-  return ( pmap );
-}
-
-
-/*
-
- */
 /**
  * @brief Method to capture OpenCV exceptions/errors and suppress them
  *
@@ -723,22 +719,22 @@ int FeatureAlgorithmFactory::handleOpenCVErrors( int status,
   return 0;   //Return value is not used
 }
 
- /**
-   * @brief Exit termination routine
-   *
-   * This (static) method ensure this object is destroyed when Qt exits.
-   *
-   * Note that it is error to add this to the system _atexit() routine because
-   * this object utilizes Qt classes.  At the time the atexit call stack is
-   * executed, Qt is long gone resulting in Very Bad Things.  Fortunately, Qt has
-   * an exit stack function as well.  This method is added to the Qt exit call
-   * stack.
-   */
-  void FeatureAlgorithmFactory::DieAtExit() {
-    delete  m_maker;
-    m_maker = 0;
-    return;
-  }
 
+/**
+ * @brief Exit termination routine
+ *
+ * This (static) method ensure this object is destroyed when Qt exits.
+ *
+ * Note that it is error to add this to the system _atexit() routine because
+ * this object utilizes Qt classes.  At the time the atexit call stack is
+ * executed, Qt is long gone resulting in Very Bad Things.  Fortunately, Qt has
+ * an exit stack function as well.  This method is added to the Qt exit call
+ * stack.
+ */
+void FeatureAlgorithmFactory::DieAtExit() {
+  delete  m_maker;
+  m_maker = 0;
+  return;
+}
 
 } // namespace Isis

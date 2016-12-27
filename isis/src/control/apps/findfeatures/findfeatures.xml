@@ -10,22 +10,24 @@
       <h3>Introduction</h3>
       <p>
         <i>findfeatures</i> was developed to provide an alternative approach to 
-         create image-based ISIS control point networks.  Traditional ISIS 
-         control networks are typically created using equally spaced grids and 
-         area-based image matching (ABM) techniques. Control points are at the 
-         center of these grids and they are not necessarily associated with any 
-         particular feature or interest point.
-         <i>findfeatures</i> applies  feature-based matching (FBM) algorihms using 
-         the full suite of  <a href="http://opencv.org/">OpenCV</a>
-         <a href="http://docs.opencv.org/2.4.12/modules/features2d/doc/features2d.html">
-         feature matching frameworks</a>. The points detected by these 
-         algorithms are associated with special surface features identified by 
-         the type of detector algorithm designed to identify certain  
-         charcteristics. Feature based matching has a 
-         <a href="http://www.computervisionblog.com/2015/01/from-feature-descriptors-to-deep.html">
-          twenty year history</a> in computer vision and continues to benefit 
-          from improvements and advancements to make development of applications 
-          like this possible. 
+        create image-based ISIS control point networks.  Traditional ISIS 
+        control networks are typically created using equally spaced grids and 
+        area-based image matching (ABM) techniques. Control points are at the 
+        center of these grids and they are not necessarily associated with any 
+        particular feature or interest point.
+        <i>findfeatures</i> applies  feature-based matching (FBM) algorihms using 
+        the full suite of <a href="http://opencv.org/">OpenCV</a>
+        <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
+        detection and descriptor extraction algorithms</a> and 
+        <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
+        descriptor matchers</a>. The points detected by these 
+        algorithms are associated with special surface features identified by 
+        the type of detector algorithm designed to identify certain  
+        charcteristics. Feature based matching has a 
+        <a href="http://www.computervisionblog.com/2015/01/from-feature-descriptors-to-deep.html">
+        twenty year history</a> in computer vision and continues to benefit 
+        from improvements and advancements to make development of applications 
+        like this possible. 
       </p>
       <p>
         This application offers alternatives to traditional image matching options 
@@ -40,223 +42,862 @@
       </p>
       <h3>Overview</h3>
       <p>
-         Feature based algorithms  are comprised of three basic processes:  
-         detection of interest points (or keypoints), extraction of interest point 
-         descriptors and finally matching of interest point descriptors from two 
-         image sources. These three operations are performed with individual 
-         algorithms called detectors, extractors and matchers, respectively. 
-         These operations alone do not ensure good, high quality  points are 
-         detected as the result set likely contains many outliers. 
-         <i>findfeatures</i> applies a robust outlier detection procedure that 
-         works well for many diverse observing conditions that commonly occur 
-         during the acquisution (e.g., opposing sun angles, wide range of emission 
-         and incidence angeles, etc..). Users can specify unique combinations of 
-         detector, extractor and matcher FBM algorithms using the OpenCV API 
-         through string specifcations. The string specification of the FBM names 
-         the three algorithms and optional parameter values for each using a 
-         custom syntax to provide flexibilty.
+        <i>findfeatures</i> uses <a href="http://opencv.org/">OpenCV 3.1's</a>
+        FBM algorithms to match a single image, or set of images, called the
+        trainer image(s) to a different image, called the query image.
       </p>
       <p>
-          <i>findfeatures</i> is designed to support many different image 
-          formats. However, ISIS images with camera models provide the greatest 
-          flexibility when using this feature matcher. Level 1 ISIS images with 
-          geometry can be effectively and efficiently matched by applying fast 
-          geometric transforms that project all overlapping candidate images 
-          (referred to as <i>train</i> images in OpenCV terminolgy) to the camera 
-          space of the match (or truth) image (referred to as the 
-          <i>query</i> image in OpenCV terminology). This single feature allows 
-          users to apply virtually all OpenCV detector and extractor, including 
-          algorithms that are not scale and rotation invariant. Other popular 
-          image formats are supported using OpenCV 
-          <a href="http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#imread">
-          imread()</a> image reader API. Images supported here can be provided as 
-          the image input files. However, these images will not have geometric 
-          functionality so  support for the fast geometric option is not 
-          available to these images. As a consequence, FBM algorithms that are 
-          not scale and rotation invarant are not recommended for these images 
-          unless they are relatively spatially consistent. Nor can the point 
-          geometries be provided - only line/sample coorelations will be 
-          computed in these cases.
+        Feature based algorithms are comprised of three basic processes:
+        detection of features (or keypoints), extraction of feature descriptors
+        and finally matching of feature descriptors from two image sources.
+        To improve the quality of matches, <i>findfeatures</i> applies a fourth
+        process, robust outlier detection.
       </p>
       <p>
-          The OpenCV FBM algorithms and parameterization of those algoriithms are 
-          selected/provided with a specific string syntax. The string contains a 
-          feature detector, descriptor extractor and descriptor matcher 
-          algorithm specification with optional parameterization of the robust 
-          matcher outlier detection and other processing algorithms. The general 
-          form of the FBM specification string is:
+        Feature detection is the search for features of interest (or key
+        points) in an image. The ultimate goal is to find features that can
+        also be found in another image of the same subject or location.
+        Feature detection algorithms are often refered to as detectors.
+      </p>
+      <p>
+        Detectors describe key points based on their location in a specific
+        image. Feature descriptors allow features found by a detector to be
+        described outside of the context of that image. For example, features
+        could be described by their roundness or how much they contrast the
+        surrounding area. Feature descriptors provide a way to compare key
+        points from different images. Algorithms that extract feature
+        descriptors from keypoints in an image are called extractors.
+      </p>
+      <p>
+        The third process is to match key points from different images based on
+        their feature descriptors. The trainer images can be matched to the
+        query image (called a trainer to query match) or the query image can be
+        matched to the trainer images (calles a query to trainer match).
+        <i>findfeatures</i> performs both a trainer to query match and a query
+        to trainer match. Algorithms for matching feature descriptors are
+        called matchers.
+      </p>
+      <p>
+        The final step is to remove outlier matches. This helps improve the
+        quality and accuracy of matches when conditions make matching
+        challenging. <i>findfeatures</i> uses a five step outlier removal
+        process. At each step, matches are rejected and only the surviving
+        matches are used in the following step.  First, a ratio test comparing
+        the best and second best match for each point removes points that not
+        sufficiently distinct. Second, the matches are checked for symmetry. If
+        a match was made in the trainer to query match, but not in the query to
+        trainer match (or vice versa) then the match is removed. Third, the
+        homography matrices (projections from one image's perspective into
+        anothers) from the query image to the trainer images are computed using
+        the RANSAC algorithm and matches with a high residual are removed.
+        Fourth, the fundamental matrices between the trainer images and the
+        query image are computed using the RANSAC algorithm and matches that
+        are excluded by the RANSAC algorithm are removed. Finally, the
+        homography matrices from the query image to the trainer images are
+        computed again and matches with a high residual are removed.
+      </p>
+      <p>
+        Matches that survive the outlier rejection process are converted into
+        an output control network. From here, mutliple control networks created
+        by systematic use of <i>findfeatures</i> can be combined into one
+        regional or global control network with <i>cnetcombinept</i>. This can
+        result in extremely larget control networks. <i>cnetthinner</i> can be
+        used to reduce the size of the network without significantly degrading
+        its quality.
+      </p>
+      <h3>Supported Image Formats</h3>
+      <p>
+        <i>findfeatures</i> is designed to support many different image
+        formats. However, ISIS cubes with camera models provide the greatest 
+        flexibility when using this feature matcher. ISIS cubes with  geometry
+        can be effectively and efficiently matched by applying fast  geometric
+        transforms that project all overlapping candidate images (referred to
+        as <i>train</i> images in OpenCV terminolgy) to the camera space of the
+        match (or truth) image (referred to as the <i>query</i> image in OpenCV
+        terminology). This single feature allows users to apply virtually all
+        OpenCV detector and extractor, including algorithms that are not scale
+        and rotation invariant. Other popular image formats are supported using
+        OpenCV 
+        <a href="http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html">
+        imread()</a> image reader API. Images supported here can be provided as 
+        the image input files. However, these images will not have geometric 
+        functionality so  support for the fast geometric option is not 
+        available to these images. As a consequence, FBM algorithms that are 
+        not scale and rotation invarant are not recommended for these images 
+        unless they are relatively spatially consistent. Nor can the point 
+        geometries be provided - only line/sample coorelations will be 
+        computed in these cases.
+      </p>
+      <h3>Specifying Algorithms and Robust Matcher Parameters</h3>
+      <p>
+        Detectors, extractors, matchers, and robust matcher parameters are
+        specified by a specification string entered as the <b>ALGORITHM</b>
+        parameter. The basic scheme is shown below (optional portions are
+        surrounded by <code>[ ]</code>).
       </p>
       <code>
-          detector[@param1:value1@...]/extractor[@param1:value@...][/matcher@param1@value1@...][/parameters@param1:value1@...]
+        detector[@param1:value1@...]/extractor[@param1:value@...][/matcher@param1@value1@...][/parameters@param1:value1@...]
       </code>
       <p>
-          where <code>detector</code>
-          is the name of an OpenCV feature <a href="http://docs.opencv.org/2.4.12/modules/features2d/doc/feature_detection_and_description.html#feature-detection-and-description">
-          detector </a> (such as SIFT, SURF, FAST, etc...), 
-          <code>extractor</code> is a name                                                       
-          of a descriptor 
-          <a href="http://docs.opencv.org/2.4.12/modules/features2d/doc/common_interfaces_of_descriptor_extractors.html#descriptorextractor-create">
-          extractor</a> (such as SIFT, SURF, BRISK, BRIEF and FREAK), 
-          <code>matcher</code> is the name of a descriptor 
-          <a href="http://docs.opencv.org/2.4.12/modules/features2d/doc/common_interfaces_of_descriptor_matchers.html#descriptormatcher-create">
-          matcher</a> (such as FlannBased or BruteForce) and 
-          <code>parameters</code> names variables that alter the behavior and 
-          results of image matching processing. Only <code>detectors</code> and 
-        <code>extractors</code> are required (<i>findfeatures</i> will 
-         automatically provide a <code>matcher</code> for the 
-        <code>detector/extractor</code> combination).
-         The list of parameters for the robust matcher algorithm
-          currently available are listed in the <a href="#MatcherParameters">Robust Matcher Parameters</a> table.
+        The specification string consists of between two and four components
+        separated by <code>/</code>. Each component consists of entries
+        separated by <code>@</code>. The first component of the specification
+        string, <code>detector[@param1:value1@...]</code>, defines the
+        detector. The first entry is the name of the algorithm. The remaining
+        entries are separated by <code>@</code> and define parameters for the
+        detector. The entries consist of the parameter name followed by
+        <code>:</code> and then the parameter value. After the detector
+        component is <code>/</code> and then the extractor component,
+        <code>extractor[@param1:value@...]</code>. After the extractor
+        component is <code>/</code> and then the matcher component,
+        <code>[matcher@param1@value1@...]</code>. The extractor and matcher
+        components are formatted the same way as the detector component. The
+        final component of the specification string,
+        <code>[/parameters@param1:value1@...]</code> defines the robust matcher
+        parameters. The first entry is the word <code>parameters</code>. The
+        remaining entries consist of parameter <code>name:value</code> pairs,
+        just like the parameters in the algorithm components.
       </p>
       <p>
-          Outlier detection is implemented as four separate steps and applied 
-          to the results of the FBM detector, extractor and matcher algorithms 
-          have completed. The four main steps are:
-          <ul>
-              <li>
-                  Bi-directional ratio test of two closest matches of each tie point
-              </li>
-              <li>
-                  Symmetry test of bi-directional matches
-              </li>
-              <li>
-                <a href="http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#findfundamentalmat">
-                 Epipolar</a> (stereo) constraints from fundamental matrix using 
-                  random sampling consensus (RANSAC) 
-              </li>
-              <li>
-                  Projective relationship using
-                   <a href="http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#findhomography">
-                  homography</a> (spatial) matrix
-              </li>
-          </ul>
-        <b>
-           This is a significant improvement over existing ABM algorithms 
-           because outlier detection is now performed both in the image matching 
-           phase and <i>jigsaw</i> bundle adjustment! 
-        </b>
+        An alternative scheme for the specification string allows the
+        components to be in any order. Each component is formatted the same,
+        except the first entry in the detector, extractor, and (if specified)
+        matcher components begin with <code>detector.</code>,
+        <code>extractor.</code>, and <code>matcher.</code> respectively. For
+        example, the specification below would enable root sift in the outlier
+        detection, define a FAST detector, define a LATCH descriptor extractor,
+        and define a FlannBased matcher.
+      </p>
+      <code>
+          extractor.LATCH@Bytes:16@HalfSSDSize:4/parameters@RootSift:true/matcher.FlannBasedMatcher/detector.FAST@Threshold:9@NonmaxSuppression:false
+      </code>
+      <p>
+        Many FBM algorithms are designed to use a specific detector, extractor
+        pair with shared parameters (SIFT and SURF are good examples of this).
+        For these cases, the alternative specification scheme allows for the
+        detector and extractor to be defined in a single component with shared
+        parameters. To do this, begin the first entry with
+        <code>feature2d.</code>. For example, the following specification would
+        define a SIFT algorithm with 4 octave layers for both the detector and
+        extractor along with a brute force matcher using the L1 norm.
+      </p>
+        <code>matcher.BFMatcher@NormType:Norm_L1/feature2d.SIFT@NOctaveLayers:4</code>.
+      <p>
+        The minimum specification string consists of a detector name and an
+        extractor name. When no matcher is specified, a brute force matcher
+        with parameters tailored to the extractor is used.  For example
+        <code>SURF/SURF</code> would result in SURF being used for the
+        detector, SURF being used for the extractor, and a brute force matcher
+        used for the matcher. If used with the alternatice specification
+        scheme, the detector and extractor can be defined in a single
+        component. So, the specification <code>feature2d.SURF</code> defines
+        the exact same detector, extractor, and matcher as the previous
+        specification.
       </p>
       <p>
-          The results of the FBM of all train images to query images will be 
-          written to an ISIS control network. The query image is automatically 
-          selected as the reference image but geometry can come from the train 
-          source for two-pair image matching. It should be noted that the 
-          goodness of fit does not follow the ABM ranges of -1 to 1. Instead it 
-          is computed from the average of the responsivity of the query and 
-          train image keypoints.
+        Multiple sets of FBM algorithms and robust matcher parameters can be
+        entered via the <b>ALGOSPECFILE</b> parameter. It takes a text file
+        (*.lis) with a specification on each line. For each specification, a
+        separate set of FBM algorithms and robust matcher parameters will be
+        created. Each set will be used to match the input images and the set
+        that produces the best matches will be used to create the output
+        control network. When the <b>DEBUG</b> and/or <b>DEBUGLOG</b>
+        parameters are used, the results from each set along with the quality
+        of the match will be output.
       </p>
       <p>
-          <i>isisminer</i> can be used to determine overlapping image sets for 
-          input into this application for multi-matching FBM processing. 
-          <i>cnetcombinept</i> is designed to take all the resulting control 
-          networks from systematic regional or global processing with 
-          <i>findfeatures</i>. <i>cnetcheck</i> should be used to ensure the 
-          combined network is suitable for bundle adjustment and solving for 
-          radius using  <i>jigsaw</i>. The bundle adjusted control network would 
-          now contain adjusted latitude/longitude coordinates and radius values 
-          at each control point, If the control network contains sufficient 
-          density, <i>cnet2dem</i> can be use to produce an interolated DEM from 
-          the control network. And CKs and SPKs can be generated using 
-          <i>ckwriter</i> and <i>spkwriter</i>, respectively, to capture the 
-          control for general distribution and use.
+        Each algorithm has default parameters that are
+        suited to most uses. The <b>LISTALL</b> parameter will list every
+        supported detector, extractor, and matcher algorithm along with its
+        parameters and default values. The <b>LISTSPEC</b> parameter will
+        output the results of the parsed specification string(s). A description
+        of every algorithm supported by <i>findfeatures</i> and if they can be
+        used as a detector, extractor, and/or matcher can be found in the
+        <a href="#Algorithms">Algorithms</a> table.
       </p>
-      <h3>Parameterization of the Matcher</h3>
       <p>
-           Much of the flexibility in <i>findfeatures</i> is the abilility to 
-           alter parameters for the OpenCV matcher algorithms. Significant 
-           effort has been made to allow the user to change algorithm behaviors. 
-           Not only can users change OpenCV algorithm parameters, but there are 
-           additional parameters available in the robust matcher, particularly 
-           in the outlier detection processing, that can modifed. These 
-           parameters can be very helpful in diagnosing issues with the matching 
-           and outlier aspects of <i>findfeatures</i>. The following table 
-           describes all the parameters available that can be modified through 
-           the <code>/parameters@...</code> option of the matcher algorithm 
-           specification string.
-
-           <TABLE border = "1">
-               <CAPTION>
-                  <h4>
-                      <a name="MatcherParameters">Robust Matcher Parameters</a>
-                  </h4> 
-               </CAPTION> 
-               <TR>
-                 <TH>Keyword</TH>
-                 <TH>Default</TH>
-                 <TH>Description</TH>
-               </TR>
-            <TR>
-               <TD>SaveRenderedImages</TD>
-               <TD>False</TD>
-               <TD>
-                    Option to save the images that are matched 
-                    after all transforms (e.g., fast geom, filtered, etc...) 
-                    have been applied. The query (MATCH) image will have 
-                    "_query" will be appended to the base name. All 
-                    FROM/FROMLIST images will have "_train" appended to their 
-                    names. They are saved as PNG images in the directory 
-                    specifed by the SavePath parameter.
-               </TD>
-             </TR>
-            <TR>
-               <TD>SavePath</TD>
-               <TD>$PWD</TD>
-               <TD>
-                   Specify the directory path to save all transform rendered 
-                   images if SaveRenderedImages=TRUE.
-               </TD>
-             </TR>
-            <TR>
-               <TD>RootSift</TD>
-               <TD>False</TD>
-               <TD>
-                   Apply the 
-                   <a href="https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf">
-                   RootSift</a> algorithm to the descriptors that 
-                   normalizes SIFT-type of descriptors. The best description of 
-                   the application of this algorithm is described in 
-                   <a href="http://www.pyimagesearch.com/2015/04/13/implementing-rootsift-in-python-and-opencv/">
-                   this article</a>. In general, SIFT descriptors histograms are 
-                   compared in Euclidean space. RootSift applies a Hellinger 
-                   kernel to the descriptor histograms that greatly improve 
-                   performance and still allows Euclidean distances in its 
-                   evaluation. Be sure to use this for SIFT-type descriptors 
-                   only.
-               </TD>
-             </TR>
-            <TR>
-               <TD>MinimumFundamentalPoints</TD>
-               <TD>8</TD>
-               <TD>
-                   The Epipolar algorithm in OpenCV requires a minimim of 8 
-                   points in order to properly compute the fundamental matrix. 
-                   This parameter allowes the user to specify the minimum number 
-                   of points allowed.
-               </TD>
-             </TR>
-            <TR>
-               <TD>RefineFundamentalMatrix</TD>
-               <TD>True</TD>
-               <TD>
-                   A single computation of the fundamental matrix is performed 
-                   unless this parameter is set to true. In this case, a new 
-                   fundmental matrix is computed after outlier are detected and 
-                   removed. This will improve the matrix since outliers are 
-                   removed and the matrix is recomputed.
-               </TD>
-            </TR>
-            <TR>
-               <TD>MinimumHomographyPoints</TD>
-               <TD>8</TD>
-               <TD>
-                   As in the Epipolar fundamental matrix, a minimum number of 8 
-                   points is required to compute the homography matrix for 
-                   outlier detection. This parameter allows the user to specify 
-                   a new minimum.
-               </TD>
-             </TR>
-           </TABLE>
-    </p>
+        Descriptions of the robust matcher parameters and their default values
+        can be found in the <a href="#MatcherParameters">Robust Matcher
+        Parameters</a> table.
+      </p>
+      <h3>Choosing Algorithms and Parameters</h3>
+      <p>
+        Choosing effective algorithms and parameters is critical to successful
+        use of <i>findfeatures</i>. If a poor choice of algorithms and/or
+        parameters is made, <i>findfeatures</i> will usually still complete,
+        but the computation time and/or outpute control network quality will
+        suffer. <i>findfeatures</i> supports all of the OpenCV 3.1
+        <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
+        detectors, extractors</a>, and 
+        <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
+        matchers</a>. Some algorithms work well in a wide range of scenarios
+        (SURF and SIFT are both well tested and very robust), while others are
+        highly specialized. The following section will help you successfully
+        determine which algorithms and parameters to use.
+      </p>
+      <p>
+        <i>findfeatures</i> gives users a wide range of options to adjust how
+        it works. Such broad power can be daunting when the user is unfamiliar
+        with FBM. The following are some rules-of-thumb to help make things a
+        little less daunting. First, when in doubt, trust the defaults. The
+        defaults in <i>findfeatures</i> are designed to be a good fit for a
+        wide range of scenarios. They are not a perfect fit for every situation
+        but a perfect fit ususally is not required. The detector and extractor
+        do not default to a specific algorithm, but the SIFT algorithm is a
+        very robust algorithm that will produce a high quality output control
+        network for most situations. The majority of more modern algorithms are
+        focused on speed increases. Second, if possible, always use the
+        <b>FASTGEOM</b> parameter. The majority of problems when using FBM
+        arise from the trainer and query images not having the same geometry.
+        The <b>FASTGEOM</b> parameter completely eliminates these challenges.
+        Combining the <b>FASTGEOM</b> parameter with algorithms that are
+        designed for speed (the FAST descriptor and BRIEF extractor are good
+        options) will quickly produce a high quality control network. Finally,
+        if you are torn between a few options, use the <b>LISTSPEC</b>
+        parameter to test each of them and then only use the best result. When
+        the <b>LISTSPEC</b> parameter is used, <i>findfeatures</i> will
+        automatically determine which specification produced the best matches
+        and use it to create the output control net.
+      </p>
+      <p>
+        Different detectors search for different types of features. For
+        example, the FAST algorithm searchs for corners, while blob detection
+        algorithms search for regions that contrast their surroundings.
+        When choosing which detector to use, consider the prominent features
+        in the image set. The FAST algorithm would work well for finding key
+        points on a ridgeline, while a blob detection algorithm would work well
+        for finding key points in nadir images of a heavily cratered area.
+      </p>
+      <p>
+        When choosing an extractor there are two things to consider: the
+        invariance of the extractor and the size of the extracted descriptor.
+        Different extractors are invariant to (not affected by) different
+        transformations. For example, the SURF algorithm uses descriptors that
+        are invariant to rotation, while BRIEF feature descriptors are not.
+        In general, invariance to more transformations comes at a cost, bigger
+        descriptors. Detectors often find a very large number of key points in
+        each image. The amount of time it takes to extract and then compare all
+        of the resultant feature descriptors heavily depends upon the size of
+        the descriptor. So, more invariance usually means longer computation
+        times.  For example, using the BRIEF extractor (which extracts very
+        small feature descriptors) instead of the SURF extractor (which has
+        moderately sized feature descriptors) provides an order of magnitude
+        speed increases for both extraction and matching. If your images are
+        from the similar sensors and under similar conditions, then an
+        extractor that uses smaller descriptors (BRISK, BRIEF, etc.) will be
+        faster and just as accurate as extractors that use larger, more robust
+        descriptors (SIFT, SURF, etc.). If your images are from very different
+        sensors (a spot spectrometer and a highly distorted framing camera, a
+        low resolution framing camera and a high resolution push broom camera,
+        etc.) or under very different conditions (very oblique and nadir, 
+        opposing sun angles, etc.) then using an extractor with a more robust
+        descriptor will take longer but will be significantly more accurate
+        than using an extractor with a smaller descriptor.
+      </p>
+      <p>
+        <i>findfeatures</i> has two options for matchers:
+        brute force matching and a FLANN based matcher. The brute force matcher
+        attempts to match a key point with every key point in another image and
+        then pairs it with the closest match. This ensures a good match but can
+        take a long time for large numbers of images and key points. The FLANN
+        based matcher trains itself to find the approximate best match.  It
+        does not ensure the same accuracy as the brute force matcher, but is
+        significantly faster for large numbers of images and key points. By
+        default <i>findfeatures</i> uses a brute force matcher with parameters
+        set based upon the extractor used.
+      </p>
+      <p>
+        Several parameters allow for fine tuning the outlier rejection process.
+        The <b>RATIO</b> parameter determines how distinct matches must be. A
+        ratio close to 0 will force <i>findfeatures</i> to consider only
+        un-ambiguous matches and reject a large number of matches. If many,
+        indistinct features are detected in each image, a low ratio will result
+        in  a smaller, higher quality control network. If few, indistinct
+        feates are detected in each image, a high ratio will prevent the
+        control network from being too sparse. The <b>EPITOLERANCE</b> and
+        <b>EPICONFIDENCE</b> parameters control how outliers are found when the
+        fundamental matrices are computed. These parameters will have the
+        highest impact when the query and trainer images are stereo pairs. The
+        <b>HMGTOLERANCE</b> parameter controls how outliers are found after the
+        homography matrices are computed. This parameter will have the highest
+        impact when the query and trainer images have very different exterior
+        orientations.
+      </p>
+      <p>
+        Prior to FBM, <i>findfeatures</i> can apply several transformations to
+        the images. These transformations can help improve match quality in
+        specific scenarios. The <b>FASTGEOM</b>, <b>GEOMTYPE</b>, and
+        <b>FASTGEOMPOINTS</b> parameters allow for reprojection of the trainer
+        images into the query image's geometry prior to FBM. These parameters
+        can be used to achieve the speed increases of algorithms that are not
+        rotation and/or scale invariant (BRIEF, FAST, etc.) without loss of
+        accuracy. These parameters require that the trainer and query images
+        are ISIS cubes with geometry. For rotation and scale invariant algorithms
+        (SIFT, SURF, etc.), these parameters will have little to no
+        effect. The <b>FILTER</b> parameter allows for the application of
+        filters to the trainer and query images prior to FBM. The <b>SOBEL</b>
+        option will emphasize edges in the images. The Sobel filter can
+        introduce artifacts into some images, so the <b>SCHARR</b> option is
+        available to apply a more accurate filter. These filters allows for
+        improved detection when using an edge based detector (FAST, AGAST,
+        BRISK, etc.). If you are using an edge based detector and not detecting
+        a sufficient number of key points or your key points are not
+        sufficienty distinct, these filters may increase the number of
+        successful matches.
+      </p>
+      <p>
+        The OpenCV methods used in the outlier rejection process have several
+        options that can be set along with the algorithms. The available
+        parameters are listed in the <a href="#MatcherParameters">Robust
+        Matcher Parameters</a> table.
+      </p>
+      <TABLE border = "1">
+        <CAPTION>
+          <h4>
+              <a name="MatcherParameters">Robust Matcher Parameters</a>
+          </h4> 
+        </CAPTION> 
+        <TR>
+          <TH>Keyword</TH>
+          <TH>Default</TH>
+          <TH>Description</TH>
+        </TR>
+        <TR>
+          <TD>SaveRenderedImages</TD>
+          <TD>False</TD>
+          <TD>
+              Option to save the images that are matched 
+              after all transforms (e.g., fast geom, filtered, etc...) 
+              have been applied. The query (MATCH) image will have 
+              "_query" will be appended to the base name. All 
+              FROM/FROMLIST images will have "_train" appended to their 
+              names. They are saved as PNG images in the directory 
+              specifed by the SavePath parameter.
+          </TD>
+        </TR>
+        <TR>
+          <TD>SavePath</TD>
+          <TD>$PWD</TD>
+          <TD>
+              Specify the directory path to save all transform rendered 
+              images if SaveRenderedImages=TRUE.
+          </TD>
+        </TR>
+        <TR>
+          <TD>RootSift</TD>
+          <TD>False</TD>
+          <TD>
+              Apply the 
+              <a href="https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf">
+              RootSift</a> algorithm to the descriptors that 
+              normalizes SIFT-type of descriptors. The best description of 
+              the application of this algorithm is described in 
+              <a href="http://www.pyimagesearch.com/2015/04/13/implementing-rootsift-in-python-and-opencv/">
+              this article</a>. In general, SIFT descriptors histograms are 
+              compared in Euclidean space. RootSift applies a Hellinger 
+              kernel to the descriptor histograms that greatly improve 
+              performance and still allows Euclidean distances in its 
+              evaluation. Be sure to use this for SIFT-type descriptors 
+              only.
+          </TD>
+        </TR>
+        <TR>
+          <TD>MinimumFundamentalPoints</TD>
+          <TD>8</TD>
+          <TD>
+              The Epipolar algorithm in OpenCV requires a minimim of 8 
+              points in order to properly compute the fundamental matrix. 
+              This parameter allowes the user to specify the minimum number 
+              of points allowed.
+          </TD>
+        </TR>
+        <TR>
+          <TD>RefineFundamentalMatrix</TD>
+          <TD>True</TD>
+          <TD>
+              A single computation of the fundamental matrix is performed 
+              unless this parameter is set to true. In this case, a new 
+              fundmental matrix is computed after outlier are detected and 
+              removed. This will improve the matrix since outliers are 
+              removed and the matrix is recomputed.
+          </TD>
+      </TR>
+      <TR>
+        <TD>MinimumHomographyPoints</TD>
+        <TD>8</TD>
+        <TD>
+            As in the Epipolar fundamental matrix, a minimum number of 8 
+            points is required to compute the homography matrix for 
+            outlier detection. This parameter allows the user to specify 
+            a new minimum.
+        </TD>
+      </TR>
+    </TABLE>
+    <TABLE border = "1">
+      <CAPTION>
+        <h4>
+            <a name="Algorithms">Algorithms</a>
+        </h4> 
+      </CAPTION> 
+      <TR>
+        <TH>Name</TH>
+        <TH>Algorithm Type</TH>
+        <TH>Description</TH>
+        <TH>Further Reading</TH>
+      </TR>
+      <TR>
+        <TD>AGAST</TD>
+        <TD>Detector</TD>
+        <TD>
+          The AGAST algorithm is a corner detection algorithm that builds on
+          the FAST algorithm to detect features as quickly as possible. The
+          main improvements are increased detection speed and less training
+          time.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www6.in.tum.de/Main/ResearchAgast">
+              PI's website</a>
+            </LI>
+            <LI>
+              <a href="http://www6.in.tum.de/Main/Publications/Mair2010c.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>Blob</TD>
+        <TD>Detector</TD>
+        <TD>
+          A simple blob detection algorithm that attempts to identify connected
+          components of the image based on DN values. The Blob algorithm is
+          able to filter features after detection based on their
+          characteristics.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlobDetector.html">
+              OpenCV 3.1.0 Documentation</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>FAST</TD>
+        <TD>Detector</TD>
+        <TD>
+          The FAST algorithm is a corner detection algorithm that is designed
+          to detect corners extremely quickly. It uses machine learning to
+          improve its accuracy.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.edwardrosten.com/work/fast.html">
+              PI's website</a>
+            </LI>
+            <LI>
+              <a href="http://www.edwardrosten.com/work/rosten_2005_tracking.pdf">
+              Original Paper</a>
+            </LI>
+            <LI>
+              <a href="http://www.edwardrosten.com/work/rosten_2006_machine.pdf">
+              Machine Learning Improvements Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>GFTT</TD>
+        <TD>Detector</TD>
+        <TD>
+          The GFTT algorithm is based upon the Harris corner detector. The
+          detection is based upon the idea that a corner varies significantly
+          from all immediately adjacent regions.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.cse.psu.edu/~rtc12/CSE486/lecture06.pdf">
+              Harris Corner Detector Lecture Slides</a>
+            </LI>
+            <LI>
+              <a href="https://cecas.clemson.edu/~stb/klt/shi-tomasi-good-features-cvpr1994.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>MSD</TD>
+        <TD>Detector</TD>
+        <TD>
+          MSD stands for Maximal Self-Dissimilarities. It is based upon the
+          idea that regions that vary significantly from their surroundings are
+          easy to uniquely identify from different perspectives. The MSD
+          algorithm detects generic features, so it invariant to many image
+          transformations and works well with stereo pairs.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://imagine.enpc.fr/~monasse/Stereo/Projects/TombariDiStefano14.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>MSER</TD>
+        <TD>Detector</TD>
+        <TD>
+          The MSER algorithm searches for regions which have significantly
+          higher or lower intensity compared to their immediate surroundings.
+          It works well for extracting features from images that lack strong
+          edges. Because it depends upon intensity, MSER is very sensitive to
+          factors such as solar angle and occlusion. In exchange MSER offers
+          strong invariance to image geometry factors such, as resolution and
+          emission angle (as long as features are not occluded).
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html">
+              OpenCV 3.1.0 Documentation</a>
+            </LI>
+            <LI>
+              <a href="http://cmp.felk.cvut.cz/~matas/papers/matas-bmvc02.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>Star</TD>
+        <TD>Detector</TD>
+        <TD>
+          The Star algorithm is OpenCV's implementation of the CenSurE
+          algorithm which is fast and scale-invariant. It is a more robust
+          version of the SIFT algorithm.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://link.springer.com/chapter/10.1007/978-3-540-88693-8_8">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>AKAZE</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The AKAZE (accelerated KAZE) algorithm is a modified version of the
+          KAZE algorithm which uses a faster method to compute non-linear
+          scales. Like the KAZE algorithm, AKAZE works well for situations
+          where the trainer and query images have different resolutions and
+          possibly different distortions. AKAZE should be used over KAZE when
+          strong invariance is needed but the size and/or number of images
+          presents computation time concerns. <b>The AKAZE algorithm can only
+          be used as an extractor if either the KAZE or AKAZE algorithm was
+          used as the detector.</b>
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.robesafe.com/personal/pablo.alcantarilla/kaze.html">
+              PI's website</a>
+            </LI>
+            <LI>
+              <a href="http://www.robesafe.com/personal/pablo.alcantarilla/papers/Alcantarilla13bmvc.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>BRISK</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The BRISK algorithm uses concentric rings of points around features
+          to extract a descriptor. It extracts a small, binary descriptor, so
+          it is very fast.  Unlike other binary descriptor extractors, BRISK
+          offers moderate rotation invariance by use points far from the
+          feature to determine orientation and then points close to the feature
+          to determine intensity after accounting for the orientation.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="https://gilscvblog.com/2013/11/08/a-tutorial-on-binary-descriptors-part-4-the-brisk-descriptor/">
+              Tutorial</a>
+            </LI>
+            <LI>
+              <a href="http://dl.acm.org/citation.cfm?id=2356277">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>KAZE</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The KAZE algorithm is a very robust algorithm that attempts to
+          provide improved invariance to scale. The method that SIFT and SURF
+          use to provide scale invariance can result in proliferation of noise.
+          The KAZE algorithm employs a non-linear scaling method that helps
+          prevent this. Hence, the KAZE algorithm provides very strong
+          invariance, but at the cost of large computation time. If very strong
+          invariance is required but computation time is a concern, use the
+          AKAZE algorithm instead. <b>The KAZE algorithm can only be used as an
+          extractor if either the KAZE or AKAZE algorithm was used as the
+          detector.</b>
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.robesafe.com/personal/pablo.alcantarilla/kaze.html">
+              PI's website</a>
+            </LI>
+            <LI>
+              <a href="https://www.doc.ic.ac.uk/~ajd/Publications/alcantarilla_etal_eccv2012.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>ORB</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The ORB algorithm extracts a very fast binary descriptor. It provides
+          improved rotational invariance compared to BRIEF by accounting for
+          orientation, but at the cost of slower extraction. It also attempts
+          to learn the best way to extract information from around each
+          feature. The ORB algorithm is faster than BRISK and FREAK, but
+          provides less invariance.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="https://gilscvblog.com/2013/10/04/a-tutorial-on-binary-descriptors-part-3-the-orb-descriptor/">
+              Tutorial</a>
+            </LI>
+            <LI>
+              <a href="http://www.willowgarage.com/sites/default/files/orb_final.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>SIFT</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The SIFT algorithm is one of the oldest and most well tested FMB
+          algorithms. It is a common benchmark for comparison of new
+          algorithms. The SIFT algorithm offers good invariance, but can
+          require large computation times. It is a good choice for both
+          detector and extractor when a high quality output control network is
+          needed and computation time is not a major concern.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>SURF</TD>
+        <TD>Detector, Extractor</TD>
+        <TD>
+          The SURF algorithm was created to be a faster version of SIFT. It
+          provides slightly less invariance, but requires significantly less
+          computation time. The SURF algorithm is a good choice when a high
+          quality match is required and there are a large number of images
+          and/or the image size is very large.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.vision.ee.ethz.ch/~surf/eccv06.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>BRIEF</TD>
+        <TD>Extractor</TD>
+        <TD>
+          The BREIF algorithm extracts an extremely fast binary descriptor. If
+          the query and trainer images are very similar, then the BRIEF
+          algorithm offers unmatched speed. This speed comes at a cost, the
+          BRIEF algorithm behaves very poorly if the query and trainer images
+          vary significantly. The <b>FASTGEOM</b> parameter can help improve
+          the quality of the match when using the BRIEF algorithm with varied
+          query and trainer images.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="https://gilscvblog.com/2013/09/19/a-tutorial-on-binary-descriptors-part-2-the-brief-descriptor/">
+              Tutorial</a>
+            </LI>
+            <LI>
+              <a href="http://www.robots.ox.ac.uk/~vgg/rg/papers/CalonderLSF10.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>DAISY</TD>
+        <TD>Extractor</TD>
+        <TD>
+          The DAISY algorithm is an adaptation of the extractor used by SIFT
+          and SURF. It was designed for use with stereo imagery. The DAISY
+          algorithm offers strong invariance similar to SIFT and SURF, but with
+          significantly faster computation time.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://cvlab.epfl.ch/software/daisy">
+              Website</a>
+            </LI>
+            <LI>
+              <a href="https://infoscience.epfl.ch/record/138785/files/tola_daisy_pami_1.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>FREAK</TD>
+        <TD>Extractor</TD>
+        <TD>
+          The FREAK algorithm extracts a fast binary descriptor. Like ORB, it
+          attempts to learn the best way to extract information from around the
+          features. The FREAK algorithm replicates how the human retina works
+          attempting to produce tiered solutions. If the first solution does
+          not provide uniqueness within a desired threshold, then a second,
+          more precise solution is computed. The FREAK algorithm provides fast
+          computation times along with adaptability to the requirements of the
+          query and trainer images.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="https://gilscvblog.com/2013/12/09/a-tutorial-on-binary-descriptors-part-5-the-freak-descriptor/">
+              Tutorial</a>
+            </LI>
+            <LI>
+              <a href="https://infoscience.epfl.ch/record/175537/files/2069.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>LATCH</TD>
+        <TD>Extractor</TD>
+        <TD>
+          The LATCH algorithm extracts a fast binary descriptor that offers
+          greater invariance than other binary descriptor extractors. It lies
+          between the extremely fast binary descriptor extractors (BRIEF and
+          BRISK) and the very invariant but slow descriptor extractors (SURF
+          and SIFT). The LATCH algorithm also offers a CUDA implementation
+          that allows for extremely fast computation times when using multiple
+          GPUs in parallel.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://www.openu.ac.il/home/hassner/projects/LATCH/">
+              CoI's website</a>
+            </LI>
+            <LI>
+              <a href="http://www.openu.ac.il/home/hassner/projects/LATCH/LATCH.pdf">
+              Original Paper</a>
+            </LI>
+            <LI>
+              <a href="http://www.openu.ac.il/home/hassner/projects/LATCH/CLATCH.pdf">
+              CUDA Implementation Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>LUCID</TD>
+        <TD>Extractor</TD>
+        <TD>
+          The LUCID algorithm was designed to extract feature descriptors from
+          color images. It offers invarianve close to SURF and BRIEF with
+          shorter computation times.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://vision.ucsd.edu/sites/default/files/NIPS2012_0012.pdf">
+              Paper</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>BFMatcher</TD>
+        <TD>Matcher</TD>
+        <TD>
+          The brute force matcher algorithm attempts to match the query and
+          train images by brute force. It is guaranteed to find the best match,
+          because it checks every match. For large numbers of features, this
+          approach can require considerable computation time.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
+              OpenCV 3.1.0 Documentation</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+      <TR>
+        <TD>FlannBasedMatcher</TD>
+        <TD>Matcher</TD>
+        <TD>
+          The FLANN based matcher algorithm computes matches based on
+          approximate nearest descriptors. It uses the FLANN library to learn
+          how to approximate descriptor matches. The FLANN based matcher
+          algorithm does not guarantee the best match for each feature, but
+          will match large sets of features and/or images in significantly less
+          time that the brute force matcher algorithm. When combined with
+          outleir rejection, the FLANN based matcher algorithm can provide high
+          quality matches.
+        </TD>
+        <TD>
+          <UL>
+            <LI>
+              <a href="http://docs.opencv.org/3.1.0/dc/de2/classcv_1_1FlannBasedMatcher.html">
+              OpenCV 3.1.0 Documentation</a>
+            </LI>
+            <LI>
+              <a href="http://www.cs.ubc.ca/research/flann/">
+              FLANN library</a>
+            </LI>
+          </UL>
+        </TD>
+      </TR>
+    </TABLE>
       <h3>Using Debugging to Diagnose Behavior</h3>
       <p>
           An additional feature of <i>findfeatures</i> is a detaileddebugging 
@@ -690,21 +1331,6 @@ End_Group
            <default><item>No</item></default>
         </parameter>
 
-        <parameter name= "LISTMATCHERS">
-            <type>boolean</type>
-            <brief> List OpenCV matcher related algorithms</brief> 
-            <description>
-              This parameter will retrieve all registered OpenCV feature 
-              matcher related algorithms available that can created by name.  
-              These algorithms will have "Feature2D" and "DescriptorMatcher" 
-              prepended to the name of the algorithm.  Many of the Detector 
-              and Extractor algorithms are not registered so they will not 
-              appear in this list. This option will create a PVL structure of 
-              individual algorithms and all their parameters.
-            </description>
-           <default><item>No</item></default>
-        </parameter>
-
        <parameter name= "LISTSPEC">
             <type>boolean</type>
             <brief>
@@ -861,7 +1487,7 @@ End
                 will cause the matching phase and outlier detection to become 
                 costly and inefficient.
             </description>
-          <internalDefault>0</internalDefault>
+          <default><item>0</item></default>
       </parameter>
 
     </group>
@@ -889,7 +1515,7 @@ End
                removed by this test. The farther from 1.0, the more matches will 
                be rejected.
            </description>
-           <internalDefault>0.65</internalDefault>
+           <default><item>0.65</item></default>
        </parameter>
 
           <parameter name= "EPITOLERANCE">
@@ -902,7 +1528,7 @@ End
                    feature may deviate from the Epipolar lines for each matching 
                    feature.
               </description>
-            <internalDefault>3.0</internalDefault>
+            <default><item>3.0</item></default>
           </parameter>
 
          <parameter name= "EPICONFIDENCE">
@@ -915,7 +1541,7 @@ End
                    determination ratio. A value of 1.0 requires that all pixels 
                    be valid in the epipolar computation.
               </description>
-            <internalDefault>0.99</internalDefault>
+            <default><item>0.99</item></default>
           </parameter>
 
           <parameter name= "HMGTOLERANCE">
@@ -944,7 +1570,7 @@ End
                      points.
                 </p>
               </description>
-            <internalDefault>3.0</internalDefault>
+            <default><item>3.0</item></default>
           </parameter>
 
        <parameter name="MAXTHREADS">
@@ -959,7 +1585,7 @@ End
                are used if it exceeds the number of CPUs physically available 
                on the system or no more than MAXTHREADS will be used.
            </description>
-           <internalDefault>0</internalDefault>
+           <default><item>0</item></default>
        </parameter>
      </group>
 
@@ -989,7 +1615,7 @@ End
            </brief>
            <description>
            </description>
-           <internalDefault>25</internalDefault>
+           <default><item>25</item></default>
        </parameter>
 
       <parameter name="GEOMTYPE">
