@@ -137,7 +137,8 @@ namespace Isis {
                 pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not Ignored as Measure EditLock is True");
               }
               else {
-                pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Failed Validation Test");
+                pvlMeasureGrp += Isis::PvlKeyword("Ignored", "For point [" + newPnt->GetId() + "] and measure [" + sn +
+                                                  "], point failed to intersect body.");
                 newMsr->SetIgnored(true);
                 iNumIgnore++;
               }

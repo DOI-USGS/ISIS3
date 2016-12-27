@@ -15,3 +15,8 @@ commands:
 	  networkid=DefaultTruth \
 	  Description=RefByResolutionHigh > /dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
+	$(APPNAME) fromlist=$(INPUT)/apolloList.lis \
+	  cnet=$(INPUT)/apolloSeed.net \
+	  criteria=resolution \
+	  type=high \
+	  onet=$(OUTPUT)/apolloTruth.net > /dev/null;
