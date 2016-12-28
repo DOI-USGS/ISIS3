@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: findfeatures.xml 6564 2016-02-11 00:14:44Z kbecker@GS.DOI.NET $ -->
-<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./application.xsd">
+<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
       Feature-based matching algorithms used to create ISIS control networks 
@@ -207,7 +207,9 @@
       </p>
       <p>
         Each algorithm has default parameters that are
-        suited to most uses. The <b>LISTSPEC</b> parameter will
+        suited to most uses. The <b>LISTALL</b> parameter will list every
+        supported detector, extractor, and matcher algorithm along with its
+        parameters and default values. The <b>LISTSPEC</b> parameter will
         output the results of the parsed specification string(s). A description
         of every algorithm supported by <i>findfeatures</i> and if they can be
         used as a detector, extractor, and/or matcher can be found in the
@@ -1157,7 +1159,7 @@ End_Group
        Completed documentation
     </change>
      <change name="Kris Becker, Jesse Mapel, Kristin Berry, Jeannie Backer" date="2016-12-27">
-       Updated to use OpenCV3. Backward Compatibility Issue:  The LISTALL parameter was removed
+       Updated to use OpenCV3. Backward Compatibility Issue:  The LISTMATCHERS parameter was removed
        and different feature detection, feature extraction, and matching algorithms are available in OpenCV2
        and OpenCV3. Some have been added and some have been removed. 
      </change>
@@ -1329,6 +1331,21 @@ End_Group
               algorithms available that can created by name.  The ones 
               pertinent to this application are those prepended with 
               "Feature2D" and "DescriptorMatcher".  However, this option lists
+              all of the registered OpenCV algorithms.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+        <parameter name= "LISTALL">
+            <type>boolean</type>
+            <brief>
+               List all OpenCV algorithms irregardles of origin
+            </brief> 
+            <description>
+              This parameter will retrieve all the registered OpenCV 
+              algorithms  available that can created by name.  The ones 
+              pertinent to this application are those prepended with 
+              "Feature2D" and "DescriptorMatcher".  However, this option lists 
               all of the registered OpenCV algorithms.
             </description>
            <default><item>No</item></default>
