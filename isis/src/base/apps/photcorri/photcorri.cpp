@@ -16,7 +16,7 @@
 #include "PhotometricFunction.h"
 #include "Minnaert.h"
 #include "Lommelseeliger.h"
-#include "Mcewen.h"
+#include "McEwen.h"
 #include "Pvl.h"
 #include "Cube.h"
 
@@ -26,15 +26,15 @@
 using namespace std;
 using namespace Isis;
 
-void IsisMain () {
+void IsisMain() {
   // We will be processing by line
-  ProcessByLine p;
+  ProcessByLine processByLine;
 
   // Set up the input cube and get camera information
-  Cube *icube = p.SetInputCube("FROM");
+  Cube *icube = processByLine.SetInputCube("FROM");
 
   // Create the output cube
-  Cube *ocube = p.SetOutputCube("TO");
+  Cube *ocube = processByLine.SetOutputCube("TO");
 
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
@@ -44,8 +44,7 @@ void IsisMain () {
   // Get the name of the parameter file
   Pvl par(ui.GetFileName("PHOTMODEL"));
 
-  IString algoName = PhotometricFunction::AlgorithmName(par);
-  algoName.UpCase();
+  QString algoName = PhotometricFunction::algorithmName(par).toUpper();
     
   PhotometricFunction *pho;
 
@@ -59,18 +58,23 @@ void IsisMain () {
     pho = new Lommelseeliger(par, *icube, !useBackplane);
   }
   else if (algoName == "MCEWEN") {
-    pho = new Mcewen(par, *icube, !useBackplane);
+    pho = new McEwen(par, *icube, !useBackplane);
   }
   else {
-    string msg = " Algorithm Name [" + algoName + "] not recognized in *.pvl file ";
-    msg += "Compatible Algorithms are:\n    Rolo\n    Minnaert\n    Lommelseeliger\n   Mcewen";
+    QString msg = " Algorithm Name [" 
+                  + algoName 
+                  + "] given in PHOTMODEL file ["
+                  + ui.GetFileName("PHOTMODEL")
+                  + "] not recognized."
+                  + "Supported Algorithms include: "
+                  + "[Rolo, Minnaert, Lommelseeliger, McEwen].";
 
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  pho->SetMaximumPhaseAngle(ui.GetDouble("MAXPHASE"));
-  pho->SetMaximumEmissionAngle(ui.GetDouble("MAXEMISSION"));
-  pho->SetMaximumIncidenceAngle(ui.GetDouble("MAXINCIDENCE"));
+  pho->setMaximumPhaseAngle(ui.GetDouble("MAXPHASE"));
+  pho->setMaximumEmissionAngle(ui.GetDouble("MAXEMISSION"));
+  pho->setMaximumIncidenceAngle(ui.GetDouble("MAXINCIDENCE"));
 
   pho->setIncidence(ui.GetDouble("INCIDENCE"));
   pho->setEmission(ui.GetDouble("EMISSION"));
@@ -78,20 +82,20 @@ void IsisMain () {
     
   // determine how photometric angles should be calculated
   bool useDem = ui.GetBoolean("USEDEM");
-  pho->setUseDem(useDem);
+  pho->useDem(useDem);
 
 
   // Start the processing
 
-  p.ProcessCube(*pho);
+  processByLine.ProcessCube(*pho);
   PvlGroup photo("Photometry");
-  pho->Report(photo);
+  pho->report(photo);
   ocube->putGroup(photo);
   Application::Log(photo);
 
 
     
-  p.Finalize();
+  processByLine.Finalize();
     
   delete pho;
   pho = NULL;

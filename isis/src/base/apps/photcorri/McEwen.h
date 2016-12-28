@@ -1,5 +1,5 @@
-#ifndef Rolo_h
-#define Rolo_h
+#ifndef McEwen_h
+#define McEwen_h
 
 /**
  *   Unless noted otherwise, the portions of Isis written by the USGS are
@@ -19,7 +19,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
 #include "PhotometricFunction.h"
 
 #include <iomanip>
@@ -31,16 +30,13 @@
 #include "IString.h"
 #include "SpecialPixel.h"
 
-/* 
-*/
-
 namespace Isis {
 
   class PvlObject;
   class Camera;
 
   /**
-   * An implementation of the Rolo photometric function.
+   * An implementation of the McEwen photometric function.
    *  
    * Note: This photometric model was adopted by the OSIRIS-REx
    * project, based on the paper of "Takir et al. (2015): 
@@ -53,21 +49,19 @@ namespace Isis {
    * @internal 
    *   @history 2016-10-09 Driss Takir - Original Version.
    *   @history 2016-12-27 Jeannie Backer - Fixed coding standards. References #4570. 
-   *
    */
-  class Rolo: public PhotometricFunction {
+  class McEwen: public PhotometricFunction {
     public:
+      McEwen(PvlObject &pvl, 
+             Cube &cube, 
+             bool useCamera);
 
-      Rolo(PvlObject &pvl, 
-           Cube &cube, 
-           bool useCamera);
+      virtual ~McEwen();
 
-      virtual ~Rolo();
-
-      double photometry(double incidenceAngle, 
+      double photometry(double incidenceAngle,
                         double emissionAngle, 
                         double phaseAngle, 
-                        int bandNumber=1) const;
+                        int bandNumber = 1) const;
 
       void report(PvlContainer &pvl);
 
@@ -81,13 +75,10 @@ namespace Isis {
        * @author 2016-10-07 Driss Takir
        */
       struct Parameters {
-        Parameters() : C0(0.0), 
-                       C1(0.0), 
-                       A0(0.0), 
-                       A1(0.0), 
-                       A2(0.0), 
-                       A3(0.0),
-                       A4(0.0), 
+        Parameters() : AMC(0.0), 
+                       BETA(0.0), 
+                       GAMMA(0.0), 
+                       DELTA(0.0), 
                        wavelength(0.0), 
                        tolerance(0.0),
                        units("Degrees"), 
@@ -107,17 +98,14 @@ namespace Isis {
         }
 
 
-        double C0;         /**< Rolo constant.*/
-        double C1;         /**< Rolo constant.*/
-        double A0;         /**< Rolo coefficient.*/
-        double A1;         /**< Rolo coefficient.*/
-        double A2;         /**< Rolo coefficient.*/
-        double A3;         /**< Rolo coefficient.*/
-        double A4;         /**< Rolo coefficient.*/
+        double AMC;        /**< McEwen parameter.*/
+        double BETA;       /**< McEwen coefficient.*/
+        double GAMMA;      /**< McEwen coefficient.*/
+        double DELTA;      /**< McEwen coefficient.*/
         double wavelength; /**< Wavelength for correction.*/
         double tolerance;  /**< Wavelength range or tolerance.*/
         QString units;     /**< Phase units of Hiller equation.*/
-        double phaUnit;    /**< 1 for degree, PI/180 for radians.*/
+        double phaUnit;    /**< 1 for degrees, Pi/180 for radians.*/
         int band;          /**< Cube band parameters.*/
         double phoStd;     /**< Computed photometric standard.*/
         int iProfile;      /**< Profile index of this data.*/

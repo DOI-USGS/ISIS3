@@ -1,17 +1,7 @@
 #ifndef Lommelseeliger_h
 #define Lommelseeliger_h
 
-/* This program was originally written by Kris Becker for LRO mission and has been modified by Driss Takir (USGS) to 
-     * incorporate the four photometric models (Lommel-Seeliger, 
-     * Rolo, Minnaert, and McEwen) adopted by the OSIRIS-REx 
-     * project. 
-     * Build 3.0- 8/15/2016 
-*/ 
 /**
- * @file
- * $Revision$
- * $Date$
- *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
  *   for intellectual property information, user agreements, and related
@@ -29,15 +19,15 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "PhotometricFunction.h"
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
-#include "PhotometricFunction.h"
-#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -46,63 +36,92 @@ namespace Isis {
   class Camera;
 
   /**
-   * @brief An implementation of the Lommel Seeliger photometric 
-   *        function
+   * An implementation of the Lommel Seeliger photometric function.
    * 
-   * adopted by the OSIRIS-REx project, based on the paper of 
-   * "Takir et al. (2015): Photometric Models of Disk-integrated 
-   * Observations of the OSIRIS-REx target Asteroid (101955) 
-   * Bennu, Icarus, 252, 393-399." 
-   * 
-   *
-   * @author  Driss Takir- 10/9/16
-   *
+   * Note: This photometric model was adopted by the OSIRIS-REx
+   * project, based on the paper of "Takir et al. (2015): 
+   * Photometric Models of Disk-integrated Observations of the 
+   * OSIRIS-REx target Asteroid (101955) Bennu, Icarus, 252, 
+   * 393-399." The code for this class was adapted from code 
+   * originally written by Kris Becker for the LRO mission. 
+   *  
+   * @author 2016-10-09 Driss Takir 
+   * @internal 
+   *   @history 2016-10-09 Driss Takir - Original Version.
+   *   @history 2016-12-27 Jeannie Backer - Fixed coding standards. References #4570. 
    */
-  class Lommelseeliger: public PhotometricFunction{
+  class Lommelseeliger: public PhotometricFunction {
     public:
-      /**
-       * @brief Create Lommel Seeliger photometric object
-       *
-       */
-      Lommelseeliger (PvlObject &pvl, Cube &cube, bool useCamera) : PhotometricFunction(pvl, cube, useCamera) {init(pvl, cube);};
+      Lommelseeliger(PvlObject &pvl, 
+                     Cube &cube, 
+                     bool useCamera);
 
-      //! Destructor
-      virtual ~Lommelseeliger() {};
+      virtual ~Lommelseeliger();
 
-      double photometry(double i, double e, double g, int band = 1) const;
-      void Report(PvlContainer &pvl);
+      double photometry(double incidenceAngle, 
+                        double emissionAngle, 
+                        double phaseAngle, 
+                        int bandNumber=1) const;
+
+      void report(PvlContainer &pvl);
 
     private:
+      void init(PvlObject &pvl, 
+                Cube &cube);
+
       /**
-       * @brief Container for band photometric correction parameters
+       * Container for band photometric correction parameters.
        *
-       * @author Driss Takir - 10/9/2016
+       * @author 2016-10-07 Driss Takir
        */
       struct Parameters {
-        Parameters() : ALS(0.0), BETA(0.0), GAMMA(0.0), DELTA(0.0), wavelength(0.0), tolerance(0.0),
-                       units("Degrees"), phaUnit(1.0), band(0), phoStd(0.0),
-                       iProfile(-1) { }
-        ~Parameters() { }
-        bool IsValid() const { return (iProfile != -1); }
-        double ALS, BETA, GAMMA, DELTA;  //<! Lommel Seeliger parameters
-        double wavelength;                  //<! Wavelength for correction
-        double tolerance;                   //<! Wavelenght Range/Tolerance
-        QString units;                      //<! Phase units of Hiller eq.
-        double phaUnit;  // 1 for degrees, Pi/180 for radians
-        int band;                           //<! Cube band parameters
-        double phoStd;                      //<! Computed photometric std.
-        int iProfile;                       //<! Profile index of this data
+        Parameters() : ALS(0.0), 
+                       BETA(0.0), 
+                       GAMMA(0.0), 
+                       DELTA(0.0), 
+                       wavelength(0.0), 
+                       tolerance(0.0),
+                       units("Degrees"), 
+                       phaUnit(1.0), 
+                       band(0), 
+                       phoStd(0.0),
+                       iProfile(-1) {
+        }
+
+
+        ~Parameters() { 
+        }
+
+
+        bool isValid() const { 
+          return (iProfile != -1); 
+        }
+
+
+        double ALS;        /**< Lommel Seeliger parameter.*/
+        double BETA;       /**< Lommel Seeliger coefficient.*/
+        double GAMMA;      /**< Lommel Seeliger coefficient.*/
+        double DELTA;      /**< Lommel Seeliger coefficient.*/
+        double wavelength; /**< Wavelength for correction.*/
+        double tolerance;  /**< Wavelength range or tolerance.*/
+        QString units;     /**< Phase units of Hiller equation.*/
+        double phaUnit;    /**< 1 for degrees, Pi/180 for radians.*/
+        int band;          /**< Cube band parameters.*/
+        double phoStd;     /**< Computed photometric standard.*/
+        int iProfile;      /**< Profile index of this data.*/
       };
 
-      std::vector<DbProfile> _profiles;
-      std::vector<Parameters> _bandpho;
-
-      void init(PvlObject &pvl, Cube &cube);
-
-      virtual double photometry(const Parameters &parms, double i, double e,double g) const;
+      virtual double photometry(const Parameters &parms, 
+                                double incidenceAngle,
+                                double emissionAngle, 
+                                double phaseAngle) const;
 
       Parameters findParameters(const double wavelength) const;
       Parameters extract(const DbProfile &profile) const;
+
+      std::vector<DbProfile> m_profiles;      /**< Vector of profiles.*/
+      std::vector<Parameters> m_bandpho;      /**< Vector of band photometry parameters.*/
+
   };
 
 };

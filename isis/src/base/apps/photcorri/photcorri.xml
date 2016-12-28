@@ -8,9 +8,12 @@
 
   <description>
     <p>
-      <b>photcorri</b> implements photometric correction using four photometric models (Lommel-Seeliger, ROLO, Minnaert, and McEwen) adopted by the OSIRIS-REx project, based on the paper 
-             of "Takir et al. (2015): Photometric Models of Disk-integrated Observations of the OSIRIS-REx target Asteroid (101955) Bennu, Icarus, 252, 393-399." 
-             141, 205-225 (1999).  Takir et al. (2015) defined  the following equations for I/F photometric correction:
+      The <b>photcorri</b> program performs photometric correction on the given input cube. 
+      The user may choose between four photometric models (Lommel-Seeliger, ROLO, Minnaert, or McEwen).
+      These models are based on the paper "Takir et al. (2015): Photometric Models of Disk-integrated 
+      Observations of the OSIRIS-REx target Asteroid (101955) Bennu, Icarus, 252, 393-399." 141, 205-225 (1999).
+
+      These models use  the following equations for I/F photometric correction:
     </p>
 
     <b>Lommel Seeliger:</b>
@@ -65,14 +68,14 @@
     </p>
   
     <p>
-      The Incref, Emaref and Pharef are the incidence, emission and phase angles to be  used 
+      The IncRef, EmaRef and PhaRef are the incidence, emission and phase angles to be  used 
       as the photometric standard.  It will be used to normalize the photometric 
       correction parameter to these angles.    The equation used to create the 
       photometrically corrected I/F is:
     </p>
     <PRE>
           I/F_corr(Inc_o, Em_o, Pha_o) = I/F_model(Inc_o, Em_o, Pha_o)   * [ I/F_measure(IncMeasure, EmMeasure, PhaMeasure)  / I/F_model(IncMeasure, EmMeasure, PhaMeasure) ]
-          where (incMeasure, EmMeasure, PhaMeasure) is the scaterring geometry of measured reflectance. The most commonly used reference geometries for correction are (Inc_o, Emc_o, Pha_o) = (0, 0, 0),
+          where (IncMeasure, EmMeasure, PhaMeasure) is the scaterring geometry of measured reflectance. The most commonly used reference geometries for correction are (Inc_o, Emc_o, Pha_o) = (0, 0, 0),
           which corresponds to the normal reflectance, and (inc_o, Emc_o, Pha_o) = (30, 0, 30), which is a common laboratory setting.
     </PRE>
     <p>
@@ -94,13 +97,13 @@
     <PRE>
       Object = NormalizationModel 
           Group = Algorithm 
-          Name = Albedo 
-          PhotoModel = Lommel-Seeliger, Rolo, Minnaert, or McEwen 
-          Incref=30.0
-          Emaref=0.0
-          Pharef=30.0
+              Name = Albedo 
+              PhotoModel = Lommel-Seeliger, Rolo, Minnaert, or McEwen 
+              IncRef=30.0
+              EmaRef=0.0
+              PhaRef=30.0
           EndGroup 
-          EndObject 
+      EndObject 
     </PRE>
     <p>
       Additional consequences of the photometric correction processing is any 
@@ -116,6 +119,9 @@
     </change>
     <change name="Makayla Shepherd and Ian Humphery" date="2016-10-07">
       Used functor with ProcessCube to remove global variables.
+    </change>
+    <change name="Jeannie Backer" date="2016-12-28">
+      Fixed to fit ISIS coding standards and checked into ISIS trunk. References #4570.
     </change>
   </history>
 

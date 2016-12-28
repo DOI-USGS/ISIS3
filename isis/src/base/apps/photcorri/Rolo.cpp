@@ -39,9 +39,10 @@ namespace Isis {
   /** 
    * Create Rolo photometric object. 
    *  
-   * @param pvl 
-   * @param cube 
-   * @param useCamera 
+   * @param pvl Photometric parameter files
+   * @param cube Input cube file
+   * @param useCamera Indicates whether to use the camera model for the given 
+   *                  cube.
    *
    * @author 2016-10-07 Driss Takir
    *
@@ -60,7 +61,7 @@ namespace Isis {
   
      
   /**
-   * @brief Initialize class from input PVL and Cube files
+   * Initialize class from input PVL and Cube files.
    *
    * This method is typically called at class instantiation time, but is reentrant. 
    * It reads the parameter PVL file and extracts Photometric  model and Normalization 
@@ -78,10 +79,15 @@ namespace Isis {
     m_bandpho.clear();
 
     //  Interate over all Photometric groups
-    m_iRef = toDouble(ConfKey(m_normProf, "IncRef", toString(30.0)));
-    m_eRef = toDouble(ConfKey(m_normProf, "EmaRef", toString(0.0)));
-    m_gRef = toDouble(ConfKey(m_normProf, "PhaRef", toString(m_iRef)));
-
+    setIncidenceReference(toDouble(ConfKey(normalProfile(), 
+                                           "IncRef", 
+                                           toString(30.0))));
+    setEmissionReference(toDouble(ConfKey(normalProfile(), 
+                                          "EmaRef", 
+                                          toString(0.0))));
+    setPhaseReference(toDouble(ConfKey(normalProfile(), 
+                                       "PhaRef", 
+                                       toString(incidenceReference()))));
   
     PvlObject &phoObj = pvl.findObject("PhotometricModel");
     DbProfile phoProf = DbProfile(phoObj);
@@ -98,10 +104,13 @@ namespace Isis {
     QString errs("");
     for (int i = 0; i < cube.bandCount(); i++) {
       Parameters parms = findParameters(toDouble(center[i]));
-      if (parms.IsValid()) {
+      if (parms.isValid()) {
         parms.band = i + 1;
         //m_camera->SetBand(i + 1);
-        parms.phoStd = photometry(parms, m_iRef, m_eRef, m_gRef);
+        parms.phoStd = photometry(parms, 
+                                  incidenceReference(), 
+                                  emissionReference(), 
+                                  phaseReference());
         m_bandpho.push_back(parms);
       }
       else { // Appropriate photometric parameters not found
@@ -123,7 +132,7 @@ namespace Isis {
 
 
   /** 
-   * @brief Method to get photometric property given angles
+   * Method to get photometric property given angles.
    *
    * This routine computes the photometric property at the given cube location after ensuring 
    * a proper parameter container is found for the specified band. 
@@ -131,8 +140,7 @@ namespace Isis {
    * @param incidenceAngle Incidence angle at cube location
    * @param emissionAngle  Emission angle at cube location
    * @param phaseAngle     Phase angle at cube location
-   * @param bandIndex      Band number in cube for lookup purposes. This parameter expects
-   *                       zero-based indexing.
+   * @param bandNumber     Band number in cube for lookup purposes.
    *
    * @return @b double Returns photometric correction using parameters.
    *
@@ -141,19 +149,19 @@ namespace Isis {
   double Rolo::photometry(double incidenceAngle, 
                           double emissionAngle, 
                           double phaseAngle,
-                          int bandIndex ) const {
+                          int bandNumber) const {
     // Test for valid band
-    if ((bandIndex <= 0) || (bandIndex > (int) m_bandpho.size())) {
-      QString mess = "Provided band " + toString(bandIndex) + " out of range.";
+    if ((bandNumber <= 0) || (bandNumber > (int) m_bandpho.size())) {
+      QString mess = "Provided band " + toString(bandNumber) + " out of range.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    return photometry(m_bandpho[bandIndex - 1], incidenceAngle, emissionAngle, phaseAngle);
+    return photometry(m_bandpho[bandNumber - 1], incidenceAngle, emissionAngle, phaseAngle);
   }
 
 
   /**
-   * @brief Performs actual photometric correction calculations
+   * Performs actual photometric correction calculations.
    *
    * This routine computes photometric correction using parameters
    * for the Hillier-Buratti-Hill equation.
@@ -204,7 +212,7 @@ namespace Isis {
  
 
   /**
-   * @brief Return parameters used for all bands
+   * Return parameters used for all bands.
    *
    * Method creates keyword vectors of band specific parameters
    * used in the photometric correction.
@@ -213,7 +221,7 @@ namespace Isis {
    *  
    * @author 2016-10-07 Driss Takir
    */
-  void Rolo::Report(PvlContainer &pvl) {
+  void Rolo::report(PvlContainer &pvl) {
 
     pvl.addComment("I/F = mu0/(mu0+mu) * F(phase)");
     pvl.addComment(" where:");
@@ -222,9 +230,9 @@ namespace Isis {
     pvl.addComment("  F(phase) = C0*exp(-C1*phase) + A0 + A1*phase + A2*phase^2 + A3*phase^3 + A4*phase^4");
  
     pvl += PvlKeyword("Algorithm", "Rolo");
-    pvl += PvlKeyword("IncRef", toString(m_iRef), "degrees");
-    pvl += PvlKeyword("EmaRef", toString(m_eRef), "degrees");
-    pvl += PvlKeyword("PhaRef", toString(m_gRef), "degrees");
+    pvl += PvlKeyword("IncRef", toString(incidenceReference()), "degrees");
+    pvl += PvlKeyword("EmaRef", toString(emissionReference()), "degrees");
+    pvl += PvlKeyword("PhaRef", toString(phaseReference()), "degrees");
     PvlKeyword units("RoloUnits");
     PvlKeyword phostd("PhotometricStandard");
     PvlKeyword bbc("BandBinCenter");
@@ -271,7 +279,7 @@ namespace Isis {
 
 
   /**
-   * @brief Determine Hillier parameters given a wavelength
+   * Determine Hillier parameters given a wavelength.
    *
    * This method determines the set of Hillier parameters to use
    * for a given wavelength.  It iterates through all band
@@ -296,15 +304,15 @@ namespace Isis {
 
       if (p.exists("BandBinCenter")) {
 
-        double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
+        double center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
         double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
 
-        if (fabs(wavelength - p_center) <= fabs(tolerance)) {
+        if (fabs(wavelength - center) <= fabs(tolerance)) {
           Parameters pars = extract(p);
           pars.iProfile = i;
           pars.wavelength = wavelength;
           pars.tolerance = tolerance;
-          return (pars);
+          return pars;
         }
 
       }
@@ -317,7 +325,7 @@ namespace Isis {
 
 
   /**
-   * @brief Extracts necessary Hillier parameters from profile
+   * Extracts necessary Hillier parameters from profile.
    *
    * Given a profile read from the input PVL file, this method
    * extracts needed parameters (from Keywords) in the PVL profile
@@ -344,7 +352,7 @@ namespace Isis {
     //  Determine equation units - defaults to Radians
     pars.units = ConfKey(p, "RoloUnits", QString("Radians"));
     pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
-    return (pars);
+    return pars;
   }
 } // namespace Isis
 

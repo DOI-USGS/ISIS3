@@ -30,7 +30,7 @@
 
 #include "Camera.h"
 #include "DbProfile.h"
-#include "Lommelseeliger.h"
+#include "McEwen.h"
 #include "PhotometricFunction.h"
 #include "PvlObject.h"
 
@@ -38,7 +38,7 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Create Lommel Seeliger photometric object.
+   * Create McEwen photometric object.
    *
    * @param pvl Photometric parameter files
    * @param cube Input cube file
@@ -47,16 +47,16 @@ namespace Isis {
    *
    * @author 2016-10-07 Driss Takir
    */
-  Lommelseeliger::Lommelseeliger(PvlObject &pvl, 
-                                 Cube &cube, 
-                                 bool useCamera) 
-                                 : PhotometricFunction(pvl, cube, useCamera) {
+  McEwen::McEwen(PvlObject &pvl, 
+                 Cube &cube, 
+                 bool useCamera) 
+                 : PhotometricFunction(pvl, cube, useCamera) {
     init(pvl, cube);
   }
 
 
   //! Destructor
-  Lommelseeliger::~Lommelseeliger() {
+  McEwen::~McEwen() {
   }
 
 
@@ -74,8 +74,8 @@ namespace Isis {
    *
    * @author 2016-10-07 Driss Takir
    */
-  void Lommelseeliger::init(PvlObject &pvl, 
-                            Cube &cube) {
+  void McEwen::init(PvlObject &pvl, 
+                    Cube &cube) {
 
     //  Make it reentrant
     m_profiles.clear();
@@ -131,7 +131,7 @@ namespace Isis {
       throw IException(IException::User, errs, _FILEINFO_);
     }
     return;
-  }
+  } // namespace Isis
 
 
   /**
@@ -150,10 +150,10 @@ namespace Isis {
    *
    * @author 2016-10-07 Driss Takir
    */
-  double Lommelseeliger::photometry(double incidenceAngle, 
-                                    double emissionAngle, 
-                                    double phaseAngle,
-                                    int bandNumber) const {
+  double McEwen::photometry(double incidenceAngle, 
+                            double emissionAngle, 
+                            double phaseAngle,
+                            int bandNumber) const {
     // Test for valid band
     if ((bandNumber <= 0) || (bandNumber > (int) m_bandpho.size())) {
       QString mess = "Provided band " + toString(bandNumber) + " out of range.";
@@ -164,13 +164,10 @@ namespace Isis {
 
 
   /**
-   * Performs actual photometric correction calculation 
+   * Performs actual photometric correction calculations.
+   *
    * This routine computes photometric correction using parameters
-   * for the Lommel Seeliger equation. 
-   * Container of band-specific Lommel Seeliger parameters
-   * Incidence angle in degrees Emission angle in degrees param g
-   * Phase angle in degrees double Photometric correction
-   * parameter
+   * for the McEwen equation.
    *
    * @param parms          Container of band-specific Hillier parameters.
    * @param incidenceAngle Incidence angle, in degrees.
@@ -181,10 +178,10 @@ namespace Isis {
    *
    * @author 2016-10-07 Driss Takir
    */
-  double Lommelseeliger::photometry(const Parameters &parms, 
-                                    double incidenceAngle, 
-                                    double emissionAngle, 
-                                    double phaseAngle) const {
+  double McEwen::photometry(const Parameters &parms, 
+                            double incidenceAngle, 
+                            double emissionAngle, 
+                            double phaseAngle) const {
 
     //  Ensure problematic values are adjusted
     if (incidenceAngle == 0.0) {
@@ -204,41 +201,41 @@ namespace Isis {
     double mu = cos(emissionAngle);
     double mu0 = cos(incidenceAngle);
 
-    double Falpha = exp(parms.BETA * phaseAngle 
+    double Lalpha = exp(parms.BETA * phaseAngle 
                         + parms.GAMMA * phaseAngle * phaseAngle 
                         + parms.DELTA * phaseAngle * phaseAngle * phaseAngle);
 
     // Simple Hillier photometric polynomial equation with exponential opposition
     //  surge term.
-    double rcal = M_PI * parms.ALS * Falpha * (mu0 / (mu + mu0));
-      return rcal;
+    double rcal = M_PI * parms.AMC * (2 * Lalpha * (mu0 / (mu + mu0)) + ((1 - Lalpha) * mu0));
+    return rcal;
   }
 
- 
+
   /**
-   * Return parameters used for all band.
+   * Return parameters used for all bands.
    *
-   * Method creates 
-   * keyword vectors of band specific parameters used 
-   * in the photometric correction. 
-   * Output PVL container write keywords 
+   * Method creates keyword vectors of band specific parameters
+   * used in the photometric correction.
+   *
+   * @param pvl Output PVL container write keywords 
    *
    * @author 2016-10-07 Driss Takir
-   */                           
-  void Lommelseeliger::report(PvlContainer &pvl) {
-    pvl.addComment("I/F = M_PI * ALS * F(alpha) * (mu0/(mu0+mu) * F(phase))");
+   */    
+  void McEwen::report(PvlContainer &pvl) {
+    pvl.addComment("I/F = M_PI * AMC * ( (2 * Lalpha * mu0 / mu0 + mu) + (1 - Lalpha) * mu0)");
     pvl.addComment(" where:");
     pvl.addComment("  mu0 = cos(incidence)");
     pvl.addComment("  mu = cos(incidence)");
-    pvl.addComment("  F(phase) = exp(BETA * phase + GAMMA * phase^2 + DELTA * phase^3");
+    pvl.addComment("  Lalpha = exp(BETA * alpha + GAMMA * alpha^2 + DELTA * alpha^3");
 
-    pvl += PvlKeyword("Algorithm", "Lommelseeliger");
-    PvlKeyword units("LommelseeligerUnits");
+    pvl += PvlKeyword("Algorithm", "McEwen");
+    PvlKeyword units("McEwenUnits");
     PvlKeyword phostd("PhotometricStandard");
     PvlKeyword bbc("BandBinCenter");
     PvlKeyword bbct("BandBinCenterTolerance");
     PvlKeyword bbn("BandNumber");
-    PvlKeyword ALS("ALS");
+    PvlKeyword AMC("AMC");
     PvlKeyword BETA("BETA");
     PvlKeyword GAMMA("GAMMA");
     PvlKeyword DELTA("DELTA");
@@ -249,7 +246,7 @@ namespace Isis {
       bbc.addValue(toString(p.wavelength));
       bbct.addValue(toString(p.tolerance));
       bbn.addValue(toString(p.band));
-      ALS.addValue(toString(p.ALS));
+      AMC.addValue(toString(p.AMC));
       BETA.addValue(toString(p.BETA));
       GAMMA.addValue(toString(p.GAMMA));
       DELTA.addValue(toString(p.DELTA));
@@ -259,7 +256,7 @@ namespace Isis {
     pvl += bbc;
     pvl += bbct;
     pvl += bbn;
-    pvl += ALS;
+    pvl += AMC;
     pvl += BETA;
     pvl += GAMMA;
     pvl += DELTA;
@@ -268,27 +265,25 @@ namespace Isis {
 
 
   /**
-   * Determine Hillier parameters given a wavelength. 
-   *  
-   * This method determines the set of Lommel Seeliger parameters 
-   * to use for a given wavelength.  It iterates through 
-   * all band profiles as read from the PVL file and 
-   * computes the difference between the "wavelength" 
-   * parameter and the BandBinCenter keyword. The 
-   * absolute value of this value is checked against the
-   * BandBinCenterTolerance paramter and if it is less 
-   * than or equal to it, a Parameter container is 
-   * returned. 
-   *  
-   * @param wavelength Wavelength used to find paramete set 
-   *  
-   * @return Hillier::Parameters Container of valid 
-   * values.  If not found, a value of iProfile = -1 is 
-   * returned. 
+   * Determine Hillier parameters given a wavelength.
+   *
+   * This method determines the set of Hillier parameters to use
+   * for a given wavelength.  It iterates through all band
+   * profiles as read from the PVL file and computes the
+   * difference between the "wavelength" parameter and the
+   * BandBinCenter keyword.  The absolute value of this value is
+   * checked against the BandBinCenterTolerance paramter and if it
+   * is less than or equal to it, a Parameter container is
+   * returned.
+   *
+   * @param wavelength Wavelength used to find parameter set
+   *
+   * @return McEwen::Parameters Container of valid values.  If not
+   *         found, a value of iProfile = -1 is returned.
    *
    * @author 2016-10-07 Driss Takir
-   */  
-  Lommelseeliger::Parameters Lommelseeliger::findParameters(const double wavelength) const {
+   */
+  McEwen::Parameters McEwen::findParameters(const double wavelength) const {
     for (unsigned int i = 0; i < m_profiles.size(); i++) {
       const DbProfile &p = m_profiles[i];
       if (p.exists("BandBinCenter")) {
@@ -303,37 +298,37 @@ namespace Isis {
         }
       }
     }
+
     // Not found if we reach here
     return Parameters();
   }
 
 
   /**
-   * Extracts necessary Hillier parameters from profile. 
-   *  
-   * Given a profile read from the input PVL file, this method 
-   * extracts needed parameters (from Keywords) in the 
-   * PVL profile and creates a container of the converted values. 
-   * 
-   * @param p Profile to extract/convert 
-   *  
-   * @return Lommel Seeliger::Parameters Container of extracted 
-   * values 
+   * Extracts necessary Hillier parameters from profile.
+   *
+   * Given a profile read from the input PVL file, this method
+   * extracts needed parameters (from Keywords) in the PVL profile
+   * and creates a container of the converted values.
+   *
+   * @param p Profile to extract/convert
+   *
+   * @return McEwen::Parameters Container of extracted values
    *
    * @author 2016-10-07 Driss Takir
-   */  
-  Lommelseeliger::Parameters Lommelseeliger::extract(const DbProfile &p) const {
+   */
+  McEwen::Parameters McEwen::extract(const DbProfile &p) const {
     Parameters pars;
-    pars.ALS = toDouble(ConfKey(p, "ALS", toString(0.0)));
+    pars.AMC = toDouble(ConfKey(p, "AMC", toString(0.0)));
     pars.BETA = toDouble(ConfKey(p, "BETA", toString(0.0)));
     pars.GAMMA = toDouble(ConfKey(p, "GAMMA", toString(0.0)));
     pars.DELTA = toDouble(ConfKey(p, "DELTA", toString(0.0)));
     pars.wavelength = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
     pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
-    pars.units = ConfKey(p, "LommelseeligerUnits", QString("Radians"));
+    pars.units = ConfKey(p, "McEwenUnits", QString("Radians"));
     pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
     return pars;
   }
-} // namespace Isis
 
+}
