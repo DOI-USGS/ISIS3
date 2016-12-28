@@ -34,7 +34,63 @@ namespace Isis {
    */
   BlobDetectionAlgorithm::BlobDetectionAlgorithm() : 
                  Feature2DAlgorithm("Blob", "Feature2D",
-                                    BLOBType::create()) {  
+                                    BLOBType::create()) { 
+   setupParameters();
+  }
+
+
+  /**
+   * Constructs the algorithm with the input variables
+   * 
+   * @param cvars  The variables and values the algorithm will use.
+   *               Variables that are not included will be set to their default.
+   * @param config The config string used to construct cvars.
+   */
+  BlobDetectionAlgorithm::BlobDetectionAlgorithm(const PvlFlatMap &cvars, const QString &config) :
+                          Feature2DAlgorithm("Blob", "Feature2D", 
+                                              BLOBType::create(), cvars) {
+    setConfig(config);
+    PvlFlatMap variables = setupParameters();
+    variables.merge(cvars);
+    cv::SimpleBlobDetector::Params params;
+    params.thresholdStep = variables.get("ThresholdStep").toFloat();
+    params.minThreshold = variables.get("MinThreshold").toFloat();
+    params.maxThreshold = variables.get("MaxThreshold").toFloat();
+    params.minRepeatability = variables.get("MinRepeatability").toUInt();
+    params.minDistBetweenBlobs = variables.get("MinDistance").toFloat();
+    params.filterByColor = toBool(variables.get("FilterByColor"));
+    params.blobColor = (unsigned char) toInt(variables.get("BlobColor"));
+    params.filterByArea = toBool(variables.get("FilterByArea"));
+    params.minArea = variables.get("MinArea").toFloat();
+    params.maxArea = variables.get("MaxArea").toFloat();
+    params.filterByCircularity = toBool(variables.get("FilterByCircularity"));
+    params.minCircularity = variables.get("MinCircularity").toFloat();
+    params.maxCircularity = variables.get("maxCircularity").toFloat();
+    params.filterByInertia = toBool(variables.get("FilterByInertia"));
+    params.minInertiaRatio = variables.get("MinInertiaRatio").toFloat();
+    params.maxInertiaRatio = variables.get("MaxInertiaRatio").toFloat();
+    params.filterByConvexity = toBool(variables.get("FilterByConvexity"));
+    params.minConvexity = variables.get("MinConvexity").toFloat();
+    params.maxConvexity = variables.get("MaxConvexity").toFloat();
+
+    m_algorithm = BLOBType::create(params); 
+
+    m_variables.merge(variables);
+  }
+
+
+  /**
+   * Destroys the algorithm
+   */
+  BlobDetectionAlgorithm::~BlobDetectionAlgorithm() { }
+
+
+  /**
+   * Sets up the algorithm parameters with default values. 
+   * 
+   * @return PvlFlatMap Algorithm parameters and their default values. 
+   */
+  PvlFlatMap BlobDetectionAlgorithm::setupParameters() {
     PvlFlatMap variables;
     variables.add("ThresholdStep",       "10");
     variables.add("MinThreshold",        "50");
@@ -55,50 +111,9 @@ namespace Isis {
     variables.add("FilterByConvexity",   "true");
     variables.add("MinConvexity",        "0.95");
     variables.add("MaxConvexity",        "inf");
-    m_variables.merge(variables);
+    m_variables = variables;
+    return (m_variables);
   }
-
-
-  /**
-   * Constructs the algorithm with the input variables
-   * 
-   * @param cvars  The variables and values the algorithm will use.
-   *               Variables that are not included will be set to their default.
-   * @param config The config string used to construct cvars.
-   */
-  BlobDetectionAlgorithm::BlobDetectionAlgorithm(const PvlFlatMap &cvars, const QString &config,
-                                                 const cv::SimpleBlobDetector::Params params) :
-                  Feature2DAlgorithm("Blob", "Feature2D", 
-                                     BLOBType::create(params), cvars) {
-    setConfig(config);
-    PvlFlatMap variables;
-    variables.add("ThresholdStep",       toString(params.thresholdStep));
-    variables.add("MinThreshold",        toString(params.minThreshold));
-    variables.add("MaxThreshold",        toString(params.maxThreshold));
-    variables.add("MinRepeatability",    toString( (int) params.minRepeatability));
-    variables.add("MinDistance",         toString(params.minDistBetweenBlobs));
-    variables.add("FilterByColor",       toString(params.filterByColor));
-    variables.add("BlobColor",           toString(params.blobColor));
-    variables.add("FilterByArea",        toString(params.filterByArea));
-    variables.add("MinArea",             toString(params.minArea));
-    variables.add("MaxArea",             toString(params.maxArea));
-    variables.add("FilterByCircularity", toString(params.filterByCircularity));
-    variables.add("MinCircularity",      toString(params.minCircularity));
-    variables.add("maxCircularity",      toString(params.maxCircularity));
-    variables.add("FilterByInertia",     toString(params.filterByInertia));
-    variables.add("MinInertiaRatio",     toString(params.minInertiaRatio));
-    variables.add("MaxInertiaRatio",     toString(params.maxInertiaRatio));
-    variables.add("FilterByConvexity",   toString(params.filterByConvexity));
-    variables.add("MinConvexity",        toString(params.minConvexity));
-    variables.add("MaxConvexity",        toString(params.maxConvexity));
-    m_variables.merge(variables);
-  }
-
-
-  /**
-   * Destroys the algorithm
-   */
-  BlobDetectionAlgorithm::~BlobDetectionAlgorithm() { }
 
 
   /**
@@ -123,27 +138,7 @@ namespace Isis {
    */
   Feature2DAlgorithm *BlobDetectionAlgorithm::create(const PvlFlatMap &vars,
                                                      const QString &config) {
-    cv::SimpleBlobDetector::Params params;
-    params.thresholdStep = vars.get("ThresholdStep", "10").toFloat();
-    params.minThreshold = vars.get("MinThreshold", "50").toFloat();
-    params.maxThreshold = vars.get("MaxThreshold", "220").toFloat();
-    params.minRepeatability = vars.get("MinRepeatability", "2").toUInt();
-    params.minDistBetweenBlobs = vars.get("MinDistance", "10").toFloat();
-    params.filterByColor = toBool(vars.get("FilterByColor", "true"));
-    params.blobColor = (unsigned char) toInt(vars.get("BlobColor", "0"));
-    params.filterByArea = toBool(vars.get("FilterByArea", "true"));
-    params.minArea = vars.get("MinArea", "25").toFloat();
-    params.maxArea = vars.get("MaxArea", "5000").toFloat();
-    params.filterByCircularity = toBool(vars.get("FilterByCircularity", "false"));
-    params.minCircularity = vars.get("MinCircularity", "0.8").toFloat();
-    params.maxCircularity = vars.get("maxCircularity", "inf").toFloat();
-    params.filterByInertia = toBool(vars.get("FilterByInertia", "true"));
-    params.minInertiaRatio = vars.get("MinInertiaRatio", "0.1").toFloat();
-    params.maxInertiaRatio = vars.get("MaxInertiaRatio", "inf").toFloat();
-    params.filterByConvexity = toBool(vars.get("FilterByConvexity", "true"));
-    params.minConvexity = vars.get("MinConvexity", "0.95").toFloat();
-    params.maxConvexity = vars.get("MaxConvexity", "inf").toFloat();
-    return ( new BlobDetectionAlgorithm(vars, config, params) );
+    return ( new BlobDetectionAlgorithm(vars, config) );
   }
 
 

@@ -8,6 +8,12 @@ namespace Isis {
 
 /**
  * Wrap of OpenCV3 MSER algorithm to implement pure virtual functions. 
+ *  
+ * @author 2016-12-20 Jesse Mapel 
+ *  
+ * @internal 
+ *  @history 2016-12-20 Jesse Mapel - Original Version
+ *  @history 2016-12-27 Kristin Berry - Added documentation
  */
 
 class MSERExtractor : public cv::MSER {  
