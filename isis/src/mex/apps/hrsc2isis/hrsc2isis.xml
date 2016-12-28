@@ -36,6 +36,10 @@
         into only having entries on time changes, and the times no longer have a 'Z' at the end
         of them once imported.
     </change>
+    <change name="Adam Paquette" date="2016-10-05">
+      Updated the error messages thrown when hrsc2isis trys to ingest an image that is not an HRSC
+      image, and when hrsc2isis trys to ingest a map projected image. Fixes #4259.
+    </change>
   </history>
 
   <oldName>
