@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: findfeatures.xml 6564 2016-02-11 00:14:44Z kbecker@GS.DOI.NET $ -->
-<!--<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> -->
-<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./application.xsd"> 
+<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
       Feature-based matching algorithms used to create ISIS control networks 
