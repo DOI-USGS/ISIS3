@@ -43,7 +43,16 @@
 
 namespace Isis {
 
-  // Container class
+/**
+ * Container class for CnetManager
+ *  
+ * @author 2016-09-30 Kris Becker 
+ *  
+ * @internal 
+ *   @history 2016-09-30 Kris Becker - Original Version
+ *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
+ * 
+ */
   class CnetSuppression : public CnetManager {
     public:
       typedef CnetManager::IndexPoint  IndexPoint;
@@ -53,7 +62,13 @@ namespace Isis {
       typedef TNT::Array1D<bool>       BitMask;
 
       /** 
-       *  Results of a particular suppression
+       * Results of a particular suppression
+       *  
+       * @author 2016-09-30 Kris Becker 
+       *  
+       * @internal 
+       *   @history 2016-09-30 Kris Becker - Original Version
+       *  
        */
       class Results {
         public:
@@ -109,9 +124,9 @@ namespace Isis {
             return;
           }
 
-          BitMask    m_candidates; //!
-          BitMask    m_selected; //!
-          PointSet   m_points; //!
+          BitMask    m_candidates; //! 
+          BitMask    m_selected; //! 
+          PointSet   m_points; //! 
           QRectF     m_domain; //!
           double     m_radius; //! 
       };
@@ -184,7 +199,11 @@ namespace Isis {
        * This is a comparison class used to sort lists of objects, 
        * where the QPair.second datum is a number in descending order.
        * 
-       * @author 2016-09-30 Kris Becker
+       * @author 2016-09-30 Kris Becker 
+       *  
+       * @internal 
+       *   @history 2016-09-30 Kris Becker - Original Version
+       *  
        */
       class SortSerialsByPntSize {
         public:

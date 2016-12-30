@@ -55,7 +55,11 @@ namespace Isis {
 /**
  * Class to store control points with a weight and computed strength for CnetManager. 
  *  
- * @author Kris Becker 
+ * @author 2016-09-30 Kris Becker 
+ *  
+ * @internal 
+ *   @history 2016-09-30 Kris Becker - Original Version
+ *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
  * 
  */
   class KPoint {
@@ -124,7 +128,12 @@ namespace Isis {
 
 /**
  * Container class for the network and suppression data.
- * 
+ *  
+ * @author 2016-09-30 Kris Becker 
+ *  
+ * @internal 
+ *   @history 2016-09-30 Kris Becker - Original Version
+ *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
  */
   class CnetManager {
     public:
@@ -158,7 +167,11 @@ namespace Isis {
        * This is a comparison class used to sort lists of KPoint objects by strength, in
        * ascending order.
        * 
-       * @author 2016-09-30 Kris Becker
+       * @author 2016-09-30 Kris Becker 
+       *  
+       * @internal 
+       *   @history 2016-09-30 Kris Becker - Original Version
+       *  
        */
       class SortStrengthDescending {
         public:
