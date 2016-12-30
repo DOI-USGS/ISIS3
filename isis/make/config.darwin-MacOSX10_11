@@ -506,6 +506,17 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libglib-*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libp11-kit*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libffi*.dylib"
 
+# OpenCV3 dependencies
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavresample*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxcb-shm*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsoxr*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopenjp2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libOpenNI*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswresample*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libidn*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtasn1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libusb*.dylib"
+
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicuuc*.dylib"
