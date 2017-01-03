@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include <cfloat>
+#include <cmath>
+
 #include <vector>
 #include <stdio.h>
 
@@ -8,14 +11,18 @@
 
 #include "Camera.h"
 #include "EndianSwapper.h"
+#include "iTime.h"
 #include "IException.h"
 #include "IString.h"
 #include "LeastSquares.h"
 #include "LineManager.h"
 #include "PolynomialUnivariate.h"
 #include "ProcessByLine.h"
+#include "ProcessByBrick.h"
 #include "ProgramLauncher.h"
+#include "Pvl.h"
 #include "PvlGroup.h"
+#include "Spice.h"
 #include "Statistics.h"
 #include "Table.h"
 #include "UserInterface.h"
@@ -29,8 +36,15 @@ map< pair<int, int>, double > sampleBasedDarkCorrections;
 //! map from <line, band> to dark correction value
 map< pair<int, int>, double > lineBasedDarkCorrections;
 
+QString yearString;
+QString timeString;
+
 //! specific energy corrections for each band of the cube
 vector<double> specificEnergyCorrections;
+
+//! Bandwidth centers
+vector<double> bandwidthVector;
+vector<double> averageBandwidthVector;
 
 //! list of temp files that need deleted
 vector<QString> tempFiles;
@@ -38,8 +52,28 @@ vector<QString> tempFiles;
 //! solar remove coefficient
 double solarRemoveCoefficient;
 
+//! The calibration file containing multiplier information.
+static Pvl g_configFile;
+
+//! Calibration multipliers
+static double g_solar(1.0);
+static double g_ir(1.0);
+static double g_vis(1.0);
+static double g_wavecal(1.0);
+
+//! The calibration version.  It's the name of the directory
+//! in $cassini/calibration/vims where all of the radiometric
+//! calibration cubes are kept.
+QString calVersion;
+QString g_startTime;
+
 //! Output in I/F units
 bool iof;
+
+//!
+bool g_visBool;
+
+QString g_oCubeName;
 
 void calculateDarkCurrent(Cube *);
 void calculateVisDarkCurrent(Cube *);
@@ -49,7 +83,12 @@ void chooseFlatFile(Cube *, ProcessByLine *);
 
 void calculateSpecificEnergy(Cube *);
 void calculateSolarRemove(Cube *, ProcessByLine *);
+void loadCalibrationValues();
+void updateWavelengths(Cube *icube);
 
+
+void normalize(Buffer &in,Buffer &out);
+void normalize1(Buffer &out);
 void calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 
 QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile = false);
@@ -61,20 +100,27 @@ PvlGroup calibInfo;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  const QString calVersion = "RC17";
-  
+  //load the appropriate multipliers and the correct calibration version
+
   tempFiles.clear();
   specificEnergyCorrections.clear();
+  bandwidthVector.clear();
+  averageBandwidthVector.clear();
   sampleBasedDarkCorrections.clear();
   lineBasedDarkCorrections.clear();
   solarRemoveCoefficient = 1.0;
   iof = (ui.GetString("UNITS") == "IOF");
 
   calibInfo = PvlGroup("RadiometricCalibration");
-  calibInfo += PvlKeyword("CalibrationVersion", calVersion);
+
+  loadCalibrationValues();
 
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
+  PvlGroup &inst = icube->group("Instrument");
+
+
+  g_visBool = (inst["Channel"][0] != "IR");
 
   bool isVims = true;
 
@@ -86,13 +132,33 @@ void IsisMain() {
     isVims = false;
   }
 
+
+  try {
+    timeString = QString(inst["StartTime"]);
+
+  }
+  catch(IException &e) {
+
+    QString msg = "The label for the input cube [" + QString(ui.GetAsString("FROM")) +
+        "] does not have a start time in the Instrument group.";
+    throw IException(IException::User,msg,_FILEINFO_);
+
+  }
+
+  iTime startTime(timeString);
+  //Determine the year string to access the appropriate calibration file
+  yearString= QString::number(startTime.Year() );
+
+
   if(!isVims) {
-    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
+    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) +
+        "] is not a Cassini VIMS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube->label()->findObject("IsisCube").hasGroup("AlphaCube")) {
-    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
+    QString msg = "The input cube [" + QString(ui.GetAsString("FROM"))
+        + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -106,9 +172,13 @@ void IsisMain() {
 
   chooseFlatFile(icube, &p);
   calculateSpecificEnergy(icube);
+  updateWavelengths(icube);
 
   Cube *outCube = p.SetOutputCube("TO");
+  g_oCubeName = outCube->fileName();
+
   p.StartProcess(calibrate);
+
 
   outCube->putGroup(calibInfo);
   // Rename group to Results for writing to Log
@@ -116,6 +186,23 @@ void IsisMain() {
   Application::Log(calibInfo);
 
   p.EndProcess();
+  
+
+  //This is used to create normalized spectral plots
+#if 0
+  ProcessByBrick p1;
+  CubeAttributeInput iatt;
+  CubeAttributeOutput oatt;
+  p1.SetBrickSize(1,1,icube->bandCount());
+  p1.SetInputCube(outCube);
+  p1.SetOutputCube(g_oCubeName+"_norm.cub",oatt,outCube->sampleCount(),outCube->lineCount(),
+                   outCube->bandCount());
+  p1.StartProcess(normalize);
+   p.EndProcess();
+  p1.EndProcess();
+
+#endif
+
 
   for(unsigned int i = 0; i < tempFiles.size(); i++) {
     QFile::remove(tempFiles[i]);
@@ -123,6 +210,26 @@ void IsisMain() {
 
   tempFiles.clear();
 }
+
+
+void normalize(Buffer &in,Buffer &out) {
+
+  double normalizer = in[54];
+
+
+        for (int i =0; i < in.size(); i++)  {
+
+          if (!IsSpecial(in[i])) {
+
+           out[i] = in[i]/normalizer;
+
+          }
+          else{
+              out[i]=in[i];
+          }
+        }
+}
+
 
 /**
  * This applies the calculated calibration coefficients to the file.
@@ -135,7 +242,8 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   Buffer *flatFieldBuffer = inBuffers[1];
   Buffer *solarRemoveBuffer = NULL; // this is optional
 
-  if(inBuffers.size() > 2) {
+
+  if (inBuffers.size() > 2) {
     inBuffer = inBuffers[0];
     solarRemoveBuffer = inBuffers[1];
     flatFieldBuffer = inBuffers[2];
@@ -143,7 +251,7 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
 
   Buffer *outBuffer = outBuffers[0];
 
-  for(int i = 0; i < inBuffer->size(); i++) {
+  for (int i = 0; i < inBuffer->size(); i++) {
     (*outBuffer)[i] = (*inBuffer)[i];
 
     if(IsSpecial((*outBuffer)[i])) continue;
@@ -151,42 +259,55 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
     map< pair<int, int>, double>::iterator darkCorrection =
       sampleBasedDarkCorrections.find(pair<int, int>(i + 1, inBuffer->Band()));
 
-    if(darkCorrection != sampleBasedDarkCorrections.end()) {
+    //Darkfield correction
+    if (darkCorrection != sampleBasedDarkCorrections.end()) {
       (*outBuffer)[i] -= darkCorrection->second;
     }
 
-    darkCorrection = lineBasedDarkCorrections.find(pair<int, int>(inBuffer->Line(), inBuffer->Band()));
+    darkCorrection = lineBasedDarkCorrections.find(pair<int,
+                                                   int>(inBuffer->Line(), inBuffer->Band()));
 
-    if(darkCorrection != lineBasedDarkCorrections.end()) {
-      if(!IsSpecial(darkCorrection->second))
+
+    if (darkCorrection != lineBasedDarkCorrections.end()) {
+      if (!IsSpecial(darkCorrection->second))
         (*outBuffer)[i] -= darkCorrection->second;
       else
         (*outBuffer)[i] = Null;
     }
 
-    if(!IsSpecial((*flatFieldBuffer)[i]) && !IsSpecial((*outBuffer)[i])) {
+    //Flatfield correction
+    if (!IsSpecial((*flatFieldBuffer)[i]) && !IsSpecial((*outBuffer)[i])) {
       (*outBuffer)[i] /= (*flatFieldBuffer)[i];
     }
 
-    if(inBuffer->Band() <= (int)specificEnergyCorrections.size() && !IsSpecial((*outBuffer)[i])) {
+
+    //(1) Convert from DN/sec to photons/sec using RC19
+    //(2) Then convert from photons/sec to specific intensity
+    if (inBuffer->Band() <= (int)specificEnergyCorrections.size() && !IsSpecial((*outBuffer)[i]))
+    {
       (*outBuffer)[i] *= specificEnergyCorrections[inBuffer->Band()-1];
     }
 
-    if(iof && solarRemoveBuffer && !IsSpecial((*outBuffer)[i])) {
-      (*outBuffer)[i] = (*outBuffer)[i] / ((*solarRemoveBuffer)[i] / solarRemoveCoefficient) * Isis::PI;
+
+    //Convert to I/F/  Equation (3) in the white paper
+    if (iof && solarRemoveBuffer && !IsSpecial((*outBuffer)[i])) {
+      (*outBuffer)[i] = (*outBuffer)[i] /( g_solar*(*solarRemoveBuffer)[i]
+                                           / solarRemoveCoefficient) * Isis::PI  ;
     }
+
   }
 }
+
 
 /**
  * This calculates the values necessary to convert from
  * specific energy to I/F. A cube is used as part of the
- * equation (which probably* just contains a vector of values)
+ * equation (which probably just contains a vector of values)
  * so p->SetInputCube(...) will be called with the appropriate
  * filename.
  *
- * @param icube
- * @param p
+ * @param *icube A pointer to the input cube
+ * @param *p A pointer to the ProcessByLine object
  */
 void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   UserInterface &ui = Application::GetUserInterface();
@@ -261,13 +382,13 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     */
   }
 
-  bool vis = (icube->label()->
-              findGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
+  //bool vis = (icube->label()->
+  //            findGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
   QString attributes;
 
   // vis is bands 1-96, ir is bands 97-352 in this calibration file
-  if(vis) {
+  if(g_visBool) {
     attributes = "+1-96";
   }
   else {
@@ -276,7 +397,12 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
 
   CubeAttributeInput iatt(attributes);
 
-  FileName solarFileName("$cassini/calibration/vims/solar_v????.cub");
+  //QString solarFilePath = "$cassini/calibration/vims/solar_v????.cub";
+  QString solarFilePath = "$cassini/calibration/vims/"+calVersion+
+     "/solar-spectrum/"+"solar."+yearString+"_v????.cub";
+
+  FileName solarFileName(solarFilePath);
+
   solarFileName = solarFileName.highestVersion();
 
   calibInfo += PvlKeyword("SolarColorFile",
@@ -287,45 +413,224 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
 
 
 /**
- * This calculates the coefficients for specific energy corrections
+ * @brief Loads the approrpriate constants which need to be multiplied by
+ * the values in the calibration cubes during the calibration phase.
+ * Also loads the current radiometric calibration version.
  */
-void calculateSpecificEnergy(Cube *icube) {
+void loadCalibrationValues() {
+
+  FileName calibFile("$cassini/calibration/vims/vimsCalibration????.trn");
+  calibFile = calibFile.highestVersion();
+
+  //Pvl configFile;
+  g_configFile.read(calibFile.expanded());
+  PvlGroup &multipliers = g_configFile.findGroup("CalibrationMultipliers");
+
+  calVersion = (QString)multipliers["version"];
+
+  g_solar = multipliers["solar"][0].toDouble();
+
+  g_ir = multipliers["IR"][0].toDouble();
+
+  g_vis = multipliers["VIS"][0].toDouble();
+
+  g_wavecal = multipliers["wave-cal"][0].toDouble();
+
+
+
+  calibInfo += PvlKeyword("CalibrationVersion", calVersion);
+  calibInfo += PvlKeyword("SolarMultiplier",QString::number(g_solar,'f',2));
+  calibInfo += PvlKeyword("IR_Multiplier",QString::number(g_ir,'f',2));
+  calibInfo += PvlKeyword("VIS_Multiplier",QString::number(g_vis,'f',2));
+  calibInfo += PvlKeyword("Wave-CalMultiplier",QString::number(g_wavecal,'f',2));
+
+
+}
+
+
+/**
+ * @brief Updates the BandBin::Center keyword value in the input cube's label
+ * with new wavelength values for RC 19 (Radiometric Calibration version 19).
+ * This is due to the wavelength calibration drift.
+ * @param icube  The original input cube prior to calibration
+ */
+void updateWavelengths(Cube *icube) {
+
   PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
+
+  PvlGroup &bandBin = icube->label()->findGroup("BandBin",Pvl::Traverse);
+
+  QString bandwidthFile = "$cassini/calibration/vims/"+calVersion+"/band-wavelengths/wavelengths."+
+      yearString+"_v????.cub";
+
+  QString averageBandwidthFile = "$cassini/calibration/vims/"+calVersion+"/band-wavelengths/"+
+      "wavelengths_average_v????.cub";
+
+
+  FileName bandwidthFileName = FileName(bandwidthFile);
+  FileName averageBandwidthFileName = FileName(averageBandwidthFile);
+  bandwidthFileName =bandwidthFileName.highestVersion();
+  averageBandwidthFileName = averageBandwidthFileName.highestVersion();
+
+  Cube averageBandwidthCube;
+  Cube bandwidthCube;
+  bandwidthCube.open(bandwidthFileName.expanded());
+  averageBandwidthCube.open(averageBandwidthFileName.expanded());
+
+  calibInfo += PvlKeyword("BandwidthFile",
+                          bandwidthFileName.originalPath() + "/" + bandwidthFileName.name());
+
+  calibInfo += PvlKeyword("AverageBandwidthFile",
+                          averageBandwidthFileName.originalPath() + "/"
+                          + averageBandwidthFileName.name());
+
+  LineManager bandwidthMgr(bandwidthCube);
+  LineManager averageBandwidthMgr(averageBandwidthCube);
+
+  for (int i =0; i < icube->bandCount();i++) {
+
+    Statistics bandwidthStats;
+    Statistics averageBandwidthStats;
+
+    if (vis) {
+      averageBandwidthMgr.SetLine(1,i+1);
+      bandwidthMgr.SetLine(1, i + 1);
+    }
+    else {
+      // ir starts at band 97
+      averageBandwidthMgr.SetLine(1,i+97);
+      bandwidthMgr.SetLine(1, i + 97);
+    }
+
+    bandwidthCube.read(bandwidthMgr);
+    bandwidthStats.AddData(bandwidthMgr.DoubleBuffer(), bandwidthMgr.size());
+    bandwidthVector.push_back(bandwidthStats.Average());
+
+    averageBandwidthCube.read(averageBandwidthMgr);
+    averageBandwidthStats.AddData(averageBandwidthMgr.DoubleBuffer(), averageBandwidthMgr.size());
+    averageBandwidthVector.push_back(averageBandwidthStats.Average());
+  }
+
+  QString bandbinCenterString("(");
+  QString averageBandbinString("(");
+
+  for (unsigned int i =0; i < bandwidthVector.size()-1; i++) {
+    bandbinCenterString+=QString::number(bandwidthVector[i]);
+    bandbinCenterString+=",";
+
+    averageBandbinString+=QString::number(averageBandwidthVector[i]);
+    averageBandbinString+=",";
+  }
+
+  bandbinCenterString+=QString::number(bandwidthVector[bandwidthVector.size()-1]);
+  bandbinCenterString+=")";
+
+  averageBandbinString+=QString::number(averageBandwidthVector[averageBandwidthVector.size()-1]);
+  averageBandbinString+=")";
+
+
+
+  PvlKeyword &centerBand = bandBin.findKeyword("Center");
+  centerBand.setValue(bandbinCenterString);
+
+  PvlKeyword averageBand("MissionAverage");
+  averageBand.setValue(averageBandbinString);
+  bandBin.addKeyword(averageBand);
+  centerBand.setValue(bandbinCenterString);
+
+}
+
+
+/**
+ * @brief This calculates the coefficients for specific energy corrections
+ */
+void calculateSpecificEnergy(Cube *icube) {
+  PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
+  //bool vis = (inst["Channel"][0] != "IR");
+
+
+  double multiplier = 1.0;
   double coefficient = 1.0;
 
   if(inst["GainMode"][0] == "HIGH") {
     coefficient /= 2;
   }
 
-  if(vis && inst["SamplingMode"][0] == "HI-RES") {
+  if(g_visBool && inst["SamplingMode"][0] == "HI-RES") {
     coefficient *= 3;
   }
 
-  if(vis) {
+  if(g_visBool) {
     coefficient /= toDouble(inst["ExposureDuration"][1]) / 1000.0;
   }
   else {
+
+  //Discrepancies between the VIMS and Spacecraft clock necessitated a
+  //conversion multiplier, which is in the USGS: ISIS3 version of vimscal
+  //but was not part of the University of Arizona pipeline.  Below is the
+  //text describing this problem:
+  /**
+    I. VIMS ISIS Camera Model - Three subtasks were included in this work:
+       Timing Discrepancy - The first involved accounting for a timing discrepancy recorded in
+       the VIMS EDRs. In 2012 (following an inquiry from Mark Showalter) we identified a
+       timing error that arose because the S/C clock and VIMS internal clock run at slightly
+       different rates (the VIMS internal clock rate is 1.01725 slower than the
+       S/C USO-driven clock). The instrument timing reported in the VIMS_IR EDR labels
+       includes exposure duration, interline delay, and intercube delay. We had been under the
+       misimpression that these times had been converted to S/C clock units at JPL during the
+       creation of the EDRs. This was not the case and the labels are, in fact, in units of
+       the VIMS internal clock. This error propagates into errors in geometric reconstruction
+       that become particularly severe for very long IR exposures. During reconstruction,
+       each VIMS IR spectral sample (pixel) is assigned an acquisition time (based on timing
+       data in the labels) that is used to index into the SPICE kernel data bases in order to
+       derived necessary geometric information for that pixel. As a result of the use of the wrong
+       time base, the geometric parameters so derived were in error.
+
+       Prior to making any changes the VIMS internal clock rate was remeasured using inflight
+       sequences in which both the VIMS and S/C clock times were recorded for each VIMS_IR pixel.
+       These results showed that the VIMS internal clock rate was the same as measured prelaunch
+       to a precision of 10-6. We then made changes to ISIS S/W to convert these erroneous times
+       reported in the EDR headers to UTC time. This required modifying the VIMS IR Camera model
+       in ISIS-3 (as well as in ISIS-2, used in the VIMS data processing pipeline at the
+       University of Arizona). Bob Brown is preparing a document for inclusion in PDS EDR
+       deliveries describing the problem and procedure to convert the time parameters as given in
+       EDR labels (EXPOSURE_DURATION, INTERLINE_DELAY_DURATION, and INTERFRAME_DELAY_DURATION).
+    */
+
+    //USGS
     coefficient /= (toDouble(inst["ExposureDuration"][0]) * 1.01725) / 1000.0 - 0.004;
+
+
+    //University of Arizona
+    //coefficient /= (toDouble(inst["ExposureDuration"][0]) ) / 1000.0 - 0.004;
   }
 
-  QString specEnergyFile = "$cassini/calibration/vims/";
 
-  if(vis) {
-    specEnergyFile += "vis_perf_v????.cub";
-  }
-  else {
-    specEnergyFile += "ir_perf_v????.cub";
-  }
 
-  QString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
+  //QString specEnergyFile = "$cassini/calibration/vims/ir_perf_v????.cub";
+
+
+
+  QString specEnergyFile = "$cassini/calibration/vims/"+calVersion+"/RC19-mults/RC19."
+      +yearString+"_v????.cub";
+
+
+  //B multiplier
+  //QString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
+
+  QString waveCalFile = "$cassini/calibration/vims/"+calVersion+"/wave-cal/wave.cal."+
+      yearString+"_v????.cub";
+
 
   FileName specEnergyFileName(specEnergyFile);
   specEnergyFileName = specEnergyFileName.highestVersion();
 
+
   FileName waveCalFileName(waveCalFile);
   waveCalFileName = waveCalFileName.highestVersion();
+
 
   Cube specEnergyCube;
   specEnergyCube.open(specEnergyFileName.expanded());
@@ -345,14 +650,18 @@ void calculateSpecificEnergy(Cube *icube) {
     Statistics specEnergyStats;
     Statistics waveCalStats;
 
-    if(vis) {
+    if(g_visBool) {
       specEnergyMgr.SetLine(1, i + 1);
       waveCalMgr.SetLine(1, i + 1);
+      multiplier=g_vis;
+
     }
     else {
-      specEnergyMgr.SetLine(1, i + 1);
+      //specEnergyMgr.SetLine(1, i + 1);  //vimscalold
+      specEnergyMgr.SetLine(1,i+96+1);
       // ir starts at band 97
       waveCalMgr.SetLine(1, i + 96 + 1);
+      multiplier = g_ir;
     }
 
     specEnergyCube.read(specEnergyMgr);
@@ -361,11 +670,23 @@ void calculateSpecificEnergy(Cube *icube) {
     specEnergyStats.AddData(specEnergyMgr.DoubleBuffer(), specEnergyMgr.size());
     waveCalStats.AddData(waveCalMgr.DoubleBuffer(), waveCalMgr.size());
 
-    double bandCoefficient = coefficient * specEnergyStats.Average() * waveCalStats.Average();
+
+    //Determine Specific Intensity
+    //  I = [(Raw_{DN} = Dark)/flatfield]*B*C
+    //  B = waveCalStats.Average()
+    //  C = specEnergyStats.Average()
+    //Equation 1 in the white paper (C = specificEnergyStats.Average(),
+    //B = waveCalStats.Average() )
+
+    double bandCoefficient = coefficient * (multiplier*specEnergyStats.Average())
+        *(g_wavecal*waveCalStats.Average() );
+
 
     specificEnergyCorrections.push_back(bandCoefficient);
   }
+
 }
+
 
 /**
  * This decides if we have a VIS or IR dark current correction and calls the
@@ -386,6 +707,7 @@ void calculateDarkCurrent(Cube *icube) {
     calculateIrDarkCurrent(icube);
   }
 }
+
 
 /**
  * This populates darkCorrections with the result of the equation:
@@ -482,13 +804,15 @@ void calculateVisDarkCurrent(Cube *icube) {
         // now set the values to the average
         for(int setIndex = 0; setIndex < 8; setIndex ++) {
           pair<int,int> index = pair<int,int>(sample, band+setIndex);
-          if(!setIndex) printf("Changing %.4f to %.4f\n", sampleBasedDarkCorrections.find(index)->second, stats.Average());
+          if(!setIndex) printf("Changing %.4f to %.4f\n",
+          sampleBasedDarkCorrections.find(index)->second, stats.Average());
           sampleBasedDarkCorrections.find(index)->second = stats.Average();
         }
       }
     }
   }*/
 }
+
 
 /**
  * This calculates the dark current corrections for IR. If
@@ -619,16 +943,46 @@ void calculateIrDarkCurrent(Cube *icube) {
 }
 
 /**
- * This calls p->SetInputCube with the appropriate flat file needed for
+ * @brief This calls p->SetInputCube with the appropriate flat file needed for
  * icube.
  *
  * @param icube
  * @param p
  */
 void chooseFlatFile(Cube *icube, ProcessByLine *p) {
+
+  UserInterface &ui = Application::GetUserInterface();
+
+  QString flatField= ui.GetString("FLATFIELD");
+  QString signature="";
+
   PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
+
+//#if 0
+
+if (!vis) {
+  if (flatField == "2006FLAT") {
+    signature="352_";
+
+  }
+
+  else if (flatField == "2006SSFLAT") {
+    signature = "ss_352_";
+
+  }
+
+  else if (flatField == "2013FLAT") {
+
+    signature = "2013_";
+  }
+
+ }
+
+
+//#endif
+
 
   QString calFile = "$cassini/calibration/vims/flatfield/";
 
@@ -640,20 +994,26 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
   }
 
   if(hires) {
-    calFile += "hires_flatfield_v????.cub";
+
+   //calFile += "hires_flatfield_v????.cub";
+   calFile += "hires_flatfield_"+signature+"v????.cub";
   }
   else {
-    calFile += "flatfield_v????.cub";
+      //calFile += "ss_flat_352_v????.cub";
+    calFile += "flatfield_"+signature+"v????.cub";
+
   }
 
   FileName calibrationFileName(calFile);
   calibrationFileName = calibrationFileName.highestVersion();
 
-  calibInfo += PvlKeyword("FlatFile", calibrationFileName.originalPath() + "/" + calibrationFileName.name());
+  calibInfo += PvlKeyword("FlatFile", calibrationFileName.originalPath() +
+                          "/" + calibrationFileName.name());
 
   CubeAttributeInput iatt;
   p->SetInputCube(createCroppedFile(icube, calibrationFileName.expanded(), true), iatt);
 }
+
 
 /**
  * This makes our calibration files match the input cube described
@@ -688,6 +1048,7 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
   tempFiles.push_back(tempFile.expanded());
   return tempFile.expanded();
 }
+
 
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
   const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
