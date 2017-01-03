@@ -1,0 +1,84 @@
+Unit Test for HayabusaAmicaCamera...
+
+----------------------------------------------
+Test for full frame image...
+FileName:  "st_2530292409_v.cub"
+CK Frame:  -130102
+
+Kernel IDs: 
+CK Frame ID      =  -130000
+CK Reference ID  =  1
+SPK Target ID    =  -130
+SPK Reference ID =  1
+
+Spacecraft Name Long:   "Hayabusa"
+Spacecraft Name Short:  "Hayabusa"
+Instrument Name Long:   "Amica"
+Instrument Name Short:  "Amica"
+
+Shutter open  =  "184747466.18263"
+Shutter close =  "184747466.1826735"
+
+For upper left corner ...
+DeltaSample =  0
+DeltaLine   =  0
+
+For upper right corner ...
+DeltaSample =  0
+DeltaLine   =  0
+
+For lower left corner ...
+DeltaSample =  0
+DeltaLine   =  0
+
+For lower right corner ...
+DeltaSample =  0
+DeltaLine   =  0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+DeltaSample =  0
+DeltaLine   =  0
+
+----------------------------------------------
+Test for subframe image...
+FileName:  "st_2391934788_v.cub"
+CK Frame:  -130102
+
+Kernel IDs: 
+CK Frame ID      =  -130000
+CK Reference ID  =  1
+SPK Target ID    =  -130
+SPK Reference ID =  1
+
+Spacecraft Name Long:   "Hayabusa"
+Spacecraft Name Short:  "Hayabusa"
+Instrument Name Long:   "Amica"
+Instrument Name Short:  "Amica"
+
+Shutter open  =  "180453955.8918987"
+Shutter close =  "180453955.8919857"
+
+For upper left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For upper right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+DeltaSample =  0
+DeltaLine   =  0
+

@@ -18,7 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "AmicaCamera.h"
+#include "HayabusaAmicaCamera.h"
 
 #include <QString>
 
@@ -35,13 +35,13 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Constructs a Hayabusa AmicaCamera object using the image labels.
+   * Constructs a Hayabusa HayabusaAmicaCamera object using the image labels.
    *
    * @param lab Pvl label from a Hayabusa AMICA image.
    *
    * @internal
    */
-  AmicaCamera::AmicaCamera(Cube &cube) : FramingCamera(cube) {
+  HayabusaAmicaCamera::HayabusaAmicaCamera(Cube &cube) : FramingCamera(cube) {
     m_instrumentNameLong = "Amica";
     m_instrumentNameShort = "Amica";
     m_spacecraftNameLong = "Hayabusa";
@@ -79,10 +79,20 @@ namespace Isis {
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
 
-    // Setup detector map
+    // Setup detector map. FirstSample is zero-based indexing, Detector is one-based.
     CameraDetectorMap *detMap =  new CameraDetectorMap(this);
     detMap->SetStartingDetectorSample((int) inst["FirstSample"] + 1);
-    detMap->SetStartingDetectorLine((int) inst["FirstLine"] + 1);
+
+    // We flip the image over the horizontal axis on ingestion to
+    // match fits viewers. So for cubes that are for subframes, first/last line
+    // values in the label are flipped about the detector's x-axis. We need to
+    // compensate to set the detector's first line. FirstLine is zero-based
+    // indexing and there are 1024 lines on the detector so the Detector last
+    // line index is 1023.
+    int actualFirstLine = 1023 - ((int) inst["LastLine"]);
+
+    //The detector line indexing is one-based. 
+    detMap->SetStartingDetectorLine(actualFirstLine + 1);
 
     // Handle summing
     int binning = inst["Binning"];
@@ -101,6 +111,14 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+
+
+  /** 
+   * Destructor 
+   */ 
+  HayabusaAmicaCamera::~HayabusaAmicaCamera() {
+  }
+
 
   /**
    * Returns the shutter open and close times. The user should pass in the
@@ -124,23 +142,56 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Original version.
    */
-  pair<iTime, iTime> AmicaCamera::ShutterOpenCloseTimes(double time,
+  pair<iTime, iTime> HayabusaAmicaCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Frame ID
+   */
+  int HayabusaAmicaCamera::CkFrameId() const { 
+    return (-130000); 
+  }
+
+
+  /**
+   * CK Reference ID - J2000
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int HayabusaAmicaCamera::CkReferenceId() const { 
+    return (1); 
+  }
+
+
+  /**
+   * SPK Reference ID - J2000
+   *
+   * @return @b int The appropriate instrument code for the Spacecraft
+   *         Kernel Reference ID
+   */
+  int HayabusaAmicaCamera::SpkReferenceId() const { 
+    return (1); 
   }
 }
 
 
 /**
- * This is the function that is called in order to instantiate an AmicaCamera
+ * This is the function that is called in order to instantiate an HayabusaAmicaCamera
  * object.
  *
  * @param lab Cube labels
  *
- * @return Isis::Camera* AmicaCamera
+ * @return Isis::Camera* HayabusaAmicaCamera
  * @internal
  *   @history 2013-11-27 Kris Becker - Original Version
  */
-extern "C" Isis::Camera *AmicaCameraPlugin(Isis::Cube &cube) {
-  return new Isis::AmicaCamera(cube);
+extern "C" Isis::Camera *HayabusaAmicaCameraPlugin(Isis::Cube &cube) {
+  return new Isis::HayabusaAmicaCamera(cube);
 }

@@ -1,5 +1,5 @@
-#ifndef AmicaCamera_h
-#define AmicaCamera_h
+#ifndef HayabusaAmicaCamera_h
+#define HayabusaAmicaCamera_h
 /**
  * @file
  *
@@ -47,38 +47,23 @@ namespace Isis {
    *   @history 2016-09-14 Kelvin Rodriguez - Enforced the order in which BORESIGHT_LINE and
    *                           BORESIGHT_SAMPLE are added to the PVL. Part of porting to
    *                           OSX 10.11 
+   *   @history 2017-01-03 Jeannie Backer - Renamed from AmicaCamera to HayabusaAmicaCamera.
+   *   @history 2017-01-03 Jeannie Backer - Fixed bug in constructor. When setting the detector
+   *                           start line, the camera model was not taking into account the image
+   *                           flip on ingestion. Added subframe example to test. Fixes #.
    */
-  class AmicaCamera : public FramingCamera {
+  class HayabusaAmicaCamera : public FramingCamera {
     public:
-      AmicaCamera(Cube &cube);
-      /** Destructor  */
-      ~AmicaCamera() { }
+      HayabusaAmicaCamera(Cube &cube);
+
+      ~HayabusaAmicaCamera();
+
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
-      /**
-       * CK frame ID -  - Instrument Code from spacit run on CK
-       *
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Frame ID
-       */
-      virtual int CkFrameId() const { return (-130000); }
-
-      /**
-       * CK Reference ID - J2000
-       *
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
-       */
-      virtual int CkReferenceId() const { return (1); }
-
-      /**
-       * SPK Reference ID - J2000
-       *
-       * @return @b int The appropriate instrument code for the Spacecraft
-       *         Kernel Reference ID
-       */
-      virtual int SpkReferenceId() const { return (1); }
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkReferenceId() const;
   };
 };
 #endif
