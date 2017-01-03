@@ -1,7 +1,6 @@
 #ifndef AmicaCalUtils_h
 #define AmicaCalUtils_h
 
-
 #include <cmath>
 #include <string>
 #include <vector>
@@ -20,9 +19,7 @@
 
 
 
-// OpenCV stuff
-
-
+// OpenCV libraries
 #include <opencv2/opencv.hpp>
 
 
@@ -33,11 +30,6 @@
  */
 using namespace cv;
 using namespace std;
-
-
-
-
-
 
 namespace Isis {
 
@@ -52,12 +44,11 @@ namespace Isis {
 static void loadNaifTiming() {
   static bool naifLoaded = false;
   if (!naifLoaded) {
+
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
     leapseconds = leapseconds.highestVersion();
-
     Isis::FileName sclk("$hayabusa/kernels/sclk/hayabusa.tsc");    
-
     Isis::FileName pck1("$hayabusa/kernels/tspk/de403s.bsp");
     Isis::FileName pck2("$hayabusa/kernels/tspk/sb_25143_140.bsp");
     Isis::FileName pck3("$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp");
@@ -66,7 +57,6 @@ static void loadNaifTiming() {
 //  Load the kernels
     QString leapsecondsName(leapseconds.expanded());
     QString sclkName(sclk.expanded());
-
 
     QString pckName1(pck1.expanded());
     QString pckName2(pck2.expanded());
@@ -95,7 +85,6 @@ static void loadNaifTiming() {
  * provides instrument time support, leap seconds and planet body ephemeris.
  * @return @b double Distance in AU between Sun and observed body.
  */
-
 static bool sunDistanceAU(const QString &scStartTime,
                           const QString &target,
                           double &sunDist) {
@@ -144,7 +133,6 @@ static bool sunDistanceAU(const QString &scStartTime,
  *
  * @return @b Mat A pointer to the OpenMat object
  */
-
 Mat * isis2mat(Cube *icube) {
 
   int nlines = icube->lineCount();
@@ -178,7 +166,6 @@ return matrix;
  * @param cubeName The name of the Isis::Cube that is being created.
  *
  */
-
 void mat2isis(Mat *matrix, QString cubeName) {
 
   int nlines = matrix->rows;
@@ -217,7 +204,6 @@ void mat2isis(Mat *matrix, QString cubeName) {
  * @param cubeName The name of the ISIS::Cube that is being created.
  *
  */
-
 void  translate(Cube *flatField, int *transform, QString fname) {
 
   Mat * originalMat = isis2mat(flatField);
@@ -272,7 +258,6 @@ void  translate(Cube *flatField, int *transform, QString fname) {
  * at pixel with coordinates (x,y) relative to the central pixel (with coordinates (0,0) ).
  *
  */
-
 static double f_focused(double alpha,int binning,double x,double y) {
 
         double X = x*binning;
@@ -313,8 +298,6 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
   double Y = binning*y;
 
   double r = sqrt(X*X+Y*Y);
-
-
   double sum = 0;
 
   for (int i = 0; i < N; i ++)   {     
@@ -345,7 +328,6 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
  * @param binning
  * @return @b double * A pointer to a [size x size] matrix of light distribution values.
  */
-
 double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int binning) {
 
 
@@ -353,25 +335,16 @@ double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int 
 
   int i = 0;
 
-  for(double y = -(size / 2) ; y <= (size / 2) ; y++) {
-    for(double x = -(size / 2) ; x <= (size / 2) ; x++) {
-
+  for (double y = -(size / 2) ; y <= (size / 2) ; y++) {
+    for (double x = -(size / 2) ; x <= (size / 2) ; x++) {
        if (x == 0 && y ==0) {
-
-
          psfVals[i] = 0;
          i++;
-
        }
        else {
-
-         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);
-         //psfVals[i] = f_focused(alpha,binning,x,y);
-
+         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);                 
          i++;
-
-       }
-      //i++;
+       }      
     }
   }
 

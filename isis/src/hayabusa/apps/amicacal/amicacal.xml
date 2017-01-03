@@ -482,7 +482,22 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       a single-band ISIS cube to an OpenCV::OpenMat matrix and vice versa for the purpose
       of translating and scaling flat-field images so their dimensions match
       some AMICA images which have been cropped.  Fixes #3880.
-
+    </change>
+    <change name="Kris Becker" date="2016-08-25">
+        Determined the LOSSY compression images must be scaled by a factor of 
+        16 to match the LOSSLESS mode for proper calibration. Added the UNIT 
+        option to specify output calibration units as DN, RADIANCE or I/F. This
+        parameter replaces the IOF parameter. Added option to allow user to
+        determine to apply PSF correction. Added CONFIG parameter that user
+        can provide a version of the calibration parameters to apply in amicacal.
+    </change>
+    <change name="Tyler Wilson" date="2016-11-02">
+        Added the "APPLYSMEAR" option which will force the smear correction calibration
+        to be applied, and a new test for smear correction.
+        The default is for this option to not be applied except in the case where an image is
+        being processed for which on-board smear correction was not applied.  Also made the
+        applyPSF boolean parameter into a global variable for consistency with the applySmear
+        global variable.
     </change>
   </history>
 
@@ -504,6 +519,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
         <brief>
           Non-PSF Corrected Output cube
         </brief>
@@ -514,54 +530,103 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         <filter>
           *.cub
         </filter>
-      </parameter>      
-
-      <!--
-      <parameter name="PSFCORRECTED">
-        <type>cube</type>
-        <fileMode>output</fileMode>
+      </parameter>
+      
+      <parameter name="CONFIG">
+        <type>filename</type>
+        <fileMode>input</fileMode>
         <brief>
-          PSF Corrected Output cube
+          Input AMICA calibration config file
         </brief>
         <description>
-          This is the output file. The output cube will be a calibrated version
-          of the input cube (with PSF correction).
+           This is the PVL file containing the input configuration
+           parameters for the amicacal program. Users can modify
+           the parameters as needed.
         </description>
-        <filter>
-          *.cub
-        </filter>
-      </parameter>
-      -->
-
-
-
+        <filter>*.trn</filter>
+        <default><item>$hayabusa/calibration/amica/amicaCalibration????.trn</item></default>
+      </parameter>            
     </group>
+
+
     <group name="Options">
+
+      <parameter name = "APPLYPSF">
+          <type>boolean</type>
+          <default><item>False</item></default>
+          <brief>
+              Apply PSF correction
+          </brief>
+          <description>
+          </description>
+      </parameter>
+      <parameter name = "APPLYSMEAR">
+          <type>boolean</type>
+          <default><item>False</item></default>
+          <brief>
+              Apply smear correction
+          </brief>
+          <description>
+          </description>
+      </parameter>
       <parameter name = "NULLPOLARPIX">
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
           Set polarized pixels to ISIS::Null.
         </brief>
-	<description>
+        <description>
           Four position angle glass polarizers (of dimension 200 x 200 pixels each) 
           are attached to the upper left of the CCD chip.  This option sets those
           pixels to Null in the calibrated image by default.
-	</description>
+	    </description>
       </parameter>  
 
-      <parameter name = "IOF">
-        <type>boolean</type>
-        <default><item>True</item></default>
+      <parameter name = "UNITS">
+        <type>string</type>
+        <default><item>IOF</item></default> 
         <brief>
-          Convert to I/F units.
+          Convert to specified output calibrated units.
+        </brief>
+        <description>
+        </description>
+        <list>
+          <option value="DN">
+            <brief>
+              Convert to DN units 
+            </brief> 
+            <description>
+            </description>
+          </option>
+
+          <option value="RADIANCE">
+            <brief>
+              Convert to radiance unit
+            </brief> 
+            <description> 
+            </description>
+          </option>
+
+            <option value="IOF">
+              <brief>Irradiance over flux</brief>
+              <description>
+                  Commonly referred to as "I over F", this option selects the 
+                  output calibration units as irradiance over flux.
+              </description>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name = "KERNEL_SIZE">
+        <type>string</type>
+        <default><item>23</item></default>
+        <brief>
+
         </brief>
         <description>
 
-        </description>
+      </description>
       </parameter>
-
-	
 
     </group>
     
