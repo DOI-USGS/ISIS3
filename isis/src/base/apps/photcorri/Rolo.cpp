@@ -190,8 +190,8 @@ namespace Isis {
     }
 
     // Convert to radians
-    incidenceAngle *= rpd_c();
-    emissionAngle *= rpd_c();
+    incidenceAngle *= Isis::DEG2RAD;
+    emissionAngle *= Isis::DEG2RAD;
     phaseAngle *= parms.phaUnit; //  Apply unit normalizer
 
     // Compute Lommel-Seeliger components
@@ -351,7 +351,7 @@ namespace Isis {
     pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
     pars.units = ConfKey(p, "RoloUnits", QString("Radians"));
-    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
+    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : Isis::DEG2RAD;
     return pars;
   }
 } // namespace Isis

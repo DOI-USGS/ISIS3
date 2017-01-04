@@ -7,7 +7,7 @@
 #
 # @history 2016-09-09 Jeannie Backer - Original version.
 #
-D19030320000-cam2map_equi.cub.TOLERANCE=1e-03
+D19030320000-cam2map_equi.cub.TOLERANCE = 1e-03
 
 include $(ISISROOT)/make/isismake.tsts
 
