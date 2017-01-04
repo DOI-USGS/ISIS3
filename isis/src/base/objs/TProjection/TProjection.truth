@@ -127,6 +127,16 @@ Minimum latitude:        45
 Maximum latitude:        80
 Minimum longitude:       15
 Maximum longitude:       190
+
+Testing inLatitudeRange, inLongitudeRange methods...
+
+InLongitudeRange (15,190,0):   0
+InLongitudeRange (15,190,100): 1
+InLongitudeRange (100):        1
+InLongitudeRange (-12):        0
+InLatitudeRange (-70):         0
+InLatitudeRange (70):          1
+
 Find coordinate range ...  
 Minimum X:              150
 Maximum X:              1900

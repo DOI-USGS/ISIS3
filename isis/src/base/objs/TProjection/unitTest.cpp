@@ -21,6 +21,8 @@
   *   @history 2016-08-26 Kelvin Rodriguez - Changed invalidValue varible to have
   *                           both an int and double version to avoid undefined behavior in
   *                           trying to convert double to int. Part of porting to OSX 10.11
+  *   @history 2016-12-28 Kristin Berry - Updated to test inLatitude range and two new
+  *                           inLongitudeRange functions.
  */
 
 using namespace std;
@@ -86,6 +88,20 @@ class MyProjection : public Isis::TProjection {
       return xyRangeOblique(minX, maxX, minY, maxY);
     }
 
+    // create wrappers to test protected methods
+    bool testinLongitudeRange(double longitude) { 
+      return inLongitudeRange(longitude);
+    }
+
+    bool testinLongitudeRange(double minLon, double maxLon, double longitude) {
+      return inLongitudeRange(minLon, maxLon, longitude);
+    }
+
+    bool testinLatitudeRange(double latitude) {
+      return inLatitudeRange(latitude);
+    }
+
+
     // create output method to print results of private methods
     void Output() const {
       cout << "tCompute(0,sin(0)):             " << tCompute(0.0, 0.0) << endl;
@@ -100,6 +116,7 @@ class MyProjection : public Isis::TProjection {
       cout << "phi2Compute(1000):              " << phi2Compute(1000.0) << endl;
       cout << "qCompute(sin(0)):               " << qCompute(0.0) << endl;
     }
+
     double testqCompute(const double sinPhi) const {
       return qCompute(sinPhi);
     }
@@ -310,6 +327,16 @@ int main(int argc, char *argv[]) {
   cout << "Maximum latitude:        " << p2.MaximumLatitude() << endl;
   cout << "Minimum longitude:       " << p2.MinimumLongitude() << endl;
   cout << "Maximum longitude:       " << p2.MaximumLongitude() << endl;
+  cout << endl; 
+
+  cout << "Testing inLatitudeRange, inLongitudeRange methods...\n" << endl;
+  cout << "InLongitudeRange (15,190,0):   " << p2.testinLongitudeRange(15.0, 190.0, 0.0) << endl;
+  cout << "InLongitudeRange (15,190,100): " << p2.testinLongitudeRange(15.0,190.0, 100.0) << endl;
+  cout << "InLongitudeRange (100):        " << p2.testinLongitudeRange(100.0) << endl;
+  cout << "InLongitudeRange (-12):        " << p2.testinLongitudeRange(-12.0) << endl;
+  cout << "InLatitudeRange (-70):         " << p2.testinLatitudeRange(-70.0) << endl;
+  cout << "InLatitudeRange (70):          " << p2.testinLatitudeRange(70.0) << endl;
+  cout << endl; 
 
   double minX, maxX, minY, maxY;
   p2.XYRange(minX, maxX, minY, maxY);
