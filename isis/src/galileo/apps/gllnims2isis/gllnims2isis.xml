@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="gllnims2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation=
-"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
 
   <brief>
     Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS3 cube format.
@@ -18,8 +17,47 @@ xsi:noNamespaceSchemaLocation=
     NIMS cube, and an output path and name for both the core and suffix cubes.
     </p>
     <p>
+     The projections used for the original qub files are not compatible with ISIS projections, so projected Galileo NIMS 
+     qubs cannot be converted into equivalent ISIS cubes with mapping information directly. Instead, imported NIMS ISIS cubes are provided with a MappingInformation PVL group in the cube label. 
+     The information in this PVL group and latitude and longitude information from the output suffix cube can be used with the nocam2map ISIS application to produce a projeted image. An example follows.
+    </p>
+    <p>
+	To use nocam2map in this way, first convert the Galileo NIMS PDS QUB into an ISIS cube using gllnims2isis:
+        <pre> 
+  gllnims2isis from=original.qub core=core.cub suffix=suffix.cub
+	</pre>
+	 Then, extract latitude and longitude cubes from the suffix cube. The first band is latitude, the second is longitude:
+	<pre>
+  cubeatt from=suffix.cub+1 to=latitude.cub
+  cubeatt from=suffix.cub+2 to=longitude.cub
+	</pre>
+	Next, use information from core.cub's MappingInfo PVL group to run nocam2map. Here is an example of the information contained in a MappingInfo PVL group:
+         <pre>
+  Group = MappingInformation
+    LatitudeType            = Planetocentric
+    LongitudeDirection      = PositiveWest
+    MapResolution           = 0.334 &lt;pixels/degree&gt;
+    MinimumLatitude         = -80.53 &lt;degrees&gt;
+    MaximumLatitude         = 75.99 &lt;degrees&gt;
+    MinimumLongitude        = 0.06 &lt;degrees&gt;
+    MaximumLongitude        = 176.90 &lt;degrees&gt;
+    MapProjectionType       = POINT_PERSPECTIVE
+    MapScale                = 95.548 &lt;km/pixel&gt;
+    MapProjectionRotation   = 0.22 &lt;degrees&gt;
+    MajorEquatorialRadius  = 1830.00 &lt;km&gt;
+    MinorEquatorialRadius = 1818.70 &lt;km&gt;
+    PolarRadius             = 1815.30 &lt;km&gt;
+  End_Group
+	 </pre>
+	  This information can be used to run nocam2map to project this cube into an ISIS-compatible projection. As you can see below, the MajorEquatorialRadius in the MappingInformation PVL group above lists the EQURADIUS to use in nocam2map, the PolarRadius lists the value to use for POLRADIUS, and the MapResolution is the value to use for RESOLUTION in nocam2map.
+<pre>
+  nocam2map from=core.cub latcube=latitude.cub loncube=longitude.cub londir=positivewest to=projected.cub pixres=ppd resolution=0.334
+  equradius=1830.00 polradius=1815.30
+</pre>
+        It isn't required, but the minimum and maximum latitude and longitude from the MappingInformation group can also be used in nocam2map to define the output range of the projection. For defining the projection to use, either a pre-existing map template can be used, or a new mapping label can be created from the information in the MappingInformation group. 
+</p>
+    <p>
     See Also:
-
     <ul>
         <li>
         <a href="http://pdsimage.wr.usgs.gov/Missions/Galileo/NIMS/go_1001/document/nimsinst/instpub.asc">
@@ -36,8 +74,6 @@ xsi:noNamespaceSchemaLocation=
         data catalogs.
         </p>
         </li>
-
-
     </ul>
 
     </p>
@@ -51,6 +87,14 @@ xsi:noNamespaceSchemaLocation=
     <change name="Jeannie Backer" date="2016-03-15">
       Modified error throw to not append a caught message to the current message.
       This was printing non UTF-8 characters on some platforms. Updated truth data. 
+    </change>
+    <change name="Jesse Mapel" date="2016-10-08">
+      Modified to import the PDS mapping group. 
+    </change>
+    <change name="Kristin Berry" date="2016-12-28">
+      Took out the PDS mapping group because they don't match ISIS Projection standards.
+      Instead a MappingInformation PVL group was added, along with documentation about
+      how to use nocam2map with this information to create a valid projected ISIS Cube.
     </change>
 
   </history>
