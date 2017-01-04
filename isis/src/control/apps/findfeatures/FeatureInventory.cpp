@@ -22,6 +22,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <QRegularExpression>
 #include <QStringList>
 #include <QSet>
 
@@ -43,8 +44,10 @@ namespace Isis {
                              const QStringList &aliases) {
 
     // Add the fundamental 
-    int v_made(0);
-    QString v_name = name.toLower();
+    int v_made(0);    
+    // There cannot be withspace at the begging or end of the name - its okay
+    // to embed them.
+    QString v_name = name.toLower().trimmed(); 
     m_theFeatureCreator.insert(v_name, maker);
     v_made++;
 
@@ -52,13 +55,16 @@ namespace Isis {
     // etc....
     BOOST_FOREACH ( QString a_name, aliases ) {
       if ( !a_name.isEmpty() ) {
-       m_theFeatureCreator.insert(a_name, maker);
+       QString l_name = a_name.toLower().trimmed();
+       m_theFeatureCreator.insert(l_name, maker);
        v_made++;
-       if ( a_name.contains("detector.", Qt::CaseInsensitive) ) {
-         m_detectorNames.append( name.toLower() );
+       if ( l_name.contains(QRegularExpression("^detector\\.*", 
+                                               QRegularExpression::CaseInsensitiveOption) ) ) {
+         m_detectorNames.append( l_name.toLower() );
        }
-       if ( a_name.contains("extractor.", Qt::CaseInsensitive) ) {
-         m_extractorNames.append( name.toLower() );
+       if ( a_name.contains(QRegularExpression("^extractor\\.*", 
+                                               QRegularExpression::CaseInsensitiveOption) ) ) {
+         m_extractorNames.append( l_name.toLower() );
        }
       }
     }
@@ -71,7 +77,9 @@ namespace Isis {
                              FeatureInventory::MatcherCreator maker,
                              const QStringList &aliases) {
     int v_made(0);
-    QString v_name = name.toLower();
+    // There cannot be whitespace at the begining or end of the name - its okay 
+    // to embed them. 
+    QString v_name = name.toLower().trimmed(); 
     m_theMatcherCreator.insert(v_name, maker);
     m_matcherNames.append( name.toLower() );
     v_made++;
@@ -79,8 +87,9 @@ namespace Isis {
     // Add all aliases. Expected to of form "detector.name, extractor.name",
     // etc....
     BOOST_FOREACH ( QString a_name, aliases ) {
-      if ( !a_name.isEmpty() ) {
-        m_theMatcherCreator.insert(a_name, maker);
+      QString l_name = a_name.toLower().trimmed(); 
+      if ( !l_name.isEmpty() ) {
+        m_theMatcherCreator.insert(l_name, maker);
       }
       v_made++;
     }
@@ -97,7 +106,7 @@ namespace Isis {
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    QString name = parts.takeFirst().toLower();
+    QString name = parts.takeFirst().toLower().trimmed();
     PvlFlatMap variables = parameters(parts);
     
     if ( m_theFeatureCreator.contains(name) ) {
@@ -143,7 +152,8 @@ namespace Isis {
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    QString name = parts.takeFirst().toLower();
+    QString c_name = parts.takeFirst();
+    QString name = c_name.toLower().trimmed();
     PvlFlatMap variables = parameters(parts);
 
     if ( m_theMatcherCreator.contains(name) ) {
@@ -151,7 +161,7 @@ namespace Isis {
       return ( matcher(variables, config));
     }
     else {
-      QString mess = name + " Matcher not found or invalid";
+      QString mess = c_name + " Matcher not found or invalid";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -180,7 +190,7 @@ namespace Isis {
 
   PvlObject FeatureInventory::algorithmInfo(const QString algorithmName) const {
     PvlObject algorithmObject(algorithmName);
-    QString lowerName = algorithmName.toLower();
+    QString lowerName = algorithmName.toLower().trimmed();
 
     try {
       if ( m_theFeatureCreator.contains(lowerName) ) {
@@ -208,7 +218,7 @@ namespace Isis {
 
   PvlKeyword FeatureInventory::aliases(const QString algorithmName) const {
     PvlKeyword aliasKey("Aliases");
-    QString lowerName = algorithmName.toLower();
+    QString lowerName = algorithmName.toLower().trimmed();
 
     if ( m_theFeatureCreator.contains( lowerName ) ) {
       FeatureCreator creator = m_theFeatureCreator.value(lowerName);
@@ -279,7 +289,7 @@ namespace Isis {
      BOOST_FOREACH ( QString parm, fromConfig) {
        QStringList parts = parse(parm, ":");
        if ( parts.size() > 0 ) {
-         PvlKeyword key(parts.takeFirst());
+         PvlKeyword key(parts.takeFirst().trimmed());
          BOOST_FOREACH  (QString value, parts) {
            key.addValue(value);
          }

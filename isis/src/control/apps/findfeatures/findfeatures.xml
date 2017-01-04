@@ -920,22 +920,22 @@
   1 ---------------------------------------------------
   2 Program:        findfeatures
   3 Version         0.1
-  4 Revision:       $Revision: 6598 $
-  5 RunTime:        2016-03-15T14:25:18
-  6 OpenCV_Version: 2.4.6.1
+  4 Revision:       $Revision: 7311 $
+  5 RunTime:        2017-01-03T16:59:01
+  6 OpenCV_Version: 3.1.0
   7 
   8 System Environment...
-  9 Number available CPUs:     8
- 10 Number default threads:    8
- 11 Total threads:             8
+  9 Number available CPUs:     4
+ 10 Number default threads:    4
+ 11 Total threads:             4
  12 
  13 Total Algorithms to Run:     1
  14 
- 15 @@ matcher-pair started on 2016-03-15T14:25:19
+ 15 @@ matcher-pair started on 2017-01-03T16:59:02
  16 
  17 +++++++++++++++++++++++++++++
  18 Entered RobustMatcher::match(MatchImage &amp;query, MatchImage &amp;trainer)...
- 19   Specification:   surf@hessianThreshold:100/surf/DescriptorMatcher.BFMatcher@normType:4@crossCheck:false
+ 19   Specification:   surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
  20 **  Query Image:   EW0211981114G.lev1.cub
  21        FullSize:     (1024, 1024)
  22        Rendered:     (1024, 1024)
@@ -945,11 +945,11 @@
  26 --> Feature detection...
  27   Total Query keypoints:    11823 [11823]
  28   Total Trainer keypoints:  11989 [11989]
- 29   Processing Time:          0.476
- 30   Processing Keypoints/Sec: 50025.2
+ 29   Processing Time:          0.307
+ 30   Processing Keypoints/Sec: 77563.5
  31 --> Extracting descriptors...
- 32   Processing Time(s):         0.599
- 33   Processing Descriptors/Sec: 39752.9
+ 32   Processing Time(s):         0.9
+ 33   Processing Descriptors/Sec: 26457.8
  34 
  35 *Removing outliers from image pairs
  36 Entered RobustMatcher::removeOutliers(Mat &amp;query, vector&lt;Mat&gt; &amp;trainer)...
@@ -957,12 +957,12 @@
  38   Query, Train Descriptors: 11823, 11989
  39   Computing query->train Matches...
  40   Total Matches Found:   11823
- 41   Processing Time:       0.352
- 42   Matches/second:        33588.1
+ 41   Processing Time:       1.906
+ 42   Matches/second:        6203.04
  43   Computing train->query Matches...
  44   Total Matches Found:   11989
- 45   Processing Time:       0.356 &lt;seconds&gt;
- 46   Matches/second:        33677
+ 45   Processing Time:       2.412 &lt;seconds&gt;
+ 46   Matches/second:        4970.56
  47  -Ratio test on query->train matches...
  48 Entered RobustMatcher::ratioTest(matches[2]) for 2 NearestNeighbors (NN)...
  49   RobustMatcher::Ratio:       0.65
@@ -970,7 +970,7 @@
  51   Total Passing Ratio Tests:  988
  52   Total Matches Removed:      10835
  53   Total Failing NN Test:      10835
- 54   Processing Time:            0.001
+ 54   Processing Time:            0
  55  -Ratio test on train->query matches...
  56 Entered RobustMatcher::ratioTest(matches[2]) for 2 NearestNeighbors (NN)...
  57   RobustMatcher::Ratio:       0.65
@@ -990,7 +990,7 @@
  71   Number Initial Matches:       669
  72   Total 1st Inliers Remaining:  273
  73   Total 2nd Inliers Remaining:  266
- 74   Processing Time:              0.05
+ 74   Processing Time:              0.041
  75 Entered EpiPolar RobustMatcher::ransacTest(matches, keypoints1/2...)...
  76  -Running EpiPolar Constraints/Fundamental Matrix...
  77   RobustMatcher::EpiTolerance:    1
@@ -999,7 +999,7 @@
  80   Inliers on 1st Epipolar:        219
  81   Inliers on 2nd Epipolar:        209
  82   Total Passing Epipolar:         209
- 83   Processing Time:                0.011
+ 83   Processing Time:                0.01
  84 Entered RobustMatcher::computeHomography(keypoints1/2, matches...)...
  85  -Running RANSAC Constraints/Homography Matrix...
  86   RobustMatcher::HmgTolerance:  1
@@ -1007,9 +1007,7 @@
  88   Total 1st Inliers Remaining:  197
  89   Total 2nd Inliers Remaining:  197
  90   Processing Time:              0.001
- 91 %% match-pair complete in 1.859 seconds!
- 92 
- 93 
+ 91 %% match-pair complete in 5.589 seconds!
     </PRE>
     <p>
         In the above example, lines 2-13 provide general information about the 
@@ -1124,9 +1122,9 @@
       MatchSolution group. Here is an example:
       <pre>
 Group = MatchSolution
-  Efficiency    = 0.016662437621585
-  MinEfficiency = 0.016662437621585
-  MaxEfficiency = 0.016662437621585
+  Matcher      = surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
+  MatchedPairs = 1
+  Efficiency   = 0.016662437621585
 End_Group
       </pre>
     </p>
@@ -1159,10 +1157,17 @@ End_Group
        Completed documentation
     </change>
      <change name="Kris Becker, Jesse Mapel, Kristin Berry, Jeannie Backer" date="2016-12-27">
-       Updated to use OpenCV3. Backward Compatibility Issue:  The LISTMATCHERS parameter was removed
-       and different feature detection, feature extraction, and matching algorithms are available in OpenCV2
-       and OpenCV3. Some have been added and some have been removed. 
+       Updated to use OpenCV3. Backward Compatibility Issue:  The LISTMATCHERS parameter was removed;
+       Different feature detection, feature extraction, and matching algorithms are available in OpenCV3
+       than in version 2, therefore some have been added and some have been removed. References #4556.
      </change>
+    <change name="Kris Becker" date="2017-01-03"> 
+       Corrected a bug in creation of the matcher algorithm if not provided by the user;
+       updated some additional elements of the documentation to be consistent with OpenCV3;
+       added additional code to allow for spaces in some areas of the user algorithm string specification; 
+       changed the program version to 1.0 from 0.1.
+       References #4556.
+    </change>
   </history> 
 
   <groups>
@@ -1374,56 +1379,107 @@ End_Group
                 <br/><br/>
                 <b>
                      findfeatures listspec=true 
-                     algorithm=detector.SimpleBlob@minrepeatability:1/orb 
+                     algorithm=detector.Blob@minrepeatability:1/orb 
                      toinfo=/dev/tty 
                 </b>
                 <PRE>
 Object = FeatureAlgorithms
-  Object = FeatureAlgorithm
-    Name          = detector.SimpleBlob@minrepeatability:1/orb/DescriptorMatc-
-                    her.BFMatcher@normType:6@crossCheck:false
-    OpenCVVersion = 2.4.6
-    Specification = detector.SimpleBlob@minrepeatability:1/orb/DescriptorMatc-
-                    her.BFMatcher@normType:6@crossCheck:false
+  Object = RobustMatcher
+    OpenCVVersion = 3.1.0
+    Name          = detector.Blob@minrepeatability:1/orb/BFMatcher@NormType:N-
+                    ORM_HAMMING@CrossCheck:false
 
-    Object = Algorithm
-      Type                = Detector
-      Name                = Feature2D.SimpleBlob
-      blobColor           = 0
-      filterByArea        = Yes
-      filterByCircularity = No
-      filterByColor       = Yes
-      filterByConvexity   = Yes
-      filterByInertia     = Yes
-      maxArea             = 5000.0
-      maxCircularity      = 3.40282346638529e+38
-      maxConvexity        = 3.40282346638529e+38
-      maxInertiaRatio     = 3.40282346638529e+38
-      maxThreshold        = 220.0
-      minDistBetweenBlobs = 10.0
-      minRepeatability    = 1
-      minThreshold        = 50.0
-      thresholdStep       = 10.0
+    Object = Detector
+      CVVersion    = 3.1.0
+      Name         = Blob
+      Type         = Feature2D
+      Features     = Detector
+      Description  = "The OpenCV simple blob detection algorithm. See the
+                      documentation at
+                      http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlo-
+                      bDetector.html"
+      CreatedUsing = detector.Blob@minrepeatability:1
+
+      Group = Parameters
+        BlobColor           = 0
+        FilterByArea        = true
+        FilterByCircularity = false
+        FilterByColor       = true
+        FilterByConvexity   = true
+        FilterByInertia     = true
+        MaxArea             = 5000
+        maxCircularity      = inf
+        MaxConvexity        = inf
+        MaxInertiaRatio     = inf
+        MaxThreshold        = 220
+        MinArea             = 25
+        MinCircularity      = 0.8
+        MinConvexity        = 0.95
+        MinDistance         = 10
+        MinInertiaRatio     = 0.1
+        minrepeatability    = 1
+        MinThreshold        = 50
+        ThresholdStep       = 10
+      End_Group
     End_Object
 
-    Object = Algorithm
-      Type          = Extractor
-      Name          = Feature2D.ORB
-      WTA_K         = 2
-      edgeThreshold = 31
-      firstLevel    = 0
-      nFeatures     = 500
-      nLevels       = 8
-      patchSize     = 31
-      scaleFactor   = 1.2000000476837
-      scoreType     = 0
+    Object = Extractor
+      CVVersion    = 3.1.0
+      Name         = ORB
+      Type         = Feature2D
+      Features     = (Detector, Extractor)
+      Description  = "The OpenCV ORB Feature2D detector/extractor algorithm.
+                      See the documentation at
+                      http://docs.opencv.org/3.1.0/db/d95/classcv_1_1ORB.html"
+      CreatedUsing = orb
+
+      Group = Parameters
+        edgeThreshold = 31
+        fastThreshold = 20
+        firstLevel    = 0
+        nfeatures     = 500
+        nlevels       = 8
+        patchSize     = 31
+        scaleFactor   = 1.2000000476837
+        scoreType     = HARRIS_SCORE
+        WTA_K         = 2
+      End_Group
     End_Object
 
-    Object = Algorithm
-      Type       = Matcher
-      Name       = DescriptorMatcher.BFMatcher
-      crossCheck = No
-      normType   = 6
+    Object = Matcher
+      CVVersion    = 3.1.0
+      Name         = BFMatcher
+      Type         = DecriptorMatcher
+      Features     = Matcher
+      Description  = "The OpenCV BFMatcher DescriptorMatcher matcher
+                      algorithm. See the documentation at
+                      http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher-
+                      .html"
+      CreatedUsing = BFMatcher@NormType:NORM_HAMMING@CrossCheck:false
+
+      Group = Parameters
+        CrossCheck = No
+        NormType   = NORM_HAMMING
+      End_Group
+    End_Object
+
+    Object = Parameters
+      EpiConfidence            = 0.99
+      EpiTolerance             = 3.0
+      FastGeom                 = false
+      FastGeomPoints           = 25
+      Filter                   = None
+      GeomSource               = MATCH
+      GeomType                 = CAMERA
+      HmgTolerance             = 3.0
+      MaxPoints                = 0
+      MinimumFundamentalPoints = 8
+      MinimumHomographyPoints  = 8
+      Ratio                    = 0.65
+      RefineFundamentalMatrix  = true
+      RootSift                 = false
+      SavePath                 = $PWD
+      SaveRenderedImages       = false
     End_Object
   End_Object
 End_Object

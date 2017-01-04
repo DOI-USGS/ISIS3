@@ -521,8 +521,10 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
   QString parametersSpec;
 
   QStringList remains;
+  // Within each part are the values between /'s (i.e., detector, extractor, 
+  // matcher and parameters.
   for (int i = 0 ; i < parts.size() ; i++) {
-    QString part = parts[i].simplified();
+    QString part = parts[i].trimmed();  // Remove leading/trailing whitespace
     if ( part.contains(QRegularExpression("^feature2d\\.*", QRegularExpression::CaseInsensitiveOption)) ) {
       // std::cout << "Setting feature2d: " << part << "\n";
       // If we have a detector and extractor, this is an error
@@ -672,8 +674,8 @@ MatcherAlgorithmPtr FeatureAlgorithmFactory::createMatcher(FeatureAlgorithmPtr e
 
   // Create the matcher and return
   QString matcherSpecs = "BFMatcher";
-  matcherSpecs + "@NormType:" + normType;
-  matcherSpecs + "@CrossCheck:" + crossCheck;
+  matcherSpecs += ("@NormType:" + normType);
+  matcherSpecs += ("@CrossCheck:" + crossCheck);
   MatcherAlgorithmPtr matcher = m_algorithmInventory.getMatcher(matcherSpecs);
   return ( matcher );
 }

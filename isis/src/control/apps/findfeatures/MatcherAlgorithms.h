@@ -35,7 +35,11 @@
 namespace Isis {
 
 /**
- * @brief Generic container for OpenCV-type feature matcher algorithms
+ * @brief Generic container for ISIS/OpenCV-type feature matcher algorithms
+ *  
+ * This class provides a container for the three elements of feature-based 
+ * matching: detector, extractor and matcher. An addition container of robust 
+ * matcher outlier detection is added as a "paramters" specification. 
  *  
  * @author  2016-11-29 Kris Becker
  *  

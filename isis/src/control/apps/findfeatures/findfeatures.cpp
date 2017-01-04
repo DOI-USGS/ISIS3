@@ -85,7 +85,7 @@ void IsisMain() {
 
   //  Program constants
   const QString findfeatures_program = "findfeatures";
-  const QString findfeatures_version = "0.1";
+  const QString findfeatures_version = "1.0";
   const QString findfeatures_revision = "$Revision$";
   const QString findfeatures_runtime = Application::DateTime();
 
