@@ -1,0 +1,182 @@
+#include "Isis.h"
+
+#include "Cube.h"
+#include "IException.h"
+#include "ImportFits.h"
+#include "iTime.h"
+#include "LineManager.h"
+#include "PixelType.h"
+#include "Preference.h"
+#include "ProcessByLine.h"
+#include "ProcessImportPds.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlTranslationManager.h"
+#include "OriginalLabel.h"
+#include "UserInterface.h"
+
+#include <QString>
+#include <QFile>
+
+using namespace std;
+using namespace Isis;
+
+void IsisMain() {
+
+  UserInterface &ui = Application::GetUserInterface();
+
+  ProcessImportPds processPDS;
+
+  FileName detachedLabel = ui.GetFileName("FROM");
+  Pvl label;
+  processPDS.SetPdsFile (detachedLabel.expanded(), "", label);
+
+  QString fitsImage = detachedLabel.path() + "/" + (QString) label.findKeyword("^COMBINED_SPECTRUM"); 
+  FileName fitsFile(fitsImage);
+  ImportFits fits(fitsFile, "FitsLabel");
+  label += fits.label();
+
+  QString axisCount;
+  QString axis1Length;
+  QString axis2Length;
+  try {
+    axisCount   = (QString) label.findKeyword ("NAXIS", PvlObject::Traverse);
+    axis1Length = (QString) label.findKeyword ("NAXIS1", PvlObject::Traverse);
+    axis2Length = (QString) label.findKeyword ("NAXIS2", PvlObject::Traverse);
+  }
+  catch (IException &e) {
+    QString msg = "Unable to read [NAXIS], [NAXIS1] or [NAXIS2] "
+                  "from FITS label in input [" + fitsImage + "].";
+    throw IException(e, IException::Io, msg, _FILEINFO_);
+  }
+  axisCount = axisCount.simplified().trimmed();
+  axis1Length = axis1Length.simplified().trimmed();
+  axis2Length = axis2Length.simplified().trimmed();
+  if ( !( axisCount   == "2"  &&
+          axis1Length == "64" &&
+          axis2Length == "2"     ) ) {
+    QString msg = "Input file [" + fitsImage +
+                  "] does not have the correct dimensions " +
+                  "for a Hayabusa NIRS FITS image.\n" +
+                  "Expected dimensions are [2] axes, [64 x 2]. " +
+                  "File dimensions are [" + axisCount + "] axes, [" +
+                  axis1Length + " x " + axis2Length + "].";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  processPDS.OmitOriginalLabel();
+
+  QString tempCubeName = detachedLabel.baseName() + ".temp.cub";
+  CubeAttributeOutput outputAtts = ui.GetOutputAttribute("TO");
+  outputAtts.setPixelType( Isis::Real);
+  Cube* tempCube = processPDS.SetOutputCube(tempCubeName, outputAtts);
+
+  // Convert the fits file into an ISIS cube
+  processPDS.StartProcess();
+
+  // Check the temp cube's dimensions
+  if ( (tempCube->sampleCount() != 64) ||
+       (tempCube->lineCount()   != 2 ) ||
+       (tempCube->bandCount()   != 1 )    ) {
+    QString msg = "Invalid temp cube dimensions. Dimensions "
+                  "must be 64 samples, by 2 lines, by 1 band.\n"
+                  "Temp cube dimensions are [" +
+                  toString( tempCube->sampleCount() ) +
+                  "] samples, by [" +
+                  toString( tempCube->lineCount() ) +
+                  "] lines, by [" +
+                  toString( tempCube->bandCount() ) +
+                  "] bands.";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  // Write the image data to the output cubes
+
+  Cube* reflectanceCube = processPDS.SetOutputCube(ui.GetFileName("TO"),
+                                                   outputAtts,
+                                                   1, 1, 64);
+  Cube* stdevCube = processPDS.SetOutputCube(ui.GetFileName("TOSTDDEV"),
+                                             outputAtts,
+                                             1, 1, 64);
+
+  LineManager tempManager(*tempCube);
+  LineManager reflectanceManager(*reflectanceCube);
+  LineManager stdevManager(*reflectanceCube);
+
+  // The first line is reflectance values in reverse order
+  tempManager.SetLine(1);
+  tempCube->read(tempManager);
+  for (int sample = 0; sample < tempCube->sampleCount(); sample++) {
+    reflectanceManager.SetLine(1, 64 - sample);
+    reflectanceManager[0] = tempManager[sample];
+    reflectanceCube->write(reflectanceManager);
+  }
+
+  // The second line is standard deviation values in reverse order
+  tempManager.SetLine(2);
+  tempCube->read(tempManager);
+  for (int sample = 0; sample < tempCube->sampleCount(); sample++) {
+    stdevManager.SetLine(1, 64 - sample);
+    stdevManager[0] = tempManager[sample];
+    stdevCube->write(stdevManager);
+  }
+
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse));
+  QString transDir = (QString) dataDir["hayabusa"] + "/translations/";
+  QString instrumentTrans = transDir + "nirsInstrument.trn";
+  QString archiveTrans = transDir + "nirsArchive.trn";
+
+  Pvl newLabel;
+
+  Isis::PvlTranslationManager instXlater(label, instrumentTrans);
+  instXlater.Auto(newLabel);
+
+  Isis::PvlTranslationManager archXlater(label, archiveTrans);
+  archXlater.Auto(newLabel);
+
+  // Create the bandbin group
+  // The following equation is from:
+  // Abe et al., 2004. Characteristics and current status of near infrared
+  // spectrometer for Hayabusa mission. Lunar & Planet. Sci. XXXV, 1724.
+  PvlGroup bandBinGroup("BandBin");
+  PvlKeyword filterNumber("FilterNumber");
+  PvlKeyword center("Center");
+  for (int i = 1; i <= 64; i++) {
+    filterNumber += toString( i );
+    center += toString( 2.2714 - 0.02356 * (65 - i) );
+  }
+  bandBinGroup += filterNumber;
+  bandBinGroup += center;
+
+  // Create the Kernels group
+  PvlGroup kerns("Kernels");
+  kerns += PvlKeyword("NaifFrameCode","-130200");
+
+  //  Create YearDoy keyword in Archive group
+  iTime stime(newLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
+  (void) newLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
+
+  // Add the instrument, band bin, archive, mission data, and kernels
+  // groups to the output cube labels
+  reflectanceCube->putGroup( newLabel.findGroup("Instrument", Pvl::Traverse) );
+  reflectanceCube->putGroup( bandBinGroup );
+  reflectanceCube->putGroup( newLabel.findGroup("Archive", Pvl::Traverse) );
+  reflectanceCube->putGroup( newLabel.findGroup("MissionData", Pvl::Traverse) );
+  reflectanceCube->putGroup( kerns );
+  stdevCube->putGroup( newLabel.findGroup("Instrument", Pvl::Traverse) );
+  stdevCube->putGroup( bandBinGroup );
+  stdevCube->putGroup( newLabel.findGroup("Archive", Pvl::Traverse) );
+  stdevCube->putGroup( newLabel.findGroup("MissionData", Pvl::Traverse) );
+  stdevCube->putGroup( kerns );
+
+  // Attach the original fits label and detached label
+  OriginalLabel originalFits(label);
+  reflectanceCube->write(originalFits);
+  stdevCube->write(originalFits);
+
+  // Clean up
+  processPDS.EndProcess();
+  QFile(tempCubeName).remove();
+}
