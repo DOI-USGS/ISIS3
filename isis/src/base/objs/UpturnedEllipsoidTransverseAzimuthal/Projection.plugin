@@ -1,0 +1,6 @@
+Group = UpturnedEllipsoidTransverseAzimuthal
+  Library = UpturnedEllipsoidTransverseAzimuthal
+  Routine = UpturnedEllipsoidTransverseAzimuthalPlugin
+  Keyword = CenterLongitude
+EndGroup
+
