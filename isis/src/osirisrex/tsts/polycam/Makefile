@@ -5,6 +5,12 @@
 #
 # @history 2016-09-09 Jeannie Backer - Original version. 
 #
+2019-01-13T23_35_59.000_PCAM_L2b_V001_map.cub.TOLERANCE=1e-03
+2019-01-13T23_36_05.000_PCAM_L2b_V001_map.cub.TOLERANCE=1e-03
+mosaic.cub.TOLERANCE=1e-03
+noseamMOS.cub.TOLERANCE=1e-03
+trimmed.cub.TOLERANCE=1e-03
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
@@ -230,7 +236,7 @@ commands:
 	           fromlist=$(OUTPUT)/unprojectedSpiceinitCubeList.txt                     \
 	           overlaplist=$(OUTPUT)/PCAM_findimageoverlaps.txt                        \
 	           detail=full                                                             \
-	           to=$(OUTPUT)/PCAM_overlapstats.txt                                      \
+	           to=$(OUTPUT)/PCAM_overlapstats.csv                                      \
 	           >& /dev/null;
 
 	# autoseed the two images
@@ -254,3 +260,6 @@ commands:
 
 	# change name so that pvldiff can compare
 	$(MV) $(OUTPUT)/PCAM_equi.map $(OUTPUT)/PCAM_equi.pvl;
+	# if findimageoverlaps fails, this will be reflected in the overlapstats test
+	# no need to keep this file.
+	$(RM) $(OUTPUT)/PCAM_findimageoverlaps.txt;
