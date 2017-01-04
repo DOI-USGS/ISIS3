@@ -28,11 +28,10 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   /**
-   * @brief Transverse Azimuthal Map Projection
+   * @brief Upturned Ellipsoid Transverse Azimuthal Map Projection
    *
    * This class provides methods for the forward and inverse formulas of a 
-   * Transverse Azimuthal map projection (??? from a sphere or an ellipsoid to
-   * a disk. ???)
+   * Upturned Ellipsoid Transverse Azimuthal map projection 
    *  
    *  
    * This class inherits Projection and implements the virtual methods 
@@ -69,7 +68,6 @@ namespace Isis {
 
       virtual QString Name() const;
       virtual QString Version() const;
-//???      double TrueScaleLatitude() const;
 
       virtual bool SetGround(const double lat, const double lon);
       virtual bool SetCoordinate(const double x, const double y);

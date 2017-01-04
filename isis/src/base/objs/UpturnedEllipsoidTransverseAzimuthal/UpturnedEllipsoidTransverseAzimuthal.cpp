@@ -137,17 +137,15 @@ namespace Isis {
    * @author 2016-03-18 Jeannie Backer 
    */
   bool UpturnedEllipsoidTransverseAzimuthal::operator== (const Projection &proj) {
-    if (!Projection::operator==(proj)) return false;
     // don't do the below it is a recursive plunge
     //  if (Projection::operator!=(proj)) return false;
-#if 0    
+
+    // all other data members calculated using m_lambda0, m_a and m_b.
     UpturnedEllipsoidTransverseAzimuthal *tcyl = (UpturnedEllipsoidTransverseAzimuthal *) &proj;
-    if ((tcyl->m_phi1 != m_phi1) ||
-        (tcyl->m_lambda0 != m_lambda0) ||
+    if ((tcyl->m_lambda0 != m_lambda0) ||
         (tcyl->m_a != m_a) ||
-        (tcyl->m_e != m_e)) return false;
-#endif
-    // all other data members calculated using m_lambda0, m_phi1, m_a and m_e.
+        (tcyl->m_b != m_b)) return false;
+
     return true;
   }
 
