@@ -1,0 +1,6 @@
+Group = Hayabusa/Nirs
+  Version = 1
+  Library = HayabusaNirsCamera
+  Routine = HayabusaNirsCameraPlugin
+EndGroup
+ 
