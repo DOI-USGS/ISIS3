@@ -4,6 +4,8 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDialog>
+#include <QDockWidget>
+#include <QFlags>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -94,6 +96,7 @@ namespace Isis {
    *                            listBox.
    */
   void QnetNavTool::createNavigationDialog(QWidget *parent) {
+    
     // Create the combo box selector
     m_listCombo = new QComboBox();
     m_listCombo->addItem("Points");
@@ -237,6 +240,7 @@ namespace Isis {
                          m_navDialog->size().height() / 2);
     m_navDialog->move(settings.value("pos", defaultPos).toPoint());
 
+    
   }
 
 
@@ -1179,6 +1183,7 @@ namespace Isis {
    */
   void QnetNavTool::showNavTool() {
     m_navDialog->setVisible(true);
+    m_navDialog->raise();
   }
 
 #if 0

@@ -2,6 +2,7 @@
 #include <signal.h>
 
 #include <QApplication>
+#include <QDialog>
 
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
@@ -58,7 +59,13 @@ int main(int argc, char *argv[]) {
     FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
-    ViewportMainWindow *vw = new ViewportMainWindow("qnet");;
+    ViewportMainWindow *vw = new ViewportMainWindow("qnet");
+    
+//     QDialog *navDialog = new QDialog(vw);
+//     navDialog->setWindowTitle("test");
+    vw->show();
+//     navDialog->show();
+//     navDialog->raise();
 
     ToolList tools;
     Tool *rubberBandTool = createTool<RubberBandTool>(vw , &tools);
@@ -76,6 +83,7 @@ int main(int argc, char *argv[]) {
     QnetNavTool *ntool = new QnetNavTool(qnetTool, vw);
     ((Tool *)ntool)->addTo(vw);
     tools.append(ntool);
+    ntool->showNavTool();
     
     /**** ADD TOOLS TO TOOL PAD ON LEFT/RIGHT ****/
     // adds band tool button to toolpad on left
@@ -209,7 +217,8 @@ int main(int argc, char *argv[]) {
                      ftool, SLOT(exit()));
     //-----------------------------------------------------------------
 
-    vw->show();
+//     vw->show();
+//    ntool->showNavTool();
     int status = app->exec();
     delete ftool;
     ftool = NULL;

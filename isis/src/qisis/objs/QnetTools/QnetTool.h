@@ -310,6 +310,8 @@ namespace Isis {
       void deletePoint(ControlPoint *point);
       void updatePointInfo(QString pointId);
       void refresh();
+      
+      QWidget* qnetTool();
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
@@ -332,7 +334,7 @@ namespace Isis {
       void setIgnoreLeftMeasure (bool ignore);
       void setLockRightMeasure (bool ignore);
       void setIgnoreRightMeasure (bool ignore);
-      void showNavWindow (bool checked);
+      void showNavWindow ();
 
       void updateSurfacePointInfo ();
 
