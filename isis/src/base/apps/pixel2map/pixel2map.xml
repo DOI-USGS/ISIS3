@@ -239,6 +239,10 @@
       Added tests to for all errors. Fixed a check so now all files in a list have to have the 
       same number of bands selected. References #4535.
     </change>
+    <change name="Jesse Mapel" date="2017-01-04">
+      Added the NUMIFOV parameter to determine how many IFOVs are used when creating a full FOV.
+      References #4576.
+    </change>
   </history>
 
   <groups>
@@ -583,6 +587,7 @@
           longitude are not parallel to image lines and sample columns.
         </description>
       </parameter>
+
       <parameter name="FOVRANGE">
         <type>string</type>
         <brief>The time range to be used to determine the FOV.</brief>
@@ -597,18 +602,33 @@
                 The instantaneous field of view (IFOV) at the center of the exposure will be used
                 to map each pixel.
               </description>
+              <exclusions>
+                <item>NUMIFOV</item>
+              </exclusions>
             </option>
            <option value="FULLEXPOSURE">
               <brief>Uses the full FOV for the entire exposure time.</brief>
               <description>
                 The full field of view will be used to map each pixel. This is determined by
-                finding IFOVs at three times: beginning exposure, center exposure, 
-                and end exposure. The maximum ground coverage area found by combining all
-                three of these IFOVs is used as the full FOV.  <b>NOTE:</b> This option is
-                currently not available for framing cameras.
+                finding IFOVs at NUMIFOV times during the exposure. The maximum ground coverage
+                area found by combining all of these IFOVs is used as the full FOV. 
+                <b>NOTE:</b> This option is currently not available for framing cameras.
               </description>
             </option>
         </list>
+      </parameter>
+
+      <parameter name="NUMIFOV">
+        <type>integer</type>
+        <brief>The number of instananeous FOVs used to create the full FOV.</brief>
+        <default><item>3</item></default>
+        <description>
+          The number of instananeous FOVs used to create the full FOV. The
+          IFOVs are spaced equally across the exposure. The first IFOV will
+          always be the beginning of the exposure and the last IFOV will always
+          be the end of the exposure.
+        </description>
+        <minimum inclusive="yes">3</minimum>
       </parameter>
     </group>
 

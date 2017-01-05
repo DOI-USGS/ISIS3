@@ -70,7 +70,7 @@ void IsisMain() {
     g_numIFOVs = 1;
   }
   else {
-    g_numIFOVs = 3;
+    g_numIFOVs = ui.GetInteger("NUMIFOV");
   }
 
   double newminlat, newmaxlat, newminlon, newmaxlon;
