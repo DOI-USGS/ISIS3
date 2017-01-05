@@ -170,7 +170,6 @@ namespace Isis {
       void refreshList();
       void updateEditPoint(QString pointId);
       void disconnectAprioriDialog();
-      void showNavTool();
 
     private slots:
       void load();
@@ -184,7 +183,7 @@ namespace Isis {
       void ignorePoints();
       void deletePoints();
       void resetCubeList();
-      
+      void showNavTool();
       void aprioriDialog();
       void setAprioriDialogPoints();
 

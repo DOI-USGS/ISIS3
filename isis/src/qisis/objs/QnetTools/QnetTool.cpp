@@ -259,10 +259,6 @@ namespace Isis {
 
     return topSplitter;
   }
-  
-  QWidget* QnetTool::qnetTool() {
-    return m_qnetTool;
-  }
 
 
   //! @returns The groupbox labeled "Control Point"
@@ -1484,7 +1480,7 @@ namespace Isis {
     action->setIcon(QPixmap(toolIconDir()+"/stock_draw-connector-with-arrows.png"));
     action->setToolTip("Control Point Editor (T)");
     action->setShortcut(Qt::Key_T);
-    QObject::connect(action,SIGNAL(triggered()),this,SLOT(showNavWindow()));
+    QObject::connect(action,SIGNAL(triggered(bool)),this,SLOT(showNavWindow(bool)));
     return action;
   }
 
@@ -3596,7 +3592,7 @@ namespace Isis {
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Original version
    */
-  void QnetTool::showNavWindow(){
+  void QnetTool::showNavWindow(bool checked){
     emit showNavTool();
   }
 
@@ -3623,9 +3619,7 @@ namespace Isis {
     "<b>Function:</b> This button will bring up the Navigation Tool window that allows \
      the user to view, modify, ignore, delete, or filter points and cubes.";
     showNavToolButton->setWhatsThis(text);
-    connect(showNavToolButton,SIGNAL(clicked()),this,SLOT(showNavWindow()));
-    
-    showNavToolButton->setEnabled(true);
+    connect(showNavToolButton,SIGNAL(clicked(bool)),this,SLOT(showNavWindow(bool)));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
