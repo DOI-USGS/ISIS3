@@ -682,10 +682,11 @@ int main(int argc, char *argv[]) {
   }
 }
 
-
+// The Latitude step of 18 is 180/10 (Test values at 10 equally-spaced latitudes.)
+// The Longitude step of 72 is 360/10 (Test values at 10 equally-space longitudes for each lat.) 
 void testSetGround(TProjection *p) {
-  for (double lat = 90.0; lat >= -90.0; lat-=10.0) {
-    for (double lon = -360.0; lon <= 360.0; lon+=10.0) {
+  for (double lat = 90.0; lat >= -90.0; lat-=18.0) {
+    for (double lon = -360.0; lon <= 360.0; lon+=72.0) {
       cout << "[Lat/Lon  (" 
            << toString(lat) << ", " << toString(lon) << ")]";
       bool success = p->SetGround(lat, lon);
