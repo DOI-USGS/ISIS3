@@ -1207,6 +1207,25 @@ EndObject
         </TD>
       </TR>
       <TR>
+        <TD>Header</TD>
+        <TD>Optional</TD>
+        <TD>
+          The list of keywords that the values in each column will be stored
+          in. The column values will be associated with keywords from left to
+          right unless <em>Index</em> is used.
+        </TD>
+      </TR>
+      <TR>
+        <TD>Index</TD>
+        <TD>Optional</TD>
+        <TD>
+          The column indices in the CSV file that the keywords in
+          <em>Header</em> will use for their values.  The first entry will be
+          the value for the first keyword in <em>Header</em>, the second entry
+          will be the value for the second keyword, etc.
+        </TD>
+      </TR>
+      <TR>
         <TD>SkipLines</TD>
         <TD>Optional</TD>
         <TD>
@@ -1532,11 +1551,11 @@ EndObject
       The following is an example of a CsvWriter strategy:
       <pre>
 Object = Strategy
-  Type = CsvWriter
-  Name = mdismla
-  Filename = "mdis_mla_ridelong.lis"
-  Mode = Create
-  Header = True
+  Type     = CsvWriter
+  Name     = mdismla
+  CSVFile  = "mdis_mla_ridelong.lis"
+  Mode     = Create
+  Header   = True
   Keywords = (YearDoy, SourceProductId, StartTime, EtStartTime, 
               ExposureDuration, CenterLongitude, CenterLatitude,
               PixelResolution, MeanGroundResolution,
@@ -2169,7 +2188,7 @@ EndObject
        of the primary Resource. Keywords from both Resources are combined into a 
        single Resource by renaming each keyword from both Resources and 
        propagating them to the merged Asset Resource. An <em>A</em> is appended to the 
-       source Resource keywords and a<em>A</em> is appended to the candidate Resource 
+       source Resource keywords and a <em>B</em> is appended to the candidate Resource 
        keywords before they are merged to distinguish keywords. The suffix of 
        keyword sources can be specified by the user using the                                                         
        <em>MergeSuffixA</em> and <em>MergeSuffixB</em> keywords, respectively. 
@@ -2289,7 +2308,7 @@ EndObject
               <TH>Description</TH>
             </TR>
             <TR>
-              <TD> Intersect </TD>
+              <TD> Intersection </TD>
               <TD>
                   Combines the two GIS footprints as an intersection. This will 
                   result in a GIS geometry that contains the area of common 
@@ -3928,7 +3947,7 @@ Result = StereoPairRank
       keyword suffixes for each image as they are merged. <em>MergeSuffixA</em> 
       is used to identify the primary stereo image, <em>MergeSuffixB</em> the 
       secondary or matched stereo image. Defaults for merge suffix keywords are 
-      <em>A</em> and <em>A</em> respectively.
+      <em>A</em> and <em>B</em> respectively.
     </p>
     <p>
        If data is provided by caminfo, then the values required by this Strategy 

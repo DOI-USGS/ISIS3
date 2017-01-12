@@ -64,6 +64,8 @@ namespace Isis {
    *                          a global resource list.
    *   @history 2015-06-15 Kris Becker - Ensure at least 2 entries are allocated
    *                          for GOES RTree allocations (required by GEOS)
+   *   @history 2017-01-06 Jesse Mapel - Made the "Total Geoms" output a debug
+   *                          statement. Fixes #4581.
    */
   class GisOverlapStrategy : public Strategy {
   

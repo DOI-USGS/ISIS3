@@ -53,6 +53,8 @@ namespace Isis {
    *   @history 2010-04-08 Steven Lambright - Min, max functions expanded upon
    *   @history 2012-01-09 Jeff Anderson - Modified to conform
    *                           ISIS programming standards
+   *   @history 2017-01-09 Jesse Mapel - Modified to allow for "_" in variables.
+   *                           Fixes #4581.
    */
   class InfixToPostfix {
     public:
