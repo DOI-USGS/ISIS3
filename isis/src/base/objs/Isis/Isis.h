@@ -120,6 +120,10 @@ int main(int argc, char *argv[]) {
   Isis::Application::p_applicationForceGuiApp = true;
 #endif
 
+  // Add the plugin directory so QT looks at the Isis plugin dir
+  FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+  QCoreApplication::addLibraryPath(qtpluginpath.expanded());
+
   Isis::Application *app = new Isis::Application(argc, argv);
   app->RegisterGuiHelpers(GuiHelpers());
   int status = app->Run(APPLICATION);
