@@ -43,6 +43,12 @@ int main(int argc, char *argv[]) {
   Isis::Gui::checkX11();
 
   try {
+
+    // Add the Qt plugin directory to the library path
+    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
+
+
     QIsisApplication *app = new QIsisApplication(argc,argv);
     QApplication::setApplicationName("qnet");
 
@@ -54,17 +60,13 @@ int main(int argc, char *argv[]) {
       QApplication::setStyle((QString) style);
     }
 
-    // Add the Qt plugin directory to the library path
-    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
-
     ViewportMainWindow *vw = new ViewportMainWindow("qnet");
 
     ToolList tools;
     Tool *rubberBandTool = createTool<RubberBandTool>(vw , &tools);
 
     QnetTool *qnetTool = new QnetTool(vw);
-    
+
     /**** ADD FILE TOOL FIRST SO THAT IT APPEARS FIRST IN THE PERMANENT AND MENU TOOLBARS ****/
     // adds file tool buttons and separator on permanent toolbar
     // adds to "File" dropdown of Menu toolbar
@@ -73,24 +75,24 @@ int main(int argc, char *argv[]) {
     tools.append(ftool);
     vw->permanentToolBar()->addSeparator();
 
-    
+
     // Show the ViewportMainWindow - we need this because there is an bug with Qt5 that causes the
-    // NavTool to go behind the ViewportMainWindow when using Gnome and Cinnamon (KDE doesn't have 
+    // NavTool to go behind the ViewportMainWindow when using Gnome and Cinnamon (KDE doesn't have
     // this bug), unless we show the ViewportMainWindow before the NavTool is created.
     // No idea why this fixes it. This issue appeared after we converted to Qt5. According to Qt
-    // a child widget should always be in front of it's parent widget but that isn't the case here 
+    // a child widget should always be in front of it's parent widget but that isn't the case here
     // for some reason. See redmine ticket #4541.
     //
     // TODO: Figure out why the NavTool wasn't in front in the first place, and figure out why this
     // fixes it
-    // TODO: Figure out a way to keep a Qt widget sibling on top of another sibling. (ie keep the 
+    // TODO: Figure out a way to keep a Qt widget sibling on top of another sibling. (ie keep the
     // NavTool on top of QnetTool)
     vw->show();
-    
+
     QnetNavTool *ntool = new QnetNavTool(qnetTool, vw);
     ((Tool *)ntool)->addTo(vw);
     tools.append(ntool);
-    
+
     /**** ADD TOOLS TO TOOL PAD ON LEFT/RIGHT ****/
     // adds band tool button to toolpad on left
     Tool *btool = createTool<BandTool>(vw, &tools);
@@ -222,7 +224,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(vw , SIGNAL(closeWindow()),
                      ftool, SLOT(exit()));
     //-----------------------------------------------------------------
-    
+
     vw->show();
     int status = app->exec();
     delete ftool;

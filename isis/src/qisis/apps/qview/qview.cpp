@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QFontDialog>
 #include <QMdiArea>
 
@@ -60,6 +61,10 @@ ToolClass *createTool(ViewportMainWindow *viewportMainWindow, ToolList *tools) {
 
 int main(int argc, char *argv[]) {
   Isis::Gui::checkX11();
+
+  // Add the Qt plugin directory to the library path
+  FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+  QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
   // Check to see if the user wants to force a new window
   int newWindow = -1;
@@ -130,10 +135,6 @@ int main(int argc, char *argv[]) {
     QString style = uiPref["GuiStyle"];
     QApplication::setStyle((QString) style);
   }
-
-  // Add the Qt plugin directory to the library path
-  FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-  QCoreApplication::addLibraryPath(qtpluginpath.expanded().toLatin1().data());
 
   ViewportMainWindow *vw = new ViewportMainWindow("qview");
 
@@ -279,4 +280,3 @@ int main(int argc, char *argv[]) {
   //delete QCoreApplication::instance();
   return status;
 }
-
