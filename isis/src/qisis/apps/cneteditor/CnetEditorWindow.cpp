@@ -1,5 +1,3 @@
-#include <QCoreApplication>
-
 #include "IsisDebug.h"
 
 #include "CnetEditorWindow.h"

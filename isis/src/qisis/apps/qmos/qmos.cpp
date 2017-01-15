@@ -1,6 +1,6 @@
-#include <QCoreApplication>
-
 #include "IsisDebug.h"
+
+#include <QCoreApplication>
 
 #include "Gui.h"
 #include "IException.h"
