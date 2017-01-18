@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="gllnims2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS3 cube format.
@@ -17,12 +17,12 @@
     NIMS cube, and an output path and name for both the core and suffix cubes.
     </p>
     <p>
-     The projections used for the original qub files are not compatible with ISIS projections, so projected Galileo NIMS 
-     qubs cannot be converted into equivalent ISIS cubes with mapping information directly. Instead, imported NIMS ISIS cubes are provided with a MappingInformation PVL group in the cube label. 
-     The information in this PVL group and latitude and longitude information from the output suffix cube can be used with the nocam2map ISIS application to produce a projeted image. An example follows.
+     The projections used for the original qube files are not compatible with ISIS projections, so projected Galileo NIMS 
+     qubes cannot be converted into equivalent ISIS cubes with mapping information directly. Instead, imported NIMS ISIS cubes are provided with a MappingInformation PVL group in the cube label. 
+     The information in this PVL group and latitude and longitude information from the output suffix cube can be used with the nocam2map ISIS application to produce a projected image. An example follows.
     </p>
     <p>
-	To use nocam2map in this way, first convert the Galileo NIMS PDS QUB into an ISIS cube using gllnims2isis:
+	To use nocam2map in this way, first convert the Galileo NIMS PDS qube into an ISIS cube using gllnims2isis:
         <pre> 
   gllnims2isis from=original.qub core=core.cub suffix=suffix.cub
 	</pre>
@@ -147,7 +147,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis core data for a Galileo NIMS cube.
+           Output ISIS core data for a Galileo NIMS cube.
          </brief>
          <description>
            Use this parameter to select the output core data filename.
@@ -160,10 +160,10 @@
           <type>cube</type>
           <fileMode>output</fileMode>
           <brief>
-            Output Isis suffix cube data for a Galileo NIMS cube.
+            Output ISIS suffix cube data for a Galileo NIMS cube.
           </brief>
           <description>
-            Use this parameter to select the output cube for the Isis backplane data.
+            Use this parameter to select the output cube for the ISIS backplane data.
           </description>
           <filter>
             *.cub
@@ -177,7 +177,7 @@
     <example>
       <brief>Importing a NIMS cube</brief>
       <description>
-        This example shows how to import Galileo NIMS cubes into ISIS 3.
+        This example shows how to import Galileo NIMS cubes into ISIS3.
       </description>
       <terminalInterface>
         <commandLine>
