@@ -70,9 +70,7 @@ XALAN_PARAM_OPTION := -p
 XALAN_INFILE_OPTION :=
 XALAN_XSL_OPTION :=
 
-ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
-  XALAN = $(ISIS3LOCAL)/bin/Xalan
-endif
+XALAN = $(ISIS3LOCAL)/bin/Xalan
 
 #---------------------------------------------------------------------------
 # The BSD version of grep on 10.7-10.9 is reported to be broken so use GNU
