@@ -44,7 +44,7 @@
 #define EARLY_TERMINATION  true
 #define RADIUS_CELLS        100
 
-#define DEBUG 1
+///#define DEBUG 1
 
 namespace Isis {
 

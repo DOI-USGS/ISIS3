@@ -29,10 +29,10 @@
 cnetthinner will output a Control Network and also output a Results PVL group. The Results group provides the following information about the results: 
 <pre>
 Group = Results
-Points = (Original Number of Points)
-Saved = (Number Of Points Retained)
-Suppressed = (Number of Points Ignored or Removed) 
-Efficiency = (Number of Points Removed / Original Number of Points) * 100 percent
+  Points = (Original Number of Points)
+  Saved = (Number Of Points Retained)
+  Suppressed = (Number of Points Ignored or Removed) 
+  Efficiency = (Number of Points Removed / Original Number of Points) * 100 percent
 End_Group
 </pre>
   </p>
