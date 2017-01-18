@@ -147,7 +147,7 @@ namespace Isis {
     // Sort to find the image with the highest measure count as a starting point
     qSort(pntcount.begin(), pntcount.end(), SortSerialsByPntSize());
 
-#if defined(DEBUG1)
+#if defined(DEBUG)
     for (int i = 0; i < pntcount.size() ; i++) {
       std::cout << pntcount[i].first << "\t" << pntcount[i].second << "\n";
     }
@@ -237,10 +237,10 @@ namespace Isis {
     QVector<double> radii = linspace(min_radius, max_radius, num, 
                                      1.0/qSqrt(2.0) );
 
-    QPointF topL = d.topLeft();
     QPointF botR = d.bottomRight();
 
 #if defined(DEBUG)
+    QPointF topL = d.topLeft();
     std::cout << "  Domain((x), (y)): (" << topL.x() << "," << botR.x() 
               << "), (" << topL.y() << "," << botR.y() << ")\n";
     std::cout << "  Min.Max, count Radius: " << min_radius << ", "
@@ -300,9 +300,10 @@ namespace Isis {
       GridMask grid(n_x_cells, n_y_cells, false);
       result = Results(size(), d, cell_size);
       result.add(fixed);
-      int nIcov =  cover(grid, fixed, cell_size);
+      cover(grid, fixed, cell_size);
 
 #if defined(DEBUG)
+      int nIcov = cover(grid, fixed, cell_size);
       std::cout << "  InitialCoverage: " << nIcov << "\n";
 #endif
 
@@ -327,9 +328,10 @@ namespace Isis {
           }
 
           // Compute cell coverage
-          int ncov = cover(grid, x_center, y_center, cell_size);
+          cover(grid, x_center, y_center, cell_size);
 
 #if defined(DEBUG)
+          int ncov = cover(grid, x_center, y_center, cell_size);
           std::cout << "  TotalCovered: " << ncov << "(" << nCovered(grid) 
                     << ") of " << (n_x_cells*n_y_cells) << "\n"; 
 #endif
@@ -372,11 +374,9 @@ namespace Isis {
  */
   void CnetSuppression::write(const QString &onetfile, const Results &result,
                               const bool saveall, const QString &netid) {
-    std::cout << "set at all?" << netid <<std::endl; 
     // Create new network
     QScopedPointer<ControlNet> onet;
     if ( m_cnet.isNull() ) {
-      std::cout << "we're setting some stuff" << std::endl; 
       onet.reset( new ControlNet() );
       onet->SetNetworkId("cnetsuppress");
       onet->SetUserName(Application::UserName());

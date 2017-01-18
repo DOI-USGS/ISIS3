@@ -38,7 +38,7 @@ End_Group
   </p>
   <h2>References</h2>
     <cite>
-    Efficiently selecting spatially distributed keypoints for visual tracking
+    <a href="http://lucafoschini.com/papers/Efficiently_ICIP11.pdf">Efficiently selecting spatially distributed keypoints for visual tracking</a>
     S Gauglitz, L Foschini, M Turk, T Höllerer
     Image Processing (ICIP), 18th IEEE International Conference on, 1869-1872
     </cite>
