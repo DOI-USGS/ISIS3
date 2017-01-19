@@ -131,6 +131,8 @@ XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.2
 XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
+XALAN = $(ISIS3LOCAL)/bin/Xalan
+
 #---------------------------------------------------------------------------
 # Set up for geotiff 
 #---------------------------------------------------------------------------
