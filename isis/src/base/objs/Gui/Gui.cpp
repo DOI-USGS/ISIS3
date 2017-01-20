@@ -261,12 +261,14 @@ namespace Isis {
     helpMenu->addAction(whatsThisAction);
 
     QAction *aboutProgram = new QAction(this);
+    aboutProgram->setMenuRole(QAction::AboutRole);
     aboutProgram->setText("About this program");
     aboutProgram->setShortcut(Qt::CTRL + Qt::Key_H);
     helpMenu->addAction(aboutProgram);
     connect(aboutProgram, SIGNAL(triggered(bool)), this, SLOT(AboutProgram()));
 
     QAction *aboutIsis = new QAction(this);
+    aboutIsis->setMenuRole(QAction::NoRole);
     aboutIsis->setText("About Isis");
     aboutIsis->setShortcut(Qt::CTRL + Qt::Key_I);
     helpMenu->addAction(aboutIsis);
