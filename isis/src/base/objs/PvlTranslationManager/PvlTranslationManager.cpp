@@ -19,18 +19,47 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "LabelTranslationManager.h"
 
+#include "IException.h"
 #include "IString.h"
 #include "Message.h"
-#include "IException.h"
+#include "Pvl.h"
+#include "PvlContainer.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 #include "PvlTranslationManager.h"
 
 using namespace std;
 namespace Isis {
 
-  PvlTranslationManager::PvlTranslationManager(const QString &transFile) {
-    AddTable(transFile);
+  /**
+   * Constructs and initializes a TranslationManager object from given the 
+   * Pvl translation file. If this constructor is used, the user will need to 
+   * set the input label before translating. This may be done by using 
+   * SetLabel(Pvl inputLabel) or Auto(Pvl inputLabel, Pvl outputLabel).
+   *
+   * @param transFile The translation file to be used to tranlate keywords in
+   *                  the input label.
+   */
+  PvlTranslationManager::PvlTranslationManager(const QString &transFile) 
+      : LabelTranslationManager(transFile) {
   }
+
+  /**
+   * Constructs and initializes a TranslationManager object from the given 
+   * input stream. If this constructor is used, the user will need to set the 
+   * input label before translating. This may be done by using SetLabel(Pvl 
+   * inputLabel) or Auto(Pvl inputLabel, Pvl outputLabel). 
+   *
+   * @param transStrm A stream containing the tranlation table to be used to
+   *                  tranlate keywords in the input label.
+   */
+  PvlTranslationManager::PvlTranslationManager(std::istream &transStrm)
+      : LabelTranslationManager(transStrm) {
+  }
+
 
   /**
    * Constructs and initializes a TranslationManager object
@@ -40,13 +69,12 @@ namespace Isis {
    * @param transFile The translation file to be used to tranlate keywords in
    *                  the input label.
    */
-  PvlTranslationManager::PvlTranslationManager(Isis::Pvl &inputLabel,
-      const QString &transFile) {
+  PvlTranslationManager::PvlTranslationManager(Pvl &inputLabel,
+                                               const QString &transFile)
+      : LabelTranslationManager(transFile) {
     p_fLabel = inputLabel;
-
-    // Internalize the translation table
-    AddTable(transFile);
   }
+
 
   /**
    * Constructs and initializes a TranslationManager object
@@ -56,13 +84,22 @@ namespace Isis {
    * @param transStrm A stream containing the tranlation table to be used to
    *                  tranlate keywords in the input label.
    */
-  PvlTranslationManager::PvlTranslationManager(Isis::Pvl &inputLabel,
-      std::istream &transStrm) {
+  PvlTranslationManager::PvlTranslationManager(Pvl &inputLabel,
+      std::istream &transStrm)
+      : LabelTranslationManager(transStrm) {
     p_fLabel = inputLabel;
-
-    // Internalize the translation table
-    AddTable(transStrm);
   }
+
+
+  //! Destroys the TranslationManager object.
+  PvlTranslationManager::~PvlTranslationManager() {
+  }
+
+
+  void PvlTranslationManager::SetLabel(Pvl &inputLabel) {
+    p_fLabel = inputLabel;
+  }
+
 
   /**
    * Returns a translated value. The output name is used to find the input
@@ -80,7 +117,7 @@ namespace Isis {
    * @return string
    */
   QString PvlTranslationManager::Translate(QString nName, int findex) {
-    const Isis::PvlContainer *con;
+    const PvlContainer *con;
     int inst = 0;
     PvlKeyword grp;
 
@@ -93,8 +130,9 @@ namespace Isis {
       }
     }
 
-    return Isis::PvlTranslationTable::Translate(nName);
+    return PvlTranslationTable::Translate(nName);
   }
+
 
   /**
    * Translate the requested output name to output values using the input name
@@ -103,12 +141,11 @@ namespace Isis {
    * @param nName The output name used to identify the input keyword to be
    *              translated.
    *
-   * @return Isis::PvlKeyword
+   * @return PvlKeyword
    */
-  Isis::PvlKeyword PvlTranslationManager::DoTranslation(
-    const QString nName) {
-    const Isis::PvlContainer *con = NULL;
-    Isis::PvlKeyword key;
+  PvlKeyword PvlTranslationManager::DoTranslation(const QString nName) {
+    const PvlContainer *con = NULL;
+    PvlKeyword key;
 
     int inst = 0;
     PvlKeyword grp;
@@ -119,7 +156,7 @@ namespace Isis {
           key.setName(OutputName(nName));
 
           for(int v = 0; v < (*con)[(InputKeywordName(nName))].size(); v++) {
-            key.addValue(Isis::PvlTranslationTable::Translate(nName,
+            key.addValue(PvlTranslationTable::Translate(nName,
                          (*con)[InputKeywordName(nName)][v]),
                          (*con)[InputKeywordName(nName)].unit(v));
           }
@@ -129,24 +166,37 @@ namespace Isis {
       }
     }
 
-    return Isis::PvlKeyword(OutputName(nName),
+    return PvlKeyword(OutputName(nName),
                             PvlTranslationTable::Translate(nName, ""));
   }
 
 
+  /**
+   * Automatically translate all the output names found in the translation table
+   * If a output name does not translate an error will be thrown by one              
+   * of the support members                                                          
+   * Store the translated key, value pairs in the argument pvl                       
+   */
+  void PvlTranslationManager::Auto(Pvl &inputLabel, Pvl &outputLabel) {
+    p_fLabel = inputLabel;
+    Auto(outputLabel);
+  }
 
-  // Automatically translate all the output names found in the translation table
-  // If a output name does not translate an error will be thrown by one
-  // of the support members
-  // Store the translated key, value pairs in the argument pvl
-  void PvlTranslationManager::Auto(Isis::Pvl &outputLabel) {
+
+  /**
+   * Automatically translate all the output names found in the translation table
+   * If a output name does not translate an error will be thrown by one              
+   * of the support members                                                          
+   * Store the translated key, value pairs in the argument pvl                       
+   */
+  void PvlTranslationManager::Auto(Pvl &outputLabel) {
     // Attempt to translate every group in the translation table
     for(int i = 0; i < TranslationTable().groups(); i++) {
-      Isis::PvlGroup &g = TranslationTable().group(i);
+      PvlGroup &g = TranslationTable().group(i);
       if(IsAuto(g.name())) {
         try {
-          Isis::PvlContainer *con = CreateContainer(g.name(), outputLabel);
-          (*con) += PvlTranslationManager::DoTranslation(g.name());
+          PvlContainer *con = CreateContainer(g.name(), outputLabel);
+          (*con) += DoTranslation(g.name());
         }
         catch(IException &e) {
           if(!IsOptional(g.name())) {
@@ -157,6 +207,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Returns the ith input value assiciated with the output name argument.
    *
@@ -164,10 +215,9 @@ namespace Isis {
    *
    * @param findex The index into the input keyword array.  Defaults to 0
    *
-   * @throws Isis::IException::Programmer
+   * @throws IException::Programmer
    */
-  const PvlKeyword &PvlTranslationManager::InputKeyword(
-    const QString nName) const {
+  const PvlKeyword &PvlTranslationManager::InputKeyword(const QString nName) const {
 
     int instanceNumber = 0;
     PvlKeyword inputGroupKeyword = InputGroup(nName, instanceNumber);
@@ -218,7 +268,7 @@ namespace Isis {
 
     // Set the current position in the input label pvl
     // by finding the input group corresponding to the output group
-    const Isis::PvlContainer *con;
+    const PvlContainer *con;
     int inst = 0;
     //while ((con = GetContainer(InputGroup(nName, inst++))) != NULL) {
     //if ((con = GetContainer (InputGroup(nName))) != NULL) {
@@ -233,25 +283,9 @@ namespace Isis {
     return false;
   }
 
-  /*
-   * Indicates if the input group corresponding to the output name exists in
-   * the label
-   *
-   * @param nName The output name used to identify the input keyword.
 
-   bool PvlTranslationManager::InputHasGroup (const QString nName) {
-
-     if (GetContainer (InputGroup(nName)) != NULL) {
-       return true;
-     }
-
-     return false;
-   }
-  */
-
-  // Return a container from the input label according tund
-  const Isis::PvlContainer *PvlTranslationManager::GetContainer(
-    const PvlKeyword &inputGroup) const {
+  //! Return a container from the input label according tund
+  const PvlContainer *PvlTranslationManager::GetContainer(const PvlKeyword &inputGroup) const {
 
 
     // Return the root container if "ROOT" is the ONLY thing in the list
@@ -260,7 +294,7 @@ namespace Isis {
       return &p_fLabel;
     }
 
-    const Isis::PvlObject *currentObject = &p_fLabel;
+    const PvlObject *currentObject = &p_fLabel;
 
     // Search for object containing our solution
     int objectIndex;
@@ -288,38 +322,12 @@ namespace Isis {
   }
 
 
-  // Create the requsted container and any containers above it and
-  // return a reference to the container
-  // list is an Isis::PvlKeyword with an array of container types an their names
-  Isis::PvlContainer *PvlTranslationManager::CreateContainer(const QString nName,
-      Isis::Pvl &pvl) {
-
-    // Get the array of Objects/Groups from the OutputName keyword
-    Isis::PvlKeyword np = OutputPosition(nName);
-
-    Isis::PvlObject *obj = &pvl;
-
-    // Look at every pair in the output position
-    for(int c = 0; c < np.size(); c += 2) {
-      // If this pair is an object
-      if(np[c].toUpper() == "OBJECT") {
-        // If the object doesn't exist create it
-        if(!obj->hasObject(np[c+1])) {
-          obj->addObject(np[c+1]);
-        }
-        obj = &(obj->findObject(np[c+1]));
-      }
-      // If this pair is a group
-      else if(np[c].toUpper() == "GROUP") {
-        // If the group doesn't exist create it
-        if(!obj->hasGroup(np[c+1])) {
-          obj->addGroup(np[c+1]);
-        }
-        return (Isis::PvlContainer *) & (obj->findGroup(np[c+1]));
-
-      }
-    }
-
-    return (Isis::PvlContainer *) obj;
+  /**
+   * Create the requsted container and any containers above it and
+   * return a reference to the container
+   * list is an PvlKeyword with an array of container types an their names
+   */
+  PvlContainer *PvlTranslationManager::CreateContainer(const QString nName, Pvl &pvl) {
+    return LabelTranslationManager::CreateContainer(nName, pvl);
   }
 } // end namespace isis

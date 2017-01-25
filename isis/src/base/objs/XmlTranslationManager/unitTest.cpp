@@ -1,0 +1,361 @@
+#include <sstream>
+#include "XmlTranslationManager.h"
+#include "FileName.h"
+#include "Preference.h"
+#include "IException.h"
+#include "IString.h"
+#include "Preference.h"
+
+using namespace Isis;
+using namespace std;
+
+int main(void) {
+  Preference::Preferences(true);
+
+  try {
+
+    FileName fLabel("$base/testData/xmlTestLabel.xml");
+
+    stringstream trnsStrm;
+
+    trnsStrm << "Group = Version" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Identification_Area)" << endl;
+    trnsStrm << "  InputKey = version_id" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = Version" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = Host" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Observation_Area, Investigation_Area)" << endl;
+    trnsStrm << "  InputKey = Instrument_Host_Id" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = Host" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = BandWidth" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Observation_Area)" << endl;
+    trnsStrm << "  InputKey = Science_Facets" << endl;
+    trnsStrm << "  InputKeyAttribute = bandwidth" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = BandWidth" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = SpacecraftName" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
+    trnsStrm << "  InputKey = name" << endl;
+    trnsStrm << "  InputKeyDependencies = tag@type:Spacecraft" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = SpacecraftName" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = InstrumentId" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
+    trnsStrm << "  InputKey = name" << endl;
+    trnsStrm << "  InputKeyDependencies = tag@type:Instrument" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = InstrumentId" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = InstrumentIfovWithUnits" << endl;
+    trnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    trnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = InstrumentIfovWithUnits" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = OnboardImageAcquisitionTimeUTC" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (CaSSIS_Header, DERIVED_HEADER_DATA)" << endl;
+    trnsStrm << "  InputKey = OnboardImageAcquisitionTime" << endl;
+    trnsStrm << "  InputKeyDependencies = att@Time_Base:UTC" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = OnboardImageAcquisitionTimeUTC" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = OnboardImageAcquisitionTimeET" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (CaSSIS_Header, DERIVED_HEADER_DATA)" << endl;
+    trnsStrm << "  InputKey = OnboardImageAcquisitionTime" << endl;
+    trnsStrm << "  InputKeyDependencies = att@Time_Base:ET" << endl;
+    trnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    trnsStrm << "  OutputName = OnboardImageAcquisitionTimeET" << endl;
+    trnsStrm << "  Translation = (*,*)" << endl;
+    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = CoreBands" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Product_Observational, File_Area_Observational," << endl;
+    trnsStrm << "                Array_2D_Image, Axis_Array)" << endl;
+    trnsStrm << "  InputKeyDependencies = \"tag@axis_name:Band\"" << endl;
+    trnsStrm << "  InputKey = elements" << endl;
+    trnsStrm << "  InputDefault = 1" << endl;
+    trnsStrm << "  OutputPosition = (group, CoreCube)" << endl;
+    trnsStrm << "  OutputName = CoreBands" << endl;
+    trnsStrm << "  Translation = (*, *)" << endl;
+    trnsStrm << "End_Group" << endl;
+    trnsStrm << "Group = CoreSamples" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Product_Observational, File_Area_Observational," << endl;
+    trnsStrm << "                Array_2D_Image, Axis_Array)" << endl;
+    trnsStrm << "  InputKeyDependencies = \"tag@axis_name:Sample\"" << endl;
+    trnsStrm << "  InputKey = elements" << endl;
+    trnsStrm << "  InputKeyAttribute = Units" << endl;
+    trnsStrm << "  InputDefault = 2" << endl;
+    trnsStrm << "  OutputPosition = (group, CoreCube)" << endl;
+    trnsStrm << "  OutputName = CoreSamples" << endl;
+    trnsStrm << "  Translation = (*, *)" << endl;
+    trnsStrm << "End_Group" << endl;
+    trnsStrm << "Group = CoreLines" << endl;
+    trnsStrm << "  Auto" << endl;
+    trnsStrm << "  Debug" << endl;
+    trnsStrm << "  InputPosition = (Product_Observational, Bad_Parent)" << endl;
+    trnsStrm << "  InputKey = elements" << endl;
+    trnsStrm << "  InputDefault = 10" << endl;
+    trnsStrm << "  OutputPosition = (group, CoreCube)" << endl;
+    trnsStrm << "  OutputName = CoreLines" << endl;
+    trnsStrm << "  Translation = (*, *)" << endl;
+    trnsStrm << "End_Group" << endl;
+
+    trnsStrm << "End" << endl;
+
+    stringstream badTrnsStrm;
+
+    badTrnsStrm << "Group = NoInputPosition" << endl;
+    badTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = NoInputPosition" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = BadInputPosition" << endl;
+    badTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General, Bad_Parent)" << endl;
+    badTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = BadInputPosition" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = InputKeyDoesNotExist" << endl;
+    badTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    badTrnsStrm << "  InputKey = Bad_Input_Element" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = InputKeyDoesNotExist" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = InputKeyAttributeDoesNotExist" << endl;
+    badTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    badTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    badTrnsStrm << "  InputKeyAttribute = Bad_Input_Element_Attribute" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = InputKeyAttributeDoesNotExist" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = NoDependencyType" << endl;
+    badTrnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
+    badTrnsStrm << "  InputKey = name" << endl;
+    badTrnsStrm << "  InputKeyDependencies = type:Spacecraft" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = NoDependencyType" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = BadDependencyType" << endl;
+    badTrnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
+    badTrnsStrm << "  InputKey = name" << endl;
+    badTrnsStrm << "  InputKeyDependencies = bad@type:Spacecraft" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = BadDependencyType" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+    badTrnsStrm << "Group = NoDependencyValue" << endl;
+    badTrnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
+    badTrnsStrm << "  InputKey = name" << endl;
+    badTrnsStrm << "  InputKeyDependencies = bad@type" << endl;
+    badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    badTrnsStrm << "  OutputName = NoDependencyValue" << endl;
+    badTrnsStrm << "  Translation = (*,*)" << endl;
+    badTrnsStrm << "EndGroup" << endl;
+
+    badTrnsStrm << "End";
+
+    stringstream invalidTrnsStrm;
+
+    invalidTrnsStrm << "Group = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    invalidTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    invalidTrnsStrm << "  InputKeyAttribute = (Units, Attribute_2)" << endl;
+    invalidTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    invalidTrnsStrm << "  OutputName = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  Translation = (*,*)" << endl;
+    invalidTrnsStrm << "EndGroup" << endl;
+    invalidTrnsStrm << "Group = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    invalidTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    invalidTrnsStrm << "  InputKeyDependencies = \"tag@name:value\"" << endl;
+    invalidTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    invalidTrnsStrm << "  OutputName = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  Translation = (*,*)" << endl;
+    invalidTrnsStrm << "EndGroup" << endl;
+    invalidTrnsStrm << "Group = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  Debug = Bad_Value" << endl;
+    invalidTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
+    invalidTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
+    invalidTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
+    invalidTrnsStrm << "  OutputName = InstrumentIfovWithUnits" << endl;
+    invalidTrnsStrm << "  Translation = (*,*)" << endl;
+    invalidTrnsStrm << "EndGroup" << endl;
+
+    invalidTrnsStrm << "End";
+
+    cout << "Testing string stream translation specification" << endl << endl;
+
+    XmlTranslationManager transMgr(fLabel, trnsStrm);
+
+    cout << "Testing Translate method" << endl << endl;
+    cout << "Translation of InstrumentIfovWithUnits: " <<
+            transMgr.Translate("InstrumentIfovWithUnits") << endl << endl;
+
+    cout << "Testing Auto method" << endl << endl;
+    Pvl outputLabel;
+    transMgr.Auto(outputLabel);
+    cout << endl << outputLabel << endl << endl;
+
+    cout << "Testing error throws" << endl << endl;
+    XmlTranslationManager badTransMgr(fLabel, badTrnsStrm);
+
+    try {
+      transMgr.Translate("InstrumentIfovWithUnits", 2);
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("NoInputPosition");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("BadInputPosition");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("InputKeyDoesNotExist");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("InputKeyAttributeDoesNotExist");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("NoDependencyType");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("BadDependencyType");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("NoDependencyValue");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      badTransMgr.Translate("NotInTranslationTable");
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      XmlTranslationManager invalidTransMgr(fLabel, invalidTrnsStrm);
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      FileName nonExistantFile("DoesNotExist.xml");
+      stringstream simpleTrans;
+      simpleTrans << "Group = Version" << endl;
+      simpleTrans << "  Auto" << endl;
+      simpleTrans << "  Debug" << endl;
+      simpleTrans << "  InputPosition = (Identification_Area)" << endl;
+      simpleTrans << "  InputKey = version_id" << endl;
+      simpleTrans << "  OutputPosition = (group, instrument)" << endl;
+      simpleTrans << "  OutputName = Version" << endl;
+      simpleTrans << "  Translation = (*,*)" << endl;
+      simpleTrans << "EndGroup" << endl;
+      XmlTranslationManager nonExistantFileManager(nonExistantFile, simpleTrans);
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    try {
+      FileName pvlFile("$base/translations/pdsImage.trn");
+      stringstream simpleTrans;
+      simpleTrans << "Group = Version" << endl;
+      simpleTrans << "  Auto" << endl;
+      simpleTrans << "  Debug" << endl;
+      simpleTrans << "  InputPosition = (Identification_Area)" << endl;
+      simpleTrans << "  InputKey = version_id" << endl;
+      simpleTrans << "  OutputPosition = (group, instrument)" << endl;
+      simpleTrans << "  OutputName = Version" << endl;
+      simpleTrans << "  Translation = (*,*)" << endl;
+      simpleTrans << "EndGroup" << endl;
+      XmlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
+    }
+    catch(IException &e) {
+      e.print();
+      cout << endl;
+    }
+
+    
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
+  return 0;
+}
