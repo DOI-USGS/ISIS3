@@ -897,6 +897,18 @@ EndObject
       </TR>
       <TR>
         <TD>6</TD>
+        <TD>&amp;&amp;</TD>
+        <TD>Logical and</TD>
+        <TD>x &amp;&amp; y</TD>
+      </TR>
+      <TR>
+        <TD>6</TD>
+        <TD>||</TD>
+        <TD>Logical or</TD>
+        <TD>x || y</TD>
+      </TR>
+      <TR>
+        <TD>6</TD>
         <TD>%</TD>
         <TD>Float modulus, remainder of division</TD>
         <TD>x % y</TD>

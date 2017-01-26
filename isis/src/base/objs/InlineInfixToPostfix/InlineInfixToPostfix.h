@@ -46,6 +46,7 @@ namespace Isis {
    *   @history 2015-03-24 Jeannie Backer - Changed m_variables from a QVector
    *                           to QStringList
    *   @history 2016-02-21 Kristin Berry - Added unitTest.
+   *   @history 2017-01-09 Jesse Mapel - Added logical and, or operators. Fixes #4581.
    */
   class InlineInfixToPostfix : public InfixToPostfix {
  

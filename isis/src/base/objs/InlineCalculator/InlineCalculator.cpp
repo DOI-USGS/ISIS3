@@ -398,6 +398,54 @@ namespace Isis {
     Push(result);
     return;
   }
+
+
+  /**
+   * Pops the top two vectors off the current stack and performs a logical or
+   * on each pair.
+   * 
+   * @throws IException::Unknown "Failed performing logical or operation, "
+   *                             "input vectors are of differnet lengths."
+   */
+  void InlineCalculator::logicalOr() {
+    QVector<double> inputA = Pop();
+    QVector<double> inputB = Pop();
+    QVector<double> results;
+    if ( inputA.size() != inputB.size() ) {
+      QString msg = "Failed performing logical or operation, "
+                    "input vectors are of differnet lengths.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    for (int i = 0; i < inputA.size(); i++) {
+      results.push_back( inputA[i] || inputB[i] );
+    }
+    Push(results);
+    return;
+  }
+
+
+  /**
+   * Pops the top two vectors off the current stack and performs a logical and
+   * on each pair.
+   * 
+   * @throws IException::Unknown "Failed performing logical and operation, "
+   *                             "input vectors are of differnet lengths."
+   */
+  void InlineCalculator::logicalAnd() {
+    QVector<double> inputA = Pop();
+    QVector<double> inputB = Pop();
+    QVector<double> results;
+    if ( inputA.size() != inputB.size() ) {
+      QString msg = "Failed performing logical and operation, "
+                    "input vectors are of differnet lengths.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    for (int i = 0; i < inputA.size(); i++) {
+      results.push_back( inputA[i] && inputB[i] );
+    }
+    Push(results);
+    return;
+  }
  
 
   /**
@@ -597,6 +645,8 @@ namespace Isis {
     addFunction(new InlineVoidFx("degs", &InlineCalculator::degrees, this));
     addFunction(new InlineVoidFx("rads", &InlineCalculator::radians, this));
     addFunction(new InlineVoidFx("e", &InlineCalculator::eConstant, this));
+    addFunction(new InlineVoidFx("||", &InlineCalculator::logicalOr, this));
+    addFunction(new InlineVoidFx("&&", &InlineCalculator::logicalAnd, this));
  
     // Add new functions available for inlining
   //  m_variablePoolList = defaultVariables();

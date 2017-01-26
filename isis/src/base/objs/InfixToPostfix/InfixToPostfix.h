@@ -55,6 +55,8 @@ namespace Isis {
    *                           ISIS programming standards
    *   @history 2017-01-09 Jesse Mapel - Modified to allow for "_" in variables.
    *                           Fixes #4581.
+   *   @history 2017-01-09 Jesse Mapel - Added logical and, or operators.
+   *                           Fixes #4581.
    */
   class InfixToPostfix {
     public:

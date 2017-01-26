@@ -62,6 +62,7 @@ namespace Isis {
    *   @history 2015-03-24 Jeffrey Covington and Jeannie Backer - Improved documentation.
    *   @history 2016-02-21 Kristin Berry - Added unit test and minor coding standard updates.
    *                                       Fixes #2401.
+   *   @history 2017-01-09 Jesse Mapel - Added logical and, or operators. Fixes #4581.
    */
   class InlineCalculator : public Calculator {
  
@@ -90,6 +91,8 @@ namespace Isis {
       void floatModulus();
       void radians();
       void degrees();
+      void logicalOr();
+      void logicalAnd();
       void pi();
       void eConstant();
  

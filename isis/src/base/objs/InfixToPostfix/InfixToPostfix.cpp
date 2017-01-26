@@ -426,6 +426,14 @@ namespace Isis {
           output += " != ";
           i++;
         }
+        else if(i < equation.size() - 1 && equation[i] == '|' && equation[i+1] == '|') {
+          output += " || ";
+          i++;
+        }
+        else if(i < equation.size() - 1 && equation[i] == '&' && equation[i+1] == '&') {
+          output += " && ";
+          i++;
+        }
         // Take care of scientific notiation where the exponent is negative
         else if((i > 1) && equation[i] == '-' && equation[i-1].toLower() == 'e' && equation[i-2].isLetterOrNumber()) {
           output += equation[i].toLatin1();
