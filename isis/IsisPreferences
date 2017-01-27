@@ -163,6 +163,7 @@ Group = DataDirectory
   Clementine1  = $ISIS3DATA/clementine1
   Control      = $ISIS3DATA/control
   Dawn         = $ISIS3DATA/dawn
+  Tgo          = $ISIS3DATA/tgo
   Galileo      = $ISIS3DATA/galileo
   Hayabusa     = $ISIS3DATA/hayabusa
   Kaguya       = $ISIS3DATA/kaguya

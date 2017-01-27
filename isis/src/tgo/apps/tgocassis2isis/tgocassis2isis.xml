@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tgocassis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports a PDS4 formatted CaSSIS image into an ISIS formatted cube.
+  </brief>
+
+  <description>
+    <p>
+      The application, tgocassis2isis, takes a PDS4 formatted Colour and Stereo Surface 
+      Imaging System (CaSSIS) image and outputs an ISIS cube from the image data. 
+    </p>
+    <p><i>
+      Note that the corresponding .dat file containing the image data must be placed in the 
+      same directory as the XML file in order for this program to work as intended. 
+      Furthermore, this program is specific to CaSSIS formatted image data, it will not 
+      convert other image formats to ISIS cubes in its current state.
+    </i></p>
+    <p>
+      Below is an example of part of a CaSSIS XML label for one of the images that this
+      program is capable of importing. It is vital that the XML label that is being imported 
+      has its labels formatted the same way in order for cassis2isis to work properly.
+    </p>
+    <p>
+      <pre>
+        &lt;File_Area_Observational&gt;
+          &lt;File&gt;
+            &lt;file_name&gt;G:\CaSSIS\data\COM\160407_commissioning_1\level0\CAS-COM-2016-04-07T09.44.06.839-PAN-01006-00&lt;/file_name&gt;
+            &lt;creation_date_time&gt;2016-06-14T07:30:17&lt;/creation_date_time&gt;
+            &lt;comment&gt;CaSSIS specific XML header&lt;/comment&gt;
+          &lt;/File&gt;
+          &lt;Array_2D_Image&gt;
+            &lt;axes&gt;2&lt;/axes&gt;
+            &lt;Axis_Array&gt;
+            &lt;axis_name&gt;Line&lt;/axis_name&gt;
+              &lt;sequence_number&gt;1&lt;/sequence_number&gt;
+              &lt;elements&gt;1536&lt;/elements&gt;
+            &lt;/Axis_Array&gt;
+            &lt;Axis_Array&gt;
+              &lt;axis_name&gt;Sample&lt;/axis_name&gt;
+              &lt;sequence_number&gt;2&lt;/sequence_number&gt;
+              &lt;elements&gt;255&lt;/elements&gt;
+            &lt;/Axis_Array&gt;
+            &lt;Element_Array&gt;
+              &lt;data_type&gt;SignedInteger&lt;/data_type&gt;
+              &lt;idl_data_type&gt;2&lt;/idl_data_type&gt;
+              &lt;unit&gt;DN&lt;/unit&gt;
+              &lt;scaling_factor&gt; 1.00&lt;/scaling_factor&gt;
+              &lt;value_offset&gt; 0.00&lt;/value_offset&gt;
+            &lt;/Element_Array&gt;
+          &lt;/Array_2D_Image&gt;
+        &lt;/File_Area_Observational&gt;
+      </pre>
+    </p>
+ <h2>Filters</h2>
+    <p>
+       The following table provides the nominal specifications for each of the 4
+       CaSSIS filters. Updated measured values may be available from the mission team. 
+    </p>
+      <TABLE BORDER="1">
+            <CAPTION>
+                CaSSIS Filter Nominal Specifications
+              </CAPTION>
+          <TR>
+            <TH>Name</TH>
+            <TH>Wavelength (nm)</TH>
+            <TH>Equivalent Bandwidth (nm)</TH>
+          </TR>
+          <TR>
+              <TD>PAN</TD>
+              <TD>675</TD>
+              <TD>250</TD>
+          </TR>
+          <TR>
+              <TD>BLU</TD>
+              <TD>485</TD>
+              <TD>165</TD>
+          </TR>
+          <TR>
+              <TD>RED</TD>
+              <TD>840</TD>
+              <TD>100</TD>
+          </TR>
+          <TR>
+              <TD>NIR</TD>
+              <TD>985</TD>
+              <TD>220</TD>
+          </TR>
+      </TABLE>
+  </description>
+
+  <history>
+    <change name="Kelvin Rodriguez" date="2016-08-15">
+      Original version
+    </change>
+    <change name="Marjorie Hahn" date="2016-08-17">
+      Added user documentation. Fixes #4251.
+    </change>
+    <change name="Kristin Berry and Jeannie Backer" date="2017-01-13">
+      Updated to be a standalone ingestion program which does not use ImageImporter. Changed app name to tgocassis2isis. Added filter table to documentation. References #4586
+    </change>
+  </history>
+
+  <category>
+    <missionItem>ExoMars Trace Gas Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS4 CaSSIS formatted XML file
+        </brief>
+        <description>
+          The PDS4 CaSSIS formatted XML file containing the metadata on the image. 
+          The corresponding .dat file for the XML must be inside of the same 
+          directory that the XML is in before running the program. 
+        </description>
+        <filter>
+          *.xml
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output ISIS cube
+         </brief>
+         <description>
+           Use this parameter to select the filename for the output ISIS cube. 
+           This cube will be the ISIS equivalent of the imported CaSSIS image.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

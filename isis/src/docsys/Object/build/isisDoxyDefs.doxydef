@@ -99,6 +99,7 @@
  * @history  2013-03-27 Jeannie Backer - Added NEAR Shoemaker mission. References #1248.
  * @history  2016-08-25 Marjorie Hahn - Added OSIRIS-REx mission. References #4300.
  * @history  2016-09-12 Marjorie Hahn - Added the Apollo, Chandrayaan1, Dawn, Hayabusa, Hayabusa2, Kaguya, Mars Express, ROLO, Rosetta, and SMART1 missions. Fixes #4300.
+ * @history  2017-01-19 Kristin Berry - Added the ExoMars Trace Gas Orbiter mission. References #4584
  * 
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
@@ -335,6 +336,17 @@
            * Mission site: http://dawn.jpl.nasa.gov/
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/missions/dawn
+           *
+           */
+
+          // ExoMars Trace Gas Orbiter
+          /**
+           * \defgroup  Tgo                          Trace Gas Orbiter
+           *
+           * These objects provide functionality for manipulating data from the
+           * ExoMars Trace Gas Orbiter mission to Mars which launched on March 14, 2016.
+           * 
+           * Mission site: http://exploration.esa.int/mars/46475-trace-gas-orbiter/
            *
            */
 
