@@ -326,7 +326,7 @@ namespace Isis {
     if (isDebug) {
           cout << endl << "Translating input value: " << inputValue << endl;
         }
-    return PvlTranslationTable::Translate(outputName, inputValue.)trimmed();
+    return PvlTranslationTable::Translate( outputName, inputValue.trimmed() );
     }
     catch (IException &e){
       QString msg = "Failed to translate output value for [" + outputName + "].";
