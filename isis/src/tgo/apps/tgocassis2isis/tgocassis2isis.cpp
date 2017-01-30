@@ -267,7 +267,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   bandBin.findKeyword("Width").setUnits("nm");
 
   // Create the Archive Group
-  FileName archiveTransFile(missionDir + "/translations/tgoArchive.trn");
+  FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
   XmlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
 
   // Pvl output label
@@ -278,6 +278,8 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   iTime stime(outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
   outputLabel->findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
+  outputLabel->findGroup("Archive", Pvl::Traverse).findKeyword("PredictMaximumExposureTime").
+                                                  setUnits("ms");
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
