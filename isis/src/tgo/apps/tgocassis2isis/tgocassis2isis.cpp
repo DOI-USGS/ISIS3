@@ -12,6 +12,7 @@
 #include "UserInterface.h"
 #include "XmlTranslationManager.h"
 #include "iTime.h"
+#include "OriginalXmlLabel.h"
 
 using namespace std;
 using namespace Isis;
@@ -30,8 +31,6 @@ void IsisMain() {
 // The commented-out code in this app is for processing multi-framelet images. The current test data
 // is not multi-framelet, but there may be multi-framelet input data in the future. 
 
-// There is on original label on the output cube because OriginalLabel only works with PVL, 
-// not XML files
 # if 0
 //  g_outputCubes.clear();
 //  g_frameletLines.clear();
@@ -69,6 +68,8 @@ void IsisMain() {
   translateLabels(xmlFileName, outputCube);
   
   FileName outputCubeFileName(ui.GetFileName("TO"));
+
+  // OriginalXmlLabel xmlLabel(xmlFileName.toString());
 
 #if 0
     // Set up even and odd cubes
@@ -117,6 +118,10 @@ void IsisMain() {
 # endif
 
   importer.StartProcess();
+
+  // Write out original label before closing the cube
+  // outputCube->write(xmlLabel);
+
   importer.EndProcess();
 
   // Remove now-unneeded "TO" output file if even/odd functionality is added back in
@@ -276,10 +281,20 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
 
   // Create YearDoy keyword in Archive group
   iTime stime(outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+
+  PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
+                                                  
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
-  outputLabel->findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
-  outputLabel->findGroup("Archive", Pvl::Traverse).findKeyword("PredictMaximumExposureTime").
-                                                  setUnits("ms");
+  archive.addKeyword(yeardoy);
+  archive.findKeyword("PredictMaximumExposureTime").setUnits("ms");
+  archive.findKeyword("CassisOffNadirAngle").setUnits("deg");
+  archive.findKeyword("PredictedRepetitionFrequency").setUnits("ms");
+  archive.findKeyword("GroundTrackVelocity").setUnits("km/s");
+  archive.findKeyword("ForwardRotationAngle").setUnits("deg");
+  archive.findKeyword("SpiceMisalignment").setUnits("deg");
+  archive.findKeyword("FocalLength").setUnits("m");
+  archive.findKeyword("ImageFrequency").setUnits("ms");
+  archive.findKeyword("ExposureTimePEHK").setUnits("ms");
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
@@ -292,6 +307,8 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
      && instId.compare("CaSSIS", Qt::CaseInsensitive) == 0) {
 
     int spacecraftCode = -143400;
+
+    kern += PvlKeyword("NaifFrameCode", toString(spacecraftCode));
 
     if (filter.compare("PAN", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143421;
@@ -308,7 +325,6 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
     else {
       // ??? throw error or use default??? (for now, use default)
     }
-    kern += PvlKeyword("NaifFrameCode", toString(spacecraftCode));
 
     // Add Kernel to BandBin Group
     bandBin.addKeyword(PvlKeyword("NaifFrameCode", toString(spacecraftCode)));
