@@ -328,7 +328,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
     }
 
     // Add Kernel to BandBin Group
-    bandBin.addKeyword(PvlKeyword("NaifFrameCode", toString(spacecraftCode)));
+    bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(spacecraftCode)));
   }
   else {
     QString msg = "Unrecognized Spacecraft name [" 
