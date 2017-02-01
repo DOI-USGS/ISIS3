@@ -7,12 +7,12 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "LineManager.h"
+#include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProcessImport.h"
 #include "UserInterface.h"
 #include "XmlTranslationManager.h"
 #include "iTime.h"
-#include "OriginalXmlLabel.h"
 
 using namespace std;
 using namespace Isis;
@@ -69,7 +69,8 @@ void IsisMain() {
   
   FileName outputCubeFileName(ui.GetFileName("TO"));
 
-  // OriginalXmlLabel xmlLabel(xmlFileName.toString());
+  OriginalXmlLabel xmlLabel;
+  xmlLabel.readFromXmlFile(xmlFileName);
 
 #if 0
     // Set up even and odd cubes
@@ -120,7 +121,7 @@ void IsisMain() {
   importer.StartProcess();
 
   // Write out original label before closing the cube
-  // outputCube->write(xmlLabel);
+  outputCube->write(xmlLabel);
 
   importer.EndProcess();
 

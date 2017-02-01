@@ -26,6 +26,9 @@
     <change name="Brendan George" date="2006-09-26">
       Documentation fixes
     </change>
+    <change name="Jesse Mapel" date="2017-01-31">
+      Enabled output or OriginalXmlLabels. Fixes #4584.
+    </change>
   </history>
 
   <groups>
