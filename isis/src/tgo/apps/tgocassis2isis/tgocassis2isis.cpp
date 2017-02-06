@@ -1,10 +1,8 @@
 #include "Isis.h"
 
 #include <QString>
-#include <QDomDocument>
 
 #include "Cube.h"
-#include "CubeAttribute.h"
 #include "FileName.h"
 #include "LineManager.h"
 #include "OriginalXmlLabel.h"
@@ -17,44 +15,10 @@
 using namespace std;
 using namespace Isis;
 
-vector<Cube *> g_outputCubes;
-
-int g_frameletLines; 
-//vector <std::pair<int,int> > g_frameletLines;
-//vector <int> g_frameletLines;
-//int getCubeNumber(int line);
-//void separateFrames(Buffer &in);
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
 void translateLabels(FileName &inputLabel, Cube *outputCube);
 
 void IsisMain() {
-// The commented-out code in this app is for processing multi-framelet images. The current test data
-// is not multi-framelet, but there may be multi-framelet input data in the future. 
-
-# if 0
-//  g_outputCubes.clear();
-//  g_frameletLines.clear();
-
-  // Hard-coded defaults. Can also grab from XML header 
-  // under PEHK_HEADER WindowN_(END|BEGIN)_ROW
-  //
-  // EVEN (cube 0): even lines
-  //  ODD (cube 1): odd lines
-  // 
-  // As number of lines:
-  //g_frameletLines.push_back(280); // PAN
-  //g_frameletLines.push_back(256); // RED
-  //g_frameletLines.push_back(256); // NIR
-  //g_frameletLines.push_back(256); // BLU
-
-  // As std::pair<begin, end>
-// g_frameletLines.push_back(std::pair<int,int>(354,632)); // PAN
-// g_frameletLines.push_back(std::pair<int,int>(712,966)); // RED
-// g_frameletLines.push_back(std::pair<int,int>(1048,1302)); // NIR
-// g_frameletLines.push_back(std::pair<int,int>(1409,1662)); // BLU
-
-  //g_frameletLines = 50; // Fake framelet size for testing even/odd
-# endif
 
   UserInterface &ui = Application::GetUserInterface();
   FileName xmlFileName = ui.GetFileName("FROM");
@@ -72,52 +36,6 @@ void IsisMain() {
   OriginalXmlLabel xmlLabel;
   xmlLabel.readFromXmlFile(xmlFileName);
 
-#if 0
-    // Set up even and odd cubes
-    Cube *even = new Cube();
-    Cube *odd = new Cube();
-    even->setDimensions(importer.Samples(), importer.Lines(), importer.Bands());
-    even->setPixelType(importer.PixelType());
-    even->setByteOrder(importer.ByteOrder());
-
-    odd->setDimensions(importer.Samples(), importer.Lines(), importer.Bands());
-    odd->setPixelType(importer.PixelType());
-    odd->setByteOrder(importer.ByteOrder());
-
-
-
-    QString evenFile = outputCubeFileName.path() + "/" + outputCubeFileName.baseName() + ".even.cub";
-    QString oddFile = outputCubeFileName.path() + "/" + outputCubeFileName.baseName() + ".odd.cub";
-
-    even->create(evenFile);
-    odd->create(oddFile);
-
-    g_outputCubes.push_back(odd);
-    g_outputCubes.push_back(even);
-
-  importer.StartProcess(separateFrames);
-
-  // Translate labels to every image and close output cubes before calling EndProcess
-
-  std::vector<QString> framelets;
-  framelets.push_back("Odd");
-  framelets.push_back("Even");
-
-  for(unsigned int i = 0; i < g_outputCubes.size(); i++) {
-    translateLabels(xmlFileName, g_outputCubes[i]);
-
-    // Add Framelet information to label
-    g_outputCubes[i]->label()->findObject("IsisCube").findGroup("Instrument").addKeyword(
-        PvlKeyword("Framelets", framelets[i]));
-
-    // TODO: Add any original label information?
-
-    importer.WriteHistory(*g_outputCubes[i]);
-    delete g_outputCubes[i];
-  }
-  g_outputCubes.clear();
-# endif
-
   importer.StartProcess();
 
   // Write out original label before closing the cube
@@ -125,63 +43,8 @@ void IsisMain() {
 
   importer.EndProcess();
 
-  // Remove now-unneeded "TO" output file if even/odd functionality is added back in
-//  QFile::remove(outputCubeFileName.expanded());
-
   return;
 }
-
-
-#if 0
-/**
- * Get output cube number for a given input line number
- *
- * @param line input line number (starting at 1)
- *
- * @return @b int Returns cube number that line belongs in 
- *  
- * @internal
- *   @history 2017-01-20 Kristin Berry - Original Version
- *  
- */
-int getCubeNumber(int line) {
-  return line/g_frameletLines % 2; 
-}
-
-
-/**
- * Separates the framelets into even and odd cubes. 
- * 
- * @author 2017-01-20 Kristin Berry
- * 
- * @param in Input Buffer
- */
-void separateFrames(Buffer &in) {
-  int outputCube = getCubeNumber(in.Line());
-
-  LineManager mgr(*g_outputCubes[outputCube]); 
-  mgr.SetLine(in.Line(), in.Band());
-
-  for(int i = 0; i < mgr.size(); i++){
-       mgr[i] = in[i];
-  }
-
-  g_outputCubes[outputCube]->write(mgr);
-
-  // Null out every other cube
-  for(int i = 0; i < (int)g_outputCubes.size(); i++) {
-    if(i == outputCube) continue;
-
-    LineManager mgr(*g_outputCubes[i]);
-    mgr.SetLine(in.Line(), in.Band());
-
-    for(int j = 0; j < mgr.size(); j++) {
-      mgr[j] = Isis::Null;
-    }
-    g_outputCubes[i]->write(mgr);
-  }
-}
-#endif 
 
 
 /**
@@ -194,6 +57,7 @@ void separateFrames(Buffer &in) {
  *  
  * @internal
  *   @history 2017-01-20 Jeannie Backer - Original Version
+ *   @history 2017-01-21 Krisitn Berry - Flipped ns & nl. They're flipped in the CaSSIS header.
  */
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   // Get the directory where the Tgo translation tables are
@@ -322,9 +186,6 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
     }
     if (filter.compare("BLU", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143424;
-    }
-    else {
-      // ??? throw error or use default??? (for now, use default)
     }
 
     // Add Kernel to BandBin Group

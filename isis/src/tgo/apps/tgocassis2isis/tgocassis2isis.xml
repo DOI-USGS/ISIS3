@@ -14,13 +14,12 @@
     <p><i>
       Note that the corresponding .dat file containing the image data must be placed in the 
       same directory as the XML file in order for this program to work as intended. 
-      Furthermore, this program is specific to CaSSIS formatted image data, it will not 
-      convert other image formats to ISIS cubes in its current state.
+      Furthermore, this program is specific to CaSSIS formatted image data.
     </i></p>
     <p>
       Below is an example of part of a CaSSIS XML label for one of the images that this
       program is capable of importing. It is vital that the XML label that is being imported 
-      has its labels formatted the same way in order for cassis2isis to work properly.
+      has its labels formatted the same way in order for tgocassis2isis to work properly.
     </p>
     <p>
       <pre>
@@ -97,7 +96,7 @@
     <change name="Marjorie Hahn" date="2016-08-17">
       Added user documentation. Fixes #4251.
     </change>
-    <change name="Kristin Berry and Jeannie Backer" date="2017-01-13">
+    <change name="Kristin Berry, Jeannie Backer, Jesse Mapel" date="2017-01-13">
       Updated to be a standalone ingestion program which does not use ImageImporter. Changed app name to tgocassis2isis. Added filter table to documentation. References #4586
     </change>
   </history>
