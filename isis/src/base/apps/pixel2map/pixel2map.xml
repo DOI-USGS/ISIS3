@@ -6,65 +6,74 @@
   </brief>
 
   <description>
-    This specialized program projects an ISIS <def link="Level0">level0</def> or 
+    The pixel2map program projects an ISIS <def link="Level0">level0</def> or 
     <def link="Level1">level1</def> <def link="Cube">cube</def> to a 
-    <def link="MAP">map</def> projected (ISIS <def link="Level2">level2</def>) cube.  
+    <def link="MAP">map</def>-projected, ISIS <def link="Level2">level2</def>
+    cube. Please note that pixels that fall
+    in either polar region (i.e. latitude of 90.0 degrees or -90.0 degrees)
+    cannot currently be processed and are assigned as NULL pixels.
     <p>
-      The program, <i>cam2map</i> also projects a cube, and is recommended for most mapping 
-      applications. Use <i>pixel2map</i> to project cubes where pixels do not overlap.
-      For instance, this program is used to project Cassini VIMS, a point instrument. It is
-      also used for line scan instruments whose lines may not overlap, such as 
-      Mars Reconnaissance Orbiter CRISM and Dawn VIR.
-      
+      In order for <i>pixel2map</i> to run successfully, input cubes must have
+      SPICE data. The program <i>spiceinit</i> should be used to attach the
+      appropriate SPICE data to input cubes. The <i>pixel2map</i> program also
+      requires a map projection specification. The map projection is defined
+      using a PVL file specified with the MAP parameter. The <i>maptemplate</i>
+      program can be used to create a map projection file.
     </p>
     <p>
-    Note: <i>pixel2map</i> cannot currently process the input <b>pixel</b> which contains either pole
-    (i.e. latitude of 90.0 degrees or -90.0 degrees), which will cause a NULL pixel in your output map projected
-    cube where the pole is located.
+      The ISIS program <i>cam2map</i> also projects a cube, and is recommended
+      for most mapping applications. The <i>pixel2map</i> program is designed to project cubes where
+      pixels do not overlap, such as line scan spectrometers. The
+      <i>cam2map</i> program will stretch data in the final product to cover
+      any gaps. The <i>pixel2map</i> program will preserve these gaps.
     </p>
     <p>
-    <b>How <i>pixel2map</i> and <i>cam2map</i> differ</b>
-    </p>
-    <p>
-    <ul>
-    <li>The <i>pixel2map</i> application uses a forward driven algorithm.</li>
-    <li>Each input pixel is converted to a polygon and rasterized into the output projected image by calculating output
-     pixels that fall in the boundary of the input pixel.</li>
-    <li>The space between pixels is retained in the output projected cube.</li>
-    </ul>
-    Versus
-    <ul>
-    <li>The <i>cam2map</i> application uses a reverse driven algorithm.</li>
-    <li>Each input pixel is not converted to a polygon and rasterized into the output projected image. The input pixels
-    are calculated by pixels situated at the same latitude and longitude.</li>
-    <li>The space between pixels are interpolated thus gaps are filled in the output projected cube.</li>
-    </ul>
-    </p>
-    <p>
+    <b>The following table indicates how <i>pixel2map</i> and <i>cam2map</i> differ:</b>
+
+    <table border="1">
+      <tr>
+        <td><i>pixel2map</i></td>
+        <td><i>cam2map</i></td>
+      </tr>
+
+      <tr>
+        <td>Uses a forward driven algorithm</td>
+        <td>Uses a reverse driven algorithm.</td>
+      </tr>
+
+      <tr>
+        <td>Each input pixel is converted to a polygon and rasterized into the output projected image by calculating output
+     pixels that fall in the boundary of the input pixel.</td>
+        <td>Each input pixel is not converted to a polygon and rasterized into the output projected image. The input pixels
+    are calculated by pixels situated at the same latitude and longitude.</td>
+      </tr>
+
+      <tr>
+        <td>The space between pixels is retained in the output projected cube.</td>
+        <td>The space between pixels are interpolated thus gaps are filled in the output projected cube.</td>
+      </tr>
+
+      <tr>
+        <td>The output cube will be spatially correct.</td>
+        <td>The output cube may not be spatially correct.</td>
+      </tr>
+    </table>
+
     The examples below are Mars Reconnaissance Orbiter/CRISM cubes where scan lines do not overlap in their original state.
     The major difference is in the output of the application used to project the cube. Both applications will project the cube,
-    but also result in a different spatial outcome. 
+    but will also result in a different spatial outcome. 
     Left Cube: cam2map was chosen to project the cube. Notice the scan lines have been interpolated thus filled.  If you want to
     preserve gaps, cam2map will not achieve this result. In addition, the cube is no longer spatially correct. 
-    Right Cube: pixel2map was chosen to project the cube. Notice how the gaps are retained in the output. The cube is spatially
+    Right Cube: pixel2map was chosen to project the cube. Notice the gaps are retained in the output and the cube is spatially
     correct.   
     </p>
     <img src="assets/crismCam2mapEqui.jpg"> </img>
     <img src="assets/crismPixel2mapEqui.jpg"> </img>
     <p>
-    The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should be run on it 
-    prior to <i>pixel2map</i>.  The <def link="Map Projection">map projection</def> is defined using a 
-    <def>PVL</def> file specified with the MAP parameter.  The default projection is the system Sinusoidal projection 
-    ($ISIS3DATA/base/templates/maps/sinusoidal.map).  To learn more about using map projections in ISIS, 
-    refer to the ISIS Workshop 
-    <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
-    "Learning About Map Projections"</a>.
-    </p>
-    <p>
-      If you need to generate your own map file you can use the <i>maptemplate</i> program or alternatively, 
-    hand create a file using your favorite editor.  The file need only specify the ProjectionName 
-    as defaults will be computed for the remaining map file parameters.  The following table indicates 
-    how the defaults are established:
+      Several parameters of the map projection have default values when not
+      specified in the map projection file. The default projection is the
+      system sinusoidal projection. The following table indicates how the
+      defaults are established:
     </p>
 
     <table border="1">
@@ -80,7 +89,7 @@
 
       <tr>
         <td>Equatorial<def>Radius</def><br />PolarRadius</td>
-        <td>Read from SPICE pck file set during <i>spiceinit</i>.  The pck file is defined in the Kernels 
+        <td>Read from SPICE PCK file set during <i>spiceinit</i>.  The PCK file is defined in the Kernels 
         group via the TargetAttitudeShape keyword</td>
       </tr>
 
@@ -103,7 +112,7 @@
         <td>Minimum<def>Latitude</def><br />MaximumLatitude<br />Minimum<def>Longitude</def><br />MaximumLongitude</td>
         <td>Computed from the input cube or read from the map file.   However, any combination of the 
         four values can then be overridden by the user.  The values the user specifies are expected 
-        to be in the coodinate system of the projection.</td>
+        to be in the coordinate system of the projection.</td>
       </tr>
 
       <tr>
@@ -114,7 +123,7 @@
     </table>
 
     <p>
-      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters the 
+      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters, the 
       following is the default Mapping group:
     </p>
     <pre>
@@ -154,7 +163,7 @@
    specific parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is, 
    you should create one map file and use it as input for all the cubes in your mosaic.  By letting the 
    minimum and maximum latitude and longitude values default, the application will determine the coverage of each image.  
-   However, if the mosaic Latiude and Longitude range is entered, each output image will be projected to the full 
+   However, if the mosaic Latitude and Longitude range is entered, each output image will be projected to the full 
    size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
 
    The following Mapping group could be used for mosaicking:
@@ -183,7 +192,7 @@
    <b>Output of pixel2map</b>
    </p>
    <p>
-   A single input file produces a projected level2 cube. A list of files (filelist) produces an averaged mosaic as output.
+   A single input file (FROM) produces a projected level2 cube. A list of files (FILELIST) produces an averaged mosaic as output.
    A count cube that contains the number of input pixels averaged into each output pixel is created along with the output
    cube or mosaic.
    </p>
@@ -270,7 +279,7 @@
             <description>
               This option allows a list to be used to process multiple input cubes.  All cubes 
               contained in this list will be projected to the same output cube given in the 'TO'
-              parameter.  This effictively projects and mosaics all input cubes given in the list
+              parameter.  This effectively projects and mosaics all input cubes given in the list
               to the same output map projected file.
             </description>
             <exclusions><item>FROM</item></exclusions>
@@ -297,7 +306,7 @@
         <description>
           This option allows a list to be used to process multiple input cubes.  All cubes 
           contained in this list will be projected to the same output cube given in the 'TO'
-          parameter.  This effictively projects and mosaics all input cubes given in the list
+          parameter.  This effectively projects and mosaics all input cubes given in the list
           to the same output map projected file.
         </description>
         <exclusions><item>FROM</item></exclusions>
@@ -464,7 +473,7 @@
         <default><item>MINIMIZE</item></default>
         <description>
           This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
-          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default
+          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can override the default
           using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage of
           the map projected image.  Essentially, the ground range and pixel resolution are used to compute the
           size (samples and line) of the output image.
@@ -490,7 +499,7 @@
              <description>
                This option will use the camera and projection in combination to ensure the output image size 
                (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with 
-               curved merdians and/or parallels and hence large output images.  The amount of padding can be 
+               curved meridians and/or parallels and hence large output images.  The amount of padding can be 
                quite large for extremely high resolution maps.
              </description>
              <inclusions><item>LONSEAM</item></inclusions>
@@ -506,7 +515,7 @@
            <option value="CAMERA">
               <brief> Compute default range from input cube</brief>
               <description>
-                This option will automatically determine the mininum/maximum latitude/longitude from the input
+                This option will automatically determine the minimum/maximum latitude/longitude from the input
                 camera model cube specified using the FROM parameter.
               </description>
               <inclusions><item>LONSEAM</item></inclusions>
@@ -515,7 +524,7 @@
            <option value="MAP">
               <brief> Read default range from map file</brief>
               <description>
-                This option will read the mininum/maximum latitude/longitude from the input map file.
+                This option will read the minimum/maximum latitude/longitude from the input map file.
                 All four values are expected to be defined.
               </description>
               <exclusions><item>LONSEAM</item></exclusions>
@@ -528,7 +537,7 @@
         <brief>Minimum latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum latitude of the ground range.   If this is entered by the user it will override
+          The minimum latitude of the ground range.   If this is entered by the user, it will override
           the default camera or map value.  By default, planetocentric latitudes are assumed unless
           the MAP file specifies otherwise.
         </description>
@@ -542,7 +551,7 @@
         <brief>Maximum latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum latitude of the ground range.   If this is entered by the user it will override
+          The maximum latitude of the ground range.   If this is entered by the user, it will override
           the default camera or map value.  By default, planetocentric latitudes are assumed unless
           the MAP file specifies otherwise.
         </description>
@@ -556,7 +565,7 @@
         <brief>Minimum longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum longitude of the ground range.   If this is entered by the user it will override
+          The minimum longitude of the ground range.   If this is entered by the user, it will override
           the default camera or map value.  By default, positive east longitudes in the range of 0 to
           360 are assumed unless the MAP file specifies otherwise.
         </description>
@@ -567,7 +576,7 @@
         <brief>Maximum longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum longitude of the ground range.   If this is entered by the user it will override
+          The maximum longitude of the ground range.   If this is entered by the user, it will override
           the default camera or map value.  By default, positive east longitudes in the range of 0 to
           360 are assumed unless the MAP file specifies otherwise.
         </description>
@@ -581,7 +590,7 @@
           Null all pixels outside lat/lon boundaries
         </brief>
         <description>
-          If this option is selected, pixels outside the latitude/longtiude
+          If this option is selected, pixels outside the latitude/longitude
           range will be trimmed (set to null).
           This is useful for certain projections whose lines of latitude and
           longitude are not parallel to image lines and sample columns.
@@ -643,7 +652,7 @@
           With this option you can turn on/off the automatic longitude domain switching that occurs
           when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If 
           the switching is turn off then you have the choice of making the program continue or 
-          exit when the cube does cross the bounday.
+          exit when the cube does cross the boundary.
         </description>
 
         <list>
