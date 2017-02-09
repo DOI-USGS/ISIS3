@@ -3,7 +3,7 @@
 <application name="tgocassis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Imports a PDS4 formatted CaSSIS image into an ISIS formatted cube.
+    Imports a PDS4-formatted CaSSIS image into an ISIS-formatted cube.
   </brief>
 
   <description>
