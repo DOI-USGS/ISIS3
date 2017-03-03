@@ -49,9 +49,9 @@ BodyFixedCoordinate: -322.959465020
 LocalRadius: 1827797.594771857
 SampleResolution: 52846.204303124
 LineResolution: 52846.204303124
-ObliqueDetectorResolution: 53053.568832246
-ObliqueLineResolution: 53053.568832246
-ObliqueSampleResolution: 53053.568832246
+ObliqueDetectorResolution: 53261.747044178
+ObliqueLineResolution: 53261.747044178
+ObliqueSampleResolution: 53261.747044178
 Sample: 2503.000000000
 Line: 330.000000000
 RightAscension: 332.298302833
@@ -71,8 +71,8 @@ BodyFixedCoordinate: -322.959465020
 LocalRadius: 1827797.594771857
 SampleResolution: 52846.204303124
 LineResolution: 52846.204303124
-ObliqueDetectorResolution: 53053.568832246
-ObliqueLineResolution: 53053.568832246
-ObliqueSampleResolution: 53053.568832246
+ObliqueDetectorResolution: 53261.747044178
+ObliqueLineResolution: 53261.747044178
+ObliqueSampleResolution: 53261.747044178
 Latitude OK
 Longitude OK
