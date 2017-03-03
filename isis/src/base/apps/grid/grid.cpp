@@ -121,8 +121,11 @@ void IsisMain() {
 
     //if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
     // each band
-    if ( (inputBands >= 2) && !(icube->camera()->IsBandIndependent()) ) {
-      recalculateForEachBand = true; 
+
+    if (icube->hasGroup("Instrument")) {
+      if ((inputBands >= 2) && !(icube->camera()->IsBandIndependent())) {
+        recalculateForEachBand = true; 
+      }
     }
 
     gmap = new UniversalGroundMap(*icube, UniversalGroundMap::ProjectionFirst);

@@ -166,6 +166,10 @@
       when MODE="GROUND" on a Cube with a band-dependent camera model, the grid will 
       be re-calculated for each band. Fixes #2191.
     </change>
+    <change name="Kristin Berry" date="2017-02-16">
+      Fixed error introduced in last change which caused grid to no longer work on multi-band 
+      cubes without camera models (for example: a mosaic will not have a camera model.) Fixes #4586. 
+    </change>
   </history>
 
   <groups>
