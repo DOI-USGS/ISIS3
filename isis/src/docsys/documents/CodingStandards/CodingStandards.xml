@@ -27,6 +27,7 @@
             <li><a href="#continuingLinesOfCode">Continuing Lines of Code</a></li>
             <li><a href="#logicalOperators">Logical Operators</a></li>
             <li><a href="#pointerRefFormatting">Pointers and References</a></li>
+            <li><a href="#sourceCodeDocs">Source Code Documentation</a></li>
           </ol>
 
           <li><a href="#namingConventions">Naming Conventions</a></li>
@@ -458,8 +459,7 @@
 
         <h3> <a name="pointerRefFormatting">Pointers and References</a> </h3>
         <p>
-          The asterisk for pointers (*) and the ampersand for references (&amp;) should always be
-          put on the variable name or method name when possible.
+          The asterisk for pointers (*) and the ampersand for references (&amp;) should always be put on the variable name or method name when possible.
         </p>
         <p>
           For example:
@@ -476,6 +476,121 @@
             int &amp;function(const int *a);
             int &amp;Class::method(const int &amp;a);
           </strong></pre>
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
+        <h3> <a name="sourceCodeDocs">Source Code Documentation</a> </h3>
+        <h4> <a name="doxygenComments"></a> Doxygen </h4>
+        <p>
+	  Isis 3 uses the <a href="http://www.doxygen.org ">Doxygen</a> documentation 
+	  extraction software. Doxygen has extended the tag set of the 
+	  <a href="http://java.sun.com/j2se/javadoc">javadoc documentation style</a>, 
+	  a systematic in-code documentation style that allows pertinent documentation to 
+	  be extracted easily. Doxygen is just one of many software packages that are 
+	  able to extract and use javadoc documentation for a variety of purposes, 
+	  allowing us to take advantage of a wealth of documentation extractors, IDEs, 
+	  and other tools on the market that make our lives simpler and more productive.
+        </p>
+        <ul>
+          <li>
+            Documentation should be provided for each entity (class, method, struct, 
+	    variable, etc.) in the source code <em>where the primary or most commonly 
+	    used definition of that entity resides</em>. Generally, this means the 
+	    following files contain documentation for the listed entities:
+            <ul>
+              <li>
+                <b>Header (.h)</b>: classes, inline functions, enums, typedefs, unions, 
+		structs, and variables declared in the header file
+              </li>
+              <li>
+                <b>Implementation (.cpp)</b>: member function implementations and any 
+		entities declared or defined in the implementation file
+              </li>
+            </ul>
+          </li>
+          
+          <li>
+            To allow Doxygen to generate external documentation specialized commenting styles 
+	    must be used.  The comments are typically before each entity but single line 
+	    comments on the same line can be added after the entity.  For example:
+          <ul>
+            <li>
+              <b>Single line of documentation (<em>documentation line</em>)</b>
+              <ul>
+                <li>start documentation with string <b>//!</b> before or <b>//!&lt;</b> after 
+		    the code
+		</li>
+                <li>Before the entity
+                  <div class="code">
+                    //! my integer<br/>
+                    int myInteger ;
+                  </div>
+                </li>
+          
+                <li>After the entity
+                  <div class="code">
+                    int myInteger ; //!&lt; my integer<br/>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          
+            <li>
+              <b>Multi-lined documentation (<em>documentation block</em>)</b>
+              <ul>
+                <li>Before the entity in JavaDoc style
+                  <div class="code">
+                    <pre>
+/**
+ * Comment about setGlobalB here. Never place multi-lined comments
+ * after the entitiy.
+ */
+void setGlobalB() {
+  //! single line comment here
+  g_b = 3; //!&lt; or single line comment here
+}
+                    </pre>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          </li>
+        </ul>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
+        <h4> <a name="usingHTML"></a> Using HTML </h4> 
+        <p>
+          HTML can be used anywhere in your documentation.
+          Keep it simple. Doxygen will "interpret" your HTML, so you may not get the 
+          desired effect. Best advice, avoid attempting special effects by just using 
+	  the basic HTML formatting tags - bold, underline, pre, code, table (caption, 
+	  tr, td, th), etc. and only when really necessary. Better yet, consider using 
+	  the formatting tags in the Other Useful Tags section instead of HTML. Your 
+	  plain old text will be pretty nicely rendered into paragraphs with automatically 
+	  linked items and other bells and whistles. Keep your source readable: minimize 
+	  formatting.
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
+        <h4> <a name="autolinking"></a> Autolinking </h4>
+        <p>
+          Class, method, variable, and other entity names will be automatically linked 
+	  in the documentation. To prevent this for a specific occurence of a name, 
+	  use a percent sign (%) in front of the name. For example, if you have a 
+	  class name "Histogram" and you want to prevent the linking of the word 
+	  "Histogram" in your description because it is not referring to the class but 
+	  to an actual histogram, use "%Histogram" to prevent the word from being linked.
+        </p>
+        <p>
+          E-mail addresses and web addresses are also automatically linked. If a web 
+	  address is particularly long, put it on its own line.
         </p>
         <p align="right"><a href="#top"><font size="1">
           Return to Table of Contents
@@ -1245,7 +1360,10 @@
 
         <h2><a name="todo">TO DO</a></h2>
           <ul>
-          <li> Improve examples </li>
+          <li> 
+	    Improve examples - possibly a reference to a single canonical file in 
+	    the source tree
+	  </li>
           <li> Binary Operators - Determine padding. </li>
           <li> Complete History and Documentation section
             <ol>
@@ -1281,6 +1399,12 @@
           </li>
           <li>
             Should  the Disclaimer be required for all ISIS files?
+          </li>
+          <li>
+            Should prohibition against SVN keywords be added?
+          </li>
+          <li>
+            Mention of @file and (new?) copyright header?
           </li>
           </ul>
       </body>
@@ -1335,6 +1459,9 @@
     </change>
     <change name="Steven Lambright" date="2012-10-10">
       Added Strings section
+    </change>
+    <change name="JP Bonn" date="2017-02-21">
+      Incorporated sections of former Style Guide
     </change>
   </history>
 
