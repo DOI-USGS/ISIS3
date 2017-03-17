@@ -116,11 +116,24 @@ void ascii2isis(Buffer &out) {
     }  
     
     fin >> out[i];
+
+    // If we've reached the end of file and stream is bad, we didn't find enough numerical data
     if (!fin && fin.eof()) {
       QString msg = "End of file reached. There is not enough data in [" + from;
       msg += "] to fill the output cube.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+
+    // Check if there was an issue extracting a double
+    if (!fin) {
+      // Clean stream to get the position and invalid data that broke the stream
+      fin.clear();
+      QString msg = "Could not extract non-numerical data [" + QString(fin.peek()) + "] ";
+      msg += "at byte position [" + QString::number(fin.tellg()) + "]. ";
+      msg += "Please make sure to skip any header data in [" + from + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     out[i] = TestSpecial(out[i]);
   }
 }
