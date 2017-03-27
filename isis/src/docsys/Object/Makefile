@@ -44,6 +44,7 @@ documentation:
 
 assetsDir:
 	echo "        ...copying assets"
+	mkdir -p $(ISISROOT)/doc/Object
 	rsync -qlHptr --delete --rsh=ssh assets $(ISISROOT)/doc/Object/ 
 
 conf:
