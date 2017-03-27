@@ -83,16 +83,6 @@ conf:
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                         >> build/Programmer_temp.conf; \
-	  echo "WARNINGS               = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = YES"                        >> build/Programmer_temp.conf; \
-        else \
-	  echo "QUIET                  = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARNINGS               = NO"                         >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = NO"                         >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = NO"                         >> build/Programmer_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = NO"                         >> build/Programmer_temp.conf; \
 	fi
 
 	if [[ "$(DOT_PATH)" != "" ]];                                          \
@@ -116,16 +106,6 @@ conf:
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                         >> build/Developer_temp.conf; \
-	  echo "WARNINGS               = YES"                        >> build/Developer_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = YES"                        >> build/Developer_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = YES"                        >> build/Developer_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = YES"                        >> build/Developer_temp.conf; \
-        else \
-	  echo "QUIET                  = YES"                        >> build/Developer_temp.conf; \
-	  echo "WARNINGS               = NO"                         >> build/Developer_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = NO"                         >> build/Developer_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = NO"                         >> build/Developer_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = NO"                         >> build/Developer_temp.conf; \
 	fi
 
 	if [[ "$(DOT_PATH)" != "" ]];                                          \
@@ -199,6 +179,7 @@ clean:
 	rm -f  build/Developer_temp.conf 
 	rm -rf build/apps
 	rm -f ../documents/DocStyle/assets/isisDoxyDefs.doxydef
+	rm -f doxyWarnDeveloper.txt doxyWarnProgrammer.txt
 
 cleandoc:
 	rm -r $(ISISROOT)/doc/Object
