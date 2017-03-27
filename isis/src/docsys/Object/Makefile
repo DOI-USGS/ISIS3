@@ -133,8 +133,11 @@ doDev:
 	$(DOXYGEN) build/Developer_temp.conf
 	cd $(ISISROOT)/doc/Object/Developer ; cd $(ISISROOT)/src/docsys/Object/
 
+# The doProgTest target can be used to build documentation for an individual Object.
+# E.G. from isis/src/base/objs/Camera do
+#      ( cd ../../../docsys/Object ; make CURDIR=/scratch/m04585/isis/src/base/objs/Camera doProgTest )
 doProgTest:
-	echo "Building ProgTester configuration"
+	echo "Building ProgTester configuration in: $(CURDIR) ISISROOT is: $(ISISROOT)"
 	mkdir -p docbuild
 	cat $(ISISROOT)/src/docsys/Object/build//Programmer.conf         >  docbuild/ProgTester_temp.conf
 	echo "FILE_PATTERNS          = *.h \ "                           >> docbuild/ProgTester_temp.conf
@@ -147,23 +150,16 @@ doProgTest:
 	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeaderProgTester.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooterProgTester.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
+	echo "LATEX_OUTPUT     = html/latex"                             >> docbuild/ProgTester_temp.conf
 	echo "TAGFILES         = "                                       >> docbuild/ProgTester_temp.conf
 	echo "HTML_STYLESHEET  = $(ISISROOT)/src/docsys/Object/build/doxygen.css"                     >> docbuild/ProgTester_temp.conf
 	echo "LATEX_CMD_NAME   = $(LATEX)"                               >> docbuild/ProgTester_temp.conf
-	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
-	then \
-	  echo "QUIET                  = NO"                           >> build/ProgTester_temp.conf; \
-	  echo "WARNINGS               = YES"                          >> build/ProgTester_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = YES"                          >> build/ProgTester_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = YES"                          >> build/ProgTester_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = YES"                          >> build/ProgTester_temp.conf; \
-	else \
-	  echo "QUIET                  = YES"                          >> build/ProgTester_temp.conf; \
-	  echo "WARNINGS               = NO"                           >> build/ProgTester_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = NO"                           >> build/ProgTester_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = NO"                           >> build/ProgTester_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = NO"                           >> build/ProgTester_temp.conf; \
-	fi
+	echo "WARN_LOGFILE           = "                                 >> docbuild/ProgTester_temp.conf
+	echo "QUIET                  = YES"                              >> docbuild/ProgTester_temp.conf
+	echo "WARNINGS               = YES"                              >> docbuild/ProgTester_temp.conf
+	echo "WARN_IF_UNDOCUMENTED   = YES"                              >> docbuild/ProgTester_temp.conf
+	echo "WARN_IF_DOC_ERROR      = YES"                              >> docbuild/ProgTester_temp.conf
+	echo "WARN_NO_PARAMDOC       = YES"                              >> docbuild/ProgTester_temp.conf
 	$(DOXYGEN) docbuild/ProgTester_temp.conf
 	echo "View your documentation by opening the file html/index.html in a browser"
 #do the following on a clean, as well as whacking the html directory created in this dir by doxy
