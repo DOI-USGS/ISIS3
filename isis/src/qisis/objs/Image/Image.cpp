@@ -147,7 +147,7 @@ namespace Isis {
 
 
   /**
-   * @description Read the image settings from a Pvl.  The Pvl file looks like this:
+   * @brief Read the image settings from a Pvl.  The Pvl file looks like this:
    *
    * <pre>
    *   Object = Image
@@ -179,7 +179,7 @@ namespace Isis {
 
 
   /**
-   * @description Convert this Image to PVL.
+   * @brief Convert this Image to PVL.
    *
    * The output looks like this:
    * <pre>
@@ -214,7 +214,7 @@ namespace Isis {
 
 
   /**
-   * @description Test to see if it's possible to create a footprint from this image.
+   * @brief Test to see if it's possible to create a footprint from this image.
    * This may not give an accurate answer if the cube isn't open.
    * @return @b bool Returns True if it is possible, False if it is not.
    */
@@ -246,8 +246,8 @@ namespace Isis {
 
 
   /**
-   * @description Get the Cube pointer associated with this display property. This will allocate
-   * the Cube pointer if one is not already present.
+   * @brief Get the Cube pointer associated with this display property. 
+   * This will allocate the Cube pointer if one is not already present.
    * @throws IException::Programmer "Cube cannot be created"
    * @return @b (Cube *) A pointer to the image cube.
    */
@@ -266,7 +266,8 @@ namespace Isis {
 
 
   /**
-   * @description Cleans up the Cube pointer. You want to call this once you are sure you are done
+   * @brief Cleans up the Cube pointer. 
+   * You want to call this once you are sure you are done
    * with the Cube because the OS will limit how many of these we have open.
    */
   void Image::closeCube() {
@@ -346,9 +347,9 @@ namespace Isis {
 
 
   /**
-   * @description Calculate a footprint for this image. If the footprint is already stored
-   * inside the cube, that will be used instead. If no footprint can be found, this throws
-   * an exception.
+   * @brief Calculate a footprint for this image. 
+   * If the footprint is already stored inside the cube, that will be used instead. 
+   * If no footprint can be found, this throws an exception.
    * @param cameraMutex A pointer to the camera mutex to lock the camera resource while a footprint
    * is created.
    * @throws IException::Io  "Could not read the footprint from cube [$cube].  Please make sure
@@ -397,7 +398,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the resolution of this image, as calculated and attached by camstats.
+   * @brief Get the resolution of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b double The resolution if available, otherwise Null is returned.
    */
@@ -407,7 +408,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the emission angle of this image, as calculated and attached by camstats.
+   * @brief Get the emission angle of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b Angle The emission angle if available, otherwise an invalid angle is returned.
    */
@@ -417,7 +418,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the incidence angle of this image, as calculated and attached by camstats.
+   * @brief Get the incidence angle of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b Angle The incidence angle if available, otherwise an invalid angle is returned.
    */
@@ -427,7 +428,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the line resolution of this image, as calculated and attached by camstats.
+   * @brief Get the line resolution of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b double The line resolution if available, otherwise Null.
    */
@@ -437,7 +438,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the local radius of this image, as calculated and attached by camstats.
+   * @brief Get the local radius of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b The local radius if available, otherwise an invalid Distance.
    */
@@ -447,7 +448,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the north azimuth of this image, as calculated and attached by camstats.
+   * @brief Get the north azimuth of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b Angle The north azimuth if available, otherwise an invalid angle
    */
@@ -457,7 +458,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the phase angle of this image, as calculated and attached by camstats.
+   * @brief Get the phase angle of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b Angle The phase angle if available, otherwise an invalid angle is returned.
    */
@@ -467,7 +468,7 @@ namespace Isis {
 
 
   /**
-   * @description Get the sample resolution of this image, as calculated and attached by camstats.
+   * @brief Get the sample resolution of this image, as calculated and attached by camstats.
    * This is the image-wide average.
    * @return @b double The sample resolution if available, otherwise Null is returned.
    */
@@ -512,7 +513,7 @@ namespace Isis {
 
 
   /**
-   * @description Delete the image data from disk. The cube() will no longer be accessible
+   * @brief Delete the image data from disk. The cube() will no longer be accessible
    * until you call updateFileName().
    * @throws IException::Io "Could not remove file [$filename]"
    */
@@ -542,7 +543,7 @@ namespace Isis {
 
 
   /**
-   * @description Write the Image properties out to an XML file.
+   * @brief Write the Image properties out to an XML file.
    * @param stream The output data stream.
    * @param project The project this image is contained within.
    * @param newProjectRoot The path/filename we are writing to.
@@ -617,7 +618,7 @@ namespace Isis {
 
 
   /**
-   * @description Change the on-disk file name for this cube to be where the image ought to be in
+   * @brief Change the on-disk file name for this cube to be where the image ought to be in
    * the given project.
    * @param project The project that this image is stored in.
    */
@@ -632,7 +633,7 @@ namespace Isis {
 
 
   /**
-   * @description  Calculates a footprint for an Image using the camera or projection information.
+   * @brief  Calculates a footprint for an Image using the camera or projection information.
    * @param cameraMutex A mutex that guarantees us serial access to the camera/projection classes
    * @return @b (geos::geom::MultiPolygon *) The resulting footprint.
    */
@@ -661,7 +662,7 @@ namespace Isis {
 
 
   /**
-   * @description Checks to see if the Cube label contains Camera Statistics.  If it does,
+   * @brief Checks to see if the Cube label contains Camera Statistics.  If it does,
    * then we attempt to grab data from the label to populate the private members variables.
    */
   void Image::initCamStats() {
@@ -755,7 +756,7 @@ namespace Isis {
 
 
   /**
-   * @description  Create an XML Handler (reader) that can populate the Image class data.
+   * @brief  Create an XML Handler (reader) that can populate the Image class data.
    * @see Image::save() for the expected format.
    * @param image The image we're going to be initializing
    * @param imageFolder The folder that contains the Cube
@@ -768,7 +769,8 @@ namespace Isis {
 
 
   /**
-   * @description The XML reader invokes this method at the start of every element in the
+   * @brief Read mage class attributes
+   * The XML reader invokes this method at the start of every element in the
    *        XML document.  This expects <image/> and <displayProperties/> elements.
    * A quick example using this function:
    *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
@@ -865,7 +867,7 @@ namespace Isis {
 
 
   /**
-   * @description This implementation of a virtual function calls
+   * @brief This implementation of a virtual function calls
    * QXmlDefaultHandler::characters(QString &ch)
    * which in turn calls QXmlContentHandler::characters(QString &ch) which
    * is called when the XML processor has parsed a chunk of character data.

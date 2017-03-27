@@ -568,27 +568,74 @@ namespace Isis {
 
 
   /**
-   * @description This method returns the Oblique Detector Resolution
-   * if the Look Vector intersects the target and if the emission angle is greater than or equal
-   * to 0, and less than 90 degrees.   Otherwise, it returns -1.0.  This formula provides an
-   * improved estimate to the detector resolution for images near the limb:
+   * @brief Improve the estimate of detector resolution when the target is near the limb 
+   * This function provides an improved estimate of the detector resolution (in meters)
+   * when the target is near the limb.  It does this by calculating the determinant of an affine
+   * transformation. The area element of one pixel projected onto the surface at Nadir looks
+   * like a square with sides of length = Detector Resolution.  The detector resolution is the
+   * value returned by the original function.  An affine projective transformation of this
+   * area element as one would see if it was on the limb instead of looking straight down, appears
+   * like a skewed parallelogram.
+   *
+   * The determinant of the transformation matrix taking the Nadir-area element into
+   * some parallelogram near the limb of a planet measures the change in area for the
+   * transformation when we are off-Nadir.  The sqare-root of the area of this parallelogram
+   * gives us the resolution.
+   *
+   *The calculation is straightforward.  Any affine transformation with a strictly positive
+   *determinant that is not a similarity transformation has a unique decomposition
+   *(See Theorem 2.1 in Reference #1):
    *
    *
-   * @f[ \text{Oblique\;\;Detector\;\; Resolution} = \frac{n}{cos(\theta)} @f]
    *
    *
-   * The equation is derived two separate ways.  A geometric argument is presented in
-   * Reference 2, while a matrix algebra based argument is presented in Theorem 2.1 of
-   * Reference 1.
+   * @f{eqnarray*}
+   *
+   *        A = \[\left[\begin{array}{cc} a & b \\
+   *                                      c & d \end{array} \right]\] =
+   *
+   *         H_{\lambda}R_1(\psi)T_tR_2(\phi) = \lambda
+   *        \[ \left[\begin{array}{cc} cos(\psi) & -sin(\psi) \\
+   *                                   sin(\psi) & cos(\psi) \end{array} \right]\]
+   *        \[ \left[\begin{array}{cc} t & 0 \\
+   *                                   0 & 1 \end{array} \right]\]
+   *        \[ \left[\begin{array}{cc} cos(\phi) & -sin(\phi) \\
+   *                                   sin(\phi) & cos(\phi) \end{array} \right]\]
+   *
+   * @f}
+   *
+   * Where:
+   *
+   * @f$ t = \frac{1}{cos(\theta)}},\;\;\theta = \text{Emmission\;\; Angle}@f$
+   * and @f$\lambda = \text{zoom\;\;factor} = 1@f$
+   *
+   *  The determinant of A is:
+   *
+   *  @f[ |A| = \lambda t = \frac{\lambda}{cos(\theta)} = \frac{1}{\cos(\theta)} @f]
+   *
+   * This is because the two rotation matrices in this decomposition have determinants equal to 1.
+   *
+   *  Let @f$ n = \text{Detector\;\;Resolution} @f$
+   *
+   *  Then:
+   *
+   *   @f[ Area = n^2 |A| =\frac{n^2}{cos(\theta)}@f]
+   *
+   * And:
+   *
+   *   @f[ \text{Local\;\;Detector\;\; Resolution} = \frac{n}{\sqrt{cos(\theta)}} @f]
    *
    *
-   *   <b>Reference 1:</b>  J-M Morel and G. Yu, "Asift:  A new framework for fully affine
+   * This method returns the Local Detector Resolution if the Look Vector intersects the target
+   * and if @f$ 0 \leq \theta < \frac{\pi}{2} @f$ and -1.0 otherwise.
+   *
+   *
+   *
+   *
+   *   Reference 1:  J-M Morel and G. Yu, "Asift:  A new framework for fully affine
    *                 invariant image comparison," SIAM Journal on Imaging Sciences
    *                 2(2), pp. 438-469, 2009
    *
-   *
-   *   <b>Reference 2:</b>  Handwritten notes by Orrin Thomas which can be found in the
-   *                 Glossary under the entry for Oblique Detector Resolution.
    *
    * @return @b double
    */
@@ -597,11 +644,23 @@ namespace Isis {
 
       if(HasSurfaceIntersection()){
 
-          double thetaRad;          
+
+          double thetaRad;
+          double sB[3];
+          instrumentPosition(sB);
+          double pB[3];
+          Coordinate(pB);
+          double a = sB[0] - pB[0];
+          double b = sB[1] - pB[1];
+          double c = sB[2] - pB[2];
+          double rho = sqrt(a * a + b * b + c * c) * 1000.0;
+
           thetaRad = EmissionAngle()*DEG2RAD;
 
-          if (thetaRad < HALFPI) {           
-            return DetectorResolution()/cos(thetaRad);
+          if (thetaRad < HALFPI) {
+
+            double nadirResolution = rho/(p_focalLength/p_pixelPitch);
+            return nadirResolution/sqrt(cos(thetaRad));
 
           }
           return Isis::Null;

@@ -258,7 +258,7 @@ namespace Isis {
 
   
   /**
-   * @description Initializes the actions that the Directory can provide to a main window.
+   * @brief Initializes the actions that the Directory can provide to a main window.
    */
   void Directory::initializeActions() {
     // Menus are created temporarily to convinently organize the actions.
@@ -340,7 +340,7 @@ namespace Isis {
 
   
   /**
-   * @description This method sets up the main menu at the top of the window (File, Settings, ...)
+   * @brief This method sets up the main menu at the top of the window (File, Settings, ...)
    * @param menuBar The menu area to populate.
    */
   void Directory::populateMainMenu(QMenuBar *menuBar) {
@@ -1165,7 +1165,7 @@ namespace Isis {
 
 
   /**
-   * @description The XML reader invokes this method at the start of every element in the
+   * @brief The XML reader invokes this method at the start of every element in the
    * XML document.  This method expects <footprint2DView/> and <imageFileList/>
    * elements.
    * A quick example using this function:
@@ -1200,7 +1200,7 @@ namespace Isis {
 
 
   /**
-   * @description Reformat actionPairings to be user friendly for use in menus.
+   * @brief Reformat actionPairings to be user friendly for use in menus.
    *
    * actionPairings is:
    *    Widget A ->
@@ -1366,7 +1366,7 @@ namespace Isis {
 
 
   /**
-   * @description Updates the SIGNAL/SLOT connections for the cotrol net editor.
+   * @brief Updates the SIGNAL/SLOT connections for the cotrol net editor.
    */
   void Directory::updateControlNetEditConnections() {
 #if 0

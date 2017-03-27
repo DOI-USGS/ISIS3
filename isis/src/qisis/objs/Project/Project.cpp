@@ -1159,7 +1159,7 @@ namespace Isis {
   /**
    * @brief Set the Active Control (control network) 
    *  
-   * @description Set the active control (control network) for views which need to operate on the 
+   * Set the active control (control network) for views which need to operate on the 
    * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
    *  
    * @internal 
@@ -1173,7 +1173,7 @@ namespace Isis {
   /**
    * @brief Return the Active Control (control network) 
    *  
-   * @description Returns the active control (control network) for views which need to operate on 
+   * Returns the active control (control network) for views which need to operate on 
    * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
    *  
    * @internal 
@@ -1187,7 +1187,7 @@ namespace Isis {
   /**
    * @brief Set the Active ImageList
    *  
-   * @description Set the active ImageList for views which need to operate on the 
+   * Set the active ImageList for views which need to operate on the 
    * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
    *  
    * @internal 
@@ -1201,7 +1201,7 @@ namespace Isis {
   /**
    * @brief  Returns the active ImageList
    *  
-   * @description Returns the active ImageList for views which need to operate on the 
+   * Returns the active ImageList for views which need to operate on the 
    * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
    *  
    * @internal 

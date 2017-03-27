@@ -24,7 +24,7 @@ namespace Isis {
   /**
    * @brief Internalizes a list of images and allows for operations on the entire list
    * 
-   * @description This class reads a list of images from an images.xml file and internalizes them
+   * This class reads a list of images from an images.xml file and internalizes them
    * as aQList of images.  It also allows for modifications to the entire list of
    * images and storing the image list as an images.xml file.
    * 

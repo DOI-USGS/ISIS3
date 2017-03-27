@@ -183,7 +183,8 @@ namespace Isis {
 
 
   /**
-  * @description This method reads the covariance matrix in from a file,
+  * @brief Read covariance matrix and compute correlation values
+  * This method reads the covariance matrix in from a file,
   * one SparseBlockColumnMatrix at a time.  It then stores the diagonal values from that column
   * and computes the correlation values. The resulting SparseBlockMatrix is written to a
   * new file, one SparseBlockColumnMatrix at a time.
@@ -270,7 +271,8 @@ namespace Isis {
 
 
   /**
-   * @description This method will open the correlation matrix file and read in the blocks that
+   * @brief Extract requested area from correlation matrix
+   * This method will open the correlation matrix file and read in the blocks that
    * apply to the requested area. It will populate m_visibleElements.
    *
    * @param x first coordinate of the location in the matrix that the user wants to see.
@@ -315,7 +317,8 @@ namespace Isis {
 
 
   /**
-   * @description This is used to make sure the covariance matrix exists.
+   * @brief Check if the correlation matrix has a covariance matrix
+   * This is used to make sure the covariance matrix exists.
    * If it doesn't this class is not valid. If this file exists, we can compute the
    * correlation matrix.
    *
@@ -409,7 +412,7 @@ namespace Isis {
 
 
   /**
-   * @description This method will read the matrix in from the file and hold on to the whole thing.
+   * @brief This method will read the matrix in from the file and hold on to the whole thing.
    * This will only be used when the matrix is small enough that this will be useful.
    *
    */
@@ -427,7 +430,8 @@ namespace Isis {
 
 
   /**
-   * @description This method will be used when the matrix is too big to display the whole thing.
+   * @brief Display only part of a matrix
+   * This method will be used when the matrix is too big to display the whole thing.
    * It will read in the block we want to see and the two blocks for the diagonals that belong to
    * the right images.
    */
@@ -445,7 +449,7 @@ namespace Isis {
 
 
   /**
-   * @description This method creates a Pvl group with the information necessary to recreate
+   * @brief This method creates a Pvl group with the information necessary to recreate
    * this correlation matrix.
    *
    * Object = CorrelationMatrixData

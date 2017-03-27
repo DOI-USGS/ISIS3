@@ -289,7 +289,7 @@ namespace Isis {
       };
 
       /**        
-       * @description This class is used for processing an XML file containing information
+       * @brief This class is used for processing an XML file containing information
        * about a WorkOrder.
        *
        * @author 2012-??-?? Steven Lambright

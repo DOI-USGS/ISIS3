@@ -41,7 +41,7 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * This is the GUI communication mechanism for target body objects.
+   * @brief The GUI communication mechanism for target body objects.
    *
    * This class is the connector between various GUI interfaces for target body objects.
    *   We use this to communicate shared properties that various widgets need
@@ -121,7 +121,8 @@ namespace Isis {
 
     private:
       /**
-       * @description  Child class for XmlStackedHandler which is used to process XML in
+       * @brief Process a GuiCameraDisplayProperties in a stack-oriented way
+       * Child class for XmlStackedHandler which is used to process XML in
        * a stack-oriented way.  It's been modified to process a GuiCameraDisplayProperties
        * object.
        *

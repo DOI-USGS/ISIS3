@@ -260,7 +260,7 @@ namespace Isis {
       Directory &operator=(const Directory &rhs);
 
       /**
-       * @description Create a work order, append it to m_workOrders, and return it.
+       * @brief Create a work order, append it to m_workOrders, and return it.
        *
        * Example:
        *   createWorkOrder<ImageFileListViewWorkOrder>();
