@@ -78,7 +78,6 @@ conf:
 	echo "HTML_OUTPUT      = Programmer"                             >> build/Programmer_temp.conf
 	echo "TAGFILES         = build/apps/apps_fix.tag"                >> build/Programmer_temp.conf
 	echo "HTML_STYLESHEET  = build/doxygen_prog.css"                 >> build/Programmer_temp.conf
-	echo "IMAGE_PATH       = "                                     >> build/Programmer_temp.conf
 
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
@@ -102,7 +101,6 @@ conf:
 	echo "HTML_OUTPUT      = Developer"                         >> build/Developer_temp.conf
 	echo "TAGFILES         = build/apps/apps_fix.tag"           >> build/Developer_temp.conf
 	echo "HTML_STYLESHEET  = build/doxygen.css"                 >> build/Developer_temp.conf
-	echo "IMAGE_PATH       = "                                >> build/Developer_temp.conf
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                         >> build/Developer_temp.conf; \
@@ -126,12 +124,10 @@ doApps:
 doProg:
 	echo "        ...building Programmer documentation"
 	$(DOXYGEN) build/Programmer_temp.conf
-	cd $(ISISROOT)/doc/Object/Programmer ; cd $(ISISROOT)/src/docsys/Object/
 
 doDev:
 	echo "        ...building Developer documentation"
 	$(DOXYGEN) build/Developer_temp.conf
-	cd $(ISISROOT)/doc/Object/Developer ; cd $(ISISROOT)/src/docsys/Object/
 
 # The doProgTest target can be used to build documentation for an individual Object.
 # E.G. from isis/src/base/objs/Camera do
