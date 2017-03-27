@@ -16,6 +16,7 @@ help:
 	echo "Isis Object Documentation Make System Commands"
 	echo "------------------------ "
 	echo "make docs      : Build Isis Object Documentation"
+	echo "                 SHOWDOCWARNINGS=1 will show doxygen warnings"
 	echo " "
 	echo "make wwwdocsrc : Sync Source to Public Web Server" 
 	echo "make devdocsrc : Sync Source to Development Web Server" 
