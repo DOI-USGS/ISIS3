@@ -89,10 +89,10 @@ conf:
 	  echo "WARN_NO_PARAMDOC       = YES"                        >> build/Programmer_temp.conf; \
         else \
 	  echo "QUIET                  = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARNINGS               = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_UNDOCUMENTED   = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_IF_DOC_ERROR      = YES"                        >> build/Programmer_temp.conf; \
-	  echo "WARN_NO_PARAMDOC       = YES"                        >> build/Programmer_temp.conf; \
+	  echo "WARNINGS               = NO"                         >> build/Programmer_temp.conf; \
+	  echo "WARN_IF_UNDOCUMENTED   = NO"                         >> build/Programmer_temp.conf; \
+	  echo "WARN_IF_DOC_ERROR      = NO"                         >> build/Programmer_temp.conf; \
+	  echo "WARN_NO_PARAMDOC       = NO"                         >> build/Programmer_temp.conf; \
 	fi
 
 	if [[ "$(DOT_PATH)" != "" ]];                                          \
