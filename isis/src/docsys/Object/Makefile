@@ -56,9 +56,9 @@ conf:
 	  echo "QUIET                  = NO"                         >> build/Programmer_temp.conf; \
 	fi
 
-	if [[ "$(DOT_PATH)" != "" ]];                                          \
-	then                                                                   \
-	  echo "DOT_PATH  = /opt/local/bin" >> build/Programmer_temp.conf;     \
+	if [[ "$(DOT_PATH)" != "" ]];                                      \
+	then                                                               \
+	  echo "DOT_PATH  = $(DOT_PATH)" >> build/Programmer_temp.conf;    \
 	fi
 
 	echo "        ...building Developer configuration"
@@ -73,9 +73,9 @@ conf:
 	  echo "QUIET                  = NO"                         >> build/Developer_temp.conf; \
 	fi
 
-	if [[ "$(DOT_PATH)" != "" ]];                                          \
-	then                                                                   \
-	  echo "DOT_PATH  = /opt/local/bin" >> build/Developer_temp.conf;     \
+	if [[ "$(DOT_PATH)" != "" ]];                                      \
+	then                                                               \
+	  echo "DOT_PATH  = $(DOT_PATH)" >> build/Developer_temp.conf;     \
 	fi
 
 
