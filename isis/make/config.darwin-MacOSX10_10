@@ -82,7 +82,6 @@ ISIS3PROP        ?= $(IDK_ROOT)/proprietary
 #  Set up paths to tools needed for doxygen
 DOXYGEN     = $(ISIS3OPT)/bin/doxygen
 DOT_PATH    = $(ISIS3OPT)/bin 
-LATEX       = $(ISIS3OPT)/bin/latex
 
 #---------------------------------------------------------------------------
 # Set up for cwd

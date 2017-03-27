@@ -192,8 +192,6 @@ html: force
 	echo "FILE_PATTERNS          = *.h *.cpp *.doxydef"              >> docbuild/ProgTester_temp.conf
 	echo "OUTPUT_DIRECTORY = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
 	echo "STRIP_FROM_PATH  = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
-	echo "LATEX_OUTPUT     = $(CURDIR)/html/latex"                   >> docbuild/ProgTester_temp.conf
-	echo "LATEX_CMD_NAME   = $(LATEX)"                               >> docbuild/ProgTester_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/docsys/Object/build/isisDoxyDefs.doxydef $(CURDIR)/"  >> docbuild/ProgTester_temp.conf
 	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeaderProgTester.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooterProgTester.html" >> docbuild/ProgTester_temp.conf
