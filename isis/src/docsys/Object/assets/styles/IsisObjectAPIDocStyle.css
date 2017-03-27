@@ -10,7 +10,7 @@
    */
 
 
-    /* ----------------------------------------------------------------
+    /* -----------IsisObjectAPIDocStyle.css-----------------------------------------------------
      * HEADINGS */
 
      H1       {
@@ -34,7 +34,7 @@
      body     {
                 background-repeat: repeat ;
                 background-attachment: fixed ;
-                background-image: URL('../../../assets/banners/isis_bg.jpg');
+                background-image: URL('../../../doc/assets/banners/isis_bg.jpg');
               }
 
      small    {
@@ -96,6 +96,7 @@ DIV.ah {
   margin-bottom: 3px;
   margin-top: 3px
 }
+
 
 TD.md {
   background-color: #FFEEDD;
@@ -161,7 +162,7 @@ IMG.formulaDsp { }
 IMG.formulaInl { vertical-align: middle; }
 
 img {
-  background-color: white ;
+/*  background-color: white ; */
   border: 2px solid black ;
   padding: 5px;
   margin: 5px;
@@ -209,6 +210,7 @@ SPAN.charliteral   { color: #008080 }
         margin: 0px;
 }
 .memItemLeft {
+        white-space: normal;
         padding: 1px 0px 0px 8px;
         margin: 4px;
         border-top-width: 1px;
@@ -259,3 +261,38 @@ INPUT.search { font-size: 75%;
                background-color: #ffeeee;
 }
 TD.tiny      { font-size: 75%;}
+
+#nav-tree {
+  background-image: inherit;
+  background-repeat:inherit;
+  background-color: inherit;
+}
+
+#nav-tree img {
+  background-color: inherit;
+}
+
+div.header {
+    background-image: inherit;
+    background-color: inherit;
+}
+
+#side-nav {
+    left: inherit;
+}
+
+.memdoc {
+    background-color: inherit;
+}
+
+dd {
+    background-image: inherit;
+    background-color: inherit;
+}
+.directory tr.even {
+    background-color: #FFFFF0;
+}
+
+dl.reflist dd {
+    background-color: inherit;
+}

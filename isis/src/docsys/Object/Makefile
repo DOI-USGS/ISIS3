@@ -55,7 +55,7 @@ conf:
 	echo "HTML_HEADER      = build/IsisObjectHeaderApps.html"   >> build/apps_tag_temp.conf
 	echo "HTML_FOOTER      = build/IsisObjectFooter.html"       >> build/apps_tag_temp.conf
 	echo "HTML_OUTPUT      = apps"                              >> build/apps_tag_temp.conf
-	echo "HTML_STYLESHEET  = build/doxygen_apps.css"            >> build/apps_tag_temp.conf
+	echo "HTML_STYLESHEET  = build/doxygen.css"            >> build/apps_tag_temp.conf
 
 	if [[ "$(DOT_PATH)" != "" ]];                                          \
 	then                                                                   \
@@ -65,16 +65,10 @@ conf:
 	echo "        ...building Programmer configuration"
 	cat build/Programmer.conf                                        >  build/Programmer_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"                >> build/Programmer_temp.conf
-	echo "FILE_PATTERNS    = *objs*.h \ "                            >> build/Programmer_temp.conf
-	echo "                   *objs*.cpp \ "                          >> build/Programmer_temp.conf
-	echo "                   *build/isisDoxyDefs.doxydef"            >> build/Programmer_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                           >> build/Programmer_temp.conf
 	echo "INPUT            = build/isisDoxyDefs.doxydef $(ISISROOT)/src/ " >> build/Programmer_temp.conf
-	echo "HTML_HEADER      = build/IsisObjectHeaderProgrammers.html" >> build/Programmer_temp.conf
-	echo "HTML_FOOTER      = build/IsisObjectFooter.html"            >> build/Programmer_temp.conf
 	echo "HTML_OUTPUT      = Programmer"                             >> build/Programmer_temp.conf
 	echo "TAGFILES         = build/apps/apps_fix.tag"                >> build/Programmer_temp.conf
-	echo "HTML_STYLESHEET  = build/doxygen_prog.css"                 >> build/Programmer_temp.conf
 
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
@@ -92,11 +86,8 @@ conf:
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/Developer_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/Developer_temp.conf
 	echo "                   build/isisDoxyDefs.doxydef"        >> build/Developer_temp.conf
-	echo "HTML_HEADER      = build/IsisObjectHeader.html"       >> build/Developer_temp.conf
-	echo "HTML_FOOTER      = build/IsisObjectFooter.html"       >> build/Developer_temp.conf
 	echo "HTML_OUTPUT      = Developer"                         >> build/Developer_temp.conf
 	echo "TAGFILES         = build/apps/apps_fix.tag"           >> build/Developer_temp.conf
-	echo "HTML_STYLESHEET  = build/doxygen.css"                 >> build/Developer_temp.conf
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                         >> build/Developer_temp.conf; \
