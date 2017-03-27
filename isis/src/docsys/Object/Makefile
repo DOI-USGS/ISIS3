@@ -32,7 +32,6 @@ docs: conf assetsDir
 documentation: 
 	echo "      Creating Object Documentation"
 	mkdir -p $(ISISROOT)/doc/Object
-	mkdir -p $(ISISROOT)/doc/Object/apps
 	mkdir -p $(ISISROOT)/doc/Object/Developer
 	mkdir -p $(ISISROOT)/doc/Object/Programmer
 	mkdir -p $(ISISROOT)/doc/documents/DocStyle/assets
@@ -45,30 +44,12 @@ assetsDir:
 	rsync -qlHptr --delete --rsh=ssh assets $(ISISROOT)/doc/Object/ 
 
 conf:
-	echo "        ...building apps configuration"
-	mkdir -p build/apps
-	cat build/apps_tag.conf                                     >  build/apps_tag_temp.conf
-	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/apps_tag_temp.conf
-	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/apps_tag_temp.conf
-	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/apps_tag_temp.conf
-	echo "                   build/isisAppsDoxyDefs.doxydef"    >> build/apps_tag_temp.conf
-	echo "HTML_HEADER      = build/IsisObjectHeaderApps.html"   >> build/apps_tag_temp.conf
-	echo "HTML_FOOTER      = build/IsisObjectFooter.html"       >> build/apps_tag_temp.conf
-	echo "HTML_OUTPUT      = apps"                              >> build/apps_tag_temp.conf
-	echo "HTML_STYLESHEET  = build/doxygen.css"            >> build/apps_tag_temp.conf
-
-	if [[ "$(DOT_PATH)" != "" ]];                                          \
-	then                                                                   \
-	  echo "DOT_PATH  = /opt/local/bin" >> build/apps_tag_temp.conf;       \
-	fi
-
 	echo "        ...building Programmer configuration"
 	cat build/Programmer.conf                                        >  build/Programmer_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"                >> build/Programmer_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                           >> build/Programmer_temp.conf
 	echo "INPUT            = build/isisDoxyDefs.doxydef $(ISISROOT)/src/ " >> build/Programmer_temp.conf
 	echo "HTML_OUTPUT      = Programmer"                             >> build/Programmer_temp.conf
-	echo "TAGFILES         = build/apps/apps_fix.tag"                >> build/Programmer_temp.conf
 
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
@@ -87,7 +68,6 @@ conf:
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/Developer_temp.conf
 	echo "                   build/isisDoxyDefs.doxydef"        >> build/Developer_temp.conf
 	echo "HTML_OUTPUT      = Developer"                         >> build/Developer_temp.conf
-	echo "TAGFILES         = build/apps/apps_fix.tag"           >> build/Developer_temp.conf
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                         >> build/Developer_temp.conf; \
@@ -100,13 +80,7 @@ conf:
 
 
 
-render: doApps doProg doDev
-doApps:
-	echo "        ...building apps documentation"
-	$(DOXYGEN) build/apps_tag_temp.conf
-#	cp build/apps/apps.tag $(ISISROOT)/doc/Object/apps/
-	$(XALAN) $(XALAN_OUTFILE_OPTION) build/apps/apps_fix.tag $(XALAN_INFILE_OPTION) build/apps/apps.tag $(XALAN_XSL_OPTION) build/IsisApplicationTagFix.xsl
-	cp build/apps/apps_fix.tag $(ISISROOT)/doc/Object/apps/
+render: doProg doDev
 
 doProg:
 	echo "        ...building Programmer documentation"
@@ -151,11 +125,9 @@ doProgTest:
 #----
 # CLEAN
 clean:
-	rm -f  build/apps_tag_temp.conf 
 	rm -f  build/Programmer_temp.conf
 	rm -f  build/Developer_temp.conf 
 	rm -rf docbuild
-	rm -rf build/apps
 	rm -f ../documents/DocStyle/assets/isisDoxyDefs.doxydef
 	rm -f doxyWarnDeveloper.txt doxyWarnProgrammer.txt
 
