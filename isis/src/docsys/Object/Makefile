@@ -51,7 +51,6 @@ conf:
 	echo "        ...building apps configuration"
 	mkdir -p build/apps
 	cat build/apps_tag.conf                                     >  build/apps_tag_temp.conf
-	echo "LATEX_CMD_NAME   = $(LATEX)"                          >> build/apps_tag_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/apps_tag_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/apps_tag_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/apps_tag_temp.conf
@@ -92,7 +91,6 @@ conf:
 
 	echo "        ...building Developer configuration"
 	cat build/Developer.conf                                    >  build/Developer_temp.conf
-	echo "LATEX_CMD_NAME   = $(LATEX)"                          >> build/Developer_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/Developer_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/Developer_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/Developer_temp.conf
@@ -147,10 +145,8 @@ doProgTest:
 	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeaderProgTester.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooterProgTester.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
-	echo "LATEX_OUTPUT     = html/latex"                             >> docbuild/ProgTester_temp.conf
 	echo "TAGFILES         = "                                       >> docbuild/ProgTester_temp.conf
 	echo "HTML_STYLESHEET  = $(ISISROOT)/src/docsys/Object/build/doxygen.css"                     >> docbuild/ProgTester_temp.conf
-	echo "LATEX_CMD_NAME   = $(LATEX)"                               >> docbuild/ProgTester_temp.conf
 	echo "WARN_LOGFILE           = "                                 >> docbuild/ProgTester_temp.conf
 	echo "QUIET                  = YES"                              >> docbuild/ProgTester_temp.conf
 	echo "WARNINGS               = YES"                              >> docbuild/ProgTester_temp.conf
