@@ -36,9 +36,6 @@ documentation:
 	mkdir -p $(ISISROOT)/doc/Object/Developer
 	mkdir -p $(ISISROOT)/doc/Object/Programmer
 	mkdir -p $(ISISROOT)/doc/documents/DocStyle/assets
-#dls 2006-10-04 -- took out -d on rsync that i'd added to make Sun happy
-# (Sun = hipeaks)... Linux (orkin) was complaining
-	rsync -qlHptr --delete --rsh=ssh *.html $(ISISROOT)/doc/Object/
 	rsync -qlHptr --delete --rsh=ssh build/isisDoxyDefs.doxydef $(ISISROOT)/doc/documents/DocStyle/assets/
 
 
