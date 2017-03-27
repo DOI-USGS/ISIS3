@@ -97,18 +97,13 @@ doProgTest:
 	echo "Building ProgTester configuration in: $(CURDIR) ISISROOT is: $(ISISROOT)"
 	mkdir -p docbuild
 	cat $(ISISROOT)/src/docsys/Object/build//Programmer.conf         >  docbuild/ProgTester_temp.conf
-	echo "FILE_PATTERNS          = *.h \ "                           >> docbuild/ProgTester_temp.conf
-	echo "                         *.cpp \ "                         >> docbuild/ProgTester_temp.conf
-	echo "                         *build/isisDoxyDefs.doxydef"      >> docbuild/ProgTester_temp.conf
 	echo "OUTPUT_DIRECTORY = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
 	echo "STRIP_FROM_PATH  = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
 	echo "INPUT            = $(CURDIR)/ \\"                          >> docbuild/ProgTester_temp.conf
 	echo "                   $(ISISROOT)/src/docsys/Object/build/isisDoxyDefs.doxydef"            >> docbuild/ProgTester_temp.conf
-	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeaderProgTester.html" >> docbuild/ProgTester_temp.conf
-	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooterProgTester.html" >> docbuild/ProgTester_temp.conf
+	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeader.html" >> docbuild/ProgTester_temp.conf
+	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooter.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
-	echo "TAGFILES         = "                                       >> docbuild/ProgTester_temp.conf
-	echo "HTML_STYLESHEET  = $(ISISROOT)/src/docsys/Object/build/doxygen.css"                     >> docbuild/ProgTester_temp.conf
 	echo "WARN_LOGFILE           = "                                 >> docbuild/ProgTester_temp.conf
 	echo "QUIET                  = YES"                              >> docbuild/ProgTester_temp.conf
 	echo "WARNINGS               = YES"                              >> docbuild/ProgTester_temp.conf
