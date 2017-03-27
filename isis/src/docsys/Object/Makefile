@@ -100,10 +100,6 @@ conf:
 	  echo "DOT_PATH  = /opt/local/bin" >> build/Programmer_temp.conf;     \
 	fi
 
-	for dirname in "$(OBJECTASSETS)"; do \
-	  echo "$$dirname \\"                                          >> build/Programmer_temp.conf ; \
-	done
-
 	echo "        ...building Developer configuration"
 	cat build/Developer.conf                                    >  build/Developer_temp.conf
 	echo "LATEX_CMD_NAME   = $(LATEX)"                          >> build/Developer_temp.conf
@@ -131,10 +127,6 @@ conf:
 	  echo "WARN_IF_DOC_ERROR      = NO"                         >> build/Developer_temp.conf; \
 	  echo "WARN_NO_PARAMDOC       = NO"                         >> build/Developer_temp.conf; \
 	fi
-
-	for dirname in "$(OBJECTASSETS)" ; do \
-	    echo "$$dirname \\"                                     >> build/Developer_temp.conf ; \
-	done
 
 
 render: doApps doProg doDev
