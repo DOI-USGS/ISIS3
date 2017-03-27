@@ -128,6 +128,12 @@ conf:
 	  echo "WARN_NO_PARAMDOC       = NO"                         >> build/Developer_temp.conf; \
 	fi
 
+	if [[ "$(DOT_PATH)" != "" ]];                                          \
+	then                                                                   \
+	  echo "DOT_PATH  = /opt/local/bin" >> build/Developer_temp.conf;     \
+	fi
+
+
 
 render: doApps doProg doDev
 doApps:
