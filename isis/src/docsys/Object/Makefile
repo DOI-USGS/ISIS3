@@ -61,6 +61,11 @@ conf:
 	  echo "DOT_PATH  = $(DOT_PATH)" >> build/Programmer_temp.conf;    \
 	fi
 
+	if [[ "$(SHOWDOCWARNINGS)" != "" ]];                               \
+	then                                                               \
+	  echo "WARN_LOGFILE = " >> build/Programmer_temp.conf;            \
+	fi
+
 	echo "        ...building Developer configuration"
 	cat build/Developer.conf                                    >  build/Developer_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/Developer_temp.conf
@@ -76,6 +81,11 @@ conf:
 	if [[ "$(DOT_PATH)" != "" ]];                                      \
 	then                                                               \
 	  echo "DOT_PATH  = $(DOT_PATH)" >> build/Developer_temp.conf;     \
+	fi
+
+	if [[ "$(SHOWDOCWARNINGS)" != "" ]];                               \
+	then                                                               \
+	  echo "WARN_LOGFILE = " >> build/Developer_temp.conf;             \
 	fi
 
 
@@ -100,7 +110,7 @@ doProgTest:
 	echo "OUTPUT_DIRECTORY = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
 	echo "STRIP_FROM_PATH  = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
 	echo "INPUT            = $(CURDIR)/ \\"                          >> docbuild/ProgTester_temp.conf
-	echo "                   $(ISISROOT)/src/docsys/Object/build/isisDoxyDefs.doxydef"            >> docbuild/ProgTester_temp.conf
+	echo "                   $(ISISROOT)/src/docsys/Object/build/isisDoxyDefs.doxydef"  >> docbuild/ProgTester_temp.conf
 	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeader.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooter.html" >> docbuild/ProgTester_temp.conf
 	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
