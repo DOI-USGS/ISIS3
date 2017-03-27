@@ -170,6 +170,7 @@ clean:
 	rm -f  build/apps_tag_temp.conf 
 	rm -f  build/Programmer_temp.conf
 	rm -f  build/Developer_temp.conf 
+	rm -rf docbuild
 	rm -rf build/apps
 	rm -f ../documents/DocStyle/assets/isisDoxyDefs.doxydef
 	rm -f doxyWarnDeveloper.txt doxyWarnProgrammer.txt
