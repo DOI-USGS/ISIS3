@@ -662,17 +662,17 @@
     /* @}  end of Missions group */
 
 
-// MAIN PAGE - content of the table-of-contents page for the %Isis 3 Object Documentation
+// MAIN PAGE - content of the table-of-contents page for the %Isis 3.0 Object Documentation
 //  TODO: look at using doxy conditional processing to have different main page for
 //        API vs. Programmer Docs
 
     /**
-     * \mainpage Isis 3 Object Documentation
+     * \mainpage Isis 3.0 Object Documentation
      *
-     * The %Isis 3 Developers' (API) and Programmers' References are provided on this
+     * The %Isis 3.0 Developers' (API) and Programmers' References are provided on this
      * site for developers to access information about the %Isis Objects that are the
-     * building blocks of the %Isis software package. %Isis 3 is written in the C++
-     * programming language. %Isis 3 Objects are in $ISISROOT/src/[module]/objs,
+     * building blocks of the %Isis software package. %Isis 3.0 is written in the C++
+     * programming language. %Isis 3.0 Objects are in $ISISROOT/src/[module]/objs,
      * where [module] is a subdirectory containing related Objects.
      *
      * The Developers' Reference, also called the Application Program Interface (API),
@@ -687,8 +687,8 @@
      * Currently, Object documentation is under development as we move to a new documentation system
      * and old documentation is converted to the new system, content is reviewed and updated, and
      * new documentation is completed. The References will be updated frequently on the
-     * <a href="http://isis.astrogeology.usgs.gov" target="_top">%Isis 3 website</a> - access them via the
-     * %Isis 3 Technical Docs link on the home page.
+     * <a href="http://isis.astrogeology.usgs.gov" target="_top">%Isis 3.0 website</a> - access them via the
+     * %Isis 3.0 Technical Docs link on the home page.
      *
      * \section section1 Objects
      * <table align="center">

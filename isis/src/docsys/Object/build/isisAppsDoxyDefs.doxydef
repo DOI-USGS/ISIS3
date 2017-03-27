@@ -1,0 +1,39 @@
+// this file should not be shown in doxygen output if possible
+
+/**
+ * @file
+ * This file contains internal configuration settings
+ * for the %Isis API and Programmer documentation.
+ */
+
+/** @internal
+ * isisAppsDoxyDefs.doxydef
+ *
+ * This file contains doxygen commands for setting up
+ * global documentation options shared by all %Isis
+ * apps
+ *
+ * @author deborah lee soltesz 2004-11-03
+ * @history 2005-03-10 deborah lee soltesz modified for
+ *          apps from objects conf
+ */
+
+
+// MAIN PAGE - content of the table-of-contents page for the %Isis 3.0 Object Documentation
+//  TODO: look at using doxy conditional processing to have different main page for
+//        API vs. Programmer Docs
+
+    /**
+     * \mainpage Isis 3.0 Application Documentation
+     *
+     * This documentation is generated merely to provide copies of application
+     * source code for the %Isis 3.0 <a href="../Developer/" target="_top">Developers' Reference (API)</a>
+     * and <a href="../Programmer/" target="_top">Programmers' References</a>. Actual
+     * Isis application documentation (usage, examples, etc.) are provided
+     * in the <a href="../../Application/index.html">Isis Software Manual</a>.
+     *
+     */
+
+
+
+

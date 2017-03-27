@@ -39,6 +39,7 @@ ECHO           := /bin/echo
 EVAL           := eval
 GREP           := grep
 HEAD           := head
+LATEX          := latex
 LN             := ln -s
 LS             := /bin/ls
 MKDIR          := mkdir -p
