@@ -47,7 +47,7 @@ namespace Isis {
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View &Footprints..."));
-    QUndoCommand::setText(tr("View &Footprints..."));
+    setUndoRedo(false);
   }
 
   /**
@@ -55,6 +55,7 @@ namespace Isis {
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
+    setUndoRedo(false);
   }
 
   /**
@@ -132,12 +133,11 @@ namespace Isis {
       }
     }
 
+    int viewToUse = -1;
     if (success) {
       QStringList viewOptions;
 
       QList<Footprint2DView *> existingViews = project()->directory()->footprint2DViews();
-      int viewToUse = -1;
-
       if (existingViews.count()) {
         for (int i = 0; i < existingViews.count(); i++) {
           viewOptions.append(existingViews[i]->windowTitle());
@@ -157,45 +157,17 @@ namespace Isis {
         viewToUse = viewOptions.count() - 1;
       }
 
-      bool newView = false;
       if (viewToUse == viewOptions.count() - 1) {
-        newView = true;
         QUndoCommand::setText(tr("View footprints in new 2D footprint view"));
       }
       else if (viewToUse != -1) {
          QUndoCommand::setText(tr("View footprints in footprint view [%1]")
               .arg(existingViews[viewToUse]->windowTitle()));
       }
-
-      QStringList internalData;
-      internalData.append(QString::number(viewToUse));
-      internalData.append(newView? "new view" : "existing view");
-      setInternalData(internalData);
     }
 
-    return success;
-  }
 
-  /**
-   * This method returns whether or not other depends on a Footprint2DViewWorkOrder.
-   * 
-   * @param other WorkOrder that we are checking for dependencies
-   * 
-   * @return @b bool True if other depends on a Footprint2DViewWorkOrder
-   */
-  bool Footprint2DViewWorkOrder::dependsOn(WorkOrder *other) const {
-    // depend on types of ourselves.
-    return dynamic_cast<Footprint2DViewWorkOrder *>(other);
-  }
-
-  /**
-   * This methods adds the current item to Footprint2DView.
-   * 
-   */
-  void Footprint2DViewWorkOrder::syncRedo() {
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
-
-    int viewToUse = internalData().first().toInt();
 
     Footprint2DView *view = NULL;
     if (viewToUse == project()->directory()->footprint2DViews().count()) {
@@ -206,13 +178,7 @@ namespace Isis {
     }
 
     view->addItems( selectedItems );
-
-    //  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  source model: "<<project()->directory()->model()<<"  rows = "<<project()->directory()->model()->rowCount();
-//  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  proxy model: "<<view->internalModel()<<"  rows = "<<view->internalModel()->rowCount();
-  }
-
-  void Footprint2DViewWorkOrder::syncUndo() {
-    delete project()->directory()->footprint2DViews().last();
+    return success;
   }
 }
 

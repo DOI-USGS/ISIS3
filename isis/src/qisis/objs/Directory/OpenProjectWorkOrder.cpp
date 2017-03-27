@@ -44,7 +44,7 @@ namespace Isis {
       WorkOrder(project) {
     //qDebug()<<"OpenProjectWorkOrder::OpenProjectWorkOrder";
     QAction::setText(tr("&Open Project"));
-
+    QUndoCommand::setText(tr("Open Project"));
     setCreatesCleanState(true);
 
     QStringList args = QCoreApplication::arguments();

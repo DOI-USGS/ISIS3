@@ -460,7 +460,6 @@ namespace Isis {
     QList<QGraphicsItem *> selectedGraphicsItems = getScene()->selectedItems();
     QList<MosaicSceneItem *> selectedImageItems;
     ImageList selectedImages;
-    //qDebug()<<"MosaicSceneWidget::contextMenuEvent   #selectItems = "<<selectedGraphicsItems.size();
     foreach (QGraphicsItem *graphicsItem, selectedGraphicsItems) {
       MosaicSceneItem *sceneImageItem = dynamic_cast<MosaicSceneItem *>(graphicsItem);
 
@@ -515,7 +514,6 @@ namespace Isis {
 
 
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(Image *image) {
-//  //qDebug()<<"::cubeToMosaic(Image *image)";
     if (image == NULL) {
       QString msg = tr("Can not find a NULL image in the mosaic");
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -540,7 +538,6 @@ namespace Isis {
 
 
   PvlObject MosaicSceneWidget::toPvl() const {
-//  //qDebug()<<"MosaicSceneWidget::toPvl";
     PvlObject output("MosaicScene");
 
     if (m_projection) {
@@ -597,7 +594,6 @@ namespace Isis {
    * @param project The project Pvl
    */
   void MosaicSceneWidget::fromPvl(const PvlObject &project) {
-//  //qDebug()<<"MosaicSceneWidget::fromPvl";
     setProjection(project.findGroup("Mapping"));
     recalcSceneRect();
 
@@ -632,7 +628,6 @@ namespace Isis {
             project.findObject("SceneVisiblePosition");
 
         delete m_projectViewTransform;
-//      //qDebug()<<"MosaicSceneWidget::fromPvl   SceneVisisblePos = ";
         m_projectViewTransform = new PvlObject(positionInfo);
       }
     }
@@ -640,13 +635,11 @@ namespace Isis {
 
 
   void MosaicSceneWidget::load(XmlStackedHandlerReader *xmlReader) {
-//  //qDebug()<<"MosaicSceneWidget::load";
     xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 
   void MosaicSceneWidget::save(QXmlStreamWriter &stream, Project *, FileName) const {
-//  //qDebug()<<"MosaicSceneWidget::save";
     if (m_projection) {
       stream.writeStartElement("footprint2DView");
 
@@ -672,7 +665,6 @@ namespace Isis {
       QBuffer dataBuffer;
       dataBuffer.open(QIODevice::ReadWrite);
       QDataStream transformStream(&dataBuffer);
-//    //qDebug()<<"MosaiceSceneWidget::save   transform = "<<getView()->transform();
       transformStream << getView()->transform();
       dataBuffer.seek(0);
       stream.writeCharacters(dataBuffer.data().toHex());
@@ -717,7 +709,6 @@ namespace Isis {
 
 
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(DisplayProperties *props) {
-//  //qDebug()<<"::cubeToMosaic(DisplayProperties *)";
     if (props == NULL) {
       QString msg = tr("Can not find a NULL Display Properties in the mosaic");
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -766,7 +757,6 @@ namespace Isis {
   ImageList MosaicSceneWidget::selectedImages()  {
 
     QList<QGraphicsItem *> selectedGraphicsItems = getScene()->selectedItems();
-    //qDebug()<<"MosaicSceneWidget::selectedImages  selected scene items = "<<selectedGraphicsItems.size();
     QList<MosaicSceneItem *> selectedImageItems;
     ImageList selectedImages;
 
@@ -782,8 +772,6 @@ namespace Isis {
         selectedImages.append(sceneImageItem->image());
       }
     }
-    //qDebug()<<"MosaicSceneWidget::selectedImages  TotalItems = "<<m_mosaicSceneItems->size();
-    //qDebug()<<"MosaicSceneWidget::selectedImages  SelectedItems = "<<selectedImages.size();
     return selectedImages;
 
 
@@ -838,7 +826,6 @@ namespace Isis {
    */
   QList<QAction *> MosaicSceneWidget::supportedActions(ImageList *images) {
     QList<QAction *> results;
-    //qDebug()<<"MosaicSceneWidget::supportedActions(ImageList *images)";
     bool allImagesInView = !images->isEmpty();
 
     foreach (Image *image, *images) {
@@ -1297,7 +1284,6 @@ namespace Isis {
 
 
   MosaicSceneItem *MosaicSceneWidget::addImage(Image *image) {
-//  //qDebug()<<"MosaicSceneWidget::addImage START image cube= "<<image->cube();
     if (m_projection == NULL) {
       setProjection(createInitialProjection(image), *image->cube()->label());
     }
@@ -1351,7 +1337,6 @@ namespace Isis {
       connect(prop, SIGNAL(zoomFit()),
               this, SLOT(fitInView()));
     }
-//  //qDebug()<<"MosaicSceneWidget::addImage END image cube= "<<image->cube();
 
     return mosItem;
   }
@@ -1407,7 +1392,6 @@ namespace Isis {
     recalcSceneRect();
 
     if (m_projectViewTransform) {
-//    //qDebug()<<"MosaicSceneWidget::addImages";
       PvlObject &positionInfo = *m_projectViewTransform;
       QByteArray hexValues(positionInfo["ViewTransform"][0].toLatin1());
       QDataStream transformStream(QByteArray::fromHex(hexValues));
@@ -1501,7 +1485,6 @@ namespace Isis {
 
   void MosaicSceneWidget::removeMosItem(QObject *mosItem) {
     MosaicSceneItem *castedMosItem = (MosaicSceneItem *) mosItem;
-//  qDebug()<<"MosaicSceneWidget::removeMosItem mosItem = "<<castedMosItem;
     m_mosaicSceneItems->removeAll(castedMosItem);
     m_displayPropsToMosaicSceneItemMap.remove(
         m_displayPropsToMosaicSceneItemMap.key(castedMosItem));
@@ -1573,9 +1556,7 @@ namespace Isis {
 
     switch(event->type()) {
       case QMouseEvent::GraphicsSceneMousePress: {
-//      //qDebug()<<"MosaicSceneWidget::eventFilter  MousePress";
         if (m_customRubberBandEnabled) {
-//        //qDebug()<<"     ::eventFilter MousePress  rubberBandEnabled";
           // Intiate the rubber banding!
           if (!m_customRubberBand) {
             m_customRubberBand = new QRubberBand(QRubberBand::Rectangle,
@@ -1595,19 +1576,16 @@ namespace Isis {
         emit mouseButtonPress(
               ((QGraphicsSceneMouseEvent *)event)->scenePos(),
               ((QGraphicsSceneMouseEvent *)event)->button());
-//      //qDebug()<<"     ::eventFilter after   emit mouseButtonPress";
         stopProcessingEvent = false;
         break;
       }
 
       case QMouseEvent::GraphicsSceneMouseRelease: {
-//      //qDebug()<<"MosaicSceneWidget::eventFilter  MouseRelease";
         bool signalEmitted = false;
         if (m_customRubberBandEnabled && m_rubberBandOrigin &&
            m_customRubberBand) {
           if (m_customRubberBand->geometry().width() +
              m_customRubberBand->geometry().height() > 10) {
-//          //qDebug()<<"     ::eventFilter  rubberband";
             emit rubberBandComplete(
                 getView()->mapToScene(
                     m_customRubberBand->geometry()).boundingRect(),
@@ -1623,7 +1601,6 @@ namespace Isis {
         }
 
         if (!signalEmitted) {
-//        //qDebug()<<"     ::eventFilter   if (!signalEmitted),   emits mouseButtonRelease";
           stopProcessingEvent = false;
           emit mouseButtonRelease(
                 ((QGraphicsSceneMouseEvent *)event)->scenePos(),
@@ -1814,7 +1791,6 @@ namespace Isis {
 
   void MosaicSceneWidget::moveToBottom() {
     DisplayProperties *props = qobject_cast<DisplayProperties *>(sender());
-//  //qDebug()<<"::moveToBottom()   props = "<<props;
     if (props) {
       moveToBottom(cubeToMosaic(props));
     }
@@ -1826,7 +1802,6 @@ namespace Isis {
    *   be empty after this operation.
    */
   double MosaicSceneWidget::moveToBottom(MosaicSceneItem *item) {
-//  //qDebug()<<"::moveToBottom(MosaicSceneItem *item)";
     double originalZ = item->zValue();
     double minZ = minimumZ();
 
@@ -1848,7 +1823,6 @@ namespace Isis {
    *   empty after this operation.
    */
   double MosaicSceneWidget::moveToBottom(Image *image) {
-//  //qDebug()<<"::moveToBottom(Image *image)";
     return moveToBottom(cubeToMosaic(image));
   }
 
@@ -1858,7 +1832,6 @@ namespace Isis {
    *   empty after this operation.
    */
   QList<double> MosaicSceneWidget::moveToBottom(ImageList *images) {
-//  //qDebug()<<"::moveToBottom(ImageList *images)";
     QList<double> results;
 
     foreach (Image *image, *images) {
@@ -1968,8 +1941,6 @@ namespace Isis {
    */
   QList<double> MosaicSceneWidget::moveToTop(ImageList *images) {
     QList<double> results;
-// //qDebug() << "moveToTop( list...count=" << images->count() << ")";
-// printZ(m_mosaicSceneItems);
 
     foreach (Image *image, *images) {
       results.append(moveToTop(image));
@@ -2242,7 +2213,6 @@ namespace Isis {
       }
       else if (localName == "images" && m_imagesToAdd->count()) {
         ASSERT(m_imagesToAdd->count() == m_imageZValues.count());
-        qDebug()<<"MosaicSceneWidget::endElement before m_scene->addImages";
         m_scene->addImages(*m_imagesToAdd);
 
         for (int i = 0; i < m_imageZValues.count(); i++) {

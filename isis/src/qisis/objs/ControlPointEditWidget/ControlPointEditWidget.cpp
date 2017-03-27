@@ -10,6 +10,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -42,6 +43,7 @@
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "NewControlPointDialog.h"
+#include "NewGroundSourceLocationDialog.h"
 #include "Project.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
@@ -73,6 +75,9 @@ namespace Isis {
     m_netChanged = false;
     m_templateModified = false;
     m_serialNumberList = NULL;
+
+    m_changeAllGroundLocation = false;
+    m_changeGroundLocationInNet = false;
 
 //  qDebug()<<"ControlPointEditWidget::ControlPointEditWidget  #shapes = "<<m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
 
@@ -552,70 +557,144 @@ namespace Isis {
    */
   ControlMeasure *ControlPointEditWidget::createTemporaryGroundMeasure() {
 
+    //  If a ground serial number has already been added to the serial number list, clear out
+    //  the old before adding the new.
+    if (!m_groundSN.isEmpty()) {
+      if (m_serialNumberList->hasSerialNumber(m_groundSN)) {
+        m_serialNumberList->Delete(m_groundSN);
+        m_groundSN.clear();
+      }
+    }
+
     ControlMeasure *groundMeasure = NULL;
-    FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
+
+    FileName groundFile = findGroundFile();
     if (!groundFile.fileExists()) {
+      return groundMeasure;
+    }
+
+    //  If ground file exists, open, create cube and ground map.  If doesn't exist, prompt
+    //  for new location or new source, either a Shape in the project, or import a new shape,
+    //  or simplay choose file?   
+    //  THIS SHOULD BE MOVED TO ::LOADPOINT AND info needs to be saved
+    QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
+    QScopedPointer<UniversalGroundMap> groundMap(new UniversalGroundMap(*groundCube));
+
+    // Use apriori surface point to find location on ground source.  If
+    // apriori surface point does not exist use reference measure
+    double lat = 0.;
+    double lon = 0.;
+    if (m_editPoint->HasAprioriCoordinates()) {
+      SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+      lat = sPt.GetLatitude().degrees();
+      lon = sPt.GetLongitude().degrees();
+    }
+    else {
+      ControlMeasure m = *(m_editPoint->GetRefMeasure());
+      int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
+      Camera *cam;
+      cam = m_controlNet->Camera(camIndex);
+      cam->SetImage(m.GetSample(),m.GetLine());
+      lat = cam->UniversalLatitude();
+      lon = cam->UniversalLongitude();
+    }
+
+    //  Try to locate point position on current ground source,
+    //  TODO ???if doesn't exist,???
+    if (!groundMap->SetUniversalGround(lat,lon)) {
+      QString message = "This point does not exist on the ground source.\n";
+      message += "Latitude = " + QString::number(lat);
+      message += "  Longitude = " + QString::number(lon);
+      message += "\n A ground measure will not be created.";
+      QMessageBox::warning(this, "Warning", message);
+    }
+    else {
+      //  Create new serial number for ground source and add to serial number list
+      m_groundSN = SerialNumber::Compose(groundFile.expanded(), true);
+      m_serialNumberList->add(groundFile.expanded(), true);
+
+      groundMeasure = new ControlMeasure;
+      groundMeasure->SetCubeSerialNumber(m_groundSN);
+      groundMeasure->SetType(ControlMeasure::Candidate);
+      groundMeasure->SetCoordinate(groundMap->Sample(), groundMap->Line());
+      groundMeasure->SetChooserName("GroundMeasureTemporary");
+    }
+
+    return groundMeasure;
+
+  }
+
+
+  FileName ControlPointEditWidget::findGroundFile() {
+
+    FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
+
+    if (m_changeAllGroundLocation) {
+      QFileInfo oldFile(groundFile.expanded());
+      QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+
+      groundFile = newFile.absoluteFilePath();
+    }
+
+    if (!groundFile.fileExists()) {
+
       //  simply print error for now, need to prompt
       //  for new location or new source, either a Shape in the project, or import a new shape,
       //  or simplay choose file?
       QString message = "Ground Source file " + groundFile.expanded();
-      message += " doesn't exist";
-      QMessageBox::critical(this, "Warning", message);
-    }
-    else {
-
-      //  If ground file exists, open, create cube and ground map.  If doesn't exist, prompt
-      //  for new location or new source, either a Shape in the project, or import a new shape,
-      //  or simplay choose file?   
-      //  THIS SHOULD BE MOVED TO ::LOADPOINT AND info needs to be saved
-      QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
-      QScopedPointer<UniversalGroundMap> groundMap(new UniversalGroundMap(*groundCube));
-
-      // Use apriori surface point to find location on ground source.  If
-      // apriori surface point does not exist use reference measure
-      double lat = 0.;
-      double lon = 0.;
-      if (m_editPoint->HasAprioriCoordinates()) {
-        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
-        lat = sPt.GetLatitude().degrees();
-        lon = sPt.GetLongitude().degrees();
-      }
-      else {
-        ControlMeasure m = *(m_editPoint->GetRefMeasure());
-        int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
-        Camera *cam;
-        cam = m_controlNet->Camera(camIndex);
-        cam->SetImage(m.GetSample(),m.GetLine());
-        lat = cam->UniversalLatitude();
-        lon = cam->UniversalLongitude();
-      }
-
-      //  Try to locate point position on current ground source,
-      //  TODO ???if doesn't exist,???
-      if (!groundMap->SetUniversalGround(lat,lon)) {
-        QString message = "This point does not exist on the ground source.\n";
-        message += "Latitude = " + QString::number(lat);
-        message += "  Longitude = " + QString::number(lon);
-        message += "\n A ground measure will not be created.";
-        QMessageBox::warning(this, "Warning", message);
-      }
-      else {
-        // This measure will be deleted when the ControlPoint is saved to the
-        // ControlNet.
-        groundMeasure = new ControlMeasure;
-        QString groundSN = SerialNumber::Compose(*groundCube);
-        groundMeasure->SetCubeSerialNumber(groundSN);
-        groundMeasure->SetType(ControlMeasure::Candidate);
-        groundMeasure->SetCoordinate(groundMap->Sample(), groundMap->Line());
-        groundMeasure->SetChooserName("GroundMeasureTemporary");
-        //  Add serial number to serial number list if  not already there
-        if (!m_serialNumberList->hasSerialNumber(groundSN)) {
-          m_serialNumberList->add(groundFile.expanded(), true);
+      message += " doesn't exist.  Has the file moved?  Would you like to enter a new location for"
+                 " this ground source?";
+      int ret = QMessageBox::question(this, "Ground Source not found", message);
+      if (ret == QMessageBox::Yes) {
+        QString dir = m_directory->project()->shapeDataRoot();
+        NewGroundSourceLocationDialog *dialog = new NewGroundSourceLocationDialog(
+            "New Ground Source Location", dir);
+        if (dialog->exec() == QDialog::Accepted) {
+          m_newGroundDir = dialog->selectedFiles().value(0);
+          m_changeAllGroundLocation = dialog->changeAllGroundSourceLocation();
+          m_changeGroundLocationInNet = dialog->changeControlNet();
+          //  Change all ground source locations to reflect new directory
+          if (m_changeGroundLocationInNet) {
+            changeGroundLocationsInNet();
+            //groundFile = NULL;
+          }
+          //  Don't change control net, but look for ground source in new directory
+          else  {
+            QFileInfo oldFile(groundFile.expanded());
+            QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+            
+            groundFile = newFile.absoluteFilePath();
+          }
+        }
+        else {
+          //  Either user does not want to change location of ground source or the new location
+          //  Dialog was cancelled. Load point without the ground source.
+          groundFile = NULL;
         }
       }
+      else {
+        //  Either user does not want to change location of ground source or the new location
+        //  Dialog was cancelled. Load point without the ground source.
+        groundFile = NULL;
+      }
     }
+    return groundFile;
+  }
 
-    return groundMeasure;
+
+  void ControlPointEditWidget::changeGroundLocationsInNet() {
+
+    for (int i = 0; i < m_controlNet->GetNumPoints(); i++ ) {
+      FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
+
+      QFileInfo oldFile(groundFile.expanded());
+      QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+
+      groundFile = newFile.absoluteFilePath();
+      m_controlNet->GetPoint(i)->SetAprioriSurfacePointSourceFile(groundFile.expanded());
+    }
+    //  TODO:  Temporary until autosave is implemented Save control net to Backup file
+    emit saveControlNet();
   }
 
 
@@ -661,7 +740,7 @@ namespace Isis {
    *                          ground measure-use AprioriSurface point, not lat,lon
    *                          of reference measure unless there is no apriori
    *                          surface point.
-   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
+   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from IString to QString.
    *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
    *                          clicked on first on the left side, use m_leftFile.
    */
@@ -674,10 +753,6 @@ namespace Isis {
     m_ptIdValue->setText(ptId);
 
     m_pointType->setCurrentIndex((int) m_editPoint->GetType());
-    QString groundFile;
-    if (m_editPoint->GetType() != ControlPoint::Free) {
-      groundFile = m_editPoint->GetAprioriSurfacePointSourceFile();
-    }
 
     //  Write number of measures
     QString ptsize = "Number of Measures:  " +
@@ -704,15 +779,14 @@ namespace Isis {
       // Create a temporary measure to hold the ground point info for ground source
       // This measure will be deleted when the ControlPoint is saved to the
       // ControlNet.
-      // TODO:  Does open ground source match point ground source
       ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
       if (groundMeasure) {
         m_editPoint->Add(groundMeasure);
       }
       else {
-        QString message = "Cannot create ground measure on ground source file ";
-        message += groundFile;
-        QMessageBox::warning(this, "Warning", message);
+//      QString message = "Cannot create ground measure on ground source file ";
+//      message += m_groundSN;
+//      QMessageBox::warning(this, "Warning", message);
       }
     }
 
@@ -720,15 +794,18 @@ namespace Isis {
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
       QString file;
-      if (m.GetChooserName() == "GroundMeasureTemporary") {
-        file = groundFile;
-      }
-      else {
+//    if (m.GetChooserName() == "GroundMeasureTemporary") {
+//      qDebug()<<"::loadPoint before setting file to groundFile = "<<groundFile;
+//      file = groundFile;
+//    }
+//    else {
         file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
-      }
+//    }
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
 
+      // This actually fills the right combo box for selecting measures.  A model was used to enable
+      // drag & drop for ordering measures which will also set the blink order.
       QStandardItem *item = new QStandardItem(tempFileName);
 //    qDebug()<<"before item flags = "<<item->flags();
       item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);

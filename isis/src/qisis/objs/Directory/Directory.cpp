@@ -126,6 +126,8 @@ namespace Isis {
 //  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
 
     try {
+
+      //  Context menu actions
       createWorkOrder<SetActiveImageListWorkOrder>();
       createWorkOrder<SetActiveControlWorkOrder>();
       createWorkOrder<CnetEditorViewWorkOrder>();
@@ -137,6 +139,7 @@ namespace Isis {
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
 
+      //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
       m_exportImagesWorkOrder = createWorkOrder<ExportImagesWorkOrder>();
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
@@ -259,6 +262,10 @@ namespace Isis {
   
   /**
    * @description Initializes the actions that the Directory can provide to a main window.
+   *  
+   * @todo 2017-02-14 Tracie Sucharski - As far as I can tell the created menus are never used. 
+   * Instead of creating menus to use the addAction method, can't we simply create actions and 
+   * add them to the member variables which save the list of actions for each menu? 
    */
   void Directory::initializeActions() {
     // Menus are created temporarily to convinently organize the actions.
@@ -326,11 +333,14 @@ namespace Isis {
     m_fileMenuActions.append( fileMenu->actions() );
 
     
-    QMenu *projectMenu = new QMenu();
-    projectMenu->addAction(m_renameProjectWorkOrder->clone());
-    projectMenu->addAction(m_runJigsawWorkOrder->clone() );
+//  QMenu *projectMenu = new QMenu();
+//  projectMenu->addAction(m_renameProjectWorkOrder->clone());
+//  projectMenu->addAction(m_runJigsawWorkOrder->clone() );
     
-    m_projectMenuActions.append( projectMenu->actions() );
+    m_projectMenuActions.append(m_renameProjectWorkOrder->clone());
+    m_projectMenuActions.append(m_runJigsawWorkOrder->clone() );
+    
+//  m_projectMenuActions.append( projectMenu->actions() );
 
     m_editMenuActions = QList<QAction *>();
     m_viewMenuActions = QList<QAction *>();
@@ -339,86 +349,6 @@ namespace Isis {
   }
 
   
-  /**
-   * @description This method sets up the main menu at the top of the window (File, Settings, ...)
-   * @param menuBar The menu area to populate.
-   */
-  void Directory::populateMainMenu(QMenuBar *menuBar) {
-    QMenu *fileMenu = menuBar->findChild<QMenu *>("fileMenu");
-    if (fileMenu) {
-      fileMenu->addAction(m_importControlNetWorkOrder->clone());
-      fileMenu->addAction(m_importImagesWorkOrder->clone());
-      fileMenu->addAction(m_importShapesWorkOrder->clone());
-      QAction *openProjectAction = m_openProjectWorkOrder->clone();
-      openProjectAction->setIcon(QIcon(":open") );
-      fileMenu->addAction(openProjectAction);
-
-      QMenu *recentProjectsMenu = fileMenu->addMenu("Recent P&rojects");
-      int nRecentProjects = m_recentProjects.size();
-      for (int i = 0; i < nRecentProjects; i++) {
-        FileName projectFileName = m_recentProjects.at(i);
-        if (!projectFileName.fileExists() )
-          continue;
-
-        QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
-
-        openRecentProjectAction->setData(m_recentProjects.at(i) );
-        openRecentProjectAction->setText(m_recentProjects.at(i) );
-
-        if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
-             ->isExecutable(m_recentProjects.at(i) ) )
-          continue;
-
-        recentProjectsMenu->addAction(openRecentProjectAction);
-      }
-
-      fileMenu->addSeparator();
-      fileMenu->addAction(m_openProjectWorkOrder->clone());
-      fileMenu->addSeparator();
-
-      m_permToolBarActions.append(m_openProjectWorkOrder->clone());
-
-      QAction *saveAction = m_saveProjectWorkOrder->clone();
-      saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
-      saveAction->setIcon( QIcon(":save") );
-
-      connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
-               saveAction, SLOT( setDisabled(bool) ) );
-
-      fileMenu->addAction(saveAction);
-      QAction *addAction = m_saveProjectAsWorkOrder->clone();
-      addAction->setIcon(QIcon(":saveAs") );
-      fileMenu->addAction(addAction);
-
-      fileMenu->addSeparator();
-      fileMenu->addAction(m_exportControlNetWorkOrder->clone());
-      fileMenu->addAction(m_exportImagesWorkOrder->clone());
-
-      QMenu *importMenu = fileMenu->addMenu("&Import");
-      importMenu->addAction(m_importControlNetWorkOrder->clone() );
-      importMenu->addAction(m_importImagesWorkOrder->clone() );
-      importMenu->addAction(m_importShapesWorkOrder->clone() );
-
-      QMenu *exportMenu = fileMenu->addMenu("&Export");
-
-      exportMenu->addAction(m_exportControlNetWorkOrder->clone() );
-      exportMenu->addAction(m_exportImagesWorkOrder->clone() );
-
-      fileMenu->addSeparator();
-
-      fileMenu->addAction(m_closeProjectWorkOrder->clone() );
-
-      fileMenu->addSeparator();
-    }
-
-    QMenu *projectMenu = menuBar->findChild<QMenu *>("projectMenu");
-    if (projectMenu) {
-      projectMenu->addAction( m_renameProjectWorkOrder->clone() );
-      projectMenu->addAction( m_runJigsawWorkOrder->clone() );
-    }
-  }
-
-
   /**
    * @brief Set up the history info in the history dockable widget.
    * @param historyContainer The widget to fill.
@@ -608,7 +538,7 @@ namespace Isis {
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
     
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupFootprint2DViewWidgets() ) );
+             this, SLOT( cleanupFootprint2DViewWidgets(QObject *) ) );
     
     emit newWidgetAvailable(result);
 
@@ -701,6 +631,9 @@ namespace Isis {
       //  I have one signal, controlChanged?
       connect(result->controlPointEditWidget(), SIGNAL(controlPointAdded(QString)),
               this, SIGNAL(controlPointAdded(QString)));
+
+      connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
+              this, SLOT(makeBackupActiveControl()));
     }
 
     return controlPointEditView();
@@ -867,8 +800,15 @@ namespace Isis {
   /**
    * @brief Removes pointers to deleted Footprint2DView objects.
    */
-  void Directory::cleanupFootprint2DViewWidgets() {
-    m_footprint2DViewWidgets.removeAll(NULL);
+  void Directory::cleanupFootprint2DViewWidgets(QObject *obj) {
+//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  obj = "<<obj;
+    Footprint2DView *footprintView = static_cast<Footprint2DView *>(obj);
+//  qDebug()<<"                                          cast footprintView = "<<footprintView<<"  # = "<<m_footprint2DViewWidgets.count();
+    if (!footprintView) {
+      return;
+    }
+    m_footprint2DViewWidgets.removeAll(footprintView);
+//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  # = "<<m_footprint2DViewWidgets.count();
   }
 
 
@@ -1401,6 +1341,7 @@ namespace Isis {
       addControlPointEditView();
     }
     controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint);
+    controlPointChipViewports()->setPoint(controlPoint);
   }
 
 
@@ -1422,5 +1363,10 @@ namespace Isis {
     }
     controlPointEditView()->controlPointEditWidget()->createControlPoint(
         latitude, longitude, cube, isGroundSource);
+  }
+
+  void Directory::makeBackupActiveControl() {
+
+    project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
   }
 }

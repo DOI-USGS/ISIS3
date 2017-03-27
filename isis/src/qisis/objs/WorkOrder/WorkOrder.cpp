@@ -63,6 +63,7 @@ namespace Isis {
     m_guiCamera = GuiCameraQsp();
     m_targetBody = TargetBodyQsp();
 
+    m_undoRedo = true;
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
@@ -92,25 +93,6 @@ namespace Isis {
 
 
   /**
-   * @brief The Destructor
-   */
-  WorkOrder::~WorkOrder() {
-    delete m_imageList;
-    delete m_shapeList;
-    delete m_futureWatcher;
-    delete m_progressBar;
-    delete m_progressBarDeletionTimer;
-    delete m_progressBarUpdateTimer;
-    delete m_transparentConstMutex;
-
-    m_nextWorkOrder = NULL;
-    m_previousWorkOrder = NULL;
-    m_project = NULL;
-    m_transparentConstMutex = NULL;
-  }
-
-
-  /**
    * @brief Copy the work order 'other' into this (new) instance.
    * @param other The work order being copied.
    * @throws IException::Unknown  This Excecption is thrown if the WorkOrder being copies
@@ -133,6 +115,7 @@ namespace Isis {
     m_targetBody = other.m_targetBody;
     m_internalData = other.m_internalData;
 
+    m_undoRedo = true;
     m_createsCleanState = other.m_createsCleanState;
     m_modifiesDiskState = other.m_modifiesDiskState;
 
@@ -164,6 +147,25 @@ namespace Isis {
 
     listenForImageDestruction();
     listenForShapeDestruction();
+  }
+
+
+  /**
+   * @brief The Destructor
+   */
+  WorkOrder::~WorkOrder() {
+    delete m_imageList;
+    delete m_shapeList;
+    delete m_futureWatcher;
+    delete m_progressBar;
+    delete m_progressBarDeletionTimer;
+    delete m_progressBarUpdateTimer;
+    delete m_transparentConstMutex;
+
+    m_nextWorkOrder = NULL;
+    m_previousWorkOrder = NULL;
+    m_project = NULL;
+    m_transparentConstMutex = NULL;
   }
 
 
@@ -390,7 +392,7 @@ namespace Isis {
 
   /**
    * @brief Determines if the WorkOrder is execuatable on the data stored in
-   * a ProjectItem.
+   * a ProjectItem. 
    * @param item (ProjectItem *) The item containing the data.
    * @return @b bool Returns True if the WorkOrder is executable on data
    * stored in a ProjectItem.
@@ -399,6 +401,9 @@ namespace Isis {
     if ( !item ) {
       return false;
     }
+    //  @TODO 3/22/2017 TLS  Is ProjectContext necessary.  I think this is simply to create a
+    //                signature so that the correct WorkOrder is called, at this time only
+    //                RenameProjectWorkOrder.  Can we simply pass in Project instead?
     else if ( item->isProject() ) {
       return isExecutable( ProjectContext );
     }
@@ -679,7 +684,7 @@ namespace Isis {
 
   /**
    * @brief This is a virtual function whose role in child classes is to determine
-   * if this WorkOrder deppends on the WorkOrder passed in as an argument.
+   * if this WorkOrder depends on the WorkOrder passed in as an argument.
    * @param WorkOrder * The WorkOrder we are checking for dependency with this one.
    * @return @b bool Returns True if there is a dependency, and False if there is no
    * dependency.
@@ -711,6 +716,16 @@ namespace Isis {
     }
 
     return result;
+  }
+
+
+  /**
+   * @brief Returns if this work order is on the QUndoStack
+   *
+   * @return @b Returns True if this work order is on the QUndoStack.  False if it is not.
+   */
+  bool WorkOrder::onUndoStack() const {
+    return m_undoRedo;
   }
 
 
@@ -1078,7 +1093,7 @@ namespace Isis {
   bool WorkOrder::execute() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
     //   redo()
-    if (createsCleanState()) {
+    if (createsCleanState() || !onUndoStack()) {
       m_status = WorkOrderFinished;
 
       emit statusChanged(this);
@@ -1088,7 +1103,7 @@ namespace Isis {
 
     resetProgressBar();
 
-    if (createsCleanState()) {
+    if (createsCleanState()  || !onUndoStack()) {
       setProgressToFinalText();
     }
     else {
@@ -1519,6 +1534,18 @@ namespace Isis {
    */
   void WorkOrder::setCreatesCleanState(bool createsCleanState) {
     m_createsCleanState = createsCleanState;
+  }
+
+
+  /**
+   * @description This will determine whether this work order is put on the QUndoStack and the 
+   *              redo/undo methods are not called. If set to false, the work order will not be put
+   *              on the QUndoStack and assumes all of the work was completed in the execute method.
+   *              If set to true (default), the work order is put on the QUndoStack and the
+   *              redo/undo methods of the work order are called.
+   */
+  void WorkOrder::setUndoRedo(bool undoRedo) {
+    m_undoRedo = undoRedo;
   }
 
 

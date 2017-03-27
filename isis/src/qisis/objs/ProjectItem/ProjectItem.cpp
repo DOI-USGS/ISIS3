@@ -23,6 +23,7 @@
 
 #include "ProjectItem.h"
 
+#include <QBrush>
 #include <QIcon>
 #include <QStandardItem>
 #include <QVariant>
@@ -956,4 +957,8 @@ namespace Isis {
     return static_cast<ProjectItem *>( items.first() );
   }
   
+
+  void ProjectItem::setTextColor(Qt::GlobalColor color) {
+    setForeground(QBrush(color));
+  }
 }

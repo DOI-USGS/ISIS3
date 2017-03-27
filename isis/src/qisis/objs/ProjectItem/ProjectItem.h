@@ -109,6 +109,7 @@ namespace Isis {
    *                               A naming conflict was causing strange warnings 
    *                               to show up on the command line when cnetsuite is launched, 
    *                               and this fixed it.  Fixes #3982.
+   *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item. 
    */
   class ProjectItem : public QStandardItem {
     public:
@@ -195,6 +196,8 @@ namespace Isis {
       ProjectItem *parent() const;
       void setChild(int row, ProjectItem *item);
       ProjectItem *takeChild(int row);
+
+      void setTextColor(Qt::GlobalColor color);
     };
 
 }

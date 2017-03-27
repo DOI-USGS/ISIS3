@@ -35,6 +35,9 @@ namespace Isis {
    *
    * @internal 
    * @history 2016-09-19 Tracie Sucharski - Call SetImages on the control net to initialize cameras.
+   * @history 2017-01-09 Tracie Sucharski - Moved the SetImages step to the 
+   *                         Project::setActiveControl.
+   * @history 2017-01-30 Tracie Sucharski - Print active control in the Undo text. 
    *
    */
 

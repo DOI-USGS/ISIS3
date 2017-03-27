@@ -102,6 +102,19 @@ namespace Isis {
    *                           and opening a project (modified save() and startElement()).
    *                           Fixes #4486.
    *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews. 
+   *   @history 2016-12-21 Tracie Sucharski - Added QObject parameter to
+   *                           cleanupFootprint2DViewWidgets.  All footprint views were being
+   *                           destroyed rather than simply the view which was closed. TODO: This
+   *                           also needs to be fixed for all other cleanup(View) methods.
+   *   @history 2017-02-08 Tracie Sucharski - Implemented quick&dirty auto-save for active control
+   *                           net.
+   *   @history 2017-02-23 Tracie Sucharski - Removed populateMainMenu method.  It became obsolete
+   *                           during changes Jeffrey Covington made on 1-4-2016, rev 6511.
+   *   @history 2017-02-28 Tracie Sucharski - Added ability to set the colors for the ControlPoint
+   *                           display on views which show ControlPoints such as CubeDnView and
+   *                           Footprint2DView.  This is done as an application setting so that all
+   *                           views use the same colors.  Directory stores the colors so that any
+   *                           registered view can get the current colors.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -109,7 +122,6 @@ namespace Isis {
       explicit Directory(QObject *parent = 0);
       ~Directory();
 
-      void populateMainMenu(QMenuBar *);
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
       void setRecentProjectsList(QStringList recentProjects);
@@ -218,13 +230,16 @@ namespace Isis {
       void cleanupCnetEditorViewWidgets();
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
-      void cleanupFootprint2DViewWidgets();
+      void cleanupFootprint2DViewWidgets(QObject *);
       void cleanupControlPointEditViewWidget();
       void cleanupMatrixViewWidgets();
       void cleanupSensorInfoWidgets();
       void cleanupTargetInfoWidgets();
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
+
+      // TODO temporary slot until autosave is implemented
+      void makeBackupActiveControl();
 
       //  Slots in response to mouse clicks on CubeDnView (IpceTool) and
       //    Footprint2DView (MosaicControlNetTool)

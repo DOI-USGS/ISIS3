@@ -22,10 +22,17 @@
  */
 #include "CNetSuiteMainWindow.h"
 
+#include <QtDebug>
+#include <QApplication>
+#include <QColor>
+#include <QDockWidget>
+#include <QMdiArea>
 #include <QObject>
 #include <QtWidgets>
 #include <QSettings>
+#include <QStatusBar>
 #include <QTreeView>
+#include <QVariant>
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -174,18 +181,20 @@ namespace Isis {
     centralWidget->setTabsMovable(true);
     centralWidget->setTabsClosable(true);
 
-    // ken testing
-    setActiveView(projectTreeView);
-    // ken testing
-
     if (args.count() == 2) {
       m_directory->project()->open(args.last());
     }
+
+    // ken testing  If this is used, we will not need to call updateMenuActions() or updateToolBar()
+    // above.  They are both called from setActiveView.
+    //  setActiveView(projectTreeView);
+    // ken testing
   }
 
 
   /**
-   * 
+   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a 
+   * view which was detached from the MDI main window. 
    *
    * @param[in] newWidget (QWidget *)
    */
@@ -201,6 +210,8 @@ namespace Isis {
       if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
         mdiArea->addSubWindow(newWidget);
         newWidget->show();
+        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
+        setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
       }
     }
   }
@@ -234,59 +245,71 @@ namespace Isis {
   void CNetSuiteMainWindow::updateMenuActions() {
 
     m_fileMenu->clear();
+    // Get Directory FileMenu actions
     foreach ( QAction *action, m_directory->fileMenuActions() ) {
       m_fileMenu->addAction(action);
     }
     m_fileMenu->addSeparator();
+    // Get FileMenu actions for the active view (eg. CubeDnView, Footprint2DView)
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->fileMenuActions() ) {
         m_fileMenu->addAction(action);
       }
     }
     m_fileMenu->addSeparator();
+    // Get FileMenu actions from the CNetsuiteMainWindow, Exit is the only action
     foreach ( QAction *action, m_fileMenuActions ) {
       m_fileMenu->addAction(action);
     }
 
     m_projectMenu->clear();
+    //  Get Project menu actions from Directory
     foreach ( QAction *action, m_directory->projectMenuActions() ) {
       m_projectMenu->addAction(action);
     }
     m_projectMenu->addSeparator();
+    //  Get Project menu actions from the active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->projectMenuActions() ) {
         m_projectMenu->addAction(action);
       }
     }
     m_projectMenu->addSeparator();
+    //  Get Project menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_projectMenuActions ) {
       m_projectMenu->addAction(action);
     }
 
     m_editMenu->clear();
+    // Get Edit menu actions from Directory
     foreach ( QAction *action, m_directory->editMenuActions() ) {
       m_editMenu->addAction(action);
     }
     m_editMenu->addSeparator();
+    // Get Edit menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->editMenuActions() ) {
         m_editMenu->addAction(action);
       }
     }
     m_editMenu->addSeparator();
+    // Get Edit menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_editMenuActions ) {
       m_editMenu->addAction(action);
     }
 
     m_viewMenu->clear();
+    // Get View menu actions from Directory
     foreach ( QAction *action, m_directory->viewMenuActions() ) {
       m_viewMenu->addAction(action);
     }
     m_viewMenu->addSeparator();
+    // Get View menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_viewMenuActions ) {
       m_viewMenu->addAction(action);
     }
     m_viewMenu->addSeparator();
+    // Get View menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->viewMenuActions() ) {
         m_viewMenu->addAction(action);
@@ -294,31 +317,37 @@ namespace Isis {
     }
 
     m_settingsMenu->clear();
+    // Get Settings menu actions from Directory
     foreach ( QAction *action, m_directory->settingsMenuActions() ) {
       m_settingsMenu->addAction(action);
     }
     m_settingsMenu->addSeparator();
+    // Get Settings menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->settingsMenuActions() ) {
         m_settingsMenu->addAction(action);
       }
     }
     m_settingsMenu->addSeparator();
+    // Get Settings menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_settingsMenuActions ) {
       m_settingsMenu->addAction(action);
     }
 
     m_helpMenu->clear();
+    // Get Help menu actions from Directory
     foreach ( QAction *action, m_directory->helpMenuActions() ) {
       m_helpMenu->addAction(action);
     }
     m_helpMenu->addSeparator();
+    // Get Help menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->helpMenuActions() ) {
         m_helpMenu->addAction(action);
       }
     }
     m_helpMenu->addSeparator();
+    // Get Help menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_helpMenuActions ) {
       m_helpMenu->addAction(action);
     }

@@ -24,10 +24,11 @@
 #include <QtDebug>
 
 #include "Control.h"
-#include "ControlNet.h"
 #include "Directory.h"
 #include "IException.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
 
@@ -93,8 +94,10 @@ namespace Isis {
     if (success) {
 
       if (project()->activeImageList()) {
-        project()->setActiveControl(controlList()->at(0));
-        project()->activeControl()->controlNet()->SetImages(*project()->activeImageList()->serialNumberList());
+        project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
+
+        QUndoCommand::setText(tr("Set Active Control Network to [%1]").arg(
+                                 controlList()->at(0)->displayProperties()->displayName()));
         success = true;
       }
       else {

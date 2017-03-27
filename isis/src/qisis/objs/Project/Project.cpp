@@ -44,6 +44,7 @@
 #include "Camera.h"
 #include "Control.h"
 #include "ControlList.h"
+#include "ControlNet.h"
 #include "CorrelationMatrix.h"
 #include "Cube.h"
 #include "Directory.h"
@@ -56,6 +57,9 @@
 #include "ImageReader.h"
 #include "IException.h"
 #include "ProgressBar.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+#include "SerialNumberList.h"
 #include "Shape.h"
 #include "ShapeList.h"
 #include "ShapeReader.h"
@@ -493,6 +497,18 @@ namespace Isis {
         m_bundleSolutionInfo->at(i)->runTime();
       }
     
+      stream.writeEndElement();
+    }
+
+    if (m_activeImageList) {
+      stream.writeStartElement("activeImageList");
+      stream.writeAttribute("displayName", m_activeImageList->name());
+      stream.writeEndElement();
+    }
+
+    if (m_activeControl) {
+      stream.writeStartElement("activeControl");
+      stream.writeAttribute("displayName", m_activeControl->displayProperties()->displayName());
       stream.writeEndElement();
     }
 
@@ -1164,9 +1180,31 @@ namespace Isis {
    *  
    * @internal 
    *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   *   @history 2016-12-22 Tracie Sucharski - Changed to take a displayName, so that it can be used
+   *                           when loading a saved project which has an active control saved with
+   *                           the displayName.
+   *   @history 2017-01-09 Tracie Sucharski - Moved SetImages step from
+   *                           SetActiveControlWorkOrder::execute so that SetImages is always done
+   *                           whether from the workorder or calling this method directly from the
+   *                           project loading.  TODO:  should project loading call the WorkOrder
+   *                           rather than this method directly?
+   *       
    */
-  void Project::setActiveControl(Control *control) {
-    m_activeControl = control;
+  void Project::setActiveControl(QString displayName) {
+
+    if (m_activeControl) {
+      QString message = "Currently you cannot change the active control when one is already set.  "
+                        "This functionality will be implemented in a future release.";
+      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
+      return;
+    }
+    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
+    if (item && item->isControl()) {
+      m_activeControl = item->control();
+      item->setTextColor(Qt::darkGreen);
+    }
+
+    activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
   }
 
 
@@ -1185,16 +1223,37 @@ namespace Isis {
 
 
   /**
-   * @brief Set the Active ImageList
+   * @brief Set the Active ImageList from the displayName which is saved in project.xml
    *  
    * @description Set the active ImageList for views which need to operate on the 
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. This version of 
+   * the setActiveImageList method is used when loading a project which has an activeImageList 
+   * saved. 
    *  
    * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   *   @history 2016-12-02 Tracie Sucharski - Original version.
+   *   @history 2016-12-29 Tracie Sucharski - Combined the functionality of
+   *                           setActiveImageList(ImageList *) in this method.  This will allow
+   *                           projects saved with an active ImageList to be restored properly.
+   *                           Only the displayName is saved in a project since the ImageList is
+   *                           created when the project is loaded.  As long as the Images and
+   *                           Controls are loaded before the setActiveImageList is loaded, there
+   *                           will be a correct correspondence between the displayName and
+   *                           ImageList.
    */
-  void Project::setActiveImageList(ImageList *imageList) {
-    m_activeImageList = imageList;
+  void Project::setActiveImageList(QString displayName) {
+
+    if (m_activeImageList) {
+      QString message = "Currently you cannot change the active imageList when one is already set.  "
+                        "This functionality will be implemented in a future release.";
+      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
+      return;
+    }
+    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole); 
+    if (item && item->isImageList()) {
+      m_activeImageList = item->imageList();
+      item->setTextColor(Qt::darkGreen);
+    }
   }
 
 
@@ -1455,6 +1514,11 @@ namespace Isis {
                        _FILEINFO_);
     }
 
+    //  If current project is temporary set project name to path name as a default
+    if (m_isTemporaryProject) {
+      setName(newPath.name());
+    }
+
     QFile projectSettingsFile(newPath.toString() + "/project.xml");
     if (!projectSettingsFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
       throw IException(IException::Io,
@@ -1562,8 +1626,9 @@ namespace Isis {
         if (workOrder->createsCleanState()) {
           m_undoStack.setClean();
         }
-        else {
-          // All other work orders go onto the undo stack
+        // All other work orders go onto the undo stack, unless specifically told not to
+        else if (workOrder->onUndoStack()) {
+          // All other work orders go onto the undo stack, unless specifically told not to
           m_undoStack.push(workOrder); // This calls redo for us
         }
 
@@ -1918,12 +1983,12 @@ namespace Isis {
         m_controls.append(new ControlList(m_project, reader()));
       }
       else if (localName == "imageList") {
-//      qDebug()<<"Project::XmlHandler::startElement localName = imageList";
         m_imageLists.append(new ImageList(m_project, reader()));
       }
       else if (localName == "shapeLists") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
+      //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
         QString type = atts.value("type");
 
@@ -1932,6 +1997,7 @@ namespace Isis {
 
         m_workOrder->read(reader());
       }
+      //  warnings stored in warning.xml, using same reader as project.xml
       else if (localName == "warning") {
         QString warningText = atts.value("text");
 
@@ -1956,18 +2022,40 @@ namespace Isis {
         }
 //      bundleSettings = new BundleSettings(m_project, reader());
       }
+      else if (localName == "activeImageList") {
+        QString displayName = atts.value("displayName");
+        m_project->setActiveImageList(displayName);
+      }
+      else if (localName == "activeControl") {
+        // Find Control
+        QString displayName = atts.value("displayName");
+        m_project->setActiveControl(displayName);
+      }
     }
 
     return true;
   }
 
 
+  /**
+   * The xml parser for ending tags 
+   *  
+   * @internal
+   *   @history 2016-12-02 Tracie Sucharski - Changed localName == "project" to 
+   *                           localName == "imageLists", so that images and shapes
+   *                           are added to the project as soon as their end tag is found.
+   *                           Restoring activeImageList was not working since the project had
+   *                           no images until the end tag for "project" was reached.
+   *
+   */
   bool Project::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName) {
-    if (localName == "project") {
+    if (localName == "imageLists") {
       foreach (ImageList *imageList, m_imageLists) {
         m_project->imagesReady(*imageList);
       }
+    }
+    else if (localName == "shapeLists") {
       // TODO does this go here under project or should it be under shapes?
       foreach (ShapeList *shapeList, m_shapeLists) {
         m_project->shapesReady(*shapeList);

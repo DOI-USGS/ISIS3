@@ -100,6 +100,12 @@ namespace Isis {
    *   @history 2016-06-22 Tyler Wilson - Removed all references to deprecated functions/member
    *                          variables.  Fixes #4052.
    *   @history 2016-07-26 Tracie Sucharski - Added functionality for ShapeList.
+   *   @history 2017-02-06 Tracie Sucharski - Added methods to set/get whether work order is put on
+   *                          the QUndoStack.  If it is NOT put on the stack, it will be greyed out
+   *                          in the HistoryTreeWidget and not undo-able.  Todo:  Decide whether
+   *                          work orders not on the QUndoStack should appear in the
+   *                          HistoryTreeWidget.  Fixes #4598.
+   *  
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -165,6 +171,7 @@ namespace Isis {
       void setPrevious(WorkOrder *previousWorkOrder);
 
       QString bestText() const;
+      bool onUndoStack() const;
       bool createsCleanState() const;
       QDateTime executionTime() const;
       bool isFinished() const;
@@ -242,6 +249,10 @@ namespace Isis {
       Project *project() const;
 
       void setCreatesCleanState(bool createsCleanState);
+      /**
+       * This determines whether the work order is put on the QUndoStack.
+       */
+      void setUndoRedo(bool undoRedo);  
       void setModifiesDiskState(bool changesProjectOnDisk);
       void setInternalData(QStringList data);
 
@@ -323,6 +334,13 @@ namespace Isis {
        *   in their constructor.
        */
       bool m_createsCleanState;
+
+      /**
+       * This is defaulted to true. The work order will be pushed onto the QUndoStack and the 
+       * redo and undo methods will be called.  If false, then the work order is not put on the 
+       * QUndoStack and all of the work must go in the execute method of the work order. 
+       */
+      bool m_undoRedo;
 
       /**
        * This is defaulted to false. If a WorkOrder modifies the project on disk to perform its

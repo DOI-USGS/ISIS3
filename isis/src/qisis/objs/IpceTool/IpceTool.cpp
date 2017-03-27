@@ -62,7 +62,8 @@ namespace Isis {
     */
    QAction *IpceTool::toolPadAction(ToolPad *pad) {
      QAction *action = new QAction(pad);
-     action->setIcon(QPixmap(toolIconDir()+"/stock_draw-connector-with-arrows.png"));
+//   action->setIcon(QPixmap(toolIconDir()+"/stock_draw-connector-with-arrows.png"));
+     action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
      action->setShortcut(Qt::Key_T);
 //     QObject::connect(action,SIGNAL(triggered(bool)),this,SLOT(showNavWindow(bool)));

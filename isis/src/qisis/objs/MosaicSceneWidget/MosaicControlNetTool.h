@@ -52,6 +52,9 @@ namespace Isis {
    *                           checks for the existence of a Directory pointer in the openControlNet
    *                           and mouseButtonRelease methods.  If Directory point is NULL, IPCE
    *                           code not executed.  Fixes #4063.
+   *   @history 2017-01-03 Tracie Sucharski - If IPCE, set m_controlNet to active control net in the
+   *                           loadNetwork method and do not display Load/Close Network button if
+   *                           IPCE.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

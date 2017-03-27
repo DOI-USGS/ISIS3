@@ -90,7 +90,7 @@ namespace Isis {
     bool success = WorkOrder::execute();
 
     if (success) {
-      project()->setActiveImageList(imageList());
+      project()->setActiveImageList(imageList()->name());
     }
 
     return success;

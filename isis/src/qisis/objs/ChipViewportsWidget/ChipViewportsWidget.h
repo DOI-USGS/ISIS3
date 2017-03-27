@@ -9,6 +9,7 @@
 class QAction;
 class QGridLayout;
 class QLabel;
+class QMouseEvent;
 
 namespace Isis {
   class ChipViewport;
@@ -38,6 +39,7 @@ namespace Isis {
       ChipViewportsWidget(QWidget *parent);
       virtual ~ChipViewportsWidget();
 
+      bool eventFilter(QObject *object, QEvent *event);
 
     signals:
       void controlPointChanged(QString pointId);
@@ -72,6 +74,8 @@ namespace Isis {
       void createActions();
 
       void loadPoint();
+
+      void mousePressEvent(QObject *object, QMouseEvent *event);
 
     private:
 

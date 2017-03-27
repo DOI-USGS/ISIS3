@@ -40,6 +40,7 @@ namespace Isis {
   CloseProjectWorkOrder::CloseProjectWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Close Project"));
+    QUndoCommand::setText(tr("Close Project"));
 
     setCreatesCleanState(true);
   }

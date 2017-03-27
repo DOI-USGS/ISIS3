@@ -101,6 +101,21 @@ namespace Isis {
    *                           the open function, so that warnings/errors are output to the
    *                           warnings tab of the GUI instead of causing the application 
    *                           to exit.  Fixes #4488.
+   *   @history 2016-11-22 Tracie Sucharski - When saving a new project, if it is currently a
+   *                           temporary project, save project name as the base pathname for the
+   *                           project.
+   *   @history 2016-12-02 Tracie Sucharski - Changed the the tag name in ::endElement from
+   *                           "project" to "imageLists" and "shapeLists", so that images and shapes
+   *                           are added to the project when their end tags are found instead of the
+   *                           project end tag.
+   *   @history 2016-12-29 Tracie Sucharski - Changed setActiveControl and setActiveImageList to
+   *                           take a displayName instead of a Control/ImageList so that restoration
+   *                           of Project which contains an active control/imageList can be used.
+   *                           The only piece of info that can be saved to a project is the
+   *                           displayName.
+   *   @history 2017-02-06 Tracie Sucharski - When adding a work order to the project, check the
+   *                           work order to determine if it should be put on the QUndoStack.
+   *                           Fixes #4598.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -143,9 +158,9 @@ namespace Isis {
       void waitForShapeReaderFinished();
       QList<WorkOrder *> workOrderHistory();
 
-      void setActiveControl(Control *);
+      void setActiveControl(QString displayName);
       Control  *activeControl();
-      void setActiveImageList(ImageList *);
+      void setActiveImageList(QString displayName);
       ImageList *activeImageList();
 
       static QString cnetRoot(QString projectRoot);
@@ -206,6 +221,12 @@ namespace Isis {
        * receivers: ProjectTreeWidget
        */
       void controlAdded(Control *control);
+
+      /**
+       * Emitted when new ImageList added to Project 
+       * receivers: ProjectTreeWidget 
+       */
+      void imageListAdded(ImageList *images);
 
       /**
        * Emitted when new images are available.

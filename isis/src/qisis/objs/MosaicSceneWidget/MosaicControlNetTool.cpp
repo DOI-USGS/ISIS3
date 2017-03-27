@@ -94,6 +94,7 @@ namespace Isis {
     connect(m_configMovement, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
+    if (!getWidget()->directory()) {
     m_closeNetwork = new QPushButton("Close Network");
     m_closeNetwork->setEnabled(false);
     m_closeNetwork->setVisible(false);
@@ -108,6 +109,8 @@ namespace Isis {
             this, SLOT(openControlNet()));
     connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
+
+    }
 
     m_controlNetFileLabel = new QLabel;
     m_controlNetFileLabel->setToolTip("The filename of the currently open "
@@ -565,16 +568,14 @@ namespace Isis {
       }
     }
     else {
-        Control *activeControl = getWidget()->directory()->project()->activeControl();
-        if (activeControl == NULL) {
-          // Error and return to Select Tool
-          QString message = "No active control network chosen.  Choose active control network on "
-                            "project tree.\n";
-          QMessageBox::critical(getWidget(), "Error", message);
-          return;
-        }
-        m_controlNet = activeControl->controlNet();
-        m_controlNetFile = activeControl->fileName(); 
+      if (!getWidget()->directory()->project()->activeControl()) {
+        // Error and return to Select Tool
+        QString message = "No active control network chosen.  Choose an active image list then an"
+                          "active control network on the project tree.\n";
+        QMessageBox::critical(getWidget(), "Error", message);
+        return;
+      }
+      m_controlNetFile = getWidget()->directory()->project()->activeControl()->fileName(); 
     }
 
     if (!m_controlNetFile.isEmpty()) {
@@ -599,6 +600,9 @@ namespace Isis {
         if (!getWidget()->directory()) {
           m_controlNet = new ControlNet(m_controlNetFile);
         }
+        else {
+          m_controlNet = getWidget()->directory()->project()->activeControl()->controlNet();
+        }
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
 
@@ -608,16 +612,6 @@ namespace Isis {
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
                 this, SLOT(objectDestroyed(QObject *)));
 
-        // TODO:  TLS 2014-06-04
-        //  Use Directory to add control point editor for now.  Should this be done from Directory
-        //  similarly to addFootprint2DView, addImageFileListView, etc.  It was done here because
-        //  the infrastructure for opening, displaying control nets was already in place.  
-        //  However for cnetsuite, if we want to follow the Directory/WorkOrder design paradigm this 
-        //  is probably not the best place to implement this.
-        //  Also, once we figure out how to determine the active control network, this will change.
-//      if (getWidget()->directory()) {
-//        getWidget()->directory()->addControlPointEditor(m_controlNet, netFile);
-//      }
       }
       catch(IException &e) {
         QString message = "Invalid control network.\n";
