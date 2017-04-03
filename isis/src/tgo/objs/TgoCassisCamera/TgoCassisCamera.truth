@@ -1,32 +1,32 @@
 Unit Test for TgoCassisCamera...
-FileName: CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-B1.cub
-CK Frame: -143420
+FileName:  "CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-B1.cub"
+CK Frame:  -143420
 
 Kernel IDs: 
-CK Frame ID = -143420
-CK Reference ID = 1
-SPK Target ID = -143
-SPK Reference ID = 1
+CK Frame ID =  -143420
+CK Reference ID =  1
+SPK Target ID =  -143
+SPK Reference ID =  1
 
-Shutter open = 533104787.536896408
-Shutter close = 533104787.538624406
-Focal Length = 880.000000000
+Shutter open =  533104787.536896408
+Shutter close =  533104787.538624406
+Focal Length =  880
 
 For upper left corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample =  0
+DeltaLine =  0
 
 For upper right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample =  0
+DeltaLine =  0
 
 For lower left corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample =  0
+DeltaLine =  0
 
 For lower right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample =  0
+DeltaLine =  0
 
 For center pixel position ...
 Latitude OK

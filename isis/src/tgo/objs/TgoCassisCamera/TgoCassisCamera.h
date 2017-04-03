@@ -60,6 +60,8 @@ namespace Isis {
    *     TGO_CASSIS_FSA
    * </pre>
    *  
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup Tgo
    * @author 2017-01-26 Kris Becker
    *
    * @internal
