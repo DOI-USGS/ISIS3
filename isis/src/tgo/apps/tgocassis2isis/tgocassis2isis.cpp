@@ -76,7 +76,7 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   int nl = toInt(str);
   str = labelXlater.Translate("CoreBands");
   int nb = toInt(str);
-  importer.SetDimensions(nl, ns, nb); // nl/ns swapped: switched here for correct output.
+  importer.SetDimensions(ns, nl, nb);
 
   str = labelXlater.Translate("CoreType");    
   importer.SetPixelType(PixelTypeEnumeration(str));
