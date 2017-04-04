@@ -107,7 +107,7 @@ namespace Isis {
     }
     else if (success) {
       QString projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
-                                                              tr("Open Project"));
+                                                              tr("Select Project Directory"));
 
       if (!projectName.isEmpty()) {
         project()->open(projectName);
