@@ -28,7 +28,7 @@
 
 namespace Isis {
   /** 
-   *  Distort/undistort focal plane coordinates
+   * Distort/undistort focal plane coordinates.
    *
    * Creates a map for adding/removing optical distortions
    * from the focal plane of a camera.
@@ -38,7 +38,7 @@ namespace Isis {
    *
    * @see TgoCassisCamera
    *
-   * @author 2008-08-22 Steven Lambright
+   * @author 2017-04-03 Jeannie Backer
    *
    * @internal
    *   @history 2017-04-03 Jeannie Walldren - Original version.
@@ -47,8 +47,7 @@ namespace Isis {
     public:
       TgoCassisDistortionMap(Camera *parent, int naifIkCode);
 
-      //! Destructor
-      virtual ~TgoCassisDistortionMap() {};
+      virtual ~TgoCassisDistortionMap();
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 

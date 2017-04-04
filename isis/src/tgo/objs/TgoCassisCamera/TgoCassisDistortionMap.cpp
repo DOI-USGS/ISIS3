@@ -28,10 +28,11 @@
 #include "TgoCassisDistortionMap.h"
 
 namespace Isis {
-  /** Camera distortion map constructor
+  /** 
+   * Exomars TGO CaSSIS distortion map constructor.
    *
    * Create a camera distortion map.  This class maps between distorted
-   * and undistorted focal plane x/y's.  The default mapping is the
+   * and undistorted focal plane x/y's. The default mapping is the
    * identity, that is, the focal plane x/y and undistorted focal plane
    * x/y will be identical.
    *
@@ -54,7 +55,15 @@ namespace Isis {
   }
 
 
-  /** Compute undistorted focal plane x/y
+  /** 
+   * Exomars TGO CaSSIS distortion map destructor.
+   */
+  TgoCassisDistortionMap::~TgoCassisDistortionMap() {
+  }
+
+
+  /** 
+   * Compute undistorted focal plane x/y
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
    *
@@ -112,7 +121,8 @@ namespace Isis {
   }
 
 
-  /** Compute distorted focal plane x/y
+  /** 
+   * Compute distorted focal plane x/y
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
    *
