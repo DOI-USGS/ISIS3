@@ -291,7 +291,7 @@ namespace Isis {
  * @param stopTime     Stop time of observation
  * @param exposureTime Exposure time of observation
  * 
- * @return bool True if successful, false if failed
+ * @return @b bool True if successful, false if failed
  */
   bool SumFinder::calculateTimes(Cube &cube, 
                                  iTime &startTime, 
@@ -328,7 +328,12 @@ namespace Isis {
     if ( instGrp.hasKeyword("SpacecraftClockStopCount") ) {
       PvlKeyword stopSClock = instGrp["SpacecraftClockStopCount"];
       QString originalClock = stopSClock[0];
-      stopTime = cube.camera()->getClockTime(originalClock) - stopDelay;
+      try {
+        stopTime = cube.camera()->getClockTime(originalClock) - stopDelay;
+      }
+      catch(IException &e) {
+        // The stop time is not required. So, if we cannot access it, move on.
+      }
     }
 
 #if defined(DEBUG)
