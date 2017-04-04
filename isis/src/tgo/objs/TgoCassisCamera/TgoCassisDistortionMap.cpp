@@ -63,16 +63,12 @@ namespace Isis {
 
 
   /** 
-   * Compute undistorted focal plane x/y
+   * Compute undistorted focal plane (x,y) coordinate from the distorted (x,y).
    *
-   * Compute undistorted focal plane x/y given a distorted focal plane x/y.
+   * @param dx distorted focal plane x, in millimeters
+   * @param dy distorted focal plane y, in millimeters
    *
-   * @param dx distorted focal plane x in millimeters
-   * @param dy distorted focal plane y in millimeters
-   *
-   * @return if the conversion was successful
-   * @see SetDistortion
-   * @todo Generalize polynomial equation
+   * @return @b bool Indicates whether the conversion was successful.
    */
   bool TgoCassisDistortionMap::SetFocalPlane(const double dx, 
                                              const double dy) {
@@ -122,17 +118,12 @@ namespace Isis {
 
 
   /** 
-   * Compute distorted focal plane x/y
+   * Compute distorted focal plane (x,y) given an undistorted focal plane (x,y).
    *
-   * Compute distorted focal plane x/y given an undistorted focal plane x/y.
+   * @param ux undistorted focal plane x, in millimeters
+   * @param uy undistorted focal plane y, in millimeters
    *
-   * @param ux undistorted focal plane x in millimeters
-   * @param uy undistorted focal plane y in millimeters
-   *
-   * @return if the conversion was successful
-   * @see SetDistortion
-   * @todo Generalize polynomial equation
-   * @todo Figure out a better solution for divergence condition
+   * @return @b bool Indicates whether the conversion was successful
    */
   bool TgoCassisDistortionMap::SetUndistortedFocalPlane(const double ux,
                                                         const double uy) {
@@ -146,7 +137,7 @@ namespace Isis {
     // i, j are distorted coordinates
     double iNorm = xNorm;
     double jNorm = yNorm;
-    int newtonIterations = 2000;  //???
+    int newtonIterations = 2000;
     // newton's method to iterate
     for( int index = 0; index < newtonIterations; ++index ) {
       /* 
