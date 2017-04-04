@@ -240,7 +240,7 @@ namespace Isis {
    * 
    * @return @b double The normalized value.
    */
-  double TgoCassisDistortionMap::denormalize(double value, double a, double b) {
+  double TgoCassisDistortionMap::denormalize(double value) {
     // use scaling factor based on size of CCD:
     // CCD width = CCD height = 2048
     return value * 4096 + 2048 / 2;

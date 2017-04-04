@@ -151,15 +151,35 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
                                                   
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
   archive.addKeyword(yeardoy);
-  archive.findKeyword("PredictMaximumExposureTime").setUnits("ms");
-  archive.findKeyword("CassisOffNadirAngle").setUnits("deg");
-  archive.findKeyword("PredictedRepetitionFrequency").setUnits("ms");
-  archive.findKeyword("GroundTrackVelocity").setUnits("km/s");
-  archive.findKeyword("ForwardRotationAngle").setUnits("deg");
-  archive.findKeyword("SpiceMisalignment").setUnits("deg");
-  archive.findKeyword("FocalLength").setUnits("m");
-  archive.findKeyword("ImageFrequency").setUnits("ms");
-  archive.findKeyword("ExposureTimePEHK").setUnits("ms");
+
+  // Set units on optional archived keywords
+  if (archive.hasKeyword("PredictMaximumExposureTime")) {
+    archive.findKeyword("PredictMaximumExposureTime").setUnits("ms");
+  }
+  if (archive.hasKeyword("CassisOffNadirAngle")) {
+    archive.findKeyword("CassisOffNadirAngle").setUnits("deg");
+  }
+  if (archive.hasKeyword("PredictedRepetitionFrequency")) {
+    archive.findKeyword("PredictedRepetitionFrequency").setUnits("ms");
+  }
+  if (archive.hasKeyword("GroundTrackVelocity")) {
+    archive.findKeyword("GroundTrackVelocity").setUnits("km/s");
+  }
+  if (archive.hasKeyword("ForwardRotationAngle")) {
+    archive.findKeyword("ForwardRotationAngle").setUnits("deg");
+  }
+  if (archive.hasKeyword("SpiceMisalignment")) {
+    archive.findKeyword("SpiceMisalignment").setUnits("deg");
+  }
+  if (archive.hasKeyword("FocalLength")) {
+    archive.findKeyword("FocalLength").setUnits("m");
+  }
+  if (archive.hasKeyword("ImageFrequency")) {
+    archive.findKeyword("ImageFrequency").setUnits("ms");
+  }
+  if (archive.hasKeyword("ExposureTimePEHK")) {
+    archive.findKeyword("ExposureTimePEHK").setUnits("ms");
+  }
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
