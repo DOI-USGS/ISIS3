@@ -144,7 +144,7 @@ void IsisMain() {
   PvlKeyword center("Center");
   for (int i = 1; i <= 64; i++) {
     filterNumber += toString( i );
-    center += toString( 2.2714 - 0.02356 * (65 - i) );
+    center += toString( 2.27144 - 0.02356 * (65 - i) );
   }
   bandBinGroup += filterNumber;
   bandBinGroup += center;
