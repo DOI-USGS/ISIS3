@@ -59,18 +59,17 @@ namespace Isis {
    *   undo/redo capabilities (which need to be implemented correctly), and the ability for the
    *   project to guarantee a good state on disk.
    *
-   * State between the end of execute() and the beginning of the redo methods must be saved via
-   *   the parent (WorkOrder) class. This is to ensure serializability. State between the redo
+   * State between the end of setupExecution() and the beginning of the redo methods must be saved 
+   *   via the parent (WorkOrder) class. This is to ensure serializability. State between the redo
    *   methods and undo methods should work the same way. Child implementations may only save state
    *   (have member variables) that store state between syncRedo(), asyncRedo() and postSyncRedo()
    *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
    *   work order to not function properly when saved/restored from disk.
    *  
    *   The order of execution for work orders is:
-   *   execute() - GUI thread, can ask user for input*
+   *   setupExecution() - GUI thread, can ask user for input
    *   syncRedo() - GUI thread, should not prompt the user for input
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread
+   *   asyncRedo() - Pooled thread postSyncRedo() - GUI thread
    *
    *   syncUndo() - GUI thread, always called after redo finishes
    *   asyncUndo() - Pooled thread
@@ -121,6 +120,8 @@ namespace Isis {
    *                          in the HistoryTreeWidget and not undo-able.  Todo:  Decide whether
    *                          work orders not on the QUndoStack should appear in the
    *                          HistoryTreeWidget.  Fixes #4598.
+   *   @history 2017-03-30 Tracie Sucharski - Renamed the execute method to setupExecution.
+   *                          Fixes #4718.
    *  
    */
   class WorkOrder : public QAction, public QUndoCommand {
@@ -237,7 +238,7 @@ namespace Isis {
        *           turns out to be impossible, etc). This prevents the work order from making it
        *           into the history and redo will never be called.
        */
-      virtual bool execute();
+      virtual bool setupExecution();
 
       virtual void redo();
       virtual void undo();
@@ -267,9 +268,9 @@ namespace Isis {
       void setCreatesCleanState(bool createsCleanState);
       /** 
        *  Sets whether this work order is put on the QUndoStack.
-          If this is set to false, all of the work needs to go in the execute method.  The syncRedo
-          and asyncRedo methods will never be called since the work order is not pushed onto the
-          undo stack which is where the WorkOrder::redo method is called.
+          If this is set to false, all of the work needs to go in the setupExecution method.  The
+          syncRedo and asyncRedo methods will never be called since the work order is not pushed
+          onto the undo stack which is where the WorkOrder::redo method is called.
          */
       void setUndoRedo(bool undoRedo);
       void setModifiesDiskState(bool changesProjectOnDisk);
@@ -357,7 +358,7 @@ namespace Isis {
       /**
        * This is defaulted to true. The work order will be pushed onto the QUndoStack and the 
        * redo and undo methods will be called.  If false, then the work order is not put on the 
-       * QUndoStack and all of the work must go in the execute method of the work order. 
+       * QUndoStack and all of the work must go in the setupExecution method of the work order. 
        */
       bool m_undoRedo;
 
@@ -442,7 +443,7 @@ namespace Isis {
       QMutex *m_transparentConstMutex;
 
       /**
-       * This is the date/time that execute() was called.
+       * This is the date/time that setupExecution() was called.
        */
       QDateTime m_executionTime;
 

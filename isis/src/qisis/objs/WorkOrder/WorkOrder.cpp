@@ -1065,14 +1065,16 @@ namespace Isis {
   }
 
 
-  /**
+  /** 
+   * @brief This sets up the state for the work order.  Child should implement this to get user 
+   *        input.
+   *  
    * @description This method is designed to be implemented by children work orders, but they need
-   * to call this version inside of their execute (at the beginning). The order of execution for
-   * work orders is:
-   *   execute() - GUI thread, can ask user for input*
+   * to call this version inside of their setupExecution (at the beginning). The order of execution 
+   * for work orders is: 
+   *   setupExecution() - GUI thread, can ask user for input
    *   syncRedo() - GUI thread, should not prompt the user for input
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread
+   *   asyncRedo() - Pooled thread postSyncRedo() - GUI thread
    *
    *   syncUndo() - GUI thread, always called after redo finishes
    *   asyncUndo() - Pooled thread
@@ -1090,7 +1092,7 @@ namespace Isis {
    *
    * @return @b bool Returns True upon successful execution of the WorkOrder, False otherwise.
    */
-  bool WorkOrder::execute() {
+  bool WorkOrder::setupExecution() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
     //   redo()
     if (createsCleanState() || !onUndoStack()) {
@@ -1540,8 +1542,8 @@ namespace Isis {
   /**
    * @description This will determine whether this work order is put on the QUndoStack and the 
    *              redo/undo methods are not called. If set to false, the work order will not be put
-   *              on the QUndoStack and assumes all of the work was completed in the execute method.
-   *              If set to true (default), the work order is put on the QUndoStack and the
+   *              on the QUndoStack and assumes all of the work was completed in the setupExecution
+   *              method. If set to true (default), the work order is put on the QUndoStack and the
    *              redo/undo methods of the work order are called.
    */
   void WorkOrder::setUndoRedo(bool undoRedo) {
