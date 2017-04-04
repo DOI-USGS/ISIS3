@@ -116,6 +116,7 @@ namespace Isis {
    *   @history 2017-02-06 Tracie Sucharski - When adding a work order to the project, check the
    *                           work order to determine if it should be put on the QUndoStack.
    *                           Fixes #4598.
+   *   @history 2017-03-30 Tracie Sucharski - Cleaned up some documentation regarding last change. 
    */
   class Project : public QObject {
     Q_OBJECT

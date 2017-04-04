@@ -65,6 +65,22 @@ namespace Isis {
    *   (have member variables) that store state between syncRedo(), asyncRedo() and postSyncRedo()
    *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
    *   work order to not function properly when saved/restored from disk.
+   *  
+   *   The order of execution for work orders is:
+   *   execute() - GUI thread, can ask user for input*
+   *   syncRedo() - GUI thread, should not prompt the user for input
+   *   asyncRedo() - Pooled thread
+   *   postSyncRedo() - GUI thread
+   *
+   *   syncUndo() - GUI thread, always called after redo finishes
+   *   asyncUndo() - Pooled thread
+   *   postSyncUndo() - GUI thread
+   *
+   *   syncRedo() - GUI thread
+   *   asyncRedo() - Pooled thread
+   *   postSyncRedo() - GUI thread
+   *
+   *   and so on...
    *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
@@ -249,10 +265,13 @@ namespace Isis {
       Project *project() const;
 
       void setCreatesCleanState(bool createsCleanState);
-      /**
-       * This determines whether the work order is put on the QUndoStack.
-       */
-      void setUndoRedo(bool undoRedo);  
+      /** 
+       *  Sets whether this work order is put on the QUndoStack.
+          If this is set to false, all of the work needs to go in the execute method.  The syncRedo
+          and asyncRedo methods will never be called since the work order is not pushed onto the
+          undo stack which is where the WorkOrder::redo method is called.
+         */
+      void setUndoRedo(bool undoRedo);
       void setModifiesDiskState(bool changesProjectOnDisk);
       void setInternalData(QStringList data);
 

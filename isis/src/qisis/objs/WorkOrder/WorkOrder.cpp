@@ -910,7 +910,7 @@ namespace Isis {
 
   /**
    * @description Starts (or enqueues) a redo. This should not be re-implemented by children.
-   * TODO:  (Then why is it declared virtual?)
+   * 
    */
   void WorkOrder::redo() {
     if (!isInStableState()) {

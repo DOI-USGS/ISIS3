@@ -1628,8 +1628,9 @@ namespace Isis {
         }
         // All other work orders go onto the undo stack, unless specifically told not to
         else if (workOrder->onUndoStack()) {
-          // All other work orders go onto the undo stack, unless specifically told not to
-          m_undoStack.push(workOrder); // This calls redo for us
+          // This calls WorkOrder::redo for us through Qt's QUndoStack::push method, redo is only
+          // implemented in the base class.  Child work orders do not implement redo. 
+          m_undoStack.push(workOrder); 
         }
 
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)
