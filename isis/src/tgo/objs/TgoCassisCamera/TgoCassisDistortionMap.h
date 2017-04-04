@@ -55,9 +55,8 @@ namespace Isis {
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
     private:
-      double normalize(double value, double a, double b);
-      double denormalize(double value, double a, double b);
-      double divisor(double i, double j);
+      double normalize(double value);
+      double denormalize(double value);
 
       QList<double> m_A1; //!< First row of parameters of rational distortion model.
       QList<double> m_A2; //!< Second row of parameters of rational distortion model.
