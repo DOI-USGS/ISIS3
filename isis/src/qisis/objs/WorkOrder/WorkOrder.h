@@ -344,17 +344,7 @@ namespace Isis {
           WorkOrder *m_workOrder;
       };
 
-
-    private:
-      WorkOrder &operator=(const WorkOrder &rhs);
-
-      /**
-       * This is defaulted to false. If a work order saves the project to disk, this causes a
-       *   'clean' (non-dirty) state. These work orders should call setCreatesCleanState(true)
-       *   in their constructor.
-       */
-      bool m_createsCleanState;
-
+    protected:
       /**
        * This is defaulted to true. If true, the work order will be pushed onto the QUndoStack and the
        * redo and undo methods will be called.  If false, then the work order is not put on the 
@@ -368,6 +358,16 @@ namespace Isis {
         * block the GUI.
         */
        bool m_isSynchronous;
+
+    private:
+      WorkOrder &operator=(const WorkOrder &rhs);
+
+      /**
+       * This is defaulted to false. If a work order saves the project to disk, this causes a
+       *   'clean' (non-dirty) state. These work orders should call setCreatesCleanState(true)
+       *   in their constructor.
+       */
+      bool m_createsCleanState;
 
       /**
        * This is defaulted to false. If a WorkOrder modifies the project on disk to perform its

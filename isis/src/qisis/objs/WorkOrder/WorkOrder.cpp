@@ -65,6 +65,7 @@ namespace Isis {
 
     m_isUndoable = true;
     m_isSynchronous = true;
+
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
