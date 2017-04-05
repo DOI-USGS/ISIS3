@@ -56,8 +56,6 @@ namespace Isis {
       ~ImportControlNetWorkOrder();
 
       virtual ImportControlNetWorkOrder *clone() const;
-
-      virtual bool isSynchronous() const;
       
       bool setupExecution();
       void execute();

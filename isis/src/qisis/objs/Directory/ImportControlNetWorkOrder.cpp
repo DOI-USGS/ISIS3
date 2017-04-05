@@ -39,6 +39,10 @@ namespace Isis {
 
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(Project *project) :
       WorkOrder(project) {
+
+    // This is an asynchronous workorder
+    m_isSynchronous = false;
+
     m_watcher = NULL;
 
     QAction::setText(tr("Import &Control Networks..."));
@@ -70,19 +74,6 @@ namespace Isis {
     return new ImportControlNetWorkOrder(*this);
   }
 
-  /**
-   * @brief Returns if the WorkOrder is synchronous
-   * 
-   * @description This method overrides WorkOrder's isSynchronous. This will return false as this 
-   * WorkOrder is asynchronous.
-   * 
-   * @see WorkOrder::isSynchronous()
-   * 
-   * @return bool Returns false because this WorkOrder is asynchronous.
-   */
-  bool ImportControlNetWorkOrder::isSynchronous() const {
-    return false;
-  }
   
   /**
    * @brief Sets up the work order for execution.

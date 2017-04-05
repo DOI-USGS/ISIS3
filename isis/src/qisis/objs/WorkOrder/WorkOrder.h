@@ -192,8 +192,8 @@ namespace Isis {
       void setPrevious(WorkOrder *previousWorkOrder);
 
       QString bestText() const;
-      virtual bool isUndoable() const;
-      virtual bool isSynchronous() const;
+      bool isUndoable() const;
+      bool isSynchronous() const;
       bool createsCleanState() const;
       QDateTime executionTime() const;
       bool isFinished() const;
@@ -272,10 +272,6 @@ namespace Isis {
       Project *project() const;
 
       void setCreatesCleanState(bool createsCleanState);
-      /**
-       * This determines whether the work order is put on the QUndoStack.
-       */
-      void setUndoable(bool undoable);
       void setModifiesDiskState(bool changesProjectOnDisk);
       void setInternalData(QStringList data);
 
@@ -346,16 +342,19 @@ namespace Isis {
 
     protected:
       /**
-       * This is defaulted to true. If true, the work order will be pushed onto the QUndoStack and the
-       * redo and undo methods will be called.  If false, then the work order is not put on the 
-       * QUndoStack and all of the work must go in the setupExecution method of the work order. 
+       * Set the workorder to be undoable/redoable
+       * This is defaulted to true - his will allow the workorder to be redone.  Note
+       * the workorder Undo method must be implemented.  This will result on the
+       * workorder being placed on the QUndoStack and being displayed in the history
+       * as being undoable. If set to false, the work order will not be put on the
+       * QUndoStack and the workorder will not be able to be undone.
        */
       bool m_isUndoable;
 
       /**
-        * This is defaulted to true. If true, the work order will be executed on the GUI thread synchronously.
-        * If false, then the work order will be queued for execution on a non-GUI thread and wil not
-        * block the GUI.
+        * This is defaulted to true. If true, the work order will be executed on the GUI
+        * thread synchronously. If false, then the work order will be queued for execution
+        * on a non-GUI thread and will not block the GUI.
         */
        bool m_isSynchronous;
 

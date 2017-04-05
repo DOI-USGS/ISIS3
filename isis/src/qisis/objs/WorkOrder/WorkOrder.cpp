@@ -724,13 +724,9 @@ namespace Isis {
 
 
   /**
-   * @brief Returns true if this work order is on the QUndoStack, otherwise false.
-   *  
-   * @desc This returns whether this work order is undoable and if it has been pushed onto the 
-   *       QUndoStack.  Note:  Qt's QUndoStack::push method will call the work order's ::redo
-   *       method.
-   *  
-   * @return @b (bool) Returns True if this work order is on the QUndoStack, false if it is not.
+   * @brief Returns true if this work order is undoable, otherwise false.
+   *
+   * @return @b (bool) Returns True if this work order is undoable, false if it is not.
    */
   bool WorkOrder::isUndoable() const {
     return m_isUndoable;
@@ -739,9 +735,6 @@ namespace Isis {
 
   /**
    * @brief Returns true if this work order is run synchronously, otherwise false.
-   *  
-   * @desc This returns whether this work order is run synchronously, if false this work order is 
-   *       run asynchronously. 
    *  
    * @return @b (bool) Returns True if this work order is run synchronously
    */
@@ -1539,24 +1532,6 @@ namespace Isis {
    */
   void WorkOrder::setCreatesCleanState(bool createsCleanState) {
     m_createsCleanState = createsCleanState;
-  }
-
-
-  /** 
-   * @brief This will prevent this work order from being pushed onto the QUndoStack. 
-   *  
-   * @description Set the workorder to be undoable/redoable.
-   *              setUndoable(TRUE) will allow the workorder to be redone.  Note the workorder Undo
-   *              method must be implemented.  This will result on the workorder being placed on the
-   *              QUndoStack and being displayed in the history as being undoable.
-   *              If set to false, the work order will not be put on the QUndoStack and the workorder
-   *              will not be able to be undone.
-   *  
-   * @param[in] undoable (bool)   Indicates whether this work order is undoable and should be pushed 
-   *                              onto the undo stack. 
-   */
-  void WorkOrder::setUndoable(bool unDoable) {
-    m_isUndoable = unDoable;
   }
 
 

@@ -51,8 +51,6 @@ namespace Isis {
       virtual SetActiveControlWorkOrder *clone() const;
 
       virtual bool isExecutable(ControlList *controls);
-      virtual bool isUndoable() const;
-      virtual bool isSynchronous() const;
 
       bool setupExecution();
       void execute();

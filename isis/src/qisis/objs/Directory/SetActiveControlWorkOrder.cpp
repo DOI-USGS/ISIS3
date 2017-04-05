@@ -38,6 +38,8 @@ namespace Isis {
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This workorder is not undoable
+    m_isUndoable = false;
 
     QAction::setText(tr("Set Active Control Network") );
     QUndoCommand::setText(tr("Set Active Control Network"));
@@ -80,28 +82,6 @@ namespace Isis {
     if (controls->size() != 1 || project()->activeControl() == controls->at(0)) {
       return false;
     }
-
-    return true;
-  }
-
-
-  /**
-   * @brief Indicates whether this work order is undoable. 
-   * 
-   * @return bool Returns false indicating that setting the active control net is not undoable.
-   */
-  bool SetActiveControlWorkOrder::isUndoable() const {
-
-    return false;
-  }
-
-
-  /**
-   * @brief Indicates that setting the active control net is a synchronous process
-   * 
-   * @return bool Returns true indicating that setting the active control net is syncronous.
-   */
-  bool SetActiveControlWorkOrder::isSynchronous() const {
 
     return true;
   }
