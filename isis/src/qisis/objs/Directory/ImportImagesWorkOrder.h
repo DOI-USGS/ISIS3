@@ -40,7 +40,7 @@ namespace Isis {
   /**
    * @brief Add cubes to a project
    *
-   * Asks the user for a list of cube file names and whether they should be copied into
+   * @description Asks the user for a list of cube file names and whether they should be copied into
    * the project. The cubes are then converted to external cube label files inside the project (and
    * cube files if the user said to copy the DN data). These files are then handed off to the
    * project.
@@ -57,6 +57,11 @@ namespace Isis {
    *                           images are freed from memory undo/redo correctly.
    *   @history 2012-10-29 Steven Lambright - Added a prompt to save the project if importing a lot
    *                           of images to a temporary project.
+   *   @history 2017-04-05 Ian Humphrey and Makayla Shepherd - Renamed the following: execute() to
+   *                           setupExeuction(), asyncRedo() to execute(), syncUndo() to
+   *                           undoExecution(), postSyncRedo() to postExecution(), and
+   *                           postSyncUndo() to postUndoExecution(). Added isSynchronous(). This is
+   *                           related to the WorkOrder redesign. Fixes #4732.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -67,12 +72,14 @@ namespace Isis {
 
       virtual ImportImagesWorkOrder *clone() const;
 
+      bool isSynchronous() const;
+
       bool setupExecution();
 
-      void asyncRedo();
-      void postSyncRedo();
-      void asyncUndo();
-      void postSyncUndo();
+      void execute();
+      void undoExecution();
+      void postExecution();
+      void postUndoExecution();
 
     private:
       ImportImagesWorkOrder &operator=(const ImportImagesWorkOrder &rhs);

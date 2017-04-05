@@ -63,6 +63,37 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Indicates that this work order is an asynchronous work order.
+   *
+   * @description Indicates that ImportImagesWorkOrder is not a synchronous work order; i.e.,
+   *              it is asynchronous.
+   *
+   * @see WorkOrder::isSynchronous()
+   *
+   * @return Returns false, as this is an asynchronous work order.
+   *
+   */
+  bool ImportImagesWorkOrder::isSynchronous() const {
+    return false;
+  }
+
+
+  /**
+   * @brief Sets up this work order before being executed.
+   *
+   * @description First invokes WorkOrder's setupExecution(). Prompts the user for cubes and image
+   * list files to import and stores them via a setInternalData() call. If there are more than 100
+   * images to import, the user is prompted if they want to save their project before the import
+   * occurs. If yes, a SaveProjectWorkOrder will be executed. This setup is considered successful
+   * if the user does not hit cancel on a dialog prompt and if there is at least one image has been
+   * selected by the user to import. This method was renamed from execute() to setupExecution()
+   * according to the WorkOrder redesign.
+   *
+   * @see WorkOrder::setupExecution()
+   *
+   * @return bool Returns true if the setup was successful.
+   */
   bool ImportImagesWorkOrder::setupExecution() {
     WorkOrder::setupExecution();
 
@@ -134,13 +165,31 @@ namespace Isis {
   }
 
 
-  void ImportImagesWorkOrder::asyncUndo() {
+  /**
+   * @brief Undoes the work order's execute.
+   *
+   * @description After this ImportImagesWorkOrder has executed and finished (all the images have
+   * been read), this removes the images from this import from disk in the project's directory.
+   * This was renamed from asyncUndo() to undoExecution() according to the WorkOrder redesign.
+   *
+   * @see WorkOrder::undoExecution()
+   */
+  void ImportImagesWorkOrder::undoExecution() {
     project()->waitForImageReaderFinished();
     project()->images().last()->deleteFromDisk(project());
   }
 
 
-  void ImportImagesWorkOrder::postSyncUndo() {
+  /**
+   * @brief Cleans up memory (images) after the undo execution occurs.
+   *
+   * @description After the undoExecution() occurs, this cleans up memory that was allocated for
+   * the images from this import. This was renamed from postSyncUndo() to postUndoExecution()
+   * according to the WorkOrder redesign.
+   *
+   * @see WorkOrder::postUndoExecution()
+   */
+  void ImportImagesWorkOrder::postUndoExecution() {
     QPointer<ImageList> imagesWeAdded = project()->images().last();
 
     foreach (Image *image, *imagesWeAdded) {
@@ -150,14 +199,34 @@ namespace Isis {
   }
 
 
-  void ImportImagesWorkOrder::asyncRedo() {
+  /**
+   * @brief Executes the work order.
+   *
+   * @description This actually "does" the work order task. In this case, this imports the images
+   * into memory and copies any necessary data to disk. This was renamed from asyncRedo() to
+   * execute() according to the WorkOrder redesign.
+   *
+   * @see ImportImagesWorkOrder::importConfirmedImages(QStringList confirmedImages, bool copyDnData)
+   * @see WorkOrder::execute()
+   */
+  void ImportImagesWorkOrder::execute() {
     if (internalData().count() > 0) {
       importConfirmedImages(internalData().mid(1), (internalData()[0] == "copy"));
     }
   }
 
 
-  void ImportImagesWorkOrder::postSyncRedo() {
+  /**
+   * @brief Associates the imported images to the project.
+   *
+   * @description After execute finishes, associates the imported images to the project. This will
+   * also notifies the project if there are any warnings that occurred related to the import. This
+   * was renamed from postSyncRedo() to postExecution() according to the WorkOrder redesign.
+   *
+   * @see Project::addImages(Imagelist newImages)
+   * @see WorkOrder::postExecution()
+   */
+  void ImportImagesWorkOrder::postExecution() {
     if (!m_newImages->isEmpty()) {
       project()->addImages(*m_newImages);
 
