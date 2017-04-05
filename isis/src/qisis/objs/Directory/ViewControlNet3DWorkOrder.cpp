@@ -85,8 +85,8 @@ namespace Isis {
    * @brief Attempts to display a control network in 3D.
    * @return @b bool True upon success, False otherwise.
    */
-  bool ViewControlNet3DWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ViewControlNet3DWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
 

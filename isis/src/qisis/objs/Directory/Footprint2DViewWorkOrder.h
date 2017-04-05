@@ -66,7 +66,7 @@ namespace Isis {
 
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
-      bool execute();
+      bool setupExecution();
 
     private:
       Footprint2DViewWorkOrder &operator=(const Footprint2DViewWorkOrder &rhs);

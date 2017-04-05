@@ -72,8 +72,8 @@ namespace Isis {
   }
 
 
-  bool RenameProjectWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool RenameProjectWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success && internalData().count() == 0) {
       QString newName;

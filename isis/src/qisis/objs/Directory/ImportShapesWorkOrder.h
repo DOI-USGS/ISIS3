@@ -57,7 +57,7 @@ namespace Isis {
 
       virtual ImportShapesWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
 
       void asyncRedo();
       void postSyncRedo();

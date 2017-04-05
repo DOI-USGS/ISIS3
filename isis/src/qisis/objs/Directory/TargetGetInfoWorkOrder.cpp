@@ -94,8 +94,8 @@ namespace Isis {
    * @brief Attempt to retrieve the Target info and view it.
    * @return @b bool True if successful, False otherwise.
    */
-  bool TargetGetInfoWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool TargetGetInfoWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString targetDisplayName = targetBody()->displayProperties()->displayName();

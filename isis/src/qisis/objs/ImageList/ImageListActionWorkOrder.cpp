@@ -107,8 +107,8 @@ namespace Isis {
    * 
    * @return @b bool If the work order successfully set the needed the information.
    */
-  bool ImageListActionWorkOrder::execute() {
-    bool result = WorkOrder::execute() && !internalData().isEmpty();
+  bool ImageListActionWorkOrder::setupExecution() {
+    bool result = WorkOrder::setupExecution() && !internalData().isEmpty();
 
     if (!internalData().isEmpty()) {
       QStringList state = internalData();

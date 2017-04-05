@@ -38,7 +38,7 @@ namespace Isis {
       bool isExecutable(ImageList *images);
 
 
-      bool execute();
+      bool setupExecution();
 
       void asyncRedo();
       void postSyncRedo();

@@ -48,7 +48,7 @@ namespace Isis {
 
       bool isExecutable(Context context);
 
-      bool execute();
+      bool setupExecution();
 
       static bool isNameValid(QString nameToCheck);
 

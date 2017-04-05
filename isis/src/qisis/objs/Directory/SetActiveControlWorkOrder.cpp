@@ -88,8 +88,8 @@ namespace Isis {
    * @brief Attempt to set control as active control.
    * @return @b bool True if successful, False otherwise.
    */
-  bool SetActiveControlWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SetActiveControlWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
 

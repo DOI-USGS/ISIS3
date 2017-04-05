@@ -63,7 +63,7 @@ namespace Isis {
     m_guiCamera = GuiCameraQsp();
     m_targetBody = TargetBodyQsp();
 
-    m_undoRedo = true;
+    m_isUndoable = true;
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
@@ -88,7 +88,7 @@ namespace Isis {
     connect(this, SIGNAL(triggered()),
             this, SLOT(addCloneToProject()));
     connect(m_futureWatcher, SIGNAL(finished()),
-            this, SLOT(asyncFinished()));
+            this, SLOT(executionFinished()));
   }
 
 
@@ -115,7 +115,9 @@ namespace Isis {
     m_targetBody = other.m_targetBody;
     m_internalData = other.m_internalData;
 
-    m_undoRedo = true;
+    m_isUndoable = true;
+    m_isSynchronous = true;
+
     m_createsCleanState = other.m_createsCleanState;
     m_modifiesDiskState = other.m_modifiesDiskState;
 
@@ -143,7 +145,7 @@ namespace Isis {
     connect(this, SIGNAL(triggered()),
             this, SLOT(addCloneToProject()));
     connect(m_futureWatcher, SIGNAL(finished()),
-            this, SLOT(asyncFinished()));
+            this, SLOT(executionFinished()));
 
     listenForImageDestruction();
     listenForShapeDestruction();
@@ -724,8 +726,8 @@ namespace Isis {
    *
    * @return @b Returns True if this work order is on the QUndoStack.  False if it is not.
    */
-  bool WorkOrder::onUndoStack() const {
-    return m_undoRedo;
+  bool WorkOrder::isUndoable() const {
+    return m_isUndoable;
   }
 
 
@@ -988,12 +990,19 @@ namespace Isis {
         m_elapsedTimer = new QTime;
         m_elapsedTimer->start();
 
-        syncRedo();
-
-        m_progressBar->setText("Running...");
-        m_progressBar->update();
-        QFuture<void> future = QtConcurrent::run(this, &WorkOrder::asyncRedo);
-        m_futureWatcher->setFuture(future);
+        if (isSynchronous()) {
+          execute();
+          executionFinished();
+        }
+        else {
+          m_progressBar->setText("Running...");
+          m_progressBar->update();
+          // queue the workorder for asynchronous execution
+          QFuture<void> future = QtConcurrent::run(this, &WorkOrder::execute);
+          // executionFinished() is called via the finished signal.  The
+          // connection is setup in the constructor.
+          m_futureWatcher->setFuture(future);
+        }
       }
     }
     else {
@@ -1051,12 +1060,19 @@ namespace Isis {
         m_elapsedTimer = new QTime;
         m_elapsedTimer->start();
 
-        syncUndo();
-
-        m_progressBar->setText("Undoing...");
-        m_progressBar->update();
-        QFuture<void> future = QtConcurrent::run(this, &WorkOrder::asyncUndo);
-        m_futureWatcher->setFuture(future);
+        if (isSynchronous()) {
+          undoExecution();
+          executionFinished();
+        }
+        else {
+          m_progressBar->setText("Undoing...");
+          m_progressBar->update();
+          // queue the workorder for asynchronous execution
+          QFuture<void> future = QtConcurrent::run(this, &WorkOrder::undoExecution);
+          // executionFinished() is called via the finished signal.  The
+          // connection is setup in the constructor.
+          m_futureWatcher->setFuture(future);
+        }
       }
     }
     else {
@@ -1095,7 +1111,7 @@ namespace Isis {
   bool WorkOrder::setupExecution() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
     //   redo()
-    if (createsCleanState() || !onUndoStack()) {
+    if (createsCleanState() || !isUndoable()) {
       m_status = WorkOrderFinished;
 
       emit statusChanged(this);
@@ -1105,7 +1121,7 @@ namespace Isis {
 
     resetProgressBar();
 
-    if (createsCleanState()  || !onUndoStack()) {
+    if (createsCleanState()  || !isUndoable()) {
       setProgressToFinalText();
     }
     else {
@@ -1206,102 +1222,70 @@ namespace Isis {
 
 
   /**
-   * @description This method is designed to be implemented by children work orders.
-   * The order of execution for
-   * redo is:
-   *   syncRedo() - GUI thread*
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread
+   * @description Execute the workorder.
+   * Execute() does the actual work in the work order. All necessary data for the execution (and
+   * undo) of the
+   * workorder should have been saved in the workorder prior to execute().  Execute() is also called
+   * to redo a workorder for redoable workorders.  If the workorder is a synchrounous workorder
+   * the workorder will be run on the GUI thread, otherwise it will be queued and run on a separate
+   * thread.
    *
+   * For Synchronous workorders:
    * State should only be read from the parent WorkOrder class in this method. You can set state to
    * be used in asyncRedo() and postSyncRedo() safely. This method is always executed in the GUI
    * thread and has no progress.
-   */
-  void WorkOrder::syncRedo() {
-  }
-
-
-  /**
-   * @description This method is designed to be implemented by children work orders.
-   * The order of execution for
-   * redo is:
-   *   syncRedo() - GUI thread
-   *   asyncRedo() - Pooled thread*
-   *   postSyncRedo() - GUI thread
    *
+   * For asynchronous workorders:
    * State can be read from the parent WorkOrder class and from state set in syncRedo() while in
    *   this method. You can set state to be used in postSyncRedo() safely. Please be wary of
    *   creating QObjects inside of this method because they will associated with the pooled thread
-   *   and must be moved back to the GUI thread with QObject::moveToThread(). This method is never
-   *   executed in the GUI thread. You can update progress by calling setProgressRange() and
+   *   and must be moved back to the GUI thread with QObject::moveToThread().  You can update
+   *   progress by calling setProgressRange() and
    *   setProgressValue(). Please do not manipulate any GUI objects here.
    */
-  void WorkOrder::asyncRedo() {
+  void WorkOrder::execute() {
   }
 
 
   /**
-   * @description This method is designed to be implemented by children work orders.
-   * The order of execution for
-   *     redo is:
-   *   syncRedo() - GUI thread
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread*
+   * @description Perform any necessary actions after execution of a workorder.
    *
-   * State can be read from the parent WorkOrder class and from state set in either syncRedo() or
+   * State can be read from the parent WorkOrder class and from state set in either synchronous() or
    *   asyncRedo() while in this method. You can not set state to be used in any of the undo code
    *   safely. This method is always executed in the GUI thread and has no progress.
    */
-  void WorkOrder::postSyncRedo() {
+  void WorkOrder::postExecution() {
   }
 
 
   /**
-   * This method is designed to be implemented by children work orders.
-   * The order of execution for
-   *     undo is:
-   *   syncUndo() - GUI thread*
-   *   asyncUndo() - Pooled thread
-   *   postSyncUndo() - GUI thread
+   * @description Execute the steps necessary to undo this workorder.
+   * The workorder should have all state necessary to undo itself stored in the workorder.
    *
+   *For synchronous workorders:
    * State should only be read from the parent WorkOrder class in this method. You can set state to
    *   be used in asyncUndo() and postSyncUndo() safely. This method is always executed in the GUI
    *   thread and has no progress.
-   */
-  void WorkOrder::syncUndo() {
-  }
-
-
-  /**
-   * This method is designed to be implemented by children work orders. The order of execution for
-   * undo is:
-   *   syncUndo() - GUI thread
-   *   asyncUndo() - Pooled thread*
-   *   postSyncUndo() - GUI thread
    *
+   *For Asynchronous workorders:
    * State can be read from the parent WorkOrder class and from state set in syncUndo() while in
    *   this method. You can set state to be used in postSyncUndo() safely. Please be wary of
    *   deleting QObjects inside of this method because they will cause unpredictable crashes. This
    *   method is never executed in the GUI thread. You can update progress by calling
    *   setProgressRange() and setProgressValue(). Please do not manipulate any GUI objects here.
    */
-  void WorkOrder::asyncUndo() {
+  void WorkOrder::undoExecution() {
   }
 
 
   /**
-   * @description This method is designed to be implemented by children work orders.
-   * The order of execution for
-   * undo is:
-   *   syncUndo() - GUI thread
-   *   asyncUndo() - Pooled thread
-   *   postSyncUndo() - GUI thread*
+   * @description Perform any steps necessary after an undo of a workorder.
    *
    * State can be read from the parent WorkOrder class and from state set in either syncUndo() or
    *   asyncUndo() while in this method. You can not set state to be used in any of the redo code
    *   safely. This method is always executed in the GUI thread and has no progress.
    */
-  void WorkOrder::postSyncUndo() {
+  void WorkOrder::postUndoExecution() {
   }
 
 
@@ -1450,18 +1434,18 @@ namespace Isis {
    * @brief Signals the Project that the WorkOrder is finished, deletes
    * the update time for the Progress bar, and sets the finished status.
    */
-  void WorkOrder::asyncFinished() {
+  void WorkOrder::executionFinished() {
     delete m_progressBarUpdateTimer;
 
     WorkOrderStatus finishedStatus = WorkOrderRedone;
-    void (WorkOrder::*postSyncMethod)() = &WorkOrder::postSyncRedo;
+    void (WorkOrder::*postMethod)() = &WorkOrder::postExecution;
 
     if (isUndoing()) {
       finishedStatus = WorkOrderUndone;
-      postSyncMethod = &WorkOrder::postSyncUndo;
+      postMethod = &WorkOrder::postUndoExecution;
     }
 
-    (this->*postSyncMethod)();
+    (this->*postMethod)();
 
     m_status = finishedStatus;
 
@@ -1540,14 +1524,15 @@ namespace Isis {
 
 
   /**
-   * @description This will determine whether this work order is put on the QUndoStack and the 
-   *              redo/undo methods are not called. If set to false, the work order will not be put
-   *              on the QUndoStack and assumes all of the work was completed in the setupExecution
-   *              method. If set to true (default), the work order is put on the QUndoStack and the
-   *              redo/undo methods of the work order are called.
+   * @description Set the workorder to be undoable/redoable.
+   *              setUndoable(TRUE) will allow the workorder to be redone.  Note the workorder Undo
+   *              method must be implemented.  This will result on the workorder being placed on the
+   *              QUndoStack and being displayed in the history as being undoable.
+   *              If set to false, the work order will not be put on the QUndoStack and the workorder
+   *              will not be able to be undone.
    */
-  void WorkOrder::setUndoRedo(bool undoRedo) {
-    m_undoRedo = undoRedo;
+  void WorkOrder::setUndoable(bool unDoable) {
+    m_isUndoable = unDoable;
   }
 
 

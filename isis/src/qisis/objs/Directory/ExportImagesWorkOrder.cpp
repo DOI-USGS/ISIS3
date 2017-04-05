@@ -80,8 +80,8 @@ namespace Isis {
    * 
    * @return bool 
    */
-  bool ExportImagesWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ExportImagesWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList internalData;

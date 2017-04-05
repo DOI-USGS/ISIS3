@@ -91,9 +91,9 @@ namespace Isis {
    *
    * @return @b bool true if the successfully executed
    */
-  bool OpenProjectWorkOrder::execute() {
+  bool OpenProjectWorkOrder::setupExecution() {
     //qDebug()<<"OpenProjectWorkOrder::execute()";
-    bool success = WorkOrder::execute();
+    bool success = WorkOrder::setupExecution();
 
     // We dislike the progress bar
     delete progressBar();

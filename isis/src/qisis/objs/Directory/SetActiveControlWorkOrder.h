@@ -51,7 +51,7 @@ namespace Isis {
       virtual SetActiveControlWorkOrder *clone() const;
 
       virtual bool isExecutable(ControlList *controls);
-      bool execute();
+      bool setupExecution();
 
     private:
       SetActiveControlWorkOrder &operator=(const SetActiveControlWorkOrder &rhs);

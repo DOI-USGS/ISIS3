@@ -188,7 +188,8 @@ namespace Isis {
       void setPrevious(WorkOrder *previousWorkOrder);
 
       QString bestText() const;
-      bool onUndoStack() const;
+      bool isUndoable() const;
+      bool isSynchronous() const;
       bool createsCleanState() const;
       QDateTime executionTime() const;
       bool isFinished() const;
@@ -266,13 +267,10 @@ namespace Isis {
       Project *project() const;
 
       void setCreatesCleanState(bool createsCleanState);
-      /** 
-       *  Sets whether this work order is put on the QUndoStack.
-          If this is set to false, all of the work needs to go in the setupExecution method.  The
-          syncRedo and asyncRedo methods will never be called since the work order is not pushed
-          onto the undo stack which is where the WorkOrder::redo method is called.
-         */
-      void setUndoRedo(bool undoRedo);
+      /**
+       * This determines whether the work order is put on the QUndoStack.
+       */
+      void setUndoable(bool undoable);
       void setModifiesDiskState(bool changesProjectOnDisk);
       void setInternalData(QStringList data);
 
@@ -283,12 +281,10 @@ namespace Isis {
       void setProgressValue(int);
 
       QStringList internalData() const;
-      virtual void syncRedo();
-      virtual void asyncRedo();
-      virtual void postSyncRedo();
-      virtual void syncUndo();
-      virtual void asyncUndo();
-      virtual void postSyncUndo();
+      virtual void execute();
+      virtual void postExecution();
+      virtual void undoExecution();
+      virtual void postUndoExecution();
 
     protected slots:
       void addCloneToProject();
@@ -302,7 +298,7 @@ namespace Isis {
 
     private slots:
       void attemptQueuedAction();
-      void asyncFinished();
+      void executionFinished();
       void clearImageList();
       void clearShapeList();
       void deleteProgress();
@@ -356,11 +352,18 @@ namespace Isis {
       bool m_createsCleanState;
 
       /**
-       * This is defaulted to true. The work order will be pushed onto the QUndoStack and the 
+       * This is defaulted to true. If true, the work order will be pushed onto the QUndoStack and the
        * redo and undo methods will be called.  If false, then the work order is not put on the 
        * QUndoStack and all of the work must go in the setupExecution method of the work order. 
        */
-      bool m_undoRedo;
+      bool m_isUndoable;
+
+      /**
+        * This is defaulted to true. If true, the work order will be executed on the GUI thread synchronously.
+        * If false, then the work order will be queued for execution on a non-GUI thread and wil not
+        * block the GUI.
+        */
+       bool m_isSynchronous;
 
       /**
        * This is defaulted to false. If a WorkOrder modifies the project on disk to perform its

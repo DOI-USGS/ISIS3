@@ -47,7 +47,7 @@ namespace Isis {
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View &Footprints..."));
-    setUndoRedo(false);
+    setUndoable(false);
   }
 
   /**
@@ -55,7 +55,7 @@ namespace Isis {
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
-    setUndoRedo(false);
+    setUndoable(false);
   }
 
   /**
@@ -115,8 +115,8 @@ namespace Isis {
    * 
    * @return @b bool True if WorkOrder::execute() returns true 
    */
-  bool Footprint2DViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool Footprint2DViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     int maxRecommendedFootprints = 50000;
     if (success && imageList()->count() > maxRecommendedFootprints) {

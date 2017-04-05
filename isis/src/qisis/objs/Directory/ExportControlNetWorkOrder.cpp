@@ -77,8 +77,8 @@ namespace Isis {
    * 
    * @return bool 
    */
-  bool ExportControlNetWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ExportControlNetWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList internalData;

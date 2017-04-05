@@ -43,7 +43,7 @@ namespace Isis {
       virtual CnetEditorViewWorkOrder *clone() const;
 
       virtual bool isExecutable(ControlList *controls);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

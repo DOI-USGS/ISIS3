@@ -47,7 +47,7 @@ namespace Isis {
       virtual CloseProjectWorkOrder *clone() const;
 
       virtual bool isExecutable();
-      bool execute();
+      bool setupExecution();
 
     signals:
 

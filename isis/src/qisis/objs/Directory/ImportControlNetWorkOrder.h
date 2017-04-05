@@ -53,7 +53,7 @@ namespace Isis {
 
       virtual ImportControlNetWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
 
     protected:
       void syncRedo();

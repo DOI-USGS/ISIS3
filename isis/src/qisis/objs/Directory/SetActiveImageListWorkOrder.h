@@ -47,7 +47,7 @@ namespace Isis {
       virtual SetActiveImageListWorkOrder *clone() const;
 
       virtual bool isExecutable(ImageList *imageList);
-      bool execute();
+      bool setupExecution();
 
     private:
       SetActiveImageListWorkOrder &operator=(const SetActiveImageListWorkOrder &rhs);

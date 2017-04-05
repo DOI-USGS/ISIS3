@@ -32,7 +32,7 @@ namespace Isis {
       bool isExecutable(ControlList *controls);
 
 
-      bool execute();
+      bool setupExecution();
 
       void asyncRedo();
       void postSyncRedo();

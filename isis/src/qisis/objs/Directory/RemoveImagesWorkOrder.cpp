@@ -70,9 +70,9 @@ namespace Isis {
 
 
 
-  bool RemoveImagesWorkOrder::execute() {
+  bool RemoveImagesWorkOrder::setupExecution() {
 
-    bool success = WorkOrder::execute();
+    bool success = WorkOrder::setupExecution();
     return success;
     //TODO: 2016-07-29 TLS Should I ask if files should be deleted from disk also?
   }

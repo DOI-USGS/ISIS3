@@ -1614,7 +1614,7 @@ namespace Isis {
 
       workOrder->setPrevious(lastNotUndoneWorkOrder());
 
-      if (workOrder->execute()) {
+      if (workOrder->setupExecution()) {
         if (workOrder->previous()) workOrder->previous()->setNext(workOrder);
 
         m_workOrderHistory->append(workOrder);

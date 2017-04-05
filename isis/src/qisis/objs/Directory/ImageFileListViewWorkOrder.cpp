@@ -56,8 +56,8 @@ namespace Isis {
   }
 
 
-  bool ImageFileListViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ImageFileListViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList viewOptions;

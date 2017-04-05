@@ -55,7 +55,7 @@ namespace Isis {
       virtual OpenRecentProjectWorkOrder *clone() const;
 
       virtual bool isExecutable(QString projectFileName);
-      bool execute();
+      bool setupExecution();
 
     private:
       OpenRecentProjectWorkOrder &operator=(const OpenRecentProjectWorkOrder &rhs);

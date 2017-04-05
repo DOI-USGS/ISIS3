@@ -100,8 +100,8 @@ namespace Isis {
    * in a view.
    * @return  @b bool True if successful, False if not.
    */
-  bool SensorGetInfoWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SensorGetInfoWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString sensorDisplayName = guiCamera()->displayProperties()->displayName();

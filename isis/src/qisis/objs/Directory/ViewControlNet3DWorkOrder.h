@@ -48,7 +48,7 @@ namespace Isis {
 
       //virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ControlList *controls);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

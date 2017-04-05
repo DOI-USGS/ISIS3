@@ -68,8 +68,8 @@ namespace Isis {
   }
 
 
-  bool CnetEditorViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool CnetEditorViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QUndoCommand::setText(tr("View control network [%1] in new cnet editor view")

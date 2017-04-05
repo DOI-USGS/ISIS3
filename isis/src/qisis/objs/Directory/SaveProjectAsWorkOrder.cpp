@@ -56,8 +56,8 @@ namespace Isis {
   }
 
 
-  bool SaveProjectAsWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SaveProjectAsWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString newDestination =

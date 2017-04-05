@@ -56,7 +56,7 @@ namespace Isis {
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
 
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

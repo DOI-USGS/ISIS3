@@ -90,8 +90,8 @@ namespace Isis {
    *
    * @return @b bool True if WorkOrder::execute() returns true.
    */
-  bool MatrixViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool MatrixViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList viewOptions;

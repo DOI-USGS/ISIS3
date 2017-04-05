@@ -48,7 +48,7 @@ namespace Isis {
       virtual ImageFileListViewWorkOrder *clone() const;
 
       bool isExecutable(ImageList *images);
-      bool execute();
+      bool setupExecution();
 
     protected:
       void syncRedo();

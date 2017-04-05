@@ -50,7 +50,7 @@ namespace Isis {
       virtual TargetGetInfoWorkOrder *clone() const;
 
       virtual bool isExecutable(TargetBodyQsp targetBody);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

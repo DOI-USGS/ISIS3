@@ -45,7 +45,7 @@ namespace Isis {
       virtual JigsawWorkOrder *clone() const;
 
       virtual bool isExecutable();
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

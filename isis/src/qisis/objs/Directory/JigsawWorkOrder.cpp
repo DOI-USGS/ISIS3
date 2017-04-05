@@ -85,8 +85,8 @@ namespace Isis {
    * 
    * @return @b bool True if WorkOrder::execute() returns true.
    */
-  bool JigsawWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool JigsawWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 /*
     if (success) {
         JigsawDialog* bundledlg = new JigsawDialog(project());

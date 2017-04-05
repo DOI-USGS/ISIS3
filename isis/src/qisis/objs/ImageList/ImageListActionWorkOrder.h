@@ -82,7 +82,7 @@ namespace Isis {
       bool isExecutable(ImageList *images);
       void setData(ImageList *images);
 
-      bool execute();
+      bool setupExecution();
       void syncRedo();
       void syncUndo();
 

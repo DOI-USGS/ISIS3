@@ -50,7 +50,7 @@ namespace Isis {
 
       virtual OpenProjectWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
 
     signals:
       void openProjectFromCommandLine(QString);

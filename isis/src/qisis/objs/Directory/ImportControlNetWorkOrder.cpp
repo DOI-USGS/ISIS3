@@ -72,8 +72,8 @@ namespace Isis {
   }
 
 
-  bool ImportControlNetWorkOrder::execute() {
-    WorkOrder::execute();
+  bool ImportControlNetWorkOrder::setupExecution() {
+    WorkOrder::setupExecution();
 
     QStringList cnetFileNames = QFileDialog::getOpenFileNames(
         qobject_cast<QWidget *>(parent()),

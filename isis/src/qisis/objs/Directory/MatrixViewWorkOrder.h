@@ -46,7 +46,7 @@ namespace Isis {
       virtual MatrixViewWorkOrder *clone() const;
 
       virtual bool isExecutable(CorrelationMatrix matrix);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;

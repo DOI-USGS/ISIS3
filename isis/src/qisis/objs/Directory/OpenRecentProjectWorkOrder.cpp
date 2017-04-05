@@ -88,8 +88,8 @@ namespace Isis {
    * @brief Attempts to open the recent project.
    * @return  @b bool True if successful, False if not.
    */
-  bool OpenRecentProjectWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool OpenRecentProjectWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     // We dislike the progress bar
     // delete progressBar();

@@ -63,8 +63,8 @@ namespace Isis {
   }
 
 
-  bool ImportShapesWorkOrder::execute() {
-    WorkOrder::execute();
+  bool ImportShapesWorkOrder::setupExecution() {
+    WorkOrder::setupExecution();
 
     QStringList fileNames = QFileDialog::getOpenFileNames(
         qobject_cast<QWidget *>(parent()),

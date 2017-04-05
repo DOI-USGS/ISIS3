@@ -99,8 +99,8 @@ namespace Isis {
    * 
    * @return @b bool True if WorkOrder::execute() returns true.
    */
-  bool CubeDnViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool CubeDnViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
 
 

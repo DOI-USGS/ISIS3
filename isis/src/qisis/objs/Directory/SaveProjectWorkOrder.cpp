@@ -58,8 +58,8 @@ namespace Isis {
   }
 
 
-  bool SaveProjectWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SaveProjectWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       project()->save();

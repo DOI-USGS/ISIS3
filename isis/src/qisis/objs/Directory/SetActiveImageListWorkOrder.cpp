@@ -86,8 +86,8 @@ namespace Isis {
    * @brief Attempt to set imageList as active ImageList.
    * @return @b bool True if successful, False otherwise.
    */
-  bool SetActiveImageListWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SetActiveImageListWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       project()->setActiveImageList(imageList()->name());
