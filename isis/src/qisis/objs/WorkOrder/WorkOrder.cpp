@@ -64,6 +64,7 @@ namespace Isis {
     m_targetBody = TargetBodyQsp();
 
     m_isUndoable = true;
+    m_isSynchronous = true;
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
@@ -115,8 +116,8 @@ namespace Isis {
     m_targetBody = other.m_targetBody;
     m_internalData = other.m_internalData;
 
-    m_isUndoable = true;
-    m_isSynchronous = true;
+    m_isUndoable = other.m_isUndoable;
+    m_isSynchronous = other.m_isSynchronous;
 
     m_createsCleanState = other.m_createsCleanState;
     m_modifiesDiskState = other.m_modifiesDiskState;
@@ -722,12 +723,29 @@ namespace Isis {
 
 
   /**
-   * @brief Returns if this work order is on the QUndoStack
-   *
-   * @return @b Returns True if this work order is on the QUndoStack.  False if it is not.
+   * @brief Returns true if this work order is on the QUndoStack, otherwise false.
+   *  
+   * @desc This returns whether this work order is undoable and if it has been pushed onto the 
+   *       QUndoStack.  Note:  Qt's QUndoStack::push method will call the work order's ::redo
+   *       method.
+   *  
+   * @return @b (bool) Returns True if this work order is on the QUndoStack, false if it is not.
    */
   bool WorkOrder::isUndoable() const {
     return m_isUndoable;
+  }
+
+
+  /**
+   * @brief Returns true if this work order is run synchronously, otherwise false.
+   *  
+   * @desc This returns whether this work order is run synchronously, if false this work order is 
+   *       run asynchronously. 
+   *  
+   * @return @b (bool) Returns True if this work order is run synchronously
+   */
+  bool WorkOrder::isSynchronous() const {
+    return m_isSynchronous;
   }
 
 
@@ -1013,7 +1031,7 @@ namespace Isis {
 
   /**
    * @brief Starts (or enqueues) an undo. This should not be re-implemented by children.
-   * (Why virtual then?)
+   * 
    */
   void WorkOrder::undo() {
     if (!isInStableState()) {
@@ -1523,13 +1541,18 @@ namespace Isis {
   }
 
 
-  /**
+  /** 
+   * @brief This will prevent this work order from being pushed onto the QUndoStack. 
+   *  
    * @description Set the workorder to be undoable/redoable.
    *              setUndoable(TRUE) will allow the workorder to be redone.  Note the workorder Undo
    *              method must be implemented.  This will result on the workorder being placed on the
    *              QUndoStack and being displayed in the history as being undoable.
    *              If set to false, the work order will not be put on the QUndoStack and the workorder
    *              will not be able to be undone.
+   *  
+   * @param[in] undoable (bool)   Indicates whether this work order is undoable and should be pushed 
+   *                              onto the undo stack. 
    */
   void WorkOrder::setUndoable(bool unDoable) {
     m_isUndoable = unDoable;

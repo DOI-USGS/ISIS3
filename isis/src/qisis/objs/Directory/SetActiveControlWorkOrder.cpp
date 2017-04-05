@@ -41,6 +41,7 @@ namespace Isis {
 
     QAction::setText(tr("Set Active Control Network") );
     QUndoCommand::setText(tr("Set Active Control Network"));
+
   }
 
 
@@ -85,32 +86,63 @@ namespace Isis {
 
 
   /**
-   * @brief Attempt to set control as active control.
-   * @return @b bool True if successful, False otherwise.
+   * @brief Indicates whether this work order is undoable. 
+   * 
+   * @return bool Returns false indicating that setting the active control net is not undoable.
+   */
+  bool SetActiveControlWorkOrder::isUndoable() const {
+
+    return false;
+  }
+
+
+  /**
+   * @brief Indicates that setting the active control net is a synchronous process
+   * 
+   * @return bool Returns true indicating that setting the active control net is syncronous.
+   */
+  bool SetActiveControlWorkOrder::isSynchronous() const {
+
+    return true;
+  }
+
+
+  /**
+   * @desc Make sure an active ImageList has been chosen. 
+   *  
+   * @return @b bool True if project has an active ImageList, False otherwise.
    */
   bool SetActiveControlWorkOrder::setupExecution() {
+
     bool success = WorkOrder::setupExecution();
-
     if (success) {
+      if (!project()->activeImageList()) {
 
-      if (project()->activeImageList()) {
-        project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
-
-        QUndoCommand::setText(tr("Set Active Control Network to [%1]").arg(
-                                 controlList()->at(0)->displayProperties()->displayName()));
-        success = true;
-      }
-      else {
         QMessageBox::critical(NULL, tr("Unable to set active control."), 
                               tr("You must first choose an active Image List before setting "
-                                 "the active control net."));
+                              "the active control net."));
         success = false;
       }
-//    internalData.append(activeControl()->displayProperties()->displayName());
-//    setInternalData(internalData);
+      //  So far, so good, set the command text
+      else {
+        QUndoCommand::setText(tr("Set Active Control Network to [%1]").arg(
+                                 controlList()->at(0)->displayProperties()->displayName()));
+      }
     }
 
     return success;
+  }
+
+
+  /**
+   * @desc  Set the active control net for the project.  This allows any views to operate on the 
+   *        same control net.  The active image list must be set before the active control net is
+   *        chosen.  If not, a critical message dialog is displayed and we return false.
+   * 
+   */
+  void SetActiveControlWorkOrder::execute() {
+
+    project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
   }
 }
 

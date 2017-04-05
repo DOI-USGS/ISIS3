@@ -38,7 +38,7 @@ namespace Isis {
    * @history 2017-01-09 Tracie Sucharski - Moved the SetImages step to the 
    *                         Project::setActiveControl.
    * @history 2017-01-30 Tracie Sucharski - Print active control in the Undo text. 
-   *
+   *          2017-04-04 Tracie Sucharski - Updated to reflect the new WorkOrder design.
    */
 
   class SetActiveControlWorkOrder : public WorkOrder {
@@ -51,7 +51,11 @@ namespace Isis {
       virtual SetActiveControlWorkOrder *clone() const;
 
       virtual bool isExecutable(ControlList *controls);
+      virtual bool isUndoable() const;
+      virtual bool isSynchronous() const;
+
       bool setupExecution();
+      void execute();
 
     private:
       SetActiveControlWorkOrder &operator=(const SetActiveControlWorkOrder &rhs);

@@ -117,6 +117,8 @@ namespace Isis {
    *                           work order to determine if it should be put on the QUndoStack.
    *                           Fixes #4598.
    *   @history 2017-03-30 Tracie Sucharski - Cleaned up some documentation regarding last change. 
+   *   @history 2017-04-04 Makayla Shepherd - Updated addToProject to support the new WorkOrder 
+   *                           design. Fixes #4729.
    */
   class Project : public QObject {
     Q_OBJECT

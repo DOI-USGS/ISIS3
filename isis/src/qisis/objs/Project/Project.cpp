@@ -1596,13 +1596,17 @@ namespace Isis {
 
 
   /**
-   * Run the work order and stores it in the project. If WorkOrder::execute() returns true then
-   *   the work order's redo is called. This takes ownership of workOrder.
+   * @brief This executes the WorkOrder and stores it in the project.
+   * 
+   * @decription Run the WorkOrder and stores it in the project. If WorkOrder::setupExecution() 
+   * returns true then the WorkOrder's redo is called. This takes ownership of WorkOrder.
    *
    * The order of events is:
-   *   1) WorkOrder::execute()
+   *   1) WorkOrder::setupExecution()
    *   2) emit workOrderStarting()
-   *   3) WorkOrder::redo() [optional - see WorkOrder]
+   *   3) WorkOrder::redo()
+   * 
+   * @see WorkOrder::redo()
    *
    * @param workOrder The work order to be executed. This work order must not already be in the
    *                    project.
@@ -1627,10 +1631,15 @@ namespace Isis {
           m_undoStack.setClean();
         }
         // All other work orders go onto the undo stack, unless specifically told not to
-        else if (workOrder->onUndoStack()) {
+        else if (workOrder->isUndoable()) {
           // This calls WorkOrder::redo for us through Qt's QUndoStack::push method, redo is only
           // implemented in the base class.  Child work orders do not implement redo. 
           m_undoStack.push(workOrder); 
+        }
+        else {
+          // If we get this far the WorkOrder is not-undoable therefore we have to call execute by
+          // hand
+          workOrder->execute();
         }
 
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)

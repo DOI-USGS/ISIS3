@@ -42,7 +42,6 @@ namespace Isis {
     m_watcher = NULL;
 
     QAction::setText(tr("Import &Control Networks..."));
-    QUndoCommand::setText(tr("Import Control Networks"));
 
     setModifiesDiskState(true);
 
@@ -71,8 +70,33 @@ namespace Isis {
     return new ImportControlNetWorkOrder(*this);
   }
 
-
+  /**
+   * @brief Returns if the WorkOrder is synchronous
+   * 
+   * @description This method overrides WorkOrder's isSynchronous. This will return false as this 
+   * WorkOrder is asynchronous.
+   * 
+   * @see WorkOrder::isSynchronous()
+   * 
+   * @return bool Returns false because this WorkOrder is asynchronous.
+   */
+  bool ImportControlNetWorkOrder::isSynchronous() const {
+    return false;
+  }
+  
+  /**
+   * @brief Sets up the work order for execution.
+   * 
+   * @description This method prompts the user for a control net to open. That control net is then
+   * saved using setInternalData data. This method was renamed from execute() to setupExecution()
+   * 
+   * @see WorkOrder::setupExecution()
+   * 
+   * @return bool Returns a boolean. This boolean is true if the internal data was set correctly.
+   */
   bool ImportControlNetWorkOrder::setupExecution() {
+    QUndoCommand::setText(tr("Import Control Networks"));
+    
     WorkOrder::setupExecution();
 
     QStringList cnetFileNames = QFileDialog::getOpenFileNames(
@@ -89,8 +113,13 @@ namespace Isis {
     return internalData().count() > 0;
   }
 
-
-  void ImportControlNetWorkOrder::syncRedo() {
+  /**
+   * @brief Imports the control network asynchronously.
+   * 
+   * @description This method asynchronously imports the control net. This method replaces both
+   * syncRedo() and asyncRedo().
+   */
+  void ImportControlNetWorkOrder::execute() {
 
     QDir cnetFolder = project()->addCnetFolder("controlNetworks");
 
@@ -106,10 +135,7 @@ namespace Isis {
 
     m_watcher->setFuture(QtConcurrent::mapped(cnetFileNamesAndProgress,
                                               CreateControlsFunctor(project(), cnetFolder)));
-  }
 
-
-  void ImportControlNetWorkOrder::asyncRedo() {
     while (!m_watcher->isFinished()) {
       setProgressRange(0, 100 * m_readProgresses.count());
       int totalProgress = 0;
@@ -133,8 +159,13 @@ namespace Isis {
     }
   }
 
-
-  void ImportControlNetWorkOrder::postSyncRedo() {
+  /**
+   * @brief Clears progress.
+   * 
+   * @description This method clears the progresses created in execute(). This method was renamed 
+   * from postSyncRedo() to postExecution().
+   */
+  void ImportControlNetWorkOrder::postExecution() {
 
     foreach (Progress *progress, m_readProgresses) {
       delete progress;
@@ -142,8 +173,13 @@ namespace Isis {
     m_readProgresses.clear();
   }
 
-
-  void ImportControlNetWorkOrder::syncUndo() {
+  /**
+   * @brief Deletes the control network
+   * 
+   * @description This method deletes the control network from the project. This method is was 
+   * renamed from undoSyncRedo() to undoExecution().
+   */
+  void ImportControlNetWorkOrder::undoExecution() {
     if (m_watcher->isFinished()) {
       ControlList *list = project()->controls().last();
       list->deleteFromDisk(project());
