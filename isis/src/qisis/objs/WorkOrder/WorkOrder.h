@@ -122,6 +122,9 @@ namespace Isis {
    *                          HistoryTreeWidget.  Fixes #4598.
    *   @history 2017-03-30 Tracie Sucharski - Renamed the execute method to setupExecution.
    *                          Fixes #4718.
+   *   @history 2017-04-04 JP Bonn - Updated to new design.  setupExecution() used for preparation.
+   *                          No longer separate methods for sync/async - workorder::execute()
+   *                          handles both sync/async
    *  
    */
   class WorkOrder : public QAction, public QUndoCommand {
