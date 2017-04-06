@@ -45,6 +45,9 @@ namespace Isis {
                                                  int naifIkCode) 
       : CameraDistortionMap(parent) {
 
+    m_width = 2048;
+    m_height = 2048;
+
     QString od = "INS" + toString(naifIkCode) + "_OD_";
 
     for(int i = 0; i < 6; i++) {
@@ -77,8 +80,8 @@ namespace Isis {
     p_focalPlaneY = dy;
 
     // i and j are normalized distorted coordinates
-    double i = normalize(dx);
-    double j = normalize(dy);
+    double i = normalize(dx, m_width,  m_height);
+    double j = normalize(dy, m_height, m_width);
 
     // convenience variables
     double i2 = i*i;
@@ -110,8 +113,8 @@ namespace Isis {
                    / divider;
 
     // denormalize ideal (x,y) coordinates
-    p_undistortedFocalPlaneX = denormalize(xNorm);
-    p_undistortedFocalPlaneY = denormalize(yNorm);
+    p_undistortedFocalPlaneX = denormalize(xNorm, m_width,  m_height);
+    p_undistortedFocalPlaneY = denormalize(yNorm, m_height, m_width);
 
     return true;
   }
@@ -131,8 +134,8 @@ namespace Isis {
     p_undistortedFocalPlaneY = uy;
 
     // x, y are normalized undistorted (ideal) coordinates
-    double xNorm = normalize(ux);
-    double yNorm = normalize(uy);
+    double xNorm = normalize(ux, m_width,  m_height);
+    double yNorm = normalize(uy, m_height, m_width);
 
     // i, j are distorted coordinates
     double iNorm = xNorm;
@@ -146,6 +149,11 @@ namespace Isis {
        * F_vec(i,j) = [ initialX - ( A1 * chi' ) / ( A3 * chi' ) ]
        *              [ initialY - ( A2 * chi' ) / ( A3 * chi' ) ]
       */
+      m_width = 0.0; 
+      m_height = 0.0; // Below we call SetFocalPlane(). This method normalizes its inputs, i.e.
+                      // iNorm and jNorm in this case. Since they are already normalized, we 
+                      // set height = weight = 0.0 so that normalize(value) just
+                      // returns value.
 
       if (SetFocalPlane(iNorm, jNorm) ) {
         double xPredict = p_undistortedFocalPlaneX;
@@ -203,47 +211,58 @@ namespace Isis {
       }
 
     }
+    m_width = 2048;
+    m_height = 2048;
+
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
     // denormalize distorted (i,j) coordinates
-    p_focalPlaneX = denormalize(iNorm);
-    p_focalPlaneY = denormalize(jNorm);
+    p_focalPlaneX = denormalize(iNorm, m_width,  m_height);
+    p_focalPlaneY = denormalize(jNorm, m_height, m_width);
     return true;
   }
 
 
   /**
-   * Normalize the value using the dimensions of the CCD, 2048 x 2048. This 
-   * method uses the formula below to normalize the given value: 
+   * Normalize the value using the given scalars. This method uses the formula 
+   * below to normalize the given value: 
    *  
-   *  @f[ norm = \frac{ value - \frac{2048}{2} }{ 2048 + 2048 } @f]
+   *  @f[ norm = \frac{ value - \frac{a}{2} }{ a + b } @f]
    * 
    * @param value Value to be normalize.
+   * @param a Primary scaling value.
+   * @param b Secondary scaling value.
    * 
    * @return @b double The normalized value.
    */
-  double TgoCassisDistortionMap::normalize(double value) {
-    // use scaling factor based on size of CCD:
-    // CCD width = CCD height = 2048
-    return (value - 2048 / 2) / 4096;
+  double TgoCassisDistortionMap::normalize(double value, double a, double b) {
+    double sum = a + b;
+    if (sum == 0) {
+      return value;
+    }
+    return (value - a / 2) / sum;
   }
 
 
   /**
-   * De-normalize the value using the dimensions of the CCD, 2048 x 2048. 
-   * This method is the inverse function of the normalize() function. It 
-   * uses the formula below to denormalize the given value: 
+   * De-normalize the value using the given scalars. This method is the 
+   * inverse function of the normalize() function. It uses the formula below 
+   * to denormalize the given value: 
    *  
-   *  @f[ denorm = value * (2048 + 2048) + \frac{2048}{2} @f]
+   *  @f[ denorm = value * (a + b) + \frac{a}{2} @f]
    * 
    * @param value Value to be normalize.
+   * @param a Primary scaling value.
+   * @param b Secondary scaling value.
    * 
    * @return @b double The normalized value.
    */
-  double TgoCassisDistortionMap::denormalize(double value) {
-    // use scaling factor based on size of CCD:
-    // CCD width = CCD height = 2048
-    return value * 4096 + 2048 / 2;
+  double TgoCassisDistortionMap::denormalize(double value, double a, double b) {
+    double sum = a + b;
+    if (sum == 0) {
+      return value;
+    }
+    return value * sum + a / 2;
   }
   
 }

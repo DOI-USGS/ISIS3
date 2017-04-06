@@ -42,6 +42,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-04-03 Jeannie Walldren - Original version.
+   *   @history 2017-04-06 Jeannie Walldren - Fixed bugs and updated unitTest.
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:
@@ -54,8 +55,11 @@ namespace Isis {
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
     private:
-      double normalize(double value);
-      double denormalize(double value);
+      double normalize(double value, double a, double b);
+      double denormalize(double value, double a, double b);
+
+      double m_width;   //!< The width of the CaSSIS CCD, used to normalize/denormalize variables.
+      double m_height;  //!< The height of the CaSSIS CCD, used to normalize/denormalize variables.
 
       QList<double> m_A1; //!< First row of parameters of rational distortion model.
       QList<double> m_A2; //!< Second row of parameters of rational distortion model.
