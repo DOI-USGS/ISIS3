@@ -79,19 +79,19 @@ namespace Isis {
    * @startuml {workOrderFlow.png} "WorkOrder Flow"
    * |GUI thread|
    * start
-   * :User selects workorder from menu<
+   *  #yellow:User selects workorder from menu<
    * if (workOrder::setupExecution()) then (true)
    *  repeat
    *   if (WorkOrder::isSynchronous()) then (true)
-   *     :WorkOrder::execute() on GUI thread;
+   *     :WorkOrder::execute();
    *   else (false)
    *     |non-GUI thread|
-   *     :WorkOrder::execute() on non-GUI thread;
+   *     :WorkOrder::execute();
    *     |GUI thread|
    *   endif
    *   :WorkOrder::postExecute();
    *
-   *  :User selects undo from menu<
+   *   #yellow:User selects undo from menu<
    *
    *   if (WorkOrder::isSynchronous()) then (true)
    *     :WorkOrder::undoExecution();
@@ -102,7 +102,7 @@ namespace Isis {
    *  endif
    *  :WorkOrder::postUndoExecution();
    *
-   * :User selects redo from menu<
+   *  #yellow:User selects redo from menu<
    * repeat while (test)
    *
    * else (false)
