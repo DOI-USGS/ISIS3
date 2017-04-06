@@ -59,27 +59,58 @@ namespace Isis {
    *   undo/redo capabilities (which need to be implemented correctly), and the ability for the
    *   project to guarantee a good state on disk.
    *
-   * State between the end of setupExecution() and the beginning of the redo methods must be saved 
-   *   via the parent (WorkOrder) class. This is to ensure serializability. State between the redo
-   *   methods and undo methods should work the same way. Child implementations may only save state
-   *   (have member variables) that store state between syncRedo(), asyncRedo() and postSyncRedo()
-   *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
+   * State between the end of setupExecution() and the beginning of the execute() method must be saved
+   *   via the parent (WorkOrder) class. This is to ensure serializability. State between the execute()
+   *   method and undoExecution() should work the same way. Child implementations may only save state
+   *   (have member variables) that store state between execute() and postExecution()
+   *   OR between undoExecution() and postUndoExecution(). Other forms of state will cause the
    *   work order to not function properly when saved/restored from disk.
    *  
    *   The order of execution for work orders is:
    *   setupExecution() - GUI thread, can ask user for input
-   *   syncRedo() - GUI thread, should not prompt the user for input
-   *   asyncRedo() - Pooled thread postSyncRedo() - GUI thread
+   *   execute() - run on either the GUI thread or a non-GUI thread as specified by the m_isSynchronous flag
+   *   postExecution() -
    *
-   *   syncUndo() - GUI thread, always called after redo finishes
-   *   asyncUndo() - Pooled thread
-   *   postSyncUndo() - GUI thread
    *
-   *   syncRedo() - GUI thread
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread
+   *   undoExecution() - run on either the GUI thread or a non-GUI thread as specified by the
+   *                     m_isSynchronous flag
+   *   postUndoExecution() -
    *
-   *   and so on...
+   * @startuml {workOrderFlow.png} "WorkOrder Flow"
+   * |GUI thread|
+   * start
+   * :User selects workorder from menu<
+   * if (workOrder::setupExecution()) then (true)
+   *  repeat
+   *   if (WorkOrder::isSynchronous()) then (true)
+   *     :WorkOrder::execute() on GUI thread;
+   *   else (false)
+   *     |non-GUI thread|
+   *     :WorkOrder::execute() on non-GUI thread;
+   *     |GUI thread|
+   *   endif
+   *   :WorkOrder::postExecute();
+   *
+   *  :User selects undo from menu<
+   *
+   *   if (WorkOrder::isSynchronous()) then (true)
+   *     :WorkOrder::undoExecution();
+   *   else (false)
+   *     |non-GUI thread|
+   *     :WorkOrder::undoExecution();
+   *    |GUI thread|
+   *  endif
+   *  :WorkOrder::postUndoExecution();
+   *
+   * :User selects redo from menu<
+   * repeat while (test)
+   *
+   * else (false)
+   *   stop
+   * endif
+   * stop
+   * @enduml
+   *
    *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
@@ -230,8 +261,8 @@ namespace Isis {
        *   work order. This could be a list of file names, an ImageList of images you're viewing,
        *   or really anything else.
        *
-       * Finally, the actual work needs done in *Redo(), using only state (data) stored by the
-       *   parent (this) WorkOrder class. You do not have to call *Redo() - this is done for you
+       * Finally, the actual work needs done in execute(), using only state (data) stored by the
+       *   parent (this) WorkOrder class. You do not have to call execute() - this is done for you
        *   by WorkOrder::redo().  WorkOrder::redo() is called from Project::addToProject() when the
        *   workOrder is pushed onto the undo stack.
        *
@@ -244,6 +275,7 @@ namespace Isis {
        *           into the history and redo will never be called.
        */
       virtual bool setupExecution();
+
       virtual void execute();
 
       virtual void redo();
@@ -344,7 +376,7 @@ namespace Isis {
       /**
        * Set the workorder to be undoable/redoable
        * This is defaulted to true - his will allow the workorder to be redone.  Note
-       * the workorder Undo method must be implemented.  This will result on the
+       * the workorder undoExecution() method must be implemented.  This will result on the
        * workorder being placed on the QUndoStack and being displayed in the history
        * as being undoable. If set to false, the work order will not be put on the
        * QUndoStack and the workorder will not be able to be undone.

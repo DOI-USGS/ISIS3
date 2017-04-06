@@ -1098,27 +1098,16 @@ namespace Isis {
    *        input.
    *  
    * @description This method is designed to be implemented by children work orders, but they need
-   * to call this version inside of their setupExecution (at the beginning). The order of execution 
-   * for work orders is: 
-   *   setupExecution() - GUI thread, can ask user for input
-   *   syncRedo() - GUI thread, should not prompt the user for input
-   *   asyncRedo() - Pooled thread postSyncRedo() - GUI thread
-   *
-   *   syncUndo() - GUI thread, always called after redo finishes
-   *   asyncUndo() - Pooled thread
-   *   postSyncUndo() - GUI thread
-   *
-   *   syncRedo() - GUI thread
-   *   asyncRedo() - Pooled thread
-   *   postSyncRedo() - GUI thread
-   *
-   *   and so on...
-   *
+   * to call this version inside of their setupExecution (at the beginning).
+
    * State should only be set in the parent WorkOrder class in this method. You can set arbitrary
    *   state using setInternalData(). This method is always executed in the GUI thread and is the
    *   only place to ask the user questions.
    *
-   * @return @b bool Returns True upon successful execution of the WorkOrder, False otherwise.
+   * If this method returns false the workorder will be cancelled and will not be executed.
+   *
+   * @return @b bool Returns True upon successful preparation of the WorkOrder, False to
+   *         cancel the workorder.
    */
   bool WorkOrder::setupExecution() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
@@ -1236,24 +1225,22 @@ namespace Isis {
   /**
    * @description Execute the workorder.
    * Execute() does the actual work in the work order. All necessary data for the execution (and
-   * undo) of the
-   * workorder should have been saved in the workorder prior to execute().  Execute() is also called
-   * to redo a workorder for redoable workorders.  If the workorder is a synchrounous workorder
-   * the workorder will be run on the GUI thread, otherwise it will be queued and run on a separate
-   * thread.
+   * undo) of the workorder should have been saved in the workorder prior to execute().  Execute()
+   * is also called to redo a workorder for redoable workorders.  If the workorder is a synchrounous
+   * workorder the workorder will be run on the GUI thread, otherwise it will be queued and run on a
+   * separate thread.
    *
    * For Synchronous workorders:
    * State should only be read from the parent WorkOrder class in this method. You can set state to
-   * be used in asyncRedo() and postSyncRedo() safely. This method is always executed in the GUI
-   * thread and has no progress.
+   * postExecution() safely. This method is always executed in the GUI thread.
    *
    * For asynchronous workorders:
-   * State can be read from the parent WorkOrder class and from state set in syncRedo() while in
-   *   this method. You can set state to be used in postSyncRedo() safely. Please be wary of
+   * State can be read from the parent WorkOrder class while in
+   *   this method. You can set state to be used in postExecution() safely. Please be wary of
    *   creating QObjects inside of this method because they will associated with the pooled thread
    *   and must be moved back to the GUI thread with QObject::moveToThread().  You can update
-   *   progress by calling setProgressRange() and
-   *   setProgressValue(). Please do not manipulate any GUI objects here.
+   *   progress by calling setProgressRange() and setProgressValue(). Do not manipulate any
+   *   GUI objects here.
    */
   void WorkOrder::execute() {
   }
@@ -1274,17 +1261,17 @@ namespace Isis {
    * @description Execute the steps necessary to undo this workorder.
    * The workorder should have all state necessary to undo itself stored in the workorder.
    *
-   *For synchronous workorders:
-   * State should only be read from the parent WorkOrder class in this method. You can set state to
-   *   be used in asyncUndo() and postSyncUndo() safely. This method is always executed in the GUI
+   * For synchronous workorders:
+   *   State should only be read from the parent WorkOrder class in this method. You can set state
+   *   to be used in postUndoExecution() safely. This method is always executed in the GUI
    *   thread and has no progress.
    *
-   *For Asynchronous workorders:
-   * State can be read from the parent WorkOrder class and from state set in syncUndo() while in
-   *   this method. You can set state to be used in postSyncUndo() safely. Please be wary of
-   *   deleting QObjects inside of this method because they will cause unpredictable crashes. This
-   *   method is never executed in the GUI thread. You can update progress by calling
-   *   setProgressRange() and setProgressValue(). Please do not manipulate any GUI objects here.
+   * For Asynchronous workorders:
+   *   State can be read from the parent WorkOrder class while in this method. You can set state
+   *   to be used in postSyncUndo() safely. Please be wary of deleting QObjects inside of this
+   *   method because they will cause unpredictable crashes. This method is never executed in the
+   *   GUI thread. You can update progress by calling setProgressRange() and setProgressValue().
+   *   Do not manipulate any GUI objects here.
    */
   void WorkOrder::undoExecution() {
   }
@@ -1293,9 +1280,9 @@ namespace Isis {
   /**
    * @description Perform any steps necessary after an undo of a workorder.
    *
-   * State can be read from the parent WorkOrder class and from state set in either syncUndo() or
-   *   asyncUndo() while in this method. You can not set state to be used in any of the redo code
-   *   safely. This method is always executed in the GUI thread and has no progress.
+   *  State can be read from the parent WorkOrder class and from state set undoExecution() while
+   *  in this method. You can not set state to be used in any of the redo code
+   *  safely. This method is always executed in the GUI thread and has no progress.
    */
   void WorkOrder::postUndoExecution() {
   }
