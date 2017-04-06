@@ -67,7 +67,7 @@ namespace Isis {
 
 
   /**
-   * @brief Determines if we can set this imageList as active.  
+   * @brief Determines if we can set this imageList as active.
    *
    * @param ImageList *imageList
    * @return  @b bool True if  we can set as active, False otherwise.
@@ -83,17 +83,35 @@ namespace Isis {
 
 
   /**
-   * @brief Attempt to set imageList as active ImageList.
-   * @return @b bool True if successful, False otherwise.
+   * @description Indicates whether this work order is undoable.
+   *
+   * @return bool Returns false, indicating that setting the active image list is not undoable.
+   */
+  bool SetActiveImageListWorkOrder::isUndoable() const {
+    return false;
+  }
+
+
+  /**
+   * @description Simply calls the parent WorkOrder::setupExecution(). There is nothing specific
+   * that this work order needs to set up before execution. This was separated from execute() as
+   * part of the WorkOrder redesign.
+   *
+   * @see WorkOrder::setupExecution()
+   *
+   * @return bool Returns true if successful (i.e. if the parent call succeeds).
    */
   bool SetActiveImageListWorkOrder::setupExecution() {
-    bool success = WorkOrder::setupExecution();
+    return WorkOrder::setupExecution();
+  }
 
-    if (success) {
-      project()->setActiveImageList(imageList()->name());
-    }
 
-    return success;
+  /**
+   * @brief Executes this work order.
+   *
+   * @description Sets the active image list for the project.
+   */
+  void SetActiveImageListWorkOrder::execute() {
+    project()->setActiveImageList(imageList()->name());
   }
 }
-

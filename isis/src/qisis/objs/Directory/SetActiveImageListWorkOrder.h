@@ -34,6 +34,9 @@ namespace Isis {
    * @author 2016-06-27 Tracie Sucharski
    *
    * @internal
+   *   @history 2017-04-05 Ian Humphrey - Added isUndoable() implementation to indicate that this
+   *                           work order is not undoable. Separated setup and execution into
+   *                           setupExecution() and execute(). Fixes #4734.
    *
    */
 
@@ -47,11 +50,13 @@ namespace Isis {
       virtual SetActiveImageListWorkOrder *clone() const;
 
       virtual bool isExecutable(ImageList *imageList);
-      bool setupExecution();
+      virtual bool isUndoable() const;
+
+      virtual bool setupExecution();
+      virtual void execute();
 
     private:
       SetActiveImageListWorkOrder &operator=(const SetActiveImageListWorkOrder &rhs);
   };
 }
 #endif
-
