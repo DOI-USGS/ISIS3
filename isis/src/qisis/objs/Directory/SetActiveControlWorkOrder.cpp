@@ -33,8 +33,8 @@
 namespace Isis {
 
 /**
-   * @brief Creates a WorkOrder that will set the active Control in the project.
-   * @param project  The Project that this work order should be interacting with.
+   * @description Creates a WorkOrder that will set the active Control in the project.
+   * @param project The Project that this work order should be interacting with.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(Project *project) :
       WorkOrder(project) {
@@ -48,7 +48,7 @@ namespace Isis {
 
 
   /**
-   * @brief Copies the 'other' WorkOrdeer instance into this new instance.
+   * @description Copies the 'other' WorkOrder instance into this new instance.
    * @param other The WorkOrder being copied.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(const SetActiveControlWorkOrder &other) :
@@ -57,14 +57,14 @@ namespace Isis {
 
 
   /**
-   * @brief The Destructor.
+   * @description The Destructor.
    */
   SetActiveControlWorkOrder::~SetActiveControlWorkOrder() {
   }
 
 
   /**
-   * @brief Returns a copy of this SetActiveControlWorkOrder instance.
+   * @description Returns a copy of this SetActiveControlWorkOrder instance.
    * @return @b (SetActiveControlWorkOrder *) A pointer to a copy of this WorkOrder.
    */
   SetActiveControlWorkOrder *SetActiveControlWorkOrder::clone() const {
@@ -73,9 +73,9 @@ namespace Isis {
 
 
   /**
-   * @brief Determines if we can set this control as active.  
+   * @description Determines if we can set this control as active.  
    *
-   * @param Control *control
+   * @param controls (ControlList *) The ControlList chosen from the project tree.
    * @return  @b bool True if  we can set as active, False otherwise.
    */
   bool SetActiveControlWorkOrder::isExecutable(ControlList *controls) {
@@ -88,7 +88,7 @@ namespace Isis {
 
 
   /**
-   * @desc Make sure an active ImageList has been chosen. 
+   * @description Make sure an active ImageList has been chosen.
    *  
    * @return @b bool True if project has an active ImageList, False otherwise.
    */
@@ -115,9 +115,10 @@ namespace Isis {
 
 
   /**
-   * @desc  Set the active control net for the project.  This allows any views to operate on the 
-   *        same control net.  The active image list must be set before the active control net is
-   *        chosen.  If not, a critical message dialog is displayed and we return false.
+   * @description  Set the active control net for the project.  This allows any views to operate on 
+   *               the same control net.  The active image list must be set before the active
+   *               control net is chosen.  If not, a critical message dialog is displayed and we
+   *               return false.
    * 
    */
   void SetActiveControlWorkOrder::execute() {

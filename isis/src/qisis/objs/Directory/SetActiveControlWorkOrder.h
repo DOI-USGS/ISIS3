@@ -38,7 +38,9 @@ namespace Isis {
    * @history 2017-01-09 Tracie Sucharski - Moved the SetImages step to the 
    *                         Project::setActiveControl.
    * @history 2017-01-30 Tracie Sucharski - Print active control in the Undo text. 
-   *          2017-04-04 Tracie Sucharski - Updated to reflect the new WorkOrder design.
+   *          2017-04-04 Tracie Sucharski - Updated to reflect the new WorkOrder design, renaming
+   *                         execute to setupExecution, and moving the actual work to execute.
+   *                         Fixes #4717, #4728.
    */
 
   class SetActiveControlWorkOrder : public WorkOrder {
