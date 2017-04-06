@@ -1629,6 +1629,7 @@ namespace Isis {
         //   Instead, we tell the undo stack that we're now clean.
         if (workOrder->createsCleanState()) {
           m_undoStack.setClean();
+          workOrder->execute();
         }
         // All other work orders go onto the undo stack, unless specifically told not to
         else if (workOrder->isUndoable()) {

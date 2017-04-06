@@ -38,12 +38,12 @@ namespace Isis {
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(Project *project) :
       WorkOrder(project) {
+
     // This workorder is not undoable
     m_isUndoable = false;
 
     QAction::setText(tr("Set Active Control Network") );
     QUndoCommand::setText(tr("Set Active Control Network"));
-
   }
 
 

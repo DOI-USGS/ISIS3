@@ -119,6 +119,8 @@ namespace Isis {
    *   @history 2017-03-30 Tracie Sucharski - Cleaned up some documentation regarding last change. 
    *   @history 2017-04-04 Makayla Shepherd - Updated addToProject to support the new WorkOrder 
    *                           design. Fixes #4729.
+   *   @history 2017-04-06 Tracie Sucharski - Added call to child WorkOrder::execute() even if it
+   *                           a CleanState.
    */
   class Project : public QObject {
     Q_OBJECT
