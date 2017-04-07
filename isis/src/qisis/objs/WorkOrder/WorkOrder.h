@@ -111,6 +111,58 @@ namespace Isis {
    * stop
    * @enduml
    *
+   *@startuml {NonUndoableWorkOrderSequence.png} "Non-undoable WorkOrder Sequence (unfinished)"
+   * title Non-undoable Workorder (unfinished)
+   * actor User
+   * participant WorkOrder
+   * participant Project
+   * participant HistoryTreeWidget
+   * 
+   * 
+   * User -> WorkOrder: Menuclick
+   * 
+   * activate WorkOrder
+   * 
+   * WorkOrder -> WorkOrder: addCloneToProject
+   * activate WorkOrder
+   * 
+   * WorkOrder -> Project : addToProject
+   * activate Project
+   * 
+   *  Project -> WorkOrder : setPrevious
+   * 
+   * Project -> WorkOrder : **setupExecution**
+   * activate WorkOrder
+   * WorkOrder -> Project
+   * deactivate WorkOrder
+   * 
+   *  Project -> WorkOrder : setNextWorkorder
+   * 
+   * 
+   * Project -> HistoryTreeWidget : << signal:workOrderStarting >>
+   * Project <-- HistoryTreeWidget : slot:addToHistory
+   * 
+   * 
+   * Project -> WorkOrder: **execute**
+   * activate WorkOrder
+   * WorkOrder -> Project
+   * deactivate WorkOrder
+   * 
+   * 
+   * 
+   * 
+   * Project  -> WorkOrder
+   * deactivate Project
+   * 
+   * deactivate WorkOrder
+   * 
+   * 
+   * 
+   * WorkOrder -> HistoryTreeWidget : << signal:destroyed >>
+   * WorkOrder <-- HistoryTreeWidget : slot:removeFromHistory
+   * 
+   * deactivate WorkOrder
+   * @enduml
    *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
