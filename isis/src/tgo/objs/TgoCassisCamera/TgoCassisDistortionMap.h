@@ -41,7 +41,8 @@ namespace Isis {
    * @author 2017-04-03 Jeannie Backer
    *
    * @internal
-   *   @history 2017-04-03 Jeannie Walldren - Original version.
+   *   @history 2017-04-03 Jeannie Walldren - Original version from model
+   *                           provided by Anton Ivanov.
    *   @history 2017-04-06 Jeannie Walldren - Fixed bugs and updated unitTest.
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
