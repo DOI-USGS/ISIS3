@@ -93,17 +93,31 @@ namespace Isis {
   bool CubeDnViewWorkOrder::isExecutable(ShapeList *shapes) {
     return (shapes->count() > 0 && shapes->count() < 20);
   }
-
+  
   /**
-   * If WorkOrder::execute() returns true, then this method returns true.
+   * @description This method returns false because this WorkOrder is not undoable.
    * 
-   * @return @b bool True if WorkOrder::execute() returns true.
+   * @see WorkOrder::isUndoable()
+   * 
+   * @return bool Returns false because this WorkOrder is not undoable.
+   */
+  bool CubeDnViewWorkOrder::isUndoable() const {
+    return false;
+  }
+
+  
+  /**
+   * @description This method asks the user what view they want to see their cube list in. The user 
+   * can select an existing vew or they can create a new view. The user's choice is then saved using 
+   * setInternalData(). This method was renamed from execute() to setupExecution() according to the 
+   * WorkOrder redesign.
+   * 
+   * @see WorkOrder::setupExecution()
+   * 
+   * @return @b bool True if WorkOrder::setupExecution() returns true.
    */
   bool CubeDnViewWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
-
-
-
 
     if (success) {
       QStringList viewOptions;
@@ -146,29 +160,16 @@ namespace Isis {
       setInternalData(internalData);
     }
 
-
-
     return success;
   }
 
-  /**
-   * This method returns true if other depends on a CubeDnViewWorkOrder
-   * 
-   * @param order the WorkOrder we want to check for dependancies
-   * 
-   * @return @b bool True if WorkOrder depends on a CubeDnViewWorkOrder
-   * 
-   */
-  bool CubeDnViewWorkOrder::dependsOn(WorkOrder *other) const {
-    // depend on types of ourselves.
-    return dynamic_cast<CubeDnViewWorkOrder *>(other);
-  }
 
   /**
-   * This method adds a new CubeDnView to the project's directory and then adds currentItem() to
-   * that. 
+   * @desciption This method adds a new CubeDnView to the project's directory and then adds 
+   * currentItem() to that. This method was renamed from syncRedo() to execute() according to 
+   * WorkOrder's redesign. 
    */
-  void CubeDnViewWorkOrder::syncRedo() {
+  void CubeDnViewWorkOrder::execute() {
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
 
     int viewToUse = internalData().first().toInt();
@@ -182,6 +183,20 @@ namespace Isis {
     }
    
     view->addItems(selectedItems);
+  }
+  
+  
+    /**
+   * This method returns true if other depends on a CubeDnViewWorkOrder
+   * 
+   * @param order the WorkOrder we want to check for dependancies
+   * 
+   * @return @b bool True if WorkOrder depends on a CubeDnViewWorkOrder
+   * 
+   */
+  bool CubeDnViewWorkOrder::dependsOn(WorkOrder *other) const {
+    // depend on types of ourselves.
+    return dynamic_cast<CubeDnViewWorkOrder *>(other);
   }
 }
 
