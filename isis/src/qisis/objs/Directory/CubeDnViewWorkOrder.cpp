@@ -165,7 +165,7 @@ namespace Isis {
 
 
   /**
-   * @desciption This method adds a new CubeDnView to the project's directory and then adds 
+   * @description This method adds a new CubeDnView to the project's directory and then adds 
    * currentItem() to that. This method was renamed from syncRedo() to execute() according to 
    * WorkOrder's redesign. 
    */
