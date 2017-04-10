@@ -35,6 +35,8 @@ namespace Isis {
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Adapted from Mosaic2DViewWorkOrder.
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
+   *   @history 2017-04-10 Makayla Shepherd - Renamed syncRedo() to execute() and syncUndo() to 
+   *                           undoExecution() according to the WorkOrder redesign.
    */
   class MatrixViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -47,11 +49,13 @@ namespace Isis {
 
       virtual bool isExecutable(CorrelationMatrix matrix);
       bool setupExecution();
+      
+      void execute();
+      void undoExecution()
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
+      ;
 
     private:
       MatrixViewWorkOrder &operator=(const MatrixViewWorkOrder &rhs);

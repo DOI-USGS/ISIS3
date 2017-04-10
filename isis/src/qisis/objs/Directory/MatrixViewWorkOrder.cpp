@@ -161,9 +161,10 @@ namespace Isis {
   
 
   /**
-   * This method computes and displays the correlation matrix.
+   * @description This method computes and displays the correlation matrix. This was renamed from
+   * syncRedo() to execute() according to the WorkOrder redesign.
    */
-  void MatrixViewWorkOrder::syncRedo() {
+  void MatrixViewWorkOrder::execute() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
     CorrelationMatrix corrMat = correlationMatrix();
     /*
@@ -182,9 +183,10 @@ namespace Isis {
 
   
   /**
-   * This method deletes the last matrix viewed
+   * @description This method deletes the last matrix viewed. This was renamed from syncUndo() to
+   * execute() according to the WorkOrder redesign.
    */
-  void MatrixViewWorkOrder::syncUndo() {
+  void MatrixViewWorkOrder::undoExecution() {
     if (internalData()[1] == "new view") {
       delete project()->directory()->matrixViews().last();
     }
