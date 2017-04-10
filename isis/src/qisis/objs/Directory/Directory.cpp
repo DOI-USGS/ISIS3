@@ -261,7 +261,7 @@ namespace Isis {
 
   
   /**
-   * @description Initializes the actions that the Directory can provide to a main window.
+   * @brief Initializes the actions that the Directory can provide to a main window.
    *  
    * @todo 2017-02-14 Tracie Sucharski - As far as I can tell the created menus are never used. 
    * Instead of creating menus to use the addAction method, can't we simply create actions and 
@@ -1105,7 +1105,7 @@ namespace Isis {
 
 
   /**
-   * @description The XML reader invokes this method at the start of every element in the
+   * @brief The XML reader invokes this method at the start of every element in the
    * XML document.  This method expects <footprint2DView/> and <imageFileList/>
    * elements.
    * A quick example using this function:
@@ -1140,7 +1140,7 @@ namespace Isis {
 
 
   /**
-   * @description Reformat actionPairings to be user friendly for use in menus.
+   * @brief Reformat actionPairings to be user friendly for use in menus.
    *
    * actionPairings is:
    *    Widget A ->
@@ -1306,7 +1306,7 @@ namespace Isis {
 
 
   /**
-   * @description Updates the SIGNAL/SLOT connections for the cotrol net editor.
+   * @brief Updates the SIGNAL/SLOT connections for the cotrol net editor.
    */
   void Directory::updateControlNetEditConnections() {
 #if 0

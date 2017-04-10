@@ -49,6 +49,8 @@ namespace Isis {
    * 
    * @internal 
    *   @history 2016-09-14 Kris Becker - Original Version
+   *   @history 2017-02-09 Jesse Mapel - Updated to ignore invalid
+   *                           SpacecraftClockStopCount values.
    */
   class SumFinder {
     public:

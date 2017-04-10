@@ -22,7 +22,7 @@ namespace Isis {
   /**
    * @brief Internalizes a list of shapes and allows for operations on the entire list
    * 
-   * @description This class reads a list of shapes from an shapes.xml file and internalizes them
+   * This class reads a list of shapes from an shapes.xml file and internalizes them
    * as aQList of shapes.  It also allows for modifications to the entire list of
    * shapes and storing the shape list as an shapes.xml file.
    * 

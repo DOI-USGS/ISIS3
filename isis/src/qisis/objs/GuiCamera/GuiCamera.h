@@ -179,7 +179,7 @@ namespace Isis {
   };
 
   /**
-   * @description GuiCameraQsp  Represents a smart pointer to a GuiCamera object.
+   * @brief GuiCameraQsp  Represents a smart pointer to a GuiCamera object.
    * It behaves exactly like a normal pointer, but it is thread-safe and it will delete the pointer
    *  it is holding when it goes out of scope, provided no other QSharedPointer objects
    * are referencing it.

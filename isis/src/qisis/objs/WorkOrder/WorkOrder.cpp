@@ -174,7 +174,7 @@ namespace Isis {
 
 
   /**
-   * @description Re-implement this method if your work order utilizes controls for data
+   * @brief Re-implement this method if your work order utilizes controls for data
    * in order to operate. For example, "CnetEditorViewWorkOrder" works sometimes on controls
    * - the logic in side of CnetEditorViewWorkOrder::isExecutable() determines whethere or not a
    * user is prompted with this work order as a possibility.
@@ -466,7 +466,7 @@ namespace Isis {
 
 
   /**
-   * @description:  Saves a WorkOrder to a data stream.
+   * @brief:  Saves a WorkOrder to a data stream.
    * The XML output format looks like this:
    *
    * <pre>
@@ -568,7 +568,7 @@ namespace Isis {
 
 
   /**
-   * @briefReturns a pointer to the ImageList for this WorkOrder.
+   * @brief Returns a pointer to the ImageList for this WorkOrder.
    * @return @b (ImageList*) A pointer to the ImageList.
    */
   ImageList *WorkOrder::imageList() {
@@ -687,7 +687,8 @@ namespace Isis {
 
 
   /**
-   * @brief This is a virtual function whose role in child classes is to determine
+   * @brief Indicate workorder dependency
+   * This is a virtual function whose role in child classes is to determine
    * if this WorkOrder depends on the WorkOrder passed in as an argument.
    * @param WorkOrder * The WorkOrder we are checking for dependency with this one.
    * @return @b bool Returns True if there is a dependency, and False if there is no
@@ -700,7 +701,8 @@ namespace Isis {
 
 
   /**
-   * @description We don't use action text anymore because Directory likes to rename our actions.
+   * @brief Generate unique action names
+   * We don't use action text anymore because Directory likes to rename our actions.
    * It converts a set of actions that have the same text, like Zoom Fit, to be in a menu named
    * Zoom Fit with items that name their widgets. Widget names are unhelpful as a description
    * of the action.
@@ -864,7 +866,7 @@ namespace Isis {
 
 
   /**
-   * @description Attempts to query the current status of the WorkOrder.
+   * @brief Attempts to query the current status of the WorkOrder.
    * @param statusString The status we want information about.
    * @return @b WorkOrderStatus Returns WorkOrderUnknownStatus if the statusString
    * does not match the current status.  If there is a result, then it returns
@@ -923,7 +925,7 @@ namespace Isis {
 
 
   /**
-   * @description Starts (or enqueues) a redo. This should not be re-implemented by children.
+   * @brief Starts (or enqueues) a redo. This should not be re-implemented by children.
    * 
    */
   void WorkOrder::redo() {
@@ -1024,7 +1026,8 @@ namespace Isis {
 
 
   /**
-   * @brief Starts (or enqueues) an undo. This should not be re-implemented by children.
+   * @brief Starts (or enqueues) an undo. 
+   * This should not be re-implemented by children.
    * 
    */
   void WorkOrder::undo() {
@@ -1097,7 +1100,8 @@ namespace Isis {
    * @brief This sets up the state for the work order.  Child should implement this to get user 
    *        input.
    *  
-   * @description This method is designed to be implemented by children work orders, but they need
+   * @brief Execute a workorder
+   * This method is designed to be implemented by children work orders, but they need
    * to call this version inside of their setupExecution (at the beginning).
 
    * State should only be set in the parent WorkOrder class in this method. You can set arbitrary
@@ -1134,7 +1138,8 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the Directory object of the Project this WorkOrder is attached to.
+   * @brief return the workorder project directory
+   * Returns the Directory object of the Project this WorkOrder is attached to.
    * @return @b (Directory *) A pointer to the Directory.
    */
   Directory *WorkOrder::directory() const {
@@ -1223,7 +1228,7 @@ namespace Isis {
 
 
   /**
-   * @description Execute the workorder.
+   * @brief Execute the workorder.
    * Execute() does the actual work in the work order. All necessary data for the execution (and
    * undo) of the workorder should have been saved in the workorder prior to execute().  Execute()
    * is also called to redo a workorder for redoable workorders.  If the workorder is a synchrounous
@@ -1247,7 +1252,7 @@ namespace Isis {
 
 
   /**
-   * @description Perform any necessary actions after execution of a workorder.
+   * @brief Perform any necessary actions after execution of a workorder.
    *
    * State can be read from the parent WorkOrder class and from state set in either synchronous() or
    *   asyncRedo() while in this method. You can not set state to be used in any of the undo code
@@ -1258,7 +1263,7 @@ namespace Isis {
 
 
   /**
-   * @description Execute the steps necessary to undo this workorder.
+   * @brief Execute the steps necessary to undo this workorder.
    * The workorder should have all state necessary to undo itself stored in the workorder.
    *
    * For synchronous workorders:
@@ -1278,7 +1283,7 @@ namespace Isis {
 
 
   /**
-   * @description Perform any steps necessary after an undo of a workorder.
+   * @brief Perform any steps necessary after an undo of a workorder.
    *
    *  State can be read from the parent WorkOrder class and from state set undoExecution() while
    *  in this method. You can not set state to be used in any of the redo code
@@ -1289,7 +1294,7 @@ namespace Isis {
 
 
   /**
-   * @description  Runs a copy of the current WorkOrder and stores it in the project.
+   * @brief  Runs a copy of the current WorkOrder and stores it in the project.
    */
   void WorkOrder::addCloneToProject() {
     if (project()) {
@@ -1314,7 +1319,7 @@ namespace Isis {
 
 
   /**
-   * @description Checks to see if we have lost any images in the ImageList.  If we have, then
+   * @brief Checks to see if we have lost any images in the ImageList.  If we have, then
    * destroy the entire list.  This will send a signal that the list needs to be rebuilt if
    * requested.
    */
@@ -1334,7 +1339,7 @@ namespace Isis {
 
 
   /**
-   * @description Checks to see if we have lost any shapes in the ShapeList.  If we have, then
+   * @brief Checks to see if we have lost any shapes in the ShapeList.  If we have, then
    * destroy the entire list.  This will send a signal that the list needs to be rebuilt if
    * requested. 
    *  
@@ -1510,7 +1515,7 @@ namespace Isis {
 
 
   /**
-   * @description Declare that this work order is saving the project.
+   * @brief Declare that this work order is saving the project.
    * This makes the work order not appear in the undo stack (cannot undo/redo), and instead it is
    * marked as a 'clean' state of the project. The QUndoCommand undo/redo will never be called.
    * The default for createsCleanState is false.
@@ -1523,7 +1528,7 @@ namespace Isis {
 
 
   /**
-   * @description.  By default, m_modifiesDiskState is False.  If a WorkOrder modifies the Project
+   * @brief.  By default, m_modifiesDiskState is False.  If a WorkOrder modifies the Project
    * on disk as a result of it's action, this should be set to true.
    * @param changesProjectOnDisk True if this WorkOrder modifies the Project on disk.  False
    * if it does not.
@@ -1543,7 +1548,7 @@ namespace Isis {
 
 
   /**
-   * @description The XML reader invokes this method at the start of every element in the
+   * @brief The XML reader invokes this method at the start of every element in the
    *        XML document.  This expects <workOrder/> and <dataValue/> elements.
    * A quick example using this function:
    *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)

@@ -152,7 +152,7 @@ namespace Isis {
   /**
    * @brief Sets the solve settings for the target body.
    * 
-   * @description Sets the solve settings for the target body's right ascension, declination,
+   * Sets the solve settings for the target body's right ascension, declination,
    * prime meridian, and radius based on the input values.
    * Parameter vectors, sigma vectors and the weight vector will be filled in the following order:
    * 
@@ -556,7 +556,7 @@ namespace Isis {
   /**
    * @brief Applies a vector of corrections to the parameters for the target body.
    * 
-   * @description Applies a vector of corrections to the internal parameters for the
+   * Applies a vector of corrections to the internal parameters for the
    * target body and records the corrections in the internal corrections vector.
    * The corrections vector should be ordered the same as the parameter vector descriped
    * in setSolveSettings.
@@ -802,7 +802,7 @@ namespace Isis {
   /**
    * @brief Returns the number of radius parameters being solved for.
    * 
-   * @description Returns the number of radius parameters being solved for
+   * Returns the number of radius parameters being solved for
    * which is based on the target radius solve method:
    * None -> 0
    * Mean -> 1
@@ -834,7 +834,7 @@ namespace Isis {
   /**
    * @brief Returns the coefficients of the right ascension polynomial.
    * 
-   * @description Returns The vector of right ascension polynomial coefficients ordered as:
+   * Returns The vector of right ascension polynomial coefficients ordered as:
    * 
    * angle,
    * velocity,
@@ -852,7 +852,7 @@ namespace Isis {
   /**
    * @brief Returns the coefficients of the declination polynomial.
    * 
-   * @description Returns The vector of declination polynomial coefficients ordered as:
+   * Returns The vector of declination polynomial coefficients ordered as:
    * 
    * angle,
    * velocity,
@@ -870,7 +870,7 @@ namespace Isis {
   /**
    * @brief Returns the coefficients of the prime meridian polynomial.
    * 
-   * @description Returns The vector of prime meridian polynomial coefficients ordered as:
+   * Returns The vector of prime meridian polynomial coefficients ordered as:
    * 
    * angle,
    * velocity,
@@ -888,7 +888,7 @@ namespace Isis {
   /**
    * @brief Returns the radius values.
    * 
-   * @description Returns the vector of radius values formatted as RadiusA, RadiusB, RadiusC.
+   * Returns the vector of radius values formatted as RadiusA, RadiusB, RadiusC.
    * 
    * @return @b vector<Distance> The vector of radius values.
    * 
@@ -924,7 +924,7 @@ namespace Isis {
   /**
    * @brief Calculates and returns the weighted sum of the squares of the corrections.
    * 
-   * @description Calculates and returns the weighted sum of the squares of the corrections
+   * Calculates and returns the weighted sum of the squares of the corrections
    * computed by V(T)*P*V where:
    * V is the vector of corrections,
    * P is the weight matrix,

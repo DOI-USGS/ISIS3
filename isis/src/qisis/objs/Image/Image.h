@@ -138,7 +138,8 @@ namespace Isis {
 
     private:
       /**
-       * @description  Child class for XmlStackedHandler which is used to process XML in
+       * @brief Process XML in a stack-oriented fashion  
+       * Child class for XmlStackedHandler which is used to process XML in
        * a stack-oriented way.  It's been modified to process an Image object
        * object.
        * @author 2012-??-?? Steven Lambright

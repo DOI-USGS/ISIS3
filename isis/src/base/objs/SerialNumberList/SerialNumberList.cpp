@@ -201,7 +201,7 @@ namespace Isis {
   /**
    * @brief Overloaded add method that takes char * parameters
    *
-   * @description Adds a new filename / serial number pair to the SerialNumberList
+   * Adds a new filename / serial number pair to the SerialNumberList
    *
    * @param serialNumber The serial number to be added
    * @param filename The filename to be added

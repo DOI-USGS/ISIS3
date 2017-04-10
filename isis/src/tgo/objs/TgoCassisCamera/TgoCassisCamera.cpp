@@ -19,6 +19,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "TgoCassisCamera.h"
 
 #include <cmath>
 
@@ -26,9 +27,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "TgoCassisCamera.h"
 #include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
@@ -37,6 +36,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
+#include "TgoCassisDistortionMap.h"
 
 using namespace std;
 
@@ -111,7 +111,7 @@ namespace Isis {
     detMap->SetStartingDetectorLine(getDouble("INS" + filter + "_FILTER_OFFSET"));
 
     // Setup distortion map
-    new CameraDistortionMap(this);
+    new TgoCassisDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

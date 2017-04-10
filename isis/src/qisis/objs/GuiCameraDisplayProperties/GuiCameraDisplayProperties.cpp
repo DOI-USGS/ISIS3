@@ -227,7 +227,7 @@ namespace Isis {
 
 
   /**
-   * @description The XML reader invokes this method at the start of every element in the
+   * @brief The XML reader invokes this method at the start of every element in the
    *        XML document.
    * A quick example using this function:
    *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
@@ -257,7 +257,7 @@ namespace Isis {
 
 
   /**
-   * @description This implementation of a virtual function calls
+   * @brief This implementation of a virtual function calls
    * QXmlDefaultHandler::characters(QString &ch)
    * which in turn calls QXmlContentHandler::characters(QString &ch) which
    * is called when the XML processor has parsed a chunk of character data.
@@ -297,8 +297,9 @@ namespace Isis {
 
 
   /**
-   * @description This is the generic mutator for properties. Given a value, this will
-   * change it and emit propertyChanged if its different and supported.
+   * @brief This is the generic mutator for properties. 
+   * Given a value, this will change it and emit propertyChanged if its different 
+   * and supported.  
    * @param prop The key into the m_propertyValues QMap <int, QVariant>
    * @param value The value we want to change to.
    */
@@ -314,7 +315,7 @@ namespace Isis {
 
 
   /**
-   * @description This is for the slots that have a list of display properties as associated
+   * @brief This is for the slots that have a list of display properties as associated
    * data. This gets that list out of the data.
    * @param senderObj  The caller object containing a list of the display properties.
    */

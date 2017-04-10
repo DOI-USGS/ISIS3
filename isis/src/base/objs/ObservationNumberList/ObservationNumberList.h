@@ -36,7 +36,7 @@ namespace Isis {
   /**
    * @brief Create a list of observation numbers from a file or serial number list
    *
-   * @description This class allows for creating observation numbers from a provided file or
+   * This class allows for creating observation numbers from a provided file or
    * and existing non-empty SerialNumberList. Internally, it will map the observation numbers
    * that are created to the corresponding serial number for a given observation. 
    *
