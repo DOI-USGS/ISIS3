@@ -33,8 +33,11 @@ namespace Isis {
    * This executes synchronously and is not undoable.
    * 
    * @author 2016-07-28 Tracie Sucharski
-   *
+   * 
    * @internal 
+   *   @history 2017-04-07 Marjorie Hahn - Updated method names and documentation 
+   *                           to match new work order design.
+   *
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class RemoveImagesWorkOrder : public WorkOrder {
@@ -49,6 +52,7 @@ namespace Isis {
       virtual bool isExecutable(ImageList *images);
 
       bool setupExecution();
+      bool isUndoable();
 
     protected:
       void execute();
