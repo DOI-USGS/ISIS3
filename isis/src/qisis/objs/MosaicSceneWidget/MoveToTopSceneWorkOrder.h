@@ -8,12 +8,14 @@ namespace Isis {
 
   /**
    * @brief Move images on top of all other images in a mosaic scene
+   * This workorder is synchronous and undoable
    *
    * This shows up as "Bring to Front" to the user.
    *
    * @author 2012-10-04 Stuart Sides and Steven Lambright
    *
    * @internal
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class MoveToTopSceneWorkOrder : public MosaicSceneWorkOrder {
       Q_OBJECT
@@ -25,8 +27,8 @@ namespace Isis {
 
       virtual MoveToTopSceneWorkOrder *clone() const;
 
-      void syncRedo();
-      void syncUndo();
+      void execute();
+      void undoExecution();
 
     private:
       MoveToTopSceneWorkOrder &operator=(const MoveToTopSceneWorkOrder &rhs);

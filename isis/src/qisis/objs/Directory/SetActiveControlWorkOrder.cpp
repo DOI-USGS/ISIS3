@@ -33,7 +33,7 @@
 namespace Isis {
 
 /**
-   * @description Creates a WorkOrder that will set the active Control in the project.
+   * @brief Creates a WorkOrder that will set the active Control in the project.
    * @param project The Project that this work order should be interacting with.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(Project *project) :
@@ -48,7 +48,7 @@ namespace Isis {
 
 
   /**
-   * @description Copies the 'other' WorkOrder instance into this new instance.
+   * @brief Copies the 'other' WorkOrder instance into this new instance.
    * @param other The WorkOrder being copied.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(const SetActiveControlWorkOrder &other) :
@@ -57,14 +57,14 @@ namespace Isis {
 
 
   /**
-   * @description The Destructor.
+   * @brief The Destructor.
    */
   SetActiveControlWorkOrder::~SetActiveControlWorkOrder() {
   }
 
 
   /**
-   * @description Returns a copy of this SetActiveControlWorkOrder instance.
+   * @brief Returns a copy of this SetActiveControlWorkOrder instance.
    * @return @b (SetActiveControlWorkOrder *) A pointer to a copy of this WorkOrder.
    */
   SetActiveControlWorkOrder *SetActiveControlWorkOrder::clone() const {
@@ -73,7 +73,7 @@ namespace Isis {
 
 
   /**
-   * @description Determines if we can set this control as active.  
+   * @brief Determines if we can set this control as active.
    *
    * @param controls (ControlList *) The ControlList chosen from the project tree.
    * @return  @b bool True if  we can set as active, False otherwise.
@@ -88,7 +88,7 @@ namespace Isis {
 
 
   /**
-   * @description Make sure an active ImageList has been chosen.
+   * @brief Make sure an active ImageList has been chosen.
    *  
    * @return @b bool True if project has an active ImageList, False otherwise.
    */
@@ -115,7 +115,7 @@ namespace Isis {
 
 
   /**
-   * @description  Set the active control net for the project.  This allows any views to operate on 
+   * @brief  Set the active control net for the project.  This allows any views to operate on
    *               the same control net.  The active image list must be set before the active
    *               control net is chosen.  If not, a critical message dialog is displayed and we
    *               return false.

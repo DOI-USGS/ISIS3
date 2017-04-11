@@ -78,7 +78,7 @@ namespace Isis {
   /**
    * @brief Sets up the work order for execution.
    * 
-   * @description This method prompts the user for a control net to open. That control net is then
+   * This method prompts the user for a control net to open. That control net is then
    * saved using setInternalData data. This method was renamed from execute() to setupExecution()
    * 
    * @see WorkOrder::setupExecution()
@@ -107,7 +107,7 @@ namespace Isis {
   /**
    * @brief Imports the control network asynchronously.
    * 
-   * @description This method asynchronously imports the control net. This method replaces both
+   * This method asynchronously imports the control net. This method replaces both
    * syncRedo() and asyncRedo().
    */
   void ImportControlNetWorkOrder::execute() {
@@ -153,7 +153,7 @@ namespace Isis {
   /**
    * @brief Clears progress.
    * 
-   * @description This method clears the progresses created in execute(). This method was renamed 
+   * This method clears the progresses created in execute(). This method was renamed
    * from postSyncRedo() to postExecution().
    */
   void ImportControlNetWorkOrder::postExecution() {
@@ -167,7 +167,7 @@ namespace Isis {
   /**
    * @brief Deletes the control network
    * 
-   * @description This method deletes the control network from the project. This method is was 
+   * This method deletes the control network from the project. This method is was
    * renamed from undoSyncRedo() to undoExecution().
    */
   void ImportControlNetWorkOrder::undoExecution() {

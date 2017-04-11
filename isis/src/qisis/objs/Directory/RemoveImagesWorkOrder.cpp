@@ -45,6 +45,8 @@ namespace Isis {
 
   RemoveImagesWorkOrder::RemoveImagesWorkOrder(const RemoveImagesWorkOrder &other) :
      WorkOrder(other) {
+    // This is not undoable
+    m_isUndoable = false;
   }
 
 
@@ -78,7 +80,7 @@ namespace Isis {
   }
 
 
-  void RemoveImagesWorkOrder::syncRedo() {
+  void RemoveImagesWorkOrder::execute() {
     qDebug()<<"RemoveImagesWorkOrder::syncRedo  project()->directory()->model() = "<<project()->directory()->model();
     ProjectItem *currentItem = project()->directory()->model()->currentItem();
     project()->directory()->model()->removeItem(currentItem);

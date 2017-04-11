@@ -1260,7 +1260,7 @@ namespace Isis {
   /**
    * @brief  Returns the active ImageList
    *  
-   * Returns the active ImageList for views which need to operate on the 
+   * Returns the active ImageList for views which need to operate on the
    * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
    *  
    * @internal 

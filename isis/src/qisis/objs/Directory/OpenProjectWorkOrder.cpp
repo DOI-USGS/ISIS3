@@ -36,7 +36,7 @@
 namespace Isis {
 
   /**
-   * @description Constructs an OpenProjectWorkOrder
+   * @brief Constructs an OpenProjectWorkOrder
    *
    * @param project The project object
    */
@@ -62,7 +62,7 @@ namespace Isis {
 
 
   /**
-   * @description Copy constructor
+   * @brief Copy constructor
    *
    * @param other The other OpenProjectWorkOrder to initialize from
    */
@@ -72,7 +72,7 @@ namespace Isis {
 
 
   /**
-   * @description Destructor
+   * @brief Destructor
    */
   OpenProjectWorkOrder::~OpenProjectWorkOrder() {
 
@@ -80,7 +80,7 @@ namespace Isis {
 
 
   /**
-   * @description Clones the current OpenProjectWorkOrder
+   * @brief Clones the current OpenProjectWorkOrder
    *
    * @return @b (OpenProjectWorkOrder *) The OpenProjectWorkOrder clone
    */
@@ -90,7 +90,7 @@ namespace Isis {
 
 
   /**
-   * @description Setup this WorkOrder for execution, deleting the progress bar, determine if there
+   * @brief Setup this WorkOrder for execution, deleting the progress bar, determine if there
    *              is a current project and if it has been modified and prompting for project
    *              directory.
    *
@@ -127,7 +127,7 @@ namespace Isis {
 
 
   /**
-   * @description  Open the chosen project folder.
+   * @brief  Open the chosen project folder.
    * 
    */
   void OpenProjectWorkOrder::execute() {

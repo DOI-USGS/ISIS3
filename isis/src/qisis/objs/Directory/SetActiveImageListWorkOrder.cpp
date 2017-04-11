@@ -85,7 +85,7 @@ namespace Isis {
 
 
   /**
-   * Simply calls the parent WorkOrder::setupExecution(). There is nothing specific
+   * @brief Simply calls the parent WorkOrder::setupExecution(). There is nothing specific
    * that this work order needs to set up before execution. This was separated from execute() as
    * part of the WorkOrder redesign.
    *

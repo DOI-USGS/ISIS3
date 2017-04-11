@@ -26,6 +26,7 @@ namespace Isis {
    * @author 2012-09-26 Tracie Sucharski
    *
    * @internal
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class ExportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

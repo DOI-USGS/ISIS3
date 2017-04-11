@@ -16,8 +16,9 @@
 
 namespace Isis {
   /**
-   * @brief ShapeDisplayProperties constructor. This sets default values and
-   * constructs the object *.
+   * @brief ShapeDisplayProperties constructor. 
+   *
+   * This sets default values and constructs the object *.
    * @param displayName The filename (fully expanded) of the object.
    * @param parent Qt parent object (this is destroyed when parent is destroyed)
    */
@@ -196,6 +197,7 @@ namespace Isis {
 
   /**
    * @brief Change the visibility of the display name. 
+   *
    * This should only be connected to
    * by an action with a list of displays as its data. This synchronizes all
    * of the values where at least one is guaranteed to be toggled.
@@ -215,6 +217,7 @@ namespace Isis {
 
   /**
    * @brief Constructor for the XmlHandler class.  
+   *
    * This is a child class of XmlStackedHandler,
    * which is used by XmlStackedHandlerReader to parse an XML file.
    * @param displayProperties Pointer to a ShapeDisplayProperties object.
@@ -251,7 +254,9 @@ namespace Isis {
 
 
   /**
-   * @brief This implementation of a virtual function calls
+   * @brief This is called when the XML processor has parsed a chunk of character data.
+   *
+   * This implementation of a virtual function calls
    * QXmlDefaultHandler::characters(QString &ch)
    * which in turn calls QXmlContentHandler::characters(QString &ch) which
    * is called when the XML processor has parsed a chunk of character data.
@@ -294,6 +299,7 @@ namespace Isis {
 
   /**
    * @brief This is the generic mutator for properties. 
+   *
    * Given a value, this will change it and emit propertyChanged if its 
    * different and supported.
    * @param prop The key into the m_propertyValues QMap <int, QVariant>
@@ -312,6 +318,7 @@ namespace Isis {
 
   /**
    * @brief  Get the display properties from a slot
+   *
    * This is for the slots that have a list of display properties as associated
    * data. This gets that list out of the data.
    * @param The object requesting the data.

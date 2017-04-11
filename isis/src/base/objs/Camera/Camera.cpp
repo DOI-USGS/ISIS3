@@ -568,7 +568,7 @@ namespace Isis {
 
 
   /**
-   * @description This method returns the Oblique Detector Resolution
+   * @brief This method returns the Oblique Detector Resolution
    * if the Look Vector intersects the target and if the emission angle is greater than or equal
    * to 0, and less than 90 degrees.   Otherwise, it returns -1.0.  This formula provides an
    * improved estimate to the detector resolution for images near the limb:

@@ -26,7 +26,8 @@
 
 namespace Isis {
   /**
-   * This work order allows the user to run a bundle adjustment (jigsaw).
+   * @brief This work order allows the user to run a bundle adjustment (jigsaw).
+   * This workorder is synchronous and undoable.
    *
    * @author 2014-04-03 Ken Edmundson
    *
@@ -34,6 +35,7 @@ namespace Isis {
    *   @history 2014-06-04 Jeannie Backer - Fixed JigsawWorkOrder error.
    *   @history 2015-09-05 Ken Edmundson - Added preliminary target body functionality to IPCE.
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -49,8 +51,8 @@ namespace Isis {
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
+      void execute();
+      void undoExecution();
 
     private:
       JigsawWorkOrder &operator=(const JigsawWorkOrder &rhs);

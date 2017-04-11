@@ -128,7 +128,7 @@ namespace Isis {
    * As of 06/06/2016 this method is not implemented as the contents are commented out.
    * 
    */
-  void JigsawWorkOrder::syncRedo() {
+  void JigsawWorkOrder::execute() {
 //    TargetInfoWidget *targetInfoWidget =
 //        project()->directory()->addTargetInfoView(targetBody());
 
@@ -143,7 +143,7 @@ namespace Isis {
    * As of 06/06/2016 this method is not implemented as the contents are commented out.
    * 
    */
-  void JigsawWorkOrder::syncUndo() {
+  void JigsawWorkOrder::undoExecution() {
     //delete project()->directory()->cnetEditorViews().last();
   }
 }

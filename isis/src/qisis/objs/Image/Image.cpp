@@ -247,6 +247,7 @@ namespace Isis {
 
   /**
    * @brief Get the Cube pointer associated with this display property. 
+   *
    * This will allocate the Cube pointer if one is not already present.
    * @throws IException::Programmer "Cube cannot be created"
    * @return @b (Cube *) A pointer to the image cube.
@@ -267,6 +268,7 @@ namespace Isis {
 
   /**
    * @brief Cleans up the Cube pointer. 
+   *
    * You want to call this once you are sure you are done
    * with the Cube because the OS will limit how many of these we have open.
    */
@@ -348,6 +350,7 @@ namespace Isis {
 
   /**
    * @brief Calculate a footprint for this image. 
+   *
    * If the footprint is already stored inside the cube, that will be used instead. 
    * If no footprint can be found, this throws an exception.
    * @param cameraMutex A pointer to the camera mutex to lock the camera resource while a footprint
@@ -770,6 +773,7 @@ namespace Isis {
 
   /**
    * @brief Read mage class attributes
+   *
    * The XML reader invokes this method at the start of every element in the
    *        XML document.  This expects <image/> and <displayProperties/> elements.
    * A quick example using this function:

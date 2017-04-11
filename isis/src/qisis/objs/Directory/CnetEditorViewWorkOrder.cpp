@@ -86,14 +86,14 @@ namespace Isis {
   }
 
 
-  void CnetEditorViewWorkOrder::syncRedo() {
+  void CnetEditorViewWorkOrder::execute() {
     for (int i = 0; i < controlList()->size(); i++) {
       //project()->directory()->addCnetEditorView(controlList().first());
       project()->directory()->addCnetEditorView(controlList()->at(i));
     }
   }
 
-  void CnetEditorViewWorkOrder::syncUndo() {
+  void CnetEditorViewWorkOrder::undoExecution() {
     delete project()->directory()->cnetEditorViews().last();
   }
 }

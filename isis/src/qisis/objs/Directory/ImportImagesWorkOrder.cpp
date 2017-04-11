@@ -76,7 +76,7 @@ namespace Isis {
 
 
   /**
-   * Creates a clone of this work order.
+   * @brief Creates a clone of this work order.
    *
    * @see WorkOrder::clone()
    *

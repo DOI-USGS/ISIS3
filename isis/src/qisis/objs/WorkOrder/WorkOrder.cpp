@@ -1100,7 +1100,6 @@ namespace Isis {
    * @brief This sets up the state for the work order.  Child should implement this to get user 
    *        input.
    *  
-   * @brief Execute a workorder
    * This method is designed to be implemented by children work orders, but they need
    * to call this version inside of their setupExecution (at the beginning).
 
