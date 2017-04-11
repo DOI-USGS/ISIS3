@@ -40,7 +40,7 @@ namespace Isis {
   /**
    * @brief Add cubes to a project
    *
-   * @description Asks the user for a list of cube file names and whether they should be copied into
+   * Asks the user for a list of cube file names and whether they should be copied into
    * the project. The cubes are then converted to external cube label files inside the project (and
    * cube files if the user said to copy the DN data). These files are then handed off to the
    * project.
@@ -62,6 +62,9 @@ namespace Isis {
    *                           undoExecution(), postSyncRedo() to postExecution(), and
    *                           postSyncUndo() to postUndoExecution(). Added isSynchronous(). This is
    *                           related to the WorkOrder redesign. Fixes #4732.
+   *   @history 2017-04-11 Ian Humphrey - Removed isSynchronous() and instead set inherited member
+   *                           m_isSynchronous to false in constructor to indicate this is an
+   *                           asynchronous work order. Updated documentation. References #4732.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -72,14 +75,14 @@ namespace Isis {
 
       virtual ImportImagesWorkOrder *clone() const;
 
-      bool isSynchronous() const;
+      virtual bool setupExecution();
 
-      bool setupExecution();
+      virtual void execute();
 
-      void execute();
-      void undoExecution();
-      void postExecution();
-      void postUndoExecution();
+    protected:
+      virtual void undoExecution();
+      virtual void postExecution();
+      virtual void postUndoExecution();
 
     private:
       ImportImagesWorkOrder &operator=(const ImportImagesWorkOrder &rhs);
@@ -108,21 +111,21 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder;
-          bool m_copyDnData;
-          QThread *m_guiThread;
+          QDir m_destinationFolder; //! Directory where to import the images to.
+          bool m_copyDnData; //! Indicates whether the cube data will be copied to the project.
+          QThread *m_guiThread; //! Pointer to the GUI thread. Not used?
 
-          QMutex m_errorsLock;
-          QSharedPointer<IException> m_errors;
-          QSharedPointer<int> m_numErrors;
+          QMutex m_errorsLock; //! Mutex lock for appending errors and incrementing error count.
+          QSharedPointer<IException> m_errors; //! Stores any errors that occur during import.
+          QSharedPointer<int> m_numErrors; //! Number of errors that occur during import.
       };
 
     private:
       void importConfirmedImages(QStringList confirmedImages, bool copyDnData);
 
     private:
-      ImageList *m_newImages;
-      QString m_warning;
+      ImageList *m_newImages; //! List of images that are being imported in this work order.
+      QString m_warning; //! String of any errors/warnings that occurred during import.
   };
 }
 #endif // ImportImagesWorkOrder_H

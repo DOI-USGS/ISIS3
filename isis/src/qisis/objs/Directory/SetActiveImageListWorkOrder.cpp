@@ -30,11 +30,13 @@
 namespace Isis {
 
 /**
-   * @brief Creates a WorkOrder that will set the active ImageList in the project.
+   * @brief Creates a not undable WorkOrder that will set the active ImageList in the project.
    * @param project  The Project that this work order should be interacting with.
    */
   SetActiveImageListWorkOrder::SetActiveImageListWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This work order is not undoable
+    m_isUndoable = false;
 
     QAction::setText(tr("Set Active Image List") );
     QUndoCommand::setText(tr("Set Active Image List"));
@@ -83,17 +85,7 @@ namespace Isis {
 
 
   /**
-   * @description Indicates whether this work order is undoable.
-   *
-   * @return bool Returns false, indicating that setting the active image list is not undoable.
-   */
-  bool SetActiveImageListWorkOrder::isUndoable() const {
-    return false;
-  }
-
-
-  /**
-   * @description Simply calls the parent WorkOrder::setupExecution(). There is nothing specific
+   * Simply calls the parent WorkOrder::setupExecution(). There is nothing specific
    * that this work order needs to set up before execution. This was separated from execute() as
    * part of the WorkOrder redesign.
    *
@@ -109,7 +101,7 @@ namespace Isis {
   /**
    * @brief Executes this work order.
    *
-   * @description Sets the active image list for the project.
+   * Sets the active image list for the project.
    */
   void SetActiveImageListWorkOrder::execute() {
     project()->setActiveImageList(imageList()->name());
