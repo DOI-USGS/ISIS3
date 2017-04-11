@@ -15,7 +15,8 @@ namespace Isis {
    * @brief Write project images to a user-specified location
    *
    * Takes an imageList and writes it's images to disk at a user-specified location. This works
-   *   both with and without context (context menus and file menu).
+   *   both with and without context (context menus and file menu). This runs asynchronously and
+   *   is not undoable.
    *
    *  internalData() stores:
    *    ImageList name [OPTIONAL] - need context if this isn't present (see WorkOrder::imageList())
@@ -40,8 +41,8 @@ namespace Isis {
 
       bool setupExecution();
 
-      void asyncRedo();
-      void postSyncRedo();
+      void execute();
+      void postExecution();
 
     private:
       /**
