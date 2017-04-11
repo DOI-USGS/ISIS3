@@ -34,7 +34,7 @@ namespace Isis {
   class FileName;
 
   /**
-   * @description Saves a project to disk (File->Save Project As...)
+   * @brief Saves a project to disk (File->Save Project As...)
    *
    * @author 2012-??-?? ???
    *

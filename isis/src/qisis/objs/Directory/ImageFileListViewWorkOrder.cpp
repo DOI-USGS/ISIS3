@@ -57,7 +57,7 @@ namespace Isis {
   
   
   /**
-   * @description This method returns false because this WorkOrder is not undoable.
+   * @brief This method returns false because this WorkOrder is not undoable.
    * 
    * @see WorkOrder::isUndoable()
    * 
@@ -69,10 +69,9 @@ namespace Isis {
 
   
   /**
-   * @description This method asks the user what view they want to see their image list in. The user 
+   * @brief This method asks the user what view they want to see their image list in. The user 
    * can select an existing view or they can create a new view. The user's choice is then saved 
-   * using setInternalData(). This method was renamed from execute() to setupExecution() according  
-   * to the WorkOrder redesign.
+   * using setInternalData(). 
    * 
    * @see WorkOrder::setupExecution()
    * 
@@ -137,9 +136,8 @@ namespace Isis {
 
   
   /**
-   * @description This method adds a new image file list to the project's directory and then adds 
-   * currentItem() to that. This method was renamed from syncRedo() to execute() according to 
-   * WorkOrder's redesign. 
+   * @brief This method adds a new image file list to the project's directory and then adds 
+   * currentItem() to that. 
    */
   void ImageFileListViewWorkOrder::execute() {
     int viewToUse = internalData().first().toInt();

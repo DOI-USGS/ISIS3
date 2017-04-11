@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -95,7 +93,7 @@ namespace Isis {
   }
   
   /**
-   * @description This method returns false because this WorkOrder is not undoable.
+   * @brief This method returns false because this WorkOrder is not undoable.
    * 
    * @see WorkOrder::isUndoable()
    * 
@@ -107,10 +105,9 @@ namespace Isis {
 
   
   /**
-   * @description This method asks the user what view they want to see their cube list in. The user 
+   * @brief This method asks the user what view they want to see their cube list in. The user 
    * can select an existing vew or they can create a new view. The user's choice is then saved using 
-   * setInternalData(). This method was renamed from execute() to setupExecution() according to the 
-   * WorkOrder redesign.
+   * setInternalData(). 
    * 
    * @see WorkOrder::setupExecution()
    * 
@@ -165,9 +162,8 @@ namespace Isis {
 
 
   /**
-   * @description This method adds a new CubeDnView to the project's directory and then adds 
-   * currentItem() to that. This method was renamed from syncRedo() to execute() according to 
-   * WorkOrder's redesign. 
+   * @brief This method adds a new CubeDnView to the project's directory and then adds 
+   * currentItem() to that. 
    */
   void CubeDnViewWorkOrder::execute() {
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();

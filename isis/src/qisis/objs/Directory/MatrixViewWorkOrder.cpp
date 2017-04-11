@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -147,7 +145,7 @@ namespace Isis {
 
   
   /**
-   * This method returns true if other depends on a MatrixViewWorkOrder
+   * @brief This method returns true if other depends on a MatrixViewWorkOrder
    * 
    * @param other we want to check for dependancies
    * 
@@ -161,8 +159,7 @@ namespace Isis {
   
 
   /**
-   * @description This method computes and displays the correlation matrix. This was renamed from
-   * syncRedo() to execute() according to the WorkOrder redesign.
+   * @brief This method computes and displays the correlation matrix. 
    */
   void MatrixViewWorkOrder::execute() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
@@ -183,8 +180,7 @@ namespace Isis {
 
   
   /**
-   * @description This method deletes the last matrix viewed. This was renamed from syncUndo() to
-   * execute() according to the WorkOrder redesign.
+   * @brief This method deletes the last matrix viewed. 
    */
   void MatrixViewWorkOrder::undoExecution() {
     if (internalData()[1] == "new view") {
