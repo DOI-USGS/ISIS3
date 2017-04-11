@@ -5,20 +5,23 @@
 
 
 namespace Isis {
-  /** 
-   * @brief Write a project control network to a user-specified location 
-   *  
-   * Takes a control and writes it's controlNet to disk at a user-specified location. This works 
+  /**
+   * @brief Write a project control network to a user-specified location
+   *
+   * Takes a control and writes it's controlNet to disk at a user-specified location. This works
    *   both with and without context (context menus and file menu).
-   *  
+   *
    *  internalData() stores:
    *    Control ID [OPTIONAL] - need context if this isn't present (see controlList())
    *    Output File Name [REQUIRED]
-   *  
-   *  
+   *
+   *
    * @author 2012-09-26 Tracie Sucharski
    *
    * @internal
+   *   @history 2017-04-11 Ian Humphrey - Updated to match work order redesign. Replaced asyncRedo
+   *                           and postSyncRedo with execute and postExecution. Separated
+   *                           setup and action into setupExecution and execute. Fixes #4763.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -31,16 +34,16 @@ namespace Isis {
 
       bool isExecutable(ControlList *controls);
 
+      virtual bool setupExecution();
+      virtual void execute();
 
-      bool setupExecution();
-
-      void asyncRedo();
-      void postSyncRedo();
+    protected:
+      virtual void postExecution();
 
     private:
       ExportControlNetWorkOrder &operator=(const ExportControlNetWorkOrder &rhs);
 
-      QString m_warning;
+      QString m_warning; //!< Stores any errors that may have occurred during export.
   };
 }
 
