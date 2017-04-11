@@ -51,7 +51,7 @@ namespace Isis {
       bool setupExecution();
       
       void execute();
-      void undoExecution()
+      void undoExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
