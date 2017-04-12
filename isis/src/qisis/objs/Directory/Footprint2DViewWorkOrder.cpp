@@ -51,7 +51,11 @@ namespace Isis {
 
 
   /**
-   * @brief This method has not been implemented.
+   * @brief Copy constructor.
+   *
+   * Creates a copy of the other Footprint2DViewWorkOrder.
+   *
+   * @param Footprint2DViewWorkOrder &other The other work order to copy state from.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
@@ -60,9 +64,11 @@ namespace Isis {
 
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
+   *
+   * Destructor to clean up any memory that this work order allocates.
    */
-  Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
+   Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
   }
 
 
