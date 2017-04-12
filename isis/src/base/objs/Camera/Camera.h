@@ -235,6 +235,9 @@ namespace Isis {
    *   @history 2016-12-02 Victor Silva - Made changes to GetLocalNormal to calculate local normal
    *                           accurately for LRO by changing 4 corner surrounding points from adding
    *                           0.5 to adding 0.5 - DBL_MIN. Fixes #4560.
+   *   @history 2017-03-03 Tyler Wilson - Updated the oblique detector resolution function to correct
+   *                           an error in the original formula, and updated the documention for this
+   *                           function.  Fixes #4614.
    */
 
   class Camera : public Sensor {
