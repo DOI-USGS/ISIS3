@@ -1,5 +1,7 @@
 /**
  * @file
+ * $Revision: 1.19 $
+ * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -33,8 +35,8 @@
 namespace Isis {
 
   /**
-   * Creates a work order to save the project to a new location. This work order is not undoable and
-   * runs synchronously.
+   * Creates a work order to save the project to a new location. This work order is
+   * synchronous and not undoable.
    *
    * @param Project *project Pointer to the project this work order belongs to.
    */
@@ -56,7 +58,6 @@ namespace Isis {
    */
   SaveProjectAsWorkOrder::SaveProjectAsWorkOrder(const SaveProjectAsWorkOrder &other) :
       WorkOrder(other) {
-    m_isUndoable = other.m_isUndoable;
   }
 
 
@@ -66,6 +67,7 @@ namespace Isis {
    * Destructor to clean up any memory that this work order allocates.
    */
   SaveProjectAsWorkOrder::~SaveProjectAsWorkOrder() {
+
   }
 
 
@@ -119,7 +121,6 @@ namespace Isis {
     QString destination = internalData().first();
     if (!destination.isEmpty()) {
       project()->save(destination);
-//      project()->relocateProjectRoot(realPath);
     }
   }
 }
