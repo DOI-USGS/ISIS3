@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -38,6 +36,9 @@ namespace Isis {
 
   ImportShapesWorkOrder::ImportShapesWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This workorder is synchronous and undoable.
+    m_isUndoable = true;
+    m_isSynchronous = false;
     m_newShapes = NULL;
 
     QAction::setText(tr("Import &Shape Models..."));
@@ -62,7 +63,21 @@ namespace Isis {
     return new ImportShapesWorkOrder(*this);
   }
 
+  /**
+   * @brief Prompt the user for shape files to import and whether to copy DN data in to project.
+   *
+   * This method is designed to be implemented by children work orders, but they need
+   * to call this version inside of their setupExecution (at the beginning).
 
+   * State should only be set in the parent WorkOrder class in this method. You can set arbitrary
+   *   state using setInternalData(). This method is always executed in the GUI thread and is the
+   *   only place to ask the user questions.
+   *
+   * If this method returns false the workorder will be cancelled and will not be executed.
+   *
+   * @return @b bool Returns True is the user selected shape files to import, false
+   *                 if the user cancelled the import.
+   */
   bool ImportShapesWorkOrder::setupExecution() {
     WorkOrder::setupExecution();
 
@@ -117,14 +132,20 @@ namespace Isis {
   }
 
 
-
-  void ImportShapesWorkOrder::asyncUndo() {
+  /**
+    * @brief delete the imported shapes from the disk.
+    *
+    * Note: postUndoExecution() deletes shapes from project.
+    */
+  void ImportShapesWorkOrder::undoExecution() {
     project()->waitForShapeReaderFinished();
     project()->shapes().last()->deleteFromDisk(project());
   }
 
-
-  void ImportShapesWorkOrder::postSyncUndo() {
+  /**
+    * @brief delete the imported shapes from the project.
+    */
+  void ImportShapesWorkOrder::postUndoExecution() {
     QPointer<ShapeList> shapesWeAdded = project()->shapes().last();
 
     foreach (Shape *shape, *shapesWeAdded) {
@@ -133,15 +154,22 @@ namespace Isis {
     delete shapesWeAdded;
   }
 
-
-  void ImportShapesWorkOrder::asyncRedo() {
+  /**
+    * @brief Creates a project shape folder and copies the shape cubes into it. This will create
+    * the *.ecub and .cub files inside of the project.
+    */
+  void ImportShapesWorkOrder::execute() {
     if (internalData().count() > 0) {
       importConfirmedShapes(internalData().mid(1), (internalData()[0] == "copy"));
     }
   }
 
-
-  void ImportShapesWorkOrder::postSyncRedo() {
+  /**
+    * @brief Add the imported shapes into the project.
+    *
+    * If there was an error on import display a error message to the user.
+    */
+  void ImportShapesWorkOrder::postExecution() {
     if (!m_newShapes->isEmpty()) {
       project()->addShapes(*m_newShapes);
 
