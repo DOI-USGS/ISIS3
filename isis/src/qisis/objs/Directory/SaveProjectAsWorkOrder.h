@@ -2,8 +2,6 @@
 #define SaveProjectAsWorkOrder_H
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -37,11 +35,11 @@ namespace Isis {
    * @brief Saves a project to disk (File->Save Project As...)
    *
    * @author 2012-??-?? ???
-   *
-   * @internal
-   *   @history 2017-04-11 Ian Humphrey - Updated the work order according to the redesign of
-   *                           WorkOrder. Separated setup and execution steps into setupExecution
-   *                           and execution(). Fixes #4763.
+   *  
+   * @internal 
+   *   @history 2017-04-10 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
+   *                           execute to setupExecution, and moving the actual work to the execute
+   *                           method.
    */
   class SaveProjectAsWorkOrder : public WorkOrder {
       Q_OBJECT

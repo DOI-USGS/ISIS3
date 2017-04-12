@@ -2,8 +2,6 @@
 #define Footprint2DViewWorkOrder_H
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -54,6 +52,9 @@ namespace Isis {
    *   @history 2016-02-06 Tracie Sucharski - Made this WorkOrder not undo-able by calling
    *                           setUndoRedo to false on parent class, and removing syncRedo and
    *                           syncUndo. The work is now done in the execute method. Fixes #4598.
+   *   @history 2017-04-10 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
+   *                           execute to setupExecution, and moving the actual work to the execute
+   *                           method.
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -66,7 +67,8 @@ namespace Isis {
 
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
-      bool setupExecution();
+      virtual bool setupExecution();
+      virtual void execute();
 
     private:
       Footprint2DViewWorkOrder &operator=(const Footprint2DViewWorkOrder &rhs);

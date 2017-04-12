@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -40,9 +38,10 @@
 namespace Isis {
   
   /** 
-   * Constructor. This method sets the text of the project to View Footprints.
+   * Creates a work order to view image footprints. This WorkOrder is not undoable and runs 
+   * synchronously.
    * 
-   * @param project Current project
+   * @param Project *project Pointer to the project this work order belongs to.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
@@ -50,22 +49,25 @@ namespace Isis {
     QAction::setText(tr("View &Footprints..."));
   }
 
+
   /**
-   * This method has not been implemented.
+   * @brief This method has not been implemented.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
-    m_isUndoable = false;
+    m_isUndoable = other.m_isUndoable;
   }
 
+
   /**
-   * Destructor
+   * @brief Destructor
    */
   Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
   }
 
+
   /**
-   * This method clones the current Footprint2DViewWorkOrder and returns it.
+   * @brief This method clones the current Footprint2DViewWorkOrder and returns it.
    * 
    * @return @b Footprint2DViewWorkOrder that was cloned
    */
@@ -74,8 +76,12 @@ namespace Isis {
     return new Footprint2DViewWorkOrder(*this);
   }
   
+
   /**
-   * This method returns true if one of an image in ImageList images isFootprintable.
+   * @brief This method returns true if one of an image in ImageList images isFootprintable, 
+   *              False if none of the images has a footprint. This is used by
+   *              Directory::supportedActions(DataType data) to determine what actions are appended
+   *              to context menus.
    * 
    * @param images ImageList of images
    * 
@@ -93,11 +99,14 @@ namespace Isis {
 
 
   /**
-   * This check is used by Directory::supportedActions(DataType data).
+   * @brief This method returns true if one of the shapes in ShapeList isFootprintable, False 
+   *              if none of shapes have a footprint.  This is used by
+   *              Directory::supportedActions(DataType data) to determine what actions are appended
+   *              to context menus.
    *
-   * @param images ShapeList we are checking
+   * @param shapes ShapeList we are checking
    *
-   * @return @b bool True if one of the images in ImagesList images isFootprintable
+   * @return @b bool True if one of the shapes in ShapeList images isFootprintable
    */
   bool Footprint2DViewWorkOrder::isExecutable(ShapeList *shapes) {
     bool result = false;
@@ -111,9 +120,12 @@ namespace Isis {
 
 
   /**
-   * This method calls WorkOrder's execute.
+   * @brief Setup this WorkOrder for execution.  Prompt for whether these footprints should be
+   *              displayed in a new view or an existing view.  This calls
+   *              WorkOrder::setupExecution().
    * 
-   * @return @b bool True if WorkOrder::execute() returns true 
+   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created, 
+   *         otherwise returns False.
    */
   bool Footprint2DViewWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
@@ -164,10 +176,25 @@ namespace Isis {
          QUndoCommand::setText(tr("View footprints in footprint view [%1]")
               .arg(existingViews[viewToUse]->windowTitle()));
       }
-    }
 
+      QStringList internalData;
+      internalData.append(QString::number(viewToUse));
+      setInternalData(internalData);
+    }
+    return success;
+  }
+
+
+  /**
+   * @brief This either adds a new Footprint2DView containing the selected images or adds the 
+   *              image's footprints to an existing Footprint2DView.
+   *  
+   */
+  void Footprint2DViewWorkOrder::execute() {
 
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
+
+    int viewToUse = internalData().first().toInt();
 
     Footprint2DView *view = NULL;
     if (viewToUse == project()->directory()->footprint2DViews().count()) {
@@ -178,7 +205,6 @@ namespace Isis {
     }
 
     view->addItems( selectedItems );
-    return success;
   }
 }
 
