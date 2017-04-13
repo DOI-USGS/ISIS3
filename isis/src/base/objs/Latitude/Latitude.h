@@ -55,6 +55,8 @@ namespace Isis {
    *                           documentation for all exceptions thrown. Fixes #3907
    *   @history 2016-09-29 Jeannie Backer - Changed strings in error message to use Angle::toString
    *                           instead of the Isis::toString(double) method.
+   *   @history 2017-04-10 Jesse Mapel - Added an accessor and mutator for ErrorChecking member.
+   *                           Fixes #4766.
    */
   class Latitude : public Angle {
     public:
@@ -143,6 +145,9 @@ namespace Isis {
       double planetographic(Angle::Units units = Angle::Radians) const;
       void setPlanetographic(double latitude,
                            Angle::Units units = Angle::Radians);
+
+      ErrorChecking errorChecking() const;
+      void setErrorChecking(ErrorChecking errors);
 
       bool inRange(Latitude min, Latitude max) const;
 
