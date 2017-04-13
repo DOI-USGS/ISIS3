@@ -336,14 +336,6 @@ namespace Isis {
       }
     }
 
-#if defined(DEBUG)
-    cout << "File: " << cube.fileName() << "\n";
-    cout << "Observation Times\n"
-         << "Start:   " << IString(startTime, 20)  << "  (" << startTime.UTC() << ")"
-         << "\nStop:     " << IString(stopTime, 20)  << "  (" << stopTime.UTC() << ")"
-         << "\nExpTime: " << IString(exposureTime, 8) << " <seconds>\n";
-#endif
-
     return ( true );
   }
 
