@@ -42,9 +42,7 @@ int g_numIFOVs = 0;
 
 void IsisMain() {
 
-  ProcessRubberSheet processRubberSheet;
   g_incam = NULL;
-  Cube *icube;
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
@@ -84,11 +82,17 @@ void IsisMain() {
   // Get the combined lat/lon range for all input cubes
   int bands = 1;
   for (int i = 0; i < list.size(); i++) {
+
     // Open the input cube and get the camera
     CubeAttributeInput atts0(list[i]);
-    icube = processRubberSheet.SetInputCube(list[i].toString(), atts0);
-    bands = icube->bandCount();
-    g_incam = icube->camera();
+    Cube icube;
+    if(atts0.bands().size() != 0) {
+      vector<QString> lame = atts0.bands();
+      icube.setVirtualBands(lame);
+    }
+    icube.open( list[i].toString() );
+    bands = icube.bandCount();
+    g_incam = icube.camera();
 
     // Make sure it is not the sky
     if (g_incam->target()->isSky()) {
@@ -127,6 +131,9 @@ void IsisMain() {
     if (newmaxlon > maxlon) {
       maxlon = newmaxlon;
     }
+
+    // The camera will be deleted when the Cube is deleted so NULL g_incam
+    g_incam = NULL;
   } //end for list.size
 
   camGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
@@ -226,7 +233,17 @@ void IsisMain() {
 
   // See if the user want us to handle the longitude seam
   if (ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
-  // TODO: the g_incam below is left over from the for loop above. This must be fixed
+
+    // Open the last cube and use its camera
+    CubeAttributeInput atts0( list.back() );
+    Cube icube;
+    if(atts0.bands().size() != 0) {
+      vector<QString> lame = atts0.bands();
+      icube.setVirtualBands(lame);
+    }
+    icube.open( list.back().toString() );
+    g_incam = icube.camera();
+
     if (g_incam->IntersectsLongitudeDomain(userMap)) {
       if (ui.GetString("LONSEAM") == "AUTO") {
         if ((int) userGrp["LongitudeDomain"] == 360) {
@@ -272,6 +289,9 @@ void IsisMain() {
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
+
+    // The camera will be deleted when the Cube is deleted so NULL g_incam
+    g_incam = NULL;
   }
 
 
@@ -316,7 +336,7 @@ void IsisMain() {
     processBrick.SetBrickSize(1, 1, bands);
     // Recall list[f] is a FileName, which stores the attributes
     CubeAttributeInput atts0(list[f]);
-    icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
+    Cube *icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
     g_incam = icube->camera();
 
     processBrick.StartProcess(rasterizePixel);

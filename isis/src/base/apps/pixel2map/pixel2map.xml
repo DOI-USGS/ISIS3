@@ -252,6 +252,11 @@
       Added the NUMIFOV parameter to determine how many IFOVs are used when creating a full FOV.
       References #4576.
     </change>
+    <change name="Jesse Mapel" date="2017-04-10">
+      Modified to no longer keep all cubes in the fromlist open. This resulted in crashing due to
+      reaching the maximum number of open files when the fromlist was large. Cubes will now be
+      opened one at a time and then closed before opening the next cube. Fixes #4761.
+    </change>
   </history>
 
   <groups>
