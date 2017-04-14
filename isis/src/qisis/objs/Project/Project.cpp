@@ -1496,6 +1496,107 @@ namespace Isis {
   }
 
 
+
+
+  /**
+   * @brief Project::save  Saves the project state out to an XML file
+   * @param newPath  The path to the project directory.
+   * @param verifyPathDoesntExist A boolean variable which is set to true
+   * if we wish to check that we are not overwriting a pre-existing save.
+   *
+   * XML Serialization.  Below is a tree listing the XML tag hiearchy.
+   *
+   * @startsalt{projectXMLTagHierarchy.png}"Project::Save XML Tag Hierarchy"
+   *
+   * {
+   * {T
+   * +project (project.xml)
+   * ++controlNets
+   * +++controlList 1 (controls.xml)
+   * ++++controls
+   * +++++controlNet
+   * +++controlList 2
+   * ++++controls
+   * +++++controlNet
+   * ++imageLists
+   * +++imageList 1 (images.xml)
+   * ++++images
+   * +++++image
+   * +++imageList 2 (images.xml)
+   * ++++images
+   * +++++image
+   * ++shapeLists
+   * +++shapeList 1 (shapes.xml)
+   * ++++shapes
+   * +++++shape
+   * +++shapeList 2 (shapes.xml)
+   * ++bundleRuns (currently the tag is output, but not run times)
+   * ++activeImageList
+   * ++activeControl
+   * }
+   * }
+   * @endsalt
+   *
+   *
+   * The figure below represents a flow chart for XML code generation which starts
+   * with a call to this function:
+   *
+   *   @startuml {projectSaveWorkFlow.png} "Projec Save"
+   *   |XML Processing|
+   *   start
+   *   - Project::save(FileName &, bool &)
+   *    -Project::save(QxmlStreamWriter &stream,FileName &)[save project.xml]
+   *     |XML Code|
+   *     -project.xml
+   *     |XML Processing|
+   *    repeat
+   *     - m_controls[i]->save(stream)
+   *    repeat while (i < m_controls.size() )
+   *   |XML Code|
+   *   -controls.xml for each control list in separate folders.
+   *   |XML Processing|
+   *   repeat
+   *     - m_imagesLists[i]->save(stream)
+   *   repeat while (i < m_imageLists.size() )
+   *   |XML Code|
+   *   -images.xml
+   *   |XML Processing|
+   *   repeat
+   *     - m_shapeLists[i]->save(stream)
+   *   repeat while (i < m_shapeLists.size() )
+   *
+   *   |XML Code|
+   *   -shapes.xml for each control list in separate folders.
+   *   |XML Processing|
+   *   -stream.write("bundleruns") [if it is non-empty]
+   *   |XML Code|
+   *     -project.xml
+   *   |XML Processing|
+   *   -stream.write("activeImageList") [if it exists]
+   *   |XML Code|
+   *     -project.xml
+   *   |XML Processing|
+   *   -stream.write("activeControl") [if it exists]
+   *   |XML Code|
+   *   -project.xml
+   *   |XML Processing|
+   *   -Project::saveHistory(stream)[save history.xml]
+   *   |XML Code|
+   *   -history.xml in project root folder
+   *   |XML Processing|
+   *   -Project::saveWarnings(stream)[save warnings.xml]
+   *   |XML Code|
+   *   -warnings.xml in project root folder
+   *   |XML Processing|
+   *   -Directory::save(stream)[save directory.xml]
+   *   |XML Code|
+   *   -directory.xml in project root folder
+   *   |XML Processing|
+   *   stop
+   *   @enduml
+   *
+   *
+   */
   void Project::save(FileName newPath, bool verifyPathDoesntExist) {
     if ( verifyPathDoesntExist && QFile::exists( newPath.toString() ) ) {
       throw IException(IException::Io,
