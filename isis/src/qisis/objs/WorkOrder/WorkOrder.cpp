@@ -103,6 +103,10 @@ namespace Isis {
   WorkOrder::WorkOrder(const WorkOrder &other) :
       QAction(other.icon(), ((QAction &)other).text(), other.parentWidget()),
       QUndoCommand(((QUndoCommand &)other).text()) {
+    // Copy the action's what's this and tool tip (hover text).
+    QAction::setWhatsThis(other.whatsThis());
+    QAction::setToolTip(other.toolTip());
+
     m_transparentConstMutex = NULL;
     m_elapsedTimer = NULL;
     m_project = other.project();
@@ -204,8 +208,8 @@ namespace Isis {
   /**
    * @brief Re-implement this method if your work order utilizes shapes for data in order to
    *  operate. For example, "ImportShapeWorkOrder" works on shapes - the logic
-   * in side of ImportShapeWorkOrder::isExecutable(ShapeList) determines whethere or not a user is 
-   * prompted with this work order as a possibility. 
+   * in side of ImportShapeWorkOrder::isExecutable(ShapeList) determines whethere or not a user is
+   * prompted with this work order as a possibility.
    * @param shapes A shape list that this work order should execute on
    * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
    * if it is not.
@@ -396,7 +400,7 @@ namespace Isis {
 
   /**
    * @brief Determines if the WorkOrder is execuatable on the data stored in
-   * a ProjectItem. 
+   * a ProjectItem.
    * @param item (ProjectItem *) The item containing the data.
    * @return @b bool Returns True if the WorkOrder is executable on data
    * stored in a ProjectItem.
@@ -449,7 +453,7 @@ namespace Isis {
       //return isExecutable( item->guiCamera() ) || isExecutable( item->guiCamera().data() );
       return isExecutable( item->guiCamera() );
     }
- 
+
     return false;
   }
 
@@ -622,7 +626,7 @@ namespace Isis {
       }
     }
 
-    return 
+    return
       m_shapeList;
   }
 
@@ -734,7 +738,7 @@ namespace Isis {
 
   /**
    * @brief Returns true if this work order is run synchronously, otherwise false.
-   *  
+   *
    * @return @b (bool) Returns True if this work order is run synchronously
    */
   bool WorkOrder::isSynchronous() const {
@@ -923,7 +927,7 @@ namespace Isis {
 
   /**
    * @brief Starts (or enqueues) a redo. This should not be re-implemented by children.
-   * 
+   *
    */
   void WorkOrder::redo() {
     if (!isInStableState()) {
@@ -1023,9 +1027,9 @@ namespace Isis {
 
 
   /**
-   * @brief Starts (or enqueues) an undo. 
+   * @brief Starts (or enqueues) an undo.
    * This should not be re-implemented by children.
-   * 
+   *
    */
   void WorkOrder::undo() {
     if (!isInStableState()) {
@@ -1092,11 +1096,34 @@ namespace Isis {
     }
   }
 
+  /**
+   * @brief Enables the work order.
+   *
+   * Enables the work order so that it can be triggered (clicked).
+   *
+   * @see Directory::initializeActions()
+   */
+  void WorkOrder::enableWorkOrder() {
+    setEnabled(true);
+  }
 
-  /** 
-   * @brief This sets up the state for the work order.  Child should implement this to get user 
+
+  /**
+   * @brief Disables the work order.
+   *
+   * Disables the work order so it cannot be triggered (grayed-out).
+   *
+   * @see Directory::initializeActions()
+   */
+  void WorkOrder::disableWorkOrder() {
+    setEnabled(false);
+  }
+
+
+  /**
+   * @brief This sets up the state for the work order.  Child should implement this to get user
    *        input.
-   *  
+   *
    * This method is designed to be implemented by children work orders, but they need
    * to call the base class setupExecution (at the beginning).
    *
@@ -1351,10 +1378,10 @@ namespace Isis {
   /**
    * @brief Checks to see if we have lost any shapes in the ShapeList.  If we have, then
    * destroy the entire list.  This will send a signal that the list needs to be rebuilt if
-   * requested. 
-   *  
-   * TODO 2016-07-26 TLS Combine this with listenForImageDestruction() - Basically duplicate 
-   *    code. 
+   * requested.
+   *
+   * TODO 2016-07-26 TLS Combine this with listenForImageDestruction() - Basically duplicate
+   *    code.
    */
   void WorkOrder::listenForShapeDestruction() {
     m_shapeIds.clear();

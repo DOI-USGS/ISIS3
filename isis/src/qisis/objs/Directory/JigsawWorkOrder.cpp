@@ -57,7 +57,11 @@ namespace Isis {
     m_isUndoable = false;
     QAction::setText(tr("&Bundle Adjustment..."));
     QUndoCommand::setText("&Bundle Adjustment...");
+    QString hoverText = "Runs a bundle adjustment. ";
+    hoverText += "You must have both an active control and image list set.";
+    QAction::setToolTip(hoverText);
   }
+
 
   /**
    * @brief Copy constructor.
@@ -69,11 +73,13 @@ namespace Isis {
     m_bundleSettings = other.m_bundleSettings;
   }
 
+
   /**
    * Destructor
    */
   JigsawWorkOrder::~JigsawWorkOrder() {
   }
+
 
   /**
    * This method clones the JigsawViewWorkOrder
@@ -84,6 +90,7 @@ namespace Isis {
     return new JigsawWorkOrder(*this);
   }
 
+
   /**
    * This check is used by Directory::supportedActions(DataType data).
    *
@@ -93,6 +100,7 @@ namespace Isis {
   bool JigsawWorkOrder::isExecutable() {
     return (project()->controls().size() > 0 && project()->images().size() > 0);
   }
+
 
   /**
    * If WorkOrder:setupExecution() returns true, this creates a setup dialog.

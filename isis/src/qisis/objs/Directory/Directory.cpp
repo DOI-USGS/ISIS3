@@ -120,7 +120,7 @@ namespace Isis {
 
 //     connect( m_project, SIGNAL(projectLoaded(Project *) ),
 //              this, SLOT(updateRecentProjects(Project *) ) );
-// 
+//
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
 
@@ -161,7 +161,6 @@ namespace Isis {
     }
 
     initializeActions();
-
   }
 
 
@@ -197,7 +196,7 @@ namespace Isis {
     return m_projectMenuActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the edit menu.
    * @return @b QList<QAction *> Returns a list of edit menu actions.
@@ -215,7 +214,7 @@ namespace Isis {
     return m_viewMenuActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the settings menu.
    * @return @b QList<QAction *>  Returns a list of menu actions for the settings.
@@ -251,7 +250,7 @@ namespace Isis {
     return m_activeToolBarActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the Tool Pad.
    * @return @b QList<QAction *>  Returns a list of Tool Pad actions.
@@ -260,13 +259,17 @@ namespace Isis {
     return m_toolPadActions;
   }
 
-  
+
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
-   *  
-   * @todo 2017-02-14 Tracie Sucharski - As far as I can tell the created menus are never used. 
-   * Instead of creating menus to use the addAction method, can't we simply create actions and 
-   * add them to the member variables which save the list of actions for each menu? 
+   *
+   * Any work orders that need to be disabled by default can be done so here.
+   * You need to grab the clone pointer, setEnabled(false), then set up the proper connections
+   * between the project signals (representing changes to state) and WorkOrder::enableWorkOrder.
+   *
+   * @todo 2017-02-14 Tracie Sucharski - As far as I can tell the created menus are never used.
+   * Instead of creating menus to use the addAction method, can't we simply create actions and
+   * add them to the member variables which save the list of actions for each menu?
    */
   void Directory::initializeActions() {
     // Menus are created temporarily to convinently organize the actions.
@@ -324,32 +327,55 @@ namespace Isis {
     importMenu->addAction(m_importShapesWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
-    exportMenu->addAction(m_exportControlNetWorkOrder->clone() );
-    exportMenu->addAction(m_exportImagesWorkOrder->clone() );
+
+    // Temporarily grab the export control network clone so we can listen for the
+    // signals that tell us when we can export a cnet. We cannot export a cnet unless at least
+    // one has been imported to the project.
+    WorkOrder *clone = m_exportControlNetWorkOrder->clone();
+    clone->setEnabled(false);
+    connect(m_project, &Project::controlListAdded,
+            clone, &WorkOrder::enableWorkOrder);
+    // TODO this is not setup yet
+    // connect(m_project, &Project::allControlsRemoved,
+    //         clone, &WorkOrder::disableWorkOrder);
+    exportMenu->addAction(clone);
+
+    // Similarly for export images, disable the work order until we have images in the project.
+    clone = m_exportImagesWorkOrder->clone();
+    clone->setEnabled(false);
+    connect(m_project, &Project::imagesAdded,
+            clone, &WorkOrder::enableWorkOrder);
+    exportMenu->addAction(clone);
 
     fileMenu->addSeparator();
-
     fileMenu->addAction(m_closeProjectWorkOrder->clone() );
-
     m_fileMenuActions.append( fileMenu->actions() );
 
-    
-//  QMenu *projectMenu = new QMenu();
-//  projectMenu->addAction(m_renameProjectWorkOrder->clone());
-//  projectMenu->addAction(m_runJigsawWorkOrder->clone() );
-    
     m_projectMenuActions.append(m_renameProjectWorkOrder->clone());
-    m_projectMenuActions.append(m_runJigsawWorkOrder->clone() );
-    
+
+    // For JigsawWorkOrder, disable the work order utnil we have both an active control and image
+    // list. Setup a tool tip so user can see why the work order is disabled by default.
+    // NOTE: Trying to set a what's this on the clone doesn't seem to work for disabled actions,
+    // even though Qt's documentation says it should work on disabled actions.
+    clone = m_runJigsawWorkOrder->clone();
+    clone->setEnabled(false);
+
+    // Listen for when both an active control and active image list have been set.
+    // When this happens, we can enable the JigsawWorkOrder.
+    connect(m_project, &Project::activeControlAndImageListSet,
+            clone, &WorkOrder::enableWorkOrder);
+
+    m_projectMenuActions.append(clone);
+
 //  m_projectMenuActions.append( projectMenu->actions() );
 
     m_editMenuActions = QList<QAction *>();
     m_viewMenuActions = QList<QAction *>();
     m_settingsMenuActions = QList<QAction *>();
-    m_helpMenuActions = QList<QAction *>();    
+    m_helpMenuActions = QList<QAction *>();
   }
 
-  
+
   /**
    * @brief Set up the history info in the history dockable widget.
    * @param historyContainer The widget to fill.
@@ -372,7 +398,7 @@ namespace Isis {
     }
     warningContainer->setWidget(m_warningTreeWidget);
   }
-  
+
 
   /**
    * @brief Add recent projects to the recent projects list.
@@ -391,7 +417,7 @@ namespace Isis {
      return m_recentProjects;
   }
 
-  
+
   /**
    * @brief Add the widget for the cnet editor view to the window.
    * @param network Control net to edit.
@@ -496,10 +522,10 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets() ) );
-    
+
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
-    
+
     emit newWidgetAvailable(result);
 
     // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
@@ -507,10 +533,10 @@ namespace Isis {
     // TODO 2016-09-27 TLS  Find BETTER WAY
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
             this, SLOT(modifyControlPoint(ControlPoint *)));
-  
+
     connect(result, SIGNAL(deleteControlPoint(ControlPoint *)),
             this, SLOT(deleteControlPoint(ControlPoint *)));
-  
+
     connect(result, SIGNAL(createControlPoint(double, double, Cube *, bool)),
             this, SLOT(createControlPoint(double, double, Cube *, bool)));
 
@@ -537,10 +563,10 @@ namespace Isis {
 //  qDebug()<<"                              internalModel after setModel = "<<result->internalModel();
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
-    
+
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFootprint2DViewWidgets(QObject *) ) );
-    
+
     emit newWidgetAvailable(result);
 
     // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
@@ -561,7 +587,7 @@ namespace Isis {
     connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
 
     return result;
-    
+
     /*
     //qDebug()<<"Directory::addFootprint2DView";
     MosaicSceneWidget *result = new MosaicSceneWidget(NULL, true, true, this);
@@ -748,7 +774,7 @@ namespace Isis {
    * @return @b (ProjectItemTreeView *) The added view.
    */
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
-    ProjectItemTreeView *result = new ProjectItemTreeView(); 
+    ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
    
     //  The model emits this signal when the user double-clicks on the project name, the parent
@@ -931,7 +957,7 @@ namespace Isis {
     return results;
   }
 
-  
+
   /**
    * @brief Accessor for the list of SensorInfoWidgets currently available.
    * @return QList<SensorInfoWidget *> The list of SensorInfoWidget objects.
@@ -1066,7 +1092,7 @@ namespace Isis {
    * @brief Save the directory to an XML file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
-   * 
+   *
    * @internal
    *   @history 2016-11-07 Ian Humphrey - Restored saving of footprints (footprint2view).
    *                           References #4486.
@@ -1335,7 +1361,7 @@ namespace Isis {
     if (m_controlPointEditView && m_footprint2DViewWidgets.size() == 1) {
       connect(m_footprint2DViewWidgets.at(0), SIGNAL(controlPointSelected(ControlPoint *)),
               m_controlPointEdit, SLOT(loadControlPoint(ControlPoint *)));
-      connect(m_cnetEditor, SIGNAL(controlPointCreated(ControlPoint *)), 
+      connect(m_cnetEditor, SIGNAL(controlPointCreated(ControlPoint *)),
               m_controlPointEditWidget, SLOT(setEditPoint(ControlPoint *)));
 
       // MosaicControlTool->MosaicSceneWidget->ControlNetEditor

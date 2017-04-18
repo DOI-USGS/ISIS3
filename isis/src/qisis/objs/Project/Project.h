@@ -96,10 +96,10 @@ namespace Isis {
    *   @history 2016-07-06 Tracie Sucharski - Changed the ImageReader to require footprints, because
    *                           ImageReader class was changed so that footprints are no longer
    *                           created if not required.
-   *   @history 2016-07-06 Tracie Sucharski - Add import shape models to project. 
+   *   @history 2016-07-06 Tracie Sucharski - Add import shape models to project.
    *   @history 2016-11-09 Tyler Wilson - Added try-catch blocks around reader.parse calls in
    *                           the open function, so that warnings/errors are output to the
-   *                           warnings tab of the GUI instead of causing the application 
+   *                           warnings tab of the GUI instead of causing the application
    *                           to exit.  Fixes #4488.
    *   @history 2016-11-22 Tracie Sucharski - When saving a new project, if it is currently a
    *                           temporary project, save project name as the base pathname for the
@@ -116,11 +116,17 @@ namespace Isis {
    *   @history 2017-02-06 Tracie Sucharski - When adding a work order to the project, check the
    *                           work order to determine if it should be put on the QUndoStack.
    *                           Fixes #4598.
-   *   @history 2017-03-30 Tracie Sucharski - Cleaned up some documentation regarding last change. 
-   *   @history 2017-04-04 Makayla Shepherd - Updated addToProject to support the new WorkOrder 
+   *   @history 2017-03-30 Tracie Sucharski - Cleaned up some documentation regarding last change.
+   *   @history 2017-04-04 Makayla Shepherd - Updated addToProject to support the new WorkOrder
    *                           design. Fixes #4729.
    *   @history 2017-04-06 Tracie Sucharski - Added call to child WorkOrder::execute() even if it
    *                           a CleanState.
+   *   @history 2017-04-16 Ian Humphrey - Added activeControlSet and activeImageListSet,
+   *                           activeControlAndImageListSet signals. Added
+   *                           checkActiveControlAndImageList slot. This facilitates enabling
+   *                           the JigsawWorkOrder on the main window menu. Fixes #4749. Also,
+   *                           modified addToProject so that not undoable work orders have their
+   *                           redo called instead of execute.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -228,8 +234,24 @@ namespace Isis {
       void controlAdded(Control *control);
 
       /**
-       * Emitted when new ImageList added to Project 
-       * receivers: ProjectTreeWidget 
+       * Emitted when an active control is set.
+       * receivers: Project::checkActiveControlAndImageList
+       */
+      void activeControlSet();
+
+      /**
+       * Emitted when all controls have been removed from the Project.
+       * receivers: WorkOrder::disableWorkOrder
+       *
+       * Currently does not work (there is no work order to remove cnets).
+       *
+       * @see Project::controlListDeleted(QObject *controlListObj)
+       */
+      void allControlsRemoved();
+
+      /**
+       * Emitted when new ImageList added to Project
+       * receivers: ProjectTreeWidget
        */
       void imageListAdded(ImageList *images);
 
@@ -238,6 +260,18 @@ namespace Isis {
        * receivers: Directory, Project, WorkOrder
        */
       void imagesAdded(ImageList *images);
+
+      /**
+       * Emitted when an active image list is set.
+       * receivers: Project::checkActiveControlAndImageList
+       */
+      void activeImageListSet();
+
+      /**
+       * Emitted when both an active control and active image list have been set.
+       * receivers: WorkOrder::enableWorkOrder
+       */
+      void activeControlAndImageListSet();
 
       /**
        * Emitted when new shape model images are available.
@@ -300,6 +334,7 @@ namespace Isis {
       void shapesReady(ShapeList shapes);
       void shapeClosed(QObject *shape);
       void shapeListDeleted(QObject *shapeList);
+      void checkActiveControlAndImageList();
 
     private:
       Project(const Project &other);

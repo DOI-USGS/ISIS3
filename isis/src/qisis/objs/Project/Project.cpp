@@ -211,6 +211,12 @@ namespace Isis {
 
     m_shapeReadingMutex = new QMutex;
 
+    // Listen for when an active control is set and when an active image list is set.
+    // This is used for enabling the JigsawWorkOrder (the Bundle Adjustment menu action).
+    connect(this, &Project::activeControlSet,
+            this, &Project::checkActiveControlAndImageList);
+    connect(this, &Project::activeImageListSet,
+            this, &Project::checkActiveControlAndImageList);
     // TODO: ken testing
 //    m_bundleSettings = NULL;
 //    m_bundleSettings = new BundleSettings();
@@ -486,22 +492,22 @@ namespace Isis {
 
     // if ( !m_bundleSolutionInfo->isEmpty() ) {
     //   stream.writeStartElement("bundleSolutionInfo");
-    // 
+    //
     //   for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
     //     m_bundleSolutionInfo->at(i)->save(stream, this, newProjectRoot);
     //   }
-    // 
+    //
     //   stream.writeEndElement();
     // }
 
     // should we write the runtimes of the runs here???
     if (!m_bundleSolutionInfo->isEmpty()) {
       stream.writeStartElement("bundleRuns");
-    
+
       for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
         m_bundleSolutionInfo->at(i)->runTime();
       }
-    
+
       stream.writeEndElement();
     }
 
@@ -691,8 +697,8 @@ namespace Isis {
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( controlListDeleted(QObject *) ) );
 
-      emit controlListAdded(result);
       m_controls->append(result);
+      emit controlListAdded(result);
     }
 
     return result;
@@ -803,9 +809,9 @@ namespace Isis {
 
 
   /**
-   * Add the given BundleSolutionInfo to the current project. This will cause the 
-   * BundleSolutionInfo to be saved/restored from disk, Project-related GUIs to display the 
-   * BundleSolutionInfo, and enable access to the BundleSolutionInfo given access to the project. 
+   * Add the given BundleSolutionInfo to the current project. This will cause the
+   * BundleSolutionInfo to be saved/restored from disk, Project-related GUIs to display the
+   * BundleSolutionInfo, and enable access to the BundleSolutionInfo given access to the project.
    */
   void Project::addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
 
@@ -826,7 +832,7 @@ namespace Isis {
     loadBundleSolutionInfo(bundleSolutionInfo);
   }
 
-  
+
   void Project::loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
     m_bundleSolutionInfo->append(bundleSolutionInfo);
 
@@ -852,12 +858,12 @@ namespace Isis {
    * @param The path to the project folder
    * @internal
    *   @history Tyler Wilson - Added try-catch blocks around all reader.parse
-   *                  calls.  The exception information is not piped to the Warnings tab 
+   *                  calls.  The exception information is not piped to the Warnings tab
    *                  in the GUI instead of the command line, and the application starts
    *                  instead of executing prematurely.  Fixes #4488.
    * */
   void Project::open(QString projectPathStr) {
-  
+
     m_isTemporaryProject = false;
 
     FileName projectPath(projectPathStr);
@@ -910,7 +916,7 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
-   
+
     try {
         reader.parse(xmlHistoryInputSource);
         }
@@ -945,7 +951,7 @@ namespace Isis {
 
     QString directoryXmlPath = projectPath.toString() + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
-   
+
 
     if (!directoryFile.open(QFile::ReadOnly)) {
       throw IException(IException::Io,
@@ -957,7 +963,7 @@ namespace Isis {
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
-   
+
     try {
       reader.parse(xmlDirectoryInputSource);
          }
@@ -1046,7 +1052,7 @@ namespace Isis {
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
-  
+
 
   WorkOrder *Project::lastNotUndoneWorkOrder() {
     WorkOrder *result = NULL;
@@ -1178,13 +1184,29 @@ namespace Isis {
 
 
   /**
-   * @brief Set the Active Control (control network) 
-   *  
-   * Set the active control (control network) for views which need to operate on the 
-   * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * @brief Checks if both an active control and active image list have been set.
+   *
+   * This can be used to check when both an active control and active image list have been set.
+   * This is used for enabling the jigsaw work order on the Project menu when there is an active
+   * control and image list set.
+   *
+   * @see Directory::initializeActions()
+   */
+  void Project::checkActiveControlAndImageList() {
+    if (m_activeControl && m_activeImageList) {
+      emit activeControlAndImageListSet();
+    }
+  }
+
+
+  /**
+   * @brief Set the Active Control (control network)
+   *
+   * Set the active control (control network) for views which need to operate on the
+   * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
    *   @history 2016-12-22 Tracie Sucharski - Changed to take a displayName, so that it can be used
    *                           when loading a saved project which has an active control saved with
    *                           the displayName.
@@ -1193,7 +1215,7 @@ namespace Isis {
    *                           whether from the workorder or calling this method directly from the
    *                           project loading.  TODO:  should project loading call the WorkOrder
    *                           rather than this method directly?
-   *       
+   *
    */
   void Project::setActiveControl(QString displayName) {
 
@@ -1210,17 +1232,18 @@ namespace Isis {
     }
 
     activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+    emit activeControlSet();
   }
 
 
   /**
-   * @brief Return the Active Control (control network) 
-   *  
-   * Returns the active control (control network) for views which need to operate on 
-   * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * @brief Return the Active Control (control network)
+   *
+   * Returns the active control (control network) for views which need to operate on
+   * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
    */
   Control *Project::activeControl() {
     return m_activeControl;
@@ -1229,13 +1252,13 @@ namespace Isis {
 
   /**
    * @brief Set the Active ImageList from the displayName which is saved in project.xml
-   *  
-   * Set the active ImageList for views which need to operate on the 
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. This version of 
-   * the setActiveImageList method is used when loading a project which has an activeImageList 
-   * saved. 
-   *  
-   * @internal 
+   *
+   * Set the active ImageList for views which need to operate on the
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. This version of
+   * the setActiveImageList method is used when loading a project which has an activeImageList
+   * saved.
+   *
+   * @internal
    *   @history 2016-12-02 Tracie Sucharski - Original version.
    *   @history 2016-12-29 Tracie Sucharski - Combined the functionality of
    *                           setActiveImageList(ImageList *) in this method.  This will allow
@@ -1254,22 +1277,23 @@ namespace Isis {
       QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
       return;
     }
-    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole); 
+    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
     if (item && item->isImageList()) {
       m_activeImageList = item->imageList();
       item->setTextColor(Qt::darkGreen);
     }
+    emit activeImageListSet();
   }
 
 
   /**
    * @brief  Returns the active ImageList
-   *  
+   *
    * Returns the active ImageList for views which need to operate on the
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
    */
   ImageList *Project::activeImageList() {
     return m_activeImageList;
@@ -1482,8 +1506,8 @@ namespace Isis {
 
   void Project::save() {
     if (m_isTemporaryProject) {
-      QString newDestination = QFileDialog::getSaveFileName(NULL, 
-                                                            QString("Project Location"), 
+      QString newDestination = QFileDialog::getSaveFileName(NULL,
+                                                            QString("Project Location"),
                                                             QString("."));
 
       if ( !newDestination.isEmpty() ) {
@@ -1703,15 +1727,15 @@ namespace Isis {
 
   /**
    * @brief This executes the WorkOrder and stores it in the project.
-   * 
-   * @decription Run the WorkOrder and stores it in the project. If WorkOrder::setupExecution() 
+   *
+   * @decription Run the WorkOrder and stores it in the project. If WorkOrder::setupExecution()
    * returns true then the WorkOrder's redo is called. This takes ownership of WorkOrder.
    *
    * The order of events is:
    *   1) WorkOrder::setupExecution()
    *   2) emit workOrderStarting()
    *   3) WorkOrder::redo()
-   * 
+   *
    * @see WorkOrder::redo()
    *
    * @param workOrder The work order to be executed. This work order must not already be in the
@@ -1740,13 +1764,13 @@ namespace Isis {
         // All other work orders go onto the undo stack, unless specifically told not to
         else if (workOrder->isUndoable()) {
           // This calls WorkOrder::redo for us through Qt's QUndoStack::push method, redo is only
-          // implemented in the base class.  Child work orders do not implement redo. 
-          m_undoStack.push(workOrder); 
+          // implemented in the base class.  Child work orders do not implement redo.
+          m_undoStack.push(workOrder);
         }
         else {
-          // If we get this far the WorkOrder is not-undoable therefore we have to call execute by
-          // hand
-          workOrder->execute();
+          // If we get this far the WorkOrder is not-undoable therefore we have to call redo by
+          // hand.
+          workOrder->redo();
         }
 
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)
@@ -1856,7 +1880,7 @@ namespace Isis {
     emit targetsAdded(m_targets);
   }
 
-  
+
 
   void Project::addCamerasFromImportedImagesToProject(ImageList *imageList) {
     bool found = false;
@@ -1963,6 +1987,10 @@ namespace Isis {
     int indexToRemove = m_controls->indexOf(static_cast<ControlList *>(controlListObj));
     if (indexToRemove != -1) {
       m_controls->removeAt(indexToRemove);
+    }
+
+    if (controls().count() == 0) {
+      emit allControlsRemoved();
     }
   }
 
@@ -2155,10 +2183,10 @@ namespace Isis {
 
 
   /**
-   * The xml parser for ending tags 
-   *  
+   * The xml parser for ending tags
+   *
    * @internal
-   *   @history 2016-12-02 Tracie Sucharski - Changed localName == "project" to 
+   *   @history 2016-12-02 Tracie Sucharski - Changed localName == "project" to
    *                           localName == "imageLists", so that images and shapes
    *                           are added to the project as soon as their end tag is found.
    *                           Restoring activeImageList was not working since the project had

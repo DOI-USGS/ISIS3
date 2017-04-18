@@ -42,6 +42,9 @@ namespace Isis {
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
    *   @history 2017-04-17 Ian Humphrey - Updated documentation and methods for accommodating the
    *                           changes to work order. References #4748.
+   *   @history 2017-04-17 Ian Humphrey - Added what's this and tool tip text to this work order
+   *                           so the user knows that this work order is disabled until an
+   *                           active cnet and image list have been set. Fixes #4749.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT

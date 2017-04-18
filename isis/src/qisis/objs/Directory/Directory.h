@@ -50,7 +50,7 @@ namespace Isis {
   class CubeDnView;
   class Footprint2DView;
   class HistoryTreeWidget;
-  class ImageFileListWidget; 
+  class ImageFileListWidget;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -101,7 +101,7 @@ namespace Isis {
    *   @history 2016-11-07 Ian Humphrey - Restored saving and loading Footprint2DViews when saving
    *                           and opening a project (modified save() and startElement()).
    *                           Fixes #4486.
-   *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews. 
+   *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews.
    *   @history 2016-12-21 Tracie Sucharski - Added QObject parameter to
    *                           cleanupFootprint2DViewWidgets.  All footprint views were being
    *                           destroyed rather than simply the view which was closed. TODO: This
@@ -118,6 +118,11 @@ namespace Isis {
    *   @history 2017-04-17 Tracie Sucharski - Added connection between model's projectNameEdited,
    *                           initiated by double-clicking the project name on the ProjectTreeView
    *                           and Directory's slot, initiateRenameProjectWorkOrder.  Fixes #2295.
+   *   @history 2017-04-17 Ian Humphrey - Modified how ExportControlNet, ExportImages, and
+   *                           Jigsaw WorkOrder's are added to the main window menu. These are
+   *                           disabled by default, and connections are setup to listen for when
+   *                           cnets are added, when images are added, and when both an active
+   *                           cnet and image list have been set. Fixes #4749.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -156,7 +161,7 @@ namespace Isis {
       QList<QAction *> permToolBarActions();
       QList<QAction *> activeToolBarActions();
       QList<QAction *> toolPadActions();
-      
+
       QList<CnetEditorWidget *> cnetEditorViews();
       QList<CubeDnView *> cubeDnViews();
       QList<Footprint2DView *> footprint2DViews();
@@ -298,8 +303,8 @@ namespace Isis {
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
 
-      void initializeActions(); 
-      
+      void initializeActions();
+
       QPointer<ProjectItemModel> m_projectItemModel; //!< Pointer to the ProjectItemModel.
 
 
@@ -318,7 +323,7 @@ namespace Isis {
       QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets
 
       QList< QPointer<WorkOrder> > m_workOrders; //!< List of WorkOrders
-      
+
       QStringList m_recentProjects;  //!< List of the names of recent projects
 
       // We only need to store the work orders that go into menus uniquely... all work orders
@@ -347,6 +352,7 @@ namespace Isis {
       QList<QAction *> m_permToolBarActions; //!< List of perm ToolBar actions
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
+
   };
 }
 

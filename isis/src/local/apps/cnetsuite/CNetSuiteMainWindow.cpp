@@ -91,7 +91,7 @@ namespace Isis {
 
     QStringList args = QCoreApplication::arguments();
 /**
-    if (args.count() == 2) {    
+    if (args.count() == 2) {
       qDebug() << args.last();
       m_directory->project()->open(args.last());
     }
@@ -193,8 +193,8 @@ namespace Isis {
 
 
   /**
-   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a 
-   * view which was detached from the MDI main window. 
+   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a
+   * view which was detached from the MDI main window.
    *
    * @param[in] newWidget (QWidget *)
    */
@@ -437,7 +437,7 @@ namespace Isis {
         return true;
       }
     }
- 
+
     return QMainWindow::eventFilter(watched, event);
   }
 
@@ -528,6 +528,11 @@ namespace Isis {
     m_projectMenu = menuBar()->addMenu(tr("&Project"));
     m_projectMenu->setObjectName("projectMenu");
 
+    // Allow tool tips to be displayed for the project menu's actions (e.g. "Bundle Adjustment")
+    // This is a work around for Qt's what this text not working on disabled actions
+    // (even though the Qt documentation says it should work on disabled QAction's).
+    m_projectMenu->setToolTipsVisible(true);
+
     m_editMenu = menuBar()->addMenu(tr("&Edit"));
     m_editMenu->setObjectName("editMenu");
 
@@ -546,14 +551,14 @@ namespace Isis {
    * Write the window positioning and state information out to a
    * config file. This allows us to restore the settings when we
    * create another main window (the next time this program is run).
-   * 
+   *
    * The state will be saved according to the currently loaded project and its name.
    *
    * When no project is loaded (i.e. the default "Project" is open), the config file used is
    * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
    * When a project, ProjectName, is loaded, the config file used is
    * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
-   * 
+   *
    * @param[in] project Pointer to the project that is currently loaded (default is "Project")
    *
    * @internal
@@ -561,8 +566,8 @@ namespace Isis {
    *                           References #4358.
    */
   void CNetSuiteMainWindow::writeSettings(const Project *project) const {
-    // Ensure that we are not using a NULL pointer   
-    if (!project) { 
+    // Ensure that we are not using a NULL pointer
+    if (!project) {
       QString msg = "Cannot write settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
