@@ -20,13 +20,53 @@
 
 namespace Isis {
 
+  /**
+   * @brief Constructor.
+   *
+   * Creates a dialog for running a jigsaw (bundle adjustment) and changing the solve settings.
+   *
+   * @param Project *project Pointer to the project this dialog belongs to.
+   * @param QWidget *parent Pointer to parent widget.
+   */
   JigsawDialog::JigsawDialog(Project *project, QWidget *parent) :
-                      QDialog(parent), m_ui(new Ui::JigsawDialog) {
+      QDialog(parent), m_ui(new Ui::JigsawDialog) {
+    m_project = project;
+    m_selectedControl = NULL;
+    init();
+  }
+
+
+  /**
+   * @brief Constructor that takes bundle settings and a selected control.
+   *
+   * Creates a dialog after the jigsaw solve settings have been set up and a control has been
+   * selected.
+   *
+   * @param Project *project Pointer to the project this dialog belongs to.
+   * @param BundleSettingsQsp bundleSettings Settings to give to this dialog to use for a jigsaw.
+   * @param Control *selectedControl Pointer to the selected control to adjust.
+   * @param QWidget *parent Pointer to the parent widget.
+   */
+  JigsawDialog::JigsawDialog(Project *project,
+                             BundleSettingsQsp bundleSettings,
+                             Control *selectedControl,
+                             QWidget *parent) : QDialog(parent), m_ui(new Ui::JigsawDialog) {
+    m_project = project;
+    m_bundleSettings = bundleSettings;
+    m_selectedControl = selectedControl;
+    init();
+  }
+
+
+  /**
+   * @brief Constructor delegate.
+   *
+   * Delegate method that helps the constructors. This is used to reduce repeated code.
+   */
+  void JigsawDialog::init() {
     m_ui->setupUi(this);
 
     m_bundleAdjust = NULL;
-    m_project = project;
-    m_selectedControl = NULL;
 
     m_bRunning = false;
 
@@ -44,6 +84,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor.
+   */
   JigsawDialog::~JigsawDialog() {
     if (m_ui) {
       delete m_ui;
@@ -59,9 +102,9 @@ namespace Isis {
     // useLastSettings = matches check box
     // readOnly = false,
     // parent = this
-    JigsawSetupDialog setupdlg(m_project, 
-                               m_ui->useLastSettings->isChecked(), 
-                               false, 
+    JigsawSetupDialog setupdlg(m_project,
+                               m_ui->useLastSettings->isChecked(),
+                               false,
                                this);
 
     // how to set up default settings object if last is not used or doesnt exist ???
@@ -147,7 +190,7 @@ namespace Isis {
 //    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
 //    QString path = cwd.absolutePath() + "/";
 //    m_bundleSettings->setOutputFilePrefix(path);
-       
+
 //     m_bundleAdjust = new BundleAdjust(m_bundleSettings,
 //                                            *m_selectedControl,
 //                                            m_project->images(),
@@ -157,34 +200,41 @@ namespace Isis {
 
        m_bundleAdjust->moveToThread(bundleThread);
 
+       // Track the status updates bundle adjust gives and update the dialog.
        connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
                 this, SLOT( outputBundleStatus(QString) ) );
 
+       // Track any errors that may occur during the bundle adjust and update the dialog.
        connect( m_bundleAdjust, SIGNAL( error(QString) ),
                 this, SLOT( errorString(QString) ) );
 
-       connect( m_bundleAdjust, SIGNAL( bundleException(QString) ),
-                this, SLOT( reportException(QString) ) );
-
+       // Update the iteration dialog element when the bundle updates its iteration count.
        connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
                 this, SLOT( updateIterationSigma0(int, double) ) );
 
+       // When we start the bundle thread, run the bundle adjustment.
        connect( bundleThread, SIGNAL( started() ),
                 m_bundleAdjust, SLOT( solveCholesky() ) );
 
+       // When the bundle adjust says results are ready, we can allow the dialog to update the
+       // project as necessary.
        connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
                 this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
 
+       // Schedule the bundle thread for deletion when it finishes.
        connect( bundleThread, SIGNAL( finished() ),
                 bundleThread, SLOT( deleteLater() ) );
 
        // ken testing
+       // Notify the dialog that the bundle thread is finished, and update the gui elements.
        connect( bundleThread, SIGNAL( finished() ),
                 this, SLOT( notifyThreadFinished() ) );
 
+       // Tell the thread to quit (stop) when the bundle adjust finishes (successfully or not)
        connect( m_bundleAdjust, SIGNAL( finished() ),
                 bundleThread, SLOT( quit() ) );
 
+       // Schedule the bundle adjustment for deletion.
        connect( m_bundleAdjust, SIGNAL( finished() ),
                 m_bundleAdjust, SLOT( deleteLater() ) );
        // ken testing
@@ -278,13 +328,22 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Notifies the dialog that the bundle thread has finished.
+   *
+   * This slot is used to notify the dialog that the bundle has finished. The bundle thread
+   * finishes when the bundle adjust finishes (either successfully or unsuccessfully, or if the
+   * user aborts the run).
+   */
   void JigsawDialog::notifyThreadFinished() {
-    QString str = "\nThread Finished signal received";
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(str) );
+    //QString str = "\nThread Finished signal received";
+    //m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(str) );
 
     // set Run button text back to "Run"
-    m_ui->JigsawRunButton->setText("&Run...");
-
+    m_ui->JigsawRunButton->setText("&Run");
+    // Since this slot is invoked when the thread finishes, the bundle adjustment is no longer
+    // running.
+    m_bRunning = false;
     update();
 
     m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
@@ -307,7 +366,7 @@ namespace Isis {
       m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
 
       //TODO: move correlation matrix to correct position in project directory
-      
+
       // create output control net
   //     bundleAdjustment.controlNet()->Write("ONET.net");
   //
@@ -344,7 +403,7 @@ namespace Isis {
   }
   else {
     //This bundle was bad so we should delete all remenants.
-    
+
     //TODO: delete correlation matrix cov file...
     //TODO: delete bundle results object
 
@@ -353,7 +412,7 @@ namespace Isis {
 
   // TODO: Give user the option to keep or throw away the bundle. Even if the bundle converged it
   //       could still be worthless.
-  }  
+  }
 }
 
   /**
@@ -428,7 +487,7 @@ namespace Isis {
 
     bundleFinished(&br);
     // **************************************************************************
-    
+
     // ********************************************** ****************************
 //#if 0
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

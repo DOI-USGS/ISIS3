@@ -24,7 +24,12 @@
  */
 #include "WorkOrder.h"
 
+template <class T>
+class QSharedPointer;
+
 namespace Isis {
+  class BundleSettings;
+  typedef QSharedPointer<BundleSettings> BundleSettingsQsp;
   /**
    * @brief This work order allows the user to run a bundle adjustment (jigsaw).
    * This workorder is synchronous and undoable.
@@ -35,7 +40,8 @@ namespace Isis {
    *   @history 2014-06-04 Jeannie Backer - Fixed JigsawWorkOrder error.
    *   @history 2015-09-05 Ken Edmundson - Added preliminary target body functionality to IPCE.
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
-   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-04-17 Ian Humphrey - Updated documentation and methods for accommodating the
+   *                           changes to work order. References #4748.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -47,16 +53,15 @@ namespace Isis {
       virtual JigsawWorkOrder *clone() const;
 
       virtual bool isExecutable();
-      bool setupExecution();
+      virtual bool setupExecution();
+      virtual void execute();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void execute();
-      void undoExecution();
 
     private:
       JigsawWorkOrder &operator=(const JigsawWorkOrder &rhs);
+      BundleSettingsQsp m_bundleSettings; /**< BundleSettings shared betweeen setup and execute. */
   };
 }
 #endif
-

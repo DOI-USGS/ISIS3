@@ -24,6 +24,7 @@
 
 #include <QtDebug>
 
+#include <QDialog>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -32,27 +33,40 @@
 #include "Control.h"
 #include "Directory.h"
 #include "JigsawDialog.h"
+#include "JigsawSetupDialog.h"
 #include "Project.h"
 
 namespace Isis {
 
   /**
-   * This method sets the text of the work order.
-   * 
+   * @brief Constructs a JigsawWorkOrder.
+   *
+   * This creates a work order to run bundle adjustments. Note that right now,
+   * the design implemented means that this work order finishes after a JigsawDialog
+   * is shown. This work order is synchronous and not undoable. Note is is synchronous
+   * in that it simply displays a dialog. The actual bundle adjust is threaded.
+   *
+   * @see JigsawDialog
+   *
    * @param project The Project that we are going to Bundle Adjust
-   * 
+   *
    */
   JigsawWorkOrder::JigsawWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This work order is synchronous and not undoable
+    m_isUndoable = false;
     QAction::setText(tr("&Bundle Adjustment..."));
     QUndoCommand::setText("&Bundle Adjustment...");
   }
 
   /**
-   * As of 06/06/2016 this method is not implemented.
+   * @brief Copy constructor.
+   *
+   * Copies the state of another JigsawWorkOrder.
    */
   JigsawWorkOrder::JigsawWorkOrder(const JigsawWorkOrder &other) :
       WorkOrder(other) {
+    m_bundleSettings = other.m_bundleSettings;
   }
 
   /**
@@ -63,8 +77,8 @@ namespace Isis {
 
   /**
    * This method clones the JigsawViewWorkOrder
-   * 
-   * @return @b JigsawWorkOrder Returns a clone of the JigsawWorkOrder
+   *
+   * @return JigsawWorkOrder* Returns a clone of the JigsawWorkOrder
    */
   JigsawWorkOrder *JigsawWorkOrder::clone() const {
     return new JigsawWorkOrder(*this);
@@ -73,7 +87,7 @@ namespace Isis {
   /**
    * This check is used by Directory::supportedActions(DataType data).
    *
-   * @return @b bool True if the number of project controls and the number of project images
+   * @return bool True if the number of project controls and the number of project images
    *         is greater than 0.
    */
   bool JigsawWorkOrder::isExecutable() {
@@ -81,70 +95,66 @@ namespace Isis {
   }
 
   /**
-   * If WorkOrder::execute() returns true, this method creates a JigsawDialog.
-   * 
-   * @return @b bool True if WorkOrder::execute() returns true.
+   * If WorkOrder:setupExecution() returns true, this creates a setup dialog.
+   *
+   * When the setup is successful (i.e. the user does not cancel the dialog), this work order
+   * will be read to execute.
+   *
+   * @return bool Returns True if setup dialog for the bundle adjustment is successful.
    */
   bool JigsawWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
-/*
+
     if (success) {
-        JigsawDialog* bundledlg = new JigsawDialog(project());
-        bundledlg->setAttribute(Qt::WA_DeleteOnClose);
-        bundledlg->show();
-//      QUndoCommand::setText(tr("&Bundle Adjustment")
-//          .arg(controlList().first()->displayProperties()->displayName()));
+      // Create a blocking setup dialog initially and check to make sure we get valid info
+      JigsawSetupDialog setup(project());
+      if (setup.exec() == QDialog::Accepted) {
+        m_bundleSettings = setup.bundleSettings();
+        if (setup.selectedControl()) {
+          setInternalData(QStringList(setup.selectedControl()->id()));
+        }
+        // This else should not happen, the work order should be disabled if there are no controls.
+        else {
+          QString msg = "Cannot run a bundle adjustment without a selected control network.";
+          QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", msg);
+          success = false;
+        }
+      }
+      else {
+        success = false;
+      }
     }
-*/
-    if (success) {
-//      QDockWidget* dock = new QDockWidget();
-//      dock->setMinimumWidth(525);
-//      dock->setMinimumHeight(325);
-//      dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-      JigsawDialog* bundledlg = new JigsawDialog(project());
-      bundledlg->setAttribute(Qt::WA_DeleteOnClose);
-      bundledlg->show();
-//      dock->setWidget(bundledlg);
-//      dock->show();
-    }
+
 
     return success;
   }
 
-  /**
-  * This method returns true if other depends on a JigsawViewWorkOrder
-  * 
+
+ /**
+  * This method returns true if other depends on a JigsawWorkOrder
+  *
   * @param order the WorkOrder we want to check for dependancies
-  * 
-  * @return @b bool True if WorkOrder depends on a JigsawViewWorkOrder
-  * 
+  *
+  * @return bool True if WorkOrder depends on a JigsawWorkOrder
+  *
   */
   bool JigsawWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<JigsawWorkOrder *>(other);
   }
 
+
   /**
-   * As of 06/06/2016 this method is not implemented as the contents are commented out.
-   * 
+   * Executes the work order by creating a jigsaw dialog that allows the user to run or re-setup
+   * the settings for a bundle adjustment.
+   *
+   * @see WorkOrder::execute()
    */
   void JigsawWorkOrder::execute() {
-//    TargetInfoWidget *targetInfoWidget =
-//        project()->directory()->addTargetInfoView(targetBody());
-
-
-//    if (!targetInfoWidget) {
-//      QString msg = "error displaying target info";
-//      throw IException(IException::Programmer, msg, _FILEINFO_);
-//    }
-  }
-
-  /**
-   * As of 06/06/2016 this method is not implemented as the contents are commented out.
-   * 
-   */
-  void JigsawWorkOrder::undoExecution() {
-    //delete project()->directory()->cnetEditorViews().last();
+    // Get the selected control and bundle settings and give them to the JigsawDialog for now.
+    Control *selectedControl = project()->control(internalData().first());
+    JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl);
+    runDialog->setAttribute(Qt::WA_DeleteOnClose);
+    runDialog->show();
   }
 }
-
