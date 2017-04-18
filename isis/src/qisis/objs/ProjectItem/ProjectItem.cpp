@@ -45,7 +45,9 @@ namespace Isis {
   /**
    * Constructs an item without children, a parent, or a model.
    */
-  ProjectItem::ProjectItem() : QStandardItem() {}
+  ProjectItem::ProjectItem() : QStandardItem() {
+    setEditable(false);
+  }
 
   
   /**
@@ -56,6 +58,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to copy.
    */
   ProjectItem::ProjectItem(ProjectItem *item) {
+    item->setEditable(false);
     setProjectItem(item);
     for (int i=0; i < item->rowCount(); i++) {
       appendRow(new ProjectItem( item->child(i) ) );
@@ -70,6 +73,7 @@ namespace Isis {
    *                                          construct from.
    */
   ProjectItem::ProjectItem(BundleResults bundleResults) {
+    setEditable(false);
     setBundleResults(bundleResults);
     appendRow( new ProjectItem( bundleResults.correlationMatrix() ) );
   }
@@ -82,6 +86,7 @@ namespace Isis {
    *                                               construct from.
    */
   ProjectItem::ProjectItem(BundleSettingsQsp bundleSettings) {
+    setEditable(false);
     setBundleSettings(bundleSettings);
   }
 
@@ -93,6 +98,7 @@ namespace Isis {
    *                                                      to construct from.
    */
   ProjectItem::ProjectItem(BundleSolutionInfo *bundleSolutionInfo) {
+    setEditable(false);
     setBundleSolutionInfo(bundleSolutionInfo);
     
     QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
@@ -110,6 +116,7 @@ namespace Isis {
    * @param[in] control (Control *) The Control to construct from.
    */
   ProjectItem::ProjectItem(Control *control) {
+    setEditable(false);
     setControl(control);
   }
 
@@ -120,6 +127,7 @@ namespace Isis {
    * @param[in] controlList (ControlList *) The ControlList to construct from.
    */
   ProjectItem::ProjectItem(ControlList *controlList) {
+    setEditable(false);
     setControlList(controlList);
     foreach (Control *control, *controlList) {
       appendRow( new ProjectItem(control) );
@@ -133,6 +141,7 @@ namespace Isis {
    * @param[in] controls (QList<ControlList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ControlList *> controls) {
+    setEditable(false);
     setControls();
     foreach (ControlList *controlList, controls) {
       appendRow( new ProjectItem(controlList) );
@@ -147,6 +156,7 @@ namespace Isis {
    *                                                  construct from.
    */
   ProjectItem::ProjectItem(CorrelationMatrix correlationMatrix) {
+    setEditable(false);
     setCorrelationMatrix(correlationMatrix);
   }
 
@@ -157,6 +167,7 @@ namespace Isis {
    * @param[in] image (Image *) The Image to construct from.
    */
   ProjectItem::ProjectItem(Image *image) {
+    setEditable(false);
     setImage(image);
   }
 
@@ -167,6 +178,7 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList to construct from.
    */
   ProjectItem::ProjectItem(ImageList *imageList) {
+    setEditable(false);
     setImageList(imageList);
     foreach (Image *image, *imageList) {
       appendRow( new ProjectItem(image) );
@@ -180,6 +192,7 @@ namespace Isis {
    * @param[in] images (QList<ImageList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ImageList *> images) {
+    setEditable(false);
     setImages();
     foreach (ImageList *imageList, images) {
       appendRow( new ProjectItem(imageList) );
@@ -193,6 +206,7 @@ namespace Isis {
    * @param[in] shape (Shape *) The Shape to construct from.
    */
   ProjectItem::ProjectItem(Shape *shape) {
+    setEditable(false);
     setShape(shape);
   }
 
@@ -203,6 +217,7 @@ namespace Isis {
    * @param[in] shapeList (ShapeList *) The ShapeList to construct from.
    */
   ProjectItem::ProjectItem(ShapeList *shapeList) {
+    setEditable(false);
     setShapeList(shapeList);
     foreach (Shape *shape, *shapeList) {
       appendRow(new ProjectItem(shape));
@@ -216,6 +231,7 @@ namespace Isis {
    * @param[in] shapes (QList<ShapeList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ShapeList *> shapes) {
+    setEditable(false);
     setShapes();
     foreach (ShapeList *shapeList, shapes) {
       appendRow( new ProjectItem(shapeList) );
@@ -229,6 +245,7 @@ namespace Isis {
    * @param[in] guiCamera (GuiCameraQsp) The camera to construct from.
    */
   ProjectItem::ProjectItem(GuiCameraQsp guiCamera) {
+    setEditable(false);
     setGuiCamera(guiCamera);
   }
 
@@ -240,6 +257,7 @@ namespace Isis {
    *                                            construct from.
    */
   ProjectItem::ProjectItem(GuiCameraList *guiCameraList) {
+    setEditable(false);
     setGuiCameraList();
     foreach (GuiCameraQsp guiCamera, *guiCameraList) {
       appendRow( new ProjectItem(guiCamera) );
@@ -284,6 +302,7 @@ namespace Isis {
    *                                                  from.
    */
   ProjectItem::ProjectItem(QList<BundleSolutionInfo *> results) {
+    setEditable(false);
     setResults();
     foreach (BundleSolutionInfo *bundleSolutionInfo, results) {
       appendRow( new ProjectItem( bundleSolutionInfo) );
@@ -297,6 +316,7 @@ namespace Isis {
    * @param[in] targetBody (TargetBodyQsp) The target body to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyQsp targetBody) {
+    setEditable(false);
     setTargetBody(targetBody);
   }
 
@@ -307,6 +327,7 @@ namespace Isis {
    * @param[in] targetBodyList (TargetBodyList *) The list to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyList *targetBodyList) {
+    setEditable(false);
     setTargetBodyList();
     foreach (TargetBodyQsp targetBody, *targetBodyList) {
       appendRow( new ProjectItem(targetBody) );
@@ -604,6 +625,7 @@ namespace Isis {
     setText( item->text() );
     setIcon( item->icon() );
     setData( item->data() );
+    setEditable(item->isEditable());
   }
 
 

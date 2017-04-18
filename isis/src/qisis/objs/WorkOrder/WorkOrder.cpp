@@ -405,9 +405,6 @@ namespace Isis {
     if ( !item ) {
       return false;
     }
-    //  @TODO 3/22/2017 TLS  Is ProjectContext necessary.  I think this is simply to create a
-    //                signature so that the correct WorkOrder is called, at this time only
-    //                RenameProjectWorkOrder.  Can we simply pass in Project instead?
     else if ( item->isProject() ) {
       return isExecutable( ProjectContext );
     }

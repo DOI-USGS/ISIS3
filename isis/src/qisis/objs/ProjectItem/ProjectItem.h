@@ -109,7 +109,9 @@ namespace Isis {
    *                               A naming conflict was causing strange warnings 
    *                               to show up on the command line when cnetsuite is launched, 
    *                               and this fixed it.  Fixes #3982.
-   *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item. 
+   *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
+   *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project
+   *                               name.
    */
   class ProjectItem : public QStandardItem {
     public:

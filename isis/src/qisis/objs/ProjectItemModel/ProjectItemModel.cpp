@@ -639,5 +639,23 @@ namespace Isis {
     }
 //  qDebug()<<"ProjectItemModel::onRowsRemoved  Source model : "<<this<<"  row count = "<<rowCount();
   }
+
+
+  bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+
+    ProjectItem *item = itemFromIndex(index);
+    if (item->isProject() && role == Qt::EditRole) {
+
+      QString name = value.toString();
+      emit projectNameEdited(name);
+    }
+    return true;
+  }
+
+
+  Qt::ItemFlags ProjectItemModel::flags(const QModelIndex &index) const {
+
+    return Qt::ItemIsEditable | QStandardItemModel::flags(index);
+  }
 }
 

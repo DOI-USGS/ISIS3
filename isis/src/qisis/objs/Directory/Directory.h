@@ -115,6 +115,9 @@ namespace Isis {
    *                           Footprint2DView.  This is done as an application setting so that all
    *                           views use the same colors.  Directory stores the colors so that any
    *                           registered view can get the current colors.
+   *   @history 2017-04-17 Tracie Sucharski - Added connection between model's projectNameEdited,
+   *                           initiated by double-clicking the project name on the ProjectTreeView
+   *                           and Directory's slot, initiateRenameProjectWorkOrder.  Fixes #2295.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -249,6 +252,9 @@ namespace Isis {
                               bool isGroundSource = false);
 
       void updateRecentProjects(Project *project);
+
+    private slots:
+      void initiateRenameProjectWorkOrder(QString projectName);
 
     private:
       /**

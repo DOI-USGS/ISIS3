@@ -22,6 +22,7 @@
  */
 #include "ProjectItemTreeView.h"
 
+#include <QAbstractItemView>
 #include <QEvent>
 #include <QObject>
 #include <QTreeView>
@@ -42,9 +43,15 @@ namespace Isis {
     m_treeView = new QTreeView(this);
     m_treeView->installEventFilter(this);
     setInternalModel( internalModel() );
-    m_treeView->setDragEnabled(true);
+    // 2017-04-12 TSucharski Turn off for now, since not accepting drops, not point in allowing
+    // drags
+//  m_treeView->setDragEnabled(true);
+    m_treeView->setDragEnabled(false);
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
+
+    //  Currently set all items on view to un-editable
+    //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     setAcceptDrops(true);
     
@@ -82,6 +89,7 @@ namespace Isis {
     disconnect(internalModel(), 0, this, 0);
 
     AbstractProjectItemView::setInternalModel(model);
+
     m_treeView->reset();
     m_treeView->setModel(model);
     m_treeView->setSelectionModel( model->selectionModel() );
@@ -89,6 +97,7 @@ namespace Isis {
 
     connect( model, SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
+
   }
 
 

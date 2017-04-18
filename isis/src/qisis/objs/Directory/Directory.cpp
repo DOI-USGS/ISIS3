@@ -123,6 +123,7 @@ namespace Isis {
 // 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
+
 //  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
 
     try {
@@ -749,8 +750,29 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView(); 
     result->setModel(m_projectItemModel);
-    
+   
+    //  The model emits this signal when the user double-clicks on the project name, the parent
+    //  node located on the ProjectTreeView. 
+    connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
+            this, SLOT(initiateRenameProjectWorkOrder(QString)));
+
     return result;
+  }
+
+
+/** 
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+ * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
+ *  
+ * @param QString projectName New project name
+ */
+  void Directory::initiateRenameProjectWorkOrder(QString projectName) {
+
+    //  Create the WorkOrder and add it to the Project.  The Project will then execute the
+    //  WorkOrder.
+    RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
+    project()->addToProject(workOrder);
   }
   
 
