@@ -5,6 +5,7 @@
 #include <QPointer>
 #include <QWidget>
 
+#include "BundleAdjustWorkOrder.h"
 #include "BundleSettings.h"
 #include "IException.h"
 
@@ -42,6 +43,11 @@ namespace Isis {
    *                           information to this dialog. Added init() delegate method for
    *                           constructors to use to reduce code duplication. Modified
    *                           notifyThreadFinished to update the Run button. References #4748.
+   *   @history 2017-04-18 Ian Humphrey - Added members for an Accept, Reject, and Close button
+   *                           to determine when to save a successful bundle adjust's results
+   *                           to the project (or when to discard the results). Added placeholder
+   *                           private slots for accepting and rejecting the results. Removed
+   *                           default OK and Cancel buttons from UI file. Fixes #4781.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -72,14 +78,19 @@ namespace Isis {
     BundleSettingsQsp m_bundleSettings;
 
   private:
-    bool m_bRunning;
+    bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
+    QPushButton *m_accept; /**< Dialog's accept button that is used to save the bundle results. */
+    QPushButton *m_close; /**< Dialog's close button that is used to close the dialog. */
+    QPushButton *m_reject; /**< Dialog's reject button that is used to discard the results. */
 
   private slots:
     void on_JigsawSetupButton_pressed();
     void on_JigsawRunButton_clicked();
+    void acceptBundleResults();
+    void rejectBundleResults();
 
   private:
-    Ui::JigsawDialog *m_ui;
+    Ui::JigsawDialog *m_ui; /**< Reference to self's UI generated with QtDesigner. */
   };
 };
 #endif

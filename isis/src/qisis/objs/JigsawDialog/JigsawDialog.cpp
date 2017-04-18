@@ -5,7 +5,6 @@
 #include <QThread>
 
 #include "JigsawSetupDialog.h"
-//#include "ui_JigsawDialog.h"
 
 #include "BundleAdjust.h"
 #include "BundleSolutionInfo.h"
@@ -51,6 +50,7 @@ namespace Isis {
                              BundleSettingsQsp bundleSettings,
                              Control *selectedControl,
                              QWidget *parent) : QDialog(parent), m_ui(new Ui::JigsawDialog) {
+
     m_project = project;
     m_bundleSettings = bundleSettings;
     m_selectedControl = selectedControl;
@@ -65,6 +65,28 @@ namespace Isis {
    */
   void JigsawDialog::init() {
     m_ui->setupUi(this);
+
+    // Three buttons: Accept, Reject, Close. Initially only close is enabled.
+    // After a bundle is successfully run, reject and accept are enabled.
+    // If aborting a bundle, only close will be enabled.
+    m_accept = new QPushButton(tr("&Accept"));
+    m_reject = new QPushButton(tr("&Reject"));
+    m_close = new QPushButton(tr("&Close"));
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+    m_close->setEnabled(true);
+
+    // Add the buttons to the QDialogButtonBox defined in the UI file.
+    m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
+    m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
+    m_ui->buttonBox->addButton(m_close, QDialogButtonBox::AcceptRole);
+
+    // Accept will handle saving the results.
+    connect(m_accept, SIGNAL(clicked(bool)),
+           this, SLOT(acceptBundleResults()));
+    // Reject will handle discarding the results.
+    connect(m_reject, SIGNAL(clicked(bool)),
+           this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
 
@@ -123,6 +145,9 @@ namespace Isis {
 
 
   void JigsawDialog::on_JigsawRunButton_clicked() {
+    // Once a bundle is run, the previous results cannot be accepted or rejected.
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
 
     if (!m_bRunning) {
       // ??? warning dialogs ???
@@ -266,6 +291,28 @@ namespace Isis {
 
 
   /**
+   * Accepts the bundle results and saves them to the project. The "Accept" and "Reject" buttons
+   * will be disabled.
+   */
+  void JigsawDialog::acceptBundleResults() {
+    qDebug() << "\n*** Accepting the results...\n";
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+  }
+
+
+  /**
+   * Rejects the bundle results and discards them. The "Accept" and "Reject" buttons will be
+   * disabled.
+   */
+  void JigsawDialog::rejectBundleResults() {
+    qDebug() << "\n*** Rejecting the results...\n";
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+  }
+
+
+  /**
    * Update the label or text edit area with the most recent status update by appending to list and
    * refreshing.
    *
@@ -361,6 +408,10 @@ namespace Isis {
    * @param bundleSolutionInfo The results of the bundle run.
    */
   void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
+    // Since results are available, the user can accept (save) or reject(discard) the results.
+    m_accept->setEnabled(true);
+    m_reject->setEnabled(true);
+    // m_close->setEnabled(false);
     if ( bundleSolutionInfo->bundleResults().converged() ) {
       bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
       m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
