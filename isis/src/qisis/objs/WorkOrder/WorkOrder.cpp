@@ -1098,16 +1098,26 @@ namespace Isis {
    *        input.
    *  
    * This method is designed to be implemented by children work orders, but they need
-   * to call this version inside of their setupExecution (at the beginning).
-
-   * State should only be set in the parent WorkOrder class in this method. You can set arbitrary
-   *   state using setInternalData(). This method is always executed in the GUI thread and is the
-   *   only place to ask the user questions.
+   * to call the base class setupExecution (at the beginning).
+   *
+   * State should only be set in the WorkOrder class in this method. You can set arbitrary
+   * state using setInternalData(). Call setData(ImageList),
+   * setInternalData(QStringList), etc... with all of the data/state necessary to perform the
+   * work order. This could be a list of file names, an ImageList of images you're viewing,
+   * or really anything else. This method is always executed in the GUI thread and is the
+   * only place to ask the user questions.
+   *
+   * The actual work is done in execute(), using only state (data) stored in the
+   * WorkOrder class. You do not have to call execute() - this is done for you
+   * by WorkOrder::redo().  WorkOrder::redo() is called from Project::addToProject() when the
+   * workOrder is pushed onto the undo stack.
    *
    * If this method returns false the workorder will be cancelled and will not be executed.
    *
-   * @return @b bool Returns True upon successful preparation of the WorkOrder, False to
-   *         cancel the workorder.
+   * @return @b bool Returns True upon successful preparation of the WorkOrder, False if this
+   *            operation should be cancelled (the user clicked cancel, the operation turns
+   *            out to be impossible, etc). This prevents the work order from executing and
+   *            it will not be entered into the history.
    */
   bool WorkOrder::setupExecution() {
     // We're finished at this point if we save/open a project, we're not finished if we need to do
@@ -1160,6 +1170,10 @@ namespace Isis {
 
   /**
    * @brief Sets the internal data for this WorkOrder.
+   *
+   * WorkOrders may not use member variables to store data.  Any data
+   * needed for the workorder should be saved in to the base WorkOrder
+   * using setInternalData.
    * @param data The data to set the internal data to.
    */
   void WorkOrder::setInternalData(QStringList data) {
@@ -1415,7 +1429,7 @@ namespace Isis {
 
 
   /**
-   * @brief Attempts to execute an action on the action action queue.
+   * @brief Attempts to execute an action on the action queue.
    */
   void WorkOrder::attemptQueuedAction() {
     QueuedWorkOrderAction queued = m_queuedAction;

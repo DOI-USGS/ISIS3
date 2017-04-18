@@ -230,6 +230,11 @@ namespace Isis {
 
       int undoNeededToRestoreDiskState = undoStackIndex;
 
+      // Go back through the stack looking for the last "clean" state
+      // for the project.  If workorders are found that change the disk
+      // state undo all workorders up to and including those workorders.
+      // Ideally the project has been saved by one of the workorders
+      // (state set to clean) and nothing needs to be undone.
       for (int i = undoStackIndex - 1; i >= undoStackCleanIndex; i--) {
         const WorkOrder *currentWorkOrder =
               dynamic_cast<const WorkOrder *>( m_undoStack.command(i) );
