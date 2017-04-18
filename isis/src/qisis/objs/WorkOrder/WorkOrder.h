@@ -291,6 +291,9 @@ namespace Isis {
    *   @history 2017-04-04 JP Bonn - Updated to new design.  setupExecution() used for preparation.
    *                          No longer separate methods for sync/async - workorder::execute()
    *                          handles both sync/async
+   *   @history 2017-04-16 Ian Humphrey - Added enableWorkOrder and disableWorkOrder slots for
+   *                           enabling and disabling work orders. Copy constructor now copies
+   *                           what's this and tool tip (hover text) state.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -384,6 +387,8 @@ namespace Isis {
       void statusChanged(WorkOrder *);
 
     public slots:
+      void enableWorkOrder();
+      void disableWorkOrder();
 
       virtual bool setupExecution();
 
