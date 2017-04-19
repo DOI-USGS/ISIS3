@@ -5,6 +5,7 @@
 #include <QPointer>
 #include <QWidget>
 
+#include "BundleAdjustWorkOrder.h"
 #include "BundleSettings.h"
 #include "IException.h"
 
@@ -47,6 +48,8 @@ namespace Isis {
    *                           to the project (or when to discard the results). Added placeholder
    *                           private slots for accepting and rejecting the results. Removed
    *                           default OK and Cancel buttons from UI file. Fixes #4781.
+   *   @history 2017-04-18 Tracie Sucharski - Write the updated control net to the runtime
+   *                           folder under results folder.  Fixes #4783.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -90,6 +93,8 @@ namespace Isis {
 
   private:
     Ui::JigsawDialog *m_ui; /**< Reference to self's UI generated with QtDesigner. */
+
+    BundleSolutionInfo *m_bundleSolutionInfo;
   };
 };
 #endif

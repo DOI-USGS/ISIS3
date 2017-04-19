@@ -9,6 +9,7 @@
 #include "BundleAdjust.h"
 #include "BundleSolutionInfo.h"
 #include "Directory.h"
+#include "FileName.h"
 #include "IException.h"
 #include "JigsawSetupDialog.h"
 #include "Control.h"
@@ -197,7 +198,7 @@ namespace Isis {
     // **************************************************************************
 
     // Threaded *****************************************************************
-       QThread *bundleThread = new QThread;
+      QThread *bundleThread = new QThread;
 
        // Takes too long to copy/recreate the serial number list
 //       BundleAdjust *ba = new BundleAdjust(m_bundleSettings,
@@ -220,56 +221,60 @@ namespace Isis {
 //                                            *m_selectedControl,
 //                                            m_project->images(),
 //                                            false);
-    m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
-                                      false);
 
-       m_bundleAdjust->moveToThread(bundleThread);
+//    qDebug()<<"JigsawDialog::on_jigsawRun  #imagelists = "<<m_project->images().count();
+//    qDebug()<<"JigsawDialog::on_jigsawRun  images = "<<m_project->images();
 
-       // Track the status updates bundle adjust gives and update the dialog.
-       connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
-                this, SLOT( outputBundleStatus(QString) ) );
+      m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
+                                        false);
 
-       // Track any errors that may occur during the bundle adjust and update the dialog.
-       connect( m_bundleAdjust, SIGNAL( error(QString) ),
-                this, SLOT( errorString(QString) ) );
+      m_bundleAdjust->moveToThread(bundleThread);
 
-       // Update the iteration dialog element when the bundle updates its iteration count.
-       connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
-                this, SLOT( updateIterationSigma0(int, double) ) );
+      // Track the status updates bundle adjust gives and update the dialog.
+      connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
+               this, SLOT( outputBundleStatus(QString) ) );
 
-       // When we start the bundle thread, run the bundle adjustment.
-       connect( bundleThread, SIGNAL( started() ),
-                m_bundleAdjust, SLOT( solveCholesky() ) );
+      // Track any errors that may occur during the bundle adjust and update the dialog.
+      connect( m_bundleAdjust, SIGNAL( error(QString) ),
+               this, SLOT( errorString(QString) ) );
 
-       // When the bundle adjust says results are ready, we can allow the dialog to update the
-       // project as necessary.
-       connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
-                this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
+      // Update the iteration dialog element when the bundle updates its iteration count.
+      connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
+               this, SLOT( updateIterationSigma0(int, double) ) );
 
-       // Schedule the bundle thread for deletion when it finishes.
-       connect( bundleThread, SIGNAL( finished() ),
-                bundleThread, SLOT( deleteLater() ) );
+      // When we start the bundle thread, run the bundle adjustment.
+      connect( bundleThread, SIGNAL( started() ),
+               m_bundleAdjust, SLOT( solveCholesky() ) );
 
-       // ken testing
-       // Notify the dialog that the bundle thread is finished, and update the gui elements.
-       connect( bundleThread, SIGNAL( finished() ),
-                this, SLOT( notifyThreadFinished() ) );
+      // When the bundle adjust says results are ready, we can allow the dialog to update the
+      // project as necessary.
+      connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
+               this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
 
-       // Tell the thread to quit (stop) when the bundle adjust finishes (successfully or not)
-       connect( m_bundleAdjust, SIGNAL( finished() ),
-                bundleThread, SLOT( quit() ) );
+      // Schedule the bundle thread for deletion when it finishes.
+      connect( bundleThread, SIGNAL( finished() ),
+               bundleThread, SLOT( deleteLater() ) );
 
-       // Schedule the bundle adjustment for deletion.
-       connect( m_bundleAdjust, SIGNAL( finished() ),
-                m_bundleAdjust, SLOT( deleteLater() ) );
-       // ken testing
+      // ken testing
+      // Notify the dialog that the bundle thread is finished, and update the gui elements.
+      connect( bundleThread, SIGNAL( finished() ),
+               this, SLOT( notifyThreadFinished() ) );
 
-       bundleThread->start();
+      // Tell the thread to quit (stop) when the bundle adjust finishes (successfully or not)
+      connect( m_bundleAdjust, SIGNAL( finished() ),
+               bundleThread, SLOT( quit() ) );
 
-       // change "Run" button text to "Abort" (or maybe pause)
-       m_bRunning = true;
-       m_ui->JigsawRunButton->setText("&Abort");
-       update();
+      // Schedule the bundle adjustment for deletion.
+      connect( m_bundleAdjust, SIGNAL( finished() ),
+               m_bundleAdjust, SLOT( deleteLater() ) );
+      // ken testing
+
+      bundleThread->start();
+
+      // change "Run" button text to "Abort" (or maybe pause)
+      m_bRunning = true;
+      m_ui->JigsawRunButton->setText("&Abort");
+      update();
     }
     else {
       // if bundle is running then we want to abort
@@ -281,12 +286,7 @@ namespace Isis {
       }
     }
 
-    // ********************************************** ****************************
-//#if 0
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     m_ui->useLastSettings->setEnabled(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#endif
   }
 
 
@@ -296,8 +296,75 @@ namespace Isis {
    */
   void JigsawDialog::acceptBundleResults() {
     qDebug() << "\n*** Accepting the results...\n";
+
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
+
+    m_bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
+    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+
+    // create output control net
+    // Write the new jigged control net with correct path to results folder + runtime
+    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" +
+                               m_bundleSolutionInfo->runTime() + "/" +
+                               FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
+    m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
+
+
+      //TODO: move correlation matrix to correct position in project directory
+
+  //
+  //       for (int i = 0; i < bundleAdjustment.images(); i++) {
+  //         Process p;
+  //         CubeAttributeInput inAtt;
+  //  4-18-2017 TLS  bundleAdjustment.fileName is an .ecub.  code encompassed by my comment
+  //                 is test code.
+
+//      Cube *c = 
+//    Cube *c = p.SetInputCube(bundleAdjustment.fileName(i), inAtt, ReadWrite);
+
+
+
+
+
+
+
+  //  4-18-2017 TLS  bundleAdjustment.fileName is an .ecub.  code encompassed by my comment
+  //                 is test code.
+  //         Cube *c = p.SetInputCube(bundleAdjustment.fileName(i), inAtt, ReadWrite);
+  //         //check for existing polygon, if exists delete it
+  //         if (c->label()->hasObject("Polygon")) {
+  //           c->label()->deleteObject("Polygon");
+  //         }
+  //
+  //         // check for CameraStatistics Table, if exists, delete
+  //         for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+  //           PvlObject obj = c->label()->object(iobj);
+  //           if (obj.name() != "Table") continue;
+  //           if (obj["Name"][0] != QString("CameraStatistics")) continue;
+  //           c->label()->deleteObject(iobj);
+  //           break;
+  //         }
+  //
+  //         //  Get Kernel group and add or replace LastModifiedInstrumentPointing
+  //         //  keyword.
+  //         Table cmatrix = bundleAdjustment.cMatrix(i);
+  //         QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+  //         cmatrix.Label().addComment(jigComment);
+  //         Table spvector = bundleAdjustment.spVector(i);
+  //         spvector.Label().addComment(jigComment);
+  //         c->write(cmatrix);
+  //         c->write(spvector);
+  //         p.WriteHistory(*c);
+  //       }
+  //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
+    //This bundle was bad so we should delete all remenants.
+
+    //TODO: delete correlation matrix cov file...
+    //TODO: delete bundle results object
+
+//       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
+
   }
 
 
@@ -309,6 +376,8 @@ namespace Isis {
     qDebug() << "\n*** Rejecting the results...\n";
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
+
+    m_bundleSolutionInfo = NULL;
   }
 
 
@@ -412,57 +481,8 @@ namespace Isis {
     m_accept->setEnabled(true);
     m_reject->setEnabled(true);
     // m_close->setEnabled(false);
-    if ( bundleSolutionInfo->bundleResults().converged() ) {
-      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
-      m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
 
-      //TODO: move correlation matrix to correct position in project directory
-
-      // create output control net
-  //     bundleAdjustment.controlNet()->Write("ONET.net");
-  //
-  //       for (int i = 0; i < bundleAdjustment.images(); i++) {
-  //         Process p;
-  //         CubeAttributeInput inAtt;
-  //         Cube *c = p.SetInputCube(bundleAdjustment.fileName(i), inAtt, ReadWrite);
-  //         //check for existing polygon, if exists delete it
-  //         if (c->label()->hasObject("Polygon")) {
-  //           c->label()->deleteObject("Polygon");
-  //         }
-  //
-  //         // check for CameraStatistics Table, if exists, delete
-  //         for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
-  //           PvlObject obj = c->label()->object(iobj);
-  //           if (obj.name() != "Table") continue;
-  //           if (obj["Name"][0] != QString("CameraStatistics")) continue;
-  //           c->label()->deleteObject(iobj);
-  //           break;
-  //         }
-  //
-  //         //  Get Kernel group and add or replace LastModifiedInstrumentPointing
-  //         //  keyword.
-  //         Table cmatrix = bundleAdjustment.cMatrix(i);
-  //         QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-  //         cmatrix.Label().addComment(jigComment);
-  //         Table spvector = bundleAdjustment.spVector(i);
-  //         spvector.Label().addComment(jigComment);
-  //         c->write(cmatrix);
-  //         c->write(spvector);
-  //         p.WriteHistory(*c);
-  //       }
-  //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
-  }
-  else {
-    //This bundle was bad so we should delete all remenants.
-
-    //TODO: delete correlation matrix cov file...
-    //TODO: delete bundle results object
-
-//       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
-  }
-
-  // TODO: Give user the option to keep or throw away the bundle. Even if the bundle converged it
-  //       could still be worthless.
+    m_bundleSolutionInfo = bundleSolutionInfo;
   }
 }
 

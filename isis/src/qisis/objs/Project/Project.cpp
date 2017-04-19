@@ -213,10 +213,10 @@ namespace Isis {
 
     // Listen for when an active control is set and when an active image list is set.
     // This is used for enabling the JigsawWorkOrder (the Bundle Adjustment menu action).
-    connect(this, &Project::activeControlSet,
-            this, &Project::checkActiveControlAndImageList);
-    connect(this, &Project::activeImageListSet,
-            this, &Project::checkActiveControlAndImageList);
+//  connect(this, &Project::activeControlSet,
+//          this, &Project::checkActiveControlAndImageList);
+//  connect(this, &Project::activeImageListSet,
+//          this, &Project::checkActiveControlAndImageList);
     // TODO: ken testing
 //    m_bundleSettings = NULL;
 //    m_bundleSettings = new BundleSettings();
