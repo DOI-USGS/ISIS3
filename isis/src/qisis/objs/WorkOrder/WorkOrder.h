@@ -56,8 +56,8 @@ namespace Isis {
    *   This class should be used for operations that affect a Project and need to provide history
    *   and/or undo/redo capabilities, and the ability for the project to guarantee a
    *   good state on disk. It follows the Command Pattern using Qt's QUndoCommand framework.
-   *   Not all actions require workorders - many of the
-   *   actions performed in the various widgets may not use workorders.
+   *   Not all actions require WorkOrders - many of the
+   *   actions performed in the various widgets may not use WorkOrders.
    *
    *   The order of execution for work orders is:
    *   setupExecution() - GUI thread, can ask user for input
@@ -72,68 +72,69 @@ namespace Isis {
    *
    *   ** Adding a new Workorder **
    *
-   *   The workorder will need to be determined to be either synchronous/asynchronous and
+   *   The WorkOrder will need to be determined to be either synchronous/asynchronous and
    *   whether it is undoable.  These are decisions determined by the use case.  Asynchronous
-   *   workorders will not block the GUI thread while running and are typically used for
-   *   long-running operations.  Note that workorders are not reentrant - a new one is created
+   *   WorkOrders will not block the GUI thread while running and are typically used for
+   *   long-running operations.  Note that WorkOrders are not reentrant - a new one is created
    *   for each action.
    *
-   *   The constructor for the workorder must set m_isUndoable and m_isSynchronous to the appropriate
+   *   The constructor for the WorkOrder must set m_isUndoable and m_isSynchronous to the appropriate
    *   values. The constructor must call the base WorkOrder constructor.  The default is
    *   synchronous and undoable.
    *
-   *   All information required to execute the workorder should be saved in the workorder
-   *   in the setupExecution() method.  Since workorders may be serialized and may run on
-   *   non-GUI threads there are restrictions on how the workorder may save state.  To allow
-   *   serialization the workorders  must save state to the base WorkOrder class using
+   *   All information required to execute the WorkOrder should be saved in the WorkOrder
+   *   in the setupExecution() method.  Since WorkOrders may be serialized and may run on
+   *   non-GUI threads there are restrictions on how the WorkOrder may save state.  To allow
+   *   serialization the WorkOrders  must save state to the base WorkOrder class using
    *   WorkOrder::setInternalData() in the following calls:
    *   setupExecution(), postExecution(), postUndoExecution().
-   *   Workorders may use member variables to pass data between the execute()->postExecution()
-   *   and undoExecution()->undoPostExecution() methods since since serialization can not
-   *   happen between these calls.  For asynchronous  workorders the execute()/postExecution()
-   *   and undoExecution()/undoPostExecution() methods are on different threads so any
-   *   allocated memory moved between the non-GUI and GUI threads between methods.
+   *   Workorders may use member variables to pass data between the execute() and postExecution()
+   *   methods and also between the undoExecution() and undoPostExecution() methods since 
+   *   serialization can not happen between these calls.  For asynchronous WorkOrders the 
+   *   execute()/postExecution() and undoExecution()/undoPostExecution() methods are on 
+   *   different threads so any allocated memory moved between the non-GUI and GUI threads 
+   *   between methods.
    *
    *   Serialization is handled by the base WorkOrder class.  Since all state is saved
-   *   into the base class using setInternalData() the derived workorders do not contain
-   *   any data that needs to be serialized.  The times when workorders are allowed to use
-   *   member variables are periods when the workorder can not be serialized.
+   *   into the base class using setInternalData() the derived WorkOrders do not contain
+   *   any data that needs to be serialized.  The times when WorkOrders are allowed to use
+   *   member variables are periods when the WorkOrder can not be serialized.
    *
-   *   There are 5 key methods in the flow of the workorder as shown in the WorkOrder Flow
+   *   There are 5 key methods in the flow of the WorkOrder as shown in the WorkOrder Flow
    *   diagram below.
    *
    *   *setupExecution*
-   *   The setupExecution() method gathers all required information to run the workorder but
-   *   does not execute it.  The gathered information is stored in the workorder.
+   *   The setupExecution() method gathers all required information to run the WorkOrder but
+   *   does not execute it.  The gathered information is stored in the WorkOrder.
    *   SetupExecution() is optional but typically required. It can bring up GUI elements to
    *   prompt the user for any necessary information.  SetupExecution() is not called when
-   *   a workorder is redone.
+   *   a WorkOrder is redone.
    *
    *   *execute*
-   *   execute() needs to be implemented perform the workorder.
-   *   All information neccessary to run the workorder should already be stored in the workorder.
-   *   The data necessary for the  workorder can be retrieved via internalData()
+   *   execute() needs to be implemented perform the WorkOrder.
+   *   All information neccessary to run the WorkOrder should already be stored in the WorkOrder.
+   *   The data necessary for the  WorkOrder can be retrieved via internalData()
    *   Execute() can not use any GUI elements. Each time a
-   *   workorder is redone execute() is called to redo the workorder.
+   *   WorkOrder is redone execute() is called to redo the WorkOrder.
    *
-   *   For synchronous workorders the execute()
+   *   For synchronous WorkOrders the execute()
    *   method runs on the GUI thread and there are no special requirements on object ownership.
    *
-   *   For asynchronous workorders any memory allocations that aren't deallocated within
+   *   For asynchronous WorkOrders any memory allocations that aren't deallocated within
    *   execute() will need to be moved to the GUI thread.  @see ImportImagesWorkOrder::execute
-   *   for an example of an asynchronous workorder that allocates memory. setProgressValue()
+   *   for an example of an asynchronous WorkOrder that allocates memory. setProgressValue()
    *   can be used to update the progress bar in the GUI.
    *
    *   *postExecution*
    *   postExecution() runs on the GUI thread so it should not perform any long running operations.
    *   It is intended for any cleanup or GUI updates after execute().  Typically it would only be
-   *   needed for asynchronous workorders where they need to update the GUI and do cleanup.  It is
+   *   needed for asynchronous WorkOrders where they need to update the GUI and do cleanup.  It is
    *   not required to implement this method.
    *
    *   *undoExecution*
-   *   undoExecution() is only required for undoable workorders.  undoExecution() should undo the
+   *   undoExecution() is only required for undoable WorkOrders.  undoExecution() should undo the
    *   effects of the execute() only using state stored in the
-   *   workorder.  It will run on the GUI thread if synchronous or a non-GUI thread if asynchronous.
+   *   WorkOrder.  It will run on the GUI thread if synchronous or a non-GUI thread if asynchronous.
    *   The same restrictions as execute() apply to this method.
    *
    *   *postUndoExecution()*
@@ -143,24 +144,25 @@ namespace Isis {
    *   Other methods the WorkOrder may need to implement are:
    *
    *   *isExecutable(<various type>)*
-   *   IsExecutable() determines if the workorder should show up in the context menus (this has no
+   *   IsExecutable() determines if the WorkOrder should show up in the context menus (this has no
    *   bearing on how the main menu is populated).  Note that isExecutable will need to be
    *   implemented for each type of parameter this WorkOrder should show in the context menu.
    *
    *   *dependsOn*
-   *   This is currently not implemented properly for most workorders.  In theory this should determine
+   *   This is currently not implemented properly for most WorkOrders.  In theory this should determine
    *   if the workOrder parameter passed in must be completed prior to this workOrder completing.   Most
    *   current WorkOrders just check if the WorkOrder parameter is the same type.
    *
    *   *setCreatesCleanState*
-   *   This is used to indicate the workorder has set the state back to an unchanged state from which
-   *   it was originally opened.  This is used by open, save, and close project workorders. Unlikely
+   *   This is used to indicate the WorkOrder has set the state back to an unchanged state from which
+   *   the project was originally opened.  This is used by open, save, and close project WorkOrders. Unlikely
    *   to be needed by other WorkOrders.
    *
    *   *setModifiesDiskState*
-   *   WorkOrders should call this to indicate they modify the disk state.  This is used to indicate
-   *   the disk state should be restored back to the original state if the project is closed without
-   *   saving.  The WorkOrder should implement the undoExecution method if this is set to true.
+   *   WorkOrders should call this to indicate they modify the disk state.  The WorkOrder should 
+   *   implement the undoExecution method if this is set to true.  (This flag is used by the Project to 
+   *   indicate the disk state should be restored back to the original state if the project is 
+   *   closed without saving.)
    *
    *
    *   **WorkOrder Diagrams**
