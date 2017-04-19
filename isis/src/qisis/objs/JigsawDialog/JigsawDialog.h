@@ -5,7 +5,6 @@
 #include <QPointer>
 #include <QWidget>
 
-#include "BundleAdjustWorkOrder.h"
 #include "BundleSettings.h"
 #include "IException.h"
 
