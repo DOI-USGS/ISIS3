@@ -105,8 +105,8 @@ namespace Isis {
 
   }
 
-
 #if 0
+  // TODO: The following code maybe needed for #4787 / #4805
   /**
    * Construct this BundleSettings object from XML.
    *
@@ -1118,7 +1118,6 @@ namespace Isis {
    * also. 
    */
   void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {
-//#if 0
     // option 2
     stream.writeStartElement("bundleSettings");
 
@@ -1201,78 +1200,7 @@ namespace Isis {
     else {
       // throw error??? should not write if no observation settings... 
     }
-//#endif
 
-
-
-#if 0
-    // option 3
-    stream.writeStartDocument("1.0");
-    //stream.writeStartDocument("BundleSettingsOption3");
-    stream.writeStartElement("globalSettings");
-
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("validateNetwork", toString(validateNetwork()));
-    
-    stream.writeStartElement("solveOptions");
-    stream.writeTextElement("solveObservationMode", toString(solveObservationMode()));
-    stream.writeTextElement("solveRadius", toString(solveRadius()));
-    stream.writeTextElement("updateCubeLabel", toString(updateCubeLabel()));
-    stream.writeTextElement("errorPropagation", toString(errorPropagation()));
-    stream.writeEndElement();
-
-    stream.writeStartElement("aprioriSigmas");
-    stream.writeTextElement("latitude", toString(globalLatitudeAprioriSigma()));
-    stream.writeTextElement("longitude", toString(globalLongitudeAprioriSigma()));
-    if (solveRadius()) {
-      stream.writeTextElement("radius", toString(globalRadiusAprioriSigma()));
-    }
-    else {
-      stream.writeTextElement("radius", "N/A");
-    }
-    stream.writeEndElement();
-    
-    stream.writeStartElement("outlierRejectionOptions");
-    stream.writeTextElement("rejection", toString(outlierRejection()));
-    if (outlierRejection()) {
-      stream.writeTextElement("multiplier", toString(outlierRejectionMultiplier()));
-    }
-    else {
-      stream.writeTextElement("multiplier", "N/A");
-    }
-    stream.writeEndElement();
-    
-    stream.writeStartElement("convergenceCriteriaOptions");
-    stream.writeTextElement("convergenceCriteria", convergenceCriteriaToString(convergenceCriteria()));
-    stream.writeTextElement("threshold", toString(convergenceCriteriaThreshold()));
-    stream.writeTextElement("maximumIterations", toString(convergenceCriteriaMaximumIterations()));
-    stream.writeEndElement();
-    
-    stream.writeStartElement("maximumLikelihoodEstimation");
-    for (int i = 0; i < m_maximumLikelihood.size(); i++) {
-      stream.writeStartElement("model");
-      stream.writeAttribute("type", 
-                          MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
-      stream.writeAttribute("quantile", toString(m_maximumLikelihood[i].second));
-      stream.writeEndElement();
-    }
-    stream.writeEndElement();
-    
-    stream.writeStartElement("outputFileOptions");
-    stream.writeTextElement("fileNamePrefix", outputFilePrefix());
-    stream.writeEndElement();
-    
-    stream.writeEndElement(); // end global settings
-
-    stream.writeStartElement("observationSolveSettingsList");
-    stream.writeAttribute("listSize", toString(numberSolveSettings()));
-    for (int i = 0; i < m_observationSolveSettings.size(); i++) {
-      stream.writeStartElement("observationSolveSettings");
-      m_observationSolveSettings[i].save(stream, project);
-      stream.writeEndElement();
-    }
-    stream.writeEndElement();
-#endif
     stream.writeEndElement();
   }
 
