@@ -30,11 +30,6 @@
 #include <QString>
 #include <QVector>
 
-// hdf5 Library
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
-
 // Isis Library
 #include "BundleControlPoint.h"
 #include "BundleObservationVector.h"
@@ -248,12 +243,6 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void createH5Group(hid_t locationId, QString locationName) const;// delete these
-      void parseH5Group(hid_t locationId, QString locationName);       // delete these
-
-      void createH5Group(H5::CommonFG &locationObject, QString locationName) const;
-      void openH5Group(H5::CommonFG &locationObject, QString locationName);
-      BundleResults(H5::CommonFG &locationObject, QString locationName);
 
     private:
       /**

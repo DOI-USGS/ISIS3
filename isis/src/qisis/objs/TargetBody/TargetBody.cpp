@@ -6,10 +6,6 @@
 #include <QUuid>
 #include <QXmlStreamWriter>
 
-#include <hdf5.h>
-#include <hdf5_hl.h>
-
-
 #include "Distance.h"
 #include "IString.h"
 #include "Project.h"
@@ -623,52 +619,4 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
 //    return TargetBody.read(stream);
 //  }
 
-
-
-//  void TargetBody::savehdf5(FileName outputfilename) const {
-//    const H5std_string  hdfFileName(outputfilename.expanded().toStdString());
-//Is this the right way to have a dynamic file name?  What about PATH?
-    
-    
-//    // Try block to detect exceptions raised by any of the calls inside it
-//    try {
-//      /*
-//       * Turn off the auto-printing when failure occurs so that we can
-//       * handle the errors appropriately
-//       */
-//      H5::Exception::dontPrint();
-//      /*
-//       * Create a new file using H5F_ACC_TRUNC access,
-//       * default file creation properties, and default file
-//       * access properties.
-//       */
-//      H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_EXCL );
-//      hid_t fileId = hdfFile.getId();
-//
-//      QString objectName = "/TargetBody";
-//      H5LTset_attribute_string(fileId, objectName.toLatin1(), "runTime", m_runTime.toAscii());
-//      H5LTset_attribute_string(fileId, objectName.toLatin1(), "controlNetworkFileName",
-//                               m_controlNetworkFileName->expanded().toLatin1());
-//
-//      //??? H5::Group settingsGroup = H5::Group(hdfFile.
-//                     createGroup("/TargetBody/BundleSettings"));
-//        //???
-//      //???H5::Group settingsGroup = hdfFile.createGroup("/TargetBody/BundleSettings");
-//      QString groupName = objectName + "/BundleSettings";
-//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(),
-//           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-//      m_settings->savehdf5(groupId, groupName.toLatin1());
-//      groupName = objectName + "/BundleResults";
-//      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toLatin1()));
-//      m_statisticsResults->savehdf5(fileId, resultsGroup);
-//
-//    }
-//    catch (H5::FileIException error) {
-//      QString msg = QString(error.getCDetailMsg());
-//      IException hpfError(IException::Unknown, msg, _FILEINFO_);
-//      msg = "Unable to save TargetBody to hpf5 file. "
-//            "H5 exception handler has detected a file error.";
-//      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-//    }
-//  }
 }

@@ -109,7 +109,6 @@ namespace Isis {
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
 
-//      void savehdf5(FileName outputfilename) const;
 
     private:
       /**

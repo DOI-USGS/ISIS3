@@ -824,10 +824,8 @@ namespace Isis {
     QString runTime = bundleSolutionInfo->runTime();
     QDir bundleDir = addBundleSolutionInfoFolder(runTime); //???
                                                            // save solution information to a file
-    QString bundleFileName = bundleDir.absolutePath() + "/" + "BundleSolutionInfo.hdf";
 
     bundleSolutionInfo->bundleSettings()->setOutputFilePrefix(bundleDir.absolutePath() + "/");
-    bundleSolutionInfo->createH5File(FileName(bundleFileName));
 
     loadBundleSolutionInfo(bundleSolutionInfo);
   }
@@ -990,15 +988,15 @@ namespace Isis {
         QDir bundleSolutionDir(bundleDirs[dirListIndex].absoluteFilePath());
         bundleSolutionDir.setFilter(QDir::Files | QDir::NoSymLinks); // sym links ok???
 
-        QFileInfoList bundleSolutionFiles = bundleSolutionDir.entryInfoList();
-        for (int fileListIndex = 0; fileListIndex < bundleSolutionFiles.size(); fileListIndex++) {
-          // if the file is an hdf file with BundleSolutionInfo object, add it to the project tree
-          if (bundleSolutionFiles[fileListIndex].fileName().contains("_BundleSolutionInfo.hdf")) {
-            QString  absoluteFileName = bundleSolutionFiles[fileListIndex].absoluteFilePath();
-            FileName solutionFile(bundleSolutionFiles[fileListIndex].absoluteFilePath());
-            loadBundleSolutionInfo(new BundleSolutionInfo(solutionFile));
-          }
-        }
+//         QFileInfoList bundleSolutionFiles = bundleSolutionDir.entryInfoList();
+//         for (int fileListIndex = 0; fileListIndex < bundleSolutionFiles.size(); fileListIndex++) {
+//           // if the file is an hdf file with BundleSolutionInfo object, add it to the project tree
+//           if (bundleSolutionFiles[fileListIndex].fileName().contains("_BundleSolutionInfo.hdf")) {
+//             QString  absoluteFileName = bundleSolutionFiles[fileListIndex].absoluteFilePath();
+//             FileName solutionFile(bundleSolutionFiles[fileListIndex].absoluteFilePath());
+//             loadBundleSolutionInfo(new BundleSolutionInfo(solutionFile));
+//           }
+//         }
       }
     }
 

@@ -10,11 +10,6 @@
 #include <QXmlInputSource>
 #include <QXmlStreamWriter>
 
-// in the hdf5 library
-#include <hdf5.h>
-#include <hdf5_hl.h> 
-#include <H5Cpp.h>
-
 #include "BundleImage.h"
 #include "Camera.h"
 #include "FileName.h"
@@ -1232,67 +1227,4 @@ namespace Isis {
     return settings.read(stream);
   }
 
-
-#if 0
-  /** 
-   *  H5 compound data type uses the offesets from the QDataStream returned by
-   *  the write(QDataStream &stream) method.
-   */
-  H5::CompType BundleObservationSolveSettings::compoundH5DataType() {
-
-    H5::CompType compoundDataType((size_t)   );
-
-    size_t offset = 0;
-
-    compoundDataType.insertMember("InstrumentId", offset, H5::PredType::C_S1);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("InstrumentPointingSolveOption", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("NumCamAngleCoefSolved", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("CkDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("CkSolveDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("SolveTwist", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("SolvePointingPolynomialOverExisting", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_instrumentId);
-???    compoundDataType.insertMember("AnglesAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("PointingInterpolationType", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("InstrumentPositionSolveOption", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("NumCamPosCoefSolved", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_numberCamPosCoefSolved);
-    compoundDataType.insertMember("SpkDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_spkDegree);
-    compoundDataType.insertMember("SpkSolveDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_spkSolveDegree);
-    compoundDataType.insertMember("SolvePositionOverHermiteSpline", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_solvePositionOverHermiteSpline);
-???    compoundDataType.insertMember("PositionAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
-
-    offset += sizeof(m_positionAprioriSigma);
-    compoundDataType.insertMember("PositionInterpolationType", offset, H5::PredType::NATIVE_INT);
-
-    return compoundDataType;
-
-  }
-#endif
 }

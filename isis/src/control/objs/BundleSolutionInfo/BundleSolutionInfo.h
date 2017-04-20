@@ -105,7 +105,6 @@ namespace Isis {
       BundleSolutionInfo(Project *project, 
                     XmlStackedHandlerReader *xmlReader, 
                     QObject *parent = 0);  //TODO does xml stuff need project???
-      BundleSolutionInfo(FileName bundleSolutionInfoFile);
       BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
@@ -140,11 +139,6 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void writeH5File(FileName outputFileName) const;
-      void readH5File(FileName outputFileName) const;
-
-      void createH5File(FileName outputFileName) const;
-      void openH5File(FileName outputFileName);
 //      BundleSolutionInfo(FileName bundleSolutionInfoFile);
       
       public slots:
