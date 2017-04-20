@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lromakeflat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Create a flat-field image for line-scan, push-frame, and framing instruments
+  </brief>
+
+  <description>
+    <p>
+      This program creates flat-field images for line scan, push frame, and framing instruments. 
+      All input cubes should have the same number of samples; any images in the list that do not
+      have the same number of samples as the first image will not be used.  The names of the cube 
+      files used to create the flat-field image must be entered using an ASCII file (FROMLIST) with 
+      one filename per line (any line beginning with a '#' or '//' is treated as a comment).  The 
+      specific equation for each camera type is below.
+    </p>
+    <ul>
+      <li>Line Scan</li>
+        <p>
+          A frame is a NUMLINES line section of data. The equation for the final single line, single
+          band, flat field file is:
+         <br />
+          Mean Calculation:
+         <br />
+         Sum( Sum(FrameColumn) / Average(Frame) * ValidPixels(FrameColumn) ) / 
+         TotalColumnValidPixels
+         <br />
+          Median Calculation:
+         <br />
+          Median(PixelColumn(ValidPixel / Average(Frame)))
+        </p>
+          
+      <li>Push Frame</li>
+        <p>
+          Mean Calculation:
+          <br />
+          The equation for the final single framelet, single band flat field file is:<br /> Average(
+          PixelInFramelet1, PixelInFramelet2, PixelInFramelet3, ... )
+          <br />
+          Median Calculation:
+          <br />
+          Median(PixelColumn(ValidPixel / Average(Frame)))
+        </p>
+      <li>Framing</li>
+        <p>
+          Mean Calculation:
+          <br />
+          The equation for the final single framelet, single band flat field file is:<br /> Average(
+          PixelInCube1, PixelInCube2, PixelInCube3, ... )
+          <br />
+          Median Calculation:
+          <br />
+          Median(PixelColumn(ValidPixel / Average(Frame)))
+        </p>
+    </ul>
+    <p>
+      <b>Warning: This program creates potentially large temporary files</b>
+    </p>
+  </description>
+
+  <history>
+    <change name="Victor Silva" date="2016-09-12">
+      Original version, Adapted from Isis3 version of makeflat.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cubes
+        </brief>
+        <description>
+          Use this parameter to select the file which contains a list of
+          cube filenames to be used to create the flat file.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+     </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output name appended to flat field output cubes
+        </brief>
+        <description>
+         Output flat field cubes name prefix
+        </description>
+      </parameter>
+
+      <parameter name="EXCLUDE">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PVL-formatted file of all excluded files and sections of data
+        </brief>
+        <description>
+         Output PVL-formatted file of all excluded files and sections of data.
+        </description>
+      </parameter>
+    </group>
+    <group name="Camera Options">
+      <parameter name="IMAGETYPE">
+        <type>string</type>
+        <default><item>LINESCAN</item></default>
+        <brief>
+          This is the type of camera which took the image.
+        </brief>
+        <description>
+          Line scan cameras collect a cube a single line of data at a time. Push frame cameras collect
+          multiple lines of cube data at once.  Framing cameras collect an entire cube of data at
+          once.
+        </description>
+        <list>
+          <option value="LINESCAN">
+            <brief>Line scan camera</brief>
+            <description>
+              Line scan cameras collect a cube a single line of data at a time. This option makes
+              the flat field a single line of data.
+            </description>
+            <inclusions>
+              <item>NUMLINES</item>
+            </inclusions>
+            <exclusions>
+              <item>FRAMELETHEIGHT</item>
+              <item>HEIGHT_LINES</item>
+            </exclusions>
+          </option>
+          <option value="PUSHFRAME">
+            <brief>Push frame camera</brief>
+            <description>
+              Push frame cameras take multiple lines of cube data at once. This option makes the
+              flat field a single framelet of data.
+            </description>
+            <inclusions>
+              <item>FRAMELETHEIGHT</item>
+            </inclusions>
+            <exclusions>
+              <item>NUMLINES</item>
+              <item>HEIGHT_LINES</item>
+            </exclusions>
+          </option>
+          <option value="FRAMING" >
+            <brief>Framing camera</brief>
+            <description>
+              Framing cameras collect an entire cube of data at once. This option makes the
+              flat field the size of one of the input images.
+            </description>
+            <exclusions>
+              <item>NUMLINES</item>
+              <item>FRAMELETHEIGHT</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="NUMLINES">
+        <type>integer</type>
+        <brief>
+          This is the the number of lines to consider when doing statistics
+        </brief>
+        <description>
+          A single line often does not have enough data in it to perform good tolerance
+          calculations. The tolerance calculations will be performed on this many lines as
+          a time, and if found to be invalid, this many lines will be excluded from the output
+          flat file calculations at a time.
+        </description>
+      </parameter>
+      <parameter name="FRAMELETHEIGHT">
+        <type>integer</type>
+        <brief>
+          This is the height of each framelet in the image.
+        </brief>
+        <description>
+          Push frame images consist of framelets. The framelet size needs to be
+          known in order to make a flat field file for a push frame camera.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Processing Options">
+      <parameter name="NORMALIZATION">
+        <type>string</type>
+        <default><item>NO</item></default>
+        <brief>
+          Include Normalization Step
+        </brief>
+        <description>
+          If this pre-processing step was not done prior, Makeflat will normalize each pixel by the frame's mean in
+          order to normalize to 1. You can select image dimensions (height and width in pixels) to use when calculating frame mean.
+        </description>
+        <list>
+          <option value="YES">
+            <brief>
+              The normalization process will be applied.
+            </brief>
+            <description>
+              The normalization process will be applied to each pixel location
+              prior to stacking.
+            </description>
+            <inclusions>
+              <item>WIDTH_PIXELS</item>
+              <item>HEIGHT_LINES</item>
+            </inclusions>
+          </option>
+          <option value="NO">
+            <brief>
+              The normalization process will not be applied.
+            </brief>
+            <description>
+              Each pixel location will not be normalized prior to stacking.
+            </description>
+            <exclusions>
+              <item>WIDTH_PIXELS</item>
+              <item>HEIGHT_LINES</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="STDEVTOL">
+        <type>double</type>
+        <default><item>2</item></default>
+        <brief>
+          This is the number of standard deviations to use as outlier boundary.
+        </brief>
+        <description>
+          Any pixel column averages beyond this boundary will be excluded. The default value is
+          +- 1 standard deviation. Any pixel column average within this range will be included.
+        </description>
+      </parameter>
+    </group>
+    <group name="Normalization Options">
+      <parameter name="WIDTH_PIXELS">
+        <type>integer</type>
+        <default><item>0</item></default>
+        <brief>
+          Width in Pixels from center of image to use for normalization
+        </brief>
+        <description>
+          If value is left at zero, pixels will be normalized using entire width frame of image.
+        </description>
+      </parameter>
+      <parameter name="HEIGHT_LINES">
+        <type>integer</type>
+        <default><item>0</item></default>
+        <brief>
+          Height in Lines from center of image to use for normalization
+        </brief>
+        <description>
+          If LINESCAN, height will always equal 1. If value is left at zero and is not LINESCAN,
+          pixels will be normalized using entire frame height of image.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>
