@@ -300,7 +300,6 @@ namespace Isis {
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
 
-    m_bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
     m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // create output control net
@@ -477,12 +476,14 @@ namespace Isis {
    * @param bundleSolutionInfo The results of the bundle run.
    */
   void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
+
+    bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
+    m_bundleSolutionInfo = bundleSolutionInfo;
+
     // Since results are available, the user can accept (save) or reject(discard) the results.
     m_accept->setEnabled(true);
     m_reject->setEnabled(true);
     // m_close->setEnabled(false);
-
-    m_bundleSolutionInfo = bundleSolutionInfo;
   }
 }
 
