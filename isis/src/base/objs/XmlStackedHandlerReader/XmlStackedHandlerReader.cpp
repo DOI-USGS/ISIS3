@@ -40,6 +40,8 @@ namespace Isis {
     setContentHandler(m_contentHandlers->top());
 
     if (old) {
+      // Switch to newHandler and continue parsing
+      // This will call newHandler->startElement(...)
       old->switchToNewHandler(topContentHandler());
     }
   }
