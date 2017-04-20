@@ -91,9 +91,10 @@ namespace Isis {
     void rejectBundleResults();
 
   private:
-    Ui::JigsawDialog *m_ui; /**< Reference to self's UI generated with QtDesigner. */
-
+    /** Captures the most recent results of a bundle. JigsawDialog owns this pointer. */
     BundleSolutionInfo *m_bundleSolutionInfo;
+    /** Reference to self's UI generated with QtDesigner. */
+    Ui::JigsawDialog *m_ui;
   };
 };
 #endif
