@@ -30,14 +30,14 @@ namespace Isis {
    * XmlHandler::startElement method handles reading of the XML file and initializing the
    * member variables for the object. The class must also define a constructor that takes a
    * XmlStackedHandlerReader as a parameter (Note the IPCE signatures vary on this method).
-   * The constructor pushes a it's own content handler (the XmlHandler class) on the reader
+   * The constructor pushes it's own content handler (the XmlHandler class) on the reader
    * to allow parsing to continue with this object. Note the push of the content handler
    * does not return until the XML is parsed, specifically the push of the content handler
    * calls XmlHandler::startElement() for the handler just pushed.  If a contained object
-   * is found while parsing the XML the constructor for the contained object that takes a
+   * is found while parsing the XML, the constructor for the contained object that takes a
    * XmlStackedHandlerReader as a parameter is called.  This will result in the contained
    * object pushing it's content handler and parsing the relevant XML. When the constructor
-   * returns XML parsing can continue for this object.
+   * returns, XML parsing can continue for this object.
    *
    * *Potential issue*
    * There appears to be no support for cycles or joins in the object graph when serializing
@@ -49,8 +49,8 @@ namespace Isis {
    * To ensure backwards compatibility versioning is done per object. This keeps version
    * information for a class within a single source file with no need to know Project file
    * structure and where Project level file information is saved.  The version number
-   * for an class should be incremented by 1 each time a when the XML for that object changes.
-   * When reading old version XML files the class should choose a sensible default for the
+   * for a class should be incremented by 1 each time the XML for that object changes.
+   * When reading old version XML, files the class should choose a sensible default for the
    * missing XML elements and write out the XML in the newest format.
    *
    * This XML handler is designed to work with the XmlStackedHandlerReader. This XML handler class
@@ -70,11 +70,11 @@ namespace Isis {
    *     </xmlTag>
    *   </pre>
    *
-   *   To start the processing of the XML an initial XML content handler is pushed onto the
+   *   To start the processing of the XML, an initial XML content handler is pushed onto the
    *   stack of content handlers.  In the example above this initial content handler only
    *   processes elements associated with xmlTag1.  In IPCE the xmlTag1 elements will be the
    *   member variables associated with a class.  The xmlTag2 contains XML for an object
-   *   contained with in the first class.  When the xmlTag2 element is encountered the
+   *   contained within the first class.  When the xmlTag2 element is encountered the
    *   XML content handler (the xmlTag2::XmlHandler class) will be pushed and take over
    *   parsing.
    *
