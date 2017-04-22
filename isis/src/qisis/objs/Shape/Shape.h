@@ -223,7 +223,7 @@ namespace Isis {
       Distance m_minimumRadius;
       Distance m_maximumRadius;
   };
-  // TODO: add QDataStream >> and << ???
+
 }
 
 Q_DECLARE_METATYPE(Isis::Shape *);

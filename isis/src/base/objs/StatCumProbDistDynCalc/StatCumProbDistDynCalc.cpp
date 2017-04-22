@@ -619,7 +619,7 @@ namespace Isis {
   QDataStream &StatCumProbDistDynCalc::write(QDataStream &stream) const {
     stream << m_id->toString()
            << (qint32)m_numberCells
-           << (qint32)m_numberQuantiles 
+           << (qint32)m_numberQuantiles
            << (qint32)m_numberObservations
            << m_quantiles
            << m_observationValues

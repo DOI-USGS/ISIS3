@@ -238,7 +238,7 @@ namespace Isis {
        */
       QString m_path;
   };
-  // TODO: add QDataStream >> and << ???
+
 }
 
 Q_DECLARE_METATYPE(Isis::ImageList *);

@@ -32,7 +32,6 @@
 #include "XmlStackedHandler.h"
 
 class QAction;
-class QDataStream;
 class QMenu;
 class QModelIndex;
 class QToolBar;

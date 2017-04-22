@@ -37,7 +37,6 @@ namespace Isis {
       void addSupport(int property);
       bool supports(int property);
 
-//       void setValue(int property, QVariant value);
       QVariant getValue(int property) const;
 
       void setDisplayName(QString displayName);

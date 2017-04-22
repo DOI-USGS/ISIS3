@@ -23,7 +23,6 @@
 #include "CubeDnView.h"
 
 #include <QAction>
-#include <QDataStream>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMdiArea>

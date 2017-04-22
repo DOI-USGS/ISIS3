@@ -167,8 +167,7 @@ class BundleObservationSolveSettings {
 
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;  
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
+
 
     private:
       /**
@@ -263,10 +262,7 @@ class BundleObservationSolveSettings {
   //!  Definition for BundleObservationSolveSettingsQsp, a QSharedPointer to a
   //!< BundleObservationSolveSettings object.
   typedef QSharedPointer<BundleObservationSolveSettings> BundleObservationSolveSettingsQsp;
-  
-  // Operators to read/write BundleResults to/from binary data.
-  QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings);
-  QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings);
+
 };
 
 #endif // BundleObservationSolveSettings_h

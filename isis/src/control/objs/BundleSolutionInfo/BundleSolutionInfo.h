@@ -130,17 +130,11 @@ namespace Isis {
                           QString settingsName = "InputSettings",
                           QString statisticsName = "StatisticsResults");
        
-      //TODO does xml stuff need project and newRoot???
+
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  
-      
-      //TODO does xml stuff need project???
+           
       void save(QXmlStreamWriter &stream, const Project *project) const;  
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
-
-//      BundleSolutionInfo(FileName bundleSolutionInfoFile);
-      
       public slots:
       void updateFileName(Project *);
 
@@ -191,9 +185,6 @@ namespace Isis {
       QList<ImageList *> *m_images; //!< The list of images that were adjusted
   }; // end BundleSolutionInfo class
 
-  // operators to read/write BundleSolutionInfo to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const BundleSolutionInfo &bundleSolutionInfo);
-  QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo);
 
   void setStringAttribute(int locationId, QString locationName, 
                           QString attributeName, QString attributeValue);

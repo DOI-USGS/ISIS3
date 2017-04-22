@@ -205,19 +205,6 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
   }
 
 
-//  PvlObject TargetBody::pvlObject(QString resultsName, QString settingsName,
-//                                     QString statisticsName) {
-
-//    PvlObject pvl(resultsName);
-//    pvl += PvlKeyword("RunTime", runTime());
-//    if (m_controlNetworkFileName->expanded() != "") {
-//      pvl += PvlKeyword("OutputControlNetwork", controlNetworkFileName());
-//    }
-//    pvl += bundleSettings()->pvlObject(settingsName);
-//    pvl += bundleResults()->pvlObject(statisticsName);
-//    return pvl;
-
-//  }
 
   /**
    * @brief Returns the frame type.
@@ -584,39 +571,5 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
 
-
-//  QDataStream &TargetBody::write(QDataStream &stream) const {
-//    stream << m_id->toString()
-//           << m_runTime;
-//
-//    return stream;
-//  }
-
-
-
-//  QDataStream &TargetBody::read(QDataStream &stream) {
-
-//    QString id;
-//    stream >> id;
-//    delete m_id;
-//    m_id = NULL;
-//    m_id = new QUuid(id);
-
-//    stream >> m_runTime;
-
-//    return stream;
-//  }
-
-
-
-//  QDataStream &operator<<(QDataStream &stream, const TargetBody &TargetBody) {
-//    return TargetBody.write(stream);
-//  }
-
-
-
-//  QDataStream &operator>>(QDataStream &stream, TargetBody &TargetBody) {
-//    return TargetBody.read(stream);
-//  }
 
 }

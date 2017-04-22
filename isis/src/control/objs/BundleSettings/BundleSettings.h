@@ -28,10 +28,7 @@
 #include <QSharedPointer>
 #include <QString>
 
-// hdf5 library
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
+
 
 // ISIS library
 #include "BundleTargetBody.h"
@@ -44,7 +41,7 @@ class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
-using namespace H5;
+
 using namespace Isis;
 
 namespace Isis {
@@ -276,22 +273,6 @@ namespace Isis {
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
-
-      void createH5Group(hid_t locationId, 
-                         QString locationName) const; //delete
-      void parseH5Group(hid_t locationId, 
-                        QString locationName);        //delete
-
-      void createH5Group(H5::CommonFG &locationObject, 
-                         QString locationName) const;
-      H5::Group createH5Group2(H5::Group locationGroup, 
-                               QString locationName);
-      void openH5Group(H5::CommonFG &locationObject, 
-                       QString locationName);
-      BundleSettings(H5::CommonFG &locationObject, 
-                     QString locationName);
 
     private:
 
@@ -403,9 +384,7 @@ namespace Isis {
   //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.
   typedef QSharedPointer<BundleSettings> BundleSettingsQsp;
 
-  // operators to read/write BundleResults to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);
-  QDataStream &operator>>(QDataStream &stream, BundleSettings &settings);
+
 };
 
 Q_DECLARE_METATYPE(Isis::BundleSettingsQsp);

@@ -499,8 +499,6 @@ namespace Isis {
 
 
 
-
-
   /**
    * @brief Outputs the header for the bundleout_images.csv file
    * @param fpOut The output file stream.
@@ -1632,95 +1630,6 @@ namespace Isis {
     fpOut.close();
 
     return true;
-  }
-
-
-  /**
-   * Writes the data to the stream.
-   * 
-   * @param stream The stream we are writing to and returning
-   * 
-   * @return @b QDataStream The stream we wrote to
-   */
-  QDataStream &BundleSolutionInfo::write(QDataStream &stream) const {
-    stream << m_id->toString()
-           << m_runTime
-           << m_controlNetworkFileName->expanded()
-           << *m_settings
-           << *m_statisticsResults;
-  //TODO add this capability to Image and ImageList
-  //          << *m_images;
-    return stream;
-  }
-
-
-  /**
-   * Reads the data from the stream
-   * 
-   * @param stream The stream we are reading from
-   * 
-   * @return @b QDataStream The stream we read from
-   */
-  QDataStream &BundleSolutionInfo::read(QDataStream &stream) {
-
-    QString id;
-    stream >> id;
-    delete m_id;
-    m_id = NULL;
-    m_id = new QUuid(id);
-
-    stream >> m_runTime;
-
-    QString controlNetworkFileName;
-    stream >> controlNetworkFileName;
-    delete m_controlNetworkFileName;
-    m_controlNetworkFileName = NULL;
-    m_controlNetworkFileName = new FileName(controlNetworkFileName);
-
-    BundleSettings settings;
-    stream >> settings;
-    m_settings = BundleSettingsQsp(new BundleSettings(settings));
-
-    BundleResults statisticsResults;
-    stream >> statisticsResults;
-    delete m_statisticsResults;
-    m_statisticsResults = NULL;
-    m_statisticsResults = new BundleResults(statisticsResults);
-
-    //TODO add this capability to Image and ImageList
-    // QList<ImageList*> imageLists;
-    // stream >> imageLists;
-    // delete m_images;
-    // m_images = NULL;
-    // m_images = new QList<ImageList *>(imageLists);
-
-    return stream;
-  }
-
-
-  /**
-   * Creates the write operator for BundleSolutionInfo
-   * 
-   * @param stream The stream we are writing to
-   * @param bundleSolutionInfo The BundleSolutionInfo we are writing
-   * 
-   * @return @b QDataStream The stream we wrote to
-   */
-  QDataStream &operator<<(QDataStream &stream, const BundleSolutionInfo &bundleSolutionInfo) {
-    return bundleSolutionInfo.write(stream);
-  }
-
-
-  /**
-   * Creates the read operator for BundleSolutionInfo
-   * 
-   * @param stream The stream we are reading to
-   * @param bundleSolutionInfo The BundleSolutionInfo we are reading
-   * 
-   * @return @b QDataStream The stream we read from
-   */
-  QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo) {
-    return bundleSolutionInfo.read(stream);
   }
 
 }

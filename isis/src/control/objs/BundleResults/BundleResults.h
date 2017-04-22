@@ -240,9 +240,6 @@ namespace Isis {
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
       
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
-
 
     private:
       /**
@@ -294,14 +291,8 @@ namespace Isis {
        *   when saving to disk).
        */
       QUuid *m_id;
-//???      QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
       CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
 
-// ???       Statistics m_statsx;                       //!<  x errors
-// ???       Statistics m_statsy;                       //!<  y errors
-// ???       Statistics m_statsrx;                      //!<  x residuals
-// ???       Statistics m_statsry;                      //!<  y residuals
-// ???       Statistics m_statsrxy;                     //!< xy residuals
 
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
       // Currently set but unused
@@ -422,9 +413,7 @@ namespace Isis {
       double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/ 
        
   };
-  // operators to read/write BundleResults to/from binary disk file
-  QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults);
-  QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults);
+
 };
 
 Q_DECLARE_METATYPE(Isis::BundleResults);
