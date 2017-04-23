@@ -92,10 +92,10 @@
         <pixelType>real</pixelType>
         <fileMode>output</fileMode>
         <brief>
-          Output name appended to flat field output cubes
+          Output name prepended to flat field output cubes
         </brief>
         <description>
-         Output flat field cubes name prefix
+         Output prefix of the flat field cube's name
         </description>
       </parameter>
 
@@ -119,15 +119,13 @@
           This is the type of camera which took the image.
         </brief>
         <description>
-          Line scan cameras collect a cube a single line of data at a time. Push frame cameras collect
-          multiple lines of cube data at once.  Framing cameras collect an entire cube of data at
-          once.
+          The type of camera that captured the input image.
         </description>
         <list>
           <option value="LINESCAN">
             <brief>Line scan camera</brief>
             <description>
-              Line scan cameras collect a cube a single line of data at a time. This option makes
+              Line scan cameras collect an image a single line of data at a time. This option makes
               the flat field a single line of data.
             </description>
             <inclusions>
@@ -141,8 +139,8 @@
           <option value="PUSHFRAME">
             <brief>Push frame camera</brief>
             <description>
-              Push frame cameras take multiple lines of cube data at once. This option makes the
-              flat field a single framelet of data.
+              Push frame cameras collect multiple lines, one framelet, of data at once. This
+              option makes the flat field a single framelet of data.
             </description>
             <inclusions>
               <item>FRAMELETHEIGHT</item>
@@ -168,7 +166,7 @@
       <parameter name="NUMLINES">
         <type>integer</type>
         <brief>
-          This is the the number of lines to consider when doing statistics
+          This is the number of lines to consider when doing statistics
         </brief>
         <description>
           A single line often does not have enough data in it to perform good tolerance
