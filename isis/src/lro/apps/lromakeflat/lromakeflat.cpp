@@ -36,7 +36,6 @@
  */
 #include "Isis.h"
 
-#include <bits/algorithmfwd.h>
 #include <cmath>
 #include <iostream>
 #include <limits>
