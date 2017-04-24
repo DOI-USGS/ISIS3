@@ -90,7 +90,6 @@ ISIS3PROP        ?= $(IDK_ROOT)/proprietary
 #  Set up paths to needed for doxygen
 DOXYGEN     = $(ISIS3OPT)/bin/doxygen
 DOT_PATH    = $(ISIS3OPT)/bin
-LATEX       = $(ISIS3OPT)/bin/latex
 GREP        = $(ISIS3OPT)/bin/grep
 
 #---------------------------------------------------------------------------

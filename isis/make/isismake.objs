@@ -186,45 +186,9 @@ help:
 	echo "make ostruthdata                : Runs the unitTest and creates OS specific truth"
 	echo "make protos                     : Builds the object of google protocol buffer(*.proto) files"
 
+TEMPDIR:=${CURDIR}
 html: force
-	mkdir -p docbuild
-	cat $(ISISROOT)/src/docsys/Object/build//Programmer.conf         >  docbuild/ProgTester_temp.conf
-	echo "FILE_PATTERNS          = *.h *.cpp *.doxydef"              >> docbuild/ProgTester_temp.conf
-	echo "OUTPUT_DIRECTORY = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
-	echo "STRIP_FROM_PATH  = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
-	echo "LATEX_OUTPUT     = $(CURDIR)/html/latex"                   >> docbuild/ProgTester_temp.conf
-	echo "LATEX_CMD_NAME   = $(LATEX)"                               >> docbuild/ProgTester_temp.conf
-	echo "INPUT            = $(ISISROOT)/src/docsys/Object/build/isisDoxyDefs.doxydef $(CURDIR)/"  >> docbuild/ProgTester_temp.conf
-	echo "HTML_HEADER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectHeaderProgTester.html" >> docbuild/ProgTester_temp.conf
-	echo "HTML_FOOTER      = $(ISISROOT)/src/docsys/Object/build/IsisObjectFooterProgTester.html" >> docbuild/ProgTester_temp.conf
-	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
-	echo "TAGFILES         = "                                       >> docbuild/ProgTester_temp.conf
-	echo "HTML_STYLESHEET  = $(ISISROOT)/src/docsys/Object/build/doxygen.css"                     >> docbuild/ProgTester_temp.conf
-	echo "IMAGE_PATH       = $(CURDIR)/"                             >> docbuild/ProgTester_temp.conf
-
-	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
-	then \
-	  echo "QUIET                  = NO"                             >> docbuild/ProgTester_temp.conf;   \
-	echo "WARNINGS               = YES"                              >> docbuild/ProgTester_temp.conf;   \
-	echo "WARN_IF_UNDOCUMENTED   = YES"                              >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARN_IF_DOC_ERROR      = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARN_NO_PARAMDOC       = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	else \
-	  echo "QUIET                  = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARNINGS               = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARN_IF_UNDOCUMENTED   = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARN_IF_DOC_ERROR      = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	  echo "WARN_NO_PARAMDOC       = YES"                            >> docbuild/ProgTester_temp.conf;   \
-	fi
-
-	if [[ "$(DOT_PATH)" != "" ]];                                          \
-	then                                                                   \
-	  echo "DOT_PATH = $(DOT_PATH)" >> docbuild/ProgTester_temp.conf;      \
-	fi
-
-	$(DOXYGEN) docbuild/ProgTester_temp.conf
-	-$(RM) -r docbuild
-	echo "View your documentation by opening the file html/index.html in a browser"
+	(cd $(ISISROOT)/src/docsys/Object/ ; make CURDIR=$(TEMPDIR) doProgTest )
 
 clean:  localclean
 	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt    \
