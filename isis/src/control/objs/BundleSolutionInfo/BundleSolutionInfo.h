@@ -45,10 +45,10 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * @brief Container class for BundleAdjustment results. 
-   * This class includes the settings used to run the bundle adjustment, the resulting statistics 
+   * @brief Container class for BundleAdjustment results.
+   * This class includes the settings used to run the bundle adjustment, the resulting statistics
    * values, and the name of the control network used.
-   *  
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-07-08 Jeannie Backer
@@ -59,7 +59,7 @@ namespace Isis {
    *                           operators and the read/write methods.
    *   @history 2014-12-04 Jeannie Backer - Renamed from BundleResults to BundleSolutionInfo.
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
-   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as 
+   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as
    *                           a Qt metatype for use with QVariant.
    *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
    *                           Fixes #2298.
@@ -88,22 +88,23 @@ namespace Isis {
    *                            "CAMSOLVE: All POLYNOMIAL COEFFICIENTS"
    *                           -modified output of image EO in bundleout.txt for images solved with
    *                            observation mode; previously one entry per observation was written,
-   *                            now all images in the observation are written separately. 
+   *                            now all images in the observation are written separately.
    *   @history 2016-12-01 Ian Humphrey - Modified an sprintf() call in outputImagesCSV() to
    *                           prevent a -Wformat-security warning from occurring.
    *   @history 2016-12-08 Ian Humphrey - Modified outputImagesCSVHeader() to treat TWIST the same
    *                           as the other angles when determining how many headers to create.
    *                           Fixes #4557.
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
     public:
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
-                    FileName controlNetworkFileName, 
-                    BundleResults outputStatistics, 
+                    FileName controlNetworkFileName,
+                    BundleResults outputStatistics,
                     QObject *parent = 0);
-      BundleSolutionInfo(Project *project, 
-                    XmlStackedHandlerReader *xmlReader, 
+      BundleSolutionInfo(Project *project,
+                    XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
       BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
@@ -119,29 +120,23 @@ namespace Isis {
       QString runTime() const;
 
 
-      bool outputImagesCSVHeader(std::ofstream &fpOut);     
+      bool outputImagesCSVHeader(std::ofstream &fpOut);
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
       bool outputImagesCSV();
       bool outputPointsCSV();
       bool outputResiduals();
 
-      PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
-                          QString settingsName = "InputSettings",
-                          QString statisticsName = "StatisticsResults");
-       
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+      void save(QXmlStreamWriter &stream, const Project *project) const;
 
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  
-           
-      void save(QXmlStreamWriter &stream, const Project *project) const;  
-
-      public slots:
+    public slots:
       void updateFileName(Project *);
 
     private:
       /**
        * This class is used to read an images.xml file into an image list
-       * 
+       *
        * @see QXmlDefaultHandler documentation
        * @author 2014-07-21 Ken Edmundson
        *
@@ -152,7 +147,7 @@ namespace Isis {
       class XmlHandler : public XmlStackedHandler {
         public:
           //TODO does xml stuff need project???
-          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);  
+          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);
           ~XmlHandler();
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -186,7 +181,7 @@ namespace Isis {
   }; // end BundleSolutionInfo class
 
 
-  void setStringAttribute(int locationId, QString locationName, 
+  void setStringAttribute(int locationId, QString locationName,
                           QString attributeName, QString attributeValue);
   QString getStringAttribute(int locationId, QString locationName, QString attributeName);
 }; // end namespace Isis

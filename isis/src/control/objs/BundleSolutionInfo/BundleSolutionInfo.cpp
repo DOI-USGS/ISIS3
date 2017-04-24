@@ -22,10 +22,10 @@
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
-  
+
   /**
    * Constructor. Creates a BundleSolutionInfo.
-   * 
+   *
    * @param inputSettings The settings saved in BundleSolutionInfo
    * @param controlNetworkFileName The file name and path of the control network
    * @param outputStatistics The results of the BundleAdjust
@@ -33,7 +33,7 @@ namespace Isis {
    */
   BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
                                          FileName controlNetworkFileName,
-                                         BundleResults outputStatistics, 
+                                         BundleResults outputStatistics,
                                          QObject *parent) : QObject(parent) {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
@@ -55,14 +55,14 @@ namespace Isis {
 
   /**
    * Constructor. Creates a BundleSolutionInfo.
-   * 
+   *
    * @param project The current project
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    * @param parent The Qt-relationship parent
    */
-  BundleSolutionInfo::BundleSolutionInfo(Project *project, 
-                                         XmlStackedHandlerReader *xmlReader, 
-                                         QObject *parent) : QObject(parent) {   
+  BundleSolutionInfo::BundleSolutionInfo(Project *project,
+                                         XmlStackedHandlerReader *xmlReader,
+                                         QObject *parent) : QObject(parent) {
                                          //TODO does xml stuff need project???
     m_id = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
@@ -71,10 +71,10 @@ namespace Isis {
     xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
 
-  
+
   /**
    * Constructor. Creates a BundleSolutionInfo.
-   * 
+   *
    * @param src BundleSolutionInfo where the settings and BundleResults are read from.
    */
   BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
@@ -114,9 +114,9 @@ namespace Isis {
 
   /**
    * Creates an equal operator for BundleSolutionInfos.
-   * 
+   *
    * @param src the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
-   * 
+   *
    * @return @b BundleSolutionInfo Reference to the current BundleSolutionInfo
    */
   BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &src) {
@@ -149,7 +149,7 @@ namespace Isis {
 
   /**
    * Sets the stat results.
-   * 
+   *
    * @param statisticsResults The new BundleResults
    */
   void BundleSolutionInfo::setOutputStatistics(BundleResults statisticsResults) {
@@ -158,34 +158,10 @@ namespace Isis {
     m_statisticsResults = new BundleResults(statisticsResults);
   }
 
-  /**
-   * Writes the results from BundleAdjust to a Pvl.
-   * 
-   * @param resultsName The name of the results
-   * @param settingsName The name of the settings
-   * @param statisticsName The name of the statistics
-   * 
-   * @return @b PvlObject The PvlObject that we are writing to
-   */
-  PvlObject BundleSolutionInfo::pvlObject(QString resultsName, QString settingsName, 
-                                          QString statisticsName) {
-
-    PvlObject pvl(resultsName);
-    pvl += PvlKeyword("RunTime", runTime());
-    if (m_controlNetworkFileName->expanded() != "") {
-      pvl += PvlKeyword("OutputControlNetwork", controlNetworkFileName());
-    }
-    pvl += bundleSettings()->pvlObject(settingsName);
-    pvl += bundleResults().pvlObject(statisticsName);
-    return pvl;
-
-  }
-
-
 
   /**
    * Saves the BundleSolutionInfo to the project
-   * 
+   *
    * Output format:
    *
    *
@@ -194,7 +170,7 @@ namespace Isis {
    * </image>
    *
    * (fileName attribute is just the base name)
-   * 
+   *
    * @param stream The stream to which the BundleSolutionInfo will be saved
    * @param project The project to which this BundleSolutionInfo will be saved
    * @param newProjectRoot The location of the project root directory. This is not used.
@@ -217,9 +193,11 @@ namespace Isis {
     m_statisticsResults->save(stream, project);
 
     // save image lists to stream
+    std::cout << "\nm_images->isEmpty() ? " << (m_images->isEmpty() ? "EMPTY" : "NOT EMPTY") << "\n\n";
     if ( !m_images->isEmpty() ) {
       stream.writeStartElement("imageLists");
 
+      std::cout << "m_images->count() " << m_images->count() << "\n\n";
       for (int i = 0; i < m_images->count(); i++) {
         m_images->at(i)->save(stream, project, "");
       }
@@ -232,7 +210,7 @@ namespace Isis {
 
   /**
    * Saves the BundleSolutionInfo to the project
-   * 
+   *
    * @param stream The stream to which the BundleSolutionInfo will be saved
    * @param project The project to which this BundleSolutionInfo will be saved
    */
@@ -264,21 +242,21 @@ namespace Isis {
     }
     stream.writeEndElement(); //end bundleSolutionInfo
   }
-  
+
   /**
-   * Change the on-disk file name for the control network used to be where the control network 
+   * Change the on-disk file name for the control network used to be where the control network
    * ought to be in the given project.
-   * 
+   *
    * This method is modelled after the updateFileName() methods in Image and Control. Those methods
-   * close something (cubes for Image and a control net for control) but there is not a close 
-   * method in BundleSolutionInfo. 
+   * close something (cubes for Image and a control net for control) but there is not a close
+   * method in BundleSolutionInfo.
    *
    * @param project The project that this BundleSolutionInfo is stored in
    */
   void BundleSolutionInfo::updateFileName(Project *project) {
-    
+
     //TODO do we need to close anything here?
-    
+
     FileName oldFileName(*m_controlNetworkFileName);
     FileName newName(project->cnetRoot() + "/" +
                      oldFileName.dir().dirName() + "/" + oldFileName.name());
@@ -294,7 +272,7 @@ namespace Isis {
    * @param bundleSolutionInfo The bundle solution we're going to be initializing
    * @param project The project we are working in
    */
-  BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo, 
+  BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo,
                                              Project *project) {
     m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
     m_xmlHandlerProject = NULL;
@@ -333,10 +311,10 @@ namespace Isis {
    * @param localName The keyword name given to the member variable in the XML.
    * @param qName ???
    * @param atts The attribute containing the keyword value for the given local name.
-   * 
+   *
    * @return @b bool True if we should continue reading the XML.
    */
-  bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI, 
+  bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI,
                                                     const QString &localName,
                                                     const QString &qName,
                                                     const QXmlAttributes &atts) {
@@ -353,7 +331,7 @@ namespace Isis {
         m_xmlHandlerBundleResults = NULL;
 
         //TODO need to add constructor for this???
-        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader()); 
+        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
       }
       else if (localName == "imageList") {
         m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
@@ -365,9 +343,9 @@ namespace Isis {
 
   /**
    * Adds characters to m_xmlHandlerCharacters
-   * 
+   *
    * @param ch QString of characters to add
-   * 
+   *
    * @return @b bool Almost always true. Only false if the characters cannot be read
    */
   bool BundleSolutionInfo::XmlHandler::characters(const QString &ch) {
@@ -378,14 +356,14 @@ namespace Isis {
 
   /**
    * Handle an XML end element.
-   * 
+   *
    * @param namespaceURI ???
    * @param localName The keyword name given to the member variable in the XML.
    * @param qName ???
-   * 
+   *
    * @return @b bool Returns XmlStackedHandler's endElement()
-   */  
-  bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI, 
+   */
+  bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
                                                   const QString &localName,
                                                   const QString &qName) {
     if (localName == "id") {
@@ -431,10 +409,10 @@ namespace Isis {
 
   /**
    * Sets the run time
-   * 
+   *
    * @param runTime The run time.
    */
-  void BundleSolutionInfo::setRunTime(QString runTime) { 
+  void BundleSolutionInfo::setRunTime(QString runTime) {
     // ??? validate that a valid time has been given???
     // try {
     //   iTime time(runTime);
@@ -450,7 +428,7 @@ namespace Isis {
 
   /**
    * Returns the run time.
-   * 
+   *
    * @return @b QString The run time.
    */
   QString BundleSolutionInfo::runTime() const {
@@ -460,7 +438,7 @@ namespace Isis {
 
   /**
    * Returns the name of the control network.
-   * 
+   *
    * @return @b QString The name of the control network.
    */
   QString BundleSolutionInfo::controlNetworkFileName() const {
@@ -470,7 +448,7 @@ namespace Isis {
 
   /**
    * Returns the bundle settings.
-   * 
+   *
    * @return @b BundleSettingsQsp The bundle settings.
    */
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
@@ -480,9 +458,9 @@ namespace Isis {
 
   /**
    * Returns the bundle results.
-   * 
+   *
    * @throws IException::Unknown "Results for this bundle is NULL."
-   * 
+   *
    * @return @b BundleResults The bundle results.
    */
   BundleResults BundleSolutionInfo::bundleResults() {
@@ -490,7 +468,7 @@ namespace Isis {
       return *m_statisticsResults;
     }
     else {
-      throw IException(IException::Unknown, 
+      throw IException(IException::Unknown,
                        "Results for this bundle is NULL.",
                        _FILEINFO_);
     }
@@ -652,14 +630,14 @@ namespace Isis {
 
   /**
    * Output header for bundle results file.
-   * 
+   *
    * @param fpOut The output stream that the header will be sent to.
-   * 
+   *
    * @return @b bool If the header was successfully output to the output stream.
-   * 
+   *
    * @throws IException::Io "Failed to output residual percentiles for bundleout"
    * @throws IException::Io "Failed to output residual box plot for bundleout"
-   * 
+   *
    * @todo Determine how multiple sensor solve settings should be output.
    */
   bool BundleSolutionInfo::outputHeader(std::ofstream &fpOut) {
@@ -1047,7 +1025,7 @@ namespace Isis {
     sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",
                   m_statisticsResults->elapsedTime());
     fpOut << buf;
-    if (m_statisticsResults->numberObservations() 
+    if (m_statisticsResults->numberObservations()
         + m_statisticsResults->numberRejectedObservations()
         > 100) {
       sprintf(buf, "\n           Residual Percentiles:\n");
@@ -1114,13 +1092,13 @@ namespace Isis {
     int imageIndex = 0;
 
     for (int i = 0; i < numObservations; i++) {
-      
+
       int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
-      
+
       for (int j = 0; j < numImagesInObservation; j++) {
-        
+
         BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
-        
+
         double rmsSampleResiduals = m_statisticsResults->
                                         rmsImageSampleResiduals()[imageIndex].Rms();
         double rmsLineResiduals =   m_statisticsResults->
@@ -1255,7 +1233,7 @@ namespace Isis {
 
   /**
    * Outputs a text file with the results of the BundleAdjust.
-   * 
+   *
    * @return @b bool If the text file was successfully output.
    */
   bool BundleSolutionInfo::outputText() {
@@ -1337,7 +1315,7 @@ namespace Isis {
         }
       }
     }
-        
+
     // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
     m_statisticsResults->setCorrMatImgsAndParams(imagesAndParameters);
 
@@ -1434,7 +1412,7 @@ namespace Isis {
 
   /**
    * Outputs point data to a csv file.
-   * 
+   *
    * @return @b bool If the point data was successfully output.
    */
   bool BundleSolutionInfo::outputPointsCSV() {
@@ -1548,7 +1526,7 @@ namespace Isis {
 
   /**
    * Outputs image coordinate residuals to a csv file.
-   * 
+   *
    * @return @b bool If the residuals were successfully output.
    */
   bool BundleSolutionInfo::outputResiduals() {
@@ -1580,7 +1558,7 @@ namespace Isis {
 
     BundleControlPointQsp bundleControlPoint;
     BundleMeasureQsp bundleMeasure;
-    
+
     for (int i = 0; i < numPoints; i++) {
       bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
       numMeasures = bundleControlPoint->size();
@@ -1588,7 +1566,7 @@ namespace Isis {
       if (bundleControlPoint->rawControlPoint()->IsIgnored()) {
         continue;
       }
-      
+
       for (int j = 0; j < numMeasures; j++) {
         bundleMeasure = bundleControlPoint->at(j);
 
@@ -1631,5 +1609,4 @@ namespace Isis {
 
     return true;
   }
-
 }

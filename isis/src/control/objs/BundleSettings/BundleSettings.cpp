@@ -27,10 +27,10 @@
 namespace Isis {
 
   /**
-   * Constructs a BundleSettings object. 
+   * Constructs a BundleSettings object.
    * Default values are set for all member variables. By default, BundleSettings allows creation
    * of the inverse correlation matrix file.
-   * 
+   *
    * @see createInverseMatrix()
    * @see setCreateInverseMatrix()
    */
@@ -80,11 +80,11 @@ namespace Isis {
 
 
   /**
-   * Construct a BundleSettings object from member data read from an XML file. 
-   *  
-   * @code 
+   * Construct a BundleSettings object from member data read from an XML file.
+   *
+   * @code
    *   FileName xmlFile("bundleSettingsFileName.xml");
-   *  
+   *
    *   QString xmlPath = xmlFile.expanded();
    *   QFile file(xmlPath);
    *   file.open(QFile::ReadOnly);
@@ -95,7 +95,7 @@ namespace Isis {
    * @param project A pointer to the project where the Settings will be saved.
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    */
-  BundleSettings::BundleSettings(Project *project, 
+  BundleSettings::BundleSettings(Project *project,
                                  XmlStackedHandlerReader *xmlReader) {
     m_id = NULL;
     // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
@@ -112,12 +112,12 @@ namespace Isis {
    *
    * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * 
+   *
    * @throw
    * @throw
    */
   BundleSettings::BundleSettings(FileName xmlFile,
-                                 Project *project, 
+                                 Project *project,
                                  XmlStackedHandlerReader *xmlReader) {
 
 
@@ -138,14 +138,14 @@ namespace Isis {
     xmlReader->setErrorHandler(new XmlHandler(this, project));
     bool success = xmlReader->parse(xmlInputSource);
     if (!success) {
-      throw IException(IException::Unknown, 
+      throw IException(IException::Unknown,
                        QString("Failed to parse xml file, [%1]").arg(xmlPath),
                         _FILEINFO_);
     }
   }
 
 
-  /** 
+  /**
    * TODO
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    */
@@ -155,7 +155,7 @@ namespace Isis {
     xmlReader->setErrorHandler(new XmlHandler(this));
   }
 
-  /** 
+  /**
    * TODO
    */
   BundleSettings::BundleSettings(H5::CommonFG &locationObject, QString locationName) {
@@ -165,10 +165,10 @@ namespace Isis {
 
 
   /**
-   * This copy constructor sets this BundleSettings' member data to match 
-   * that of the 'other' given BundleSettings. 
-   *  
-   * @param other The BundleSettings object to be copied. 
+   * This copy constructor sets this BundleSettings' member data to match
+   * that of the 'other' given BundleSettings.
+   *
+   * @param other The BundleSettings object to be copied.
    */
   BundleSettings::BundleSettings(const BundleSettings &other)
       : m_id(new QUuid(other.m_id->toString())),
@@ -195,20 +195,20 @@ namespace Isis {
 
 
   /**
-   * Destroys the BundleSettings object. 
+   * Destroys the BundleSettings object.
    */
-  BundleSettings::~BundleSettings() {    
+  BundleSettings::~BundleSettings() {
     delete m_id;
     m_id = NULL;
   }
 
 
-  /** 
-   * Assignment operator to allow proper copying of the 'other' BundleSettings 
-   * object to this one. 
-   *  
+  /**
+   * Assignment operator to allow proper copying of the 'other' BundleSettings
+   * object to this one.
+   *
    * @param other The BundleSettings object to be copied.
-   * 
+   *
    * @return @b BundleSettings& A reference to the copied BundleSettings object.
    */
   BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
@@ -242,14 +242,14 @@ namespace Isis {
 
 
   /**
-   * Sets the internal flag to indicate whether to validate the network before 
-   * the bundle adjustment. 
-   *  
-   * @see BundleAdjust::validateNetwork() 
-   *  
-   * @param validate Indicates whether the network should be validated by 
+   * Sets the internal flag to indicate whether to validate the network before
+   * the bundle adjustment.
+   *
+   * @see BundleAdjust::validateNetwork()
+   *
+   * @param validate Indicates whether the network should be validated by
    *                 BundleAdjust.
-   *  
+   *
    */
   void BundleSettings::setValidateNetwork(bool validate) {
     m_validateNetwork = validate;
@@ -257,14 +257,14 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether to validate the network before 
-   * the bundle adjustment. 
-   *  
-   * @see BundleAdjust::validateNetwork() 
-   *  
-   * @return @b bool Indicates whether the network should be validated by 
+   * This method is used to determine whether to validate the network before
+   * the bundle adjustment.
+   *
+   * @see BundleAdjust::validateNetwork()
+   *
+   * @return @b bool Indicates whether the network should be validated by
    *                 BundleAdjust.
-   *  
+   *
    */
   bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
@@ -277,13 +277,13 @@ namespace Isis {
 
   /**
    * Set the solve options for the bundle adjustment.
-   * 
+   *
    * @param solveObservationMode A boolean value indicating whether to solve for
    *                             observation mode.
-   * @param updateCubeLabel A boolean value indicating whether to update the 
+   * @param updateCubeLabel A boolean value indicating whether to update the
    *                        cube labels after the bundle adjustment is
    *                        completed.
-   * @param errorPropagation A boolean value indicating whether to use the 
+   * @param errorPropagation A boolean value indicating whether to use the
    *                         cholmod library's error propagation.
    * @param solveRadius A boolean value indicating whether to solve for radius.
    * @param globalLatitudeAprioriSigma The global a priori sigma for latitude.
@@ -291,11 +291,11 @@ namespace Isis {
    * @param globalRadiusAprioriSigma The global a priori sigma for radius.
    */
   void BundleSettings::setSolveOptions(bool solveObservationMode,
-                                       bool updateCubeLabel, 
-                                       bool errorPropagation, 
-                                       bool solveRadius, 
-                                       double globalLatitudeAprioriSigma, 
-                                       double globalLongitudeAprioriSigma, 
+                                       bool updateCubeLabel,
+                                       bool errorPropagation,
+                                       bool solveRadius,
+                                       double globalLatitudeAprioriSigma,
+                                       double globalLongitudeAprioriSigma,
                                        double globalRadiusAprioriSigma) {
     m_solveObservationMode = solveObservationMode;
     m_solveRadius = solveRadius;
@@ -326,9 +326,9 @@ namespace Isis {
 
 
   /**
-   * Set the outlier rejection options for the bundle adjustment. 
-   * 
-   * @param outlierRejection Indicates whether to perform automatic outlier 
+   * Set the outlier rejection options for the bundle adjustment.
+   *
+   * @param outlierRejection Indicates whether to perform automatic outlier
    *                         rejection during the bundle adjustment.
    * @param mutliplier The outlier rejection multiplier.
    */
@@ -345,8 +345,8 @@ namespace Isis {
 
   /**
    * Add the list of solve options for each observation.
-   * 
-   * @param observationSolveSettings A list of BundleObservationSolveSettings objects 
+   *
+   * @param observationSolveSettings A list of BundleObservationSolveSettings objects
    *                                 to indicate the settings for each observation of
    *                                 the bundle adjustment.
    */
@@ -358,13 +358,13 @@ namespace Isis {
 
   /**
    * Indicates if the settings will allow the inverse correlation matrix to be created.
-   * 
+   *
    * This method is used to determine if the inverse correlation matrix file will be created when
    * creating error propagation information in the bundle adjust. If error propagation is not
    * turned on, then the inverse correlation matrix file will not be created.
-   * 
+   *
    * @return @b bool Returns whether or now the inverse correlation matrix is allowed to be created.
-   * 
+   *
    * @see BundleAdjust::errorPropagation()
    */
   bool BundleSettings::createInverseMatrix() const {
@@ -373,10 +373,10 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether outlier rejection will be 
-   * performed on this bundle adjustment. 
-   * 
-   * @return @b bool Indicates whether to perform automatic outlier 
+   * This method is used to determine whether outlier rejection will be
+   * performed on this bundle adjustment.
+   *
+   * @return @b bool Indicates whether to perform automatic outlier
    *                 rejection during the bundle adjustment.
    */
   bool BundleSettings::outlierRejection() const {
@@ -385,9 +385,9 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether this bundle adjustment will solve 
-   * for observation mode. 
-   * 
+   * This method is used to determine whether this bundle adjustment will solve
+   * for observation mode.
+   *
    * @return @b bool Indicates whether to solve for observation mode.
    */
   bool BundleSettings::solveObservationMode() const {
@@ -396,9 +396,9 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether this bundle adjustment will solve 
-   * for radius. 
-   * 
+   * This method is used to determine whether this bundle adjustment will solve
+   * for radius.
+   *
    * @return @b bool Indicates whether to solve for radius.
    */
   bool BundleSettings::solveRadius() const {
@@ -407,9 +407,9 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether this bundle 
-   * adjustment will update the cube labels. 
-   * 
+   * This method is used to determine whether this bundle
+   * adjustment will update the cube labels.
+   *
    * @return @b bool Indicates whether to update the cube labels after the bundle adjustment
    *                 is completed.
    */
@@ -419,27 +419,27 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether this bundle adjustment will 
-   * perform error propagation. 
-   * 
+   * This method is used to determine whether this bundle adjustment will
+   * perform error propagation.
+   *
    * @return @b bool Indicates whether to perform error propagation.
    */
   bool BundleSettings::errorPropagation() const {
     return m_errorPropagation;
   }
 
- 
+
   /**
    * Turn the creation of the inverse correlation matrix file on or off.
-   * 
+   *
    * Note that the inverse correlation matrix is created in BundleAdjust, and will only be created
    * if error propagation is turned on. By default, BundleSettings allows the inverse matrix to
    * be created. This requires stand-alone applications (e.g. jigsaw) to call this method
-   * to turn of the correlation matrix creation. 
-   * 
+   * to turn of the correlation matrix creation.
+   *
    * @param createMatrixFile Boolean indicating whether or not to allow the inverse matrix file to
    *                         be created.
-   * 
+   *
    * @see BundleAdjust::errorPropagation()
    */
   void BundleSettings::setCreateInverseMatrix(bool createMatrixFile) {
@@ -448,8 +448,8 @@ namespace Isis {
 
 
   /**
-   * Retrieves the outlier rejection multiplier for the bundle adjustment. 
-   * 
+   * Retrieves the outlier rejection multiplier for the bundle adjustment.
+   *
    * @return @b double The outlier rejection multiplier.
    */
   double BundleSettings::outlierRejectionMultiplier() const {
@@ -458,9 +458,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma latitude value for this bundle 
-   * adjustment. 
-   * 
+   * Retrieves the global a priori sigma latitude value for this bundle
+   * adjustment.
+   *
    * @return @b double The global a priori sigma for latitude.
    */
   double BundleSettings::globalLatitudeAprioriSigma() const {
@@ -469,9 +469,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma longitude value for this bundle 
-   * adjustment. 
-   * 
+   * Retrieves the global a priori sigma longitude value for this bundle
+   * adjustment.
+   *
    * @return @b double The global a priori sigma for longitude.
    */
   double BundleSettings::globalLongitudeAprioriSigma() const {
@@ -480,9 +480,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma radius value for this bundle 
-   * adjustment. 
-   * 
+   * Retrieves the global a priori sigma radius value for this bundle
+   * adjustment.
+   *
    * @return @b double The global a priori sigma for radius.
    */
   double BundleSettings::globalRadiusAprioriSigma() const {
@@ -490,10 +490,10 @@ namespace Isis {
   }
 
 
-  /** 
-   * Retrieves the number of observation solve settings. 
-   *  
-   * @return @b int The number of solve settings object for this run of the 
+  /**
+   * Retrieves the number of observation solve settings.
+   *
+   * @return @b int The number of solve settings object for this run of the
    *                bundle adjustment.
    */
   int BundleSettings::numberSolveSettings() const {
@@ -501,20 +501,20 @@ namespace Isis {
   }
 
 
-  /** 
-   * Retrieves solve settings for the observation corresponding to the given 
+  /**
+   * Retrieves solve settings for the observation corresponding to the given
    * observation number.
-   *  
-   * @param observationNumber The observation number associated with the 
+   *
+   * @param observationNumber The observation number associated with the
    *                          BundleObservationSolveSettings object to be accessed.
-   *  
+   *
    * @return @b BundleObservationSolveSettings The observation settings object that contains
    *                                           the observation number passed.
-   *  
-   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings 
+   *
+   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings
    *                             for given observation number"
    */
-  BundleObservationSolveSettings 
+  BundleObservationSolveSettings
       BundleSettings::observationSolveSettings(QString observationNumber) const {
 
     for (int i = 0; i < numberSolveSettings(); i++) {
@@ -529,21 +529,21 @@ namespace Isis {
 
 
   /**
-   * Retrieves solve settings for the observation corresponding to the given 
-   * index. 
-   *  
-   * @param n The index of the BundleObservationSolveSettings object to be 
+   * Retrieves solve settings for the observation corresponding to the given
+   * index.
+   *
+   * @param n The index of the BundleObservationSolveSettings object to be
    *          accessed.
    * @return @b BundleObservationSolveSettings The observation settings object corresponding
    *                                           to the given index.
-   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings 
+   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings
    *                             with given index"
    */
-  BundleObservationSolveSettings 
-      BundleSettings::observationSolveSettings(int n) const { 
+  BundleObservationSolveSettings
+      BundleSettings::observationSolveSettings(int n) const {
 
     if (n >= 0 && n < numberSolveSettings()) {
-      return m_observationSolveSettings[n]; 
+      return m_observationSolveSettings[n];
     }
     QString msg = "Unable to find BundleObservationSolveSettings with index = ["
                   + toString(n) + "].";
@@ -556,21 +556,21 @@ namespace Isis {
   // =============================================================================================//
 
   /**
-   * Converts the given string value to a BundleSettings::ConvergenceCriteria 
-   * enumeration. Currently accepted inputs are listed below. This method is 
-   * case insensitive. 
-   * <ul> 
+   * Converts the given string value to a BundleSettings::ConvergenceCriteria
+   * enumeration. Currently accepted inputs are listed below. This method is
+   * case insensitive.
+   * <ul>
    *   <li>Sigma0</li>
    *   <li>ParameterCorrections</li>
    * </ul>
-   *  
+   *
    * @param criteria Convergence criteria name to be converted.
-   * 
+   *
    * @return @b ConvergenceCriteria The enumeration corresponding to the given name.
-   * 
+   *
    * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria."
    */
-  BundleSettings::ConvergenceCriteria 
+  BundleSettings::ConvergenceCriteria
       BundleSettings::stringToConvergenceCriteria(QString criteria) {
     if (criteria.compare("SIGMA0", Qt::CaseInsensitive) == 0) {
       return BundleSettings::Sigma0;
@@ -585,14 +585,14 @@ namespace Isis {
 
 
   /**
-   * Converts the given BundleSettings::ConvergenceCriteria enumeration to a string. 
-   * This method is used to print the type of convergence criteria used in 
-   * the bundle adjustment. 
-   * 
+   * Converts the given BundleSettings::ConvergenceCriteria enumeration to a string.
+   * This method is used to print the type of convergence criteria used in
+   * the bundle adjustment.
+   *
    * @param criteria The ConvergenceCriteria enumeration to be converted.
-   * 
+   *
    * @return @b QString The name associated with the given convergence criteria.
-   * 
+   *
    * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria enum."
    */
   QString BundleSettings::convergenceCriteriaToString(
@@ -606,8 +606,8 @@ namespace Isis {
 
 
   /**
-   * Set the convergence criteria options for the bundle adjustment. 
-   * 
+   * Set the convergence criteria options for the bundle adjustment.
+   *
    * @param criteria An enumeration for the convergence criteria to be
    *                 used for this bundle adjustment.
    * @param threshold The convergence threshold for this bundle adjustment.
@@ -615,8 +615,8 @@ namespace Isis {
    *                          before the bundle adjustment determines
    *                          that the data is not converging.
    */
-  void BundleSettings::setConvergenceCriteria(BundleSettings::ConvergenceCriteria criteria, 
-                                              double threshold, 
+  void BundleSettings::setConvergenceCriteria(BundleSettings::ConvergenceCriteria criteria,
+                                              double threshold,
                                               int maximumIterations) {
     m_convergenceCriteria = criteria;
     m_convergenceCriteriaThreshold = threshold;
@@ -625,9 +625,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the convergence criteria to be used to solve the bundle 
-   * adjustment. 
-   * 
+   * Retrieves the convergence criteria to be used to solve the bundle
+   * adjustment.
+   *
    * @return @b ConvergenceCriteria The enumeration of the convergence criteria.
    */
   BundleSettings::ConvergenceCriteria BundleSettings::convergenceCriteria() const {
@@ -636,9 +636,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the convergence threshold to be used to solve the bundle 
-   * adjustment. 
-   * 
+   * Retrieves the convergence threshold to be used to solve the bundle
+   * adjustment.
+   *
    * @return @b double The threshold that determines convergence.
    */
   double BundleSettings::convergenceCriteriaThreshold() const {
@@ -647,9 +647,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the maximum number of iterations allowed to solve the 
-   * bundle adjustment. 
-   * 
+   * Retrieves the maximum number of iterations allowed to solve the
+   * bundle adjustment.
+   *
    * @param maximumIterations The maximum number of iterations allowed
    *                          before the bundle adjustment determines
    *                          that the data is not converging.
@@ -659,22 +659,22 @@ namespace Isis {
   }
 
 
-  
+
   // =============================================================================================//
   // ======================== Parameter Uncertainties (Weighting) ================================//
   // =============================================================================================//
 //   void BundleSettings::setGlobalLatitudeAprioriSigma(double sigma) {
 //     m_globalLatitudeAprioriSigma = sigma;
 //   }
-// 
-// 
-// 
+//
+//
+//
 //   void BundleSettings::setGlobalLongitudeAprioriSigma(double sigma) {
 //     m_globalLongitudeAprioriSigma = sigma;
 //   }
-// 
-// 
-// 
+//
+//
+//
 //   void BundleSettings::setGlobalRadiiAprioriSigma(double sigma) {
 //     m_globalRadiusAprioriSigma = sigma;
 //   }
@@ -687,17 +687,17 @@ namespace Isis {
 
   /**
    * Add a maximum likelihood estimator (MLE) model to the bundle adjustment.
-   * 
+   *
    * @param model The enumeration for the model to be used.
-   * @param maxModelCQuantile The C-Quantile of the residual to be used to 
+   * @param maxModelCQuantile The C-Quantile of the residual to be used to
    *                          compute the tweaking constant.
-   * 
-   * 
-   * @throw Isis::Exception::Programmer "For bundle adjustments with multiple maximum 
+   *
+   *
+   * @throw Isis::Exception::Programmer "For bundle adjustments with multiple maximum
    *                                     likelihood estimators, the first model must be of
    *                                     type HUBER or HUBER_MODIFIED."
    */
-  void BundleSettings::addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
+  void BundleSettings::addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model,
                                                           double maxModelCQuantile) {
 
     if (m_maximumLikelihood.size() == 0 && model > MaximumLikelihoodWFunctions::HuberModified) {
@@ -711,14 +711,14 @@ namespace Isis {
 
 
   /**
-   * Retrieves the list of maximum likelihood estimator (MLE) models with their 
-   * corresponding C-Quantiles. 
-   * 
-   * @return QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
+   * Retrieves the list of maximum likelihood estimator (MLE) models with their
+   * corresponding C-Quantiles.
+   *
+   * @return QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
    *             The list of tuples of the form (model, quantile) to be used for the
    *             bundle adjustment.
    */
-  QList< QPair< MaximumLikelihoodWFunctions::Model, double > >  
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
       BundleSettings::maximumLikelihoodEstimatorModels() const {
     return m_maximumLikelihood;
   }
@@ -727,15 +727,15 @@ namespace Isis {
   // =============================================================================================//
   // ======================== Self Calibration ??? (from cnetsuite only) =========================//
   // =============================================================================================//
-  
+
   // =============================================================================================//
   // ======================== Target Body ??? (from cnetsuite only) ==============================//
   // =============================================================================================//
 
   /**
    * Sets the target body for the bundle adjustment.
-   *  
-   * @param bundleTargetBody A pointer to the BundleTargetBody object for the 
+   *
+   * @param bundleTargetBody A pointer to the BundleTargetBody object for the
    *                         bundle adjustment to be run.
    */
   void BundleSettings::setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody) {
@@ -745,7 +745,7 @@ namespace Isis {
 
   /**
    * Retrieves a pointer to target body information for the bundle adjustment.
-   *  
+   *
    * @return @b BundleTargetBodyQsp A pointer to the BundleTargetBody object for
    *                                the bundle adjustment to be run.
    */
@@ -755,9 +755,9 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body pole position. 
-   *  
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body pole position.
+   *
    * @return @b bool Indicates whether to solve for target pole position.
    */
 //  bool BundleSettings::solveTargetBodyPolePosition() const {
@@ -766,9 +766,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the number of target body parameters. If the BundleTargetBody 
+   * Retrieves the number of target body parameters. If the BundleTargetBody
    * associated with this bundle adjustment is NULL, this method returns 0.
-   *  
+   *
    * @return @b int The number of target body parameters.
    */
   int BundleSettings::numberTargetBodyParameters() const {
@@ -780,9 +780,9 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment will solve 
-   * for target body. 
-   *  
+   * This method is used to determine whether the bundle adjustment will solve
+   * for target body.
+   *
    * @return @b bool Indicates whether to solve for target body.
    */
   bool BundleSettings::solveTargetBody() const {
@@ -796,12 +796,12 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment will 
-   * solve for target body pole right ascension. 
-   * 
+   * This method is used to determine whether the bundle adjustment will
+   * solve for target body pole right ascension.
+   *
    * @see BundleTargetBody::solvePoleRA()
-   * 
-   * @return @b bool Indicates whether to solve for target pole RA. 
+   *
+   * @return @b bool Indicates whether to solve for target pole RA.
    */
   bool BundleSettings::solvePoleRA() const {
     if (!m_bundleTargetBody) {
@@ -812,11 +812,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment will 
-   * solve for target body pole right ascension velocity. 
-   * 
+   * This method is used to determine whether the bundle adjustment will
+   * solve for target body pole right ascension velocity.
+   *
    * @see BundleTargetBody::solvePoleRAVelocity()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target pole RA velocity.
    */
   bool BundleSettings::solvePoleRAVelocity() const {
@@ -828,11 +828,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment will 
-   * solve for target body pole declination. 
-   * 
+   * This method is used to determine whether the bundle adjustment will
+   * solve for target body pole declination.
+   *
    * @see BundleTargetBody::solvePoleDeclination()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target pole declination.
    */
   bool BundleSettings::solvePoleDec() const {
@@ -844,11 +844,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment will 
-   * solve for target body pole declination velocity. 
-   * 
+   * This method is used to determine whether the bundle adjustment will
+   * solve for target body pole declination velocity.
+   *
    * @see BundleTargetBody::solvePoleDeclinationVelocity()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target pole declination velocity.
    */
   bool BundleSettings::solvePoleDecVelocity() const {
@@ -860,11 +860,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body prime meridian. 
-   * 
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body prime meridian.
+   *
    * @see BundleTargetBody::solvePM()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target PM.
    */
   bool BundleSettings::solvePM() const {
@@ -876,11 +876,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body prime meridian velocity. 
-   * 
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body prime meridian velocity.
+   *
    * @see BundleTargetBody::solvePMVelocity()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target PM velocity.
    */
   bool BundleSettings::solvePMVelocity() const {
@@ -892,11 +892,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body prime meridian acceleration. 
-   * 
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body prime meridian acceleration.
+   *
    * @see BundleTargetBody::solvePMAcceleration()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target PM acceleration.
    */
   bool BundleSettings::solvePMAcceleration() const {
@@ -908,11 +908,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body triaxial radii. 
-   * 
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body triaxial radii.
+   *
    * @see BundleTargetBody::solveTriaxialRadii()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target triaxial radii.
    */
   bool BundleSettings::solveTriaxialRadii() const {
@@ -924,11 +924,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine whether the bundle adjustment 
-   * will solve for target body mean radius. 
-   * 
+   * This method is used to determine whether the bundle adjustment
+   * will solve for target body mean radius.
+   *
    * @see BundleTargetBody::solveMeanRadius()
-   * 
+   *
    * @return @b bool Indicates whether to solve for target mean radius.
    */
   bool BundleSettings::solveMeanRadius() const {
@@ -982,15 +982,15 @@ namespace Isis {
 //                                         sigmaRadiusA, aprioriRadiusB, sigmaRadiusB, aprioriRadiusC,
 //                                         sigmaRadiusC, aprioriMeanRadius, sigmaMeanRadius);
 //  }
-  
+
 
   // =============================================================================================//
   // ========================= Output Options (from Jigsaw only) ================================//
   // =============================================================================================//
   /**
-   * Set the output file prefix for the bundle adjustment. 
-   * 
-   * @param outputFilePrefix A string containing a prefix and/or directory path 
+   * Set the output file prefix for the bundle adjustment.
+   *
+   * @param outputFilePrefix A string containing a prefix and/or directory path
    */
   void BundleSettings::setOutputFilePrefix(QString outputFilePrefix) {
     m_outputFilePrefix = outputFilePrefix;
@@ -998,11 +998,11 @@ namespace Isis {
 
 
   /**
-   * Retrieve the output file prefix. This string will be 
-   * appended to all of the output files created by the bundle 
-   * adjustment. 
-   * 
-   * @return @b QString A string containing a prefix and/or 
+   * Retrieve the output file prefix. This string will be
+   * appended to all of the output files created by the bundle
+   * adjustment.
+   *
+   * @return @b QString A string containing a prefix and/or
    *                    directory path to be appended to all
    *                    output files.
    */
@@ -1012,120 +1012,20 @@ namespace Isis {
 
 
   /**
-   * Create PvlObject with the given name containing the BundleSettings 
-   * information. 
-   * 
-   * @param name The name of the output PvlObject. Defaults to "BundleSettings".
-   * 
-   * @return @b PvlObject A PVL containing all of the BundleSettings 
-   *                      information for this bundle adjustment.
-   */
-  PvlObject BundleSettings::pvlObject(QString name) const {
-
-    PvlObject pvl(name);
-
-    // General Solve Options
-    pvl += PvlKeyword("NetworkValidated", toString(validateNetwork()));
-    pvl += PvlKeyword("SolveObservationMode", toString(solveObservationMode()));
-    pvl += PvlKeyword("SolveRadius", toString(solveRadius()));
-    pvl += PvlKeyword("UpdateCubeLabel", toString(updateCubeLabel()));
-    pvl += PvlKeyword("ErrorPropagation", toString(errorPropagation()));
-    pvl += PvlKeyword("CreateInverseMatrix", toString(createInverseMatrix()));
-    pvl += PvlKeyword("OutlierRejection", toString(outlierRejection()));
-    if (m_outlierRejection) {
-      pvl += PvlKeyword("OutlierMultiplier", toString(outlierRejectionMultiplier()));
-    }
-    if ( !IsSpecial(globalLatitudeAprioriSigma()) ) {
-      pvl += PvlKeyword("GlobalLatitudeAprioriSigma", toString(globalLatitudeAprioriSigma()));
-    }
-    else {
-      pvl += PvlKeyword("GlobalLatitudeAprioriSigma", "None");
-    }
-    if (!IsSpecial(globalLongitudeAprioriSigma())) {
-      pvl += PvlKeyword("GlobalLongitudeAprioriSigma", toString(globalLongitudeAprioriSigma()));
-    }
-    else {
-      pvl += PvlKeyword("GlobalLongitudeAprioriSigma", "None");
-    }
-    if (m_solveRadius) {
-      if ( !IsSpecial(globalLongitudeAprioriSigma()) ) {
-      pvl += PvlKeyword("GlobalRadiiAprioriSigma", toString(globalRadiusAprioriSigma()));
-      }
-      else {
-        pvl += PvlKeyword("GlobalRadiiAprioriSigma", "None");
-      }
-    }
-
-    // Convergence Criteria
-    pvl += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(convergenceCriteria()));
-    pvl += PvlKeyword("ConvergenceCriteriaThreshold", toString(convergenceCriteriaThreshold()));
-    pvl += PvlKeyword("ConvergenceCriteriaMaximumIterations",
-                        toString(convergenceCriteriaMaximumIterations()));
-
-    // Target body
-    pvl += PvlKeyword("SolveTargetBody", toString(solveTargetBody()));
-    pvl += PvlKeyword("NumberTargetBodyParameters", toString(numberTargetBodyParameters()));
-    pvl += PvlKeyword("SolvePoleRightAscension", toString(solvePoleRA()));
-    pvl += PvlKeyword("SolvePoleRightAscensionVelocity", toString(solvePoleRAVelocity()));
-    pvl += PvlKeyword("SolvePoleDeclination", toString(solvePoleDec()));
-    pvl += PvlKeyword("SolvePoleDeclinationVelocity", toString(solvePoleDecVelocity()));
-    pvl += PvlKeyword("SolvePolePrimeMeridian", toString(solvePM()));
-    pvl += PvlKeyword("SolvePolePrimeMeridianVelocity", toString(solvePMVelocity()));
-    pvl += PvlKeyword("SolvePolePrimeMeridianAcceleration", toString(solvePMAcceleration()));
-    pvl += PvlKeyword("solveTriaxialRadii", toString(solveTriaxialRadii()));
-    pvl += PvlKeyword("solveMeanRadius", toString(solveMeanRadius()));
-
-    // Output Options
-    pvl += PvlKeyword("FilePrefix", outputFilePrefix());
-
-    // Maximum Likelihood Options
-    PvlKeyword models("MaximumLikelihoodModels"); 
-    if (m_maximumLikelihood.size() > 0) {
-
-      models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[0].first));
-
-      PvlKeyword quantiles("MaximumLikelihoodQuantiles", 
-                           toString(m_maximumLikelihood[0].second));
-
-      for (int i = 1; i < m_maximumLikelihood.size(); i++) {
-        models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
-        quantiles.addValue(toString(m_maximumLikelihood[i].second));
-      }
-      pvl += models;
-      pvl += quantiles;
-    }
-    else {
-      models.addValue("None");
-    }
-
-    pvl += PvlKeyword("NumberObservationSolveSettings", toString(numberSolveSettings()));
-
-    for (int i = 0; i < numberSolveSettings(); i++) {
-      BundleObservationSolveSettings boss = observationSolveSettings(i);
-      PvlObject bundleObsSolveSettingsPvl = boss.pvlObject();
-      pvl += bundleObsSolveSettingsPvl;
-    }
-
-    return pvl;
-  }
-
-
-  /**
-   * This method is used to write a BundleSettings object to an XML format 
-   *  
-   * NOTE: Currently this method is not used and may be deleted. Documentation 
-   * and testing to be completed if called. TargetBody info should be added 
-   * also. 
+   * This method is used to write a BundleSettings object to an XML format
+   *
+   * NOTE: Currently this method is not used and may be deleted. Documentation
+   * and testing to be completed if called. TargetBody info should be added
+   * also.
    */
   void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {
-    // option 2
     stream.writeStartElement("bundleSettings");
 
     stream.writeStartElement("globalSettings");
 
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("validateNetwork", toString(validateNetwork()));
-    
+
     stream.writeStartElement("solveOptions");
     stream.writeAttribute("solveObservationMode", toString(solveObservationMode()));
     stream.writeAttribute("solveRadius", toString(solveRadius()));
@@ -1154,7 +1054,7 @@ namespace Isis {
       stream.writeAttribute("radius", toString(globalRadiusAprioriSigma()));
     }
     stream.writeEndElement();
-    
+
     stream.writeStartElement("outlierRejectionOptions");
     stream.writeAttribute("rejection", toString(outlierRejection()));
     if (outlierRejection()) {
@@ -1164,7 +1064,7 @@ namespace Isis {
       stream.writeAttribute("multiplier", "N/A");
     }
     stream.writeEndElement();
-    
+
     stream.writeStartElement("convergenceCriteriaOptions");
     stream.writeAttribute("convergenceCriteria",
                           convergenceCriteriaToString(convergenceCriteria()));
@@ -1173,21 +1073,21 @@ namespace Isis {
     stream.writeAttribute("maximumIterations",
                           toString(convergenceCriteriaMaximumIterations()));
     stream.writeEndElement();
-    
+
     stream.writeStartElement("maximumLikelihoodEstimation");
     for (int i = 0; i < m_maximumLikelihood.size(); i++) {
       stream.writeStartElement("model");
-      stream.writeAttribute("type", 
+      stream.writeAttribute("type",
                           MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
       stream.writeAttribute("quantile", toString(m_maximumLikelihood[i].second));
       stream.writeEndElement();
     }
     stream.writeEndElement();
-    
+
     stream.writeStartElement("outputFileOptions");
     stream.writeAttribute("fileNamePrefix", outputFilePrefix());
     stream.writeEndElement();
-    
+
     stream.writeEndElement(); // end global settings
 
     if (!m_observationSolveSettings.isEmpty()) {
@@ -1198,9 +1098,8 @@ namespace Isis {
       stream.writeEndElement();
     }
     else {
-      // throw error??? should not write if no observation settings... 
+      // throw error??? should not write if no observation settings...
     }
-
     stream.writeEndElement();
   }
 
@@ -1208,7 +1107,7 @@ namespace Isis {
   /**
    * Create an XML Handler (reader) that can populate the BundleSettings class data. See
    * BundleSettings::save() for the expected format. This contructor is called inside the
-   * BundleSettings constructor that takes an XmlStackedHandlerReader. 
+   * BundleSettings constructor that takes an XmlStackedHandlerReader.
    *
    * @param bundleSettings The BundleSettings we're going to be initializing
    * @param project The project that contains the settings
@@ -1239,10 +1138,10 @@ namespace Isis {
 
   /**
    * Destroys BundleSettings::XmlHandler object.
-   *  
-   * NOTE: Currently this method is not used and may be deleted. Documentation 
-   * and testing to be completed if called. TargetBody info should be added 
-   * also. 
+   *
+   * NOTE: Currently this method is not used and may be deleted. Documentation
+   * and testing to be completed if called. TargetBody info should be added
+   * also.
    */
   BundleSettings::XmlHandler::~XmlHandler() {
     // do not delete these pointers...
@@ -1255,15 +1154,15 @@ namespace Isis {
   /**
    * Handle an XML start element. This method is called when the reader finds an open tag.
    * handle the read when the startElement with the name localName has been found.
-   * 
+   *
    * @param qName The qualified name of the tag.
-   * @param attributes The list of attributes for the tag. 
-   *  
+   * @param attributes The list of attributes for the tag.
+   *
    * @return @b bool Indicates whether to continue reading the XML (usually true).
    */
-  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, 
+  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI,
                                                 const QString &localName,
-                                                const QString &qName, 
+                                                const QString &qName,
                                                 const QXmlAttributes &attributes) {
     m_xmlHandlerCharacters = "";
 
@@ -1342,7 +1241,7 @@ namespace Isis {
         QString outlierRejectionMultiplierStr = attributes.value("multiplier");
         if (!outlierRejectionMultiplierStr.isEmpty()) {
           if (outlierRejectionMultiplierStr != "N/A") {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier 
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier
                 = toDouble(outlierRejectionMultiplierStr);
           }
           else {
@@ -1354,19 +1253,19 @@ namespace Isis {
 
         QString convergenceCriteriaStr = attributes.value("convergenceCriteria");
         if (!convergenceCriteriaStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteria 
+          m_xmlHandlerBundleSettings->m_convergenceCriteria
               = stringToConvergenceCriteria(convergenceCriteriaStr);
         }
 
         QString convergenceCriteriaThresholdStr = attributes.value("threshold");
         if (!convergenceCriteriaThresholdStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold 
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold
               = toDouble(convergenceCriteriaThresholdStr);
         }
 
         QString convergenceCriteriaMaximumIterationsStr = attributes.value("maximumIterations");
         if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations 
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations
               = toInt(convergenceCriteriaMaximumIterationsStr);
         }
       }
@@ -1396,10 +1295,10 @@ namespace Isis {
 
   /**
    * XML - TBD.
-   *  
-   * NOTE: Currently this method is not used and may be deleted. Documentation 
-   * and testing to be completed if called. TargetBody info should be added 
-   * also. 
+   *
+   * NOTE: Currently this method is not used and may be deleted. Documentation
+   * and testing to be completed if called. TargetBody info should be added
+   * also.
    */
   bool BundleSettings::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
@@ -1409,10 +1308,10 @@ namespace Isis {
 
   /**
    * XML - TBD.
-   *  
-   * NOTE: Currently this method is not used and may be deleted. Documentation 
-   * and testing to be completed if called. TargetBody info should be added 
-   * also. 
+   *
+   * NOTE: Currently this method is not used and may be deleted. Documentation
+   * and testing to be completed if called. TargetBody info should be added
+   * also.
    */
   bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
@@ -1431,7 +1330,7 @@ namespace Isis {
         }
         m_xmlHandlerObservationSettings.clear();
       }
-  
+
       m_xmlHandlerCharacters = "";
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
@@ -1440,10 +1339,10 @@ namespace Isis {
 
   /**
    * XML - TBD.
-   *  
-   * NOTE: Currently this method is not used and may be deleted. Documentation 
-   * and testing to be completed if called. TargetBody info should be added 
-   * also. 
+   *
+   * NOTE: Currently this method is not used and may be deleted. Documentation
+   * and testing to be completed if called. TargetBody info should be added
+   * also.
    */
   bool BundleSettings::XmlHandler::fatalError(const QXmlParseException &exception) {
     qDebug() << "Parse error at line " << exception.lineNumber()
@@ -1451,10 +1350,4 @@ namespace Isis {
              << qPrintable(exception.message());
     return false;
   }
-
-
- }
-
-
-
-
+}
