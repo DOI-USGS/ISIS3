@@ -10,16 +10,13 @@ namespace Isis {
 
   /**
    *
-   * @brief This enables stack-based XML parsing of XML files.
+   * @brief Manage a stack of content handlers for reading XML files.
    *
    *   This class is designed to work with the XmlStackedHandler class. Use this
    *   in-place of a QXmlSimpleReader if you want to use stack-based Xml parsing. The
    *   XmlStackedHandler class has an explanation as to how this is designed to work.
    *
-   *   @see XmlStackedHandler
-   *
-   * The naming of this class is:
-   *   XmlStackedHandler + Reader (parent class).
+   * @see XmlStackedHandler
    *
    * @author 2012-??-?? Steven Lambright
    *
