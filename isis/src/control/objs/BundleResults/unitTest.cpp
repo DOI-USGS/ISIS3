@@ -283,16 +283,6 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "";
 
-
-    qDebug() << "Testing serialization...";
-    QByteArray byteArray;
-    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
-    outputData << results;
-    QDataStream inputData(byteArray);
-    BundleResults newResults;
-    inputData >> newResults;
-    qDebug() << "";
-
     qDebug() << "Testing XML write/read...";
     // write xml
     FileName xmlFile("./BundleResults.xml");
