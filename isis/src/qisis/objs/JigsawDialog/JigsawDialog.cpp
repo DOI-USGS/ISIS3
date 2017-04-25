@@ -110,6 +110,13 @@ namespace Isis {
     m_ui->sigma0LcdNumber->setMode(QLCDNumber::Dec);
     m_ui->sigma0LcdNumber->setDigitCount(5);
 
+    QString lastSettingsToolTip("Use the settings from the most recently accepted bundle adjust.");
+    QString lastSettingsWhat("When checked, the settings from the most recently accepted bundle "
+                             "adjust (i.e. the most recent bundle results in the project) will be "
+                             "used for running the next bundle adjust when \"Run\" is clicked.");
+    m_ui->useLastSettings->setToolTip(lastSettingsToolTip);
+    m_ui->useLastSettings->setWhatsThis(lastSettingsWhat);
+
     setWindowFlags(Qt::WindowStaysOnTopHint);
   }
 
@@ -141,10 +148,19 @@ namespace Isis {
                                false,
                                this);
 
+    // We want to use the current settings if not use the most recently accepted bundle settings.
+    // This allows user to click "Setup", make changes, "OK", then click "Setup", and those changes
+    // are present in the setup dialog.
+    if (m_bundleSettings && !m_ui->useLastSettings->isChecked()) {
+      setupdlg.loadSettings(m_bundleSettings);
+    }
+
     if (setupdlg.exec() == QDialog::Accepted) {
       m_selectedControlName = setupdlg.selectedControlName();
       m_selectedControl = setupdlg.selectedControl();
       m_bundleSettings = setupdlg.bundleSettings();
+      // The settings have been modified, might be misleading to keep this check after setup.
+      m_ui->useLastSettings->setChecked(false);
     }
   }
 
@@ -240,8 +256,6 @@ namespace Isis {
         m_close->setEnabled(true);
       }
     }
-
-    m_ui->useLastSettings->setEnabled(true);
   }
 
 
@@ -262,6 +276,8 @@ namespace Isis {
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
+    // Make sure that when we add our results, we let the use last settings box be checkable.
+    m_ui->useLastSettings->setEnabled(true);
 
       //TODO: move correlation matrix to correct position in project directory
   //

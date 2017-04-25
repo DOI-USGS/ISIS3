@@ -14,8 +14,8 @@ namespace Isis {
   class Control;
 
   /**
-   * @brief 
-   *  
+   * @brief
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-04-21 Ken Edmundson
@@ -36,6 +36,8 @@ namespace Isis {
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
    *                           SpeckialK and OldSparse. References #4162.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2017-04-25 Ian Humphrey - Added public loadSettings() to allow JigsawDialog to
+   *                           load its current settings into the setup dialog. Fixes #4817.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -43,13 +45,17 @@ namespace Isis {
 
   public:
 //    explicit JigsawSetupDialog(Project* project, QWidget *parent = 0);
-    explicit JigsawSetupDialog(Project* project, bool useLastSettings = true,
-                               bool readOnly = false, QWidget *parent = 0);
+    explicit JigsawSetupDialog(Project* project,
+                               bool useLastSettings = true,
+                               bool readOnly = false,
+                               QWidget *parent = 0);
     ~JigsawSetupDialog();
 
     Control *selectedControl();// TODO: return const references ???
     QString *selectedControlName();// TODO: return const references ???
     BundleSettingsQsp bundleSettings();// TODO: return const references ???
+
+    void loadSettings(const BundleSettingsQsp settings);
 
   private slots:
 
@@ -90,7 +96,7 @@ namespace Isis {
 
     private:
     void makeReadOnly()    ;
-    void fillFromSettings(BundleSettingsQsp settings);
+    void fillFromSettings(const BundleSettingsQsp settings);
     void showTargetAngleWidgets();
     void hideTargetAngleWidgets();
 

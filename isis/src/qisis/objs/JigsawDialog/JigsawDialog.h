@@ -49,6 +49,9 @@ namespace Isis {
    *                           default OK and Cancel buttons from UI file. Fixes #4781.
    *   @history 2017-04-18 Tracie Sucharski - Write the updated control net to the runtime
    *                           folder under results folder.  Fixes #4783.
+   *   @history 2017-04-25 Ian Humphrey - Updated the setup clicked slot to load the current
+   *                           settings into the setup dialog if we are not using the last
+   *                           (most recent) settings in the project. Fixes #4817.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
