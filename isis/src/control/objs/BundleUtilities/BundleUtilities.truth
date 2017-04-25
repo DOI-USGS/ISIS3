@@ -4,191 +4,179 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleObservationSolveSettings...
 
 Printing PVL group with settings from the default constructor...
-Object = DefaultBundleObservationSolveSettings
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing copy constructor...
-Object = CopySettingsObject
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing assignment operator to set this equal to itself...
-Object = SelfAssignedSettingsObject
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing assignment operator to create a new settings object...
-Object = AssignedSettingsObject
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing mutator methods...
 setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings()
-Object = MyInstrumentId
-  InstrumentPointingSolveOption       = AnglesAndVelocity
-  NumberAngleCoefficientsSolved       = 2
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (3.0, 4.0)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionOnly
-  NumberPositionCoefficientsSolved    = 1
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = 800.0
-  InstrumentPositionInterpolationType = 4
-End_Object
 
-Testing pvlObject()...
-Object = SettingsFromPvlGroup-SolveForNone
-  InstrumentPointingSolveOption       = None
-  NumberAngleCoefficientsSolved       = N/A
-  CKDegree                            = N/A
-  CKSolveDegree                       = N/A
-  SolveTwist                          = N/A
-  SolvePointingPolynomialOverExisting = N/A
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = N/A
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+<bundleObservationSolveSettings>
+    
+    <instrumentId>MyInstrumentId</instrumentId>
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>3.0</sigma>
+            <sigma>4.0</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+        <aprioriPositionSigmas>
+            <sigma>800.0</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
 
-Object = SettingsFromPvlGroup-SolveForAnglesPositions
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionOnly
-  NumberPositionCoefficientsSolved    = 1
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = 3
-End_Object
 
-Object = SettingsFromPvlGroup-SolveForVelocities
-  InstrumentPointingSolveOption       = AnglesAndVelocity
-  NumberAngleCoefficientsSolved       = 2
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (N/A, N/A)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionAndVelocity
-  NumberPositionCoefficientsSolved    = 2
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = (N/A, N/A)
-  InstrumentPositionInterpolationType = 3
-End_Object
 
-Object = SettingsFromPvlGroup-SolveForAccelerations
-  InstrumentPointingSolveOption       = AnglesVelocityAndAcceleration
-  NumberAngleCoefficientsSolved       = 3
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (N/A, N/A, N/A)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionVelocityAndAcceleration
-  NumberPositionCoefficientsSolved    = 3
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = (N/A, N/A, N/A)
-  InstrumentPositionInterpolationType = 3
-End_Object
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas/>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
 
-Object = SettingsFromPvlGroup-SolveForAllCoefficients
-  InstrumentPointingSolveOption       = AllPolynomialCoefficients
-  NumberAngleCoefficientsSolved       = 6
-  CKDegree                            = 4
-  CKSolveDegree                       = 5
-  SolveTwist                          = No
-  SolvePointingPolynomialOverExisting = Yes
-  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
-  InstrumentPointingInterpolationType = 4
-  InstrumentPositionSolveOption       = AllPolynomialCoefficients
-  NumberPositionCoefficientsSolved    = 8
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 7
-  SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = (8.0, 9.0, N/A)
-  InstrumentPositionInterpolationType = 4
-End_Object
+
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
+
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
+
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
+
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId>MyInstrumentId</instrumentId>
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+        <aprioriPointingSigmas>
+            <sigma>1.0</sigma>
+            <sigma>N/A</sigma>
+            <sigma>3.0</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+        <aprioriPositionSigmas>
+            <sigma>8.0</sigma>
+            <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing static unused enum-to-string and string-to-enum methods...
 "None"
@@ -202,139 +190,120 @@ Testing static unused enum-to-string and string-to-enum methods...
 "PositionVelocityAndAcceleration"
 "AllPolynomialCoefficients"
 
-Testing serialization...
-Object = SerializedSettings
-  InstrumentPointingSolveOption       = AllPolynomialCoefficients
-  NumberAngleCoefficientsSolved       = 6
-  CKDegree                            = 4
-  CKSolveDegree                       = 5
-  SolveTwist                          = No
-  SolvePointingPolynomialOverExisting = Yes
-  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
-  InstrumentPointingInterpolationType = 4
-  InstrumentPositionSolveOption       = AllPolynomialCoefficients
-  NumberPositionCoefficientsSolved    = 8
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 7
-  SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = (8.0, 9.0, N/A)
-  InstrumentPositionInterpolationType = 4
-End_Object
-
 Testing XML: write XML from BundleObservationSolveSettings object...
 Testing XML: read XML to BundleObservationSolveSettings object...
-Object = FromXml-1
-  InstrumentPointingSolveOption       = None
-  NumberAngleCoefficientsSolved       = N/A
-  CKDegree                            = N/A
-  CKSolveDegree                       = N/A
-  SolveTwist                          = N/A
-  SolvePointingPolynomialOverExisting = N/A
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = N/A
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing XML: read XML to BundleObservationSolveSettings object...
-Object = FromXml-2
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionOnly
-  NumberPositionCoefficientsSolved    = 1
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = 3
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing XML: read XML to BundleObservationSolveSettings object...
-Object = FromXml-3
-  InstrumentPointingSolveOption       = AnglesAndVelocity
-  NumberAngleCoefficientsSolved       = 2
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (N/A, N/A)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionAndVelocity
-  NumberPositionCoefficientsSolved    = 2
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = (N/A, N/A)
-  InstrumentPositionInterpolationType = 3
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing XML: read XML to BundleObservationSolveSettings object...
-Object = FromXml-4
-  InstrumentPointingSolveOption       = AnglesVelocityAndAcceleration
-  NumberAngleCoefficientsSolved       = 3
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (N/A, N/A, N/A)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionVelocityAndAcceleration
-  NumberPositionCoefficientsSolved    = 3
-  SPKDegree                           = 2
-  SPKSolveDegree                      = 2
-  SolvePositionOverHermiteSpline      = No
-  PositionAprioriSigmas               = (N/A, N/A, N/A)
-  InstrumentPositionInterpolationType = 3
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing XML: read XML to BundleObservationSolveSettings object...
-Object = FromXml
-  InstrumentPointingSolveOption       = AllPolynomialCoefficients
-  NumberAngleCoefficientsSolved       = 6
-  CKDegree                            = 4
-  CKSolveDegree                       = 5
-  SolveTwist                          = No
-  SolvePointingPolynomialOverExisting = Yes
-  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
-  InstrumentPointingInterpolationType = 4
-  InstrumentPositionSolveOption       = AllPolynomialCoefficients
-  NumberPositionCoefficientsSolved    = 8
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 7
-  SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = (8.0, 9.0, N/A)
-  InstrumentPositionInterpolationType = 4
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId>MyInstrumentId</instrumentId>
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+        <aprioriPointingSigmas>
+            <sigma>1.0</sigma>
+            <sigma>N/A</sigma>
+            <sigma>3.0</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+        <aprioriPositionSigmas>
+            <sigma>8.0</sigma>
+            <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing XML: read XML with no attributes or values to object...
-Object = DefaultSettingsFromEmptyXml
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 Testing error throws...
 **ERROR** Unknown bundle instrument pointing solve option Nonsense.
@@ -372,23 +341,18 @@ Testing assignment operator to create a new object...
 Testing copy constructor...
 Testing mutators and accessors...
     Set/get solve settings using with CAMESOLVE=NONE...
-Object = NoCamAngles
-  InstrumentPointingSolveOption       = None
-  NumberAngleCoefficientsSolved       = N/A
-  CKDegree                            = N/A
-  CKSolveDegree                       = N/A
-  SolveTwist                          = N/A
-  SolvePointingPolynomialOverExisting = N/A
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = N/A
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas/>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
     output bundle observation...
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
@@ -408,23 +372,26 @@ DEC  (t0)       0.00000000           0.00000000          0.00000000             
 TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 
     Set solve settings using with TWIST=FALSE...
-Object = NoTwist
-  InstrumentPointingSolveOption       = AllPolynomialCoefficients
-  NumberAngleCoefficientsSolved       = 6
-  CKDegree                            = 4
-  CKSolveDegree                       = 5
-  SolveTwist                          = No
-  SolvePointingPolynomialOverExisting = Yes
-  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
-  InstrumentPointingInterpolationType = 4
-  InstrumentPositionSolveOption       = AllPolynomialCoefficients
-  NumberPositionCoefficientsSolved    = 8
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 7
-  SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = (8.0, 9.0, N/A)
-  InstrumentPositionInterpolationType = 4
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId>MyInstrumentId</instrumentId>
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+        <aprioriPointingSigmas>
+            <sigma>1.0</sigma>
+            <sigma>N/A</sigma>
+            <sigma>3.0</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+        <aprioriPositionSigmas>
+            <sigma>8.0</sigma>
+            <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
     output bundle observation...
 0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
@@ -516,23 +483,20 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
      (t5)       0.00000000           0.00000000          0.00000000               N/A               N/A
 
     Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...
-Object = SettingsFromBundleObservation
-  InstrumentPointingSolveOption       = AnglesOnly
-  NumberAngleCoefficientsSolved       = 1
-  CKDegree                            = 2
-  CKSolveDegree                       = 2
-  SolveTwist                          = Yes
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = None
-  NumberPositionCoefficientsSolved    = N/A
-  SPKDegree                           = N/A
-  SPKSolveDegree                      = N/A
-  SolvePositionOverHermiteSpline      = N/A
-  PositionAprioriSigmas               = N/A
-  InstrumentPositionInterpolationType = N/A
-End_Object
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>N/A</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
 
 index =  "1"
 instrument id =  "InstrumentId2"
