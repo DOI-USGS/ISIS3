@@ -243,16 +243,6 @@ int main(int argc, char *argv[]) {
                                BundleSettings::stringToConvergenceCriteria("PARAMETERCORRECTIONS"));
     qDebug() << "";
 
-    qDebug() << "Testing serialization...";
-    QByteArray byteArray;
-    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
-    outputData << copySettings;
-    QDataStream inputData(byteArray);
-    BundleSettings newSettings;
-    inputData >> newSettings;
-    printXml<BundleSettings>(newSettings);
-    qDebug() << "";
-
     qDebug() << "Testing XML: write XML from BundleSettings object...";
     // write xml
     FileName xmlFile("./BundleSettings.xml");
