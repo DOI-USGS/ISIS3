@@ -135,8 +135,8 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
    const bool onErrorThrow = false;  // Conditions for managed matching
 
    // Setup
-   MatchImage &v_query = query;
-   MatchImage &v_train = train;
+   MatchImage v_query = query.clone();
+   MatchImage v_train = train.clone();
    MatchPair v_pair(v_query, v_train);
 
    // Render images for matching
