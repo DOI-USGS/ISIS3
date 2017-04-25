@@ -184,6 +184,15 @@ namespace Isis {
     connect( this, SIGNAL(imagesAdded(ImageList *) ),
              this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
 
+    // Project will be listening for when both cnets and images have been added.
+    // It will emit a signal, controlsAndImagesAvailable, when this occurs.
+    // Directory sets up a listener on the JigsawWorkOrder clone to enable itself
+    // when it hears this signal.
+    connect(this, SIGNAL(imagesAdded(ImageList *)),
+            this, SLOT(checkControlsAndImagesAvailable()));
+    connect(this, SIGNAL(controlListAdded(ControlList *)),
+            this, SLOT(checkControlsAndImagesAvailable()));
+
     m_images = new QList<ImageList *>;
 
     // Shape reader
@@ -1193,6 +1202,23 @@ namespace Isis {
   void Project::checkActiveControlAndImageList() {
     if (m_activeControl && m_activeImageList) {
       emit activeControlAndImageListSet();
+    }
+  }
+
+
+  /**
+   * @brief Checks if at least one control and image have been added to the project.
+   *
+   * This can be used to check whenever there are control nets and images available
+   * in the project. This is used for enabling the jigsaw work order on the Project menu when
+   * a control net and image are available / loaded in the project.
+   * 
+   * @see Project::Project(Directory &directory, QObject *parent)
+   * @see Directory::initializeActions()
+   */
+  void Project::checkControlsAndImagesAvailable() {
+    if (controls().count() > 0 && images().count() > 0) {
+      emit controlsAndImagesAvailable();
     }
   }
 

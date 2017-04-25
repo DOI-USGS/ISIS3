@@ -123,6 +123,9 @@ namespace Isis {
    *                           disabled by default, and connections are setup to listen for when
    *                           cnets are added, when images are added, and when both an active
    *                           cnet and image list have been set. Fixes #4749.
+   *   @history 2017-04-25 Ian Humphrey - Modified initializeActions() so that the jigsaw work
+   *                           order is enabled whenever there are both images and cnets in the
+   *                           project. Otherwise, it is disabled until then. Fixes #4819.
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -359,9 +359,15 @@ namespace Isis {
     // even though Qt's documentation says it should work on disabled actions.
     clone = m_runJigsawWorkOrder->clone();
     if (project()->controls().count() && project()->images().count()) {
+      clone->setEnabled(true);
+    }
+    else {
       clone->setEnabled(false);
     }
 
+    // Listen for when both images and control net have been added to the project.
+    connect(m_project, &Project::controlsAndImagesAvailable,
+            clone, &WorkOrder::enableWorkOrder);
     // Listen for when both an active control and active image list have been set.
     // When this happens, we can enable the JigsawWorkOrder.
 //  connect(m_project, &Project::activeControlAndImageListSet,

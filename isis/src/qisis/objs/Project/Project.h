@@ -127,6 +127,11 @@ namespace Isis {
    *                           the JigsawWorkOrder on the main window menu. Fixes #4749. Also,
    *                           modified addToProject so that not undoable work orders have their
    *                           redo called instead of execute.
+   *   @history 2017-04-25 Ian Humphrey - Added checkControlsAndImagesAvailable() slot and 
+   *                           controlsAndImagesAvailble() signal. These are used by internally
+   *                           by Project constructor to listen for when a control and image are
+   *                           added, used externally by directory to enable the jigsaw work order
+   *                           when a cnet and image are available in the project. Fixes #4819.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -274,6 +279,13 @@ namespace Isis {
       void activeControlAndImageListSet();
 
       /**
+       * Emitted when at least one cnet and image have been added to the project.
+       * This is used to enable the JigsawWorkOrder in the main menu.
+       * receivers: WorkOrder::enableWorkOrder
+       */
+      void controlsAndImagesAvailable();
+
+      /**
        * Emitted when new shape model images are available.
        * receivers: Directory, Project, WorkOrder
        */
@@ -335,6 +347,7 @@ namespace Isis {
       void shapeClosed(QObject *shape);
       void shapeListDeleted(QObject *shapeList);
       void checkActiveControlAndImageList();
+      void checkControlsAndImagesAvailable();
 
     private:
       Project(const Project &other);

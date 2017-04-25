@@ -58,7 +58,7 @@ namespace Isis {
     QAction::setText(tr("&Bundle Adjustment..."));
     QUndoCommand::setText("&Bundle Adjustment...");
     QString hoverText = "Runs a bundle adjustment. ";
-    hoverText += "You must have both an active control and image list set.";
+    hoverText += "You must import a control net and images before you can run a bundle adjustment.";
     QAction::setToolTip(hoverText);
   }
 

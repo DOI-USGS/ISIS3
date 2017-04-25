@@ -45,6 +45,7 @@ namespace Isis {
    *   @history 2017-04-17 Ian Humphrey - Added what's this and tool tip text to this work order
    *                           so the user knows that this work order is disabled until an
    *                           active cnet and image list have been set. Fixes #4749.
+   *   @history 2017-04-25 Ian Humphrey - Modified tool tip text. Fixes #4819.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT
