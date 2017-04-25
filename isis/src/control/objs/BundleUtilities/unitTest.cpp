@@ -202,23 +202,6 @@ int main(int argc, char *argv[]) {
                                                                       "AllPolynomialCoefficients"));
     qDebug() << "";
 
-    qDebug() << "Testing serialization...";
-    QByteArray byteArray;
-    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
-    outputData << boss;
-    QDataStream inputData(byteArray);
-    BundleObservationSolveSettings newBoss;
-    inputData >> newBoss;
-    printXml(newBoss);
-//    QFile file("BundleObservationSolveSettingsTest.dat");
-//    file.open(QIODevice::WriteOnly);
-//    QDataStream out(&file);
-//    out << boss;
-//    file.close();
-//    file.open(QIODevice::ReadOnly);
-//    QDataStream in(&file);
-//    in >> newBoss;
-    qDebug() << "";
 
     qDebug() << "Testing XML: write XML from BundleObservationSolveSettings object...";
     // write xml
