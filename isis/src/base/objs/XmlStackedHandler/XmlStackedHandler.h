@@ -43,7 +43,9 @@ namespace Isis {
    * There appears to be no support for cycles or joins in the object graph when serializing
    * or deserializing.  This means that if multiple pointers point to the same object ensure
    * the object is only serialized once and that all pointers are properly restored on
-   * deserialization.
+   * deserialization.  Currently many of the ISIS objects have unique IDs and IPCE encapsulates
+   * the underlying ISIS object.  One option would be to use the ISIS ids to uniquely identify
+   * the objects during serialization.
    *
    * *Versioning*
    * To ensure backwards compatibility versioning is done per object. This keeps version
