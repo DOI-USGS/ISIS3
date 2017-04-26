@@ -191,6 +191,9 @@ namespace Isis {
          }
       }
 
+      // Clear the dialog displays.
+      clearDialog();
+
       QThread *bundleThread = new QThread;
 
       m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
@@ -334,21 +337,38 @@ namespace Isis {
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
 
-    // Reset the dialog.
-    m_ui->iterationLcdNumber->display(0);
-    m_ui->sigma0LcdNumber->display(0);
-    m_ui->statusUpdatesLabel->clear();
+    // Clear the dialog so the lcd's are 0 and the status text is cleared.
+    clearDialog();
     QString statusText("Bundle Rejected.\n\n");
     m_ui->statusUpdatesLabel->setText(statusText);
-
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-        m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
 
     // Cleanup the results (bundle solution info)
     // How does this affect m_bundleSettings or m_bundleAdjustment?
     // How does this affect using the last (most recent) settings for the run?
     delete m_bundleSolutionInfo;
     m_bundleSolutionInfo = NULL;
+  }
+
+
+  /**
+   * Resets the dialog's status widgets to their default state. This will clear the status text,
+   * reset the lcd displays to 0, and update the scroll on the scroll bar. This does NOT affect
+   * the state of the buttons.
+   */
+  void JigsawDialog::clearDialog() {
+    m_ui->iterationLcdNumber->display(0);
+    m_ui->sigma0LcdNumber->display(0);
+    m_ui->statusUpdatesLabel->clear();
+    updateScrollBar();
+  }
+
+
+  /**
+   * Updates the scroll bar to position to its maximum setting (the bottom).
+   */
+  void JigsawDialog::updateScrollBar() {
+    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
+        m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
   }
 
 
@@ -363,8 +383,7 @@ namespace Isis {
 
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(updateStr) );
 
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
+    updateScrollBar();
 
     update();
   }
@@ -379,8 +398,7 @@ namespace Isis {
     QString errorStr = "\n" + error;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
 
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
+    updateScrollBar();
 
     update();
   }
@@ -395,8 +413,7 @@ namespace Isis {
     QString exceptionStr = "\n" + exception;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(exceptionStr) );
 
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
+    updateScrollBar();
 
     update();
   }
@@ -431,10 +448,10 @@ namespace Isis {
     // Since this slot is invoked when the thread finishes, the bundle adjustment is no longer
     // running.
     m_bRunning = false;
-    update();
 
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
+    updateScrollBar();
+
+    update();
   }
 
 

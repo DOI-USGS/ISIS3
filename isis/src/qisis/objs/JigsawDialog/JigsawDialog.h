@@ -52,6 +52,9 @@ namespace Isis {
    *   @history 2017-04-25 Ian Humphrey - Updated the setup clicked slot to load the current
    *                           settings into the setup dialog if we are not using the last
    *                           (most recent) settings in the project. Fixes #4817.
+   *   @history 2017-04-26 Ian Humphrey - Added updateScrollBar() and clearDialog() to reduce
+   *                           code duplication. Modified the run clicked slot to clear the
+   *                           dialog display anytime that a bundle adjust is re-ran. Fixes #4808.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -92,6 +95,8 @@ namespace Isis {
     void on_JigsawRunButton_clicked();
     void acceptBundleResults();
     void rejectBundleResults();
+    void clearDialog();
+    void updateScrollBar();
 
   private:
     /** Captures the most recent results of a bundle. JigsawDialog owns this pointer. */
