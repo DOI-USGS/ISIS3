@@ -333,8 +333,8 @@ namespace Isis {
     // one has been imported to the project.
     WorkOrder *clone = m_exportControlNetWorkOrder->clone();
     clone->setEnabled(false);
-    connect(m_project, &Project::controlListAdded,
-            clone, &WorkOrder::enableWorkOrder);
+    connect(m_project, SIGNAL(controlListAdded(ControlList *)),
+            clone, SLOT(enableWorkOrder()));
     // TODO this is not setup yet
     // connect(m_project, &Project::allControlsRemoved,
     //         clone, &WorkOrder::disableWorkOrder);
@@ -343,8 +343,8 @@ namespace Isis {
     // Similarly for export images, disable the work order until we have images in the project.
     clone = m_exportImagesWorkOrder->clone();
     clone->setEnabled(false);
-    connect(m_project, &Project::imagesAdded,
-            clone, &WorkOrder::enableWorkOrder);
+    connect(m_project, SIGNAL(imagesAdded(ImageList *)),
+            clone, SLOT(enableWorkOrder()));
     exportMenu->addAction(clone);
 
     fileMenu->addSeparator();
@@ -366,8 +366,8 @@ namespace Isis {
     }
 
     // Listen for when both images and control net have been added to the project.
-    connect(m_project, &Project::controlsAndImagesAvailable,
-            clone, &WorkOrder::enableWorkOrder);
+    connect(m_project, SIGNAL(controlsAndImagesAvailable()),
+            clone, SLOT(enableWorkOrder()));
     // Listen for when both an active control and active image list have been set.
     // When this happens, we can enable the JigsawWorkOrder.
 //  connect(m_project, &Project::activeControlAndImageListSet,
