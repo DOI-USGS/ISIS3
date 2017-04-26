@@ -33,7 +33,14 @@ namespace Isis {
    * The constructor pushes it's own content handler (the XmlHandler class) on the reader
    * to allow parsing to continue with this object. Note the push of the content handler
    * does not return until the XML is parsed, specifically the push of the content handler
-   * calls XmlHandler::startElement() for the handler just pushed.  If a contained object
+   * calls XmlHandler::startElement() for the handler just pushed. (Actually the behavior
+   * of XmlStackedHandlerReader::pushContentHandler() varies - if there are no contentHandlers
+   * on the content handler stack when it is called it returns immediately and parse()
+   * must be called to start parsing.  If there is a content handler already on the stack
+   * the push results in a call to startElement() and it does not return until the
+   * corresponding end element.)
+   *
+   * If a contained object
    * is found while parsing the XML, the constructor for the contained object that takes a
    * XmlStackedHandlerReader as a parameter is called.  This will result in the contained
    * object pushing it's content handler and parsing the relevant XML. When the constructor
