@@ -1468,13 +1468,7 @@ namespace Isis {
    * @param project The project that the BundleResults object belongs to.
    */
   void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {
-    // TODO: does xml stuff need project???
-
     stream.writeStartElement("bundleResults");
-    // stream.writeTextElement("id", m_id->toString());
-
-//    stream.writeTextElement("instrumentId", m_instrumentId);
-
     stream.writeStartElement("correlationMatrix");
     stream.writeAttribute("correlationFileName",
                           correlationMatrix().correlationFileName().expanded());
@@ -1721,14 +1715,15 @@ namespace Isis {
 
 
   /**
-   * Writes a starting XML element
+   * Handle an XML start element. This method is called when the reader finds an open tag.
+   * handle the read when the startElement with the name localName has been found.
    *
-   * @param namespaceURI ???
-   * @param localName ???
-   * @param qName The name of the element.
-   * @param atts The attributes of the element.
+   * @param qName SAX namespace for this tag
+   * @param localName SAX local name
+   * @param qName SAX qualified name of the tag.
+   * @param attributes The list of attributes for the tag.
    *
-   * @return @b bool If the XmlHandler should continue to be used, usually true.
+   * @return @b bool Indicates whether to continue reading the XML (usually true).
    */
   bool BundleResults::XmlHandler::startElement(const QString &namespaceURI,
                                                const QString &localName,
@@ -1739,7 +1734,6 @@ namespace Isis {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
       if (qName == "correlationMatrix") {
-
         m_xmlHandlerBundleResults->m_correlationMatrix = NULL;
         m_xmlHandlerBundleResults->m_correlationMatrix = new CorrelationMatrix();
 
@@ -1754,7 +1748,6 @@ namespace Isis {
           FileName covarianceFile(covarianceFileName);
           m_xmlHandlerBundleResults->m_correlationMatrix->setCovarianceFileName(covarianceFile);
         }
-
       }
       else if (qName == "image") {
         QString correlationMatrixImageId = atts.value("id");
@@ -1763,7 +1756,6 @@ namespace Isis {
         }
       }
       else if (qName == "residuals") {
-
         QString rx = atts.value("x");
         if (!rx.isEmpty()) {
           m_xmlHandlerBundleResults->m_rmsXResiduals = toDouble(rx);
@@ -1778,10 +1770,8 @@ namespace Isis {
         if (!rxy.isEmpty()) {
           m_xmlHandlerBundleResults->m_rmsXYResiduals = toDouble(rxy);
         }
-
       }
       else if (qName == "sigmas") {
-
         QString lat = atts.value("lat");
         if (!lat.isEmpty()) {
           m_xmlHandlerBundleResults->m_rmsSigmaLatitudeStats = toDouble(lat);
@@ -1796,58 +1786,44 @@ namespace Isis {
         if (!rad.isEmpty()) {
           m_xmlHandlerBundleResults->m_rmsSigmaRadiusStats = toDouble(rad);
         }
-
       }
       else if (qName == "residualsList") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerResidualsListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "sampleList") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerSampleResidualsListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "lineList") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerLineResidualsListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "xSigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerXSigmasListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "ySigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerYSigmasListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "zSigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerZSigmasListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "raSigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerRASigmasListSize = toInt(listSizeStr);
@@ -1855,20 +1831,16 @@ namespace Isis {
 
       }
       else if (qName == "decSigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerDECSigmasListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "twistSigmas") {
-
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
           m_xmlHandlerTWISTSigmasListSize = toInt(listSizeStr);
         }
-
       }
       else if (qName == "statisticsItem") {
         // add statistics object to the xml handler's current statistics list.
@@ -1876,7 +1848,6 @@ namespace Isis {
             new Statistics(m_xmlHandlerProject, reader()));
       }
       else if (qName == "elapsedTime") {
-
         QString time = atts.value("time");
         if (!time.isEmpty()) {
           m_xmlHandlerBundleResults->m_elapsedTime = toDouble(time);
@@ -1897,7 +1868,6 @@ namespace Isis {
 // ???        }
 // ???      }
       else if (qName == "minLat") {
-
         QString minLat = atts.value("value");
         if (!minLat.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaLatitudeDistance.setMeters(toDouble(minLat));
@@ -1907,10 +1877,8 @@ namespace Isis {
         if (!minLatPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaLatitudePointId = minLatPointId;
         }
-
       }
       else if (qName == "maxLat") {
-
         QString maxLat = atts.value("value");
         if (!maxLat.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaLatitudeDistance.setMeters(toDouble(maxLat));
@@ -1920,10 +1888,8 @@ namespace Isis {
         if (!maxLatPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaLatitudePointId = maxLatPointId;
         }
-
       }
       else if (qName == "minLon") {
-
         QString minLon = atts.value("value");
         if (!minLon.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaLongitudeDistance.setMeters(toDouble(minLon));
@@ -1933,10 +1899,8 @@ namespace Isis {
         if (!minLonPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaLongitudePointId = minLonPointId;
         }
-
       }
       else if (qName == "maxLon") {
-
         QString maxLon = atts.value("value");
         if (!maxLon.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaLongitudeDistance.setMeters(toDouble(maxLon));
@@ -1946,10 +1910,8 @@ namespace Isis {
         if (!maxLonPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaLongitudePointId = maxLonPointId;
         }
-
       }
       else if (qName == "minRad") {
-
         QString minRad = atts.value("value");
         if (!minRad.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaRadiusDistance.setMeters(toDouble(minRad));
@@ -1959,10 +1921,8 @@ namespace Isis {
         if (!minRadPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_minSigmaRadiusPointId = minRadPointId;
         }
-
       }
       else if (qName == "maxRad") {
-
         QString maxRad = atts.value("value");
         if (!maxRad.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaRadiusDistance.setMeters(toDouble(maxRad));
@@ -1972,10 +1932,8 @@ namespace Isis {
         if (!maxRadPointId.isEmpty()) {
           m_xmlHandlerBundleResults->m_maxSigmaRadiusPointId = maxRadPointId;
         }
-
       }
       else if (qName == "maximumLikelihoodEstimation") {
-
         QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");
         if (!maximumLikelihoodIndex.isEmpty()) {
           m_xmlHandlerBundleResults->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
@@ -1987,7 +1945,6 @@ namespace Isis {
           m_xmlHandlerBundleResults->m_maximumLikelihoodMedianR2Residuals =
             toDouble(maximumLikelihoodMedianR2Residuals);
         }
-
       }
       else if (qName == "model") {
         QString model = atts.value("modelSelection");
@@ -2025,7 +1982,7 @@ namespace Isis {
    *
    * @param ch The data to be added.
    *
-   * @return @b bool If false, then the data was not successfully added.
+   * @return @b bool true
    */
   bool BundleResults::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
@@ -2034,13 +1991,13 @@ namespace Isis {
 
 
   /**
-   * Writes an ending XML element.
+   * @brief Handle end tags for the BundleResults serialized XML.
    *
-   * @param namespaceURI ???
-   * @param localName ???
-   * @param qName The name of the element.
+   * @param namespaceURI URI of the specified tags namespce
+   * @param localName SAX localName
+   * @param qName SAX qualified name
    *
-   * @return @b bool If the XmlHandler should continue to be used.
+   * @return true
    */
   bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                              const QString &qName) {
@@ -2050,9 +2007,6 @@ namespace Isis {
         m_xmlHandlerBundleResults->m_id = NULL;
         m_xmlHandlerBundleResults->m_id = new QUuid(m_xmlHandlerCharacters);
       }
-//      else if (qName == "instrumentId") {
-//        m_xmlHandlerBundleResults->m_instrumentId = m_xmlHandlerCharacters;
-//      }
       if (qName == "parameter") {
         // add the parameter to the current list
         m_xmlHandlerCorrelationParameterList.append(m_xmlHandlerCharacters);
@@ -2120,21 +2074,20 @@ namespace Isis {
       }
       // copy the xml handler's statistics list to the appropriate bundle statistics list
       else if (qName == "residualsList") {
-        // do this check or assume the xml is valid???
-        // ??? if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid residualsList", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid residualsList", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageResiduals.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "sampleList") {
-        // ??? if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid sampleList", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid sampleList", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageSampleResiduals.append(
                                                                    m_xmlHandlerStatisticsList[i]);
@@ -2142,70 +2095,70 @@ namespace Isis {
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "lineList") {
-        // ??? if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid lineList", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid lineList", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "xSigmas") {
-        // ??? if (m_xmlHandlerXSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid xSigmas", _FILEINFO_); ???
-        // }
+        if (m_xmlHandlerXSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid xSigmas", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageXSigmas.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "ySigmas") {
-        // ??? if (m_xmlHandlerYSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid ySigmas", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerYSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid ySigmas", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageYSigmas.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "zSigmas") {
-        // ??? if (m_xmlHandlerZSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid zSigmas", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerZSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid zSigmas", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageZSigmas.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "raSigmas") {
-        // ??? if (m_xmlHandlerRASigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid raSigmas", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerRASigmasListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid raSigmas", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageRASigmas.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "decSigmas") {
-        // ??? if (m_xmlHandlerDECSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid decSigmas", _FILEINFO_);
-        // ??? }
+        if (m_xmlHandlerDECSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid decSigmas", _FILEINFO_);
+        }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageDECSigmas.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
       else if (qName == "twistSigmas") {
-        // ??? if (m_xmlHandlerTWISTSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-        // ???   throw IException(IException::Unknown,
-        // ???                    "Unable to read xml file. Invalid twistSigmas", _FILEINFO_);
-        // ??? }
+          if (m_xmlHandlerTWISTSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+            throw IException(IException::Unknown,
+                             "Unable to read xml file. Invalid twistSigmas", _FILEINFO_);
+          }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageTWISTSigmas.append(m_xmlHandlerStatisticsList[i]);
         }
