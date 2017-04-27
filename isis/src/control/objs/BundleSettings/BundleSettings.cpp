@@ -27,7 +27,7 @@
 namespace Isis {
 
   /**
-   * Constructs a BundleSettings object.
+   * @brief Constructs a BundleSettings object.
    * Default values are set for all member variables. By default, BundleSettings allows creation
    * of the inverse correlation matrix file.
    *
@@ -35,9 +35,17 @@ namespace Isis {
    * @see setCreateInverseMatrix()
    */
   BundleSettings::BundleSettings() {
-    m_id = NULL;
-    m_id = new QUuid(QUuid::createUuid());
+    init();
+    BundleObservationSolveSettings defaultSolveSettings;
+    m_observationSolveSettings.append(defaultSolveSettings);
+  }
 
+  /**
+   * @brief Set Default vales for a BundleSettings object.
+   * Note we call the default constructor to initialize the TargetBody information
+   * that is not currently in the XML.
+   */
+  void BundleSettings::init() {
     m_validateNetwork = true;
 
     m_solveObservationMode = false;
@@ -53,9 +61,6 @@ namespace Isis {
     m_globalLatitudeAprioriSigma  = Isis::Null;
     m_globalLongitudeAprioriSigma = Isis::Null;
     m_globalRadiusAprioriSigma    = Isis::Null;
-
-    BundleObservationSolveSettings defaultSolveSettings;
-    m_observationSolveSettings.append(defaultSolveSettings);
 
     // Convergence Criteria
     m_convergenceCriteria = BundleSettings::Sigma0;
@@ -93,75 +98,14 @@ namespace Isis {
    * @endcode
    *
    * @param project A pointer to the project where the Settings will be saved.
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param xmlReader The Content handler to parse the BundleSettings XML
    */
   BundleSettings::BundleSettings(Project *project,
                                  XmlStackedHandlerReader *xmlReader) {
-    m_id = NULL;
-    // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
-
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    init();
     xmlReader->setErrorHandler(new XmlHandler(this, project));
-
-  }
-
-#if 0
-  // TODO: The following code maybe needed for #4787 / #4805
-  /**
-   * Construct this BundleSettings object from XML.
-   *
-   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   *
-   * @throw
-   * @throw
-   */
-  BundleSettings::BundleSettings(FileName xmlFile,
-                                 Project *project,
-                                 XmlStackedHandlerReader *xmlReader) {
-
-
-    m_id = NULL;
-    // what about the rest of the member data ??? should we set defaults ???
-
-    QString xmlPath = xmlFile.expanded();
-    QFile qXmlFile(xmlPath);
-    if (!qXmlFile.open(QFile::ReadOnly) ) {
-      throw IException(IException::Io,
-                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
-                       _FILEINFO_);
-    }
-
-    QXmlInputSource xmlInputSource(&qXmlFile);
-
     xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    bool success = xmlReader->parse(xmlInputSource);
-    if (!success) {
-      throw IException(IException::Unknown,
-                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                        _FILEINFO_);
-    }
   }
-
-
-  /**
-   * TODO
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   */
-  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader) {
-    m_id = NULL;
-    xmlReader->pushContentHandler(new XmlHandler(this));
-    xmlReader->setErrorHandler(new XmlHandler(this));
-  }
-
-  /**
-   * TODO
-   */
-  BundleSettings::BundleSettings(H5::CommonFG &locationObject, QString locationName) {
-    openH5Group(locationObject, locationName);
-  }
-#endif
 
 
   /**
@@ -171,8 +115,7 @@ namespace Isis {
    * @param other The BundleSettings object to be copied.
    */
   BundleSettings::BundleSettings(const BundleSettings &other)
-      : m_id(new QUuid(other.m_id->toString())),
-        m_validateNetwork(other.m_validateNetwork),
+      : m_validateNetwork(other.m_validateNetwork),
         m_solveObservationMode(other.m_solveObservationMode),
         m_solveRadius(other.m_solveRadius),
         m_updateCubeLabel(other.m_updateCubeLabel),
@@ -198,8 +141,6 @@ namespace Isis {
    * Destroys the BundleSettings object.
    */
   BundleSettings::~BundleSettings() {
-    delete m_id;
-    m_id = NULL;
   }
 
 
@@ -213,10 +154,6 @@ namespace Isis {
    */
   BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
     if (&other != this) {
-      delete m_id;
-      m_id = NULL;
-      m_id = new QUuid(other.m_id->toString());
-
       m_validateNetwork = other.m_validateNetwork;
       m_solveObservationMode = other.m_solveObservationMode;
       m_solveRadius = other.m_solveRadius;
@@ -1012,18 +949,16 @@ namespace Isis {
 
 
   /**
-   * This method is used to write a BundleSettings object to an XML format
+   * @brief This method is used to write a BundleSettings object in an XML format
    *
-   * NOTE: Currently this method is not used and may be deleted. Documentation
-   * and testing to be completed if called. TargetBody info should be added
-   * also.
+   * @param stream The stream to write serialized XML output
+   * @param project The project that contains the settings
    */
   void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {
     stream.writeStartElement("bundleSettings");
 
     stream.writeStartElement("globalSettings");
 
-    stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("validateNetwork", toString(validateNetwork()));
 
     stream.writeStartElement("solveOptions");
@@ -1105,9 +1040,9 @@ namespace Isis {
 
 
   /**
-   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-   * BundleSettings::save() for the expected format. This contructor is called inside the
-   * BundleSettings constructor that takes an XmlStackedHandlerReader.
+   * @brief Create an XML Handler (reader) that can populate the BundleSettings class data.
+   * See BundleSettings::save() for the expected format. This contructor is called
+   * inside the BundleSettings constructor that takes an XmlStackedHandlerReader.
    *
    * @param bundleSettings The BundleSettings we're going to be initializing
    * @param project The project that contains the settings
@@ -1120,34 +1055,10 @@ namespace Isis {
   }
 
 
-
-//  /**
-//   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-//   *   BundleSettings::save() for the expected format.
-//   *
-//   * @param bundleSettings The BundleSettings we're going to be initializing
-//   * @param imageFolder The folder that contains the Cube
-//   */
-//  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
-//    m_xmlHandlerBundleSettings = bundleSettings;
-//    m_xmlHandlerProject = NULL;
-//    m_xmlHandlerCharacters = "";
-//    m_xmlHandlerObservationSettings.clear();
-//  }
-
-
   /**
-   * Destroys BundleSettings::XmlHandler object.
-   *
-   * NOTE: Currently this method is not used and may be deleted. Documentation
-   * and testing to be completed if called. TargetBody info should be added
-   * also.
+   * @brief Destroys BundleSettings::XmlHandler object.
    */
   BundleSettings::XmlHandler::~XmlHandler() {
-    // do not delete these pointers...
-    // we don't own them, do we??? project passed into StatCumProbDistDynCalc constructor as pointer and bundleSettings = this
-    // delete m_xmlHandlerProject;
-    m_xmlHandlerProject = NULL;
   }
 
 
@@ -1155,7 +1066,9 @@ namespace Isis {
    * Handle an XML start element. This method is called when the reader finds an open tag.
    * handle the read when the startElement with the name localName has been found.
    *
-   * @param qName The qualified name of the tag.
+   * @param qName SAX namespace for this tag
+   * @param localName SAX local name
+   * @param qName SAX qualified name of the tag.
    * @param attributes The list of attributes for the tag.
    *
    * @return @b bool Indicates whether to continue reading the XML (usually true).
@@ -1294,11 +1207,10 @@ namespace Isis {
 
 
   /**
-   * XML - TBD.
+   * @brief Add a character from an XML element to the content handler.
    *
-   * NOTE: Currently this method is not used and may be deleted. Documentation
-   * and testing to be completed if called. TargetBody info should be added
-   * also.
+   * @param ch charater from XML element
+   * @return true
    */
   bool BundleSettings::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
@@ -1307,20 +1219,18 @@ namespace Isis {
 
 
   /**
-   * XML - TBD.
+   * @brief Handle end tags for the BundleSettings serialized XML.
    *
-   * NOTE: Currently this method is not used and may be deleted. Documentation
-   * and testing to be completed if called. TargetBody info should be added
-   * also.
+   * @param namespaceURI URI of the specified tags namespce
+   * @param localName SAX localName
+   * @param qName SAX qualified name
+   *
+   * @return true
    */
   bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (localName == "id") {
-        m_xmlHandlerBundleSettings->m_id = NULL;
-        m_xmlHandlerBundleSettings->m_id = new QUuid(m_xmlHandlerCharacters);
-      }
-      else if (localName == "validateNetwork") {
+      if (localName == "validateNetwork") {
         m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "observationSolveSettingsList") {
@@ -1338,14 +1248,13 @@ namespace Isis {
 
 
   /**
-   * XML - TBD.
+   * @brief Format an error message indicating a problem with BundleSettings.
    *
-   * NOTE: Currently this method is not used and may be deleted. Documentation
-   * and testing to be completed if called. TargetBody info should be added
-   * also.
+   * @param QXmlParseException Execption thrown by parser.
+   * @return false
    */
   bool BundleSettings::XmlHandler::fatalError(const QXmlParseException &exception) {
-    qDebug() << "Parse error at line " << exception.lineNumber()
+    qDebug() << "Parse error with BundleSettings at line " << exception.lineNumber()
              << ", " << "column " << exception.columnNumber() << ": "
              << qPrintable(exception.message());
     return false;

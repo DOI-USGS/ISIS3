@@ -177,9 +177,6 @@ int main(int argc, char *argv[]) {
                                         5, 6, true, 7000.0, 8000.0, 9000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
                                         10, 11, true, true, 12.0, 13.0, 14.0);
-    // TODO: why am i getting QList index error???
-//    pvl = boss1.pvlObject();
-//    cout << pvl << endl << endl;
     QList<BundleObservationSolveSettings> observationSolveSettings;
     observationSolveSettings.append(boss1);
     boss1.addObservationNumber("Instrument2");
@@ -187,9 +184,6 @@ int main(int argc, char *argv[]) {
                                         15, 16, true, 17000.0, 18000.0, 19000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients,
                                         20, 21, true, true, 22.0, 23.0, 24.0);
-    // TODO: why am i getting QList index error???
-//    pvl = boss1.pvlObject();
-//    cout << pvl << endl << endl;
     observationSolveSettings.append(boss1);
     copySettings.setObservationSolveOptions(observationSolveSettings);
     // set convergence criteria values
@@ -218,7 +212,6 @@ int main(int argc, char *argv[]) {
     settings.setOutputFilePrefix("TestFilePrefix");
     printXml<BundleSettings>(settings);
 
-
     qDebug() << "Testing accessor methods...";
     BundleObservationSolveSettings boss2 = copySettings.observationSolveSettings("Instrument1");
     qDebug() << "Get BundleObservationSolveSettings with name InstrumentId = Instrument1";
@@ -243,9 +236,12 @@ int main(int argc, char *argv[]) {
                                BundleSettings::stringToConvergenceCriteria("PARAMETERCORRECTIONS"));
     qDebug() << "";
 
-    qDebug() << "Testing XML: write XML from BundleSettings object...";
-    // write xml
-    FileName xmlFile("./BundleSettings.xml");
+    qDebug() << "Testing XML serialization 1: write XML from BundleSettings object...";
+    // write xml to test output file for comparison
+    qDebug() << "Serializing test XML object to file:";
+    printXml<BundleSettings>(settings);
+    // now write the object to serialization file
+    FileName xmlFile("./BundleSettings2.xml");
     QString xmlPath = xmlFile.expanded();
     QFile qXmlFile(xmlPath);
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -260,31 +256,34 @@ int main(int argc, char *argv[]) {
     settings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml
-    qDebug() << "Testing XML: read XML to BundleSettings object...";
+
+    // read serialized xml into object and then write object to log file
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
     XmlStackedHandlerReader reader;
     BundleSettingsXmlHandlerTester bsFromXml(project, &reader, xmlFile);
-    //BundleSettings bsFromXml(xmlFile, project, &reader);
     printXml<BundleSettings>(bsFromXml);
 
+    qDebug() << "Testing XML serialization 2: write XML from BundleSettings object...";
     // for test coverage, read/write the copySettings object with
     // solveRadius=true, outlierRejection=true, no observationSolveSettings,
     // globalRadiusAprioriSigma != N/A, outlierRejectionMultiplier != N/A
-    copySettings.setObservationSolveOptions(QList<BundleObservationSolveSettings>());
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
                        QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
                        _FILEINFO_);
     }
+    // write xml to test output file for comparison
+    qDebug() << "Serializing test XML object to file:";
+    printXml<BundleSettings>(copySettings);
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
     copySettings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml
-    qDebug() << "Testing XML: read XML to BundleSettings object...";
+
+    // read serialized xml into object and then write object to log file
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
     BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);
-    //BundleSettings bsFromXml(xmlFile, project, &reader);
     printXml<BundleSettings>(bsFromXml2);
     qXmlFile.remove();
 
@@ -359,13 +358,8 @@ void printXml(const T &printable) {
   QXmlStreamWriter writer(&output);
   writer.setAutoFormatting(true);
   printable.save(writer, NULL);
+  // needed to remove UUids from sub-object serialization.
   output.remove(QRegExp("<id>[^<]*</id>"));
   qDebug().noquote() << output << endl << endl;
 }
-#if 0
-still need test coverage for
 
-commented out bundlesettings constructors, commented out xmlhandler constructor
-
-fatalError
-#endif

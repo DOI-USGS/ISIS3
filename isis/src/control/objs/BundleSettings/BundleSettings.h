@@ -110,9 +110,8 @@ namespace Isis {
    *   @todo Determine whether QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
    *         m_maximumLikelihood should be a list of pointers, or a pointer to a list, or a pointer
    *         to a list of pointers, etc...
-      ;
-   *   @todo Determine which to use or delete: XML or HDF5. Whichever is used needs to be fully
-   *         documented, tested
+   *   @todo TargetBody information is not being serialized. A determination needs to
+   *         be made as to where it will be stored.
    */
   class BundleSettings {
     public:
@@ -243,6 +242,7 @@ namespace Isis {
       //=====================================================================//
       //============================== Target Body ==========================//
       //=====================================================================//
+      // Note targeBody information is not currently serialized.
       void setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody);
       BundleTargetBodyQsp bundleTargetBody() const;
 //      bool solveTargetBodyPolePosition() const;
@@ -273,6 +273,7 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
     private:
+      void init();
 
       //=====================================================================//
       //============= Saving/Restoring a BundleSettings object ==============//
@@ -325,8 +326,6 @@ namespace Isis {
           double quantileFieldValue; //!< The quantile of the TableRecord.???
       };
 
-      QUuid *m_id; /**< A unique ID for this BundleSettings object.
-                        Used to reference this object when saving to disk.*/
       bool m_validateNetwork; //!< Indicates whether the network should be validated.
       bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
