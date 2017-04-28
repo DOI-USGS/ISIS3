@@ -29,8 +29,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Geometry from WKT GIS source"
@@ -39,8 +39,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "WKT"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Geometry from WKB GIS source"
@@ -49,8 +49,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "WKB"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Geometry from IsisCube GIS source"
@@ -59,8 +59,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             4.05913
-    length?           8.38034
+    area?             4.09421
+    length?           8.41585
     points?           209
 
 "Construct Geometry from GEOSGeometry"
@@ -69,8 +69,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Empty Default Geometry"
@@ -89,8 +89,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Copy Geometry from Undefined Geometry"
@@ -109,8 +109,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Equal Geometry from Equal Geometry"
@@ -119,8 +119,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Construct Equal Geometry from Undefined Geometry"
@@ -139,8 +139,8 @@ GisGeometry::Types:
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "IsisCube"
-    area?             50.218
-    length?           29.6669
+    area?             50.3519
+    length?           29.6976
     points?           413
 
 "Clone Geometry from Undefined Geometry"
@@ -178,7 +178,7 @@ GisGeometry::Types:
     disjoint?         "No"
     overlaps?         "Yes"
     equals?           "No"
-    intersect ratio?  "0.95216803927449"
+    intersect ratio?  "0.95030561790462"
 
 "Source: WKT Geometry, Target: WKB Geometry (equal geometries)"
     distance?         "0.0"
@@ -190,7 +190,7 @@ GisGeometry::Types:
     intersect ratio?  "1.0"
 
 "Source: WKT Geometry, Target: Lat/Lon Geometry"
-    distance?         "288.73577074892"
+    distance?         "288.65234410472"
     intersects?       "No"
     contains?         "No"
     disjoint?         "Yes"
@@ -206,8 +206,8 @@ Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry:  0
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             97.1265
-    length?           40.3919
+    area?             97.31
+    length?           40.4313
     points?           5
 
 "Envelope Geometry from Invalid Geometry"
@@ -226,9 +226,9 @@ Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry:  0
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             51.236
-    length?           29.6587
-    points?           211
+    area?             51.3562
+    length?           29.6897
+    points?           108
 
 "Convex Hull Geometry from Invalid Geometry"
     isDefined?        false
@@ -246,8 +246,8 @@ Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry:  0
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             50.2148
-    length?           29.6512
+    area?             50.3126
+    length?           29.6816
     points?           5
 
 Simplified Geometry from Invalid Geometry is NULL.
@@ -278,9 +278,9 @@ Simplified Geometry from Invalid Geometry is NULL.
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             3.86497
-    length?           8.20245
-    points?           188
+    area?             3.89075
+    length?           8.23376
+    points?           187
 
 "Union Geometry of Invalid Geometry with WKT Geometry as target"
     isDefined?        false
@@ -308,9 +308,9 @@ Simplified Geometry from Invalid Geometry is NULL.
     isValidReason?    "Valid Geometry"
     isEmpty?          false
     type?             "GeosGis"
-    area?             50.4122
-    length?           29.8448
-    points?           438
+    area?             50.5554
+    length?           29.8797
+    points?           439
 
 "Centroid Geometry of Invalid Geometry"
     isDefined?        false
@@ -335,8 +335,8 @@ Simplified Geometry from Invalid Geometry is NULL.
 Centroid found for Invalid Geometry?  false
 
 Centroid found for WKT Geometry?  true
-	Longitude:  290.491
-	Latitude:   50.1643
+	Longitude:  290.412
+	Latitude:   50.1576
 
 Testing Errors...
 **PROGRAMMER ERROR** Unknown GIS type given [None].

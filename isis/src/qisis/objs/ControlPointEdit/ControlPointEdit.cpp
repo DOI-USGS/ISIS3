@@ -47,9 +47,11 @@ namespace Isis {
    *                                    ChipViewport
    * @author Tracie Sucharski
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Added error
-   *                            string to iException::Message before
-   *                            creating QMessageBox
+   *   @history 2008-15-2008 Jeannie Walldren - Added error
+   *                           string to iException::Message before
+   *                           creating QMessageBox
+   *   @history 2017-04-21 Marjorie Hahn - Moved p_autoRegFact creation
+   *                           from constructor to registerPoint() method.
    */
   ControlPointEdit::ControlPointEdit(ControlNet * cnet, QWidget *parent,
                                      bool allowLeftMouse, bool useGeometry) : QWidget(parent) {
@@ -66,25 +68,9 @@ namespace Isis {
     p_leftGroundMap = 0;
     p_rightGroundMap = 0;
 
-    try {
-      p_templateFileName = "$base/templates/autoreg/qnetReg.def";
-      Pvl pvl(p_templateFileName);
-      p_autoRegFact = AutoRegFactory::Create(pvl);
-    }
-    catch (IException &e) {
-      p_autoRegFact = NULL;
-      IException fullError(e, IException::Io,
-                           "Cannot create AutoRegFactory. As a result, "
-                           "sub-pixel registration will not work.",
-                           _FILEINFO_);
-      QString message = fullError.toString();
-      QMessageBox::information((QWidget *)parent, "Error", message);
-    }
-
     createPointEditor(parent);
     if (cnet != NULL) emit newControlNetwork(cnet);
   }
-
 
 
   ControlPointEdit::~ControlPointEdit() {
@@ -96,23 +82,22 @@ namespace Isis {
   }
 
 
-
   /**
    * Design the PointEdit widget
    *
    * @author  Tracie Sucharski
    * @internal
-   *   @history 2008-11-19  Tracie Sucharski - Added left pan buttons, but
+   *   @history 2008-11-19 Tracie Sucharski - Added left pan buttons, but
    *                           default to hidden.
-   *   @history 2008-12-02  Jeannie Walldren - Allow connection
+   *   @history 2008-12-02 Jeannie Walldren - Allow connection
    *                           between updateLeftView and refreshView for all
    *                           objects.  Previously this was only done if
    *                           allowLeftMouse = true.
-   *   @history 2008-12-02  Tracie Sucharski - Another bug fix due to change
+   *   @history 2008-12-02 Tracie Sucharski - Another bug fix due to change
    *                           on 2008-11-19, The leftView tackPointChanged
    *                           connection needs to always be made whether mouse
    *                           button events are allowed or not.
-   *   @history 2008-12-10  Jeannie Walldren - Set the default
+   *   @history 2008-12-10 Jeannie Walldren - Set the default
    *                           value of the new private variable,
    *                           p_templateFileName, to the previously hard-coded
    *                           template filename.
@@ -160,8 +145,8 @@ namespace Isis {
     QToolButton *leftPanDown = 0;
     QToolButton *leftPanLeft = 0;
     QToolButton *leftPanRight = 0;
-    if ( p_allowLeftMouse ) {
-      //  Add arrows for panning
+    if (p_allowLeftMouse) {
+      // Add arrows for panning
       leftPanUp = new QToolButton(parent);
       leftPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
                                expanded()));
@@ -292,7 +277,7 @@ namespace Isis {
 
     p_leftView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
     //  Do not want to accept mouse/keyboard events
-    if ( !p_allowLeftMouse ) p_leftView->setDisabled(true);
+    if (!p_allowLeftMouse) p_leftView->setDisabled(true);
 
     gridLayout->addWidget(p_leftView, row, 0);
 
@@ -310,18 +295,18 @@ namespace Isis {
     leftLockStretch->setChecked(false);
 
 
-    //  Connect left zoom buttons to ChipViewport's zoom slots
+    // Connect left zoom buttons to ChipViewport's zoom slots
     connect(leftZoomIn, SIGNAL(clicked()), p_leftView, SLOT(zoomIn()));
     connect(leftZoomOut, SIGNAL(clicked()), p_leftView, SLOT(zoomOut()));
     connect(leftZoom1, SIGNAL(clicked()), p_leftView, SLOT(zoom1()));
 
-    //  If zoom on left, need to re-geom right
+    // If zoom on left, need to re-geom right
     connect(leftZoomIn, SIGNAL(clicked()), this, SLOT(updateRightGeom()));
     connect(leftZoomOut, SIGNAL(clicked()), this, SLOT(updateRightGeom()));
     connect(leftZoom1, SIGNAL(clicked()), this, SLOT(updateRightGeom()));
 
-    //  Connect the ChipViewport tackPointChanged signal to
-    //  the update sample/line label
+    // Connect the ChipViewport tackPointChanged signal to
+    // the update sample/line label
     connect(p_leftView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateLeftPositionLabel(double)));
     
@@ -333,7 +318,7 @@ namespace Isis {
     connect (p_leftView, SIGNAL(userMovedTackPoint()),
              this, SLOT(colorizeSaveButton()));
 
-    if ( p_allowLeftMouse ) {
+    if (p_allowLeftMouse) {
       //  Connect pan buttons to ChipViewport
       connect(leftPanUp, SIGNAL(clicked()), p_leftView, SLOT(panUp()));
       connect(leftPanDown, SIGNAL(clicked()), p_leftView, SLOT(panDown()));
@@ -360,8 +345,8 @@ namespace Isis {
             SLOT(changeStretchLock(int)));
     rightLockStretch->setChecked(false);
 
-    //  Connect the ChipViewport tackPointChanged signal to
-    //  the update sample/line label
+    // Connect the ChipViewport tackPointChanged signal to
+    // the update sample/line label
     connect(p_rightView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateRightPositionLabel(double)));
     connect(this, SIGNAL(updateRightView(double, double)),
@@ -374,7 +359,7 @@ namespace Isis {
     connect(p_rightZoomOut, SIGNAL(clicked()), p_rightView, SLOT(zoomOut()));
     connect(p_rightZoom1, SIGNAL(clicked()), p_rightView, SLOT(zoom1()));
 
-    //  Connect pan buttons to ChipViewport
+    // Connect pan buttons to ChipViewport
     connect(rightPanUp, SIGNAL(clicked()), p_rightView, SLOT(panUp()));
     connect(rightPanDown, SIGNAL(clicked()), p_rightView, SLOT(panDown()));
     connect(rightPanLeft, SIGNAL(clicked()), p_rightView, SLOT(panLeft()));
@@ -385,7 +370,7 @@ namespace Isis {
     connect(rightPanLeft, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
     connect(rightPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
 
-    //  Create chips for left and right
+    // Create chips for left and right
     p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
     p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
     
@@ -425,7 +410,7 @@ namespace Isis {
 
     QRadioButton *rotate = new QRadioButton("Rotate");
     bgroup->addButton(rotate);
-    //  TODO:  ?? Don't think we need this connection
+    // TODO:  ?? Don't think we need this connection
     connect(rotate, SIGNAL(clicked()), this, SLOT(setRotate()));
 
     //  Set some defaults
@@ -503,7 +488,7 @@ namespace Isis {
     vlayout->addWidget(p_slider);
     gridLayout->addLayout(vlayout, row++, 2);
 
-    //  Show sample / line for measure of chips shown
+    // Show sample / line for measure of chips shown
     p_leftSampLinePosition = new QLabel();
     p_leftSampLinePosition->setToolTip("Sample/Line under the crosshair");
     gridLayout->addWidget(p_leftSampLinePosition, row, 0);
@@ -644,8 +629,6 @@ namespace Isis {
   }
 
 
-
-
   /**
    * Set the measure displayed in the left ChipViewport
    *
@@ -654,15 +637,15 @@ namespace Isis {
    *
    * @author Tracie Sucharski
    * @internal
-   *   @history 2008-11-19  Tracie Sucharski - If left cube changes, get new
+   *   @history 2008-11-19 Tracie Sucharski - If left cube changes, get new
    *                           universalGroundMap.
-   *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
+   *   @history 2012-04-17 Tracie Sucharski - If geom is turned on update the
    *                           right measure.
-   *   @history 2012-05-07  Tracie Sucharski - Last change introduced bug when
+   *   @history 2012-05-07 Tracie Sucharski - Last change introduced bug when
    *                           loading a different control point, so only
    *                           update the right chip if we're not loading a
    *                           different control point.
-   *   @history 2013-04-30  Tracie Sucharski - Fixed bug introduced by linking zooms between left
+   *   @history 2013-04-30 Tracie Sucharski - Fixed bug introduced by linking zooms between left
    *                           and right viewports.  Zoom factors were being passed into the
    *                           Chip::Load method as the second argument which should be the rotation
    *                           value.
@@ -671,7 +654,7 @@ namespace Isis {
                                         Cube *leftCube, QString pointId) {
 
     //  Make sure registration is turned off
-    if ( p_autoRegShown ) {
+    if (p_autoRegShown) {
       //  Undo Registration
       p_autoRegShown = false;
       p_autoRegExtension->hide();
@@ -712,17 +695,17 @@ namespace Isis {
    *
    * @author Tracie Sucharski
    * @internal
-   *   @history 2008-11-19  Tracie Sucharski - If right cube changes, get new
+   *   @history 2008-11-19 Tracie Sucharski - If right cube changes, get new
    *                           universalGroundMap.
    *   @history 2008-15-2008 Jeannie Walldren - Added error string to
    *                           iException::Message before
    *                           creating QMessageBox
-   *   @history 2009-09-14  Tracie Sucharski - Call geomChip to make
+   *   @history 2009-09-14 Tracie Sucharski - Call geomChip to make
    *                           sure left chip is initialized in the
    *                           ChipViewport.  This was done for the changes
    *                           made to the Chip class and the ChipViewport
    *                           class where the Cube info is no longer stored.
-   *   @history 2013-04-30  Tracie Sucharski - Fixed bug introduced by linking zooms between left
+   *   @history 2013-04-30 Tracie Sucharski - Fixed bug introduced by linking zooms between left
    *                           and right viewports.  Zoom factors were being passed into the
    *                           Chip::Load method as the second argument which should be the rotation
    *                           value.
@@ -732,7 +715,7 @@ namespace Isis {
                                          Cube *rightCube, QString pointId) {
 
     //  Make sure registration is turned off
-    if ( p_autoRegShown ) {
+    if (p_autoRegShown) {
       //  Undo Registration
       p_autoRegShown = false;
       p_autoRegExtension->hide();
@@ -753,7 +736,7 @@ namespace Isis {
 
     p_rightChip->TackCube(p_rightMeasure->GetSample(),
                           p_rightMeasure->GetLine());
-    if ( p_geomIt == false ) {
+    if (p_geomIt == false) {
       p_rightChip->Load(*p_rightCube);
     }
     else {
@@ -834,7 +817,7 @@ namespace Isis {
   void ControlPointEdit::updateRightPositionLabel(double zoomFactor) {
 
     // If registration Info is on, turn off
-    if ( p_autoRegShown ) {
+    if (p_autoRegShown) {
       //  Undo Registration
       p_autoRegShown = false;
       p_autoRegExtension->hide();
@@ -942,13 +925,31 @@ namespace Isis {
    *                           successful, change save button to red.
    *   @history 2011-10-21 Tracie Sucharski - Add try/catch around registration
    *                           to catch errors thrown from autoreg class.
+   *   @history 2017-04-21 Marjorie Hahn - Added auto registration factory creation.
    *
    */
-
   void ControlPointEdit::registerPoint() {
+    
+    if (p_autoRegFact == NULL) {
+      try {
+        p_templateFileName = "$base/templates/autoreg/qnetReg.def";
+        Pvl pvl(p_templateFileName);
+        p_autoRegFact = AutoRegFactory::Create(pvl);
+      }
+      catch (IException &e) {
+        p_autoRegFact = NULL;
+        IException fullError(e, IException::Io,
+                            "Cannot create AutoRegFactory. As a result, "
+                            "sub-pixel registration will not work.",
+                            _FILEINFO_);
+        QString message = fullError.toString();
+        QMessageBox::information((QWidget *)parent(), "Error", message);
+        return;
+      }
+    }
         
-    if ( p_autoRegShown ) {
-      //  Undo Registration
+    if (p_autoRegShown) {
+      // Undo Registration
       p_autoRegShown = false;
       p_autoRegExtension->hide();
       p_autoReg->setText("Register");
@@ -962,17 +963,15 @@ namespace Isis {
       // Since un-doing registration, make sure save button not red
       p_saveMeasure->setPalette(p_saveDefaultPalette);
       return;
-
     }
     p_autoRegAttempted = true;
 
     try {
-      p_autoRegFact->PatternChip()->TackCube(
-                          p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
+      p_autoRegFact->PatternChip()->TackCube(p_leftMeasure->GetSample(), 
+                                             p_leftMeasure->GetLine());
       p_autoRegFact->PatternChip()->Load(*p_leftCube);
-      p_autoRegFact->SearchChip()->TackCube(
-                          p_rightMeasure->GetSample(),
-                          p_rightMeasure->GetLine());
+      p_autoRegFact->SearchChip()->TackCube(p_rightMeasure->GetSample(),
+                                            p_rightMeasure->GetLine());
       if (p_useGeometry) {
         p_autoRegFact->SearchChip()->Load(*p_rightCube,
                             *(p_autoRegFact->PatternChip()), *p_leftCube);
@@ -990,30 +989,30 @@ namespace Isis {
 
     try {
       AutoReg::RegisterStatus status = p_autoRegFact->Register();
-      if ( !p_autoRegFact->Success() ) {
+      if (!p_autoRegFact->Success()) {
         QString msg = "Cannot sub-pixel register this point.\n";
-        if ( status == AutoReg::PatternChipNotEnoughValidData ) {
+        if (status == AutoReg::PatternChipNotEnoughValidData) {
           msg += "\n\nNot enough valid data in Pattern Chip.\n";
           msg += "  PatternValidPercent = ";
           msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
         }
-        else if ( status == AutoReg::FitChipNoData ) {
+        else if (status == AutoReg::FitChipNoData) {
           msg += "\n\nNo valid data in Fit Chip.";
         }
-        else if ( status == AutoReg::FitChipToleranceNotMet ) {
+        else if (status == AutoReg::FitChipToleranceNotMet) {
           msg += "\n\nGoodness of Fit Tolerance not met.\n";
           msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
           msg += "\nGoodnessOfFitTolerance = ";
           msg += QString::number(p_autoRegFact->Tolerance());
         }
-        else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
+        else if (status == AutoReg::SurfaceModelNotEnoughValidData) {
           msg += "\n\nNot enough valid points in the fit chip window for sub-pixel ";
           msg += "accuracy.  Probably too close to edge.\n";
         }
-        else if ( status == AutoReg::SurfaceModelSolutionInvalid ) {
+        else if (status == AutoReg::SurfaceModelSolutionInvalid) {
           msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
         }
-        else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
+        else if (status == AutoReg::SurfaceModelDistanceInvalid) {
           double sampDist, lineDist;
           p_autoRegFact->Distance(sampDist, lineDist);
           msg += "\n\nSub pixel algorithm moves registration more than tolerance.\n";
@@ -1022,14 +1021,14 @@ namespace Isis {
           msg += "\nDistanceTolerance = " +
                  QString::number(p_autoRegFact->DistanceTolerance());
         }
-        else if ( status == AutoReg::PatternZScoreNotMet ) {
+        else if (status == AutoReg::PatternZScoreNotMet) {
           double score1, score2;
           p_autoRegFact->ZScores(score1, score2);
           msg += "\n\nPattern data max or min does not pass z-score test.\n";
           msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
           msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
         }
-        else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
+        else if (status == AutoReg::AdaptiveAlgorithmFailed) {
           msg += "\n\nError occured in Adaptive algorithm.";
         }
         else {
@@ -1047,11 +1046,9 @@ namespace Isis {
       return;
     }
 
-
-
     //  Load chip with new registered point
     emit updateRightView(p_autoRegFact->CubeSample(), p_autoRegFact->CubeLine());
-    //  If registered pt different from measure, colorize the save button
+    // If registered pt different from measure, colorize the save button
     if (p_autoRegFact->CubeSample() != p_rightMeasure->GetSample() ||
         p_autoRegFact->CubeLine() != p_rightMeasure->GetLine()) {
       colorizeSaveButton();
@@ -1214,8 +1211,8 @@ namespace Isis {
    * Slot to update the geomed right ChipViewport for zoom
    * operations
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Added error string to
-   *                              iException::Message before creating QMessageBox
+   *   @history 2008-15-2008 Jeannie Walldren - Added error string to
+   *                             iException::Message before creating QMessageBox
    */
   void ControlPointEdit::updateRightGeom() {
 
@@ -1236,7 +1233,6 @@ namespace Isis {
   }
 
 
-
 ///**
 // * Slot to update the right ChipViewport for zoom
 // * operations
@@ -1247,7 +1243,7 @@ namespace Isis {
 // */
 //void ControlPointEdit::updateRightZoom() {
 //
-//  if ( p_linkZoom ) {
+//  if (p_linkZoom) {
 //    try {
 //      p_rightView->geomChip(p_leftChip, p_leftCube);
 //
@@ -1262,7 +1258,6 @@ namespace Isis {
 //    }
 //  }
 //}
-
 
 
   /**
@@ -1298,7 +1293,6 @@ namespace Isis {
     p_dial->setNotchesVisible(true);
 
   }
-
 
 
   /**
@@ -1337,7 +1331,6 @@ namespace Isis {
 
     try {
       p_rightView->geomChip(p_leftChip, p_leftCube);
-
     }
     catch (IException &e) {
       IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
@@ -1386,8 +1379,6 @@ namespace Isis {
   }
 
 
-
-
   /**
    * Turn circle widgets on/off
    *
@@ -1397,10 +1388,10 @@ namespace Isis {
    */
   void ControlPointEdit::setCircle(bool checked) {
 
-    if ( checked == p_circle ) return;
+    if (checked == p_circle) return;
 
     p_circle = checked;
-    if ( p_circle ) {
+    if (p_circle) {
       // Turn on slider bar
       p_slider->setDisabled(false);
       p_slider->show();
@@ -1415,9 +1406,7 @@ namespace Isis {
       p_rightView->setCircle(false);
     }
 
-
   }
-
 
 
   /**
@@ -1429,19 +1418,18 @@ namespace Isis {
    */
   void ControlPointEdit::setZoomLink(bool checked) {
 
-    if ( checked == p_linkZoom ) return;
+    if (checked == p_linkZoom) return;
 
     p_linkZoom = checked;
-    if ( p_linkZoom ) {
+    if (p_linkZoom) {
       p_rightView->zoom(p_leftView->zoomFactor());
     }
   }
 
 
-
   //!  Slot to start blink function
   void ControlPointEdit::blinkStart() {
-    if ( p_timerOn ) return;
+    if (p_timerOn) return;
 
     //  Set up blink list
     p_blinkList.push_back(p_leftView);
@@ -1468,7 +1456,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Set blink rate
    *
@@ -1476,7 +1463,7 @@ namespace Isis {
    * @author  Tracie Sucharski
    */
   void ControlPointEdit::changeBlinkTime(double interval) {
-    if ( p_timerOn ) p_timer->setInterval((int)(interval * 1000.));
+    if (p_timerOn) p_timer->setInterval((int)(interval * 1000.));
   }
 
 
@@ -1486,8 +1473,6 @@ namespace Isis {
     p_blinkIndex = !p_blinkIndex;
     p_leftView->loadView(*(p_blinkList)[p_blinkIndex]);
   }
-
-
 
 
   /**
@@ -1522,7 +1507,7 @@ namespace Isis {
 
       // try to register file
       reg = AutoRegFactory::Create(pvl);
-      if ( p_autoRegFact != NULL )
+      if (p_autoRegFact != NULL)
         delete p_autoRegFact;
       p_autoRegFact = reg;
 
@@ -1578,12 +1563,10 @@ namespace Isis {
   }
 
 
-
   void ControlPointEdit::refreshChips() {
     p_leftView->update();
     p_rightView->update();
   }
-
 
 
   /**
@@ -1596,8 +1579,8 @@ namespace Isis {
    */
   void ControlPointEdit::saveChips() {
 
-//    if (!p_autoRegShown) {
-    if ( !p_autoRegAttempted ) {
+    // if (!p_autoRegShown) {
+    if (!p_autoRegAttempted) {
       QString message = "Point must be Registered before chips can be saved.";
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       return;

@@ -85,6 +85,7 @@ static void loadNaifTiming() {
  *
  * This method requires the appropriate NAIK kernels to be loaded that
  * provides instrument time support, leap seconds and planet body ephemeris.
+ *  
  * @return @b double Distance in AU between Sun and observed body.
  */
 static bool sunDistanceAU(const QString &scStartTime,

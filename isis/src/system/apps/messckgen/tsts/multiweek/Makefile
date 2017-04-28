@@ -3,7 +3,8 @@ APPNAME = messckgen
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/kernels.0110.db to=$(OUTPUT)/kernels.0111.pvl \
-	pivot=$(INPUT)/pivot_kernels.0111.db \
-	atthist=$(INPUT)/atthist_kernels.0111.db \
+	$(APPNAME) from=$(INPUT)/messenger_kernels.0004.db \
+	to=$(OUTPUT)/messenger_kernels.0005.pvl \
+	pivot=$(INPUT)/mdis_kernels.0002.db \
+	atthist=$(INPUT)/messenger_mdis_att_kernels.0002.db \
 	> /dev/null;

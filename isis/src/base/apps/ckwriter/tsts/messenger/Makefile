@@ -1,6 +1,6 @@
 APPNAME = ckwriter
 BASES    = $(basename $(notdir $(wildcard $(INPUT)/*.cub)))
-EXTRA    = $(shell ls -1t $(ISIS3DATA)/messenger/kernels/ck/*_mdis_pivot_pvtres.bc | head -1)
+EXTRA    = $(shell ls -1t $(ISIS3DATA)/messenger/kernels/ck/*_mdis_gm040819_150430v1.bc | head -1)
 
 
 include $(ISISROOT)/make/isismake.tsts

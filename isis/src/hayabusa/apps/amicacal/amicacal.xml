@@ -17,8 +17,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <li><a href="#HotPixel">Step 3: Remove the hot pixels.</a ></li>
     <li><a href="#Smear">Step 4: Readout smear correction.</a ></li>
     <li><a href="#Flatfield">Step 5: Uniformity (flat field) correction.</a ></li>
-    <li><a href="#ConvertIOF">Step 6: Conversion to I/F</a ></li>
-    <li><a href="#PSFCorrection">Step 7: PSF correction</a ></li>
+    <li><a href="#ConvertIOF">Step 6 (Optional): Unit conversion to Radiance or I/F</a ></li>
+<!--    <li><a href="#PSFCorrection">Step 7: PSF correction</a ></li> -->
     <li><a href="#Notes">Notes</a></li>
     <li><a href="#References">References</a ></li>
   </ul>
@@ -247,16 +247,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       <td>B</td><td>The binning number.</td>
     </tr>
     </table></center>
-
-
-
     </div>
-
-
-
-
-
-
   </p>
   <p>
     <h1><a id="Flatfield">Step 5: Flat-field correction:</a ></h1>
@@ -271,21 +262,50 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     flat-field image.
   </p>
   <p>
-    <h1><a id="ConvertIOF">Step 6: Convert units to I over F:</a ></h1>
-    This converts the raw DN values to I/F (radiance) units.  The formula is as follows:
+    <h1><a id="ConvertIOF">Step 6 (Optional): Convert output units to Radiance or I over F:</a ></h1>
+    This step is optional, and the formula used depends on the value of the UNITS user parameter. 
+
+    If UNITS=RADIANCE, the following formula will be used to convert the raw DN values to radiance 
+    (W/m2/sr/µm):
+
     <br/><br/>
      <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-      <center><strong>IoF = Raw*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
+      <center><strong>R = Raw*RadianceStandard*RadianceScaleFactor</strong></center>
       <br/><br/>
       <center><table border="1" cellpadding="5">
       <tr>
           <td>Variable</td><td>Description</td>
      </tr>
      <tr>
-          <td>Raw</td><td>The raw DN value.</td>
+          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
      </tr>
      <tr>
-          <td>IoF</td><td>The IoF units of the raw DN value.</td>
+          <td>Raw</td><td>The raw DN value. </td>
+     </tr>
+     <tr>
+          <td>RadianceStandard</td><td>The standard conversion factor from DNs to radiance. </td>
+     </tr>
+     <tr>
+          <td>RadianceScaleFactor</td><td>An adjustment factor for each filter.</td>
+     </tr>
+     </table></center>
+     </div>
+
+    If UNITS = IOF, first the above formula will be used to convert from raw DNs to calibrated Radiance, and then
+    the following formula will be used to convert the raw DN values to I/F (radiance) units:
+    <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+      <center><strong>IoF = R*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
+      <br/><br/>
+      <center><table border="1" cellpadding="5">
+      <tr>
+          <td>Variable</td><td>Description</td>
+     </tr>
+     <tr>
+          <td>IoF</td><td>The calibrated radiance in units of I over F.</td>
+     </tr>
+     <tr>
+          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
      </tr>
      <tr>
          <td>R<sub>s</sub></td><td>The distance in Astronomical Units (AU) between the Sun
@@ -293,14 +313,15 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
          </td>
      </tr>
      <tr>
-          <td>F</td><td>The solar flux at the target body.</td>
+          <td>F</td><td>The solar flux (w/m2/µm) at 1 AU. </td>
      </tr>
      </table></center>
      </div>
 
+    If UNITS=DN, no output conversion will be performed and the output units will be in raw DNs. 
   </p>
-  <p>
 
+<!--  <p>
     <h1><a id="PSFCorrection">Step 7: PSF Correction:</a ></h1>
     The point-spread function (PSF) is a model describing the two-dimensional distribution of
     light emitted from an infinitely small point source.  For point light sources, there
@@ -420,7 +441,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     </tr>
     </table></center>
     </div>
-  </p>
+  </p> --> 
   <p>
   <h1><a id="Notes">Notes</a></h1>
   <ol>
@@ -450,14 +471,14 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
   </p>
 
 
-  <p>
+ <!-- <p>
     <h1>Output units</h1>
     The output units of the DNs will depend on which calibration flags are turned on.
     <ul>
       <li>If IOF=TRUE, output units are measured in I/F</li>
       <li>Otherwise output units are measured in W/(m<sup>2</sup> micrometer sr)</li>
     </ul>
-  </p>
+  </p> -->
 
   </description>
 
@@ -499,6 +520,19 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         applyPSF boolean parameter into a global variable for consistency with the applySmear
         global variable.
     </change>
+    <change name="Kristin Berry" date="2017-02-07">
+       Removed the "APPLYSMEAR" option as a user-specifiable parameter. The smear correction
+       will still be applied automatically when an image is being processed for which on-board smear 
+       correction was not applied (NSUB &lt;= 1). Also updated application code for conformity with ISIS3
+       Coding Standards. Backward Compatibility Issue: The APPLYSMEAR parameter was removed. The smear
+       correction will automatically be applied to images with 1 sub-image. 
+    </change>
+    <change name="Kristin Berry" date="2017-02-08">
+       Removed the "PSF" correction option, since the PSF correction is not yet working. Related code has been commented-
+       out rather than removed entirely so that this work can potentially be resumed at a later date. 
+       Backward Compatibility Issue: The PSF parameter was removed, since it is not yet working. 
+       amicacal cannot apply a PSF correction anymore.
+    </change>
   </history>
 
   <groups>
@@ -521,11 +555,11 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         <fileMode>output</fileMode>
         <pixelType>real</pixelType>
         <brief>
-          Non-PSF Corrected Output cube
+          Corrected Output cube
         </brief>
         <description>
           This is the output file. The output cube will be a calibrated version 
-          of the input cube (without PSF correction).
+          of the input cube.
         </description>
         <filter>
           *.cub
@@ -551,7 +585,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
     <group name="Options">
 
-      <parameter name = "APPLYPSF">
+<!--      <parameter name = "APPLYPSF">
           <type>boolean</type>
           <default><item>False</item></default>
           <brief>
@@ -559,8 +593,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
           </brief>
           <description>
           </description>
-      </parameter>
-      <parameter name = "APPLYSMEAR">
+      </parameter> --> 
+<!--      <parameter name = "APPLYSMEAR">
           <type>boolean</type>
           <default><item>False</item></default>
           <brief>
@@ -568,7 +602,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
           </brief>
           <description>
           </description>
-      </parameter>
+      </parameter> -->
       <parameter name = "NULLPOLARPIX">
         <type>boolean</type>
         <default><item>True</item></default>
@@ -617,20 +651,17 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         </list>
       </parameter>
 
-      <parameter name = "KERNEL_SIZE">
+<!--   Part of the PSF correction, so removed until PSF is added back in   
+         <parameter name = "KERNEL_SIZE">
         <type>string</type>
         <default><item>23</item></default>
         <brief>
 
-        </brief>
+        </brief> 
         <description>
 
       </description>
-      </parameter>
-
+      </parameter>-->
     </group>
-    
-
   </groups>
-  
 </application>

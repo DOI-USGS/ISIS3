@@ -325,7 +325,11 @@ namespace Isis {
       progress->CheckStatus();
     }
 
-    for (Latitude lat = startLat; lat <= endLat + latInc / 2; lat += latInc) {
+    // Ensure that the Latitude being incremented does not throw an exception
+    // if incremented past -90 or 90 degrees.
+    Latitude latStep = startLat;
+    latStep.setErrorChecking(Latitude::AllowPastPole);
+    for (; latStep <= endLat + latInc / 2; latStep += latInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
@@ -333,7 +337,7 @@ namespace Isis {
       for (Longitude lon = *p_minLon; lon <= *p_maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(lat, lon, x, y);
+        bool valid = GetXY(latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {
@@ -356,11 +360,15 @@ namespace Isis {
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for (Latitude lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
+      // Ensure that the Latitude being incremented does not throw an exception
+      // if incremented past -90 or 90 degrees.
+      latStep = *p_minLat;
+      latStep.setErrorChecking(Latitude::AllowPastPole);
+      for (; latStep <= *p_maxLat; latStep += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
 
-        bool valid = GetXY(lat, lon, x, y);
+        bool valid = GetXY(latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX == x && previousY == y) {
@@ -423,7 +431,11 @@ namespace Isis {
     const Longitude &maxLon = *p_maxLon;
 
     // Walk the minLat/maxLat lines
-    for (Latitude lat = minLat; lat <= maxLat; lat += (maxLat - minLat)) {
+    // Ensure that the Latitude being incremented does not throw an exception
+    // if incremented past -90 or 90 degrees.
+    Latitude latStep = minLat;
+    latStep.setErrorChecking(Latitude::AllowPastPole);
+    for (; latStep <= maxLat; latStep += (maxLat - minLat)) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
@@ -431,7 +443,7 @@ namespace Isis {
       for (Longitude lon = minLon; lon <= maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(lat, lon, x, y);
+        bool valid = GetXY(latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {
@@ -451,10 +463,14 @@ namespace Isis {
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for (Latitude lat = minLat; lat <= maxLat; lat += lonRes) {
+      // Ensure that the Latitude being incremented does not throw an exception
+      // if incremented past -90 or 90 degrees.
+      latStep = minLat;
+      latStep.setErrorChecking(Latitude::AllowPastPole);
+      for (; latStep <= maxLat; latStep += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(lat, lon, x, y);
+        bool valid = GetXY(latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {

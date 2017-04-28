@@ -1168,6 +1168,12 @@ End_Group
        changed the program version to 1.0 from 0.1.
        References #4556.
     </change>
+    <change name="Jesse Mapel" date="2017-04-14"> 
+       Corrected a bug where keypoints and descriptors were being overwritten
+       when using multiple algorithm specificiations. Added a new clone()
+       method to MatchImage and made the MatchImages used by each algorithm
+       specification independent. Fixes #4765.
+    </change>
   </history> 
 
   <groups>

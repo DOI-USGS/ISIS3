@@ -65,6 +65,8 @@ namespace Isis {
    *                           method was fixed to match the signature of the parent method.
    *                           Moved implementation of GroundMap() and GetMappingGroup() to the
    *                           cpp file per ISIS coding standards.
+   *   @history 2017-04-10 Jesse mapel - Modified to not throw an exception when calculating
+   *                           longitude lines close to 90 or -90 latitude. Fixes #4766.
    */
   class GroundGrid {
     public:
