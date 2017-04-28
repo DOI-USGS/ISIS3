@@ -83,6 +83,7 @@ namespace Isis {
    *                           network for write methods in BundleSolutionInfo.  Fixes #4159.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
    *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
+   *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
    */
   class BundleResults : public QObject {
     Q_OBJECT
