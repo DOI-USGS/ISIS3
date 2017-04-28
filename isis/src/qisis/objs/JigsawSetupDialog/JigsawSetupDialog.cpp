@@ -64,6 +64,10 @@ namespace Isis {
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (useLastSettings && bundleSolutionInfo.size() > 0) {
      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+     // Retrieve the control net name used in the last bundle adjustment.
+     // Note that this returns a fully specified path and filename, while the cnet combo box
+     // only stores file names.
+     selectControl(bundleSolutionInfo.last()->controlNetworkFileName());
      fillFromSettings(lastBundleSettings);
     }
 
@@ -616,6 +620,35 @@ namespace Isis {
   }
 
 
+  /**
+   * Selects a control in the control network combo box by trying to find an item with the
+   * matching name. If the name is found in the combo box, the box's index is set to that
+   * found control network index. If the name is not found and the box is not empty, the
+   * current index is set to 0 (the first item). If the name is not found and the box is
+   * empty, the index is set to -1 (see Qt).
+   *
+   * @param const QString &controlName The name of the control to try to find in the combo box.
+   */
+  void JigsawSetupDialog::selectControl(const QString &controlName) {
+    QComboBox &cnetBox = *(m_ui->controlNetworkComboBox);
+    int foundControlIndex = cnetBox.findText(FileName(controlName).name());
+    // We did not find it, so we need to see if the combo box is empty or not.
+    if (foundControlIndex == -1) {
+      if (cnetBox.count() == 0) {
+       cnetBox.setCurrentIndex(-1);
+      }
+      // If it is not empty, just set the current index to the first item.
+      else {
+        cnetBox.setCurrentIndex(0);
+      }
+    }
+    // Otherwise, set the current index to the found control net index.
+    else {
+      cnetBox.setCurrentIndex(foundControlIndex);
+    }
+  } 
+
+
   Control *JigsawSetupDialog::selectedControl() {
 
       int nIndex = m_ui->controlNetworkComboBox->currentIndex();
@@ -626,11 +659,8 @@ namespace Isis {
   }
 
 
-  QString *JigsawSetupDialog::selectedControlName() {
-
-    QString *name = new QString(m_ui->controlNetworkComboBox->currentText());
-      return name;
-
+  QString JigsawSetupDialog::selectedControlName() {
+    return QString(m_ui->controlNetworkComboBox->currentText());
   }
 
 

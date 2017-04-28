@@ -55,6 +55,7 @@ namespace Isis {
     m_project = project;
     m_bundleSettings = bundleSettings;
     m_selectedControl = selectedControl;
+    m_selectedControlName = FileName(selectedControl->fileName()).name();
     init();
   }
 
@@ -66,6 +67,9 @@ namespace Isis {
    */
   void JigsawDialog::init() {
     m_ui->setupUi(this);
+
+    // Note: The buttons are added to the UI setup from the JigsawDialog.ui file.
+    // These could have been added to the UI file itself (as XML).
 
     // Three buttons: Accept, Reject, Close. Initially only close is enabled.
     // Close is only disabled when a bundle is running.
@@ -84,6 +88,8 @@ namespace Isis {
     m_close->setToolTip(tr("Close this dialog."));
 
     // Add the buttons to the QDialogButtonBox defined in the UI file.
+    // Note that according to the Qt doc'n for QDialogButtonBox, addButton() causes the
+    // dialog box to take ownership of the QPushButton's, so we don't manually manage their memory.
     m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
     m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
     m_ui->buttonBox->addButton(m_close, QDialogButtonBox::AcceptRole);
@@ -153,6 +159,8 @@ namespace Isis {
     // are present in the setup dialog.
     if (m_bundleSettings && !m_ui->useLastSettings->isChecked()) {
       setupdlg.loadSettings(m_bundleSettings);
+      // We also tell the setup dialog what the last selected control is.
+      setupdlg.selectControl(m_selectedControlName);
     }
 
     if (setupdlg.exec() == QDialog::Accepted) {
@@ -189,6 +197,9 @@ namespace Isis {
          if (lastBundleSettings) {
            m_bundleSettings = lastBundleSettings;
          }
+
+         // Grab the control name that was used in that bundle adjustment.
+         m_selectedControlName = FileName(bundleSolutionInfo.last()->controlNetworkFileName()).name();
       }
 
       // Clear the dialog displays.

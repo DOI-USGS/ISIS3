@@ -55,6 +55,8 @@ namespace Isis {
    *   @history 2017-04-26 Ian Humphrey - Added updateScrollBar() and clearDialog() to reduce
    *                           code duplication. Modified the run clicked slot to clear the
    *                           dialog display anytime that a bundle adjust is re-ran. Fixes #4808.
+   *   @history 2017-04-27 Ian Humphrey - Modified to track the last used control net to properly
+   *                           update the jigsaw setup dialog's cnet combo box. References #4817.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -81,7 +83,7 @@ namespace Isis {
     BundleAdjust *m_bundleAdjust;
     Project *m_project;
     Control *m_selectedControl;
-    QString *m_selectedControlName;
+    QString m_selectedControlName;
     BundleSettingsQsp m_bundleSettings;
 
   private:
