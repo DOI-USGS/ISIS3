@@ -121,28 +121,42 @@ namespace Isis {
       Control *control = NULL;
       // See if there are any other control lists in the project and give these to the user as
       // choices for control nets they can export.
-      if (controlList()->isEmpty()) {
-        QMap<Control *, QString> cnetChoices;
-        foreach (ControlList *list, project()->controls()) {
-          foreach (Control *control, *list) {
-            cnetChoices[control] = tr("%1/%2").arg(list->name())
-                .arg(control->displayProperties()->displayName());
-          }
+
+
+      if(project()) {
+
+        Project *proj = project();
+
+        QList<ControlList *> controls = proj->controls();
+        if (controls.count() > 0) {
+          ControlList *l=controls.first();
+          WorkOrder::setData(l);
+          control = controlList()->first();
         }
 
-        QStringList cnetNames = cnetChoices.values();
-        qSort(cnetNames);
+        else {
 
-        QString choice = QInputDialog::getItem(NULL, tr("Select Control"),
-            tr("Please choose a control to export."), cnetNames, 0, false, &success);
+          QMap<Control *, QString> cnetChoices;
+          foreach (ControlList *list, project()->controls()) {
+            foreach (Control *control, *list) {
+              cnetChoices[control] = tr("%1/%2").arg(list->name())
+                  .arg(control->displayProperties()->displayName());
+            }
+          }
 
-        control = cnetChoices.key(choice);
-        internalData.append(control->id());
+          QStringList cnetNames = cnetChoices.values();
+          qSort(cnetNames);
+
+          QString choice = QInputDialog::getItem(NULL, tr("Select Control"),
+              tr("Please choose a control to export."), cnetNames, 0, false, &success);
+
+          control = cnetChoices.key(choice);
+          internalData.append(control->id());
+
+
+        }
       }
-      // Otherwise, export the control net associated with this work order.
-      else {
-        control = controlList()->first();
-      }
+
 
       QString destination =
           QFileDialog::getSaveFileName(NULL, QString("Export Control Network"),

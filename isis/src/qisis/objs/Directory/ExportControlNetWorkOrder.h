@@ -22,6 +22,9 @@ namespace Isis {
    *   @history 2017-04-11 Ian Humphrey - Updated to match work order redesign. Replaced asyncRedo
    *                           and postSyncRedo with execute and postExecution. Separated
    *                           setup and action into setupExecution and execute. Fixes #4763.
+   *   @history 2017-05-01 Tyler Wilson - Modified the setupExecution() function so that
+   *                           it no longer causes a segmentation fault when the user attempts
+   *                           to export a control network from the file menu.  Fixes #4816.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
