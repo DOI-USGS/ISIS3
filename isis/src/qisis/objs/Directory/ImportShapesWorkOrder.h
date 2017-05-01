@@ -46,6 +46,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-04-12 JP Bonn - Updated to new workorder design.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undone, imported
+   *                           shapes are removed from the project tree. Fixes #4597.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -34,6 +34,8 @@
 #include "IException.h"
 #include "Progress.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
 
@@ -74,20 +76,20 @@ namespace Isis {
     return new ImportControlNetWorkOrder(*this);
   }
 
-  
+
   /**
    * @brief Sets up the work order for execution.
-   * 
+   *
    * This method prompts the user for a control net to open. That control net is then
    * saved using setInternalData data. This method was renamed from execute() to setupExecution()
-   * 
+   *
    * @see WorkOrder::setupExecution()
-   * 
+   *
    * @return bool Returns a boolean. This boolean is true if the internal data was set correctly.
    */
   bool ImportControlNetWorkOrder::setupExecution() {
     QUndoCommand::setText(tr("Import Control Networks"));
-    
+
     WorkOrder::setupExecution();
 
     QStringList cnetFileNames = QFileDialog::getOpenFileNames(
@@ -106,7 +108,7 @@ namespace Isis {
 
   /**
    * @brief Imports the control network asynchronously.
-   * 
+   *
    * This method asynchronously imports the control net. This method replaces both
    * syncRedo() and asyncRedo().
    */
@@ -134,7 +136,7 @@ namespace Isis {
       for (int i = 0; i < m_readProgresses.count(); i++) {
         Progress *progress = m_readProgresses[i];
 
-        if (m_watcher->future().isResultReadyAt(i)) {  
+        if (m_watcher->future().isResultReadyAt(i)) {
           totalProgress += 100;
         }
         else if (progress->MaximumSteps() > 0) {
@@ -152,7 +154,7 @@ namespace Isis {
 
   /**
    * @brief Clears progress.
-   * 
+   *
    * This method clears the progresses created in execute(). This method was renamed
    * from postSyncRedo() to postExecution().
    */
@@ -166,19 +168,19 @@ namespace Isis {
 
   /**
    * @brief Deletes the control network
-   * 
+   *
    * This method deletes the control network from the project. This method is was
    * renamed from undoSyncRedo() to undoExecution().
    */
   void ImportControlNetWorkOrder::undoExecution() {
     if (m_watcher->isFinished()) {
       ControlList *list = project()->controls().last();
+      // Remove the controls from disk.
       list->deleteFromDisk(project());
-      foreach (Control *control, *list) {
-        delete control;
-      }
-      
-      delete list;
+      // Remove the controls from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData(QVariant::fromValue(list));
+      project()->directory()->model()->removeItem(currentItem);
     }
   }
 

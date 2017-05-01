@@ -29,6 +29,8 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 #include "SaveProjectWorkOrder.h"
 #include "TextFile.h"
 
@@ -139,7 +141,13 @@ namespace Isis {
     */
   void ImportShapesWorkOrder::undoExecution() {
     project()->waitForShapeReaderFinished();
-    project()->shapes().last()->deleteFromDisk(project());
+    ShapeList *list = project()->shapes().last();
+    // Remove the shapes from disk.
+    list->deleteFromDisk(project());
+    // Remove the shapes from the model, which updates the tree view.
+    ProjectItem *currentItem =
+        project()->directory()->model()->findItemData(QVariant::fromValue(list));
+    project()->directory()->model()->removeItem(currentItem);
   }
 
   /**
@@ -268,8 +276,8 @@ namespace Isis {
 
 
   /**
-   * Creates a project shape folder and copies the shape cubes into it. This will create the *.ecub 
-   * and .cub files inside of the project. 
+   * Creates a project shape folder and copies the shape cubes into it. This will create the *.ecub
+   * and .cub files inside of the project.
    * This can be thought of as:
    * <pre>
    *   mkdir project/Shapes/import1

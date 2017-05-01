@@ -65,6 +65,8 @@ namespace Isis {
    *   @history 2017-04-11 Ian Humphrey - Removed isSynchronous() and instead set inherited member
    *                           m_isSynchronous to false in constructor to indicate this is an
    *                           asynchronous work order. Updated documentation. References #4732.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undo, imported
+   *                           images are removed from the project tree. Fixes #4597.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

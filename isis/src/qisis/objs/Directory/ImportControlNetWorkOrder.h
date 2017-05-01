@@ -47,6 +47,8 @@ namespace Isis {
    *                           execute to setupExecution, and renamed postSyncRedo to postExecution
    *                           and undoSyncRedo to undoExecution. This was done to match the 
    *                           WorkOrder redesign. Fixes #4716.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so when undone, the imported
+   *                           cnet(s) are removed from the project tree. Fixes #4597. 
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT

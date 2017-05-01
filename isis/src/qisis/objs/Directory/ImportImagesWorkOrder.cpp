@@ -31,6 +31,8 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 #include "SaveProjectWorkOrder.h"
 #include "TextFile.h"
 
@@ -185,7 +187,13 @@ namespace Isis {
    */
   void ImportImagesWorkOrder::undoExecution() {
     project()->waitForImageReaderFinished();
-    project()->images().last()->deleteFromDisk(project());
+    ImageList *list = project()->images().last();
+    // Remove the images from disk.
+    list->deleteFromDisk(project());
+    // Remove the images from the model, which updates the tree view.
+    ProjectItem *currentItem =
+        project()->directory()->model()->findItemData(QVariant::fromValue(list));
+    project()->directory()->model()->removeItem(currentItem);
   }
 
 
