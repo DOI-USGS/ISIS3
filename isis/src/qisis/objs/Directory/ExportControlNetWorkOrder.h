@@ -24,7 +24,7 @@ namespace Isis {
    *                           setup and action into setupExecution and execute. Fixes #4763.
    *   @history 2017-05-01 Tyler Wilson - Modified the setupExecution() function so that
    *                           it no longer causes a segmentation fault when the user attempts
-   *                           to export a control network from the file menu.  Fixes #4816.
+   *                           to export a control network from the file menu.  Fixes #4760.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
