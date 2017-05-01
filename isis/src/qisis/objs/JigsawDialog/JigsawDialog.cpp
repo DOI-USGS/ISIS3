@@ -290,6 +290,21 @@ namespace Isis {
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
+
+    QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
+    foreach (ImageList *imageList, imageLists) {
+      foreach (Image *image, *imageList) {
+        FileName imageName(image->fileName());
+        FileName imagesBundledFile(m_project->bundleSolutionInfoRoot() + "/" +
+                                   m_bundleSolutionInfo->runTime() + "/" + imageName.name());
+        imagesBundledFile = imagesBundledFile.setExtension("ecub");
+
+        Cube *originalCube = new Cube(image->fileName(), "r");
+        Cube *ecub = originalCube->copy(imagesBundledFile, CubeAttributeOutput("+External"));
+      }
+    }
+
+
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
 

@@ -254,10 +254,13 @@ namespace Isis {
     m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
     m_bundleResults.setOutputControlNet(m_controlNet);
 
+    m_imageLists = imgLists;
+
     // this is too slow and we need to get rid of the serial number list anyway
     // should be unnecessary as Image class has serial number
     // could hang on to image list until creating BundleObservations?
     m_serialNumberList = new SerialNumberList;
+
     foreach (ImageList *imgList, imgLists) {
       foreach (Image *image, *imgList) {
         m_serialNumberList->add(image->fileName());
@@ -930,7 +933,7 @@ namespace Isis {
    * @return @b BundleSolutionInfo A container with solve information from the adjustment.
    */
   BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults);
+    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
     results.setRunTime("");
     return results;
   }
@@ -2531,6 +2534,40 @@ namespace Isis {
     std::cout << "Measures that came back: " << numComingBack << "\n" << std::endl;
 
     return true;
+  }
+
+
+  /**
+  * This method returns the image list used in the bundle adjust. If a QList<ImageList *> was passed
+  * into the constructor then it uses that list, otherwise it constructs the QList using the
+  * m_serialNumberList
+  *
+  * @return QList<ImageList *> The ImageLists used for the bundle adjust
+  */
+  QList<ImageList *> BundleAdjust::imageLists() {
+    if (m_imageLists.count() > 0) {
+      return m_imageLists;
+    }
+    else if (m_serialNumberList->size() > 0) {
+      ImageList *imgList;
+      try {
+        for (int i = 0; i < m_serialNumberList->size(); i++) {
+          Image *image = new Image(m_serialNumberList->fileName(i));
+          imgList->append(image);
+        }
+        m_imageLists.append(imgList);
+        return m_imageLists;
+      }
+      catch (IException &e) {
+        QString msg = "Invalid image in serial number list\n";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    else {
+      QString msg = "No images used in bundle adjust\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return m_imageLists;
   }
 
 

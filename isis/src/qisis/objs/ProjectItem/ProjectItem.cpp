@@ -49,12 +49,12 @@ namespace Isis {
     setEditable(false);
   }
 
-  
+
   /**
    * Contructs a copy of another item. The copy will have the same text,
    * icon, and data, and copies of the children. The copy will not have a
    * parent or a model.
-   * 
+   *
    * @param[in] item (ProjectItem *) The item to copy.
    */
   ProjectItem::ProjectItem(ProjectItem *item) {
@@ -100,13 +100,14 @@ namespace Isis {
   ProjectItem::ProjectItem(BundleSolutionInfo *bundleSolutionInfo) {
     setEditable(false);
     setBundleSolutionInfo(bundleSolutionInfo);
-    
+
     QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
     Control *control = new Control(cNetFileName);
     appendRow( new ProjectItem(control) );
 
     appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
+    appendRow( new ProjectItem( bundleSolutionInfo->imageList() ) );
   }
 
 
@@ -199,7 +200,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Constructs an item from an Shape.
    *
@@ -249,7 +250,7 @@ namespace Isis {
     setGuiCamera(guiCamera);
   }
 
-  
+
   /**
    * Constructs an item from a GuiCameraList.
    *
@@ -278,19 +279,19 @@ namespace Isis {
     appendRow( new ProjectItem( project->images() ) );
 //  qDebug()<<"                                            rowCount() afterImages = "<<rowCount();
     appendRow( new ProjectItem( project->shapes() ) );
-        
+
     ProjectItem *targetBodyListItem = new ProjectItem();
     targetBodyListItem->setTargetBodyList();
     appendRow(targetBodyListItem);
-    
+
     ProjectItem *guiCameraListItem = new ProjectItem();
     guiCameraListItem->setGuiCameraList();
     appendRow(guiCameraListItem);
-    
+
     ProjectItem *spaceCraftItem = new ProjectItem();
     spaceCraftItem->setSpacecraft();
     appendRow(spaceCraftItem);
-    
+
     appendRow( new ProjectItem( project->bundleSolutionInfo() ) );
   }
 
@@ -430,7 +431,7 @@ namespace Isis {
     return data().value<ControlList *>();
   }
 
-  
+
   /**
    * Returns the CorrelationMatrix stored the item.
    *
@@ -460,11 +461,11 @@ namespace Isis {
     return data().value<GuiCameraQsp>();
 
   }
-  
+
 
   /**
    * Returns the TargetBodyQsp stored in the data of the item.
-   * 
+   *
    * @return @b TargetBodyQsp The target body stored in the item.
    */
   TargetBodyQsp ProjectItem::targetBody() const {
@@ -555,7 +556,7 @@ namespace Isis {
    *
    * @return @b bool If a Control is stored in the data of the item or not.
    */
-  bool ProjectItem::isControl() const { 
+  bool ProjectItem::isControl() const {
     return data().canConvert<Control *>();
   }
 
@@ -589,7 +590,7 @@ namespace Isis {
    *
    * @return @b bool If a Project is stored in the data of the item or not.
    */
-  bool ProjectItem::isProject() const { 
+  bool ProjectItem::isProject() const {
     return data().canConvert<Project *>();
   }
 
@@ -600,7 +601,7 @@ namespace Isis {
    *
    * @return @b bool If a GuiCameraQsp is stored in the item or not.
    */
-  bool ProjectItem::isGuiCamera() const {     
+  bool ProjectItem::isGuiCamera() const {
     return data().canConvert<GuiCameraQsp>();
   }
 
@@ -611,7 +612,7 @@ namespace Isis {
    *
    * @return @b bool If a TargetBodyQsp is stored in the item or not.
    */
-  bool ProjectItem::isTargetBody() const { 
+  bool ProjectItem::isTargetBody() const {
     return data().canConvert<TargetBodyQsp>();
   }
 
@@ -766,7 +767,7 @@ namespace Isis {
     setData( QVariant() );
   }
 
-  
+
   /**
    * Sets the text, icon, and data corresponding to a CorrelationMatrix.
    *
@@ -787,7 +788,7 @@ namespace Isis {
    *     @history  2016-11-10 - Tyler Wilson  Changed the reference
    *               to the icon from ':data' to ':data-management'
    *               due to a naming conflict causing strange errors
-   *               to appear on the command line.  Fixes #3982.   
+   *               to appear on the command line.  Fixes #3982.
    */
   void ProjectItem::setProject(Project *project) {
     setText( project->name() );
@@ -826,8 +827,8 @@ namespace Isis {
     setIcon( QIcon(":camera") );
     setData( QVariant() );
   }
-  
-  
+
+
   /**
    * Sets the text, icon, and data corresponding to SpaceCraft.
    */
@@ -836,7 +837,7 @@ namespace Isis {
     setIcon( QIcon(":spacecraft") );
     setData( QVariant() );
   }
-  
+
 
   /**
    * Sets the text, icon, and data corresponding to a TargetBodyQsp.
@@ -857,7 +858,7 @@ namespace Isis {
       setIcon( QIcon(":moonPhase") );
     setData( QVariant::fromValue<TargetBodyQsp>(targetBody) );
   }
-  
+
 
   /**
    * Sets the text, icon, and data corresponding to a TargetBodyList.
@@ -884,7 +885,7 @@ namespace Isis {
     if ( data(role) == value ) {
       return this;
     }
-    
+
     for (int i=0; i<rowCount(); i++) {
 //    qDebug()<<"ProjectItem::findItemData  BEFORE call: child(i)->findItemData...";
       ProjectItem *item = child(i)->findItemData(value, role);
@@ -907,7 +908,7 @@ namespace Isis {
     QStandardItem::appendRow(item);
   }
 
- 
+
   /**
    * Returns the child item at a given row.
    *
@@ -971,14 +972,14 @@ namespace Isis {
    */
   ProjectItem *ProjectItem::takeChild(int row) {
     QList<QStandardItem *> items = QStandardItem::takeRow(row);
-    
+
     if ( items.isEmpty() ) {
       return 0;
     }
 
     return static_cast<ProjectItem *>( items.first() );
   }
-  
+
 
   void ProjectItem::setTextColor(Qt::GlobalColor color) {
     setForeground(QBrush(color));

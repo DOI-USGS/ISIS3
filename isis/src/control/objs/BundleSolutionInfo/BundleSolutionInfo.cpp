@@ -34,6 +34,7 @@ namespace Isis {
   BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
                                          FileName controlNetworkFileName,
                                          BundleResults outputStatistics,
+                                         QList<ImageList *> imgList,
                                          QObject *parent) : QObject(parent) {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
@@ -49,7 +50,7 @@ namespace Isis {
     m_statisticsResults = new BundleResults(outputStatistics);
 
     m_images = NULL;
-    m_images = new QList<ImageList *>;
+    m_images = new QList<ImageList *>(imgList);
   }
 
 
@@ -474,7 +475,14 @@ namespace Isis {
     }
   }
 
-
+/**
+* Returns the images used in the bundle
+*
+* @return m_imageList The image list used in the bundle
+*/
+  QList<ImageList *> BundleSolutionInfo::imageList() {
+    return *m_images;
+  }
 
 
   /**

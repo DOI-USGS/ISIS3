@@ -102,6 +102,7 @@ namespace Isis {
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
                     FileName controlNetworkFileName,
                     BundleResults outputStatistics,
+                    QList<ImageList *> imgList,
                     QObject *parent = 0);
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
@@ -117,6 +118,7 @@ namespace Isis {
       QString controlNetworkFileName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
+      QList<ImageList *> imageList();
       QString runTime() const;
 
 
