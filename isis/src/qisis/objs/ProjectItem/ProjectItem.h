@@ -33,7 +33,7 @@
 class QVariant;
 
 namespace Isis {
-  
+
   class BundleResults;
   class BundleSolutionInfo;
   class Control;
@@ -94,7 +94,7 @@ namespace Isis {
    * model->appendRow(item);
    * @endcode
    *
-   * @author 2015-10-21 Jeffrey Covington 
+   * @author 2015-10-21 Jeffrey Covington
    *
    * @internal
    *     @history 2015-10-21 Jeffrey Covington - Original version.
@@ -103,15 +103,17 @@ namespace Isis {
    *                             BundleSettingsQsp.
    *     @history 2016-07-25 Tracie Sucharksi - Added support for Shapes.
    *     @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
-   *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the 
-   *                               the data management icon from 'data' to 
+   *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the
+   *                               the data management icon from 'data' to
    *                               'data-management' in the setProject function.
-   *                               A naming conflict was causing strange warnings 
-   *                               to show up on the command line when cnetsuite is launched, 
+   *                               A naming conflict was causing strange warnings
+   *                               to show up on the command line when cnetsuite is launched,
    *                               and this fixed it.  Fixes #3982.
    *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
    *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project
    *                               name.
+   *     @history 2017-05-01 Makayla Shepherd - Added the images that were bundled to the
+   *                               BundleSolutionInfo ProjectItem. Fixes #4818.
    */
   class ProjectItem : public QStandardItem {
     public:
@@ -167,7 +169,7 @@ namespace Isis {
       bool isGuiCamera() const;
       bool isTargetBody() const;
 
-      void setProjectItem(ProjectItem *item); 
+      void setProjectItem(ProjectItem *item);
       void setBundleResults(BundleResults bundleResults);
       void setBundleSettings(BundleSettingsQsp bundleSettings);
       void setBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
@@ -190,7 +192,7 @@ namespace Isis {
       void setTargetBodyList();
 
       ProjectItem *findItemData(const QVariant &value, int role = Qt::UserRole+1);
-      
+
       void appendRow(ProjectItem *item);
       ProjectItem *child(int row) const;
       void insertRow(int row, ProjectItem *item);

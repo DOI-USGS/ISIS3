@@ -267,6 +267,8 @@ namespace Isis {
    *                           occur. Removed bundleException(QString) signal. Fixes #4483.
    *   @history 2016-12-01 Ian Humphrey - Modified outputBundleStatus()'s printf() call so that
    *                           there is no longer a -Wformat-security warning.
+   *   @history 2017-05-01 Makayla Shepherd - Added imageLists() to track and return the images
+   *                           bundled. Fixes #4818.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

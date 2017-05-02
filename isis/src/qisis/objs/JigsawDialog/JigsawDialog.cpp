@@ -293,6 +293,7 @@ namespace Isis {
 
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
     foreach (ImageList *imageList, imageLists) {
+      int i = 0;
       foreach (Image *image, *imageList) {
         FileName imageName(image->fileName());
         FileName imagesBundledFile(m_project->bundleSolutionInfoRoot() + "/" +
@@ -301,6 +302,32 @@ namespace Isis {
 
         Cube *originalCube = new Cube(image->fileName(), "r");
         Cube *ecub = originalCube->copy(imagesBundledFile, CubeAttributeOutput("+External"));
+
+        Process p;
+        p.SetInputCube(ecub);
+        //check for existing polygon, if exists delete it
+        if (ecub->label()->hasObject("Polygon")) {
+          ecub->label()->deleteObject("Polygon");
+        }
+
+        // check for CameraStatistics Table, if exists, delete
+        for (int iobj = 0; iobj < ecub->label()->objects(); iobj++) {
+          PvlObject obj = ecub->label()->object(iobj);
+         if (obj.name() != "Table") continue;
+         if (obj["Name"][0] != QString("CameraStatistics")) continue;
+         ecub->label()->deleteObject(iobj);
+         break;
+        }
+        //  Get Kernel group and add or replace LastModifiedInstrumentPointing keyword.
+        Table cmatrix = m_bundleAdjust->cMatrix(i);
+        QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+        cmatrix.Label().addComment(jigComment);
+        Table spvector = m_bundleAdjust->spVector(i);
+        spvector.Label().addComment(jigComment);
+        ecub->write(cmatrix);
+        ecub->write(spvector);
+        p.WriteHistory(*ecub);
+        i++;
       }
     }
 

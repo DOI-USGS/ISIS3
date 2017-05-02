@@ -93,6 +93,10 @@ namespace Isis {
    *                           as the other angles when determining how many headers to create.
    *                           Fixes #4557.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *   @history 2017-05-01 Makayla Shepherd - Added imageList() to track and return the images used
+   *                           in the bundle adjustment. These images will be displayed on the
+   *                           project tree under results/bundle/<runtime> and will keep the same
+   *                           structure as the input on the project tree. Fixes #4818.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
