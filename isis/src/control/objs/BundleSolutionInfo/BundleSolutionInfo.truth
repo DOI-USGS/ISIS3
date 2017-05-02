@@ -1,5 +1,5 @@
 Unit test for BundleSolutionInfo...
-Printing PVL group with results from the settings/cnet/statistics constructor...
+Serializing results from the settings/cnet/statistics constructor...
 
 <bundleSolutionInfo>
     <generalAttributes>
@@ -9,7 +9,6 @@ Printing PVL group with results from the settings/cnet/statistics constructor...
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
-            
             <validateNetwork>Yes</validateNetwork>
             <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
             <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
@@ -97,7 +96,6 @@ Testing copy constructor...
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
-            
             <validateNetwork>Yes</validateNetwork>
             <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
             <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
@@ -185,7 +183,6 @@ Testing assignment operator to set this equal to itself...
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
-            
             <validateNetwork>Yes</validateNetwork>
             <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
             <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
@@ -273,7 +270,6 @@ Testing assignment operator to create a new results object...
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
-            
             <validateNetwork>Yes</validateNetwork>
             <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
             <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
@@ -361,7 +357,6 @@ Testing mutator methods...
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
-            
             <validateNetwork>Yes</validateNetwork>
             <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
             <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
@@ -448,5 +443,205 @@ we cannot test updateFileName().
 Testing error throws...
 
 Testing output methods
-Testing XML write/read...
 
+Testing XML serialization 1: round trip serialization of fully populated BundleSolution object...
+Serializing test XML object to file...
+
+<bundleSolutionInfo>
+    <generalAttributes>
+        
+        <runTime>xxx</runTime>
+        <fileName>cnetfile.net</fileName>
+    </generalAttributes>
+    <bundleSettings>
+        <globalSettings>
+            <validateNetwork>Yes</validateNetwork>
+            <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
+            <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
+            <outlierRejectionOptions rejection="No" multiplier="N/A"/>
+            <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
+            <maximumLikelihoodEstimation/>
+            <outputFileOptions fileNamePrefix=""/>
+        </globalSettings>
+        <observationSolveSettingsList>
+            <bundleObservationSolveSettings>
+                
+                <instrumentId></instrumentId>
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                    <aprioriPointingSigmas>
+                        <sigma>N/A</sigma>
+                    </aprioriPointingSigmas>
+                </instrumentPointingOptions>
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                    <aprioriPositionSigmas/>
+                </instrumentPositionOptions>
+            </bundleObservationSolveSettings>
+        </observationSolveSettingsList>
+    </bundleSettings>
+    <bundleResults>
+        <correlationMatrix correlationFileName="" covarianceFileName="">
+            <imagesAndParameters>
+                <image id="TestImageFileName">
+                    <parameter>  X  (t0)</parameter>
+                    <parameter>  Y  (t0)</parameter>
+                    <parameter>  Z  (t0)</parameter>
+                    <parameter> RA  (t0)</parameter>
+                    <parameter>DEC  (t0)</parameter>
+                    <parameter>TWI  (t0)</parameter>
+                </image>
+            </imagesAndParameters>
+        </correlationMatrix>
+        <generalStatisticsValues>
+            <numberFixedPoints>0</numberFixedPoints>
+            <numberIgnoredPoints>0</numberIgnoredPoints>
+            <numberHeldImages>0</numberHeldImages>
+            <rejectionLimit>0.5</rejectionLimit>
+            <numberRejectedObservations>0</numberRejectedObservations>
+            <numberObservations>0</numberObservations>
+            <numberImageParameters>0</numberImageParameters>
+            <numberConstrainedPointParameters>0</numberConstrainedPointParameters>
+            <numberConstrainedImageParameters>0</numberConstrainedImageParameters>
+            <numberConstrainedTargetParameters>0</numberConstrainedTargetParameters>
+            <numberUnknownParameters>0</numberUnknownParameters>
+            <degreesOfFreedom>-1</degreesOfFreedom>
+            <sigma0>0.0</sigma0>
+            <converged>No</converged>
+        </generalStatisticsValues>
+        <rms>
+            <residuals x="0.0" y="0.0" xy="0.0"/>
+            <sigmas lat="0.0" lon="0.0" rad="0.0"/>
+            <imageResidualsLists>
+                <residualsList listSize="3">
+                    <statisticsItem>
+                        
+                    </statisticsItem>
+                </lineList>
+            </imageResidualsLists>
+            <imageSigmasLists>
+                <xSigmas listSize="0"/>
+                <ySigmas listSize="0"/>
+                <zSigmas listSize="0"/>
+                <raSigmas listSize="0"/>
+                <decSigmas listSize="0"/>
+                <twistSigmas listSize="0"/>
+            </imageSigmasLists>
+        </rms>
+        <elapsedTime time="0.0" errorProp="0.0"/>
+        <minMaxSigmas>
+            <minLat value="1000000000000.0" pointId=""/>
+            <maxLat value="0.0" pointId=""/>
+            <minLon value="1000000000000.0" pointId=""/>
+            <maxLon value="0.0" pointId=""/>
+            <minRad value="1000000000000.0" pointId=""/>
+            <maxRad value="0.0" pointId=""/>
+        </minMaxSigmas>
+        <maximumLikelihoodEstimation numberModels="0" maximumLikelihoodIndex="0" maximumLikelihoodMedianR2Residuals="0.0">
+            <cumulativeProbabilityCalculator/>
+            <residualsCumulativeProbabilityCalculator/>
+        </maximumLikelihoodEstimation>
+    </bundleResults>
+</bundleSolutionInfo> 
+
+
+Testing XML: reading serialized BundleResults back in...
+Testing XML: Object deserialized as (should match object above):
+
+<bundleSolutionInfo>
+    <generalAttributes>
+        
+        <runTime>xxx</runTime>
+        <fileName>cnetfile.net</fileName>
+    </generalAttributes>
+    <bundleSettings>
+        <globalSettings>
+            <validateNetwork>Yes</validateNetwork>
+            <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
+            <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
+            <outlierRejectionOptions rejection="No" multiplier="N/A"/>
+            <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
+            <maximumLikelihoodEstimation/>
+            <outputFileOptions fileNamePrefix=""/>
+        </globalSettings>
+        <observationSolveSettingsList>
+            <bundleObservationSolveSettings>
+                
+                <instrumentId></instrumentId>
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                    <aprioriPointingSigmas>
+                        <sigma>N/A</sigma>
+                    </aprioriPointingSigmas>
+                </instrumentPointingOptions>
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                    <aprioriPositionSigmas/>
+                </instrumentPositionOptions>
+            </bundleObservationSolveSettings>
+        </observationSolveSettingsList>
+    </bundleSettings>
+    <bundleResults>
+        <correlationMatrix correlationFileName="" covarianceFileName="">
+            <imagesAndParameters>
+                <image id="TestImageFileName">
+                    <parameter>  X  (t0)</parameter>
+                    <parameter>  Y  (t0)</parameter>
+                    <parameter>  Z  (t0)</parameter>
+                    <parameter> RA  (t0)</parameter>
+                    <parameter>DEC  (t0)</parameter>
+                    <parameter>TWI  (t0)</parameter>
+                </image>
+            </imagesAndParameters>
+        </correlationMatrix>
+        <generalStatisticsValues>
+            <numberFixedPoints>0</numberFixedPoints>
+            <numberIgnoredPoints>0</numberIgnoredPoints>
+            <numberHeldImages>0</numberHeldImages>
+            <rejectionLimit>0.5</rejectionLimit>
+            <numberRejectedObservations>0</numberRejectedObservations>
+            <numberObservations>0</numberObservations>
+            <numberImageParameters>0</numberImageParameters>
+            <numberConstrainedPointParameters>0</numberConstrainedPointParameters>
+            <numberConstrainedImageParameters>0</numberConstrainedImageParameters>
+            <numberConstrainedTargetParameters>0</numberConstrainedTargetParameters>
+            <numberUnknownParameters>0</numberUnknownParameters>
+            <degreesOfFreedom>-1</degreesOfFreedom>
+            <sigma0>0.0</sigma0>
+            <converged>No</converged>
+        </generalStatisticsValues>
+        <rms>
+            <residuals x="0.0" y="0.0" xy="0.0"/>
+            <sigmas lat="0.0" lon="0.0" rad="0.0"/>
+            <imageResidualsLists>
+                <residualsList listSize="3">
+                    <statisticsItem>
+                        
+                    </statisticsItem>
+                </lineList>
+            </imageResidualsLists>
+            <imageSigmasLists>
+                <xSigmas listSize="0"/>
+                <ySigmas listSize="0"/>
+                <zSigmas listSize="0"/>
+                <raSigmas listSize="0"/>
+                <decSigmas listSize="0"/>
+                <twistSigmas listSize="0"/>
+            </imageSigmasLists>
+        </rms>
+        <elapsedTime time="0.0" errorProp="0.0"/>
+        <minMaxSigmas>
+            <minLat value="1000000000000.0" pointId=""/>
+            <maxLat value="0.0" pointId=""/>
+            <minLon value="1000000000000.0" pointId=""/>
+            <maxLon value="0.0" pointId=""/>
+            <minRad value="1000000000000.0" pointId=""/>
+            <maxRad value="0.0" pointId=""/>
+        </minMaxSigmas>
+        <maximumLikelihoodEstimation numberModels="0" maximumLikelihoodIndex="0" maximumLikelihoodMedianR2Residuals="0.0">
+            <cumulativeProbabilityCalculator/>
+            <residualsCumulativeProbabilityCalculator/>
+        </maximumLikelihoodEstimation>
+    </bundleResults>
+</bundleSolutionInfo> 
+
+
+
+Writing text ouput file...
+Writing csv ouput files...

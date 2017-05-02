@@ -46,7 +46,6 @@ namespace Isis {
 
     m_statisticsResults = new BundleResults(outputStatistics);
 
-    m_images = NULL;
     m_images = new QList<ImageList *>(imgList);
   }
 
@@ -80,19 +79,12 @@ namespace Isis {
    * @param src BundleSolutionInfo where the settings and BundleResults are read from.
    */
   BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
-      : m_id(new QUuid(src.m_id->toString())),
+      : m_id(new QUuid(QUuid::createUuid())),
         m_runTime(src.m_runTime),
         m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)) { // is this correct???
-
-    // m_images = NULL;
-    // m_images = new QList<ImageList *>;
-    // for (int i = 0; i < src.m_images->size(); i++) {
-    //   m_images->append(src.m_images->at(i));
-    // }
-
+        m_images(new QList<ImageList *>(*src.m_images)) { 
   }
 
 
@@ -101,7 +93,6 @@ namespace Isis {
    */
   BundleSolutionInfo::~BundleSolutionInfo() {
     delete m_id;
-    m_id = NULL;
 
     delete m_controlNetworkFileName;
     m_controlNetworkFileName = NULL;
@@ -128,7 +119,7 @@ namespace Isis {
     if (&src != this) {
 
       delete m_id;
-      m_id = new QUuid(src.m_id->toString());
+      m_id = new QUuid(QUuid::createUuid());
 
       m_runTime = src.m_runTime;
 
@@ -156,55 +147,6 @@ namespace Isis {
     delete m_statisticsResults;
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults(statisticsResults);
-  }
-
-
-  /**
-   * Saves the BundleSolutionInfo to the project
-   *
-   * Output format:
-   *
-   *
-   * <image id="..." fileName="...">
-   *   ...
-   * </image>
-   *
-   * (fileName attribute is just the base name)
-   *
-   * @param stream The stream to which the BundleSolutionInfo will be saved
-   * @param project The project to which this BundleSolutionInfo will be saved
-   * @param newProjectRoot The location of the project root directory. This is not used.
-   */
-  void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
-                                FileName newProjectRoot) const {
-
-    stream.writeStartElement("bundleSolutionInfo");
-    // save ID, cnet file name, and run time to stream
-    stream.writeStartElement("generalAttributes");
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeEndElement(); // end general attributes
-
-    // save settings to stream
-    m_settings->save(stream, project);
-
-    // save statistics to stream
-    m_statisticsResults->save(stream, project);
-
-    // save image lists to stream
-    std::cout << "\nm_images->isEmpty() ? " << (m_images->isEmpty() ? "EMPTY" : "NOT EMPTY") << "\n\n";
-    if ( !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
-
-      std::cout << "m_images->count() " << m_images->count() << "\n\n";
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
-      }
-
-      stream.writeEndElement();
-    }
-    stream.writeEndElement(); //end bundleSolutionInfo
   }
 
 
@@ -277,7 +219,6 @@ namespace Isis {
     m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
     m_xmlHandlerProject = project;
     m_xmlHandlerCharacters = "";
-    m_xmlHandlerBundleResults = NULL;
   }
 
 
@@ -285,9 +226,6 @@ namespace Isis {
    * Destructor
    */
   BundleSolutionInfo::XmlHandler::~XmlHandler() {
-    if (m_xmlHandlerBundleResults) {
-      delete m_xmlHandlerBundleResults;
-    }
   }
 
 
@@ -310,11 +248,11 @@ namespace Isis {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
       if (localName == "bundleSettings") {
-        m_xmlHandlerBundleSettings =
+        m_xmlHandlerBundleSolutionInfo->m_settings =
             BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
       }
       else if (localName == "bundleResults") {
-        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
+        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject, reader());
       }
       else if (localName == "imageList") {
         m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
@@ -350,26 +288,17 @@ namespace Isis {
                                                   const QString &localName,
                                                   const QString &qName) {
     if (localName == "id") {
-      m_xmlHandlerBundleSolutionInfo->m_id = NULL;
+      // all constructors assign a Uuid - we need to give it a one from the XML
+      assert(m_xmlHandlerBundleSolutionInfo->m_id);
+      delete m_xmlHandlerBundleSolutionInfo->m_id;
       m_xmlHandlerBundleSolutionInfo->m_id = new QUuid(m_xmlHandlerCharacters);
     }
     else if (localName == "runTime") {
       m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
     }
     else if (localName == "fileName") {
-      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = NULL;
+      assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
       m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
-    }
-    else if (localName == "bundleSettings") {
-      m_xmlHandlerBundleSolutionInfo->m_settings =
-          BundleSettingsQsp(new BundleSettings(*m_xmlHandlerBundleSettings));
-    }
-    else if (localName == "bundleResults") {
-      m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(*m_xmlHandlerBundleResults);
-      delete m_xmlHandlerBundleResults;
-      m_xmlHandlerBundleResults = NULL;
-    }
-    else if (localName == "imageLists") {
     }
     m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

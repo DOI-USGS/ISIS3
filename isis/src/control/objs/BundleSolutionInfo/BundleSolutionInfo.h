@@ -97,6 +97,7 @@ namespace Isis {
    *                           in the bundle adjustment. These images will be displayed on the
    *                           project tree under results/bundle/<runtime> and will keep the same
    *                           structure as the input on the project tree. Fixes #4818.
+   *   @history 2017-05-02 J Bonn - Fixed XML serialzation and code cleanup.  #4835
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -131,7 +132,7 @@ namespace Isis {
       bool outputPointsCSV();
       bool outputResiduals();
 
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+       //void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
     public slots:
@@ -166,9 +167,6 @@ namespace Isis {
           BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
           Project *m_xmlHandlerProject;  //TODO does xml stuff need project???
           QString m_xmlHandlerCharacters; //!< List of characters that have been handled
-          QList<ImageList *> *m_xmlHandlerImages; //!< List of pointers to images
-          BundleSettingsQsp m_xmlHandlerBundleSettings; //!< Settings used to run the bundle adjust
-          BundleResults *m_xmlHandlerBundleResults; //!< Results from the bundle adjust
       };
 
     private:

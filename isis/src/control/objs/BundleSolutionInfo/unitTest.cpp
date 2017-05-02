@@ -322,6 +322,8 @@ void printXml(const BundleSolutionInfo &printable) {
   QXmlStreamWriter writer(&output);
   writer.setAutoFormatting(true);
   printable.save(writer, NULL);
+  // Note Statistics class does not serialize/restore properly as of 2017-04-27
+  output.remove(QRegExp("<statistics>.*</statistics>"));
   output.remove(QRegExp("<id>[^<]*</id>"));
   qDebug().noquote() << output << endl << endl;
 }
