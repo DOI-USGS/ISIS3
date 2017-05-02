@@ -36,17 +36,14 @@ namespace Isis {
                                          BundleResults outputStatistics,
                                          QList<ImageList *> imgList,
                                          QObject *parent) : QObject(parent) {
-    m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
 
     m_runTime = "";
 
-    m_controlNetworkFileName = NULL;
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
 
     m_settings = inputSettings;
 
-    m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults(outputStatistics);
 
     m_images = NULL;
@@ -65,11 +62,15 @@ namespace Isis {
                                          XmlStackedHandlerReader *xmlReader,
                                          QObject *parent) : QObject(parent) {
                                          //TODO does xml stuff need project???
-    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
+    m_runTime = "";
+    m_controlNetworkFileName = NULL;
+    m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
+    m_images = new QList<ImageList *>;
 
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
     xmlReader->setErrorHandler(new XmlHandler(this, project));
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -108,8 +109,10 @@ namespace Isis {
     delete m_statisticsResults;
     m_statisticsResults = NULL;
 
-    delete m_images;
-    m_images = NULL;
+    if (m_images != NULL) {
+      delete m_images;
+      m_images = NULL;
+    }
   }
 
 
@@ -125,23 +128,19 @@ namespace Isis {
     if (&src != this) {
 
       delete m_id;
-      m_id = NULL;
       m_id = new QUuid(src.m_id->toString());
 
       m_runTime = src.m_runTime;
 
       delete m_controlNetworkFileName;
-      m_controlNetworkFileName = NULL;
       m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
 
       m_settings = src.m_settings;
 
       delete m_statisticsResults;
-      m_statisticsResults = NULL;
       m_statisticsResults = new BundleResults(*src.m_statisticsResults);
 
       delete m_images;
-      m_images = NULL;
       m_images = new QList<ImageList *>(*src.m_images);
     }
     return *this;
@@ -232,7 +231,7 @@ namespace Isis {
     m_statisticsResults->save(stream, project);
 
     // save image lists to stream
-    if ( !m_images->isEmpty() ) {
+    if ( m_images && !m_images->isEmpty() ) {
       stream.writeStartElement("imageLists");
 
       for (int i = 0; i < m_images->count(); i++) {
@@ -276,10 +275,8 @@ namespace Isis {
   BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo,
                                              Project *project) {
     m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
-    m_xmlHandlerProject = NULL;
     m_xmlHandlerProject = project;
     m_xmlHandlerCharacters = "";
-    m_xmlHandlerImages = NULL;
     m_xmlHandlerBundleResults = NULL;
   }
 
@@ -288,20 +285,9 @@ namespace Isis {
    * Destructor
    */
   BundleSolutionInfo::XmlHandler::~XmlHandler() {
-    // bundleSolutionInfo passed in is "this" delete+null will cause problems,no?
-//    delete m_xmlHandlerBundleSolutionInfo;
-//    m_xmlHandlerBundleSolutionInfo = NULL;
-
-    // we do not delete this pointer since it was set to a passed in pointer in constructor and we
-    // don't own it... is that right???
-//    delete m_xmlHandlerProject;
-    m_xmlHandlerProject = NULL;
-
-    delete m_xmlHandlerImages;
-    m_xmlHandlerImages = NULL;
-
-    delete m_xmlHandlerBundleResults;
-    m_xmlHandlerBundleResults = NULL;
+    if (m_xmlHandlerBundleResults) {
+      delete m_xmlHandlerBundleResults;
+    }
   }
 
 
@@ -328,14 +314,10 @@ namespace Isis {
             BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
       }
       else if (localName == "bundleResults") {
-        delete m_xmlHandlerBundleResults;
-        m_xmlHandlerBundleResults = NULL;
-
-        //TODO need to add constructor for this???
         m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
       }
       else if (localName == "imageList") {
-        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
+        m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
       }
     }
     return true;
@@ -387,11 +369,7 @@ namespace Isis {
       delete m_xmlHandlerBundleResults;
       m_xmlHandlerBundleResults = NULL;
     }
-    if (localName == "imageLists") {
-      for (int i = 0; i < m_xmlHandlerImages->size(); i++) {
-        m_xmlHandlerBundleSolutionInfo->m_images->append(m_xmlHandlerImages->at(i));
-      }
-      m_xmlHandlerImages->clear();
+    else if (localName == "imageLists") {
     }
     m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   try {
     qDebug() << "Unit test for BundleSolutionInfo...";
-    qDebug() << "Printing PVL group with results from the settings/cnet/statistics constructor...";
+    qDebug() << "Serializing results from the settings/cnet/statistics constructor...";
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
@@ -257,9 +257,11 @@ int main(int argc, char *argv[]) {
     results.outputPointsCSV();
     results.outputResiduals();
 
-    qDebug() << "Testing XML write/read...";
-    // write xml
-#if 0
+
+    qDebug() << "";
+    qDebug() << "Testing XML serialization 1: round trip serialization of fully populated BundleSolution object...";
+    qDebug() << "Serializing test XML object to file...";
+    printXml(results);    // save XML to test log for comparison
     FileName xmlFile("./BundleSolutionInfo.xml");
     QString xmlPath = xmlFile.expanded();
     QFile qXmlFile(xmlPath);
@@ -275,19 +277,22 @@ int main(int argc, char *argv[]) {
     results.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml
-    XmlStackedHandlerReader reader;
-// ???     BundleSolutionInfoXmlHandlerTester brToFill(project, &reader, xmlFile);
-// ???     pvl = bsToFill.pvlObject("BundleSolutionInfoFromXml");
-// ???     cout << pvl << endl << endl;
-#endif
-    qDebug() << "";
 
+    qDebug() << "Testing XML: reading serialized BundleResults back in...";
+    XmlStackedHandlerReader reader;
+    BundleSolutionInfoXmlHandlerTester bsFromXml(project, &reader, xmlFile);
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
+    printXml(bsFromXml);  // Save comparison output to log file
+
+
+    qDebug() << "";
+    qDebug() << "Writing text ouput file...";
     FileName txtFile("./bundleout.txt");
     QFile txtOutput(txtFile.expanded());
     if (txtOutput.exists()) {
       txtOutput.remove();
     }
+    qDebug() << "Writing csv ouput files...";
     FileName pointsCsv("./bundleout_points.csv");
     QFile pointsOutput(pointsCsv.expanded());
     if (pointsOutput.exists()) {
