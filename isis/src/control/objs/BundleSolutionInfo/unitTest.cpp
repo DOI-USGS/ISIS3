@@ -136,7 +136,8 @@ int main(int argc, char *argv[]) {
     statistics.setBundleControlPoints(bundleControlPointVector);
     statistics.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     statistics.setObservations(observationVector);
-    BundleSolutionInfo results(settings, cnetFile, statistics, parent);
+    QList<ImageList *> imgList;
+    BundleSolutionInfo results(settings, cnetFile, statistics, imgList, parent);
 
     printXml(results);
 
