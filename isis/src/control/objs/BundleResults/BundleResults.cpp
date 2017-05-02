@@ -41,7 +41,6 @@ namespace Isis {
 
     initialize();
 
-    m_id = new QUuid(QUuid::createUuid());
     m_correlationMatrix = new CorrelationMatrix;
     m_cumPro = new StatCumProbDistDynCalc;
     m_cumProRes = new StatCumProbDistDynCalc;
@@ -80,8 +79,7 @@ namespace Isis {
    * @param src The other BundleResults object to be copied.
    */
   BundleResults::BundleResults(const BundleResults &src)
-      : m_id(new QUuid(src.m_id->toString())),
-        m_correlationMatrix(new CorrelationMatrix(*src.m_correlationMatrix)),
+      : m_correlationMatrix(new CorrelationMatrix(*src.m_correlationMatrix)),
         m_numberFixedPoints(src.m_numberFixedPoints),
         m_numberIgnoredPoints(src.m_numberIgnoredPoints),
         m_numberHeldImages(src.m_numberHeldImages),
@@ -135,7 +133,6 @@ namespace Isis {
         m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
         m_cumProRes(new StatCumProbDistDynCalc(*src.m_cumProRes)),
         m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals) {
-
   }
 
 
@@ -143,9 +140,6 @@ namespace Isis {
    * Destroys this BundleResults object.
    */
   BundleResults::~BundleResults() {
-
-    delete m_id;
-    m_id = NULL;
 
     delete m_correlationMatrix;
     m_correlationMatrix = NULL;
@@ -168,10 +162,6 @@ namespace Isis {
   BundleResults &BundleResults::operator=(const BundleResults &src) {
 
     if (&src != this) {
-      delete m_id;
-      m_id = NULL;
-      m_id = new QUuid(src.m_id->toString());
-
       delete m_correlationMatrix;
       m_correlationMatrix = NULL;
       m_correlationMatrix = new CorrelationMatrix(*src.m_correlationMatrix);
@@ -247,7 +237,6 @@ namespace Isis {
    * QLists are cleared, and all other members are set to NULL.
    */
   void BundleResults::initialize() {
-    m_id = NULL;
     m_correlationMatrix = NULL;
 
     m_numberFixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
@@ -2003,10 +1992,6 @@ namespace Isis {
                                              const QString &qName) {
 
     if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (qName == "id") {
-        m_xmlHandlerBundleResults->m_id = NULL;
-        m_xmlHandlerBundleResults->m_id = new QUuid(m_xmlHandlerCharacters);
-      }
       if (qName == "parameter") {
         // add the parameter to the current list
         m_xmlHandlerCorrelationParameterList.append(m_xmlHandlerCharacters);

@@ -287,11 +287,6 @@ namespace Isis {
           QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
       };
 
-      /**
-       * A unique ID for this object (useful for others to reference this object
-       *   when saving to disk).
-       */
-      QUuid *m_id;
       CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
 
 
