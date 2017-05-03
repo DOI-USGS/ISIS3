@@ -141,6 +141,35 @@ int main(int argc, char *argv[]) {
 
     printXml(results);
 
+
+    qDebug() << "";
+    qDebug() << "Testing XML serialization 1: round trip serialization of BundleSolution object...";
+    qDebug() << "Serializing test XML object to file...";
+    printXml(results);    // save XML to test log for comparison
+    FileName xmlFile1("./BundleSolutionInfo1.xml");
+    QString xmlPath1 = xmlFile1.expanded();
+    QFile qXmlFile1(xmlPath1);
+    if (!qXmlFile1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath1),
+                       _FILEINFO_);
+    }
+    QXmlStreamWriter writer(&qXmlFile1);
+    writer.setAutoFormatting(true);
+    writer.writeStartDocument();
+    Project *project = NULL;
+    results.save(writer, project);
+    writer.writeEndDocument();
+    qXmlFile1.close();
+
+    qDebug() << "Testing XML: reading serialized BundleResults back in...";
+    XmlStackedHandlerReader reader1;
+    BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
+    printXml(bsFromXml1);  // Save comparison output to log file
+
+
+
     qDebug() << "Testing copy constructor...";
 
     BundleSolutionInfo copySolutionInfo(results);
@@ -260,30 +289,29 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "";
-    qDebug() << "Testing XML serialization 1: round trip serialization of fully populated BundleSolution object...";
+    qDebug() << "Testing XML serialization 2: round trip serialization of fully populated BundleSolution object...";
     qDebug() << "Serializing test XML object to file...";
     printXml(results);    // save XML to test log for comparison
-    FileName xmlFile("./BundleSolutionInfo.xml");
-    QString xmlPath = xmlFile.expanded();
-    QFile qXmlFile(xmlPath);
-    if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
+    FileName xmlFile2("./BundleSolutionInfo2.xml");
+    QString xmlPath2 = xmlFile2.expanded();
+    QFile qXmlFile2(xmlPath2);
+    if (!qXmlFile2.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
-                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath2),
                        _FILEINFO_);
     }
-    QXmlStreamWriter writer(&qXmlFile);
-    writer.setAutoFormatting(true);
-    writer.writeStartDocument();
-    Project *project = NULL;
-    results.save(writer, project);
-    writer.writeEndDocument();
-    qXmlFile.close();
+    QXmlStreamWriter writer2(&qXmlFile2);
+    writer2.setAutoFormatting(true);
+    writer2.writeStartDocument();
+    results.save(writer2, project);
+    writer2.writeEndDocument();
+    qXmlFile2.close();
 
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
     XmlStackedHandlerReader reader;
-    BundleSolutionInfoXmlHandlerTester bsFromXml(project, &reader, xmlFile);
+    BundleSolutionInfoXmlHandlerTester bsFromXml2(project, &reader, xmlFile2);
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
-    printXml(bsFromXml);  // Save comparison output to log file
+    printXml(bsFromXml2);  // Save comparison output to log file
 
 
     qDebug() << "";

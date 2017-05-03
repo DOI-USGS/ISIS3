@@ -23,6 +23,11 @@
 
 namespace Isis {
 
+  // initialize default filenames for csv output.
+  const char BundleSolutionInfo::m_csvImagesFilename[] = "bundleout_images.csv";
+  const char BundleSolutionInfo::m_csvPointsFilename[] = "bundleout_points.csv";
+  const char BundleSolutionInfo::m_csvResidualsFilename[] = "residuals.csv";
+
   /**
    * Constructor. Creates a BundleSolutionInfo.
    *
@@ -164,6 +169,9 @@ namespace Isis {
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("runTime", runTime());
     stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
+    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
+    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
+    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
     stream.writeEndElement(); // end general attributes
 
     // save settings to stream
@@ -300,6 +308,16 @@ namespace Isis {
       assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
       m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
     }
+    else if (localName == "imagesCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = m_xmlHandlerCharacters;
+    }
+    else if (localName == "pointsCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename = m_xmlHandlerCharacters;
+    }
+    else if (localName == "residualsCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename = m_xmlHandlerCharacters;
+    }
+
     m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
@@ -1072,8 +1090,9 @@ namespace Isis {
     QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
     QList<Statistics> rmsImageResiduals = m_statisticsResults->rmsImageResiduals();
 
-    QString ofname = "bundleout_images.csv";
+    QString ofname = m_csvImagesFilename;
     ofname = m_settings->outputFilePrefix() + ofname;
+    m_csvSavedImagesFilename = ofname;
 
     std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
     if (!fpOut) {
@@ -1333,8 +1352,9 @@ namespace Isis {
   bool BundleSolutionInfo::outputPointsCSV() {
     char buf[1056];
 
-    QString ofname = "bundleout_points.csv";
+    QString ofname = m_csvPointsFilename;
     ofname = m_settings->outputFilePrefix() + ofname;
+    m_csvSavedPointsFilename = ofname;
 
     std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
     if (!fpOut) {
@@ -1447,8 +1467,9 @@ namespace Isis {
   bool BundleSolutionInfo::outputResiduals() {
     char buf[1056];
 
-    QString ofname = "residuals.csv";
+    QString ofname = m_csvResidualsFilename;
     ofname = m_settings->outputFilePrefix() + ofname;
+    m_csvSavedResidualsFilename = ofname;
 
     std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
     if (!fpOut) {

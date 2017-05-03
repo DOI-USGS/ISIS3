@@ -6,6 +6,192 @@ Serializing results from the settings/cnet/statistics constructor...
         
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
+    </generalAttributes>
+    <bundleSettings>
+        <globalSettings>
+            <validateNetwork>Yes</validateNetwork>
+            <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
+            <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
+            <outlierRejectionOptions rejection="No" multiplier="N/A"/>
+            <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
+            <maximumLikelihoodEstimation/>
+            <outputFileOptions fileNamePrefix=""/>
+        </globalSettings>
+        <observationSolveSettingsList>
+            <bundleObservationSolveSettings>
+                
+                <instrumentId></instrumentId>
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                    <aprioriPointingSigmas>
+                        <sigma>N/A</sigma>
+                    </aprioriPointingSigmas>
+                </instrumentPointingOptions>
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                    <aprioriPositionSigmas/>
+                </instrumentPositionOptions>
+            </bundleObservationSolveSettings>
+        </observationSolveSettingsList>
+    </bundleSettings>
+    <bundleResults>
+        <correlationMatrix correlationFileName="" covarianceFileName="">
+            <imagesAndParameters/>
+        </correlationMatrix>
+        <generalStatisticsValues>
+            <numberFixedPoints>0</numberFixedPoints>
+            <numberIgnoredPoints>0</numberIgnoredPoints>
+            <numberHeldImages>0</numberHeldImages>
+            <rejectionLimit>0.0</rejectionLimit>
+            <numberRejectedObservations>0</numberRejectedObservations>
+            <numberObservations>0</numberObservations>
+            <numberImageParameters>0</numberImageParameters>
+            <numberConstrainedPointParameters>0</numberConstrainedPointParameters>
+            <numberConstrainedImageParameters>0</numberConstrainedImageParameters>
+            <numberConstrainedTargetParameters>0</numberConstrainedTargetParameters>
+            <numberUnknownParameters>0</numberUnknownParameters>
+            <degreesOfFreedom>-1</degreesOfFreedom>
+            <sigma0>0.0</sigma0>
+            <converged>No</converged>
+        </generalStatisticsValues>
+        <rms>
+            <residuals x="0.0" y="0.0" xy="0.0"/>
+            <sigmas lat="0.0" lon="0.0" rad="0.0"/>
+            <imageResidualsLists>
+                <residualsList listSize="0"/>
+                <sampleList listSize="0"/>
+                <lineList listSize="0"/>
+            </imageResidualsLists>
+            <imageSigmasLists>
+                <xSigmas listSize="0"/>
+                <ySigmas listSize="0"/>
+                <zSigmas listSize="0"/>
+                <raSigmas listSize="0"/>
+                <decSigmas listSize="0"/>
+                <twistSigmas listSize="0"/>
+            </imageSigmasLists>
+        </rms>
+        <elapsedTime time="0.0" errorProp="0.0"/>
+        <minMaxSigmas>
+            <minLat value="1000000000000.0" pointId=""/>
+            <maxLat value="0.0" pointId=""/>
+            <minLon value="1000000000000.0" pointId=""/>
+            <maxLon value="0.0" pointId=""/>
+            <minRad value="1000000000000.0" pointId=""/>
+            <maxRad value="0.0" pointId=""/>
+        </minMaxSigmas>
+        <maximumLikelihoodEstimation numberModels="0" maximumLikelihoodIndex="0" maximumLikelihoodMedianR2Residuals="0.0">
+            <cumulativeProbabilityCalculator/>
+            <residualsCumulativeProbabilityCalculator/>
+        </maximumLikelihoodEstimation>
+    </bundleResults>
+</bundleSolutionInfo> 
+
+
+
+Testing XML serialization 1: round trip serialization of BundleSolution object...
+Serializing test XML object to file...
+
+<bundleSolutionInfo>
+    <generalAttributes>
+        
+        <runTime></runTime>
+        <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
+    </generalAttributes>
+    <bundleSettings>
+        <globalSettings>
+            <validateNetwork>Yes</validateNetwork>
+            <solveOptions solveObservationMode="No" solveRadius="No" updateCubeLabel="No" errorPropagation="No" createInverseMatrix="No"/>
+            <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
+            <outlierRejectionOptions rejection="No" multiplier="N/A"/>
+            <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
+            <maximumLikelihoodEstimation/>
+            <outputFileOptions fileNamePrefix=""/>
+        </globalSettings>
+        <observationSolveSettingsList>
+            <bundleObservationSolveSettings>
+                
+                <instrumentId></instrumentId>
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                    <aprioriPointingSigmas>
+                        <sigma>N/A</sigma>
+                    </aprioriPointingSigmas>
+                </instrumentPointingOptions>
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                    <aprioriPositionSigmas/>
+                </instrumentPositionOptions>
+            </bundleObservationSolveSettings>
+        </observationSolveSettingsList>
+    </bundleSettings>
+    <bundleResults>
+        <correlationMatrix correlationFileName="" covarianceFileName="">
+            <imagesAndParameters/>
+        </correlationMatrix>
+        <generalStatisticsValues>
+            <numberFixedPoints>0</numberFixedPoints>
+            <numberIgnoredPoints>0</numberIgnoredPoints>
+            <numberHeldImages>0</numberHeldImages>
+            <rejectionLimit>0.0</rejectionLimit>
+            <numberRejectedObservations>0</numberRejectedObservations>
+            <numberObservations>0</numberObservations>
+            <numberImageParameters>0</numberImageParameters>
+            <numberConstrainedPointParameters>0</numberConstrainedPointParameters>
+            <numberConstrainedImageParameters>0</numberConstrainedImageParameters>
+            <numberConstrainedTargetParameters>0</numberConstrainedTargetParameters>
+            <numberUnknownParameters>0</numberUnknownParameters>
+            <degreesOfFreedom>-1</degreesOfFreedom>
+            <sigma0>0.0</sigma0>
+            <converged>No</converged>
+        </generalStatisticsValues>
+        <rms>
+            <residuals x="0.0" y="0.0" xy="0.0"/>
+            <sigmas lat="0.0" lon="0.0" rad="0.0"/>
+            <imageResidualsLists>
+                <residualsList listSize="0"/>
+                <sampleList listSize="0"/>
+                <lineList listSize="0"/>
+            </imageResidualsLists>
+            <imageSigmasLists>
+                <xSigmas listSize="0"/>
+                <ySigmas listSize="0"/>
+                <zSigmas listSize="0"/>
+                <raSigmas listSize="0"/>
+                <decSigmas listSize="0"/>
+                <twistSigmas listSize="0"/>
+            </imageSigmasLists>
+        </rms>
+        <elapsedTime time="0.0" errorProp="0.0"/>
+        <minMaxSigmas>
+            <minLat value="1000000000000.0" pointId=""/>
+            <maxLat value="0.0" pointId=""/>
+            <minLon value="1000000000000.0" pointId=""/>
+            <maxLon value="0.0" pointId=""/>
+            <minRad value="1000000000000.0" pointId=""/>
+            <maxRad value="0.0" pointId=""/>
+        </minMaxSigmas>
+        <maximumLikelihoodEstimation numberModels="0" maximumLikelihoodIndex="0" maximumLikelihoodMedianR2Residuals="0.0">
+            <cumulativeProbabilityCalculator/>
+            <residualsCumulativeProbabilityCalculator/>
+        </maximumLikelihoodEstimation>
+    </bundleResults>
+</bundleSolutionInfo> 
+
+
+Testing XML: reading serialized BundleResults back in...
+Testing XML: Object deserialized as (should match object above):
+
+<bundleSolutionInfo>
+    <generalAttributes>
+        
+        <runTime></runTime>
+        <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -93,6 +279,9 @@ Testing copy constructor...
         
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -180,6 +369,9 @@ Testing assignment operator to set this equal to itself...
         
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -267,6 +459,9 @@ Testing assignment operator to create a new results object...
         
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -354,6 +549,9 @@ Testing mutator methods...
         
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV></imagesCSV>
+        <pointsCSV></pointsCSV>
+        <residualsCSV></residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -444,7 +642,7 @@ Testing error throws...
 
 Testing output methods
 
-Testing XML serialization 1: round trip serialization of fully populated BundleSolution object...
+Testing XML serialization 2: round trip serialization of fully populated BundleSolution object...
 Serializing test XML object to file...
 
 <bundleSolutionInfo>
@@ -452,6 +650,9 @@ Serializing test XML object to file...
         
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV>bundleout_images.csv</imagesCSV>
+        <pointsCSV>bundleout_points.csv</pointsCSV>
+        <residualsCSV>residuals.csv</residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>
@@ -551,6 +752,9 @@ Testing XML: Object deserialized as (should match object above):
         
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
+        <imagesCSV>bundleout_images.csv</imagesCSV>
+        <pointsCSV>bundleout_points.csv</pointsCSV>
+        <residualsCSV>residuals.csv</residualsCSV>
     </generalAttributes>
     <bundleSettings>
         <globalSettings>

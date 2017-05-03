@@ -1667,6 +1667,7 @@ namespace Isis {
    */
   BundleResults::XmlHandler::XmlHandler(BundleResults *statistics, Project *project) {
     // TODO: does xml stuff need project???
+    m_xmlHandlerCumProCalc = NULL;
     m_xmlHandlerBundleResults = NULL;
     m_xmlHandlerProject = NULL;
 
