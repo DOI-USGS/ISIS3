@@ -418,8 +418,6 @@ namespace Isis {
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( imageListDeleted(QObject *) ) );
-      //TODO  07-29-14  Kim & Tracie commented this out.  Didn't seem like it was necessary.
-      //      If problems, need to understand this code better.
       m_images->append(result);
     }
     return result;
@@ -499,22 +497,11 @@ namespace Isis {
 //  stream.writeAttribute("state", layout_data.toString());
 
 
-    // if ( !m_bundleSolutionInfo->isEmpty() ) {
-    //   stream.writeStartElement("bundleSolutionInfo");
-    //
-    //   for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
-    //     m_bundleSolutionInfo->at(i)->save(stream, this, newProjectRoot);
-    //   }
-    //
-    //   stream.writeEndElement();
-    // }
-
-    // should we write the runtimes of the runs here???
-    if (!m_bundleSolutionInfo->isEmpty()) {
-      stream.writeStartElement("bundleRuns");
+    if ( !m_bundleSolutionInfo->isEmpty() ) {
+      stream.writeStartElement("results");
 
       for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
-        m_bundleSolutionInfo->at(i)->runTime();
+        m_bundleSolutionInfo->at(i)->save(stream, this, newProjectRoot);
       }
 
       stream.writeEndElement();
@@ -618,27 +605,6 @@ namespace Isis {
    */
   QList<QAction *> Project::userPreferenceActions() {
     return m_imageReader->actions(ImageDisplayProperties::FootprintViewProperties);
-  }
-
-
-  /**
-   * Create and return the name of a folder for placing BundleSolutionInfo.
-   *
-   * TODO: don't know if sentence below is accurate.
-   * This can be called from multiple threads, but should only be called by one thread at a time.
-   */
-  QDir Project::addBundleSolutionInfoFolder(QString folder) {
-    QDir bundleSolutionInfoFolder(bundleSolutionInfoRoot());
-
-    if (!bundleSolutionInfoFolder.mkpath(folder)) {
-      throw IException(IException::Io,
-                       tr("Could not create bundle results directory [%1] in [%2].")
-                       .arg(folder).arg(bundleSolutionInfoFolder.absolutePath()),
-                       _FILEINFO_);
-    }
-
-    bundleSolutionInfoFolder.cd(folder);
-    return bundleSolutionInfoFolder;
   }
 
 
@@ -818,12 +784,32 @@ namespace Isis {
 
 
   /**
+   * Create and return the name of a folder for placing BundleSolutionInfo.
+   *
+   * TODO: don't know if sentence below is accurate.
+   * This can be called from multiple threads, but should only be called by one thread at a time.
+   */
+  QDir Project::addBundleSolutionInfoFolder(QString folder) {
+    QDir bundleSolutionInfoFolder(bundleSolutionInfoRoot());
+
+    if (!bundleSolutionInfoFolder.mkpath(folder)) {
+      throw IException(IException::Io,
+                       tr("Could not create bundle results directory [%1] in [%2].")
+                       .arg(folder).arg(bundleSolutionInfoFolder.absolutePath()),
+                       _FILEINFO_);
+    }
+
+    bundleSolutionInfoFolder.cd(folder);
+    return bundleSolutionInfoFolder;
+  }
+
+
+  /**
    * Add the given BundleSolutionInfo to the current project. This will cause the
    * BundleSolutionInfo to be saved/restored from disk, Project-related GUIs to display the
    * BundleSolutionInfo, and enable access to the BundleSolutionInfo given access to the project.
    */
   void Project::addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
-
     connect(bundleSolutionInfo, SIGNAL(destroyed(QObject *)),
             this, SLOT(bundleSolutionInfoClosed(QObject *)));//???
     connect(this, SIGNAL(projectRelocated(Project *)),
@@ -1724,6 +1710,7 @@ namespace Isis {
     saveWarnings(warningsWriter);
     warningsWriter.writeEndDocument();
 
+    //  Save the Directory structure
     QFile directoryStateFile(newPath.toString() + "/directory.xml");
     if (!directoryStateFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
       throw IException(IException::Io,
@@ -2184,12 +2171,8 @@ namespace Isis {
 //    restoreState(layout_data);
       }
 
-      else if (localName == "bundleSettings") {
-        BundleSettings *bundleSettings = m_project->bundleSettings();
-        if (!bundleSettings) {
-          // throw error???
-        }
-//      bundleSettings = new BundleSettings(m_project, reader());
+      else if (localName == "bundleSolutionInfo") {
+        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, reader()));
       }
       else if (localName == "activeImageList") {
         QString displayName = atts.value("displayName");
@@ -2243,8 +2226,10 @@ namespace Isis {
       }
       m_controls.clear();
     }
-    else if (localName == "bundleSettings") {
-      // TODO: what to do here????
+    else if (localName == "results") {
+      foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
+        m_project->addBundleSolutionInfo(bundleInfo);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

@@ -641,6 +641,19 @@ namespace Isis {
   }
 
 
+  /**
+   * This virtual method was added to handle changing the project name by double-clicking the 
+   * project name on the project tree.  It was required by Qt in order to allow editing 
+   * capabilities. 
+   *  
+   * @see http://doc.qt.io/qt-5/modelview.html 
+   *  
+   * @param[in] index (const QModelIndex &) Field which has been edited
+   * @param[in] value (const QVariant &) Value contained in the field
+   * @param[in] role (int) Will always be EditRole since field only contains text
+   * 
+   * @return bool Returns true if successful; otherwise false
+   */
   bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
     ProjectItem *item = itemFromIndex(index);
@@ -653,6 +666,17 @@ namespace Isis {
   }
 
 
+  /**
+   * This virtual method was added to handle changing the project name by double-clicking the 
+   * project name on the project tree.  It was required by Qt in order to allow editing 
+   * capabilities. 
+   *  
+   * @see http://doc.qt.io/qt-5/modelview.html
+   *  
+   * @param[in] index (const QModelIndex &) Field which has been edited
+   * 
+   * @return Qt::ItemFlags Add the ItemIsEditable to the standard flags.
+   */
   Qt::ItemFlags ProjectItemModel::flags(const QModelIndex &index) const {
 
     return Qt::ItemIsEditable | QStandardItemModel::flags(index);

@@ -98,6 +98,9 @@ namespace Isis {
    *                           project tree under results/bundle/<runtime> and will keep the same
    *                           structure as the input on the project tree. Fixes #4818.
    *   @history 2017-05-02 J Bonn - Fixed XML serialzation and code cleanup.  #4835
+   *   @history 2017-05-02 Tracie Sucharski - Moved XMLHandler code to bottom of file for
+   *                           consistency;  all other classes have the XmlHandler at end of file.
+   *                           Fixes #4822.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -132,8 +135,8 @@ namespace Isis {
       bool outputPointsCSV();
       bool outputResiduals();
 
-       //void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
-      void save(QXmlStreamWriter &stream, const Project *project) const;
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+//    void save(QXmlStreamWriter &stream, const Project *project) const;
 
     public slots:
       void updateFileName(Project *);

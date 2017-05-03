@@ -484,7 +484,7 @@ namespace Isis {
    * Prints out information about which tier the solution is in and the status of the residuals.
    */
   void BundleResults::printMaximumLikelihoodTierInformation() {
-    printf("Maximum Likelihood Tier: %d\n", m_maximumLikelihoodIndex);
+//  printf("Maximum Likelihood Tier: %d\n", m_maximumLikelihoodIndex);
     if (numberMaximumLikelihoodModels() > m_maximumLikelihoodIndex) {
       // if maximum likelihood estimation is being used
       // at the end of every iteration
@@ -494,7 +494,7 @@ namespace Isis {
       m_maximumLikelihoodFunctions[m_maximumLikelihoodIndex].first.setTweakingConstant(tc);
       //  print meadians of residuals
       m_maximumLikelihoodMedianR2Residuals = m_cumPro->value(0.5);
-      printf("Median of R^2 residuals:  %lf\n", m_maximumLikelihoodMedianR2Residuals);
+//    printf("Median of R^2 residuals:  %lf\n", m_maximumLikelihoodMedianR2Residuals);
 
       //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals|
       // so it will be up to date for the next iteration

@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
     Project *project = NULL;
-    results.save(writer, project);
+    results.save(writer, project, "");
     writer.writeEndDocument();
     qXmlFile1.close();
 
@@ -303,7 +303,7 @@ int main(int argc, char *argv[]) {
     QXmlStreamWriter writer2(&qXmlFile2);
     writer2.setAutoFormatting(true);
     writer2.writeStartDocument();
-    results.save(writer2, project);
+    results.save(writer2, project, "");
     writer2.writeEndDocument();
     qXmlFile2.close();
 
@@ -349,7 +349,7 @@ void printXml(const BundleSolutionInfo &printable) {
   QString output;
   QXmlStreamWriter writer(&output);
   writer.setAutoFormatting(true);
-  printable.save(writer, NULL);
+  printable.save(writer, NULL, "");
   // Note Statistics class does not serialize/restore properly as of 2017-04-27
   output.remove(QRegExp("<statistics>.*</statistics>"));
   output.remove(QRegExp("<id>[^<]*</id>"));

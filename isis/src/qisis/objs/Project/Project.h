@@ -132,6 +132,9 @@ namespace Isis {
    *                           by Project constructor to listen for when a control and image are
    *                           added, used externally by directory to enable the jigsaw work order
    *                           when a cnet and image are available in the project. Fixes #4819.
+   *   @history 2017-05-02 Tracie Sucharski - Added saving and resoring of BundleSolutionInfo.
+   *                           Fixes #4822.
+   *                
    */
   class Project : public QObject {
     Q_OBJECT
@@ -390,6 +393,7 @@ namespace Isis {
           QList<ImageList *> m_imageLists;
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
+          QList<BundleSolutionInfo *> m_bundleSolutionInfos;
           WorkOrder *m_workOrder;
       };
 
@@ -403,11 +407,11 @@ namespace Isis {
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
       GuiCameraList *m_guiCameras;
+      QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
       QPointer<Control> m_activeControl;
       QPointer<ImageList> m_activeImageList;
 
-      QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
       // TODO: kle testing - this will almost certainly be changed
       BundleSettings *m_bundleSettings;

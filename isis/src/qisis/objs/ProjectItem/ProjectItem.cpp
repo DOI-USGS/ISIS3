@@ -75,7 +75,7 @@ namespace Isis {
   ProjectItem::ProjectItem(BundleResults bundleResults) {
     setEditable(false);
     setBundleResults(bundleResults);
-    appendRow( new ProjectItem( bundleResults.correlationMatrix() ) );
+//  appendRow( new ProjectItem( bundleResults.correlationMatrix() ) );
   }
 
 
@@ -101,11 +101,11 @@ namespace Isis {
     setEditable(false);
     setBundleSolutionInfo(bundleSolutionInfo);
 
+    appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
     Control *control = new Control(cNetFileName);
     appendRow( new ProjectItem(control) );
 
-    appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
     appendRow( new ProjectItem( bundleSolutionInfo->imageList() ) );
   }
@@ -636,7 +636,7 @@ namespace Isis {
    * @param[in] bundleResults (BundleResults) The BundleResults.
    */
   void ProjectItem::setBundleResults(BundleResults bundleResults) {
-    setText("Results");
+    setText("Statistics");
     setIcon( QIcon(":results") );
     setData( QVariant::fromValue<BundleResults>(bundleResults) );
   }

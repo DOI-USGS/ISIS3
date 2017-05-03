@@ -156,44 +156,6 @@ namespace Isis {
 
 
   /**
-   * Saves the BundleSolutionInfo to the project
-   *
-   * @param stream The stream to which the BundleSolutionInfo will be saved
-   * @param project The project to which this BundleSolutionInfo will be saved
-   */
-  void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project) const {
-
-    stream.writeStartElement("bundleSolutionInfo");
-    // save ID, cnet file name, and run time to stream
-    stream.writeStartElement("generalAttributes");
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
-    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
-    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
-    stream.writeEndElement(); // end general attributes
-
-    // save settings to stream
-    m_settings->save(stream, project);
-
-    // save statistics to stream
-    m_statisticsResults->save(stream, project);
-
-    // save image lists to stream
-    if ( m_images && !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
-
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
-      }
-
-      stream.writeEndElement();
-    }
-    stream.writeEndElement(); //end bundleSolutionInfo
-  }
-
-  /**
    * Change the on-disk file name for the control network used to be where the control network
    * ought to be in the given project.
    *
@@ -211,115 +173,6 @@ namespace Isis {
     FileName newName(project->cnetRoot() + "/" +
                      oldFileName.dir().dirName() + "/" + oldFileName.name());
     *m_controlNetworkFileName = newName.expanded();
-  }
-
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the BundleSolutionInfo class data. See
-   *   BundleSolutionInfo::save() for the expected format.
-   *
-   * @param bundleSolutionInfo The bundle solution we're going to be initializing
-   * @param project The project we are working in
-   */
-  BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo,
-                                             Project *project) {
-    m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
-    m_xmlHandlerProject = project;
-    m_xmlHandlerCharacters = "";
-  }
-
-
-  /**
-   * Destructor
-   */
-  BundleSolutionInfo::XmlHandler::~XmlHandler() {
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   * @param atts The attribute containing the keyword value for the given local name.
-   *
-   * @return @b bool True if we should continue reading the XML.
-   */
-  bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI,
-                                                    const QString &localName,
-                                                    const QString &qName,
-                                                    const QXmlAttributes &atts) {
-    m_xmlHandlerCharacters = "";
-
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-
-      if (localName == "bundleSettings") {
-        m_xmlHandlerBundleSolutionInfo->m_settings =
-            BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
-      }
-      else if (localName == "bundleResults") {
-        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject, reader());
-      }
-      else if (localName == "imageList") {
-        m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Adds characters to m_xmlHandlerCharacters
-   *
-   * @param ch QString of characters to add
-   *
-   * @return @b bool Almost always true. Only false if the characters cannot be read
-   */
-  bool BundleSolutionInfo::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  /**
-   * Handle an XML end element.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   *
-   * @return @b bool Returns XmlStackedHandler's endElement()
-   */
-  bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
-                                                  const QString &localName,
-                                                  const QString &qName) {
-    if (localName == "id") {
-      // all constructors assign a Uuid - we need to give it a one from the XML
-      assert(m_xmlHandlerBundleSolutionInfo->m_id);
-      delete m_xmlHandlerBundleSolutionInfo->m_id;
-      m_xmlHandlerBundleSolutionInfo->m_id = new QUuid(m_xmlHandlerCharacters);
-    }
-    else if (localName == "runTime") {
-      m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
-    }
-    else if (localName == "fileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
-    }
-    else if (localName == "imagesCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = m_xmlHandlerCharacters;
-    }
-    else if (localName == "pointsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename = m_xmlHandlerCharacters;
-    }
-    else if (localName == "residualsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename = m_xmlHandlerCharacters;
-    }
-
-    m_xmlHandlerCharacters = "";
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 
@@ -1544,5 +1397,204 @@ namespace Isis {
     fpOut.close();
 
     return true;
+  }
+
+
+  /**
+   * Saves the BundleSolutionInfo to the project
+   *
+   * Output format:
+   *
+   *
+   * <image id="..." fileName="...">
+   *   ...
+   * </image>
+   *
+   * (fileName attribute is just the base name)
+   *
+   * @param stream The stream to which the BundleSolutionInfo will be saved
+   * @param project The project to which this BundleSolutionInfo will be saved
+   * @param newProjectRoot The location of the project root directory. This is not used.
+   */
+  void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
+                                FileName newProjectRoot) const {
+
+    stream.writeStartElement("bundleSolutionInfo");
+    // save ID, cnet file name, and run time to stream
+    stream.writeStartElement("generalAttributes");
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("runTime", runTime());
+    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
+    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
+    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
+    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
+    stream.writeEndElement(); // end general attributes
+
+    // save settings to stream
+    m_settings->save(stream, project);
+
+    // save statistics to stream
+    m_statisticsResults->save(stream, project);
+
+    // save image lists to stream
+//  std::cout << "\nm_images->isEmpty() ? " << (m_images->isEmpty() ? "EMPTY" : "NOT EMPTY") << "\n\n";
+    if ( !m_images->isEmpty() ) {
+      stream.writeStartElement("imageLists");
+
+//    std::cout << "m_images->count() " << m_images->count() << "\n\n";
+      for (int i = 0; i < m_images->count(); i++) {
+        m_images->at(i)->save(stream, project, "");
+      }
+
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); //end bundleSolutionInfo
+  }
+
+#if 0
+  /**
+   * Saves the BundleSolutionInfo to the project
+   *
+   * @param stream The stream to which the BundleSolutionInfo will be saved
+   * @param project The project to which this BundleSolutionInfo will be saved
+   */
+  void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project) const {
+
+    stream.writeStartElement("bundleSolutionInfo");
+    // save ID, cnet file name, and run time to stream
+    stream.writeStartElement("generalAttributes");
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("runTime", runTime());
+    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
+    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
+    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
+    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
+    stream.writeEndElement(); // end general attributes
+
+    // save settings to stream
+    m_settings->save(stream, project);
+
+    // save statistics to stream
+    m_statisticsResults->save(stream, project);
+
+    // save image lists to stream
+    if ( m_images && !m_images->isEmpty() ) {
+      stream.writeStartElement("imageLists");
+
+      for (int i = 0; i < m_images->count(); i++) {
+        m_images->at(i)->save(stream, project, "");
+      }
+
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); //end bundleSolutionInfo
+  }
+#endif
+
+  /**
+   * Create an XML Handler (reader) that can populate the BundleSolutionInfo class data. See
+   *   BundleSolutionInfo::save() for the expected format.
+   *
+   * @param bundleSolutionInfo The bundle solution we're going to be initializing
+   * @param project The project we are working in
+   */
+  BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo,
+                                             Project *project) {
+    m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
+    m_xmlHandlerProject = project;
+    m_xmlHandlerCharacters = "";
+  }
+
+
+  /**
+   * Destructor
+   */
+  BundleSolutionInfo::XmlHandler::~XmlHandler() {
+  }
+
+
+  /**
+   * Adds characters to m_xmlHandlerCharacters
+   *
+   * @param ch QString of characters to add
+   *
+   * @return @b bool Almost always true. Only false if the characters cannot be read
+   */
+  bool BundleSolutionInfo::XmlHandler::characters(const QString &ch) {
+    m_xmlHandlerCharacters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+  /**
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   *
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML.
+   * @param qName ???
+   * @param atts The attribute containing the keyword value for the given local name.
+   *
+   * @return @b bool True if we should continue reading the XML.
+   */
+  bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI,
+                                                    const QString &localName,
+                                                    const QString &qName,
+                                                    const QXmlAttributes &atts) {
+    m_xmlHandlerCharacters = "";
+
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+
+      if (localName == "bundleSettings") {
+        m_xmlHandlerBundleSolutionInfo->m_settings =
+            BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
+      }
+      else if (localName == "bundleResults") {
+        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject, reader());
+      }
+      else if (localName == "imageList") {
+        m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handle an XML end element.
+   *
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML.
+   * @param qName ???
+   *
+   * @return @b bool Returns XmlStackedHandler's endElement()
+   */
+  bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
+                                                  const QString &localName,
+                                                  const QString &qName) {
+    if (localName == "id") {
+      // all constructors assign a Uuid - we need to give it a one from the XML
+      assert(m_xmlHandlerBundleSolutionInfo->m_id);
+      delete m_xmlHandlerBundleSolutionInfo->m_id;
+      m_xmlHandlerBundleSolutionInfo->m_id = new QUuid(m_xmlHandlerCharacters);
+    }
+    else if (localName == "runTime") {
+      m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
+    }
+    else if (localName == "fileName") {
+      assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
+      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
+    }
+    else if (localName == "imagesCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = m_xmlHandlerCharacters;
+    }
+    else if (localName == "pointsCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename = m_xmlHandlerCharacters;
+    }
+    else if (localName == "residualsCSV") {
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename = m_xmlHandlerCharacters;
+    }
+
+    m_xmlHandlerCharacters = "";
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

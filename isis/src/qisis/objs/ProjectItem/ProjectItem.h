@@ -114,6 +114,9 @@ namespace Isis {
    *                               name.
    *     @history 2017-05-01 Makayla Shepherd - Added the images that were bundled to the
    *                               BundleSolutionInfo ProjectItem. Fixes #4818.
+   *     @history 2017-05-02 Tracie Sucharski - Get rid of Correlation Matrix in BundleResults,
+   *                               change order of objects under BundleSolutionInfo.  Change text on
+   *                               some of BundleSolutionInfo items.  Fixes #4822.
    */
   class ProjectItem : public QStandardItem {
     public:
