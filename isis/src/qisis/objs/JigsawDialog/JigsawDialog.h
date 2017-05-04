@@ -2,6 +2,7 @@
 #define JigsawDialog_h
 
 #include <QDialog>
+#include <QDir>
 #include <QPointer>
 #include <QWidget>
 
@@ -18,7 +19,9 @@ namespace Isis {
   class BundleAdjust;
   class BundleSolutionInfo;
   class Control;
+  class Cube;
   class Directory;
+  class FileName;
   class Project;
 
   /**
@@ -57,6 +60,9 @@ namespace Isis {
    *                           dialog display anytime that a bundle adjust is re-ran. Fixes #4808.
    *   @history 2017-04-27 Ian Humphrey - Modified to track the last used control net to properly
    *                           update the jigsaw setup dialog's cnet combo box. References #4817.
+   *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Updated acceptBundleResults()
+   *                           to concurrently save the bundled images (ecub's) to the project.
+   *                           Fixes #4804, #4837.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -91,6 +97,25 @@ namespace Isis {
     QPushButton *m_accept; /**< Dialog's accept button that is used to save the bundle results. */
     QPushButton *m_close; /**< Dialog's close button that is used to close the dialog. */
     QPushButton *m_reject; /**< Dialog's reject button that is used to discard the results. */
+
+    /**
+     * Functor used to copy images to a specified destination directory. This is used by
+     * a QtConcurrent::mapped call in acceptBundleResults().
+     *
+     * @author 2017-05-04 Ian Humphrey
+     *
+     * @internal
+     */
+    class CopyImageToResultsFunctor :
+        public std::unary_function<const FileName &, Cube *> {
+      public:
+        CopyImageToResultsFunctor(const QDir &destination);
+        ~CopyImageToResultsFunctor();
+        Cube *operator()(const FileName &image);
+      private:
+        CopyImageToResultsFunctor &operator=(const CopyImageToResultsFunctor &other);
+        QDir m_destinationFolder; /**< Directory to copy the image to. */
+    };
 
   private slots:
     void on_JigsawSetupButton_pressed();

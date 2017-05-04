@@ -89,7 +89,7 @@ namespace Isis {
         m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)) { 
+        m_images(new QList<ImageList *>(*src.m_images)) {
   }
 
 
@@ -1437,13 +1437,13 @@ namespace Isis {
     m_statisticsResults->save(stream, project);
 
     // save image lists to stream
-//  std::cout << "\nm_images->isEmpty() ? " << (m_images->isEmpty() ? "EMPTY" : "NOT EMPTY") << "\n\n";
     if ( !m_images->isEmpty() ) {
       stream.writeStartElement("imageLists");
 
-//    std::cout << "m_images->count() " << m_images->count() << "\n\n";
+      FileName newResultsRoot(Project::bundleSolutionInfoRoot(newProjectRoot.expanded()) +
+                              "/" + runTime());
       for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
+        m_images->at(i)->save(stream, project, newResultsRoot);
       }
 
       stream.writeEndElement();

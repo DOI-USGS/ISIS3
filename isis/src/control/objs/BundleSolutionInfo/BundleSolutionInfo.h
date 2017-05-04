@@ -101,6 +101,9 @@ namespace Isis {
    *   @history 2017-05-02 Tracie Sucharski - Moved XMLHandler code to bottom of file for
    *                           consistency;  all other classes have the XmlHandler at end of file.
    *                           Fixes #4822.
+   *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Modified save() to write the bundle
+   *                           solution info images to the correct directory in the project on disk.
+   *                           Fixes #4804, #4837.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

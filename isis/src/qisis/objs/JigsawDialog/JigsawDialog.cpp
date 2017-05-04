@@ -1,6 +1,9 @@
 #include "JigsawDialog.h"
 
+#include <QtConcurrent>
 #include <QDebug>
+#include <QDir>
+#include <QFuture>
 #include <QScrollBar>
 #include <QThread>
 
@@ -8,9 +11,12 @@
 
 #include "BundleAdjust.h"
 #include "BundleSolutionInfo.h"
+#include "Cube.h"
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Image.h"
+#include "ImageList.h"
 #include "JigsawSetupDialog.h"
 #include "Control.h"
 #include "iTime.h"
@@ -274,6 +280,51 @@ namespace Isis {
 
 
   /**
+   * Constructs a image copier functor for copying images used in the bundle adjustment to the
+   * bundle solution info results (when the bundle is accepted).
+   */
+  JigsawDialog::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
+    m_destinationFolder = destination;
+  }
+
+
+  /**
+   * Destructor.
+   */
+  JigsawDialog::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
+    m_destinationFolder = QDir();
+  }
+
+
+  /**
+   * @brief Callable operator that copies an image to the bundle solution info results.
+   *
+   * This makes the functor callable - this will copy the passed FileName and return a pointer
+   * to the newly copied external cube.
+   *
+   * @param const FileName &image File name of the image to create an external copy of.
+   *
+   * @return Cube* Returns a pointer to the external cube copy. Returns NULL if an error
+   *               occurs.
+   */
+  Cube *JigsawDialog::CopyImageToResultsFunctor::operator()(const FileName &image) {
+    try {
+      // Get the destination folder and create that path.
+      FileName destination(QFileInfo(m_destinationFolder, image.name()).absoluteFilePath());
+      m_destinationFolder.mkpath(destination.path());
+
+      Cube originalCube(image, "r");
+      return originalCube.copy(destination, CubeAttributeOutput("+External"));
+    }
+    // Error tracking should be more robust, see ImportImagesWorkOrder.
+    catch (IException &e) {
+      std::cout << "\nerror: " << e.what();
+      return NULL;
+    }
+  }
+
+
+  /**
    * Accepts the bundle results and saves them to the project. The "Accept" and "Reject" buttons
    * will be disabled.
    */
@@ -290,47 +341,29 @@ namespace Isis {
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
-
+    // Iterate through all of the image lists (the "imports" in the project).
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
     foreach (ImageList *imageList, imageLists) {
-      int i = 0;
-      foreach (Image *image, *imageList) {
-        FileName imageName(image->fileName());
-        FileName imagesBundledFile(m_project->bundleSolutionInfoRoot() + "/" +
-                                   m_bundleSolutionInfo->runTime() + "/" + imageName.name());
-        imagesBundledFile = imagesBundledFile.setExtension("ecub");
-
-        Cube *originalCube = new Cube(image->fileName(), "r");
-        Cube *ecub = originalCube->copy(imagesBundledFile, CubeAttributeOutput("+External"));
-
-        // Process p;
-        // p.SetInputCube(ecub);
-        // //check for existing polygon, if exists delete it
-        // if (ecub->label()->hasObject("Polygon")) {
-        //   ecub->label()->deleteObject("Polygon");
-        // }
-        //
-        // // check for CameraStatistics Table, if exists, delete
-        // for (int iobj = 0; iobj < ecub->label()->objects(); iobj++) {
-        //   PvlObject obj = ecub->label()->object(iobj);
-        //  if (obj.name() != "Table") continue;
-        //  if (obj["Name"][0] != QString("CameraStatistics")) continue;
-        //  ecub->label()->deleteObject(iobj);
-        //  break;
-        // }
-        // //  Get Kernel group and add or replace LastModifiedInstrumentPointing keyword.
-        // Table cmatrix = m_bundleAdjust->cMatrix(i);
-        // QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-        // cmatrix.Label().addComment(jigComment);
-        // Table spvector = m_bundleAdjust->spVector(i);
-        // spvector.Label().addComment(jigComment);
-        // ecub->write(cmatrix);
-        // ecub->write(spvector);
-        // p.WriteHistory(*ecub);
-        // i++;
+      // Keep track of the file names of the images that were used in the bundle.
+      QStringList imagesToCopy;
+      int temp = 1;
+      if (!imageList->name().isEmpty()) {
+        imageList->setName("import" + QString::number(temp));
       }
+      // Now, we iterate through each image in the current image list ("import"), and we determine
+      // the location of the image and where to copy it to (as an ecub).
+      foreach (Image *image, *imageList) {
+        FileName original(image->fileName());
+        // Update our list of tracked file names for the images we are going to copy.
+        imagesToCopy.append(original.expanded());
+      }
+      // Concurrently copy the bundled images as ecub's to the bundle solution info results.
+      CopyImageToResultsFunctor copyImage(m_project->bundleSolutionInfoRoot() + "/" +
+                                          m_bundleSolutionInfo->runTime() + "/images/" +
+                                          imageList->name());
+      // Do we need to release the memory for these cubes?
+      QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
     }
-
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
