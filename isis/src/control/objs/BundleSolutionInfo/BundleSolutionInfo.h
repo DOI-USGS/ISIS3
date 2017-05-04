@@ -120,6 +120,10 @@ namespace Isis {
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
+      QString getSavedImagesFilename();
+      QString getSavedPointsFilename();
+      QString getSavedResidualsFilename();
+
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
 

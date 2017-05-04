@@ -2,8 +2,6 @@
 #define ProjectItem_h
 /**
  * @file
- * $Date$
- * $Revision$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -29,6 +27,7 @@
 #include "BundleSettings.h"
 #include "GuiCamera.h"
 #include "TargetBody.h"
+#include "FileItem.h"
 
 class QVariant;
 
@@ -48,6 +47,7 @@ namespace Isis {
   class Shape;
   class ShapeList;
   class TargetBodyList;
+  class FileItemData;
 
   /**
    * Represents an item of a ProjectItemModel in Qt's model-view
@@ -117,6 +117,8 @@ namespace Isis {
    *     @history 2017-05-02 Tracie Sucharski - Get rid of Correlation Matrix in BundleResults,
    *                               change order of objects under BundleSolutionInfo.  Change text on
    *                               some of BundleSolutionInfo items.  Fixes #4822.
+   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. m4838
+   *
    */
   class ProjectItem : public QStandardItem {
     public:
@@ -141,6 +143,8 @@ namespace Isis {
       ProjectItem(QList<BundleSolutionInfo *> results);
       ProjectItem(TargetBodyQsp targetBody);
       ProjectItem(TargetBodyList *targetBodyList);
+      ProjectItem(FileItemQsp filename, QString treeText, QIcon icon);
+
 
       ~ProjectItem();
 
@@ -171,6 +175,7 @@ namespace Isis {
       bool isProject() const;
       bool isGuiCamera() const;
       bool isTargetBody() const;
+      bool isFileItem() const;
 
       void setProjectItem(ProjectItem *item);
       void setBundleResults(BundleResults bundleResults);

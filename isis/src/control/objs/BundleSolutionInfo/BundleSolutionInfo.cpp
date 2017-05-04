@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QString>
 #include <QStringList>
 #include <QUuid>
 #include <QXmlStreamWriter>
@@ -142,6 +143,17 @@ namespace Isis {
     return *this;
   }
 
+  QString BundleSolutionInfo::getSavedImagesFilename() {
+    return m_csvSavedImagesFilename;
+  }
+
+  QString BundleSolutionInfo::getSavedPointsFilename() {
+    return m_csvSavedPointsFilename;
+  }
+
+  QString BundleSolutionInfo::getSavedResidualsFilename() {
+    return m_csvSavedResidualsFilename;
+  }
 
   /**
    * Sets the stat results.

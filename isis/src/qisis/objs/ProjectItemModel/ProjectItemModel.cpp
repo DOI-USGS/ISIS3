@@ -1,7 +1,5 @@
 /**
  * @file
- * $Date$
- * $Revision$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -41,6 +39,8 @@
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "TargetBodyList.h"
+#include "FileItem.h"
+
 
 namespace Isis {
   /**
@@ -353,7 +353,30 @@ namespace Isis {
         for (int j=0; j < projectItem->rowCount(); j++) {
           ProjectItem *resultsItem = projectItem->child(j);
           if (resultsItem->text() == "Results") {
-            resultsItem->appendRow( new ProjectItem(bundleSolutionInfo) );
+            ProjectItem *pItem = new ProjectItem(bundleSolutionInfo);
+            resultsItem->appendRow( pItem );
+            // Append the CSV files to the Statistics in the project
+            if (bundleSolutionInfo->outputResiduals()) {
+              ProjectItem *residualsItem =
+                  new ProjectItem(FileItemQsp( new FileItem(bundleSolutionInfo->getSavedResidualsFilename())),
+                                  bundleSolutionInfo->getSavedResidualsFilename(),
+                                  QIcon(":spacecraft") );
+              pItem->child(2)->appendRow(residualsItem);
+            }
+            if (bundleSolutionInfo->outputImagesCSV()) {
+              ProjectItem *imagesItem =
+                  new ProjectItem(FileItemQsp( new FileItem(bundleSolutionInfo->getSavedImagesFilename())),
+                                  bundleSolutionInfo->getSavedImagesFilename(),
+                                  QIcon(":spacecraft") );
+              pItem->child(2)->appendRow(imagesItem);
+            }
+            if (bundleSolutionInfo->outputPointsCSV()) {
+              ProjectItem *pointsItem =
+                  new ProjectItem(FileItemQsp( new FileItem(bundleSolutionInfo->getSavedPointsFilename())),
+                                  bundleSolutionInfo->getSavedPointsFilename(),
+                                  QIcon(":spacecraft") );
+              pItem->child(2)->appendRow(pointsItem);
+            }
           }
         }
       }

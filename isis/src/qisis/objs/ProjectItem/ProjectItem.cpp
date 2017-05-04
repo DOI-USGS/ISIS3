@@ -67,6 +67,21 @@ namespace Isis {
 
 
   /**
+   * Constructs an item representing a file in the filesystem.
+   *
+   * @param[in] filename The full path to the file in the filesystem
+   * @param[in] treetext The name displayed in the project tree
+   * @param[in] filename A icon to display next to the treetext
+   */
+  ProjectItem::ProjectItem(FileItemQsp filename, QString treeText, QIcon icon) {
+    setEditable(false);
+    setData(QVariant::fromValue<FileItemQsp>(filename));
+    setText(treeText);
+    setIcon(icon);
+  }
+
+
+  /**
    * Constructs an item from a BundleResults.
    *
    * @param[in] bundleResults (BundleResults) The BundleResults to
@@ -75,7 +90,6 @@ namespace Isis {
   ProjectItem::ProjectItem(BundleResults bundleResults) {
     setEditable(false);
     setBundleResults(bundleResults);
-//  appendRow( new ProjectItem( bundleResults.correlationMatrix() ) );
   }
 
 
@@ -614,6 +628,17 @@ namespace Isis {
    */
   bool ProjectItem::isTargetBody() const {
     return data().canConvert<TargetBodyQsp>();
+  }
+
+
+  /**
+   * Returns true if a FileItemQsp is stored in the data of the item.
+   * Returns false otherwise.
+   *
+   * @return @b bool If a FileItemQsp is stored in the item or not.
+   */
+  bool ProjectItem::isFileItem() const {
+    return data().canConvert<FileItemQsp>();
   }
 
 
