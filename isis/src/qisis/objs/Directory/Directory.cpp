@@ -36,7 +36,9 @@
 
 #include <QtDebug>
 #include <QMessageBox>
-
+#include "BundleObservation.h"
+#include "BundleObservationView.h"
+#include "BundleObservationViewWorkOrder.h"
 #include "ChipViewportsWidget.h"
 #include "CloseProjectWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
@@ -139,6 +141,7 @@ namespace Isis {
       createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
+      createWorkOrder<BundleObservationViewWorkOrder>();
 
       //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
@@ -423,6 +426,28 @@ namespace Isis {
    */
    QStringList Directory::recentProjectsList() {
      return m_recentProjects;
+  }
+
+
+  /**
+   * @brief Add the BundleObservationView to the window.
+   * @return @b (BundleObservationView *) The BundleObservationView displayed.
+   */
+  BundleObservationView *Directory::addBundleObservationView(BundleObservation *bundleObservation) {
+    BundleObservationView *result = new BundleObservationView(NULL);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupBundleObservationViews() ) );
+
+    m_bundleObservationViews.append(result);
+
+    result->setWindowTitle( tr("Bundle Observation View %1").
+                            arg( m_bundleObservationViews.count() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
   }
 
 
@@ -825,6 +850,14 @@ namespace Isis {
    */
   QWidget *Directory::warningWidget() {
     return m_warningTreeWidget;
+  }
+
+
+  /**
+   * @brief Removes pointers to deleted BundleObservationView objects.
+   */
+  void Directory::cleanupBundleObservationViews() {
+    m_bundleObservationViews.removeAll(NULL);
   }
 
 

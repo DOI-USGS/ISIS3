@@ -50,6 +50,7 @@ namespace Isis {
    *   @history 2016-07-26 Tracie Sucharski - Added support for Importing shapes.
    *   @history 2016-11-07 Tracie Sucharski - Added the CubeDnViewWorkOrder,
    *                         SetActiveControlWorkOrder, SetActiveImageListWorkOrder.  Fixes #4485.
+   *   @history 2017-05-04 Tracie Sucharski - Added BundleObservationViewWorkOrder.  Fixes #4840. 
    */
   class WorkOrderFactory {
     public:

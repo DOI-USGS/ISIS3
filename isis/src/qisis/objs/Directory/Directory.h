@@ -43,6 +43,8 @@ class QSplitter;
 class QTabWidget;
 
 namespace Isis {
+  class BundleObservation;
+  class BundleObservationView;
   class ChipViewportsWidget;
   class CnetEditorWidget;
   class ControlNet;
@@ -126,6 +128,8 @@ namespace Isis {
    *   @history 2017-04-25 Ian Humphrey - Modified initializeActions() so that the jigsaw work
    *                           order is enabled whenever there are both images and cnets in the
    *                           project. Otherwise, it is disabled until then. Fixes #4819.
+   *   @history 2017-05-03 Tracie Sucharski - Added methods and member variables for the
+   *                           BundleObservationView.  Fixes #4839. Fixes #4840.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -138,6 +142,7 @@ namespace Isis {
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
+      BundleObservationView *addBundleObservationView(BundleObservation *bundleObservation);
       CnetEditorWidget *addCnetEditorView(Control *network);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
@@ -165,6 +170,7 @@ namespace Isis {
       QList<QAction *> activeToolBarActions();
       QList<QAction *> toolPadActions();
 
+      QList<BundleObservationView *> bundleObservationViews();
       QList<CnetEditorWidget *> cnetEditorViews();
       QList<CubeDnView *> cubeDnViews();
       QList<Footprint2DView *> footprint2DViews();
@@ -238,6 +244,7 @@ namespace Isis {
       void controlPointAdded(QString newPointId);
 
     public slots:
+      void cleanupBundleObservationViews();
       void cleanupCnetEditorViewWidgets();
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
@@ -315,6 +322,8 @@ namespace Isis {
       QPointer<Project> m_project;                      //!< Pointer to the Project.
       QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
 
+      //!< List of BundleObservationView
+      QList< QPointer<BundleObservationView> > m_bundleObservationViews;
       QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;  //!< List of CnetEditorWidgets
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets

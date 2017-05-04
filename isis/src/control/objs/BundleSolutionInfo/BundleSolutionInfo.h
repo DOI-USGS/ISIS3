@@ -139,7 +139,6 @@ namespace Isis {
       bool outputResiduals();
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
-//    void save(QXmlStreamWriter &stream, const Project *project) const;
 
     public slots:
       void updateFileName(Project *);

@@ -1,5 +1,6 @@
 #include "WorkOrderFactory.h"
 
+#include "BundleObservationViewWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
 #include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
@@ -45,6 +46,7 @@ namespace Isis {
   WorkOrder *WorkOrderFactory::create(Project *project, QString type) {
     WorkOrder *result = NULL;
 
+    tryType<BundleObservationViewWorkOrder>(type, project, result);
     tryType<CnetEditorViewWorkOrder>(type, project, result);
     tryType<CubeDnViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);

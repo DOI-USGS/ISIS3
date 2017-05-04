@@ -1451,45 +1451,6 @@ namespace Isis {
     stream.writeEndElement(); //end bundleSolutionInfo
   }
 
-#if 0
-  /**
-   * Saves the BundleSolutionInfo to the project
-   *
-   * @param stream The stream to which the BundleSolutionInfo will be saved
-   * @param project The project to which this BundleSolutionInfo will be saved
-   */
-  void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project) const {
-
-    stream.writeStartElement("bundleSolutionInfo");
-    // save ID, cnet file name, and run time to stream
-    stream.writeStartElement("generalAttributes");
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
-    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
-    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
-    stream.writeEndElement(); // end general attributes
-
-    // save settings to stream
-    m_settings->save(stream, project);
-
-    // save statistics to stream
-    m_statisticsResults->save(stream, project);
-
-    // save image lists to stream
-    if ( m_images && !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
-
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
-      }
-
-      stream.writeEndElement();
-    }
-    stream.writeEndElement(); //end bundleSolutionInfo
-  }
-#endif
 
   /**
    * Create an XML Handler (reader) that can populate the BundleSolutionInfo class data. See
