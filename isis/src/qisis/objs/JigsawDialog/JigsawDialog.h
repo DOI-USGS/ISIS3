@@ -63,6 +63,11 @@ namespace Isis {
    *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Updated acceptBundleResults()
    *                           to concurrently save the bundled images (ecub's) to the project.
    *                           Fixes #4804, #4837.
+   *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Removed connection handling deleting the
+   *                           bundle adjust later. This prevents a segfault from occuring when the
+   *                           bundle adjust was accessed in the acceptBundleResults() slot, Since
+   *                           its memory may have been deleted by then. Now manually managing the
+   *                           memory for m_bundleAdjust. Fixes #4849.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
