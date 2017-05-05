@@ -140,6 +140,10 @@ namespace Isis {
     if (m_bundleSolutionInfo) {
       delete m_bundleSolutionInfo;
     }
+    if (m_bundleAdjust) {
+      delete m_bundleAdjust;
+      m_bundleAdjust = NULL;
+    }
     if (m_ui) {
       delete m_ui;
     }
@@ -213,6 +217,12 @@ namespace Isis {
 
       QThread *bundleThread = new QThread;
 
+      // Make sure to clean up any previously run bundle adjusts.
+      if (m_bundleAdjust) {
+        delete m_bundleAdjust;
+        m_bundleAdjust = NULL;
+      }
+
       m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
                                         false);
 
@@ -252,11 +262,6 @@ namespace Isis {
       connect( m_bundleAdjust, SIGNAL( finished() ),
                bundleThread, SLOT( quit() ) );
 
-      // Schedule the bundle adjustment for deletion.
-      connect( m_bundleAdjust, SIGNAL( finished() ),
-               m_bundleAdjust, SLOT( deleteLater() ) );
-      // ken testing
-
       bundleThread->start();
 
       // change "Run" button text to "Abort" (or maybe pause)
@@ -266,15 +271,13 @@ namespace Isis {
       update();
     }
     else {
-      // if bundle is running then we want to abort
-      if (m_bRunning) {
-        m_bundleAdjust->abortBundle();
-        m_bRunning = false;
-        m_ui->JigsawRunButton->setText("&Aborting...");
-        update();
-        // Since the bundle has stopped, the user can close the dialog via "Close" again
-        m_close->setEnabled(true);
-      }
+      // Make sure to abort the bundle if it is currently running.
+      m_bundleAdjust->abortBundle();
+      m_bRunning = false;
+      m_ui->JigsawRunButton->setText("&Aborting...");
+      update();
+      // Since the bundle has stopped, the user can close the dialog via "Close" again
+      m_close->setEnabled(true);
     }
   }
 
@@ -363,6 +366,10 @@ namespace Isis {
                                           imageList->name());
       // Do we need to release the memory for these cubes?
       QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
+      for (int i = 0; i < imagesToCopy.size(); i++) {
+        Cube *c = copiedCubes.resultAt(i);
+        Table matrix = m_bundleAdjust->cMatrix(i);
+      }
     }
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
