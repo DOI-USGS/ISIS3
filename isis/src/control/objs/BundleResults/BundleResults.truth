@@ -430,13 +430,6 @@ Testing XML: Object deserialized as (should match object above):
 
 
 Testing error throws...
-Maximum Likelihood Tier: 0
-Median of R^2 residuals:  0.495050
-Maximum Likelihood Tier: 1
-Median of R^2 residuals:  0.495050
-Maximum Likelihood Tier: 2
-Median of R^2 residuals:  0.495050
-Maximum Likelihood Tier: 3
 **I/O ERROR** Computed degrees of freedom [-1] is invalid.
 **I/O ERROR** Computed degrees of freedom [0] is invalid.
 **PROGRAMMER ERROR** Output Control Network has not been set.
