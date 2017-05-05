@@ -36,6 +36,7 @@
 
 #include <QtDebug>
 #include <QMessageBox>
+
 #include "BundleObservation.h"
 #include "BundleObservationView.h"
 #include "BundleObservationViewWorkOrder.h"
@@ -53,6 +54,7 @@
 #include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
+#include "FileItem.h"
 #include "FileName.h"
 #include "Footprint2DView.h"
 #include "Footprint2DViewWorkOrder.h"
@@ -433,8 +435,8 @@ namespace Isis {
    * @brief Add the BundleObservationView to the window.
    * @return @b (BundleObservationView *) The BundleObservationView displayed.
    */
-  BundleObservationView *Directory::addBundleObservationView(BundleObservation *bundleObservation) {
-    BundleObservationView *result = new BundleObservationView(NULL);
+  BundleObservationView *Directory::addBundleObservationView(FileItemQsp fileItem) {
+    BundleObservationView *result = new BundleObservationView(fileItem);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews() ) );

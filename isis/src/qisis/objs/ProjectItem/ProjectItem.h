@@ -25,9 +25,9 @@
 #include <QStandardItem>
 
 #include "BundleSettings.h"
+#include "FileItem.h"
 #include "GuiCamera.h"
 #include "TargetBody.h"
-#include "FileItem.h"
 
 class QVariant;
 
@@ -38,6 +38,7 @@ namespace Isis {
   class Control;
   class ControlList;
   class CorrelationMatrix;
+  class FileItem;
   class Image;
   class ImageList;
   class GuiCameraList;
@@ -47,7 +48,6 @@ namespace Isis {
   class Shape;
   class ShapeList;
   class TargetBodyList;
-  class FileItemData;
 
   /**
    * Represents an item of a ProjectItemModel in Qt's model-view
@@ -117,7 +117,9 @@ namespace Isis {
    *     @history 2017-05-02 Tracie Sucharski - Get rid of Correlation Matrix in BundleResults,
    *                               change order of objects under BundleSolutionInfo.  Change text on
    *                               some of BundleSolutionInfo items.  Fixes #4822.
-   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. m4838
+   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. Fixes #4838.
+   *     @history 2017-05-04 Tracie Sucharski - Added isFileItem and fileItem methods and member
+   *                           variables needed for WorkOrders.  Fixes #4839. Fixes #4840.
    *
    */
   class ProjectItem : public QStandardItem {
@@ -161,6 +163,7 @@ namespace Isis {
       Project *project() const;
       GuiCameraQsp guiCamera() const;
       TargetBodyQsp targetBody() const;
+      FileItemQsp fileItem() const;
 
       bool isBundleResults() const;
       bool isBundleSettings() const;

@@ -31,6 +31,7 @@
 
 
 #include "CorrelationMatrix.h"
+#include "FileItem.h"
 #include "GuiCamera.h"
 #include "TargetBody.h"
 #include "XmlStackedHandler.h"
@@ -296,6 +297,8 @@ namespace Isis {
    *   @history 2017-04-16 Ian Humphrey - Added enableWorkOrder and disableWorkOrder slots for
    *                           enabling and disabling work orders. Copy constructor now copies
    *                           what's this and tool tip (hover text) state.
+   *   @history 2017-05-05 Tracie Sucharski - Added functionality for FileItem types and added
+   *                           BundleObservationViewWorkOrder. Fixes #4838, #4839, #4840.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -342,6 +345,7 @@ namespace Isis {
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
+      virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool isExecutable(ProjectItem *item);
 
       void read(XmlStackedHandlerReader *xmlReader);
@@ -354,6 +358,7 @@ namespace Isis {
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
+      virtual void setData(FileItemQsp fileItem);
       virtual void setData(ProjectItem *item);
 
 
@@ -415,6 +420,8 @@ namespace Isis {
       TargetBodyQsp targetBody();
 
       GuiCameraQsp guiCamera();
+
+      FileItemQsp fileItem();
 
       virtual bool dependsOn(WorkOrder *other) const;
 
@@ -558,6 +565,12 @@ namespace Isis {
        * framework.
        */
       TargetBodyQsp m_targetBody;
+
+
+      /**
+       * A QSharedPointer to the FileItem
+       */
+      FileItemQsp m_fileItem;
 
 
       /**

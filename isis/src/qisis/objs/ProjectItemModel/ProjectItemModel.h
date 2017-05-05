@@ -94,7 +94,7 @@ namespace Isis {
    *                           the ProjectItemTree, by double-clicking on the project name.  This
    *                           functionality required the addition of the setData and flags methods.
    *                           The projectNameEdited signal is also emitted.  Fixes #2295
-   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. m4838
+   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. Fixes #4838.
    */
   class ProjectItemModel : public QStandardItemModel {
 

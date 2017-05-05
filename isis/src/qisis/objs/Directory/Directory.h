@@ -50,6 +50,7 @@ namespace Isis {
   class ControlNet;
   class ControlPointEditView;
   class CubeDnView;
+  class FileItem;
   class Footprint2DView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
@@ -142,7 +143,7 @@ namespace Isis {
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
-      BundleObservationView *addBundleObservationView(BundleObservation *bundleObservation);
+      BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
       CnetEditorWidget *addCnetEditorView(Control *network);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
@@ -205,7 +206,7 @@ namespace Isis {
         //if (!results.isEmpty()) {
         //  results.append(NULL);
         //}
-        //qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
+//      qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
         foreach (WorkOrder *workOrder, m_workOrders) {
           if (workOrder->isExecutable(data)) {
             WorkOrder *clone = workOrder->clone();

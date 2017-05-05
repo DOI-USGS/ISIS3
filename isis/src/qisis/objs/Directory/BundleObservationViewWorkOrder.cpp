@@ -81,10 +81,10 @@ namespace Isis {
    * 
    * @return @b bool True if one of the images in ImagesList images isFootprintable
    */
-  bool BundleObservationViewWorkOrder::isExecutable(BundleObservation *bundleObservation) {
+  bool BundleObservationViewWorkOrder::isExecutable(FileItemQsp fileItem) {
     bool result = false;
    
-    if (bundleObservation) {
+    if (fileItem) {
       result = true;
     }
     return result;
@@ -98,9 +98,9 @@ namespace Isis {
    *                 displayed, otherwise return False. 
    */
   bool BundleObservationViewWorkOrder::setupExecution() {
-    bool success = WorkOrder::setupExecution();
 
-    return success;
+    bool success = WorkOrder::setupExecution();
+    return success; 
   }
 
 
@@ -114,8 +114,7 @@ namespace Isis {
   void BundleObservationViewWorkOrder::execute() {
 
     //ProjectItem * selectedItem = project()->directory()->model()->selectedItems();
-
-    project()->directory()->addBundleObservationView(NULL);
+    project()->directory()->addBundleObservationView(fileItem());
   }
 
 }

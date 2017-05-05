@@ -1,56 +1,55 @@
-#include "AbstractProjectItemView.h"
-#include "BundleObservationView.h"
-#include "BundleObservation.h"
-#include <QAction>
-#include <QDragEnterEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QEvent>
-#include <QFile>
-#include <QHBoxLayout>
-#include <QMap>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QMenu>
-#include <QModelIndex>
-#include <QSize>
-#include <QSizePolicy>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QStatusBar>
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 
+#include "BundleObservationView.h"
+
+#include <QDebug>
+#include <QFile>
 #include <QHeaderView>
+#include <QSizePolicy>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QString>
 #include <QStringList>
 #include <QTableView>
 #include <QTextStream>
-#include <QToolBar>
 #include <QVBoxLayout>
-#include <QWidgetAction>
-#include <QXmlStreamWriter>
-
-
-#include "ControlPoint.h"
-#include "Directory.h"
-#include "Cube.h"
-#include "Image.h"
-#include "MosaicGraphicsView.h"
-#include "MosaicSceneWidget.h"
-#include "ProjectItem.h"
-#include "ProjectItemModel.h"
-#include "Shape.h"
-#include "ToolPad.h"
-
-
-  namespace Isis {
 
 
 
-  BundleObservationView::BundleObservationView(BundleObservation * bundleObservation,QWidget *parent):
+namespace Isis {
+
+
+
+  /** 
+   * Creates a view showing the CSV file from BundleObservation. 
+   * 
+   * @param FileItemQsp fileItem  QSharedPointer to the fileItem from the ProjectItemModel
+   */
+  BundleObservationView::BundleObservationView(FileItemQsp fileItem, QWidget *parent):
                          AbstractProjectItemView(parent) {
 
     QStandardItemModel *model = new QStandardItemModel;
+    QFile file(fileItem->fileName());
 
-    QFile file("AS15_16_test_bundleout_images.csv");
     if (file.open(QIODevice::ReadOnly)) {
 
       int lineindex = 0;                     // file line counter

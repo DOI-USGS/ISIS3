@@ -23,6 +23,7 @@
 
 #include <QSharedPointer>
 #include <QObject>
+#include <QString>
 
 namespace Isis {
 
@@ -32,12 +33,14 @@ namespace Isis {
    *
    * @author 2017-05-04 J Bonn
    *
-   * @internal
+   * @internal 
+   *   @history 2017-05-05 Tracie Sucharski - Renamed accessor method to match Isis standards. Moved
+   *                           class to a Directory under qisis/objs.
    */
   class FileItem : public QObject {
     public:
       FileItem(const QString filename) : m_filename(filename) {};
-      QString getFileName() { return m_filename; };
+      QString fileName() { return m_filename; };
     private:
       QString m_filename;
   };

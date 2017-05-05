@@ -32,7 +32,6 @@
 #include <QXmlStreamWriter>
 
 #include "ControlList.h"
-#include "CorrelationMatrix.h"
 #include "IException.h"
 #include "ImageList.h"
 #include "IString.h"
@@ -40,7 +39,6 @@
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ShapeList.h"
-#include "TargetBody.h"
 #include "XmlStackedHandlerReader.h"
 
 
@@ -62,6 +60,7 @@ namespace Isis {
     m_correlationMatrix = CorrelationMatrix();
     m_guiCamera = GuiCameraQsp();
     m_targetBody = TargetBodyQsp();
+    m_fileItem = FileItemQsp();
 
     m_isUndoable = true;
     m_isSynchronous = true;
@@ -119,6 +118,7 @@ namespace Isis {
     m_controlList = other.m_controlList;
     m_guiCamera = other.m_guiCamera;
     m_targetBody = other.m_targetBody;
+    m_fileItem = other.m_fileItem;
     m_internalData = other.m_internalData;
 
     m_isUndoable = other.m_isUndoable;
@@ -330,6 +330,15 @@ namespace Isis {
 
 
   /**
+   * @brief Sets the FileItem data for this WorkOrder.
+   * @param FileItem A QSharedPointer to the FileItem.
+   */
+  void WorkOrder::setData(FileItemQsp fileItem) {
+    m_fileItem = fileItem;
+  }
+
+
+  /**
    * @brief Sets the internal data to the data stored in a ProjectItem.
    * @param item The item containing the data.
    */
@@ -371,6 +380,9 @@ namespace Isis {
     else if ( item->isGuiCamera() ) {
       setData( item->guiCamera() );
     }
+    else if ( item->isFileItem() ) {
+      setData( item->fileItem() );
+    }
   }
 
 
@@ -394,6 +406,18 @@ namespace Isis {
    * if it is not.
    */
   bool WorkOrder::isExecutable(GuiCameraQsp guiCamera) {
+    return false;
+  }
+
+
+  /**
+   * @brief Re-implement this method if your WorkOrder utilizes FileItemQsp (a QSharedPointer to a
+   * FileItem object) for data in order to operate.
+   * @param FileItemQsp
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
+   */
+  bool WorkOrder::isExecutable(FileItemQsp fileItem) {
     return false;
   }
 
@@ -452,6 +476,9 @@ namespace Isis {
     else if ( item->isGuiCamera() ) {
       //return isExecutable( item->guiCamera() ) || isExecutable( item->guiCamera().data() );
       return isExecutable( item->guiCamera() );
+    }
+    else if ( item->isFileItem() ) {
+      return isExecutable( item->fileItem() );
     }
 
     return false;
@@ -684,6 +711,15 @@ namespace Isis {
    */
   GuiCameraQsp WorkOrder::guiCamera() {
     return m_guiCamera;
+  }
+
+
+  /**
+   * @brief WorkOrder::fileItem
+   * @return @b QSharedPointer Returns a shared pointer to the fileItem.
+   */
+  FileItemQsp WorkOrder::fileItem() {
+    return m_fileItem;
   }
 
 

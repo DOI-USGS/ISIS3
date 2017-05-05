@@ -53,7 +53,7 @@ namespace Isis {
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    setAcceptDrops(true);
+//  setAcceptDrops(true);
     
     QBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(m_treeView);

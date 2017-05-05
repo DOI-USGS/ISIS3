@@ -29,7 +29,6 @@
 #include <QVariant>
 
 #include "BundleResults.h"
-#include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
 #include "Control.h"
 #include "ControlList.h"
@@ -484,6 +483,16 @@ namespace Isis {
    */
   TargetBodyQsp ProjectItem::targetBody() const {
     return data().value<TargetBodyQsp>();
+  }
+
+
+  /**
+   * Returns the FileItemQsp stored in the data of the item.
+   *
+   * @return @b FileItemQsp The filename stored in the item.
+   */
+  FileItemQsp ProjectItem::fileItem() const {
+    return data().value<FileItemQsp>();
   }
 
 

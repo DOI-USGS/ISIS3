@@ -22,6 +22,8 @@
  */
 #include "WorkOrder.h"
 
+#include "FileItem.h"
+
 namespace Isis {
   class Project;
   class BundleObservation;
@@ -47,7 +49,7 @@ namespace Isis {
 
       virtual BundleObservationViewWorkOrder *clone() const;
 
-      virtual bool isExecutable(BundleObservation * bundleObservation);
+      virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool setupExecution();
       virtual void execute();
 
