@@ -95,6 +95,7 @@ namespace Isis {
     m_isTemporaryProject = true;
     m_activeControl = NULL;
     m_activeImageList = NULL;
+    m_copyCubes = false;
 
     m_numImagesCurrentlyReading = 0;
 
@@ -1511,6 +1512,32 @@ namespace Isis {
   void Project::relocateProjectRoot(QString newProjectRoot) {
     *m_projectRoot = newProjectRoot;
     emit projectRelocated(this);
+  }
+
+
+  /**
+   * Sets a boolean flag which determines whether to save the
+   * Cubes in the project ImageLists as well as the ecubs (the labels)
+   * False means we do not save the cubes, and true means we do.
+   * @param copy
+   *
+   */
+  void Project::setCopyCubes(bool copy) {
+
+    m_copyCubes = copy;
+
+  }
+
+  /**
+   * Returns the boolean flag indicating whether or not we are copying
+   * the cubes in the ImageLists into the results folder upon save.
+   * False means we are not (and are saving the ecubs only).  True means we are copying both.
+   * @return True if saving the cubes, false otherwise.
+   */
+  bool Project::copyCubes() const {
+
+    return m_copyCubes;
+
   }
 
 
