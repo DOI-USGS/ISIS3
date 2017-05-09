@@ -20,7 +20,8 @@ using namespace Isis;
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     QString networkId, QString description);
-void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog);
+void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, 
+    PvlObject &cnetLog, Progress progress);
 
 ControlPoint * mergePoint(
     ControlPoint *basePoint, ControlPoint *newPoint,
@@ -210,27 +211,26 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     }
   }
 
-  // Creates a Progress bar for the entire merging process
+  // Show progress using "File X of N" and progress bar for each file.
   Progress progress;
-  progress.SetMaximumSteps(filelist.size());
+  progress.SetText("Loading base network");
   progress.CheckStatus();
 
   // The original base network is the first in the list, all successive
   // networks will be added to the base in descending order
-  ControlNet *baseNet = new ControlNet(filelist[0].toString());
+  ControlNet *baseNet = new ControlNet(filelist[0].toString(), &progress);
   baseNet->SetNetworkId(networkId);
   baseNet->SetUserName(Isis::Application::UserName());
   baseNet->SetCreatedDate(Isis::Application::DateTime());
   baseNet->SetModifiedDate(Isis::iTime::CurrentLocalTime());
   baseNet->SetDescription(description);
 
-  progress.CheckStatus();
 
   // Loop through each network in the list and attempt to merge it into the
   // base
   for (int cnetIndex = 1; cnetIndex < (int) filelist.size(); cnetIndex++) {
     FileName currentCnetFileName(filelist[cnetIndex]);
-    ControlNet newNet(currentCnetFileName.expanded());
+    ControlNet newNet(currentCnetFileName.expanded(), &progress);
 
     // Networks can only be merged if the targets are the same
     if (baseNet->GetTarget().toLower() != newNet.GetTarget().toLower()) {
@@ -243,19 +243,21 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     PvlObject cnetLog = createNetworkLog(newNet);
 
     // Merge the network, add the resulting conflicts to the log
-    mergeNetwork(*baseNet, newNet, cnetLog);
+    progress.SetText("Merging file " + QString::number(cnetIndex) 
+                                     + " of " + QString::number(filelist.size()-1));
+    mergeNetwork(*baseNet, newNet, cnetLog, progress);
     addLog(conflictLog, cnetLog);
 
-    progress.CheckStatus();
   }
 
   return baseNet;
 }
 
 
-void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog) {
+void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog, Progress progress) {
   // Loop through all points in the new network, looking for new points to add
   // and conflicting points to resolve
+  progress.SetMaximumSteps(newNet.GetNumPoints());
   for (int newIndex = 0; newIndex < newNet.GetNumPoints(); newIndex++) {
     ControlPoint *newPoint = newNet.GetPoint(newIndex);
     if (baseNet.ContainsPoint(newPoint->GetId())) {
@@ -274,6 +276,7 @@ void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog) {
       ControlPoint *outPoint = new ControlPoint(*newPoint);
       baseNet.AddPoint(outPoint);
     }
+    progress.CheckStatus();
   }
 }
 
