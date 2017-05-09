@@ -243,8 +243,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     PvlObject cnetLog = createNetworkLog(newNet);
 
     // Merge the network, add the resulting conflicts to the log
-    progress.SetText("Merging file " + QString::number(cnetIndex) 
-                                     + " of " + QString::number(filelist.size()-1));
+    progress.SetText("Merging file " + QString::number(cnetIndex+1) 
+                                     + " of " + QString::number(filelist.size()));
     mergeNetwork(*baseNet, newNet, cnetLog, progress);
     addLog(conflictLog, cnetLog);
 
