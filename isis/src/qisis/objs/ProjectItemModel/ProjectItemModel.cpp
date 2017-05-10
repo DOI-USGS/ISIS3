@@ -40,7 +40,6 @@
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "TargetBodyList.h"
-#include "FileItem.h"
 
 
 namespace Isis {
@@ -358,27 +357,21 @@ namespace Isis {
             resultsItem->appendRow( pItem );
 
             // Append the CSV files to the Statistics in the project
-            if (bundleSolutionInfo->outputResiduals()) {
-              ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
-                 new FileItem(bundleSolutionInfo->savedResidualsFilename())),
-                              bundleSolutionInfo->savedResidualsFilename(),
-                              QIcon(":spacecraft") );
-              pItem->child(2)->appendRow(residualsItem);
-            }
-            if (bundleSolutionInfo->outputImagesCSV()) {
-              ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
-                 new FileItem(bundleSolutionInfo->savedImagesFilename())),
-                              bundleSolutionInfo->savedImagesFilename(),
-                              QIcon(":spacecraft") );
-              pItem->child(2)->appendRow(imagesItem);
-            }
-            if (bundleSolutionInfo->outputPointsCSV()) {
-              ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
-                 new FileItem(bundleSolutionInfo->savedPointsFilename())),
-                              bundleSolutionInfo->savedPointsFilename(),
-                              QIcon(":spacecraft") );
-              pItem->child(2)->appendRow(pointsItem);
-            }
+            ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedResidualsFilename())),
+                            bundleSolutionInfo->savedResidualsFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(residualsItem);
+            ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedImagesFilename())),
+                            bundleSolutionInfo->savedImagesFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(imagesItem);
+            ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedPointsFilename())),
+                            bundleSolutionInfo->savedPointsFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(pointsItem);
           }
         }
       }
