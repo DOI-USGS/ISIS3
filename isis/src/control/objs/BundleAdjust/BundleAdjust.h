@@ -267,6 +267,16 @@ namespace Isis {
    *                           occur. Removed bundleException(QString) signal. Fixes #4483.
    *   @history 2016-12-01 Ian Humphrey - Modified outputBundleStatus()'s printf() call so that
    *                           there is no longer a -Wformat-security warning.
+   *   @history 2017-05-09 Ken Edmundson - Speed improvements and error propagation bug fix.
+   *                           Separated initializations for Normal Equations matrix out of
+   *                           ::initializeCholmodLibraryVariables() into
+   *                           ::initializeNormalEquationsMatrix(). Added
+   *                           m_previousNumberImagePartials to avoid unnecessary resizing of the
+   *                           "coeffImage" matrix in ::computePartials. New m_startColumn member in
+   *                           SparseBlockColumnMatrix eliminates costly computation of leading
+   *                           colums and rows. In ::errorPropagation method, call to get Q matrix
+   *                           from BundleControlPoint was creating a copy instead of getting a
+   *                           reference. References #4664.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -326,6 +336,7 @@ namespace Isis {
       //TODO Should there be a resetBundle(BundleSettings bundleSettings) method
       //     that allows for rerunning with new settings? JWB
       void init(Progress *progress = 0);
+      bool initializeNormalEquationsMatrix();
       bool validateNetwork();
       bool solveSystem();
       void iterationSummary();
@@ -467,6 +478,10 @@ namespace Isis {
                                                                    cholmod_factorize.*/
       LinearAlgebra::Vector m_imageSolution;                 /**!< The image parameter solution
                                                                    vector.*/
+                                                                   
+      int m_previousNumberImagePartials;                     /**!< used in ::computePartials method
+                                                                   to avoid unnecessary resizing
+                                                                   of the coeffImage matrix.*/
   };
 }
 

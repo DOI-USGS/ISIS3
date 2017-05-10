@@ -62,12 +62,15 @@ namespace Isis {
    *                           ISIS coding standards.
    *   @history 2016-08-10 Jeannie Backer - Replaced boost matrix with Isis::LinearAlgebra::Matrix.
    *                           References #4163.
+   *   @history 2017-05-09 Ken Edmundson - Added m_startColumn member and mutator/accessor methods
+   *                           to SparseBlockColumnMatrix. Done to eliminate lengthy computation of
+   *                           leading colums and rows. References #4664.
    */
   class SparseBlockColumnMatrix :
       public QMap< int, LinearAlgebra::Matrix * > {
 
   public:
-    SparseBlockColumnMatrix(){} // default constructor
+    SparseBlockColumnMatrix();  // default constructor
     ~SparseBlockColumnMatrix(); // destructor
 
     // copy constructor
@@ -80,11 +83,19 @@ namespace Isis {
 
     void zeroBlocks();
     bool insertMatrixBlock(int nColumnBlock, int nRows, int nCols);
+
+    void setStartColumn(int nStartColumn);
+    int startColumn() const;
     int numberOfElements();
     int numberOfRows();
     int numberOfColumns();
     void print(std::ostream& outstream);
     void printClean(std::ostream& outstream);
+
+  protected:
+    int m_startColumn; /**< starting column for this Block Column in full matrix
+                            e.g. for Block Column 4, if the preceding Block Columns each have 6
+                            columns, then the starting column for Block Column 4 is 24 */
   };
 
   // operators to read/write SparseBlockColumnMatrix to/from binary disk file

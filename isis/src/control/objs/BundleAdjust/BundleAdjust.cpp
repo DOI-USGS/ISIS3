@@ -327,6 +327,9 @@ namespace Isis {
    *   @todo answer comments with questions, TODO, ???, and !!!
    */
   void BundleAdjust::init(Progress *progress) {
+
+    m_previousNumberImagePartials = 0;
+
     // initialize
     //
     // JWB
@@ -490,6 +493,8 @@ namespace Isis {
     // initializations for cholmod
     initializeCHOLMODLibraryVariables();
 
+    // initialize normal equations matrix
+    initializeNormalEquationsMatrix();
   }
 
 
@@ -546,36 +551,71 @@ namespace Isis {
 
   /**
    * Initializations for CHOLMOD sparse matrix package.
-   * Calls cholmod_start, sets m_cholmodCommon options, and resizes m_sparseNormals.
+   * Calls cholmod_start, sets m_cholmodCommon options.
    * 
    * @return @b bool If the CHOLMOD library variables were successfully initialized.
    */
   bool BundleAdjust::initializeCHOLMODLibraryVariables() {
+    if ( m_rank <= 0 ) {
+      return false;
+    }
 
-      if ( m_rank <= 0 ) {
-          return false;
+    m_cholmodTriplet = NULL;
+
+    cholmod_start(&m_cholmodCommon);
+
+    // set user-defined cholmod error handler
+    m_cholmodCommon.error_handler = cholmodErrorHandler;
+
+    // testing not using metis
+    m_cholmodCommon.nmethods = 1;
+    m_cholmodCommon.method[0].ordering = CHOLMOD_AMD;
+
+    return true;
+  }
+
+
+  /**
+   * Initialize Normal Equations matrix (m_sparseNormals).
+   *
+   * Ken NOTE: Currently we are explicitly setting the start column for each block in the normal
+   *           equations matrix below. I think it should be possible (and relatively easy) to make
+   *           the m_sparseNormals smart enough to set the start column of a column block
+   *           automatically when it is added to the matrix.
+   *
+   * @return @b bool.
+   */
+  bool BundleAdjust::initializeNormalEquationsMatrix() {
+
+    int nBlockColumns = m_bundleObservations.size();
+
+    if (m_bundleSettings->solveTargetBody())
+      nBlockColumns += 1;
+
+    m_sparseNormals.setNumberOfColumns(nBlockColumns);
+
+    m_sparseNormals.at(0)->setStartColumn(0);
+
+    int nParameters = 0;
+    if (m_bundleSettings->solveTargetBody()) {
+      nParameters += m_bundleSettings->numberTargetBodyParameters();
+      m_sparseNormals.at(1)->setStartColumn(nParameters);
+
+      int observation = 0;
+      for (int i = 2; i < nBlockColumns; i++) {
+        nParameters += m_bundleObservations.at(observation)->numberParameters();
+        m_sparseNormals.at(i)->setStartColumn(nParameters);
+        observation++;
       }
-
-      m_cholmodTriplet = NULL;
-
-      cholmod_start(&m_cholmodCommon);
-
-      // set user-defined cholmod error handler
-      m_cholmodCommon.error_handler = cholmodErrorHandler;
-
-      // testing not using metis
-      m_cholmodCommon.nmethods = 1;
-      m_cholmodCommon.method[0].ordering = CHOLMOD_AMD;
-
-      // set size of sparse block normal equations matrix
-      if (m_bundleSettings->solveTargetBody()) {
-        m_sparseNormals.setNumberOfColumns(m_bundleObservations.size()+1);
+    }
+    else {     
+      for (int i = 0; i < nBlockColumns; i++) {
+        m_sparseNormals.at(i)->setStartColumn(nParameters);
+        nParameters += m_bundleObservations.at(i)->numberParameters();
       }
-      else {
-        m_sparseNormals.setNumberOfColumns(m_bundleObservations.size());
-      }
+    }
 
-      return true;
+    return true;
   }
 
 
@@ -1031,8 +1071,10 @@ namespace Isis {
         // update number of observations
         int numObs = m_bundleResults.numberObservations();
         m_bundleResults.setNumberObservations(numObs + 2);
+
         formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
                              measure->observationIndex());
+
       } // end loop over this points measures
 
       formPointNormals(N22, N12, n2, m_RHS, point);
@@ -1044,7 +1086,6 @@ namespace Isis {
   } // end loop over 3D points
 
   // finally, form the reduced normal equations
-
   formWeightedNormals(n1, m_RHS);
 
   // update number of unknown parameters
@@ -1113,9 +1154,9 @@ namespace Isis {
       N11TargetImage.clear();
       N11TargetImage = prod(trans(coeffTarget),coeffImage);
 
-      m_sparseNormals.insertMatrixBlock(observationIndex+1, 0,
+      m_sparseNormals.insertMatrixBlock(blockIndex, 0,
                                         numTargetPartials, coeffImage.size2());
-      (*(*m_sparseNormals[observationIndex+1])[0]) += N11TargetImage;
+      (*(*m_sparseNormals[blockIndex])[0]) += N11TargetImage;
 
       // form N12 target portion
       static matrix<double> N12Target(numTargetPartials, 3);
@@ -1153,14 +1194,7 @@ namespace Isis {
 
     N11 = prod(trans(coeffImage), coeffImage);
 
-    int t = 0;
-    //testing
-    for (int a = 0; a < observationIndex; a++) {
-      BundleObservationQsp observation = m_bundleObservations.at(a);
-      t += observation->numberParameters();
-    }
-    // account for target parameters
-    t += numTargetPartials;
+    int t = m_sparseNormals.at(blockIndex)->startColumn();
 
     // insert submatrix at column, row
     m_sparseNormals.insertMatrixBlock(blockIndex, blockIndex,
@@ -1261,7 +1295,6 @@ namespace Isis {
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
 
     // form Q (this is N22{-1} * N12{T})
-    // Q = prod(N22, trans(N12));
     productATransB(N22, N12, Q);
 
     // form product of N22(inverse) and n2; store in NIC
@@ -1271,7 +1304,6 @@ namespace Isis {
     productAB(N12, Q);
 
     // accumulate -nj
-    // nj -= prod(trans(Q),n2);
     accumProductAlphaAB(-1.0, Q, n2, nj);
 
     return true;
@@ -1366,15 +1398,15 @@ namespace Isis {
     QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
 
     int subrangeStart, subrangeEnd;
-
+    
     while ( Qit.hasNext() ) {
       Qit.next();
 
       int columnIndex = Qit.key();
 
-      subrangeStart = m_sparseNormals.getLeadingColumnsForBlock(columnIndex);
+      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
       subrangeEnd = subrangeStart + Qit.value()->size2();
-
+      
       v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
@@ -1473,7 +1505,7 @@ namespace Isis {
       return;
     }
 
-    int numTargetParameters = m_bundleSettings->numberTargetBodyParameters();
+    int numParams;
 
     QMapIterator<int, LinearAlgebra::Matrix*> Qit(Q);
 
@@ -1485,22 +1517,7 @@ namespace Isis {
 
       LinearAlgebra::Vector blockProduct = prod(trans(*Qblock),n2);
 
-      int numParams = 0;
-      for (int observationIndex = 0; observationIndex < columnIndex; observationIndex++) {
-        if (numTargetParameters > 0 && observationIndex == 0) {
-          numParams += numTargetParameters;
-        }
-        else {
-          if (numTargetParameters > 0 ) {
-            BundleObservationQsp observation = m_bundleObservations.at(observationIndex-1);
-            numParams += observation->numberParameters();
-          }
-          else {
-            BundleObservationQsp observation = m_bundleObservations.at(observationIndex);
-            numParams += observation->numberParameters();
-          }
-        }
-      }
+      numParams = m_sparseNormals.at(columnIndex)->startColumn();
 
       for (unsigned i = 0; i < blockProduct.size(); i++) {
         nj(numParams+i) += alpha*blockProduct(i);
@@ -1622,7 +1639,7 @@ namespace Isis {
         return false;
       }
 
-      int numLeadingColumns = m_sparseNormals.getLeadingColumnsForBlock(columnIndex);
+      int numLeadingColumns = normalsColumn->startColumn();
 
       QMapIterator< int, LinearAlgebra::Matrix * > it(*normalsColumn);
 
@@ -1631,7 +1648,9 @@ namespace Isis {
 
         int rowIndex = it.key();
 
-        int numLeadingRows = m_sparseNormals.getLeadingRowsForBlock(rowIndex);
+        // note: as the normal equations matrix is symmetric, the # of leading rows for a block is
+        //       equal to the # of leading columns for a block column at the "rowIndex" position
+        int numLeadingRows = m_sparseNormals.at(rowIndex)->startColumn();
 
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
@@ -1816,7 +1835,14 @@ namespace Isis {
     BundleObservationQsp observation = measure.parentBundleObservation();
 
     int numImagePartials = observation->numberParameters();
-    coeffImage.resize(2,numImagePartials);
+
+    // we're saving the number of image partials in m_previousNumberImagePartials
+    // to compare to the previous computePartials call to avoid unnecessary resizing of the
+    // coeffImage matrix
+    if (numImagePartials != m_previousNumberImagePartials) {
+      coeffImage.resize(2,numImagePartials);
+      m_previousNumberImagePartials = numImagePartials;
+    }
 
     // clear partial derivative matrices and vectors
     if (m_bundleSettings->solveTargetBody()) {
@@ -2076,7 +2102,7 @@ namespace Isis {
 
       t += numTargetBodyParameters;
     }
-
+       
     // Update spice for each BundleObservation
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
@@ -2092,12 +2118,10 @@ namespace Isis {
 
       t += numParameters;
     }
-
-    // TODO: CHECK - do we need point index in case of rejected points????
-
+        
     // TODO: Below code should move into BundleControlPoint->updateParameterCorrections
     //       except, what about the productAlphaAV method?
-
+    
     // Update lat/lon for each control point
     double latCorrection, lonCorrection, radCorrection;
     int pointIndex = 0;
@@ -2114,9 +2138,8 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
       SparseBlockRowMatrix &Q = point->cholmodQMatrix();
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
-
+      
       // subtract product of Q and nj from NIC
-      // NIC -= prod(Q, m_imageSolution);
       productAlphaAV(-1.0, NIC, Q, m_imageSolution);
 
       // get point parameter corrections
@@ -2156,7 +2179,7 @@ namespace Isis {
       corrections(0) += latCorrection;
       corrections(1) += lonCorrection;
       corrections(2) += radCorrection;
-
+           
       // ken testing - if solving for target body mean radius, set radius to current
       // mean radius value
       if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
@@ -2599,20 +2622,19 @@ namespace Isis {
     int columnIndex = 0;
     int numColumns = 0;
     int numBlockColumns = m_sparseNormals.size();
-
     for (i = 0; i < numBlockColumns; i++) {
 
       // columns in this column block
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals.at(i);
       if (i == 0) {
         numColumns = normalsColumn->numberOfColumns();
-        int numRows = m_sparseNormals.at(i)->numberOfRows();
+        int numRows = normalsColumn->numberOfRows();
         inverseMatrix.insertMatrixBlock(i, numRows, numColumns);
         inverseMatrix.zeroBlocks();
       }
       else {
         if (normalsColumn->numberOfColumns() == numColumns) {
-          int numRows = m_sparseNormals.at(i)->numberOfRows();
+          int numRows = normalsColumn->numberOfRows();
           inverseMatrix.insertMatrixBlock(i, numRows, numColumns);
           inverseMatrix.zeroBlocks();
         }
@@ -2637,7 +2659,7 @@ namespace Isis {
       // solve for inverse for nCols
       for (j = 0; j < numColumns; j++) {
         if ( columnIndex > 0 ) {
-          pb[columnIndex- 1] = 0.0;
+          pb[columnIndex - 1] = 0.0;
         }
         pb[columnIndex] = 1.0;
 
@@ -2710,7 +2732,9 @@ namespace Isis {
         }
 
         // get corresponding Q matrix
-        SparseBlockRowMatrix Q = point->cholmodQMatrix();
+        // NOTE: we are getting a reference to the Q matrix stored
+        //       in the BundleControlPoint for speed (without the & it is dirt slow)
+        SparseBlockRowMatrix &Q = point->cholmodQMatrix();
 
         T.clear();
 
