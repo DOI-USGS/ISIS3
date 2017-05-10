@@ -120,9 +120,9 @@ namespace Isis {
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
-      QString getSavedImagesFilename();
-      QString getSavedPointsFilename();
-      QString getSavedResidualsFilename();
+      QString savedImagesFilename();
+      QString savedPointsFilename();
+      QString savedResidualsFilename();
 
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
@@ -189,12 +189,6 @@ namespace Isis {
       BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
       BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
       QList<ImageList *> *m_images; //!< The list of images that were adjusted
-
-      // Hard code these for now but we may allow setting them in future updates.
-      // These are default names for the file.  The path comes from BundleSettings.
-      static const char m_csvImagesFilename[];
-      static const char m_csvPointsFilename[];
-      static const char m_csvResidualsFilename[];
 
       // In theory the path in the BundlesSettings can change while running.  So we save the
       // filenames actually used when the most recent save of the file was done.

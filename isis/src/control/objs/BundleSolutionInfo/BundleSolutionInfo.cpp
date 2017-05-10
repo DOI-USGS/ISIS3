@@ -24,11 +24,6 @@
 
 namespace Isis {
 
-  // initialize default filenames for csv output.
-  const char BundleSolutionInfo::m_csvImagesFilename[] = "bundleout_images.csv";
-  const char BundleSolutionInfo::m_csvPointsFilename[] = "bundleout_points.csv";
-  const char BundleSolutionInfo::m_csvResidualsFilename[] = "residuals.csv";
-
   /**
    * Constructor. Creates a BundleSolutionInfo.
    *
@@ -90,7 +85,10 @@ namespace Isis {
         m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)) {
+        m_images(new QList<ImageList *>(*src.m_images)),
+        m_csvSavedImagesFilename(src.m_csvSavedImagesFilename),
+        m_csvSavedPointsFilename(src.m_csvSavedPointsFilename),
+        m_csvSavedResidualsFilename(src.m_csvSavedResidualsFilename) {
   }
 
 
@@ -143,15 +141,15 @@ namespace Isis {
     return *this;
   }
 
-  QString BundleSolutionInfo::getSavedImagesFilename() {
+  QString BundleSolutionInfo::savedImagesFilename() {
     return m_csvSavedImagesFilename;
   }
 
-  QString BundleSolutionInfo::getSavedPointsFilename() {
+  QString BundleSolutionInfo::savedPointsFilename() {
     return m_csvSavedPointsFilename;
   }
 
-  QString BundleSolutionInfo::getSavedResidualsFilename() {
+  QString BundleSolutionInfo::savedResidualsFilename() {
     return m_csvSavedResidualsFilename;
   }
 
@@ -955,7 +953,7 @@ namespace Isis {
     QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
     QList<Statistics> rmsImageResiduals = m_statisticsResults->rmsImageResiduals();
 
-    QString ofname = m_csvImagesFilename;
+    QString ofname = "bundleout_images.csv";
     ofname = m_settings->outputFilePrefix() + ofname;
     m_csvSavedImagesFilename = ofname;
 
@@ -1217,7 +1215,7 @@ namespace Isis {
   bool BundleSolutionInfo::outputPointsCSV() {
     char buf[1056];
 
-    QString ofname = m_csvPointsFilename;
+    QString ofname = "bundleout_points.csv";
     ofname = m_settings->outputFilePrefix() + ofname;
     m_csvSavedPointsFilename = ofname;
 
@@ -1332,7 +1330,7 @@ namespace Isis {
   bool BundleSolutionInfo::outputResiduals() {
     char buf[1056];
 
-    QString ofname = m_csvResidualsFilename;
+    QString ofname = "residuals.csv";
     ofname = m_settings->outputFilePrefix() + ofname;
     m_csvSavedResidualsFilename = ofname;
 

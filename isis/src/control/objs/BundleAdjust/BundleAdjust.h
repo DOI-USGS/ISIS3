@@ -269,6 +269,7 @@ namespace Isis {
    *                           there is no longer a -Wformat-security warning.
    *   @history 2017-05-01 Makayla Shepherd - Added imageLists() to track and return the images
    *                           bundled. Fixes #4818.
+   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method. 
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

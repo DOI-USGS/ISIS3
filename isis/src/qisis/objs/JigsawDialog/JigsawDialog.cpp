@@ -335,6 +335,11 @@ namespace Isis {
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
 
+    //  Write csv files
+    m_bundleSolutionInfo->outputResiduals();
+    m_bundleSolutionInfo->outputImagesCSV();
+    m_bundleSolutionInfo->outputPointsCSV();
+
     m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // create output control net
@@ -342,6 +347,7 @@ namespace Isis {
     FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" +
                                m_bundleSolutionInfo->runTime() + "/" +
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
+    
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
     // Iterate through all of the image lists (the "imports" in the project).

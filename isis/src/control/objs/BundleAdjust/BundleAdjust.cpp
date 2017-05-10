@@ -2545,18 +2545,18 @@ namespace Isis {
   * @return QList<ImageList *> The ImageLists used for the bundle adjust
   */
   QList<ImageList *> BundleAdjust::imageLists() {
+
     if (m_imageLists.count() > 0) {
       return m_imageLists;
     }
     else if (m_serialNumberList->size() > 0) {
-      ImageList *imgList;
+      ImageList *imgList = new ImageList;
       try {
         for (int i = 0; i < m_serialNumberList->size(); i++) {
           Image *image = new Image(m_serialNumberList->fileName(i));
           imgList->append(image);
         }
         m_imageLists.append(imgList);
-        return m_imageLists;
       }
       catch (IException &e) {
         QString msg = "Invalid image in serial number list\n";
@@ -2567,6 +2567,7 @@ namespace Isis {
       QString msg = "No images used in bundle adjust\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
     return m_imageLists;
   }
 
