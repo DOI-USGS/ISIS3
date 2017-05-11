@@ -94,22 +94,27 @@ namespace Isis {
     connect(m_configMovement, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    if (!getWidget()->directory()) {
-    m_closeNetwork = new QPushButton("Close Network");
-    m_closeNetwork->setEnabled(false);
-    m_closeNetwork->setVisible(false);
-    m_closeNetwork->setToolTip("Close the currently open control network");
-    connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
-    connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
-            this, SLOT(objectDestroyed(QObject *)));
+    //  MosaicSceneWidget could be NULL because the MosaicSceneWidget::getControlNetHelp and
+    //  MosaicSceneWidget::getGridHelp create tools passing in Null for the Widget.
+    //  Why can't the getControlNetHelp and getGridHelp pass in the current MosaicSceneWidget?
+    if (getWidget() && !getWidget()->directory()) {
+      m_closeNetwork = new QPushButton("Close Network");
+      m_closeNetwork->setEnabled(false);
+      m_closeNetwork->setVisible(false);
+      m_closeNetwork->setToolTip("Close the currently open control network");
+      connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
+      connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
+              this, SLOT(objectDestroyed(QObject *)));
 
-    m_loadControlNetButton = new QPushButton("Open Network");
-    m_loadControlNetButton->setToolTip("Open and load a control network");
-    connect(m_loadControlNetButton, SIGNAL(clicked()),
-            this, SLOT(openControlNet()));
-    connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
-            this, SLOT(objectDestroyed(QObject *)));
+      m_loadControlNetButton = new QPushButton("Open Network");
+      m_loadControlNetButton->setToolTip("Open and load a control network");
+      connect(m_loadControlNetButton, SIGNAL(clicked()),
+              this, SLOT(openControlNet()));
+      connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
+              this, SLOT(objectDestroyed(QObject *)));
 
+      connect(this, SIGNAL(controlPointSelected(ControlPoint *)),
+              getWidget(), SIGNAL(controlPointSelected(ControlPoint *)));
     }
 
     m_controlNetFileLabel = new QLabel;
@@ -118,8 +123,6 @@ namespace Isis {
     connect(m_controlNetFileLabel, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    connect(this, SIGNAL(controlPointSelected(ControlPoint *)),
-            getWidget(), SIGNAL(controlPointSelected(ControlPoint *)));
   }
 
 
