@@ -24,6 +24,14 @@ using namespace boost::numeric::ublas;
 namespace Isis {
 
   /**
+   * Default constructor.
+   */
+  SparseBlockColumnMatrix::SparseBlockColumnMatrix() {
+    m_startColumn = 0;
+  }
+
+
+  /**
    * Destructor. See description of wipe method below.
    */
   SparseBlockColumnMatrix::~SparseBlockColumnMatrix() {
@@ -71,6 +79,8 @@ namespace Isis {
       // insert matrix into map
       this->insert(it.key(),m);
     }
+
+    m_startColumn = src.startColumn();
   }
 
 
@@ -116,10 +126,30 @@ namespace Isis {
     // zero matrix elements
     m->clear();
 
-    // insert matrix into map
+    // insert matrix into map   
     this->insert(nColumnBlock,m);
 
     return true;
+  }
+
+
+  /**
+   * Sets starting column for block in full matrix.
+   *
+   * @param nStartColumn value for starting column in full matrix for this block columns
+   */
+  void SparseBlockColumnMatrix::setStartColumn(int nStartColumn) {
+    m_startColumn = nStartColumn;
+  }
+
+
+  /**
+   * Sets starting column for block in full matrix.
+   *
+   * @return int returns the starting column in the full matrix
+   */
+  int SparseBlockColumnMatrix::startColumn() const {
+    return m_startColumn;
   }
 
 

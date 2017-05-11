@@ -149,6 +149,28 @@ Printing SparseBlockColumnMatrix...
 
 Empty SparseBlockColumnMatrix...
 
+----- Insert boost block matrix of zeros in each column, set values, and startColumn
+             # block columns: 3
+             # matrix blocks: 3
+    # diagonal matrix blocks: 1
+# off-diagonal matrix blocks: 2
+         block 0 startColumn: 0
+         block 1 startColumn: 3
+         block 2 startColumn: 6
+Printing SparseBlockMatrix...
+Printing SparseBlockColumnMatrix...
+0
+[3,3]((0,1,2),(3,4,5),(6,7,8))
+
+Printing SparseBlockColumnMatrix...
+2
+[3,3]((0,1,2),(3,4,5),(6,7,8))
+
+Printing SparseBlockColumnMatrix...
+3
+[3,3]((0,1,2),(3,4,5),(6,7,8))
+
+
 ----- copy method
              # matrix blocks: 1
     # diagonal matrix blocks: 1
