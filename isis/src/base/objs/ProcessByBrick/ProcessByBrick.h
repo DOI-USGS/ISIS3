@@ -90,10 +90,6 @@ namespace Isis {
    *   @history 2016-04-26 Ian Humphrey - Modified BlockingReportProgress() so that it unlocks
    *                           the local QMutex before it goes out of scope (Qt5 issues a warning
    *                           if a locked QMutex is destroyed).
-   *   @history 2017-05-08 Tyler Wilson - Added a call to the virtual method SetBricks inside
-   *                          the functions PreProcessCubeInPlace/PreProcessCube/PreProcessCubes.
-   *                          Fixes #4698.
-   *
    */
   class ProcessByBrick : public Process {
     public:

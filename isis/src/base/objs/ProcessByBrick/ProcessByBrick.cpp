@@ -114,45 +114,9 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 }
 
+  void ProcessByBrick::SetBricks(IOCubes cn){
 
-/**
-   * Sets the size of the input/output bricks.  This function is virtual and the
-   * child classes ProcessByTile/ProcessBySpectra/ProcessBySample,ProcessByLine have their
-   * own versions of this function which the call.
-   * @param cn  An enumeration which indicates whether one cube is being processed in place,
-   * one cube is an input and one cube is an output, or if we are processing a vector
-   * of input and output cubes.
-   */
-void ProcessByBrick::SetBricks(IOCubes cn){
-
-    switch (cn) {
-      case InPlace:
-        if (InputCubes.size() == 1) {
-          SetBrickSize(InputCubes[0]->sampleCount(), InputCubes[0]->lineCount(),
-              InputCubes[0]->bandCount());
-        }
-        else {
-          SetBrickSize(OutputCubes[0]->sampleCount(), OutputCubes[0]->lineCount(),
-              OutputCubes[0]->bandCount());
-        }
-        break;
-      case InputOutput:
-        SetInputBrickSize(InputCubes[0]->sampleCount(), InputCubes[0]->lineCount(),
-            InputCubes[0]->bandCount());
-        SetOutputBrickSize(OutputCubes[0]->sampleCount(), OutputCubes[0]->lineCount(),
-            OutputCubes[0]->bandCount());
-        break;
-      case InputOutputList:
-        for (unsigned int i = 0; i < InputCubes.size(); i++) {
-          SetInputBrickSize(InputCubes[i]->sampleCount(), InputCubes[i]->lineCount(),
-                            InputCubes[i]->bandCount(), i + 1);
-        }
-        for (unsigned int i = 0; i < OutputCubes.size(); i++) {
-          SetOutputBrickSize(OutputCubes[i]->sampleCount(), OutputCubes[i]->lineCount(),
-                             OutputCubes[i]->bandCount(), i + 1);
-        }
-        break;
-    }
+      ;
 
   }
 
@@ -168,6 +132,10 @@ void ProcessByBrick::SetBricks(IOCubes cn){
     *
     * @throws iException::Message
     */
+
+
+
+
   void ProcessByBrick::VerifyCubes(IOCubes cn){
 
 
@@ -762,8 +730,6 @@ void ProcessByBrick::SetBricks(IOCubes cn){
 
     bool haveInput;
     if (InputCubes.size() == 1) {
-
-      SetBricks(InPlace);
       //  Make sure the brick size has been set
       if (!p_inputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetInputBrickSize() method to set"
@@ -783,7 +749,6 @@ void ProcessByBrick::SetBricks(IOCubes cn){
     }
     else {
       //  Make sure the brick size has been set
-      SetBricks(InPlace);
       if (!p_outputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetOutputBrickSize() method to "
                    "set the output brick size";
@@ -830,8 +795,6 @@ void ProcessByBrick::SetBricks(IOCubes cn){
       string m = "You must specify exactly one output cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-
-    SetBricks(InputOutput);
 
     //  Make sure the brick size has been set
     if (!p_inputBrickSizeSet || !p_outputBrickSizeSet) {
@@ -924,7 +887,6 @@ void ProcessByBrick::SetBricks(IOCubes cn){
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
-    SetBricks(InputOutputList);
     //  Make sure the brick size has been set
     if(!p_inputBrickSizeSet && InputCubes.size() > 0) {
       string m = "Use the SetBrickSize() or SetInputBrick() method to set the "
