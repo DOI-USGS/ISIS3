@@ -3,8 +3,10 @@
 
 
 #include "ControlPoint.h"
+#include "FileName.h"
 
 #include <QCloseEvent>
+#include <QDir>
 #include <QHideEvent>
 #include <QPalette>
 #include <QPointer>
@@ -57,6 +59,9 @@ namespace Isis {
    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
    *                           query for shapes and other data from the project.
+   *   @history 2017-01-05 Tracie Sucharski - Allow a new ground source location to be entered which
+   *                           includes allowing the option to change the location in the active
+   *                           control for all ground points.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -171,6 +176,8 @@ namespace Isis {
       bool validateMeasureChange(ControlMeasure *m);
 
       ControlMeasure *createTemporaryGroundMeasure();
+      FileName findGroundFile();
+      void changeGroundLocationsInNet();
 
 
     private:
@@ -244,6 +251,11 @@ namespace Isis {
       QScopedPointer<Cube> m_rightCube; //!< Right cube
 
       QList<Cube *> m_pointCubes;
+
+      QString m_groundSN;
+      bool m_changeAllGroundLocation;
+      bool m_changeGroundLocationInNet;
+      QString m_newGroundDir;
   };
 };
 #endif

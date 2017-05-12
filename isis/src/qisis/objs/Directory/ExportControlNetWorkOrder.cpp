@@ -36,75 +36,127 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order for exporting a control network from the project. This work
+   * order is asynchronous and is not undoable.
+   *
+   * @param Project *project Pointer to the project to export from (the project this work order
+   * belongs to).
+   */
   ExportControlNetWorkOrder::ExportControlNetWorkOrder(Project *project) :
       WorkOrder(project) {
+    m_isSynchronous = false;
+    m_isUndoable = false;
     QAction::setText(tr("&Export Control Network..."));
   }
 
 
+  /**
+   * @brief Copy constructor.
+   *
+   * Copies the work order.
+   *
+   * @param ExportControlNetWorkOrder &other The other work order to copy state from.
+   */
   ExportControlNetWorkOrder::ExportControlNetWorkOrder(const ExportControlNetWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * @brief Destructor.
+   *
+   * Default destructor to clean up any memory this work order might allocate.
+   */
   ExportControlNetWorkOrder::~ExportControlNetWorkOrder() {
 
   }
 
 
+  /**
+   * @brief Clones this work order.
+   *
+   * Allocate a new work order using this work order's state.
+   *
+   * @return ExportControlNetWorkOrder* Returns a pointer to the newly cloned work order.
+   */
   ExportControlNetWorkOrder *ExportControlNetWorkOrder::clone() const {
     return new ExportControlNetWorkOrder(*this);
   }
 
 
   /**
-   * Currently, this work order only works with either no data (file menu) or with a single 
-   *   control network.
-   * 
-   * @param controls The current context we're inquiring about
-   * 
-   * @return bool True if this work order functions with the given control list
+   * @brief Determines if we can export a control net.
+   *
+   * Currently, this work order only works with either no data (file menu) or with a
+   * single control network.
+   *
+   * @param ControList *controls The current context we're inquiring about.
+   *
+   * @return bool Returns true if this work order functions with the given control list. Right now,
+   * true indicates that there is one control list in the project.
    */
   bool ExportControlNetWorkOrder::isExecutable(ControlList *controls) {
+    // TODO: This shouldn't be executable (in the menu) if there are no imported control networks?
     return (controls->count() == 1);
   }
 
 
   /**
-   * Prompts the user for input. If there is no context, we ask the user to select a control. Once 
-   *   we have a control (via context or asking the user), we then ask for a output cnet file name.
-   *   The relevant data is stored in internalData().
-   * 
-   * @return bool 
+   * @brief Prepares for exporting a control net by soliciting information from the user.
+   *
+   * Prompts the user for input. If there is no context, we ask the user to select a
+   * control. Once we have a control (via context or asking the user), we then ask for a output cnet
+   * file name. The relevant data is stored in internalData(). The internal data will contain
+   * the control net id and the destination to export to.
+   *
+   * @return bool Returns true if the setup is successful.
    */
-  bool ExportControlNetWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ExportControlNetWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList internalData;
 
       Control *control = NULL;
-      if (controlList()->isEmpty()) {
-        QMap<Control *, QString> cnetChoices;
-        foreach (ControlList *list, project()->controls()) {
-          foreach (Control *control, *list) {
-            cnetChoices[control] = tr("%1/%2").arg(list->name())
-                .arg(control->displayProperties()->displayName());
-          }
+      // See if there are any other control lists in the project and give these to the user as
+      // choices for control nets they can export.
+
+
+      if(project()) {
+
+        Project *proj = project();
+
+        QList<ControlList *> controls = proj->controls();
+        if (controls.count() > 0) {
+          ControlList *l=controls.first();
+          WorkOrder::setData(l);
+          control = controlList()->first();
         }
 
-        QStringList cnetNames = cnetChoices.values();
-        qSort(cnetNames);
+        else {
 
-        QString choice = QInputDialog::getItem(NULL, tr("Select Control"),
-            tr("Please choose a control to export."), cnetNames, 0, false, &success);
+          QMap<Control *, QString> cnetChoices;
+          foreach (ControlList *list, project()->controls()) {
+            foreach (Control *control, *list) {
+              cnetChoices[control] = tr("%1/%2").arg(list->name())
+                  .arg(control->displayProperties()->displayName());
+            }
+          }
 
-        control = cnetChoices.key(choice);
-        internalData.append(control->id());
+          QStringList cnetNames = cnetChoices.values();
+          qSort(cnetNames);
+
+          QString choice = QInputDialog::getItem(NULL, tr("Select Control"),
+              tr("Please choose a control to export."), cnetNames, 0, false, &success);
+
+          control = cnetChoices.key(choice);
+          internalData.append(control->id());
+
+
+        }
       }
-      else {
-        control = controlList()->first();
-      }
+
 
       QString destination =
           QFileDialog::getSaveFileName(NULL, QString("Export Control Network"),
@@ -123,10 +175,14 @@ namespace Isis {
 
 
   /**
-   * Use internalData() and write the control network into the output file. Stores errors in 
-   *   m_warning which will be reported in postSyncRedo().
+   * @brief Executes the work order.
+   *
+   * Uses internalData() and writes the control network into the output file. Stores
+   * errors in m_warning which will be reported in postExecution().
+   *
+   * @see WorkOrder::execute()
    */
-  void ExportControlNetWorkOrder::asyncRedo() {
+  void ExportControlNetWorkOrder::execute() {
     QString destination;
     Control *control = NULL;
 
@@ -151,9 +207,13 @@ namespace Isis {
 
 
   /**
-   * Display any warnings that occurred during the asynchronous computations.
+   * @brief Display any warnings that occurred during the asynchronous computations.
+   *
+   * These warnings will be attached to the project.
+   *
+   * @see WorkOrder::postExecution()
    */
-  void ExportControlNetWorkOrder::postSyncRedo() {
+  void ExportControlNetWorkOrder::postExecution() {
     if (!m_warning.isEmpty()) {
       project()->warn(m_warning);
       m_warning.clear();

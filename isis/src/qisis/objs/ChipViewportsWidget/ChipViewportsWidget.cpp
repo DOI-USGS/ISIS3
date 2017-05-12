@@ -8,6 +8,7 @@
 
 #include <QtWidgets>
 #include <QMessageBox>
+#include <QMouseEvent>
 
 #include "Application.h"
 #include "Camera.h"
@@ -56,6 +57,8 @@ namespace Isis {
 //  m_cubeMeasureEditMap = QMap<Cube *, ControlMeasureEditWidget *>();
 
     createChipViewports(parent);
+
+    installEventFilter(this);
 
 //  connect(this, SIGNAL(newControlNetwork(ControlNet *)),
 //          m_measureEditor, SIGNAL(newControlNetwork(ControlNet *)));
@@ -190,7 +193,7 @@ namespace Isis {
 
 //  m_cubeMeasureEditMap.clear();
 //    qDebug()<<"ChipViewportsWidget::setEditPoint  pt = "<<controlPoint->GetId();
-    qDebug()<<"  Control Net = "<<m_controlNet;
+//  qDebug()<<"  Control Net = "<<m_controlNet;
     //  Find reference measure first,  the measure editor needs the reference measure to load the
     //  chip viewport properly (needs to geom to Reference measure).
     if (m_controlPoint->IsReferenceExplicit()) {
@@ -329,6 +332,47 @@ namespace Isis {
       m_chipViewports.clear();
     }
 //  m_controlPoint = NULL;
+  }
+
+
+  bool ChipViewportsWidget::eventFilter(QObject *object, QEvent *event) {
+
+    bool blockEvent = false;
+
+    switch (event->type()) {
+      case QEvent::MouseButtonPress: {
+        mousePressEvent(object, (QMouseEvent *)event);
+        blockEvent = true;
+        break;
+      }
+
+      default:
+        break;
+    }
+    return blockEvent;
+  }
+
+
+  void ChipViewportsWidget::mousePressEvent(QObject *object, QMouseEvent *event) {
+
+    if (event->button() == Qt::RightButton) {
+      qDebug()<<"ChipViewportsWidget::mousePressEvent  right mouse";
+      //  Find child widget (ChipViewport) under the mouse
+      ChipViewport *chipViewport = qobject_cast<ChipViewport *>(focusWidget());
+
+      QMenu contextMenu;
+
+      QAction *setReferenceMeasureAction = new QAction(tr("Set as Reference Measure"), this);
+      contextMenu.addAction(setReferenceMeasureAction);
+
+      QAction *chosenAction =
+          contextMenu.exec(qobject_cast<QWidget *>(object)->mapToGlobal(event->pos()));
+
+      if (chosenAction == setReferenceMeasureAction) {
+        qDebug()<<"ChipViewportsWidget::mousePressEvent setRefMeasureAction chipViewport = "<<chipViewport;
+        //setNewReferenceMeasure(chipViewport);
+      }
+    }
   }
 }
 

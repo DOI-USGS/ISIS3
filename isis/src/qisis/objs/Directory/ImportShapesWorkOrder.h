@@ -2,8 +2,6 @@
 #define ImportShapesWorkOrder_H
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -47,6 +45,9 @@ namespace Isis {
    * @author 2016-07-06 Tracie Sucharski
    *
    * @internal
+   *   @history 2017-04-12 JP Bonn - Updated to new workorder design.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undone, imported
+   *                           shapes are removed from the project tree. Fixes #4597.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -57,12 +58,12 @@ namespace Isis {
 
       virtual ImportShapesWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
 
-      void asyncRedo();
-      void postSyncRedo();
-      void asyncUndo();
-      void postSyncUndo();
+      void execute();
+      void postExecution();
+      void undoExecution();
+      void postUndoExecution();
 
     private:
       ImportShapesWorkOrder &operator=(const ImportShapesWorkOrder &rhs);
@@ -71,11 +72,6 @@ namespace Isis {
        * This copies the given shape model cube(s) into the project. This is designed to work with
        *   QtConcurrentMap.  TODO::  TLS 2016-07-13  If large DEM, do not allow DN data to be
        *   copied??
-       *
-       * @author 2016-07-13 Tracie Sucharski
-       *
-       * @internal 
-       *  
        */
       class OriginalFileToProjectCubeFunctor :
           public std::unary_function<const FileName &, Cube *> {

@@ -53,6 +53,8 @@ namespace Isis {
    *   @history 2012-09-17 Steven Lambright - Added warning to show labels
    *   @history 2012-10-02 Stuart Sides and Steven Lambright - Removed ZoomFit Action
    *   @history 2016-06-08 Jesse Mapel - Added documentation.  Fixes #3995.
+   *   @history 2017-04-07 Makayla Shepherd - Renamed syncRedo() to execute() and syncUndo() to 
+   *                           undoExecution() according to the WorkOrder redesign.
    */
   class ImageListActionWorkOrder : public WorkOrder {
     Q_OBJECT
@@ -82,9 +84,9 @@ namespace Isis {
       bool isExecutable(ImageList *images);
       void setData(ImageList *images);
 
-      bool execute();
-      void syncRedo();
-      void syncUndo();
+      bool setupExecution();
+      void execute();
+      void undoExecution();
 
       static QString qualifyString(QString unqualifiedString, ImageList *);
       static QString toString(Action);

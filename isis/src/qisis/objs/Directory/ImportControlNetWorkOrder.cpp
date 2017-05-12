@@ -34,15 +34,20 @@
 #include "IException.h"
 #include "Progress.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
 
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(Project *project) :
       WorkOrder(project) {
+
+    // This is an asynchronous workorder
+    m_isSynchronous = false;
+
     m_watcher = NULL;
 
     QAction::setText(tr("Import &Control Networks..."));
-    QUndoCommand::setText(tr("Import Control Networks"));
 
     setModifiesDiskState(true);
 
@@ -72,8 +77,20 @@ namespace Isis {
   }
 
 
-  bool ImportControlNetWorkOrder::execute() {
-    WorkOrder::execute();
+  /**
+   * @brief Sets up the work order for execution.
+   *
+   * This method prompts the user for a control net to open. That control net is then
+   * saved using setInternalData data. This method was renamed from execute() to setupExecution()
+   *
+   * @see WorkOrder::setupExecution()
+   *
+   * @return bool Returns a boolean. This boolean is true if the internal data was set correctly.
+   */
+  bool ImportControlNetWorkOrder::setupExecution() {
+    QUndoCommand::setText(tr("Import Control Networks"));
+
+    WorkOrder::setupExecution();
 
     QStringList cnetFileNames = QFileDialog::getOpenFileNames(
         qobject_cast<QWidget *>(parent()),
@@ -89,8 +106,13 @@ namespace Isis {
     return internalData().count() > 0;
   }
 
-
-  void ImportControlNetWorkOrder::syncRedo() {
+  /**
+   * @brief Imports the control network asynchronously.
+   *
+   * This method asynchronously imports the control net. This method replaces both
+   * syncRedo() and asyncRedo().
+   */
+  void ImportControlNetWorkOrder::execute() {
 
     QDir cnetFolder = project()->addCnetFolder("controlNetworks");
 
@@ -106,10 +128,7 @@ namespace Isis {
 
     m_watcher->setFuture(QtConcurrent::mapped(cnetFileNamesAndProgress,
                                               CreateControlsFunctor(project(), cnetFolder)));
-  }
 
-
-  void ImportControlNetWorkOrder::asyncRedo() {
     while (!m_watcher->isFinished()) {
       setProgressRange(0, 100 * m_readProgresses.count());
       int totalProgress = 0;
@@ -117,7 +136,7 @@ namespace Isis {
       for (int i = 0; i < m_readProgresses.count(); i++) {
         Progress *progress = m_readProgresses[i];
 
-        if (m_watcher->future().isResultReadyAt(i)) {  
+        if (m_watcher->future().isResultReadyAt(i)) {
           totalProgress += 100;
         }
         else if (progress->MaximumSteps() > 0) {
@@ -133,8 +152,13 @@ namespace Isis {
     }
   }
 
-
-  void ImportControlNetWorkOrder::postSyncRedo() {
+  /**
+   * @brief Clears progress.
+   *
+   * This method clears the progresses created in execute(). This method was renamed
+   * from postSyncRedo() to postExecution().
+   */
+  void ImportControlNetWorkOrder::postExecution() {
 
     foreach (Progress *progress, m_readProgresses) {
       delete progress;
@@ -142,16 +166,21 @@ namespace Isis {
     m_readProgresses.clear();
   }
 
-
-  void ImportControlNetWorkOrder::syncUndo() {
+  /**
+   * @brief Deletes the control network
+   *
+   * This method deletes the control network from the project. This method is was
+   * renamed from undoSyncRedo() to undoExecution().
+   */
+  void ImportControlNetWorkOrder::undoExecution() {
     if (m_watcher->isFinished()) {
       ControlList *list = project()->controls().last();
+      // Remove the controls from disk.
       list->deleteFromDisk(project());
-      foreach (Control *control, *list) {
-        delete control;
-      }
-      
-      delete list;
+      // Remove the controls from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData(QVariant::fromValue(list));
+      project()->directory()->model()->removeItem(currentItem);
     }
   }
 

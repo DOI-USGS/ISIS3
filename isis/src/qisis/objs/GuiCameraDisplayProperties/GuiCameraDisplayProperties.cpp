@@ -298,6 +298,7 @@ namespace Isis {
 
   /**
    * @brief This is the generic mutator for properties. 
+   *
    * Given a value, this will change it and emit propertyChanged if its different 
    * and supported.  
    * @param prop The key into the m_propertyValues QMap <int, QVariant>

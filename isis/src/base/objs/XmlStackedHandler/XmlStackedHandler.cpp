@@ -25,6 +25,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Switch to a new content handler and continue processing using the new handler.
+   *
+   */
   void XmlStackedHandler::switchToNewHandler(XmlStackedHandler *nextHandler) {
     nextHandler->startElement(m_lastStartNamespaceURI, m_lastStartLocalName,
                               m_lastStartQName, m_lastStartAtts);

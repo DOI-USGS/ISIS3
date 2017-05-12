@@ -90,6 +90,11 @@ namespace Isis {
    *                           standards. Fixes #4006.
    *   @history 2016-07-18 Tracie Sucharski - Added Project Item slots for adding shape models. 
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2017-04-17 Tracie Sucharski - Made changeds to allow project name to be edited from
+   *                           the ProjectItemTree, by double-clicking on the project name.  This
+   *                           functionality required the addition of the setData and flags methods.
+   *                           The projectNameEdited signal is also emitted.  Fixes #2295
+   *     @history 2017-05-04 J Bonn - Added FileItem to project tree. Fixes #4838.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -124,12 +129,16 @@ namespace Isis {
       void setItem(int row, ProjectItem *item);
       ProjectItem *takeItem(int row);
 
+      bool setData(const QModelIndex &index, const QVariant &value, int role);
+      Qt::ItemFlags flags(const QModelIndex &index) const;
+
     signals:
       /**
        * This signal is emitted when a ProjectItem is added to the model.
        */
       void itemAdded(ProjectItem *);
       void itemRemoved(ProjectItem *);
+      void projectNameEdited(QString);
 
     protected slots:
       void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

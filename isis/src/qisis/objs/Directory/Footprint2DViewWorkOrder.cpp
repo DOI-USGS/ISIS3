@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -40,31 +38,42 @@
 namespace Isis {
   
   /** 
-   * Constructor. This method sets the text of the project to View Footprints.
+   * Creates a work order to view image footprints. This WorkOrder is not undoable and runs 
+   * synchronously.
    * 
-   * @param project Current project
+   * @param Project *project Pointer to the project this work order belongs to.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
+    m_isUndoable = false;
     QAction::setText(tr("View &Footprints..."));
-    QUndoCommand::setText(tr("View &Footprints..."));
   }
 
+
   /**
-   * This method has not been implemented.
+   * @brief Copy constructor.
+   *
+   * Creates a copy of the other Footprint2DViewWorkOrder.
+   *
+   * @param Footprint2DViewWorkOrder &other The other work order to copy state from.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
       WorkOrder(other) {
+    m_isUndoable = other.m_isUndoable;
   }
 
+
   /**
-   * Destructor
+   * @brief Destructor.
+   *
+   * Destructor to clean up any memory that this work order allocates.
    */
-  Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
+   Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
   }
 
+
   /**
-   * This method clones the current Footprint2DViewWorkOrder and returns it.
+   * @brief This method clones the current Footprint2DViewWorkOrder and returns it.
    * 
    * @return @b Footprint2DViewWorkOrder that was cloned
    */
@@ -73,8 +82,12 @@ namespace Isis {
     return new Footprint2DViewWorkOrder(*this);
   }
   
+
   /**
-   * This method returns true if one of an image in ImageList images isFootprintable.
+   * @brief This method returns true if one of an image in ImageList images isFootprintable, 
+   *              False if none of the images has a footprint. This is used by
+   *              Directory::supportedActions(DataType data) to determine what actions are appended
+   *              to context menus.
    * 
    * @param images ImageList of images
    * 
@@ -92,11 +105,14 @@ namespace Isis {
 
 
   /**
-   * This check is used by Directory::supportedActions(DataType data).
+   * @brief This method returns true if one of the shapes in ShapeList isFootprintable, False 
+   *              if none of shapes have a footprint.  This is used by
+   *              Directory::supportedActions(DataType data) to determine what actions are appended
+   *              to context menus.
    *
-   * @param images ShapeList we are checking
+   * @param shapes ShapeList we are checking
    *
-   * @return @b bool True if one of the images in ImagesList images isFootprintable
+   * @return @b bool True if one of the shapes in ShapeList images isFootprintable
    */
   bool Footprint2DViewWorkOrder::isExecutable(ShapeList *shapes) {
     bool result = false;
@@ -110,12 +126,15 @@ namespace Isis {
 
 
   /**
-   * This method calls WorkOrder's execute.
+   * @brief Setup this WorkOrder for execution.  Prompt for whether these footprints should be
+   *              displayed in a new view or an existing view.  This calls
+   *              WorkOrder::setupExecution().
    * 
-   * @return @b bool True if WorkOrder::execute() returns true 
+   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created, 
+   *         otherwise returns False.
    */
-  bool Footprint2DViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool Footprint2DViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     int maxRecommendedFootprints = 50000;
     if (success && imageList()->count() > maxRecommendedFootprints) {
@@ -132,12 +151,11 @@ namespace Isis {
       }
     }
 
+    int viewToUse = -1;
     if (success) {
       QStringList viewOptions;
 
       QList<Footprint2DView *> existingViews = project()->directory()->footprint2DViews();
-      int viewToUse = -1;
-
       if (existingViews.count()) {
         for (int i = 0; i < existingViews.count(); i++) {
           viewOptions.append(existingViews[i]->windowTitle());
@@ -157,9 +175,7 @@ namespace Isis {
         viewToUse = viewOptions.count() - 1;
       }
 
-      bool newView = false;
       if (viewToUse == viewOptions.count() - 1) {
-        newView = true;
         QUndoCommand::setText(tr("View footprints in new 2D footprint view"));
       }
       else if (viewToUse != -1) {
@@ -169,30 +185,19 @@ namespace Isis {
 
       QStringList internalData;
       internalData.append(QString::number(viewToUse));
-      internalData.append(newView? "new view" : "existing view");
       setInternalData(internalData);
     }
-
     return success;
   }
 
-  /**
-   * This method returns whether or not other depends on a Footprint2DViewWorkOrder.
-   * 
-   * @param other WorkOrder that we are checking for dependencies
-   * 
-   * @return @b bool True if other depends on a Footprint2DViewWorkOrder
-   */
-  bool Footprint2DViewWorkOrder::dependsOn(WorkOrder *other) const {
-    // depend on types of ourselves.
-    return dynamic_cast<Footprint2DViewWorkOrder *>(other);
-  }
 
   /**
-   * This methods adds the current item to Footprint2DView.
-   * 
+   * @brief This either adds a new Footprint2DView containing the selected images or adds the 
+   *              image's footprints to an existing Footprint2DView.
+   *  
    */
-  void Footprint2DViewWorkOrder::syncRedo() {
+  void Footprint2DViewWorkOrder::execute() {
+
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
 
     int viewToUse = internalData().first().toInt();
@@ -206,13 +211,6 @@ namespace Isis {
     }
 
     view->addItems( selectedItems );
-
-    //  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  source model: "<<project()->directory()->model()<<"  rows = "<<project()->directory()->model()->rowCount();
-//  qDebug()<<"Footprint2DViewWorkOrder::syncRedo  proxy model: "<<view->internalModel()<<"  rows = "<<view->internalModel()->rowCount();
-  }
-
-  void Footprint2DViewWorkOrder::syncUndo() {
-    delete project()->directory()->footprint2DViews().last();
   }
 }
 

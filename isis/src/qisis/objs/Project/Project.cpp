@@ -44,6 +44,7 @@
 #include "Camera.h"
 #include "Control.h"
 #include "ControlList.h"
+#include "ControlNet.h"
 #include "CorrelationMatrix.h"
 #include "Cube.h"
 #include "Directory.h"
@@ -56,6 +57,9 @@
 #include "ImageReader.h"
 #include "IException.h"
 #include "ProgressBar.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+#include "SerialNumberList.h"
 #include "Shape.h"
 #include "ShapeList.h"
 #include "ShapeReader.h"
@@ -91,6 +95,7 @@ namespace Isis {
     m_isTemporaryProject = true;
     m_activeControl = NULL;
     m_activeImageList = NULL;
+    m_copyCubes = false;
 
     m_numImagesCurrentlyReading = 0;
 
@@ -180,6 +185,15 @@ namespace Isis {
     connect( this, SIGNAL(imagesAdded(ImageList *) ),
              this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
 
+    // Project will be listening for when both cnets and images have been added.
+    // It will emit a signal, controlsAndImagesAvailable, when this occurs.
+    // Directory sets up a listener on the JigsawWorkOrder clone to enable itself
+    // when it hears this signal.
+    connect(this, SIGNAL(imagesAdded(ImageList *)),
+            this, SLOT(checkControlsAndImagesAvailable()));
+    connect(this, SIGNAL(controlListAdded(ControlList *)),
+            this, SLOT(checkControlsAndImagesAvailable()));
+
     m_images = new QList<ImageList *>;
 
     // Shape reader
@@ -207,6 +221,12 @@ namespace Isis {
 
     m_shapeReadingMutex = new QMutex;
 
+    // Listen for when an active control is set and when an active image list is set.
+    // This is used for enabling the JigsawWorkOrder (the Bundle Adjustment menu action).
+//  connect(this, &Project::activeControlSet,
+//          this, &Project::checkActiveControlAndImageList);
+//  connect(this, &Project::activeImageListSet,
+//          this, &Project::checkActiveControlAndImageList);
     // TODO: ken testing
 //    m_bundleSettings = NULL;
 //    m_bundleSettings = new BundleSettings();
@@ -226,6 +246,11 @@ namespace Isis {
 
       int undoNeededToRestoreDiskState = undoStackIndex;
 
+      // Go back through the stack looking for the last "clean" state
+      // for the project.  If workorders are found that change the disk
+      // state undo all workorders up to and including those workorders.
+      // Ideally the project has been saved by one of the workorders
+      // (state set to clean) and nothing needs to be undone.
       for (int i = undoStackIndex - 1; i >= undoStackCleanIndex; i--) {
         const WorkOrder *currentWorkOrder =
               dynamic_cast<const WorkOrder *>( m_undoStack.command(i) );
@@ -394,8 +419,6 @@ namespace Isis {
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( imageListDeleted(QObject *) ) );
-      //TODO  07-29-14  Kim & Tracie commented this out.  Didn't seem like it was necessary.
-      //      If problems, need to understand this code better.
       m_images->append(result);
     }
     return result;
@@ -475,24 +498,25 @@ namespace Isis {
 //  stream.writeAttribute("state", layout_data.toString());
 
 
-    // if ( !m_bundleSolutionInfo->isEmpty() ) {
-    //   stream.writeStartElement("bundleSolutionInfo");
-    // 
-    //   for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
-    //     m_bundleSolutionInfo->at(i)->save(stream, this, newProjectRoot);
-    //   }
-    // 
-    //   stream.writeEndElement();
-    // }
+    if ( !m_bundleSolutionInfo->isEmpty() ) {
+      stream.writeStartElement("results");
 
-    // should we write the runtimes of the runs here???
-    if (!m_bundleSolutionInfo->isEmpty()) {
-      stream.writeStartElement("bundleRuns");
-    
       for (int i = 0; i < m_bundleSolutionInfo->count(); i++) {
-        m_bundleSolutionInfo->at(i)->runTime();
+        m_bundleSolutionInfo->at(i)->save(stream, this, newProjectRoot);
       }
-    
+
+      stream.writeEndElement();
+    }
+
+    if (m_activeImageList) {
+      stream.writeStartElement("activeImageList");
+      stream.writeAttribute("displayName", m_activeImageList->name());
+      stream.writeEndElement();
+    }
+
+    if (m_activeControl) {
+      stream.writeStartElement("activeControl");
+      stream.writeAttribute("displayName", m_activeControl->displayProperties()->displayName());
       stream.writeEndElement();
     }
 
@@ -586,27 +610,6 @@ namespace Isis {
 
 
   /**
-   * Create and return the name of a folder for placing BundleSolutionInfo.
-   *
-   * TODO: don't know if sentence below is accurate.
-   * This can be called from multiple threads, but should only be called by one thread at a time.
-   */
-  QDir Project::addBundleSolutionInfoFolder(QString folder) {
-    QDir bundleSolutionInfoFolder(bundleSolutionInfoRoot());
-
-    if (!bundleSolutionInfoFolder.mkpath(folder)) {
-      throw IException(IException::Io,
-                       tr("Could not create bundle results directory [%1] in [%2].")
-                       .arg(folder).arg(bundleSolutionInfoFolder.absolutePath()),
-                       _FILEINFO_);
-    }
-
-    bundleSolutionInfoFolder.cd(folder);
-    return bundleSolutionInfoFolder;
-  }
-
-
-  /**
    * Create and return the name of a folder for placing control networks.
    *
    * This can be called from multiple threads, but should only be called by one thread at a time.
@@ -670,8 +673,8 @@ namespace Isis {
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( controlListDeleted(QObject *) ) );
 
-      emit controlListAdded(result);
       m_controls->append(result);
+      emit controlListAdded(result);
     }
 
     return result;
@@ -782,12 +785,32 @@ namespace Isis {
 
 
   /**
-   * Add the given BundleSolutionInfo to the current project. This will cause the 
-   * BundleSolutionInfo to be saved/restored from disk, Project-related GUIs to display the 
-   * BundleSolutionInfo, and enable access to the BundleSolutionInfo given access to the project. 
+   * Create and return the name of a folder for placing BundleSolutionInfo.
+   *
+   * TODO: don't know if sentence below is accurate.
+   * This can be called from multiple threads, but should only be called by one thread at a time.
+   */
+  QDir Project::addBundleSolutionInfoFolder(QString folder) {
+    QDir bundleSolutionInfoFolder(bundleSolutionInfoRoot());
+
+    if (!bundleSolutionInfoFolder.mkpath(folder)) {
+      throw IException(IException::Io,
+                       tr("Could not create bundle results directory [%1] in [%2].")
+                       .arg(folder).arg(bundleSolutionInfoFolder.absolutePath()),
+                       _FILEINFO_);
+    }
+
+    bundleSolutionInfoFolder.cd(folder);
+    return bundleSolutionInfoFolder;
+  }
+
+
+  /**
+   * Add the given BundleSolutionInfo to the current project. This will cause the
+   * BundleSolutionInfo to be saved/restored from disk, Project-related GUIs to display the
+   * BundleSolutionInfo, and enable access to the BundleSolutionInfo given access to the project.
    */
   void Project::addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
-
     connect(bundleSolutionInfo, SIGNAL(destroyed(QObject *)),
             this, SLOT(bundleSolutionInfoClosed(QObject *)));//???
     connect(this, SIGNAL(projectRelocated(Project *)),
@@ -797,15 +820,13 @@ namespace Isis {
     QString runTime = bundleSolutionInfo->runTime();
     QDir bundleDir = addBundleSolutionInfoFolder(runTime); //???
                                                            // save solution information to a file
-    QString bundleFileName = bundleDir.absolutePath() + "/" + "BundleSolutionInfo.hdf";
 
     bundleSolutionInfo->bundleSettings()->setOutputFilePrefix(bundleDir.absolutePath() + "/");
-    bundleSolutionInfo->createH5File(FileName(bundleFileName));
 
     loadBundleSolutionInfo(bundleSolutionInfo);
   }
 
-  
+
   void Project::loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
     m_bundleSolutionInfo->append(bundleSolutionInfo);
 
@@ -831,12 +852,12 @@ namespace Isis {
    * @param The path to the project folder
    * @internal
    *   @history Tyler Wilson - Added try-catch blocks around all reader.parse
-   *                  calls.  The exception information is not piped to the Warnings tab 
+   *                  calls.  The exception information is not piped to the Warnings tab
    *                  in the GUI instead of the command line, and the application starts
    *                  instead of executing prematurely.  Fixes #4488.
    * */
   void Project::open(QString projectPathStr) {
-  
+
     m_isTemporaryProject = false;
 
     FileName projectPath(projectPathStr);
@@ -889,7 +910,7 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
-   
+
     try {
         reader.parse(xmlHistoryInputSource);
         }
@@ -924,7 +945,7 @@ namespace Isis {
 
     QString directoryXmlPath = projectPath.toString() + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
-   
+
 
     if (!directoryFile.open(QFile::ReadOnly)) {
       throw IException(IException::Io,
@@ -936,7 +957,7 @@ namespace Isis {
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
-   
+
     try {
       reader.parse(xmlDirectoryInputSource);
          }
@@ -963,15 +984,15 @@ namespace Isis {
         QDir bundleSolutionDir(bundleDirs[dirListIndex].absoluteFilePath());
         bundleSolutionDir.setFilter(QDir::Files | QDir::NoSymLinks); // sym links ok???
 
-        QFileInfoList bundleSolutionFiles = bundleSolutionDir.entryInfoList();
-        for (int fileListIndex = 0; fileListIndex < bundleSolutionFiles.size(); fileListIndex++) {
-          // if the file is an hdf file with BundleSolutionInfo object, add it to the project tree
-          if (bundleSolutionFiles[fileListIndex].fileName().contains("_BundleSolutionInfo.hdf")) {
-            QString  absoluteFileName = bundleSolutionFiles[fileListIndex].absoluteFilePath();
-            FileName solutionFile(bundleSolutionFiles[fileListIndex].absoluteFilePath());
-            loadBundleSolutionInfo(new BundleSolutionInfo(solutionFile));
-          }
-        }
+//         QFileInfoList bundleSolutionFiles = bundleSolutionDir.entryInfoList();
+//         for (int fileListIndex = 0; fileListIndex < bundleSolutionFiles.size(); fileListIndex++) {
+//           // if the file is an hdf file with BundleSolutionInfo object, add it to the project tree
+//           if (bundleSolutionFiles[fileListIndex].fileName().contains("_BundleSolutionInfo.hdf")) {
+//             QString  absoluteFileName = bundleSolutionFiles[fileListIndex].absoluteFilePath();
+//             FileName solutionFile(bundleSolutionFiles[fileListIndex].absoluteFilePath());
+//             loadBundleSolutionInfo(new BundleSolutionInfo(solutionFile));
+//           }
+//         }
       }
     }
 
@@ -1025,7 +1046,7 @@ namespace Isis {
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
-  
+
 
   WorkOrder *Project::lastNotUndoneWorkOrder() {
     WorkOrder *result = NULL;
@@ -1157,27 +1178,83 @@ namespace Isis {
 
 
   /**
-   * @brief Set the Active Control (control network) 
-   *  
-   * Set the active control (control network) for views which need to operate on the 
-   * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * @brief Checks if both an active control and active image list have been set.
+   *
+   * This can be used to check when both an active control and active image list have been set.
+   * This is used for enabling the jigsaw work order on the Project menu when there is an active
+   * control and image list set.
+   *
+   * @see Directory::initializeActions()
    */
-  void Project::setActiveControl(Control *control) {
-    m_activeControl = control;
+  void Project::checkActiveControlAndImageList() {
+    if (m_activeControl && m_activeImageList) {
+      emit activeControlAndImageListSet();
+    }
   }
 
 
   /**
-   * @brief Return the Active Control (control network) 
-   *  
-   * Returns the active control (control network) for views which need to operate on 
-   * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * @brief Checks if at least one control and image have been added to the project.
+   *
+   * This can be used to check whenever there are control nets and images available
+   * in the project. This is used for enabling the jigsaw work order on the Project menu when
+   * a control net and image are available / loaded in the project.
+   * 
+   * @see Project::Project(Directory &directory, QObject *parent)
+   * @see Directory::initializeActions()
+   */
+  void Project::checkControlsAndImagesAvailable() {
+    if (controls().count() > 0 && images().count() > 0) {
+      emit controlsAndImagesAvailable();
+    }
+  }
+
+
+  /**
+   * @brief Set the Active Control (control network)
+   *
+   * Set the active control (control network) for views which need to operate on the
+   * same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
+   *   @history 2016-12-22 Tracie Sucharski - Changed to take a displayName, so that it can be used
+   *                           when loading a saved project which has an active control saved with
+   *                           the displayName.
+   *   @history 2017-01-09 Tracie Sucharski - Moved SetImages step from
+   *                           SetActiveControlWorkOrder::execute so that SetImages is always done
+   *                           whether from the workorder or calling this method directly from the
+   *                           project loading.  TODO:  should project loading call the WorkOrder
+   *                           rather than this method directly?
+   *
+   */
+  void Project::setActiveControl(QString displayName) {
+
+    if (m_activeControl) {
+      QString message = "Currently you cannot change the active control when one is already set.  "
+                        "This functionality will be implemented in a future release.";
+      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
+      return;
+    }
+    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
+    if (item && item->isControl()) {
+      m_activeControl = item->control();
+      item->setTextColor(Qt::darkGreen);
+    }
+
+    activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+    emit activeControlSet();
+  }
+
+
+  /**
+   * @brief Return the Active Control (control network)
+   *
+   * Returns the active control (control network) for views which need to operate on
+   * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
    */
   Control *Project::activeControl() {
     return m_activeControl;
@@ -1185,27 +1262,49 @@ namespace Isis {
 
 
   /**
-   * @brief Set the Active ImageList
-   *  
-   * Set the active ImageList for views which need to operate on the 
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   * @brief Set the Active ImageList from the displayName which is saved in project.xml
+   *
+   * Set the active ImageList for views which need to operate on the
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. This version of
+   * the setActiveImageList method is used when loading a project which has an activeImageList
+   * saved.
+   *
+   * @internal
+   *   @history 2016-12-02 Tracie Sucharski - Original version.
+   *   @history 2016-12-29 Tracie Sucharski - Combined the functionality of
+   *                           setActiveImageList(ImageList *) in this method.  This will allow
+   *                           projects saved with an active ImageList to be restored properly.
+   *                           Only the displayName is saved in a project since the ImageList is
+   *                           created when the project is loaded.  As long as the Images and
+   *                           Controls are loaded before the setActiveImageList is loaded, there
+   *                           will be a correct correspondence between the displayName and
+   *                           ImageList.
    */
-  void Project::setActiveImageList(ImageList *imageList) {
-    m_activeImageList = imageList;
+  void Project::setActiveImageList(QString displayName) {
+
+    if (m_activeImageList) {
+      QString message = "Currently you cannot change the active imageList when one is already set.  "
+                        "This functionality will be implemented in a future release.";
+      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
+      return;
+    }
+    ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
+    if (item && item->isImageList()) {
+      m_activeImageList = item->imageList();
+      item->setTextColor(Qt::darkGreen);
+    }
+    emit activeImageListSet();
   }
 
 
   /**
    * @brief  Returns the active ImageList
-   *  
-   * Returns the active ImageList for views which need to operate on the 
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   *  
-   * @internal 
-   *   @history 2016-06-23 Tracie Sucharski - Original version. 
+   *
+   * Returns the active ImageList for views which need to operate on the
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   *
+   * @internal
+   *   @history 2016-06-23 Tracie Sucharski - Original version.
    */
   ImageList *Project::activeImageList() {
     return m_activeImageList;
@@ -1416,10 +1515,36 @@ namespace Isis {
   }
 
 
+  /**
+   * Sets a boolean flag which determines whether to save the
+   * Cubes in the project ImageLists as well as the ecubs (the labels)
+   * False means we do not save the cubes, and true means we do.
+   * @param copy
+   *
+   */
+  void Project::setCopyCubes(bool copy) {
+
+    m_copyCubes = copy;
+
+  }
+
+  /**
+   * Returns the boolean flag indicating whether or not we are copying
+   * the cubes in the ImageLists into the results folder upon save.
+   * False means we are not (and are saving the ecubs only).  True means we are copying both.
+   * @return True if saving the cubes, false otherwise.
+   */
+  bool Project::copyCubes() const {
+
+    return m_copyCubes;
+
+  }
+
+
   void Project::save() {
     if (m_isTemporaryProject) {
-      QString newDestination = QFileDialog::getSaveFileName(NULL, 
-                                                            QString("Project Location"), 
+      QString newDestination = QFileDialog::getSaveFileName(NULL,
+                                                            QString("Project Location"),
                                                             QString("."));
 
       if ( !newDestination.isEmpty() ) {
@@ -1437,6 +1562,107 @@ namespace Isis {
   }
 
 
+
+
+  /**
+   * @brief Project::save  Saves the project state out to an XML file
+   * @param newPath  The path to the project directory.
+   * @param verifyPathDoesntExist A boolean variable which is set to true
+   * if we wish to check that we are not overwriting a pre-existing save.
+   *
+   * XML Serialization.  Below is a tree listing the XML tag hiearchy.
+   *
+   * @startsalt{projectXMLTagHierarchy.png}"Project::Save XML Tag Hierarchy"
+   *
+   * {
+   * {T
+   * +project (project.xml)
+   * ++controlNets
+   * +++controlList 1 (controls.xml)
+   * ++++controls
+   * +++++controlNet
+   * +++controlList 2
+   * ++++controls
+   * +++++controlNet
+   * ++imageLists
+   * +++imageList 1 (images.xml)
+   * ++++images
+   * +++++image
+   * +++imageList 2 (images.xml)
+   * ++++images
+   * +++++image
+   * ++shapeLists
+   * +++shapeList 1 (shapes.xml)
+   * ++++shapes
+   * +++++shape
+   * +++shapeList 2 (shapes.xml)
+   * ++bundleRuns (currently the tag is output, but not run times)
+   * ++activeImageList
+   * ++activeControl
+   * }
+   * }
+   * @endsalt
+   *
+   *
+   * The figure below represents a flow chart for XML code generation which starts
+   * with a call to this function:
+   *
+   *   @startuml {projectSaveWorkFlow.png} "Projec Save"
+   *   |XML Processing|
+   *   start
+   *   - Project::save(FileName &, bool &)
+   *    -Project::save(QxmlStreamWriter &stream,FileName &)[save project.xml]
+   *     |XML Code|
+   *     -project.xml
+   *     |XML Processing|
+   *    repeat
+   *     - m_controls[i]->save(stream)
+   *    repeat while (i < m_controls.size() )
+   *   |XML Code|
+   *   -controls.xml for each control list in separate folders.
+   *   |XML Processing|
+   *   repeat
+   *     - m_imagesLists[i]->save(stream)
+   *   repeat while (i < m_imageLists.size() )
+   *   |XML Code|
+   *   -images.xml
+   *   |XML Processing|
+   *   repeat
+   *     - m_shapeLists[i]->save(stream)
+   *   repeat while (i < m_shapeLists.size() )
+   *
+   *   |XML Code|
+   *   -shapes.xml for each control list in separate folders.
+   *   |XML Processing|
+   *   -stream.write("bundleruns") [if it is non-empty]
+   *   |XML Code|
+   *     -project.xml
+   *   |XML Processing|
+   *   -stream.write("activeImageList") [if it exists]
+   *   |XML Code|
+   *     -project.xml
+   *   |XML Processing|
+   *   -stream.write("activeControl") [if it exists]
+   *   |XML Code|
+   *   -project.xml
+   *   |XML Processing|
+   *   -Project::saveHistory(stream)[save history.xml]
+   *   |XML Code|
+   *   -history.xml in project root folder
+   *   |XML Processing|
+   *   -Project::saveWarnings(stream)[save warnings.xml]
+   *   |XML Code|
+   *   -warnings.xml in project root folder
+   *   |XML Processing|
+   *   -Directory::save(stream)[save directory.xml]
+   *   |XML Code|
+   *   -directory.xml in project root folder
+   *   |XML Processing|
+   *   stop
+   *   @enduml
+   *
+   *
+   */
   void Project::save(FileName newPath, bool verifyPathDoesntExist) {
     if ( verifyPathDoesntExist && QFile::exists( newPath.toString() ) ) {
       throw IException(IException::Io,
@@ -1453,6 +1679,11 @@ namespace Isis {
                                "because we could not create the folder")
                        .arg(newPath.original()),
                        _FILEINFO_);
+    }
+
+    //  If current project is temporary set project name to path name as a default
+    if (m_isTemporaryProject) {
+      setName(newPath.name());
     }
 
     QFile projectSettingsFile(newPath.toString() + "/project.xml");
@@ -1506,6 +1737,7 @@ namespace Isis {
     saveWarnings(warningsWriter);
     warningsWriter.writeEndDocument();
 
+    //  Save the Directory structure
     QFile directoryStateFile(newPath.toString() + "/directory.xml");
     if (!directoryStateFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
       throw IException(IException::Io,
@@ -1532,13 +1764,17 @@ namespace Isis {
 
 
   /**
-   * Run the work order and stores it in the project. If WorkOrder::execute() returns true then
-   *   the work order's redo is called. This takes ownership of workOrder.
+   * @brief This executes the WorkOrder and stores it in the project.
+   *
+   * @decription Run the WorkOrder and stores it in the project. If WorkOrder::setupExecution()
+   * returns true then the WorkOrder's redo is called. This takes ownership of WorkOrder.
    *
    * The order of events is:
-   *   1) WorkOrder::execute()
+   *   1) WorkOrder::setupExecution()
    *   2) emit workOrderStarting()
-   *   3) WorkOrder::redo() [optional - see WorkOrder]
+   *   3) WorkOrder::redo()
+   *
+   * @see WorkOrder::redo()
    *
    * @param workOrder The work order to be executed. This work order must not already be in the
    *                    project.
@@ -1550,7 +1786,7 @@ namespace Isis {
 
       workOrder->setPrevious(lastNotUndoneWorkOrder());
 
-      if (workOrder->execute()) {
+      if (workOrder->setupExecution()) {
         if (workOrder->previous()) workOrder->previous()->setNext(workOrder);
 
         m_workOrderHistory->append(workOrder);
@@ -1561,10 +1797,18 @@ namespace Isis {
         //   Instead, we tell the undo stack that we're now clean.
         if (workOrder->createsCleanState()) {
           m_undoStack.setClean();
+          workOrder->execute();
+        }
+        // All other work orders go onto the undo stack, unless specifically told not to
+        else if (workOrder->isUndoable()) {
+          // This calls WorkOrder::redo for us through Qt's QUndoStack::push method, redo is only
+          // implemented in the base class.  Child work orders do not implement redo.
+          m_undoStack.push(workOrder);
         }
         else {
-          // All other work orders go onto the undo stack
-          m_undoStack.push(workOrder); // This calls redo for us
+          // If we get this far the WorkOrder is not-undoable therefore we have to call redo by
+          // hand.
+          workOrder->redo();
         }
 
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)
@@ -1674,7 +1918,7 @@ namespace Isis {
     emit targetsAdded(m_targets);
   }
 
-  
+
 
   void Project::addCamerasFromImportedImagesToProject(ImageList *imageList) {
     bool found = false;
@@ -1781,6 +2025,10 @@ namespace Isis {
     int indexToRemove = m_controls->indexOf(static_cast<ControlList *>(controlListObj));
     if (indexToRemove != -1) {
       m_controls->removeAt(indexToRemove);
+    }
+
+    if (controls().count() == 0) {
+      emit allControlsRemoved();
     }
   }
 
@@ -1918,12 +2166,12 @@ namespace Isis {
         m_controls.append(new ControlList(m_project, reader()));
       }
       else if (localName == "imageList") {
-//      qDebug()<<"Project::XmlHandler::startElement localName = imageList";
         m_imageLists.append(new ImageList(m_project, reader()));
       }
       else if (localName == "shapeLists") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
+      //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
         QString type = atts.value("type");
 
@@ -1932,6 +2180,7 @@ namespace Isis {
 
         m_workOrder->read(reader());
       }
+      //  warnings stored in warning.xml, using same reader as project.xml
       else if (localName == "warning") {
         QString warningText = atts.value("text");
 
@@ -1949,12 +2198,17 @@ namespace Isis {
 //    restoreState(layout_data);
       }
 
-      else if (localName == "bundleSettings") {
-        BundleSettings *bundleSettings = m_project->bundleSettings();
-        if (!bundleSettings) {
-          // throw error???
-        }
-//      bundleSettings = new BundleSettings(m_project, reader());
+      else if (localName == "bundleSolutionInfo") {
+        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, reader()));
+      }
+      else if (localName == "activeImageList") {
+        QString displayName = atts.value("displayName");
+        m_project->setActiveImageList(displayName);
+      }
+      else if (localName == "activeControl") {
+        // Find Control
+        QString displayName = atts.value("displayName");
+        m_project->setActiveControl(displayName);
       }
     }
 
@@ -1962,12 +2216,25 @@ namespace Isis {
   }
 
 
+  /**
+   * The xml parser for ending tags
+   *
+   * @internal
+   *   @history 2016-12-02 Tracie Sucharski - Changed localName == "project" to
+   *                           localName == "imageLists", so that images and shapes
+   *                           are added to the project as soon as their end tag is found.
+   *                           Restoring activeImageList was not working since the project had
+   *                           no images until the end tag for "project" was reached.
+   *
+   */
   bool Project::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName) {
-    if (localName == "project") {
+    if (localName == "imageLists") {
       foreach (ImageList *imageList, m_imageLists) {
         m_project->imagesReady(*imageList);
       }
+    }
+    else if (localName == "shapeLists") {
       // TODO does this go here under project or should it be under shapes?
       foreach (ShapeList *shapeList, m_shapeLists) {
         m_project->shapesReady(*shapeList);
@@ -1986,8 +2253,10 @@ namespace Isis {
       }
       m_controls.clear();
     }
-    else if (localName == "bundleSettings") {
-      // TODO: what to do here????
+    else if (localName == "results") {
+      foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
+        m_project->addBundleSolutionInfo(bundleInfo);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

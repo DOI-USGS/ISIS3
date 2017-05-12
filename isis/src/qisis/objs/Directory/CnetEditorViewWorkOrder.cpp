@@ -68,8 +68,8 @@ namespace Isis {
   }
 
 
-  bool CnetEditorViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool CnetEditorViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QUndoCommand::setText(tr("View control network [%1] in new cnet editor view")
@@ -86,14 +86,14 @@ namespace Isis {
   }
 
 
-  void CnetEditorViewWorkOrder::syncRedo() {
+  void CnetEditorViewWorkOrder::execute() {
     for (int i = 0; i < controlList()->size(); i++) {
       //project()->directory()->addCnetEditorView(controlList().first());
       project()->directory()->addCnetEditorView(controlList()->at(i));
     }
   }
 
-  void CnetEditorViewWorkOrder::syncUndo() {
+  void CnetEditorViewWorkOrder::undoExecution() {
     delete project()->directory()->cnetEditorViews().last();
   }
 }

@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QList>
+#include <QRegExp>
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -21,9 +22,12 @@
 using namespace std;
 using namespace Isis;
 
+template<class T>
+void printXml(const T &);
+
 /**
-  * Test BundleSettings 
-  *  
+  * Test BundleSettings
+  *
   *
   * @author 2014-05-14 Jeannie Backer
   * @internal
@@ -37,24 +41,26 @@ using namespace Isis;
   *   @history 2016-10-13 Ian Humphrey - Replaced setInstrumentId() with addObservationNumber()
   *                           to associate the bundle observation solve settings with an
   *                           observation number. References #4293.
-  *   @history 2016-10-24 Makayla Shepherd - Commented out the test for setting the default settings 
-  *                           when reading from an empty XML. This test was failing on prog24 and we 
-  *                           are not sure if we are going to allow XML reading/writing as we are 
+  *   @history 2016-10-24 Makayla Shepherd - Commented out the test for setting the default settings
+  *                           when reading from an empty XML. This test was failing on prog24 and we
+  *                           are not sure if we are going to allow XML reading/writing as we are
   *                           most likely going to move to HDF5. Fixes #4327.
+  *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() and replaced with the XML save().
+  *                           Fixes #4797.
   *
   *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
   *         this should be fixed as part of #4292.
   *   @todo Test hdf5 methods when added.
   *   @todo Test setBundleTargetBody()
   *   @todo Test non-null bundleTargetBody()
-  *  
+  *
   */
 
 
 namespace Isis {
   /**
    * Child class of BundleSettings used to test the embedded XML handler class.
-   *  
+   *
    * @author 2014-05-14 Jeannie Backer
    * @internal
    *   @history 2014-05-14 Jeannie Backer - Original version.
@@ -62,18 +68,18 @@ namespace Isis {
   class BundleSettingsXmlHandlerTester : public BundleSettings {
     public:
       /**
-       * Constructs BundleSettings using XML handler. 
-       *  
+       * Constructs BundleSettings using XML handler.
+       *
        * @param project A pointer to the project.
        * @param reader A pointer to a XmlStackedHandlerReader.
-       * @param xmlFile The name of the XML file to be used to create a 
+       * @param xmlFile The name of the XML file to be used to create a
        *                BundleSettings object.
-       * 
-       * 
+       *
+       *
        * @throw Isis::Exception::Io "Unable to open XML file with read access."
        * @throw Isis::Exception::Unknown "Failed to parse XML file."
        */
-      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
+      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
                                      FileName xmlFile) : BundleSettings(project, reader) {
 
         QString xmlPath(xmlFile.expanded());
@@ -88,7 +94,7 @@ namespace Isis {
         QXmlInputSource xmlInputSource(&file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
-          throw IException(IException::Unknown, 
+          throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
@@ -127,36 +133,34 @@ int main(int argc, char *argv[]) {
     //      int convergenceCriteriaMaximumIterations() const;
     //      QString outputFilePrefix() const;
     //      int numberSolveSettings();
-    //      int numberTargetBodyParameters() 
-    //      bool solveTargetBody()            
-    //      bool solvePoleRA()                
-    //      bool solvePoleRAVelocity()        
-    //      bool solvePoleDec()               
-    //      bool solvePoleDecVelocity()       
-    //      bool solvePM()                    
-    //      bool solvePMVelocity()   
+    //      int numberTargetBodyParameters()
+    //      bool solveTargetBody()
+    //      bool solvePoleRA()
+    //      bool solvePoleRAVelocity()
+    //      bool solvePoleDec()
+    //      bool solvePoleDecVelocity()
+    //      bool solvePM()
+    //      bool solvePMVelocity()
     //      bool solvePMAcceleration()
     //      bool solveTriaxialRadii()
     //      bool solveMeanRadius()
 
-    PvlObject pvl = settings.pvlObject("DefaultSettingsObject");
-    cout << pvl << endl << endl;
+    // Default bundle settings
+    printXml<BundleSettings>(settings);
+
 
     qDebug() << "Testing copy constructor...";
     BundleSettings copySettings(settings);
-    pvl = copySettings.pvlObject("CopySettingsObject");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(copySettings);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
     settings = settings;
-    pvl = settings.pvlObject("SelfAssignedSettingsObject");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(settings);
 
     qDebug() << "Testing assignment operator to create a new settings object...";
     BundleSettings assignmentOpSettings;
     assignmentOpSettings = settings;
-    pvl = assignmentOpSettings.pvlObject("AssignedSettingsObject");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(assignmentOpSettings);
 
     qDebug() << "Testing mutator methods...";
     // reset all...
@@ -171,37 +175,30 @@ int main(int argc, char *argv[]) {
     boss1.addObservationNumber("Instrument1");
     boss1.setInstrumentPositionSettings(BundleObservationSolveSettings::AllPositionCoefficients,
                                         5, 6, true, 7000.0, 8000.0, 9000.0);
-    boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors, 
+    boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
                                         10, 11, true, true, 12.0, 13.0, 14.0);
-    // TODO: why am i getting QList index error???
-//    pvl = boss1.pvlObject();
-//    cout << pvl << endl << endl;
     QList<BundleObservationSolveSettings> observationSolveSettings;
     observationSolveSettings.append(boss1);
     boss1.addObservationNumber("Instrument2");
     boss1.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionOnly,
                                         15, 16, true, 17000.0, 18000.0, 19000.0);
-    boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients, 
+    boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients,
                                         20, 21, true, true, 22.0, 23.0, 24.0);
-    // TODO: why am i getting QList index error???
-//    pvl = boss1.pvlObject();
-//    cout << pvl << endl << endl;
     observationSolveSettings.append(boss1);
     copySettings.setObservationSolveOptions(observationSolveSettings);
     // set convergence criteria values
     copySettings.setConvergenceCriteria(
                      BundleSettings::stringToConvergenceCriteria("parametercorrections"), 0.25, 26);
     // set maximum likelihood models
-    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Huber, 0.27); 
-    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Welsch, 28); 
-    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::HuberModified, 29); 
-    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Chen, 30); 
+    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Huber, 0.27);
+    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Welsch, 28);
+    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::HuberModified, 29);
+    copySettings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Chen, 30);
     // set target body
     // TODO
     // set output file options
     copySettings.setOutputFilePrefix("TestFilePrefix");
-    pvl = copySettings.pvlObject("ResetAllOptions");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(copySettings);
 
     // now for test coverage, call some more resets
     // SolveObservationMode = UpdateCubeLabel = ErrorPropagation = true and
@@ -209,24 +206,20 @@ int main(int argc, char *argv[]) {
     settings.setSolveOptions(true, true, true, false);
     settings.setOutlierRejection(false);
     settings.setOutputFilePrefix("TestFilePrefix");
-    pvl = settings.pvlObject("ResetSolveOptions");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(settings);
 
     // reset output options - test coverage
     settings.setOutputFilePrefix("TestFilePrefix");
-    pvl = settings.pvlObject("ResetOutputOptions");
-    cout << pvl << endl << endl;
-
+    printXml<BundleSettings>(settings);
 
     qDebug() << "Testing accessor methods...";
     BundleObservationSolveSettings boss2 = copySettings.observationSolveSettings("Instrument1");
     qDebug() << "Get BundleObservationSolveSettings with name InstrumentId = Instrument1";
-    pvl = boss2.pvlObject();
-    cout << pvl << endl << endl;
+    printXml<BundleObservationSolveSettings>(boss2);
+
     boss2 = copySettings.observationSolveSettings(1);
     qDebug() << "Now get BundleObservationSolveSettings at index 1";
-    pvl = boss2.pvlObject();
-    cout << pvl << endl << endl;
+    printXml<BundleObservationSolveSettings>(boss2);
 
     QList< QPair< MaximumLikelihoodWFunctions::Model, double > > models
             = copySettings.maximumLikelihoodEstimatorModels();
@@ -238,25 +231,17 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing static enum-to-string and string-to-enum methods...";
     qDebug() << BundleSettings::convergenceCriteriaToString(
-                               BundleSettings::stringToConvergenceCriteria("SIGMA0")); 
+                               BundleSettings::stringToConvergenceCriteria("SIGMA0"));
     qDebug() << BundleSettings::convergenceCriteriaToString(
-                               BundleSettings::stringToConvergenceCriteria("PARAMETERCORRECTIONS")); 
-    qDebug() << "";
- 
-    qDebug() << "Testing serialization...";
-    QByteArray byteArray;
-    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
-    outputData << copySettings;
-    QDataStream inputData(byteArray);
-    BundleSettings newSettings;
-    inputData >> newSettings;
-    pvl = newSettings.pvlObject();
-    cout << pvl << endl;
+                               BundleSettings::stringToConvergenceCriteria("PARAMETERCORRECTIONS"));
     qDebug() << "";
 
-    qDebug() << "Testing XML: write XML from BundleSettings object...";
-    // write xml 
-    FileName xmlFile("./BundleSettings.xml");
+    qDebug() << "Testing XML serialization 1: write XML from BundleSettings object...";
+    // write xml to test output file for comparison
+    qDebug() << "Serializing test XML object to file:";
+    printXml<BundleSettings>(settings);
+    // now write the object to serialization file
+    FileName xmlFile("./BundleSettings2.xml");
     QString xmlPath = xmlFile.expanded();
     QFile qXmlFile(xmlPath);
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -271,81 +256,82 @@ int main(int argc, char *argv[]) {
     settings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
-    qDebug() << "Testing XML: read XML to BundleSettings object...";
+
+    // read serialized xml into object and then write object to log file
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
     XmlStackedHandlerReader reader;
     BundleSettingsXmlHandlerTester bsFromXml(project, &reader, xmlFile);
-    //BundleSettings bsFromXml(xmlFile, project, &reader);
-    pvl = bsFromXml.pvlObject("BundleSettingsFromXml");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(bsFromXml);
 
+    qDebug() << "Testing XML serialization 2: write XML from BundleSettings object...";
     // for test coverage, read/write the copySettings object with
     // solveRadius=true, outlierRejection=true, no observationSolveSettings,
     // globalRadiusAprioriSigma != N/A, outlierRejectionMultiplier != N/A
-    copySettings.setObservationSolveOptions(QList<BundleObservationSolveSettings>());
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
                        QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
                        _FILEINFO_);
     }
+    // write xml to test output file for comparison
+    qDebug() << "Serializing test XML object to file:";
+    printXml<BundleSettings>(copySettings);
     writer.setAutoFormatting(true);
     writer.writeStartDocument();
     copySettings.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
-    qDebug() << "Testing XML: read XML to BundleSettings object...";
+
+    // read serialized xml into object and then write object to log file
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
     BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);
-    //BundleSettings bsFromXml(xmlFile, project, &reader);
-    pvl = bsFromXml2.pvlObject("BundleSettingsFromXml");
-    cout << pvl << endl << endl;
+    printXml<BundleSettings>(bsFromXml2);
     qXmlFile.remove();
 
 
     qDebug() << "Testing error throws..."; // ??? weird error if i move this after read from empty???
     try {
       settings.observationSolveSettings("UnassociatedObservationNumber");
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       settings.observationSolveSettings(32);
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       settings.observationSolveSettings(-1.0);
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleSettings::stringToConvergenceCriteria("Pickles");
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleSettings::convergenceCriteriaToString(BundleSettings::ConvergenceCriteria(33));
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleSettings invalidMaxLikelihoodModel1;
       invalidMaxLikelihoodModel1.addMaximumLikelihoodEstimatorModel(
-          MaximumLikelihoodWFunctions::Chen, 33); 
-    } 
+          MaximumLikelihoodWFunctions::Chen, 33);
+    }
     catch (IException &e) {
       e.print();
     }
-    
-    /* 
+
+    /*
      * Commenting out this test because it is causing an error on prog24 and we are not sure
      * if we are going to include XML reading/writing
-     * 
+     *
      * qDebug() << "";    // read xml with no attributes or values
      * qDebug() << "Testing XML: read XML with no attributes or values to object...";
      * FileName emptyXmlFile("./unitTest_NoElementValues.xml");
@@ -353,28 +339,27 @@ int main(int argc, char *argv[]) {
      * pvl = bsFromEmptyXml.pvlObject("DefaultBundleSettingsFromEmptyXml");
      * cout << pvl << endl << endl;
     */
-    
-    qDebug() << "";
-    qDebug() << "Testing HDF5 write/read...";
-    FileName hdfFile("./BundleSettings.hdf");
-    if (hdfFile.fileExists()) {
-      QFile::remove(hdfFile.expanded());
-    }
-//    newSettings.createH5Group(hdfFile, "/");
-//    BundleSettings fromHDF(hdfFile);
-//    pvl = fromHDF.pvlObject("BundleSolutionInfoFromHDF");
-//    cout << pvl << endl << endl;
-//    QFile::remove(hdfFile.expanded());
 
-  } 
+  }
   catch (IException &e) {
     e.print();
   }
 }
-#if 0
-still need test coverage for
 
-commented out bundlesettings constructors, commented out xmlhandler constructor
 
-fatalError
-#endif
+/**
+ * Prints the serialized BundleSettings as XML.
+ *
+ * @param const T &printable The BundleSettings to print.
+ */
+template<class T>
+void printXml(const T &printable) {
+  QString output;
+  QXmlStreamWriter writer(&output);
+  writer.setAutoFormatting(true);
+  printable.save(writer, NULL);
+  // needed to remove UUids from sub-object serialization.
+  output.remove(QRegExp("<id>[^<]*</id>"));
+  qDebug().noquote() << output << endl << endl;
+}
+

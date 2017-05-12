@@ -49,7 +49,7 @@ namespace Isis {
 
       virtual SaveProjectWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
 
     private:
       SaveProjectWorkOrder &operator=(const SaveProjectWorkOrder &rhs);

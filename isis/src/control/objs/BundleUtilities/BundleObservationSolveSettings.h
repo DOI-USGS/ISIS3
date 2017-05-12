@@ -74,8 +74,9 @@ namespace Isis {
    *                           observationNumbers() members to associate multiple observation types
    *                           with these settings. Removed the setFromPvl() method. When re-
    *                           implemented, it should be put in jigsaw. References #4293.
-   *  
-   *  
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *
+   *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
@@ -85,17 +86,15 @@ class BundleObservationSolveSettings {
 
     public:
       BundleObservationSolveSettings();
-      BundleObservationSolveSettings(Project *project, 
+      BundleObservationSolveSettings(Project *project,
                                      XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
-      BundleObservationSolveSettings(FileName xmlFile, 
-                                     Project *project, 
+      BundleObservationSolveSettings(FileName xmlFile,
+                                     Project *project,
                                      XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
       void initialize();
-
-      PvlObject pvlObject(QString name = "") const; // Default name is instrument ID.
 
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;
@@ -118,13 +117,13 @@ class BundleObservationSolveSettings {
 
       static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
       static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
-      void setInstrumentPointingSettings(InstrumentPointingSolveOption option, 
-                                         bool solveTwist, 
-                                         int ckDegree = 2, 
+      void setInstrumentPointingSettings(InstrumentPointingSolveOption option,
+                                         bool solveTwist,
+                                         int ckDegree = 2,
                                          int ckSolveDegree = 2,
-                                         bool solvePolynomialOverExisting = false, 
+                                         bool solvePolynomialOverExisting = false,
                                          double anglesAprioriSigma = -1.0,
-                                         double angularVelocityAprioriSigma = -1.0, 
+                                         double angularVelocityAprioriSigma = -1.0,
                                          double angularAccelerationAprioriSigma = -1.0);
       InstrumentPointingSolveOption instrumentPointingSolveOption() const;
       bool solveTwist() const;
@@ -166,9 +165,8 @@ class BundleObservationSolveSettings {
       SpicePosition::Source positionInterpolationType() const;
 
       // TODO: does xml stuff need project???
-      void save(QXmlStreamWriter &stream, const Project *project) const;  
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
+      void save(QXmlStreamWriter &stream, const Project *project) const;
+
 
     private:
       /**
@@ -183,16 +181,16 @@ class BundleObservationSolveSettings {
           // TODO: does xml stuff need project???
           XmlHandler(BundleObservationSolveSettings *settings, Project *project);
           ~XmlHandler();
-   
+
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                   const QString &qName);
-   
+
         private:
           Q_DISABLE_COPY(XmlHandler);
-   
+
           BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
           Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
@@ -217,12 +215,12 @@ class BundleObservationSolveSettings {
       int m_ckSolveDegree;                        /**< Degree of the camera angles polynomial being
                                                        fit to in the bundle adjustment. **/
       bool m_solveTwist;                          //!< Solve for "twist" angle.
-      bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing 
+      bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing
                                                        pointing polynomial.*/
       QList<double> m_anglesAprioriSigma; /**< The image position a priori sigmas.The size of the
                                                list is equal to the number of coefficients in the
-                                               solution. An Isis::Null value implies no weighting 
-                                               will be applied.*/ 
+                                               solution. An Isis::Null value implies no weighting
+                                               will be applied.*/
       SpiceRotation::Source
           m_pointingInterpolationType;    /**< SpiceRotation interpolation type.
                                                Defined in SpiceRotation.cpp, these types are:
@@ -247,7 +245,7 @@ class BundleObservationSolveSettings {
       QList<double> m_positionAprioriSigma; /**< The instrument pointing a priori sigmas. The
                                                   size of the list is equal to the number of
                                                   coefficients in the solution. An Isis:Null value
-                                                  implies no weighting will be applied.*/ 
+                                                  implies no weighting will be applied.*/
       SpicePosition::Source
           m_positionInterpolationType;      /**< SpicePosition interpolation types.
                                                  Defined in SpicePosition.cpp, these types are:
@@ -256,17 +254,13 @@ class BundleObservationSolveSettings {
                                                  3) HermiteCache: read from splined table,
                                                  4) PolyFunction: calced from nth degree polynomial,
                                                  5) PolyFunctionOverHermiteConstant: read from
-                                                    splined table and adding nth degree 
-                                                    polynomial.*/ 
+                                                    splined table and adding nth degree
+                                                    polynomial.*/
 
   };
   //!  Definition for BundleObservationSolveSettingsQsp, a QSharedPointer to a
   //!< BundleObservationSolveSettings object.
   typedef QSharedPointer<BundleObservationSolveSettings> BundleObservationSolveSettingsQsp;
-  
-  // Operators to read/write BundleResults to/from binary data.
-  QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings);
-  QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings);
 };
 
 #endif // BundleObservationSolveSettings_h

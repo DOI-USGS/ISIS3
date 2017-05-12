@@ -26,12 +26,14 @@
 
 namespace Isis {
   /**
-   * This work order allows the user to open a cnet editor (table) view of a single control network.
+   * @brief This work order allows the user to open a cnet editor (table) view of a single control network.
+   * This workorder is synchronous and undoable.
    *
    * @author 2012-09-19 Steven Lambright
    *
    * @internal 
    *   @history 2016-06-23 Tyler Wilson - Replaced QList<Control *> with ControlList *.
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class CnetEditorViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -43,12 +45,12 @@ namespace Isis {
       virtual CnetEditorViewWorkOrder *clone() const;
 
       virtual bool isExecutable(ControlList *controls);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
+      void execute();
+      void undoExecution();
 
     private:
       CnetEditorViewWorkOrder &operator=(const CnetEditorViewWorkOrder &rhs);

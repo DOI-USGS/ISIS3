@@ -32,7 +32,6 @@
 #include "XmlStackedHandler.h"
 
 class QAction;
-class QDataStream;
 class QMenu;
 class QModelIndex;
 class QToolBar;
@@ -70,6 +69,8 @@ namespace Isis {
    *                           Shape.
    *   @history 2016-11-10 Tracie Sucharski - Added functionality to save/restore CubeDnViews when
    *                           opening projects.
+   *   @history 2017-01-02 Tracie Sucharski - Moved IpceTool to first tool on tool bar, change
+   *                           icon to match the Footprint2DView.
    */
   class CubeDnView : public AbstractProjectItemView {
 

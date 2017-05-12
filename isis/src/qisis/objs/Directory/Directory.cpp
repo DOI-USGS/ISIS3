@@ -37,6 +37,9 @@
 #include <QtDebug>
 #include <QMessageBox>
 
+#include "BundleObservation.h"
+#include "BundleObservationView.h"
+#include "BundleObservationViewWorkOrder.h"
 #include "ChipViewportsWidget.h"
 #include "CloseProjectWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
@@ -51,6 +54,7 @@
 #include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
+#include "FileItem.h"
 #include "FileName.h"
 #include "Footprint2DView.h"
 #include "Footprint2DViewWorkOrder.h"
@@ -120,12 +124,15 @@ namespace Isis {
 
 //     connect( m_project, SIGNAL(projectLoaded(Project *) ),
 //              this, SLOT(updateRecentProjects(Project *) ) );
-// 
+//
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
+
 //  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
 
     try {
+
+      //  Context menu actions
       createWorkOrder<SetActiveImageListWorkOrder>();
       createWorkOrder<SetActiveControlWorkOrder>();
       createWorkOrder<CnetEditorViewWorkOrder>();
@@ -136,7 +143,9 @@ namespace Isis {
       createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
+      createWorkOrder<BundleObservationViewWorkOrder>();
 
+      //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
       m_exportImagesWorkOrder = createWorkOrder<ExportImagesWorkOrder>();
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
@@ -157,7 +166,6 @@ namespace Isis {
     }
 
     initializeActions();
-
   }
 
 
@@ -193,7 +201,7 @@ namespace Isis {
     return m_projectMenuActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the edit menu.
    * @return @b QList<QAction *> Returns a list of edit menu actions.
@@ -211,7 +219,7 @@ namespace Isis {
     return m_viewMenuActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the settings menu.
    * @return @b QList<QAction *>  Returns a list of menu actions for the settings.
@@ -247,7 +255,7 @@ namespace Isis {
     return m_activeToolBarActions;
   }
 
-  
+
   /**
    * @brief Get the list of actions that the Directory can provide for the Tool Pad.
    * @return @b QList<QAction *>  Returns a list of Tool Pad actions.
@@ -256,9 +264,17 @@ namespace Isis {
     return m_toolPadActions;
   }
 
-  
+
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
+   *
+   * Any work orders that need to be disabled by default can be done so here.
+   * You need to grab the clone pointer, setEnabled(false), then set up the proper connections
+   * between the project signals (representing changes to state) and WorkOrder::enableWorkOrder.
+   *
+   * @todo 2017-02-14 Tracie Sucharski - As far as I can tell the created menus are never used.
+   * Instead of creating menus to use the addAction method, can't we simply create actions and
+   * add them to the member variables which save the list of actions for each menu?
    */
   void Directory::initializeActions() {
     // Menus are created temporarily to convinently organize the actions.
@@ -316,106 +332,60 @@ namespace Isis {
     importMenu->addAction(m_importShapesWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
-    exportMenu->addAction(m_exportControlNetWorkOrder->clone() );
-    exportMenu->addAction(m_exportImagesWorkOrder->clone() );
+
+    // Temporarily grab the export control network clone so we can listen for the
+    // signals that tell us when we can export a cnet. We cannot export a cnet unless at least
+    // one has been imported to the project.
+    WorkOrder *clone = m_exportControlNetWorkOrder->clone();
+    clone->setEnabled(false);
+    connect(m_project, SIGNAL(controlListAdded(ControlList *)),
+            clone, SLOT(enableWorkOrder()));
+    // TODO this is not setup yet
+    // connect(m_project, &Project::allControlsRemoved,
+    //         clone, &WorkOrder::disableWorkOrder);
+    exportMenu->addAction(clone);
+
+    // Similarly for export images, disable the work order until we have images in the project.
+    clone = m_exportImagesWorkOrder->clone();
+    clone->setEnabled(false);
+    connect(m_project, SIGNAL(imagesAdded(ImageList *)),
+            clone, SLOT(enableWorkOrder()));
+    exportMenu->addAction(clone);
 
     fileMenu->addSeparator();
-
     fileMenu->addAction(m_closeProjectWorkOrder->clone() );
-
     m_fileMenuActions.append( fileMenu->actions() );
 
-    
-    QMenu *projectMenu = new QMenu();
-    projectMenu->addAction(m_renameProjectWorkOrder->clone());
-    projectMenu->addAction(m_runJigsawWorkOrder->clone() );
-    
-    m_projectMenuActions.append( projectMenu->actions() );
+    m_projectMenuActions.append(m_renameProjectWorkOrder->clone());
+
+    // For JigsawWorkOrder, disable the work order utnil we have both an active control and image
+    // list. Setup a tool tip so user can see why the work order is disabled by default.
+    // NOTE: Trying to set a what's this on the clone doesn't seem to work for disabled actions,
+    // even though Qt's documentation says it should work on disabled actions.
+    clone = m_runJigsawWorkOrder->clone();
+    if (project()->controls().count() && project()->images().count()) {
+      clone->setEnabled(true);
+    }
+    else {
+      clone->setEnabled(false);
+    }
+
+    // Listen for when both images and control net have been added to the project.
+    connect(m_project, SIGNAL(controlsAndImagesAvailable()),
+            clone, SLOT(enableWorkOrder()));
+    // Listen for when both an active control and active image list have been set.
+    // When this happens, we can enable the JigsawWorkOrder.
+//  connect(m_project, &Project::activeControlAndImageListSet,
+//          clone, &WorkOrder::enableWorkOrder);
+
+    m_projectMenuActions.append(clone);
+
+//  m_projectMenuActions.append( projectMenu->actions() );
 
     m_editMenuActions = QList<QAction *>();
     m_viewMenuActions = QList<QAction *>();
     m_settingsMenuActions = QList<QAction *>();
-    m_helpMenuActions = QList<QAction *>();    
-  }
-
-  
-  /**
-   * @brief This method sets up the main menu at the top of the window (File, Settings, ...)
-   * @param menuBar The menu area to populate.
-   */
-  void Directory::populateMainMenu(QMenuBar *menuBar) {
-    QMenu *fileMenu = menuBar->findChild<QMenu *>("fileMenu");
-    if (fileMenu) {
-      fileMenu->addAction(m_importControlNetWorkOrder->clone());
-      fileMenu->addAction(m_importImagesWorkOrder->clone());
-      fileMenu->addAction(m_importShapesWorkOrder->clone());
-      QAction *openProjectAction = m_openProjectWorkOrder->clone();
-      openProjectAction->setIcon(QIcon(":open") );
-      fileMenu->addAction(openProjectAction);
-
-      QMenu *recentProjectsMenu = fileMenu->addMenu("Recent P&rojects");
-      int nRecentProjects = m_recentProjects.size();
-      for (int i = 0; i < nRecentProjects; i++) {
-        FileName projectFileName = m_recentProjects.at(i);
-        if (!projectFileName.fileExists() )
-          continue;
-
-        QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
-
-        openRecentProjectAction->setData(m_recentProjects.at(i) );
-        openRecentProjectAction->setText(m_recentProjects.at(i) );
-
-        if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
-             ->isExecutable(m_recentProjects.at(i) ) )
-          continue;
-
-        recentProjectsMenu->addAction(openRecentProjectAction);
-      }
-
-      fileMenu->addSeparator();
-      fileMenu->addAction(m_openProjectWorkOrder->clone());
-      fileMenu->addSeparator();
-
-      m_permToolBarActions.append(m_openProjectWorkOrder->clone());
-
-      QAction *saveAction = m_saveProjectWorkOrder->clone();
-      saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
-      saveAction->setIcon( QIcon(":save") );
-
-      connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
-               saveAction, SLOT( setDisabled(bool) ) );
-
-      fileMenu->addAction(saveAction);
-      QAction *addAction = m_saveProjectAsWorkOrder->clone();
-      addAction->setIcon(QIcon(":saveAs") );
-      fileMenu->addAction(addAction);
-
-      fileMenu->addSeparator();
-      fileMenu->addAction(m_exportControlNetWorkOrder->clone());
-      fileMenu->addAction(m_exportImagesWorkOrder->clone());
-
-      QMenu *importMenu = fileMenu->addMenu("&Import");
-      importMenu->addAction(m_importControlNetWorkOrder->clone() );
-      importMenu->addAction(m_importImagesWorkOrder->clone() );
-      importMenu->addAction(m_importShapesWorkOrder->clone() );
-
-      QMenu *exportMenu = fileMenu->addMenu("&Export");
-
-      exportMenu->addAction(m_exportControlNetWorkOrder->clone() );
-      exportMenu->addAction(m_exportImagesWorkOrder->clone() );
-
-      fileMenu->addSeparator();
-
-      fileMenu->addAction(m_closeProjectWorkOrder->clone() );
-
-      fileMenu->addSeparator();
-    }
-
-    QMenu *projectMenu = menuBar->findChild<QMenu *>("projectMenu");
-    if (projectMenu) {
-      projectMenu->addAction( m_renameProjectWorkOrder->clone() );
-      projectMenu->addAction( m_runJigsawWorkOrder->clone() );
-    }
+    m_helpMenuActions = QList<QAction *>();
   }
 
 
@@ -441,7 +411,7 @@ namespace Isis {
     }
     warningContainer->setWidget(m_warningTreeWidget);
   }
-  
+
 
   /**
    * @brief Add recent projects to the recent projects list.
@@ -460,7 +430,29 @@ namespace Isis {
      return m_recentProjects;
   }
 
-  
+
+  /**
+   * @brief Add the BundleObservationView to the window.
+   * @return @b (BundleObservationView *) The BundleObservationView displayed.
+   */
+  BundleObservationView *Directory::addBundleObservationView(FileItemQsp fileItem) {
+    BundleObservationView *result = new BundleObservationView(fileItem);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupBundleObservationViews() ) );
+
+    m_bundleObservationViews.append(result);
+
+    result->setWindowTitle( tr("Bundle Observation View %1").
+                            arg( m_bundleObservationViews.count() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
+  }
+
+
   /**
    * @brief Add the widget for the cnet editor view to the window.
    * @param network Control net to edit.
@@ -565,10 +557,10 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets() ) );
-    
+
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
-    
+
     emit newWidgetAvailable(result);
 
     // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
@@ -576,10 +568,10 @@ namespace Isis {
     // TODO 2016-09-27 TLS  Find BETTER WAY
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
             this, SLOT(modifyControlPoint(ControlPoint *)));
-  
+
     connect(result, SIGNAL(deleteControlPoint(ControlPoint *)),
             this, SLOT(deleteControlPoint(ControlPoint *)));
-  
+
     connect(result, SIGNAL(createControlPoint(double, double, Cube *, bool)),
             this, SLOT(createControlPoint(double, double, Cube *, bool)));
 
@@ -606,10 +598,10 @@ namespace Isis {
 //  qDebug()<<"                              internalModel after setModel = "<<result->internalModel();
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
-    
+
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupFootprint2DViewWidgets() ) );
-    
+             this, SLOT( cleanupFootprint2DViewWidgets(QObject *) ) );
+
     emit newWidgetAvailable(result);
 
     // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
@@ -630,7 +622,7 @@ namespace Isis {
     connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
 
     return result;
-    
+
     /*
     //qDebug()<<"Directory::addFootprint2DView";
     MosaicSceneWidget *result = new MosaicSceneWidget(NULL, true, true, this);
@@ -701,6 +693,9 @@ namespace Isis {
       //  I have one signal, controlChanged?
       connect(result->controlPointEditWidget(), SIGNAL(controlPointAdded(QString)),
               this, SIGNAL(controlPointAdded(QString)));
+
+      connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
+              this, SLOT(makeBackupActiveControl()));
     }
 
     return controlPointEditView();
@@ -814,10 +809,31 @@ namespace Isis {
    * @return @b (ProjectItemTreeView *) The added view.
    */
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
-    ProjectItemTreeView *result = new ProjectItemTreeView(); 
+    ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-    
+   
+    //  The model emits this signal when the user double-clicks on the project name, the parent
+    //  node located on the ProjectTreeView. 
+    connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
+            this, SLOT(initiateRenameProjectWorkOrder(QString)));
+
     return result;
+  }
+
+
+/** 
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+ * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
+ *  
+ * @param QString projectName New project name
+ */
+  void Directory::initiateRenameProjectWorkOrder(QString projectName) {
+
+    //  Create the WorkOrder and add it to the Project.  The Project will then execute the
+    //  WorkOrder.
+    RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
+    project()->addToProject(workOrder);
   }
   
 
@@ -836,6 +852,14 @@ namespace Isis {
    */
   QWidget *Directory::warningWidget() {
     return m_warningTreeWidget;
+  }
+
+
+  /**
+   * @brief Removes pointers to deleted BundleObservationView objects.
+   */
+  void Directory::cleanupBundleObservationViews() {
+    m_bundleObservationViews.removeAll(NULL);
   }
 
 
@@ -867,8 +891,15 @@ namespace Isis {
   /**
    * @brief Removes pointers to deleted Footprint2DView objects.
    */
-  void Directory::cleanupFootprint2DViewWidgets() {
-    m_footprint2DViewWidgets.removeAll(NULL);
+  void Directory::cleanupFootprint2DViewWidgets(QObject *obj) {
+//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  obj = "<<obj;
+    Footprint2DView *footprintView = static_cast<Footprint2DView *>(obj);
+//  qDebug()<<"                                          cast footprintView = "<<footprintView<<"  # = "<<m_footprint2DViewWidgets.count();
+    if (!footprintView) {
+      return;
+    }
+    m_footprint2DViewWidgets.removeAll(footprintView);
+//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  # = "<<m_footprint2DViewWidgets.count();
   }
 
 
@@ -969,7 +1000,7 @@ namespace Isis {
     return results;
   }
 
-  
+
   /**
    * @brief Accessor for the list of SensorInfoWidgets currently available.
    * @return QList<SensorInfoWidget *> The list of SensorInfoWidget objects.
@@ -1104,7 +1135,7 @@ namespace Isis {
    * @brief Save the directory to an XML file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
-   * 
+   *
    * @internal
    *   @history 2016-11-07 Ian Humphrey - Restored saving of footprints (footprint2view).
    *                           References #4486.
@@ -1373,7 +1404,7 @@ namespace Isis {
     if (m_controlPointEditView && m_footprint2DViewWidgets.size() == 1) {
       connect(m_footprint2DViewWidgets.at(0), SIGNAL(controlPointSelected(ControlPoint *)),
               m_controlPointEdit, SLOT(loadControlPoint(ControlPoint *)));
-      connect(m_cnetEditor, SIGNAL(controlPointCreated(ControlPoint *)), 
+      connect(m_cnetEditor, SIGNAL(controlPointCreated(ControlPoint *)),
               m_controlPointEditWidget, SLOT(setEditPoint(ControlPoint *)));
 
       // MosaicControlTool->MosaicSceneWidget->ControlNetEditor
@@ -1401,6 +1432,7 @@ namespace Isis {
       addControlPointEditView();
     }
     controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint);
+    controlPointChipViewports()->setPoint(controlPoint);
   }
 
 
@@ -1422,5 +1454,10 @@ namespace Isis {
     }
     controlPointEditView()->controlPointEditWidget()->createControlPoint(
         latitude, longitude, cube, isGroundSource);
+  }
+
+  void Directory::makeBackupActiveControl() {
+
+    project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
   }
 }

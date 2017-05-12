@@ -177,6 +177,7 @@ namespace Isis {
 
   /**
    * @brief Set lat/lon and attempt to calculate x/y values
+   *
    * This method is used to set the latitude/longitude (assumed to be of the
    * correct LatitudeType, LongitudeDirection, and LongitudeDomain). The Set
    * forces an attempted calculation of the projection X/Y values. This may or
@@ -286,6 +287,7 @@ namespace Isis {
 
   /**
    * @brief Find x/y range from lat/lon range
+   *
    * This method is used to determine the x/y range which completely covers the
    * area of interest specified by the lat/lon range. The latitude/longitude
    * range may be obtained from the labels. The purpose of this method is to

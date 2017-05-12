@@ -9,7 +9,7 @@
 namespace Isis {
   
   /**
-   * Construct a work order for the given project.
+   * @brief Construct a work order for the given project.
    * 
    * @param project The project that the work order is for
    */
@@ -19,7 +19,7 @@ namespace Isis {
 
 
   /**
-   * Construct a work order for the given project and action.
+   * @brief Construct a work order for the given project and action.
    * 
    * @param action The action that the work order will perform
    * @param project The project that the work order is for
@@ -36,7 +36,7 @@ namespace Isis {
 
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
    * 
    * @param other The work order to be copied from
    */
@@ -49,14 +49,14 @@ namespace Isis {
 
 
   /**
-   * Destructor.
+   * @brief Destructor.
    */
   ImageListActionWorkOrder::~ImageListActionWorkOrder() {
   }
 
 
   /**
-   * Clone the current work order.
+   * @brief Clone the current work order.
    * 
    * @return @b ImageListActionWorkOrder * A pointer to a copy of the work order
    */
@@ -66,7 +66,7 @@ namespace Isis {
 
 
   /**
-   * Check if the work order can run on a given image list.
+   * @brief Check if the work order can run on a given image list.
    * This work order can be run on any non-empty image list.
    * 
    * @param images The image list to be checked
@@ -79,7 +79,8 @@ namespace Isis {
 
 
   /**
-   * Assign an image list to the work order.
+   * @brief Assign an image list to the work order.
+   * 
    * When this work order is assigned an image list, update the undo command text.
    * 
    * @param images The image list to be assigned to the work order
@@ -102,13 +103,15 @@ namespace Isis {
 
 
   /**
-   * If needed, prompt the user for input and save it.  ChangeTransparency, ChangeColor,
-   * and potentially ToggleShowLabel will prompt for input from the user.
+   * @brief If needed, prompt the user for input and save it.  ChangeTransparency, ChangeColor,
+   * 
+   * and potentially ToggleShowLabel will prompt for input from the user. This was renamed from 
+   * execute() to setupExecution() according to WorkOrder's redesign.
    * 
    * @return @b bool If the work order successfully set the needed the information.
    */
-  bool ImageListActionWorkOrder::execute() {
-    bool result = WorkOrder::execute() && !internalData().isEmpty();
+  bool ImageListActionWorkOrder::setupExecution() {
+    bool result = WorkOrder::setupExecution() && !internalData().isEmpty();
 
     if (!internalData().isEmpty()) {
       QStringList state = internalData();
@@ -178,8 +181,8 @@ namespace Isis {
 
 
   /**
-   * Perform the action stored in the work order and update the work order's
-   * internal data with the restuls of the action.
+   * @brief Perform the action stored in the work order and update the work order's
+   * internal data with the restuls of the action. 
    * 
    * @see ImageList::saveAndApplyAlpha
    * @see ImageList::saveAndApplyColor
@@ -189,7 +192,7 @@ namespace Isis {
    * @see ImageList::saveAndToggleShowDNs
    * @see ImageList::saveAndToggleShowOutline
    */
-  void ImageListActionWorkOrder::syncRedo() {
+  void ImageListActionWorkOrder::execute() {
     QStringList state = internalData();
     QString actionString = internalData()[0];
 
@@ -243,8 +246,8 @@ namespace Isis {
 
 
   /**
-   * Undo the action stored in the work order and update the work order's
-   * internal data with the results of the undo.
+   * @brief Undo the action stored in the work order and update the work order's
+   * internal data with the results of the undo. 
    * 
    * @see ImageList::applyAlphas
    * @see ImageList::applyColors
@@ -253,7 +256,7 @@ namespace Isis {
    * @see ImageList::applyShowDNs
    * @see ImageList::applyShowOutline
    */
-  void ImageListActionWorkOrder::syncUndo() {
+  void ImageListActionWorkOrder::undoExecution() {
     QStringList state = internalData();
     QString actionString = internalData()[0];
 
@@ -296,7 +299,7 @@ namespace Isis {
 
 
   /**
-   * Determine whether a toggle action should show or hide.
+   * @brief Determine whether a toggle action should show or hide.
    * 
    * @param unqualifiedString The action string.
    * @param imageList The image list that the action will be performed on.
@@ -353,7 +356,7 @@ namespace Isis {
 
 
   /**
-   * Convert an action to a string.
+   * @brief Convert an action to a string.
    * 
    * @param action The action to be converted
    * 
@@ -401,7 +404,7 @@ namespace Isis {
 
 
   /**
-   * Convert a string to an action.
+   * @brief Convert a string to an action.
    * 
    * @param actionString The string to be converted
    * 

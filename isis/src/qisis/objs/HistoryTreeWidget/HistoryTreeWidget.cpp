@@ -119,8 +119,8 @@ namespace Isis {
     QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
     newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
 
-    // Do font for save work orders
-    if (workOrder->createsCleanState()) {
+    // Do font for save work orders or work orders not on QUndoStack
+    if (workOrder->createsCleanState() || !workOrder->isUndoable()) {
       QFont saveFont = newItem->font(0);
       saveFont.setBold(true);
       saveFont.setItalic(true);

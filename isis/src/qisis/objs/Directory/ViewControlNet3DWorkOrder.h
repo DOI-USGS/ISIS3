@@ -26,9 +26,9 @@
 
 namespace Isis {
   /**
-   * @brief  This is a child of class WorkOrder which is used for anything that performs
-   *  an action in a Project.  This work order displays a control network in 3D in
-   *  an OpenGL view.
+   * @brief  This work order displays a control network in 3D in an OpenGL view.
+   * This runs synchronously and is undoable.
+   * This is non-functioning and mostly unimplemented.
    *
    * @author 2014-04-04 Ken Edmundson
    *
@@ -36,6 +36,7 @@ namespace Isis {
    *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
    *              brought the code into compliance with ISIS3 coding standards.
    *              References #3944.
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class ViewControlNet3DWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -48,12 +49,12 @@ namespace Isis {
 
       //virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ControlList *controls);
-      bool execute();
+      bool setupExecution();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
+      void execute();
+      void undoExecution();
 
     private:
       ViewControlNet3DWorkOrder &operator=(const ViewControlNet3DWorkOrder &rhs);

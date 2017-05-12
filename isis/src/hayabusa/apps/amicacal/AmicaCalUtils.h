@@ -35,7 +35,8 @@ namespace Isis {
 
 
 /**
- * @description Load required NAIF kernels required for timing needs.
+ * @brief Load required NAIF kernels required for timing needs.
+ *
  * This method maintains the loading of kernels for HAYABUSA timing and
  * planetary body ephemerides to support time and relative positions of planet
  * bodies.
@@ -80,7 +81,8 @@ static void loadNaifTiming() {
 
 
 /**
- * @description Computes the distance from the Sun to the observed body.
+ * @brief Computes the distance from the Sun to the observed body.
+ *
  * This method requires the appropriate NAIK kernels to be loaded that
  * provides instrument time support, leap seconds and planet body ephemeris.
  *  

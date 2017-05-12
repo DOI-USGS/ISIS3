@@ -31,6 +31,21 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Push a contentHandler and maybe continue parsing...
+   *
+   *   Push a contentHadler on the content handler stack.  If there are currently
+   *   no other handlers on the stack that is all that happens.
+   *
+   *   If there are other content handlers on the stack it is assumed that
+   *   a XML file is being processed and processing continues by calling
+   *   startElement() of the newly pushed handler.  In this case
+   *   pushContentHandler() will not return until the element has been
+   *   fully processed.
+   *
+   *   @see XmlStackedHandler
+   *
+   */
   void XmlStackedHandlerReader::pushContentHandler(XmlStackedHandler *newHandler) {
     XmlStackedHandler *old = topContentHandler();
 
@@ -40,6 +55,8 @@ namespace Isis {
     setContentHandler(m_contentHandlers->top());
 
     if (old) {
+      // Switch to newHandler and continue parsing
+      // This will call newHandler->startElement(...)
       old->switchToNewHandler(topContentHandler());
     }
   }

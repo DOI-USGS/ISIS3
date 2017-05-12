@@ -41,6 +41,11 @@ namespace Isis {
 
   ExportImagesWorkOrder::ExportImagesWorkOrder(Project *project) :
       WorkOrder(project) {
+
+    // This is an asynchronous workorder and not undoable
+    m_isSynchronous = false;
+    m_isUndoable = false;
+
     QAction::setText(tr("Export I&mages..."));
   }
 
@@ -80,8 +85,8 @@ namespace Isis {
    * 
    * @return bool 
    */
-  bool ExportImagesWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ExportImagesWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList internalData;
@@ -123,7 +128,7 @@ namespace Isis {
    * Use internalData() and write the images into the output directory. Stores errors in 
    *   m_warning which will be reported in postSyncRedo().
    */
-  void ExportImagesWorkOrder::asyncRedo() {
+  void ExportImagesWorkOrder::execute() {
     ImageList *list = imageList();
 
     if (list->isEmpty()) {
@@ -156,7 +161,7 @@ namespace Isis {
   /**
    * Display any warnings that occurred during the asynchronous computations.
    */
-  void ExportImagesWorkOrder::postSyncRedo() {
+  void ExportImagesWorkOrder::postExecution() {
     if (!m_warning.isEmpty()) {
       project()->warn(m_warning);
       m_warning.clear();

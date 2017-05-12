@@ -2,6 +2,7 @@
 #define MosaicGraphicsView_H
 
 #include <QGraphicsView>
+#include <QSize>
 
 namespace Isis {
   /**
@@ -10,6 +11,10 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2017-01-27 Tracie Sucharski - Added member variable to save the size of the graphics
+   *                          view, because there is a bug in Qt's QResizeEvent::oldSize() method.
+   *                          This only happens when this is used from cnetsuite in a QMdiSubWindow.
+   *                          See https://bugreports.qt.io/browse/QTBUG-32446.
    */
   class MosaicGraphicsView : public QGraphicsView {
       Q_OBJECT
@@ -28,6 +33,7 @@ namespace Isis {
 
     private:
       bool p_resizeZooming;
+      QSize m_oldSize;
   };
 }
 

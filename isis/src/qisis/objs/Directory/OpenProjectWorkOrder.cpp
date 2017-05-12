@@ -36,30 +36,33 @@
 namespace Isis {
 
   /**
-   * Constructs an OpenProjectWorkOrder
+   * @brief Constructs an OpenProjectWorkOrder
    *
-   * @param project The project 
+   * @param project The project object
    */
   OpenProjectWorkOrder::OpenProjectWorkOrder(Project *project) :
       WorkOrder(project) {
-    //qDebug()<<"OpenProjectWorkOrder::OpenProjectWorkOrder";
-    QAction::setText(tr("&Open Project"));
 
+    // This workorder is not undoable
+    m_isUndoable = false;
+
+    QAction::setText(tr("&Open Project"));
+    QUndoCommand::setText(tr("Open Project"));
     setCreatesCleanState(true);
 
     QStringList args = QCoreApplication::arguments();
 
-    if (args.count() == 2) {
+//    if (args.count() == 2) {
 //    connect(this, SIGNAL(openProjectFromCommandLine(QString)),
 //            project, SLOT(open(QString)), Qt::QueuedConnection);
 //    emit openProjectFromCommandLine(args.last());
 //    project->open(args.last());
-    }
+//    }
   }
 
 
   /**
-   * Copy constructor
+   * @brief Copy constructor
    *
    * @param other The other OpenProjectWorkOrder to initialize from
    */
@@ -69,7 +72,7 @@ namespace Isis {
 
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   OpenProjectWorkOrder::~OpenProjectWorkOrder() {
 
@@ -77,9 +80,9 @@ namespace Isis {
 
 
   /**
-   * Clones the current OpenProjectWorkOrder
+   * @brief Clones the current OpenProjectWorkOrder
    *
-   * @return @b OpenProjectWorkOrder * The OpenProjectWorkOrder clone
+   * @return @b (OpenProjectWorkOrder *) The OpenProjectWorkOrder clone
    */
   OpenProjectWorkOrder *OpenProjectWorkOrder::clone() const {
     return new OpenProjectWorkOrder(*this);
@@ -87,13 +90,15 @@ namespace Isis {
 
 
   /**
-   * Executes the OpenProjectWorkOrder
+   * @brief Setup this WorkOrder for execution, deleting the progress bar, determine if there
+   *              is a current project and if it has been modified and prompting for project
+   *              directory.
    *
-   * @return @b bool true if the successfully executed
+   * @return @b bool True if the setup was successful, False otherwise.
    */
-  bool OpenProjectWorkOrder::execute() {
-    //qDebug()<<"OpenProjectWorkOrder::execute()";
-    bool success = WorkOrder::execute();
+  bool OpenProjectWorkOrder::setupExecution() {
+
+    bool success = WorkOrder::setupExecution();
 
     // We dislike the progress bar
     delete progressBar();
@@ -101,16 +106,16 @@ namespace Isis {
     // If more than this work order is in the history, don't allow this operation
     if (success && project()->workOrderHistory().count()) {
       QMessageBox::critical(NULL, tr("Unable To Open a Project"),
-                            tr("If you have modified your current project, you cannot open a new "
-                               "project because this is not yet implemented"));
+                            tr("Opening a new project is not implemented yet because there is no "
+                               "checking for changes to the current open project."));
       success = false;
     }
     else if (success) {
-      QString projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
-                                                              tr("Open Project"));
+      m_projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
+                                                              tr("Select Project Directory"));
 
-      if (!projectName.isEmpty()) {
-        project()->open(projectName);
+      if (!m_projectName.isEmpty()) {
+        QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectName));
       }
       else {
         success = false;
@@ -118,5 +123,15 @@ namespace Isis {
     }
 
     return success;
+  }
+
+
+  /**
+   * @brief  Open the chosen project folder.
+   * 
+   */
+  void OpenProjectWorkOrder::execute() {
+
+    project()->open(m_projectName);
   }
 }

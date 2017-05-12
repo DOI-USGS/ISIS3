@@ -144,6 +144,7 @@ namespace Isis {
 
   /**
    * @brief Saves this object to an XML file.
+   *
    * @param stream  The XML stream writer write to.
    * @param project The project this object is attached to (not used).
    * @param newProjectRoot FileName of the project?  (not used).
@@ -169,6 +170,7 @@ namespace Isis {
 
   /**
    * @brief Change the color associated with this target.
+   *
    * @param newColor  The new color associated with this target.
    */
   void TargetBodyDisplayProperties::setColor(QColor newColor) {
@@ -178,6 +180,7 @@ namespace Isis {
 
   /**
    * @brief Change the selected state associated with this target.
+   *
    * @param The new state associated with this target.
    */
   void TargetBodyDisplayProperties::setSelected(bool newValue) {
@@ -187,6 +190,7 @@ namespace Isis {
 
   /**
    * @brief Change the visibility of the display name associated with this target.
+   * 
    * @param newValue The visibiliy of the display name for this target.
    */
   void TargetBodyDisplayProperties::setShowLabel(bool newValue) {
@@ -196,8 +200,9 @@ namespace Isis {
 
   /**
    * @brief Change the visibility of the display name. 
+   *
    * This should only be connected to
-   * by an action with a list of displays as its data. This synchronizes all
+   * an action with a list of displays as its data. This synchronizes all
    * of the values where at least one is guaranteed to be toggled.
    */
   void TargetBodyDisplayProperties::toggleShowLabel() {
@@ -215,6 +220,7 @@ namespace Isis {
 
   /**
    * @brief Constructor for the XmlHandler class.  
+   * 
    * This is a child class of XmlStackedHandler,
    * which is used by XmlStackedHandlerReader to parse an XML file.
    * @param displayProperties Pointer to a TargetBodyDisplayProperties object.
@@ -294,6 +300,7 @@ namespace Isis {
 
   /**
    * @brief This is the generic mutator for properties. 
+   *
    * Given a value, this will change it and emit propertyChanged if its 
    * different and supported.
    * @param prop The key into the m_propertyValues QMap <int, QVariant>
@@ -312,6 +319,7 @@ namespace Isis {
 
   /**
    * @brief Return display properties associated with a slot.
+   *
    * This is for the slots that have a list of display properties as associated
    * data. This gets that list out of the data.
    * @param The object requesting the data.

@@ -29,6 +29,7 @@
 using namespace std;
 using namespace Isis;
 
+void printXml(const BundleSolutionInfo &);
 
 /**
  * This class is needed to test the xml read/write methods.
@@ -40,7 +41,7 @@ using namespace Isis;
 namespace Isis {
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
-      BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
+      BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
                                      FileName xmlFile) : BundleSolutionInfo(project, reader) {
 
         QString xmlPath(xmlFile.expanded());
@@ -55,7 +56,7 @@ namespace Isis {
         QXmlInputSource xmlInputSource(&file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
-          throw IException(IException::Unknown, 
+          throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
@@ -76,6 +77,7 @@ namespace Isis {
  *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
  *                           we will keep this code.
  *   @history 2016-10-13 Ian Humphrey - Changed addnew call to addNew(). References #4293.
+ *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -84,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   try {
     qDebug() << "Unit test for BundleSolutionInfo...";
-    qDebug() << "Printing PVL group with results from the settings/cnet/statistics constructor...";
+    qDebug() << "Serializing results from the settings/cnet/statistics constructor...";
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
@@ -102,14 +104,14 @@ int main(int argc, char *argv[]) {
     freeMeasure2->SetCoordinate(1.0, 2.0);
     freeMeasure2->SetResidual(-3.0, 4.0);
     freePoint->Add(freeMeasure2);
-    SurfacePoint freeSurfacePoint(Latitude(45.0, Angle::Degrees), 
-                                  Longitude(120.0, Angle::Degrees), 
+    SurfacePoint freeSurfacePoint(Latitude(45.0, Angle::Degrees),
+                                  Longitude(120.0, Angle::Degrees),
                                   Distance(6.0, Distance::Meters));
     freePoint->SetAdjustedSurfacePoint(freeSurfacePoint);
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
     fixedPoint->SetType(ControlPoint::Fixed);
-    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees), 
-                                   Longitude(180.0, Angle::Degrees), 
+    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees),
+                                   Longitude(180.0, Angle::Degrees),
                                    Distance(10.0, Distance::Meters));
     fixedPoint->SetAdjustedSurfacePoint(fixedSurfacePoint);
     ControlNet outNet;
@@ -134,35 +136,60 @@ int main(int argc, char *argv[]) {
     statistics.setBundleControlPoints(bundleControlPointVector);
     statistics.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     statistics.setObservations(observationVector);
-    BundleSolutionInfo results(settings, cnetFile, statistics, parent);
+    QList<ImageList *> imgList;
+    BundleSolutionInfo results(settings, cnetFile, statistics, imgList, parent);
 
-    PvlObject pvl = results.pvlObject("DefaultSolutionInfoObject");
-    cout << pvl << endl << endl;
+    printXml(results);
+
+
+    qDebug() << "";
+    qDebug() << "Testing XML serialization 1: round trip serialization of BundleSolution object...";
+    qDebug() << "Serializing test XML object to file...";
+    printXml(results);    // save XML to test log for comparison
+    FileName xmlFile1("./BundleSolutionInfo1.xml");
+    QString xmlPath1 = xmlFile1.expanded();
+    QFile qXmlFile1(xmlPath1);
+    if (!qXmlFile1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath1),
+                       _FILEINFO_);
+    }
+    QXmlStreamWriter writer(&qXmlFile1);
+    writer.setAutoFormatting(true);
+    writer.writeStartDocument();
+    Project *project = NULL;
+    results.save(writer, project, "");
+    writer.writeEndDocument();
+    qXmlFile1.close();
+
+    qDebug() << "Testing XML: reading serialized BundleResults back in...";
+    XmlStackedHandlerReader reader1;
+    BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
+    printXml(bsFromXml1);  // Save comparison output to log file
+
+
 
     qDebug() << "Testing copy constructor...";
 
     BundleSolutionInfo copySolutionInfo(results);
-    pvl = copySolutionInfo.pvlObject("CopySolutionInfoObject");
-    cout << pvl << endl << endl;
+    printXml(copySolutionInfo);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
     results = results;
-    pvl = results.pvlObject("SelfAssignedSolutionInfoObject");
-    cout << pvl << endl << endl;
+    printXml(results);
 
     qDebug() << "Testing assignment operator to create a new results object...";
 
     BundleSolutionInfo assignmentOpSolutionInfo = results;
     assignmentOpSolutionInfo = results;
-    pvl = assignmentOpSolutionInfo.pvlObject("AssignedSolutionInfoObject");
-    cout << pvl << endl << endl;
+    printXml(assignmentOpSolutionInfo);
 
     qDebug() << "Testing mutator methods...";
     statistics.setRejectionLimit(0.5);
     results.setOutputStatistics(statistics);
     results.setRunTime("xxx"); //???
-    pvl = results.pvlObject("MutatorTest");
-    cout << pvl << endl << endl;
+    printXml(results);
 
     qDebug() << "Testing accessor methods...";
     // Can't print this value out since it changes for every run,
@@ -211,16 +238,16 @@ int main(int argc, char *argv[]) {
     rmsStats.AddData(-1);        // 1 below range
     rmsStats.AddData(1000);      // 2 above range
     rmsStats.AddData(1001);
-    // 6, 14, 0, 3, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, false 
-     
+    // 6, 14, 0, 3, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, false
+
     QList<Statistics> rmsImageLineResiduals;
     rmsImageLineResiduals += rmsStats;
     rmsStats.AddData(4);
-    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false 
+    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false
     rmsImageLineResiduals += rmsStats;
     rmsStats.AddData(5);
     rmsStats.RemoveData(5);
-    // 10, 30, 0, 5, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, true 
+    // 10, 30, 0, 5, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, true
     rmsImageLineResiduals += rmsStats;
 
     QList<Statistics> rmsImageSampleResiduals = rmsImageLineResiduals;
@@ -228,8 +255,8 @@ int main(int argc, char *argv[]) {
     rmsImageSampleResiduals[0].AddData(4);
     rmsImageSampleResiduals[2].RemoveData(2);
     // 10, 30, 0, 3, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, true
-    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false 
-    // 8, 26, 0, 5, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, true 
+    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false
+    // 8, 26, 0, 5, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, true
 
     QList<Statistics> rmsImageResiduals = rmsImageSampleResiduals;
     rmsImageResiduals[0].AddData(0);
@@ -246,7 +273,7 @@ int main(int argc, char *argv[]) {
     rmsImageResiduals[2].AddData(3);
     // 16, 44, 0, 3, 0, 100, 26, 8, 1, 2, 3, 4, 5, 1, 2, true
     // 16, 44, 0, 4, 0, 100, 27, 9, 1, 2, 3, 4, 5, 1, 2, false
-    // 14, 40, 0, 5, 0, 100, 26, 8, 1, 2, 3, 4, 5, 1, 2, true 
+    // 14, 40, 0, 5, 0, 100, 26, 8, 1, 2, 3, 4, 5, 1, 2, true
 
     statistics.setRmsImageResidualLists(rmsImageLineResiduals,
                                         rmsImageSampleResiduals,
@@ -254,60 +281,47 @@ int main(int argc, char *argv[]) {
     results.setOutputStatistics(statistics);
 
     qDebug() << "Testing output methods";
-    
+
     results.outputText();
     results.outputImagesCSV();
     results.outputPointsCSV();
     results.outputResiduals();
 
 
-
-
-
-
-
-    qDebug() << "Testing XML write/read...";
-    // write xml
-#if 0
-    FileName xmlFile("./BundleSolutionInfo.xml");
-    QString xmlPath = xmlFile.expanded();
-    QFile qXmlFile(xmlPath);
-    if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
+    qDebug() << "";
+    qDebug() << "Testing XML serialization 2: round trip serialization of fully populated BundleSolution object...";
+    qDebug() << "Serializing test XML object to file...";
+    printXml(results);    // save XML to test log for comparison
+    FileName xmlFile2("./BundleSolutionInfo2.xml");
+    QString xmlPath2 = xmlFile2.expanded();
+    QFile qXmlFile2(xmlPath2);
+    if (!qXmlFile2.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
-                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath2),
                        _FILEINFO_);
     }
-    QXmlStreamWriter writer(&qXmlFile);
-    writer.setAutoFormatting(true);
-    writer.writeStartDocument();
-    Project *project = NULL;
-    results.save(writer, project);
-    writer.writeEndDocument();
-    qXmlFile.close();
-    // read xml
-    XmlStackedHandlerReader reader;
-// ???     BundleSolutionInfoXmlHandlerTester brToFill(project, &reader, xmlFile);
-// ???     pvl = bsToFill.pvlObject("BundleSolutionInfoFromXml");
-// ???     cout << pvl << endl << endl;
-#endif
-    qDebug() << "";
+    QXmlStreamWriter writer2(&qXmlFile2);
+    writer2.setAutoFormatting(true);
+    writer2.writeStartDocument();
+    results.save(writer2, project, "");
+    writer2.writeEndDocument();
+    qXmlFile2.close();
 
-    qDebug() << "Testing HDF5 write/read...";
-    // write hdf
-    FileName hdfFile("./BundleSolutionInfo.hdf");
-    if (hdfFile.fileExists()) {
-       QFile::remove(hdfFile.expanded());
-    }
-    results.createH5File(hdfFile);
-    BundleSolutionInfo fromHDF(hdfFile);
-    pvl = fromHDF.pvlObject("BundleSolutionInfoFromHDF");
-    cout << pvl << endl << endl;
-//    QFile::remove(hdfFile.expanded());
+    qDebug() << "Testing XML: reading serialized BundleResults back in...";
+    XmlStackedHandlerReader reader;
+    BundleSolutionInfoXmlHandlerTester bsFromXml2(project, &reader, xmlFile2);
+    qDebug() << "Testing XML: Object deserialized as (should match object above):";
+    printXml(bsFromXml2);  // Save comparison output to log file
+
+
+    qDebug() << "";
+    qDebug() << "Writing text ouput file...";
     FileName txtFile("./bundleout.txt");
     QFile txtOutput(txtFile.expanded());
     if (txtOutput.exists()) {
       txtOutput.remove();
     }
+    qDebug() << "Writing csv ouput files...";
     FileName pointsCsv("./bundleout_points.csv");
     QFile pointsOutput(pointsCsv.expanded());
     if (pointsOutput.exists()) {
@@ -323,4 +337,21 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     e.print();
   }
+}
+
+
+/**
+ * Prints the serialzed BundleSolutionInfo as XML.
+ *
+ * @param const BundleSolutionInfo &printable The BundleSolutionInfo to print.
+ */
+void printXml(const BundleSolutionInfo &printable) {
+  QString output;
+  QXmlStreamWriter writer(&output);
+  writer.setAutoFormatting(true);
+  printable.save(writer, NULL, "");
+  // Note Statistics class does not serialize/restore properly as of 2017-04-27
+  output.remove(QRegExp("<statistics>.*</statistics>"));
+  output.remove(QRegExp("<id>[^<]*</id>"));
+  qDebug().noquote() << output << endl << endl;
 }

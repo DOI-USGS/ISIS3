@@ -65,8 +65,7 @@ namespace Isis {
 
 
   StatCumProbDistDynCalc::StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other)
-    : m_id(new QUuid(other.m_id->toString())),
-      m_numberCells(other.m_numberCells),      
+    : m_numberCells(other.m_numberCells),
       m_numberQuantiles(other.m_numberQuantiles),  
       m_numberObservations(other.m_numberObservations),
       m_quantiles(other.m_quantiles),        
@@ -81,8 +80,6 @@ namespace Isis {
    * Destroys StatCumProbDistDynCalc object.
    */ 
   StatCumProbDistDynCalc::~StatCumProbDistDynCalc() { 
-    delete m_id;
-    m_id = NULL;
   }
 
 
@@ -90,10 +87,6 @@ namespace Isis {
   StatCumProbDistDynCalc &StatCumProbDistDynCalc::operator=(const StatCumProbDistDynCalc &other) {
 
     if (&other != this) {
-      delete m_id;
-      m_id = NULL;
-      m_id = new QUuid(other.m_id->toString());
-
       m_numberCells              = other.m_numberCells;
       m_numberQuantiles          = other.m_numberQuantiles;
       m_numberObservations       = other.m_numberObservations;
@@ -115,7 +108,6 @@ namespace Isis {
    *                 will be dynamically tracked
    */
   void StatCumProbDistDynCalc::initialize() {
-    m_id = NULL;
     m_numberCells = m_numberQuantiles = m_numberObservations = 0;
     m_quantiles.clear();
     m_observationValues.clear();
@@ -127,8 +119,6 @@ namespace Isis {
 
   void StatCumProbDistDynCalc::setQuantiles(unsigned int nodes) {
     initialize();
-    m_id = new QUuid(QUuid::createUuid());
-
     if (nodes < 3) {
       m_numberQuantiles = 3; 
     }
@@ -514,7 +504,6 @@ namespace Isis {
   void StatCumProbDistDynCalc::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
     stream.writeStartElement("statCumProbDistDynCalc");
-    stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("numberCells", toString(m_numberCells));
     stream.writeTextElement("numberQuantiles", toString(m_numberQuantiles));
     stream.writeTextElement("numberObservations", toString(m_numberObservations));
@@ -595,11 +584,7 @@ namespace Isis {
                                                       const QString &localName,
                                                       const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (qName == "id") {
-        m_xmlHandlerCumProbCalc->m_id = NULL;
-        m_xmlHandlerCumProbCalc->m_id = new QUuid(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberCells") {
+      if (qName == "numberCells") {
         m_xmlHandlerCumProbCalc->m_numberCells = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberQuantiles") {
@@ -617,9 +602,8 @@ namespace Isis {
 
 
   QDataStream &StatCumProbDistDynCalc::write(QDataStream &stream) const {
-    stream << m_id->toString()
-           << (qint32)m_numberCells
-           << (qint32)m_numberQuantiles 
+    stream << (qint32)m_numberCells
+           << (qint32)m_numberQuantiles
            << (qint32)m_numberObservations
            << m_quantiles
            << m_observationValues
@@ -633,18 +617,13 @@ namespace Isis {
   QDataStream &StatCumProbDistDynCalc::read(QDataStream &stream) {
     QString id;
     qint32 numCells, numQuantiles, numObservations;
-    stream >> id
-           >> numCells
+    stream >> numCells
            >> numQuantiles
            >> numObservations
            >> m_quantiles
            >> m_observationValues
            >> m_idealNumObsBelowQuantile
            >> m_numObsBelowQuantile;
-
-    delete m_id;
-    m_id = NULL;
-    m_id = new QUuid(id);
 
     m_numberCells = (unsigned int)numCells;
     m_numberQuantiles  = (unsigned int)numQuantiles;

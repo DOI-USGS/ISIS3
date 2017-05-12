@@ -62,11 +62,11 @@ namespace Isis {
 
   /**
    * @brief An image bundle adjustment object.
-   * 
+   *
    * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS 3 cubes.
    * Using the collineariy condition, BundleAdjust can construct a system of normal equations
    * and then using the CHOLMOD library, solve that system.
-   * 
+   *
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
    *
    * @internal
@@ -83,7 +83,7 @@ namespace Isis {
    *   @history 2007-11-17 Debbie A. Cook - Added method SetSolution Method.
    *   @history 2007-12-21 Debbie A. Cook - Added member p_Degree and methods m_nsolveCamDegree and
    *                           ckDegree.
-   *   @history 2008-01-11 Debbie A. Cook - Added observation mode functionality for spacecraft 
+   *   @history 2008-01-11 Debbie A. Cook - Added observation mode functionality for spacecraft
    *                           position and upgraded ObservationNumber methods for compatability.
    *   @history 2008-01-14 Debbie A. Cook - Added code to solve for local radii.
    *   @history 2008-04-18 Debbie A. Cook - Added progress for ControlNet.
@@ -149,11 +149,11 @@ namespace Isis {
    *                           single ControlPoint and ControlMeasure.
    *   @history 2011-08-08 Tracie Sucharski - Added method to return the iteration summary to be
    *                           used in qtie which does not have a log file. In SetImages, clear the
-   *                           cameraMavtpv_targetBodyp and cameraList.  Added this back in (was 
+   *                           cameraMavtpv_targetBodyp and cameraList.  Added this back in (was
    *                           originally added on 2011-01-19), was deleted somewhere along the
    *                           line.
    *   @history 2011-09-28 Debbie A. Cook - Renamed SPARSE solve method to OLDSPARSE and CHOLMOD to
-   *                           SPARSE. 
+   *                           SPARSE.
    *   @history 2011-10-14 Ken Edmundson - Added call to m_pCnet->ClearJigsawRejected() to the
    *                           init() method to set all measure/point JigsawRejected flags to false
    *                           prior to bundle.
@@ -165,7 +165,7 @@ namespace Isis {
    *                           m_bSolvePolyOverHermite and m_positionType.
    *   @history 2012-03-26 Orrin Thomas - Added maximum likelihood capabilities.
    *   @history 2012-05-21 Debbie A. Cook - Added initialization of m_dRejectionMultiplier.
-   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-09-28 Ken Edmundson - Initialized variables for bundle statistic computations.
    *                           The bundleout.txt file was modifed to show N/A for RMS, Min, Max of
@@ -190,7 +190,7 @@ namespace Isis {
    *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix. Covariance matrix
    *                           is now written to a file and the location is saved as part of the
    *                           CorrelationMatrix object.
-   *   @history 2014-07-23 Jeannie Backer - Modified to print "N/A" for rejection multiplier if 
+   *   @history 2014-07-23 Jeannie Backer - Modified to print "N/A" for rejection multiplier if
    *                           outlier rejection is turned off.
    *   @history 2014-09-18 Kimberly Oyama - Added a constructor for running the bunlde in a
    *                           separate thread.
@@ -237,7 +237,7 @@ namespace Isis {
    *   @history 2016-08-24 Jesse Mapel - Updated documentation and member variable names.  Brought
    *                           closer to ISIS 3 coding standards.  Fixes #4183, #4188, #4235.
    *   @history 2016-08-28 Kelvin Rodriguez - Remvoed useless register keywords to squash warnigns
-   *                         in clang. Part of porting to OS X 10.11. 
+   *                         in clang. Part of porting to OS X 10.11.
    *   @history 2016-09-22 Ian Humphrey - Modified validateNetwork() so that validation status
    *                           messages are logged to stdout. Fixes #4313.
    *   @history 2016-10-05 Ian Humphrey - Modified errorPropagation_CHOLMOD() to check bundle
@@ -267,6 +267,9 @@ namespace Isis {
    *                           occur. Removed bundleException(QString) signal. Fixes #4483.
    *   @history 2016-12-01 Ian Humphrey - Modified outputBundleStatus()'s printf() call so that
    *                           there is no longer a -Wformat-security warning.
+   *   @history 2017-05-01 Makayla Shepherd - Added imageLists() to track and return the images
+   *                           bundled. Fixes #4818.
+   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method. 
    *   @history 2017-05-09 Ken Edmundson - Speed improvements and error propagation bug fix.
    *                           Separated initializations for Normal Equations matrix out of
    *                           ::initializeCholmodLibraryVariables() into
@@ -282,20 +285,20 @@ namespace Isis {
       Q_OBJECT
     public:
       BundleAdjust(BundleSettingsQsp bundleSettings,
-                   const QString &cnetFile, 
+                   const QString &cnetFile,
                    const QString &cubeList,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
-                   QString &cnet, 
-                   SerialNumberList &snlist, 
+                   QString &cnet,
+                   SerialNumberList &snlist,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &cnet,
                    SerialNumberList &snlist,
                    bool bPrintSummary);
       BundleAdjust(BundleSettingsQsp bundleSettings,
-                   ControlNet &cnet, 
-                   SerialNumberList &snlist, 
+                   ControlNet &cnet,
+                   SerialNumberList &snlist,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    ControlNetQsp cnet,
@@ -307,6 +310,8 @@ namespace Isis {
                    bool printSummary);
       ~BundleAdjust();
       BundleSolutionInfo    solveCholeskyBR();
+
+      QList<ImageList *> imageLists();
 
     public slots:
       bool solveCholesky();
@@ -377,22 +382,22 @@ namespace Isis {
                                LinearAlgebra::Vector                               &nj);
 
       // dedicated matrix functions
-      
+
       void productAB(SparseBlockColumnMatrix &A,
                      SparseBlockRowMatrix    &B);
       void accumProductAlphaAB(double                alpha,
                                SparseBlockRowMatrix  &A,
                                LinearAlgebra::Vector &B,
                                LinearAlgebra::Vector &C);
-      bool invert3x3(boost::numeric::ublas::symmetric_matrix< 
+      bool invert3x3(boost::numeric::ublas::symmetric_matrix<
                           double, boost::numeric::ublas::upper >  &m);
-      bool productATransB(boost::numeric::ublas::symmetric_matrix< 
+      bool productATransB(boost::numeric::ublas::symmetric_matrix<
                               double, boost::numeric::ublas::upper >  &N22,
                           SparseBlockColumnMatrix                     &N12,
                           SparseBlockRowMatrix                        &Q);
-      void productAlphaAV(double alpha, 
+      void productAlphaAV(double alpha,
                           boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-                          SparseBlockRowMatrix                                &Q, 
+                          SparseBlockRowMatrix                                &Q,
                           LinearAlgebra::Vector                               &v1);
 
       // CHOLMOD library methods
@@ -440,6 +445,8 @@ namespace Isis {
                                                                    meters conversion factor.*/
       double m_metersToRadians;                              /**!< The body specific meters to
                                                                    radians conversion factor.*/
+      QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
+                                                                   bundle.*/
 
       // ==========================================================================================
       // === BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution.     ===
@@ -448,7 +455,7 @@ namespace Isis {
       // ==========================================================================================
 
       //! Inverse of the normal equations matrix.  Set by cholmodInverse.
-      boost::numeric::ublas::symmetric_matrix< 
+      boost::numeric::ublas::symmetric_matrix<
           double,
           boost::numeric::ublas::upper,
           boost::numeric::ublas::column_major > m_normalInverse;
@@ -486,4 +493,3 @@ namespace Isis {
 }
 
 #endif
-

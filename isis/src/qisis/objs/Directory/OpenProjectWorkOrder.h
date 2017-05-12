@@ -38,6 +38,11 @@ namespace Isis {
    *                           command line.
    *   @history 2016-06-10 Ian Humphrey - Minor updates to documentation and coding standards.
    *                           Fixes #3952.
+   *   @history 2017-03-28 Tracie Sucharski - Changed user prompt to indicating a directory is to
+   *                           be selected, not a project file.
+   *   @history 2017-04-06 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
+   *                           execute to setupExecution, and moving the actual work to the execute
+   *                           method.
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -48,13 +53,16 @@ namespace Isis {
 
       virtual OpenProjectWorkOrder *clone() const;
 
-      bool execute();
+      bool setupExecution();
+      void execute();
 
     signals:
       void openProjectFromCommandLine(QString);
 
     private:
       OpenProjectWorkOrder &operator=(const OpenProjectWorkOrder &rhs);
+
+      QString m_projectName;
   };
 }
 

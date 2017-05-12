@@ -37,6 +37,8 @@ namespace Isis {
    * @author 2012-??-?? ???
    *
    * @internal
+   *   @history 2017-04-07 Makayla Shepherd - Removed syncUndo(), added isUndoable(), and renamed 
+   *                           syncRedo() to execute() according to the WorkOrder redesign.
    */
   class ImageFileListViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -48,11 +50,14 @@ namespace Isis {
       virtual ImageFileListViewWorkOrder *clone() const;
 
       bool isExecutable(ImageList *images);
-      bool execute();
+      
+      bool isUndoable() const;
+      
+      bool setupExecution();
+      void execute();
 
     protected:
-      void syncRedo();
-      void syncUndo();
+      
 
     private:
       ImageFileListViewWorkOrder &operator=(const ImageFileListViewWorkOrder &rhs);

@@ -109,7 +109,6 @@ namespace Isis {
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
 
-//      void savehdf5(FileName outputfilename) const;
 
     private:
       /**
@@ -187,9 +186,6 @@ namespace Isis {
 
   typedef QSharedPointer<GuiCamera> GuiCameraQsp;
 
-  // operators to read/write GuiCamera to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const GuiCamera &GuiCamera);
-  QDataStream &operator>>(QDataStream &stream, GuiCamera &GuiCamera);
 };
 
 Q_DECLARE_METATYPE(Isis::GuiCameraQsp);

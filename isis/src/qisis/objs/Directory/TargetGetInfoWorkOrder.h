@@ -28,18 +28,22 @@ namespace Isis {
   class TargetBody;
 
   /**
-   * @brief  This is a child of class WorkOrder which is used for anything that performs
-   *  an action in a Project.  This work order allows the user to view target body info.
+   * @brief This work order allows the user to view target body info.
+   *
+   * This is a child of class WorkOrder which is used for anything that performs
+   * an action in a Project.  This work order allows the user to view target body info.
    *
    * @author 2015-06-12 Ken Edmundson
    *
    * @internal
-   *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
-   *              brought the code into compliance with ISIS3 coding standards.
-   *              References #3944.
-   *
+   *   @history 2016-06-06 Tyler Wilson - Added documentation for the functions and
+   *                           brought the code into compliance with ISIS3 coding standards.
+   *                           References #3944.
+   *   @history 2017-04-11 Ian Humphrey - Separated setup and execution of the work order into
+   *                           setupExecution() and execute(). Removed syncRedo() and syncUndo().
+   *                           Set m_isUndoable to false as work order is not undoable.
+   *                           Fixes #4737.
    */
-
   class TargetGetInfoWorkOrder : public WorkOrder {
       Q_OBJECT
     public:
@@ -50,16 +54,14 @@ namespace Isis {
       virtual TargetGetInfoWorkOrder *clone() const;
 
       virtual bool isExecutable(TargetBodyQsp targetBody);
-      bool execute();
+      virtual bool setupExecution();
+      virtual void execute();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
 
     private:
       TargetGetInfoWorkOrder &operator=(const TargetGetInfoWorkOrder &rhs);
   };
 }
 #endif
-

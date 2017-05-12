@@ -2,8 +2,6 @@
 #define WorkOrder_H
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -33,6 +31,7 @@
 
 
 #include "CorrelationMatrix.h"
+#include "FileItem.h"
 #include "GuiCamera.h"
 #include "TargetBody.h"
 #include "XmlStackedHandler.h"
@@ -53,18 +52,201 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * @brief Parent class for anything that performs an action in Project
+   * @brief Provide Undo/redo abilities, serialization, and history for an operation.
    *
-   * This class should be used for any operation that affects a Project. This provides history,
-   *   undo/redo capabilities (which need to be implemented correctly), and the ability for the
-   *   project to guarantee a good state on disk.
+   *   This class should be used for operations that affect a Project and need to provide history
+   *   and/or undo/redo capabilities, and the ability for the project to guarantee a
+   *   good state on disk. It follows the Command Pattern using Qt's QUndoCommand framework.
+   *   Not all actions require WorkOrders - many of the
+   *   actions performed in the various widgets may not use WorkOrders.
    *
-   * State between the end of execute() and the beginning of the redo methods must be saved via
-   *   the parent (WorkOrder) class. This is to ensure serializability. State between the redo
-   *   methods and undo methods should work the same way. Child implementations may only save state
-   *   (have member variables) that store state between syncRedo(), asyncRedo() and postSyncRedo()
-   *   OR between syncUndo(), asyncUndo() and postSyncUndo(). Other forms of state will cause the
-   *   work order to not function properly when saved/restored from disk.
+   *   The order of execution for work orders is:
+   *   setupExecution() - GUI thread, can ask user for input
+   *   execute() - run on either the GUI thread or a non-GUI thread as specified by the m_isSynchronous flag
+   *   postExecution() - perform any cleanup after execute.
+   *
+   *
+   *   undoExecution() - run on either the GUI thread or a non-GUI thread as specified by the
+   *                     m_isSynchronous flag
+   *   postUndoExecution() - perform any cleanup after undoExecution()
+   *
+   *
+   *   ** Adding a new Workorder **
+   *
+   *   The WorkOrder will need to be determined to be either synchronous/asynchronous and
+   *   whether it is undoable.  These are decisions determined by the use case.  Asynchronous
+   *   WorkOrders will not block the GUI thread while running and are typically used for
+   *   long-running operations.  Note that WorkOrders are not reentrant - a new one is created
+   *   for each action.
+   *
+   *   The constructor for the WorkOrder must set m_isUndoable and m_isSynchronous to the appropriate
+   *   values. The constructor must call the base WorkOrder constructor.  The default is
+   *   synchronous and undoable.
+   *
+   *   All information required to execute the WorkOrder should be saved in the WorkOrder
+   *   in the setupExecution() method.  Since WorkOrders may be serialized and may run on
+   *   non-GUI threads there are restrictions on how the WorkOrder may save state.  To allow
+   *   serialization the WorkOrders  must save state to the base WorkOrder class using
+   *   WorkOrder::setInternalData() in the following calls:
+   *   setupExecution(), postExecution(), postUndoExecution().
+   *   Workorders may use member variables to pass data between the execute() and postExecution()
+   *   methods and also between the undoExecution() and undoPostExecution() methods since 
+   *   serialization can not happen between these calls.  For asynchronous WorkOrders the 
+   *   execute()/postExecution() and undoExecution()/undoPostExecution() methods are on 
+   *   different threads so any allocated memory moved between the non-GUI and GUI threads 
+   *   between methods.
+   *
+   *   Serialization is handled by the base WorkOrder class.  Since all state is saved
+   *   into the base class using setInternalData() the derived WorkOrders do not contain
+   *   any data that needs to be serialized.  The times when WorkOrders are allowed to use
+   *   member variables are periods when the WorkOrder can not be serialized.
+   *
+   *   There are 5 key methods in the flow of the WorkOrder as shown in the WorkOrder Flow
+   *   diagram below.
+   *
+   *   *setupExecution*
+   *   The setupExecution() method gathers all required information to run the WorkOrder but
+   *   does not execute it.  The gathered information is stored in the WorkOrder.
+   *   SetupExecution() is optional but typically required. It can bring up GUI elements to
+   *   prompt the user for any necessary information.  SetupExecution() is not called when
+   *   a WorkOrder is redone.
+   *
+   *   *execute*
+   *   execute() needs to be implemented perform the WorkOrder.
+   *   All information neccessary to run the WorkOrder should already be stored in the WorkOrder.
+   *   The data necessary for the  WorkOrder can be retrieved via internalData()
+   *   Execute() can not use any GUI elements. Each time a
+   *   WorkOrder is redone execute() is called to redo the WorkOrder.
+   *
+   *   For synchronous WorkOrders the execute()
+   *   method runs on the GUI thread and there are no special requirements on object ownership.
+   *
+   *   For asynchronous WorkOrders any memory allocations that aren't deallocated within
+   *   execute() will need to be moved to the GUI thread.  @see ImportImagesWorkOrder::execute
+   *   for an example of an asynchronous WorkOrder that allocates memory. setProgressValue()
+   *   can be used to update the progress bar in the GUI.
+   *
+   *   *postExecution*
+   *   postExecution() runs on the GUI thread so it should not perform any long running operations.
+   *   It is intended for any cleanup or GUI updates after execute().  Typically it would only be
+   *   needed for asynchronous WorkOrders where they need to update the GUI and do cleanup.  It is
+   *   not required to implement this method.
+   *
+   *   *undoExecution*
+   *   undoExecution() is only required for undoable WorkOrders.  undoExecution() should undo the
+   *   effects of the execute() only using state stored in the
+   *   WorkOrder.  It will run on the GUI thread if synchronous or a non-GUI thread if asynchronous.
+   *   The same restrictions as execute() apply to this method.
+   *
+   *   *postUndoExecution()*
+   *   This is not required. If needed, it should perform any cleanup after undoExecution().
+   *   postUndoExecution() has the same restrictions as postExecution().
+   *
+   *   Other methods the WorkOrder may need to implement are:
+   *
+   *   *isExecutable(<various type>)*
+   *   IsExecutable() determines if the WorkOrder should show up in the context menus (this has no
+   *   bearing on how the main menu is populated).  Note that isExecutable will need to be
+   *   implemented for each type of parameter this WorkOrder should show in the context menu.
+   *
+   *   *dependsOn*
+   *   This is currently not implemented properly for most WorkOrders.  In theory this should determine
+   *   if the workOrder parameter passed in must be completed prior to this workOrder completing.   Most
+   *   current WorkOrders just check if the WorkOrder parameter is the same type.
+   *
+   *   *setCreatesCleanState*
+   *   This is used to indicate the WorkOrder has set the state back to an unchanged state from which
+   *   the project was originally opened.  This is used by open, save, and close project WorkOrders. Unlikely
+   *   to be needed by other WorkOrders.
+   *
+   *   *setModifiesDiskState*
+   *   WorkOrders should call this to indicate they modify the disk state.  The WorkOrder should 
+   *   implement the undoExecution method if this is set to true.  (This flag is used by the Project to 
+   *   indicate the disk state should be restored back to the original state if the project is 
+   *   closed without saving.)
+   *
+   *
+   *   **WorkOrder Diagrams**
+   *
+   * @startuml {workOrderFlow.png} "WorkOrder Flow"
+   * |GUI thread|
+   * start
+   *  #yellow:User selects workorder from menu<
+   * if (workOrder::setupExecution()) then (true)
+   *  repeat
+   *   if (WorkOrder::isSynchronous()) then (true)
+   *     :WorkOrder::execute();
+   *   else (false)
+   *     |non-GUI thread|
+   *     :WorkOrder::execute();
+   *     |GUI thread|
+   *   endif
+   *   :WorkOrder::postExecute();
+   *
+   *   #yellow:User selects undo from menu<
+   *
+   *   if (WorkOrder::isSynchronous()) then (true)
+   *     :WorkOrder::undoExecution();
+   *   else (false)
+   *     |non-GUI thread|
+   *     :WorkOrder::undoExecution();
+   *    |GUI thread|
+   *  endif
+   *  :WorkOrder::postUndoExecution();
+   *
+   *  #yellow:User selects redo from menu<
+   * repeat while (test)
+   *
+   * else (false)
+   *   stop
+   * endif
+   * stop
+   * @enduml
+   *
+   *@startuml {NonUndoableWorkOrderSequence.png} "Non-undoable WorkOrder Sequence (unfinished)"
+   * title Non-undoable Workorder (unfinished)
+   * actor User
+   * participant WorkOrder
+   * participant Project
+   * participant HistoryTreeWidget
+   * 
+   * User -> WorkOrder: Menuclick
+   * 
+   * activate WorkOrder
+   * 
+   * WorkOrder -> WorkOrder: addCloneToProject
+   * activate WorkOrder
+   * 
+   * WorkOrder -> Project : addToProject
+   * activate Project
+   * 
+   *  Project -> WorkOrder : setPrevious
+   * 
+   * Project -> WorkOrder : **setupExecution**
+   * activate WorkOrder
+   * WorkOrder -> Project
+   * deactivate WorkOrder
+   * 
+   *  Project -> WorkOrder : setNextWorkorder
+   *
+   * Project -> HistoryTreeWidget : << signal:workOrderStarting >>
+   * Project <-- HistoryTreeWidget : slot:addToHistory
+   * 
+   * Project -> WorkOrder: **execute**
+   * activate WorkOrder
+   * WorkOrder -> Project
+   * deactivate WorkOrder
+   * 
+   * Project  -> WorkOrder
+   * deactivate Project
+   * 
+   * deactivate WorkOrder
+   * 
+   * WorkOrder -> HistoryTreeWidget : << signal:destroyed >>
+   * WorkOrder <-- HistoryTreeWidget : slot:removeFromHistory
+   * 
+   * deactivate WorkOrder
+   * @enduml
    *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
@@ -100,6 +282,23 @@ namespace Isis {
    *   @history 2016-06-22 Tyler Wilson - Removed all references to deprecated functions/member
    *                          variables.  Fixes #4052.
    *   @history 2016-07-26 Tracie Sucharski - Added functionality for ShapeList.
+   *   @history 2017-02-06 Tracie Sucharski - Added methods to set/get whether work order is put on
+   *                          the QUndoStack.  If it is NOT put on the stack, it will be greyed out
+   *                          in the HistoryTreeWidget and not undo-able.  Todo:  Decide whether
+   *                          work orders not on the QUndoStack should appear in the
+   *                          HistoryTreeWidget.  Fixes #4598.
+   *   @history 2017-04-04 Tracie Sucharski - Renamed the execute method to setupExecution.
+   *                          Fixes #4718.
+   *   @history 2017-04-04 Tracie Sucharski - Renamed onUndoStack to isUndoable.  Renamed
+   *                          setUndoRedo to setUndoable.  Fixes #4722.
+   *   @history 2017-04-04 JP Bonn - Updated to new design.  setupExecution() used for preparation.
+   *                          No longer separate methods for sync/async - workorder::execute()
+   *                          handles both sync/async
+   *   @history 2017-04-16 Ian Humphrey - Added enableWorkOrder and disableWorkOrder slots for
+   *                           enabling and disabling work orders. Copy constructor now copies
+   *                           what's this and tool tip (hover text) state.
+   *   @history 2017-05-05 Tracie Sucharski - Added functionality for FileItem types and added
+   *                           BundleObservationViewWorkOrder. Fixes #4838, #4839, #4840.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -146,6 +345,7 @@ namespace Isis {
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
+      virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool isExecutable(ProjectItem *item);
 
       void read(XmlStackedHandlerReader *xmlReader);
@@ -158,6 +358,7 @@ namespace Isis {
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
+      virtual void setData(FileItemQsp fileItem);
       virtual void setData(ProjectItem *item);
 
 
@@ -165,6 +366,8 @@ namespace Isis {
       void setPrevious(WorkOrder *previousWorkOrder);
 
       QString bestText() const;
+      bool isUndoable() const;
+      bool isSynchronous() const;
       bool createsCleanState() const;
       QDateTime executionTime() const;
       bool isFinished() const;
@@ -191,30 +394,12 @@ namespace Isis {
       void statusChanged(WorkOrder *);
 
     public slots:
-      /**
-       * The (child) implementation of this method should prompt the user/gather state by any means
-       *   necessary. Prompts for file names, questions, warnings, etc.. should be done here.
-       *
-       * Once the work order has enough data to execute, this method needs to set the
-       *   state in the parent (this) WorkOrder class. Call setData(ImageList),
-       *   setInternalData(QStringList), etc... with all of the data/state necessary to perform the
-       *   work order. This could be a list of file names, an ImageList of images you're viewing,
-       *   or really anything else.
-       *
-       * Finally, the actual work needs done in *Redo(), using only state (data) stored by the
-       *   parent (this) WorkOrder class. You do not have to call *Redo() - this is done for you
-       *   by WorkOrder::redo().  WorkOrder::redo() is called from Project::addToProject() when the
-       *   workOrder is pushed onto the undo stack.
-       *
-       * We do it this way to ensure saving/restoring from history
-       *   can be done automatically/simply and implemented only once per data type. This also gives
-       *   us full undo/redo functionality.
-       *
-       * @return False if this operation should be cancelled (the user clicked cancel, the operation
-       *           turns out to be impossible, etc). This prevents the work order from making it
-       *           into the history and redo will never be called.
-       */
-      virtual bool execute();
+      void enableWorkOrder();
+      void disableWorkOrder();
+
+      virtual bool setupExecution();
+
+      virtual void execute();
 
       virtual void redo();
       virtual void undo();
@@ -236,6 +421,8 @@ namespace Isis {
 
       GuiCameraQsp guiCamera();
 
+      FileItemQsp fileItem();
+
       virtual bool dependsOn(WorkOrder *other) const;
 
       Directory *directory() const;
@@ -252,12 +439,9 @@ namespace Isis {
       void setProgressValue(int);
 
       QStringList internalData() const;
-      virtual void syncRedo();
-      virtual void asyncRedo();
-      virtual void postSyncRedo();
-      virtual void syncUndo();
-      virtual void asyncUndo();
-      virtual void postSyncUndo();
+      virtual void postExecution();
+      virtual void undoExecution();
+      virtual void postUndoExecution();
 
     protected slots:
       void addCloneToProject();
@@ -271,7 +455,7 @@ namespace Isis {
 
     private slots:
       void attemptQueuedAction();
-      void asyncFinished();
+      void executionFinished();
       void clearImageList();
       void clearShapeList();
       void deleteProgress();
@@ -313,6 +497,23 @@ namespace Isis {
           WorkOrder *m_workOrder;
       };
 
+    protected:
+      /**
+       * Set the workorder to be undoable/redoable
+       * This is defaulted to true - his will allow the workorder to be redone.  Note
+       * the workorder undoExecution() method must be implemented.  This will result on the
+       * workorder being placed on the QUndoStack and being displayed in the history
+       * as being undoable. If set to false, the work order will not be put on the
+       * QUndoStack and the workorder will not be able to be undone.
+       */
+      bool m_isUndoable;
+
+      /**
+        * This is defaulted to true. If true, the work order will be executed on the GUI
+        * thread synchronously. If false, then the work order will be queued for execution
+        * on a non-GUI thread and will not block the GUI.
+        */
+       bool m_isSynchronous;
 
     private:
       WorkOrder &operator=(const WorkOrder &rhs);
@@ -367,6 +568,12 @@ namespace Isis {
 
 
       /**
+       * A QSharedPointer to the FileItem
+       */
+      FileItemQsp m_fileItem;
+
+
+      /**
        * A QStringList of unique image identifiers for all of the images this WorkOrder is dealing
        * with.
        */
@@ -405,7 +612,7 @@ namespace Isis {
       QMutex *m_transparentConstMutex;
 
       /**
-       * This is the date/time that execute() was called.
+       * This is the date/time that setupExecution() was called.
        */
       QDateTime m_executionTime;
 

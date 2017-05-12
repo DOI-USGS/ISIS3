@@ -3,8 +3,6 @@
 
 /**
  * @file
- * $Revision: 1.20 $
- * $Date: 2009/10/15 01:35:17 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -45,10 +43,10 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * @brief Container class for BundleAdjustment results. 
-   * This class includes the settings used to run the bundle adjustment, the resulting statistics 
+   * @brief Container class for BundleAdjustment results.
+   * This class includes the settings used to run the bundle adjustment, the resulting statistics
    * values, and the name of the control network used.
-   *  
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-07-08 Jeannie Backer
@@ -59,7 +57,7 @@ namespace Isis {
    *                           operators and the read/write methods.
    *   @history 2014-12-04 Jeannie Backer - Renamed from BundleResults to BundleSolutionInfo.
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
-   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as 
+   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as
    *                           a Qt metatype for use with QVariant.
    *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
    *                           Fixes #2298.
@@ -88,27 +86,43 @@ namespace Isis {
    *                            "CAMSOLVE: All POLYNOMIAL COEFFICIENTS"
    *                           -modified output of image EO in bundleout.txt for images solved with
    *                            observation mode; previously one entry per observation was written,
-   *                            now all images in the observation are written separately. 
+   *                            now all images in the observation are written separately.
    *   @history 2016-12-01 Ian Humphrey - Modified an sprintf() call in outputImagesCSV() to
    *                           prevent a -Wformat-security warning from occurring.
    *   @history 2016-12-08 Ian Humphrey - Modified outputImagesCSVHeader() to treat TWIST the same
    *                           as the other angles when determining how many headers to create.
    *                           Fixes #4557.
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *   @history 2017-05-01 Makayla Shepherd - Added imageList() to track and return the images used
+   *                           in the bundle adjustment. These images will be displayed on the
+   *                           project tree under results/bundle/<runtime> and will keep the same
+   *                           structure as the input on the project tree. Fixes #4818.
+   *   @history 2017-05-02 J Bonn - Fixed XML serialzation and code cleanup.  Fixes #4835.
+   *   @history 2017-05-02 Tracie Sucharski - Moved XMLHandler code to bottom of file for
+   *                           consistency;  all other classes have the XmlHandler at end of file.
+   *                           Fixes #4822.
+   *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Modified save() to write the bundle
+   *                           solution info images to the correct directory in the project on disk.
+   *                           Fixes #4804, #4837.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
     public:
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
-                    FileName controlNetworkFileName, 
-                    BundleResults outputStatistics, 
+                    FileName controlNetworkFileName,
+                    BundleResults outputStatistics,
+                    QList<ImageList *> imgList,
                     QObject *parent = 0);
-      BundleSolutionInfo(Project *project, 
-                    XmlStackedHandlerReader *xmlReader, 
+      BundleSolutionInfo(Project *project,
+                    XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
-      BundleSolutionInfo(FileName bundleSolutionInfoFile);
       BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
+
+      QString savedImagesFilename();
+      QString savedPointsFilename();
+      QString savedResidualsFilename();
 
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
@@ -117,43 +131,26 @@ namespace Isis {
       QString controlNetworkFileName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
+      QList<ImageList *> imageList();
       QString runTime() const;
 
 
-      bool outputImagesCSVHeader(std::ofstream &fpOut);     
+      bool outputImagesCSVHeader(std::ofstream &fpOut);
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
       bool outputImagesCSV();
       bool outputPointsCSV();
       bool outputResiduals();
 
-      PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
-                          QString settingsName = "InputSettings",
-                          QString statisticsName = "StatisticsResults");
-       
-      //TODO does xml stuff need project and newRoot???
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  
-      
-      //TODO does xml stuff need project???
-      void save(QXmlStreamWriter &stream, const Project *project) const;  
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
-
-      void writeH5File(FileName outputFileName) const;
-      void readH5File(FileName outputFileName) const;
-
-      void createH5File(FileName outputFileName) const;
-      void openH5File(FileName outputFileName);
-//      BundleSolutionInfo(FileName bundleSolutionInfoFile);
-      
-      public slots:
+    public slots:
       void updateFileName(Project *);
 
     private:
       /**
        * This class is used to read an images.xml file into an image list
-       * 
+       *
        * @see QXmlDefaultHandler documentation
        * @author 2014-07-21 Ken Edmundson
        *
@@ -164,7 +161,7 @@ namespace Isis {
       class XmlHandler : public XmlStackedHandler {
         public:
           //TODO does xml stuff need project???
-          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);  
+          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);
           ~XmlHandler();
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -179,9 +176,6 @@ namespace Isis {
           BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
           Project *m_xmlHandlerProject;  //TODO does xml stuff need project???
           QString m_xmlHandlerCharacters; //!< List of characters that have been handled
-          QList<ImageList *> *m_xmlHandlerImages; //!< List of pointers to images
-          BundleSettingsQsp m_xmlHandlerBundleSettings; //!< Settings used to run the bundle adjust
-          BundleResults *m_xmlHandlerBundleResults; //!< Results from the bundle adjust
       };
 
     private:
@@ -195,13 +189,17 @@ namespace Isis {
       BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
       BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
       QList<ImageList *> *m_images; //!< The list of images that were adjusted
+
+      // In theory the path in the BundlesSettings can change while running.  So we save the
+      // filenames actually used when the most recent save of the file was done.
+      QString m_csvSavedImagesFilename;
+      QString m_csvSavedPointsFilename;
+      QString m_csvSavedResidualsFilename;
+
   }; // end BundleSolutionInfo class
 
-  // operators to read/write BundleSolutionInfo to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const BundleSolutionInfo &bundleSolutionInfo);
-  QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo);
 
-  void setStringAttribute(int locationId, QString locationName, 
+  void setStringAttribute(int locationId, QString locationName,
                           QString attributeName, QString attributeValue);
   QString getStringAttribute(int locationId, QString locationName, QString attributeName);
 }; // end namespace Isis

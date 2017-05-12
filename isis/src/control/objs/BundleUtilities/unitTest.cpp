@@ -40,10 +40,11 @@ using namespace std;
 using namespace Isis;
 
 void printBundleMeasure(BundleMeasure &);
+void printXml(const BundleObservationSolveSettings &);
 
 /**
  * This class is used to test loading objects from xml files.
- * 
+ *
  * @author 2014 Jeannie Backer
  *
  * @internal
@@ -67,7 +68,7 @@ namespace Isis {
         QXmlInputSource xmlInputSource(&file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
-          throw IException(IException::Unknown, 
+          throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
@@ -96,6 +97,7 @@ namespace Isis {
  *                           setSettingsFromPvl(). References #4293.
  *   @history 2016-12-01 Ian Humphrey - Added extra qDebug() stream so the "apply param
  *                           corrections successful?" string will be in the unitTest output.
+ *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -111,25 +113,21 @@ int main(int argc, char *argv[]) {
     // default constructor
     qDebug() << "Printing PVL group with settings from the default constructor...";
     BundleObservationSolveSettings boss;
-    PvlObject pvl = boss.pvlObject("DefaultBundleObservationSolveSettings");
-    cout << pvl << endl << endl;
-    
+    printXml(boss);
+
     qDebug() << "Testing copy constructor...";
     BundleObservationSolveSettings copySettings(boss);
-    pvl = copySettings.pvlObject("CopySettingsObject");
-    cout << pvl << endl << endl;
-    
+    printXml(copySettings);
+
     qDebug() << "Testing assignment operator to set this equal to itself...";
     boss = boss;
-    pvl = boss.pvlObject("SelfAssignedSettingsObject");
-    cout << pvl << endl << endl;
-    
+    printXml(boss);
+
     qDebug() << "Testing assignment operator to create a new settings object...";
     BundleObservationSolveSettings assignmentOpSettings;
     assignmentOpSettings = boss;
-    pvl = assignmentOpSettings.pvlObject("AssignedSettingsObject");
-    cout << pvl << endl << endl;
-    
+    printXml(assignmentOpSettings);
+
     qDebug() << "Testing mutator methods...";
     qDebug() << "setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings()";
     boss.setInstrumentId("MyInstrumentId");
@@ -137,46 +135,39 @@ int main(int argc, char *argv[]) {
                                        false, 3.0, 4.0, 5.0);
     boss.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionOnly, 6, 7,
                                        true, 800.0, 900.0, 1000.0);
-    pvl = boss.pvlObject();// using MyInstrumentId as PvlObject name
-    cout << pvl << endl << endl;
-    
-    qDebug() << "Testing pvlObject()...";
+    printXml(boss);
+
     BundleObservationSolveSettings solveNone;
     solveNone.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
                                                true);
     solveNone.setInstrumentPositionSettings(BundleObservationSolveSettings::NoPositionFactors);
-    pvl = solveNone.pvlObject("SettingsFromPvlGroup-SolveForNone");
-    cout << pvl << endl << endl;
+    printXml(solveNone);
 
     BundleObservationSolveSettings solveAnglesPositions;
     solveAnglesPositions.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesOnly,
                                                        true);
     solveAnglesPositions.setInstrumentPositionSettings(
         BundleObservationSolveSettings::PositionOnly);
-    pvl = solveAnglesPositions.pvlObject("SettingsFromPvlGroup-SolveForAnglesPositions");
-    cout << pvl << endl << endl;
+    printXml(solveAnglesPositions);
 
     BundleObservationSolveSettings solveVelocities;
     solveVelocities.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesVelocity,
                                                   true);
     solveVelocities.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionVelocity);
-    pvl = solveVelocities.pvlObject("SettingsFromPvlGroup-SolveForVelocities");
-    cout << pvl << endl << endl;
+    printXml(solveVelocities);
 
     BundleObservationSolveSettings solveAccelerations;
     solveAccelerations.setInstrumentPointingSettings(
         BundleObservationSolveSettings::AnglesVelocityAcceleration, true);
     solveAccelerations.setInstrumentPositionSettings(
         BundleObservationSolveSettings::PositionVelocityAcceleration);
-    pvl = solveAccelerations.pvlObject("SettingsFromPvlGroup-SolveForAccelerations");
-    cout << pvl << endl << endl;
-    
+    printXml(solveAccelerations);
+
     boss.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients,
                                        false, 4, 5, true, 1.0, -1.0, 3.0);
     boss.setInstrumentPositionSettings(BundleObservationSolveSettings::AllPositionCoefficients,
                                        6, 7, true, 8.0, 9.0, -1.0);
-    pvl = boss.pvlObject("SettingsFromPvlGroup-SolveForAllCoefficients");
-    cout << pvl << endl << endl;
+    printXml(boss);
 
     qDebug() << "Testing static unused enum-to-string and string-to-enum methods...";
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
@@ -211,31 +202,13 @@ int main(int argc, char *argv[]) {
                                                                       "AllPolynomialCoefficients"));
     qDebug() << "";
 
-    qDebug() << "Testing serialization...";
-    QByteArray byteArray;
-    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
-    outputData << boss;
-    QDataStream inputData(byteArray);
-    BundleObservationSolveSettings newBoss;
-    inputData >> newBoss;
-    pvl = newBoss.pvlObject("SerializedSettings");
-    cout << pvl << endl;
-//    QFile file("BundleObservationSolveSettingsTest.dat");
-//    file.open(QIODevice::WriteOnly);
-//    QDataStream out(&file);
-//    out << boss;
-//    file.close();
-//    file.open(QIODevice::ReadOnly);
-//    QDataStream in(&file);
-//    in >> newBoss;
-    qDebug() << "";
 
     qDebug() << "Testing XML: write XML from BundleObservationSolveSettings object...";
-    // write xml 
+    // write xml
     FileName xmlFile("./BundleObservationSolveSettings.xml");
     QString xmlPath = xmlFile.expanded();
     QFile qXmlFile(xmlPath);
-  
+
     // For test coverage, we need to write/read BundleObservationSolveSettings objects
     // with 0,1,2,3 apriori sigmas and an empty xml
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -250,12 +223,11 @@ int main(int argc, char *argv[]) {
     solveNone.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
     XmlStackedHandlerReader reader;
     XmlHandlerTester bsFromXml1(project, &reader, xmlFile);
-    pvl = bsFromXml1.pvlObject("FromXml-1");
-    cout << pvl << endl << endl;
+    printXml(bsFromXml1);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -267,11 +239,10 @@ int main(int argc, char *argv[]) {
     solveAnglesPositions.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
     XmlHandlerTester bsFromXml2(project, &reader, xmlFile);
-    pvl = bsFromXml2.pvlObject("FromXml-2");
-    cout << pvl << endl << endl;
+    printXml(bsFromXml2);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -283,11 +254,10 @@ int main(int argc, char *argv[]) {
     solveVelocities.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
     XmlHandlerTester bsFromXml3(project, &reader, xmlFile);
-    pvl = bsFromXml3.pvlObject("FromXml-3");
-    cout << pvl << endl << endl;
+    printXml(bsFromXml3);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -299,11 +269,10 @@ int main(int argc, char *argv[]) {
     solveAccelerations.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
     XmlHandlerTester bsFromXml4(project, &reader, xmlFile);
-    pvl = bsFromXml4.pvlObject("FromXml-4");
-    cout << pvl << endl << endl;
+    printXml(bsFromXml4);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -315,19 +284,17 @@ int main(int argc, char *argv[]) {
     boss.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
     XmlHandlerTester bossToFill(project, &reader, xmlFile);
 //    BundleObservationSolveSettings bossToFill(xmlFile, project, &reader);
-    pvl = bossToFill.pvlObject("FromXml");
-    cout << pvl << endl << endl;
+    printXml(bossToFill);
 
     // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to object...";
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
     XmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);
-    pvl = bsFromEmptyXml.pvlObject("DefaultSettingsFromEmptyXml");
-    cout << pvl << endl << endl;
+    printXml(bsFromEmptyXml);
 
     //bool deleted = qXmlFile.remove();
     //if (!deleted) {
@@ -338,27 +305,27 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing error throws...";
     try {
       BundleObservationSolveSettings::stringToInstrumentPointingSolveOption("Nonsense");
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
           BundleObservationSolveSettings::InstrumentPointingSolveOption(-1));
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleObservationSolveSettings::stringToInstrumentPositionSolveOption("Nonsense");
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     try {
       BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
           BundleObservationSolveSettings::InstrumentPositionSolveOption(-2));
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
@@ -418,15 +385,15 @@ int main(int argc, char *argv[]) {
     BundleObservation bo;
     BundleTargetBodyQsp bundleTargetBody = BundleTargetBodyQsp(new BundleTargetBody);
     qDebug() << "Constructing BundleObservation object from BundleImage...";
-    BundleObservation bo2(bi2, 
-                          "ObservationNumber2", 
-                          "InstrumentId2", 
+    BundleObservation bo2(bi2,
+                          "ObservationNumber2",
+                          "InstrumentId2",
                           bundleTargetBody);
 
     BundleImageQsp nullImage;
-    BundleObservation nullBO(nullImage, 
-                             "NullObservationNumber", 
-                             "NullInstrumentId", 
+    BundleObservation nullBO(nullImage,
+                             "NullObservationNumber",
+                             "NullInstrumentId",
                              bundleTargetBody);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
@@ -440,8 +407,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "    Set/get solve settings using with CAMESOLVE=NONE...";
     bo2.setSolveSettings(solveNone);
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
-    pvl = bossFromBo.pvlObject("NoCamAngles");
-    cout << pvl << endl << endl;
+    printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
     qDebug().noquote() << bo2.formatBundleOutputString(true,true);
     qDebug().noquote() << bo2.formatBundleOutputString(false,true);
@@ -450,8 +416,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
-    pvl = bossFromBo.pvlObject("NoTwist");
-    cout << pvl << endl << endl;
+    printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
     qDebug().noquote() << bo2.formatBundleOutputString(true,true);
     qDebug().noquote() << bo2.formatBundleOutputString(false,true);
@@ -460,13 +425,12 @@ int main(int argc, char *argv[]) {
 
 
 
-    
+
     qDebug() << "    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...";
     bo3.setSolveSettings(bsFromEmptyXml);
 
     bossFromBo = *bo3.solveSettings();
-    pvl = bossFromBo.pvlObject("SettingsFromBundleObservation");
-    cout << pvl << endl << endl;
+    printXml(bossFromBo);
     bo3.setIndex(1);
     qDebug() << "index = " << toString(bo3.index());
     qDebug() << "instrument id = " << bo3.instrumentId();
@@ -501,7 +465,7 @@ int main(int argc, char *argv[]) {
       vectors.append("     ");
     }
     qDebug().noquote() << vectors;
-    
+
     // initializeBodyRotation (verify???)
     // bo3.initializeBodyRotation(); //Seg fault
 
@@ -509,7 +473,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bo3.formatBundleOutputString(false,true);
     qDebug().noquote() << bo3.formatBundleOutputString(false);
     qDebug().noquote() << bo3.formatBundleOutputString(true,true);
-    qDebug() << "init exterior orientiation successful?  " 
+    qDebug() << "init exterior orientiation successful?  "
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation
     //      with a better (i.e. non-null) Camera. See ticket #4249.
@@ -524,9 +488,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     // spiceRotation and spicePosition (verify???)
-    //SpiceRotation *rotation = 
+    //SpiceRotation *rotation =
     bo3.spiceRotation();
-    //SpicePosition *position = 
+    //SpicePosition *position =
     bo3.spicePosition();
 
     qDebug() << "    add another image...";
@@ -547,7 +511,7 @@ int main(int argc, char *argv[]) {
       nullBO.applyParameterCorrections(paramCor);
     }
     catch (IException &e) {
-      e.print(); 
+      e.print();
     }
     try {
       bo3.applyParameterCorrections(paramCor);
@@ -581,7 +545,7 @@ int main(int argc, char *argv[]) {
                   bo.instId() != this.instId
                   bundleObservation != null
                   bundleSettings.numberSolveSettings() != 1
-      6) addNew - 
+      6) addNew -
                   map.contains(obsNumber)
                   bo.instId() != this.instId
                   bundleObservation == null
@@ -589,7 +553,7 @@ int main(int argc, char *argv[]) {
       8) getObsByCubeSerialNumber - map.contains(sn)
       9) getObsByCubeSerialNumber - map.contains(sn) == false
 
-    #endif               
+    #endif
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
     // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
@@ -600,7 +564,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
-    
+
 #if 0
     BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");
     qDebug() << "same observation?" << toString((obs1 == obs1b));
@@ -638,7 +602,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Set BundleControlPoint 1 to rejected - is rejected?"
         << toString(bcp1.isRejected());
     bcp1.setRejected(false);
-    qDebug() << "Set BundleControlPoint 1 to non-rejected - is rejected?" 
+    qDebug() << "Set BundleControlPoint 1 to non-rejected - is rejected?"
         << toString(bcp1.isRejected());
 
     qDebug() << "Number of rejected measures:" << bcp1.numberOfRejectedMeasures();
@@ -659,8 +623,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()";
-    SurfacePoint sp1(Latitude(0.0, Angle::Degrees), 
-                     Longitude(0.0, Angle::Degrees), 
+    SurfacePoint sp1(Latitude(0.0, Angle::Degrees),
+                     Longitude(0.0, Angle::Degrees),
                      Distance(10.0, Distance::Meters));
     bcp1.setAdjustedSurfacePoint(sp1);
     // ??? this appears to do nothing! measure is added to the internal QVector of measures,
@@ -748,8 +712,8 @@ int main(int argc, char *argv[]) {
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
     fixedPoint->SetType(ControlPoint::Fixed);
     BundleControlPoint *bcp3 = new BundleControlPoint(fixedPoint);
-    SurfacePoint sp2(Latitude(90.0, Angle::Degrees), 
-                     Longitude(180.0, Angle::Degrees), 
+    SurfacePoint sp2(Latitude(90.0, Angle::Degrees),
+                     Longitude(180.0, Angle::Degrees),
                      Distance(10.0, Distance::Meters));
     bcp3->setAdjustedSurfacePoint(sp2);
     qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
@@ -898,11 +862,11 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     bundleMeasure.setParentObservation(BundleObservationQsp(new BundleObservation(bo2)));
-    // const BundleObservationSolveSettings *solveSettings = 
+    // const BundleObservationSolveSettings *solveSettings =
     bundleMeasure.observationSolveSettings();
-    // Camera *cam = 
+    // Camera *cam =
     bundleMeasure.camera();
-    // BundleObservation  *parentObs = 
+    // BundleObservation  *parentObs =
     bundleMeasure.parentBundleObservation();
     BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
     qDebug() << "parent control point id" << parentBCP->id();
@@ -925,7 +889,7 @@ int main(int argc, char *argv[]) {
     printBundleMeasure(bundleMeasure);
     printBundleMeasure(bundleMeasureRejected);
     printBundleMeasure(bundleMeasureEq);
-      
+
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
 
@@ -1327,7 +1291,7 @@ int main(int argc, char *argv[]) {
     // This causes the Angle(double, Angle::Radians) to throw an exception.
     try {
       LinearAlgebra::Vector hasSpecial(btb1.numberParameters());
-      hasSpecial[0] = Isis::Lrs; 
+      hasSpecial[0] = Isis::Lrs;
       btb1.applyParameterCorrections(hasSpecial);
     }
     catch (IException &e) {
@@ -1713,7 +1677,7 @@ int main(int argc, char *argv[]) {
     }
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-  } 
+  }
   catch (IException &e) {
     e.print();
   }
@@ -1739,7 +1703,15 @@ int main(int argc, char *argv[]) {
    qDebug() << "computed focal x" << toString(m.focalPlaneComputedX());
    qDebug() << "computed focal y" << toString(m.focalPlaneComputedY());
    qDebug() << "observation index" << toString(m.observationIndex());
-   qDebug() << "";  
+   qDebug() << "";
 }
 
 
+void printXml(const BundleObservationSolveSettings &printable) {
+  QString output;
+  QXmlStreamWriter writer(&output);
+  writer.setAutoFormatting(true);
+  printable.save(writer, NULL);
+  output.remove(QRegExp("<id>[^<]*</id>"));
+  qDebug().noquote() << output << endl << endl;
+}

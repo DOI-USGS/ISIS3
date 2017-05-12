@@ -23,7 +23,12 @@ namespace Isis {
    *   @history 2012-07-23 Steven Lambright and Stuart Sides - Added display of undo stack
    *   @history 2012-07-27 Kimberly Oyama and Steven Lambright - Added resizeEvent() and improved
    *                           implementation of refit().
-   *   @histroy 2012-07-31 Kimberly Oyama - Added comments to some of the methods.
+   *   @history 2012-07-31 Kimberly Oyama - Added comments to some of the methods.
+   *   @history 2017-02-06 Tracie Sucharski - Work orders that are not on the QUndoStack are greyed
+   *                           out and italicized.
+   *   @history 2017-04-05 Tracie Sucharski - For the last change, method name was changed from
+   *                           onUndoStack to isUndoable.
+   *  
    */
   class HistoryTreeWidget : public QTreeWidget {
       Q_OBJECT

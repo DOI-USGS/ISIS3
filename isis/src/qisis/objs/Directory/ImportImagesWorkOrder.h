@@ -57,6 +57,16 @@ namespace Isis {
    *                           images are freed from memory undo/redo correctly.
    *   @history 2012-10-29 Steven Lambright - Added a prompt to save the project if importing a lot
    *                           of images to a temporary project.
+   *   @history 2017-04-05 Ian Humphrey and Makayla Shepherd - Renamed the following: execute() to
+   *                           setupExeuction(), asyncRedo() to execute(), syncUndo() to
+   *                           undoExecution(), postSyncRedo() to postExecution(), and
+   *                           postSyncUndo() to postUndoExecution(). Added isSynchronous(). This is
+   *                           related to the WorkOrder redesign. Fixes #4732.
+   *   @history 2017-04-11 Ian Humphrey - Removed isSynchronous() and instead set inherited member
+   *                           m_isSynchronous to false in constructor to indicate this is an
+   *                           asynchronous work order. Updated documentation. References #4732.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undo, imported
+   *                           images are removed from the project tree. Fixes #4597.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -67,12 +77,14 @@ namespace Isis {
 
       virtual ImportImagesWorkOrder *clone() const;
 
-      bool execute();
+      virtual bool setupExecution();
 
-      void asyncRedo();
-      void postSyncRedo();
-      void asyncUndo();
-      void postSyncUndo();
+      virtual void execute();
+
+    protected:
+      virtual void undoExecution();
+      virtual void postExecution();
+      virtual void postUndoExecution();
 
     private:
       ImportImagesWorkOrder &operator=(const ImportImagesWorkOrder &rhs);
@@ -101,21 +113,21 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder;
-          bool m_copyDnData;
-          QThread *m_guiThread;
+          QDir m_destinationFolder; //! Directory where to import the images to.
+          bool m_copyDnData; //! Indicates whether the cube data will be copied to the project.
+          QThread *m_guiThread; //! Pointer to the GUI thread. Not used?
 
-          QMutex m_errorsLock;
-          QSharedPointer<IException> m_errors;
-          QSharedPointer<int> m_numErrors;
+          QMutex m_errorsLock; //! Mutex lock for appending errors and incrementing error count.
+          QSharedPointer<IException> m_errors; //! Stores any errors that occur during import.
+          QSharedPointer<int> m_numErrors; //! Number of errors that occur during import.
       };
 
     private:
       void importConfirmedImages(QStringList confirmedImages, bool copyDnData);
 
     private:
-      ImageList *m_newImages;
-      QString m_warning;
+      ImageList *m_newImages; //! List of images that are being imported in this work order.
+      QString m_warning; //! String of any errors/warnings that occurred during import.
   };
 }
 #endif // ImportImagesWorkOrder_H

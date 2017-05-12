@@ -2,8 +2,6 @@
 #define ProjectItem_h
 /**
  * @file
- * $Date$
- * $Revision$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -27,18 +25,20 @@
 #include <QStandardItem>
 
 #include "BundleSettings.h"
+#include "FileItem.h"
 #include "GuiCamera.h"
 #include "TargetBody.h"
 
 class QVariant;
 
 namespace Isis {
-  
+
   class BundleResults;
   class BundleSolutionInfo;
   class Control;
   class ControlList;
   class CorrelationMatrix;
+  class FileItem;
   class Image;
   class ImageList;
   class GuiCameraList;
@@ -94,7 +94,7 @@ namespace Isis {
    * model->appendRow(item);
    * @endcode
    *
-   * @author 2015-10-21 Jeffrey Covington 
+   * @author 2015-10-21 Jeffrey Covington
    *
    * @internal
    *     @history 2015-10-21 Jeffrey Covington - Original version.
@@ -103,12 +103,24 @@ namespace Isis {
    *                             BundleSettingsQsp.
    *     @history 2016-07-25 Tracie Sucharksi - Added support for Shapes.
    *     @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
-   *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the 
-   *                               the data management icon from 'data' to 
+   *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the
+   *                               the data management icon from 'data' to
    *                               'data-management' in the setProject function.
-   *                               A naming conflict was causing strange warnings 
-   *                               to show up on the command line when cnetsuite is launched, 
+   *                               A naming conflict was causing strange warnings
+   *                               to show up on the command line when cnetsuite is launched,
    *                               and this fixed it.  Fixes #3982.
+   *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
+   *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project
+   *                               name.
+   *     @history 2017-05-01 Makayla Shepherd - Added the images that were bundled to the
+   *                               BundleSolutionInfo ProjectItem. Fixes #4818.
+   *     @history 2017-05-02 Tracie Sucharski - Get rid of Correlation Matrix in BundleResults,
+   *                               change order of objects under BundleSolutionInfo.  Change text on
+   *                               some of BundleSolutionInfo items.  Fixes #4822.
+   *     @history 2017-05-04 J Bonn -Added FileItem to project tree. Fixes #4838.
+   *     @history 2017-05-04 Tracie Sucharski - Added isFileItem and fileItem methods and member
+   *                           variables needed for WorkOrders.  Fixes #4839. Fixes #4840.
+   *
    */
   class ProjectItem : public QStandardItem {
     public:
@@ -133,6 +145,8 @@ namespace Isis {
       ProjectItem(QList<BundleSolutionInfo *> results);
       ProjectItem(TargetBodyQsp targetBody);
       ProjectItem(TargetBodyList *targetBodyList);
+      ProjectItem(FileItemQsp filename, QString treeText, QIcon icon);
+
 
       ~ProjectItem();
 
@@ -149,6 +163,7 @@ namespace Isis {
       Project *project() const;
       GuiCameraQsp guiCamera() const;
       TargetBodyQsp targetBody() const;
+      FileItemQsp fileItem() const;
 
       bool isBundleResults() const;
       bool isBundleSettings() const;
@@ -163,8 +178,9 @@ namespace Isis {
       bool isProject() const;
       bool isGuiCamera() const;
       bool isTargetBody() const;
+      bool isFileItem() const;
 
-      void setProjectItem(ProjectItem *item); 
+      void setProjectItem(ProjectItem *item);
       void setBundleResults(BundleResults bundleResults);
       void setBundleSettings(BundleSettingsQsp bundleSettings);
       void setBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
@@ -187,7 +203,7 @@ namespace Isis {
       void setTargetBodyList();
 
       ProjectItem *findItemData(const QVariant &value, int role = Qt::UserRole+1);
-      
+
       void appendRow(ProjectItem *item);
       ProjectItem *child(int row) const;
       void insertRow(int row, ProjectItem *item);
@@ -195,6 +211,8 @@ namespace Isis {
       ProjectItem *parent() const;
       void setChild(int row, ProjectItem *item);
       ProjectItem *takeChild(int row);
+
+      void setTextColor(Qt::GlobalColor color);
     };
 
 }

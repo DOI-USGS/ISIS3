@@ -1,16 +1,22 @@
 #include "JigsawDialog.h"
 
+#include <QtConcurrent>
 #include <QDebug>
+#include <QDir>
+#include <QFuture>
 #include <QScrollBar>
 #include <QThread>
 
 #include "JigsawSetupDialog.h"
-//#include "ui_JigsawDialog.h"
 
 #include "BundleAdjust.h"
 #include "BundleSolutionInfo.h"
+#include "Cube.h"
 #include "Directory.h"
+#include "FileName.h"
 #include "IException.h"
+#include "Image.h"
+#include "ImageList.h"
 #include "JigsawSetupDialog.h"
 #include "Control.h"
 #include "iTime.h"
@@ -20,13 +26,89 @@
 
 namespace Isis {
 
+  /**
+   * @brief Constructor.
+   *
+   * Creates a dialog for running a jigsaw (bundle adjustment) and changing the solve settings.
+   *
+   * @param Project *project Pointer to the project this dialog belongs to.
+   * @param QWidget *parent Pointer to parent widget.
+   */
   JigsawDialog::JigsawDialog(Project *project, QWidget *parent) :
-                      QDialog(parent), m_ui(new Ui::JigsawDialog) {
-    m_ui->setupUi(this);
-
-    m_bundleAdjust = NULL;
+      QDialog(parent), m_ui(new Ui::JigsawDialog) {
     m_project = project;
     m_selectedControl = NULL;
+    init();
+  }
+
+
+  /**
+   * @brief Constructor that takes bundle settings and a selected control.
+   *
+   * Creates a dialog after the jigsaw solve settings have been set up and a control has been
+   * selected.
+   *
+   * @param Project *project Pointer to the project this dialog belongs to.
+   * @param BundleSettingsQsp bundleSettings Settings to give to this dialog to use for a jigsaw.
+   * @param Control *selectedControl Pointer to the selected control to adjust.
+   * @param QWidget *parent Pointer to the parent widget.
+   */
+  JigsawDialog::JigsawDialog(Project *project,
+                             BundleSettingsQsp bundleSettings,
+                             Control *selectedControl,
+                             QWidget *parent) : QDialog(parent), m_ui(new Ui::JigsawDialog) {
+
+    m_project = project;
+    m_bundleSettings = bundleSettings;
+    m_selectedControl = selectedControl;
+    m_selectedControlName = FileName(selectedControl->fileName()).name();
+    init();
+  }
+
+
+  /**
+   * @brief Constructor delegate.
+   *
+   * Delegate method that helps the constructors. This is used to reduce repeated code.
+   */
+  void JigsawDialog::init() {
+    m_ui->setupUi(this);
+
+    // Note: The buttons are added to the UI setup from the JigsawDialog.ui file.
+    // These could have been added to the UI file itself (as XML).
+
+    // Three buttons: Accept, Reject, Close. Initially only close is enabled.
+    // Close is only disabled when a bundle is running.
+    // After a bundle is successfully run, reject and accept are enabled.
+    // If aborting a bundle, only close will be enabled.
+    m_accept = new QPushButton(tr("&Accept"));
+    m_reject = new QPushButton(tr("&Reject"));
+    m_close = new QPushButton(tr("&Close"));
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+    m_close->setEnabled(true);
+
+    // Add tool tips to the buttons
+    m_accept->setToolTip(tr("Accept the bundle results and save them to the project."));
+    m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the dialog."));
+    m_close->setToolTip(tr("Close this dialog."));
+
+    // Add the buttons to the QDialogButtonBox defined in the UI file.
+    // Note that according to the Qt doc'n for QDialogButtonBox, addButton() causes the
+    // dialog box to take ownership of the QPushButton's, so we don't manually manage their memory.
+    m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
+    m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
+    m_ui->buttonBox->addButton(m_close, QDialogButtonBox::AcceptRole);
+
+    // Accept will handle saving the results.
+    connect(m_accept, SIGNAL(clicked(bool)),
+           this, SLOT(acceptBundleResults()));
+    // Reject will handle discarding the results.
+    connect(m_reject, SIGNAL(clicked(bool)),
+           this, SLOT(rejectBundleResults()));
+
+    m_bundleAdjust = NULL;
+    m_bundleSolutionInfo = NULL;
 
     m_bRunning = false;
 
@@ -40,14 +122,32 @@ namespace Isis {
     m_ui->sigma0LcdNumber->setMode(QLCDNumber::Dec);
     m_ui->sigma0LcdNumber->setDigitCount(5);
 
+    QString lastSettingsToolTip("Use the settings from the most recently accepted bundle adjust.");
+    QString lastSettingsWhat("When checked, the settings from the most recently accepted bundle "
+                             "adjust (i.e. the most recent bundle results in the project) will be "
+                             "used for running the next bundle adjust when \"Run\" is clicked.");
+    m_ui->useLastSettings->setToolTip(lastSettingsToolTip);
+    m_ui->useLastSettings->setWhatsThis(lastSettingsWhat);
+
     setWindowFlags(Qt::WindowStaysOnTopHint);
   }
 
 
+  /**
+   * Destructor.
+   */
   JigsawDialog::~JigsawDialog() {
+    if (m_bundleSolutionInfo) {
+      delete m_bundleSolutionInfo;
+    }
+    if (m_bundleAdjust) {
+      delete m_bundleAdjust;
+      m_bundleAdjust = NULL;
+    }
     if (m_ui) {
       delete m_ui;
     }
+    m_bundleSolutionInfo = NULL;
     m_ui = NULL;
   }
 
@@ -59,27 +159,34 @@ namespace Isis {
     // useLastSettings = matches check box
     // readOnly = false,
     // parent = this
-    JigsawSetupDialog setupdlg(m_project, 
-                               m_ui->useLastSettings->isChecked(), 
-                               false, 
+    JigsawSetupDialog setupdlg(m_project,
+                               m_ui->useLastSettings->isChecked(),
+                               false,
                                this);
 
-    // how to set up default settings object if last is not used or doesnt exist ???
-    // if (m_bundleSettings != NULL && setupdlg.useLastSettings()) {
-    // }
-    // if (m_bundleSettings == NULL) {
-    //   m_bundleSettings = setupdlg.bundleSettings();
-    // }
+    // We want to use the current settings if not use the most recently accepted bundle settings.
+    // This allows user to click "Setup", make changes, "OK", then click "Setup", and those changes
+    // are present in the setup dialog.
+    if (m_bundleSettings && !m_ui->useLastSettings->isChecked()) {
+      setupdlg.loadSettings(m_bundleSettings);
+      // We also tell the setup dialog what the last selected control is.
+      setupdlg.selectControl(m_selectedControlName);
+    }
 
     if (setupdlg.exec() == QDialog::Accepted) {
       m_selectedControlName = setupdlg.selectedControlName();
       m_selectedControl = setupdlg.selectedControl();
       m_bundleSettings = setupdlg.bundleSettings();
+      // The settings have been modified, might be misleading to keep this check after setup.
+      m_ui->useLastSettings->setChecked(false);
     }
   }
 
 
   void JigsawDialog::on_JigsawRunButton_clicked() {
+    // Once a bundle is run, the previous results cannot be accepted or rejected.
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
 
     if (!m_bRunning) {
       // ??? warning dialogs ???
@@ -100,220 +207,187 @@ namespace Isis {
          if (lastBundleSettings) {
            m_bundleSettings = lastBundleSettings;
          }
+
+         // Grab the control name that was used in that bundle adjustment.
+         m_selectedControlName = FileName(bundleSolutionInfo.last()->controlNetworkFileName()).name();
       }
 
-    // Non threaded *************************************************************
-//    SerialNumberList snlist;
+      // Clear the dialog displays.
+      clearDialog();
 
-//    QList<ImageList *> imagelists = m_project->images();
+      QThread *bundleThread = new QThread;
 
-//    for (int i = 0; i < imagelists.size( ); i++) {
-//      ImageList* list = imagelists.at(i);
-//      for (int j = 0; j < list->size(); j++) {
-//        Image* image = list->at(j);
-//        snlist.Add(image->fileName());
-//      }
-//    }
+      // Make sure to clean up any previously run bundle adjusts.
+      if (m_bundleAdjust) {
+        delete m_bundleAdjust;
+        m_bundleAdjust = NULL;
+      }
 
-//    BundleAdjust bundleAdjustment(m_bundleSettings, *m_selectedControl, snlist, false);
+      m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
+                                        false);
 
-//    connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
-//             this, SLOT( outputBundleStatus(QString) ) );
+      m_bundleAdjust->moveToThread(bundleThread);
 
-//    // clear dialog output window
-//    m_ui->statusUpdatesLabel->clear();
+      // Track the status updates bundle adjust gives and update the dialog.
+      connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
+               this, SLOT( outputBundleStatus(QString) ) );
 
-//    BundleSolutionInfo br = bundleAdjustment.solveCholeskyBR();
+      // Track any errors that may occur during the bundle adjust and update the dialog.
+      connect( m_bundleAdjust, SIGNAL( error(QString) ),
+               this, SLOT( errorString(QString) ) );
 
-//    bundleFinished(&br);
-    // **************************************************************************
+      // Update the iteration dialog element when the bundle updates its iteration count.
+      connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
+               this, SLOT( updateIterationSigma0(int, double) ) );
 
-    // Threaded *****************************************************************
-       QThread *bundleThread = new QThread;
+      // When we start the bundle thread, run the bundle adjustment.
+      connect( bundleThread, SIGNAL( started() ),
+               m_bundleAdjust, SLOT( solveCholesky() ) );
 
-       // Takes too long to copy/recreate the serial number list
-//       BundleAdjust *ba = new BundleAdjust(m_bundleSettings,
-//                                           *m_selectedControl,
-//                                           m_project->images(),
-//                                           false);
+      // When the bundle adjust says results are ready, we can allow the dialog to update the
+      // project as necessary.
+      connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
+               this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
 
-    // Use the run time to create a uniquely named directory in the results
-    // directory. This run time directory will contain the output files for
-    // this run (along with correlation matrix and serialized bundle
-    // information files).
+      // Schedule the bundle thread for deletion when it finishes.
+      connect( bundleThread, SIGNAL( finished() ),
+               bundleThread, SLOT( deleteLater() ) );
 
-// KLE - test commenting out 2016-05-30
-//    QString runTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-//    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
-//    QString path = cwd.absolutePath() + "/";
-//    m_bundleSettings->setOutputFilePrefix(path);
-       
-//     m_bundleAdjust = new BundleAdjust(m_bundleSettings,
-//                                            *m_selectedControl,
-//                                            m_project->images(),
-//                                            false);
-    m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
-                                      false);
+      // ken testing
+      // Notify the dialog that the bundle thread is finished, and update the gui elements.
+      connect( bundleThread, SIGNAL( finished() ),
+               this, SLOT( notifyThreadFinished() ) );
 
-       m_bundleAdjust->moveToThread(bundleThread);
+      // Tell the thread to quit (stop) when the bundle adjust finishes (successfully or not)
+      connect( m_bundleAdjust, SIGNAL( finished() ),
+               bundleThread, SLOT( quit() ) );
 
-       connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
-                this, SLOT( outputBundleStatus(QString) ) );
+      bundleThread->start();
 
-       connect( m_bundleAdjust, SIGNAL( error(QString) ),
-                this, SLOT( errorString(QString) ) );
-
-       connect( m_bundleAdjust, SIGNAL( bundleException(QString) ),
-                this, SLOT( reportException(QString) ) );
-
-       connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
-                this, SLOT( updateIterationSigma0(int, double) ) );
-
-       connect( bundleThread, SIGNAL( started() ),
-                m_bundleAdjust, SLOT( solveCholesky() ) );
-
-       connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
-                this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
-
-       connect( bundleThread, SIGNAL( finished() ),
-                bundleThread, SLOT( deleteLater() ) );
-
-       // ken testing
-       connect( bundleThread, SIGNAL( finished() ),
-                this, SLOT( notifyThreadFinished() ) );
-
-       connect( m_bundleAdjust, SIGNAL( finished() ),
-                bundleThread, SLOT( quit() ) );
-
-       connect( m_bundleAdjust, SIGNAL( finished() ),
-                m_bundleAdjust, SLOT( deleteLater() ) );
-       // ken testing
-
-       bundleThread->start();
-
-       // change "Run" button text to "Abort" (or maybe pause)
-       m_bRunning = true;
-       m_ui->JigsawRunButton->setText("&Abort");
-       update();
+      // change "Run" button text to "Abort" (or maybe pause)
+      m_bRunning = true;
+      m_close->setEnabled(false);
+      m_ui->JigsawRunButton->setText("&Abort");
+      update();
     }
     else {
-      // if bundle is running then we want to abort
-      if (m_bRunning) {
-        m_bundleAdjust->abortBundle();
-        m_bRunning = false;
-        m_ui->JigsawRunButton->setText("&Aborting...");
-        update();
+      // Make sure to abort the bundle if it is currently running.
+      m_bundleAdjust->abortBundle();
+      m_bRunning = false;
+      m_ui->JigsawRunButton->setText("&Aborting...");
+      update();
+      // Since the bundle has stopped, the user can close the dialog via "Close" again
+      m_close->setEnabled(true);
+    }
+  }
+
+
+  /**
+   * Constructs a image copier functor for copying images used in the bundle adjustment to the
+   * bundle solution info results (when the bundle is accepted).
+   */
+  JigsawDialog::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
+    m_destinationFolder = destination;
+  }
+
+
+  /**
+   * Destructor.
+   */
+  JigsawDialog::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
+    m_destinationFolder = QDir();
+  }
+
+
+  /**
+   * @brief Callable operator that copies an image to the bundle solution info results.
+   *
+   * This makes the functor callable - this will copy the passed FileName and return a pointer
+   * to the newly copied external cube.
+   *
+   * @param const FileName &image File name of the image to create an external copy of.
+   *
+   * @return Cube* Returns a pointer to the external cube copy. Returns NULL if an error
+   *               occurs.
+   */
+  Cube *JigsawDialog::CopyImageToResultsFunctor::operator()(const FileName &image) {
+    try {
+      // Get the destination folder and create that path.
+      FileName destination(QFileInfo(m_destinationFolder, image.name()).absoluteFilePath());
+      m_destinationFolder.mkpath(destination.path());
+
+      Cube originalCube(image, "r");
+      return originalCube.copy(destination, CubeAttributeOutput("+External"));
+    }
+    // Error tracking should be more robust, see ImportImagesWorkOrder.
+    catch (IException &e) {
+      std::cout << "\nerror: " << e.what();
+      return NULL;
+    }
+  }
+
+
+  /**
+   * Accepts the bundle results and saves them to the project. The "Accept" and "Reject" buttons
+   * will be disabled.
+   */
+  void JigsawDialog::acceptBundleResults() {
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+
+    //  Write csv files
+    m_bundleSolutionInfo->outputResiduals();
+    m_bundleSolutionInfo->outputImagesCSV();
+    m_bundleSolutionInfo->outputPointsCSV();
+
+    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+
+    // create output control net
+    // Write the new jigged control net with correct path to results folder + runtime
+    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" +
+                               m_bundleSolutionInfo->runTime() + "/" +
+                               FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
+    
+    m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
+
+    // Iterate through all of the image lists (the "imports" in the project).
+    QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
+    foreach (ImageList *imageList, imageLists) {
+      // Keep track of the file names of the images that were used in the bundle.
+      QStringList imagesToCopy;
+      int temp = 1;
+      if (!imageList->name().isEmpty()) {
+        imageList->setName("import" + QString::number(temp));
+      }
+      // Now, we iterate through each image in the current image list ("import"), and we determine
+      // the location of the image and where to copy it to (as an ecub).
+      foreach (Image *image, *imageList) {
+        FileName original(image->fileName());
+        // Update our list of tracked file names for the images we are going to copy.
+        imagesToCopy.append(original.expanded());
+      }
+      // Concurrently copy the bundled images as ecub's to the bundle solution info results.
+      CopyImageToResultsFunctor copyImage(m_project->bundleSolutionInfoRoot() + "/" +
+                                          m_bundleSolutionInfo->runTime() + "/images/" +
+                                          imageList->name());
+      // Do we need to release the memory for these cubes?
+      QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
+      for (int i = 0; i < imagesToCopy.size(); i++) {
+        Cube *c = copiedCubes.resultAt(i);
+        Table matrix = m_bundleAdjust->cMatrix(i);
       }
     }
 
-    // ********************************************** ****************************
-//#if 0
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#endif
-  }
-
-
-  /**
-   * Update the label or text edit area with the most recent status update by appending to list and
-   * refreshing.
-   *
-   * @param status Current status of bundle.
-   */
-  void JigsawDialog::outputBundleStatus(QString status) {
-    QString updateStr = "\n" + status;
-
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(updateStr) );
-
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
-
-    update();
-  }
-
-
-  /**
-   * Update the label or text edit area with the error message by appending to list and refreshing.
-   *
-   * @param error Error status of bundle.
-   */
-  void JigsawDialog::errorString(QString error) {
-    QString errorStr = "\n" + error;
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
-
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
-
-    update();
-  }
-
-
-  /**
-   * Update the label or text edit area with the error message by appending to list and refreshing.
-   *
-   * @param error Error status of bundle.
-   */
-  void JigsawDialog::reportException(QString exception) {
-    QString exceptionStr = "\n" + exception;
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(exceptionStr) );
-
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
-
-    update();
-  }
-
-
-  /**
-   * Update the label or text edit area with the error message by appending to list and refreshing.
-   *
-   * @param error Error status of bundle.
-   */
-  void JigsawDialog::updateIterationSigma0(int iteration, double sigma0) {
-    m_ui->iterationLcdNumber->display(iteration);
-    m_ui->sigma0LcdNumber->display(sigma0);
-
-    update();
-  }
-
-
-  void JigsawDialog::notifyThreadFinished() {
-    QString str = "\nThread Finished signal received";
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(str) );
-
-    // set Run button text back to "Run"
-    m_ui->JigsawRunButton->setText("&Run...");
-
-    update();
-
-    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
-          m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
-  }
-
-
-  /**
-   * This method will be called when the bundle is complete. This method will only be used when the
-   * bundle is threaded. It can be used when the bundle is not threaded but we don't need it
-   * because we have solveCholeskyBR().
-   *
-   *
-   *
-   * @param bundleSolutionInfo The results of the bundle run.
-   */
-  void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
-    if ( bundleSolutionInfo->bundleResults().converged() ) {
-      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
-      m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
 
       //TODO: move correlation matrix to correct position in project directory
-      
-      // create output control net
-  //     bundleAdjustment.controlNet()->Write("ONET.net");
   //
   //       for (int i = 0; i < bundleAdjustment.images(); i++) {
   //         Process p;
   //         CubeAttributeInput inAtt;
+  //  4-18-2017 TLS  bundleAdjustment.fileName is an .ecub.  code encompassed by my comment
+  //                 is test code.
   //         Cube *c = p.SetInputCube(bundleAdjustment.fileName(i), inAtt, ReadWrite);
   //         //check for existing polygon, if exists delete it
   //         if (c->label()->hasObject("Polygon")) {
@@ -341,19 +415,165 @@ namespace Isis {
   //         p.WriteHistory(*c);
   //       }
   //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
-  }
-  else {
     //This bundle was bad so we should delete all remenants.
-    
+
     //TODO: delete correlation matrix cov file...
     //TODO: delete bundle results object
 
 //       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
+
   }
 
-  // TODO: Give user the option to keep or throw away the bundle. Even if the bundle converged it
-  //       could still be worthless.
-  }  
+
+  /**
+   * Rejects the bundle results and discards them. The "Accept" and "Reject" buttons will be
+   * disabled.
+   */
+  void JigsawDialog::rejectBundleResults() {
+    // TODO should there be a prompt to user (are you sure?) -- Annoying?
+    // TODO Add tooltip/what'sthis for the buttons!!!! (CTR)
+    // Disable the "Accept" and "Reject" buttons.
+    m_accept->setEnabled(false);
+    m_reject->setEnabled(false);
+
+    // Clear the dialog so the lcd's are 0 and the status text is cleared.
+    clearDialog();
+    QString statusText("Bundle Rejected.\n\n");
+    m_ui->statusUpdatesLabel->setText(statusText);
+
+    // Cleanup the results (bundle solution info)
+    // How does this affect m_bundleSettings or m_bundleAdjustment?
+    // How does this affect using the last (most recent) settings for the run?
+    delete m_bundleSolutionInfo;
+    m_bundleSolutionInfo = NULL;
+  }
+
+
+  /**
+   * Resets the dialog's status widgets to their default state. This will clear the status text,
+   * reset the lcd displays to 0, and update the scroll on the scroll bar. This does NOT affect
+   * the state of the buttons.
+   */
+  void JigsawDialog::clearDialog() {
+    m_ui->iterationLcdNumber->display(0);
+    m_ui->sigma0LcdNumber->display(0);
+    m_ui->statusUpdatesLabel->clear();
+    updateScrollBar();
+  }
+
+
+  /**
+   * Updates the scroll bar to position to its maximum setting (the bottom).
+   */
+  void JigsawDialog::updateScrollBar() {
+    m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
+        m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
+  }
+
+
+  /**
+   * Update the label or text edit area with the most recent status update by appending to list and
+   * refreshing.
+   *
+   * @param status Current status of bundle.
+   */
+  void JigsawDialog::outputBundleStatus(QString status) {
+    QString updateStr = "\n" + status;
+
+    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(updateStr) );
+
+    updateScrollBar();
+
+    update();
+  }
+
+
+  /**
+   * Update the label or text edit area with the error message by appending to list and refreshing.
+   *
+   * @param error Error status of bundle.
+   */
+  void JigsawDialog::errorString(QString error) {
+    QString errorStr = "\n" + error;
+    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
+
+    updateScrollBar();
+
+    update();
+  }
+
+
+  /**
+   * Update the label or text edit area with the error message by appending to list and refreshing.
+   *
+   * @param error Error status of bundle.
+   */
+  void JigsawDialog::reportException(QString exception) {
+    QString exceptionStr = "\n" + exception;
+    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(exceptionStr) );
+
+    updateScrollBar();
+
+    update();
+  }
+
+
+  /**
+   * Update the label or text edit area with the error message by appending to list and refreshing.
+   *
+   * @param error Error status of bundle.
+   */
+  void JigsawDialog::updateIterationSigma0(int iteration, double sigma0) {
+    m_ui->iterationLcdNumber->display(iteration);
+    m_ui->sigma0LcdNumber->display(sigma0);
+
+    update();
+  }
+
+
+  /**
+   * @brief Notifies the dialog that the bundle thread has finished.
+   *
+   * This slot is used to notify the dialog that the bundle has finished. The bundle thread
+   * finishes when the bundle adjust finishes (either successfully or unsuccessfully, or if the
+   * user aborts the run).
+   */
+  void JigsawDialog::notifyThreadFinished() {
+    //QString str = "\nThread Finished signal received";
+    //m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(str) );
+
+    // set Run button text back to "Run"
+    m_ui->JigsawRunButton->setText("&Run");
+    // Since this slot is invoked when the thread finishes, the bundle adjustment is no longer
+    // running.
+    m_bRunning = false;
+
+    updateScrollBar();
+
+    update();
+  }
+
+
+  /**
+   * This method will be called when the bundle is complete. This method will only be used when the
+   * bundle is threaded. It can be used when the bundle is not threaded but we don't need it
+   * because we have solveCholeskyBR().
+   *
+   *
+   *
+   * @param bundleSolutionInfo The results of the bundle run.
+   */
+  void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
+
+    bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
+    m_bundleSolutionInfo = bundleSolutionInfo;
+
+    // Since results are available, the user can accept (save) or reject(discard) the results.
+    m_accept->setEnabled(true);
+    m_reject->setEnabled(true);
+    // The bundle is done, so the user can close again.
+    m_close->setEnabled(true);
+  }
 }
 
   /**
@@ -400,40 +620,3 @@ namespace Isis {
    *    explanation/"
    *
    */
-/*
-  void JigsawDialog::on_JigsawRunButton_clicked() {
-
-    // Non threaded *************************************************************
-    SerialNumberList snlist;
-
-    QList<ImageList *> imagelists = m_project->images();
-
-    for (int i = 0; i < imagelists.size( ); i++) {
-      ImageList* list = imagelists.at(i);
-      for (int j = 0; j < list->size(); j++) {
-        Image* image = list->at(j);
-        snlist.Add(image->fileName());
-      }
-    }
-
-    BundleAdjust bundleAdjustment(m_bundleSettings, *m_selectedControl, snlist, false);
-
-    connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
-             this, SLOT( outputBundleStatus(QString) ) );
-
-    // clear dialog output window
-    m_ui->statusUpdatesLabel->clear();
-
-    BundleSolutionInfo br = bundleAdjustment.solveCholeskyBR();
-
-    bundleFinished(&br);
-    // **************************************************************************
-    
-    // ********************************************** ****************************
-//#if 0
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    m_ui->useLastSettings->setEnabled(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#endif
-  }
-*/

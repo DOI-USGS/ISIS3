@@ -27,14 +27,21 @@ namespace Isis {
 
   /**
    * @brief  This is a child of class WorkOrder which is used for anything that performs
-   *  an action in a Project.  This work order allows the user to set the active ImageList in the
+   *  an action in a Project.
+   *
+   *  This work order allows the user to set the active ImageList in the
    *  project.  Views that need to operate on a common ImageList, ie. footprint2dview,
    *  ControlPointEditView, etc. can get the active ImageList from project.
    *
    * @author 2016-06-27 Tracie Sucharski
    *
    * @internal
-   *
+   *   @history 2017-04-05 Ian Humphrey - Added isUndoable() implementation to indicate that this
+   *                           work order is not undoable. Separated setup and execution into
+   *                           setupExecution() and execute(). Fixes #4734.
+   *   @history 2017-04-11 Ian Humphrey - Removed isUndoable() and instead set inherited
+   *                           m_isUndoable to false in constructor to indicate it is not undoable.
+   *                           References #4734.
    */
 
   class SetActiveImageListWorkOrder : public WorkOrder {
@@ -47,11 +54,12 @@ namespace Isis {
       virtual SetActiveImageListWorkOrder *clone() const;
 
       virtual bool isExecutable(ImageList *imageList);
-      bool execute();
+
+      virtual bool setupExecution();
+      virtual void execute();
 
     private:
       SetActiveImageListWorkOrder &operator=(const SetActiveImageListWorkOrder &rhs);
   };
 }
 #endif
-

@@ -29,12 +29,12 @@ namespace Isis {
   }
 
 
-  void MoveUpOneSceneWorkOrder::syncRedo() {
+  void MoveUpOneSceneWorkOrder::execute() {
     storeZPositions( scene()->moveUpOne(imageList()) );
   }
 
 
-  void MoveUpOneSceneWorkOrder::syncUndo() {
+  void MoveUpOneSceneWorkOrder::undoExecution() {
     restoreZPositions(true);
   }
 }

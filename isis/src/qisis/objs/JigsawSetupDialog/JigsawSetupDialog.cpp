@@ -18,42 +18,6 @@
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
-//  JigsawSetupDialog::JigsawSetupDialog(Project *project, QWidget *parent) :
-//                                QDialog(parent), m_ui(new Ui::JigsawSetupDialog) {
-//    //
-//    // Note: When the ui is set up, all intializations to enabled/disabled
-//    // are taken care of. Also connections between some widgets will be taken
-//    // care of in the ui setup.
-
-//    // For example:
-//    //   radiusCheckBox is connected to pointRadiusSigmaLabel and pointRadiusSigmaLineEdit
-//    //   outlierRejectionCheckBox is connected
-//    //       to outlierRejectionMultiplierLabel and outlierRejectionMultiplierLineEdit
-//    //
-//    // These connections and settings can be found in the JigsawSetupDialog.ui file
-//    // created by QtDesigner and may be edited by opening the ui file in QtDesigner.
-//    //
-//    // More complex connections such as the relationship between positionSolveOption and
-//    // spkDegree are handled in this file by the on_widgetName_signal methods.
-//    m_ui->setupUi(this);
-
-//    m_project = project;
-
-//    // fill control net combo box from project
-//    for (int i = 0; i < project->controls().size(); i++) {
-//      ControlList* conlist = project->controls().at(i);
-//      for (int j = 0; j < conlist->size(); j++) {
-//        Control *control = conlist->at(j);
-
-//        QVariant v = qVariantFromValue((void*)control);
-
-//        m_ui->controlNetworkComboBox->addItem(control->displayProperties()->displayName(), v);
-//      }
-//    }
-
-//    m_ui->JigsawSetup->setCurrentIndex(0);
-//  }
-
 
   JigsawSetupDialog::JigsawSetupDialog(Project *project, bool useLastSettings, bool readOnly,
                                        QWidget *parent) : QDialog(parent),
@@ -100,8 +64,14 @@ namespace Isis {
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (useLastSettings && bundleSolutionInfo.size() > 0) {
      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+     // Retrieve the control net name used in the last bundle adjustment.
+     // Note that this returns a fully specified path and filename, while the cnet combo box
+     // only stores file names.
+     selectControl(bundleSolutionInfo.last()->controlNetworkFileName());
      fillFromSettings(lastBundleSettings);
     }
+
+    // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
     m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
@@ -267,7 +237,7 @@ namespace Isis {
     bool solveAngularVelocity           = (bool) (index > 1);
     bool solveAngularAcceleration       = (bool) (index > 2);
 //    bool solveAllPolynomialCoefficients = (bool) (index > 3);
-    
+
     m_ui->twistCheckBox->setEnabled(solveAngles);
     m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
 
@@ -322,7 +292,7 @@ namespace Isis {
   }
 
 
-  void JigsawSetupDialog::fillFromSettings(BundleSettingsQsp settings) {
+  void JigsawSetupDialog::fillFromSettings(const BundleSettingsQsp settings) {
 
     BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
 
@@ -439,8 +409,8 @@ namespace Isis {
                               m_ui->updateCubeLabelCheckBox->isChecked(),
                               m_ui->errorPropagationCheckBox->isChecked(),
                               m_ui->radiusCheckBox->isChecked(),
-                              latitudeSigma, 
-                              longitudeSigma, 
+                              latitudeSigma,
+                              longitudeSigma,
                               radiusSigma);
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
@@ -450,7 +420,7 @@ namespace Isis {
 
     QList<BundleObservationSolveSettings> observationSolveSettingsList;
     BundleObservationSolveSettings observationSolveSettings;
-   
+
     // pointing settings
     double anglesSigma              = -1.0;
     double angularVelocitySigma     = -1.0;
@@ -472,7 +442,7 @@ namespace Isis {
         m_ui->ckSolveDegreeSpinBox->text().toInt(),
         m_ui->fitOverPointingCheckBox->isChecked(),
         anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-   
+
     // position option
     double positionSigma     = -1.0;
     double velocitySigma     = -1.0;
@@ -488,16 +458,16 @@ namespace Isis {
     }
     observationSolveSettings.setInstrumentPositionSettings(
         BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
-        m_ui->spkDegreeSpinBox->text().toInt(), 
+        m_ui->spkDegreeSpinBox->text().toInt(),
         m_ui->spkSolveDegreeSpinBox->text().toInt(),
         m_ui->hermiteSplineCheckBox->isChecked(),
         positionSigma, velocitySigma, accelerationSigma);
-   
+
     observationSolveSettingsList.append(observationSolveSettings);
     settings->setObservationSolveOptions(observationSolveSettingsList);
     // convergence criteria
-    settings->setConvergenceCriteria(BundleSettings::Sigma0, 
-                                     m_ui->sigma0ThresholdLineEdit->text().toDouble(), 
+    settings->setConvergenceCriteria(BundleSettings::Sigma0,
+                                     m_ui->sigma0ThresholdLineEdit->text().toDouble(),
                                      m_ui->maximumIterationsLineEdit->text().toInt()); // TODO: change this to give user a choice between sigma0 and param corrections???
 
     // max likelihood estimation
@@ -505,21 +475,21 @@ namespace Isis {
       // if model1 is not "NONE", add to the models list with its quantile
       settings->addMaximumLikelihoodEstimatorModel(
           MaximumLikelihoodWFunctions::stringToModel(
-              m_ui->maximumLikelihoodModel1ComboBox->currentText()), 
+              m_ui->maximumLikelihoodModel1ComboBox->currentText()),
           m_ui->maximumLikelihoodModel1QuantileLineEdit->text().toDouble());
 
       if (m_ui->maximumLikelihoodModel2ComboBox->currentText().compare("NONE") != 0) {
         // if model2 is not "NONE", add to the models list with its quantile
         settings->addMaximumLikelihoodEstimatorModel(
             MaximumLikelihoodWFunctions::stringToModel(
-                m_ui->maximumLikelihoodModel2ComboBox->currentText()), 
+                m_ui->maximumLikelihoodModel2ComboBox->currentText()),
             m_ui->maximumLikelihoodModel2QuantileLineEdit->text().toDouble());
 
         if (m_ui->maximumLikelihoodModel3ComboBox->currentText().compare("NONE") != 0) {
           // if model3 is not "NONE", add to the models list with its quantile
           settings->addMaximumLikelihoodEstimatorModel(
               MaximumLikelihoodWFunctions::stringToModel(
-                  m_ui->maximumLikelihoodModel3ComboBox->currentText()), 
+                  m_ui->maximumLikelihoodModel3ComboBox->currentText()),
               m_ui->maximumLikelihoodModel3QuantileLineEdit->text().toDouble());
         }
       }
@@ -639,21 +609,58 @@ namespace Isis {
   }
 
 
+  /**
+   * Loads the passed bundle settings into the setup dialog. This is used by JigsawDialog to
+   * load its current settings when not using the last (most recent) bundle settings in the project.
+   *
+   * @param const BundleSettingsQsp settings Shared pointer to the settings to load up.
+   */
+  void JigsawSetupDialog::loadSettings(const BundleSettingsQsp settings) {
+    fillFromSettings(settings);
+  }
+
+
+  /**
+   * Selects a control in the control network combo box by trying to find an item with the
+   * matching name. If the name is found in the combo box, the box's index is set to that
+   * found control network index. If the name is not found and the box is not empty, the
+   * current index is set to 0 (the first item). If the name is not found and the box is
+   * empty, the index is set to -1 (see Qt).
+   *
+   * @param const QString &controlName The name of the control to try to find in the combo box.
+   */
+  void JigsawSetupDialog::selectControl(const QString &controlName) {
+    QComboBox &cnetBox = *(m_ui->controlNetworkComboBox);
+    int foundControlIndex = cnetBox.findText(FileName(controlName).name());
+    // We did not find it, so we need to see if the combo box is empty or not.
+    if (foundControlIndex == -1) {
+      if (cnetBox.count() == 0) {
+       cnetBox.setCurrentIndex(-1);
+      }
+      // If it is not empty, just set the current index to the first item.
+      else {
+        cnetBox.setCurrentIndex(0);
+      }
+    }
+    // Otherwise, set the current index to the found control net index.
+    else {
+      cnetBox.setCurrentIndex(foundControlIndex);
+    }
+  } 
+
+
   Control *JigsawSetupDialog::selectedControl() {
 
       int nIndex = m_ui->controlNetworkComboBox->currentIndex();
-      Control *selectedControl 
+      Control *selectedControl
                    = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
       return selectedControl;
 
   }
 
 
-  QString *JigsawSetupDialog::selectedControlName() {
-
-    QString *name = new QString(m_ui->controlNetworkComboBox->currentText());
-      return name;
-
+  QString JigsawSetupDialog::selectedControlName() {
+    return QString(m_ui->controlNetworkComboBox->currentText());
   }
 
 

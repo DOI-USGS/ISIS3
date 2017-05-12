@@ -30,11 +30,6 @@
 #include <QString>
 #include <QVector>
 
-// hdf5 Library
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
-
 // Isis Library
 #include "BundleControlPoint.h"
 #include "BundleObservationVector.h"
@@ -63,8 +58,8 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * A container class for statistical results from a BundleAdjust solution. 
-   *  
+   * A container class for statistical results from a BundleAdjust solution.
+   *
    * @author 2014-07-01 Jeannie Backer
    *
    * @internal
@@ -86,6 +81,9 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Added iteration count, radians to meters conversion,
    *                           observation vector, bundle control point vector, and output control
    *                           network for write methods in BundleSolutionInfo.  Fixes #4159.
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
+   *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
+   *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -173,7 +171,7 @@ namespace Isis {
       void setOutputControlNet(ControlNetQsp outNet);
       void setIterations(int iterations);
       void setObservations(BundleObservationVector observations);
-      
+
       // Accessors...
       QList<Statistics> rmsImageSampleResiduals() const;
       QList<Statistics> rmsImageLineResiduals() const;
@@ -221,7 +219,7 @@ namespace Isis {
       ControlNetQsp outputControlNet() const;
       int iterations() const;
       const BundleObservationVector &observations() const;
-      
+
       int numberMaximumLikelihoodModels() const;
       int maximumLikelihoodModelIndex() const;
       StatCumProbDistDynCalc cumulativeProbabilityDistribution() const;
@@ -235,8 +233,6 @@ namespace Isis {
       bool setNumberHeldImages(SerialNumberList pHeldSnList,
                                SerialNumberList *pSnList);
 
-      PvlObject pvlObject(QString name = "BundleResults") const;
-
       // Correlation Matrix accessors for cnetsuite and mutators for bundle adjust.
       CorrelationMatrix correlationMatrix() const;
       void setCorrMatCovFileName(FileName name);
@@ -244,23 +240,14 @@ namespace Isis {
 
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
-      
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
 
-      void createH5Group(hid_t locationId, QString locationName) const;// delete these
-      void parseH5Group(hid_t locationId, QString locationName);       // delete these
-
-      void createH5Group(H5::CommonFG &locationObject, QString locationName) const;
-      void openH5Group(H5::CommonFG &locationObject, QString locationName);
-      BundleResults(H5::CommonFG &locationObject, QString locationName);
 
     private:
       /**
        * This class is an XmlHandler used to read and write BundleResults objects
        * from and to XML files.  Documentation will be updated when it is decided
        * if XML support will remain.
-       * 
+       *
        * @author 2014-07-28 Jeannie Backer
        *
        * @internal
@@ -270,16 +257,16 @@ namespace Isis {
           // TODO: does xml stuff need project???
           XmlHandler(BundleResults *statistics, Project *project);
           ~XmlHandler();
-   
+
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                   const QString &qName);
-   
+
         private:
           Q_DISABLE_COPY(XmlHandler);
-   
+
           BundleResults *m_xmlHandlerBundleResults;
           Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
@@ -300,32 +287,21 @@ namespace Isis {
           QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
       };
 
-      /**
-       * A unique ID for this object (useful for others to reference this object
-       *   when saving to disk).
-       */
-      QUuid *m_id;
-//???      QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
       CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
 
-// ???       Statistics m_statsx;                       //!<  x errors
-// ???       Statistics m_statsy;                       //!<  y errors
-// ???       Statistics m_statsrx;                      //!<  x residuals
-// ???       Statistics m_statsry;                      //!<  y residuals
-// ???       Statistics m_statsrxy;                     //!< xy residuals
 
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
       // Currently set but unused
       int m_numberIgnoredPoints;              //!< number of ignored points
-      int m_numberHeldImages;                 //!< number of 'held' images (define)          
+      int m_numberHeldImages;                 //!< number of 'held' images (define)
 
       // The following three members are set but unused.
       double m_rmsXResiduals;                 //!< rms of x residuals
       double m_rmsYResiduals;                 //!< rms of y residuals
       double m_rmsXYResiduals;                //!< rms of all x and y residuals
-      
+
       double m_rejectionLimit;                //!< current rejection limit
-      // TODO:??? reorder read/write data stream, init, copy constructor, operator= 
+      // TODO:??? reorder read/write data stream, init, copy constructor, operator=
       int m_numberObservations;                //!< number of image coordinate observations
       int m_numberRejectedObservations;        //!< number of rejected image coordinate observations
       int m_numberUnknownParameters;           //!< total number of parameters to solve for
@@ -341,7 +317,7 @@ namespace Isis {
       bool m_converged;
 
       // Variables for output methods in BundleSolutionInfo
-      
+
       QVector<BundleControlPointQsp> m_bundleControlPoints; /**< The vector of BundleControlPoints
                                                                  from BundleAdjust.  Equivalent to
                                                                  the output control net minus
@@ -360,13 +336,13 @@ namespace Isis {
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables set in computeBundleResults()
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      // QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range", 
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
       QList<Statistics> m_rmsImageSampleResiduals;/**< List of RMS image sample residual statistics
                                                        for each image in the bundle  */
       QList<Statistics> m_rmsImageLineResiduals;  /**< List of RMS image line residual statistics
                                                        for each image in the bundle  */
-      QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics 
+      QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics
                                                        for each image in the bundle  */
 
       //!< The root mean square image x sigmas.
@@ -403,20 +379,20 @@ namespace Isis {
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+
       //!< The maximum likelihood models and their quantiles.
       QList< QPair< MaximumLikelihoodWFunctions, double > > m_maximumLikelihoodFunctions;
 
-      /**< The number of maximum likelihood estimation 
+      /**< The number of maximum likelihood estimation
       models. Up to three different models can be used
       in succession.*/
-      /**< This class is used to reweight observations in 
-           order to achieve more robust parameter 
-           estimation, up to three different maximum 
+      /**< This class is used to reweight observations in
+           order to achieve more robust parameter
+           estimation, up to three different maximum
            likelihood estimation models can be used in
            succession.*/
       /**< Quantiles of the |residual| distribution to be
-           used for tweaking constants of the maximum 
+           used for tweaking constants of the maximum
            probability models.*/
       int m_maximumLikelihoodIndex;            /**< This count keeps track of which stage of the
                                                     maximum likelihood adjustment the bundle is
@@ -426,16 +402,14 @@ namespace Isis {
                                                     |R^2 residuals|, quantiles of this distribution
                                                     are used to adjust the maximum likelihood
                                                     functions dynamically iteration by iteration.*/
-      StatCumProbDistDynCalc *m_cumProRes;     /**< This class keeps track of the cumulative 
+      StatCumProbDistDynCalc *m_cumProRes;     /**< This class keeps track of the cumulative
                                                     probability distribution of residuals
-                                                    (in unweighted pixels), this is used for 
+                                                    (in unweighted pixels), this is used for
                                                     reporting, and not for computation.*/
-      double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/ 
-       
+      double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/
+
   };
-  // operators to read/write BundleResults to/from binary disk file
-  QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults);
-  QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults);
+
 };
 
 Q_DECLARE_METATYPE(Isis::BundleResults);
