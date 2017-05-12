@@ -1,5 +1,9 @@
 #include "Isis.h"
 #include "ProcessByBrick.h"
+#include "ProcessByLine.h"
+#include "ProcessBySample.h"
+#include "ProcessBySpectra.h"
+#include "ProcessByTile.h"
 #include "Cube.h"
 #include <iostream>
 #include <string>
@@ -46,7 +50,6 @@ void IsisMain() {
   Preference::Preferences(true);
   Cube *icube;
   ProcessByBrick p;
-
   cout << "Testing Functors\n";
   {
     cout << "Functor2 - ProcessCube One Thread\n";
@@ -71,9 +74,6 @@ void IsisMain() {
         cout << "2:" + exMsg.toStdString() << endl;
 
     }
-
-
-
 
     icube = p.SetInputCube("FROM");
     p.SetBrickSize(10, 10, 2);
@@ -196,6 +196,49 @@ void IsisMain() {
     cout << "\n";
   }
 
+
+  {
+    cout << "Testing ProcessByBrick::ProcessCube[Buffer &in, Buffer &out]" << endl;
+    Functor2 functor;
+    ProcessByBrick *pline;
+    pline = new ProcessByLine;
+    icube = pline->SetInputCube("FROM");
+    pline->SetOutputCube("TO",icube->sampleCount(), icube->lineCount(),icube->bandCount());
+    pline->ProcessCube(functor, false);
+    pline->EndProcess();
+
+  }
+
+
+
+  {
+    cout << "Testing ProcessByBrick::ProcessCubes[vector<Buffer> &in, vector<Buffer> &out]" << endl;
+    Functor3 functor;
+    ProcessByBrick *psample;
+    psample = new ProcessBySample;
+    Cube *icube = psample->SetInputCube("FROM");
+    psample->SetInputCube("FROM2");
+    psample->SetBrickSize(10, 10, 2);
+    psample->SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount()+10);
+    psample->SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    psample->ProcessCubes(functor, false);
+    psample->EndProcess();
+    cout << "\n";
+
+  }
+
+  {
+    cout << "Testing ProcessByBrick::ProcessCubeInPlace[Buffer &inout]" << endl; 
+    Functor5 functor;
+    ProcessByBrick *psample;
+    psample = new ProcessBySample;
+    icube=psample->SetInputCube("FROM");
+    //psample->SetOutputCube("TO",icube->sampleCount(), icube->lineCount(),icube->bandCount());
+    psample->ProcessCubeInPlace(functor, false);
+    psample->EndProcess();
+  }
+
+
   {
     cout << "Functor3 - ProcessCubes One Thread\n";
 
@@ -274,6 +317,8 @@ void IsisMain() {
     p.EndProcess();
     cout << "\n";
   }
+
+
 
   {
     cout << "Functor4 - ProcessCube Threaded\n";
@@ -365,6 +410,9 @@ void oneInAndOut(Buffer &ib, Buffer &ob) {
     cout << "Bogus error #1" << endl;
   }
 }
+
+
+
 
 void twoInAndOut(vector<Buffer *> &ib, vector<Buffer *> &ob) {
   static bool firstTime = true;

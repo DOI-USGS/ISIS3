@@ -10,1277 +10,3079 @@ Functor2 - ProcessCube One Thread
 unittest: Working
 0% Processed
 Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
+Buffer Samples:  31752
+Buffer Lines:    126
 Buffer Bands:    2
 
 Sample:  1  Line:  1  Band:  1
+10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 
+Testing ProcessByBrick::ProcessCube[Buffer &in, Buffer &out]
+unittest: Working
+0% Processed
 Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
+Buffer Samples:  126
+Buffer Lines:    1
+Buffer Bands:    1
 
-Sample:  11  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  21  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  31  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  41  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  51  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  61  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  71  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  81  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  91  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  101  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  111  Line:  1  Band:  1
-
-Testing one input and output cube ... 
-Buffer Samples:  200
-Buffer Lines:    10
-Buffer Bands:    2
-
-Sample:  121  Line:  1  Band:  1
+Sample:  1  Line:  1  Band:  1
+Sample:  1  Line:  2  Band:  1
+Sample:  1  Line:  3  Band:  1
+Sample:  1  Line:  4  Band:  1
+Sample:  1  Line:  5  Band:  1
+Sample:  1  Line:  6  Band:  1
+Sample:  1  Line:  7  Band:  1
+Sample:  1  Line:  8  Band:  1
+Sample:  1  Line:  9  Band:  1
+Sample:  1  Line:  10  Band:  1
 Sample:  1  Line:  11  Band:  1
-Sample:  11  Line:  11  Band:  1
-Sample:  21  Line:  11  Band:  1
-Sample:  31  Line:  11  Band:  1
-10% ProcessedSample:  41  Line:  11  Band:  1
-Sample:  51  Line:  11  Band:  1
-Sample:  61  Line:  11  Band:  1
-Sample:  71  Line:  11  Band:  1
-Sample:  81  Line:  11  Band:  1
-Sample:  91  Line:  11  Band:  1
-Sample:  101  Line:  11  Band:  1
-Sample:  111  Line:  11  Band:  1
-Sample:  121  Line:  11  Band:  1
+Sample:  1  Line:  12  Band:  1
+Sample:  1  Line:  13  Band:  1
+Sample:  1  Line:  14  Band:  1
+Sample:  1  Line:  15  Band:  1
+Sample:  1  Line:  16  Band:  1
+Sample:  1  Line:  17  Band:  1
+Sample:  1  Line:  18  Band:  1
+Sample:  1  Line:  19  Band:  1
+Sample:  1  Line:  20  Band:  1
 Sample:  1  Line:  21  Band:  1
-Sample:  11  Line:  21  Band:  1
-Sample:  21  Line:  21  Band:  1
-Sample:  31  Line:  21  Band:  1
-Sample:  41  Line:  21  Band:  1
-Sample:  51  Line:  21  Band:  1
-Sample:  61  Line:  21  Band:  1
-Sample:  71  Line:  21  Band:  1
-20% ProcessedSample:  81  Line:  21  Band:  1
-Sample:  91  Line:  21  Band:  1
-Sample:  101  Line:  21  Band:  1
-Sample:  111  Line:  21  Band:  1
-Sample:  121  Line:  21  Band:  1
+Sample:  1  Line:  22  Band:  1
+Sample:  1  Line:  23  Band:  1
+Sample:  1  Line:  24  Band:  1
+Sample:  1  Line:  25  Band:  1
+Sample:  1  Line:  26  Band:  1
+10% ProcessedSample:  1  Line:  27  Band:  1
+Sample:  1  Line:  28  Band:  1
+Sample:  1  Line:  29  Band:  1
+Sample:  1  Line:  30  Band:  1
 Sample:  1  Line:  31  Band:  1
-Sample:  11  Line:  31  Band:  1
-Sample:  21  Line:  31  Band:  1
-Sample:  31  Line:  31  Band:  1
-Sample:  41  Line:  31  Band:  1
-Sample:  51  Line:  31  Band:  1
-Sample:  61  Line:  31  Band:  1
-Sample:  71  Line:  31  Band:  1
-Sample:  81  Line:  31  Band:  1
-Sample:  91  Line:  31  Band:  1
-Sample:  101  Line:  31  Band:  1
-Sample:  111  Line:  31  Band:  1
-30% ProcessedSample:  121  Line:  31  Band:  1
+Sample:  1  Line:  32  Band:  1
+Sample:  1  Line:  33  Band:  1
+Sample:  1  Line:  34  Band:  1
+Sample:  1  Line:  35  Band:  1
+Sample:  1  Line:  36  Band:  1
+Sample:  1  Line:  37  Band:  1
+Sample:  1  Line:  38  Band:  1
+Sample:  1  Line:  39  Band:  1
+Sample:  1  Line:  40  Band:  1
 Sample:  1  Line:  41  Band:  1
-Sample:  11  Line:  41  Band:  1
-Sample:  21  Line:  41  Band:  1
-Sample:  31  Line:  41  Band:  1
-Sample:  41  Line:  41  Band:  1
-Sample:  51  Line:  41  Band:  1
-Sample:  61  Line:  41  Band:  1
-Sample:  71  Line:  41  Band:  1
-Sample:  81  Line:  41  Band:  1
-Sample:  91  Line:  41  Band:  1
-Sample:  101  Line:  41  Band:  1
-Sample:  111  Line:  41  Band:  1
-Sample:  121  Line:  41  Band:  1
+Sample:  1  Line:  42  Band:  1
+Sample:  1  Line:  43  Band:  1
+Sample:  1  Line:  44  Band:  1
+Sample:  1  Line:  45  Band:  1
+Sample:  1  Line:  46  Band:  1
+Sample:  1  Line:  47  Band:  1
+Sample:  1  Line:  48  Band:  1
+Sample:  1  Line:  49  Band:  1
+Sample:  1  Line:  50  Band:  1
 Sample:  1  Line:  51  Band:  1
-Sample:  11  Line:  51  Band:  1
-Sample:  21  Line:  51  Band:  1
-40% ProcessedSample:  31  Line:  51  Band:  1
-Sample:  41  Line:  51  Band:  1
-Sample:  51  Line:  51  Band:  1
-Sample:  61  Line:  51  Band:  1
-Sample:  71  Line:  51  Band:  1
-Sample:  81  Line:  51  Band:  1
-Sample:  91  Line:  51  Band:  1
-Sample:  101  Line:  51  Band:  1
-Sample:  111  Line:  51  Band:  1
-Sample:  121  Line:  51  Band:  1
+20% ProcessedSample:  1  Line:  52  Band:  1
+Sample:  1  Line:  53  Band:  1
+Sample:  1  Line:  54  Band:  1
+Sample:  1  Line:  55  Band:  1
+Sample:  1  Line:  56  Band:  1
+Sample:  1  Line:  57  Band:  1
+Sample:  1  Line:  58  Band:  1
+Sample:  1  Line:  59  Band:  1
+Sample:  1  Line:  60  Band:  1
 Sample:  1  Line:  61  Band:  1
-Sample:  11  Line:  61  Band:  1
-Sample:  21  Line:  61  Band:  1
-Sample:  31  Line:  61  Band:  1
-Sample:  41  Line:  61  Band:  1
-Sample:  51  Line:  61  Band:  1
-Sample:  61  Line:  61  Band:  1
-50% ProcessedSample:  71  Line:  61  Band:  1
-Sample:  81  Line:  61  Band:  1
-Sample:  91  Line:  61  Band:  1
-Sample:  101  Line:  61  Band:  1
-Sample:  111  Line:  61  Band:  1
-Sample:  121  Line:  61  Band:  1
+Sample:  1  Line:  62  Band:  1
+Sample:  1  Line:  63  Band:  1
+Sample:  1  Line:  64  Band:  1
+Sample:  1  Line:  65  Band:  1
+Sample:  1  Line:  66  Band:  1
+Sample:  1  Line:  67  Band:  1
+Sample:  1  Line:  68  Band:  1
+Sample:  1  Line:  69  Band:  1
+Sample:  1  Line:  70  Band:  1
 Sample:  1  Line:  71  Band:  1
-Sample:  11  Line:  71  Band:  1
-Sample:  21  Line:  71  Band:  1
-Sample:  31  Line:  71  Band:  1
-Sample:  41  Line:  71  Band:  1
-Sample:  51  Line:  71  Band:  1
-Sample:  61  Line:  71  Band:  1
-Sample:  71  Line:  71  Band:  1
-Sample:  81  Line:  71  Band:  1
-Sample:  91  Line:  71  Band:  1
-Sample:  101  Line:  71  Band:  1
-60% ProcessedSample:  111  Line:  71  Band:  1
-Sample:  121  Line:  71  Band:  1
+Sample:  1  Line:  72  Band:  1
+Sample:  1  Line:  73  Band:  1
+Sample:  1  Line:  74  Band:  1
+Sample:  1  Line:  75  Band:  1
+Sample:  1  Line:  76  Band:  1
+30% ProcessedSample:  1  Line:  77  Band:  1
+Sample:  1  Line:  78  Band:  1
+Sample:  1  Line:  79  Band:  1
+Sample:  1  Line:  80  Band:  1
 Sample:  1  Line:  81  Band:  1
-Sample:  11  Line:  81  Band:  1
-Sample:  21  Line:  81  Band:  1
-Sample:  31  Line:  81  Band:  1
-Sample:  41  Line:  81  Band:  1
-Sample:  51  Line:  81  Band:  1
-Sample:  61  Line:  81  Band:  1
-Sample:  71  Line:  81  Band:  1
-Sample:  81  Line:  81  Band:  1
-Sample:  91  Line:  81  Band:  1
-Sample:  101  Line:  81  Band:  1
-Sample:  111  Line:  81  Band:  1
-Sample:  121  Line:  81  Band:  1
+Sample:  1  Line:  82  Band:  1
+Sample:  1  Line:  83  Band:  1
+Sample:  1  Line:  84  Band:  1
+Sample:  1  Line:  85  Band:  1
+Sample:  1  Line:  86  Band:  1
+Sample:  1  Line:  87  Band:  1
+Sample:  1  Line:  88  Band:  1
+Sample:  1  Line:  89  Band:  1
+Sample:  1  Line:  90  Band:  1
 Sample:  1  Line:  91  Band:  1
-Sample:  11  Line:  91  Band:  1
-70% ProcessedSample:  21  Line:  91  Band:  1
-Sample:  31  Line:  91  Band:  1
-Sample:  41  Line:  91  Band:  1
-Sample:  51  Line:  91  Band:  1
-Sample:  61  Line:  91  Band:  1
-Sample:  71  Line:  91  Band:  1
-Sample:  81  Line:  91  Band:  1
-Sample:  91  Line:  91  Band:  1
-Sample:  101  Line:  91  Band:  1
-Sample:  111  Line:  91  Band:  1
-Sample:  121  Line:  91  Band:  1
+Sample:  1  Line:  92  Band:  1
+Sample:  1  Line:  93  Band:  1
+Sample:  1  Line:  94  Band:  1
+Sample:  1  Line:  95  Band:  1
+Sample:  1  Line:  96  Band:  1
+Sample:  1  Line:  97  Band:  1
+Sample:  1  Line:  98  Band:  1
+Sample:  1  Line:  99  Band:  1
+Sample:  1  Line:  100  Band:  1
 Sample:  1  Line:  101  Band:  1
-Sample:  11  Line:  101  Band:  1
-Sample:  21  Line:  101  Band:  1
-Sample:  31  Line:  101  Band:  1
-Sample:  41  Line:  101  Band:  1
-Sample:  51  Line:  101  Band:  1
-80% ProcessedSample:  61  Line:  101  Band:  1
-Sample:  71  Line:  101  Band:  1
-Sample:  81  Line:  101  Band:  1
-Sample:  91  Line:  101  Band:  1
-Sample:  101  Line:  101  Band:  1
-Sample:  111  Line:  101  Band:  1
-Sample:  121  Line:  101  Band:  1
+40% ProcessedSample:  1  Line:  102  Band:  1
+Sample:  1  Line:  103  Band:  1
+Sample:  1  Line:  104  Band:  1
+Sample:  1  Line:  105  Band:  1
+Sample:  1  Line:  106  Band:  1
+Sample:  1  Line:  107  Band:  1
+Sample:  1  Line:  108  Band:  1
+Sample:  1  Line:  109  Band:  1
+Sample:  1  Line:  110  Band:  1
 Sample:  1  Line:  111  Band:  1
-Sample:  11  Line:  111  Band:  1
-Sample:  21  Line:  111  Band:  1
-Sample:  31  Line:  111  Band:  1
-Sample:  41  Line:  111  Band:  1
-Sample:  51  Line:  111  Band:  1
-Sample:  61  Line:  111  Band:  1
-Sample:  71  Line:  111  Band:  1
-Sample:  81  Line:  111  Band:  1
-Sample:  91  Line:  111  Band:  1
-90% ProcessedSample:  101  Line:  111  Band:  1
-Sample:  111  Line:  111  Band:  1
-Sample:  121  Line:  111  Band:  1
+Sample:  1  Line:  112  Band:  1
+Sample:  1  Line:  113  Band:  1
+Sample:  1  Line:  114  Band:  1
+Sample:  1  Line:  115  Band:  1
+Sample:  1  Line:  116  Band:  1
+Sample:  1  Line:  117  Band:  1
+Sample:  1  Line:  118  Band:  1
+Sample:  1  Line:  119  Band:  1
+Sample:  1  Line:  120  Band:  1
 Sample:  1  Line:  121  Band:  1
-Sample:  11  Line:  121  Band:  1
-Sample:  21  Line:  121  Band:  1
-Sample:  31  Line:  121  Band:  1
-Sample:  41  Line:  121  Band:  1
-Sample:  51  Line:  121  Band:  1
-Sample:  61  Line:  121  Band:  1
-Sample:  71  Line:  121  Band:  1
-Sample:  81  Line:  121  Band:  1
-Sample:  91  Line:  121  Band:  1
-Sample:  101  Line:  121  Band:  1
-Sample:  111  Line:  121  Band:  1
-Sample:  121  Line:  121  Band:  1
+Sample:  1  Line:  122  Band:  1
+Sample:  1  Line:  123  Band:  1
+Sample:  1  Line:  124  Band:  1
+Sample:  1  Line:  125  Band:  1
+Sample:  1  Line:  126  Band:  1
+50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  2  Band:  2
+Sample:  1  Line:  3  Band:  2
+Sample:  1  Line:  4  Band:  2
+Sample:  1  Line:  5  Band:  2
+Sample:  1  Line:  6  Band:  2
+Sample:  1  Line:  7  Band:  2
+Sample:  1  Line:  8  Band:  2
+Sample:  1  Line:  9  Band:  2
+Sample:  1  Line:  10  Band:  2
+Sample:  1  Line:  11  Band:  2
+Sample:  1  Line:  12  Band:  2
+Sample:  1  Line:  13  Band:  2
+Sample:  1  Line:  14  Band:  2
+Sample:  1  Line:  15  Band:  2
+Sample:  1  Line:  16  Band:  2
+Sample:  1  Line:  17  Band:  2
+Sample:  1  Line:  18  Band:  2
+Sample:  1  Line:  19  Band:  2
+Sample:  1  Line:  20  Band:  2
+Sample:  1  Line:  21  Band:  2
+Sample:  1  Line:  22  Band:  2
+Sample:  1  Line:  23  Band:  2
+Sample:  1  Line:  24  Band:  2
+Sample:  1  Line:  25  Band:  2
+Sample:  1  Line:  26  Band:  2
+60% ProcessedSample:  1  Line:  27  Band:  2
+Sample:  1  Line:  28  Band:  2
+Sample:  1  Line:  29  Band:  2
+Sample:  1  Line:  30  Band:  2
+Sample:  1  Line:  31  Band:  2
+Sample:  1  Line:  32  Band:  2
+Sample:  1  Line:  33  Band:  2
+Sample:  1  Line:  34  Band:  2
+Sample:  1  Line:  35  Band:  2
+Sample:  1  Line:  36  Band:  2
+Sample:  1  Line:  37  Band:  2
+Sample:  1  Line:  38  Band:  2
+Sample:  1  Line:  39  Band:  2
+Sample:  1  Line:  40  Band:  2
+Sample:  1  Line:  41  Band:  2
+Sample:  1  Line:  42  Band:  2
+Sample:  1  Line:  43  Band:  2
+Sample:  1  Line:  44  Band:  2
+Sample:  1  Line:  45  Band:  2
+Sample:  1  Line:  46  Band:  2
+Sample:  1  Line:  47  Band:  2
+Sample:  1  Line:  48  Band:  2
+Sample:  1  Line:  49  Band:  2
+Sample:  1  Line:  50  Band:  2
+Sample:  1  Line:  51  Band:  2
+70% ProcessedSample:  1  Line:  52  Band:  2
+Sample:  1  Line:  53  Band:  2
+Sample:  1  Line:  54  Band:  2
+Sample:  1  Line:  55  Band:  2
+Sample:  1  Line:  56  Band:  2
+Sample:  1  Line:  57  Band:  2
+Sample:  1  Line:  58  Band:  2
+Sample:  1  Line:  59  Band:  2
+Sample:  1  Line:  60  Band:  2
+Sample:  1  Line:  61  Band:  2
+Sample:  1  Line:  62  Band:  2
+Sample:  1  Line:  63  Band:  2
+Sample:  1  Line:  64  Band:  2
+Sample:  1  Line:  65  Band:  2
+Sample:  1  Line:  66  Band:  2
+Sample:  1  Line:  67  Band:  2
+Sample:  1  Line:  68  Band:  2
+Sample:  1  Line:  69  Band:  2
+Sample:  1  Line:  70  Band:  2
+Sample:  1  Line:  71  Band:  2
+Sample:  1  Line:  72  Band:  2
+Sample:  1  Line:  73  Band:  2
+Sample:  1  Line:  74  Band:  2
+Sample:  1  Line:  75  Band:  2
+Sample:  1  Line:  76  Band:  2
+80% ProcessedSample:  1  Line:  77  Band:  2
+Sample:  1  Line:  78  Band:  2
+Sample:  1  Line:  79  Band:  2
+Sample:  1  Line:  80  Band:  2
+Sample:  1  Line:  81  Band:  2
+Sample:  1  Line:  82  Band:  2
+Sample:  1  Line:  83  Band:  2
+Sample:  1  Line:  84  Band:  2
+Sample:  1  Line:  85  Band:  2
+Sample:  1  Line:  86  Band:  2
+Sample:  1  Line:  87  Band:  2
+Sample:  1  Line:  88  Band:  2
+Sample:  1  Line:  89  Band:  2
+Sample:  1  Line:  90  Band:  2
+Sample:  1  Line:  91  Band:  2
+Sample:  1  Line:  92  Band:  2
+Sample:  1  Line:  93  Band:  2
+Sample:  1  Line:  94  Band:  2
+Sample:  1  Line:  95  Band:  2
+Sample:  1  Line:  96  Band:  2
+Sample:  1  Line:  97  Band:  2
+Sample:  1  Line:  98  Band:  2
+Sample:  1  Line:  99  Band:  2
+Sample:  1  Line:  100  Band:  2
+Sample:  1  Line:  101  Band:  2
+90% ProcessedSample:  1  Line:  102  Band:  2
+Sample:  1  Line:  103  Band:  2
+Sample:  1  Line:  104  Band:  2
+Sample:  1  Line:  105  Band:  2
+Sample:  1  Line:  106  Band:  2
+Sample:  1  Line:  107  Band:  2
+Sample:  1  Line:  108  Band:  2
+Sample:  1  Line:  109  Band:  2
+Sample:  1  Line:  110  Band:  2
+Sample:  1  Line:  111  Band:  2
+Sample:  1  Line:  112  Band:  2
+Sample:  1  Line:  113  Band:  2
+Sample:  1  Line:  114  Band:  2
+Sample:  1  Line:  115  Band:  2
+Sample:  1  Line:  116  Band:  2
+Sample:  1  Line:  117  Band:  2
+Sample:  1  Line:  118  Band:  2
+Sample:  1  Line:  119  Band:  2
+Sample:  1  Line:  120  Band:  2
+Sample:  1  Line:  121  Band:  2
+Sample:  1  Line:  122  Band:  2
+Sample:  1  Line:  123  Band:  2
+Sample:  1  Line:  124  Band:  2
+Sample:  1  Line:  125  Band:  2
+Sample:  1  Line:  126  Band:  2
 100% Processed
-
-Functor3 - ProcessCubes One Thread
-8:**PROGRAMMER ERROR** You have not specified any input or output cubes.
-9:**PROGRAMMER ERROR** All output cubes must have the same number of lines as the first input cube or output cube.
-10:**PROGRAMMER ERROR** All output cubes must have the same number of bands as the first input cube or output cube.
+Testing ProcessByBrick::ProcessCubes[vector<Buffer> &in, vector<Buffer> &out]
 unittest: Working
 0% ProcessedTesting two input and output cubes ... 
 Number of input cubes:   2
 Number of output cubes:  2
 
 Sample:  1:1  Line:  1:1  Band:  1:1
+Sample:  2:2  Line:  1:1  Band:  1:1
+Sample:  3:3  Line:  1:1  Band:  1:1
+Sample:  4:4  Line:  1:1  Band:  1:1
+Sample:  5:5  Line:  1:1  Band:  1:1
+Sample:  6:6  Line:  1:1  Band:  1:1
+Sample:  7:7  Line:  1:1  Band:  1:1
+Sample:  8:8  Line:  1:1  Band:  1:1
+Sample:  9:9  Line:  1:1  Band:  1:1
+Sample:  10:10  Line:  1:1  Band:  1:1
 Sample:  11:11  Line:  1:1  Band:  1:1
+Sample:  12:12  Line:  1:1  Band:  1:1
+Sample:  13:13  Line:  1:1  Band:  1:1
+Sample:  14:14  Line:  1:1  Band:  1:1
+Sample:  15:15  Line:  1:1  Band:  1:1
+Sample:  16:16  Line:  1:1  Band:  1:1
+Sample:  17:17  Line:  1:1  Band:  1:1
+Sample:  18:18  Line:  1:1  Band:  1:1
+Sample:  19:19  Line:  1:1  Band:  1:1
+Sample:  20:20  Line:  1:1  Band:  1:1
 Sample:  21:21  Line:  1:1  Band:  1:1
+Sample:  22:22  Line:  1:1  Band:  1:1
+Sample:  23:23  Line:  1:1  Band:  1:1
+Sample:  24:24  Line:  1:1  Band:  1:1
+Sample:  25:25  Line:  1:1  Band:  1:1
+Sample:  26:26  Line:  1:1  Band:  1:1
+Sample:  27:27  Line:  1:1  Band:  1:1
+Sample:  28:28  Line:  1:1  Band:  1:1
+Sample:  29:29  Line:  1:1  Band:  1:1
+Sample:  30:30  Line:  1:1  Band:  1:1
 Sample:  31:31  Line:  1:1  Band:  1:1
+Sample:  32:32  Line:  1:1  Band:  1:1
+Sample:  33:33  Line:  1:1  Band:  1:1
+Sample:  34:34  Line:  1:1  Band:  1:1
+Sample:  35:35  Line:  1:1  Band:  1:1
+Sample:  36:36  Line:  1:1  Band:  1:1
+Sample:  37:37  Line:  1:1  Band:  1:1
+Sample:  38:38  Line:  1:1  Band:  1:1
+Sample:  39:39  Line:  1:1  Band:  1:1
+Sample:  40:40  Line:  1:1  Band:  1:1
 Sample:  41:41  Line:  1:1  Band:  1:1
+Sample:  42:42  Line:  1:1  Band:  1:1
+Sample:  43:43  Line:  1:1  Band:  1:1
+Sample:  44:44  Line:  1:1  Band:  1:1
+Sample:  45:45  Line:  1:1  Band:  1:1
+Sample:  46:46  Line:  1:1  Band:  1:1
+Sample:  47:47  Line:  1:1  Band:  1:1
+Sample:  48:48  Line:  1:1  Band:  1:1
+Sample:  49:49  Line:  1:1  Band:  1:1
+Sample:  50:50  Line:  1:1  Band:  1:1
 Sample:  51:51  Line:  1:1  Band:  1:1
+Sample:  52:52  Line:  1:1  Band:  1:1
+Sample:  53:53  Line:  1:1  Band:  1:1
+Sample:  54:54  Line:  1:1  Band:  1:1
+Sample:  55:55  Line:  1:1  Band:  1:1
+Sample:  56:56  Line:  1:1  Band:  1:1
+Sample:  57:57  Line:  1:1  Band:  1:1
+Sample:  58:58  Line:  1:1  Band:  1:1
+Sample:  59:59  Line:  1:1  Band:  1:1
+Sample:  60:60  Line:  1:1  Band:  1:1
 Sample:  61:61  Line:  1:1  Band:  1:1
+Sample:  62:62  Line:  1:1  Band:  1:1
+Sample:  63:63  Line:  1:1  Band:  1:1
+Sample:  64:64  Line:  1:1  Band:  1:1
+Sample:  65:65  Line:  1:1  Band:  1:1
+Sample:  66:66  Line:  1:1  Band:  1:1
+Sample:  67:67  Line:  1:1  Band:  1:1
+Sample:  68:68  Line:  1:1  Band:  1:1
+Sample:  69:69  Line:  1:1  Band:  1:1
+Sample:  70:70  Line:  1:1  Band:  1:1
 Sample:  71:71  Line:  1:1  Band:  1:1
+Sample:  72:72  Line:  1:1  Band:  1:1
+Sample:  73:73  Line:  1:1  Band:  1:1
+Sample:  74:74  Line:  1:1  Band:  1:1
+Sample:  75:75  Line:  1:1  Band:  1:1
+Sample:  76:76  Line:  1:1  Band:  1:1
+Sample:  77:77  Line:  1:1  Band:  1:1
+Sample:  78:78  Line:  1:1  Band:  1:1
+Sample:  79:79  Line:  1:1  Band:  1:1
+Sample:  80:80  Line:  1:1  Band:  1:1
 Sample:  81:81  Line:  1:1  Band:  1:1
+Sample:  82:82  Line:  1:1  Band:  1:1
+Sample:  83:83  Line:  1:1  Band:  1:1
+Sample:  84:84  Line:  1:1  Band:  1:1
+Sample:  85:85  Line:  1:1  Band:  1:1
+Sample:  86:86  Line:  1:1  Band:  1:1
+Sample:  87:87  Line:  1:1  Band:  1:1
+Sample:  88:88  Line:  1:1  Band:  1:1
+Sample:  89:89  Line:  1:1  Band:  1:1
+Sample:  90:90  Line:  1:1  Band:  1:1
 Sample:  91:91  Line:  1:1  Band:  1:1
+Sample:  92:92  Line:  1:1  Band:  1:1
+Sample:  93:93  Line:  1:1  Band:  1:1
+Sample:  94:94  Line:  1:1  Band:  1:1
+Sample:  95:95  Line:  1:1  Band:  1:1
+Sample:  96:96  Line:  1:1  Band:  1:1
+Sample:  97:97  Line:  1:1  Band:  1:1
+Sample:  98:98  Line:  1:1  Band:  1:1
+Sample:  99:99  Line:  1:1  Band:  1:1
+Sample:  100:100  Line:  1:1  Band:  1:1
 Sample:  101:101  Line:  1:1  Band:  1:1
+Sample:  102:102  Line:  1:1  Band:  1:1
+Sample:  103:103  Line:  1:1  Band:  1:1
+Sample:  104:104  Line:  1:1  Band:  1:1
+Sample:  105:105  Line:  1:1  Band:  1:1
+Sample:  106:106  Line:  1:1  Band:  1:1
+Sample:  107:107  Line:  1:1  Band:  1:1
+Sample:  108:108  Line:  1:1  Band:  1:1
+Sample:  109:109  Line:  1:1  Band:  1:1
+Sample:  110:110  Line:  1:1  Band:  1:1
 Sample:  111:111  Line:  1:1  Band:  1:1
+Sample:  112:112  Line:  1:1  Band:  1:1
+Sample:  113:113  Line:  1:1  Band:  1:1
+Sample:  114:114  Line:  1:1  Band:  1:1
+Sample:  115:115  Line:  1:1  Band:  1:1
+Sample:  116:116  Line:  1:1  Band:  1:1
+Sample:  117:117  Line:  1:1  Band:  1:1
+Sample:  118:118  Line:  1:1  Band:  1:1
+Sample:  119:119  Line:  1:1  Band:  1:1
+Sample:  120:120  Line:  1:1  Band:  1:1
 Sample:  121:121  Line:  1:1  Band:  1:1
-Sample:  1:1  Line:  11:11  Band:  1:1
-Sample:  11:11  Line:  11:11  Band:  1:1
-Sample:  21:21  Line:  11:11  Band:  1:1
-Sample:  31:31  Line:  11:11  Band:  1:1
-Sample:  41:41  Line:  11:11  Band:  1:1
-Sample:  51:51  Line:  11:11  Band:  1:1
-Sample:  61:61  Line:  11:11  Band:  1:1
-Sample:  71:71  Line:  11:11  Band:  1:1
-Sample:  81:81  Line:  11:11  Band:  1:1
-Sample:  91:91  Line:  11:11  Band:  1:1
-Sample:  101:101  Line:  11:11  Band:  1:1
-Sample:  111:111  Line:  11:11  Band:  1:1
-Sample:  121:121  Line:  11:11  Band:  1:1
-Sample:  1:1  Line:  21:21  Band:  1:1
-Sample:  11:11  Line:  21:21  Band:  1:1
-Sample:  21:21  Line:  21:21  Band:  1:1
-Sample:  31:31  Line:  21:21  Band:  1:1
-Sample:  41:41  Line:  21:21  Band:  1:1
-Sample:  51:51  Line:  21:21  Band:  1:1
-Sample:  61:61  Line:  21:21  Band:  1:1
-Sample:  71:71  Line:  21:21  Band:  1:1
-Sample:  81:81  Line:  21:21  Band:  1:1
-Sample:  91:91  Line:  21:21  Band:  1:1
-Sample:  101:101  Line:  21:21  Band:  1:1
-Sample:  111:111  Line:  21:21  Band:  1:1
-Sample:  121:121  Line:  21:21  Band:  1:1
-Sample:  1:1  Line:  31:31  Band:  1:1
-Sample:  11:11  Line:  31:31  Band:  1:1
-Sample:  21:21  Line:  31:31  Band:  1:1
-Sample:  31:31  Line:  31:31  Band:  1:1
-Sample:  41:41  Line:  31:31  Band:  1:1
-Sample:  51:51  Line:  31:31  Band:  1:1
-Sample:  61:61  Line:  31:31  Band:  1:1
-Sample:  71:71  Line:  31:31  Band:  1:1
-Sample:  81:81  Line:  31:31  Band:  1:1
-Sample:  91:91  Line:  31:31  Band:  1:1
-Sample:  101:101  Line:  31:31  Band:  1:1
-Sample:  111:111  Line:  31:31  Band:  1:1
-Sample:  121:121  Line:  31:31  Band:  1:1
-Sample:  1:1  Line:  41:41  Band:  1:1
-Sample:  11:11  Line:  41:41  Band:  1:1
-Sample:  21:21  Line:  41:41  Band:  1:1
-Sample:  31:31  Line:  41:41  Band:  1:1
-Sample:  41:41  Line:  41:41  Band:  1:1
-Sample:  51:51  Line:  41:41  Band:  1:1
-Sample:  61:61  Line:  41:41  Band:  1:1
-Sample:  71:71  Line:  41:41  Band:  1:1
-Sample:  81:81  Line:  41:41  Band:  1:1
-Sample:  91:91  Line:  41:41  Band:  1:1
-Sample:  101:101  Line:  41:41  Band:  1:1
-Sample:  111:111  Line:  41:41  Band:  1:1
-Sample:  121:121  Line:  41:41  Band:  1:1
-Sample:  1:1  Line:  51:51  Band:  1:1
-Sample:  11:11  Line:  51:51  Band:  1:1
-Sample:  21:21  Line:  51:51  Band:  1:1
-Sample:  31:31  Line:  51:51  Band:  1:1
-Sample:  41:41  Line:  51:51  Band:  1:1
-Sample:  51:51  Line:  51:51  Band:  1:1
-Sample:  61:61  Line:  51:51  Band:  1:1
-Sample:  71:71  Line:  51:51  Band:  1:1
-Sample:  81:81  Line:  51:51  Band:  1:1
-Sample:  91:91  Line:  51:51  Band:  1:1
-Sample:  101:101  Line:  51:51  Band:  1:1
-Sample:  111:111  Line:  51:51  Band:  1:1
-Sample:  121:121  Line:  51:51  Band:  1:1
-Sample:  1:1  Line:  61:61  Band:  1:1
-Sample:  11:11  Line:  61:61  Band:  1:1
-Sample:  21:21  Line:  61:61  Band:  1:1
-Sample:  31:31  Line:  61:61  Band:  1:1
-Sample:  41:41  Line:  61:61  Band:  1:1
-Sample:  51:51  Line:  61:61  Band:  1:1
-Sample:  61:61  Line:  61:61  Band:  1:1
-Sample:  71:71  Line:  61:61  Band:  1:1
-Sample:  81:81  Line:  61:61  Band:  1:1
-Sample:  91:91  Line:  61:61  Band:  1:1
-Sample:  101:101  Line:  61:61  Band:  1:1
-Sample:  111:111  Line:  61:61  Band:  1:1
-Sample:  121:121  Line:  61:61  Band:  1:1
-Sample:  1:1  Line:  71:71  Band:  1:1
-Sample:  11:11  Line:  71:71  Band:  1:1
-Sample:  21:21  Line:  71:71  Band:  1:1
-Sample:  31:31  Line:  71:71  Band:  1:1
-Sample:  41:41  Line:  71:71  Band:  1:1
-Sample:  51:51  Line:  71:71  Band:  1:1
-Sample:  61:61  Line:  71:71  Band:  1:1
-Sample:  71:71  Line:  71:71  Band:  1:1
-Sample:  81:81  Line:  71:71  Band:  1:1
-Sample:  91:91  Line:  71:71  Band:  1:1
-Sample:  101:101  Line:  71:71  Band:  1:1
-10% ProcessedSample:  111:111  Line:  71:71  Band:  1:1
-Sample:  121:121  Line:  71:71  Band:  1:1
-Sample:  1:1  Line:  81:81  Band:  1:1
-Sample:  11:11  Line:  81:81  Band:  1:1
-Sample:  21:21  Line:  81:81  Band:  1:1
-Sample:  31:31  Line:  81:81  Band:  1:1
-Sample:  41:41  Line:  81:81  Band:  1:1
-Sample:  51:51  Line:  81:81  Band:  1:1
-Sample:  61:61  Line:  81:81  Band:  1:1
-Sample:  71:71  Line:  81:81  Band:  1:1
-Sample:  81:81  Line:  81:81  Band:  1:1
-Sample:  91:91  Line:  81:81  Band:  1:1
-Sample:  101:101  Line:  81:81  Band:  1:1
-Sample:  111:111  Line:  81:81  Band:  1:1
-Sample:  121:121  Line:  81:81  Band:  1:1
-Sample:  1:1  Line:  91:91  Band:  1:1
-Sample:  11:11  Line:  91:91  Band:  1:1
-Sample:  21:21  Line:  91:91  Band:  1:1
-Sample:  31:31  Line:  91:91  Band:  1:1
-Sample:  41:41  Line:  91:91  Band:  1:1
-Sample:  51:51  Line:  91:91  Band:  1:1
-Sample:  61:61  Line:  91:91  Band:  1:1
-Sample:  71:71  Line:  91:91  Band:  1:1
-Sample:  81:81  Line:  91:91  Band:  1:1
-Sample:  91:91  Line:  91:91  Band:  1:1
-Sample:  101:101  Line:  91:91  Band:  1:1
-Sample:  111:111  Line:  91:91  Band:  1:1
-Sample:  121:121  Line:  91:91  Band:  1:1
-Sample:  1:1  Line:  101:101  Band:  1:1
-Sample:  11:11  Line:  101:101  Band:  1:1
-Sample:  21:21  Line:  101:101  Band:  1:1
-Sample:  31:31  Line:  101:101  Band:  1:1
-Sample:  41:41  Line:  101:101  Band:  1:1
-Sample:  51:51  Line:  101:101  Band:  1:1
-Sample:  61:61  Line:  101:101  Band:  1:1
-Sample:  71:71  Line:  101:101  Band:  1:1
-Sample:  81:81  Line:  101:101  Band:  1:1
-Sample:  91:91  Line:  101:101  Band:  1:1
-Sample:  101:101  Line:  101:101  Band:  1:1
-Sample:  111:111  Line:  101:101  Band:  1:1
-Sample:  121:121  Line:  101:101  Band:  1:1
-Sample:  1:1  Line:  111:111  Band:  1:1
-Sample:  11:11  Line:  111:111  Band:  1:1
-Sample:  21:21  Line:  111:111  Band:  1:1
-Sample:  31:31  Line:  111:111  Band:  1:1
-Sample:  41:41  Line:  111:111  Band:  1:1
-Sample:  51:51  Line:  111:111  Band:  1:1
-Sample:  61:61  Line:  111:111  Band:  1:1
-Sample:  71:71  Line:  111:111  Band:  1:1
-Sample:  81:81  Line:  111:111  Band:  1:1
-Sample:  91:91  Line:  111:111  Band:  1:1
-Sample:  101:101  Line:  111:111  Band:  1:1
-Sample:  111:111  Line:  111:111  Band:  1:1
-Sample:  121:121  Line:  111:111  Band:  1:1
-Sample:  1:1  Line:  121:121  Band:  1:1
-Sample:  11:11  Line:  121:121  Band:  1:1
-Sample:  21:21  Line:  121:121  Band:  1:1
-Sample:  31:31  Line:  121:121  Band:  1:1
-Sample:  41:41  Line:  121:121  Band:  1:1
-Sample:  51:51  Line:  121:121  Band:  1:1
-Sample:  61:61  Line:  121:121  Band:  1:1
-Sample:  71:71  Line:  121:121  Band:  1:1
-Sample:  81:81  Line:  121:121  Band:  1:1
-Sample:  91:91  Line:  121:121  Band:  1:1
-Sample:  101:101  Line:  121:121  Band:  1:1
-Sample:  111:111  Line:  121:121  Band:  1:1
-Sample:  121:121  Line:  121:121  Band:  1:1
-Sample:  1:1  Line:  1:1  Band:  3:3
-Sample:  11:11  Line:  1:1  Band:  3:3
-Sample:  21:21  Line:  1:1  Band:  3:3
-Sample:  31:31  Line:  1:1  Band:  3:3
-Sample:  41:41  Line:  1:1  Band:  3:3
-Sample:  51:51  Line:  1:1  Band:  3:3
-Sample:  61:61  Line:  1:1  Band:  3:3
-Sample:  71:71  Line:  1:1  Band:  3:3
-Sample:  81:81  Line:  1:1  Band:  3:3
-Sample:  91:91  Line:  1:1  Band:  3:3
-Sample:  101:101  Line:  1:1  Band:  3:3
-Sample:  111:111  Line:  1:1  Band:  3:3
-Sample:  121:121  Line:  1:1  Band:  3:3
-Sample:  1:1  Line:  11:11  Band:  3:3
-Sample:  11:11  Line:  11:11  Band:  3:3
-Sample:  21:21  Line:  11:11  Band:  3:3
-Sample:  31:31  Line:  11:11  Band:  3:3
-Sample:  41:41  Line:  11:11  Band:  3:3
-Sample:  51:51  Line:  11:11  Band:  3:3
-Sample:  61:61  Line:  11:11  Band:  3:3
-Sample:  71:71  Line:  11:11  Band:  3:3
-Sample:  81:81  Line:  11:11  Band:  3:3
-Sample:  91:91  Line:  11:11  Band:  3:3
-Sample:  101:101  Line:  11:11  Band:  3:3
-Sample:  111:111  Line:  11:11  Band:  3:3
-Sample:  121:121  Line:  11:11  Band:  3:3
-Sample:  1:1  Line:  21:21  Band:  3:3
-Sample:  11:11  Line:  21:21  Band:  3:3
-Sample:  21:21  Line:  21:21  Band:  3:3
-Sample:  31:31  Line:  21:21  Band:  3:3
-Sample:  41:41  Line:  21:21  Band:  3:3
-Sample:  51:51  Line:  21:21  Band:  3:3
-Sample:  61:61  Line:  21:21  Band:  3:3
-Sample:  71:71  Line:  21:21  Band:  3:3
-20% ProcessedSample:  81:81  Line:  21:21  Band:  3:3
-Sample:  91:91  Line:  21:21  Band:  3:3
-Sample:  101:101  Line:  21:21  Band:  3:3
-Sample:  111:111  Line:  21:21  Band:  3:3
-Sample:  121:121  Line:  21:21  Band:  3:3
-Sample:  1:1  Line:  31:31  Band:  3:3
-Sample:  11:11  Line:  31:31  Band:  3:3
-Sample:  21:21  Line:  31:31  Band:  3:3
-Sample:  31:31  Line:  31:31  Band:  3:3
-Sample:  41:41  Line:  31:31  Band:  3:3
-Sample:  51:51  Line:  31:31  Band:  3:3
-Sample:  61:61  Line:  31:31  Band:  3:3
-Sample:  71:71  Line:  31:31  Band:  3:3
-Sample:  81:81  Line:  31:31  Band:  3:3
-Sample:  91:91  Line:  31:31  Band:  3:3
-Sample:  101:101  Line:  31:31  Band:  3:3
-Sample:  111:111  Line:  31:31  Band:  3:3
-Sample:  121:121  Line:  31:31  Band:  3:3
-Sample:  1:1  Line:  41:41  Band:  3:3
-Sample:  11:11  Line:  41:41  Band:  3:3
-Sample:  21:21  Line:  41:41  Band:  3:3
-Sample:  31:31  Line:  41:41  Band:  3:3
-Sample:  41:41  Line:  41:41  Band:  3:3
-Sample:  51:51  Line:  41:41  Band:  3:3
-Sample:  61:61  Line:  41:41  Band:  3:3
-Sample:  71:71  Line:  41:41  Band:  3:3
-Sample:  81:81  Line:  41:41  Band:  3:3
-Sample:  91:91  Line:  41:41  Band:  3:3
-Sample:  101:101  Line:  41:41  Band:  3:3
-Sample:  111:111  Line:  41:41  Band:  3:3
-Sample:  121:121  Line:  41:41  Band:  3:3
-Sample:  1:1  Line:  51:51  Band:  3:3
-Sample:  11:11  Line:  51:51  Band:  3:3
-Sample:  21:21  Line:  51:51  Band:  3:3
-Sample:  31:31  Line:  51:51  Band:  3:3
-Sample:  41:41  Line:  51:51  Band:  3:3
-Sample:  51:51  Line:  51:51  Band:  3:3
-Sample:  61:61  Line:  51:51  Band:  3:3
-Sample:  71:71  Line:  51:51  Band:  3:3
-Sample:  81:81  Line:  51:51  Band:  3:3
-Sample:  91:91  Line:  51:51  Band:  3:3
-Sample:  101:101  Line:  51:51  Band:  3:3
-Sample:  111:111  Line:  51:51  Band:  3:3
-Sample:  121:121  Line:  51:51  Band:  3:3
-Sample:  1:1  Line:  61:61  Band:  3:3
-Sample:  11:11  Line:  61:61  Band:  3:3
-Sample:  21:21  Line:  61:61  Band:  3:3
-Sample:  31:31  Line:  61:61  Band:  3:3
-Sample:  41:41  Line:  61:61  Band:  3:3
-Sample:  51:51  Line:  61:61  Band:  3:3
-Sample:  61:61  Line:  61:61  Band:  3:3
-Sample:  71:71  Line:  61:61  Band:  3:3
-Sample:  81:81  Line:  61:61  Band:  3:3
-Sample:  91:91  Line:  61:61  Band:  3:3
-Sample:  101:101  Line:  61:61  Band:  3:3
-Sample:  111:111  Line:  61:61  Band:  3:3
-Sample:  121:121  Line:  61:61  Band:  3:3
-Sample:  1:1  Line:  71:71  Band:  3:3
-Sample:  11:11  Line:  71:71  Band:  3:3
-Sample:  21:21  Line:  71:71  Band:  3:3
-Sample:  31:31  Line:  71:71  Band:  3:3
-Sample:  41:41  Line:  71:71  Band:  3:3
-Sample:  51:51  Line:  71:71  Band:  3:3
-Sample:  61:61  Line:  71:71  Band:  3:3
-Sample:  71:71  Line:  71:71  Band:  3:3
-Sample:  81:81  Line:  71:71  Band:  3:3
-Sample:  91:91  Line:  71:71  Band:  3:3
-Sample:  101:101  Line:  71:71  Band:  3:3
-Sample:  111:111  Line:  71:71  Band:  3:3
-Sample:  121:121  Line:  71:71  Band:  3:3
-Sample:  1:1  Line:  81:81  Band:  3:3
-Sample:  11:11  Line:  81:81  Band:  3:3
-Sample:  21:21  Line:  81:81  Band:  3:3
-Sample:  31:31  Line:  81:81  Band:  3:3
-Sample:  41:41  Line:  81:81  Band:  3:3
-Sample:  51:51  Line:  81:81  Band:  3:3
-Sample:  61:61  Line:  81:81  Band:  3:3
-Sample:  71:71  Line:  81:81  Band:  3:3
-Sample:  81:81  Line:  81:81  Band:  3:3
-Sample:  91:91  Line:  81:81  Band:  3:3
-Sample:  101:101  Line:  81:81  Band:  3:3
-Sample:  111:111  Line:  81:81  Band:  3:3
-Sample:  121:121  Line:  81:81  Band:  3:3
-Sample:  1:1  Line:  91:91  Band:  3:3
-Sample:  11:11  Line:  91:91  Band:  3:3
-Sample:  21:21  Line:  91:91  Band:  3:3
-Sample:  31:31  Line:  91:91  Band:  3:3
-Sample:  41:41  Line:  91:91  Band:  3:3
-Sample:  51:51  Line:  91:91  Band:  3:3
-Sample:  61:61  Line:  91:91  Band:  3:3
-Sample:  71:71  Line:  91:91  Band:  3:3
-Sample:  81:81  Line:  91:91  Band:  3:3
-Sample:  91:91  Line:  91:91  Band:  3:3
-Sample:  101:101  Line:  91:91  Band:  3:3
-Sample:  111:111  Line:  91:91  Band:  3:3
-Sample:  121:121  Line:  91:91  Band:  3:3
-Sample:  1:1  Line:  101:101  Band:  3:3
-Sample:  11:11  Line:  101:101  Band:  3:3
-Sample:  21:21  Line:  101:101  Band:  3:3
-Sample:  31:31  Line:  101:101  Band:  3:3
-Sample:  41:41  Line:  101:101  Band:  3:3
-Sample:  51:51  Line:  101:101  Band:  3:3
-30% ProcessedSample:  61:61  Line:  101:101  Band:  3:3
-Sample:  71:71  Line:  101:101  Band:  3:3
-Sample:  81:81  Line:  101:101  Band:  3:3
-Sample:  91:91  Line:  101:101  Band:  3:3
-Sample:  101:101  Line:  101:101  Band:  3:3
-Sample:  111:111  Line:  101:101  Band:  3:3
-Sample:  121:121  Line:  101:101  Band:  3:3
-Sample:  1:1  Line:  111:111  Band:  3:3
-Sample:  11:11  Line:  111:111  Band:  3:3
-Sample:  21:21  Line:  111:111  Band:  3:3
-Sample:  31:31  Line:  111:111  Band:  3:3
-Sample:  41:41  Line:  111:111  Band:  3:3
-Sample:  51:51  Line:  111:111  Band:  3:3
-Sample:  61:61  Line:  111:111  Band:  3:3
-Sample:  71:71  Line:  111:111  Band:  3:3
-Sample:  81:81  Line:  111:111  Band:  3:3
-Sample:  91:91  Line:  111:111  Band:  3:3
-Sample:  101:101  Line:  111:111  Band:  3:3
-Sample:  111:111  Line:  111:111  Band:  3:3
-Sample:  121:121  Line:  111:111  Band:  3:3
-Sample:  1:1  Line:  121:121  Band:  3:3
-Sample:  11:11  Line:  121:121  Band:  3:3
-Sample:  21:21  Line:  121:121  Band:  3:3
-Sample:  31:31  Line:  121:121  Band:  3:3
-Sample:  41:41  Line:  121:121  Band:  3:3
-Sample:  51:51  Line:  121:121  Band:  3:3
-Sample:  61:61  Line:  121:121  Band:  3:3
-Sample:  71:71  Line:  121:121  Band:  3:3
-Sample:  81:81  Line:  121:121  Band:  3:3
-Sample:  91:91  Line:  121:121  Band:  3:3
-Sample:  101:101  Line:  121:121  Band:  3:3
-Sample:  111:111  Line:  121:121  Band:  3:3
-Sample:  121:121  Line:  121:121  Band:  3:3
-Sample:  1:1  Line:  1:1  Band:  5:5
-Sample:  11:11  Line:  1:1  Band:  5:5
-Sample:  21:21  Line:  1:1  Band:  5:5
-Sample:  31:31  Line:  1:1  Band:  5:5
-Sample:  41:41  Line:  1:1  Band:  5:5
-Sample:  51:51  Line:  1:1  Band:  5:5
-Sample:  61:61  Line:  1:1  Band:  5:5
-Sample:  71:71  Line:  1:1  Band:  5:5
-Sample:  81:81  Line:  1:1  Band:  5:5
-Sample:  91:91  Line:  1:1  Band:  5:5
-Sample:  101:101  Line:  1:1  Band:  5:5
-Sample:  111:111  Line:  1:1  Band:  5:5
-Sample:  121:121  Line:  1:1  Band:  5:5
-Sample:  1:1  Line:  11:11  Band:  5:5
-Sample:  11:11  Line:  11:11  Band:  5:5
-Sample:  21:21  Line:  11:11  Band:  5:5
-Sample:  31:31  Line:  11:11  Band:  5:5
-Sample:  41:41  Line:  11:11  Band:  5:5
-Sample:  51:51  Line:  11:11  Band:  5:5
-Sample:  61:61  Line:  11:11  Band:  5:5
-Sample:  71:71  Line:  11:11  Band:  5:5
-Sample:  81:81  Line:  11:11  Band:  5:5
-Sample:  91:91  Line:  11:11  Band:  5:5
-Sample:  101:101  Line:  11:11  Band:  5:5
-Sample:  111:111  Line:  11:11  Band:  5:5
-Sample:  121:121  Line:  11:11  Band:  5:5
-Sample:  1:1  Line:  21:21  Band:  5:5
-Sample:  11:11  Line:  21:21  Band:  5:5
-Sample:  21:21  Line:  21:21  Band:  5:5
-Sample:  31:31  Line:  21:21  Band:  5:5
-Sample:  41:41  Line:  21:21  Band:  5:5
-Sample:  51:51  Line:  21:21  Band:  5:5
-Sample:  61:61  Line:  21:21  Band:  5:5
-Sample:  71:71  Line:  21:21  Band:  5:5
-Sample:  81:81  Line:  21:21  Band:  5:5
-Sample:  91:91  Line:  21:21  Band:  5:5
-Sample:  101:101  Line:  21:21  Band:  5:5
-Sample:  111:111  Line:  21:21  Band:  5:5
-Sample:  121:121  Line:  21:21  Band:  5:5
-Sample:  1:1  Line:  31:31  Band:  5:5
-Sample:  11:11  Line:  31:31  Band:  5:5
-Sample:  21:21  Line:  31:31  Band:  5:5
-Sample:  31:31  Line:  31:31  Band:  5:5
-Sample:  41:41  Line:  31:31  Band:  5:5
-Sample:  51:51  Line:  31:31  Band:  5:5
-Sample:  61:61  Line:  31:31  Band:  5:5
-Sample:  71:71  Line:  31:31  Band:  5:5
-Sample:  81:81  Line:  31:31  Band:  5:5
-Sample:  91:91  Line:  31:31  Band:  5:5
-Sample:  101:101  Line:  31:31  Band:  5:5
-Sample:  111:111  Line:  31:31  Band:  5:5
-Sample:  121:121  Line:  31:31  Band:  5:5
-Sample:  1:1  Line:  41:41  Band:  5:5
-Sample:  11:11  Line:  41:41  Band:  5:5
-Sample:  21:21  Line:  41:41  Band:  5:5
-Sample:  31:31  Line:  41:41  Band:  5:5
-Sample:  41:41  Line:  41:41  Band:  5:5
-Sample:  51:51  Line:  41:41  Band:  5:5
-Sample:  61:61  Line:  41:41  Band:  5:5
-Sample:  71:71  Line:  41:41  Band:  5:5
-Sample:  81:81  Line:  41:41  Band:  5:5
-Sample:  91:91  Line:  41:41  Band:  5:5
-Sample:  101:101  Line:  41:41  Band:  5:5
-Sample:  111:111  Line:  41:41  Band:  5:5
-Sample:  121:121  Line:  41:41  Band:  5:5
-Sample:  1:1  Line:  51:51  Band:  5:5
-Sample:  11:11  Line:  51:51  Band:  5:5
-Sample:  21:21  Line:  51:51  Band:  5:5
-40% ProcessedSample:  31:31  Line:  51:51  Band:  5:5
-Sample:  41:41  Line:  51:51  Band:  5:5
-Sample:  51:51  Line:  51:51  Band:  5:5
-Sample:  61:61  Line:  51:51  Band:  5:5
-Sample:  71:71  Line:  51:51  Band:  5:5
-Sample:  81:81  Line:  51:51  Band:  5:5
-Sample:  91:91  Line:  51:51  Band:  5:5
-Sample:  101:101  Line:  51:51  Band:  5:5
-Sample:  111:111  Line:  51:51  Band:  5:5
-Sample:  121:121  Line:  51:51  Band:  5:5
-Sample:  1:1  Line:  61:61  Band:  5:5
-Sample:  11:11  Line:  61:61  Band:  5:5
-Sample:  21:21  Line:  61:61  Band:  5:5
-Sample:  31:31  Line:  61:61  Band:  5:5
-Sample:  41:41  Line:  61:61  Band:  5:5
-Sample:  51:51  Line:  61:61  Band:  5:5
-Sample:  61:61  Line:  61:61  Band:  5:5
-Sample:  71:71  Line:  61:61  Band:  5:5
-Sample:  81:81  Line:  61:61  Band:  5:5
-Sample:  91:91  Line:  61:61  Band:  5:5
-Sample:  101:101  Line:  61:61  Band:  5:5
-Sample:  111:111  Line:  61:61  Band:  5:5
-Sample:  121:121  Line:  61:61  Band:  5:5
-Sample:  1:1  Line:  71:71  Band:  5:5
-Sample:  11:11  Line:  71:71  Band:  5:5
-Sample:  21:21  Line:  71:71  Band:  5:5
-Sample:  31:31  Line:  71:71  Band:  5:5
-Sample:  41:41  Line:  71:71  Band:  5:5
-Sample:  51:51  Line:  71:71  Band:  5:5
-Sample:  61:61  Line:  71:71  Band:  5:5
-Sample:  71:71  Line:  71:71  Band:  5:5
-Sample:  81:81  Line:  71:71  Band:  5:5
-Sample:  91:91  Line:  71:71  Band:  5:5
-Sample:  101:101  Line:  71:71  Band:  5:5
-Sample:  111:111  Line:  71:71  Band:  5:5
-Sample:  121:121  Line:  71:71  Band:  5:5
-Sample:  1:1  Line:  81:81  Band:  5:5
-Sample:  11:11  Line:  81:81  Band:  5:5
-Sample:  21:21  Line:  81:81  Band:  5:5
-Sample:  31:31  Line:  81:81  Band:  5:5
-Sample:  41:41  Line:  81:81  Band:  5:5
-Sample:  51:51  Line:  81:81  Band:  5:5
-Sample:  61:61  Line:  81:81  Band:  5:5
-Sample:  71:71  Line:  81:81  Band:  5:5
-Sample:  81:81  Line:  81:81  Band:  5:5
-Sample:  91:91  Line:  81:81  Band:  5:5
-Sample:  101:101  Line:  81:81  Band:  5:5
-Sample:  111:111  Line:  81:81  Band:  5:5
-Sample:  121:121  Line:  81:81  Band:  5:5
-Sample:  1:1  Line:  91:91  Band:  5:5
-Sample:  11:11  Line:  91:91  Band:  5:5
-Sample:  21:21  Line:  91:91  Band:  5:5
-Sample:  31:31  Line:  91:91  Band:  5:5
-Sample:  41:41  Line:  91:91  Band:  5:5
-Sample:  51:51  Line:  91:91  Band:  5:5
-Sample:  61:61  Line:  91:91  Band:  5:5
-Sample:  71:71  Line:  91:91  Band:  5:5
-Sample:  81:81  Line:  91:91  Band:  5:5
-Sample:  91:91  Line:  91:91  Band:  5:5
-Sample:  101:101  Line:  91:91  Band:  5:5
-Sample:  111:111  Line:  91:91  Band:  5:5
-Sample:  121:121  Line:  91:91  Band:  5:5
-Sample:  1:1  Line:  101:101  Band:  5:5
-Sample:  11:11  Line:  101:101  Band:  5:5
-Sample:  21:21  Line:  101:101  Band:  5:5
-Sample:  31:31  Line:  101:101  Band:  5:5
-Sample:  41:41  Line:  101:101  Band:  5:5
-Sample:  51:51  Line:  101:101  Band:  5:5
-Sample:  61:61  Line:  101:101  Band:  5:5
-Sample:  71:71  Line:  101:101  Band:  5:5
-Sample:  81:81  Line:  101:101  Band:  5:5
-Sample:  91:91  Line:  101:101  Band:  5:5
-Sample:  101:101  Line:  101:101  Band:  5:5
-Sample:  111:111  Line:  101:101  Band:  5:5
-Sample:  121:121  Line:  101:101  Band:  5:5
-Sample:  1:1  Line:  111:111  Band:  5:5
-Sample:  11:11  Line:  111:111  Band:  5:5
-Sample:  21:21  Line:  111:111  Band:  5:5
-Sample:  31:31  Line:  111:111  Band:  5:5
-Sample:  41:41  Line:  111:111  Band:  5:5
-Sample:  51:51  Line:  111:111  Band:  5:5
-Sample:  61:61  Line:  111:111  Band:  5:5
-Sample:  71:71  Line:  111:111  Band:  5:5
-Sample:  81:81  Line:  111:111  Band:  5:5
-Sample:  91:91  Line:  111:111  Band:  5:5
-Sample:  101:101  Line:  111:111  Band:  5:5
-Sample:  111:111  Line:  111:111  Band:  5:5
-Sample:  121:121  Line:  111:111  Band:  5:5
-Sample:  1:1  Line:  121:121  Band:  5:5
-Sample:  11:11  Line:  121:121  Band:  5:5
-Sample:  21:21  Line:  121:121  Band:  5:5
-Sample:  31:31  Line:  121:121  Band:  5:5
-Sample:  41:41  Line:  121:121  Band:  5:5
-Sample:  51:51  Line:  121:121  Band:  5:5
-Sample:  61:61  Line:  121:121  Band:  5:5
-Sample:  71:71  Line:  121:121  Band:  5:5
-Sample:  81:81  Line:  121:121  Band:  5:5
-Sample:  91:91  Line:  121:121  Band:  5:5
-Sample:  101:101  Line:  121:121  Band:  5:5
-Sample:  111:111  Line:  121:121  Band:  5:5
-Sample:  121:121  Line:  121:121  Band:  5:5
-50% ProcessedSample:  1:1  Line:  1:1  Band:  7:7
-Sample:  11:11  Line:  1:1  Band:  7:7
-Sample:  21:21  Line:  1:1  Band:  7:7
-Sample:  31:31  Line:  1:1  Band:  7:7
-Sample:  41:41  Line:  1:1  Band:  7:7
-Sample:  51:51  Line:  1:1  Band:  7:7
-Sample:  61:61  Line:  1:1  Band:  7:7
-Sample:  71:71  Line:  1:1  Band:  7:7
-Sample:  81:81  Line:  1:1  Band:  7:7
-Sample:  91:91  Line:  1:1  Band:  7:7
-Sample:  101:101  Line:  1:1  Band:  7:7
-Sample:  111:111  Line:  1:1  Band:  7:7
-Sample:  121:121  Line:  1:1  Band:  7:7
-Sample:  1:1  Line:  11:11  Band:  7:7
-Sample:  11:11  Line:  11:11  Band:  7:7
-Sample:  21:21  Line:  11:11  Band:  7:7
-Sample:  31:31  Line:  11:11  Band:  7:7
-Sample:  41:41  Line:  11:11  Band:  7:7
-Sample:  51:51  Line:  11:11  Band:  7:7
-Sample:  61:61  Line:  11:11  Band:  7:7
-Sample:  71:71  Line:  11:11  Band:  7:7
-Sample:  81:81  Line:  11:11  Band:  7:7
-Sample:  91:91  Line:  11:11  Band:  7:7
-Sample:  101:101  Line:  11:11  Band:  7:7
-Sample:  111:111  Line:  11:11  Band:  7:7
-Sample:  121:121  Line:  11:11  Band:  7:7
-Sample:  1:1  Line:  21:21  Band:  7:7
-Sample:  11:11  Line:  21:21  Band:  7:7
-Sample:  21:21  Line:  21:21  Band:  7:7
-Sample:  31:31  Line:  21:21  Band:  7:7
-Sample:  41:41  Line:  21:21  Band:  7:7
-Sample:  51:51  Line:  21:21  Band:  7:7
-Sample:  61:61  Line:  21:21  Band:  7:7
-Sample:  71:71  Line:  21:21  Band:  7:7
-Sample:  81:81  Line:  21:21  Band:  7:7
-Sample:  91:91  Line:  21:21  Band:  7:7
-Sample:  101:101  Line:  21:21  Band:  7:7
-Sample:  111:111  Line:  21:21  Band:  7:7
-Sample:  121:121  Line:  21:21  Band:  7:7
-Sample:  1:1  Line:  31:31  Band:  7:7
-Sample:  11:11  Line:  31:31  Band:  7:7
-Sample:  21:21  Line:  31:31  Band:  7:7
-Sample:  31:31  Line:  31:31  Band:  7:7
-Sample:  41:41  Line:  31:31  Band:  7:7
-Sample:  51:51  Line:  31:31  Band:  7:7
-Sample:  61:61  Line:  31:31  Band:  7:7
-Sample:  71:71  Line:  31:31  Band:  7:7
-Sample:  81:81  Line:  31:31  Band:  7:7
-Sample:  91:91  Line:  31:31  Band:  7:7
-Sample:  101:101  Line:  31:31  Band:  7:7
-Sample:  111:111  Line:  31:31  Band:  7:7
-Sample:  121:121  Line:  31:31  Band:  7:7
-Sample:  1:1  Line:  41:41  Band:  7:7
-Sample:  11:11  Line:  41:41  Band:  7:7
-Sample:  21:21  Line:  41:41  Band:  7:7
-Sample:  31:31  Line:  41:41  Band:  7:7
-Sample:  41:41  Line:  41:41  Band:  7:7
-Sample:  51:51  Line:  41:41  Band:  7:7
-Sample:  61:61  Line:  41:41  Band:  7:7
-Sample:  71:71  Line:  41:41  Band:  7:7
-Sample:  81:81  Line:  41:41  Band:  7:7
-Sample:  91:91  Line:  41:41  Band:  7:7
-Sample:  101:101  Line:  41:41  Band:  7:7
-Sample:  111:111  Line:  41:41  Band:  7:7
-Sample:  121:121  Line:  41:41  Band:  7:7
-Sample:  1:1  Line:  51:51  Band:  7:7
-Sample:  11:11  Line:  51:51  Band:  7:7
-Sample:  21:21  Line:  51:51  Band:  7:7
-Sample:  31:31  Line:  51:51  Band:  7:7
-Sample:  41:41  Line:  51:51  Band:  7:7
-Sample:  51:51  Line:  51:51  Band:  7:7
-Sample:  61:61  Line:  51:51  Band:  7:7
-Sample:  71:71  Line:  51:51  Band:  7:7
-Sample:  81:81  Line:  51:51  Band:  7:7
-Sample:  91:91  Line:  51:51  Band:  7:7
-Sample:  101:101  Line:  51:51  Band:  7:7
-Sample:  111:111  Line:  51:51  Band:  7:7
-Sample:  121:121  Line:  51:51  Band:  7:7
-Sample:  1:1  Line:  61:61  Band:  7:7
-Sample:  11:11  Line:  61:61  Band:  7:7
-Sample:  21:21  Line:  61:61  Band:  7:7
-Sample:  31:31  Line:  61:61  Band:  7:7
-Sample:  41:41  Line:  61:61  Band:  7:7
-Sample:  51:51  Line:  61:61  Band:  7:7
-Sample:  61:61  Line:  61:61  Band:  7:7
-Sample:  71:71  Line:  61:61  Band:  7:7
-Sample:  81:81  Line:  61:61  Band:  7:7
-Sample:  91:91  Line:  61:61  Band:  7:7
-Sample:  101:101  Line:  61:61  Band:  7:7
-Sample:  111:111  Line:  61:61  Band:  7:7
-Sample:  121:121  Line:  61:61  Band:  7:7
-Sample:  1:1  Line:  71:71  Band:  7:7
-Sample:  11:11  Line:  71:71  Band:  7:7
-Sample:  21:21  Line:  71:71  Band:  7:7
-Sample:  31:31  Line:  71:71  Band:  7:7
-Sample:  41:41  Line:  71:71  Band:  7:7
-Sample:  51:51  Line:  71:71  Band:  7:7
-Sample:  61:61  Line:  71:71  Band:  7:7
-Sample:  71:71  Line:  71:71  Band:  7:7
-Sample:  81:81  Line:  71:71  Band:  7:7
-Sample:  91:91  Line:  71:71  Band:  7:7
-Sample:  101:101  Line:  71:71  Band:  7:7
-60% ProcessedSample:  111:111  Line:  71:71  Band:  7:7
-Sample:  121:121  Line:  71:71  Band:  7:7
-Sample:  1:1  Line:  81:81  Band:  7:7
-Sample:  11:11  Line:  81:81  Band:  7:7
-Sample:  21:21  Line:  81:81  Band:  7:7
-Sample:  31:31  Line:  81:81  Band:  7:7
-Sample:  41:41  Line:  81:81  Band:  7:7
-Sample:  51:51  Line:  81:81  Band:  7:7
-Sample:  61:61  Line:  81:81  Band:  7:7
-Sample:  71:71  Line:  81:81  Band:  7:7
-Sample:  81:81  Line:  81:81  Band:  7:7
-Sample:  91:91  Line:  81:81  Band:  7:7
-Sample:  101:101  Line:  81:81  Band:  7:7
-Sample:  111:111  Line:  81:81  Band:  7:7
-Sample:  121:121  Line:  81:81  Band:  7:7
-Sample:  1:1  Line:  91:91  Band:  7:7
-Sample:  11:11  Line:  91:91  Band:  7:7
-Sample:  21:21  Line:  91:91  Band:  7:7
-Sample:  31:31  Line:  91:91  Band:  7:7
-Sample:  41:41  Line:  91:91  Band:  7:7
-Sample:  51:51  Line:  91:91  Band:  7:7
-Sample:  61:61  Line:  91:91  Band:  7:7
-Sample:  71:71  Line:  91:91  Band:  7:7
-Sample:  81:81  Line:  91:91  Band:  7:7
-Sample:  91:91  Line:  91:91  Band:  7:7
-Sample:  101:101  Line:  91:91  Band:  7:7
-Sample:  111:111  Line:  91:91  Band:  7:7
-Sample:  121:121  Line:  91:91  Band:  7:7
-Sample:  1:1  Line:  101:101  Band:  7:7
-Sample:  11:11  Line:  101:101  Band:  7:7
-Sample:  21:21  Line:  101:101  Band:  7:7
-Sample:  31:31  Line:  101:101  Band:  7:7
-Sample:  41:41  Line:  101:101  Band:  7:7
-Sample:  51:51  Line:  101:101  Band:  7:7
-Sample:  61:61  Line:  101:101  Band:  7:7
-Sample:  71:71  Line:  101:101  Band:  7:7
-Sample:  81:81  Line:  101:101  Band:  7:7
-Sample:  91:91  Line:  101:101  Band:  7:7
-Sample:  101:101  Line:  101:101  Band:  7:7
-Sample:  111:111  Line:  101:101  Band:  7:7
-Sample:  121:121  Line:  101:101  Band:  7:7
-Sample:  1:1  Line:  111:111  Band:  7:7
-Sample:  11:11  Line:  111:111  Band:  7:7
-Sample:  21:21  Line:  111:111  Band:  7:7
-Sample:  31:31  Line:  111:111  Band:  7:7
-Sample:  41:41  Line:  111:111  Band:  7:7
-Sample:  51:51  Line:  111:111  Band:  7:7
-Sample:  61:61  Line:  111:111  Band:  7:7
-Sample:  71:71  Line:  111:111  Band:  7:7
-Sample:  81:81  Line:  111:111  Band:  7:7
-Sample:  91:91  Line:  111:111  Band:  7:7
-Sample:  101:101  Line:  111:111  Band:  7:7
-Sample:  111:111  Line:  111:111  Band:  7:7
-Sample:  121:121  Line:  111:111  Band:  7:7
-Sample:  1:1  Line:  121:121  Band:  7:7
-Sample:  11:11  Line:  121:121  Band:  7:7
-Sample:  21:21  Line:  121:121  Band:  7:7
-Sample:  31:31  Line:  121:121  Band:  7:7
-Sample:  41:41  Line:  121:121  Band:  7:7
-Sample:  51:51  Line:  121:121  Band:  7:7
-Sample:  61:61  Line:  121:121  Band:  7:7
-Sample:  71:71  Line:  121:121  Band:  7:7
-Sample:  81:81  Line:  121:121  Band:  7:7
-Sample:  91:91  Line:  121:121  Band:  7:7
-Sample:  101:101  Line:  121:121  Band:  7:7
-Sample:  111:111  Line:  121:121  Band:  7:7
-Sample:  121:121  Line:  121:121  Band:  7:7
-Sample:  1:1  Line:  1:1  Band:  9:9
-Sample:  11:11  Line:  1:1  Band:  9:9
-Sample:  21:21  Line:  1:1  Band:  9:9
-Sample:  31:31  Line:  1:1  Band:  9:9
-Sample:  41:41  Line:  1:1  Band:  9:9
-Sample:  51:51  Line:  1:1  Band:  9:9
-Sample:  61:61  Line:  1:1  Band:  9:9
-Sample:  71:71  Line:  1:1  Band:  9:9
-Sample:  81:81  Line:  1:1  Band:  9:9
-Sample:  91:91  Line:  1:1  Band:  9:9
-Sample:  101:101  Line:  1:1  Band:  9:9
-Sample:  111:111  Line:  1:1  Band:  9:9
-Sample:  121:121  Line:  1:1  Band:  9:9
-Sample:  1:1  Line:  11:11  Band:  9:9
-Sample:  11:11  Line:  11:11  Band:  9:9
-Sample:  21:21  Line:  11:11  Band:  9:9
-Sample:  31:31  Line:  11:11  Band:  9:9
-Sample:  41:41  Line:  11:11  Band:  9:9
-Sample:  51:51  Line:  11:11  Band:  9:9
-Sample:  61:61  Line:  11:11  Band:  9:9
-Sample:  71:71  Line:  11:11  Band:  9:9
-Sample:  81:81  Line:  11:11  Band:  9:9
-Sample:  91:91  Line:  11:11  Band:  9:9
-Sample:  101:101  Line:  11:11  Band:  9:9
-Sample:  111:111  Line:  11:11  Band:  9:9
-Sample:  121:121  Line:  11:11  Band:  9:9
-Sample:  1:1  Line:  21:21  Band:  9:9
-Sample:  11:11  Line:  21:21  Band:  9:9
-Sample:  21:21  Line:  21:21  Band:  9:9
-Sample:  31:31  Line:  21:21  Band:  9:9
-Sample:  41:41  Line:  21:21  Band:  9:9
-Sample:  51:51  Line:  21:21  Band:  9:9
-Sample:  61:61  Line:  21:21  Band:  9:9
-Sample:  71:71  Line:  21:21  Band:  9:9
-70% ProcessedSample:  81:81  Line:  21:21  Band:  9:9
-Sample:  91:91  Line:  21:21  Band:  9:9
-Sample:  101:101  Line:  21:21  Band:  9:9
-Sample:  111:111  Line:  21:21  Band:  9:9
-Sample:  121:121  Line:  21:21  Band:  9:9
-Sample:  1:1  Line:  31:31  Band:  9:9
-Sample:  11:11  Line:  31:31  Band:  9:9
-Sample:  21:21  Line:  31:31  Band:  9:9
-Sample:  31:31  Line:  31:31  Band:  9:9
-Sample:  41:41  Line:  31:31  Band:  9:9
-Sample:  51:51  Line:  31:31  Band:  9:9
-Sample:  61:61  Line:  31:31  Band:  9:9
-Sample:  71:71  Line:  31:31  Band:  9:9
-Sample:  81:81  Line:  31:31  Band:  9:9
-Sample:  91:91  Line:  31:31  Band:  9:9
-Sample:  101:101  Line:  31:31  Band:  9:9
-Sample:  111:111  Line:  31:31  Band:  9:9
-Sample:  121:121  Line:  31:31  Band:  9:9
-Sample:  1:1  Line:  41:41  Band:  9:9
-Sample:  11:11  Line:  41:41  Band:  9:9
-Sample:  21:21  Line:  41:41  Band:  9:9
-Sample:  31:31  Line:  41:41  Band:  9:9
-Sample:  41:41  Line:  41:41  Band:  9:9
-Sample:  51:51  Line:  41:41  Band:  9:9
-Sample:  61:61  Line:  41:41  Band:  9:9
-Sample:  71:71  Line:  41:41  Band:  9:9
-Sample:  81:81  Line:  41:41  Band:  9:9
-Sample:  91:91  Line:  41:41  Band:  9:9
-Sample:  101:101  Line:  41:41  Band:  9:9
-Sample:  111:111  Line:  41:41  Band:  9:9
-Sample:  121:121  Line:  41:41  Band:  9:9
-Sample:  1:1  Line:  51:51  Band:  9:9
-Sample:  11:11  Line:  51:51  Band:  9:9
-Sample:  21:21  Line:  51:51  Band:  9:9
-Sample:  31:31  Line:  51:51  Band:  9:9
-Sample:  41:41  Line:  51:51  Band:  9:9
-Sample:  51:51  Line:  51:51  Band:  9:9
-Sample:  61:61  Line:  51:51  Band:  9:9
-Sample:  71:71  Line:  51:51  Band:  9:9
-Sample:  81:81  Line:  51:51  Band:  9:9
-Sample:  91:91  Line:  51:51  Band:  9:9
-Sample:  101:101  Line:  51:51  Band:  9:9
-Sample:  111:111  Line:  51:51  Band:  9:9
-Sample:  121:121  Line:  51:51  Band:  9:9
-Sample:  1:1  Line:  61:61  Band:  9:9
-Sample:  11:11  Line:  61:61  Band:  9:9
-Sample:  21:21  Line:  61:61  Band:  9:9
-Sample:  31:31  Line:  61:61  Band:  9:9
-Sample:  41:41  Line:  61:61  Band:  9:9
-Sample:  51:51  Line:  61:61  Band:  9:9
-Sample:  61:61  Line:  61:61  Band:  9:9
-Sample:  71:71  Line:  61:61  Band:  9:9
-Sample:  81:81  Line:  61:61  Band:  9:9
-Sample:  91:91  Line:  61:61  Band:  9:9
-Sample:  101:101  Line:  61:61  Band:  9:9
-Sample:  111:111  Line:  61:61  Band:  9:9
-Sample:  121:121  Line:  61:61  Band:  9:9
-Sample:  1:1  Line:  71:71  Band:  9:9
-Sample:  11:11  Line:  71:71  Band:  9:9
-Sample:  21:21  Line:  71:71  Band:  9:9
-Sample:  31:31  Line:  71:71  Band:  9:9
-Sample:  41:41  Line:  71:71  Band:  9:9
-Sample:  51:51  Line:  71:71  Band:  9:9
-Sample:  61:61  Line:  71:71  Band:  9:9
-Sample:  71:71  Line:  71:71  Band:  9:9
-Sample:  81:81  Line:  71:71  Band:  9:9
-Sample:  91:91  Line:  71:71  Band:  9:9
-Sample:  101:101  Line:  71:71  Band:  9:9
-Sample:  111:111  Line:  71:71  Band:  9:9
-Sample:  121:121  Line:  71:71  Band:  9:9
-Sample:  1:1  Line:  81:81  Band:  9:9
-Sample:  11:11  Line:  81:81  Band:  9:9
-Sample:  21:21  Line:  81:81  Band:  9:9
-Sample:  31:31  Line:  81:81  Band:  9:9
-Sample:  41:41  Line:  81:81  Band:  9:9
-Sample:  51:51  Line:  81:81  Band:  9:9
-Sample:  61:61  Line:  81:81  Band:  9:9
-Sample:  71:71  Line:  81:81  Band:  9:9
-Sample:  81:81  Line:  81:81  Band:  9:9
-Sample:  91:91  Line:  81:81  Band:  9:9
-Sample:  101:101  Line:  81:81  Band:  9:9
-Sample:  111:111  Line:  81:81  Band:  9:9
-Sample:  121:121  Line:  81:81  Band:  9:9
-Sample:  1:1  Line:  91:91  Band:  9:9
-Sample:  11:11  Line:  91:91  Band:  9:9
-Sample:  21:21  Line:  91:91  Band:  9:9
-Sample:  31:31  Line:  91:91  Band:  9:9
-Sample:  41:41  Line:  91:91  Band:  9:9
-Sample:  51:51  Line:  91:91  Band:  9:9
-Sample:  61:61  Line:  91:91  Band:  9:9
-Sample:  71:71  Line:  91:91  Band:  9:9
-Sample:  81:81  Line:  91:91  Band:  9:9
-Sample:  91:91  Line:  91:91  Band:  9:9
-Sample:  101:101  Line:  91:91  Band:  9:9
-Sample:  111:111  Line:  91:91  Band:  9:9
-Sample:  121:121  Line:  91:91  Band:  9:9
-Sample:  1:1  Line:  101:101  Band:  9:9
-Sample:  11:11  Line:  101:101  Band:  9:9
-Sample:  21:21  Line:  101:101  Band:  9:9
-Sample:  31:31  Line:  101:101  Band:  9:9
-Sample:  41:41  Line:  101:101  Band:  9:9
-Sample:  51:51  Line:  101:101  Band:  9:9
-80% ProcessedSample:  61:61  Line:  101:101  Band:  9:9
-Sample:  71:71  Line:  101:101  Band:  9:9
-Sample:  81:81  Line:  101:101  Band:  9:9
-Sample:  91:91  Line:  101:101  Band:  9:9
-Sample:  101:101  Line:  101:101  Band:  9:9
-Sample:  111:111  Line:  101:101  Band:  9:9
-Sample:  121:121  Line:  101:101  Band:  9:9
-Sample:  1:1  Line:  111:111  Band:  9:9
-Sample:  11:11  Line:  111:111  Band:  9:9
-Sample:  21:21  Line:  111:111  Band:  9:9
-Sample:  31:31  Line:  111:111  Band:  9:9
-Sample:  41:41  Line:  111:111  Band:  9:9
-Sample:  51:51  Line:  111:111  Band:  9:9
-Sample:  61:61  Line:  111:111  Band:  9:9
-Sample:  71:71  Line:  111:111  Band:  9:9
-Sample:  81:81  Line:  111:111  Band:  9:9
-Sample:  91:91  Line:  111:111  Band:  9:9
-Sample:  101:101  Line:  111:111  Band:  9:9
-Sample:  111:111  Line:  111:111  Band:  9:9
-Sample:  121:121  Line:  111:111  Band:  9:9
-Sample:  1:1  Line:  121:121  Band:  9:9
-Sample:  11:11  Line:  121:121  Band:  9:9
-Sample:  21:21  Line:  121:121  Band:  9:9
-Sample:  31:31  Line:  121:121  Band:  9:9
-Sample:  41:41  Line:  121:121  Band:  9:9
-Sample:  51:51  Line:  121:121  Band:  9:9
-Sample:  61:61  Line:  121:121  Band:  9:9
-Sample:  71:71  Line:  121:121  Band:  9:9
-Sample:  81:81  Line:  121:121  Band:  9:9
-Sample:  91:91  Line:  121:121  Band:  9:9
-Sample:  101:101  Line:  121:121  Band:  9:9
-Sample:  111:111  Line:  121:121  Band:  9:9
-Sample:  121:121  Line:  121:121  Band:  9:9
-Sample:  1:1  Line:  1:1  Band:  11:11
-Sample:  11:11  Line:  1:1  Band:  11:11
-Sample:  21:21  Line:  1:1  Band:  11:11
-Sample:  31:31  Line:  1:1  Band:  11:11
-Sample:  41:41  Line:  1:1  Band:  11:11
-Sample:  51:51  Line:  1:1  Band:  11:11
-Sample:  61:61  Line:  1:1  Band:  11:11
-Sample:  71:71  Line:  1:1  Band:  11:11
-Sample:  81:81  Line:  1:1  Band:  11:11
-Sample:  91:91  Line:  1:1  Band:  11:11
-Sample:  101:101  Line:  1:1  Band:  11:11
-Sample:  111:111  Line:  1:1  Band:  11:11
-Sample:  121:121  Line:  1:1  Band:  11:11
-Sample:  1:1  Line:  11:11  Band:  11:11
-Sample:  11:11  Line:  11:11  Band:  11:11
-Sample:  21:21  Line:  11:11  Band:  11:11
-Sample:  31:31  Line:  11:11  Band:  11:11
-Sample:  41:41  Line:  11:11  Band:  11:11
-Sample:  51:51  Line:  11:11  Band:  11:11
-Sample:  61:61  Line:  11:11  Band:  11:11
-Sample:  71:71  Line:  11:11  Band:  11:11
-Sample:  81:81  Line:  11:11  Band:  11:11
-Sample:  91:91  Line:  11:11  Band:  11:11
-Sample:  101:101  Line:  11:11  Band:  11:11
-Sample:  111:111  Line:  11:11  Band:  11:11
-Sample:  121:121  Line:  11:11  Band:  11:11
-Sample:  1:1  Line:  21:21  Band:  11:11
-Sample:  11:11  Line:  21:21  Band:  11:11
-Sample:  21:21  Line:  21:21  Band:  11:11
-Sample:  31:31  Line:  21:21  Band:  11:11
-Sample:  41:41  Line:  21:21  Band:  11:11
-Sample:  51:51  Line:  21:21  Band:  11:11
-Sample:  61:61  Line:  21:21  Band:  11:11
-Sample:  71:71  Line:  21:21  Band:  11:11
-Sample:  81:81  Line:  21:21  Band:  11:11
-Sample:  91:91  Line:  21:21  Band:  11:11
-Sample:  101:101  Line:  21:21  Band:  11:11
-Sample:  111:111  Line:  21:21  Band:  11:11
-Sample:  121:121  Line:  21:21  Band:  11:11
-Sample:  1:1  Line:  31:31  Band:  11:11
-Sample:  11:11  Line:  31:31  Band:  11:11
-Sample:  21:21  Line:  31:31  Band:  11:11
-Sample:  31:31  Line:  31:31  Band:  11:11
-Sample:  41:41  Line:  31:31  Band:  11:11
-Sample:  51:51  Line:  31:31  Band:  11:11
-Sample:  61:61  Line:  31:31  Band:  11:11
-Sample:  71:71  Line:  31:31  Band:  11:11
-Sample:  81:81  Line:  31:31  Band:  11:11
-Sample:  91:91  Line:  31:31  Band:  11:11
-Sample:  101:101  Line:  31:31  Band:  11:11
-Sample:  111:111  Line:  31:31  Band:  11:11
-Sample:  121:121  Line:  31:31  Band:  11:11
-Sample:  1:1  Line:  41:41  Band:  11:11
-Sample:  11:11  Line:  41:41  Band:  11:11
-Sample:  21:21  Line:  41:41  Band:  11:11
-Sample:  31:31  Line:  41:41  Band:  11:11
-Sample:  41:41  Line:  41:41  Band:  11:11
-Sample:  51:51  Line:  41:41  Band:  11:11
-Sample:  61:61  Line:  41:41  Band:  11:11
-Sample:  71:71  Line:  41:41  Band:  11:11
-Sample:  81:81  Line:  41:41  Band:  11:11
-Sample:  91:91  Line:  41:41  Band:  11:11
-Sample:  101:101  Line:  41:41  Band:  11:11
-Sample:  111:111  Line:  41:41  Band:  11:11
-Sample:  121:121  Line:  41:41  Band:  11:11
-Sample:  1:1  Line:  51:51  Band:  11:11
-Sample:  11:11  Line:  51:51  Band:  11:11
-Sample:  21:21  Line:  51:51  Band:  11:11
-90% ProcessedSample:  31:31  Line:  51:51  Band:  11:11
-Sample:  41:41  Line:  51:51  Band:  11:11
-Sample:  51:51  Line:  51:51  Band:  11:11
-Sample:  61:61  Line:  51:51  Band:  11:11
-Sample:  71:71  Line:  51:51  Band:  11:11
-Sample:  81:81  Line:  51:51  Band:  11:11
-Sample:  91:91  Line:  51:51  Band:  11:11
-Sample:  101:101  Line:  51:51  Band:  11:11
-Sample:  111:111  Line:  51:51  Band:  11:11
-Sample:  121:121  Line:  51:51  Band:  11:11
-Sample:  1:1  Line:  61:61  Band:  11:11
-Sample:  11:11  Line:  61:61  Band:  11:11
-Sample:  21:21  Line:  61:61  Band:  11:11
-Sample:  31:31  Line:  61:61  Band:  11:11
-Sample:  41:41  Line:  61:61  Band:  11:11
-Sample:  51:51  Line:  61:61  Band:  11:11
-Sample:  61:61  Line:  61:61  Band:  11:11
-Sample:  71:71  Line:  61:61  Band:  11:11
-Sample:  81:81  Line:  61:61  Band:  11:11
-Sample:  91:91  Line:  61:61  Band:  11:11
-Sample:  101:101  Line:  61:61  Band:  11:11
-Sample:  111:111  Line:  61:61  Band:  11:11
-Sample:  121:121  Line:  61:61  Band:  11:11
-Sample:  1:1  Line:  71:71  Band:  11:11
-Sample:  11:11  Line:  71:71  Band:  11:11
-Sample:  21:21  Line:  71:71  Band:  11:11
-Sample:  31:31  Line:  71:71  Band:  11:11
-Sample:  41:41  Line:  71:71  Band:  11:11
-Sample:  51:51  Line:  71:71  Band:  11:11
-Sample:  61:61  Line:  71:71  Band:  11:11
-Sample:  71:71  Line:  71:71  Band:  11:11
-Sample:  81:81  Line:  71:71  Band:  11:11
-Sample:  91:91  Line:  71:71  Band:  11:11
-Sample:  101:101  Line:  71:71  Band:  11:11
-Sample:  111:111  Line:  71:71  Band:  11:11
-Sample:  121:121  Line:  71:71  Band:  11:11
-Sample:  1:1  Line:  81:81  Band:  11:11
-Sample:  11:11  Line:  81:81  Band:  11:11
-Sample:  21:21  Line:  81:81  Band:  11:11
-Sample:  31:31  Line:  81:81  Band:  11:11
-Sample:  41:41  Line:  81:81  Band:  11:11
-Sample:  51:51  Line:  81:81  Band:  11:11
-Sample:  61:61  Line:  81:81  Band:  11:11
-Sample:  71:71  Line:  81:81  Band:  11:11
-Sample:  81:81  Line:  81:81  Band:  11:11
-Sample:  91:91  Line:  81:81  Band:  11:11
-Sample:  101:101  Line:  81:81  Band:  11:11
-Sample:  111:111  Line:  81:81  Band:  11:11
-Sample:  121:121  Line:  81:81  Band:  11:11
-Sample:  1:1  Line:  91:91  Band:  11:11
-Sample:  11:11  Line:  91:91  Band:  11:11
-Sample:  21:21  Line:  91:91  Band:  11:11
-Sample:  31:31  Line:  91:91  Band:  11:11
-Sample:  41:41  Line:  91:91  Band:  11:11
-Sample:  51:51  Line:  91:91  Band:  11:11
-Sample:  61:61  Line:  91:91  Band:  11:11
-Sample:  71:71  Line:  91:91  Band:  11:11
-Sample:  81:81  Line:  91:91  Band:  11:11
-Sample:  91:91  Line:  91:91  Band:  11:11
-Sample:  101:101  Line:  91:91  Band:  11:11
-Sample:  111:111  Line:  91:91  Band:  11:11
-Sample:  121:121  Line:  91:91  Band:  11:11
-Sample:  1:1  Line:  101:101  Band:  11:11
-Sample:  11:11  Line:  101:101  Band:  11:11
-Sample:  21:21  Line:  101:101  Band:  11:11
-Sample:  31:31  Line:  101:101  Band:  11:11
-Sample:  41:41  Line:  101:101  Band:  11:11
-Sample:  51:51  Line:  101:101  Band:  11:11
-Sample:  61:61  Line:  101:101  Band:  11:11
-Sample:  71:71  Line:  101:101  Band:  11:11
-Sample:  81:81  Line:  101:101  Band:  11:11
-Sample:  91:91  Line:  101:101  Band:  11:11
-Sample:  101:101  Line:  101:101  Band:  11:11
-Sample:  111:111  Line:  101:101  Band:  11:11
-Sample:  121:121  Line:  101:101  Band:  11:11
-Sample:  1:1  Line:  111:111  Band:  11:11
-Sample:  11:11  Line:  111:111  Band:  11:11
-Sample:  21:21  Line:  111:111  Band:  11:11
-Sample:  31:31  Line:  111:111  Band:  11:11
-Sample:  41:41  Line:  111:111  Band:  11:11
-Sample:  51:51  Line:  111:111  Band:  11:11
-Sample:  61:61  Line:  111:111  Band:  11:11
-Sample:  71:71  Line:  111:111  Band:  11:11
-Sample:  81:81  Line:  111:111  Band:  11:11
-Sample:  91:91  Line:  111:111  Band:  11:11
-Sample:  101:101  Line:  111:111  Band:  11:11
-Sample:  111:111  Line:  111:111  Band:  11:11
-Sample:  121:121  Line:  111:111  Band:  11:11
-Sample:  1:1  Line:  121:121  Band:  11:11
-Sample:  11:11  Line:  121:121  Band:  11:11
-Sample:  21:21  Line:  121:121  Band:  11:11
-Sample:  31:31  Line:  121:121  Band:  11:11
-Sample:  41:41  Line:  121:121  Band:  11:11
-Sample:  51:51  Line:  121:121  Band:  11:11
-Sample:  61:61  Line:  121:121  Band:  11:11
-Sample:  71:71  Line:  121:121  Band:  11:11
-Sample:  81:81  Line:  121:121  Band:  11:11
-Sample:  91:91  Line:  121:121  Band:  11:11
-Sample:  101:101  Line:  121:121  Band:  11:11
-Sample:  111:111  Line:  121:121  Band:  11:11
-Sample:  121:121  Line:  121:121  Band:  11:11
+Sample:  122:122  Line:  1:1  Band:  1:1
+Sample:  123:123  Line:  1:1  Band:  1:1
+Sample:  124:124  Line:  1:1  Band:  1:1
+Sample:  125:125  Line:  1:1  Band:  1:1
+Sample:  126:126  Line:  1:1  Band:  1:1
+Sample:  1:1  Line:  1:1  Band:  2:2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Sample:  26:26  Line:  1:1  Band:  2:2
+10% ProcessedSample:  27:27  Line:  1:1  Band:  2:2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Sample:  77:77  Line:  1:1  Band:  2:2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Sample:  1:1  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  1:1
+Bogus error #2
+20% ProcessedSample:  52:52  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Bogus error #2
+30% ProcessedSample:  77:77  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  1:1
+Bogus error #2
+40% ProcessedSample:  102:102  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Bogus error #2
+50% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  2:2
+Bogus error #2
+60% ProcessedSample:  27:27  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  1:1
+Bogus error #2
+70% ProcessedSample:  52:52  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Bogus error #2
+80% ProcessedSample:  77:77  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  1:1
+Bogus error #2
+90% ProcessedSample:  102:102  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  1:1
+Bogus error #2
+Sample:  1:1  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  2:2  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  3:3  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  4:4  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  5:5  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  6:6  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  7:7  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  8:8  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  9:9  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  10:10  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  11:11  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  12:12  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  13:13  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  14:14  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  15:15  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  16:16  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  17:17  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  18:18  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  19:19  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  20:20  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  21:21  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  22:22  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  23:23  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  24:24  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  25:25  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  26:26  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  27:27  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  28:28  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  29:29  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  30:30  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  31:31  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  32:32  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  33:33  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  34:34  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  35:35  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  36:36  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  37:37  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  38:38  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  39:39  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  40:40  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  41:41  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  42:42  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  43:43  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  44:44  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  45:45  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  46:46  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  47:47  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  48:48  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  49:49  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  50:50  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  51:51  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  52:52  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  53:53  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  54:54  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  55:55  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  56:56  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  57:57  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  58:58  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  59:59  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  60:60  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  61:61  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  62:62  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  63:63  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  64:64  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  65:65  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  66:66  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  67:67  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  68:68  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  69:69  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  70:70  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  71:71  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  72:72  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  73:73  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  74:74  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  75:75  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  76:76  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  77:77  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  78:78  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  79:79  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  80:80  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  81:81  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  82:82  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  83:83  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  84:84  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  85:85  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  86:86  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  87:87  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  88:88  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  89:89  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  90:90  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  91:91  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  92:92  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  93:93  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  94:94  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  95:95  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  96:96  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  97:97  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  98:98  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  99:99  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  100:100  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  101:101  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  102:102  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  103:103  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  104:104  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  105:105  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  106:106  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  107:107  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  108:108  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  109:109  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  110:110  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  111:111  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  112:112  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  113:113  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  114:114  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  115:115  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  116:116  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  117:117  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  118:118  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  119:119  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  120:120  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  121:121  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  122:122  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  123:123  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  124:124  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  125:125  Line:  1:1  Band:  2:2
+Bogus error #2
+Sample:  126:126  Line:  1:1  Band:  2:2
+Bogus error #2
 100% Processed
+
+Testing ProcessByBrick::ProcessCubeInPlace[Buffer &inout]
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Functor3 - ProcessCubes One Thread
+8:**PROGRAMMER ERROR** You have not specified any input or output cubes.
+9:**PROGRAMMER ERROR** All output cubes must have the same number of lines as the first input cube or output cube.
+10:**PROGRAMMER ERROR** All output cubes must have the same number of bands as the first input cube or output cube.
+unittest: Working
+0% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
+10% ProcessedSample:  1:1  Line:  1:1  Band:  3:3
+Bogus error #2
+Bogus error #3
+20% Processed30% ProcessedSample:  1:1  Line:  1:1  Band:  5:5
+Bogus error #2
+Bogus error #3
+40% Processed50% ProcessedSample:  1:1  Line:  1:1  Band:  7:7
+Bogus error #2
+Bogus error #3
+60% ProcessedSample:  1:1  Line:  1:1  Band:  9:9
+Bogus error #2
+Bogus error #3
+70% Processed80% ProcessedSample:  1:1  Line:  1:1  Band:  11:11
+Bogus error #2
+Bogus error #3
+90% Processed100% Processed
 
 Functor4 - ProcessCube Threaded
 unittest: Working
@@ -1305,172 +3107,4 @@ End Testing Functors
 Testing StartProcess
 unittest: Working
 0% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
-Sample:  11:11  Line:  1:1  Band:  1:1
-Sample:  21:21  Line:  1:1  Band:  1:1
-Sample:  31:31  Line:  1:1  Band:  1:1
-Sample:  41:41  Line:  1:1  Band:  1:1
-Sample:  51:51  Line:  1:1  Band:  1:1
-Sample:  61:61  Line:  1:1  Band:  1:1
-Sample:  71:71  Line:  1:1  Band:  1:1
-Sample:  81:81  Line:  1:1  Band:  1:1
-Sample:  91:91  Line:  1:1  Band:  1:1
-Sample:  101:101  Line:  1:1  Band:  1:1
-Sample:  111:111  Line:  1:1  Band:  1:1
-Sample:  121:121  Line:  1:1  Band:  1:1
-Sample:  1:1  Line:  11:11  Band:  1:1
-Sample:  11:11  Line:  11:11  Band:  1:1
-Sample:  21:21  Line:  11:11  Band:  1:1
-Sample:  31:31  Line:  11:11  Band:  1:1
-10% ProcessedSample:  41:41  Line:  11:11  Band:  1:1
-Sample:  51:51  Line:  11:11  Band:  1:1
-Sample:  61:61  Line:  11:11  Band:  1:1
-Sample:  71:71  Line:  11:11  Band:  1:1
-Sample:  81:81  Line:  11:11  Band:  1:1
-Sample:  91:91  Line:  11:11  Band:  1:1
-Sample:  101:101  Line:  11:11  Band:  1:1
-Sample:  111:111  Line:  11:11  Band:  1:1
-Sample:  121:121  Line:  11:11  Band:  1:1
-Sample:  1:1  Line:  21:21  Band:  1:1
-Sample:  11:11  Line:  21:21  Band:  1:1
-Sample:  21:21  Line:  21:21  Band:  1:1
-Sample:  31:31  Line:  21:21  Band:  1:1
-Sample:  41:41  Line:  21:21  Band:  1:1
-Sample:  51:51  Line:  21:21  Band:  1:1
-Sample:  61:61  Line:  21:21  Band:  1:1
-Sample:  71:71  Line:  21:21  Band:  1:1
-20% ProcessedSample:  81:81  Line:  21:21  Band:  1:1
-Sample:  91:91  Line:  21:21  Band:  1:1
-Sample:  101:101  Line:  21:21  Band:  1:1
-Sample:  111:111  Line:  21:21  Band:  1:1
-Sample:  121:121  Line:  21:21  Band:  1:1
-Sample:  1:1  Line:  31:31  Band:  1:1
-Sample:  11:11  Line:  31:31  Band:  1:1
-Sample:  21:21  Line:  31:31  Band:  1:1
-Sample:  31:31  Line:  31:31  Band:  1:1
-Sample:  41:41  Line:  31:31  Band:  1:1
-Sample:  51:51  Line:  31:31  Band:  1:1
-Sample:  61:61  Line:  31:31  Band:  1:1
-Sample:  71:71  Line:  31:31  Band:  1:1
-Sample:  81:81  Line:  31:31  Band:  1:1
-Sample:  91:91  Line:  31:31  Band:  1:1
-Sample:  101:101  Line:  31:31  Band:  1:1
-Sample:  111:111  Line:  31:31  Band:  1:1
-30% ProcessedSample:  121:121  Line:  31:31  Band:  1:1
-Sample:  1:1  Line:  41:41  Band:  1:1
-Sample:  11:11  Line:  41:41  Band:  1:1
-Sample:  21:21  Line:  41:41  Band:  1:1
-Sample:  31:31  Line:  41:41  Band:  1:1
-Sample:  41:41  Line:  41:41  Band:  1:1
-Sample:  51:51  Line:  41:41  Band:  1:1
-Sample:  61:61  Line:  41:41  Band:  1:1
-Sample:  71:71  Line:  41:41  Band:  1:1
-Sample:  81:81  Line:  41:41  Band:  1:1
-Sample:  91:91  Line:  41:41  Band:  1:1
-Sample:  101:101  Line:  41:41  Band:  1:1
-Sample:  111:111  Line:  41:41  Band:  1:1
-Sample:  121:121  Line:  41:41  Band:  1:1
-Sample:  1:1  Line:  51:51  Band:  1:1
-Sample:  11:11  Line:  51:51  Band:  1:1
-Sample:  21:21  Line:  51:51  Band:  1:1
-40% ProcessedSample:  31:31  Line:  51:51  Band:  1:1
-Sample:  41:41  Line:  51:51  Band:  1:1
-Sample:  51:51  Line:  51:51  Band:  1:1
-Sample:  61:61  Line:  51:51  Band:  1:1
-Sample:  71:71  Line:  51:51  Band:  1:1
-Sample:  81:81  Line:  51:51  Band:  1:1
-Sample:  91:91  Line:  51:51  Band:  1:1
-Sample:  101:101  Line:  51:51  Band:  1:1
-Sample:  111:111  Line:  51:51  Band:  1:1
-Sample:  121:121  Line:  51:51  Band:  1:1
-Sample:  1:1  Line:  61:61  Band:  1:1
-Sample:  11:11  Line:  61:61  Band:  1:1
-Sample:  21:21  Line:  61:61  Band:  1:1
-Sample:  31:31  Line:  61:61  Band:  1:1
-Sample:  41:41  Line:  61:61  Band:  1:1
-Sample:  51:51  Line:  61:61  Band:  1:1
-Sample:  61:61  Line:  61:61  Band:  1:1
-50% ProcessedSample:  71:71  Line:  61:61  Band:  1:1
-Sample:  81:81  Line:  61:61  Band:  1:1
-Sample:  91:91  Line:  61:61  Band:  1:1
-Sample:  101:101  Line:  61:61  Band:  1:1
-Sample:  111:111  Line:  61:61  Band:  1:1
-Sample:  121:121  Line:  61:61  Band:  1:1
-Sample:  1:1  Line:  71:71  Band:  1:1
-Sample:  11:11  Line:  71:71  Band:  1:1
-Sample:  21:21  Line:  71:71  Band:  1:1
-Sample:  31:31  Line:  71:71  Band:  1:1
-Sample:  41:41  Line:  71:71  Band:  1:1
-Sample:  51:51  Line:  71:71  Band:  1:1
-Sample:  61:61  Line:  71:71  Band:  1:1
-Sample:  71:71  Line:  71:71  Band:  1:1
-Sample:  81:81  Line:  71:71  Band:  1:1
-Sample:  91:91  Line:  71:71  Band:  1:1
-Sample:  101:101  Line:  71:71  Band:  1:1
-60% ProcessedSample:  111:111  Line:  71:71  Band:  1:1
-Sample:  121:121  Line:  71:71  Band:  1:1
-Sample:  1:1  Line:  81:81  Band:  1:1
-Sample:  11:11  Line:  81:81  Band:  1:1
-Sample:  21:21  Line:  81:81  Band:  1:1
-Sample:  31:31  Line:  81:81  Band:  1:1
-Sample:  41:41  Line:  81:81  Band:  1:1
-Sample:  51:51  Line:  81:81  Band:  1:1
-Sample:  61:61  Line:  81:81  Band:  1:1
-Sample:  71:71  Line:  81:81  Band:  1:1
-Sample:  81:81  Line:  81:81  Band:  1:1
-Sample:  91:91  Line:  81:81  Band:  1:1
-Sample:  101:101  Line:  81:81  Band:  1:1
-Sample:  111:111  Line:  81:81  Band:  1:1
-Sample:  121:121  Line:  81:81  Band:  1:1
-Sample:  1:1  Line:  91:91  Band:  1:1
-Sample:  11:11  Line:  91:91  Band:  1:1
-70% ProcessedSample:  21:21  Line:  91:91  Band:  1:1
-Sample:  31:31  Line:  91:91  Band:  1:1
-Sample:  41:41  Line:  91:91  Band:  1:1
-Sample:  51:51  Line:  91:91  Band:  1:1
-Sample:  61:61  Line:  91:91  Band:  1:1
-Sample:  71:71  Line:  91:91  Band:  1:1
-Sample:  81:81  Line:  91:91  Band:  1:1
-Sample:  91:91  Line:  91:91  Band:  1:1
-Sample:  101:101  Line:  91:91  Band:  1:1
-Sample:  111:111  Line:  91:91  Band:  1:1
-Sample:  121:121  Line:  91:91  Band:  1:1
-Sample:  1:1  Line:  101:101  Band:  1:1
-Sample:  11:11  Line:  101:101  Band:  1:1
-Sample:  21:21  Line:  101:101  Band:  1:1
-Sample:  31:31  Line:  101:101  Band:  1:1
-Sample:  41:41  Line:  101:101  Band:  1:1
-Sample:  51:51  Line:  101:101  Band:  1:1
-80% ProcessedSample:  61:61  Line:  101:101  Band:  1:1
-Sample:  71:71  Line:  101:101  Band:  1:1
-Sample:  81:81  Line:  101:101  Band:  1:1
-Sample:  91:91  Line:  101:101  Band:  1:1
-Sample:  101:101  Line:  101:101  Band:  1:1
-Sample:  111:111  Line:  101:101  Band:  1:1
-Sample:  121:121  Line:  101:101  Band:  1:1
-Sample:  1:1  Line:  111:111  Band:  1:1
-Sample:  11:11  Line:  111:111  Band:  1:1
-Sample:  21:21  Line:  111:111  Band:  1:1
-Sample:  31:31  Line:  111:111  Band:  1:1
-Sample:  41:41  Line:  111:111  Band:  1:1
-Sample:  51:51  Line:  111:111  Band:  1:1
-Sample:  61:61  Line:  111:111  Band:  1:1
-Sample:  71:71  Line:  111:111  Band:  1:1
-Sample:  81:81  Line:  111:111  Band:  1:1
-Sample:  91:91  Line:  111:111  Band:  1:1
-90% ProcessedSample:  101:101  Line:  111:111  Band:  1:1
-Sample:  111:111  Line:  111:111  Band:  1:1
-Sample:  121:121  Line:  111:111  Band:  1:1
-Sample:  1:1  Line:  121:121  Band:  1:1
-Sample:  11:11  Line:  121:121  Band:  1:1
-Sample:  21:21  Line:  121:121  Band:  1:1
-Sample:  31:31  Line:  121:121  Band:  1:1
-Sample:  41:41  Line:  121:121  Band:  1:1
-Sample:  51:51  Line:  121:121  Band:  1:1
-Sample:  61:61  Line:  121:121  Band:  1:1
-Sample:  71:71  Line:  121:121  Band:  1:1
-Sample:  81:81  Line:  121:121  Band:  1:1
-Sample:  91:91  Line:  121:121  Band:  1:1
-Sample:  101:101  Line:  121:121  Band:  1:1
-Sample:  111:111  Line:  121:121  Band:  1:1
-Sample:  121:121  Line:  121:121  Band:  1:1
-100% Processed
+10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
