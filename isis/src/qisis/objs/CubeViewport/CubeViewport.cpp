@@ -228,6 +228,9 @@ namespace Isis {
    * This method is called to initially show the viewport. It will set the
    * scale to show the entire cube and enable the gray buffer.
    *
+   * @param QShowEvent *event Show event being received.
+   *
+   * @see http://doc.qt.io/qt-5/qwidget.html#showEvent
    */
   void CubeViewport::showEvent(QShowEvent *event) {
     if(p_scale == -1) {
@@ -237,7 +240,7 @@ namespace Isis {
       //double lineScale = (double) sizeHint().height() / (double) cubeLines();
       //double scale = sampScale < lineScale ? sampScale : lineScale;
 
-      setScale(fitScale(), cubeSamples() / 2.0, cubeLines() / 2.0);
+      setScale(fitScale(), cubeSamples() / 2.0 + 0.5, cubeLines() / 2.0 + 0.5);
     }
 
     if(p_grayBuffer && !p_grayBuffer->enabled()) {
@@ -542,7 +545,7 @@ namespace Isis {
           break;
       }
     }
-    
+
 //  if (canClose) emit viewportClosed(this);
     return canClose;
   }
@@ -582,7 +585,7 @@ namespace Isis {
    */
   void CubeViewport::setScale(double scale) {
     // Sanitize the scale value
-    if(scale == p_scale){
+    if (scale == p_scale){
       return;
     }
 
@@ -612,16 +615,16 @@ namespace Isis {
     updateScrollBars(x, y);
 
     p_updatingBuffers = true;
-    if(p_grayBuffer){
+    if (p_grayBuffer){
       p_grayBuffer->scaleChanged();
     }
-    if(p_redBuffer){
+    if (p_redBuffer){
       p_redBuffer->scaleChanged();
     }
-    if(p_greenBuffer){
+    if (p_greenBuffer){
       p_greenBuffer->scaleChanged();
     }
-    if(p_blueBuffer){
+    if (p_blueBuffer){
       p_blueBuffer->scaleChanged();
     }
     p_updatingBuffers = false;
@@ -668,24 +671,24 @@ namespace Isis {
 
     bool wasEnabled = false;
 
-    if((p_grayBuffer && p_grayBuffer->enabled()) ||
+    if ((p_grayBuffer && p_grayBuffer->enabled()) ||
         (p_redBuffer && p_redBuffer->enabled())) {
       wasEnabled = true;
     }
 
-    if(p_grayBuffer){
+    if (p_grayBuffer){
       p_grayBuffer->enable(false);
     }
-    if(p_redBuffer){
+    if (p_redBuffer){
       p_redBuffer->enable(false);
     }
-    if(p_greenBuffer){
+    if (p_greenBuffer){
       p_greenBuffer->enable(false);
     }
-    if(p_blueBuffer){
+    if (p_blueBuffer){
       p_blueBuffer->enable(false);
     }
-    if(p_paintPixmap) {
+    if (p_paintPixmap) {
       p_paintPixmap = false;
       setScale(scale);
       p_paintPixmap = true;
@@ -693,19 +696,18 @@ namespace Isis {
     else {
       setScale(scale);
     }
-
     center(sample, line);
 
-    if(p_grayBuffer){
+    if (p_grayBuffer){
       p_grayBuffer->enable(wasEnabled);
     }
-    if(p_redBuffer){
+    if (p_redBuffer){
       p_redBuffer->enable(wasEnabled);
     }
-    if(p_greenBuffer){
+    if (p_greenBuffer){
       p_greenBuffer->enable(wasEnabled);
     }
-    if(p_blueBuffer){
+    if (p_blueBuffer){
       p_blueBuffer->enable(wasEnabled);
     }
 
@@ -731,18 +733,14 @@ namespace Isis {
 
 
   /**
-   * Bring the cube sample/line the center
+   * Bring the cube sample/line the center.
    *
-   *
-   * @param sample
-   * @param line
+   * @param sample Value of the sample to center on.
+   * @param line Value of the line to center on.
    */
   void CubeViewport::center(double sample, double line) {
     int x, y;
     cubeToContents(sample, line, x, y);
-
-    x ++;
-    y ++;
 
     int panX = horizontalScrollBar()->value() - x;
     int panY = verticalScrollBar()->value() - y;

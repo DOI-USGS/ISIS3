@@ -61,6 +61,8 @@ namespace Isis {
    *                           causing bugs. As a result, the mouseButtonRelease
    *                           method did nothing so I removed that too. Zooming
    *                           happens on the rubberBandComplete slot.
+   *  @history 2017-05-10 Ian Humphrey - Modified zoomFit() so that when doing a "Fit in viewport"
+   *                          zoom, the image is centered properly in the viewport. Fixes #4756. 
    */
   class ZoomTool : public Tool {
       Q_OBJECT
@@ -123,4 +125,3 @@ namespace Isis {
 };
 
 #endif
-

@@ -156,5 +156,9 @@
       Added shortcuts to Match Tool window for selecting right measures, registration, undo 
       registration, saving measures, saving the point, and saving the control network. Fixes #2324.
     </change>
+    <change name="Ian Humphrey" date="2017-05-10">
+      Fixed initial loading of viewport and Fit to viewport zoom to correctly zoom to the center
+      of the image. Fixes #4756.
+    </change>
   </history>
 </application>
