@@ -44,6 +44,7 @@ void IsisMain() {
 
     //Checks if in file is rdr
     bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
+    std::cout << projected << std::endl;
     if(projected) {
       QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
@@ -75,7 +76,9 @@ void IsisMain() {
   }
   catch(IException &e) {
     QString msg = "The PDS header is missing important keyword(s).";
-    throw IException(IException::Io, msg, _FILEINFO_);
+    IException finalException(IException::Io, msg, _FILEINFO_);
+    finalException.append(e);
+    throw finalException;
   }
 
   id = id.simplified().trimmed();
