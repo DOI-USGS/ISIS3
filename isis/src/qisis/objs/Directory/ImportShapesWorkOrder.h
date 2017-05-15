@@ -26,10 +26,9 @@
 
 #include <QDir>
 #include <QMutex>
+#include <QString>
 
 #include "IException.h"
-
-class QString;
 
 namespace Isis {
   class Cube;
@@ -72,6 +71,10 @@ namespace Isis {
        * This copies the given shape model cube(s) into the project. This is designed to work with
        *   QtConcurrentMap.  TODO::  TLS 2016-07-13  If large DEM, do not allow DN data to be
        *   copied??
+       *  
+       * @author 2016-07-06 Tracie Sucharski 
+       *  
+       * @internal 
        */
       class OriginalFileToProjectCubeFunctor :
           public std::unary_function<const FileName &, Cube *> {
