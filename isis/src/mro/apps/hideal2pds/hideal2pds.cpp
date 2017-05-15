@@ -491,7 +491,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   // mosaic input cube.
   
   // Add NaifKeywords Object values to the ROOT object
-  QString radiiName = "BODY" + QString(cam->naifBodyCode()) + "_RADII";
+  QString radiiName = "BODY" + QString::number(cam->naifBodyCode()) + "_RADII";
   PvlObject naifKeywordGroup = cam->getStoredNaifKeywords();
 
   if (naifKeywordGroup.hasKeyword(radiiName)) {

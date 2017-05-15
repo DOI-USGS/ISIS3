@@ -151,8 +151,8 @@ void CreatePsf(Pipeline &p) {
 
   if(fromCube.lineCount() != fromCube.sampleCount()) {
     QString message = "This program only works on square cubes, the number of samples [" +
-                      QString(fromCube.sampleCount()) + "] must match the number of lines [" +
-                      QString(fromCube.lineCount()) + "]";
+                      QString::number(fromCube.sampleCount()) + "] must match the number of lines [" +
+                      QString::number(fromCube.lineCount()) + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -180,14 +180,14 @@ void CreatePsf(Pipeline &p) {
   psfCube.open(psfFile);
 
   if(psfCube.lineCount() > fromCube.lineCount()) {
-    QString message = "The input cube dimensions must be at least [" + QString(psfCube.lineCount());
+    QString message = "The input cube dimensions must be at least [" + QString::number(psfCube.lineCount());
     message += "] pixels in the line and sample dimensions";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(!IsPowerOf2(fromCube.lineCount())) {
     QString message = "The input cube dimensions must be a power of 2 (found [" +
-                      QString(fromCube.lineCount()) + "])";
+                      QString::number(fromCube.lineCount()) + "])";
     throw IException(IException::User, message, _FILEINFO_);
   }
 

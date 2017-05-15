@@ -182,7 +182,7 @@ void IsisMain() {
       QString line = in.readLine();
       QStringList results = line.split(",");
       if (results.size() < 2) {
-        QString msg = "Line " + QString(lineNumber) + " in the MEASURELIST does "
+        QString msg = "Line " + QString::number(lineNumber) + " in the MEASURELIST does "
           "not contain a Point ID and a cube filename separated by a comma";
         throw IException(IException::User, msg, _FILEINFO_);
       }
