@@ -2,8 +2,6 @@
 #define PvlContainer_h
 /**
  * @file
- * $Revision: 1.12 $
- * $Date: 2010/04/14 00:21:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -60,6 +58,7 @@ namespace Isis {
    *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *  @history 2015-05-15 J Bonn - fixed usage of iterator that had been deleted.
    */
   class PvlContainer {
     public:

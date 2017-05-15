@@ -157,7 +157,7 @@ namespace Isis {
 
       for(PvlKeywordIterator key = begin() + index + 1; key < end(); key ++) {
         if(current == *key) {
-          m_keywords.erase(key);
+          key = m_keywords.erase(key);
           keywordDeleted = true;
         }
       }
