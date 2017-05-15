@@ -424,8 +424,11 @@ void GenerateCSVOutput(Cube *incube,
     }
   }
 
-  keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
+  if (not appending) {
+    keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
+    outFile << keys << endl;
+  } 
   values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
-  outFile << keys << endl << values;
+  outFile << values << endl;
   outFile.close();
 }
