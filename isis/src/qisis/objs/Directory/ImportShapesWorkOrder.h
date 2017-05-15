@@ -26,9 +26,10 @@
 
 #include <QDir>
 #include <QMutex>
-#include <QString>
 
 #include "IException.h"
+
+class QString;
 
 namespace Isis {
   class Cube;

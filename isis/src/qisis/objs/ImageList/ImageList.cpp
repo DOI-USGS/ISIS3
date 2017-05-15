@@ -888,7 +888,7 @@ namespace Isis {
    * @see save
    */
   void *ImageList::CopyImageDataFunctor::operator()(Image * const &imageToCopy) {
-    imageToCopy->copyToNewProjectRoot(m_project, m_newProjectRoot, m_project->copyCubes());
+    imageToCopy->copyToNewProjectRoot(m_project, m_newProjectRoot);
     return NULL;
   }
 

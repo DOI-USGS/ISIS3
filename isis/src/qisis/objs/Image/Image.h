@@ -85,12 +85,7 @@ namespace Isis {
    *                           (the Spacecraft name associated with this image).
    *   @history 2016-06-22 Tyler Wilson - Added documentation to member functions/variables.
    *                           Fixes #3950.
-   *   @history 2017-05-07 Tyler Wilson - Added a third bool parameter value (copyCubes)
-   *                       to the function copyToNewProjectRoot which is true by default.
-   *                       The default behavior is to copy cubes as well as ecub values from
-   *                       ImageLists into the results folder.  If this parameter is false,
-   *                       then only ecub values are saved (which is the desired behavior
-   *                       for running cnetsuite).  Fixes #4848.
+   *
    */
 
   class Image : public QObject {
@@ -128,7 +123,7 @@ namespace Isis {
       Angle phaseAngle() const;
       double sampleResolution() const;
 
-      void copyToNewProjectRoot(const Project *project, FileName newProjectRoot,bool copyCubes=true);
+      void copyToNewProjectRoot(const Project *project, FileName newProjectRoot);
       void deleteFromDisk();
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 

@@ -68,6 +68,9 @@ namespace Isis {
    *                           bundle adjust was accessed in the acceptBundleResults() slot, Since
    *                           its memory may have been deleted by then. Now manually managing the
    *                           memory for m_bundleAdjust. Fixes #4849.
+   *   @history 2017-05-15 Tracie Sucharski - Commented out code in acceptBundleResults which was
+   *                           not being used and causing compile warnings.  Add creation of
+   *                           BundleSolutionInfo folder to the acceptBundleResults method.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT

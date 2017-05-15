@@ -134,13 +134,13 @@ namespace Isis {
    *                           when a cnet and image are available in the project. Fixes #4819.
    *   @history 2017-05-02 Tracie Sucharski - Added saving and resoring of BundleSolutionInfo.
    *                           Fixes #4822.
-   *   @history 2017-05-07 Tyler Wilson - Added private member variable m_copyCubes which
-   *                           determines whether or not we copy the cube values as well as
-   *                           the labels (ecubs) into the results folder upon save.  Also
-   *                           added a set function (setCopy(bool) ) and a get
-   *                           function (copyCubes() ).   The default value for this
-   *                           variable is set to false within the Project constructor.
-   *                           Fixes #4848.
+   *   @history 2017-05-15 Tracie Sucharski - Moved creation of BundleSolutionInfo results folder to
+   *                           JigsawDialog::acceptBundleResults.  It was in
+   *                           Project::addBundleSolutionInfo which is called for both adding to the
+   *                           project and reading a saved project (which already has the folder).
+   *                           Backed out changes make for deciding whether to copy cube dn data
+   *                           because this broke importing images.
+   *                
    */
   class Project : public QObject {
     Q_OBJECT
@@ -221,8 +221,6 @@ namespace Isis {
       void removeImages(ImageList &imageList);
 
       void save();
-      void setCopyCubes(bool copy);
-      bool copyCubes() const;
       void save(FileName newPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);
@@ -419,7 +417,6 @@ namespace Isis {
 
       QPointer<Control> m_activeControl;
       QPointer<ImageList> m_activeImageList;
-      bool m_copyCubes;
 
 
       // TODO: kle testing - this will almost certainly be changed

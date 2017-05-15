@@ -335,17 +335,22 @@ namespace Isis {
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
 
+    // create bundle results folder
+    QString runTime = m_bundleSolutionInfo->runTime();
+    QDir bundleDir = m_project->addBundleSolutionInfoFolder(runTime); //???
+                                                           // save solution information to a file
+
+    m_bundleSolutionInfo->bundleSettings()->setOutputFilePrefix(bundleDir.absolutePath() + "/");
+
     //  Write csv files
     m_bundleSolutionInfo->outputResiduals();
     m_bundleSolutionInfo->outputImagesCSV();
     m_bundleSolutionInfo->outputPointsCSV();
-
     m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // create output control net
     // Write the new jigged control net with correct path to results folder + runtime
-    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" +
-                               m_bundleSolutionInfo->runTime() + "/" +
+    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
     
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
@@ -371,11 +376,13 @@ namespace Isis {
                                           m_bundleSolutionInfo->runTime() + "/images/" +
                                           imageList->name());
       // Do we need to release the memory for these cubes?
-      QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
-      for (int i = 0; i < imagesToCopy.size(); i++) {
-        Cube *c = copiedCubes.resultAt(i);
-        Table matrix = m_bundleAdjust->cMatrix(i);
-      }
+      // TLS 2017-05-15  I commented following 5 lines of code.  They are causing compile warnings
+      // and are not currently doing anything.  Where are updated cubes written?
+//    QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
+//    for (int i = 0; i < imagesToCopy.size(); i++) {
+//      Cube *c = copiedCubes.resultAt(i);
+//      Table matrix = m_bundleAdjust->cMatrix(i);
+//    }
     }
 
     // Make sure that when we add our results, we let the use last settings box be checkable.

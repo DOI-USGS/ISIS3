@@ -484,7 +484,7 @@ namespace Isis {
    * @brief Copy the cub/ecub files associated with this image into the new project.
    * @param newProjectRoot  The root directory where the project is stored.
    */
-  void Image::copyToNewProjectRoot(const Project *project, FileName newProjectRoot, bool copyCubes) {
+  void Image::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
     if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
       Cube origImage(m_fileName);
 
@@ -496,7 +496,7 @@ namespace Isis {
 
       // If this is an ecub (it should be) and is pointing to a relative file name,
       //   then we want to copy the DN cube also.
-      if (!origImage.storesDnData() && copyCubes) {
+      if (!origImage.storesDnData() ) {
         if (origImage.externalCubeFileName().path() == ".") {
           Cube dnFile(
               FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());

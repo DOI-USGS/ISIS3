@@ -40,13 +40,6 @@ namespace Isis {
    *                         pointer. TODO:  Currently, serialNumberList created the list on the
    *                         fly.  For speed, this needs to change so that when the ImageList
    *                         changes, update the serial number list.
-   * @history 2016-05-07 Tyler Wilson - Changed the CopyImageDataFunctor so that when
-   *                         it calls Image::copyToNewProjectRoot it passes in a third
-   *                         parameter:  A boolean flag variable indicating whether or
-   *                         not cubes are being copied to the results folder in addition
-   *                         to ecubs (the cube labels).  This variable is set in the Project
-   *                         class.  References #4848.
-   *
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT
