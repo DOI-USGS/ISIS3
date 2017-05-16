@@ -44,7 +44,6 @@ void IsisMain() {
 
     //Checks if in file is rdr
     bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
-    std::cout << projected << std::endl;
     if(projected) {
       QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
