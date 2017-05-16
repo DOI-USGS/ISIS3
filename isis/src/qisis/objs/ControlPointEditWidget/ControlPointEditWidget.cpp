@@ -1545,6 +1545,8 @@ namespace Isis {
     emit netChanged();
     //   Refresh chipViewports to show new positions of controlPoints
     m_measureEditor->refreshChips();
+
+    emit saveControlNet();
   }
 
 

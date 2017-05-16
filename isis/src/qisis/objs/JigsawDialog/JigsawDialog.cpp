@@ -276,8 +276,6 @@ namespace Isis {
       m_bRunning = false;
       m_ui->JigsawRunButton->setText("&Aborting...");
       update();
-      // Since the bundle has stopped, the user can close the dialog via "Close" again
-      m_close->setEnabled(true);
     }
   }
 
@@ -387,6 +385,8 @@ namespace Isis {
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
+    //  Once the bundle has been accepted, re-enable the close button
+    m_close->setEnabled(true);
 
       //TODO: move correlation matrix to correct position in project directory
   //
@@ -439,9 +439,10 @@ namespace Isis {
   void JigsawDialog::rejectBundleResults() {
     // TODO should there be a prompt to user (are you sure?) -- Annoying?
     // TODO Add tooltip/what'sthis for the buttons!!!! (CTR)
-    // Disable the "Accept" and "Reject" buttons.
+    // Disable the "Accept" and "Reject" buttons, enable the "Close" button
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
+    m_close->setEnabled(true);
 
     // Clear the dialog so the lcd's are 0 and the status text is cleared.
     clearDialog();
@@ -502,11 +503,15 @@ namespace Isis {
    */
   void JigsawDialog::errorString(QString error) {
     QString errorStr = "\n" + error;
+//  qDebug()<<"JIgsawDialog::errorString errorStr = "<<errorStr;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
 
     updateScrollBar();
 
     update();
+
+    //  Re-enable the close button
+    m_close->setEnabled(true);
   }
 
 
@@ -578,8 +583,6 @@ namespace Isis {
     // Since results are available, the user can accept (save) or reject(discard) the results.
     m_accept->setEnabled(true);
     m_reject->setEnabled(true);
-    // The bundle is done, so the user can close again.
-    m_close->setEnabled(true);
   }
 }
 

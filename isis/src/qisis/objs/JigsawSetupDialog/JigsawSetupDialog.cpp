@@ -891,7 +891,7 @@ namespace Isis {
 
   void Isis::JigsawSetupDialog::checkIsValid() {
     if (!m_ui->aRadiusSigmaLineEdit->hasAcceptableInput()) {
-      qDebug() << "invalid input";
+//    qDebug() << "invalid input";
     }
 
 
@@ -899,12 +899,12 @@ namespace Isis {
 
 
   void Isis::JigsawSetupDialog::slotTextChanged(const QString &text) {
-    qDebug() << "Text change to" << text << "and value is valid ==" << m_ui->aRadiusSigmaLineEdit->hasAcceptableInput();
+//  qDebug() << "Text change to" << text << "and value is valid ==" << m_ui->aRadiusSigmaLineEdit->hasAcceptableInput();
   }
 
 
   void Isis::JigsawSetupDialog::on_aRadiusLineEdit_textChanged(const QString &arg1) {
-    qDebug() << "Text change to" << arg1 << "and value is valid ==" << m_ui->aRadiusLineEdit->hasAcceptableInput();
+//  qDebug() << "Text change to" << arg1 << "and value is valid ==" << m_ui->aRadiusLineEdit->hasAcceptableInput();
   }
 
 

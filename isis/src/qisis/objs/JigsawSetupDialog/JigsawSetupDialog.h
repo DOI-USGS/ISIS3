@@ -41,6 +41,7 @@ namespace Isis {
    *   @history 2017-04-27 Ian Humphrey - Added selectControl() to allow JigsawDialog to
    *                           properly tell the setup dialog which control to select in its
    *                           combo box. References #4817.
+   *   @history 2017-05-16 Tracie Sucharski - Comment qDebug statements. 
    */
 
   class JigsawSetupDialog : public QDialog {

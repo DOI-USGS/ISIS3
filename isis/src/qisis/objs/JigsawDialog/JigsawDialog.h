@@ -71,6 +71,9 @@ namespace Isis {
    *   @history 2017-05-15 Tracie Sucharski - Commented out code in acceptBundleResults which was
    *                           not being used and causing compile warnings.  Add creation of
    *                           BundleSolutionInfo folder to the acceptBundleResults method.
+   *   @history 2017-05-16 Tracie Sucharski - Disable Close button if jigsaw has been run, force
+   *                           selection of accept or reject.  Once a choice has been made,
+   *                           re-enable the Close button.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
