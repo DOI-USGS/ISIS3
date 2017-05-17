@@ -1248,8 +1248,17 @@ namespace Isis {
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
+   *   @history 2017-05-17 Tracie Sucharski - If no active control set & there is only one control
+   *                          in the project, default to that control.
    */
   Control *Project::activeControl() {
+
+    if (!m_activeControl && m_controls->count() == 1) {
+      if (m_controls->at(0)->count() == 1) {
+        m_activeControl = m_controls->at(0)->at(0);
+        qDebug()<<"activeControl = "<<m_activeControl->displayProperties()->displayName();
+      }
+    }
     return m_activeControl;
   }
 
@@ -1298,8 +1307,15 @@ namespace Isis {
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
+   *   @history 2017-05-17 Tracie Sucharski - If no active ImageList set & there is only one
+   *                          ImageList in the project, default to that ImageList.
    */
   ImageList *Project::activeImageList() {
+
+    if (!m_activeImageList && m_images->count() == 1) {
+      m_activeImageList = m_images->at(0);
+      qDebug()<<"activeImageList = "<<m_activeImageList->name();
+    }
     return m_activeImageList;
   }
 

@@ -140,6 +140,9 @@ namespace Isis {
    *                           project and reading a saved project (which already has the folder).
    *                           Backed out changes make for deciding whether to copy cube dn data
    *                           because this broke importing images.
+   *   @history 2017-05-17 Tracie Sucharski - Changed activeControl and activeImageList methods to
+   *                           return default values if project contains a single control and a
+   *                           single image list.  Fixes #4867.
    *                
    */
   class Project : public QObject {
