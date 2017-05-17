@@ -45,11 +45,6 @@
     </change>
   </history>
 
-  <oldName>
-    <item>mosaic</item>
-  </oldName>
-
-  <groups>
     <group name="Files">
       <parameter name="FROM">
         <type>cube</type>
