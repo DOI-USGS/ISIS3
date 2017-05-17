@@ -40,6 +40,9 @@
     <change name="Steven Lambright" date="2012-05-01">
       Updated documentation; fixes #458
     </change>
+    <change name="JP Bonn" date="2017-02-24">
+      Added example in documentation
+    </change>
   </history>
 
   <oldName>
@@ -113,4 +116,57 @@
       </parameter>
     </group>
   </groups>
+  <examples>
+    <example>
+      <brief>Insert a sub-cube into a parent cube</brief>
+      <description>
+        Insert a cube of 200 samples by 300 lines into a parent cube.
+      </description>
+      <terminalInterface>
+        <commandLine> FROM=crop.cub PARENT=pcrp.cub COMBINE=CROP
+        </commandLine>
+        <description>
+        In this example, uncrop will insert a 200x300 sub-area into the parent cube.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/parent.jpg" width="498" height="498">
+          <brief> Parent image</brief>
+          <description>This is the full size input image.  The area (200x300) 
+	  to be "uncropped" is grey.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/parentThumb.jpg" width="200" height="200"/>
+          <parameterName>PARENT</parameterName>
+        </image>
+        <image src="assets/image/insert.jpg" width="100" height="150">
+          <brief> Sub-cube image</brief>
+          <description> This is the sub-cube to be inserted into the parent image.
+          </description>
+          <thumbnail caption="Sub-cube image" src="assets/thumb/insertThumb.jpg" width="50" height="75"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/result.jpg" width="500" height="500">
+          <brief> Parent with inserted sub-cube</brief>
+          <description>s is the parent image with the sub-cube inserted using the "crop" combine mode.
+          </description>
+          <thumbnail caption="Parent with inserted sub-cube." src="assets/thumb/resultThumb.jpg" width="200" height="200"/>
+          <parameterName>PARENT</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="673" height="723" src="assets/image/uncropGUI.jpg">
+            <brief>Example GUI</brief>
+            <description>This is a screenshot of uncrop.  The GUI shows the parameters filled to insert a 200x300 pixel sub-area into the parent image. </description>
+            <thumbnail width="186" height="200" caption="Uncrop GUI" src="assets/thumb/uncropGUIThumb.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
 </application>
