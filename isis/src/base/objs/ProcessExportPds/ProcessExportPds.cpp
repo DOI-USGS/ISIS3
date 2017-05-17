@@ -210,9 +210,9 @@ namespace Isis {
 
 
   /**
-   * Create the standard keywords for the ROOT object in a PDS IMAGE file 
-   *  
-   * @param mainPvl 
+   * Create the standard keywords for the ROOT object in a PDS IMAGE file
+   *
+   * @param mainPvl
    */
   void ProcessExportPds::StreamImageRoot(Pvl &mainPvl) {
     // Create standard ROOT object keywords
@@ -236,13 +236,17 @@ namespace Isis {
     else {
       mainPvl += PvlKeyword("^IMAGE", "???????", "BYTES");
     }
+    // MD5 checksums are 128-bit -> 32 characters when stringified from hex.
+    if (canGenerateChecksum()) {
+      mainPvl += PvlKeyword("CHECKSUM", "????????????????????????????????");
+    }
   }
 
 
   /**
    * Create the standard keywords for the ROOT object in a PDS JP2 IMAGE file
-   *  
-   * @param mainPvl 
+   *
+   * @param mainPvl
    */
   void ProcessExportPds::StreamJP2ImageRoot(Pvl &mainPvl) {
     mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
@@ -297,8 +301,8 @@ namespace Isis {
 
   /**
    * Create the fixed keywords for the ROOT object in a PDS IMAGE file
-   *  
-   * @param mainPvl 
+   *
+   * @param mainPvl
    */
   void ProcessExportPds::FixedImageRoot(Pvl &mainPvl) {
     //Create fixed ROOT object keywords
@@ -324,12 +328,15 @@ namespace Isis {
     else {
       mainPvl += PvlKeyword("^IMAGE", "???");
     }
+    if (canGenerateChecksum()) {
+      mainPvl += PvlKeyword("CHECKSUM", "????????????????????????????????");
+    }
   }
 
 
   /**
    * Create the fixed keywords for the ROOT object in a PDS JP2 IMAGE file
-   *  
+   *
    * @param  mainPvl
    */
   void ProcessExportPds::FixedJP2ImageRoot(Pvl &mainPvl) {
@@ -388,8 +395,8 @@ namespace Isis {
    * This should not be called until after all settings have been made. The
    * labels may contain the wrong data if it is.
    *
-   * @param  mainPvl 
-   *  
+   * @param  mainPvl
+   *
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardImageImage(Pvl &mainPvl) {
@@ -529,8 +536,8 @@ namespace Isis {
    * This should not be called until after all settings have been made. The
    * labels may contain the wrong data if it is.
    *
-   * @param mainPvl 
-   *  
+   * @param mainPvl
+   *
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardJP2Image(Pvl &mainPvl) {
@@ -672,8 +679,8 @@ namespace Isis {
    * Create the standard keywords for the IMAGE_MAP_PROJECTION group in a PDS
    * label
    *
-   * @param mainPvl 
-   *  
+   * @param mainPvl
+   *
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardAllMapping(Pvl &outputPvl) {
@@ -705,7 +712,7 @@ namespace Isis {
     // Add the projection name
 //    pdsMapObj += PvlKeyword ("MAP_PROJECTION_TYPE", projName.toUpper());
 
-    // Modify the radii to be km. 
+    // Modify the radii to be km.
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
     QString unit = aRadius.unit();
     if( (unit.toUpper() == "METERS") || (unit == "") ) { //if no units, assume in meters
@@ -824,9 +831,9 @@ namespace Isis {
 
   /**
    * Return a projection name
-   *  
+   *
    * @param inputLabel
-   *  
+   *
    * @return String containing the name of the projection
    */
   QString ProcessExportPds::ProjectionName(Pvl &inputLabel) {
@@ -840,7 +847,7 @@ namespace Isis {
   /**
    * Return the line bytes (record size) for the input cube, at present this is
    * based on the number of samples and the bytes per pixel.
-   *  
+   *
    * @return Total number of bytes per line.
    */
   int ProcessExportPds::LineBytes() {
@@ -852,9 +859,9 @@ namespace Isis {
 
 
   /**
-   * Return the size of the output PDS label. 
-   *  
-   * @return Number of bytes in the label. 
+   * Return the size of the output PDS label.
+   *
+   * @return Number of bytes in the label.
    */
   int ProcessExportPds::LabelSize() {
     ostringstream temp;
@@ -867,11 +874,11 @@ namespace Isis {
     return temp.tellp();
   }
 
-  /** 
-   * Write the PDS label to the a detached file. The PDS keywords 
-   * that have place holder "?" for their values (such as LABEL_RECORDS and 
-   * ^IMAGE) will be updated to their correct values before they are written. 
-   */ 
+  /**
+   * Write the PDS label to the a detached file. The PDS keywords
+   * that have place holder "?" for their values (such as LABEL_RECORDS and
+   * ^IMAGE) will be updated to their correct values before they are written.
+   */
   void ProcessExportPds::OutputDetachedLabel() {
     if(!m_detachedLabel) {
       QString msg = "Unable to output detached label. Use "
@@ -887,14 +894,15 @@ namespace Isis {
   /**
    * Write the PDS label to the supplied stream. The PDS keywords that have place
    * holder "?" for their values (such as LABEL_RECORDS and ^IMAGE) will
-   * be updated to their correct values before they are written. 
-   *  
+   * be updated to their correct values before they are written.
+   *
    * @param Output file stream to which the pds label will be written.
    */
   void ProcessExportPds::OutputLabel(std::ofstream &os) {
     int labSize = LabelSize(); // labSize will be the old label size with "?"
     // NOTE: WARNING: If anything changes in the next two lines, you must also changes the
     // corresponding lines in the StandardImageRoot member
+
     if(m_exportType == Stream) {
       if(m_pdsFileType != ProcessExportPds::JP2Image) {
         (*m_label)["LABEL_RECORDS"].setValue(toString(labSize), "BYTES");
@@ -930,7 +938,7 @@ namespace Isis {
         for (unsigned int i = 0; i < m_tableRecords.size(); i++) {
           totalTableRecords += m_tableRecords[i];
         }
-        int imageRecords = InputCubes[0]->lineCount() 
+        int imageRecords = InputCubes[0]->lineCount()
                            * InputCubes[0]->bandCount();
         int fileRecords = labelRecords + imageRecords + totalTableRecords;
         (*m_label)["FILE_RECORDS"].setValue(toString(fileRecords));
@@ -952,37 +960,55 @@ namespace Isis {
 
   }
 
-  /** 
-   * This method will add a table to be exported to PDS. If the output PDS 
-   * labels are set to detached, the PDS table will be written to a detached 
-   * file in this method. If the output PDS product is set to attached, the 
-   * table will be added to a buffer and written to the PDS file when the 
-   * StartProcess() method is called. Attached tables are written to the file 
-   * after the image data. 
-   *  
-   * Warning: If attached tables are exported and the labels of these tables 
-   * are modified, the start byte value of the labels will need to be 
-   * updated. There is no existing method (UpdateAttachedTableLabels) to do 
-   * this in ProcessExportPds. If this functionality is needed, this class 
-   * will need to be modified accordingly. 
-   *  
-   * @throw IException::Unknown - "The output PDS file has been set to 
+
+  /**
+   * Updates the CHECKSUM value on the label and rewrites to the output file.
+   *
+   * @param std::ofstream &pdsFileStream Output file to write the label to.
+   */
+  void ProcessExportPds::updateChecksumInLabel(std::ofstream &pdsFileStream) {
+    // This occurs after application has called its StartProcess and the checksum has been
+    // generated. We need to seek to the top of the file to rewrite the label. Since the
+    // CHECKSUM is MD5, we set aside 32 characters for the value of this keyword. Since
+    // OuputLabel() has already created the label and necessary padding, we can simply update
+    // the CHECKSUM value to the generated checksum and re-write the entire label.
+    pdsFileStream.seekp(0);
+    (*m_label)["CHECKSUM"].setValue(checksum());
+    pdsFileStream << *m_label;
+  }
+
+
+  /**
+   * This method will add a table to be exported to PDS. If the output PDS
+   * labels are set to detached, the PDS table will be written to a detached
+   * file in this method. If the output PDS product is set to attached, the
+   * table will be added to a buffer and written to the PDS file when the
+   * StartProcess() method is called. Attached tables are written to the file
+   * after the image data.
+   *
+   * Warning: If attached tables are exported and the labels of these tables
+   * are modified, the start byte value of the labels will need to be
+   * updated. There is no existing method (UpdateAttachedTableLabels) to do
+   * this in ProcessExportPds. If this functionality is needed, this class
+   * will need to be modified accordingly.
+   *
+   * @throw IException::Unknown - "The output PDS file has been set to
    *                attached and a detached PDS table file name has been
    *                given. If detached is preferred, set the process to
    *                detached SetDetached() and call StandardPdsLabel() before
    *                calling ExportTable()."
-   * @throw IException::Unknown - "The output PDS file has been set to 
+   * @throw IException::Unknown - "The output PDS file has been set to
    *                detached. A file name for the detached ouput PDS table
    *                file is required. If an attached output file is prefered,
    *                use the method ProcessExportPds::SetAttached() before
    *                calling ExportTable()."
-    
+
    * @param isisTable The Isis3 Table object to be exported to PDS.
    * @param detachedPdsTableFileName The name of the exported PDS table file,
    *                                 if detached. This value should not
    *                                 include a path.  The path from the label
    *                                 file will be used.
-   */ 
+   */
   void ProcessExportPds::ExportTable(Table isisTable, QString detachedPdsTableFileName) {
 
     if(Attached() && detachedPdsTableFileName != "") {
@@ -1007,8 +1033,8 @@ namespace Isis {
     // return metadata pvl containing needed information for the output label.
 
     char *tableBuffer = new char[isisTable.Records() * fileRecordBytes];
-    PvlObject metadata = pdsTable.exportTable(tableBuffer, 
-                                              fileRecordBytes, 
+    PvlObject metadata = pdsTable.exportTable(tableBuffer,
+                                              fileRecordBytes,
                                               ByteOrderName(p_endianType));
     QString pdsTableName = pdsTable.formatPdsTableName();
     Pvl &mainPvl = *m_label;
@@ -1016,7 +1042,7 @@ namespace Isis {
       m_tableBuffers.push_back(tableBuffer);
       int labSize = LabelSize(); // labSize will be the old label size with "?"
       int labelRecords = (int)ceil((double)labSize / (double)fileRecordBytes);
-      int imageRecords = InputCubes[0]->lineCount() 
+      int imageRecords = InputCubes[0]->lineCount()
                          * InputCubes[0]->bandCount();
       int totalTableRecords = 0;
       for (unsigned int i = 0; i < m_tableRecords.size(); i++) {
@@ -1029,7 +1055,7 @@ namespace Isis {
     else {
       mainPvl += PvlKeyword("^" + pdsTableName, detachedPdsTableFileName);
       FileName labelFile(m_detachedPdsLabelFile);
-      QString tableFileWithPath = labelFile.path() + "/" 
+      QString tableFileWithPath = labelFile.path() + "/"
                                   + detachedPdsTableFileName;
       ofstream os(tableFileWithPath.toLatin1().data());
       os.write(tableBuffer, isisTable.Records() * fileRecordBytes);
@@ -1040,262 +1066,262 @@ namespace Isis {
     return;
   }
 
-  /** 
-   * Mutator method to set the output PDS file to detached. In this case, 
+  /**
+   * Mutator method to set the output PDS file to detached. In this case,
    * there will be separate output files containing the PDS label, image
    * data, and any PDS tables that are added.
-   *  
+   *
    * @param detachedLabelFile A string containing the name of the detached
    *                          PDS label file
-   */ 
+   */
   void ProcessExportPds::SetDetached(QString detachedLabelFile) {
     m_detachedLabel = true;
     m_detachedPdsLabelFile = detachedLabelFile;
     return;
   }
 
-  /** 
-   * Mutator method to set the output PDS file to attached. In this case, 
+  /**
+   * Mutator method to set the output PDS file to attached. In this case,
    * there will be a single output file containing the PDS label, image
    * data, and any PDS tables that are added.
-   */ 
+   */
   void ProcessExportPds::SetAttached() {
     m_detachedLabel = false;
     m_detachedPdsLabelFile = "";
   }
 
-  /** 
-   * Accessor function returns true if the output PDS file is set to detached. 
-   *  
-   * @return @b bool Indicates whether the PDS file is detached. 
-   */ 
+  /**
+   * Accessor function returns true if the output PDS file is set to detached.
+   *
+   * @return @b bool Indicates whether the PDS file is detached.
+   */
   bool ProcessExportPds::Detached()      {
     return m_detachedLabel;
   }
 
-  /** 
-   * Accessor function returns true if the output PDS file is set to attached. 
-   *  
-   * @return @b bool Indicates whether the PDS file is attached. 
-   */ 
+  /**
+   * Accessor function returns true if the output PDS file is set to attached.
+   *
+   * @return @b bool Indicates whether the PDS file is attached.
+   */
   bool ProcessExportPds::Attached()      {
     return !m_detachedLabel;
   }
 
-  /** 
+  /**
    * Mutator method to set the output PDS image resolution to meters per pixel
    * or kilometers per pixel.
-   * 
+   *
    * @param resolutionUnits Enumerated value for the units type to be set.
-   */ 
+   */
   void ProcessExportPds::SetPdsResolution(PdsResolution resolutionUnits) {
     m_exportResolution = resolutionUnits;
   }
 
-  /** 
-   * Mutator method to set the output PDS image record type to stream or 
-   * fixed. 
-   * 
-   * @param recordFormat Enumerated value for the record type of the exported 
+  /**
+   * Mutator method to set the output PDS image record type to stream or
+   * fixed.
+   *
+   * @param recordFormat Enumerated value for the record type of the exported
    *                     PDS file.
-   */ 
+   */
   void ProcessExportPds::SetExportType(PdsExportType recordFormat) {
     m_exportType = recordFormat;
   }
 
-  /** 
+  /**
    * Mutator method to set how the the BANDS keyword will be handled. If false,
    * the BANDS keyword will be removed from the IMAGE object of the PDS labels.
    * This member variable defaults to true in the ProcessExportPds constructor.
-   * 
+   *
    * @param force Indicates whether to force the process to keep the BANDS
    *              keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceBands(bool force) {
     m_forceBands = force;
   }
 
-  /** 
-   * Mutator method to set how the BAND_NAME keyword will be handled. If 
-   * false and the BAND_NAME keyword exists in the IMAGE object of the PDS 
-   * labels, the keyword will be removed. This member variable defaults to 
-   * true in the ProcessExportPds constructor. 
-   * 
+  /**
+   * Mutator method to set how the BAND_NAME keyword will be handled. If
+   * false and the BAND_NAME keyword exists in the IMAGE object of the PDS
+   * labels, the keyword will be removed. This member variable defaults to
+   * true in the ProcessExportPds constructor.
+   *
    * @param force Indicates whether to force the process to keep the BAND_NAME
    *              keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceBandName(bool force) {
     m_forceBandName = force;
   }
 
-  /** 
-   * Mutator method to set how the CENTER_FILTER_WAVELENGTH keyword will be 
-   * handled. If false and the CENTER_FILTER_WAVELENGTH keyword exists in the 
-   * IMAGE object of the PDS labels, the keyword will be removed. This 
+  /**
+   * Mutator method to set how the CENTER_FILTER_WAVELENGTH keyword will be
+   * handled. If false and the CENTER_FILTER_WAVELENGTH keyword exists in the
+   * IMAGE object of the PDS labels, the keyword will be removed. This
    * member variable defaults to true in the ProcessExportPds constructor.
-   * 
-   * @param force Indicates whether to force the process to keep the 
+   *
+   * @param force Indicates whether to force the process to keep the
    *              CENTER_FILTER_WAVELENGTH keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceCenterFilterWavelength(bool force) {
     m_forceCenterFilterWavelength = force;
   }
 
-  /** 
-   * Mutator method to set how the BANDWIDTH keyword will be handled. If 
-   * false and the BANDWIDTH keyword exists in the IMAGE object of the PDS 
-   * labels, the keyword will be removed. This member variable defaults to 
-   * true in the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to keep the 
+  /**
+   * Mutator method to set how the BANDWIDTH keyword will be handled. If
+   * false and the BANDWIDTH keyword exists in the IMAGE object of the PDS
+   * labels, the keyword will be removed. This member variable defaults to
+   * true in the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to keep the
    *              BANDWIDTH keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceBandwidth(bool force) {
     m_forceBandwidth = force;
   }
 
-  /** 
-   * Mutator method to set how the BAND_STORAGE_TYPE keyword will be 
-   * handled. If true, the BAND_STORAGE_TYPE keyword will be added to the 
-   * IMAGE object of the PDS labels. This member variable defaults to true in 
-   * the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the BAND_STORAGE_TYPE keyword will be
+   * handled. If true, the BAND_STORAGE_TYPE keyword will be added to the
+   * IMAGE object of the PDS labels. This member variable defaults to true in
+   * the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              BAND_STORAGE_TYPE keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceBandStorageType(bool force) {
     m_forceBandStorageType = force;
   }
 
-  /** 
-   * Mutator method to set how the OFFSET keyword will be handled. If true, 
-   * the OFFSET keyword will be added to the IMAGE object of the PDS labels. 
-   * This member variable defaults to true in the ProcessExportPds 
-   * constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the OFFSET keyword will be handled. If true,
+   * the OFFSET keyword will be added to the IMAGE object of the PDS labels.
+   * This member variable defaults to true in the ProcessExportPds
+   * constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              OFFSET keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceOffset(bool force) {
     m_forceOffset = force;
   }
 
-  /** 
-   * Mutator method to set how the SCALING_FACTOR keyword will be handled. If 
-   * true, the SCALING_FACTOR keyword will be added to the IMAGE object of 
-   * the PDS labels. This member variable defaults to true in the 
-   * ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the SCALING_FACTOR keyword will be handled. If
+   * true, the SCALING_FACTOR keyword will be added to the IMAGE object of
+   * the PDS labels. This member variable defaults to true in the
+   * ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              SCALING_FACTOR keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceScalingFactor(bool force) {
     m_forceScalingFactor = force;
   }
 
-  /** 
-   * Mutator method to set how the SAMPLE_BITS keyword will be handled. If 
-   * true, the SAMPLE_BITS keyword will be added to the IMAGE object of 
-   * the PDS labels. This member variable defaults to true in the 
-   * ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the SAMPLE_BITS keyword will be handled. If
+   * true, the SAMPLE_BITS keyword will be added to the IMAGE object of
+   * the PDS labels. This member variable defaults to true in the
+   * ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              SAMPLE_BITS keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceSampleBits(bool force) {
     m_forceSampleBits = force;
   }
 
-  /** 
+  /**
    * Mutator method to set how the SAMPLE_BIT_MASK keyword will be handled. If
-   * true, the SAMPLE_BIT_MASK keyword will be added to the IMAGE object of 
-   * the PDS labels. This member variable defaults to true in the 
-   * ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+   * true, the SAMPLE_BIT_MASK keyword will be added to the IMAGE object of
+   * the PDS labels. This member variable defaults to true in the
+   * ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              SAMPLE_BIT_MASK keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceSampleBitMask(bool force) {
     m_forceSampleBitMask = force;
   }
 
-  /** 
-   * Mutator method to set how the SAMPLE_TYPE keyword will be handled. If 
+  /**
+   * Mutator method to set how the SAMPLE_TYPE keyword will be handled. If
    * true, the SAMPLE_TYPE keyword will be added to the IMAGE object of the
-   * PDS labels. This member variable defaults to true in the 
-   * ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+   * PDS labels. This member variable defaults to true in the
+   * ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              SAMPLE_TYPE keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceSampleType(bool force) {
     m_forceSampleType = force;
   }
 
-  /** 
-   * Mutator method to set how the CORE_NULL keyword will be handled. If 
-   * true, the CORE_NULL keyword will be added to the IMAGE object of the 
-   * PDS labels. This member variable defaults to true in the 
-   * ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the CORE_NULL keyword will be handled. If
+   * true, the CORE_NULL keyword will be added to the IMAGE object of the
+   * PDS labels. This member variable defaults to true in the
+   * ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              CORE_NULL keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceCoreNull(bool force) {
     m_forceCoreNull = force;
   }
 
-  /** 
-   * Mutator method to set how the CORE_LOW_REPR_SATURATION keyword will be 
-   * handled. If true, the CORE_LOW_REPR_SATURATION keyword will be added 
-   * to the IMAGE object of the PDS labels. This member variable defaults 
-   * to true in the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the CORE_LOW_REPR_SATURATION keyword will be
+   * handled. If true, the CORE_LOW_REPR_SATURATION keyword will be added
+   * to the IMAGE object of the PDS labels. This member variable defaults
+   * to true in the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              CORE_LOW_REPR_SATURATION keyword in the PDS image labels.
-   */ 
+   */
   void ProcessExportPds::ForceCoreLrs(bool force) {
     m_forceCoreLrs = force;
   }
 
-  /** 
-   * Mutator method to set how the CORE_LOW_INSTR_SATURATION keyword will be 
-   * handled. If true, the CORE_LOW_INSTR_SATURATION keyword will be added 
-   * to the IMAGE object of the PDS labels. This member variable defaults 
-   * to true in the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the CORE_LOW_INSTR_SATURATION keyword will be
+   * handled. If true, the CORE_LOW_INSTR_SATURATION keyword will be added
+   * to the IMAGE object of the PDS labels. This member variable defaults
+   * to true in the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              CORE_LOW_INSTR_SATURATION keyword in the PDS image
    *              labels.
-   */ 
+   */
   void ProcessExportPds::ForceCoreLis(bool force) {
     m_forceCoreLis = force;
   }
 
-  /** 
-   * Mutator method to set how the CORE_HIGH_REPR_SATURATION keyword will be 
-   * handled. If true, the CORE_HIGH_REPR_SATURATION keyword will be added 
+  /**
+   * Mutator method to set how the CORE_HIGH_REPR_SATURATION keyword will be
+   * handled. If true, the CORE_HIGH_REPR_SATURATION keyword will be added
    * to the IMAGE object of the PDS labels. This member variable defaults to
-   * true in the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+   * true in the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              CORE_HIGH_REPR_SATURATION keyword in the PDS image
    *              labels.
-   */ 
+   */
   void ProcessExportPds::ForceCoreHrs(bool force) {
     m_forceCoreHrs = force;
   }
 
-  /** 
-   * Mutator method to set how the CORE_HIGH_INSTR_SATURATION keyword will be 
-   * handled. If true, the CORE_HIGH_INSTR_SATURATION keyword will be added 
-   * to the IMAGE object of the PDS labels. This member variable defaults to 
-   * true in the ProcessExportPds constructor. 
-   * 
-   * @param force Indicates whether to force the process to add the 
+  /**
+   * Mutator method to set how the CORE_HIGH_INSTR_SATURATION keyword will be
+   * handled. If true, the CORE_HIGH_INSTR_SATURATION keyword will be added
+   * to the IMAGE object of the PDS labels. This member variable defaults to
+   * true in the ProcessExportPds constructor.
+   *
+   * @param force Indicates whether to force the process to add the
    *              CORE_HIGH_INSTR_SATURATION keyword in the PDS image
    *              labels.
-   */ 
+   */
   void ProcessExportPds::ForceCoreHis(bool force) {
     m_forceCoreHis = force;
   }

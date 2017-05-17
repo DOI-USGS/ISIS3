@@ -32,14 +32,14 @@ namespace Isis {
    * @brief Process class for exporting cubes to PDS standards
    *
    * This class extends the ProcessExport class to allow the user
-   * to export cubes to PDS format. 
-   *  
+   * to export cubes to PDS format.
+   *
    * Tables from the cube may also be exported. These exported PDS tables may be
-   * attached or detached. This should correspond to whether the labels of the 
-   * exported PDS file are attached or detached. NOTE: If attached, the labels 
-   * of the table should not be altered in the export program unless 
-   * functionality is added to deal with the new start byte values for the 
-   * tables. 
+   * attached or detached. This should correspond to whether the labels of the
+   * exported PDS file are attached or detached. NOTE: If attached, the labels
+   * of the table should not be altered in the export program unless
+   * functionality is added to deal with the new start byte values for the
+   * tables.
    *
    * @author 2006-09-05 Stuart Sides
    *
@@ -58,7 +58,7 @@ namespace Isis {
    *   @history 2009-05-31 Kris Becker - Included the number of bands in the
    *                           computation of the number of FILE_RECORDS for
    *                           fixed PDS type products.  It assumed only 1 band.
-   *   @history 2010-02-24 Janet Barrett - Added code to support JPEG2000. 
+   *   @history 2010-02-24 Janet Barrett - Added code to support JPEG2000.
    *   @history 2010-07-21 Sharmila Prasad - Fixed error while converting
    *                           resolution from Meters to Kilometers
    *   @history 2012-04-06 Kris Becker - Correct label padding whereby spaces
@@ -72,50 +72,55 @@ namespace Isis {
    *                           functionality is added to deal with the new start
    *                           byte values. References #678.
    *   @history 2014-06-06 Kristin Berry - Added default units to assume if there
-   *                           are no units on certain values in the input Isis cube. 
-   *                           Unlabeled radii are assumed to be in meters; map scales 
+   *                           are no units on certain values in the input Isis cube.
+   *                           Unlabeled radii are assumed to be in meters; map scales
    *                           to be in meters/pixel, and map resolutions to be in
    *                           pixels/degree.
+   *   @history 2017-05-17 Makayla Shepherd & Ian Humphrey - Added updateChecksumInLabel() to
+   *                           convert the placeholder value to the actual generated checksum
+   *                           value. Modified StreamImageRoot() and FixedImageRoot() to create
+   *                           CHECKSUM placeholder in the labels if we are generating a checksum.
+   *                           Fixes #1013.
    */
 
   class ProcessExportPds : public Isis::ProcessExport {
     public:
-      /** 
-       * File type to be exported 
-       * @see http://pds.nasa.gov/documents/sr/AppendixA.pdf 
+      /**
+       * File type to be exported
+       * @see http://pds.nasa.gov/documents/sr/AppendixA.pdf
        */
       enum PdsFileType   {
-        Image,        /**< Two dimensional array of line/sample values. These 
+        Image,        /**< Two dimensional array of line/sample values. These
                            files generallly have the extension *.img or *.imq**/
         Qube,         /**< Multi-dimensional array (1-3 dimensional) whose axes
                            may be interpreted as line/sample/band.  These files
                            generally have the extension *.qub**/
         SpectralQube, /**< Three dimensional objects with two spatial dimensions
-                           and one spectral dimension. These files generally 
+                           and one spectral dimension. These files generally
                            have the extension *.qub**/
-        JP2Image      /**< Image coding system JPEG 2000 formatted image. These 
+        JP2Image      /**< Image coding system JPEG 2000 formatted image. These
                            files generally have the extension *.jp2 **/
       };
-      
+
       /**
-       * Resolution units per pixel of the exported PDS file  
+       * Resolution units per pixel of the exported PDS file
        */
       enum PdsResolution {
         Meter,    //!< Meters per pixel
         Kilometer //!< Kilometers per pixel
       };
-      
+
       /**
-       * Record format type of exported PDS file. 
-       *  
-       * @see http://pds.nasa.gov/documents/sr/Chapter15.pdf 
+       * Record format type of exported PDS file.
+       *
+       * @see http://pds.nasa.gov/documents/sr/Chapter15.pdf
        */
       enum PdsExportType {
         Stream, //!< Stream Records. This type is generally used for ASCII files.
-        Fixed   /**< Fixed length records. PDS recommends that FIXED_LENGTH 
+        Fixed   /**< Fixed length records. PDS recommends that FIXED_LENGTH
                      records are used whenever possible.**/
       };
-      
+
       ProcessExportPds();
       ~ProcessExportPds();
 
@@ -136,11 +141,12 @@ namespace Isis {
       virtual Pvl &StandardPdsLabel(ProcessExportPds::PdsFileType type);
 
       void OutputLabel(std::ofstream &pdsFileStream);
+      void updateChecksumInLabel(std::ofstream &pdsFileStream);
       void OutputDetachedLabel();
 
       void ExportTable(Isis::Table isisTable, QString detachedPdsTableFileName="");
 
-      // include this using declaration to indicate that ProcessExportPds 
+      // include this using declaration to indicate that ProcessExportPds
       // objects that call a StartProcess() method that has not been overridden
       // here should use the corresponding base class definitions
       using ProcessExport::StartProcess;
@@ -178,19 +184,19 @@ namespace Isis {
 
       QString ProjectionName(Pvl &inputLabel);
 
-      PvlFormatPds *m_formatter;  /**< Used to determine how to format the 
+      PvlFormatPds *m_formatter;  /**< Used to determine how to format the
                                        keyword values in the PDS file.*/
       Pvl *m_label;               //!< Exported PDS label.
       PdsExportType m_exportType; //!< Stream or Fixed
 
     private:
       PdsResolution m_exportResolution; //!< Meters or kilometers.
-      bool m_forceBands;             /**< Indicates whether to keep the 
+      bool m_forceBands;             /**< Indicates whether to keep the
                                           BANDS keyword in the PDS labels.*/
-      bool m_forceBandName;          /**< Indicates whether to keep the 
+      bool m_forceBandName;          /**< Indicates whether to keep the
                                           BAND_NAME keyword in the PDS labels.*/
       bool m_forceCenterFilterWavelength; /**< Indicates whether to keep the
-                                          CENTER_FILTER_WAVELENGTH keyword in 
+                                          CENTER_FILTER_WAVELENGTH keyword in
                                           the PDS labels.*/
       bool m_forceBandwidth;         /**< Indicates whether to keep the
                                           BANDWIDTH keyword in the PDS labels.*/
@@ -213,7 +219,7 @@ namespace Isis {
       bool m_forceCoreNull;          /**< Indicates whether to add the
                                           CORE_NULL keyword in the PDS labels.*/
       bool m_forceCoreLrs;           /**< Indicates whether to add the
-                                          CORE_LOW_REPR_SATURATION keyword in 
+                                          CORE_LOW_REPR_SATURATION keyword in
                                           the PDS labels.*/
       bool m_forceCoreLis;           /**< Indicates whether to add the
                                           CORE_LOW_INSTR_SATURATION keyword in
@@ -222,29 +228,29 @@ namespace Isis {
                                           CORE_HIGH_REPR_SATURATION keyword in
                                            the PDS labels.*/
       bool m_forceCoreHis;           /**< Indicates whether to add the
-                                          CORE_HIGH_INSTR_SATURATION keyword in 
+                                          CORE_HIGH_INSTR_SATURATION keyword in
                                           the PDS labels.*/
       bool m_detachedLabel;          /**< Indicates whether the PDS file
                                           will be detached.*/
       QString m_detachedPdsLabelFile;/**< The name of the detached PDS label
                                           file.*/
-      PdsFileType m_pdsFileType;     /**< Image, Qube, Spectral Qube, or 
+      PdsFileType m_pdsFileType;     /**< Image, Qube, Spectral Qube, or
                                           JP2 Image*/
 
       std::vector<int> m_tableStartRecord;/**< Record number where the added
-                                           table data begins. The order of the 
-                                           tables represented in this vector 
-                                           corresponds to the order of the table 
+                                           table data begins. The order of the
+                                           tables represented in this vector
+                                           corresponds to the order of the table
                                            data in m_tableBuffers**/
-      std::vector<int> m_tableRecords; /**< Number of records in each added 
-                                           table. The order of the tables 
+      std::vector<int> m_tableRecords; /**< Number of records in each added
+                                           table. The order of the tables
                                            represented in this vector
                                            corresponds to the order of the table
                                            data in m_tableBuffers. **/
-      std::vector<char *> m_tableBuffers; /**< Vector containing the binary 
-                                           table data for each of the added 
-                                           tables. The order of the tables 
-                                           represented in this vector 
+      std::vector<char *> m_tableBuffers; /**< Vector containing the binary
+                                           table data for each of the added
+                                           tables. The order of the tables
+                                           represented in this vector
                                            corresponds to the order of the table
                                            data in m_tableRecords. **/
   };

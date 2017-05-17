@@ -27,6 +27,9 @@
 #include <iostream>
 #include <string>
 
+#include <QCryptographicHash>
+#include <QString>
+
 #include "Buffer.h"
 #include "BufferManager.h"
 #include "Endian.h"
@@ -101,13 +104,17 @@ namespace Isis {
    *                           InitProcess() with accessor methods for
    *                           OutputNull(), et al. Changed local variable names
    *                           in ProcessCubes for clarity. References #1380.
-   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                            functions to ensure successful 
+   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
+   *                                            functions to ensure successful
    *                                            inheritance between Process and its
    *                                            child classes.  Added virtual keyword
-   *                                            to destructor.  References #2215. 
+   *                                            to destructor.  References #2215.
    *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
-   *  
+   *  @history 2017-05-17 Makayla Shepherd - Added setCanGenerateChecksum(), canGenerateChecksum(),
+   *                          and checksum(). Added m_cryptographicHash and m_canGenerateChecksum.
+   *                          This allows an MD5 checksum to be generated when exporting an image.
+   *                          This checksum is generated based on the image data. Fixes #1013.
+   *
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
    *                                  method
    *  @todo 2005-02-09 Jeff Anderson - add coded example to class file and
@@ -153,6 +160,10 @@ namespace Isis {
       void CreateWorldFile(const QString &worldFile);
       void SetOutputEndian(enum ByteOrder endianness);
       void SetOutputType(Isis::PixelType pixelIn);
+
+      void setCanGenerateChecksum(bool flag);
+      bool canGenerateChecksum();
+      QString checksum();
 
       double GetInputMinimum(unsigned int n=0) const;
       double GetInputMaximum(unsigned int n=0) const;
@@ -265,6 +276,10 @@ namespace Isis {
       bool p_Hrs_Set;  /**< Indicates whether p_Hrs has been set
                             (i.e. if setHrs() has been called).*/
 
+      QCryptographicHash *m_cryptographicHash; /**< A cryptographic hash that will generate an MD5
+                                                    checksum of the image data. */
+      bool m_canGenerateChecksum;  /**< Flag to determine if a file checksum will be generated. */
+
     private:
       //!Method for writing 8-bit unsigned pixel data to a file stream
       void isisOut8(Buffer &in, std::ofstream &fout);
@@ -278,8 +293,8 @@ namespace Isis {
       /**Method for writing 32-bit signed floating point pixels data to a
       file stream*/
       void isisOut32(Buffer &in, std::ofstream &fout);
-      
-      /**Method for writing 64-bit signed double precision floating point pixels 
+
+      /**Method for writing 64-bit signed double precision floating point pixels
       data to a file stream*/
       void isisOut64(Buffer &in, std::ofstream &fout);
 

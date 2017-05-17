@@ -21,6 +21,9 @@
  */
 #include <iostream>
 #include <iomanip>
+#include <QCryptographicHash>
+#include <QString>
+
 #include "ProcessExport.h"
 #include "Preference.h"
 #include "IException.h"
@@ -59,6 +62,9 @@ namespace Isis {
     p_His_Set = false;
     p_Hrs_Set = false;
 
+    m_cryptographicHash = new QCryptographicHash(QCryptographicHash::Md5);
+    m_canGenerateChecksum = false;
+
     p_progress->SetText("Exporting");
   }
 
@@ -72,6 +78,8 @@ namespace Isis {
       delete p_str[i];
     }
     p_str.clear();
+
+    delete m_cryptographicHash;
   }
 
 
@@ -666,6 +674,56 @@ namespace Isis {
 
 
   /**
+   * @description Set m_canGenerateChecksum which determines if we can generate a MD5 checksum on
+   * the image data.
+   *
+   * @param flag boolean to generate the checksum or not
+   *
+   */
+  void ProcessExport::setCanGenerateChecksum(bool flag) {
+    m_canGenerateChecksum = flag;
+  }
+
+
+  /**
+   * @description Return if we can generate a checksum
+   *
+   * @return Boolean to generate the checksum or not
+   *
+   */
+  bool ProcessExport::canGenerateChecksum() {
+    return m_canGenerateChecksum;
+  }
+
+
+  /**
+   * @description Generates a file checksum. This must be called after StartProcess.
+   *
+   * @return QString Returns a QString of the checksum.
+   */
+  QString ProcessExport::checksum() {
+
+    QString checksum;
+
+    if (!m_canGenerateChecksum) {
+      QString msg = "Cannot generate a checksum. Call setGenerateChecksum(true) before startProcess";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    else {
+      if (m_cryptographicHash == NULL) {
+        QString msg = "Unable to generate a checksum. Did you call startProcess?";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+        return checksum;
+      }
+
+      checksum = m_cryptographicHash->result().toHex();
+    }
+
+    return checksum;
+  }
+
+
+  /**
   * @brief Set cube up for processing
   *
   * This method is called from startProcess() to validate the input cube
@@ -984,23 +1042,48 @@ namespace Isis {
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
-    // Loop for each line of data
-    for(buff->begin(); !buff->end(); buff->next()) {
-      // Read a line of data
-      InputCubes[0]->read(*buff);
-      // Stretch the pixels into the desired range
-      for(int i = 0; i < buff->size(); i++) {
-        (*buff)[i] = p_str[0]->Map((*buff)[i]);
+    //This if is the changed one
+    if (m_canGenerateChecksum) {
+      // Loop for each line of data
+      for(buff->begin(); !buff->end(); buff->next()) {
+        // Read a line of data
+        InputCubes[0]->read(*buff);
+        QByteArray byteArray;
+        // Stretch the pixels into the desired range
+        for(int i = 0; i < buff->size(); i++) {
+          (*buff)[i] = p_str[0]->Map((*buff)[i]);
+          byteArray.append((*buff)[i]);
+        }
+        if(p_pixelType == Isis::UnsignedByte)
+          isisOut8(*buff, fout);
+        else if(p_pixelType == Isis::UnsignedWord)
+          isisOut16u(*buff, fout);
+        else if(p_pixelType == Isis::SignedWord)
+          isisOut16s(*buff, fout);
+        else if(p_pixelType == Isis::Real)
+          isisOut32(*buff, fout);
+        p_progress->CheckStatus();
+        m_cryptographicHash->addData(byteArray);
       }
-      if(p_pixelType == Isis::UnsignedByte)
-        isisOut8(*buff, fout);
-      else if(p_pixelType == Isis::UnsignedWord)
-        isisOut16u(*buff, fout);
-      else if(p_pixelType == Isis::SignedWord)
-        isisOut16s(*buff, fout);
-      else if(p_pixelType == Isis::Real)
-        isisOut32(*buff, fout);
-      p_progress->CheckStatus();
+    }
+    else {
+      for(buff->begin(); !buff->end(); buff->next()) {
+        // Read a line of data
+        InputCubes[0]->read(*buff);
+        // Stretch the pixels into the desired range
+        for(int i = 0; i < buff->size(); i++) {
+          (*buff)[i] = p_str[0]->Map((*buff)[i]);
+        }
+        if(p_pixelType == Isis::UnsignedByte)
+          isisOut8(*buff, fout);
+        else if(p_pixelType == Isis::UnsignedWord)
+          isisOut16u(*buff, fout);
+        else if(p_pixelType == Isis::SignedWord)
+          isisOut16s(*buff, fout);
+        else if(p_pixelType == Isis::Real)
+          isisOut32(*buff, fout);
+        p_progress->CheckStatus();
+      }
     }
     delete buff;
     return;
