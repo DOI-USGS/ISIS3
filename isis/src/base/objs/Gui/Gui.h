@@ -70,7 +70,7 @@ namespace Isis {
    *                         GuiFileNameParameter.cpp and removed SelectFile()
    *                         from GuiCubeParameter. Cube and File customization
    *                         preferences are now being handled in Cube's
-   *                         CubeIoHandler and IsisAml classes.  
+   *                         CubeIoHandler and IsisAml classes.
    *  @history 2012-11-08 Janet Barrett - Modified the AddParameter method to
    *                         only update exclusions for list and combobox widgets.
    *                         Fixes #624.
@@ -79,8 +79,10 @@ namespace Isis {
    *                         #1452.
    *  @history 2016-06-28 Adam Paquette - Modified UpdateHistory to appropriately
    *                         retrieve lists from the history pvl.
-   *  @history 2016-08-15 Adam Paquette - Reset locale after QApplication is 
+   *  @history 2016-08-15 Adam Paquette - Reset locale after QApplication is
    *                         instantiated. Fixes #3908.
+   *  @history 2017-05-16 Cole Neubauer - Fixed Title not showing in Putty/Xming
+   *                         setup. Fixes #4731.
    */
 
   class Gui : public QMainWindow {
@@ -88,7 +90,7 @@ namespace Isis {
 
     public:
       static void checkX11();
-      
+
       static Gui *Create(Isis::UserInterface &ui, int &argc, char *argv[]);
 
       void ProgressText(const QString &text);

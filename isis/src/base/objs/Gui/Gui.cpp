@@ -70,21 +70,20 @@ namespace Isis {
     #endif
   }
 
-
   Gui *Gui::Create(Isis::UserInterface &ui, int &argc, char *argv[]) {
     // Don't recreate
     if(p_gui != NULL) return p_gui;
 
     // Get preferences
     PvlGroup &uiPref = Preference::Preferences().findGroup("UserInterface");
-
     // Create the application
     new QApplication(argc, argv);
     // When QApplication is initialized, it will reset the locale to the shells locale. As a result
     // the locale needs to be reset after QApplications initialization.
     setlocale(LC_ALL, "en_US");
-    QCoreApplication::setApplicationName(FileName(argv[0]).baseName());
+
     QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::setApplicationName(FileName(argv[0]).baseName());
 
 
     // Qt is smart enough to use the style of the system running the program.
@@ -94,7 +93,6 @@ namespace Isis {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
-
     // Create the main window
     p_gui = new Gui(ui);
     p_gui->show();
@@ -106,6 +104,9 @@ namespace Isis {
   Gui::Gui(Isis::UserInterface &ui) : QMainWindow(0, Qt::Window) {
     // Create the toolbar and menu and populate them with actions
     CreateAreas();
+
+    // Set title
+    QWidget::setWindowTitle(QApplication::applicationName());
 
     // Add parameters to the main area
     for(int group = 0; group < ui.NumGroups(); group++) {
@@ -140,6 +141,7 @@ namespace Isis {
 
     // Setup the current history pointer
     p_historyEntry = -1;
+
 
   }
 
