@@ -1257,7 +1257,6 @@ namespace Isis {
       if (m_controls->at(0)->count() == 1) {
         QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
         setActiveControl(controlName);
-        qDebug()<<"activeControl = "<<controlName;//->displayProperties()->displayName();
       }
     }
     return m_activeControl;
@@ -1315,7 +1314,6 @@ namespace Isis {
 
     if (!m_activeImageList && m_images->count() == 1) {
       QString imageList = m_images->at(0)->name();
-      qDebug()<<" activeImageList = "<<imageList;
       setActiveImageList(imageList);
     }
     return m_activeImageList;
