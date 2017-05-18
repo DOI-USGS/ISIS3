@@ -1255,8 +1255,9 @@ namespace Isis {
 
     if (!m_activeControl && m_controls->count() == 1) {
       if (m_controls->at(0)->count() == 1) {
-        m_activeControl = m_controls->at(0)->at(0);
-        qDebug()<<"activeControl = "<<m_activeControl->displayProperties()->displayName();
+        QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
+        setActiveControl(controlName);
+        qDebug()<<"activeControl = "<<controlName;//->displayProperties()->displayName();
       }
     }
     return m_activeControl;
@@ -1313,8 +1314,9 @@ namespace Isis {
   ImageList *Project::activeImageList() {
 
     if (!m_activeImageList && m_images->count() == 1) {
-      m_activeImageList = m_images->at(0);
-      qDebug()<<"activeImageList = "<<m_activeImageList->name();
+      QString imageList = m_images->at(0)->name();
+      qDebug()<<" activeImageList = "<<imageList;
+      setActiveImageList(imageList);
     }
     return m_activeImageList;
   }
