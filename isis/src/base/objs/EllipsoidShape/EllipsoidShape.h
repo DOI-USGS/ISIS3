@@ -48,6 +48,12 @@ namespace Isis {
    *                           were signaled. References #2248.
    *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor 
    *                           EllipsoidShape(Target, Pvl). References #2214
+   *   @history 2017-05-19 Tyler Wilson - calculateSurfaceNormal() and calculateDefaultNormal()
+   *                           now call calculateLocalNormal(), which calculates the normal
+   *                           vector to an ellipsoid.  Prior to this, they were calling
+   *                           ShapeModel::calculateEllipsoidalSurfaceNormal() function
+   *                           which was incorrectly returning the normal vector to a
+   *                           sphere and not an ellipsoid.  Fixes #1028.
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:

@@ -80,7 +80,7 @@ Begin testing Shape Model base class....
     surface point = (-2105.83, -2380.77, 1189.41)
 
     Testing  method calculateEllipsoidalSurfaceNormal with invalid intersection...
-**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
+**PROGRAMMER ERROR** Cannot convert an invalid surface point to a naif array.
 
     Testing  method setHasIntersection false...
     Do we have an intersection? 0
@@ -88,7 +88,7 @@ Begin testing Shape Model base class....
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  method calculateEllipsoidalSurfaceNormal with no intersection...
-**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
+**PROGRAMMER ERROR** Cannot convert an invalid surface point to a naif array.
 
     Testing  method calculateEllipsoidalSurfaceNormal with valid intersection...
     intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
@@ -96,7 +96,7 @@ Begin testing Shape Model base class....
     Intersection set
       Do we have a normal? 0
       Do we have a normal? 1
-      local normal = (-0.620509, -0.701524, 0.350474)
+      local normal = (-0.6196, -0.700497, 0.354117)
 
     Testing  method targetRadii...
       true normal = (-0.6196, -0.700497, 0.354117)

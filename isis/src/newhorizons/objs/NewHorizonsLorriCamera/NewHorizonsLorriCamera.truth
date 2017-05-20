@@ -44,7 +44,7 @@ EphemerisTime: 225787161.551323384
 NorthAzimuth: 359.217580727
 SunAzimuth: 82.539531219
 SpacecraftAzimuth: 251.351022349
-OffNadirAngle: 0.000668744
+OffNadirAngle: -0.287902823
 CelestialNorthClockAngle: 81.991210878
 RaDecResolution: 0.000283854
 BodyFixedCoordinate: -1562.244751303
@@ -53,10 +53,10 @@ BodyFixedCoordinate: -262.774167442
 LocalRadius: 1826620.868095986
 SampleResolution: 15054.295387028
 LineResolution: 15054.295387028
-ObliqueDetectorResolution: 15057.126683076
-ObliqueLineResolution: 15057.126683076
-ObliqueSampleResolution: 15057.126683076
-ObliquePixelResolution: 15057.126683076
+ObliqueDetectorResolution: 15055.846913180
+ObliqueLineResolution: 15055.846913180
+ObliqueSampleResolution: 15055.846913180
+ObliquePixelResolution: 15055.846913180
 Testing SetImage with deltaT...
 Sample: 358.000000000
 Line: 534.000000000
@@ -68,7 +68,7 @@ EphemerisTime: 225792161.551323384
 NorthAzimuth: 359.217580727
 SunAzimuth: 82.539531219
 SpacecraftAzimuth: 251.351022349
-OffNadirAngle: 0.000668744
+OffNadirAngle: -0.287902823
 CelestialNorthClockAngle: 81.991210878
 RaDecResolution: 0.000283854
 BodyFixedCoordinate: -1562.244751303
@@ -77,9 +77,9 @@ BodyFixedCoordinate: -262.774167442
 LocalRadius: 1826620.868095986
 SampleResolution: 15054.295387028
 LineResolution: 15054.295387028
-ObliqueDetectorResolution: 15057.126683076
-ObliqueLineResolution: 15057.126683076
-ObliqueSampleResolution: 15057.126683076
-ObliquePixelResolution: 15057.126683076
+ObliqueDetectorResolution: 15055.846913180
+ObliqueLineResolution: 15055.846913180
+ObliqueSampleResolution: 15055.846913180
+ObliquePixelResolution: 15055.846913180
 Latitude off by: 0.0255589466259298
 Longitude off by: 0.0032366246724109

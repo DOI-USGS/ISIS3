@@ -20,7 +20,7 @@ SetImage (sample, line): Yes
 NorthAzimuth: 269.544
 SunAzimuth: 168.17
 SpacecraftAzimuth: 184.591
-OffNadirAngle: 44.4225
+OffNadirAngle: 44.4012
 CelestialNorthClockAngle: 186.19
 RaDecResolution: 0.0216226
 

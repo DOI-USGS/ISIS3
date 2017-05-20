@@ -171,7 +171,15 @@ class MyEllipse : public ShapeModel {
   }
 
   virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
-    calculateEllipsoidalSurfaceNormal();
+
+    std::vector<Distance> radii = targetRadii();
+    std::vector<double> normal(3, 0.);
+    SpiceDouble point[3];
+    surfaceIntersection()->ToNaifArray(point);
+    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), point, (SpiceDouble *) &normal[0]);
+    setNormal(normal);
+    setHasNormal(true);
+
   }
 
   virtual void calculateSurfaceNormal() {

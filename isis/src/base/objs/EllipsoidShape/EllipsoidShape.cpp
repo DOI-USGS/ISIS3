@@ -1,6 +1,8 @@
 #include "EllipsoidShape.h"
 
 #include <QVector>
+#include <iomanip>
+#include <iostream>
 
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
@@ -53,7 +55,10 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateDefaultNormal()  {
-    calculateEllipsoidalSurfaceNormal();
+
+    QVector <double *> points;
+    calculateLocalNormal(points);
+    //calculateEllipsoidalSurfaceNormal();
   }
 
 
@@ -61,7 +66,10 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateSurfaceNormal()  {
-    calculateEllipsoidalSurfaceNormal();
+
+    QVector <double *> points;
+    //calculateEllipsoidalSurfaceNormal();
+    calculateLocalNormal(points);
   }
 
 
@@ -77,17 +85,20 @@ namespace Isis {
   }
 
 
-  /** Calculate local normal
+  /**
+   * @brief EllipsoidShape::calculateLocalNormal
+   * @param cornerNeighborPoints
    *
+   * Calculates the normal vector to an ellipsoid.
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
 
     if (!surfaceIntersection()->Valid() || !hasIntersection()) {
      IString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-   }
+    }
 
-   // Get the coordinates of the current surface point
+    // Get the coordinates of the current surface point
     SpiceDouble pB[3];
     pB[0] = surfaceIntersection()->GetX().kilometers();
     pB[1] = surfaceIntersection()->GetY().kilometers();
@@ -98,8 +109,8 @@ namespace Isis {
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
-    vector<double> normal(3,0.);
 
+    vector<double> normal(3,0.);
     NaifStatus::CheckErrors();
     surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
     NaifStatus::CheckErrors();

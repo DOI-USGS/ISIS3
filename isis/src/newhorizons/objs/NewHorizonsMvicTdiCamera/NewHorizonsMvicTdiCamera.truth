@@ -40,7 +40,7 @@ EphemerisTime: 225909071.808015019
 NorthAzimuth: 266.164263392
 SunAzimuth: 0.499496252
 SpacecraftAzimuth: 321.733413412
-OffNadirAngle: 0.004881534
+OffNadirAngle: -0.077693515
 CelestialNorthClockAngle: 20.840760728
 RaDecResolution: 0.001130898
 BodyFixedCoordinate: 1687.667621071
@@ -49,9 +49,9 @@ BodyFixedCoordinate: -322.959465020
 LocalRadius: 1827797.594771857
 SampleResolution: 52846.204303124
 LineResolution: 52846.204303124
-ObliqueDetectorResolution: 53261.747044178
-ObliqueLineResolution: 53261.747044178
-ObliqueSampleResolution: 53261.747044178
+ObliqueDetectorResolution: 53252.158923802
+ObliqueLineResolution: 53252.158923802
+ObliqueSampleResolution: 53252.158923802
 Sample: 2503.000000000
 Line: 330.000000000
 RightAscension: 332.298302833
@@ -62,7 +62,7 @@ EphemerisTime: 225909072.308015019
 NorthAzimuth: 269.665880194
 SunAzimuth: 0.499496252
 SpacecraftAzimuth: 321.733413412
-OffNadirAngle: 0.004881534
+OffNadirAngle: -0.077693515
 CelestialNorthClockAngle: 20.840760728
 RaDecResolution: 0.001130898
 BodyFixedCoordinate: 1687.667621071
@@ -71,8 +71,8 @@ BodyFixedCoordinate: -322.959465020
 LocalRadius: 1827797.594771857
 SampleResolution: 52846.204303124
 LineResolution: 52846.204303124
-ObliqueDetectorResolution: 53261.747044178
-ObliqueLineResolution: 53261.747044178
-ObliqueSampleResolution: 53261.747044178
+ObliqueDetectorResolution: 53252.158923802
+ObliqueLineResolution: 53252.158923802
+ObliqueSampleResolution: 53252.158923802
 Latitude OK
 Longitude OK
