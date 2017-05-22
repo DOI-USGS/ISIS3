@@ -45,6 +45,7 @@
     </change>
   </history>
 
+  <groups>
     <group name="Files">
       <parameter name="FROM">
         <type>cube</type>
