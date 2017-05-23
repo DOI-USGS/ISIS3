@@ -556,6 +556,7 @@ namespace Isis {
       // unblock the writing process after every 10 polygons if we need to write
       if (p_calculatedSoFar % 10 == 0 && (!snlist || (p_lonLatOverlaps.size() > snlist->size()))) {
         if (p_threadedCalculate) {
+          p_calculatePolygonMutex.tryLock();
           p_calculatePolygonMutex.unlock();
         }
       }
