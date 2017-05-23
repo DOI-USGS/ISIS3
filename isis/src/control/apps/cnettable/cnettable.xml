@@ -129,7 +129,10 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Tyler Wilson" date="2014-08-17">
       Updated application truth data due to modifications in CameraPointInfo class.
       References #476.
-
+    </change>
+     <change name="Kaj Williams" date="2017-04-21">
+     Trimmed extra commas from label and data.
+      References #4657.
     </change>
   </history>
 

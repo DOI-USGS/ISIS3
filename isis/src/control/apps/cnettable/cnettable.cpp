@@ -1,5 +1,10 @@
 #include "Isis.h"
 
+#include <string>
+
+#include <QList>
+#include <QString>
+#include <QStringList>
 
 #include "CameraPointInfo.h"
 #include "ControlMeasure.h"
@@ -21,13 +26,6 @@
 #include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
-//#include "LocalPointInfo.h"
-
-#include <QList>
-#include <QString>
-#include <QStringList>
-
-#include <string>
 
 using namespace std;
 using namespace Isis;
@@ -62,7 +60,7 @@ void IsisMain() {
   SerialNumberList serials(ui.GetFileName("FROMLIST"));
   append = ui.GetBoolean("APPEND");
 
-  if(cnet.GetNumMeasures() == 0) {
+  if (cnet.GetNumMeasures() == 0) {
     string msg = "Your control network must contain at least one point";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -192,11 +190,15 @@ void IsisMain() {
     measureInfo += QString(CheckValue(Asp.GetLatSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { measureInfo += QString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; }
+    try { 
+      measureInfo += QString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; 
+    }
     catch (IException &) {
       measureInfo += ",";
     }
-    try { measureInfo += QString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; }
+    try { 
+      measureInfo += QString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; 
+    }
     catch (IException &) {
       measureInfo += ",";
     }
@@ -214,11 +216,15 @@ void IsisMain() {
     measureInfo += QString(CheckValue(sp.GetLatSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(sp.GetLonSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { measureInfo += QString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; }
+    try { 
+      measureInfo += QString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; 
+    }
     catch (IException &e) {
       measureInfo += ",";
     }
-    try { measureInfo += QString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; }
+    try { 
+      measureInfo += QString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; 
+    }
     catch (IException &e) {
       measureInfo += ",";
     }
@@ -271,7 +277,7 @@ void IsisMain() {
         ControlMeasureLogData::GoodnessOfFit).Average())) + ",";
 
     // Loop through all measures in controlpoint
-    for(int j = 0; j < cpoint->GetNumMeasures(); j++) {
+    for (int j = 0; j < cpoint->GetNumMeasures(); j++) {
 
       const ControlMeasure * cmeasure = (*cpoint)[j];
 
@@ -280,7 +286,7 @@ void IsisMain() {
 
       grp = camPoint.SetImage(cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...
-      if(grp == NULL) {
+      if (grp == NULL) {
         string msg = "You shouldn't have gotten here. Errors in CameraPointInfo class";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -295,7 +301,7 @@ void IsisMain() {
 
   // All done, clean up
   prog.CheckStatus();
-  if(txt != NULL) {
+  if (txt != NULL) {
     delete txt;
     txt = NULL;
   }
@@ -339,7 +345,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   // Do we have errors?
   int maxCount = 0;
   bool errors = point->hasKeyword("Error");
-  if(errors) {
+  if (errors) {
     maxCount = point->keywords() - 1;
   }
   else {
@@ -347,7 +353,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   }
 
   // If its first and not appending, write the column labels
-  if(isFirst && !append) {
+  if (isFirst && !append) {
 
     QList< QStringList > printableMeasureData = cm.PrintableClassData();
     QStringList nameValuePair;
@@ -356,8 +362,8 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     }
 
     // point information
-    for(int i = 0; i < maxCount; i++) {
-      if((*point)[i].size() == 3) {
+    for (int i = 0; i < maxCount; i++) {
+      if ((*point)[i].size() == 3) {
         output += QString((*point)[i].name()) + "X,";
         output += QString((*point)[i].name()) + "Y,";
         output += QString((*point)[i].name()) + "Z,";
@@ -367,16 +373,13 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
       }
     }
 
-    // control measure information
-    //dataNames = cm.GetMeasureDataNames();
-    //for(int i = 0; i < dataNames.size(); i++) {
-    //  output += IString(dataNames[i] + ",");
-    //}
-
-
-    if(errors) output += QString((*point)[maxCount].name());
+    if (errors) output += QString((*point)[maxCount].name());
     isFirst = false;
     measureLabels += output;
+    // In some cases, we need to trim a trailing comma:
+    if (measureLabels.endsWith(",")) {
+      measureLabels.chop(1);
+    }
     txt->PutLine(measureLabels);
   }
   output.clear();
@@ -390,31 +393,28 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   // Write out date values
   // point information
-  for(int i = 0; i < maxCount; i++) {
-    if((*point)[i].size() == 3) {
+  for (int i = 0; i < maxCount; i++) {
+    if ((*point)[i].size() == 3) {
       output += QString(CheckValue((*point)[i][0])) + ",";
       output += QString(CheckValue((*point)[i][1])) + ",";
       output += QString(CheckValue((*point)[i][2])) + ",";
-    }
+    } 
     else {
       output += QString(CheckValue((*point)[i][0])) + ",";
     }
   }
 
-  //dataNames = cm.GetMeasureDataNames();
-  //for(int i = 0; i < dataNames.size(); i++) {
-  //  output += IString(cm.GetMeasureData(dataNames[i])) + ",";
-  //}
+  if (errors) output += QString((*point)[maxCount][0]);
 
-
-
-  if(errors) output += QString((*point)[maxCount][0]);
-
-  // Meaure info comes first
+  // Measure info comes first
   QString pri = "";
   pri += measureInfo;
   pri += output;
 
+  // In some cases, we need to trim a trailing comma:
+  if (pri.endsWith(",")) {
+    pri.chop(1);
+  }
   txt->PutLine(pri);
 
   output.clear();
