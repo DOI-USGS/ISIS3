@@ -6,28 +6,50 @@
   </brief>
 
   <description>
-    The pixel2map program projects an ISIS <def link="Level0">level0</def> or 
-    <def link="Level1">level1</def> <def link="Cube">cube</def> to a 
+    The <i>pixel2map</i> program projects an ISIS <def link="Level0">level0</def> or
+    <def link="Level1">level1</def> <def link="Cube">cube</def> to a
     <def link="MAP">map</def>-projected, ISIS <def link="Level2">level2</def>
     cube. Please note that pixels that fall
     in either polar region (i.e. latitude of 90.0 degrees or -90.0 degrees)
-    cannot currently be processed and are assigned as NULL pixels.
+    cannot currently be processed and are assigned as NULL pixels (i.e. this is currently
+    unsupported).
     <p>
-      In order for <i>pixel2map</i> to run successfully, input cubes must have
-      SPICE data. The program <i>spiceinit</i> should be used to attach the
-      appropriate SPICE data to input cubes. The <i>pixel2map</i> program also
+      In order for <i>pixel2map</i> to run successfully, input cubes must have SPICE data. The
+      program <i>spiceinit</i> should be used to attach the appropriate SPICE data to input cubes.
+      If a shape model is provided (or added in <i>spiceinit</i> by default), orthorectification is
+      supported through the determination of the field-of-view (FOV) latitude/longitude coordinates
+      as they map onto the digital elevation map (DEM). The <i>pixel2map</i> program also
       requires a map projection specification. The map projection is defined
       using a PVL file specified with the MAP parameter. The <i>maptemplate</i>
       program can be used to create a map projection file.
     </p>
     <p>
-      The ISIS program <i>cam2map</i> also projects a cube, and is recommended
-      for most mapping applications. The <i>pixel2map</i> program is designed to project cubes where
-      pixels do not overlap, such as line scan spectrometers. The
-      <i>cam2map</i> program will stretch data in the final product to cover
-      any gaps. The <i>pixel2map</i> program will preserve these gaps.
+      The <i>cam2map</i> program also projects a cube and is recommended
+      for most mapping applications. The <i>cam2map</i> program assumes contiguous pixels and will
+      interpolate to fill any gaps that occur in the output image during projection.
+      The <i>pixel2map</i> program will preserve these gaps where the pixels are not contiguous.
+      This program is designed to project cubes for the following cases:
+      <ul>
+        <li>pixels do not overlap spatially</li>
+        <li>data is smeared from long exposure times and drifting (see FOVRANGE=FULLEXPOSURE)</li>
+        <li>data is captured from spectrometers</li>
+        <ul>
+          <li>CRISM</li>
+          <li>DAWN VIR</li>
+          <li>NEARS MSI</li>
+          <li>VIMS</li>
+        </ul>
+      </ul>
+      It is important to note that when projecting multiple spectrometer images within a single run
+      of <i>pixel2map</i>, the hyperspectral information present in the input may be compromised in
+      the output projection because individual overlapping pixels are averaged in the output pixel.
+      With a <em>single</em> observation as input, the hyperspectral information will be preserved.
+      With <em>multiple</em> observations as input (by using FROMTYPE=FROMLIST
+      and FROMLIST), each observation may have different geometry depending on the timeframe the
+      observations were acquired. Input pixels from each input observation mapped to an overlapping
+      output surface pixel will be averaged.
     </p>
-    <p>
+
     <b>The following table indicates how <i>pixel2map</i> and <i>cam2map</i> differ:</b>
 
     <table border="1">
@@ -37,15 +59,17 @@
       </tr>
 
       <tr>
-        <td>Uses a forward driven algorithm</td>
-        <td>Uses a reverse driven algorithm.</td>
+        <td>Uses a forward driven algorithm for projection.</td>
+        <td>Uses a reverse driven algorithm for projection.</td>
       </tr>
 
       <tr>
-        <td>Each input pixel is converted to a polygon and rasterized into the output projected image by calculating output
-     pixels that fall in the boundary of the input pixel.</td>
-        <td>Each input pixel is not converted to a polygon and rasterized into the output projected image. The input pixels
-    are calculated by pixels situated at the same latitude and longitude.</td>
+        <td>Each input pixel is converted to a FOV polygon, typically using the latitude/longitude of
+            the pixel corners, and rasterized into the output projected image by calculating output
+            pixels that fall in the boundary of the input pixel.</td>
+        <td>Each input pixel is <i>not</i> converted to a polygon to be rasterized. Up to 16 input
+            pixels are interpolated around the center latitude and longitude of the output map
+            pixel.</td>
       </tr>
 
       <tr>
@@ -54,21 +78,33 @@
       </tr>
 
       <tr>
-        <td>The output cube will be spatially correct.</td>
-        <td>The output cube may not be spatially correct.</td>
+        <td>The output cube will be spatially accurate for non-continuous pixels.</td>
+        <td>The output cube may not be spatially accurate as output pixels are interpolated.</td>
       </tr>
     </table>
 
-    The examples below are Mars Reconnaissance Orbiter/CRISM cubes where scan lines do not overlap in their original state.
-    The major difference is in the output of the application used to project the cube. Both applications will project the cube,
-    but will also result in a different spatial outcome. 
-    Left Cube: cam2map was chosen to project the cube. Notice the scan lines have been interpolated thus filled.  If you want to
-    preserve gaps, cam2map will not achieve this result. In addition, the cube is no longer spatially correct. 
-    Right Cube: pixel2map was chosen to project the cube. Notice the gaps are retained in the output and the cube is spatially
-    correct.   
+    <p>
+    The examples below are Mars Reconnaissance Orbiter/CRISM cubes where scan lines do not overlap
+    in their original state. The major difference is in the output of the application used to
+    project the cube. Both applications will project the cube,
+    but will also result in a different spatial outcome.
     </p>
     <img src="assets/crismCam2mapEqui.jpg"> </img>
     <img src="assets/crismPixel2mapEqui.jpg"> </img>
+    <p>
+    Left Cube: <i>cam2map</i> was chosen to project the cube. Notice the scan lines have been
+    interpolated/filled.  If you want to preserve gaps, cam2map will not achieve this result (but
+    nearest-neighbor interpolation will be more accurate). In addition, the cube is no longer accurate
+    (traceable for this type of instrument).
+    </p>
+    <p>
+    Right Cube: <i>pixel2map</i> was chosen to project the cube. Notice the gaps are retained in the output and the cube is spatially
+    correct.
+    </p>
+
+    <p>
+      <b>Mapping Parameterization</b>
+    </p>
     <p>
       Several parameters of the map projection have default values when not
       specified in the map projection file. The default projection is the
@@ -89,7 +125,7 @@
 
       <tr>
         <td>Equatorial<def>Radius</def><br />PolarRadius</td>
-        <td>Read from SPICE PCK file set during <i>spiceinit</i>.  The PCK file is defined in the Kernels 
+        <td>Read from SPICE PCK file set during <i>spiceinit</i>.  The PCK file is defined in the Kernels
         group via the TargetAttitudeShape keyword</td>
       </tr>
 
@@ -110,8 +146,8 @@
 
       <tr>
         <td>Minimum<def>Latitude</def><br />MaximumLatitude<br />Minimum<def>Longitude</def><br />MaximumLongitude</td>
-        <td>Computed from the input cube or read from the map file.   However, any combination of the 
-        four values can then be overridden by the user.  The values the user specifies are expected 
+        <td>Computed from the input cube or read from the map file.   However, any combination of the
+        four values can then be overridden by the user.  The values the user specifies are expected
         to be in the coordinate system of the projection.</td>
       </tr>
 
@@ -123,7 +159,7 @@
     </table>
 
     <p>
-      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters, the 
+      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters, the
       following is the default Mapping group:
     </p>
     <pre>
@@ -147,24 +183,25 @@
   EndGroup
     </pre>
 
-   The map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels 
-   and contains the Mapping group.  Depending on the values of the input parameters, the output 
-   cube can use some or all of the keyword values of the map file.  For instance, setting 
-   MATCHMAP=true causes all of the mapping parameters to come from the map file, resulting 
-   in an output cube having the same number of <def link="Line">lines</def> and 
-   <def link="Sample">samples</def> as the map file.  If MATCHMAP=true and the map file is missing 
-   a keyword like PixelResolution, the application will fail with a PVL error.  Setting 
-   MATCHMAP=false allows for some of the mapping components to be overridden by the user or 
+   The map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels
+   with a Mapping group that is used to determine the default output map geometric extents and
+   resolution.  Depending on the values of the input parameters, the output
+   cube can use some or all of the keyword values of the map file.  For instance, setting
+   MATCHMAP=true causes all of the mapping parameters to come from the map file, resulting
+   in an output cube having the same number of <def link="Line">lines</def> and
+   <def link="Sample">samples</def> as the map file.  If MATCHMAP=true and the map file is missing
+   a keyword like PixelResolution, the application will fail with a PVL error.  Setting
+   MATCHMAP=false allows for some of the mapping components to be overridden by the user or
    computed from the FROM cube.
-   
 
-   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, EquatorialRadius, 
-   PolarRadius, LatitudeType, LongitudeDirection, LongitudeDomain, ProjectionName, and projection 
-   specific parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is, 
-   you should create one map file and use it as input for all the cubes in your mosaic.  By letting the 
-   minimum and maximum latitude and longitude values default, the application will determine the coverage of each image.  
-   However, if the mosaic Latitude and Longitude range is entered, each output image will be projected to the full 
-   size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
+
+   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, EquatorialRadius,
+   PolarRadius, LatitudeType, LongitudeDirection, LongitudeDomain, ProjectionName, and projection
+   specific parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is,
+   you should create one map file and use it as input for all the cubes in your mosaic.  By letting the
+   minimum and maximum latitude and longitude values default, the application will determine the coverage of each image.
+   However, if the mosaic Latitude and Longitude range is entered, each output image will be projected to the full
+   size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.
 
    The following Mapping group could be used for mosaicking:
    </p>
@@ -177,25 +214,51 @@
    </pre>
 
    <p>
-     Finally, depending on the projection, problems can occur with cubes that fall on the projection 
-     longitude seam.  For example, if you are making a mosaic with LongitudeDomain = 360 and your 
-     cube crosses 0/360 seam, this program would compute the default longitude range of the cube to 
-     MinimumLongitude = 0 and MaximumLongitude = 360.  A very large output image could be created 
-     depending on the pixel resolution.  The LONSEAM parameter allows you to selectively handle this case.  
+     Finally, depending on the projection, problems can occur with cubes that fall on the projection
+     longitude seam.  For example, if you are making a mosaic with LongitudeDomain = 360 and your
+     cube crosses the 0/360 seam, this program would compute the default longitude range of the cube to
+     MinimumLongitude = 0 and MaximumLongitude = 360.  A very large output image could be created
+     depending on the pixel resolution.  The LONSEAM parameter allows you to selectively handle this case.
      If you are making mosaics near the seam you will need to understand and alter the default for this parameter.
      <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams">
-     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help 
+     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help
      illustrate the problem.
    </p>
 
    <p>
-   <b>Output of pixel2map</b>
+   <b>Output of <i>pixel2map</i></b>
    </p>
    <p>
-   A single input file (FROM) produces a projected level2 cube. A list of files (FILELIST) produces an averaged mosaic as output.
-   A count cube that contains the number of input pixels averaged into each output pixel is created along with the output
+   A single input file (FROM) produces a projected level2 cube. A list of files (FILELIST) produces
+   an averaged mosaic as output. An additional count cube with one band that contains the number of
+   input pixels averaged into each output pixel is created along with the output
    cube or mosaic.
    </p>
+
+    <p>
+      <b>Instantaneous FOV (IFOV) vs. Full FOV</b>
+    </p>
+    <p>
+      As mentioned above, <i>pixel2map</i> uses a forward-driven mapping algorithm to create a
+      projection. In short, this means that pixel2map determines a polygon (footprint) FOV for each
+      input pixel and rasterizes it into the output image space. Depending on what the METHOD
+      parameter has been set to, the input pixel DN value is included in the average of any output
+      pixels that fall within the polygon.
+    </p>
+    <p>
+      The default behavior of <i>pixel2map</i> is FOVRANGE=INSTANTANEOUS. This means that the IFOV
+       at the center time of the exposure is being used to determine
+      each pixel's footprint. For spectrometers that have longer exposure times, this method does
+      not adequately address any smearing that can occur due to drifting during the exposure.
+      In order to account for smearing, FOVRANGE=FULLEXPOSURE can be used. This method determines
+      a pixel's polygon by finding the IFOV polygons at the start time, middle time, and
+      end time of the exposure and then drawing an envelope around these polygons. The images
+      below visually demonstrate the differences between the two FOVRANGE parameter values.
+    </p>
+    <img src="assets/image/IFOV_vs_FFOV.png" width="1085" height="448"></img>
+    <p>
+      For more details, see the parameter description for FOVRANGE or examples 3 and 4.
+    </p>
   </description>
 
   <category>
@@ -208,11 +271,11 @@
   </oldName>
 
   <history>
-    <change name="Stacy Alley" date="2008-02-13"> 
+    <change name="Stacy Alley" date="2008-02-13">
       Original version
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Christopher Austin" date="2008-01-27">
       Fixed parameter names
@@ -245,7 +308,7 @@
       image. Fixes #4433. Removed unused UniveralGroundMap instance. References #4495.
     </change>
     <change name="Curtis Rose" date="2016-12-09">
-      Added tests to for all errors. Fixed a check so now all files in a list have to have the 
+      Added tests to for all errors. Fixed a check so now all files in a list have to have the
       same number of bands selected. References #4535.
     </change>
     <change name="Jesse Mapel" date="2017-01-04">
@@ -256,6 +319,9 @@
       Modified to no longer keep all cubes in the fromlist open. This resulted in crashing due to
       reaching the maximum number of open files when the fromlist was large. Cubes will now be
       opened one at a time and then closed before opening the next cube. Fixes #4761.
+    </change>
+    <change name="Ian Humphrey" date="2017-05-23">
+      Updated documentation and added examples. Fixes #4537.
     </change>
   </history>
 
@@ -275,17 +341,21 @@
             <description>
               The specification of the input cube to be projected.  The cube must
               have been initialized using the <i>spiceinit</i> program.
-              This option allows a single input cube to be processed.
+              This option allows a single input cube to be processed. Processing a single cube at a
+              time is recommended to avoid averaging output pixels with other observations not
+              acquired close in time.
             </description>
             <exclusions><item>FROMLIST</item></exclusions>
           </option>
           <option value="FROMLIST">
             <brief>Input list of cubes to be projected</brief>
             <description>
-              This option allows a list to be used to process multiple input cubes.  All cubes 
+              This option allows a list to be used to process multiple input cubes.  All cubes
               contained in this list will be projected to the same output cube given in the 'TO'
               parameter.  This effectively projects and mosaics all input cubes given in the list
-              to the same output map projected file.
+              to the same output map projected file. Use this option with caution. Overlapping
+              output pixels will be averaged. If the input images vary in input resolution, viewing
+              and illumination conditions, the output average could compromise the spectral data.
             </description>
             <exclusions><item>FROM</item></exclusions>
           </option>
@@ -309,7 +379,7 @@
         <filter>*.lis</filter>
         <brief>Input list of cubes to be projected</brief>
         <description>
-          This option allows a list to be used to process multiple input cubes.  All cubes 
+          This option allows a list to be used to process multiple input cubes.  All cubes
           contained in this list will be projected to the same output cube given in the 'TO'
           parameter.  This effectively projects and mosaics all input cubes given in the list
           to the same output map projected file.
@@ -481,7 +551,8 @@
           is obtained.  The ground range can be obtained from the camera or map file.  Note the user can override the default
           using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage of
           the map projected image.  Essentially, the ground range and pixel resolution are used to compute the
-          size (samples and line) of the output image.
+          size (samples and line) of the output image. Recall that any pixels that fall within the
+          polar regions (-90 and 90 degrees latitude) will be assigned NULL values in the output.
         </description>
 
         <helpers>
@@ -502,9 +573,9 @@
           <option value="MINIMIZE">
              <brief>Minimize output image size</brief>
              <description>
-               This option will use the camera and projection in combination to ensure the output image size 
-               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with 
-               curved meridians and/or parallels and hence large output images.  The amount of padding can be 
+               This option will use the camera and projection in combination to ensure the output image size
+               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with
+               curved meridians and/or parallels and hence large output images.  The amount of padding can be
                quite large for extremely high resolution maps.
              </description>
              <inclusions><item>LONSEAM</item></inclusions>
@@ -542,7 +613,7 @@
         <brief>Minimum latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum latitude of the ground range.   If this is entered by the user, it will override
+          The minimum latitude of the ground range. If this is entered by the user, it will override
           the default camera or map value.  By default, planetocentric latitudes are assumed unless
           the MAP file specifies otherwise.
         </description>
@@ -613,7 +684,7 @@
            <option value="INSTANTANEOUS">
               <brief>Uses the IFOV corresponding to the center pixel time.</brief>
               <description>
-                The instantaneous field of view (IFOV) at the center of the exposure will be used
+                The IFOV at the center of the exposure will be used
                 to map each pixel.
               </description>
               <exclusions>
@@ -625,7 +696,8 @@
               <description>
                 The full field of view will be used to map each pixel. This is determined by
                 finding IFOVs at NUMIFOV times during the exposure. The maximum ground coverage
-                area found by combining all of these IFOVs is used as the full FOV. 
+                area found by combining all of these IFOVs is used as the full FOV. This helps
+                account for any smearing that occurs when drift occurs during exposure.
                 <b>NOTE:</b> This option is currently not available for framing cameras.
               </description>
             </option>
@@ -634,13 +706,18 @@
 
       <parameter name="NUMIFOV">
         <type>integer</type>
-        <brief>The number of instananeous FOVs used to create the full FOV.</brief>
+        <brief>The number of instantaneous FOVs used to create the full FOV.</brief>
         <default><item>3</item></default>
         <description>
-          The number of instananeous FOVs used to create the full FOV. The
-          IFOVs are spaced equally across the exposure. The first IFOV will
+          The number of instantaneous FOVs used to create the full FOV. The
+          IFOVs are spaced equally in time across the exposure duration. The first IFOV will
           always be the beginning of the exposure and the last IFOV will always
-          be the end of the exposure.
+          be the end of the exposure. Warning: increasing this number will dramatically increase
+          the processing time of <i>pixel2map</i>. This parameter will almost never need to be
+          changed from a default of 3. If the input image was captured by a spot spectrometer,
+          has a long exposure time, and has non-linear drift, then increasing this number slightly
+          may help create a more accurate full FOV. Again, it is very rare, if at all, that this
+          parameter value should be changed.
         </description>
         <minimum inclusive="yes">3</minimum>
       </parameter>
@@ -655,17 +732,17 @@
         </brief>
         <description>
           With this option you can turn on/off the automatic longitude domain switching that occurs
-          when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If 
-          the switching is turn off then you have the choice of making the program continue or 
+          when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If
+          the switching is turned off then you have the choice of making the program continue or
           exit when the cube does cross the boundary.
         </description>
 
         <list>
            <option value="AUTO">
-              <brief>Automatically correct Longitude Domain</brief>
+              <brief>Automatically adjust Longitude Domain</brief>
               <description>
-                If the cube crosses the longitude seam automatically compute the LongitudeDomain.   
-                When the cube is near 0 or 360 degrees the program will assume 180 LongitudeDomain.  
+                If the cube crosses the longitude seam automatically compute the LongitudeDomain.
+                When the cube is near 0 or 360 degrees the program will assume 180 LongitudeDomain.
                 When the cube is near 180 or -180 degrees it will assume 360 LongitudeDomain.
               </description>
             </option>
@@ -680,8 +757,8 @@
             <option value="CONTINUE">
                <brief>Continue program if cube crosses seam</brief>
                <description>
-                 If the cube crosses the longitude seam the program will continue.  The LongitudeDomain 
-                 in the map file will be used.  If the map file does not have a LongitudeDomain, 0-360 
+                 If the cube crosses the longitude seam the program will continue.  The LongitudeDomain
+                 in the map file will be used.  If the map file does not have a LongitudeDomain, 0-360
                  will be used. Note that this could create an extremely large image.
                </description>
              </option>
@@ -690,4 +767,239 @@
     </group>
 
   </groups>
+
+  <examples>
+    <!-- Example 1 : MRO CRISM -->
+    <example>
+      <brief>Default settings with MRO CRISM</brief>
+      <description>
+        In this example, we demonstrate projecting a CRISM image using the default <i>pixel2map</i>
+        parameters. Note that the output retains the gaps in the data, indicating that the input
+        pixels do not overlap spatially.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=crism.cub
+          to=crism_default.cub
+        </commandLine>
+        <description>
+          Project the CRISM cube using default <i>pixel2map</i> settings.
+        </description>
+      </terminalInterface>
+      <!-- <guiInterfaces>
+        <guiInterface>
+          <image>
+            <brief></brief>
+             <description>
+            </description>
+            <thumbnail />
+          </image>
+        </guiInterface>
+      </guiInterfaces> -->
+      <inputImages>
+        <image src="assets/image/crism.png" width="640" height="420">
+          <brief>CRISM input image</brief>
+          <description>
+            A CRISM image is being used for the input.
+          </description>
+          <thumbnail caption="Input CRISM image"
+            src="assets/thumb/crism.png" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/crism_default.png" width="534" height="990">
+          <brief>Output projected image</brief>
+          <description>
+            Project output image using default settings. Note the gaps in the projection.
+          </description>
+          <thumbnail caption="Output projected image"
+            src="assets/thumb/crism_default.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+        <image src="assets/image/crism_default-count-.png" width="534" height="990">
+          <brief>Output count image</brief>
+          <description>
+            The count cube generated by <i>pixel2map</i>. Pixel values indicate how many input
+            pixels were used to generate the average value for the respective output pixel.
+          </description>
+          <thumbnail caption="Output count image"
+            src="assets/thumb/crism_default-count-.png" width="200" height="200"/>
+          </image>
+      </outputImages>
+    </example>
+
+    <!-- Example 2 : Cassini VIMS -->
+    <example>
+      <brief>LONSEAM=CONTINUE with Cassini VIMS</brief>
+      <description>
+        In this example, we project a VIMS-IR image using the LONSEAM=CONTINUE parameter setting.
+        This means when we cross the longitude boundary in the image, the longitude domain
+        is <em>not</em> automatically reset. The output image is split at the longitude boundary
+        that it crosses; therefore the entire range of the target body is included in the output,
+        a full 360 degree longitude. Note that a count cube is still created when running the
+        commands below, it is just ignored in this example.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=C1621694254_1.ir.band248.cub
+          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          to=default.cub
+          lonseam=continue
+        </commandLine>
+        <description>
+          Project a VIMS-IR cube into an equirectangular mapping. When the longitude boundary is
+          reached, continue to project pixels into the cube's longitude domain. The image is split
+          at the longitude boundary that it crosses, the entire range of the target body is included
+          in the output.
+        </description>
+      </terminalInterface>
+      <!-- <guiInterfaces>
+        <guiInterface>
+          <image>
+            <brief></brief>
+             <description>
+            </description>
+            <thumbnail />
+          </image>
+        </guiInterface>
+      </guiInterfaces> -->
+      <inputImages>
+        <image src="assets/image/C1621694254_1.ir.band248.png" width="136" height="825">
+          <brief>Ingested VIMS-IR cube</brief>
+          <description>
+            A VIMS-IR cube ingested with vims2isis.
+          </description>
+          <thumbnail caption="Input VIMS-IR cube"
+             src="assets/thumb/C1621694254_1.ir.band248.png" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/vims_ir_continue.png" width="1582" height="447">
+          <brief>Map projected VIMS-IR cube across the longitude seam</brief>
+          <description>
+            The output cube is projected across the longitude seam. When using LONSEAM=CONTINUE,
+            the output cube longitude domain will not be reset when the data crosses the
+            longitude seam. For this image, a large gap of NULL pixels shows up in the output
+            because the entire longitude range of the target body is included.
+          </description>
+          <thumbnail caption="Output projected VIMS-IR cube"
+            src="assets/thumb/vims_ir_continue.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>Instantaneous FOV with Dawn VIR</brief>
+      <description>
+        In this example, we project a DAWN VIR image using an instantaneous
+        field of view and a full field of view to determine the output pixels. This demonstrates
+        FOVRANGE=INSTANTANEOUS (default setting for FOVRANGE). Note that
+        a count cube is still created when running the commands below, it is just ignored in this
+        example. Compare this with FOVRANGE=FULLEXPOSURE in Example 4.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
+          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          to=dawn_vir_instantaneous_fov.cub
+        </commandLine>
+        <description>
+          Project the DAWN VIR image into an equirectangular projection using the default
+          instantaneous field of view (FOVRANGE=INSTANTANEOUS) to determine the output pixel
+          projections.
+        </description>
+      </terminalInterface>
+      <!-- <guiInterfaces>
+        <guiInterface>
+          <image>
+            <brief></brief>
+             <description>
+            </description>
+            <thumbnail />
+          </image>
+        </guiInterface>
+      </guiInterfaces> -->
+      <inputImages>
+        <image src="assets/image/VIR_IR_1B_1_506266095_refl_1.b75.l1.png" width="256" height="58">
+          <brief>Input image for <i>pixel2map</i></brief>
+          <description>
+            This is the input DAWN VIR (IR) image for this example. Note the output "strips" and
+            compare these with the output image in Example 4.
+          </description>
+          <thumbnail caption="Input image"
+            src="assets/thumb/VIR_IR_1B_1_506266095_refl_1.b75.l1.png" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/dawn_vir_instantaneous_fov.png" width="361" height="838">
+          <brief>Output image using FOVRANGE=INSTANTANEOUS</brief>
+          <description>
+            This is the output image for the first run (FOVRANGE=INSTANTANEOUS).
+          </description>
+          <thumbnail caption="Output image FOVRANGE=INSTANTANEOUS"
+            src="assets/thumb/dawn_vir_instantaneous_fov.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>FULL FOV with Dawn VIR</brief>
+      <description>
+        In this example, we project a DAWN VIR image and use each pixel's full field of view to
+        determine the output pixels. This example demonstrates FOVRANGE=FULLEXPOSURE. Note that
+        a count cube is still created when running the commands below, it is just ignored in this
+        example.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
+          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          to=dawn_vir_full_fov.cub
+          fovrange=fullexposure
+        </commandLine>
+        <description>
+          Project the DAWN VIR image into an equirectangular projection using the full field of
+          view of each pixel to determine the output pixel projections. This accounts for any smear
+          that occurs with the long exposure times of the pixels.
+        </description>
+      </terminalInterface>
+      <!-- <guiInterfaces>
+        <guiInterface>
+          <image>
+            <brief></brief>
+             <description>
+            </description>
+            <thumbnail />
+          </image>
+        </guiInterface>
+      </guiInterfaces> -->
+      <inputImages>
+        <image src="assets/image/VIR_IR_1B_1_506266095_refl_1.b75.l1.png" width="256" height="58">
+          <brief>Input image for <i>pixel2map</i></brief>
+          <description>
+            This is the input DAWN VIR (IR) image for this example.
+          </description>
+          <thumbnail caption="Input image"
+            src="assets/thumb/VIR_IR_1B_1_506266095_refl_1.b75.l1.png" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/dawn_vir_full_fov.png" width="361" height="838">
+          <brief>Output image using FOVRANGE=FULLEXPOSURE</brief>
+          <description>
+            This is the output image for FOVRANGE=FULLEXPOSURE. When comparing to the previous
+            example, note that the output image data accommodates drift (the "strips" are wider).
+          </description>
+          <thumbnail caption="Output image FOVRANGE=FULLEXPOSURE"
+            src="assets/thumb/dawn_vir_full_fov.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>
