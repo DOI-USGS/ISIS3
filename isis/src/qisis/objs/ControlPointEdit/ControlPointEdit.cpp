@@ -67,11 +67,13 @@ namespace Isis {
     p_rightCube = 0;
     p_leftGroundMap = 0;
     p_rightGroundMap = 0;
+    
+    p_templateFileName = "$base/templates/autoreg/qnetReg.def";
 
     createPointEditor(parent);
     if (cnet != NULL) emit newControlNetwork(cnet);
   }
-
+  
 
   ControlPointEdit::~ControlPointEdit() {
 
@@ -897,7 +899,7 @@ namespace Isis {
     }
 
   }
-
+  
   
   /**
    * Sub-pixel register point in right chipViewport with point in
@@ -930,9 +932,9 @@ namespace Isis {
    */
   void ControlPointEdit::registerPoint() {
     
+    // if the auto registration factory has not been initialized, do it here
     if (p_autoRegFact == NULL) {
       try {
-        p_templateFileName = "$base/templates/autoreg/qnetReg.def";
         Pvl pvl(p_templateFileName);
         p_autoRegFact = AutoRegFactory::Create(pvl);
       }
@@ -945,9 +947,9 @@ namespace Isis {
         QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
-      }
+      } 
     }
-        
+    
     if (p_autoRegShown) {
       // Undo Registration
       p_autoRegShown = false;

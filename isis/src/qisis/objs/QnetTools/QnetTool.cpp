@@ -3351,7 +3351,7 @@ namespace Isis {
    * @param fn The file path of the new template file
    */
   void QnetTool::loadTemplateFile(QString fn) {
-
+    
     QFile file(FileName(fn).expanded());
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";

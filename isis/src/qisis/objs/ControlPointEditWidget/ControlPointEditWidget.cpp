@@ -2328,7 +2328,7 @@ namespace Isis {
    * @param fn The file path of the new template file
    */
   void ControlPointEditWidget::loadTemplateFile(QString fn) {
-
+    
     QFile file(FileName((QString) fn).expanded());
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
