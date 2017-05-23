@@ -1,8 +1,7 @@
 #include "EllipsoidShape.h"
 
 #include <QVector>
-#include <iomanip>
-#include <iostream>
+
 
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
@@ -55,10 +54,8 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateDefaultNormal()  {
-
     QVector <double *> points;
     calculateLocalNormal(points);
-    //calculateEllipsoidalSurfaceNormal();
   }
 
 
@@ -66,9 +63,7 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateSurfaceNormal()  {
-
     QVector <double *> points;
-    //calculateEllipsoidalSurfaceNormal();
     calculateLocalNormal(points);
   }
 
@@ -86,10 +81,23 @@ namespace Isis {
 
 
   /**
-   * @brief EllipsoidShape::calculateLocalNormal
-   * @param cornerNeighborPoints
+   * Calculates the unit normal to an ellipsoid at the point of intersection.  
+   * In the event that the three axial radii of the body are equal, this 
+   * method returns the normal vector for a sphere.
    *
-   * Calculates the normal vector to an ellipsoid.
+   * The implicit equation for an ellipsoid is:
+   * U(x,y,z) = x^2/a^2 + y^2/b^2 + z^2/c^2 -1 =0
+   *
+   *
+   * The normal to U(x,y,z) is given by:
+   *
+   *  n = grad(U)/norm(U)
+   *
+   * i.e. as:
+   *
+   * n = <ux,uy,uz>/sqrt(ux^2,+uy^2+uz^2)
+   *
+   * @param cornerNeighborPoints
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
 

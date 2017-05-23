@@ -1,3 +1,4 @@
+Radii=[3396.19,3396.19,3376.2]
 Begin testing Ellipsoid Shape Model class....
 
   Testing constructors...
@@ -16,23 +17,23 @@ Testing method intersectSurface...
     Do we have an intersection? 0
    Set a pixel in the image and check again.
     Do we have an intersection? 1
-     surface point = (-2105.83, -2380.77, 1189.41
+     surface point = (-2105.830811, -2380.77411, 1189.409824)
 
   Testing class method calculateLocalNormal...
-    local normal = (-0.6196, -0.700497, 0.354117
+    local normal = (-0.6196003462, -0.7004971413, 0.3541174467
 
   Testing class method calculateSurfaceNormal...
-    surface normal = (-0.6196, -0.700497, 0.354117
+    surface normal = (-0.6196003462, -0.7004971413, 0.3541174467
 
   Testing class method calculateDefaultNormal...
-    default normal = (-0.6196, -0.700497, 0.354117
+    default normal = (-0.6196003462, -0.7004971413, 0.3541174467
 
   Testing localRadius method ...
-    Local radius = 3393.71
+    Local radius = 3393.711719
 
   Testing setHasIntersection method
     Do we have an intersection? 0
 
   Testing setSurfacePoint method ...
      Do we have an intersection? 1
-     surface point = (-2105.83, -2380.77, 1189.41
+     surface point = (-2105.830811, -2380.77411, 1189.409824
