@@ -780,12 +780,12 @@ namespace Isis {
     double lineOffset = inputMapping.findKeyword("UpperLeftCornerY");
     lineOffset /= (double)inputMapping.findKeyword("PixelResolution");
     lineOffset *= 1.0;
-    lineOffset += 0.5; // Add half a line to get to the center of (1,1)
+    lineOffset -= 0.5; // Add half a line to get to the center of (1,1)
     pdsMapObj += PvlKeyword("LINE_PROJECTION_OFFSET", toString(lineOffset), "PIXEL");
     double sampleOffset = inputMapping.findKeyword("UpperLeftCornerX");
     sampleOffset /= (double)inputMapping.findKeyword("PixelResolution");
     sampleOffset *= -1.0;
-    sampleOffset += 0.5; // Add half a sample to get to the center of (1,1)
+    sampleOffset -= 0.5; // Add half a sample to get to the center of (1,1)
     pdsMapObj += PvlKeyword("SAMPLE_PROJECTION_OFFSET", toString(sampleOffset), "PIXEL");
 
     // Add units to keywords already in the IMAGE_MAP_PROJECTION object as necessary

@@ -1595,11 +1595,11 @@ namespace Isis {
 
     xmult = -1.0;
     ymult = 1.0;
-    xoff = -0.5;
-    yoff = -0.5;
+    xoff = 0.5;
+    yoff = 0.5;
 
     //  Open projectionOffsetMults file
-    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY.def");
+    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY_V2.def");
 
     Isis::PvlObject &projDef = p.findObject("ProjectionOffsetMults",
                                             Pvl::Traverse);

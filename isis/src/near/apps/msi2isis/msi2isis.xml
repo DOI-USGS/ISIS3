@@ -12,7 +12,7 @@
 
     The raw image must be in FITS (Flexible Image Transport) format and  
     have a PDS label file that points to the location of the FITS image. You must input either the label file or the FITS file for the "TO" input 
-    parameter.  Please note if the FITS file is given, the label file must 
+    parameter.  Projected images are not supported.  Please note if the FITS file is given, the label file must 
     exist in the same directory or the program will throw an error.
 
     This program will verify that the input files are valid by checking the 
@@ -28,8 +28,8 @@
 
     The output cube- successfully imported into ISIS3 goes through the following processes:
     <ul>
-      <li>Convert the raw FITS image data to an ISIS3 Cube.</li>
-      <li> Save the labels from the input PDS label file to the output ISIS3 Cube. Note that FITS labels are not transferred. </li>
+      <li>Convert the raw FITS image data to an ISIS3 cube.</li>
+      <li> Save the labels from the input PDS label file to the output ISIS3 cube. Note that FITS labels are not transferred. </li>
       <li>Enlarge the image from 537 samples x 244 lines to 537 x 412 using the user-specified interpolation algorithm. Defaults to cubic convolution.</li>
       <li>Flip the image vertically, i.e. across the horizontal axis.</li>
       <li>Trim 33 pixels from the top, bottom, left and right sides. These 
@@ -105,8 +105,8 @@
         <brief>Type of interpolation for enlarge process</brief>
         <description>
           This is the type of interpolation to be performed on the input when
-          the image is enlarged from 537 samples by 244 lines to 
-          537 samples by 412 lines.
+          the image is enlarged from 537 samples x 244 lines to 
+          537 samples x 412 lines.
         </description>
         <list>
           <option value="CUBICCONVOLUTION">
