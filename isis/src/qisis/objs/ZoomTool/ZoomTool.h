@@ -71,7 +71,9 @@ namespace Isis {
       ZoomTool(QWidget *parent);
       void addTo(QMenu *menu);
 
-      //! Returns the name of the menu.
+      /**
+      *@return the name of the menu.
+      **/
       QString menuName() const {
         return "&View";
       }
@@ -120,7 +122,7 @@ namespace Isis {
       QAction *p_zoomFit; //!< Fit the cube in the viewport action.
 
       QLineEdit *p_zoomLineEdit; //!< Line edit for manual zoom factor.
-      double p_lastScale;
+      double p_lastScale; //!< Last scale.
   };
 };
 
