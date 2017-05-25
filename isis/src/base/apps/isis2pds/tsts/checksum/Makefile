@@ -20,7 +20,7 @@ commands:
 	cubeit from=$(OUTPUT)/cube.lis \
 	  to=$(OUTPUT)/cubeit.cub+Lsb+BandSequential+Detached \
 	  > /dev/null;
-	md5sum $(OUTPUT)/cubeit.cub > $(OUTPUT)/md5sum.txt;
+	#md5sum $(OUTPUT)/cubeit.cub > $(OUTPUT)/md5sum.txt;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) $(OUTPUT)/cubeit* > /dev/null;
 	$(RM) $(OUTPUT)/ab102401.img > /dev/null;
