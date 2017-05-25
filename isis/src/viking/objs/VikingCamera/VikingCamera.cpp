@@ -44,7 +44,7 @@ namespace Isis {
   /**
    * Constructs a Viking Camera Model.
    *
-   * @param lab Pvl label from a Viking image
+   * @param cube The image cube.
    *
    * @throw iException::User - "File does not appear to be a Viking image.
    *        Invalid InstrumentId."
@@ -226,7 +226,7 @@ namespace Isis {
                                                          double exposureDuration) {
     pair<iTime, iTime> shuttertimes;
     double offset1;
-    if(exposureDuration <= .420) {
+    if (exposureDuration <= .420) {
       offset1 = 7.0 / 8.0 * 4.48;    //4.48 seconds = nomtick
     }
     else {
@@ -246,7 +246,7 @@ namespace Isis {
  * This is the function that is called in order to instantiate a VikingCamera
  * object.
  *
- * @param lab Cube labels
+ * @param cube The image cube
  *
  * @return Isis::Camera* VikingCamera
  */
