@@ -35,13 +35,12 @@ namespace Isis {
   /**
    * Constructs a Rosetta Osiris NAC Framing Camera object. 
    *
-   * @param lab Pvl label from a Osiris Nac Framing Camera image.
+   * @param cube The image cube.
    *
-   * @original author Stuart Sides
+   * @author Stuart Sides
    * 
-   * @modified by Sasha Brownsberger
-   *
    * @internal
+   * @history modified by Sasha Brownsberger
    */
 
   RosettaOsirisCamera::RosettaOsirisCamera(Cube &cube) : FramingCamera(cube) {
@@ -135,7 +134,7 @@ namespace Isis {
  * This is the function that is called in order to instantiate an OsirisNacCamera
  * object.
  *
- * @param lab Cube labels
+ * @param cube The image cube.
  *
  * @return Isis::Camera* OsirisNacCamera
  * @internal
