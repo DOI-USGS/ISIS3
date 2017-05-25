@@ -45,7 +45,7 @@ namespace Isis {
    * @brief Initialize the CaSSIS camera model
    *
    *
-   * @param lab Pvl label from a TGO Cassis image.
+   * @param cube The image cube.
    */
   TgoCassisCamera::TgoCassisCamera(Cube &cube) : FramingCamera(cube) {
 
@@ -210,7 +210,7 @@ namespace Isis {
  * This is the function that is called in order to instantiate a TgoCassisCamera
  * object.
  *
- * @param lab Cube labels
+ * @param cube The image cube.
  *
  * @return Isis::Camera* TgoCassisCamera
  */
