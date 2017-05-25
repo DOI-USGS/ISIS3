@@ -37,8 +37,7 @@ namespace Isis {
    * x/y will be identical.
    *
    * @param parent        the parent camera that will use this distortion map
-   * @param zDirection    the direction of the focal plane Z-axis
-   *                      (either 1 or -1)
+   * @param naifIkCode    NAIF IK code.
    *
    */
   TgoCassisDistortionMap::TgoCassisDistortionMap(Camera *parent, 
