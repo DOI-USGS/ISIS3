@@ -45,9 +45,10 @@ namespace Isis {
     /** 
      * Reimplemented from FrameCamera 
      *  
-     * @original author Stuart Sides
+     * @author Stuart Sides
      *
-     * @modified Sasha Brownsberger (2015/05/21)
+     * @internal
+     * @history modified Sasha Brownsberger (2015/05/21)
      * 
      * @param time Start time of the observation
      * @param exposureDuration The exposure duration of the observation
