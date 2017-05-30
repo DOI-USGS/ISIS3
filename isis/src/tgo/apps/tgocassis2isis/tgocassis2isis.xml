@@ -97,7 +97,11 @@
       Added user documentation. Fixes #4251.
     </change>
     <change name="Kristin Berry, Jeannie Backer, Jesse Mapel" date="2017-01-13">
-      Updated to be a standalone ingestion program which does not use ImageImporter. Changed app name to tgocassis2isis. Added filter table to documentation. References #4586
+      Updated to be a standalone ingestion program which does not use ImageImporter. Changed app 
+      name to tgocassis2isis. Added filter table to documentation. References #4586
+    </change>
+    <change name="Makayla Shepherd" date="2017-05-30">
+      Updated to work with XmlToPvlTranslationManager rename. Fixes #4889.
     </change>
   </history>
 

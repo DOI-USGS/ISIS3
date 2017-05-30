@@ -9,7 +9,7 @@
 #include "Preference.h"
 #include "ProcessImport.h"
 #include "UserInterface.h"
-#include "XmlTranslationManager.h"
+#include "XmlToPvlTranslationManager.h"
 #include "iTime.h"
 
 using namespace std;
@@ -66,7 +66,7 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   FileName transFile(missionDir + "/translations/tgoCassis.trn");
 
   // Get the translation manager ready
-  XmlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   QString str;
   // Set up the ProcessImport
@@ -112,7 +112,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   FileName transFile(missionDir + "/translations/tgoCassisInstrument.trn");
 
   // Get the translation manager ready for translating the instrument label
-  XmlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl output label
   Pvl *outputLabel = outputCube->label();
@@ -126,7 +126,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
 
   // Translate BandBin group
   FileName bandBinTransFile(missionDir + "/translations/tgoCassisBandBin.trn");
-  XmlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
+  XmlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
 
   // Pvl output label
   outputLabel = outputCube->label();
@@ -138,7 +138,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
 
   // Create the Archive Group
   FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
-  XmlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
+  XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
 
   // Pvl output label
   outputLabel = outputCube->label();

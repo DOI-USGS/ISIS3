@@ -35,13 +35,13 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "XmlTranslationManager.h"
+#include "XmlToPvlTranslationManager.h"
 
 using namespace std;
 namespace Isis {
 
   /**
-   * Constructs and initializes an XmlTranslationManager object from the given
+   * Constructs and initializes an XmlToPvlTranslationManager object from the given
    * Pvl translation file. If this constructor is used, the user will need to 
    * set the input label before translating. This may be done by using 
    * SetLabel(FileName inputLabel) or Auto(FileName inputLabel, Pvl 
@@ -50,13 +50,13 @@ namespace Isis {
    * @param transFile The translation file to be used to tranlate keywords in
    *                  the input label.
    */
-  XmlTranslationManager::XmlTranslationManager(const QString &transFile) 
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(const QString &transFile) 
       : LabelTranslationManager() {
     AddTable(transFile);
   }
 
   /**
-   * Constructs and initializes an XmlTranslationManager object from the given 
+   * Constructs and initializes an XmlToPvlTranslationManager object from the given 
    * input stream. If this constructor is used, the user will need to set the 
    * input label before translating. This may be done by using SetLabel(FileName 
    * inputLabel) or Auto(FileName inputLabel, Pvl outputLabel). 
@@ -65,14 +65,14 @@ namespace Isis {
    * @param transStrm A stream containing the tranlation table to be used to
    *                  tranlate keywords in the input label.
    */
-  XmlTranslationManager::XmlTranslationManager(std::istream &transStrm)
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(std::istream &transStrm)
       : LabelTranslationManager() {
     AddTable(transStrm);
   }
 
 
   /**
-   * Constructs and initializes an XmlTranslationManager object from the given
+   * Constructs and initializes an XmlToPvlTranslationManager object from the given
    * Pvl translation file and input label.
    *
    * @param inputLabel The Xml holding the input label.
@@ -80,7 +80,7 @@ namespace Isis {
    * @param transFile The translation file to be used to tranlate keywords in
    *                  the input label.
    */
-  XmlTranslationManager::XmlTranslationManager(FileName &inputLabel,
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(FileName &inputLabel,
                                                const QString &transFile)
       : LabelTranslationManager() {
     AddTable(transFile);
@@ -89,7 +89,7 @@ namespace Isis {
 
 
   /**
-   * Constructs and initializes an XmlTranslationManager object from the given
+   * Constructs and initializes an XmlToPvlTranslationManager object from the given
    * input stream and input label.
    *
    * @param inputLabel The Xml holding the input label.
@@ -97,7 +97,7 @@ namespace Isis {
    * @param transStrm A stream containing the tranlation table to be used to
    *                  tranlate keywords in the input label.
    */
-  XmlTranslationManager::XmlTranslationManager(FileName &inputLabel, 
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(FileName &inputLabel, 
                                                std::istream &transStrm)
       : LabelTranslationManager() {
     AddTable(transStrm);
@@ -106,9 +106,9 @@ namespace Isis {
 
 
   /**
-   * Destroys the XmlTranslationManager object.
+   * Destroys the XmlToPvlTranslationManager object.
    */
-  XmlTranslationManager::~XmlTranslationManager() {
+  XmlToPvlTranslationManager::~XmlToPvlTranslationManager() {
   }
 
 
@@ -117,7 +117,7 @@ namespace Isis {
    * 
    * @param inputLabel The input label file
    */
-  void XmlTranslationManager::SetLabel(FileName &inputLabel) {
+  void XmlToPvlTranslationManager::SetLabel(FileName &inputLabel) {
     parseFile(inputLabel);
   }
 
@@ -128,7 +128,7 @@ namespace Isis {
    * 
    * @return @b vector<pair<QString,int>> A vector of valid keyword names and their sizes.
    */
-  vector< pair<QString, int> > XmlTranslationManager::validKeywords() const {
+  vector< pair<QString, int> > XmlToPvlTranslationManager::validKeywords() const {
 
     vector< pair<QString, int> > validKeywords = PvlTranslationTable::validKeywords();
     validKeywords.push_back(pair<QString, int>("InputKeyAttribute",      -1));
@@ -167,7 +167,7 @@ namespace Isis {
    * @throws IException::Unknown "Could not find an input value or default value."
    * @throws IException::Unknown "Input element does not have the named attribute."
    */
-  QString XmlTranslationManager::Translate(QString outputName, int index) {
+  QString XmlToPvlTranslationManager::Translate(QString outputName, int index) {
     try {
     if (index != 0) {
       QString msg = "Cannot translate value at index [" + toString(index) +
@@ -354,7 +354,7 @@ namespace Isis {
    * 
    * @throws IException::Unknown "Parsing error, dependency type is not [att] or [tag]."
    */
-  bool XmlTranslationManager::checkDependencies(QDomElement element,
+  bool XmlToPvlTranslationManager::checkDependencies(QDomElement element,
                                                 PvlKeyword dependencies,
                                                 bool isDebug) const{
 
@@ -440,9 +440,9 @@ namespace Isis {
    * @throws IException::Unknown "Name-value specification does not have two
    *                              components separated by [:]."
    * 
-   * @see XmlTranslationManager::checkDependencies
+   * @see XmlToPvlTranslationManager::checkDependencies
    */
-  QStringList XmlTranslationManager::parseDependency(QString specification) const {
+  QStringList XmlToPvlTranslationManager::parseDependency(QString specification) const {
 
     QStringList parsedSpecification;
 
@@ -486,7 +486,7 @@ namespace Isis {
    * @param inputLabel The input label file to be translated.
    * @param outputLabel The output translated Pvl.
    */
-  void XmlTranslationManager::Auto(FileName &inputLabel, Pvl &outputLabel) {
+  void XmlToPvlTranslationManager::Auto(FileName &inputLabel, Pvl &outputLabel) {
     parseFile(inputLabel);
     Auto(outputLabel);
   }
@@ -500,7 +500,7 @@ namespace Isis {
    * @throws IException::Unknown "Could not open label file."
    * @throws IException::Unknown "XML read/parse error in file."
    */
-  void XmlTranslationManager::parseFile(const FileName &xmlFileName) {
+  void XmlToPvlTranslationManager::parseFile(const FileName &xmlFileName) {
      QFile xmlFile(xmlFileName.expanded());
      if ( !xmlFile.open(QIODevice::ReadOnly) ) {
        QString msg = "Could not open label file [" + xmlFileName.expanded() +

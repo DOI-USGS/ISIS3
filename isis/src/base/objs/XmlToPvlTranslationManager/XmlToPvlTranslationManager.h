@@ -1,5 +1,5 @@
-#ifndef XmlTranslationManager_h
-#define XmlTranslationManager_h
+#ifndef XmlToPvlTranslationManager_h
+#define XmlToPvlTranslationManager_h
 /**
  * @file
  * $Revision: 1.6 $
@@ -122,20 +122,22 @@ namespace Isis {
    *                          identifying input elements. Fixes #4584.
    *  @history 2017-01-18 Jesse Mapel - Updated documentation and error messages. Fixes #4584.
    *  @history 2017-01-25 Jesse Mapel - Created unit test. Fixes #4584.
+   *  @history 2017-05-30 Makayla Shepherd - Renamed from XmlTranslationManager to 
+   *                          XmlToPvlTranslationManager. Fixes #4889.
    */
-  class XmlTranslationManager : public LabelTranslationManager {
+  class XmlToPvlTranslationManager : public LabelTranslationManager {
     public:
-      XmlTranslationManager(const QString &transFile);
+      XmlToPvlTranslationManager(const QString &transFile);
 
-      XmlTranslationManager(std::istream &transStrm);
+      XmlToPvlTranslationManager(std::istream &transStrm);
 
-      XmlTranslationManager(FileName &inputLabel,
+      XmlToPvlTranslationManager(FileName &inputLabel,
                             const QString &transFile);
 
-      XmlTranslationManager(FileName &inputLabel,
+      XmlToPvlTranslationManager(FileName &inputLabel,
                             std::istream &transStrm);
 
-      virtual ~XmlTranslationManager();
+      virtual ~XmlToPvlTranslationManager();
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value

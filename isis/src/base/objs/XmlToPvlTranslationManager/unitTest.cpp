@@ -1,5 +1,5 @@
 #include <sstream>
-#include "XmlTranslationManager.h"
+#include "XmlToPvlTranslationManager.h"
 #include "FileName.h"
 #include "Preference.h"
 #include "IException.h"
@@ -219,7 +219,7 @@ int main(void) {
 
     cout << "Testing string stream translation specification" << endl << endl;
 
-    XmlTranslationManager transMgr(fLabel, trnsStrm);
+    XmlToPvlTranslationManager transMgr(fLabel, trnsStrm);
 
     cout << "Testing Translate method" << endl << endl;
     cout << "Translation of InstrumentIfovWithUnits: " <<
@@ -231,7 +231,7 @@ int main(void) {
     cout << endl << outputLabel << endl << endl;
 
     cout << "Testing error throws" << endl << endl;
-    XmlTranslationManager badTransMgr(fLabel, badTrnsStrm);
+    XmlToPvlTranslationManager badTransMgr(fLabel, badTrnsStrm);
 
     try {
       transMgr.Translate("InstrumentIfovWithUnits", 2);
@@ -306,7 +306,7 @@ int main(void) {
     }
 
     try {
-      XmlTranslationManager invalidTransMgr(fLabel, invalidTrnsStrm);
+      XmlToPvlTranslationManager invalidTransMgr(fLabel, invalidTrnsStrm);
     }
     catch(IException &e) {
       e.print();
@@ -325,7 +325,7 @@ int main(void) {
       simpleTrans << "  OutputName = Version" << endl;
       simpleTrans << "  Translation = (*,*)" << endl;
       simpleTrans << "EndGroup" << endl;
-      XmlTranslationManager nonExistantFileManager(nonExistantFile, simpleTrans);
+      XmlToPvlTranslationManager nonExistantFileManager(nonExistantFile, simpleTrans);
     }
     catch(IException &e) {
       e.print();
@@ -344,7 +344,7 @@ int main(void) {
       simpleTrans << "  OutputName = Version" << endl;
       simpleTrans << "  Translation = (*,*)" << endl;
       simpleTrans << "EndGroup" << endl;
-      XmlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
+      XmlToPvlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
     }
     catch(IException &e) {
       e.print();
