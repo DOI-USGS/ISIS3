@@ -39,7 +39,21 @@ namespace Isis {
     p_degree = degree;
   }
 
+
   /**
+   * Create a PolynomialUnivariate object 
+   *  
+   * @param degree The order/degree of the polynomial 
+   * @param coeffs a list of the coefficients  
+   */
+   PolynomialUnivariate::PolynomialUnivariate(int degree, std::vector<double> coeffs) :
+    Isis::Basis1VariableFunction("PolynomialUnivariate", (degree + 1)) {
+     p_degree = degree;
+     SetCoefficients(coeffs);
+   }
+
+
+   /**
    * This is the the overriding virtual function that provides the expansion of
    * the two input variables into the polynomial equation.
    * See BasisFunction for more information.

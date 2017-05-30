@@ -149,7 +149,9 @@ namespace Isis {
    *   @history 2016-04-20 Jeannie Backer - Merged Janet Barret's changes to handle SignedInteger
    *                           imports. Brought code closer to coding standards.
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
-   *
+   *   @history 2017-05-29 Kristin Berry - Added support for data trailers in BIP files and fixed
+   *                            a typo so that DataTrailerBytes() will return the correct value.
+   *                            References #3888.
    *
    */
   class ProcessImport : public Isis::Process {

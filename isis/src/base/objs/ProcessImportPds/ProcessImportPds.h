@@ -208,6 +208,10 @@ namespace Isis {
    *                          References #2368.
    *  @history 2017-01-03 Jesse Mapel - Added support for importing combined spectrum
    *                          images such as from the Hyabusa NIRS. Fixes #4573.
+   *  @history 2017-05-29 Kristin Berry - Update to the DataTrailer handling code so that its size
+   *                          (DataTrailerBytes) is not inappropriately re-set if we have specified
+   *                          it previously. References #3888.
+   *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example

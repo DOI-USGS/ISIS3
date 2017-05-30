@@ -202,28 +202,20 @@ namespace Isis {
     //Determine if we are processing a QUBE whose
     //core data type is VAX_REAL
 
-    try{
-
-    PvlObject obj = p_pdsLabel.findObject("QUBE");
-    PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
-    PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
+    try {
+      PvlObject obj = p_pdsLabel.findObject("QUBE");
+      PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
+      PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
       //if ( (coreKey[0] == "VAX_REAL") && (suffixKey[0] =="VAX_REAL") )
 
       if (coreKey[0] == "VAX_REAL") {
-
-            ProcessImport::SetVAXConvert(true);
-        }
-
+        ProcessImport::SetVAXConvert(true);
+      }
     }
-    catch(IException &e){
-
-
+    catch (IException &e) {
     }
-
-
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
-
 
     // Check to see if we are dealing with a JPEG2000 file
     QString str;
@@ -258,8 +250,6 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
-
-
 
 
     // Call the correct label processing
@@ -726,13 +716,19 @@ namespace Isis {
     SetDataSuffixBytes(suffix);
 
     str = pdsXlater.Translate("SuffixItemSize");
-    int trailer = toInt(str);
-    str = pdsXlater.Translate("AxisSuffixCount", 1);
-    trailer *= toInt(str);
-    str = pdsXlater.Translate("CoreSamples", samplePos);
-    trailer *= toInt(str);
-    trailer += suffix;
-    SetDataTrailerBytes(trailer);
+
+    // Only set DataTrailerBytes if we haven't already set it elsewhere. (It's inialized to 0.)
+    if (DataTrailerBytes() == 0) {
+      int trailer = toInt(str);
+      str = pdsXlater.Translate("AxisSuffixCount", 1);
+      trailer *= toInt(str);
+      str = pdsXlater.Translate("CoreSamples", samplePos);
+      trailer *= toInt(str);
+      trailer += suffix;
+      SetDataTrailerBytes(trailer); 
+    }
+
+    SaveDataTrailer();
 
     ProcessPixelBitandType(pdsXlater);
 

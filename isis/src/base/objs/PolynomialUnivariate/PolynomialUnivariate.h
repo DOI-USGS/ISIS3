@@ -46,11 +46,14 @@ namespace Isis {
    *   @history 2008-01-11 Tracie Sucharski - Renamed from Poly1D, add derivative methods.
    *   @history 2008-02-05 Jeannie Walldren - Renamed from Polynomial1Variable.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
+   *   @history 2016-11-10 Kristin Berry - Added additional convenience constructor which
+   *                                       accepts a vector of coeffs. References #3888. 
    */
 
   class PolynomialUnivariate : public Isis::Basis1VariableFunction {
     public:
       PolynomialUnivariate(int degree);
+      PolynomialUnivariate(int degree, std::vector<double> coeffs);
 
       //! Destroys the PolynomialUnivariate object
       ~PolynomialUnivariate() {};
