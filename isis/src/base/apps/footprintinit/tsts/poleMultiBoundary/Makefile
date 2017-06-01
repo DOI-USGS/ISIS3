@@ -12,7 +12,7 @@ commands:
 	$$ISISROOT/bin/blobdump from=$(OUTPUT)/e1202081.cub \
 	                        to=$(OUTPUT)/e1202081.txt \
 	                        name=footprint \
-	                        type=Polygon 
+	                        type=Polygon \
 	                        >& /dev/null;
 	$(CAT) $(OUTPUT)/e1202081.txt \
 	       | $(SED) 's/\([0-9]\.[0-9]\{3\}\)\([0-9]*\)/\1/g' \
