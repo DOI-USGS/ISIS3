@@ -44,20 +44,20 @@ namespace Isis {
     QButtonGroup *exportOptionsGrp = new QButtonGroup();
     exportOptionsGrp->setExclusive(true); // only one option can be clicked
     
-    p_fullImage    = new QRadioButton("Full &Image", this);
+    p_fullImage    = new QRadioButton("Export Entire &Image", this);
     connect(p_fullImage, SIGNAL(clicked(bool)), this, SLOT(setFullImage(bool)));
     exportOptionsGrp->addButton(p_fullImage);
-    p_fullImage->setWhatsThis("Save the entire Image");
+    p_fullImage->setWhatsThis("Make a duplicate of the original image.");
     
-    p_exportAsIs    = new QRadioButton("Export &As Is", this);
+    p_exportAsIs    = new QRadioButton("Export Viewport &As Is", this);
     connect(p_exportAsIs, SIGNAL(clicked(bool)), this, SLOT(setAsIs(bool)));
     exportOptionsGrp->addButton(p_exportAsIs);
-    p_exportAsIs->setWhatsThis("Save the Image As Viewed");
+    p_exportAsIs->setWhatsThis("Save the viewport as it is currently being viewed.");
     
-    p_exportFullRes = new QRadioButton("Export Full &Res", this);
+    p_exportFullRes = new QRadioButton("Export Viewport at Full &Res", this);
     connect(p_exportFullRes, SIGNAL(clicked(bool)), this, SLOT(setFullResolution(bool)));
     exportOptionsGrp->addButton(p_exportFullRes);
-    p_exportFullRes->setWhatsThis("Save the Image As Viewed with Full Resoultion");
+    p_exportFullRes->setWhatsThis("Save the viewport but at the full resolution of the original image.");
     
     hBoxLayout->addWidget(p_exportAsIs);
     hBoxLayout->addWidget(p_exportFullRes);
