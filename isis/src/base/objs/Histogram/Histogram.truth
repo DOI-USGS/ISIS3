@@ -33,7 +33,7 @@ BinCount(20):      0
 **PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.
 
 End old unit test.
-/usgs/cpkgs/isis3/data/base/testData/enceladus_sp-Jig.net
+data/base/testData/enceladus_sp-Jig.net
 Loading Control Points...
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 

@@ -7,13 +7,14 @@
 #include "IString.h"
 #include "OriginalLabel.h"
 #include "Statistics.h"
+#include "QRegularExpression"
 
 using namespace std;
 using namespace Isis;
 /**
  * @internal
  *   @history 2012-05-08 Tracie Sucharski - Moved test data to /usgs/cpks/mer/testData and
- *                         /usgs/cpkgs/clementine1/testData.  Added test for invalid label.
+ *                         /usgs/cpkgs/clementine1/testData.  Added test for invalid label.z
  */
 void IsisMain() {
 
@@ -105,7 +106,7 @@ void IsisMain() {
     e.print();
   }
 
-  try{// this file is saved locally since it is not needed in the data area for 
+  try{// this file is saved locally since it is not needed in the data area for
       // the rest of isis
     cout << "Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer" << endl;
     Isis::ProcessImportPds p;
@@ -115,7 +116,7 @@ void IsisMain() {
     p.ImportTable("SUN_POSITION_TABLE");
     p.StartProcess();
     p.EndProcess();
-    
+
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
@@ -152,7 +153,7 @@ void IsisMain() {
     p.SetPdsFile("$galileo/testData/1213r.img", "$galileo/testData/1213r.img", plab);
   }
   catch (Isis::IException &e) {
-    e.print();
+    ReportError(e.toString());
   }
 }
 
@@ -162,8 +163,11 @@ void IsisMain() {
  * @author Jeannie Walldren
  * @internal
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
+ *
+ *   @history 2017-05-19 Christopher Combs - Changed to remove paths that would cause the
+ *                           cause the test to fail when not using the standard data area.
+ *                           Fixes #4738.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegExp("\\[[^\\]]*\\]"), "[]") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
 }
-

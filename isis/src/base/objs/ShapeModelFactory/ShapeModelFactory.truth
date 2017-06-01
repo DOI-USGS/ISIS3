@@ -39,12 +39,12 @@ Unit test for Isis::ShapeModel
 
   Testing Isis cube file for dem that is not map projected
 **PROGRAMMER ERROR** Unable to create a shape model from given target and pvl.
-**I/O ERROR** Invalid shape model file [/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub] in Kernels group.
+**I/O ERROR** Invalid shape model file [data/mgs/testData/ab102401.cub] in Kernels group.
 **ERROR** The given shape model file is not a valid ISIS DEM cube. It is not map-projected.
-**ERROR** Unable to initialize cube projection from file [/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub].
-**ERROR** Unable to find PVL group [Mapping] in file [/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub].
+**ERROR** Unable to initialize cube projection from file [data/mgs/testData/ab102401.cub].
+**ERROR** Unable to find PVL group [Mapping] in file [data/mgs/testData/ab102401.cub].
 **ERROR** The given shape model file is not a valid NAIF DSK file. Unable to construct a NAIF DSK shape model.
-**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(UNKNOWNFILARC)]. The Naif error is [The file, /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub, has a unidentified file architecture.  Check that this file is a properly created binary SPICE kernel.].
+**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(UNKNOWNFILARC)]. The Naif error is [The file, data/mgs/testData/ab102401.cub, has a unidentified file architecture.  Check that this file is a properly created binary SPICE kernel.].
 
   Testing Isis cube file for dem that is missing shape model statistics
 **PROGRAMMER ERROR** Unable to create a shape model from given target and pvl.

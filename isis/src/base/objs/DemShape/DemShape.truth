@@ -40,7 +40,7 @@ Begin testing Dem Shape Model class....
     The map scale of the dem file is 128 pixels/degree
 
   Testing protected methods demCube ...
-    Using dem cube file = /usgs/cpkgs/isis3/data/base/dems/molaMarsPlanetaryRadius0004.cub
+    Using dem cube file = molaMarsPlanetaryRadius0004.cub
 
   Testing input of dem file with keyword ElevationModel
 

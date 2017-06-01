@@ -16,8 +16,8 @@
     <p>
       Statistic gathering is done on a band-by-band basis. The statistics
       are used in a least squares solution to determine multiplicative (GAIN or MULT) and additive
-      (OFFSET or BASE) corrections for each image. In addition to simply calculating corrective 
-      factors and applying said factors to each image (BOTH), the user has the option to only 
+      (OFFSET or BASE) corrections for each image. In addition to simply calculating corrective
+      factors and applying said factors to each image (BOTH), the user has the option to only
       calculate statistics (CALCULATE) and then examine these gathered statistics in a text file
       (OUTSTATS). Then, equalizer can be run again using that statistics file as input (INSTATS)
       to apply correction to any or all of the images without the need to calculate corrective
@@ -31,7 +31,7 @@
     <p>
       When corrective factors are undetermined, the user can use the RECALCULATE process option
       to try to solve them. To do this, images can be added to the input list to try to create
-      more overlaps or images without overlaps can be removed. An input statistics file (INSTATS) 
+      more overlaps or images without overlaps can be removed. An input statistics file (INSTATS)
       containing previously calculated image statistics must be provided. These statistics will be
       reloaded so overlap statistics will only be recalculated for new images in the modified input
       list. If all the images have overlaps and sufficient valid overlaps exist, corrective factors
@@ -42,19 +42,19 @@
       Additionally, the RETRYBOTH process option may be used to recalculate statistics and then
       apply corrective factors. This requires the user to provide an INSTATS file containing
       previously calculated statistics. It is also suggested that the user provide an OUTSTATS file
-      in case corrective factors cannot be determined. If the corrective factors are determined, 
+      in case corrective factors cannot be determined. If the corrective factors are determined,
       they will then be applied to the input images.
     </p>
     <p>
       The addition of these RETRYBOTH and RECALCULATE parameters has modified the content of
       the output statistics. Additional information is included in the output statistics
       so that previously calculated overlap statistics can be reloaded when using these parameters.
-      Note that statistics files created with previous versions of ISIS 3 can still be used as 
+      Note that statistics files created with previous versions of ISIS 3 can still be used as
       input statistics.
     </p>
     <p>
       The actual equation to be used for equalization, for ADJUST=BRIGHTNESS, CONTRAST or BOTH, on
-      each band in each cube is as follows: 
+      each band in each cube is as follows:
       <pre>
         newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + (avg(b) + OFFSET(b))
       </pre>
@@ -231,7 +231,7 @@
       in the QRD description. References #962.
     </change>
     <change name="Steven Lambright" date="2013-02-06">
-      Added the option "ADJUST=GAIN" based on a prototype developed by Jeff 
+      Added the option "ADJUST=GAIN" based on a prototype developed by Jeff
       Anderson. Fixes #911.
     </change>
     <change name="Jeannie Backer" date="2013-02-27">
@@ -241,6 +241,10 @@
       Added RETRYBOTH and RECALCULATE parameters to allow user to fix any non-overlapping images
       in the input image list and recalculate statistics for any new images in the input list,
       reusing previously calculated statistics for the rest of the images. Fixes #2282.
+    </change>
+    <change name="Christopher Combs" date="2017-05-19">
+      Changed pvl.DIFF of input for app tests nonOverlapRecalculate and nonOverlapRetryBoth to
+      ignore file names. Allows test to pass when not using default data area. Fixes #4738.
     </change>
   </history>
 
@@ -359,7 +363,7 @@
               Calculate statistics and apply correction
             </brief>
             <description>
-              This option will calculate image statistics and then apply 
+              This option will calculate image statistics and then apply
               corrections from the results.
             </description>
             <exclusions>
@@ -391,7 +395,7 @@
               Calculate statistics only
             </brief>
             <description>
-              This option will calculate image statistics and write them to an 
+              This option will calculate image statistics and write them to an
               output PVL file. Image corrections will not be applied.
             </description>
             <inclusions>
@@ -520,7 +524,7 @@
           Algorithm type used to adjust the pixel values
         </brief>
         <description>
-          This option allows the user  to select the algorithm that will be 
+          This option allows the user  to select the algorithm that will be
           used to adjust the pixel values.  The BRIGHTNESS mode will equalize
           using only an offset (the gain will be set to 1.0), and the
           CONTRAST mode will equalize using only a gain (the offset will
@@ -835,7 +839,7 @@
               subset of the images used to produce a specified input statistics
               file.
             </description>
-            <thumbnail width="164" height="200" caption="Equalizer GUI" 
+            <thumbnail width="164" height="200" caption="Equalizer GUI"
                        src="assets/thumbs/applyGui.jpg" />
           </image>
         </guiInterface>
@@ -905,7 +909,7 @@
         <description>
           In addition to specifying a fromlist, we must also specify the previously calculated
           statistics PVL file (instats), specify a location to write the output statistics PVL file
-          (outstats), and set the process type to "recalculate."  Since no output images will be 
+          (outstats), and set the process type to "recalculate."  Since no output images will be
           created, we do not (and cannot), specify a tolist.  All other options are at
           default values.
         </description>
@@ -921,7 +925,7 @@
               Screenshot of the GUI with parameters set to initially calculate statistics
               for a set of images with non-overlapping images.
             </description>
-            <thumbnail width="123" height="200" caption="Equalizer GUI" 
+            <thumbnail width="123" height="200" caption="Equalizer GUI"
                        src="assets/thumbs/recalculateFirstGui.png" />
           </image>
         </guiInterface>
@@ -989,12 +993,12 @@
         </dataFile>
         <dataFile path="assets/firstRunStats.pvl">
           <brief>
-            Click here to see the output text file containing the statistics needed for 
+            Click here to see the output text file containing the statistics needed for
             recalculating
           </brief>
           <description>
             This PVL file contains equalization-related statistics where corrective factors have not
-            been determined (since there were images without overlaps). This can be used to 
+            been determined (since there were images without overlaps). This can be used to
             recalculate statistics for a corrected input image list. Overlap statistics will only be
             calculated for new overlaps. (INSTATS)
           </description>
@@ -1005,7 +1009,7 @@
             used for equalizing
           </brief>
           <description>
-            This PVL file contains equalization-related statistics that were recalculated from a 
+            This PVL file contains equalization-related statistics that were recalculated from a
             previous run of equalizer. This can be used for applying
             correction to any or all images used to generate this file. (OUTSTATS)
           </description>
@@ -1021,7 +1025,7 @@
       </description>
       <terminalInterface>
         <commandLine>
-          fromlist=fixedFromlist.lis tolist=tolist.lis outstats=retryBothStats.pvl 
+          fromlist=fixedFromlist.lis tolist=tolist.lis outstats=retryBothStats.pvl
           instats=nonOverlapStats.pvl process=retryboth
         </commandLine>
         <description>
@@ -1039,7 +1043,7 @@
               Example GUI
             </brief>
             <description>
-              Screenshot of the GUI with parameters set to calculate statistics and apply 
+              Screenshot of the GUI with parameters set to calculate statistics and apply
               corrections (BOTH). This fails because some of the images do not have any overlaps
               (see the application log at the bottom of the screenshot).
             </description>
@@ -1056,7 +1060,7 @@
               Screenshot of the GUI with parameters set to recalculate statistics from previously
               calculated statistics and apply corrections (RETRYBOTH) to the input images.
             </description>
-            <thumbnail width="123" height="200" caption="Equalizer GUI" 
+            <thumbnail width="123" height="200" caption="Equalizer GUI"
                        src="assets/thumbs/retryBothGui.png" />
           </image>
         </guiInterface>
@@ -1113,7 +1117,7 @@
         </dataFile>
         <dataFile path="assets/firstRunStats.pvl">
           <brief>
-            Click here to see the output text file containing the statistics needed for 
+            Click here to see the output text file containing the statistics needed for
             recalculating and then applying.
           </brief>
           <description>
@@ -1128,7 +1132,7 @@
             Click here to see the output text file containing the recalculated statistics.
           </brief>
           <description>
-            This PVL file contains equalization-related statistics that were recalculated from a 
+            This PVL file contains equalization-related statistics that were recalculated from a
             previous run of equalizer. (OUTSTATS)
           </description>
         </dataFile>

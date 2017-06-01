@@ -43,6 +43,9 @@ namespace Isis {
    *                           /tmp directory.
    *   @history 2011-08-19 Kelvin Rodriguez - Added truth data for OS X 10.11
    *                           Part of proting to 10.11.
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: now creates unitTest.cub to
+   *                          perform tests on. Allows test to pass when not using the default data
+   *                          area. Fixes #4738.
    */
   class ProgramLauncher {
     public:

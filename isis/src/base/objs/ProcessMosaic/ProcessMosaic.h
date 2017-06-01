@@ -189,6 +189,9 @@ namespace Isis {
    *                           Made destructor virtual. References #2215.
    *   @history 2015-10-04 Jeannie Backer - Fixed SetMosaicOrigin() method to populate the input
    *                           images table properly. Fixes #1178
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp to truncate paths before date
+   *                           directory. Allows test to pass when not using the default data area.
+   *                           Fixes #4738.
    */
 
   class ProcessMosaic : public Process {

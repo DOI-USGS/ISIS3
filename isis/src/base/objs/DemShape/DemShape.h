@@ -57,6 +57,9 @@ namespace Isis {
    *                           now return the normal vector to an ellipsoid.  All references
    *                           to ShapeModel::calculateEllipsoidalSurfaceNormal have been
    *                           removed.  References #1028.
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output in
+   *                           testDemCube() to allow the test to pass when not using the standard
+   *                           data areas. Fixes #4738.
    *
    */
   class DemShape : public ShapeModel {

@@ -6,6 +6,7 @@
 #include "IString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
+#include "QRegularExpression"
 
 using namespace Isis;
 using namespace std;
@@ -23,12 +24,16 @@ void IsisMain() {
 
   cerr << "Testing stats ... " << endl;
   cerr << endl;
+  ProgramLauncher::RunSystemCommand("greyscale to=unitTest.cub enddn=50.0 samples=50 lines=50");
+
   ProgramLauncher::RunIsisProgram("stats",
-        "from=$base/testData/ab102401_ideal.cub "
+        "from=unitTest.cub "
         "-preference=$ISISROOT/src/base/objs/Preference/TestPreferences");
 
   cerr << endl;
   cerr << "Testing malformed command... " << endl;
+  cerr << "NOTE: The exit code for this test differs on each OS." << endl;
+  cerr << "That is the reason for the OS specific truth files. Please ignore the exit codes." << endl;
   cerr << endl;
   try {
     ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
@@ -53,6 +58,8 @@ void IsisMain() {
 
   cerr << endl;
   cerr << "Testing using Isis 3 program as a system program... " << endl;
+  cerr << "NOTE: The exit code for this test differs on each OS." << endl;
+  cerr << "That is the reason for the OS specific truth files. Please ignore the exit codes." << endl;
   cerr << endl;
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
@@ -70,7 +77,7 @@ void IsisMain() {
   cerr << endl;
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
-        "from=\\$base/testData/ab102401_ideal.cub "
+        "from=unitTest.cub "
         "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
   catch(IException &e) {

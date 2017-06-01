@@ -411,5 +411,5 @@ Testing error throws
 
 **ERROR** Could not open label file [DoesNotExist.xml].
 
-**ERROR** XML read/parse error in file [/usgs/cpkgs/isis3/data/base/translations/pdsImage.trn] at line [1], column [1], message: error occurred while parsing element.
+**ERROR** XML read/parse error in file [data/base/translations/pdsImage.trn] at line [1], column [1], message: error occurred while parsing element.
 

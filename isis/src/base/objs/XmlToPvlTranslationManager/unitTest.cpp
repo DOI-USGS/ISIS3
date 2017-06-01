@@ -5,9 +5,14 @@
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
+#include "QRegularExpression"
 
 using namespace Isis;
 using namespace std;
+
+void ReportError(QString err) {
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+}
 
 int main(void) {
   Preference::Preferences(true);
@@ -347,11 +352,11 @@ int main(void) {
       XmlToPvlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
     }
     catch(IException &e) {
-      e.print();
+      ReportError(e.toString());
       cout << endl;
     }
 
-    
+
   }
   catch(IException &e) {
     e.print();

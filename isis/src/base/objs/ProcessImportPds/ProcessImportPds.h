@@ -182,7 +182,7 @@ namespace Isis {
    *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added ProcessPdsRdnLabel() to
    *                          handle Chandrayaan M3 RDN files.  Added a file type to handle
    *                          Chandrayaan Loc and Obs files on the same import as the Rdn files.
-   *                          Also added support for 64 bit input data. 
+   *                          Also added support for 64 bit input data.
    *                          Note:  There may be loss of precision since the output type is 32-bit.
    *                          Return reference to imported table.  Needed so that M3 table data
    *                          can be flipped to match image data depending on yaw and orbit limb
@@ -204,7 +204,7 @@ namespace Isis {
    *                          ProcessImportPds objects. Marked
    *                          EndProcess as deprecated.
    *  @history 2015-01-19 Sasha Brownsberger - Made destructor virtual. References #2215.
-   *  @history 2015-03-10 Tyler Wilson Added to unit test to test opening Galileo NIMS cube files. 
+   *  @history 2015-03-10 Tyler Wilson Added to unit test to test opening Galileo NIMS cube files.
    *                          References #2368.
    *  @history 2017-01-03 Jesse Mapel - Added support for importing combined spectrum
    *                          images such as from the Hyabusa NIRS. Fixes #4573.
@@ -213,10 +213,12 @@ namespace Isis {
    *                          it previously. References #3888.
    *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
-   *                   definitions in .h file and .cpp methods, and  insert
-   *                   implementation example
+   *                          definitions in .h file and .cpp methods, and  insert
+   *                          implementation example
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: changed ReportError method to
+   *                          truncate paths before data directory. Allows test to pass when not
+   *                          using the default data area. Fixes #4738.
    *
-  
    */
   class ProcessImportPds : public ProcessImport {
 
@@ -348,5 +350,3 @@ namespace Isis {
 };
 
 #endif
-
-

@@ -1,4 +1,4 @@
-#This test will print errors thrown by cubeit when given 
+#This test will print errors thrown by cubeit when given
 #input cubes of different sizes or nothing but TRAKCING bands
 APPNAME = cubeit
 
@@ -35,13 +35,13 @@ commands:
 	fi;
 
 #    Remove Paths
-	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error_temp2.txt;
-	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp2.txt > $(OUTPUT)/error.txt;
+	$(SED) "s/\/.*\/data/data/" $(OUTPUT)/error_temp.txt > $(OUTPUT)/error_temp2.txt;
+	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp2.txt > $(OUTPUT)/error_temp3.txt;
+	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp3.txt > $(OUTPUT)/error.txt;
 
 #    Cleanup
-	$(RM) $(OUTPUT)/error_temp.txt; 
-	$(RM) $(OUTPUT)/error_temp2.txt; 
-	$(RM) $(OUTPUT)/tracking.lis; 
-	$(RM) $(OUTPUT)/broken.lis; 
-
-
+	$(RM) $(OUTPUT)/error_temp.txt;
+	$(RM) $(OUTPUT)/error_temp2.txt;
+	$(RM) $(OUTPUT)/error_temp3.txt;
+	$(RM) $(OUTPUT)/tracking.lis;
+	$(RM) $(OUTPUT)/broken.lis;
