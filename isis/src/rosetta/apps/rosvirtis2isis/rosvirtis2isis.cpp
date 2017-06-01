@@ -97,10 +97,17 @@ void IsisMain ()
   // Retrieve HK settings file and read in HK values. 
   QList<VirtisHK> hk; 
 
-  QFile hkFile("./assets/virtis_housekeeping.txt");
+  // Get the directory where the Rosetta translation tables are.
+  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
+  QString transDir = (QString) dataDir["Rosetta"] + "/translations/";
+
+  FileName hkTranslationFile = transDir + "virtis_housekeeping.txt";
+  QFile hkFile(hkTranslationFile.toString()); 
 
   if(!hkFile.open(QIODevice::ReadOnly)) {
-    // Appropriate error
+    QString msg = "Unable to open Virtis Housekeeping information file [" +
+                 hkFile.fileName() + "]";
+    throw IException(IException::Io,msg, _FILEINFO_);
   }
 
   QTextStream in(&hkFile);
@@ -303,10 +310,7 @@ void IsisMain ()
 
   outcube->write(table);
 
-  // Get the directory where the Rosetta translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Rosetta"] + "/translations/";
-
+  
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 

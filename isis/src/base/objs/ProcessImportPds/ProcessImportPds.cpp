@@ -728,7 +728,10 @@ namespace Isis {
       SetDataTrailerBytes(trailer); 
     }
 
-    SaveDataTrailer();
+    // Save the Data Trailer if it exists
+    if (DataTrailerBytes() != 0) {
+      SaveDataTrailer(); 
+    }
 
     ProcessPixelBitandType(pdsXlater);
 
