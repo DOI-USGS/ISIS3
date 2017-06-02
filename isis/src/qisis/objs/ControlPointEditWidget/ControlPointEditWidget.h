@@ -62,6 +62,7 @@ namespace Isis {
    *   @history 2017-01-05 Tracie Sucharski - Allow a new ground source location to be entered which
    *                           includes allowing the option to change the location in the active
    *                           control for all ground points.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the setEditPoint slot. 
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -101,7 +102,7 @@ namespace Isis {
       void ignorePointChanged();
       void ignoreLeftChanged();
       void ignoreRightChanged();
-      void netChanged();
+      void cnetModified();
       void newControlNetwork(ControlNet *);
       void stretchChipViewport(Stretch *, CubeViewport *);
       void measureChanged();
@@ -110,7 +111,7 @@ namespace Isis {
     public slots:
       void setSerialNumberList(SerialNumberList *snList);
       void setControl(Control *control);
-      void setEditPoint(ControlPoint *controlPoint);
+      void setEditPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deletePoint(ControlPoint *controlPoint);
 
       void createControlPoint(double latitude, double longitude, Cube *cube = 0,
@@ -162,7 +163,7 @@ namespace Isis {
     private:
       void createActions();
 
-      void loadPoint();
+      void loadPoint(QString serialNumber = "");
       void loadMeasureTable();
       void createPointEditor(QWidget *parent, bool addMeasures);
       QSplitter * createTopSplitter();
@@ -188,7 +189,7 @@ namespace Isis {
 
       QString m_cnetFileName; //!< Filename of the control network that is being modified
       QPointer<QLabel> m_cnetFileNameLabel; //!< Label with name of the control network file
-      bool m_netChanged; //!< Indicates if the control network has been modified
+      bool m_cnetModified; //!< Indicates if the control network has been modified
 
       QPointer<QAction> m_closePointEditor; //!< Action to close the point editor
 

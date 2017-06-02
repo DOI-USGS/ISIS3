@@ -112,7 +112,7 @@ namespace Isis {
       // since we are in a connected slot, we need to handle exceptions thrown by FindClosest
       try {
         ControlPoint *point = m_controlNet->FindClosest(sn, samp, line);
-        emit modifyControlPoint(point);
+        emit modifyControlPoint(point, sn);
       }
       catch (IException &ie) {
         QString message = "No points exist for editing. Create points using the right mouse";

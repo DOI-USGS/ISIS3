@@ -439,7 +439,7 @@ namespace Isis {
     BundleObservationView *result = new BundleObservationView(fileItem);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupBundleObservationViews() ) );
+             this, SLOT( cleanupBundleObservationViews(QObject *) ) );
 
     m_bundleObservationViews.append(result);
 
@@ -534,7 +534,17 @@ namespace Isis {
     row++;
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupCnetEditorViewWidgets() ) );
+             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+
+    //  Connections for point editing between views
+    connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
+            this, SLOT(modifyControlPoint(ControlPoint *, QString)));
+
+    // Connection between cneteditor view & other views
+    connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
+    // Connection between other views & cneteditor
+    connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
+
 
     m_cnetEditorViewWidgets.append(mainWidget);
 
@@ -556,7 +566,7 @@ namespace Isis {
     result->setModel(m_projectItemModel);
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupCubeDnViewWidgets() ) );
+             this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
 
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
@@ -566,8 +576,8 @@ namespace Isis {
     // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
     // exist.
     // TODO 2016-09-27 TLS  Find BETTER WAY
-    connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
-            this, SLOT(modifyControlPoint(ControlPoint *)));
+    connect(result, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
+            this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
     connect(result, SIGNAL(deleteControlPoint(ControlPoint *)),
             this, SLOT(deleteControlPoint(ControlPoint *)));
@@ -674,7 +684,7 @@ namespace Isis {
       m_controlPointEditViewWidget = result;
 
       connect(result, SIGNAL(destroyed(QObject *)),
-              this, SLOT(cleanupControlPointEditViewWidget()));
+              this, SLOT(cleanupControlPointEditViewWidget(QObject *)));
       emit newWidgetAvailable(result);
 
 
@@ -696,6 +706,9 @@ namespace Isis {
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
+
+      //  TODO 2017-05-31 TLS create signal/slot for interaction between views
+//    connect(result, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
     }
 
     return controlPointEditView();
@@ -727,7 +740,7 @@ namespace Isis {
     MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupMatrixViewWidgets() ) );
+             this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
 
     m_matrixViewWidgets.append(result);
 
@@ -748,7 +761,7 @@ namespace Isis {
     TargetInfoWidget *result = new TargetInfoWidget(target.data(), this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupTargetInfoWidgets() ) );
+             this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
 
     m_targetInfoWidgets.append(result);
 
@@ -769,7 +782,7 @@ namespace Isis {
     SensorInfoWidget *result = new SensorInfoWidget(camera.data(), this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupSensorInfoWidgets() ) );
+             this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
 
     m_sensorInfoWidgets.append(result);
 
@@ -791,7 +804,7 @@ namespace Isis {
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupFileListWidgets() ) );
+             this, SLOT( cleanupFileListWidgets(QObject *) ) );
 
     m_fileListWidgets.append(result);
 
@@ -858,33 +871,55 @@ namespace Isis {
   /**
    * @brief Removes pointers to deleted BundleObservationView objects.
    */
-  void Directory::cleanupBundleObservationViews() {
-    m_bundleObservationViews.removeAll(NULL);
+  void Directory::cleanupBundleObservationViews(QObject *obj) {
+
+    BundleObservationView *bundleObservationView = static_cast<BundleObservationView *>(obj);
+    if (!bundleObservationView) {
+      return;
+    }
+    m_bundleObservationViews.removeAll(bundleObservationView);
   }
 
 
   /**
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
-  void Directory::cleanupCnetEditorViewWidgets() {
-    m_cnetEditorViewWidgets.removeAll(NULL);
+  void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
+
+    CnetEditorWidget *cnetEditorWidget = static_cast<CnetEditorWidget *>(obj);
+    if (!cnetEditorWidget) {
+      return;
+    }
+    m_cnetEditorViewWidgets.removeAll(cnetEditorWidget);
   }
 
 
   /**
    * @brief Removes pointers to deleted CubeDnView objects.
    */
-  void Directory::cleanupCubeDnViewWidgets() {
-    m_cubeDnViewWidgets.removeAll(NULL);
+  void Directory::cleanupCubeDnViewWidgets(QObject *obj) {
+
+    CubeDnView *cubeDnView = static_cast<CubeDnView *>(obj);
+    if (!cubeDnView) {
+      return;
+    }
+    m_cubeDnViewWidgets.removeAll(cubeDnView);
   }
 
 
   /**
    * @brief Reomoves pointers to deleted ImageFileListWidget objects.
    */
-  void Directory::cleanupFileListWidgets() {
-    m_fileListWidgets.removeAll(NULL);
-
+  void Directory::cleanupFileListWidgets(QObject *obj) {
+//  qDebug()<<"Directory::cleanupFileListWidgets  obj = "<<obj;
+    ImageFileListWidget *imageFileListWidget = static_cast<ImageFileListWidget *>(obj);
+//  qDebug()<<"                                          cast fileListWidget = "<<fileListWidget<<"  # = "<<m_fileListWidgets.count();
+    if (!imageFileListWidget) {
+      return;
+    }
+//  qDebug()<<"Directory::cleanupFileListWidgets before remove # = "<<m_fileListWidgets.count();
+    m_fileListWidgets.removeAll(imageFileListWidget);
+//  qDebug()<<"Directory::cleanupFileListWidgets  # = "<<m_fileListWidgets.count();
   }
 
 
@@ -898,6 +933,7 @@ namespace Isis {
     if (!footprintView) {
       return;
     }
+//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets before remove # = "<<m_footprint2DViewWidgets.count();
     m_footprint2DViewWidgets.removeAll(footprintView);
 //  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  # = "<<m_footprint2DViewWidgets.count();
   }
@@ -906,33 +942,57 @@ namespace Isis {
   /**
    * @brief Delete the ControlPointEditWidget and set it's pointer to NULL.
    */
-  void Directory::cleanupControlPointEditViewWidget() {
+  void Directory::cleanupControlPointEditViewWidget(QObject *obj) {
+
+    ControlPointEditView *controlPointEditView = static_cast<ControlPointEditView *>(obj);
+    if (!controlPointEditView) {
+      return;
+    }
+    //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
+    //  of ControlPointEditView
+    delete m_chipViewports;
+    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
     delete m_controlPointEditViewWidget;
-    m_controlPointEditViewWidget = NULL;
+
   }
 
 
   /**
    * @brief Removes pointers to deleted MatrixSceneWidget objects.
    */
-  void Directory::cleanupMatrixViewWidgets() {
-    m_matrixViewWidgets.removeAll(NULL);
+  void Directory::cleanupMatrixViewWidgets(QObject *obj) {
+
+    MatrixSceneWidget *matrixWidget = static_cast<MatrixSceneWidget *>(obj);
+    if (!matrixWidget) {
+      return;
+    }
+    m_matrixViewWidgets.removeAll(matrixWidget);
   }
 
 
   /**
    * @brief Removes pointers to deleted SensorInfoWidget objects.
    */
-  void Directory::cleanupSensorInfoWidgets() {
-    m_sensorInfoWidgets.removeAll(NULL);
+  void Directory::cleanupSensorInfoWidgets(QObject *obj) {
+
+    SensorInfoWidget *sensorInfoWidget = static_cast<SensorInfoWidget *>(obj);
+    if (!sensorInfoWidget) {
+      return;
+    }
+    m_sensorInfoWidgets.removeAll(sensorInfoWidget);
   }
 
 
   /**
    * @brief Removes pointers to deleted TargetInfoWidget objects.
    */
-  void Directory::cleanupTargetInfoWidgets() {
-    m_targetInfoWidgets.removeAll(NULL);
+  void Directory::cleanupTargetInfoWidgets(QObject *obj) {
+
+    TargetInfoWidget *targetInfoWidget = static_cast<TargetInfoWidget *>(obj);
+    if (!targetInfoWidget) {
+      return;
+    }
+    m_targetInfoWidgets.removeAll(targetInfoWidget);
   }
 
 
@@ -1426,12 +1486,12 @@ namespace Isis {
   }
 
 
-  void Directory::modifyControlPoint(ControlPoint *controlPoint) {
+  void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
     if (!controlPointEditView()) {
       addControlPointEditView();
     }
-    controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint);
+    controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint, serialNumber);
     controlPointChipViewports()->setPoint(controlPoint);
   }
 

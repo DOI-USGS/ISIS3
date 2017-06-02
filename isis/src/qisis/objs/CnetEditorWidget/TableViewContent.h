@@ -3,6 +3,7 @@
 
 #include <QAbstractScrollArea>
 
+#include <QPoint>
 #include <QPointer>
 
 
@@ -17,6 +18,8 @@ class QResizeEvent;
 
 
 namespace Isis {
+  class ControlPoint;
+
   namespace CnetViz {
     class AbstractTableModel;
     class AbstractTreeItem;
@@ -29,6 +32,12 @@ namespace Isis {
      *
      * @internal
      *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+     *   @history 2017-05-18 Tracie Sucharski - Added a new QAction showing on the context menu
+     *                           allowing a control point to be edited in IPCE.  Added signal to
+     *                           indicate the control point chosen from either the point table or
+     *                           the measure table.  If the point was chosen from the measure table,
+     *                           the serial number of the measure is also passed. This was added for
+     *                           IPCE, for the interaction with other views.
      */
     class TableViewContent : public QAbstractScrollArea {
         Q_OBJECT
@@ -48,6 +57,8 @@ namespace Isis {
         void tableSelectionChanged();
         void tableSelectionChanged(QList< AbstractTreeItem * >);
         void horizontalScrollBarValueChanged(int);
+
+        void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
 
 
       public slots:
@@ -109,6 +120,7 @@ namespace Isis {
         void copySelection();
         void copyAll();
         void deleteSelectedRows();
+        void editControlPoint();
         void updateItemList();
         void showContextMenu(QPoint);
 
@@ -138,7 +150,6 @@ namespace Isis {
         */
         AbstractTreeItem *m_lastDirectlySelectedRow;
         QList< AbstractTreeItem * > * m_lastShiftSelection;
-        QPoint *m_mousePressPos;
         int m_rowHeight;
 
         /**
@@ -157,6 +168,11 @@ namespace Isis {
         * This action deletes the selected rows.
         */
         QAction *m_deleteSelectedRowsAct;
+
+        /**
+        * This action edits selected control point or if measure selected, edit parent control pt
+        */
+        QAction *m_editControlPointAct;
 
 
       private:

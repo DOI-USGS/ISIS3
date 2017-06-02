@@ -72,7 +72,7 @@ namespace Isis {
 
     m_directory = directory;
     m_addMeasuresButton = addMeasures;
-    m_netChanged = false;
+    m_cnetModified = false;
     m_templateModified = false;
     m_serialNumberList = NULL;
 
@@ -144,7 +144,7 @@ namespace Isis {
             m_measureEditor, SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
     connect(m_measureEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
 //  connect(this, SIGNAL(measureChanged()), m_measureEditor, SLOT(colorizeSavePointButton()));
-    connect(this, SIGNAL(netChanged()), this, SLOT(colorizeSaveNetButton()));
+    connect(this, SIGNAL(cnetModified()), this, SLOT(colorizeSaveNetButton()));
 
     QPushButton *addMeasure = NULL;
     if (m_addMeasuresButton) {
@@ -703,7 +703,7 @@ namespace Isis {
    * 
    * @param controlPoint Pointer to the ControlPoint to edit
    */
-  void ControlPointEditWidget::setEditPoint(ControlPoint *controlPoint) {
+  void ControlPointEditWidget::setEditPoint(ControlPoint *controlPoint, QString serialNumber) {
     //qDebug()<<"ControlPointEditWidget::setEditPoint incoming ptId = "<<controlPoint->GetId();
 
     if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
@@ -716,7 +716,7 @@ namespace Isis {
     *m_editPoint = *controlPoint;
     //qDebug()<<"ControlPointEditWidget::setEditPoint m_editPoint Id = "<<m_editPoint->GetId();
 
-    loadPoint();
+    loadPoint(serialNumber);
     this->setVisible(true);
     this->raise();
     loadTemplateFile(m_measureEditor->templateFileName());
@@ -744,7 +744,7 @@ namespace Isis {
    *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
    *                          clicked on first on the left side, use m_leftFile.
    */
-  void ControlPointEditWidget::loadPoint () {
+  void ControlPointEditWidget::loadPoint (QString serialNumber) {
 
     //  Write pointId
     QString CPId = m_editPoint->GetId();
@@ -838,26 +838,45 @@ namespace Isis {
     //  the point, this will be displayed on the left ChipViewport, unless the
     //  point was selected on the ground source image.  In this case, simply
     //  load the first measure on the left.
-    int leftIndex = 0;
-    int rightIndex = 0;
+    int leftIndex = -1;
+    int rightIndex = -1;
+
+    QString referenceSerialNumber;
     //  Check for reference
     if (m_editPoint->IsReferenceExplicit()) {
+      referenceSerialNumber = m_editPoint->GetReferenceSN();
       leftIndex = m_editPoint->IndexOfRefMeasure();
+//    qDebug()<<"ControlPointEditWidget::loadPoint  reference index= "<<leftIndex;
     }
-    else {
-      if (!m_leftFile.isEmpty()) {
-        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
-        //  Sanity check
-        if (leftIndex < 0 ) leftIndex = 0;
-        m_leftFile.clear();
+
+    if (!serialNumber.isEmpty() && serialNumber != referenceSerialNumber) {
+      QString file = m_serialNumberList->fileName(serialNumber);
+      rightIndex = m_rightCombo->findText(FileName(file).name());
+      if (leftIndex == -1) {
+        if (rightIndex == 0) {
+          leftIndex = 1;
+        }
+        else {
+          leftIndex = 0;
+        }
       }
     }
 
-    if (leftIndex == 0) {
-      rightIndex = 1;
+    if (leftIndex == -1) {
+      if (rightIndex == 0) {
+        leftIndex = 1;
+      }
+      else {
+        leftIndex = 0; 
+      }
     }
-    else {
-      rightIndex = 0;
+    if (rightIndex == -1) {
+      if (leftIndex == 0) {
+        rightIndex =  1;
+      }
+      else {
+        rightIndex = 0;
+      }
     }
 
     //  Handle pts with a single measure, for now simply put measure on left/right
@@ -1135,7 +1154,7 @@ namespace Isis {
       }
 
       // emit a signal to alert user to save when exiting
-      emit netChanged();
+      emit cnetModified();
 
       // emit signal so the nav tool can update edit point
       if (m_editPoint != NULL) {
@@ -1541,8 +1560,8 @@ namespace Isis {
     m_savePoint->setPalette(m_saveDefaultPalette);
 
     // At exit, or when opening new net, use for prompting user for a save
-    m_netChanged = true;
-    emit netChanged();
+    m_cnetModified = true;
+    emit cnetModified();
     //   Refresh chipViewports to show new positions of controlPoints
     m_measureEditor->refreshChips();
 

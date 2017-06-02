@@ -16,6 +16,7 @@ class QToolBar;
 
 namespace Isis {
   class ControlNet;
+  class ControlPoint;
 
   namespace CnetViz {
     class AbstractTableModel;
@@ -42,6 +43,11 @@ namespace Isis {
    * @internal
    *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
    *                           to not violate licensing terms). Fixes #1041.
+   *   @history 2017-05-18 Tracie Sucharski - Added a signal to indicate the control point chosen
+   *                           from either the point table or the measure table.  If the point was
+   *                           chosen from the measure table, the serial number of the measure is
+   *                           also passed.  This was added for IPCE, for the interaction with other
+   *                           views.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -89,10 +95,13 @@ namespace Isis {
     public slots:
       void configSorting();
       void setTablesFrozen(bool);
+      void rebuildModels();
 
 
     signals:
       void cnetModified();
+
+      void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
 
 
     private:
@@ -111,7 +120,6 @@ namespace Isis {
 
 
     private slots:
-      void rebuildModels();
       void rebuildModels(QList< CnetViz::AbstractTreeItem * > itemsToDelete);
 
       void pointColToggled();

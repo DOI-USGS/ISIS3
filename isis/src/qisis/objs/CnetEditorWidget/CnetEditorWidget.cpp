@@ -408,6 +408,9 @@ namespace Isis {
     connect(m_pointTableView, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(handlePointTableFilterCountsChanged(int, int)));
 
+    connect(m_pointTableView, SIGNAL(editControlPoint(ControlPoint *, QString)),
+            this, SIGNAL(editControlPoint(ControlPoint *, QString)));
+
     for (int i = 0; i < AbstractPointItem::COLS; i++) {
       QAction *act = new QAction(
         AbstractPointItem::getColumnName((AbstractPointItem::Column) i), this);
@@ -454,6 +457,9 @@ namespace Isis {
 
     connect(m_measureTableView, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(handleMeasureTableFilterCountsChanged(int, int)));
+
+    connect(m_measureTableView, SIGNAL(editControlPoint(ControlPoint *, QString)),
+            this, SIGNAL(editControlPoint(ControlPoint *, QString)));
 
     for (int i = 0; i < AbstractMeasureItem::COLS; i++) {
       QAction *act = new QAction(AbstractMeasureItem::getColumnName(

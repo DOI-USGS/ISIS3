@@ -118,7 +118,7 @@ namespace Isis {
     MosaicControlNetTool *cnetTool = new MosaicControlNetTool(this);
     m_tools->append(cnetTool);
 
-    //  Pass on Signals emitted from IpceTool
+    //  Pass on Signals emitted from MosaicControlNetTool
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
     connect(cnetTool, SIGNAL(modifyControlPoint(ControlPoint *)),
             this, SIGNAL(modifyControlPoint(ControlPoint *)));

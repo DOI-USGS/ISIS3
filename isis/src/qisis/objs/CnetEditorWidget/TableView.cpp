@@ -90,6 +90,8 @@ namespace Isis {
           this, SIGNAL(modelDataChanged()));
       connect(m_content, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)),
           this, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)));
+      connect(m_content, SIGNAL(editControlPoint(ControlPoint *, QString)),
+              this, SIGNAL(editControlPoint(ControlPoint *, QString)));
 
       connect(m_header, SIGNAL(columnResized(bool)),
           m_content, SLOT(updateHorizontalScrollBar(bool)));

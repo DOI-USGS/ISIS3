@@ -154,8 +154,8 @@ namespace Isis {
     }
     //  Pass on Signals emitted from IpceTool
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
-    connect(ipceTool, SIGNAL(modifyControlPoint(ControlPoint *)),
-            this, SIGNAL(modifyControlPoint(ControlPoint *)));
+    connect(ipceTool, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
+            this, SIGNAL(modifyControlPoint(ControlPoint *, QString)));
 
     connect(ipceTool, SIGNAL(deleteControlPoint(ControlPoint *)),
             this, SIGNAL(deleteControlPoint(ControlPoint *)));

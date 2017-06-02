@@ -131,6 +131,9 @@ namespace Isis {
    *                           project. Otherwise, it is disabled until then. Fixes #4819.
    *   @history 2017-05-03 Tracie Sucharski - Added methods and member variables for the
    *                           BundleObservationView.  Fixes #4839. Fixes #4840.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint slot.
+   *   @history 2017-05-23 Tracie Sucharski - Fixed all of the cleanup methods to properly remove
+   *                           the correct view/widget from the lists.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -243,17 +246,18 @@ namespace Isis {
       void newWidgetAvailable(QWidget *newWidget);
 
       void controlPointAdded(QString newPointId);
+      void cnetModified();
 
     public slots:
-      void cleanupBundleObservationViews();
-      void cleanupCnetEditorViewWidgets();
-      void cleanupCubeDnViewWidgets();
-      void cleanupFileListWidgets();
+      void cleanupBundleObservationViews(QObject *);
+      void cleanupCnetEditorViewWidgets(QObject *);
+      void cleanupCubeDnViewWidgets(QObject *);
+      void cleanupFileListWidgets(QObject *);
       void cleanupFootprint2DViewWidgets(QObject *);
-      void cleanupControlPointEditViewWidget();
-      void cleanupMatrixViewWidgets();
-      void cleanupSensorInfoWidgets();
-      void cleanupTargetInfoWidgets();
+      void cleanupControlPointEditViewWidget(QObject *);
+      void cleanupMatrixViewWidgets(QObject *);
+      void cleanupSensorInfoWidgets(QObject *);
+      void cleanupTargetInfoWidgets(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
@@ -262,10 +266,11 @@ namespace Isis {
 
       //  Slots in response to mouse clicks on CubeDnView (IpceTool) and
       //    Footprint2DView (MosaicControlNetTool)
-      void modifyControlPoint(ControlPoint *controlPoint);
+      void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube = 0,
                               bool isGroundSource = false);
+
 
       void updateRecentProjects(Project *project);
 

@@ -71,6 +71,7 @@ namespace Isis {
    *                           opening projects.
    *   @history 2017-01-02 Tracie Sucharski - Moved IpceTool to first tool on tool bar, change
    *                           icon to match the Footprint2DView.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal. 
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -99,7 +100,7 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     signals:
-      void modifyControlPoint(ControlPoint *controlPoint);
+      void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber);
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube,
                               bool isGroundSource = false);

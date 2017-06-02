@@ -40,6 +40,7 @@ namespace Isis {
    *                           query for shapes and other data from the project.
    *   @history 2016-10-25 Tracie Sucharski - Check for existence of Control net in the
    *                           paintViewport method.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal. 
    *                           
    */
   class IpceTool : public Tool {
@@ -53,7 +54,7 @@ namespace Isis {
       void paintViewport (MdiCubeViewport *cvp, QPainter *painter);
 
     signals:
-      void modifyControlPoint(ControlPoint *controlPoint);
+      void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber);
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube,
                               bool isGroundSource = false);

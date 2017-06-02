@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <QAction>
+#include <QApplication>
 #include <QDebug>
 #include <QLabel>
 #include <QMenu>
@@ -62,7 +63,6 @@ namespace Isis {
       }
 
       m_items = new QList< QPointer<AbstractTreeItem> >;
-      m_mousePressPos = new QPoint;
       m_activeCell = new QPair<AbstractTreeItem *, int>(NULL, -1);
       rowsWithActiveColumnSelected = new QList<AbstractTreeItem *>;
       m_lastShiftSelection = new QList<AbstractTreeItem *>;
@@ -92,9 +92,6 @@ namespace Isis {
       delete m_items;
       m_items = NULL;
 
-      delete m_mousePressPos;
-      m_mousePressPos = NULL;
-
       delete m_activeCell;
       m_activeCell = NULL;
 
@@ -112,6 +109,9 @@ namespace Isis {
 
       delete m_deleteSelectedRowsAct;
       m_deleteSelectedRowsAct = NULL;
+
+      delete m_editControlPointAct;
+      m_editControlPointAct = NULL;
 
       delete m_lastShiftArrowSelectedCell;
       m_lastShiftArrowSelectedCell = NULL;
@@ -270,6 +270,7 @@ namespace Isis {
 
 
     void TableViewContent::mousePressEvent(QMouseEvent *event) {
+
       if (event->buttons() & Qt::LeftButton) {
         // FIXME refactor this file (lol)
         if (!(event->modifiers() & Qt::ShiftModifier))
@@ -878,12 +879,12 @@ namespace Isis {
       m_editWidget = NULL;
       m_lastDirectlySelectedRow = NULL;
       m_lastShiftSelection = NULL;
-      m_mousePressPos = NULL;
       m_columns = NULL;
       rowsWithActiveColumnSelected = NULL;
       m_applyToSelectionAct = NULL;
       m_applyToAllAct = NULL;
       m_deleteSelectedRowsAct = NULL;
+      m_editControlPointAct = NULL;
     }
 
 
@@ -977,6 +978,12 @@ namespace Isis {
         tr("Delete the currently selected rows"));
       connect(m_deleteSelectedRowsAct, SIGNAL(triggered()),
           this, SLOT(deleteSelectedRows()));
+
+      m_editControlPointAct = new QAction(tr("Edit selected control point"), this);
+      m_editControlPointAct->setStatusTip(
+        tr("Edit the selected control point or the parent control point of control measure"));
+      connect(m_editControlPointAct, SIGNAL(triggered()),
+          this, SLOT(editControlPoint()));
     }
 
 
@@ -1354,6 +1361,25 @@ namespace Isis {
     }
 
 
+    void TableViewContent::editControlPoint() {
+
+      AbstractTreeItem *item = m_activeCell->first;
+
+      ControlPoint *cp;
+      QString serialNumber;
+      if (item->getPointerType() == AbstractTreeItem::Point) {
+        cp = (ControlPoint *) (item->getPointer()); 
+      }
+      else {
+        cp = (ControlPoint *) (item->parent()->getPointer());
+        serialNumber = item->getData("Image ID").toString();
+      }
+//    qDebug()<<"activeCell cpid = "<<cp->GetId()<<"  sn = "<<serialNumber;
+
+      emit editControlPoint(cp, serialNumber);
+    }
+
+
     void TableViewContent::updateItemList() {
       ASSERT(m_items);
 
@@ -1374,22 +1400,29 @@ namespace Isis {
     void TableViewContent::showContextMenu(QPoint mouseLocation) {
       QMenu contextMenu(this);
 
+      // Only add this action if a single row is selected or a cell is selected
+      // TODO: 2017-05-17 TLS
+      // Always allow editing of point.  Should we check for editLock??
+      QList<AbstractTreeItem *> selectedRows = m_model->getSelectedItems();
+      if (selectedRows.count() <= 1 && QApplication::applicationName() != "cneteditor") {
+        contextMenu.addAction(m_editControlPointAct); 
+      }
+
       // If there is a row selection, show a context menu if the user clicked
       // anywhere on any of the selected row(s).
       if (hasRowSelection() && mouseInRowSelection(mouseLocation)) {
         contextMenu.addAction(m_deleteSelectedRowsAct);
-        contextMenu.exec(mapToGlobal(mouseLocation));
       }
 
       // Only show the context menu for cells if the user right-clicked on the
       // active cell.
       if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
-        if (rowsWithActiveColumnSelected->size() > 1)
+        if (rowsWithActiveColumnSelected->size() > 1) 
           contextMenu.addAction(m_applyToSelectionAct);
 
         contextMenu.addAction(m_applyToAllAct);
-        contextMenu.exec(mapToGlobal(mouseLocation));
       }
+      contextMenu.exec(mapToGlobal(mouseLocation));
     }
   }
 }
