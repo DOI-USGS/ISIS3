@@ -3,7 +3,9 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "LinearAlgebra.h"
 #include "RosettaOsirisCamera.h"
+#include "RosettaOsirisCameraDistortionMap.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -18,15 +20,134 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
+  QString testCubeFile("$rosetta/testData/n20100710t154539230id20f22.cub");
+
+  cout << "Unit Test for RosettaOsirisCameraDistortionMap..." << endl;
+  try {
+    Cube c(testCubeFile, "r");
+    Camera *cam = c.camera();
+    RosettaOsirisCameraDistortionMap *testMap = new RosettaOsirisCameraDistortionMap(cam);
+    cout << "Create default distortion map" << endl;
+    cout << endl;
+
+    cout << "Set distorted coordinates" << endl;
+    double dx = 0.5;
+    double dy = 0.75;
+    testMap->SetFocalPlane(dx, dy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set undistorted coordinates" << endl;
+    double ux = 0.25;
+    double uy = 0.1;
+    testMap->SetUndistortedFocalPlane(ux, uy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Modify the coefficient matrices" << endl;
+    LinearAlgebra::Matrix toUndistX = LinearAlgebra::zeroMatrix(4, 4);
+    LinearAlgebra::Matrix toUndistY = LinearAlgebra::zeroMatrix(4, 4);
+    toUndistX(0, 0) =  1.0; toUndistX(1, 1) =  2.0; toUndistX(2, 2) =  3.0; toUndistX(3, 3) =  4.0;
+    toUndistY(0, 0) = -1.0; toUndistY(1, 0) = -2.0; toUndistY(2, 0) = -3.0; toUndistY(3, 0) = -4.0;
+
+    testMap->setUnDistortedXMatrix(toUndistX);
+    testMap->setUnDistortedYMatrix(toUndistY);
+
+    cout << "Set distorted coordinates" << endl;
+    dx = 1.0;
+    dy = 1.0;
+    testMap->SetFocalPlane(dx, dy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set distorted coordinates" << endl;
+    dx = 0.0;
+    dy = 1.0;
+    testMap->SetFocalPlane(dx, dy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set distorted coordinates" << endl;
+    dx = 1.0;
+    dy = 0.0;
+    testMap->SetFocalPlane(dx, dy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set undistorted coordinates" << endl;
+    ux = 1.0;
+    uy = 1.0;
+    testMap->SetUndistortedFocalPlane(ux, uy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set undistorted coordinates" << endl;
+    ux = 0.0;
+    uy = 1.0;
+    testMap->SetUndistortedFocalPlane(ux, uy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+
+    cout << "Set undistorted coordinates" << endl;
+    ux = 1.0;
+    uy = 0.0;
+    testMap->SetUndistortedFocalPlane(ux, uy);
+    cout << "  Distorted coordinates: ("
+         << toString( testMap->FocalPlaneX() ) << ", "
+         << toString( testMap->FocalPlaneY() ) << ")" << endl;
+    cout << "  Undistorted coordinates: ("
+         << toString( testMap->UndistortedFocalPlaneX() ) << ", "
+         << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
+    cout << endl;
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
   cout << "Unit Test for RosettaOsirisCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 66.9949602540140887;
-    double knownLon = 95.8202502845144437;
+    double knownLat = 66.7031631205835680;
+    double knownLon = 95.7688045622468422;
 
-    Cube c("$rosetta/testData/n20100710t154539230id20f22.cub", "r");
+    Cube c(testCubeFile, "r");
     RosettaOsirisCamera *cam = (RosettaOsirisCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

@@ -20,14 +20,19 @@
 
 #include "RosettaOsirisCamera.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QString>
+
 #include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
+#include "FileName.h"
 #include "NaifStatus.h"
+#include "Preference.h"
 
 using namespace std;
 
@@ -70,18 +75,10 @@ namespace Isis {
 
     // Setup focal plane map. The class will read data from the instrument addendum kernel to pull
     // out the affine transforms from detector samp,line to focal plane x,y.
-    // cout << "Setting up FocalPlaneMap...\n";
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted 
-    // for ISIS
-    // Don't know if this is true for OSIRIS. For now, we'll keep as is and see if things look off -Sasha
-    double boresightSample = Spice::getDouble("INS" + ikCode + "_BORESIGHT",0) + 1.0;
-    double boresightLine = Spice::getDouble("INS" + ikCode + "_BORESIGHT",1) + 1.0;
-    focalMap->SetDetectorOrigin(boresightSample,boresightLine); //Presumably, don't need to worry about z (?)
-
     new CameraDetectorMap(this);
-    new CameraDistortionMap(this);
+    RosettaOsirisCameraDistortionMap* distortionMap = new RosettaOsirisCameraDistortionMap(this);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -96,7 +93,24 @@ namespace Isis {
     // double stop = getClockTime(clockStopCount).Et();
     double exposureTime = (double) inst["ExposureDuration"];
 
-   iTime centerTime = start + (exposureTime / 2.0);
+    // Setup the distortion map
+    PvlGroup &BandBin = lab.findGroup("BandBin", Pvl::Traverse);
+    QString filterNumber = BandBin["FilterNumber"];
+    initDistortion(ikCode, distortionMap);
+    distortionMap->setPixelPitch(pixelPitch);
+
+    // The boresight position depends on the filter. They are all defined as
+    // offsets from the middle of the ccd.
+    double referenceSample = Spice::getDouble("INS" + ikCode + "_BORESIGHT",0) + 1.0;
+    double referenceLine = Spice::getDouble("INS" + ikCode + "_BORESIGHT",1) + 1.0;
+    // The offsets in the IAK are based on the S/C frame, not the camera frame
+    // For now, do not adjust based on filter. -JAM
+//     referenceSample += Spice::getDouble("INS" + ikCode + "_FILTER_" + filterNumber + "_DX");
+//     referenceLine += Spice::getDouble("INS" + ikCode + "_FILTER_" + filterNumber + "_DY");
+    focalMap->SetDetectorOrigin(referenceSample, referenceLine);
+    distortionMap->setBoresight(referenceSample, referenceLine);
+
+    iTime centerTime = start + (exposureTime / 2.0);
     setTime( centerTime ); 
 
     // Internalize all the NAIF SPICE information into memory.
@@ -105,6 +119,7 @@ namespace Isis {
 
     return;
   }
+
 
   /**
    * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and 
@@ -127,6 +142,33 @@ namespace Isis {
   pair<iTime, iTime> RosettaOsirisCamera::ShutterOpenCloseTimes(double time,
                                                          double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+
+
+  /**
+   * Initialize the distortion map using the paramters from the NAIF SPICE kernels.
+   * 
+   * @param ikCode The NAIF IK code of the instrument
+   * @param[out] distortionMap The distortion map that will be initialized
+   */
+  void RosettaOsirisCamera::initDistortion(QString ikCode,
+                                           RosettaOsirisCameraDistortionMap *distortionMap) {
+
+    // Initialize matrices
+    LinearAlgebra::Matrix toUnDistX = LinearAlgebra::zeroMatrix(4, 4);
+    LinearAlgebra::Matrix toUnDistY = LinearAlgebra::zeroMatrix(4, 4);
+
+    // Fill matrices from the kernels
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        toUnDistX(i, j) = Spice::getDouble("INS" + ikCode + "_TO_UNDISTORTED_X", 4 * i + j);
+        toUnDistY(i, j) = Spice::getDouble("INS" + ikCode + "_TO_UNDISTORTED_Y", 4 * i + j);
+      }
+    }
+
+    // Save the matrices
+    distortionMap->setUnDistortedXMatrix(toUnDistX);
+    distortionMap->setUnDistortedYMatrix(toUnDistY);
   }
 }
 
