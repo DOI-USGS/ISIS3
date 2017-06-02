@@ -117,6 +117,12 @@ namespace Isis {
    *                          comboCount(), comboIndex(), setComboCount(), and setComboIndex()
    *                          accessors and setters to allow the BandTool class to retain the
    *                          settings for each cube viewport. Fixes #1612.
+   *  @history 2017-05-10 Ian Humphrey - Modified showEvent() so that when the cube viewport is
+   *                          initially shown, the image is centered properly in the viewport.
+   *                          Modified center(double, double) to no longer increment the
+   *                          cubeToContents x,y by 1. This was causing some images to be
+   *                          off-centered by 1 pixel (the bottom and right side of viewport would
+   *                          be a thin strip of non-pixel space). Fixes #4756.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT

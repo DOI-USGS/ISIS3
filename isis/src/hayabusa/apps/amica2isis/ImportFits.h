@@ -2,8 +2,8 @@
 #define ImportFits_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 5602 $
+ * $Date: 2013-11-27 11:40:00 -0700 (Wed, 27 Nov 2013) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for

@@ -38,6 +38,8 @@ namespace Isis {
  */
   OpenRecentProjectWorkOrder::OpenRecentProjectWorkOrder(Project *project) :
   WorkOrder(project) {
+    // Opening a project is currently not undoable.
+    m_isUndoable = false;
     QAction::setText(tr("Open &Recent Project") );
     setCreatesCleanState(true);
   }
@@ -85,33 +87,38 @@ namespace Isis {
 
 
   /**
-   * @brief Attempts to open the recent project.
-   * @return  @b bool True if successful, False if not.
+   * @brief Open the project the user select in the recent projects menu
+   * @return  @b bool True if a project selected, false if aborted.
    */
-  bool OpenRecentProjectWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool OpenRecentProjectWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
+    if (!success) return false;
 
     // We dislike the progress bar
     // delete progressBar();
 
     // If more than this work order is in the history, don't allow this operation
-    if (success && project()->workOrderHistory().count()) {
+    if (project()->workOrderHistory().count()) {
       QMessageBox::critical(NULL, tr("Unable To Open a Project"),
                             tr("If you have modified your current project, you cannot open a new "
                                "project because this is not yet implemented"));
-      success = false;
-    }
-    else if (success) {
-      QString projectName = QAction::text();
-
-      if (!projectName.isEmpty() ) {
-        project()->open(projectName);
-      }
-      else {
-        success = false;
-      }
+      return false;
     }
 
-    return success;
+    // The user has already selected a project (QAction) in the menus
+    m_projectName = QAction::text();
+
+    // Will this ever occur?
+    if (m_projectName.isEmpty()) return false;
+
+    QUndoCommand::setText(tr("Open Recent Project [%1]").arg(m_projectName));
+    return true;
+  }
+
+  /**
+  * @brief Open the project specified in the workorder.
+  */
+  void OpenRecentProjectWorkOrder::execute() {
+    project()->open(m_projectName);
   }
 }

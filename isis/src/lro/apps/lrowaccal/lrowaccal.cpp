@@ -4,17 +4,20 @@
 
 #include <QDir>
 #include <QRegExp>
+#include <QString>
 
 #include "Brick.h"
 #include "Camera.h"
 #include "Constants.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "iTime.h"
 #include "Message.h"
+#include "Preference.h"
 #include "ProcessByBrick.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
-#include "iTime.h"
 
 using namespace Isis;
 using namespace std;
@@ -33,6 +36,7 @@ void ResetGlobals ();
 void Calibrate ( Buffer &in, Buffer &out );
 void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data);
 double min ( double a, double b );
+QString GetCalibrationDirectory(QString calibrationType);
 
 void GetDark(QString fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, QString & file1, QString & file2);
 void GetMask(QString &fileString, double temp, Buffer* &data);
@@ -133,7 +137,7 @@ void IsisMain () {
       darkFiles.resize(2);
       double temp = (double) inst["MiddleTemperatureFpa"];
       double time = iTime(inst["StartTime"][0]).Et();
-      QString darkFile = "$lro/calibration/wac_darks/WAC_" + instModeId;
+      QString darkFile = GetCalibrationDirectory("wac_darks") + "WAC_" + instModeId;
       if (instModeId == "BW")
         darkFile += "_" + filter + "_Mode" + mode;
       darkFile += "_Offset" + offset + "_*C_*T_Dark.????.cub";
@@ -157,7 +161,7 @@ void IsisMain () {
 
   if (g_flatfield) {
     if (flatFile.toLower() == "default" || flatFile.length() == 0) {
-      flatFile = "$lro/calibration/wac_flats/WAC_" + instModeId;
+      flatFile = GetCalibrationDirectory("wac_flats") + "WAC_" + instModeId;
       if (instModeId == "BW")
         flatFile += "_" + filter + "_Mode" + mode;
       flatFile += "_Flatfield.????.cub";
@@ -177,7 +181,7 @@ void IsisMain () {
     Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
 
     if (radFile.toLower() == "default" || radFile.length() == 0)
-      radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
+      radFile = GetCalibrationDirectory("") + "WAC_RadiometricResponsivity.????.pvl";
 
     FileName radFileName(radFile);
     if (radFileName.isVersioned())
@@ -233,7 +237,7 @@ void IsisMain () {
 
   if (g_specpix) {
     if (specpixFile.toLower() == "default" || specpixFile.length() == 0) {
-      specpixFile = "$lro/calibration/wac_masks/WAC_" + instModeId;
+      specpixFile = GetCalibrationDirectory("wac_masks") + "WAC_" + instModeId;
       double temp = (double) inst["MiddleTemperatureFpa"];
       if (instModeId == "BW")
         specpixFile += "_" + filter + "_Mode" + mode;
@@ -244,9 +248,10 @@ void IsisMain () {
       CopyCubeIntoBuffer(specpixFile, g_specpixCube);
   }
 
+  PvlKeyword temperaturePvl("TemperatureFile");
   if (g_temprature) {
     if (tempFile.toLower() == "default" || tempFile.length() == 0)
-      tempFile = "$lro/calibration/WAC_TempratureConstants.????.pvl";
+      tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl"; 
 
     FileName tempFileName(tempFile);
     if (tempFileName.isVersioned())
@@ -258,6 +263,7 @@ void IsisMain () {
 
     Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
     Pvl tempPvl(tempFileName.expanded());
+    temperaturePvl.addValue(tempFileName.expanded());
     for (int b = 0; b < bands.size(); b++){
         g_TempratureConstants[g_bands[b]][0]=toDouble(tempPvl[bands[b]][0]);
         g_TempratureConstants[g_bands[b]][1]=toDouble(tempPvl[bands[b]][1]);
@@ -284,6 +290,9 @@ void IsisMain () {
 
   // Add an output group with the appropriate information
   PvlGroup calgrp("Radiometry");
+  if (g_temprature) {
+    calgrp += PvlKeyword("TemperatureFile",  temperaturePvl);
+  }
   if (g_dark) {
     PvlKeyword darks("DarkFiles");
     darks.addValue(darkFiles[0]);
@@ -594,7 +603,7 @@ struct DarkComp {
  * If there is only one tempurature, it will pick the 2 closest times at that tempurature.
  *
  *
- * @param fileString String pattern defining dark files to search (ie. $lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
+ * @param fileString String pattern defining dark files to search (ie. lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
  * @param temp Tempurature of WAC being calibrated
  * @param time Time of WAC being calibrated
  * @param data1 Buffer to hold dark file 1 cub data
@@ -749,3 +758,25 @@ void GetMask(QString &fileString, double temp, Buffer* &data) {
   CopyCubeIntoBuffer ( fileString, data );
 }
 
+/**
+ * This method returns a QString containing the path of an
+ * LRO calibration directory
+ *
+ * @param calibrationType The type of calibration data
+ * 
+ * @return @b QString Path of the calibration directory
+ *
+ * @internal
+ *   @history 2008-11-05 Jeannie Walldren - Original version
+ *   @history 2016-08-16 Victor Silva - Added option for base calibration directory
+ */
+QString GetCalibrationDirectory(QString calibrationType) {
+  // Get the directory where the CISS calibration directories are.
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+  QString missionDir = (QString) dataDir["LRO"];
+  if(calibrationType != "") {
+    calibrationType += "/";
+  }
+
+  return missionDir + "/calibration/" + calibrationType;
+}

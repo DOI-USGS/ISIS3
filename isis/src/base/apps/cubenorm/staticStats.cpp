@@ -1,4 +1,4 @@
-/*	StaticStats
+/*      StaticStats
 
 PIRL CVS ID: $Id: staticStats.cpp,v 1.1 2007/01/11 20:59:17 kbecker Exp $
 

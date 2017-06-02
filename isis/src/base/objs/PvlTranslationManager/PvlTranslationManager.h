@@ -21,15 +21,18 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "LabelTranslationManager.h"
 
-#include <string>
 #include <fstream>
+#include <string>
 
 #include "FileName.h"
 #include "PvlTokenizer.h"
-#include "PvlTranslationTable.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlContainer;
+  class PvlKeyword;
   /**
    * @brief Allows applications to translate simple text files
    *
@@ -68,46 +71,48 @@ namespace Isis {
    *                                         DoTranslation to remove ambiguity
    *                                         with a parent method, instead of
    *                                         using a dummy parameter.
+   *  @history 2017-01-11 Jeannie Backer - Moved several methods to a generic
+   *                          parent class, LabelTranslationManager. Fixes #4584.
    *  @todo 2005-02-15 Stuart Sides - add coded example and implementation example
    *                                  to class documentation, and finish
    *                                  documentation
    */
-  class PvlTranslationManager : public PvlTranslationTable {
+  class PvlTranslationManager : public LabelTranslationManager {
     public:
       PvlTranslationManager(const QString &transFile);
 
-      PvlTranslationManager(Isis::Pvl &inputLabel,
+      PvlTranslationManager(std::istream &transStrm);
+
+      PvlTranslationManager(Pvl &inputLabel,
                             const QString &transFile);
 
-      PvlTranslationManager(Isis::Pvl &inputLabel,
+      PvlTranslationManager(Pvl &inputLabel,
                             std::istream &transStrm);
 
-      //! Destroys the TranslationManager object.
-      ~PvlTranslationManager() {};
+      virtual ~PvlTranslationManager();
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      QString Translate(QString nName, int findex = 0);
+      virtual QString Translate(QString nName, int findex = 0);
 
       // Translate all translation table groups which contain "Auto"
-      void Auto(Isis::Pvl &outputLabel);
+      void Auto(Pvl &outputLabel);
+      void Auto(Pvl &inputLabel, Pvl &outputLabel);
 
       // Return the ith input value associated with a output name
-      const PvlKeyword &InputKeyword(const QString nName) const;
+      virtual const PvlKeyword &InputKeyword(const QString nName) const;
 
       // Return true if the input lable contains the translated group and key names
-      bool InputHasKeyword(const QString nName);
+      virtual bool InputHasKeyword(const QString nName);
 
-      void SetLabel(Isis::Pvl &lab) {
-        p_fLabel = lab;
-      }
+      void SetLabel(Pvl &inputLabel);
+
+    protected:
+      virtual PvlKeyword DoTranslation(const QString nName);
+      virtual const PvlContainer *GetContainer(const PvlKeyword &inputGroup) const;
+      virtual PvlContainer *CreateContainer(const QString nName, Pvl &pvl);
     private:
-
-      Isis::Pvl p_fLabel; //!<A Pvl object for the input label file
-
-      Isis::PvlKeyword DoTranslation(const QString nName);
-      const Isis::PvlContainer *GetContainer(const PvlKeyword &inputGroup) const;
-      Isis::PvlContainer *CreateContainer(const QString nName, Isis::Pvl &pvl);
+      Pvl p_fLabel; //!< A Pvl object for the input label file
   };
 };
 

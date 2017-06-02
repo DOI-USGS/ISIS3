@@ -2,8 +2,6 @@
 #define RenameProjectWorkOrder_H
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -35,6 +33,9 @@ namespace Isis {
    *   @history 2012-12-19 Steven Lambright and Stuart Sides - Added isNameValid() and changed
    *                           execute() to return false if the project name isn't changing, so that
    *                           the work order is thrown away.
+   *   @history 2017-04-12 Tracie Sucharski - Refactored to match new WorkOrder design, renaming
+   *                           execute to setupExecution, syncUndo to execute, and syncUndo to
+   *                           undoExecution. Fixes #4745.
    */
   class RenameProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -46,16 +47,15 @@ namespace Isis {
 
       virtual RenameProjectWorkOrder *clone() const;
 
-      bool isExecutable(Context context);
-
-      bool execute();
+      virtual bool isExecutable(Context context);
+      virtual bool setupExecution();
+      virtual void execute();
 
       static bool isNameValid(QString nameToCheck);
 
     protected:
+      virtual void undoExecution();
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
-      void syncUndo();
 
     private:
       RenameProjectWorkOrder &operator=(const RenameProjectWorkOrder &rhs);

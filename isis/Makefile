@@ -22,7 +22,6 @@ help:
 	echo "Isis Make System Commands"
 	echo "------------------------ "
 	echo "make all        : Build and install the entire system (incs,api,apps,docs)"
-	echo "make config     : Generate preliminary config parameters"
 	echo "make thirdParty : Copy required 3rdParty libraries into distribution"
 	echo "make incs       : Install API include files"
 	echo "make api        : Build and install the Isis API"
@@ -44,19 +43,7 @@ help:
 # After the API is created then the applications can be individually built
 # and installed. Finally create the web documentation for the entire system.
 #----------------------------------------------------------------------------
-all: config incs thirdParty api apps docs
-
-#----------------------------------------------------------------------------
-# Target = config
-# Dependencies = none
-#
-# Set up any compile/link configuration dependancy files
-#----------------------------------------------------------------------------
-config: FORCE
-	echo $(CURTIMESTAMP) "Creating config files"
-	$(MAKE) --directory=config -f config.mak config
-	echo $(CURTIMESTAMP) "Finished creating config files"
-	echo $(CURTIMESTAMP) " "
+all: incs thirdParty api apps docs
 
 #----------------------------------------------------------------------------
 # Target = incs
@@ -67,7 +54,7 @@ config: FORCE
 # copy the include file from the individual object directory into the
 # system directory $(ISISROOT)/inc.
 #----------------------------------------------------------------------------
-incs: config
+incs:
 	echo $(CURTIMESTAMP) "Installing include files"
 	mkdir -p inc
 	$(MAKE) --directory=src includes
@@ -94,6 +81,7 @@ incs: config
 # Finally after the API is completed the shared libraries will be
 # constructed from libisis.a
 #----------------------------------------------------------------------------
+
 api:
 	echo $(CURTIMESTAMP) "Building Isis API"
 	mkdir -p lib
@@ -101,21 +89,35 @@ api:
 	echo $(CURTIMESTAMP) "Finished building Isis API"
 	echo $(CURTIMESTAMP) ""
 	echo $(CURTIMESTAMP) "Adding API objects"
-	$(MAKE) --directory=src api
+	if [ "$(HOST_ARCH)" == "Linux" ]; then            \
+		$(MAKE) --directory=src api;	                  \
+	elif [ "$(HOST_ARCH)" == "Darwin" ]; then         \
+		$(MAKE) osx_static;															\
+	fi;
 	echo $(CURTIMESTAMP) "Finished adding API objects"
 	echo $(CURTIMESTAMP) " "
+	echo $(CURTIMESTAMP) "Creating Shared Libraries ..."
+	cp make/Makefile.libs lib/Makefile
+	$(MAKE) --directory=lib shared
+	echo $(CURTIMESTAMP) "Finished creating Shared Libraries ..."
+	echo $(CURTIMESTAMP) " "
+
+# Make the static library on Macos, faster then recursivly call make
+osx_static:
+	$(eval UNIT_TESTS=$(wildcard src/*/objs/*/unitTest.o))
+	$(eval PLUGIN_DIRS=$(dir $(wildcard src/*/objs/*/*.plugin)))
+	$(eval PLUGIN_FILES=$(foreach dir,$(PLUGIN_DIRS),$(wildcard $(dir)*.o)))
+	$(eval API_OBJS=$(filter-out $(PLUGIN_FILES),$(filter-out $(UNIT_TESTS),$(wildcard src/*/objs/*/*.o))))
+	$(AR) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(API_OBJS);
+	for i in $(PLUGIN_DIRS); do 			  					\
+		$(MAKE) --directory=$$i plugin install; 	  \
+	done
 
 #	echo "Building Isis API with debugging"
 #	cd src; $(MAKE) objects MODE=DEBUG
 #	cd src; $(MAKE) api MODE=DEBUG
 #	echo "Finished building Isis API with debugging"
 #	echo " "
-
-	echo $(CURTIMESTAMP) "Creating Shared Libraries ..."
-	cp make/Makefile.libs lib/Makefile
-	$(MAKE) --directory=lib shared
-	echo $(CURTIMESTAMP) "Finished creating Shared Libraries ..."
-	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = apps
@@ -152,7 +154,7 @@ docs:
 
 
 #----------------------------------------------------------------------------
-# Target = coverage 
+# Target = coverage
 # Dependencies = none
 #
 # This target builds a report on how much of Isis is tested in the automated
@@ -224,7 +226,7 @@ coverage:
 # binary executables from the source tree.  It also, clears the running
 # areas under $ISISROOT (inc, doc, bin, bin/xml, and lib)
 #
-# Target = quickclean 
+# Target = quickclean
 # Dependencies = none
 #
 # This walks the src tree and removes ".o" files and binary files
@@ -240,7 +242,6 @@ quickclean:
 	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
 	  functioncoverage functioncoverage.html *.csmes *.csexe; \
 	$(MAKE) --directory=3rdParty clean;   \
-	$(MAKE) --directory=config -f config.mak clean; \
 	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 #----------------------------------------------------------------------------
@@ -267,7 +268,6 @@ clean:
 	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
 	  functioncoverage functioncoverage.html *.csmes *.csexe; \
 	$(MAKE) --directory=3rdParty clean;   \
-	$(MAKE) --directory=config -f config.mak clean; \
 	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 cleansrc:
@@ -321,7 +321,7 @@ catTest:
 HOST_ARCH ?= $(shell uname -s)
 HOST_MACH ?= $(shell uname -m)
 
-thirdParty: config
+thirdParty:
 	echo $(CURTIMESTAMP) "Installing 3rdParty libraries"
 	rm -f $(ISISROOT)/3rdParty/lib/lib*
 	$(MAKE) -C $(ISISROOT)/3rdParty install
@@ -347,4 +347,3 @@ FORCE:
 # Include the make file debugging targets
 #----------------------------------------------------------------------------
 include $(ISISROOT)/make/isismake.print
-

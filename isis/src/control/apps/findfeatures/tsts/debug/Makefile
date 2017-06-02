@@ -31,7 +31,7 @@ commands:
 	       -e 's|\(Image:\).*/\([^/]*\)|\1   \2|' \
 	       -e 's/\(.*second:\).*/\1/' \
 	       -e 's/\(Processing.*:\).*/\1/' \
-	       -e 's/\(.*\)[0-9][0-9]*\.[0-9]* \(seconds*\)/\1\2/' \
+               -e 's/\(.*\) [0-9]*\.[0-9]* \(seconds*\)/\1 \2/' \
 	       $(OUTPUT)/debug_temp.txt > $(OUTPUT)/debug.txt;
 	# Do same to stdoutdebug_temp, and remove total threads and
 	# MatchSolution Group
@@ -45,7 +45,7 @@ commands:
 	       -e 's|\(Image:\).*/\([^/]*\)|\1   \2|' \
 	       -e 's/\(.*second:\).*/\1/' \
 	       -e 's/\(Processing.*:\).*/\1/' \
-	       -e 's/\(.*\)[0-9][0-9]*\.[0-9]* \(seconds*\)/\1\2/' \
+               -e 's/\(.*\) [0-9]*\.[0-9]* \(seconds*\)/\1 \2/' \
 	       -e 's/\(Total threads:\).*/\1/' \
 	       -e '/Group/,/End_Group/d' \
 	       $(OUTPUT)/stdoutdebug_temp.txt > $(OUTPUT)/stdoutdebug.txt;

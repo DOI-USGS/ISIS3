@@ -345,6 +345,47 @@ int main(int argc, char *argv[]) {
   catch(IException &e) {
     e.print();
   }
+  
+try {
+    cerr << endl << "----- Insert boost block matrix of zeros in each column, set values, and startColumn" << endl;
+    SparseBlockMatrix sbm;
+    sbm.setNumberOfColumns(3);
+    sbm.insertMatrixBlock(0, 0, 3, 3);
+    sbm.insertMatrixBlock(1, 2, 3, 3);
+    sbm.insertMatrixBlock(2, 3, 3, 3);
+    
+    for ( int i = 0; i < 3; i++ ) {
+      for ( int j = 0; j < 3; j++ ) {
+        (*(*sbm[0])[0])(i,j) = 3*i+j;
+      }
+    }
+    for ( int i = 0; i < 3; i++ ) {
+      for ( int j = 0; j < 3; j++ ) {
+        (*(*sbm[1])[2])(i,j) = 3*i+j;
+      }
+    }
+    for ( int i = 0; i < 3; i++ ) {
+      for ( int j = 0; j < 3; j++ ) {
+        (*(*sbm[2])[3])(i,j) = 3*i+j;
+      }
+    }
+    
+    sbm.at(0)->setStartColumn(0);
+    sbm.at(1)->setStartColumn(3);
+    sbm.at(2)->setStartColumn(6);
+    
+    cerr << "             # block columns: " << sbm.size() << endl;
+    cerr << "             # matrix blocks: " << sbm.numberOfBlocks() << endl;
+    cerr << "    # diagonal matrix blocks: " << sbm.numberOfDiagonalBlocks() << endl;
+    cerr << "# off-diagonal matrix blocks: " << sbm.numberOfOffDiagonalBlocks() << endl;
+    cerr << "         block 0 startColumn: " << sbm.at(0)->startColumn() << endl;
+    cerr << "         block 1 startColumn: " << sbm.at(1)->startColumn() << endl;
+    cerr << "         block 2 startColumn: " << sbm.at(2)->startColumn() << endl;
+    sbm.print(std::cerr);
+  }
+  catch(IException &e) {
+    e.print();
+  }  
 
   try {
     cerr << endl << "----- copy method" << endl;

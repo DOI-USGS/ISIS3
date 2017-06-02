@@ -202,7 +202,9 @@ namespace Isis {
 
     // Build the RTree geometry
     int ngeoms = qMax(goodones.size(), 2);
-    cout << "Total Geoms: " << ngeoms << "\n";
+    if ( isDebug() ) {
+      cout << "Total Geoms: " << ngeoms << "\n";
+    }
     GEOSSTRtree *rtree = GEOSSTRtree_create(ngeoms);
     if ( !rtree ) {
       cout << "Address: " << rtree << "\n";

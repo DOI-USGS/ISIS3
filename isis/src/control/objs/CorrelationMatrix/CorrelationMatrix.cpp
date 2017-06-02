@@ -183,7 +183,8 @@ namespace Isis {
 
 
   /**
-  * @description This method reads the covariance matrix in from a file,
+  * @brief Read covariance matrix and compute correlation values
+  * This method reads the covariance matrix in from a file,
   * one SparseBlockColumnMatrix at a time.  It then stores the diagonal values from that column
   * and computes the correlation values. The resulting SparseBlockMatrix is written to a
   * new file, one SparseBlockColumnMatrix at a time.
@@ -270,7 +271,8 @@ namespace Isis {
 
 
   /**
-   * @description This method will open the correlation matrix file and read in the blocks that
+   * @brief Extract requested area from correlation matrix
+   * This method will open the correlation matrix file and read in the blocks that
    * apply to the requested area. It will populate m_visibleElements.
    *
    * @param x first coordinate of the location in the matrix that the user wants to see.
@@ -315,7 +317,8 @@ namespace Isis {
 
 
   /**
-   * @description This is used to make sure the covariance matrix exists.
+   * @brief Check if the correlation matrix has a covariance matrix
+   * This is used to make sure the covariance matrix exists.
    * If it doesn't this class is not valid. If this file exists, we can compute the
    * correlation matrix.
    *
@@ -409,7 +412,7 @@ namespace Isis {
 
 
   /**
-   * @description This method will read the matrix in from the file and hold on to the whole thing.
+   * @brief This method will read the matrix in from the file and hold on to the whole thing.
    * This will only be used when the matrix is small enough that this will be useful.
    *
    */
@@ -427,7 +430,8 @@ namespace Isis {
 
 
   /**
-   * @description This method will be used when the matrix is too big to display the whole thing.
+   * @brief Display only part of a matrix
+   * This method will be used when the matrix is too big to display the whole thing.
    * It will read in the block we want to see and the two blocks for the diagonals that belong to
    * the right images.
    */
@@ -445,7 +449,7 @@ namespace Isis {
 
 
   /**
-   * @description This method creates a Pvl group with the information necessary to recreate
+   * @brief This method creates a Pvl group with the information necessary to recreate
    * this correlation matrix.
    *
    * Object = CorrelationMatrixData
@@ -476,89 +480,5 @@ namespace Isis {
     corrMatInfo += imgsAndParams;
     
     return corrMatInfo;
-  }
-
-
-  /**
-   * @brief Writes CorrelationMatrix data to the output stream and returns this stream
-   * to the user.
-   * @param stream  The input stream containing the data.
-   * @return @b QDataStream Returns the output stream.
-   */
-
-  QDataStream &CorrelationMatrix::write(QDataStream &stream) const {
-    // QMaps
-    stream << *m_imagesAndParameters;
-    // FileNames
-    stream << m_covarianceFileName->expanded() << m_correlationFileName->expanded();
-    // QLists
-    stream << *m_diagonals << *m_visibleBlocks;
-    return stream;
-  }
-
-
-  /**
-   * @brief Reads CorrelationMatrix data from the input stream and places the data
-   * in member variables.
-   * @param stream  The input input stream containing the data.
-   * @return @b QDataStream Returns the output data stream.
-   */
-    QDataStream &CorrelationMatrix::read(QDataStream &stream) {
-    // QMaps
-    QMap<QString, QStringList> imagesAndParameters;
-    stream >> imagesAndParameters;
-    delete m_imagesAndParameters;
-    m_imagesAndParameters = NULL;
-    m_imagesAndParameters = new QMap<QString, QStringList>(imagesAndParameters);
-
-    // FileNames
-    QString covarianceFileName;
-    stream >> covarianceFileName;
-    delete m_covarianceFileName;
-    m_covarianceFileName = NULL;
-    m_covarianceFileName  = new FileName(covarianceFileName);
-
-    QString correlationFileName;
-    stream >> correlationFileName;
-    delete m_correlationFileName;
-    m_correlationFileName = NULL;
-    m_correlationFileName = new FileName(correlationFileName);
-
-    // QLists
-    QList<double> diagonals;
-    stream >> diagonals;
-    delete m_diagonals;
-    m_diagonals = NULL;
-    m_diagonals = new QList<double>(diagonals);
-
-    QList<SparseBlockColumnMatrix> visibleBlocks;
-    stream >> visibleBlocks;
-    delete m_visibleBlocks;
-    m_visibleBlocks = NULL;
-    m_visibleBlocks = new QList<SparseBlockColumnMatrix>(visibleBlocks);
-
-    return stream;
-  }
-
-
-  /**
-   * @brief The operator <<  writes matrix data to a QDataStream.
-   * @param stream The output stream upon which the matrix data is written.
-   * @param matrix The CorrelationMatrix containing the data.
-   * @return @b QDataStream Returns the output stream containing the matrix data.
-   */
-  QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix) {
-    return matrix.write(stream);
-  }
-
-
-  /**
-   * @brief The operator >> reads matrix data from a QDataStream.
-   * @param stream  The input stream containing the CorrelationMatrix data.
-   * @param matrix  The matrix which is going to be overwritten by the input stream.
-   * @return @b QDataStream Returns the output stream containing the matrix data.
-   */
-  QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix) {
-    return matrix.read(stream);
   }
 }

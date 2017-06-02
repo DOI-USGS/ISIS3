@@ -1,7 +1,5 @@
 /**
  * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -90,8 +88,8 @@ namespace Isis {
    *
    * @return @b bool True if WorkOrder::execute() returns true.
    */
-  bool MatrixViewWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool MatrixViewWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QStringList viewOptions;
@@ -147,7 +145,7 @@ namespace Isis {
 
   
   /**
-   * This method returns true if other depends on a MatrixViewWorkOrder
+   * @brief This method returns true if other depends on a MatrixViewWorkOrder
    * 
    * @param other we want to check for dependancies
    * 
@@ -161,9 +159,9 @@ namespace Isis {
   
 
   /**
-   * This method computes and displays the correlation matrix.
+   * @brief This method computes and displays the correlation matrix. 
    */
-  void MatrixViewWorkOrder::syncRedo() {
+  void MatrixViewWorkOrder::execute() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
     CorrelationMatrix corrMat = correlationMatrix();
     /*
@@ -182,9 +180,9 @@ namespace Isis {
 
   
   /**
-   * This method deletes the last matrix viewed
+   * @brief This method deletes the last matrix viewed. 
    */
-  void MatrixViewWorkOrder::syncUndo() {
+  void MatrixViewWorkOrder::undoExecution() {
     if (internalData()[1] == "new view") {
       delete project()->directory()->matrixViews().last();
     }

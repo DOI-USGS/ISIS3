@@ -29,20 +29,31 @@
 #include "NaifDskPlateModel.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
+#include "QRegularExpression"
 
 using namespace Isis;
 
-/** 
- *  
- * @internal 
+/**
+ *
+ * @internal
  *   @history 2015-02-25 Jeannie Backer - Original version.
  *                           Code coverage: 91.667% scope, 95.960% line, and 100% function.
  *                           Unable to create circumstances for missing coverage.
- *  
+ *
  *   @todo - Test coverage - Constructor error throw - get dsk file openDSK returns NULL
  *   @todo - Test coverage - openDSK error throw - get dsk file with no segments
  *
+ *
+ *   @history 2017-05-19 Christopher Combs - Added ReportError method to remove paths that would
+ *                           cause the test to fail when not using the standard data area.
+ *                           Fixes #4738.
+ *
  */
+
+ void ReportError(QString err) {
+   qDebug() << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+ }
+
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
@@ -90,7 +101,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Ray Dir:            " << rayDir;
     qDebug() << "Observer:           " << obsPos;
     qDebug() << "Intercept is null?  " << toString(intercept == NULL);
-    qDebug() << "intercept plateID?  " 
+    qDebug() << "intercept plateID?  "
              << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
 
     // Find obs/rayDir with valid intercept
@@ -108,14 +119,14 @@ int main(int argc, char *argv[]) {
     xpoint[1] = xp.GetY().meters();
     xpoint[2] = xp.GetZ().meters();
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
-    qDebug() << "intercept plateID                    =  " 
+    qDebug() << "intercept plateID                    =  "
              << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
     qDebug() << "";
 
     qDebug() << "Get plate info from id:";
     qDebug() << "Is plate ID = 0 valid? " << naifPlateModelFromDSK.isPlateIdValid(0);
     qDebug() << "Is plate ID = 1 valid? " << naifPlateModelFromDSK.isPlateIdValid(1);
-    qDebug() << "Is plate ID = 1 valid for invalid NaifDskPlateModel? " 
+    qDebug() << "Is plate ID = 1 valid for invalid NaifDskPlateModel? "
              << naifPlateModel.isPlateIdValid(1);
     qDebug() << "Triangular Plate for ID = 1:";
     qDebug() << naifPlateModelFromDSK.plate(1);
@@ -136,7 +147,7 @@ int main(int argc, char *argv[]) {
 //    try {
 //      FileName junkFile("");
 //      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
-//    } 
+//    }
 //    catch (IException &e) {
 //      e.print();
 //    }
@@ -146,7 +157,7 @@ int main(int argc, char *argv[]) {
       NaifVertex badObs(2);
       badObs[0] = 0.0; badObs[1] = 0.0;
       naifPlateModelFromDSK.plateIdOfIntercept(badObs, rayDir, xpoint);
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
@@ -154,7 +165,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Thrown from plate(): Get plate from invalid plate ID.";
     try {
       naifPlateModelFromDSK.plate(0);
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
@@ -163,7 +174,7 @@ int main(int argc, char *argv[]) {
     try {
       FileName junkFile("./junk.bds");
       NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
@@ -172,7 +183,7 @@ int main(int argc, char *argv[]) {
 //    try {
 //      FileName noSegmentsFile("");
 //      NaifDskPlateModel junkmodel(noSegmentsFile.expanded());
-//    } 
+//    }
 //    catch (IException &e) {
 //      e.print();
 //    }
@@ -180,12 +191,12 @@ int main(int argc, char *argv[]) {
     qDebug() << "~NaifDskDescriptor(): Unknown NAIF error has occured.";
     try {
       FileName junkFile("$base/kernels/spk/de405.bsp");
-      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
-    } 
-    catch (IException &e) {
-      e.print();
+      NaifDskPlateModel naifPlateModelFromDSK(junkFile.toString());
     }
- 
+    catch (IException &e) {
+      ReportError(e.toString());
+    }
+
   }
   catch (IException &e) {
     qDebug() << "";

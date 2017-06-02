@@ -62,17 +62,12 @@ ifndef ISISCPPFLAGS
   $(error Unsupported platform, can not make for $(HOST_ARCH))
 endif
 
-
 # Set up Xalan's command-line option names.
 XALAN_VALIDATE_OPTION := -v
 XALAN_OUTFILE_OPTION := -o
 XALAN_PARAM_OPTION := -p
 XALAN_INFILE_OPTION :=
 XALAN_XSL_OPTION :=
-
-ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
-  XALAN = $(ISIS3LOCAL)/bin/Xalan
-endif
 
 #---------------------------------------------------------------------------
 # The BSD version of grep on 10.7-10.9 is reported to be broken so use GNU

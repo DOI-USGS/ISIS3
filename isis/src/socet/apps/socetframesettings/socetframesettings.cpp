@@ -184,7 +184,14 @@ void IsisMain() {
       socetCamFile += "ClemUVVIS.cam";
     }
   }
- 
+  else if (spacecraftName == "OSIRIS-REX") {
+    if (instrumentId == "MapCam") {
+      socetCamFile += "OCAMS_MapCam.cam";
+    }
+    else {//polycam or samcam
+      socetCamFile += "OCAMS_PolyCam.cam";
+    }
+  }
   // Throw exception for unsupported camera
   else {
     QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
@@ -470,7 +477,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   //TO DO: Delete this next line when Themis-VIS is supported
   //-----------------------------------------------------
   else if (spacecraftName == "Galileo Orbiter" || spacecraftName == "Cassini-Huygens" ||
-           spacecraftName == "Messenger" ) {
+           spacecraftName == "Messenger" || spacecraftName == "OSIRIS-REX") {
     isisFocalPlane2SocetPlate[0][0] = 1.0;
     isisFocalPlane2SocetPlate[1][1] = -1.0;
     isisFocalPlane2SocetPlate[2][2] = -1.0;

@@ -22,6 +22,11 @@
 
 #include "FramingCamera.h"
 
+#include <QXmlStreamReader>
+
+#include "LinearAlgebra.h"
+#include "RosettaOsirisCameraDistortionMap.h"
+
 namespace Isis {
   /**
    * This is the camera model for the Osiris NAC Framing Camera 
@@ -31,8 +36,9 @@ namespace Isis {
    *
    * @author 2015-05-21 Sasha Brownsberger
    *
-   * @internal 
-   *  
+   * @internal
+   *   @history 2015-05-21 Sasha Brownsberger - Original Version.
+   *   @history 2017-06-02 Jesse Mapel - Added a distortion map Fixes #4496.
    */
   class RosettaOsirisCamera : public FramingCamera {
     public:
@@ -45,9 +51,10 @@ namespace Isis {
     /** 
      * Reimplemented from FrameCamera 
      *  
-     * @original author Stuart Sides
+     * @author Stuart Sides
      *
-     * @modified Sasha Brownsberger (2015/05/21)
+     * @internal
+     * @history modified Sasha Brownsberger (2015/05/21)
      * 
      * @param time Start time of the observation
      * @param exposureDuration The exposure duration of the observation
@@ -80,6 +87,8 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+
+      void initDistortion(QString ikCode, RosettaOsirisCameraDistortionMap *distortionMap);
   };
 };
 #endif

@@ -40,6 +40,7 @@ namespace Isis {
   CloseProjectWorkOrder::CloseProjectWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Close Project"));
+    QUndoCommand::setText(tr("Close Project"));
 
     setCreatesCleanState(true);
   }
@@ -82,8 +83,8 @@ namespace Isis {
    * 
    * @return @b bool True if WorkOrder::execute() returns true.
    */
-  bool CloseProjectWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool CloseProjectWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
 //    // If more than this work order is in the history, don't allow this operation
 //    if (success && project()->workOrderHistory().count()) {

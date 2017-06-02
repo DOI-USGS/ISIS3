@@ -28,6 +28,7 @@
 #include "Cube.h"
 #include "DemShape.h"
 #include "EllipsoidShape.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Latitude.h"
@@ -39,7 +40,7 @@
 
 using namespace std;
 using namespace Isis;
- 
+
 /**
   * This application tests the DemShape base class
   *
@@ -49,7 +50,7 @@ using namespace Isis;
   * @internal
   *   @history 2015-04-30 Jeannie Backer - Added a test for calculateLocalNormal() with
   *                           empty neighbor points and a test for isDEM(). References #2243.
-  *  
+  *
   *   testcoverage 2015-04-30 - 78.571% scope, 94.309% line, 100% function
   */
 class MyShape : public DemShape {
@@ -61,7 +62,7 @@ class MyShape : public DemShape {
    void testDemCube()  {
      // Cube *demCube();
      IString fileName = demCube()->fileName();
-     cout << "    Using dem cube file = " << demCube()->fileName() << endl;
+     cout << "    Using dem cube file = " << FileName(demCube()->fileName()).name() << endl;
    }
 };
 
@@ -88,7 +89,7 @@ int main() {
     cout << "    Shape name is " << defaultShape.name() << endl;
     cout << "    Shape is DEM type? " << toString(shape.isDEM()) << endl;
 
-    cout << endl << "  Testing method intersectSurface..." << endl; 
+    cout << endl << "  Testing method intersectSurface..." << endl;
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     cout << "    Set a pixel in the image and check again." << endl;
     double line = 453.0;
@@ -108,13 +109,13 @@ int main() {
     Incidence                  = 85.341094499768
     Emission                   = 46.966269013795
     */
-    if (!shape.intersectSurface(sB, lookB)) { 
+    if (!shape.intersectSurface(sB, lookB)) {
         cout << "    ...  intersectSurface method failed" << endl;
         return -1;
     }
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     SurfacePoint *sp = shape.surfaceIntersection();
-    cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
+    cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal "
@@ -153,7 +154,7 @@ int main() {
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal(); 
+    shape.calculateSurfaceNormal();
     myNormal = shape.normal();
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
@@ -178,7 +179,7 @@ int main() {
     cout << endl << "  Testing setSurfacePoint method ..." << endl;
     shape.setSurfacePoint(*sp);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
-    cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
+    cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
 
     cout << endl << "  Testing demScale method..." << endl;

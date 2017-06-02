@@ -39,9 +39,10 @@ namespace Isis {
    *
    * @throws iException::Io
    */
-  PvlTranslationTable::PvlTranslationTable(Isis::FileName transFile) {
+  PvlTranslationTable::PvlTranslationTable(FileName transFile) {
     AddTable(transFile.expanded());
   }
+
 
   /**
    * Constructs and initializes a PvlTranslationTable object
@@ -52,9 +53,28 @@ namespace Isis {
     istr >> p_trnsTbl;
   }
 
+
   //! Construct an empty PvlTranslationTable
   PvlTranslationTable::PvlTranslationTable() {
   }
+
+
+  //! Destroys the PvlTranslationTable object.
+  PvlTranslationTable::~PvlTranslationTable() {
+  }
+
+
+  //! Protected accessor for pvl translation table passed into class.
+  Pvl &PvlTranslationTable::TranslationTable() {
+    return p_trnsTbl;
+  }
+
+
+  //! Protected accessor for const pvl translation table passed into class.
+  const Pvl &PvlTranslationTable::TranslationTable() const {
+    return p_trnsTbl;
+  }
+
 
   /**
    * Adds the contents of a translation table to the searchable groups/keys
@@ -67,6 +87,7 @@ namespace Isis {
     p_trnsTbl.read(FileName(transFile).expanded());
   }
 
+
   /**
    * Adds the contents of a translation table to the searchable groups/keys
    * Also performs a verification, to ensure that the translation table
@@ -76,6 +97,10 @@ namespace Isis {
    */
   void PvlTranslationTable::AddTable(std::istream &transStm) {
     transStm >> p_trnsTbl;
+    
+    // pair< name, size > of acceptable keywords.
+    // A size of -1 means non-zero size.
+    vector< pair<QString, int> > validKeywordSizes = validKeywords();
 
     for(int i = 0; i < p_trnsTbl.groups(); i++) {
       PvlGroup currGrp = p_trnsTbl.group(i);
@@ -87,20 +112,6 @@ namespace Isis {
         throw IException(IException::User, message, _FILEINFO_);
       }
 
-      // pair< name, size > of acceptable keywords.
-      // A size of -1 means non-zero size.
-      vector< pair<QString, int> > validKeywords;
-
-      validKeywords.push_back(pair<QString, int>("Translation",     2));
-      validKeywords.push_back(pair<QString, int>("OutputName",      1));
-      validKeywords.push_back(pair<QString, int>("InputGroup",     -1));
-      validKeywords.push_back(pair<QString, int>("InputPosition",  -1));
-      validKeywords.push_back(pair<QString, int>("OutputPosition", -1));
-      validKeywords.push_back(pair<QString, int>("Auto",            0));
-      validKeywords.push_back(pair<QString, int>("Optional",        0));
-      validKeywords.push_back(pair<QString, int>("InputKey",        1));
-      validKeywords.push_back(pair<QString, int>("InputDefault",   -1));
-
       for(int j = 0; j < currGrp.keywords(); j++) {
         bool validKeyword = false;
         bool keywordSizeMismatch = false;
@@ -109,20 +120,20 @@ namespace Isis {
 
         // Test this keyword for validity
         for(int key = 0;
-            !validKeyword && key < (int)validKeywords.size();
+            !validKeyword && key < (int)validKeywordSizes.size();
             key++) {
 
           // If this is the right keyword (names match) then test sizes
-          if(currKey.name() == validKeywords[key].first) {
+          if(currKey.name() == validKeywordSizes[key].first) {
 
             // if -1 then test that size() > 0
-            if(validKeywords[key].second == -1) {
+            if(validKeywordSizes[key].second == -1) {
               if(currKey.size() > 0) {
                 validKeyword = true;
               }
             }
             // otherwise should exact match
-            else if(currKey.size() == validKeywords[key].second) {
+            else if(currKey.size() == validKeywordSizes[key].second) {
               validKeyword = true;
             }
             else {
@@ -153,6 +164,30 @@ namespace Isis {
       }
     }
   }
+  
+  
+  /**
+   * Returns a vector of valid keyword names and their sizes.  A size of -1
+   * indicates that the keyword can be any size.
+   * 
+   * @return @b vector<pair<QString,int>> A vector of valid keyword names and their sizes.
+   */
+  vector< pair<QString, int> > PvlTranslationTable::validKeywords() const {
+
+    vector< pair<QString, int> > validKeywords;
+    validKeywords.push_back(pair<QString, int>("Translation",     2));
+    validKeywords.push_back(pair<QString, int>("OutputName",      1));
+    validKeywords.push_back(pair<QString, int>("InputGroup",     -1));
+    validKeywords.push_back(pair<QString, int>("InputPosition",  -1));
+    validKeywords.push_back(pair<QString, int>("OutputPosition", -1));
+    validKeywords.push_back(pair<QString, int>("Auto",            0));
+    validKeywords.push_back(pair<QString, int>("Optional",        0));
+    validKeywords.push_back(pair<QString, int>("InputKey",        1));
+    validKeywords.push_back(pair<QString, int>("InputDefault",   -1));
+
+    return validKeywords;
+  }
+
 
   /**
    * Translates the output name and input value.
@@ -220,6 +255,7 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
+
   /**
    * Returns the input group name from the translation table corresponding to
    * the output name argument.
@@ -251,7 +287,7 @@ namespace Isis {
 
     int currentInstance = 0;
 
-    // If no InputGroup keywords exist, the answer is root
+    // If no InputPosition keyword exists, the answer is root
     if(inst == 0 && it == transGrp.end()) {
       PvlKeyword root("InputPosition");
       root += "ROOT";
@@ -298,6 +334,7 @@ namespace Isis {
     return empty;
   }
 
+
   /**
    * Returns the input keyword name from the translation table corresponding to
    * the output name argument.
@@ -316,11 +353,12 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup tgrp = p_trnsTbl.findGroup(nName);
     if(tgrp.hasKeyword("InputKey")) return tgrp["InputKey"];
 
     return "";
   }
+
 
   /**
    * Returns the input default value from the translation table corresponding
@@ -340,10 +378,23 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup tgrp = p_trnsTbl.findGroup(nName);
     if(tgrp.hasKeyword("InputDefault")) return tgrp["InputDefault"];
 
     return "";
+  }
+
+  bool PvlTranslationTable::hasInputDefault(const QString nName) {
+    if(!p_trnsTbl.hasGroup(nName)) {
+      QString msg = "Unable to find translation group [" + nName +
+                   "] in file [" + p_trnsTbl.fileName() + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("InputDefault")) return true;
+
+    return false;
   }
 
   bool PvlTranslationTable::IsAuto(const QString nName) {
@@ -353,7 +404,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
     if(tgrp.hasKeyword("Auto")) return true;
 
     return false;
@@ -366,21 +417,20 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
     if(tgrp.hasKeyword("Optional")) return true;
 
     return false;
   }
 
-  Isis::PvlKeyword &PvlTranslationTable::OutputPosition(
-    const QString nName) {
+  PvlKeyword &PvlTranslationTable::OutputPosition(const QString nName) {
     if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
                    nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
     if(!tgrp.hasKeyword("OutputPosition")) {
       QString msg = "Unable to find translation keyword [OutputPostion] in [" +
                    nName + "] in file [" + p_trnsTbl.fileName() + "]";
@@ -399,7 +449,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    PvlGroup tgrp = p_trnsTbl.findGroup(nName);
     if(tgrp.hasKeyword("OutputName")) {
       return tgrp["OutputName"];
     }

@@ -28,9 +28,9 @@ void IsisMain() {
 
   //Check for cases of too many bands
   if(bands >= (2 * cubeBands)) {
-    QString msg = "Parameter bands [" + QString(bands) + "] "
+    QString msg = "Parameter bands [" + QString::number(bands) + "] "
                   "exceeds maximum allowable size of ["
-                  + QString((cubeBands * 2) - 1) + "] for cube ["
+                  + QString::number((cubeBands * 2) - 1) + "] for cube ["
                   + icube->fileName() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }

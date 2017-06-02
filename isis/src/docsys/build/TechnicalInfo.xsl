@@ -204,6 +204,12 @@ Deborah Lee Soltesz
                   ISIS Programmers Reference</a><br/>
                   An in-depth reference guide for programmers who modify the ISIS software
           </p>
+          <p>
+                  <a href="../documents/CodingStandards/CodingStandards.html" target="_blank">
+                  ISIS 3 Coding Standards and Style Guide</a><br/>
+                  Coding standards for ISIS 3 developers
+          </p>
+
 
       <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'api' and
                                        normalize-space(category/categoryItem) != 'hidden' and

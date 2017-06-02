@@ -14,4 +14,10 @@ commands:
 	  onet=$(OUTPUT)/truth.net \
 	  networkid=DefaultTruth \
 	  Description=RefByResolutionHigh > /dev/null;
+	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
+	  cnet=$(INPUT)/autoseed_edit.pvl \
+	  criteria=resolution \
+	  type=high \
+	  onet=$(OUTPUT)/autoseed_edit_truth.net \
+	  Description=RefByResolutionHighFail > /dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;

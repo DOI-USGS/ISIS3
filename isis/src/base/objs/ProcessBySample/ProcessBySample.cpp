@@ -20,7 +20,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-
 #include "ProcessBySample.h"
 
 #include "Buffer.h"
@@ -50,11 +49,9 @@ namespace Isis {
    *
    * @param requirements See Process::SetInputCube for more information.
    *                     Defaults to 0
-   *
-   * @throws Isis::iException::Message
    */
   Isis::Cube *ProcessBySample::SetInputCube(const QString &parameter,
-      int requirements) {
+                                            int requirements) {
     int allRequirements = Isis::SpatialMatch | Isis::BandMatchOrOne;
     allRequirements |= requirements;
     return Process::SetInputCube(parameter, allRequirements);
@@ -74,8 +71,8 @@ namespace Isis {
    *
    */
   Isis::Cube *ProcessBySample::SetInputCube(const QString &file,
-      Isis::CubeAttributeInput &att,
-      int requirements) {
+                                            Isis::CubeAttributeInput &att,
+                                            int requirements) {
     int allRequirements = Isis::SpatialMatch | Isis::BandMatchOrOne;
     allRequirements |= requirements;
     return Process::SetInputCube(file, att, allRequirements);
@@ -92,16 +89,11 @@ namespace Isis {
    *
    * @deprecated Please use ProcessCubeInPlace()
    * @param funct (Isis::Buffer &b) Name of your processing function
-   *
-   * @throws Isis::iException::Message
-   *
    */
-
   void ProcessBySample::StartProcess(void funct(Isis::Buffer &inout)) {
-      VerifyCubes(InPlace);
-      SetBricks(InPlace);
-    //SetBrickSizesForProcessCubeInPlace();
-      ProcessByBrick::StartProcess(funct);
+    VerifyCubes(InPlace);
+    SetBricks(InPlace);
+    ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -114,17 +106,12 @@ namespace Isis {
    * @deprecated Please use ProcessCube()
    * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
    *                                                    function
-   *
-   * @throws Isis::iException::Message
-   */
-
-  void ProcessBySample::StartProcess(void
-                                     funct(Isis::Buffer &in, Isis::Buffer &out)) {
-
-      VerifyCubes(InputOutput);
-      SetBricks(InputOutput);
-    //SetBrickSizesForProcessCube();
-      ProcessByBrick::StartProcess(funct);
+   */ 
+  void ProcessBySample::StartProcess(void funct(Isis::Buffer &in,
+                                                Isis::Buffer &out)) {
+    VerifyCubes(InputOutput);
+    SetBricks(InputOutput);
+    ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -136,58 +123,39 @@ namespace Isis {
    * @deprecated Please use ProcessCubes()
    * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
    *                of your processing function
-   *
-   * @throws Isis::iException::Message
    */
-
   void ProcessBySample::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
-                                     std::vector<Isis::Buffer *> &out)) {
-
-     VerifyCubes(InputOutputList) ;
-     SetBricks(InputOutputList);
-    //SetBrickSizesForProcessCubes();
+                                                std::vector<Isis::Buffer *> &out)) {
+    VerifyCubes(InputOutputList) ;
+    SetBricks(InputOutputList);
     ProcessByBrick::StartProcess(funct);
   }
 
+
   void ProcessBySample::SetBricks(IOCubes cn){
+    switch(cn){
+      case InPlace:
+        if (InputCubes.size() == 1) {
+          SetBrickSize(1, InputCubes[0]->lineCount(), 1);
+        }
+        else {
+          SetBrickSize(1, OutputCubes[0]->lineCount(), 1);
+        }
+        break;
 
-      switch(cn){
+      case InputOutput:
+        SetInputBrickSize(1, InputCubes[0]->lineCount(), 1);
+        SetOutputBrickSize(1, OutputCubes[0]->lineCount(), 1);
+        break;
 
-        case InPlace:
-          if(InputCubes.size() == 1) SetBrickSize(1, InputCubes[0]->lineCount(), 1);
-          else SetBrickSize(1, OutputCubes[0]->lineCount(), 1);
-
-          break;
-
-        case InputOutput:
-
-          SetInputBrickSize(1, InputCubes[0]->lineCount(), 1);
-          SetOutputBrickSize(1, OutputCubes[0]->lineCount(), 1);
-
-
-
-
-          break;
-
-        case InputOutputList:
-
-          for(unsigned int i = 0; i < InputCubes.size(); i++) {
-            SetInputBrickSize(1, InputCubes[i]->lineCount(), 1, i + 1);
-          }
-          for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-            SetOutputBrickSize(1, OutputCubes[i]->lineCount(), 1, i + 1);
-          }
-
-          break;
-
-
-
-      }
-
-
+      case InputOutputList:
+        for(unsigned int i = 0; i < InputCubes.size(); i++) {
+          SetInputBrickSize(1, InputCubes[i]->lineCount(), 1, i + 1);
+        }
+        for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+          SetOutputBrickSize(1, OutputCubes[i]->lineCount(), 1, i + 1);
+        }
+        break;
+    }
   }
-
-
-
-
 }

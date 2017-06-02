@@ -17,6 +17,7 @@
  *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *  http://www.usgs.gov/privacy.html.
  */
+#include <iostream>
 
 #include <QAction>
 #include <QApplication>
@@ -372,19 +373,21 @@ namespace Isis {
    * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
+   *   @history 2017-05-10 Ian Humphrey - Modified so that the setScale() is accommodating the ISIS
+   *                           pixel center definition (integer center) (+0.5). References #4756.
    */
   void ZoomTool::zoomFit() {
     MdiCubeViewport *d = cubeViewport();
-    if(d == NULL) return;
-    setScale(d, d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    if (d == NULL) return;
+    setScale(d, d->fitScale(), d->cubeSamples() / 2.0 + 0.5, d->cubeLines() / 2.0 + 0.5);
     updateTool();
 
-    if(d->isLinked()) {
-      for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    if (d->isLinked()) {
+      for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
         d = (*(cubeViewportList()))[i];
-        if(d == cubeViewport()) continue;
-        if(d->isLinked()) {
-          setScale(d, d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+        if (d == cubeViewport()) continue;
+        if (d->isLinked()) {
+          setScale(d, d->fitScale(), d->cubeSamples() / 2.0 + 0.5, d->cubeLines() / 2.0 + 0.5);
         }
       }
     }
@@ -401,16 +404,16 @@ namespace Isis {
    */
   void ZoomTool::zoomFitWidth() {
     MdiCubeViewport *d = cubeViewport();
-    if(d == NULL) return;
-    setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    if (d == NULL) return;
+    setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0 + 0.5, d->cubeLines() / 2.0 + 0.5);
     updateTool();
 
-    if(d->isLinked()) {
-      for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    if (d->isLinked()) {
+      for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
         d = (*(cubeViewportList()))[i];
-        if(d == cubeViewport()) continue;
-        if(d->isLinked()) {
-          setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+        if (d == cubeViewport()) continue;
+        if (d->isLinked()) {
+          setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0 + 0.5, d->cubeLines() / 2.0 + 0.5);
         }
       }
     }
@@ -427,16 +430,17 @@ namespace Isis {
    */
   void ZoomTool::zoomFitHeight() {
     MdiCubeViewport *d = cubeViewport();
-    if(d == NULL) return;
-    setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    if (d == NULL) return;
+    setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0 + 0.5, d->cubeLines() / 2.0 + 0.5);
     updateTool();
 
-    if(d->isLinked()) {
-      for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    if (d->isLinked()) {
+      for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
         d = (*(cubeViewportList()))[i];
-        if(d == cubeViewport()) continue;
-        if(d->isLinked()) {
-          setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+        if (d == cubeViewport()) continue;
+        if (d->isLinked()) {
+          setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0 + 0.5,
+              d->cubeLines() / 2.0 + 0.5);
         }
       }
     }

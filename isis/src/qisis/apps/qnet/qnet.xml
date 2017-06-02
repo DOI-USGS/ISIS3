@@ -547,5 +547,9 @@
       measures, saving a point, adding a new measure, find, and saving the control network. Fixes
       #2324.
     </change>
+    <change name="Makayla Shepherd" date="2017-01-04">
+      Fixed an issue that caused the Control Network Navigator to go behind the qnet main window 
+      when using Gnome or Cinnamon. Fixes #4541.
+    </change>
   </history>
 </application>

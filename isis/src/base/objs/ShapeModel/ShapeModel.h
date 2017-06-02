@@ -64,6 +64,9 @@ namespace Isis {
    *                           closer to ISIS coding standards. References #1438
    *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor ShapeModel(Target, Pvl).
    *                           Fixes #2214
+   *   @history 2017-05-19 Tyler Wilson - Removed the calculateEllipsoidalSurfaceNormal() function,
+   *                           as this is now being handled in the EllipsoidShape class.
+   *                           References #1028.
    */
   class ShapeModel {
     public:
@@ -146,7 +149,7 @@ namespace Isis {
       // Set shape name
       void setName(QString name);
 
-      void calculateEllipsoidalSurfaceNormal();
+      //void calculateEllipsoidalSurfaceNormal();
       bool hasEllipsoidIntersection();
 
       // Intersect ellipse

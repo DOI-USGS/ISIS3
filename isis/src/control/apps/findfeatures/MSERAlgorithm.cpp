@@ -1,0 +1,182 @@
+/**
+ * @file
+ * $Revision$ 
+ * $Date$ 
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+
+#include <boost/foreach.hpp>
+#include "opencv2/opencv.hpp"
+#include "opencv2/xfeatures2d.hpp"
+
+#include "MSERAlgorithm.h"
+#include <QVariant>
+
+namespace Isis {
+
+
+  /**
+   * Constructs the algorithm with default variables.
+   */
+  MSERAlgorithm::MSERAlgorithm() : 
+                 Feature2DAlgorithm("MSERA", "Feature2D",
+                                    MSERType::create()) {  
+    setupParameters();
+  }
+
+
+  /**
+   * Constructs the algorithm with the input variables
+   * 
+   * @param cvars  The variables and values the algorithm will use.
+   *               Variables that are not included will be set to their default.
+   * @param config The config string used to construct cvars.
+   */
+  MSERAlgorithm::MSERAlgorithm(const PvlFlatMap &cvars, const QString &config) :
+                 Feature2DAlgorithm("MSERA", "Feature2D", 
+                                    MSERType::create(), cvars) {
+    setConfig(config);
+    PvlFlatMap variables = setupParameters();
+    variables.merge(cvars);
+    const int delta = toInt(variables.get("Delta"));
+    const int minArea = toInt(variables.get("MinArea"));
+    const int maxArea = toInt(variables.get("MaxArea"));
+    const double maxVariation = toDouble(variables.get("MaxVariation"));
+    const double minDiversity = toDouble(variables.get("MinDiversity"));
+    const int maxEvolution = toInt(variables.get("MaxEvolution"));
+    const double areaThreshold = toDouble(variables.get("AreaThreshold"));
+    const double minMargin = toDouble(variables.get("MinMargin"));
+    const int edgeBlurSize = toInt(variables.get("EdgeBlurSize"));
+
+    m_algorithm = MSERType::create(delta, minArea, maxArea, maxVariation, minDiversity,
+                                   maxEvolution, areaThreshold, minMargin, edgeBlurSize);
+
+    m_variables.merge(variables);
+  }
+
+
+  /**
+   * Destroys the algorithm
+   */
+  MSERAlgorithm::~MSERAlgorithm() { }
+
+
+  /**
+   * Sets up the algorithm parameters with default values. 
+   * 
+   * @return PvlFlatMap Algorithm parameters and their default values. 
+   */
+  PvlFlatMap MSERAlgorithm::setupParameters() {
+    PvlFlatMap variables;
+    variables.add("Delta",         "5");
+    variables.add("MinArea",       "60");
+    variables.add("MaxArea",       "14400");
+    variables.add("MaxVariation",  "0.25");
+    variables.add("MinDiversity",  "0.2");
+    variables.add("MaxEvolution",  "200"); 
+    variables.add("AreaThreshold", "1.01");
+    variables.add("MinMargin",     "0.003");
+    variables.add("EdgeBlurSize",  "5");
+    m_variables = variables;
+    return (m_variables);
+  }
+
+
+  /**
+   * Returns a description of the algorithm.
+   * 
+   * @return @b QString A description of the algorithm.
+   */
+  QString MSERAlgorithm::description() const {
+    QString desc = "The OpenCV MSERA Feature2D detector/extractor algorithm."
+                   " See the documentation at "
+     "http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html";
+    return (desc);
+  }
+
+
+  /**
+   * Creates an instance of the algorithm.
+   * 
+   * @param cvars  The variables and values the algorithm will use.
+   *               Variables that are not included will be set to their default.
+   * @param config The config string used to construct cvars.
+   */
+  Feature2DAlgorithm *MSERAlgorithm::create(const PvlFlatMap &vars, const QString &config) {
+    return ( new MSERAlgorithm(vars, config) );
+  }
+
+
+  /**
+   * Returns true if the algorithm has a detector. 
+   *  
+   * @return @b true if the algorithm has a detector. 
+   */
+  bool MSERAlgorithm::hasDetector() const {
+    return true;
+  }
+
+
+  /**
+   * Returns true if the algorithm has an extractor. 
+   *  
+   * @return @b true if the algorithm has an extractor. 
+   */
+  bool MSERAlgorithm::hasExtractor() const {
+    return false;
+  }
+
+
+  /**
+   * Returns true if the algorithm has a matcher. 
+   *  
+   * @return @b true if the algorithm has a matcher. 
+   */
+  bool MSERAlgorithm::hasMatcher() const {
+    return false;
+  }
+
+
+  /**
+   * Returns the variables and their values used by the algorithm.
+   * 
+   * @return @b PvlFlatMap The variables and their values as keyword, value pairs.
+   */
+  PvlFlatMap MSERAlgorithm::getAlgorithmVariables( ) const {
+    return ( variables() );
+  }
+
+
+/**
+ * @brief Set parameters as provided by the variables
+ * 
+ * @param variables Container of parameters to set
+ * 
+ * @return @b int Always -1, variables cannot be set after initialization.
+ * 
+ * @throws IException::Programmer "BriefDescriptorAlgorithm does not have the ability
+ *                                 to set algorithm parameters."
+ */
+  int MSERAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
+    QString msg = "MSERAlgorithm does not have the ability to set algorithm parameters.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+
+    return (-1);
+  }
+
+};  // namespace Isis

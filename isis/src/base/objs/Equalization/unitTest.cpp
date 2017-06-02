@@ -11,10 +11,14 @@
 #include "Preference.h"
 #include "ProcessByLine.h"
 #include "PvlGroup.h"
+#include "QRegularExpression"
 
 using namespace std;
 using namespace Isis;
 
+void ReportError(QString err) {
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+}
 
 class TestFunctor {
   public:
@@ -45,7 +49,6 @@ class TestFunctor {
     int m_imageIndex;
     int m_lineCount;
 };
-
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -93,6 +96,9 @@ int main(int argc, char *argv[]) {
 
   results = equalizer.getResults();
   cout << "Results:" << endl;
+  for (int i = 0; i < results["NonOverlaps"].size(); i++) {
+    results["NonOverlaps"][i].replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data");
+  }
   cout << results << endl;
 
   cout << "     Write results to file..." << endl;
@@ -112,6 +118,11 @@ int main(int argc, char *argv[]) {
 
   results = equalizerFixed.getResults();
   cout << "Results:" << endl;
+  for (int i = 0; i < results.keywords(); i++) {
+    if (results[i].isNamed("FileName")) {
+      results[i].setValue(QString(results[i]).replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data"));
+    }
+  }
   cout << results << endl;
 
   cout << "     Write results to file..." << endl;
@@ -214,7 +225,7 @@ int main(int argc, char *argv[]) {
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }
   catch (IException &e) {
-    e.print();
+    ReportError(e.toString());
   }
 
   try {
@@ -227,7 +238,7 @@ int main(int argc, char *argv[]) {
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }
   catch (IException &e) {
-    e.print();
+    ReportError(e.toString());
   }
 
   // Testing loadOutputs exceptions TODO
@@ -239,7 +250,7 @@ int main(int argc, char *argv[]) {
     equalizer.importStatistics(nonOverlapStats);
   }
   catch (IException &e) {
-    e.print();
+    ReportError(e.toString());
   }
 
   try {
@@ -248,7 +259,7 @@ int main(int argc, char *argv[]) {
     equalizer.importStatistics(allOverlapStats);
   }
   catch (IException &e) {
-    e.print();
+    ReportError(e.toString());
   }
 
   // Remove all the temporary files

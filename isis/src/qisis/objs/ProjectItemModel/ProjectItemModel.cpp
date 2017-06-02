@@ -1,7 +1,5 @@
 /**
  * @file
- * $Date$
- * $Revision$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -35,12 +33,14 @@
 #include "BundleSolutionInfo.h"
 #include "Control.h"
 #include "ControlList.h"
+#include "FileItem.h"
 #include "GuiCameraList.h"
 #include "ImageList.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "TargetBodyList.h"
+
 
 namespace Isis {
   /**
@@ -353,7 +353,25 @@ namespace Isis {
         for (int j=0; j < projectItem->rowCount(); j++) {
           ProjectItem *resultsItem = projectItem->child(j);
           if (resultsItem->text() == "Results") {
-            resultsItem->appendRow( new ProjectItem(bundleSolutionInfo) );
+            ProjectItem *pItem = new ProjectItem(bundleSolutionInfo);
+            resultsItem->appendRow( pItem );
+
+            // Append the CSV files to the Statistics in the project
+            ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedResidualsFilename())),
+                            bundleSolutionInfo->savedResidualsFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(residualsItem);
+            ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedImagesFilename())),
+                            bundleSolutionInfo->savedImagesFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(imagesItem);
+            ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedPointsFilename())),
+                            bundleSolutionInfo->savedPointsFilename(),
+                            QIcon(":spacecraft") );
+            pItem->child(2)->appendRow(pointsItem);
           }
         }
       }
@@ -638,6 +656,48 @@ namespace Isis {
       emit itemRemoved(item);
     }
 //  qDebug()<<"ProjectItemModel::onRowsRemoved  Source model : "<<this<<"  row count = "<<rowCount();
+  }
+
+
+  /**
+   * This virtual method was added to handle changing the project name by double-clicking the 
+   * project name on the project tree.  It was required by Qt in order to allow editing 
+   * capabilities. 
+   *  
+   * @see http://doc.qt.io/qt-5/modelview.html 
+   *  
+   * @param[in] index (const QModelIndex &) Field which has been edited
+   * @param[in] value (const QVariant &) Value contained in the field
+   * @param[in] role (int) Will always be EditRole since field only contains text
+   * 
+   * @return bool Returns true if successful; otherwise false
+   */
+  bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+
+    ProjectItem *item = itemFromIndex(index);
+    if (item->isProject() && role == Qt::EditRole) {
+
+      QString name = value.toString();
+      emit projectNameEdited(name);
+    }
+    return true;
+  }
+
+
+  /**
+   * This virtual method was added to handle changing the project name by double-clicking the 
+   * project name on the project tree.  It was required by Qt in order to allow editing 
+   * capabilities. 
+   *  
+   * @see http://doc.qt.io/qt-5/modelview.html
+   *  
+   * @param[in] index (const QModelIndex &) Field which has been edited
+   * 
+   * @return Qt::ItemFlags Add the ItemIsEditable to the standard flags.
+   */
+  Qt::ItemFlags ProjectItemModel::flags(const QModelIndex &index) const {
+
+    return Qt::ItemIsEditable | QStandardItemModel::flags(index);
   }
 }
 

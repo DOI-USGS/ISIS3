@@ -43,6 +43,12 @@ namespace Isis {
    * @internal 
    *   @history 2012-09-11 Tracie Sucharski and Steven Lambright - Added asynchronous functionality
    *                           for redo.
+   *   @history 2017-04-04 Makayla Shepherd - Combined syncRedo and asyncRedo into execute, changed
+   *                           execute to setupExecution, and renamed postSyncRedo to postExecution
+   *                           and undoSyncRedo to undoExecution. This was done to match the 
+   *                           WorkOrder redesign. Fixes #4716.
+   *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so when undone, the imported
+   *                           cnet(s) are removed from the project tree. Fixes #4597. 
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -52,14 +58,13 @@ namespace Isis {
       ~ImportControlNetWorkOrder();
 
       virtual ImportControlNetWorkOrder *clone() const;
-
-      bool execute();
+      
+      bool setupExecution();
+      void execute();
 
     protected:
-      void syncRedo();
-      void asyncRedo();
-      void postSyncRedo();
-      void syncUndo();
+      void undoExecution();
+      void postExecution();
 
     private slots:
       void cnetReady(int ready);

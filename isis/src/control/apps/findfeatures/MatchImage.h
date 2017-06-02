@@ -2,8 +2,8 @@
 #define MatchImage_h
 /**
  * @file
- * $Revision: 6563 $ 
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $ 
+ * $Revision$ 
+ * $Date$ 
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -73,9 +73,22 @@ class MatchImage {
       m_data->m_duration = ptime;
     }
 
+    MatchImage(const MatchImage &other): m_data(other.m_data) { }
+
 
 
     virtual ~MatchImage() { }
+
+    /**
+     * Creates a copy of this MatchImage object with shared image source
+     * and a copy of all transformations but empty keypoints, descriptors,
+     * and duration.
+     */
+    MatchImage clone() {
+      MatchImage copyImage(*this);
+      copyImage.m_data.detach();
+      return copyImage;
+    }
 
     inline int size() const {
       return ( m_data->m_keypoints.size() );
@@ -173,7 +186,7 @@ class MatchImage {
                       m_duration(0) { }
         ImageData(const ImageData &other) : QSharedData(other),
                                             m_source(other.m_source), 
-                                            m_transforms(), 
+                                            m_transforms(other.m_transforms), 
                                             m_keypoints(), 
                                             m_descriptors(), 
                                             m_duration(0) { }

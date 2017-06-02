@@ -131,6 +131,8 @@ XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.2
 XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
+XALAN = $(ISIS3LOCAL)/bin/Xalan
+
 #---------------------------------------------------------------------------
 # Set up for geotiff 
 #---------------------------------------------------------------------------
@@ -274,8 +276,10 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
 OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib
-OPENCVLIBS   = -lopencv_calib3d -lopencv_core -lopencv_features2d \
-	       -lopencv_flann -lopencv_highgui -lopencv_imgproc \
+OPENCVLIBS   = -lopencv_calib3d -lopencv_core \
+	       -lopencv_features2d -lopencv_xfeatures2d \
+	       -lopencv_flann -lopencv_highgui \
+	       -lopencv_imgproc -lopencv_imgcodecs \
 	       -lopencv_ml -l opencv_objdetect \
 	       -lopencv_photo -lopencv_stitching -lopencv_superres \
 	       -lopencv_video -lopencv_videostab \

@@ -1,7 +1,6 @@
 #include "Isis.h"
 
 //ISIS libraries
-
 #include "BoxcarCachingAlgorithm.h"
 #include "Brick.h"
 #include "CubeAttribute.h"
@@ -15,20 +14,16 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlTranslationManager.h"
-
 #include "Table.h"
 #include "UserInterface.h"
 
-
 //STD libraries
-
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <istream>
 #include <sstream>
 #include <string>
-
 
 //QT libraries
 #include <QString>
@@ -40,17 +35,14 @@
 #include <QFileInfo>
 #include <QFile>
 
-
 using namespace std;
 using namespace Isis;
 enum CubeType {CORE,SUFFIX};
-
 
 void importQubs(QString coreParamName,QString suffixParamName);
 void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds);
 void translateNIMSLabels(Pvl &pdsLab, Cube *ocube, FileName inFile, CubeType ctype);
 QByteArray pvlFix(QString fileName);
-
 
 Cube *g_oCube;
 Brick *g_oBuff;
@@ -68,9 +60,6 @@ int g_coreItemBytes;
 int g_suffixItemBytes;
 Isis::ByteOrder g_byteOrder;
 Isis::PixelType g_corePixelType,g_suffixPixelType;
-
-
-
 
 void IsisMain() {
 
@@ -93,7 +82,6 @@ void IsisMain() {
 
   importQubs("CORE","SUFFIX");
 
-
   return;
 }
 
@@ -110,8 +98,6 @@ void IsisMain() {
  * @return  None
  *
  */
-
-
 void importQubs(QString coreParamName, QString suffixParamName) {
 
   ProcessImportPds::PdsFileType fileType = ProcessImportPds::Qube;
@@ -140,7 +126,7 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   Pvl *pdsLabel = new Pvl();
 
   try{
-  pvlStream >> *pdsLabel;
+    pvlStream >> *pdsLabel;
   }
   catch(IException &e) {
     QString msg = "Input file [" + inFile.expanded() +
@@ -151,23 +137,18 @@ void importQubs(QString coreParamName, QString suffixParamName) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-
   // Create holder for original label
   OriginalLabel origLabel(*pdsLabel);
   //pdsLabel->write(fi.baseName()+".pvl");
-
 
   //QFileInfo inputFileInfo(inFile.expanded());
   //pdsLabel->write(inputFileInfo.baseName()+".pvl");
 
   const PvlObject &qube = pdsLabel->findObject("Qube");
 
-
   QString dataSetId(qube["DATA_SET_ID"]);
 
-
   //Verify that we have a NIMS cube
-
   QRegExp galileoRx("GO-[A-Z]-NIMS*");
   galileoRx.setPatternSyntax(QRegExp::Wildcard);
 
@@ -177,8 +158,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
       QString msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-
-
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -187,7 +166,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   }
 
   //Determine the dimensions and pixel type of the core/suffix bands
-
   QString g_coreItemBytesStr(qube["CORE_ITEM_BYTES"][0]);
   QString g_suffixItemBytesStr(qube["SUFFIX_BYTES"][0]);
 
@@ -203,14 +181,11 @@ void importQubs(QString coreParamName, QString suffixParamName) {
 
   PvlKeyword coreKey = qube.findKeyword("CORE_ITEM_TYPE");
 
-
   // Set PixelType for core and suffix bands
-
   if (coreKey[0] == "VAX_REAL")
       g_corePixelType = Isis::Real;
   else if (coreKey[0] == "VAX_INTEGER")
       g_corePixelType = Isis::SignedWord;
-
 
   PvlKeyword suffixKey;
 
@@ -221,7 +196,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
           else if (suffixKey[0] == "VAX_INTEGER")
              g_suffixPixelType = Isis::SignedWord;
   }
-
 
   // Convert the pds file to a cube
   try {
@@ -243,6 +217,10 @@ void importQubs(QString coreParamName, QString suffixParamName) {
 
   g_coreCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
+//Pvl mappingLabel;
+//importPds.TranslatePdsProjection(mappingLabel);
+//PvlGroup mappingGroup = mappingLabel.findGroup("Mapping", Pvl::Traverse);
+PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Traverse);
 
   importPds.StartProcess();
   translateNIMSLabels(*pdsLabel,g_coreCube,inFile,CORE);
@@ -259,16 +237,182 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   importPds.ClearOutputCubes();
   g_suffixCube = importPds.SetOutputCube("SUFFIX");
 
-
-
   importPds.SetSuffixOffset(importPds.Samples(),importPds.Lines(),g_coreBands,g_coreItemBytes);
   g_suffixCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
-
 
   importPds.StartProcess(); 
   translateNIMSLabels(*pdsLabel,g_suffixCube,inFile,SUFFIX);
   importPds.EndProcess();
 
+// New nocam2map hint PvlGroup
+  Cube coreCube(FileName(ui.GetFileName("CORE")).expanded(),"rw");
+  Cube suffixCube(FileName(ui.GetFileName("SUFFIX")).expanded(), "rw");
+
+  PvlGroup mappingInfo("MappingInformation");
+
+  mappingInfo += Isis::PvlKeyword("LatitudeType");
+  mappingInfo += Isis::PvlKeyword("LongitudeDirection");
+  mappingInfo += Isis::PvlKeyword("MapResolution");
+  mappingInfo += Isis::PvlKeyword("MinimumLatitude");
+  mappingInfo += Isis::PvlKeyword("MaximumLatitude");
+  mappingInfo += Isis::PvlKeyword("MinimumLongitude");
+  mappingInfo += Isis::PvlKeyword("MaximumLongitude"); 
+  mappingInfo += Isis::PvlKeyword("MapProjectionType");
+  mappingInfo += Isis::PvlKeyword("MapScale"); 
+  mappingInfo += Isis::PvlKeyword("MapProjectionRotation"); 
+  mappingInfo += Isis::PvlKeyword("MajorEquatorialRadius"); 
+  mappingInfo += Isis::PvlKeyword("MinorEquatorialRadius"); 
+  mappingInfo += Isis::PvlKeyword("PolarRadius"); 
+
+  if (originalMappingGroup["COORDINATE_SYSTEM_NAME"][0] == "PLANETOCENTRIC") {
+    mappingInfo["LatitudeType"] = "Planetocentric";
+  }
+  else {
+    mappingInfo["LatitudeType"] = "Planetographic";
+  }
+
+  if (originalMappingGroup["POSITIVE_LONGITUDE_DIRECTION"][0] == "WEST") {
+    mappingInfo["LongitudeDirection"] = "PositiveWest";
+  }
+  else {
+    mappingInfo["LongitudeDirection"] = "PositiveEast";
+  }
+
+  mappingInfo["MapResolution"] = originalMappingGroup["MAP_RESOLUTION"][0];
+  mappingInfo["MapResolution"].setUnits("pixels/degree");
+
+  mappingInfo["MinimumLatitude"] = originalMappingGroup["MINIMUM_LATITUDE"][0];
+  mappingInfo["MaximumLatitude"] = originalMappingGroup["MAXIMUM_LATITUDE"][0];
+
+  mappingInfo["MinimumLongitude"] = originalMappingGroup["EASTERNMOST_LONGITUDE"][0];
+  mappingInfo["MaximumLongitude"] = originalMappingGroup["WESTERNMOST_LONGITUDE"][0];
+
+  mappingInfo["MinimumLatitude"].setUnits("degrees");
+  mappingInfo["MaximumLatitude"].setUnits("degrees");
+  mappingInfo["MinimumLongitude"].setUnits("degrees");
+  mappingInfo["MaximumLongitude"].setUnits("degrees");
+
+  mappingInfo["MapProjectionType"] = originalMappingGroup["MAP_PROJECTION_TYPE"][0];
+
+  mappingInfo["MapScale"] = originalMappingGroup["MAP_SCALE"][0];
+  mappingInfo["MapScale"].setUnits("km/pixel");
+
+  mappingInfo["MapProjectionRotation"] = originalMappingGroup["MAP_PROJECTION_ROTATION"][0];
+  mappingInfo["MapProjectionRotation"].setUnits("degrees");
+
+  mappingInfo["MajorEquatorialRadius"] = originalMappingGroup["A_AXIS_RADIUS"][0];
+  mappingInfo["MinorEquatorialRadius"] = originalMappingGroup["B_AXIS_RADIUS"][0];
+  mappingInfo["PolarRadius"] = originalMappingGroup["C_AXIS_RADIUS"][0];
+
+  mappingInfo["MajorEquatorialRadius"].setUnits("km");
+  mappingInfo["MinorEquatorialRadius"].setUnits("km");
+  mappingInfo["PolarRadius"].setUnits("km");
+
+  coreCube.putGroup(mappingInfo);
+  suffixCube.putGroup(mappingInfo);
+
+  coreCube.close();
+  suffixCube.close();
+
+// Mapping group code -- keep in case we can use this in the future. 
+
+#if 0
+  // Reopen the cubes in order to fix the mapping group
+
+  Cube suffixCube(FileName(ui.GetFileName("SUFFIX")).expanded());
+  Cube coreCube(FileName(ui.GetFileName("CORE")).expanded(),"rw");
+
+  // Read the center lat/lon off the suffix cube.
+  // Band 1 is latitude
+  // Band 2 is longitude
+  int brickSamples = 1;
+  int brickLines = 1;
+  int brickStartSample = (importPds.Samples() + 1)/2; // ceil
+  int brickStartLine = (importPds.Lines() + 1)/2;     // ceil
+  double centerLatitude = 0;
+  double centerLongitude = 0;
+  if (!(importPds.Samples() % 2)) {
+    brickSamples = 2;
+  }
+  if (!(importPds.Lines() % 2)) {
+    brickLines = 2;
+  }
+  Brick b(brickSamples, brickLines, 1, suffixCube.pixelType());
+
+  b.SetBasePosition(brickStartSample, brickStartLine, 1);
+  suffixCube.read(b);
+  for (int i = 0; i < b.size(); i++) {
+    centerLatitude += b[i];
+  }
+  centerLatitude /= b.size();
+
+  b.SetBasePosition(brickStartSample, brickStartLine, 2);
+  suffixCube.read(b);
+  for (int i = 0; i < b.size(); i++) {
+    centerLongitude += b[i];
+  }
+  centerLongitude /= b.size();
+
+  // Fix the translated mapping group
+  try {
+
+    if (mappingGroup["ProjectionName"][0] == "PointPerspective") {
+      mappingGroup["Distance"].setValue(originalMappingGroup["TARGET_CENTER_DISTANCE"][0],
+                                        "meters");
+      double lineOffset = -(double)(importPds.Lines()+1) / 2;
+      double sampleOffset = -(double)(importPds.Samples()+1) / 2;
+      double resolution = mappingGroup["PixelResolution"][0].toDouble();
+      mappingGroup["UpperLeftCornerY"] = toString(-lineOffset * resolution);
+      mappingGroup["UpperLeftCornerX"] = toString(sampleOffset * resolution);
+      if (originalMappingGroup["COORDINATE_SYSTEM_NAME"][0] == "PLANETOCENTRIC") {
+        mappingGroup["LatitudeType"] = "Planetocentric";
+      }
+    }
+
+    if (originalMappingGroup.hasKeyword("CENTER_LATITUDE")) {
+      if (mappingGroup.hasKeyword("CenterLatitude")) {
+        mappingGroup["CenterLatitude"].setValue(originalMappingGroup["CENTER_LATITUDE"][0],
+                                                "degrees");
+      }
+      else {
+        PvlKeyword clat("CenterLatitude", originalMappingGroup["CENTER_LATITUDE"][0], "degrees" );
+        mappingGroup.addKeyword(clat);
+      }
+    }
+    else {
+      if (mappingGroup.hasKeyword("CenterLatitude")) {
+        mappingGroup["CenterLatitude"].setValue(toString(centerLatitude),
+                                                "degrees");
+      }
+      else {
+        PvlKeyword clat("CenterLatitude", toString(centerLatitude), "degrees" );
+        mappingGroup.addKeyword(clat);
+      }
+    }
+    if (originalMappingGroup.hasKeyword("CENTER_LONGITUDE")) {
+      mappingGroup["CenterLongitude"].setValue(originalMappingGroup["CENTER_LONGITUDE"][0],
+                                               "degrees");
+    }
+    else {
+      mappingGroup["CenterLongitude"].setValue(toString(centerLongitude),
+                                               "degrees");
+    }
+    mappingGroup["LongitudeDomain"].setUnits("degrees");
+    mappingGroup["MinimumLatitude"].setUnits("degrees");
+    mappingGroup["MaximumLatitude"].setUnits("degrees");
+    mappingGroup["MinimumLongitude"].setUnits("degrees");
+    mappingGroup["MaximumLongitude"].setUnits("degrees");
+  }
+  catch(IException &e) {
+    QString msg = "Unable to correct mapping group.";
+    throw IException(e, IException::User, msg, _FILEINFO_);
+  }
+
+  coreCube.putGroup(mappingGroup);
+
+  coreCube.close();
+  suffixCube.close();
+#endif 
 }
 
 
@@ -281,19 +425,14 @@ void importQubs(QString coreParamName, QString suffixParamName) {
  *          a QTextStream which is then fed into a Pvl object.
  *
  */
-
-
 QByteArray pvlFix(QString fileName){
-
-
   QByteArray null;
   QFile pvlFile;
 
   pvlFile.setFileName(fileName);
 
-  if ( !pvlFile.open(QFile::ReadOnly|QIODevice::Text))
+  if ( !pvlFile.open(QFile::ReadOnly|QIODevice::Text) )
     return null;
-
 
   //Read the Pvl file into a byte array
   QByteArray fileData = pvlFile.readAll();
@@ -306,22 +445,15 @@ QByteArray pvlFix(QString fileName){
 
   //Is this one of the messed up files?
   if (pvlData.contains(QByteArray("*/\"") ) ){
-
-  pvlData.replace("*/\""," */");
-
+    pvlData.replace("*/\""," */");
   }
 
   if (pvlData.contains(QByteArray("//") ) ){
-
-  pvlData.replace("//","  ");
-
+    pvlData.replace("//","  ");
   }
 
   return pvlData;
-
-
 }
-
 
 
 /**
@@ -334,35 +466,24 @@ QByteArray pvlFix(QString fileName){
  * @return  None
  *
  */
-
-
 void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype){
-
-
   Pvl archiveLabel;
   Pvl instrumentLabel;
   Pvl bandBinLabel;
-
 
   Pvl pdsLabel(pdsLab);
   //QFileInfo fi(inFile.expanded());
 
   PvlObject qube(pdsLab.findObject("Qube"));
 
-
-
   // Directory containing translation tables
-
-
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["galileo"] + "/translations/";
-
 
   QString instrument="galileoNIMSInstrument.trn";
   QString archive = "galileoNIMSArchive.trn";
   QString coreBandBin = "galileoNIMSCoreBandBin.trn";
   QString suffixBandBin = "galileoNIMSSuffixBandBin.trn";
-
 
   FileName coreBandBinFile(transDir+coreBandBin);
   FileName suffixBandBinFile(transDir+suffixBandBin);
@@ -375,30 +496,20 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   PvlTranslationManager coreBandBinXlator(pdsLabel,coreBandBinFile.expanded());
   PvlTranslationManager suffixBandBinXlator(pdsLabel,suffixBandBinFile.expanded());
 
-
-
   archiveXlator.Auto(archiveLabel);
 
   if (ctype==CORE) {
-
     coreBandBinXlator.Auto(bandBinLabel);
-
   }
   else {
-
     suffixBandBinXlator.Auto(bandBinLabel);
-
   }
 
   instrumentXlator.Auto(instrumentLabel);
 
-
   ocube->putGroup(archiveLabel.findGroup("Archive",Pvl::Traverse));
   ocube->putGroup(instrumentLabel.findGroup("Instrument",Pvl::Traverse));
   ocube->putGroup(bandBinLabel.findGroup("BandBin",Pvl::Traverse));
-
-
-
 }
 
 
@@ -413,17 +524,11 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
  * @return  None
  *
  */
-
-
 void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
 
 //Create the BandBin Group
-
-
   PvlObject qube(pdsLab.findObject("Qube"));
   PvlGroup bandBin("BandBin");
-
-
 
   PvlKeyword suffixNames("BandSuffixName");
   PvlKeyword suffixUnits("BandSuffixUnit");
@@ -434,11 +539,9 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
   PvlKeyword suffixSolarFluxes("SolarFlux");
   PvlKeyword suffixSensitivities("Sensitivity");
 
-
   QString baseStr,multStr;
   vector<double> multi(g_suffixBands);
   vector<double> base(g_suffixBands);
-
 
   for(int i = 0; i < g_suffixBands; i++) {
     suffixNames+= (QString)qube["BAND_SUFFIX_NAME"][i];
@@ -464,11 +567,7 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
 
     if (qube.hasKeyword("BAND_BIN_SENSITIVITY") )
         suffixSensitivities += (QString)qube["BAND_BIN_SENSITIVITY"][i];
-
-
   }
-
-
 
   bandBin += suffixNames;
   bandBin += suffixUnits;
@@ -485,19 +584,14 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
    if(qube.hasKeyword("STD_DEV_SELECTED_BAND_NUMBER"))
      bandBin += (QString)qube["STD_DEV_SELECTED_BAND_NUMBER"];
 
-
   for(int i = 0; i < g_suffixBands; i++) {
-
     multStr = (QString)qube["BAND_SUFFIX_MULTIPLIER"];
     baseStr = (QString)qube["BAND_SUFFIX_BASE"];
     multi[i]=multStr.toDouble();
     base[i] = baseStr.toDouble();
-
     }
-
   importPds.SetMultiplier(multi);
   importPds.SetBase(base);
   nimsCube->putGroup(bandBin);
-
 }
 

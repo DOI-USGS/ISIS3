@@ -19,5 +19,5 @@ Object = AutoRegistration
 End_Object
 End
 Register = 1
-Goodness = 0.000831
-Position = 512.683 511.704
+Goodness = 0.00451
+Position = 512.592 511.628

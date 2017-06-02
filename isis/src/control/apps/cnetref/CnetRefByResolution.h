@@ -72,6 +72,9 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                                             Ground ------> Fixed
    *                                             Tie----------> Free
+   *   @history 2016-07-13 Adam Paquette - Updated Ignored keyword in pvlMeasureGrp to a
+   *                                       more accurate error messages as to whythe measure
+   *                                       is being ignored
    */
   class CnetRefByResolution : public ControlNetValidMeasure {
     public:

@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 4928 $
+ * $Date: 2012-12-21 10:44:12 -0700 (Fri, 21 Dec 2012) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for

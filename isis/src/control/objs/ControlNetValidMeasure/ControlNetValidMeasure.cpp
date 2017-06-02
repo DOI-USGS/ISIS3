@@ -195,10 +195,10 @@ namespace Isis {
       double pSample, double pLine, const ControlMeasure *pMeasure, Cube *pCube,
       Camera *measureCamera, PvlGroup *pMeasureGrp) {
 
-    mdEmissionAngle  = 0;
-    mdIncidenceAngle = 0;
+    mdEmissionAngle  = Null;
+    mdIncidenceAngle = Null;
     mdDnValue        = 0;
-    mdResolution     = 0;
+    mdResolution     = Null;
     mdSampleResidual = 0;
     mdLineResidual   = 0;
     mdResidualMagnitude=0;
@@ -207,11 +207,12 @@ namespace Isis {
     m_pixelShift = 0;
 
     if (measureCamera != NULL) {
-      measureCamera->SetImage(pSample, pLine);
-
-      mdEmissionAngle     = measureCamera->EmissionAngle();
-      mdIncidenceAngle    = measureCamera->IncidenceAngle();
-      mdResolution        = measureCamera->PixelResolution();
+      bool success = measureCamera->SetImage(pSample, pLine);
+      if (success) {
+        mdEmissionAngle     = measureCamera->EmissionAngle();
+        mdIncidenceAngle    = measureCamera->IncidenceAngle();
+        mdResolution        = measureCamera->PixelResolution();
+      }
     }
 
     if (pMeasure != NULL) {
@@ -254,10 +255,15 @@ namespace Isis {
     }
 
     if(pMeasureGrp != NULL) {
-      if(mbCameraRequired) {
+      if(mbCameraRequired && (mdEmissionAngle != Null || mdIncidenceAngle != Null || mdResolution != Null)) {
         *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  toString(mdEmissionAngle));
         *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", toString(mdIncidenceAngle));
         *pMeasureGrp += Isis::PvlKeyword("Resolution",     toString(mdResolution));
+      }
+      else {
+        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  "Invalid Emission Angle");
+        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", "Invalid Incidence Angle");
+        *pMeasureGrp += Isis::PvlKeyword("Resolution",     "Invalid Resolution");
       }
       if(mbValidateDN) {
         *pMeasureGrp += Isis::PvlKeyword("DNValue", toString(mdDnValue));
@@ -281,7 +287,7 @@ namespace Isis {
 
       if(!ValidIncidenceAngle(mdIncidenceAngle)) {
         results.addFailure(MeasureValidationResults::IncidenceAngle,
-            mdIncidenceAngle, mdMinIncidenceAngle, mdMaxEmissionAngle);
+            mdIncidenceAngle, mdMinIncidenceAngle, mdMaxIncidenceAngle);
       }
 
       if(!ValidResolution(mdResolution)) {

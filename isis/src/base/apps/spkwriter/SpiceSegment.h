@@ -2,8 +2,8 @@
 #define SpiceSegment_h
 /**                                                                       
  * @file                                                                  
- * $Revision$ 
- * $Date$
+ * $Revision: 6314 $ 
+ * $Date: 2015-08-12 15:30:27 -0700 (Wed, 12 Aug 2015) $
  *                                                                        
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
@@ -22,7 +22,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  *  
- *   $Id$
+ *   $Id: SpiceSegment.h 6314 2015-08-12 22:30:27Z jwbacker@GS.DOI.NET $
  */                                                                       
 
 #include <cmath>

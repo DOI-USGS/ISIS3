@@ -53,4 +53,5 @@ Thrown from openDSK(): Open DSK file that doesn't exist.
 **USER ERROR** NAIF DSK file [./junk.bds] does not exist.
 
 ~NaifDskDescriptor(): Unknown NAIF error has occured.
-**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(FILARCHMISMATCH)]. The Naif error is [A request to load the DAF file, /usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp, has been made by the DAS system.  This operation is not permitted.].
+"**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(FILARCHMISMATCH)]. The Naif error is [A request to load the DAF file, data/base/kernels/spk/de405.bsp, has been made by the DAS system.  This operation is not permitted.]." 
+

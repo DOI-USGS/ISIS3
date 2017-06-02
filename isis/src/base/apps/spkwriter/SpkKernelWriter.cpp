@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
+ * $Revision: 5850 $
+ * $Date: 2014-05-27 15:22:24 -0700 (Tue, 27 May 2014) $
+ * $Id: SpkKernelWriter.cpp 5850 2014-05-27 22:22:24Z jwbacker@GS.DOI.NET $
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

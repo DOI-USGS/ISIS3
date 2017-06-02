@@ -246,6 +246,9 @@
     <change name="Ken Edmundson" date="2016-11-17">
       Output control net will be now be written regardless of whether bundle converges. Fixes #4533.
     </change>
+    <change name="Ken Edmundson" date="2017-01-17">
+      Updated description and brief for SOLVETARGETBODY and TBPARAMETERS.
+    </change>
   </history>
 
   <groups>
@@ -981,12 +984,13 @@
       <parameter name="SOLVETARGETBODY">
         <type>boolean</type>
         <default><item>false</item></default>
-        <brief>Enter target body parameters and a priori values using a PVL file</brief>
+        <brief>
+	  Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
+	  using a PVL file specified by TBPARAMETERS below.</brief>
         <description>
-          This option indicates that target body parameters are to be input via the PVL file specified
-          by TBPARAMETERS. All of the following values for coefficients must be in the PVL file:
-          body pole RA and DEC; prime meridian; triaxial radii and/or mean radius. An example template
-          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+          Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
+	  using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
+	  $base/templates/jigsaw/TargetBodyParameters.pvl.
         </description>
         <inclusions>
           <item>TBPARAMETERS</item>
@@ -997,20 +1001,13 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          File containing target body parameters to solve and a priori values
+          File containing target body parameters to solve for, their a priori values and uncertainties.
         </brief>
         <description>
-          This file contains target body parameters to use and solve for in the bundle adjustment.
-          File must be in PVL format. It should contain an object called TargetParameters.The
-          SpacecraftName and InstrumentId keywords in the Instrument group
-          of an image file are used to create the name of each group in the PVL file. The
-          group pertaining to each spacecraft/instrument should contain the keyword/value
-          pairs needed to process images taken with that sensor:  CKDEGREE, CKSOLVEDEGREE,
-          CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE, SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE,
-          SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
-          CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
-          If any of these keywords are missing, then their defaults will be used. An example template
-          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+          This file contains target body parameters to solve for in the bundle adjustment, their
+	  a priori values, and uncertainties. The file must be in PVL format. An example template
+          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl. Instructions for the PVL
+	  structure are given in the template.
         </description>
         <filter>
           *.pvl

@@ -2,8 +2,8 @@
 #define MdisCalUtils_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 6715 $
+ * $Date: 2016-04-28 10:58:43 -0700 (Thu, 28 Apr 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions

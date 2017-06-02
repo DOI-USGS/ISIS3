@@ -36,12 +36,15 @@
 namespace Isis {
 
   /**
-  * @brief Constructor that creates a WorkOrder that will retrieve target body info.
+  * @brief Creates a WorkOrder that will retrieve target body info.
   * @param project The Project that this WorkOrder should be interacting with.
   *
   */
   SensorGetInfoWorkOrder::SensorGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
+
+    // Currently undo is not implemented.
+    m_isUndoable = false;
     QAction::setText(tr("Get Info...") );
   }
 
@@ -72,8 +75,8 @@ namespace Isis {
 
 
   /**
-   * @brief Determines if this WorkOrder can be executed. It does this by determining
-   * if we already have a view for this camera.  If we do, then do not
+   * @brief Determine if we already have a view for this camera.
+   * If we do, then do not
    * redisplay the view, and return false.
    *
    * @param guiCamera  A Camera object contained within a Project.
@@ -100,8 +103,8 @@ namespace Isis {
    * in a view.
    * @return  @b bool True if successful, False if not.
    */
-  bool SensorGetInfoWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SensorGetInfoWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString sensorDisplayName = guiCamera()->displayProperties()->displayName();
@@ -130,7 +133,7 @@ namespace Isis {
   /**
    * @brief  Redisplays the sensor view.
    */
-  void SensorGetInfoWorkOrder::syncRedo() {
+  void SensorGetInfoWorkOrder::execute() {
     SensorInfoWidget *sensorInfoWidget =
         project()->directory()->addSensorInfoView(guiCamera() );
 
@@ -145,7 +148,7 @@ namespace Isis {
   /**
    * @brief  Deletes the last view.  Currently this function is not implemented.
    */
-  void SensorGetInfoWorkOrder::syncUndo() {
+  void SensorGetInfoWorkOrder::undoExecution() {
     //delete project()->directory()->cnetEditorViews().last();
   }
 }

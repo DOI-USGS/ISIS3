@@ -31,7 +31,7 @@ commands:
 	  true; \
 	fi;
 	if [ `$(APPNAME) \
-	  url=http://pdsimage2.wr.usgs.gov/cdroms/Viking_Orbiter/vo_1004/f253sxx/f26.imq \
+	  url=https://pdsimage2.wr.usgs.gov/cdroms/Viking_Orbiter/vo_1004/f253sxx/f26.imq \
 	  topath=$(OUTPUT) \
 	  >& $(OUTPUT)/httpFileDNEtmp.txt` ]; then \
 	  true; \

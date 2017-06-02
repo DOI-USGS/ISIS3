@@ -34,11 +34,14 @@ namespace Isis {
   class FileName;
 
   /**
-   * Saves a project to disk (File->Save Project As...)
+   * @brief Saves a project to disk (File->Save Project As...)
    *
    * @author 2012-??-?? ???
    *
    * @internal
+   *   @history 2017-04-11 Ian Humphrey - Updated the work order according to the redesign of
+   *                           WorkOrder. Separated setup and execution steps into setupExecution
+   *                           and execution(). Fixes #4763.
    */
   class SaveProjectAsWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -49,7 +52,8 @@ namespace Isis {
 
       virtual SaveProjectAsWorkOrder *clone() const;
 
-      bool execute();
+      virtual bool setupExecution();
+      virtual void execute();
 
     private:
       SaveProjectAsWorkOrder &operator=(const SaveProjectAsWorkOrder &rhs);

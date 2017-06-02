@@ -79,6 +79,12 @@ namespace Isis {
    *                           The m_permToolBar, m_activeToolBar, and m_toolPad now have object
    *                           names set, so the saveState() call within writeSettings() now works.
    *                           Fixes #4358.
+   *   @history 2016-12-09 Tracie Sucharski - One of the previous 2 changes caused a problem with
+   *                           view toolbars not to be restored.  Added setActiveSubWindow and
+   *                           show to the ::addView method.  Fixes #4546.
+   *   @history 2017-04-17 Ian Humphrey - Updated createMenus() to set tool tips (hover text)
+   *                           visible so the JigsawWorkOrder tool tip can be displayed to user
+   *                           (which indicates why it is disabled by default). Fixes #4749.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT

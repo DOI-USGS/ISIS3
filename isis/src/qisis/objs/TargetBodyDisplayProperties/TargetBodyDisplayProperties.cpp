@@ -144,6 +144,7 @@ namespace Isis {
 
   /**
    * @brief Saves this object to an XML file.
+   *
    * @param stream  The XML stream writer write to.
    * @param project The project this object is attached to (not used).
    * @param newProjectRoot FileName of the project?  (not used).
@@ -169,6 +170,7 @@ namespace Isis {
 
   /**
    * @brief Change the color associated with this target.
+   *
    * @param newColor  The new color associated with this target.
    */
   void TargetBodyDisplayProperties::setColor(QColor newColor) {
@@ -178,6 +180,7 @@ namespace Isis {
 
   /**
    * @brief Change the selected state associated with this target.
+   *
    * @param The new state associated with this target.
    */
   void TargetBodyDisplayProperties::setSelected(bool newValue) {
@@ -187,6 +190,7 @@ namespace Isis {
 
   /**
    * @brief Change the visibility of the display name associated with this target.
+   * 
    * @param newValue The visibiliy of the display name for this target.
    */
   void TargetBodyDisplayProperties::setShowLabel(bool newValue) {
@@ -195,8 +199,10 @@ namespace Isis {
 
 
   /**
-   * @description. Change the visibility of the display name. This should only be connected to
-   * by an action with a list of displays as its data. This synchronizes all
+   * @brief Change the visibility of the display name. 
+   *
+   * This should only be connected to
+   * an action with a list of displays as its data. This synchronizes all
    * of the values where at least one is guaranteed to be toggled.
    */
   void TargetBodyDisplayProperties::toggleShowLabel() {
@@ -213,7 +219,9 @@ namespace Isis {
 
 
   /**
-   * @description Constructor for the XmlHandler class.  This is a child class of XmlStackedHandler,
+   * @brief Constructor for the XmlHandler class.  
+   * 
+   * This is a child class of XmlStackedHandler,
    * which is used by XmlStackedHandlerReader to parse an XML file.
    * @param displayProperties Pointer to a TargetBodyDisplayProperties object.
    */
@@ -249,7 +257,7 @@ namespace Isis {
 
 
   /**
-   * @description This implementation of a virtual function calls
+   * @brief This implementation of a virtual function calls
    * QXmlDefaultHandler::characters(QString &ch)
    * which in turn calls QXmlContentHandler::characters(QString &ch) which
    * is called when the XML processor has parsed a chunk of character data.
@@ -291,8 +299,10 @@ namespace Isis {
 
 
   /**
-   * @description This is the generic mutator for properties. Given a value, this will
-   * change it and emit propertyChanged if its different and supported.
+   * @brief This is the generic mutator for properties. 
+   *
+   * Given a value, this will change it and emit propertyChanged if its 
+   * different and supported.
    * @param prop The key into the m_propertyValues QMap <int, QVariant>
    * @param value The value we want to change to.
    */
@@ -308,7 +318,9 @@ namespace Isis {
 
 
   /**
-   * @description This is for the slots that have a list of display properties as associated
+   * @brief Return display properties associated with a slot.
+   *
+   * This is for the slots that have a list of display properties as associated
    * data. This gets that list out of the data.
    * @param The object requesting the data.
    * @return @b QList<TargetBodyDisplayProperties *> A list of pointers to

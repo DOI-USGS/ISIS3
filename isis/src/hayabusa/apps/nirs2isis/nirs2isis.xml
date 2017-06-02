@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="nirs2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import Hayabusa NIRS FITS files into ISIS format
+  </brief>
+  <description>
+    This program will import a PDS formatted Hayabusa Near-Infrared
+    Spectrometer (NIRS) image into ISIS cube format. The image data must be in
+    a FITS format (.fit or .fits). An accompanying label file must also be
+    provided (.lbl).
+  </description>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-12-28">
+      Original version
+    </change>
+    <change name="Christopher Combs" date="2017-04-07">
+      Changed category from "Import and Export" to "Hayabusa".
+      Updated documentation after review.
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>nirs2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>Hayabusa</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The image label file
+        </brief>
+        <description>
+          The detached label file for the image. The application will use the
+          FITS image file associated with the label file. The FITS header will
+          be combined with the label file to produce complete labels for the
+          output cubes.
+        </description>
+        <filter>
+          *.lbl *.LBL
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output reflectance cube.
+        </brief>
+        <description>
+          The output cube containing averaged reflectance values for the
+          entire observation. A temporary cube will be created using the output
+          cube's base name followed by ".temp.cub". This temporary file will be
+          removed when the program finishes.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TOSTDDEV">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output standard deviation cube.
+        </brief>
+        <description>
+          The output cube containing the standard deviation of reflectance
+          values for the entire observation.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -47,8 +47,8 @@ int main(void) {
 //    double knownLon = 225.0221110457575264; // Version 1 values
 //   double knownLat = -0.1923383009013995;
 //    double knownLon = 225.0671436738516888;
-    double knownLat =  -0.1987371828743253;
-    double knownLon = 225.0531249933427489;
+    double knownLat =  -0.1799382527687776;
+    double knownLon = 225.0254441224830941;
 
     Cube c("$messenger/testData/EW0089570936I.cub", "r");
     MdisCamera *cam = (MdisCamera *) CameraFactory::Create(c);

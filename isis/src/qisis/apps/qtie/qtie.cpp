@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QCoreApplication>
 #include <QToolBar>
 
 #include "Gui.h"
@@ -36,6 +37,11 @@ int main(int argc, char *argv[]) {
   Isis::Gui::checkX11();
 
   try {
+
+    // Add the Qt plugin directory to the library path
+    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
+
     QApplication *app = new QApplication(argc, argv);
     QApplication::setApplicationName("qtie");
     app->setStyle("windows");
@@ -87,7 +93,7 @@ int main(int argc, char *argv[]) {
     int status = app->exec();
 
     //Clean up the objects allocated onto the heap
-   
+
     delete ftool;
     ftool = NULL;
     delete stool;
@@ -105,4 +111,3 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 }
-

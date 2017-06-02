@@ -55,6 +55,7 @@ namespace Isis {
    *                           and creating control points.  These are passed on to Directory slots.
    *   @history 2016-10-20 Tracie Sucharski -  Added back the capability for choosing either a new
    *                           view or using an existing view.
+   *   @history 2017-02-06 Tracie Sucharski - Added status bar for the track tool.  Fixes #4475. 
    */
   class Footprint2DView : public AbstractProjectItemView {
 

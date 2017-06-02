@@ -23,12 +23,12 @@
 
 #include "ProjectItem.h"
 
+#include <QBrush>
 #include <QIcon>
 #include <QStandardItem>
 #include <QVariant>
 
 #include "BundleResults.h"
-#include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
 #include "Control.h"
 #include "ControlList.h"
@@ -44,21 +44,39 @@ namespace Isis {
   /**
    * Constructs an item without children, a parent, or a model.
    */
-  ProjectItem::ProjectItem() : QStandardItem() {}
+  ProjectItem::ProjectItem() : QStandardItem() {
+    setEditable(false);
+  }
 
-  
+
   /**
    * Contructs a copy of another item. The copy will have the same text,
    * icon, and data, and copies of the children. The copy will not have a
    * parent or a model.
-   * 
+   *
    * @param[in] item (ProjectItem *) The item to copy.
    */
   ProjectItem::ProjectItem(ProjectItem *item) {
+    item->setEditable(false);
     setProjectItem(item);
     for (int i=0; i < item->rowCount(); i++) {
       appendRow(new ProjectItem( item->child(i) ) );
     }
+  }
+
+
+  /**
+   * Constructs an item representing a file in the filesystem.
+   *
+   * @param[in] filename The full path to the file in the filesystem
+   * @param[in] treetext The name displayed in the project tree
+   * @param[in] filename A icon to display next to the treetext
+   */
+  ProjectItem::ProjectItem(FileItemQsp filename, QString treeText, QIcon icon) {
+    setEditable(false);
+    setData(QVariant::fromValue<FileItemQsp>(filename));
+    setText(treeText);
+    setIcon(icon);
   }
 
 
@@ -69,8 +87,8 @@ namespace Isis {
    *                                          construct from.
    */
   ProjectItem::ProjectItem(BundleResults bundleResults) {
+    setEditable(false);
     setBundleResults(bundleResults);
-    appendRow( new ProjectItem( bundleResults.correlationMatrix() ) );
   }
 
 
@@ -81,6 +99,7 @@ namespace Isis {
    *                                               construct from.
    */
   ProjectItem::ProjectItem(BundleSettingsQsp bundleSettings) {
+    setEditable(false);
     setBundleSettings(bundleSettings);
   }
 
@@ -92,14 +111,16 @@ namespace Isis {
    *                                                      to construct from.
    */
   ProjectItem::ProjectItem(BundleSolutionInfo *bundleSolutionInfo) {
+    setEditable(false);
     setBundleSolutionInfo(bundleSolutionInfo);
-    
+
+    appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
     Control *control = new Control(cNetFileName);
     appendRow( new ProjectItem(control) );
 
-    appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
+    appendRow( new ProjectItem( bundleSolutionInfo->imageList() ) );
   }
 
 
@@ -109,6 +130,7 @@ namespace Isis {
    * @param[in] control (Control *) The Control to construct from.
    */
   ProjectItem::ProjectItem(Control *control) {
+    setEditable(false);
     setControl(control);
   }
 
@@ -119,6 +141,7 @@ namespace Isis {
    * @param[in] controlList (ControlList *) The ControlList to construct from.
    */
   ProjectItem::ProjectItem(ControlList *controlList) {
+    setEditable(false);
     setControlList(controlList);
     foreach (Control *control, *controlList) {
       appendRow( new ProjectItem(control) );
@@ -132,6 +155,7 @@ namespace Isis {
    * @param[in] controls (QList<ControlList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ControlList *> controls) {
+    setEditable(false);
     setControls();
     foreach (ControlList *controlList, controls) {
       appendRow( new ProjectItem(controlList) );
@@ -146,6 +170,7 @@ namespace Isis {
    *                                                  construct from.
    */
   ProjectItem::ProjectItem(CorrelationMatrix correlationMatrix) {
+    setEditable(false);
     setCorrelationMatrix(correlationMatrix);
   }
 
@@ -156,6 +181,7 @@ namespace Isis {
    * @param[in] image (Image *) The Image to construct from.
    */
   ProjectItem::ProjectItem(Image *image) {
+    setEditable(false);
     setImage(image);
   }
 
@@ -166,6 +192,7 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList to construct from.
    */
   ProjectItem::ProjectItem(ImageList *imageList) {
+    setEditable(false);
     setImageList(imageList);
     foreach (Image *image, *imageList) {
       appendRow( new ProjectItem(image) );
@@ -179,19 +206,21 @@ namespace Isis {
    * @param[in] images (QList<ImageList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ImageList *> images) {
+    setEditable(false);
     setImages();
     foreach (ImageList *imageList, images) {
       appendRow( new ProjectItem(imageList) );
     }
   }
 
-  
+
   /**
    * Constructs an item from an Shape.
    *
    * @param[in] shape (Shape *) The Shape to construct from.
    */
   ProjectItem::ProjectItem(Shape *shape) {
+    setEditable(false);
     setShape(shape);
   }
 
@@ -202,6 +231,7 @@ namespace Isis {
    * @param[in] shapeList (ShapeList *) The ShapeList to construct from.
    */
   ProjectItem::ProjectItem(ShapeList *shapeList) {
+    setEditable(false);
     setShapeList(shapeList);
     foreach (Shape *shape, *shapeList) {
       appendRow(new ProjectItem(shape));
@@ -215,6 +245,7 @@ namespace Isis {
    * @param[in] shapes (QList<ShapeList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ShapeList *> shapes) {
+    setEditable(false);
     setShapes();
     foreach (ShapeList *shapeList, shapes) {
       appendRow( new ProjectItem(shapeList) );
@@ -228,10 +259,11 @@ namespace Isis {
    * @param[in] guiCamera (GuiCameraQsp) The camera to construct from.
    */
   ProjectItem::ProjectItem(GuiCameraQsp guiCamera) {
+    setEditable(false);
     setGuiCamera(guiCamera);
   }
 
-  
+
   /**
    * Constructs an item from a GuiCameraList.
    *
@@ -239,6 +271,7 @@ namespace Isis {
    *                                            construct from.
    */
   ProjectItem::ProjectItem(GuiCameraList *guiCameraList) {
+    setEditable(false);
     setGuiCameraList();
     foreach (GuiCameraQsp guiCamera, *guiCameraList) {
       appendRow( new ProjectItem(guiCamera) );
@@ -259,19 +292,19 @@ namespace Isis {
     appendRow( new ProjectItem( project->images() ) );
 //  qDebug()<<"                                            rowCount() afterImages = "<<rowCount();
     appendRow( new ProjectItem( project->shapes() ) );
-        
+
     ProjectItem *targetBodyListItem = new ProjectItem();
     targetBodyListItem->setTargetBodyList();
     appendRow(targetBodyListItem);
-    
+
     ProjectItem *guiCameraListItem = new ProjectItem();
     guiCameraListItem->setGuiCameraList();
     appendRow(guiCameraListItem);
-    
+
     ProjectItem *spaceCraftItem = new ProjectItem();
     spaceCraftItem->setSpacecraft();
     appendRow(spaceCraftItem);
-    
+
     appendRow( new ProjectItem( project->bundleSolutionInfo() ) );
   }
 
@@ -283,6 +316,7 @@ namespace Isis {
    *                                                  from.
    */
   ProjectItem::ProjectItem(QList<BundleSolutionInfo *> results) {
+    setEditable(false);
     setResults();
     foreach (BundleSolutionInfo *bundleSolutionInfo, results) {
       appendRow( new ProjectItem( bundleSolutionInfo) );
@@ -296,6 +330,7 @@ namespace Isis {
    * @param[in] targetBody (TargetBodyQsp) The target body to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyQsp targetBody) {
+    setEditable(false);
     setTargetBody(targetBody);
   }
 
@@ -306,6 +341,7 @@ namespace Isis {
    * @param[in] targetBodyList (TargetBodyList *) The list to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyList *targetBodyList) {
+    setEditable(false);
     setTargetBodyList();
     foreach (TargetBodyQsp targetBody, *targetBodyList) {
       appendRow( new ProjectItem(targetBody) );
@@ -408,7 +444,7 @@ namespace Isis {
     return data().value<ControlList *>();
   }
 
-  
+
   /**
    * Returns the CorrelationMatrix stored the item.
    *
@@ -438,15 +474,25 @@ namespace Isis {
     return data().value<GuiCameraQsp>();
 
   }
-  
+
 
   /**
    * Returns the TargetBodyQsp stored in the data of the item.
-   * 
+   *
    * @return @b TargetBodyQsp The target body stored in the item.
    */
   TargetBodyQsp ProjectItem::targetBody() const {
     return data().value<TargetBodyQsp>();
+  }
+
+
+  /**
+   * Returns the FileItemQsp stored in the data of the item.
+   *
+   * @return @b FileItemQsp The filename stored in the item.
+   */
+  FileItemQsp ProjectItem::fileItem() const {
+    return data().value<FileItemQsp>();
   }
 
 
@@ -533,7 +579,7 @@ namespace Isis {
    *
    * @return @b bool If a Control is stored in the data of the item or not.
    */
-  bool ProjectItem::isControl() const { 
+  bool ProjectItem::isControl() const {
     return data().canConvert<Control *>();
   }
 
@@ -567,7 +613,7 @@ namespace Isis {
    *
    * @return @b bool If a Project is stored in the data of the item or not.
    */
-  bool ProjectItem::isProject() const { 
+  bool ProjectItem::isProject() const {
     return data().canConvert<Project *>();
   }
 
@@ -578,7 +624,7 @@ namespace Isis {
    *
    * @return @b bool If a GuiCameraQsp is stored in the item or not.
    */
-  bool ProjectItem::isGuiCamera() const {     
+  bool ProjectItem::isGuiCamera() const {
     return data().canConvert<GuiCameraQsp>();
   }
 
@@ -589,8 +635,19 @@ namespace Isis {
    *
    * @return @b bool If a TargetBodyQsp is stored in the item or not.
    */
-  bool ProjectItem::isTargetBody() const { 
+  bool ProjectItem::isTargetBody() const {
     return data().canConvert<TargetBodyQsp>();
+  }
+
+
+  /**
+   * Returns true if a FileItemQsp is stored in the data of the item.
+   * Returns false otherwise.
+   *
+   * @return @b bool If a FileItemQsp is stored in the item or not.
+   */
+  bool ProjectItem::isFileItem() const {
+    return data().canConvert<FileItemQsp>();
   }
 
 
@@ -603,6 +660,7 @@ namespace Isis {
     setText( item->text() );
     setIcon( item->icon() );
     setData( item->data() );
+    setEditable(item->isEditable());
   }
 
 
@@ -612,7 +670,7 @@ namespace Isis {
    * @param[in] bundleResults (BundleResults) The BundleResults.
    */
   void ProjectItem::setBundleResults(BundleResults bundleResults) {
-    setText("Results");
+    setText("Statistics");
     setIcon( QIcon(":results") );
     setData( QVariant::fromValue<BundleResults>(bundleResults) );
   }
@@ -743,7 +801,7 @@ namespace Isis {
     setData( QVariant() );
   }
 
-  
+
   /**
    * Sets the text, icon, and data corresponding to a CorrelationMatrix.
    *
@@ -764,7 +822,7 @@ namespace Isis {
    *     @history  2016-11-10 - Tyler Wilson  Changed the reference
    *               to the icon from ':data' to ':data-management'
    *               due to a naming conflict causing strange errors
-   *               to appear on the command line.  Fixes #3982.   
+   *               to appear on the command line.  Fixes #3982.
    */
   void ProjectItem::setProject(Project *project) {
     setText( project->name() );
@@ -803,8 +861,8 @@ namespace Isis {
     setIcon( QIcon(":camera") );
     setData( QVariant() );
   }
-  
-  
+
+
   /**
    * Sets the text, icon, and data corresponding to SpaceCraft.
    */
@@ -813,7 +871,7 @@ namespace Isis {
     setIcon( QIcon(":spacecraft") );
     setData( QVariant() );
   }
-  
+
 
   /**
    * Sets the text, icon, and data corresponding to a TargetBodyQsp.
@@ -834,7 +892,7 @@ namespace Isis {
       setIcon( QIcon(":moonPhase") );
     setData( QVariant::fromValue<TargetBodyQsp>(targetBody) );
   }
-  
+
 
   /**
    * Sets the text, icon, and data corresponding to a TargetBodyList.
@@ -861,7 +919,7 @@ namespace Isis {
     if ( data(role) == value ) {
       return this;
     }
-    
+
     for (int i=0; i<rowCount(); i++) {
 //    qDebug()<<"ProjectItem::findItemData  BEFORE call: child(i)->findItemData...";
       ProjectItem *item = child(i)->findItemData(value, role);
@@ -884,7 +942,7 @@ namespace Isis {
     QStandardItem::appendRow(item);
   }
 
- 
+
   /**
    * Returns the child item at a given row.
    *
@@ -948,12 +1006,16 @@ namespace Isis {
    */
   ProjectItem *ProjectItem::takeChild(int row) {
     QList<QStandardItem *> items = QStandardItem::takeRow(row);
-    
+
     if ( items.isEmpty() ) {
       return 0;
     }
 
     return static_cast<ProjectItem *>( items.first() );
   }
-  
+
+
+  void ProjectItem::setTextColor(Qt::GlobalColor color) {
+    setForeground(QBrush(color));
+  }
 }

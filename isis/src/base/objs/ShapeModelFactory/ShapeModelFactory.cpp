@@ -163,7 +163,7 @@ namespace Isis {
 
         //-------------- Is the shape model an ISIS DEM? ------------------------------//
         // TODO Deal with stacks -- this could be a list of DEMs
-        Isis::Cube* shapeModelCube = new Isis::Cube();
+        Isis::Cube* shapeModelCube = new Isis::Cube;
         try {
           // first, try to open the shape model file as an Isis3 cube
           shapeModelCube->open(FileName(shapeModelFilenames).expanded(), "r" );
@@ -192,6 +192,9 @@ namespace Isis {
         }
 
         if (projection->IsEquatorialCylindrical()) {
+
+          delete shapeModelCube;
+
           // If the EquatorialCylindricalShape constructor throws an error or returns null, the
           // following exception will be appended to the fileError. (Later added to the finalError)
           QString msg = "Unable to construct a DEM shape model from the given "

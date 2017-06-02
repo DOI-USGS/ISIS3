@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: hical.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
 #include "Isis.h"
 
 #include <cstdio>
@@ -109,7 +109,7 @@ void IsisMain(){
 
   const QString hical_program = "hical";
   const QString hical_version = "5.0";
-  const QString hical_revision = "$Revision$";
+  const QString hical_revision = "$Revision: 6715 $";
   const QString hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();

@@ -33,7 +33,8 @@ void IsisMain() {
   QUrl qurl(guiURL);
 
   //test if scheme is ftp or http
-  if (qurl.scheme().toLower() == "ftp" || qurl.scheme().toLower() == "http") {
+  if (qurl.scheme().toLower() == "ftp" || qurl.scheme().toLower() == "http" || 
+      qurl.scheme().toLower() == "https") {
 
     if (ui.IsInteractive()) {
       QString parameters = "URL=" + guiURL;

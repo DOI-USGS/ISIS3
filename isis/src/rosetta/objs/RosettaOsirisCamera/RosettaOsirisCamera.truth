@@ -1,3 +1,39 @@
+Unit Test for RosettaOsirisCameraDistortionMap...
+Create default distortion map
+
+Set distorted coordinates
+  Distorted coordinates: (0.5, 0.75)
+  Undistorted coordinates: (0.5, 0.75)
+
+Set undistorted coordinates
+  Distorted coordinates: (0.25, 0.1)
+  Undistorted coordinates: (0.25, 0.1)
+
+Modify the coefficient matrices
+Set distorted coordinates
+  Distorted coordinates: (1.0, 1.0)
+  Undistorted coordinates: (10.0, -10.0)
+
+Set distorted coordinates
+  Distorted coordinates: (0.0, 1.0)
+  Undistorted coordinates: (1.0, -10.0)
+
+Set distorted coordinates
+  Distorted coordinates: (1.0, 0.0)
+  Undistorted coordinates: (1.0, -1.0)
+
+Set undistorted coordinates
+  Distorted coordinates: (-1.04607821983755e-08, -0.85196984405198)
+  Undistorted coordinates: (1.0, 1.0)
+
+Set undistorted coordinates
+  Distorted coordinates: (0.71109275805717, -0.85196984405198)
+  Undistorted coordinates: (0.0, 1.0)
+
+Set undistorted coordinates
+  Distorted coordinates: (0.71109275805717, -0.85196984405198)
+  Undistorted coordinates: (1.0, 0.0)
+
 Unit Test for RosettaOsirisCamera...
 FileName: n20100710t154539230id20f22.cub
 CK Frame: -226111

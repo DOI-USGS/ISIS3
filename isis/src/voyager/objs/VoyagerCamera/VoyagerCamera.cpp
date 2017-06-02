@@ -47,7 +47,7 @@ namespace Isis {
    * for all framing cameras, the start and end exposure times are set in this
    * constructor.
    *
-   * @param lab Pvl label from a Voyager image.
+   * @param cube The image cube.
    *
    * @throw iException::User - "File does not appear to be a Voyager image.
    *        Invalid InstrumentId."
@@ -214,7 +214,7 @@ namespace Isis {
  * This is the function that is called in order to instantiate a VoyagerCamera
  * object.
  *
- * @param lab Cube labels
+ * @param cube The image Cube 
  *
  * @return Isis::Camera* VoyagerCamera
  * @author 2010-07-19 Mackenzie Boyd

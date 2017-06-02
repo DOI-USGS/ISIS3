@@ -34,30 +34,65 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order to save the project to a new location. This work order is
+   * synchronous and not undoable.
+   *
+   * @param Project *project Pointer to the project this work order belongs to.
+   */
   SaveProjectAsWorkOrder::SaveProjectAsWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This work order is not undoable
+    m_isUndoable = false;
     QAction::setText(tr("Save Project &As"));
     setCreatesCleanState(true);
   }
 
 
+  /**
+   * @brief Copy constructor.
+   *
+   * Creates a copy of the other SaveProjectAsWorkOrder.
+   *
+   * @param SaveProjectAsWorkOrder &other The other work order to copy state from.
+   */
   SaveProjectAsWorkOrder::SaveProjectAsWorkOrder(const SaveProjectAsWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
+  /**
+   * @brief Destructor.
+   *
+   * Destructor to clean up any memory that this work order allocates.
+   */
   SaveProjectAsWorkOrder::~SaveProjectAsWorkOrder() {
 
   }
 
 
+  /**
+   * @brief Creates a clone of this work order.
+   *
+   * @return SaveProjectWorkOrder* Pointer to the newly cloned work order.
+   */
   SaveProjectAsWorkOrder *SaveProjectAsWorkOrder::clone() const {
     return new SaveProjectAsWorkOrder(*this);
   }
 
 
-  bool SaveProjectAsWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  /**
+   * @brief Sets up this work order prior to execution.
+   *
+   * This prompts the user for a location to save the project to and what name to save
+   * the project as. If the user provides an empty name, then this setup fails.
+   *
+   * @see WorkOrder::setupExecution()
+   *
+   * @return bool Returns true if the provided project name is not empty, false otherwise.
+   */
+  bool SaveProjectAsWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString newDestination =
@@ -66,8 +101,7 @@ namespace Isis {
       if (!newDestination.isEmpty()) {
         QUndoCommand::setText(tr("Save project to [%1]") .arg(newDestination));
         QString realPath = QFileInfo(newDestination + "/").absolutePath();
-        project()->save(realPath);
-//      project()->relocateProjectRoot(realPath);
+        setInternalData(QStringList(realPath));
       }
       else {
         success = false;
@@ -75,5 +109,18 @@ namespace Isis {
     }
 
     return success;
+  }
+
+
+  /**
+   * @brief Executes the work order.
+   *
+   * Saves the project with the name and destination acquired in setupExecution.
+   */
+  void SaveProjectAsWorkOrder::execute() {
+    QString destination = internalData().first();
+    if (!destination.isEmpty()) {
+      project()->save(destination);
+    }
   }
 }

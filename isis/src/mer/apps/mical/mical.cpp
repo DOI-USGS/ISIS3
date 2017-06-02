@@ -155,7 +155,7 @@ void IsisMain() {
   // output values to reflect no correction.
   if(!ui.GetBoolean("AACORRECTION")) {
     gbl::useActiveAreaValue = 0;
-    calgrp += PvlKeyword("ActiveAreaValue", 0);
+    calgrp += PvlKeyword("ActiveAreaValue", QString::number(0));
     calgrp += PvlKeyword("ActiveAreaImage", "NoCorrection");
   }
   else {

@@ -45,6 +45,8 @@ namespace Isis {
 
   RemoveImagesWorkOrder::RemoveImagesWorkOrder(const RemoveImagesWorkOrder &other) :
      WorkOrder(other) {
+    // This is not undoable
+    m_isUndoable = false;
   }
 
 
@@ -61,7 +63,7 @@ namespace Isis {
    * @brief Determines if we can remove this ImageList
    *
    * @param ImageList *imageList
-   * @return  @b bool True if  we can remove from project, False otherwise.
+   * @return bool True if we can remove from project, False otherwise.
    */
   bool RemoveImagesWorkOrder::isExecutable(ImageList *images) {
 
@@ -69,19 +71,41 @@ namespace Isis {
   }
 
 
+  /**
+   * @description Set up the execution.
+   *  
+   * @return bool True if parent WordOrder can set up the execution.
+   */
+  bool RemoveImagesWorkOrder::setupExecution() {
 
-  bool RemoveImagesWorkOrder::execute() {
-
-    bool success = WorkOrder::execute();
+    bool success = WorkOrder::setupExecution();
     return success;
     //TODO: 2016-07-29 TLS Should I ask if files should be deleted from disk also?
   }
 
 
-  void RemoveImagesWorkOrder::syncRedo() {
-    qDebug()<<"RemoveImagesWorkOrder::syncRedo  project()->directory()->model() = "<<project()->directory()->model();
+  /**
+   * @description Remove an item from the project directory.
+   */
+  void RemoveImagesWorkOrder::execute() {
+    qDebug()<<"RemoveImagesWorkOrder::execute  project()->directory()->model() = "<<project()->directory()->model();
     ProjectItem *currentItem = project()->directory()->model()->currentItem();
     project()->directory()->model()->removeItem(currentItem);
 //  project()->removeImages(imageList());
   }
+
+
+  /**
+   * @description This method returns false because this WorkOrder is not undoable.
+   * 
+   * @see WorkOrder::isUndoable()
+   * 
+   * @return bool Returns false because this WorkOrder is not undoable.
+   */
+  bool RemoveImagesWorkOrder::isUndoable() {
+    
+    return false;
+  }
 }
+
+

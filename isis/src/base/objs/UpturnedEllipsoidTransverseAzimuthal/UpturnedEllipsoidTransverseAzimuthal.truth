@@ -1,0 +1,534 @@
+UNIT TEST FOR UpturnedEllipsoidTransverseAzimuthal projection
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 PLANETOGRAPHIC-POSITIVEWEST-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLongitude = 0.0 <Degrees>
+EquatorialRadius = 1.0
+PolarRadius = 1.0
+Eccentricity = 0
+TrueScaleLatitude = 0
+
+
+				/-----------------------------------------/
+
+    Testing SetGround...
+[Lat/Lon  (90.0, -360.0)]  ---->  [x/y  (-0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, -288.0)]  ---->  [x/y  (-0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, -216.0)]  ---->  [x/y  (-0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, -144.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, -72.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 0.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 72.0)]  ---->  [x/y  (-0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 144.0)]  ---->  [x/y  (-0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 216.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 288.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (90.0, 360.0)]  ---->  [x/y  (0.00000,   2.00000)]  ---->  [Lat/Lon  (90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (72.0, -360.0)]  ---->  [x/y  (-0.00000,   1.45309)]  ---->  [Lat/Lon  (72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, -288.0)]  ---->  [x/y  (-0.53655,   1.73631)]  ---->  [Lat/Lon  (72.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, -216.0)]  ---->  [x/y  (-0.48436,   2.53615)]  ---->  [Lat/Lon  (72.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, -144.0)]  ---->  [x/y  (0.48436,   2.53615)]  ---->  [Lat/Lon  (72.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, -72.0)]  ---->  [x/y  (0.53655,   1.73631)]  ---->  [Lat/Lon  (72.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 0.0)]  ---->  [x/y  (0.00000,   1.45309)]  ---->  [Lat/Lon  (72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 72.0)]  ---->  [x/y  (-0.53655,   1.73631)]  ---->  [Lat/Lon  (72.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 144.0)]  ---->  [x/y  (-0.48436,   2.53615)]  ---->  [Lat/Lon  (72.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 216.0)]  ---->  [x/y  (0.48436,   2.53615)]  ---->  [Lat/Lon  (72.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 288.0)]  ---->  [x/y  (0.53655,   1.73631)]  ---->  [Lat/Lon  (72.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (72.0, 360.0)]  ---->  [x/y  (0.00000,   1.45309)]  ---->  [Lat/Lon  (72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (54.0, -360.0)]  ---->  [x/y  (-0.00000,   1.01905)]  ---->  [Lat/Lon  (54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, -288.0)]  ---->  [x/y  (-0.94617,   1.36932)]  ---->  [Lat/Lon  (54.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, -216.0)]  ---->  [x/y  (-1.31748,   3.08507)]  ---->  [Lat/Lon  (54.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, -144.0)]  ---->  [x/y  (1.31748,   3.08507)]  ---->  [Lat/Lon  (54.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, -72.0)]  ---->  [x/y  (0.94617,   1.36932)]  ---->  [Lat/Lon  (54.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 0.0)]  ---->  [x/y  (0.00000,   1.01905)]  ---->  [Lat/Lon  (54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 72.0)]  ---->  [x/y  (-0.94617,   1.36932)]  ---->  [Lat/Lon  (54.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 144.0)]  ---->  [x/y  (-1.31748,   3.08507)]  ---->  [Lat/Lon  (54.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 216.0)]  ---->  [x/y  (1.31748,   3.08507)]  ---->  [Lat/Lon  (54.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 288.0)]  ---->  [x/y  (0.94617,   1.36932)]  ---->  [Lat/Lon  (54.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (54.0, 360.0)]  ---->  [x/y  (0.00000,   1.01905)]  ---->  [Lat/Lon  (54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (36.0, -360.0)]  ---->  [x/y  (-0.00000,   0.64984)]  ---->  [Lat/Lon  (36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, -288.0)]  ---->  [x/y  (-1.23107,   0.94046)]  ---->  [Lat/Lon  (36.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, -216.0)]  ---->  [x/y  (-2.75276,   3.40260)]  ---->  [Lat/Lon  (36.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, -144.0)]  ---->  [x/y  (2.75276,   3.40260)]  ---->  [Lat/Lon  (36.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, -72.0)]  ---->  [x/y  (1.23107,   0.94046)]  ---->  [Lat/Lon  (36.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 0.0)]  ---->  [x/y  (0.00000,   0.64984)]  ---->  [Lat/Lon  (36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 72.0)]  ---->  [x/y  (-1.23107,   0.94046)]  ---->  [Lat/Lon  (36.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 144.0)]  ---->  [x/y  (-2.75276,   3.40260)]  ---->  [Lat/Lon  (36.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 216.0)]  ---->  [x/y  (2.75276,   3.40260)]  ---->  [Lat/Lon  (36.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 288.0)]  ---->  [x/y  (1.23107,   0.94046)]  ---->  [Lat/Lon  (36.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (36.0, 360.0)]  ---->  [x/y  (0.00000,   0.64984)]  ---->  [Lat/Lon  (36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (18.0, -360.0)]  ---->  [x/y  (-0.00000,   0.31677)]  ---->  [Lat/Lon  (18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, -288.0)]  ---->  [x/y  (-1.39812,   0.47765)]  ---->  [Lat/Lon  (18.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, -216.0)]  ---->  [x/y  (-4.84881,   2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (18.0, -144.0)]  ---->  [x/y  (4.84881,   2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (18.0, -72.0)]  ---->  [x/y  (1.39812,   0.47765)]  ---->  [Lat/Lon  (18.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, 0.0)]  ---->  [x/y  (0.00000,   0.31677)]  ---->  [Lat/Lon  (18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, 72.0)]  ---->  [x/y  (-1.39812,   0.47765)]  ---->  [Lat/Lon  (18.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, 144.0)]  ---->  [x/y  (-4.84881,   2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (18.0, 216.0)]  ---->  [x/y  (4.84881,   2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (18.0, 288.0)]  ---->  [x/y  (1.39812,   0.47765)]  ---->  [Lat/Lon  (18.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (18.0, 360.0)]  ---->  [x/y  (0.00000,   0.31677)]  ---->  [Lat/Lon  (18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (0.0, -360.0)]  ---->  [x/y  (0.00000,   0.00000)]  ---->  [Lat/Lon  (0.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, -288.0)]  ---->  [x/y  (-1.45309,   0.00000)]  ---->  [Lat/Lon  (0.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, -216.0)]  ---->  [x/y  (-6.15537,   0.00000)]  ---->  [Lat/Lon  (0.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, -144.0)]  ---->  [x/y  (6.15537,   0.00000)]  ---->  [Lat/Lon  (0.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, -72.0)]  ---->  [x/y  (1.45309,   0.00000)]  ---->  [Lat/Lon  (0.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 0.0)]  ---->  [x/y  (0.00000,   0.00000)]  ---->  [Lat/Lon  (0.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 72.0)]  ---->  [x/y  (-1.45309,   0.00000)]  ---->  [Lat/Lon  (0.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 144.0)]  ---->  [x/y  (-6.15537,   0.00000)]  ---->  [Lat/Lon  (0.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 216.0)]  ---->  [x/y  (6.15537,   0.00000)]  ---->  [Lat/Lon  (0.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 288.0)]  ---->  [x/y  (1.45309,   0.00000)]  ---->  [Lat/Lon  (0.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (0.0, 360.0)]  ---->  [x/y  (0.00000,   0.00000)]  ---->  [Lat/Lon  (0.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (-18.0, -360.0)]  ---->  [x/y  (-0.00000,   -0.31677)]  ---->  [Lat/Lon  (-18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, -288.0)]  ---->  [x/y  (-1.39812,   -0.47765)]  ---->  [Lat/Lon  (-18.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, -216.0)]  ---->  [x/y  (-4.84881,   -2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (-18.0, -144.0)]  ---->  [x/y  (4.84881,   -2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (-18.0, -72.0)]  ---->  [x/y  (1.39812,   -0.47765)]  ---->  [Lat/Lon  (-18.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, 0.0)]  ---->  [x/y  (0.00000,   -0.31677)]  ---->  [Lat/Lon  (-18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, 72.0)]  ---->  [x/y  (-1.39812,   -0.47765)]  ---->  [Lat/Lon  (-18.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, 144.0)]  ---->  [x/y  (-4.84881,   -2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (-18.0, 216.0)]  ---->  [x/y  (4.84881,   -2.68036)]  ---->  Reverse Projection Fails
+[Lat/Lon  (-18.0, 288.0)]  ---->  [x/y  (1.39812,   -0.47765)]  ---->  [Lat/Lon  (-18.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-18.0, 360.0)]  ---->  [x/y  (0.00000,   -0.31677)]  ---->  [Lat/Lon  (-18.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (-36.0, -360.0)]  ---->  [x/y  (-0.00000,   -0.64984)]  ---->  [Lat/Lon  (-36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, -288.0)]  ---->  [x/y  (-1.23107,   -0.94046)]  ---->  [Lat/Lon  (-36.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, -216.0)]  ---->  [x/y  (-2.75276,   -3.40260)]  ---->  [Lat/Lon  (-36.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, -144.0)]  ---->  [x/y  (2.75276,   -3.40260)]  ---->  [Lat/Lon  (-36.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, -72.0)]  ---->  [x/y  (1.23107,   -0.94046)]  ---->  [Lat/Lon  (-36.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 0.0)]  ---->  [x/y  (0.00000,   -0.64984)]  ---->  [Lat/Lon  (-36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 72.0)]  ---->  [x/y  (-1.23107,   -0.94046)]  ---->  [Lat/Lon  (-36.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 144.0)]  ---->  [x/y  (-2.75276,   -3.40260)]  ---->  [Lat/Lon  (-36.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 216.0)]  ---->  [x/y  (2.75276,   -3.40260)]  ---->  [Lat/Lon  (-36.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 288.0)]  ---->  [x/y  (1.23107,   -0.94046)]  ---->  [Lat/Lon  (-36.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-36.0, 360.0)]  ---->  [x/y  (0.00000,   -0.64984)]  ---->  [Lat/Lon  (-36.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (-54.0, -360.0)]  ---->  [x/y  (-0.00000,   -1.01905)]  ---->  [Lat/Lon  (-54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, -288.0)]  ---->  [x/y  (-0.94617,   -1.36932)]  ---->  [Lat/Lon  (-54.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, -216.0)]  ---->  [x/y  (-1.31748,   -3.08507)]  ---->  [Lat/Lon  (-54.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, -144.0)]  ---->  [x/y  (1.31748,   -3.08507)]  ---->  [Lat/Lon  (-54.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, -72.0)]  ---->  [x/y  (0.94617,   -1.36932)]  ---->  [Lat/Lon  (-54.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 0.0)]  ---->  [x/y  (0.00000,   -1.01905)]  ---->  [Lat/Lon  (-54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 72.0)]  ---->  [x/y  (-0.94617,   -1.36932)]  ---->  [Lat/Lon  (-54.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 144.0)]  ---->  [x/y  (-1.31748,   -3.08507)]  ---->  [Lat/Lon  (-54.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 216.0)]  ---->  [x/y  (1.31748,   -3.08507)]  ---->  [Lat/Lon  (-54.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 288.0)]  ---->  [x/y  (0.94617,   -1.36932)]  ---->  [Lat/Lon  (-54.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-54.0, 360.0)]  ---->  [x/y  (0.00000,   -1.01905)]  ---->  [Lat/Lon  (-54.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (-72.0, -360.0)]  ---->  [x/y  (-0.00000,   -1.45309)]  ---->  [Lat/Lon  (-72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, -288.0)]  ---->  [x/y  (-0.53655,   -1.73631)]  ---->  [Lat/Lon  (-72.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, -216.0)]  ---->  [x/y  (-0.48436,   -2.53615)]  ---->  [Lat/Lon  (-72.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, -144.0)]  ---->  [x/y  (0.48436,   -2.53615)]  ---->  [Lat/Lon  (-72.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, -72.0)]  ---->  [x/y  (0.53655,   -1.73631)]  ---->  [Lat/Lon  (-72.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 0.0)]  ---->  [x/y  (0.00000,   -1.45309)]  ---->  [Lat/Lon  (-72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 72.0)]  ---->  [x/y  (-0.53655,   -1.73631)]  ---->  [Lat/Lon  (-72.0, 72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 144.0)]  ---->  [x/y  (-0.48436,   -2.53615)]  ---->  [Lat/Lon  (-72.0, 144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 216.0)]  ---->  [x/y  (0.48436,   -2.53615)]  ---->  [Lat/Lon  (-72.0, -144.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 288.0)]  ---->  [x/y  (0.53655,   -1.73631)]  ---->  [Lat/Lon  (-72.0, -72.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-72.0, 360.0)]  ---->  [x/y  (0.00000,   -1.45309)]  ---->  [Lat/Lon  (-72.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+[Lat/Lon  (-90.0, -360.0)]  ---->  [x/y  (-0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, -288.0)]  ---->  [x/y  (-0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, -216.0)]  ---->  [x/y  (-0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, -144.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, -72.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 0.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 72.0)]  ---->  [x/y  (-0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 144.0)]  ---->  [x/y  (-0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 216.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 288.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+[Lat/Lon  (-90.0, 360.0)]  ---->  [x/y  (0.00000,   -2.00000)]  ---->  [Lat/Lon  (-90.0, 0.0)]  ****[Lat Ok]    [Lon Ok]****
+
+
+				/-----------------------------------------/
+
+    Testing SetGround...
+Latitude:            -20.00000
+Longitude:           100.00000
+XCoord:              -2.21174
+YCoord:              -0.81742
+    Reverse (SetCoordinate)...
+Latitude:            -20.00000
+Longitude:           100.00000
+XCoord:              -2.21174
+YCoord:              -0.81742
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(0, center longitude)
+Latitude:            0.00000
+Longitude:           0.00000
+XCoord:              0.00000
+YCoord:              0.00000
+    SetCoordinate(0, 0)
+Latitude:            0.00000
+Longitude:           0.00000
+XCoord:              0.00000
+YCoord:              0.00000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:            90.00000
+Longitude:             0.00000
+XCoord:                0.00000
+YCoord:                2.00000
+    SetCoordinate(0, PI*sphRad)
+Latitude:             64.96327
+Longitude:           -180.00000
+XCoord:                0.00000
+YCoord:                3.14159
+
+				/-----------------------------------------/
+
+    Testing XYRange method
+Given: 
+    Minimum Latitude:  20.0000000
+    Maximum Latitude:  80.0000000
+    Minimum Longitude: -90.0000000
+    Maximum Longitude: 90.0000000
+    Mapping Group: 
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveWest
+  LongitudeDomain    = 180
+  PixelResolution    = .001
+  MinimumLatitude    = 20.0
+  MaximumLatitude    = 80.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = 90.0
+  CenterLongitude    = 0.0
+End_Group
+End
+
+XYRange method returns
+    Minimum X:  -1.8793852
+    Maximum X:  1.8793852
+    Minimum Y:  0.3526540
+    Maximum Y:  1.9696155
+
+            SetCoordinate(maxX, 0) returns lat/lon = 0.0000000 / -86.4383578
+            SetCoordinate(0, maxY) returns lat/lon = 89.1229028 / -0.0000324
+            SetCoordinate(minX, 0) returns lat/lon = 0.0000000 / 86.4383578
+            SetCoordinate(0, minY) returns lat/lon = 20.0000000 / -0.0000000
+
+            SetGround(20, -90) returns x max? (x,y) = (1.8793852, 0.6840403)
+            SetGround(20, 0) returns y min? (x,y) = (0.0000000, 0.3526540)
+            SetGround(20, 90) returns x min? (x,y) = (-1.8793852, 0.6840403)
+            SetGround(80, 90) returns y max? (x,y) = (-0.3472964, 1.9696155)
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -80.0000000
+    Maximum Longitude: -30.0000000
+
+    Mapping Group: 
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveWest
+  LongitudeDomain    = 180
+  PixelResolution    = .001
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -80.0
+  MaximumLongitude   = -30.0
+  CenterLongitude    = 0.0
+End_Group
+End
+
+XYRange method returns
+    Minimum X:  0.0000000
+    Maximum X:  1.6781993
+    Minimum Y:  -2.0000000
+    Maximum Y:  2.0000000
+
+            SetCoordinate(maxX, 0) returns lat/lon = 0.0000000 / -80.0000000
+            SetCoordinate(minX, minY) returns lat/lon = -90.0000000 / -0.0000000
+            SetCoordinate(minX, maxY) returns lat/lon = 90.0000000 / -0.0000000
+
+            SetGround(90, 0) returns x min and y max? (x,y) = (0.0000000, 2.0000000)
+            SetGround(-90, 0) returns x min and y min? (x,y) = (0.0000000, -2.0000000)
+            SetGround(equator, minLon) returns x max? (x,y) = (1.6781993, 0.0000000)
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -90.0000000
+    Maximum Longitude: 90.0000000
+
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveWest
+  LongitudeDomain    = 180
+  PixelResolution    = .001
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = 90.0
+  CenterLongitude    = 0.0
+End_Group
+End
+
+XYRange method returns
+    Minimum X:  -2.0000000
+    Maximum X:  2.0000000
+    Minimum Y:  -2.0000000
+    Maximum Y:  2.0000000
+
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / -90.0000000
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / -0.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / 90.0000000
+            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / -0.0000000
+
+            SetGround(0, -90) returns x max? (x,y) = (2.0000000, 0.0000000)
+            SetGround(90, 0) returns near y max? (x,y) = (0.0000000, 2.0000000)
+            SetGround(0, 90) returns x min? (x,y) = (-2.0000000, 0.0000000)
+            SetGround(-90, 0) returns y min? (x,y) = (0.0000000, -2.0000000)
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 PLANETOCENTRIC-POSITIVEEAST-360
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLongitude = 180.0
+EquatorialRadius = 3.0000000
+PolarRadius = 1.0000000
+Eccentricity = 0.9428090
+TrueScaleLatitude = 0.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround...
+Latitude:            -20.0000000
+Longitude:           100.0000000
+XCoord:              -0.6743679
+YCoord:              -0.2492363
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate...
+Latitude:            0.1368093
+Longitude:           1.2950601
+XCoord:              -4.2339303
+YCoord:              4.0257775
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(0, 180)
+Latitude:              0.0000000
+Longitude:           180.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+    SetCoordinate(0, 0)
+Latitude:              0.0000000
+Longitude:           180.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:            90.0000000
+Longitude:            0.0000000
+XCoord:               -0.0000000
+YCoord:               0.7336148
+    SetCoordinate(0, 0.7336148)
+Latitude:            89.9998835
+Longitude:           180.0000000
+XCoord:               0.0000000
+YCoord:               0.7336148
+
+				/-----------------------------------------/
+    Testing XYRange method
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: 90.0000000
+    Maximum Longitude: 270.0000000
+
+    Mapping Group: 
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 3.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+  PixelResolution    = .001
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = 90
+  MaximumLongitude   = 270
+  CenterLongitude    = 180.0
+End_Group
+End
+
+XYRange method returns
+    Minimum X:  -0.7336148
+    Maximum X:  0.7336148
+    Minimum Y:  -0.7336148
+    Maximum Y:  0.7336148
+
+            SetCoordinate(maxX,0) returns lat/lon = 0.000 / 270.000
+            SetCoordinate(0,maxY) returns lat/lon = 90.000 / 180.000
+            SetCoordinate(minX,0) returns lat/lon = 0.000 / 90.000
+            SetCoordinate(0,minY) returns lat/lon = -90.000 / 180.000
+
+            SetGround(0, 270) returns x max? (x,y) = (0.734, 0.000)
+            SetGround(90, 180) returns y max? (x,y) = (0.000, 0.734)
+            SetGround(0, 90) returns x min? (x,y) = (-0.734, 0.000)
+            SetGround(-90, 180) returns y min? (x,y) = (0.000, -0.734)
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: 100.0000000
+    Maximum Longitude: 110.0000000
+
+    Mapping Group: 
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 3.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+  PixelResolution    = .001
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = 100.0
+  MaximumLongitude   = 110.0
+  CenterLongitude    = 180.0
+End_Group
+End
+
+XYRange method returns
+    Minimum X:  -0.7179923
+    Maximum X:  -0.0000000
+    Minimum Y:  -0.7336148
+    Maximum Y:  0.7336148
+
+
+            SetCoordinate(maxX, 0) returns lat/lon = 0.0000000 / 180.0000000
+            SetCoordinate(0, maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(minX, 0) returns lat/lon = 0.0000000 / 100.0000000
+            SetCoordinate(maxX, minY) returns lat/lon = -90.0000000 / 180.0000000
+
+            SetGround(0, 180) returns x max? (x,y) = (0.0000000, 0.0000000)
+            SetGround(90, 180) returns y max? (x,y) = (0.0000000, 0.7336148)
+            SetGround(0, 100) returns x min? (x,y) = (-0.7179923, 0.0000000)
+            SetGround(-90, 180) returns y min? (x,y) = (0.0000000, -0.7336148)
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 TESTING OTHER METHODS
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Name:                       UpturnedEllipsoidUpturnedEllipsoidTransverseAzimuthal
+Version:                    1.0
+Rotation:                   0.0000000
+TrueScaleLatitude:          0.0000000
+Testing operator==  (True): 1
+Testing operator==  (True): 1
+Testing operator==  (True): 1
+Testing operator==  (False-different CenterLongitude):  0
+Testing operator==  (False-different EquatorialRadius): 0
+Testing operator==  (False-different Eccentricity):     0
+
+				/-----------------------------------------/
+
+Testing Mapping() methods
+Mapping() = 
+Group = Mapping
+  ProjectionName     = UpturnedEllipsoidTransverseAzimuthal
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveWest
+  LongitudeDomain    = 180
+  PixelResolution    = .001
+  MinimumLatitude    = 20.0
+  MaximumLatitude    = 80.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = 90.0
+  CenterLongitude    = 0.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = 20.0
+  MaximumLatitude = 80.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -90.0
+  MaximumLongitude = 90.0
+  CenterLongitude  = 0.0
+End_Group
+End
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 TESTING    GOOD = FALSE
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Set Ground using invalid Latitude/Longitude value
+SetGround(Null, 0):    0
+SetGround(0, Null):    0
+SetGround(-91, 0):     0
+Set Coordinate using invalid x/y value
+SetCoordinate(Null, 0):    0
+SetCoordinate(0, Null):    0
+Set Coordinate using x/y value off the planet
+SetCoordinate(100000, 0):    0
+
+				/-----------------------------------------/
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 TESTING ERRORS
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Error check: Missing center longitude keyword when default is not allowed
+**ERROR** Invalid label group [Mapping].
+**ERROR** Cannot project using upturned ellipsoid Transverse Azimuthal without [CenterLongitude] value.  Keyword does not exist in labels and defaults are not allowed.
+
+				/-----------------------------------------/
+
+Error check: Min/Max Longitude not within 90 degrees of Center Longitude
+**ERROR** Invalid label group [Mapping].
+**ERROR** MinimumLongitude [0.0] is invalid. Must be within -90 degrees of the CenterLongitude [180.0].
+**ERROR** Invalid label group [Mapping].
+**ERROR** MaximumLongitude [360.0] is invalid. Must be within +90 degrees of the CenterLongitude [180.0].
+
+				/-----------------------------------------/

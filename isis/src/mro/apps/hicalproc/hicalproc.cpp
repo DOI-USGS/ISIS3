@@ -273,7 +273,7 @@ void IsisMain() {
         p5.AddToPipeline("hinoise");
         p5.Application("hinoise").SetInputParameter ("FROM", false);
         p5.Application("hinoise").SetOutputParameter("TO",   "hinoise");
-        p5.Application("hinoise").AddConstParameter ("REMOVE", QString(bRemoveTempFiles));
+        p5.Application("hinoise").AddConstParameter ("REMOVE", QString::number(bRemoveTempFiles));
 
         // Values got from HiCal configuration file
         // Lowpass options

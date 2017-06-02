@@ -1,0 +1,6 @@
+Group = TRACEGASORBITER/CASSIS
+  Version = 1
+  Library = TgoCassisCamera
+  Routine = TgoCassisCameraPlugin
+EndGroup
+ 

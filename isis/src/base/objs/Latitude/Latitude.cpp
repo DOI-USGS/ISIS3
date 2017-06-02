@@ -408,6 +408,31 @@ namespace Isis {
 
 
   /**
+   * Get the error checking status. This indicates if the Latitude object will
+   * throw an error when set to an angle less than -90 degrees or greater than
+   * 90 degrees.
+   * 
+   * @return @b ErrorChecking The error checking status.
+   */
+  Latitude::ErrorChecking Latitude::errorChecking() const {
+    return m_errors;
+  }
+
+
+  /**
+   * Set the error checking status. If set to ThrowAllErrors, then an exception
+   * will be thrown if the Latitude object is set to an angle less than -90
+   * degrees or greater than 90 degrees. If set to AllowPastPole, then no
+   * exception will be thrown.
+   * 
+   * @param error The new error checking status.
+   */
+  void Latitude::setErrorChecking(ErrorChecking errors) {
+    m_errors = errors;
+  }
+
+
+  /**
    * Checks if this latitude value is within the given range.  Defines the
    * range as the change from the minimum latitude to the maximum latitude (an
    * angle), and returns whether the change from the minimum latitude to this

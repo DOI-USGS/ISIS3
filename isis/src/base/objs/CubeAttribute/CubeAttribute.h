@@ -70,7 +70,7 @@ namespace Isis {
     if(labelType == DetachedLabel) return "Detached";
     if(labelType == ExternalLabel) return "External";
 
-    QString msg = "Invalid label attachment type [" + QString(labelType) + "]";
+    QString msg = "Invalid label attachment type [" + QString::number(labelType) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

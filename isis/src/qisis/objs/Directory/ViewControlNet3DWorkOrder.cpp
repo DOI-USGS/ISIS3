@@ -82,11 +82,11 @@ namespace Isis {
 
 
   /**
-   * @brief Attempts to display a control network in 3D.
+   * @brief Prompt user for any information need to display the control network.
    * @return @b bool True upon success, False otherwise.
    */
-  bool ViewControlNet3DWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool ViewControlNet3DWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
 
@@ -115,9 +115,9 @@ namespace Isis {
 
 
   /**
-   * @brief Redisplays the control net.  Currently not implemented.
+   * @brief Display the 3D control network.  Currently not implemented.
    */
-  void ViewControlNet3DWorkOrder::syncRedo() {
+  void ViewControlNet3DWorkOrder::execute() {
     //project()->directory()->addCnetEditorView(controlList().first());
   }
 
@@ -125,7 +125,7 @@ namespace Isis {
   /**
    * @brief Deletes the last view.  Currently not implemented.
    */
-  void ViewControlNet3DWorkOrder::syncUndo() {
+  void ViewControlNet3DWorkOrder::undoExecution() {
     //delete project()->directory()->cnetEditorViews().last();
   }
 }

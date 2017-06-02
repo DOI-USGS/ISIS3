@@ -1,7 +1,8 @@
 #include "ShapeModel.h"
 
 #include <QDebug>
-
+#include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <cfloat>
 #include <vector>
@@ -74,35 +75,6 @@ namespace Isis {
     m_surfacePoint = NULL;
   }
 
-
-  /**
-   *  Calculates the ellipsoidal surface normal.
-   */
-  void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
-    // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
-    // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true
-    // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
-    // Jeff and Stuart respond.
-
-    if (!m_hasIntersection || !surfaceIntersection()->Valid()) {
-     QString msg = "A valid intersection must be defined before computing the surface normal";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-   }
-
-   // Get the coordinates of the current surface point
-    SpiceDouble pB[3];
-    pB[0] = surfaceIntersection()->GetX().kilometers();
-    pB[1] = surfaceIntersection()->GetY().kilometers();
-    pB[2] = surfaceIntersection()->GetZ().kilometers();
-
-    // Unitize the vector
-    SpiceDouble upB[3];
-    SpiceDouble dist;
-    unorm_c(pB, upB, &dist);
-    memcpy(&m_normal[0], upB, sizeof(double) * 3);
-
-    m_hasNormal = true;
-  }
 
 
   /**

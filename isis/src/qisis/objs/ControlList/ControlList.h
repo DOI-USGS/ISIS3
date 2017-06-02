@@ -8,7 +8,6 @@
 
 #include "Control.h"
 #include "ControlDisplayProperties.h"
-#include "WorkOrder.h"
 #include "XmlStackedHandler.h"
 
 class QStringList;
@@ -30,6 +29,7 @@ namespace Isis {
    *   @history 2015-10-14 Jeffrey Covington - Declared ControlList * as a Qt
    *                           metatype for use with QVariant.
    *   @history 2016-06-06 Ian Humphrey - Updated documentation and coding standards. Fixes #3959.
+   *   @history 2017-05-05 Tracie Sucharski - Removed Workorder.h, never used.
    */
   class ControlList : public QObject, public QList<Control *> {
     Q_OBJECT

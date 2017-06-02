@@ -27,10 +27,6 @@
 
 #include <float.h>
 
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
-
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
@@ -937,88 +933,6 @@ namespace Isis {
 
   QDataStream &operator>>(QDataStream &stream, Statistics &statistics) {
     return statistics.read(stream);
-  }
-
-//??? not working for prog14/15???
-// dyld: Symbol not found: __ZN2H58PredType12NATIVE_INT64E
-//   Referenced from: /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
-//   Expected in: flat namespace
-//  in /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
-
-  /** 
-   *  H5 compound data type uses the offesets from the QDataStream returned by
-   *  the write(QDataStream &stream) method.
-   */
-  H5::CompType Statistics::compoundH5DataType() {
-
-    H5::CompType compoundDataType((size_t)124);
-
-    size_t offset = 0;
-    compoundDataType.insertMember("Sum", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_sum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("SumSquared", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_sumsum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("Minimum", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_minimum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("Maximum", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_maximum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("ValidMinimum", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_validMinimum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("ValidMaximum", offset, H5::PredType::NATIVE_DOUBLE);
-
-    // offset += sizeof(m_validMaximum);
-    offset += sizeof(double);
-    compoundDataType.insertMember("TotalPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_totalPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("ValidPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_validPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("NullPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_nullPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("LRSPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_lrsPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("LISPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_lisPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("HRSPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_hrsPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("HISPixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_hisPixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("UnderRangePixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_underRangePixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("OverRangePixels", offset, H5::PredType::NATIVE_INT64);
-
-    // offset += sizeof(m_overRangePixels);
-    offset += sizeof(BigInt);
-    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
-    // mac osx has problem with "sizeof" commented lines and the native data
-    // types too... will consider this later when ready to add serialization.
-
-    return compoundDataType;
   }
 
 } // end namespace isis

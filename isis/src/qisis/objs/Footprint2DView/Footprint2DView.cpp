@@ -32,6 +32,7 @@
 #include <QList>
 #include <QSize>
 #include <QSizePolicy>
+#include <QStatusBar>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -55,7 +56,9 @@ namespace Isis {
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) : 
                       AbstractProjectItemView(parent) {
-    m_sceneWidget = new MosaicSceneWidget(NULL, true, false, directory, this);
+
+    QStatusBar *statusBar = new QStatusBar(this);
+    m_sceneWidget = new MosaicSceneWidget(statusBar, true, false, directory, this);
     m_sceneWidget->getScene()->installEventFilter(this);
     m_sceneWidget->setAcceptDrops(false);
     MosaicGraphicsView *graphicsView = m_sceneWidget->getView();
@@ -90,6 +93,7 @@ namespace Isis {
     setLayout(layout);
 
     layout->addWidget(m_sceneWidget);
+    layout->addWidget(statusBar);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
@@ -185,7 +189,6 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item
    */
   void Footprint2DView::onItemAdded(ProjectItem *item) {
-    qDebug()<<"Footprint2DView::onItemAdded";
     if (!item || (!item->isImage() && !item->isShape())) {
       return;
     }

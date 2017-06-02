@@ -28,10 +28,7 @@
 #include <QSharedPointer>
 #include <QString>
 
-// hdf5 library
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
+
 
 // ISIS library
 #include "BundleTargetBody.h"
@@ -44,7 +41,7 @@ class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
-using namespace H5;
+
 using namespace Isis;
 
 namespace Isis {
@@ -54,10 +51,10 @@ namespace Isis {
   class XmlStackedHandlerReader;
 
   /**
-   * @brief Container class for BundleAdjustment settings. 
-   * This class contains all of the settings needed to run a bundle adjustment. 
-   * A BundleSettings object is passed into the BundleAdjustment constructor.  
-   *  
+   * @brief Container class for BundleAdjustment settings.
+   * This class contains all of the settings needed to run a bundle adjustment.
+   * A BundleSettings object is passed into the BundleAdjustment constructor.
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-05-14 Jeannie Backer
@@ -103,7 +100,8 @@ namespace Isis {
    *                           are acquired by an associated observation number. References #4293.
    *   @history 2016-10-17 Jesse Mapel - Removed m_SCPVLFilename parameter in accordance with
    *                           USEPVL being removed from jigsaw.  References #4316.
-   *  
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
    *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
@@ -112,9 +110,8 @@ namespace Isis {
    *   @todo Determine whether QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
    *         m_maximumLikelihood should be a list of pointers, or a pointer to a list, or a pointer
    *         to a list of pointers, etc...
-      ; 
-   *   @todo Determine which to use or delete: XML or HDF5. Whichever is used needs to be fully
-   *         documented, tested
+   *   @todo TargetBody information is not being serialized. A determination needs to
+   *         be made as to where it will be stored.
    */
   class BundleSettings {
     public:
@@ -124,14 +121,14 @@ namespace Isis {
       //=====================================================================//
       BundleSettings();
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project, 
+      BundleSettings(Project *project,
                      XmlStackedHandlerReader *xmlReader);
 #if 0
       BundleSettings(FileName xmlFile,
-                     Project *project, 
-                     XmlStackedHandlerReader *xmlReader, 
+                     Project *project,
+                     XmlStackedHandlerReader *xmlReader,
                      QObject *parent = NULL);
-      BundleSettings(XmlStackedHandlerReader *xmlReader, 
+      BundleSettings(XmlStackedHandlerReader *xmlReader,
                      QObject *parent = NULL);
 #endif
       ~BundleSettings();
@@ -147,13 +144,13 @@ namespace Isis {
 
       // mutators
       void setSolveOptions(bool solveObservationMode = false,
-                           bool updateCubeLabel = false, 
+                           bool updateCubeLabel = false,
                            bool errorPropagation = false,
-                           bool solveRadius = false, 
-                           double globalLatitudeAprioriSigma = Isis::Null, 
-                           double globalLongitudeAprioriSigma = Isis::Null, 
+                           bool solveRadius = false,
+                           double globalLatitudeAprioriSigma = Isis::Null,
+                           double globalLongitudeAprioriSigma = Isis::Null,
                            double globalRadiusAprioriSigma = Isis::Null);
-      void setOutlierRejection(bool outlierRejection, 
+      void setOutlierRejection(bool outlierRejection,
                                double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
@@ -180,20 +177,20 @@ namespace Isis {
       //=====================================================================//
 
       /**
-       * This enum defines the options for the bundle adjustment's convergence. 
+       * This enum defines the options for the bundle adjustment's convergence.
        */
       enum ConvergenceCriteria {
-        Sigma0,              /**< The value of sigma0 will be used to determine that the bundle 
+        Sigma0,              /**< The value of sigma0 will be used to determine that the bundle
                                   adjustment has converged.*/
-        ParameterCorrections /**< All parameter corrections will be used to determine that the 
+        ParameterCorrections /**< All parameter corrections will be used to determine that the
                                   bundle adjustment has converged.*/
       };
 
 
       static ConvergenceCriteria stringToConvergenceCriteria(QString criteria);
       static QString convergenceCriteriaToString(ConvergenceCriteria criteria);
-      void setConvergenceCriteria(ConvergenceCriteria criteria, 
-                                  double threshold, 
+      void setConvergenceCriteria(ConvergenceCriteria criteria,
+                                  double threshold,
                                   int maximumIterations);
       ConvergenceCriteria convergenceCriteria() const;
       double convergenceCriteriaThreshold() const;
@@ -209,11 +206,11 @@ namespace Isis {
 
 
       //=====================================================================//
-      //=============== Maximum Likelihood Estimation Options ===============// 
-      //=====================================================================// 
+      //=============== Maximum Likelihood Estimation Options ===============//
+      //=====================================================================//
 
       /**
-       * This enum defines the options for maximum likelihood estimation. 
+       * This enum defines the options for maximum likelihood estimation.
        */
       enum MaximumLikelihoodModel {
         NoMaximumLikelihoodEstimator, /**< Do not use a maximum likelihood model.*/
@@ -232,9 +229,9 @@ namespace Isis {
       };
 
 
-      void addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
+      void addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model,
                                               double cQuantile);
-      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
+      QList< QPair< MaximumLikelihoodWFunctions::Model, double > >
           maximumLikelihoodEstimatorModels() const;
 
       //=====================================================================//
@@ -245,6 +242,7 @@ namespace Isis {
       //=====================================================================//
       //============================== Target Body ==========================//
       //=====================================================================//
+      // Note targeBody information is not currently serialized.
       void setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody);
       BundleTargetBodyQsp bundleTargetBody() const;
 //      bool solveTargetBodyPolePosition() const;
@@ -265,69 +263,51 @@ namespace Isis {
 
 
       //=====================================================================//
-      //================== Output Options ??? (from Jigsaw only)=============// 
-      //=====================================================================// 
+      //================== Output Options ??? (from Jigsaw only)=============//
+      //=====================================================================//
       void setOutputFilePrefix(QString outputFilePrefix);
       void setSCPVLFilename(QString SCParamFilename);
       QString outputFilePrefix() const;
       QString SCPVLFilename() const;
 
-      PvlObject pvlObject(QString name = "BundleSettings") const;
-
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
-
-      void createH5Group(hid_t locationId, 
-                         QString locationName) const; //delete
-      void parseH5Group(hid_t locationId, 
-                        QString locationName);        //delete
-
-      void createH5Group(H5::CommonFG &locationObject, 
-                         QString locationName) const;
-      H5::Group createH5Group2(H5::Group locationGroup, 
-                               QString locationName);
-      void openH5Group(H5::CommonFG &locationObject, 
-                       QString locationName);
-      BundleSettings(H5::CommonFG &locationObject, 
-                     QString locationName);
-
     private:
+      void init();
 
       //=====================================================================//
       //============= Saving/Restoring a BundleSettings object ==============//
       //=====================================================================//
 
       /**
-       * This class is needed to read/write BundleSettings from/to an XML 
-       * formateed file. 
-       *  
+       * This class is needed to read/write BundleSettings from/to an XML
+       * formateed file.
+       *
        * @author 2014-07-21 Ken Edmundson
        *
-       * @internal 
+       * @internal
        *   @history 2014-07-21 Ken Edmundson - Original version.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleSettings *bundleSettings, 
+          XmlHandler(BundleSettings *bundleSettings,
                      Project *project);
           XmlHandler(BundleSettings *bundleSettings);
           ~XmlHandler();
-   
-          virtual bool startElement(const QString &namespaceURI, 
+
+          virtual bool startElement(const QString &namespaceURI,
                                     const QString &localName,
-                                    const QString &qName, 
+                                    const QString &qName,
                                     const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, 
+          virtual bool endElement(const QString &namespaceURI,
                                   const QString &localName,
                                   const QString &qName);
           bool fatalError(const QXmlParseException &exception);
 
         private:
           Q_DISABLE_COPY(XmlHandler);
-   
+
           BundleSettings *m_xmlHandlerBundleSettings ;
           Project *m_xmlHandlerProject; // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
@@ -335,10 +315,10 @@ namespace Isis {
       };
 
 
-      /** 
-       * This struct is needed to write the m_maximumLikelihood variable as an 
-       * HDF5 table. Each table record has 3 field values: index, name, and 
-       * quantile. 
+      /**
+       * This struct is needed to write the m_maximumLikelihood variable as an
+       * HDF5 table. Each table record has 3 field values: index, name, and
+       * quantile.
        */
       struct MaximumLikelihoodModelTableRecord {
           unsigned int indexFieldValue; //!< The index of the TableRecord.???
@@ -346,15 +326,13 @@ namespace Isis {
           double quantileFieldValue; //!< The quantile of the TableRecord.???
       };
 
-      QUuid *m_id; /**< A unique ID for this BundleSettings object. 
-                        Used to reference this object when saving to disk.*/
       bool m_validateNetwork; //!< Indicates whether the network should be validated.
       bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.
       bool m_errorPropagation; //!< Indicates whether to perform error propagation.
       bool m_createInverseMatrix; //!< Indicates whether to create the inverse matrix file.
-      bool m_outlierRejection; /**< Indicates whether to perform automatic 
+      bool m_outlierRejection; /**< Indicates whether to perform automatic
                                     outlier detection/rejection.*/
       double m_outlierRejectionMultiplier; /**< The multiplier value for outlier rejection.
                                                 Defaults to 1, so no change if rejection = false.*/
@@ -368,24 +346,24 @@ namespace Isis {
       QList<BundleObservationSolveSettings> m_observationSolveSettings; //!<
 
       // Convergence Criteria
-      ConvergenceCriteria m_convergenceCriteria;  /**< Enumeration used to indicate what criteria 
-                                                       to use to determine bundle 
+      ConvergenceCriteria m_convergenceCriteria;  /**< Enumeration used to indicate what criteria
+                                                       to use to determine bundle
                                                        adjustment convergence.*/
-      double m_convergenceCriteriaThreshold;      /**< Tolerance value corresponding to the selected 
+      double m_convergenceCriteriaThreshold;      /**< Tolerance value corresponding to the selected
                                                        convergence criteria.*/
-      int m_convergenceCriteriaMaximumIterations; /**< Maximum number of iterations before 
-                                                       quitting the bundle adjustment if it has 
+      int m_convergenceCriteriaMaximumIterations; /**< Maximum number of iterations before
+                                                       quitting the bundle adjustment if it has
                                                        not yet converged to the given threshold.*/
 
       // Maximum Likelihood Estimation Options
       /**
-       * Model and C-Quantile for each of the three maximum likelihood 
-       * estimations. The C-Quantile is the quantile of the residual used 
-       * to compute the tweaking constant. Note that this is an ordered 
-       * list and that the Welsch and Chen models can not be used for the 
+       * Model and C-Quantile for each of the three maximum likelihood
+       * estimations. The C-Quantile is the quantile of the residual used
+       * to compute the tweaking constant. Note that this is an ordered
+       * list and that the Welsch and Chen models can not be used for the
        * first model.
        */
-      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; 
+      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
 
       // Self Calibration
 
@@ -396,19 +374,16 @@ namespace Isis {
 
       // Output Options
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
-                                          output files to be written to the current directory, the 
+                                          output files to be written to the current directory, the
                                           output directory path should be included in this prefix.*/
  };
   // typedefs
   //! Definition for a BundleSettingsQsp, a shared pointer to a BundleSettings object.
   typedef QSharedPointer<BundleSettings> BundleSettingsQsp;
 
-  // operators to read/write BundleResults to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);
-  QDataStream &operator>>(QDataStream &stream, BundleSettings &settings);
+
 };
 
 Q_DECLARE_METATYPE(Isis::BundleSettingsQsp);
 
 #endif
-

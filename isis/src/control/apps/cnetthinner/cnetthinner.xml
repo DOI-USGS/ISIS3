@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetthinner" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+     Generate an updated control network with fewer points, with efficient spatial distributed across images. 
+  </brief>
+
+  <description>
+    <p>
+      <i>cnetthinner</i> will compute the most efficient spatial control 
+      point distribution for each image in the control network using an input number of maximum points. This would typically
+      be used for very densely populated control networks that could be processed 
+      more quickly if some of the less-useful control points or measures were ignored or removed. cnetthinner's goal is to decrease the total number 
+      of control points without compromising their spatial coverage, as much as is possible. 
+    </p>
+    <p>
+      cnetthinner accomplishes this goal using an algorithm called Suppression via Disk Covering (SDC) [1] to select 
+      the most spacially-efficient control points to retain.        
+    </p>
+    <p>
+      The maximum and minimum number of Control Points to keep in the output Control Network can 
+      be specified with the MAXPOINTS and MINPOINTS parameters. MAXPOINTS must be specified by the user and should be determined by examining the current size and density of the Control Network. Suppressed Control Points can either be set to Ignored or Removed entirely from the output 
+      Control Network using the SUPPRESSED parameter. The results can also be adjusted using the WEIGHT and TOLERANCE
+      parameters. The TOLERANCE parameter adjusts how flexible the number of output points allowed from the suppression
+      calculation is around the MAXPOINTS value and the WEIGHT parameter adjusts how much each input control point's strength is weighted in the algorithm, specifically based on the number of valid measures with "goodness of fit" it has.  
+    </p>
+    <p>
+cnetthinner will output a Control Network and also output a Results PVL group. The Results group provides the following information about the results: 
+<pre>
+Group = Results
+  Points = (Original Number of Points)
+  Saved = (Number Of Points Retained)
+  Suppressed = (Number of Points Ignored or Removed) 
+  Efficiency = (Number of Points Removed / Original Number of Points) * 100 percent
+End_Group
+</pre>
+  </p>
+  <h2>References</h2>
+    <cite>
+    <a href="http://lucafoschini.com/papers/Efficiently_ICIP11.pdf">Efficiently selecting spatially distributed keypoints for visual tracking</a>
+    S Gauglitz, L Foschini, M Turk, T Höllerer
+    Image Processing (ICIP), 18th IEEE International Conference on, 1869-1872
+    </cite>
+    <br/>
+
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2016-09-27">
+        Original Version
+    </change>
+    <change name="Kristin Berry" date="2016-11-25">
+	Add documentation, error-checking, and updates to meet ISIS coding standards and get checked in. Changed application name from cnetsuppress to cnetthinner on Kris's request. 
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>           
+        <internalDefault>None</internalDefault>
+        <brief>Input </brief>
+        <description>
+	    The input Control Network to calculate a spacially-efficient subset of. 
+        </description>
+        <filter>*.net</filter>
+      </parameter>
+
+      <parameter name="ONET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output
+        </brief>
+        <description>
+          The output Control Network, which is the result of the suppression calculation on the input Control
+	  Network. 
+        </description>
+        <filter>
+          *.ctl *.pvl *.net
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+        <parameter name="WEIGHT">
+            <type>double</type>
+            <default><item>0.0</item></default>
+           <brief>Weight applied to control point</brief>
+           <description>
+              A weight factor of the natural LOG(#Measures) * WEIGHT is applied 
+              to the AVERAGE(GoodnessOfFit) of all the measures to produce the 
+              strength of a control point for purposes of selecting the best 
+              points of spatial distribution accross the images in the control 
+              network. The equation is:
+             <PRE>
+                 AVERAGE(GoodnessOfFit of all Measures) * (1 + LOG(#Measures) * WEIGHT) 
+             </PRE>
+           </description>
+        </parameter>
+
+        <parameter name="TOLERANCE">
+            <type>double</type>
+            <default><item>0.1</item></default>
+          <brief>Point count tolerance</brief> 
+          <description>
+             This tolerance factor adjusts the range of acceptable point count output results.     
+	     Valid range is: 0.0 - 1.0. (Though 1.0 will result in only 1 output point.) 
+          </description>
+        </parameter>
+        
+        <parameter name="MAXPOINTS"> 
+           <type>double</type>
+           <brief>Number of points to retain per image</brief> 
+           <description>
+              Specify the number of control points per image to retain. 
+              Typically, the absolute minimum points would be 3, but more are 
+              better. In some cases, you may hundreds or perhaps 25 or so.
+           </description>
+        </parameter>
+
+        <parameter name="MINPOINTS">
+            <type>double</type>
+            <default><item>3.0</item></default>
+            <brief>Select minimum number of points to save</brief> 
+            <description>
+              For non-reference images that may have very little overlap,    
+              this is the minimum number of control points to retain regardless 
+              of the total points contained in the overlap. This is intended to 
+              retain the minimum number of points jigsaw requires to produce an 
+              acceptable bundle adjustment.
+            </description>
+        </parameter>
+
+       <parameter name="SUPPRESSED">
+           <type>string</type>
+          <default><item>REMOVE</item></default>
+         <brief>Disposition of removed points</brief>
+         <description>
+         </description>
+           <list>
+              <option value="IGNORE">
+                   <brief>  Set suppressed points to IGNORE</brief>
+                   <description>
+                   </description>
+               </option>
+              <option value="REMOVE">
+                   <brief> Remove points that were suppressed</brief> 
+                   <description> 
+                   </description> 
+               </option>
+           </list>
+       </parameter>
+
+       <parameter name="NETWORKID">
+         <type>string</type>
+         <internalDefault>None</internalDefault>
+         <brief>Name of the resulting network</brief>
+         <description>
+           Users have the option to rename the output control network. 
+         </description>
+       </parameter>
+
+    </group>
+  </groups>
+</application>

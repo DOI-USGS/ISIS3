@@ -23,7 +23,6 @@
 #include "CubeDnView.h"
 
 #include <QAction>
-#include <QDataStream>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMdiArea>
@@ -145,7 +144,6 @@ namespace Isis {
     //tools->append(new FileTool(this));
     //tools->append(new QnetFileTool(qnetTool, this));
     tools->append(NULL);
-    tools->append(new BandTool(this));
 
     IpceTool *ipceTool = new IpceTool(directory, this);
     defaultActiveTool = ipceTool;
@@ -169,6 +167,7 @@ namespace Isis {
     // This is done to redraw the control points on the cube viewports
     connect(this, SIGNAL(controlPointAdded(QString)), ipceTool, SLOT(refresh()));
 
+    tools->append(new BandTool(this));
     tools->append(new ZoomTool(this));
     tools->append(new PanTool(this));
     tools->append(new StretchTool(this));

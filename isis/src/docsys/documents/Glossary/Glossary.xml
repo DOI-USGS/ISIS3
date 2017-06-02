@@ -397,16 +397,18 @@
 
           <definition name="Oblique Detector Resolution"><a name="oblique_detector_resolution"></a>
             This provides an improved estimate to the standard <a href="#detector_resolution">detector resolution</a> when the image is taken at an oblique 
-            angle. It returns the square-root of the area of the projection of the detector onto the body of the target (in units of meters).
-            If the image is taken at nadir, this is the ground distance between the left and right edge of the detector, because the 
-            detector's projection is a square.  For off-nadir images, the projection has a trapezoidal shape.
-            In Figure 1A below, an image of the Dufay X crater that was taken near nadir is displayed.  Figure 1B is a
+            angle.  In Figure 1A below, an image of the Dufay X crater that was taken near nadir is displayed.  Figure 1B is a
             color map showing the relative difference between the oblique detector resolution, and the original detector resolution as a function
             of the emission angle.  For small emission angles (near nadir) the relative difference between the two estimates 
             is very small.  For larger emission angles (off-nadir), the relative difference between the 
             two estimates increases rapidly.  Figure 2A is an image of the Carlini crater group taken at an oblique angle.  Figure 2B is a color plot
-            of the relative difference between the two estimates showing a minimum value of approximately 50% between the two when the 
-            emission angles off-nadir are in the range 65-75 degrees.
+            of the relative difference between the two estimates showing a minimum of approximately 120% when the 
+            emission angles off-nadir are in the range 64-75 degrees.  The traditional approximation is obviously not adequate for a case such
+            as this, and the oblique detector resolution should be used.
+
+            
+
+
 
 
 		<table border = "1">
@@ -433,7 +435,7 @@
 		<tr>
 			<td>
 			 <center>
-                                 <image width="584" height="492" src="assets/nadir40pct.png">
+                                 <image width="585" height="487" src="assets/nadir_scaled.png">
                                  <brief><br><strong>Fig 1B:</strong> Relative percentage difference between resolution estimates for</br>
                                  <br> a nadir image (see <strong>Fig. 1A</strong>).</br></brief>
                                  </image>
@@ -441,7 +443,7 @@
 			</td>
 			<td>
 			<center>
-                                <image width="582" height="492" src="assets/oblique40pct.png">
+                                <image width="583" height="487" src="assets/oblique_scaled.png">
                                 <brief><br><strong>Fig 2B:</strong> Relative percentage difference between resolution estimates for</br>
                                 <br> an oblique image (see <strong>Fig. 2A</strong>).</br></brief>
                                 </image>
@@ -449,6 +451,11 @@
 			</td>
 		</tr>
                 </table>				 
+      
+     
+         Handwritten notes by Orrin Thomas giving a geometric justification for this method can be found <a href="assets/oblique.pdf">here.</a>         
+        
+      
 	  </definition>
 
           <definition name="I/F">

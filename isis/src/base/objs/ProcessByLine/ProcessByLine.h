@@ -45,8 +45,8 @@ namespace Isis {
    *  #include "SpecialPixel.h"
    *  void mirror (Buffer &in, Buffer &out);
    *  void IsisMain() {
-   *    // We will be processing by line ProcessByLine p;
-   *    // Setup the input and output cubes
+   *    // We will be processing by line
+   *    ProcessByLine p; // Setup the input and output cubes
    *    p.SetInputCube("FROM");
    *    p.SetOutputCube ("TO");
    *    // Start the processing
@@ -93,12 +93,22 @@ namespace Isis {
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
    *   @history 2015-09-25 Tyler Wilson  - Combined SetBrickSizesForProcessCube,
-   *   SetBrickSizesForProcessCubeInPlace, and SetBrickSizesForProcessCubes into one
-   *   function:  SetBricks(CubeNum) which takes in the enumerated date type enum
-   *   as an argument  (CubeNum = {InPlace, InputOutput, InputOutputList}).  Also moved
-   *   the verification of cubes out of the SetBrick functions and into
-   *   ProcessByBrick:: VerifyCubes(CubeNum) in parent class.
-   *
+   *                           SetBrickSizesForProcessCubeInPlace,
+   *                           and SetBrickSizesForProcessCubes
+   *                           into one
+   *                           function:SetBricks(CubeNum) which
+   *                           takes in the enumerated date type
+   *                           enum as an argument (CubeNum =
+   *                           {InPlace, InputOutput,
+   *                           InputOutputList}). Also moved the
+   *                           verification of cubes out of the
+   *                           SetBrick functions and into
+   *                           ProcessByBrick::
+   *                           VerifyCubes(CubeNum) in parent
+   *                           class.
+   *   @history 2017-04-13 Kaj Williams - Fixed a minor typo in
+   *                           the API documentation. Fixed a few
+   *                           source code formatting issues.
    */
   class ProcessByLine : public Isis::ProcessByBrick {
 
@@ -116,18 +126,14 @@ namespace Isis {
 
       void SetInputCube(Isis::Cube *inCube);
 
-
       void StartProcess(void funct(Isis::Buffer &inout));
       void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out));
       void StartProcess(void
                         funct(std::vector<Isis::Buffer *> &in,
                               std::vector<Isis::Buffer *> &out));
 
-
       void SetBricks(IOCubes cn);
-      //void VerifyCubes(IOCubes cn);
-
-
+      
       /**
        * Same functionality as StartProcess(void funct(Isis::Buffer &inout))
        * using Functors. The Functor operator(), takes the parameter
@@ -138,15 +144,12 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &)
        * @param threaded @see ProcessByBrick::ProcessCubeInPlace()
        */
-
       template <typename Functor>
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
-
         VerifyCubes(InPlace);
         SetBricks(InPlace);
         ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
-
 
 
       /**
@@ -163,7 +166,6 @@ namespace Isis {
        */
       template <typename Functor>
       void ProcessCube(const Functor & funct, bool threaded = true) {
-
         VerifyCubes(InputOutput);
         SetBricks(InputOutput);
         ProcessByBrick::ProcessCube(funct, threaded);
@@ -185,7 +187,6 @@ namespace Isis {
        */
       template <typename Functor>
       void ProcessCubes(const Functor & funct, bool threaded = true) {
-
         VerifyCubes(InputOutputList);
         SetBricks(InputOutputList);
         ProcessByBrick::ProcessCubes(funct, threaded);

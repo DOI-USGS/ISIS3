@@ -239,7 +239,7 @@ void IsisMain() {
   // Check our coefficient file
   if(calibrationData.objects() != 7) {
     QString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
-    msg += " only [" + QString(calibrationData.objects()) + "] objects were found";
+    msg += " only [" + QString::number(calibrationData.objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

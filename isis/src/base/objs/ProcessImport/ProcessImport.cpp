@@ -725,7 +725,7 @@ namespace Isis {
    * This method returns the number of data trailer bytes
    */
   int ProcessImport::DataTrailerBytes() const {
-    return p_fileTrailerBytes;
+    return p_dataTrailerBytes; 
   }
 
 
@@ -1373,8 +1373,7 @@ namespace Isis {
       fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
-        fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-
+      fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
     }
 
     // Check the last io
@@ -1490,7 +1489,6 @@ namespace Isis {
               }
               break;
             case Isis::Double:
-              //cout << "Double"  << endl;
               (*out)[samp] = (double)swapper.Double((double *)in+samp);
               break;
             default:
@@ -1636,7 +1634,7 @@ namespace Isis {
       fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
-        fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
+      fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
     }
 
     // Check the last io
@@ -1688,7 +1686,6 @@ namespace Isis {
 
         // Space for storing prefix and suffix data pointers
         vector<char *> tempPre, tempPost;
-
 
         // Handle any line prefix bytes
         pos = fin.tellg();
@@ -1878,7 +1875,7 @@ namespace Isis {
       fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
-        fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
+      fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
     }
 
     // Check the last io
@@ -2051,6 +2048,23 @@ namespace Isis {
         }
 
       } // End band loop
+
+      pos = fin.tellg();
+      if (p_saveDataTrailer) {
+        p_dataTrailer.push_back(new char[p_dataTrailerBytes]);
+        fin.read(p_dataTrailer.back(), p_dataTrailerBytes);
+      }
+      else {
+        fin.seekg(p_dataTrailerBytes, ios_base::cur);
+      }
+
+      // Check the last io
+      if (!fin.good()) {
+        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
+                     toString((int)pos) + "]. Byte count [" +
+                     toString(p_fileHeaderBytes) + "]" ;
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
 
       p_progress->CheckStatus();
 

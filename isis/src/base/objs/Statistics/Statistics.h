@@ -23,10 +23,6 @@
 #include <QObject>
 #include <QString>
 
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
-
 #include "Constants.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
@@ -100,6 +96,8 @@ namespace Isis {
    *   @history 2016-07-15 Ian Humphrey - Added constructor that initializes a Statistics object
    *                           from a PvlGroup. Added toPvl() and fromPvl() methods to allow
    *                           Statistics serialization/unserialization. References #2282.
+   *   @history 2017-04-20 Makayla Shepherd - Removed the hdf5 code because we are using XML for
+   *                           serialization. Fixes #4795.
    *
    *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
    *   @todo 2015-08-13 Jeannie Backer - Clean up header and implementation files once
@@ -168,8 +166,6 @@ namespace Isis {
     
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
-
-      static H5::CompType compoundH5DataType();
 
     private:
 

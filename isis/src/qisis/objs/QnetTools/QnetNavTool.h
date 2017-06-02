@@ -121,6 +121,10 @@ namespace Isis {
    *                          the data. Fixes #2144.
    *   @history 2016-11-18 Makayla Shepherd - Added disconnection and deletion of the Set Apriori
    *                          Dialog on close. Fixes #4490.
+   *   @history 2017-01-04 Makayla Shepherd - Made showNavTool() public in order to fix a window
+   *                          management issue that caused the NavTool to go behind the 
+   *                          ViewportMainWindow (parent widget) when using Gnome or Cinnamon. Fixes
+   *                          #4541.
    *
    *
    */
@@ -170,6 +174,7 @@ namespace Isis {
       void refreshList();
       void updateEditPoint(QString pointId);
       void disconnectAprioriDialog();
+      void showNavTool();
 
     private slots:
       void load();
@@ -183,7 +188,7 @@ namespace Isis {
       void ignorePoints();
       void deletePoints();
       void resetCubeList();
-      void showNavTool();
+      
       void aprioriDialog();
       void setAprioriDialogPoints();
 

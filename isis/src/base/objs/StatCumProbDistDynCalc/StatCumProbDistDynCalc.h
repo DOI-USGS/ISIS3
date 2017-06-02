@@ -132,9 +132,6 @@ namespace Isis {
           QString m_xmlHandlerCharacters;
       };
 
-      QUuid *m_id; /**< A unique ID for this object (useful for others to reference this object when
-                                      saving to disk).*/
-
       unsigned int m_numberCells; /**< The number of cells or histogram bins that are being used to
                                       model the probility density function.*/
       

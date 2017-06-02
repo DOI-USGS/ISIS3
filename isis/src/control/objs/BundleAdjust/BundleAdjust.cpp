@@ -53,14 +53,14 @@ namespace Isis {
   /**
    * Custom error handler for CHOLMOD.
    * If CHOLMOD encounters an error then this will be called.
-   * 
+   *
    * @param status The CHOLMOD error status.
    * @param file The name of the source code file where the error occured.
    * @param lineNumber The line number in file where the error occured.
    * @param message The error message.
    */
-  static void cholmodErrorHandler(int nStatus, 
-                                  const char* file, 
+  static void cholmodErrorHandler(int nStatus,
+                                  const char* file,
                                   int nLineNo,
                                   const char* message) {
     QString errlog;
@@ -85,7 +85,7 @@ namespace Isis {
   /**
    * Construct a BundleAdjust object from the given settings, control network file,
    * and cube list.
-   * 
+   *
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param cnetFile The filename of the control network to be used.
    * @param cubeList The list of filenames of the cubes to be adjusted.
@@ -115,7 +115,7 @@ namespace Isis {
 
   /**
    * Construct a BundleAdjust object with held cubes.
-   * 
+   *
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param cnetFile The filename of the control network to be used.
    * @param cubeList The list of filenames of the cubes to be adjusted.
@@ -148,7 +148,7 @@ namespace Isis {
   /**
    * Constructs a BundleAdjust object using a Control object.
    * A new control network object will be created as a copy of the Control's control network.
-   * 
+   *
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param cnet The Control object whose control network will be copied.
    *             The Control will not be modified by the BundleAdjust.
@@ -180,7 +180,7 @@ namespace Isis {
   /**
    * Constructs a BundleAdjust object using a ControlNet object.
    * A copy of the ControlNet will be used.
-   * 
+   *
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param cnet The ControlNet that will be copied.  The original ControlNet
    *             will not be modified.
@@ -210,7 +210,7 @@ namespace Isis {
 
   /**
    * Constructs a BundleAdjust from an already created ControlNet within a shared pointer.
-   * 
+   *
    * @param bundleSettings QSharedPointer to the bundle settings to use.
    * @param cnet QSharedPointer to the control net to adjust.
    * @param cubeList QString name of list of cubes to create serial numbers for.
@@ -229,14 +229,14 @@ namespace Isis {
     m_serialNumberList = new SerialNumberList(cubeList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
-    
+
     init();
   }
 
 
   /**
    * Thread safe constructor.
-   * 
+   *
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param control The Control object whose control network will be copied.
    *                The Control will not be modified by the BundleAdjust.
@@ -254,10 +254,13 @@ namespace Isis {
     m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
     m_bundleResults.setOutputControlNet(m_controlNet);
 
+    m_imageLists = imgLists;
+
     // this is too slow and we need to get rid of the serial number list anyway
     // should be unnecessary as Image class has serial number
     // could hang on to image list until creating BundleObservations?
     m_serialNumberList = new SerialNumberList;
+
     foreach (ImageList *imgList, imgLists) {
       foreach (Image *image, *imgList) {
         m_serialNumberList->add(image->fileName());
@@ -271,15 +274,15 @@ namespace Isis {
 
     m_cleanUp = false;
     m_cnetFileName = control.fileName();
-    
+
     init();
   }
 
 
-  /** 
-   * Destroys BundleAdjust object, deallocates pointers (if we have ownership), 
+  /**
+   * Destroys BundleAdjust object, deallocates pointers (if we have ownership),
    * and frees variables from cholmod library.
-   * 
+   *
    * @internal
    *   @history 2016-10-13 Ian Humphrey - Removed deallocation of m_pHeldSnList, since this
    *                           member was removed. References #4293.
@@ -296,8 +299,8 @@ namespace Isis {
 
 
   /**
-   * Initialize all solution parameters. This method is called 
-   * by constructors to 
+   * Initialize all solution parameters. This method is called
+   * by constructors to
    * <ul>
    *   <li> initialize member variables                            </li>
    *   <li> set up the control net                                 </li>
@@ -310,9 +313,9 @@ namespace Isis {
    *   <li> set up matrix initializations                          </li>
    *   <li> initialize cholomod library variables                  </li>
    * </ul>
-   * 
+   *
    * @param progress A pointer to the progress of creating the cameras.
-   * 
+   *
    * @throws IException::Programmer "In BundleAdjust::init(): image is null."
    * @throws IException::Programmer "In BundleAdjust::init(): observation is null."
    *
@@ -322,11 +325,14 @@ namespace Isis {
    *                           a single measure on a point
    *   @history 2016-10-13 Ian Humphrey - Removed verification of held images in the from list
    *                           and counting of the number of held images. References #4293.
-   *  
+   *
    *   @todo remove printf statements
    *   @todo answer comments with questions, TODO, ???, and !!!
    */
   void BundleAdjust::init(Progress *progress) {
+
+    m_previousNumberImagePartials = 0;
+
     // initialize
     //
     // JWB
@@ -402,7 +408,7 @@ namespace Isis {
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
-          QString msg = "In BundleAdjust::init(): observation " 
+          QString msg = "In BundleAdjust::init(): observation "
                         + observationNumber + "is null." + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -490,6 +496,8 @@ namespace Isis {
     // initializations for cholmod
     initializeCHOLMODLibraryVariables();
 
+    // initialize normal equations matrix
+    initializeNormalEquationsMatrix();
   }
 
 
@@ -499,11 +507,11 @@ namespace Isis {
    *
    * checks implemented for ...
    *  (1) images with 0 or 1 measures
-   * 
+   *
    * @return @b bool If the control network is valid.
-   * 
+   *
    * @throws IException::User "Images with one or less measures:"
-   * 
+   *
    * @internal
    *   @history  2011-08-04 Debbie A. Cook - Changed error message to
    *                            indicate it fails with one measure as
@@ -546,45 +554,80 @@ namespace Isis {
 
   /**
    * Initializations for CHOLMOD sparse matrix package.
-   * Calls cholmod_start, sets m_cholmodCommon options, and resizes m_sparseNormals.
-   * 
+   * Calls cholmod_start, sets m_cholmodCommon options.
+   *
    * @return @b bool If the CHOLMOD library variables were successfully initialized.
    */
   bool BundleAdjust::initializeCHOLMODLibraryVariables() {
+    if ( m_rank <= 0 ) {
+      return false;
+    }
 
-      if ( m_rank <= 0 ) {
-          return false;
+    m_cholmodTriplet = NULL;
+
+    cholmod_start(&m_cholmodCommon);
+
+    // set user-defined cholmod error handler
+    m_cholmodCommon.error_handler = cholmodErrorHandler;
+
+    // testing not using metis
+    m_cholmodCommon.nmethods = 1;
+    m_cholmodCommon.method[0].ordering = CHOLMOD_AMD;
+
+    return true;
+  }
+
+
+  /**
+   * Initialize Normal Equations matrix (m_sparseNormals).
+   *
+   * Ken NOTE: Currently we are explicitly setting the start column for each block in the normal
+   *           equations matrix below. I think it should be possible (and relatively easy) to make
+   *           the m_sparseNormals smart enough to set the start column of a column block
+   *           automatically when it is added to the matrix.
+   *
+   * @return @b bool.
+   */
+  bool BundleAdjust::initializeNormalEquationsMatrix() {
+
+    int nBlockColumns = m_bundleObservations.size();
+
+    if (m_bundleSettings->solveTargetBody())
+      nBlockColumns += 1;
+
+    m_sparseNormals.setNumberOfColumns(nBlockColumns);
+
+    m_sparseNormals.at(0)->setStartColumn(0);
+
+    int nParameters = 0;
+    if (m_bundleSettings->solveTargetBody()) {
+      nParameters += m_bundleSettings->numberTargetBodyParameters();
+      m_sparseNormals.at(1)->setStartColumn(nParameters);
+
+      int observation = 0;
+      for (int i = 2; i < nBlockColumns; i++) {
+        nParameters += m_bundleObservations.at(observation)->numberParameters();
+        m_sparseNormals.at(i)->setStartColumn(nParameters);
+        observation++;
       }
-
-      m_cholmodTriplet = NULL;
-
-      cholmod_start(&m_cholmodCommon);
-
-      // set user-defined cholmod error handler
-      m_cholmodCommon.error_handler = cholmodErrorHandler;
-
-      // testing not using metis
-      m_cholmodCommon.nmethods = 1;
-      m_cholmodCommon.method[0].ordering = CHOLMOD_AMD;
-
-      // set size of sparse block normal equations matrix
-      if (m_bundleSettings->solveTargetBody()) {
-        m_sparseNormals.setNumberOfColumns(m_bundleObservations.size()+1);
+    }
+    else {     
+      for (int i = 0; i < nBlockColumns; i++) {
+        m_sparseNormals.at(i)->setStartColumn(nParameters);
+        nParameters += m_bundleObservations.at(i)->numberParameters();
       }
-      else {
-        m_sparseNormals.setNumberOfColumns(m_bundleObservations.size());
-      }
+    }
 
-      return true;
+    return true;
   }
 
 
   /**
    * @brief Free CHOLMOD library variables.
-   * 
+   *
    * Frees m_cholmodTriplet, m_cholmodNormal, and m_L.
    * Calls cholmod_finish when complete.
-   * 
+   *
    * @return @b bool If the CHOLMOD library successfully cleaned up.
    */
   bool BundleAdjust::freeCHOLMODLibraryVariables() {
@@ -601,11 +644,11 @@ namespace Isis {
 
   /**
    * Compute the least squares bundle adjustment solution using Cholesky decomposition.
-   * 
+   *
    * @return @b BundleSolutionInfo A container with settings and results from the adjustment.
-   * 
+   *
    * @see BundleAdjust::solveCholesky
-   * 
+   *
    * @TODO make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
    */
   BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
@@ -625,7 +668,7 @@ namespace Isis {
 
   /**
    * Compute the least squares bundle adjustment solution using Cholesky decomposition.
-   * 
+   *
    * @return @b bool If the solution was successfully computed.
    *
    * @internal
@@ -770,7 +813,7 @@ namespace Isis {
         if (m_abort) {
           m_bundleResults.setConverged(false);
           emit statusUpdate("\n aborting...");
-          emit finished(); 
+          emit finished();
           return false;
         }
         // testing
@@ -828,7 +871,7 @@ namespace Isis {
             }
           }
         }
-        else { 
+        else {
           // bundleSettings.convergenceCriteria() == BundleSettings::ParameterCorrections
           int numConvergedParams = 0;
           int numImgParams = m_imageSolution.size();
@@ -919,17 +962,18 @@ namespace Isis {
       throw IException(e, e.errorType(), msg, _FILEINFO_);
     }
 
+    emit finished();
     return true;
   }
 
 
   /**
    * Create a BundleSolutionInfo containing the settings and results from the bundle adjustment.
-   * 
+   *
    * @return @b BundleSolutionInfo A container with solve information from the adjustment.
    */
   BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults);
+    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
     results.setRunTime("");
     return results;
   }
@@ -939,9 +983,9 @@ namespace Isis {
    * Form the least-squares normal equations matrix via cholmod.
    * Each BundleControlPoint will stores its Q matrix and NIC vector once finished.
    * The covariance matrix for each point will be stored in its adjusted surface point.
-   * 
-   * @return @b bool 
-   * 
+   *
+   * @return @b bool
+   *
    * @see BundleAdjust::formMeasureNormals
    * @see BundleAdjust::formPointNormals
    * @see BundleAdjust::formWeightedNormals
@@ -1031,8 +1075,10 @@ namespace Isis {
         // update number of observations
         int numObs = m_bundleResults.numberObservations();
         m_bundleResults.setNumberObservations(numObs + 2);
+
         formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
                              measure->observationIndex());
+
       } // end loop over this points measures
 
       formPointNormals(N22, N12, n2, m_RHS, point);
@@ -1044,7 +1090,6 @@ namespace Isis {
   } // end loop over 3D points
 
   // finally, form the reduced normal equations
-
   formWeightedNormals(n1, m_RHS);
 
   // update number of unknown parameters
@@ -1057,7 +1102,7 @@ namespace Isis {
   /**
    * Form the auxilary normal equation matrices for a measure.
    * N22, N12, n1, and n2 will contain the auxilary matrices when completed.
-   * 
+   *
    * @param N22 The normal equation matrix for the point on the body.
    * @param N12 The normal equation matrix for the camera and the target body.
    * @param n1 The right hand side vector for the camera and the target body.
@@ -1068,9 +1113,9 @@ namespace Isis {
    * @param coeffRHS The vector containing weighted x,y residuals.
    * @param observationIndex The index of the observation containing the measure that
    *                         the partial derivative matrices are for.
-   * 
+   *
    * @return @b bool If the matrices were successfully formed.
-   * 
+   *
    * @see BundleAdjust::formNormalEquations
    */
   bool BundleAdjust::formMeasureNormals(symmetric_matrix<double, upper>&N22,
@@ -1113,9 +1158,9 @@ namespace Isis {
       N11TargetImage.clear();
       N11TargetImage = prod(trans(coeffTarget),coeffImage);
 
-      m_sparseNormals.insertMatrixBlock(observationIndex+1, 0,
+      m_sparseNormals.insertMatrixBlock(blockIndex, 0,
                                         numTargetPartials, coeffImage.size2());
-      (*(*m_sparseNormals[observationIndex+1])[0]) += N11TargetImage;
+      (*(*m_sparseNormals[blockIndex])[0]) += N11TargetImage;
 
       // form N12 target portion
       static matrix<double> N12Target(numTargetPartials, 3);
@@ -1153,14 +1198,7 @@ namespace Isis {
 
     N11 = prod(trans(coeffImage), coeffImage);
 
-    int t = 0;
-    //testing
-    for (int a = 0; a < observationIndex; a++) {
-      BundleObservationQsp observation = m_bundleObservations.at(a);
-      t += observation->numberParameters();
-    }
-    // account for target parameters
-    t += numTargetPartials;
+    int t = m_sparseNormals.at(blockIndex)->startColumn();
 
     // insert submatrix at column, row
     m_sparseNormals.insertMatrixBlock(blockIndex, blockIndex,
@@ -1204,16 +1242,16 @@ namespace Isis {
    * come from calling formMeasureNormals() with the control point's measures.
    * The Q matrix and NIC vector are stored in the BundleControlPoint.
    * R = N12 x Q is accumulated into m_sparseNormals.
-   * 
+   *
    * @param N22 The normal equation matrix for the point on the body.
    * @param N12 The normal equation matrix for the camera and the target body.
    * @param n2 The right hand side vector for the point on the body.
    * @param nj The output right hand side vector.
    * @param bundleControlPoint The control point that the Q matrixs are NIC vector
    *                           are being formed for.
-   * 
+   *
    * @return @b bool If the matrices were successfully formed.
-   * 
+   *
    * @see BundleAdjust::formNormalEquations
    */
   bool BundleAdjust::formPointNormals(symmetric_matrix<double, upper>&N22,
@@ -1261,7 +1299,6 @@ namespace Isis {
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
 
     // form Q (this is N22{-1} * N12{T})
-    // Q = prod(N22, trans(N12));
     productATransB(N22, N12, Q);
 
     // form product of N22(inverse) and n2; store in NIC
@@ -1271,7 +1308,6 @@ namespace Isis {
     productAB(N12, Q);
 
     // accumulate -nj
-    // nj -= prod(trans(Q),n2);
     accumProductAlphaAB(-1.0, Q, n2, nj);
 
     return true;
@@ -1281,12 +1317,12 @@ namespace Isis {
   /**
    * Apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
    * velocities, angular accelerations if so stipulated (legalese).
-   * 
+   *
    * @param n1 The right hand side vector for the camera and the target body.
    * @param nj The right hand side vector
-   * 
+   *
    * @return @b bool If the weights were successfully applied.
-   * 
+   *
    * @see BundleAdjust::formNormalEquations
    */
   bool BundleAdjust::formWeightedNormals(compressed_vector<double> &n1,
@@ -1353,7 +1389,7 @@ namespace Isis {
 
   /**
    * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   * 
+   *
    * @param alpha A constant multiplier.
    * @param v2 The output vector.
    * @param Q A sparse block matrix.
@@ -1366,15 +1402,15 @@ namespace Isis {
     QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
 
     int subrangeStart, subrangeEnd;
-
+    
     while ( Qit.hasNext() ) {
       Qit.next();
 
       int columnIndex = Qit.key();
 
-      subrangeStart = m_sparseNormals.getLeadingColumnsForBlock(columnIndex);
+      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
       subrangeEnd = subrangeStart + Qit.value()->size2();
-
+      
       v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
@@ -1382,11 +1418,11 @@ namespace Isis {
 
   /**
    * Perform the matrix multiplication Q = N22 x N12(transpose)
-   * 
+   *
    * @param N22 A symmetric matrix
    * @param N12 A sparse block matrix
    * @param Q The output sparse block matrix
-   * 
+   *
    * @see BundleAdjust::formPointNormals
    */
   bool BundleAdjust::productATransB(symmetric_matrix <double,upper> &N22,
@@ -1413,10 +1449,10 @@ namespace Isis {
   /**
    * Perform the matrix multiplication C = N12 x Q.
    * The result, C, is stored in m_sparseNormals.
-   * 
+   *
    * @param N12 A sparse block matrix.
    * @param Q A sparse block matrix
-   * 
+   *
    * @see BundleAdjust::formPointNormals
    */
   void BundleAdjust::productAB(SparseBlockColumnMatrix &N12,
@@ -1456,12 +1492,12 @@ namespace Isis {
 
   /**
    * Performs the matrix multiplication nj = nj + alpha (Q x n2).
-   * 
+   *
    * @param alpha A constant multiplier.
    * @param Q A sparse block matrix.
    * @param n2 A vector.
    * @param nj The output accumulation vector.
-   * 
+   *
    * @see BundleAdjust::formPointNormals
    */
   void BundleAdjust::accumProductAlphaAB(double alpha,
@@ -1473,7 +1509,7 @@ namespace Isis {
       return;
     }
 
-    int numTargetParameters = m_bundleSettings->numberTargetBodyParameters();
+    int numParams;
 
     QMapIterator<int, LinearAlgebra::Matrix*> Qit(Q);
 
@@ -1485,22 +1521,7 @@ namespace Isis {
 
       LinearAlgebra::Vector blockProduct = prod(trans(*Qblock),n2);
 
-      int numParams = 0;
-      for (int observationIndex = 0; observationIndex < columnIndex; observationIndex++) {
-        if (numTargetParameters > 0 && observationIndex == 0) {
-          numParams += numTargetParameters;
-        }
-        else {
-          if (numTargetParameters > 0 ) {
-            BundleObservationQsp observation = m_bundleObservations.at(observationIndex-1);
-            numParams += observation->numberParameters();
-          }
-          else {
-            BundleObservationQsp observation = m_bundleObservations.at(observationIndex);
-            numParams += observation->numberParameters();
-          }
-        }
-      }
+      numParams = m_sparseNormals.at(columnIndex)->startColumn();
 
       for (unsigned i = 0; i < blockProduct.size(); i++) {
         nj(numParams+i) += alpha*blockProduct(i);
@@ -1513,9 +1534,9 @@ namespace Isis {
    * Compute the solution to the normal equations using the CHOLMOD library.
    *
    * @return @b bool If the solution was successfully computed.
-   * 
+   *
    * @throws IException::Programmer "CHOLMOD: Failed to load Triplet matrix"
-   * 
+   *
    * @see BundleAdjust::solveCholesky
    */
   bool BundleAdjust::solveSystem() {
@@ -1580,13 +1601,13 @@ namespace Isis {
 
   /**
    * @brief Load sparse normal equations matrix into CHOLMOD triplet.
-   * 
+   *
    * Blocks from the sparse block normal matrix are loaded into a CHOLMOD triplet.
    * Before the triplet can be used with CHOLMOD, it must be converted to a
    * CHOLMOD sparse matrix via cholmod_triplet_to_sparse.
-   * 
+   *
    * @return @b bool If the triplet was successfully formed.
-   * 
+   *
    * @see BundleAdjust::solveSystem
    */
   bool BundleAdjust::loadCholmodTriplet() {
@@ -1622,7 +1643,7 @@ namespace Isis {
         return false;
       }
 
-      int numLeadingColumns = m_sparseNormals.getLeadingColumnsForBlock(columnIndex);
+      int numLeadingColumns = normalsColumn->startColumn();
 
       QMapIterator< int, LinearAlgebra::Matrix * > it(*normalsColumn);
 
@@ -1631,7 +1652,9 @@ namespace Isis {
 
         int rowIndex = it.key();
 
-        int numLeadingRows = m_sparseNormals.getLeadingRowsForBlock(rowIndex);
+        // note: as the normal equations matrix is symmetric, the # of leading rows for a block is
+        //       equal to the # of leading columns for a block column at the "rowIndex" position
+        int numLeadingRows = m_sparseNormals.at(rowIndex)->startColumn();
 
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
@@ -1689,9 +1712,9 @@ namespace Isis {
   /**
    * Compute inverse of normal equations matrix for CHOLMOD.
    * The inverse is stored in m_normalInverse.
-   * 
+   *
    * @return @b bool If the inverse was successfully computed.
-   * 
+   *
    * @TODO This seems to be unused. JAM
    */
   bool BundleAdjust::cholmodInverse() {
@@ -1733,12 +1756,12 @@ namespace Isis {
 
   /**
    * Dedicated quick inverse of 3x3 matrix
-   * 
+   *
    * @param m The 3x3 matrix to invert.  Overwritten with the inverse.
-   * 
+   *
    * @return @b bool If the matrix was inverted.
    *                 False usually means the matrix is not invertible.
-   * 
+   *
    * @see BundleAdjust::formPointNormals
    *
    * @TODO Move to LinearAlgebra
@@ -1775,7 +1798,7 @@ namespace Isis {
    * Compute partial derivatives and weighted residuals for a measure.
    * coeffTarget, coeffImage, coeffPoint3D, and coeffRHS will be filled
    * with the different partial derivatives.
-   * 
+   *
    * @param coeffTarget A matrix that will contain target body
    *                    pertial derivatives.
    * @param coeffImage A matrix that will contain camera position and orientation
@@ -1785,12 +1808,12 @@ namespace Isis {
    * @param coeffRHS A vector that will contain weighted x,y residuals.
    * @param measure The measure that partials are being computed for.
    * @param point The point containing measure.
-   * 
+   *
    * @return @b bool If the partials were successfully computed.
-   * 
+   *
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
-  bool BundleAdjust::computePartials(matrix<double> &coeffTarget, 
+  bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
                                      matrix<double> &coeffImage,
                                      matrix<double> &coeffPoint3D,
                                      vector<double> &coeffRHS,
@@ -1816,7 +1839,14 @@ namespace Isis {
     BundleObservationQsp observation = measure.parentBundleObservation();
 
     int numImagePartials = observation->numberParameters();
-    coeffImage.resize(2,numImagePartials);
+
+    // we're saving the number of image partials in m_previousNumberImagePartials
+    // to compare to the previous computePartials call to avoid unnecessary resizing of the
+    // coeffImage matrix
+    if (numImagePartials != m_previousNumberImagePartials) {
+      coeffImage.resize(2,numImagePartials);
+      m_previousNumberImagePartials = numImagePartials;
+    }
 
     // clear partial derivative matrices and vectors
     if (m_bundleSettings->solveTargetBody()) {
@@ -1897,7 +1927,7 @@ namespace Isis {
                                                       &coeffTarget(1, index));
       index++;
     }
-      
+
     if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveMeanRadius()) {
       std::vector<double> lookBWRTMeanRadius =
           measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
@@ -2040,7 +2070,7 @@ namespace Isis {
       double residualR2ZScore
                  = sqrt(deltaX * deltaX + deltaY * deltaY) / observationSigma / sqrt(2.0);
       //dynamically build the cumulative probability distribution of the R^2 residual Z Scores
-      m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);  
+      m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
       int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
       observationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
                             .sqrtWeightScaler(residualR2ZScore);
@@ -2076,7 +2106,7 @@ namespace Isis {
 
       t += numTargetBodyParameters;
     }
-
+       
     // Update spice for each BundleObservation
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
@@ -2092,12 +2122,10 @@ namespace Isis {
 
       t += numParameters;
     }
-
-    // TODO: CHECK - do we need point index in case of rejected points????
-
+        
     // TODO: Below code should move into BundleControlPoint->updateParameterCorrections
     //       except, what about the productAlphaAV method?
-
+    
     // Update lat/lon for each control point
     double latCorrection, lonCorrection, radCorrection;
     int pointIndex = 0;
@@ -2114,9 +2142,8 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
       SparseBlockRowMatrix &Q = point->cholmodQMatrix();
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
-
+      
       // subtract product of Q and nj from NIC
-      // NIC -= prod(Q, m_imageSolution);
       productAlphaAV(-1.0, NIC, Q, m_imageSolution);
 
       // get point parameter corrections
@@ -2156,7 +2183,7 @@ namespace Isis {
       corrections(0) += latCorrection;
       corrections(1) += lonCorrection;
       corrections(2) += radCorrection;
-
+           
       // ken testing - if solving for target body mean radius, set radius to current
       // mean radius value
       if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
@@ -2191,7 +2218,7 @@ namespace Isis {
 
   /**
    * This method computes the focal plane residuals for the measures.
-   * 
+   *
    * @return @b double Weighted sum of the squares of the residuals, vtpv.
    *
    * @internal
@@ -2253,7 +2280,7 @@ namespace Isis {
 
       // get weight and correction vector for this point
       boost::numeric::ublas::bounded_vector<double, 3> weights = bundleControlPoint->weights();
-      boost::numeric::ublas::bounded_vector<double, 3> corrections = 
+      boost::numeric::ublas::bounded_vector<double, 3> corrections =
                                                              bundleControlPoint->corrections();
 
       if ( weights(0) > 0.0 ) {
@@ -2327,9 +2354,9 @@ namespace Isis {
    *
    * Computes the median and the median absolute deviation (M.A.D.) of the residuals.
    * Then, sets the rejection limit in m_bundleResults to median + RejectionMultiplier * M.A.D.
-   * 
+   *
    * @return @b bool If the rejection limit was successfully computed and set.
-   * 
+   *
    * @TODO should this be in BundleResults?
    *
    * @internal
@@ -2421,9 +2448,9 @@ namespace Isis {
 
   /**
    * Flags outlier measures and control points.
-   * 
+   *
    * @return @b bool If the flagging was successful.
-   * 
+   *
    * @TODO How should we handle points with few measures.
    */
   bool BundleAdjust::flagOutliers() {
@@ -2534,13 +2561,48 @@ namespace Isis {
 
 
   /**
+  * This method returns the image list used in the bundle adjust. If a QList<ImageList *> was passed
+  * into the constructor then it uses that list, otherwise it constructs the QList using the
+  * m_serialNumberList
+  *
+  * @return QList<ImageList *> The ImageLists used for the bundle adjust
+  */
+  QList<ImageList *> BundleAdjust::imageLists() {
+
+    if (m_imageLists.count() > 0) {
+      return m_imageLists;
+    }
+    else if (m_serialNumberList->size() > 0) {
+      ImageList *imgList = new ImageList;
+      try {
+        for (int i = 0; i < m_serialNumberList->size(); i++) {
+          Image *image = new Image(m_serialNumberList->fileName(i));
+          imgList->append(image);
+        }
+        m_imageLists.append(imgList);
+      }
+      catch (IException &e) {
+        QString msg = "Invalid image in serial number list\n";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    else {
+      QString msg = "No images used in bundle adjust\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return m_imageLists;
+  }
+
+
+  /**
    * Error propagation for solution.
-   * 
+   *
    * @return @b bool If the error propagation was successful.
-   * 
+   *
    * @throws IException::User "Input data and settings are not sufficiently stable
    *                           for error propagation."
-   * 
+   *
    * @internal
    *   @history 2016-10-05 Ian Humphrey - Updated to check to see if bundle settings is allowing
    *                           us to create the inverse matrix correlation file. References #4315.
@@ -2599,20 +2661,19 @@ namespace Isis {
     int columnIndex = 0;
     int numColumns = 0;
     int numBlockColumns = m_sparseNormals.size();
-
     for (i = 0; i < numBlockColumns; i++) {
 
       // columns in this column block
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals.at(i);
       if (i == 0) {
         numColumns = normalsColumn->numberOfColumns();
-        int numRows = m_sparseNormals.at(i)->numberOfRows();
+        int numRows = normalsColumn->numberOfRows();
         inverseMatrix.insertMatrixBlock(i, numRows, numColumns);
         inverseMatrix.zeroBlocks();
       }
       else {
         if (normalsColumn->numberOfColumns() == numColumns) {
-          int numRows = m_sparseNormals.at(i)->numberOfRows();
+          int numRows = normalsColumn->numberOfRows();
           inverseMatrix.insertMatrixBlock(i, numRows, numColumns);
           inverseMatrix.zeroBlocks();
         }
@@ -2637,7 +2698,7 @@ namespace Isis {
       // solve for inverse for nCols
       for (j = 0; j < numColumns; j++) {
         if ( columnIndex > 0 ) {
-          pb[columnIndex- 1] = 0.0;
+          pb[columnIndex - 1] = 0.0;
         }
         pb[columnIndex] = 1.0;
 
@@ -2710,7 +2771,9 @@ namespace Isis {
         }
 
         // get corresponding Q matrix
-        SparseBlockRowMatrix Q = point->cholmodQMatrix();
+        // NOTE: we are getting a reference to the Q matrix stored
+        //       in the BundleControlPoint for speed (without the & it is dirt slow)
+        SparseBlockRowMatrix &Q = point->cholmodQMatrix();
 
         T.clear();
 
@@ -2840,7 +2903,7 @@ namespace Isis {
 
   /**
    * Returns a pointer to the output control network.
-   * 
+   *
    * @return @b ControlNetQsp A shared pointer to the output control network.
    */
   ControlNetQsp BundleAdjust::controlNet() {
@@ -2850,7 +2913,7 @@ namespace Isis {
 
   /**
    * Returns a pointer to the serial number list.
-   * 
+   *
    * @return @b SerialNumberList* A pointer to the serial number list.
    */
   SerialNumberList *BundleAdjust::serialNumberList() {
@@ -2860,7 +2923,7 @@ namespace Isis {
 
   /**
    * Returns the number of images.
-   * 
+   *
    * @return @b int The number of images.
    */
   int BundleAdjust::numberOfImages() const {
@@ -2872,7 +2935,7 @@ namespace Isis {
    * Return the ith filename in the cube list file given to constructor.
    *
    * @param i The index of the cube.
-   * 
+   *
    * @return @b QString The filename of the cube.
    */
   // TODO: probably don't need this, can get from BundleObservation
@@ -2883,7 +2946,7 @@ namespace Isis {
 
   /**
    * Returns what iteration the BundleAdjust is currently on.
-   * 
+   *
    * @return @b double The current iteration number.
    */
   double BundleAdjust::iteration() const {
@@ -2895,7 +2958,7 @@ namespace Isis {
    * Return a table cmatrix for the ith cube in the cube list given to the constructor.
    *
    * @param i The index of the cube
-   * 
+   *
    * @return @b Table The InstrumentPointing table for the cube.
    */
   Table BundleAdjust::cMatrix(int i) {
@@ -2905,9 +2968,9 @@ namespace Isis {
   /**
    * Return a table spacecraft vector for the ith cube in the cube list given to the
    * constructor.
-   * 
+   *
    * @param i The index of the cube
-   * 
+   *
    * @return @b Table The InstrumentPosition table for the cube.
    */
   Table BundleAdjust::spVector(int i) {
@@ -2985,7 +3048,7 @@ namespace Isis {
 
   /**
    * Returns if the BundleAdjust converged.
-   * 
+   *
    * @return @b bool If the BundleAdjust converged.
    */
   bool BundleAdjust::isConverged() {
@@ -2995,9 +3058,9 @@ namespace Isis {
 
   /**
    * Returns the iteration summary string.
-   * 
+   *
    * @return @b QString the iteration summary string.
-   * 
+   *
    * @see iterationSummary()
    */
   QString BundleAdjust::iterationSummaryGroup() const {
@@ -3007,49 +3070,53 @@ namespace Isis {
 
   /**
    * Slot for deltack and jigsaw to output the bundle status.
-   * 
+   *
    * @param status The bundle status string to output.
+   *
+   * @internal
+   *   @history 2016-12-01 Ian Humphrey - Added %s as first paramter to prevent a
+   *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
     status += "\n";
-    printf(status.toStdString().c_str());
+    printf("%s", status.toStdString().c_str());
   }
 
 
 
   /**
    * @brief Compute Bundle statistics and store them in m_bundleResults.
-   *  
-   * Sets: 
-   * m_rmsImageSampleResiduals 
-   * m_rmsImageLineResiduals 
-   * m_rmsImageResiduals 
-   * 
+   *
+   * Sets:
+   * m_rmsImageSampleResiduals
+   * m_rmsImageLineResiduals
+   * m_rmsImageResiduals
+   *
    * m_rmsImageXSigmas
    * m_rmsImageYSigmas
    * m_rmsImageZSigmas
    * m_rmsImageRASigmas
    * m_rmsImageDECSigmas
    * m_rmsImageTWISTSigmas
-   *  
-   * m_maxSigmaLatitude 
-   * m_maxSigmaLatitudePointId 
-   * m_maxSigmaLongitude 
-   * m_maxSigmaLongitudePointId 
-   * m_maxSigmaRadius 
+   *
+   * m_maxSigmaLatitude
+   * m_maxSigmaLatitudePointId
+   * m_maxSigmaLongitude
+   * m_maxSigmaLongitudePointId
+   * m_maxSigmaRadius
    * m_maxSigmaRadiusPointId
-   *                       
-   * m_minSigmaLatitude   
-   * m_minSigmaLatitudePointId  
-   * m_minSigmaLongitude  
-   * m_minSigmaLongitudePointId 
-   * m_minSigmaRadius     
-   * m_minSigmaRadiusPointId    
-   *  
+   *
+   * m_minSigmaLatitude
+   * m_minSigmaLatitudePointId
+   * m_minSigmaLongitude
+   * m_minSigmaLongitudePointId
+   * m_minSigmaRadius
+   * m_minSigmaRadiusPointId
+   *
    * m_rmsSigmaLat
    * m_rmsSigmaLon
    * m_rmsSigmaRad
-   * 
+   *
    * @return @b bool If the statistics were successfully computed and stored.
    */
   bool BundleAdjust::computeBundleStatistics() {
@@ -3100,22 +3167,22 @@ namespace Isis {
       // initialize lat/lon/rad boundaries
       Distance minSigmaLatDist;
       QString  minSigmaLatPointId = "";
-      
+
       Distance maxSigmaLatDist;
       QString  maxSigmaLatPointId = "";
-      
+
       Distance minSigmaLonDist;
       QString  minSigmaLonPointId = "";
-      
+
       Distance maxSigmaLonDist;
       QString  maxSigmaLonPointId = "";
-      
+
       Distance minSigmaRadDist;
       QString  minSigmaRadPointId = "";
-      
+
       Distance maxSigmaRadDist;
       QString  maxSigmaRadPointId = "";
-      
+
       // compute stats for point sigmas
       Statistics sigmaLatStats;
       Statistics sigmaLonStats;
@@ -3192,7 +3259,7 @@ namespace Isis {
         }
       }
 
-      // update bundle results 
+      // update bundle results
       m_bundleResults.resizeSigmaStatisticsVectors(numberImages);
 
       m_bundleResults.setSigmaLatitudeRange(minSigmaLatDist, maxSigmaLatDist,

@@ -388,7 +388,8 @@ namespace Isis {
     // parenthesis
     for(int i = 0; i < equation.size(); i++) {
       // Ensure there is whitespace in the equation
-      if(!equation[i].isLetterOrNumber() && !equation[i].isSpace() && equation[i] != '.') {
+      if(!equation[i].isLetterOrNumber() && !equation[i].isSpace() &&
+         equation[i] != '.' && equation[i] != '_') {
         // Convert all braces to parens
         if(equation[i] == '[' || equation[i] == '{') {
           output += " ( ";
@@ -423,6 +424,14 @@ namespace Isis {
         }
         else if(i < equation.size() - 1 && equation[i] == '!' && equation[i+1] == '=') {
           output += " != ";
+          i++;
+        }
+        else if(i < equation.size() - 1 && equation[i] == '|' && equation[i+1] == '|') {
+          output += " || ";
+          i++;
+        }
+        else if(i < equation.size() - 1 && equation[i] == '&' && equation[i+1] == '&') {
+          output += " && ";
           i++;
         }
         // Take care of scientific notiation where the exponent is negative

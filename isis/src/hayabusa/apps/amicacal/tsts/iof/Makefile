@@ -9,4 +9,4 @@ commands:
         $(APPNAME) \
         FROM=$(INPUT)/st_2459265790_w.cub \
         TO=$(OUTPUT)/corrected_noiof_st_2459265790_w.cub \
-        iof=no > /dev/null;
+        units=dn > /dev/null;

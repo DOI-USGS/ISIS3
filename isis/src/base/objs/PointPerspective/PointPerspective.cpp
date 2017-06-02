@@ -22,17 +22,19 @@
 
 #include "PointPerspective.h"
 
-#include <cmath>
 #include <cfloat>
+#include <cmath>
+#include <iomanip>
 
 #include "Constants.h"
 #include "IException.h"
-#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "TProjection.h"
 
 using namespace std;
+
 namespace Isis {
   /**
    * Constructs an PointPerspective object
@@ -90,8 +92,8 @@ namespace Isis {
       // the center of planet), and calculate P
       m_distance = mapGroup["Distance"];
       m_distance *= 1000.;
-      m_P = 1.0 + (m_distance / m_equatorialRadius);
 
+      m_P = 1.0 + (m_distance / m_equatorialRadius);
     }
     catch(IException &e) {
       QString message = "Invalid label group [Mapping]";
@@ -155,6 +157,14 @@ namespace Isis {
    * correct LatitudeType, LongitudeDirection, and LongitudeDomain. The Set
    * forces an attempted calculation of the projection X/Y values. This may or
    * may not be successful and a status is returned as such.
+   * @internal
+   *     @history 2016-11-22 Tyler Wilson The call to SetGround now fails
+   *                         if the x,y values fall outside of the circle
+   *                         with center at (centerLat,centerLong) and
+   *                         radius = R/sqrt(P+1)/(P-1).  See:  
+   *                         P.173 of Map Projections - A Working Manual
+   *                         USGS Professional Paper 1395, by John P. Snyer.
+   *                         for details.  Fixes #3879.
    *
    * @param lat Latitude value to project
    *
@@ -164,6 +174,8 @@ namespace Isis {
    */
   bool PointPerspective::SetGround(const double lat, const double lon) {
     // Convert longitude to radians & clean up
+    double projectionRadius = m_equatorialRadius*sqrt((m_P+1)/(m_P+1));
+
     m_longitude = lon;
     double lonRadians = lon * PI / 180.0;
     if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
@@ -186,15 +198,23 @@ namespace Isis {
       m_good = false;
       return m_good;
     }
-
     // Compute the coordinates
     double ksp = (m_P - 1.0) / (m_P - g);
+
     double x = m_equatorialRadius * ksp * cosphi * sin(deltaLon);
     double y = m_equatorialRadius * ksp *
                (m_cosph0 * sinphi - m_sinph0 * cosphi * coslon);
-    SetComputedXY(x, y);
-    m_good = true;
-    return m_good;
+
+     if (sqrt(x*x+y*y)> projectionRadius) {
+
+       m_good =false;
+
+      return m_good;
+     }
+
+     SetComputedXY(x,y);
+     m_good = true;
+     return m_good;
   }
 
   /**
@@ -211,6 +231,8 @@ namespace Isis {
    * @return bool
    */
   bool PointPerspective::SetCoordinate(const double x, const double y) {
+
+
     // Save the coordinate
     SetXY(x, y);
 
@@ -278,6 +300,7 @@ namespace Isis {
     // Cleanup the latitude
     if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
 
+
     m_good = true;
     return m_good;
   }
@@ -290,6 +313,15 @@ namespace Isis {
    * to be. For example, how big a piece of paper is needed or how large of an
    * image needs to be created. The method may fail as indicated by its return
    * value.
+   * @internal
+   *   @history 2016-11-22 Tyler Wilson  Deleted the original XYRange() function
+   *        and replaced it with a version whose details can be found on P. 173
+   *        of Map Projections - A Working Manual, USGS Professional Paper 1395
+   *        by John P. Snyder.  Basically the limit of the map is a circle 
+   *        of radius = projectionRadius centered at the center of the projection.
+   *        Fixes #3879.
+   *        
+   *     
    *
    * @param minX Minimum x projection coordinate which covers the latitude
    *             longitude range specified in the labels.
@@ -306,55 +338,17 @@ namespace Isis {
    * @return bool
    */
   bool PointPerspective::XYRange(double &minX, double &maxX, double &minY, double &maxY) {
-    double lat, lon;
 
-    // Check the corners of the lat/lon range
-    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
-    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
-    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
-    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
+    double projectionRadius = m_equatorialRadius*sqrt((m_P-1.0)/(m_P+1.0));
 
-    // Walk top and bottom edges
-    for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
-      lon = m_minimumLongitude;
-      XYRangeCheck(lat, lon);
+    SetCoordinate(0.0,0.0);
+    minX = XCoord() - projectionRadius;
+    maxX = XCoord() + projectionRadius;
+    minY = YCoord() - projectionRadius;
+    maxY = YCoord() + projectionRadius;
 
-      lon = m_maximumLongitude;
-      XYRangeCheck(lat, lon);
-    }
-
-    // Walk left and right edges
-    for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
-      lat = m_minimumLatitude;
-      XYRangeCheck(lat, lon);
-
-      lat = m_maximumLatitude;
-      XYRangeCheck(lat, lon);
-    }
-
-    // Walk the limb
-    for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
-      double x = m_equatorialRadius * cos(angle * PI / 180.0);
-      double y = m_equatorialRadius * sin(angle * PI / 180.0);
-      if (SetCoordinate(x, y) == 0) {
-        if (m_latitude > m_maximumLatitude) continue;
-        if (m_longitude > m_maximumLongitude) continue;
-        if (m_latitude < m_minimumLatitude) continue;
-        if (m_longitude < m_minimumLongitude) continue;
-        XYRangeCheck(m_latitude, m_longitude);
-      }
-    }
-
-    // Make sure everything is ordered
-    if (m_minimumX >= m_maximumX) return false;
-    if (m_minimumY >= m_maximumY) return false;
-
-    // Return X/Y min/maxs
-    minX = m_minimumX;
-    maxX = m_maximumX;
-    minY = m_minimumY;
-    maxY = m_maximumY;
     return true;
+
   }
 
 

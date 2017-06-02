@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="vimscal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="vimscal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Radiometric correction of Cassini VIMS camera images. 
   </brief>
 
   <description>
-    This program applies a dark current and a flat field correction to images, then converts the output units
-    to either specific energy or I/F.
+    This program applies a dark current and a flat field correction to images,
+    then converts the output units to either specific energy or I/F.
 
     <br/><br/>
     <b>Dark Current:</b><br/>
-    The dark current correction for VIS consists of reading a binary ".tab" file from $cassini/calibration/vims and subtracting
-    derived values from this file.<br/>
+    The dark current correction for VIS consists of reading a
+    binary ".tab" file from $cassini/calibration/vims and subtracting derived values from
+    this file.<br/>
 
-    The dark current correction for IR consists of reading the sideplane data (stored in a SideplaneIr table in the cube) and
-    subtracting this from the input cube. If "CompressorId" is available then the sideplane data was already subtracted from
-    the file, but the linear fit capabilities are still available to re-do the dark current with a linear fit instead of the
-    default subtraction. If spectral summing is on then no dark current can be applied. If spectral editing is on then the linear
-    fit on the dark current can not be applied. Sideplane keywords for IR are as follows:
+    The dark current correction for IR consists of reading the sideplane data (stored in a
+    SideplaneIr table in the cube) and subtracting this from the input cube. If "CompressorId" is
+    available then the sideplane data was already subtracted from the file, but the linear fit
+    capabilities are still available to re-do the dark current with a linear fit instead of the
+    default subtraction. If spectral summing is on then no dark current can be applied.
+    If spectral editing is on then the linear fit on the dark current can not be applied.
+    Sideplane keywords for IR are as follows:
     <ul>
       <li>None = No dark current subtraction (applied by the instrument)</li>
       <li>Sideplane = Sideplane was subtracted only without fitting a line</li>
@@ -30,12 +35,14 @@
     <br/><br/>
 
     <b>Flat Field:</b><br/>
-    For both VIS and IR this determines the correct file from $cassini/calibration/vims/flatfield and divides the input data by the
-    flat field data.<br /><br />
+    For both VIS and IR this determines the correct file from $cassini/calibration/vims/flatfield
+    and divides the input data by the flat field data.<br /><br />
 
     <b>Subareas</b><br/>
-    The offset and swath keywords will be respected by running "crop" on the calibration files appropriately and using the cropped 
-    calibration files.
+    The offset and swath keywords will be respected by running "crop" on the calibration
+    files appropriately and using the cropped calibration files.
+
+
   </description>
 
   <history>
@@ -71,9 +78,21 @@
       clock.  The Ir exposure duration needs a correction factor of 1.01725 applied before using.
       References #1759.
     </change>
-    <change name="Tracie Sucharski" date="2014-04-02">
-      Added RadiometricCalibration group to output cube labels, which contains calibration files
-      and other calibration parameters.  Uses new performance model calibration file (RC17).  Fixes #2055.
+    <change name="Tyler Wilson" date="2016-09-15">
+      Updated vimscal to make use of RC19 files.  Instead of having one calibration
+      cube for solar/specific energy/wavecal data, there are now 14 cubes (one for each year in
+      the range 2004:2017).  This is because of the wavelength calibration shift as
+      a function of time described in "The VIMS Wavelength and Radiometric Calibration
+      White Paper", Roger N. Clark, Robert H. Brown, Dyer M. Lytle.  Draft submitted to the
+      NASA Planetary Data System: 07/19/2016.   Changes
+      to the application are minimal.  The BandBin:Center keyword value was also updated
+      for all calibrated cubes to reflect the new knowledge concerning wavelength shifts.
+      Fixes #4370.
+    </change>
+    <change name="Tyler Wilson" date="2017-01-03">
+      Added the ability for users to select which flatfield file they want to use during
+      calibration.  The default option is to continue using the original flatfield files.  
+      References #4370.
     </change>
   </history>
 
@@ -136,6 +155,35 @@
             <description>
               This option indicates that the output is in terms of solar flux (I/F). 
               Input cube must have been run through the <strong>spiceinit</strong> application.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name = "FLATFIELD">
+        <type>string</type>
+        <brief>Flatfield file</brief>
+        <description>
+        </description>
+        <default><item>2006Flat</item></default>
+
+        <list>
+          <option value="2006FLAT">
+            <brief>2006 Flatfield</brief>
+            <description>
+
+            </description>
+            </option>
+            <option value="2006SSFLAT">
+              <brief>2006 Spectrally Summed Flatfield</brief>
+              <description>
+
+              </description>
+          </option>
+          <option value="2013FLAT">
+            <brief>2013 Flatfield</brief>
+            <description>
+
             </description>
           </option>
         </list>

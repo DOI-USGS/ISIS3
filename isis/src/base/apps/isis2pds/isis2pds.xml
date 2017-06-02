@@ -22,7 +22,11 @@
       Added the Label Type capability (param)
     </change>
     <change name="Kristin Berry" date="2014-06-06">
-      Changed to assume that radii without units in the input Isis cube are in meters, map scales without units are in meters/pixel, and map resolutions without units are in pixels/degree. 
+      Changed to assume that radii without units in the input Isis cube are in meters, map scales without units are in meters/pixel, and map resolutions without units are in pixels/degree.
+    </change>
+    <change name="Makayla Shepherd and Ian Humphrey" date="2017-05-17">
+      Added CHECKSUM parameter to optionally generate and attach an MD5 checksum to the exported
+      image label. This checksum is generated from the image data. Fixes #1013.
     </change>
     </history>
 
@@ -142,7 +146,7 @@
         <default><item>true</item></default>
         <brief>Dedicates the minimum DN value for null pixels.</brief>
         <description>
-          If set to true, the minimum value of the raw output data will be 
+          If set to true, the minimum value of the raw output data will be
           reserved for null pixels.  The actual value used for null pixels will
           be denoted in the print.prt file as well as displayed onscreen.
         </description>
@@ -185,6 +189,15 @@
           If set to true, then an output DN value is set aside for the HRS input pixels.
           The actual DN value used for HRS pixels will be denoted in the print.prt
           file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="CHECKSUM">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Generates and attaches an MD5 checksum to the labels.</brief>
+        <description>
+          If set to true, then an MD5 checksum will be generated from the image data and
+          attached to the output image labels.
         </description>
       </parameter>
     </group>
@@ -327,7 +340,7 @@
         </list>
       </parameter>
     </group>
-  </groups> 
+  </groups>
 
     <examples>
         <example>
@@ -342,7 +355,7 @@
                     from=ab102401.lev2.cub to=ab102401.lev2.img
                 </commandLine>
                 <description>
-                    In this example isis2pds will convert a cube to a pds 
+                    In this example isis2pds will convert a cube to a pds
                     format image.
                 </description>
             </terminalInterface>
@@ -364,12 +377,12 @@
                         Output pds image
                     </brief>
                     <description>
-                        This is the exact same image with exact same DNs, but in 
+                        This is the exact same image with exact same DNs, but in
                         the pds format.
                     </description>
                     <thumbnail caption="Output pds Image" src="assets/thumbs/output.jpg" width="137" height="200" />
                     <parameterName>TO</parameterName>
-                </image> 
+                </image>
                 </outputImages>
             <guiInterfaces>
                 <guiInterface>

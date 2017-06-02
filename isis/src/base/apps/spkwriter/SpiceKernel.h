@@ -2,8 +2,8 @@
 #define SpiceKernel_h
 /**                                                                       
  * @file                                                                  
- * $Revision$ 
- * $Date$
+ * $Revision: 5850 $ 
+ * $Date: 2014-05-27 15:22:24 -0700 (Tue, 27 May 2014) $
  *                                                                        
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
@@ -22,7 +22,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  *  
- *   $Id$
+ *   $Id: SpiceKernel.h 5850 2014-05-27 22:22:24Z jwbacker@GS.DOI.NET $
  */                                                                       
 
 #include <cmath>

@@ -26,9 +26,13 @@
     <change name="Steven Koechle" date="2008-08-30">
         Added ability to change special pixel ranges. Added example.
     </change>
-    <change name="Makayla Shepherd" data="2015-07-15">
-        Fixed a problem with non-numeric cahracters in the file which resulted ascii2isis
+    <change name="Makayla Shepherd" date="2015-07-15">
+        Fixed a problem with non-numeric characters in the file which resulted ascii2isis
         hanging. Fixes #2066.
+    </change>
+    <change name="Ian Humphrey" date="2017-03-16">
+        Added an error message when the reading fails if the file header isn't skipped.
+        Fixes #4596.
     </change>
   </history>
 

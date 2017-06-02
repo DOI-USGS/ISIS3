@@ -325,7 +325,7 @@ void IsisMain() {
   qDebug() << "********* Test imagePositions() ********";
   for (int i = 0; i <= m11.imagePositions().groups() - 1; i++) {
     qDebug() << "Name: " << m11.imagePositions().group(i).name();
-    qDebug() << "File: " << m11.imagePositions().group(i).findKeyword("File")[0];
+    qDebug() << "File: " << FileName(m11.imagePositions().group(i).findKeyword("File")[0]).name();
     qDebug() << "StartSample: " << m11.imagePositions().group(i).findKeyword("StartSample")[0];
     qDebug() << "StartLine: " << m11.imagePositions().group(i).findKeyword("StartLine")[0];
   }

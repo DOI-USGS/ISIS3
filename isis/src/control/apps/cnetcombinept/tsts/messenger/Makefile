@@ -7,12 +7,8 @@ commands:
 	$(APPNAME) cnetlist=$(OUTPUT)/networks.lis \
 	           onet=$(OUTPUT)/Equi065S355ED10.net \
 	           networkid=Equi065S355ED10 \
-			   description="Messenger data test" \
-	           mode=image \
-	           distance=3000.0 \
-	           imagetol=1 \
-	           setaprioribest=true \
-	           rejectedmeasures=remove \
+	           description="Messenger data test" \
+	           imagetol=3000.0 \
 	           > /dev/null;
 
 	$(RM) $(OUTPUT)/networks.lis;

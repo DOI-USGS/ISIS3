@@ -42,11 +42,16 @@ namespace Isis {
   *
   * @internal
   *   @history 2011-05-11  Sharmila Prasad - Initial Version
+  *   @history 2017-06-01  Kaj Williams - renamed "save as ..." radio buttons to reflect their actual usage. Updated the associated tooltips. 
+  *                        Also updated the "enum saveAsType"  documentation.
   */
   class SaveAsDialog : public FileDialog {
       Q_OBJECT
     public:
       SaveAsDialog(QString pTitle, QStringList &pFilterList, QDir &pDir, QWidget *pParent = 0);
+      /**
+      * @param FullImage,ExportAsIs, ExportFullRes
+      **/
       enum saveAsType {FullImage, ExportAsIs, ExportFullRes};
       int getSaveAsType();
       

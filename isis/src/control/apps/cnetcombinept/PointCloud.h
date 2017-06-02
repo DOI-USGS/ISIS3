@@ -28,97 +28,68 @@
 namespace Isis {
 
 /** 
- *  Functor to compute 3-d Euclidean distances
- *  
- * @author 2014-02-17 Kris Becker
- *  
- * @internal 
- *   @history 2014-02-17 Kris Becker - Original Version 
- *  
- */
-template <class T> class Dist3d {
-public:
-  enum { Dimension = 3 };
-  Dist3d() { }
-  ~Dist3d() { }
-
-  inline int dimension() const {
-    return ( Dimension );
-  }
-
-  inline double operator()(const T &datum1, const T &datum2) const {
-    double dx = datum1.x() - datum2.x();
-    double dy = datum1.y() - datum2.y();
-    double dz = datum1.z() - datum2.z();
-    return ( dx*dx + dy*dy + dz*dz );
-  }
-
-  inline double operator()(const double *datum1, const T &datum2) const {
-    double dx = datum1[0] - datum2.x();
-    double dy = datum1[1] - datum2.y();
-    double dz = datum1[2] - datum2.z();
-    return ( dx*dx + dy*dy + dz*dz );
-  }
-};
-
-/** 
  *  Functor to compute 2-d Euclidean distances
  *  
  * @author 2014-02-17 Kris Becker
  *  
  * @internal 
- *   @history 2014-02-17 Kris Becker - Original Version 
+ *   @history 2014-02-17 Kris Becker - Original Version
+ *   @history 2016-12-06 Jesse Mapel - Updated documentation. References #4558.
  */
 template <class T> class Dist2d {
 public:
-  enum { Dimension = 2 };
+  enum { Dimension = 2 //!< The dimension of the distance metric.
+  };
+
+  /**
+   * Constructs a Dist2d functor.
+   */
   Dist2d() { }
+
+
+  /**
+   * Destroys a Dist2d functor.
+   */
   ~Dist2d() { }
 
+
+  /**
+   * Returns the dimension of the distance metric.
+   * 
+   * @return @b int Always 2.
+   */
   inline int dimension() const {
     return ( Dimension );
   }
 
+
+  /**
+   * Computes the two dimensional distance between two points.
+   * 
+   * @param datum1 The first point
+   * @param datum2 The second point
+   * 
+   * @return @b double The distance between the two points.
+   */
   inline double operator()(const T &datum1, const T &datum2) const {
     double dx = datum1.x() - datum2.x();
     double dy = datum1.y() - datum2.y();
     return ( dx*dx + dy*dy );
   }
 
+
+  /**
+   * Computes the two dimensional distance between two points.
+   * 
+   * @param datum1 The first point as a double array
+   * @param datum2 The second point
+   * 
+   * @return @b double The distance between the two points.
+   */
   inline double operator()(const double *datum1, const T &datum2) const {
     double dx = datum1[0] - datum2.x();
     double dy = datum1[1] - datum2.y();
     return ( dx*dx + dy*dy );
-  }
-};
-
-/** 
- *  Functor to compute 1-d Manhattan distances
- *  
- * @author 2014-02-17 Kris Becker
- *  
- * @internal 
- *   @history 2014-02-17 Kris Becker - Original Version 
- */
-template <class T> class Dist1d {
-public:
-  enum { Dimension = 1 };
-  Dist1d() { }
-  ~Dist1d() { }
-
-  inline int dimension() const {
-    return ( Dimension );
-  }
-
-
-  inline double operator()(const T &datum1, const T &datum2) const {
-    double dx = datum1.x() - datum2.x();
-    return ( dx*dx );
-  }
-
-  inline double operator()(const double *datum1, const T &datum2) const {
-    double dx = datum1[0] - datum2.x();
-    return ( dx*dx );
   }
 };
 
@@ -136,12 +107,12 @@ public:
  * In addition, this class accesses individual points from PointCloud using a 
  * vector component operator so as to standardize and complete this interface: 
  *  
- *   @code
+ * @code
  *   double x() const;  // X component of point
  *   double y() const;  // Y component of point
  *   double z() const;  // Z component of point
  *   double w() const;  // Optional weight of point (default should be 1.0)
- *  @endcode
+ * @endcode
  *  
  *  The point container is required to not change its content for the duration
  *  of use of the nanoflann kd-tree built from the points. Because of this,
@@ -172,42 +143,134 @@ public:
  * @internal 
  *   @history 2014-02-17 Kris Becker - Original Version 
  */
-template <class T, class Distance = Dist3d<T> > class PointCloud {
+template <class T > class PointCloud {
   public:
-    PointCloud() : m_points()  { }
-    PointCloud(const int &npoints) : m_points() { 
+
+    /**
+     * Constructs a default PointCloud.
+     */
+    PointCloud() : m_id("PointCloud"), m_points(), m_distance() { }
+
+
+    /**
+     * Constructs a PointCloud with a given ID.
+     * 
+     * @param id The ID of the PointCloud.
+     */
+    explicit PointCloud(const QString &id) :  m_id(id), m_points(), m_distance()  { }
+
+
+    /**
+     * Constructs a PointCloud with a given ID and
+     * space for a given number of points reserved.
+     * 
+     * @param npoints The number of points to reserve space for.
+     * @param id The ID of the PointCloud.  Defaults to "PointCloud". 
+     */
+    PointCloud(const int &npoints, const QString &id = "PointCloud") : 
+               m_id(id), m_points(), m_distance() { 
       m_points.reserve(npoints); 
     }
 
-    PointCloud(const QVector<T> &points) : m_points(points) { }
+
+    /**
+     * Constructs a PointCloud with a given ID and set of points.
+     * 
+     * @param points The set of points to add to the PointCloud.
+     * @param id The ID of the PointCloud.  Defaults to "PointCloud". 
+     */
+    PointCloud(const QVector<T> &points, const QString &id = "PointCloud") : 
+               m_id(id), m_points(points), m_distance() { }
+
+
+    /**
+     * Constructs a PointCloud with a given ID and set measures.
+     * The measures will be used to construct the internal set of points.
+     * 
+     * @param points The set of measures to add to the PointCloud.
+     * @param id The ID of the PointCloud.  Defaults to "PointCloud". 
+     */
+    PointCloud(const QList<ControlMeasure *> &points, 
+               const QString &id = "PointCloud") : 
+               m_id(id), m_points(), m_distance() { 
+      for (int i = 0 ; i < points.size() ; i++ ) {
+        m_points.push_back( T(points[i]) );
+      }
+    }
+
+
+    /**
+     * Desctroys the PointCloud.
+     */
     virtual ~PointCloud() { }
 
 
-    /** Standard size method */
+    /**
+     * Returns the size of the PointCloud.
+     * 
+     * @return @b int The number of points in the PointCloud.
+     */
     inline int size() const {
       return ( m_points.size() );
     }
 
-    /** Add a new point to the list */
+
+    /**
+     * Returns the PointCloud's ID.
+     * 
+     * @return @b QString The PointCloud's ID.
+     */
+    inline QString identifier() const {
+      return (m_id);
+    }
+
+
+    /**
+     * Adds a new point to the list
+     * 
+     * @param point The point to add.
+     */
     inline void addPoint(const T &point) {
       m_points.push_back(point);
     }
 
-    /** Return a reference to the point at index idx */
+
+    /**
+     * Return a reference to the point at a given index.
+     * 
+     * @param idx The index of the point to return.
+     * 
+     * @return @b T& A constant reference to the point.
+     */
     inline const T &point(const size_t idx) const {
       Q_ASSERT( idx >= 0 );
       Q_ASSERT( idx < (size_t) size() );
       return (m_points[idx]);
     }
 
+
+    /**
+     * Returns the Euclidean distance between two points.
+     * 
+     * @param first The first point.
+     * @param second The second point.
+     * 
+     * @return @b double The squared Euclidean distance between first and second.
+     */
     inline double distance( const T &first, const T &second ) const {
       return ( m_distance(first, second) );
     }
 
-        /** Return number of points in cloud */
+
+    /** 
+     * Returns the number of points in the PointCloud.
+     * 
+     * @return @b size_t The number of points in the PointCloud.
+     */
     inline size_t kdtree_get_point_count() const {
       return ( m_points.size() );
     }
+
 
   /**
    * @brief Return Euclidean distance from a source point to the indexed point
@@ -221,7 +284,7 @@ template <class T, class Distance = Dist3d<T> > class PointCloud {
    * @param p1      3-vector of the source point
    * @param idx_p2  Index into point data set contained herein
    * 
-   * @return double Returns the squared distance - not the square root!
+   * @return @b double Returns the squared distance - not the square root!
    */
     inline double kdtree_distance(const double *p1, const size_t idx_p2,
                                   size_t p_size) const {
@@ -229,6 +292,7 @@ template <class T, class Distance = Dist3d<T> > class PointCloud {
       Q_ASSERT( idx_p2 < (size_t) size() );
       return ( m_distance(p1, point(idx_p2)) );
     }
+
 
   /**
    * @brief Returns a value for a single dimemsion of a vector 
@@ -241,13 +305,14 @@ template <class T, class Distance = Dist3d<T> > class PointCloud {
    * @param idx Index of the point to get element from
    * @param dim The index (0 - 2)of the ith element of the vector 
    * 
-   * @return double Value at the specfied vector point index
+   * @return @b double Value at the specfied vector point index
    */
     inline double kdtree_get_pt(const size_t idx, int dim) const {
       if ( dim == 0 )  return ( point(idx).x() );
       if ( dim == 1 )  return ( point(idx).y() );
       return ( point(idx).z() );
     }
+
 
     /** 
      *  Let nanoflann range algorithm compute the bounding box
@@ -262,8 +327,10 @@ template <class T, class Distance = Dist3d<T> > class PointCloud {
     }
 
   private:
-    QVector<T> m_points;   ///!< points in the point cloud
-    Distance   m_distance; ///!< Instantiation of distance functor
+
+    QString    m_id;       ////! Identifier.
+    QVector<T> m_points;   ///!< Points in the point cloud.
+    Dist2d<T>  m_distance; ///!< Instantiation of distance functor.
 
 };
 

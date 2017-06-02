@@ -103,7 +103,7 @@ inline void writeBand(ProcessExportPds &process, ofstream &out,
 void IsisMain() {
   const QString mdisddrProgram = "mdisddr";
   const QString mdisddrVersion = "1.0";
-  const QString mdisddrRevision = "$Revision$";
+  const QString mdisddrRevision = "$Revision: 6715 $";
   const QString mdisddrRuntime = Application::DateTime();
   const QString dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 

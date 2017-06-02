@@ -27,6 +27,21 @@ libs:
 	   done;                                                             \
 	  fi;                                                                \
         done;                                                                \
+	for library in $(PATCHLIBS); do                                      \
+	  $(INSTALL3P) $(INSTALL3POPTS) $$library $(ISISROOT)/3rdParty/lib/; \
+	  echo $(CURTIMESTAMP) "  Installing [$$library]";                   \
+	  if [ "$(HOST_ARCH)" == "Linux" ]; then                             \
+	    for file in $$library; do                                        \
+	      localFile=$(ISISROOT)/3rdParty/lib/`basename $$file`;          \
+	      if [ ! -L "$$localFile" ]; then                                \
+	        dollar='$$';                                                 \
+	        newRpath=`echo "$${dollar}ORIGIN"`;                          \
+	        echo $(CURTIMESTAMP) "    Patching [" `basename $$file` "]"; \
+	        $(PATCHELF) --set-rpath "$$newRpath" $$localFile;            \
+	     fi;                                                             \
+	   done;                                                             \
+	  fi;                                                                \
+        done;                                                                \
 	if [ "$(HOST_ARCH)" == "Darwin" ]; then                              \
 	  chmod u+w $(ISISROOT)/3rdParty/lib/libcrypto.*.dylib;              \
 	  chmod u+w $(ISISROOT)/3rdParty/lib/libssl.*.dylib;                 \

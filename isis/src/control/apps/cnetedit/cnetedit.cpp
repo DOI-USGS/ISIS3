@@ -104,6 +104,11 @@ ControlNetValidMeasure *validator;
 
 // Main program
 void IsisMain() {
+  // 2016-12-08 Ian Humphrey - Set the QHash seed, otherwise output is ALWAYS slightly
+  //                different. Note that in Qt4, the seed was constant, but in Qt5, the seed is
+  //                created differently for each process. Fixes #4206.
+  qSetGlobalQHashSeed(1031);
+
   // Reset the counts of points and measures deleted
   numPointsDeleted = 0;
   numMeasuresDeleted = 0;
@@ -177,7 +182,7 @@ void IsisMain() {
       QString line = in.readLine();
       QStringList results = line.split(",");
       if (results.size() < 2) {
-        QString msg = "Line " + QString(lineNumber) + " in the MEASURELIST does "
+        QString msg = "Line " + QString::number(lineNumber) + " in the MEASURELIST does "
           "not contain a Point ID and a cube filename separated by a comma";
         throw IException(IException::User, msg, _FILEINFO_);
       }

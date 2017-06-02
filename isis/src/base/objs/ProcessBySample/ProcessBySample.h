@@ -22,8 +22,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "ProcessByBrick.h"
 #include "Buffer.h"
+#include "ProcessByBrick.h"
 
 namespace Isis {
   /**
@@ -36,7 +36,6 @@ namespace Isis {
    * the Process class which give many functions for setting up input and output
    * cubes.
    *
-   *
    * @ingroup HighLevelCubeIO
    *
    * @author  2006-03-27 Jacob Danton
@@ -48,9 +47,10 @@ namespace Isis {
    *                           Added some documentation to methods.
    *   @history 2012-02-22 Steven Lambright - Updated to have functorized and
    *                           threaded StartProcess equivalents.
+   *   @history 2017-02-17 JP Bonn - Formatting changes, removed commented out
+   *                           code.
    */
   class ProcessBySample : public Isis::ProcessByBrick {
-
     public:
       ProcessBySample(): ProcessByBrick() {
         SetWrap(true);
@@ -64,63 +64,54 @@ namespace Isis {
                                int requirements = 0);
 
       void StartProcess(void funct(Isis::Buffer &inout));
-
       void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out));
-
       void StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                    std::vector<Isis::Buffer *> &out));
 
       /**
        * @see ProcessByBrick::ProcessCubeInPlace()
-       * @param funct
-       * @param threaded
+       * @param funct The processing function or functor which does your
+       *              desired calculations.
+       * @param threaded True if multi-threading is supported, false otherwise.
        */
-
-
       template <typename Functor>
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
-          VerifyCubes(InPlace);
-          SetBricks(InPlace);
+        VerifyCubes(InPlace);
+        SetBricks(InPlace);
         //SetBrickSizesForProcessCubeInPlace();
         ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
 
+
       /**
        * @see ProcessByBrick::ProcessCube()
-       * @param funct
-       * @param threaded
+       * @param funct The processing function or functor which does your
+       *              desired calculations.
+       * @param threaded True if multi-threading is supported, false otherwise.
        */
-
       template <typename Functor>
       void ProcessCube(const Functor & funct, bool threaded = true) {
-          VerifyCubes(InputOutput);
-          SetBricks(InputOutput);
-        //SetBrickSizesForProcessCube();
+        VerifyCubes(InputOutput);
+        SetBricks(InputOutput);
         ProcessByBrick::ProcessCube(funct, threaded);
       }
 
+
       /**
        * @see ProcessByBrick::ProcessCubes()
-       * @param funct
-       * @param threaded
+       * @param funct The processing function or functor which does your
+       *              desired calculations.
+       * @param threaded True if multi-threading is supported, false otherwise.
        */
-
       template <typename Functor>
       void ProcessCubes(const Functor & funct, bool threaded = true) {
-          VerifyCubes(InputOutputList);
-          SetBricks(InputOutputList);
-        //SetBrickSizesForProcessCubes();
+        VerifyCubes(InputOutputList);
+        SetBricks(InputOutputList);
         ProcessByBrick::ProcessCubes(funct, threaded);
       }
 
-
     private:
-
       void SetBricks(IOCubes cn);
-
-      //void SetBrickSizesForProcessCubeInPlace();
-      //void SetBrickSizesForProcessCube();
-      //void SetBrickSizesForProcessCubes();
   };
 };
 

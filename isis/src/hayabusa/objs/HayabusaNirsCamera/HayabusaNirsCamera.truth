@@ -1,0 +1,34 @@
+Unit Test for HayabusaNirsCamera...
+FileName: 2392975548_lvl3_0.refl.cub
+CK Frame: -130200
+
+Kernel IDs: 
+CK Frame ID = -130000
+CK Reference ID = 1
+SPK Target ID = -130
+SPK Reference ID = 1
+
+Spacecraft Name Long: Hayabusa
+Spacecraft Name Short: Hayabusa
+Instrument Name Long: Near InfraRed Spectrometer
+Instrument Name Short: NIRS
+
+For upper left corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For upper right corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK

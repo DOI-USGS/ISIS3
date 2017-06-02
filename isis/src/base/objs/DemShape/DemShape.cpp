@@ -295,9 +295,37 @@ namespace Isis {
    * This method calculates the default normal (Ellipsoid for backwards
    * compatability) for the DemShape.
    */
+
   void DemShape::calculateDefaultNormal() {
-    calculateEllipsoidalSurfaceNormal();
+
+    if (!surfaceIntersection()->Valid() || !hasIntersection() ) {
+      IString msg = "A valid intersection must be defined before computing the surface normal";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Get the coordinates of the current surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Get the radii of the ellipsoid
+    vector<Distance> radii = targetRadii();
+    double a = radii[0].kilometers();
+    double b = radii[1].kilometers();
+    double c = radii[2].kilometers();
+
+    vector<double> normal(3,0.);
+
+    NaifStatus::CheckErrors();
+    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
+    NaifStatus::CheckErrors();
+
+    setNormal(normal);
+    setHasNormal(true);
+
   }
+
 
 
   /**
@@ -385,7 +413,7 @@ namespace Isis {
    * point.
    */
   void DemShape::calculateSurfaceNormal() {
-    calculateEllipsoidalSurfaceNormal();
+    calculateDefaultNormal();
   }
 
 

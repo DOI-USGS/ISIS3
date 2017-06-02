@@ -53,6 +53,14 @@ namespace Isis {
    *                           closer to ISIS coding standards. References #1438
    *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
    *                           References #2214
+   *   @history 2017-05-19 Tyler Wilson - calculateDefaultNormal() and calculateSurfaceNormal()
+   *                           now return the normal vector to an ellipsoid.  All references
+   *                           to ShapeModel::calculateEllipsoidalSurfaceNormal have been
+   *                           removed.  References #1028.
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output in
+   *                           testDemCube() to allow the test to pass when not using the standard
+   *                           data areas. Fixes #4738.
+   *
    */
   class DemShape : public ShapeModel {
     public:

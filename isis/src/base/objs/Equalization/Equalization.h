@@ -120,16 +120,20 @@ namespace Isis {
    *                           formula in evaluate() instead of just modifying how statistics
    *                           are computed. Implemented the GainsWithoutNormalization solution
    *                           type. References #911.
-   *   @history 2016-07-15 Ian Humphrey - Added recalculateStatistics() method to allow for 
+   *   @history 2016-07-15 Ian Humphrey - Added recalculateStatistics() method to allow for
    *                           statistics to be calculated only for new input images, using
    *                           previously calculated statistics for the rest of the input images.
    *                           Added fromPvl() method to unserialize Equalization data from a pvl
    *                           object. Refactored calculateStatistics() to separate functionality
-   *                           and allow for statistics recalculation. Added methods to properly 
-   *                           free some of the vector members. Added new members to help with 
+   *                           and allow for statistics recalculation. Added methods to properly
+   *                           free some of the vector members. Added new members to help with
    *                           unserialization via the fromPvl() method and help with recalulating
    *                           overlap statistics. Added API documentation. Updated unit test.
    *                           Fixes #2282.
+   *   @history 2017-05-19 Christopher Combs - Modified uniTest.cpp: truncated paths of NonOverlaps
+   *                           in output PVL  on lines 100 and 123 to allow the test to pass when
+   *                           not using the standard data areas. Added ReportError method to
+   *                           remove paths when outputting errors. Fixes #4738.
    */
   class Equalization {
     public:
@@ -138,8 +142,8 @@ namespace Isis {
 
       void addHolds(QString holdListName);
 
-      void calculateStatistics(double samplingPercent, 
-                               int mincnt, 
+      void calculateStatistics(double samplingPercent,
+                               int mincnt,
                                bool wtopt,
                                LeastSquares::SolveMethod methodType);
       void recalculateStatistics(QString inStatsFileName);
@@ -212,7 +216,7 @@ namespace Isis {
           OverlapNormalization::SolutionType m_sType;
       };
 
-      /** 
+      /**
        * This class is used as a functor calculate image statistics
        *
        * @author ????-??-?? Unknown
@@ -225,7 +229,7 @@ namespace Isis {
            * Constructs a CalculateFunctor
            *
            * @param stats Pointer to a Statistics object to add data to
-           * @param percent Sampling percentage of the image, used to calculate a line increment, 
+           * @param percent Sampling percentage of the image, used to calculate a line increment,
            *                when calculating statistics
            */
           CalculateFunctor(Statistics *stats, double percent) {
@@ -246,7 +250,7 @@ namespace Isis {
       };
 
       /**
-       * This class is used as a functor to apply adjustments (equalize) to an image 
+       * This class is used as a functor to apply adjustments (equalize) to an image
        *
        * @author ????-??-?? Unknown
        *
@@ -329,7 +333,7 @@ namespace Isis {
       //! The normalization solution type for solving normalizations (offsets, gains, or both)
       OverlapNormalization::SolutionType m_sType;
       //! Least squares method for solving normalization correcitve factors
-      LeastSquares::SolveMethod m_lsqMethod; 
+      LeastSquares::SolveMethod m_lsqMethod;
 
       Pvl *m_results; //!< Calculation results and normalization corrective factors (if solved)
   };

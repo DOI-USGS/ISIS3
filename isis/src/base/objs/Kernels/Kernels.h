@@ -2,9 +2,9 @@
 #define Kernels_h
 /**                                                                       
  * @file                                                                  
- * $Revision$
- * $Date$ 
- * $Id$ 
+ * $Revision: 6314 $
+ * $Date: 2015-08-12 15:30:27 -0700 (Wed, 12 Aug 2015) $ 
+ * $Id: Kernels.h 6314 2015-08-12 22:30:27Z jwbacker@GS.DOI.NET $ 
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

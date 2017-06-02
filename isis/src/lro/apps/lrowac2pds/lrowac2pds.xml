@@ -2,10 +2,11 @@
 <application name="lrowac2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import LRO WAC EDR images into Isis cube format
+    Convert from cube to PDS IMG format
   </brief>
 
   <description>
+    Program to convert LROC WAC calibrated cube to PDS IMG formatted file, with LROC specific label, as part of the WAC CDR product pipeline.
   </description>
 
   <history>
@@ -14,6 +15,9 @@
     </change>
     <change name="Adam Licht" date="2012-12-10">
       Added a fix to allow for N-length product IDs. Fixes #1349.
+    </change>
+    <change name="Ernest Cisneros" date="2016-07-12">
+      Update to documentation for consistentsy and clarity. Fixes #3913.
     </change>
   </history>
 
@@ -24,30 +28,30 @@
   <groups>
     <group name="Files">
       <parameter name="FROMLIST">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS formatted LRO WAC EDR image file.
+          Input cube to be converted
         </brief>
         <description>
-          Use this parameter to select the LRO WAC EDR image filename.
+          The cube to be converted to PDS IMG format.
         </description>
         <filter>
-          *.img *.IMG
+          *.cub
         </filter>
       </parameter>
 
       <parameter name="TO">
-         <type>cube</type>
+         <type>filename</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output PDS image
          </brief>
          <description>
-           Use this parameter to select the base output filename.
+           The resulting PDS IMG file.
          </description>
          <filter>
-           *.cub
+           *.img
          </filter>
        </parameter>
       </group>
@@ -57,7 +61,7 @@
           <type>string</type>
           <brief>Group to modify</brief>
           <description>
-            The user input ID string
+            The user provided version ID string, used to uniquely identifty CDR products.
           </description>
           <default><item>"N/A"</item></default>
         </parameter>

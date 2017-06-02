@@ -31,7 +31,6 @@
 #include <nanoflann/nanoflann.hpp>
 
 #include "PointCloud.h"
-#include "PointCloudSearchResult.h"
 
 namespace Isis {
 
@@ -71,10 +70,11 @@ namespace Isis {
  * @author 2014-02-17 Kris Becker
  *  
  * @internal 
- *   @history 2014-02-17 Kris Becker - Original Version 
+ *   @history 2014-02-17 Kris Becker - Original Version
+ *   @history 2016-12-06 Jesse Mapel - Updated documentation. References #4558.
  */
 
-template <class T, class D> class PointCloudTree {
+template <class T> class PointCloudTree {
 
  private:
    // Declaration of the Nanoflann interface for our PointCloud.  Note the
@@ -82,10 +82,11 @@ template <class T, class D> class PointCloudTree {
    // function type so the dimensionality of the distance can be 
    // specified at compile time
   typedef nanoflann::KDTreeSingleIndexAdaptor<
-                        nanoflann::L2_Simple_Adaptor<double, PointCloud<T,D> >, 
-                        PointCloud<T,D>, D::Dimension >  PcKdTree_t;
+                        nanoflann::L2_Simple_Adaptor<double, PointCloud<T> >, 
+                        PointCloud<T>, 2 >  PcKdTree_t;
 
  public:
+
   /**
    * @brief Constructor of PointCloudTree for the kd-tree point representaion 
    *  
@@ -102,42 +103,80 @@ template <class T, class D> class PointCloudTree {
    * 
    * @param pc        Pointer to PointCloud to build the kd-tree from.  This 
    *                  object takes complete ownership of the PointCloud pointer.
-   * @param leafNodes Maximum number of leaves stored at each kd-tree node
+   * @param leafNodes Maximum number of leaves stored at each kd-tree node.
+   *                  Defaults to 10 leaves.
    */
-    PointCloudTree(PointCloud<T,D> *pc, const int &leafNodes = 10) : m_pc(pc),
-       m_kd_index(D::Dimension, *pc, nanoflann::KDTreeSingleIndexAdaptorParams(leafNodes)) {
+    PointCloudTree(PointCloud<T> *pc, const int &leafNodes = 10) : m_pc(pc),
+       m_kd_index(2, *pc, nanoflann::KDTreeSingleIndexAdaptorParams(leafNodes)) {
        m_kd_index.buildIndex();
     } 
 
-    /** Destructor  */
+
+    /**
+     * Destroys a PointCloudTree.
+     */
     virtual ~PointCloudTree() { }
 
-    /** Perform radius query for points in kilometer units */
-    PointCloudSearchResult<T,D> radius_query(const T &point, 
-                                             const double &radius_sq) { 
+
+    /** 
+     * Performs a radius query for points in kilometer units.
+     * 
+     * @param point The point to search around.
+     * @param radius_sq The square of the radius to search around point.
+     * 
+     * @return @b QList<T> A list of all the points within the radius.
+     */
+    QList<T> radius_query(const T &point, const double &radius_sq) { 
       std::vector<std::pair<size_t, double> > matches;
 
-      int n = m_kd_index.radiusSearch(point.array(), radius_sq, matches, 
-                                      nanoflann::SearchParams());
-      return (PointCloudSearchResult<T,D>(point, radius_sq, matches, m_pc, n));
+      (void) m_kd_index.radiusSearch(point.array(), radius_sq, matches, 
+                                     nanoflann::SearchParams());
+
+      QList<T> points;
+      for ( int i = 0 ; i < (int) matches.size() ; i++ ) {
+        points.push_back( m_pc->point(matches[i].first) );
+      }
+
+      return (points);
     }
 
-    /** Perform nearest set of points from its neighbors   */
-    PointCloudSearchResult<T,D> neighbor_query(const T &point, 
-                                                const int &neighbors) { 
+
+    /** 
+     * Performs a query for the nearest neighbors to a point.
+     * 
+     * @param point The point to find neighbors around.
+     * @param neighbors The number of neighbors to find.
+     * 
+     * @return @b QList<T> A list of the neighbors.
+     */
+    QList<T> neighbor_query(const T &point, const int &neighbors) { 
       QVector<size_t> indices(neighbors);
       QVector<double> distances(neighbors);
       m_kd_index.knnSearch(point.array(), neighbors, indices.data(), 
                            distances.data());
-      return (PointCloudSearchResult<T,D>(point, neighbors, indices, distances)); 
+
+      QList<T> points;
+      for ( int i = 0 ; i < indices.size() ; i++ ) {
+        points.push_back( m_pc->point(indices[i]) );
+
+      }
+
+      return (points);
     }
 
-    /** Returns a reference to the point cloud */
-    inline const PointCloud<T,D> &cloud() const { return ( *m_pc ); }
+
+    /**
+     * Returns a reference to the point cloud.
+     * 
+     * @return @b A PointCloud<T>& A constant reference to the point cloud.
+     */
+    inline const PointCloud<T> &cloud() const {
+      return ( *m_pc );
+    }
 
   private:
-    QSharedPointer<PointCloud<T,D> >  m_pc;
-    PcKdTree_t                        m_kd_index;
+    QSharedPointer<PointCloud<T> >  m_pc;       //!< The point cloud.
+    PcKdTree_t                      m_kd_index; //!< The kd-tree.
 
 };
 

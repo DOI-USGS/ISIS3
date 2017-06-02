@@ -2,6 +2,7 @@
 
 #include <QVector>
 
+
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
@@ -53,7 +54,8 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateDefaultNormal()  {
-    calculateEllipsoidalSurfaceNormal();
+    QVector <double *> points;
+    calculateLocalNormal(points);
   }
 
 
@@ -61,7 +63,8 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateSurfaceNormal()  {
-    calculateEllipsoidalSurfaceNormal();
+    QVector <double *> points;
+    calculateLocalNormal(points);
   }
 
 
@@ -77,17 +80,33 @@ namespace Isis {
   }
 
 
-  /** Calculate local normal
+  /**
+   * Calculates the unit normal to an ellipsoid at the point of intersection.  
+   * In the event that the three axial radii of the body are equal, this 
+   * method returns the normal vector for a sphere.
    *
+   * The implicit equation for an ellipsoid is:
+   * U(x,y,z) = x^2/a^2 + y^2/b^2 + z^2/c^2 -1 =0
+   *
+   *
+   * The normal to U(x,y,z) is given by:
+   *
+   *  n = grad(U)/norm(U)
+   *
+   * i.e. as:
+   *
+   * n = <ux,uy,uz>/sqrt(ux^2,+uy^2+uz^2)
+   *
+   * @param cornerNeighborPoints
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
 
     if (!surfaceIntersection()->Valid() || !hasIntersection()) {
      IString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-   }
+    }
 
-   // Get the coordinates of the current surface point
+    // Get the coordinates of the current surface point
     SpiceDouble pB[3];
     pB[0] = surfaceIntersection()->GetX().kilometers();
     pB[1] = surfaceIntersection()->GetY().kilometers();
@@ -98,8 +117,8 @@ namespace Isis {
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
-    vector<double> normal(3,0.);
 
+    vector<double> normal(3,0.);
     NaifStatus::CheckErrors();
     surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
     NaifStatus::CheckErrors();

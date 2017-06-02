@@ -13,14 +13,14 @@ Test missing distance keyword...
 **ERROR** PVL Keyword [Distance] does not exist in [Group = Mapping].
 
 Test TrueScaleLatitude method... 
-TrueScaleLatitude = 39
+TrueScaleLatitude = 0
 
 Test SetGround method ... 
 Setting ground to (41,-74)
 Latitude:               41
 Longitude:              -74
-XCoord:                 251640.079
-YCoord:                 226487.551
+XCoord:                 -0.635866687
+YCoord:                 0.575026011
 
 Test SetCoordinate method ... 
 Setting coordinate to (251640.079, 226487.551)
@@ -30,10 +30,10 @@ XCoord:                 251640.079
 YCoord:                 226487.551
 
 Test XYRange method ... 
-Minimum X:  -5874155.27
-Maximum X:  3.88277327e-10
-Minimum Y:  2252833.7
-Maximum Y:  5006411.82
+Minimum X:  -0.858797303
+Maximum X:  0.858797303
+Minimum Y:  -0.858797303
+Maximum Y:  0.858797303
 
 Test Name and comparision method ... 
 Name:       PointPerspective
@@ -41,57 +41,148 @@ operator==  1
 
 Test default computation ... 
 Group = Mapping
-  EquatorialRadius   = 6371000.0
-  PolarRadius        = 6371000.0
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
   LatitudeType       = Planetographic
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 180
-  MinimumLatitude    = -90.0
-  MaximumLatitude    = 90.0
-  MinimumLongitude   = -180.0
-  MaximumLongitude   = 180.0
+  MinimumLatitude    = 0.0
+  MaximumLatitude    = 80.0
+  MinimumLongitude   = 0.0
+  MaximumLongitude   = 80.0
   ProjectionName     = PointPerspective
-  Distance           = 500000.0
-  CenterLongitude    = 0.0
-  CenterLatitude     = 0.0
+  Distance           = 0.00562
+  CenterLongitude    = 40.0
+  CenterLatitude     = 40.0
 End_Group
 End
 
 Testing Mapping() methods ... 
+This test outputs Table 27 (p.174) of Map Projections - A Working Manual
+USGS Professional Paper 1395
+Author:  John P. Snyder
+
 Mapping() = 
 Group = Mapping
   ProjectionName     = PointPerspective
-  EquatorialRadius   = 6371000.0
-  PolarRadius        = 6371000.0
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
   LatitudeType       = Planetographic
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 180
-  MinimumLatitude    = -90.0
-  MaximumLatitude    = 90.0
-  MinimumLongitude   = -180.0
-  MaximumLongitude   = 180.0
-  CenterLatitude     = 39.0
-  CenterLongitude    = -77.0
-  Distance           = 500000.0
+  MinimumLatitude    = 0.0
+  MaximumLatitude    = 80.0
+  MinimumLongitude   = 0.0
+  MaximumLongitude   = 80.0
+  CenterLatitude     = 0.0
+  CenterLongitude    = 0.0
+  Distance           = 0.00562
 End_Group
 End
 MappingLatitudes() = 
 Group = Mapping
-  MinimumLatitude = -90.0
-  MaximumLatitude = 90.0
-  CenterLatitude  = 39.0
+  MinimumLatitude = 0.0
+  MaximumLatitude = 80.0
+  CenterLatitude  = 0.0
 End_Group
 End
 MappingLongitudes() = 
 Group = Mapping
-  MinimumLongitude = -180.0
-  MaximumLongitude = 180.0
-  CenterLongitude  = -77.0
+  MinimumLongitude = 0.0
+  MaximumLongitude = 80.0
+  CenterLongitude  = 0.0
 End_Group
 End
 
-Unit test was obtained from:
+Testing SetGround...
+<80.0000,80.0000> = <0.0000,0.0000>
+<80.0000,70.0000> = <0.0000,0.0000>
+<80.0000,60.0000> = <0.0000,0.0000>
+<80.0000,50.0000> = <0.0000,0.0000>
+<80.0000,40.0000> = <0.0000,0.0000>
+<80.0000,30.0000> = <0.0000,0.0000>
+<80.0000,20.0000> = <0.0517,0.8572>
+<80.0000,10.0000> = <0.0263,0.8582>
+<80.0000,0.0000> = <0.0000,0.8586>
+<70.0000,80.0000> = <0.0000,0.8586>
+<70.0000,70.0000> = <0.0000,0.8586>
+<70.0000,60.0000> = <0.2581,0.8189>
+<70.0000,50.0000> = <0.2301,0.8251>
+<70.0000,40.0000> = <0.1943,0.8306>
+<70.0000,30.0000> = <0.1520,0.8351>
+<70.0000,20.0000> = <0.1044,0.8385>
+<70.0000,10.0000> = <0.0531,0.8405>
+<70.0000,0.0000> = <0.0000,0.8412>
+<60.0000,80.0000> = <0.0000,0.8412>
+<60.0000,70.0000> = <0.4094,0.7547>
+<60.0000,60.0000> = <0.3820,0.7641>
+<60.0000,50.0000> = <0.3418,0.7727>
+<60.0000,40.0000> = <0.2896,0.7804>
+<60.0000,30.0000> = <0.2271,0.7867>
+<60.0000,20.0000> = <0.1563,0.7914>
+<60.0000,10.0000> = <0.0796,0.7943>
+<60.0000,0.0000> = <0.0000,0.7953>
+<50.0000,80.0000> = <0.0000,0.7953>
+<50.0000,70.0000> = <0.5304,0.6727>
+<50.0000,60.0000> = <0.4967,0.6835>
+<50.0000,50.0000> = <0.4458,0.6936>
+<50.0000,40.0000> = <0.3789,0.7026>
+<50.0000,30.0000> = <0.2979,0.7100>
+<50.0000,20.0000> = <0.2054,0.7156>
+<50.0000,10.0000> = <0.1048,0.7191>
+<50.0000,0.0000> = <0.0000,0.7203>
+<40.0000,80.0000> = <0.0000,0.7203>
+<40.0000,70.0000> = <0.6363,0.5682>
+<40.0000,60.0000> = <0.5978,0.5792>
+<40.0000,50.0000> = <0.5382,0.5895>
+<40.0000,40.0000> = <0.4587,0.5988>
+<40.0000,30.0000> = <0.3614,0.6065>
+<40.0000,20.0000> = <0.2496,0.6123>
+<40.0000,10.0000> = <0.1275,0.6159>
+<40.0000,0.0000> = <0.0000,0.6171>
+<30.0000,80.0000> = <0.0000,0.6171>
+<30.0000,70.0000> = <0.7232,0.4444>
+<30.0000,60.0000> = <0.6813,0.4542>
+<30.0000,50.0000> = <0.6149,0.4634>
+<30.0000,40.0000> = <0.5252,0.4717>
+<30.0000,30.0000> = <0.4146,0.4787>
+<30.0000,20.0000> = <0.2867,0.4840>
+<30.0000,10.0000> = <0.1465,0.4872>
+<30.0000,0.0000> = <0.0000,0.4884>
+<20.0000,80.0000> = <0.8055,0.2977>
+<20.0000,70.0000> = <0.7879,0.3052>
+<20.0000,60.0000> = <0.7436,0.3125>
+<20.0000,50.0000> = <0.6725,0.3195>
+<20.0000,40.0000> = <0.5753,0.3258>
+<20.0000,30.0000> = <0.4548,0.3311>
+<20.0000,20.0000> = <0.3148,0.3350>
+<20.0000,10.0000> = <0.1610,0.3375>
+<20.0000,0.0000> = <0.0000,0.3384>
+<10.0000,80.0000> = <0.8452,0.1513>
+<10.0000,70.0000> = <0.8277,0.1553>
+<10.0000,60.0000> = <0.7822,0.1593>
+<10.0000,50.0000> = <0.7082,0.1630>
+<10.0000,40.0000> = <0.6065,0.1664>
+<10.0000,30.0000> = <0.4798,0.1692>
+<10.0000,20.0000> = <0.3324,0.1714>
+<10.0000,10.0000> = <0.1701,0.1727>
+<10.0000,0.0000> = <0.0000,0.1732>
+<0.0000,80.0000> = <0.8586,0.0000>
+<0.0000,70.0000> = <0.8412,0.0000>
+<0.0000,60.0000> = <0.7953,0.0000>
+<0.0000,50.0000> = <0.7203,0.0000>
+<0.0000,40.0000> = <0.6171,0.0000>
+<0.0000,30.0000> = <0.4884,0.0000>
+<0.0000,20.0000> = <0.3384,0.0000>
+<0.0000,10.0000> = <0.1732,0.0000>
+<0.0000,0.0000> = <0.0000,0.0000>
 
-  Map Projections - A Working Manual
-  USGS Professional Paper 1395 by John P. Snyder
-  Pages 320-321
+Testing SetCoordinate...
+This is taken from the numerical example given on p. 321 of Map Projections - A Working Manual
+USGS Professional Paper 1395
+Author:  John P. Snyder
+
+Latitude:                    40.9653
+Longitude:                   -74.0546
+XCoord:                      247194.0900
+YCoord:                      222485.9600

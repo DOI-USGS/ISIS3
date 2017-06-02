@@ -1,13 +1,13 @@
 /*
- *	THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
- *	IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
- *	CLEMENTINE (DSPSE) PROGRAM.
+ *      THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
+ *      IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
+ *      CLEMENTINE (DSPSE) PROGRAM.
  *
- *	IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
- *	Dr. Erick Malaret at ACT Corp.
- *			tel: (703) 742-0294
- *			     (703) 683-7431
- *                       email:	nrlvax.nrl.navy.mil
+ *      IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
+ *      Dr. Erick Malaret at ACT Corp.
+ *                      tel: (703) 742-0294
+ *                           (703) 683-7431
+ *                       email: nrlvax.nrl.navy.mil
  *
  *
  */
@@ -25,20 +25,20 @@ void genehuf(short *, short *, short *, char *, char *, short);
 void gendectbls(short *, short *, short *, short *, short *);
 
 
-short	dcbits[16], acbits[16];
-char	dchuffval[12], achuffval[162];
+short   dcbits[16], acbits[16];
+char    dchuffval[12], achuffval[162];
 
-short	dcehufco[16];
-short	dcehufsi[16];
-short	dcmincode[16];
-short	dcmaxcode[16];
-short	dcvalptr[16];
+short   dcehufco[16];
+short   dcehufsi[16];
+short   dcmincode[16];
+short   dcmaxcode[16];
+short   dcvalptr[16];
 
-short	acehufco[256];
-short	acehufsi[256];
-short	acmincode[16];
-short	acmaxcode[16];
-short	acvalptr[16];
+short   acehufco[256];
+short   acehufsi[256];
+short   acmincode[16];
+short   acmaxcode[16];
+short   acvalptr[16];
 
 /******************* Initialization of Huffman tables ********************/
 void inithuffcode() {
@@ -49,15 +49,15 @@ void inithuffcode() {
   /* generate dc Huffman codes */
   genhuffsize(dchuffsize, dcbits, &dclastk);
   genhuffcode(dchuffcode, dchuffsize);
-//	fprintf(qparm,"dc huffman tables:\n");            //removed qparm references BMG 2006-07-18
-//	fprintf(qparm,"(symbol length  code)\n");         //removed qparm references BMG 2006-07-18
+//      fprintf(qparm,"dc huffman tables:\n");            //removed qparm references BMG 2006-07-18
+//      fprintf(qparm,"(symbol length  code)\n");         //removed qparm references BMG 2006-07-18
   genehuf(dcehufco, dcehufsi, dchuffcode, dchuffsize, dchuffval, dclastk);
 
   /* generate ac Huffman codes */
   genhuffsize(achuffsize, acbits, &aclastk);
   genhuffcode(achuffcode, achuffsize);
-//	fprintf(qparm,"ac huffman tables:\n");         //removed qparm references BMG 2006-07-18
-//	fprintf(qparm,"(symbol length  code)\n");      //removed qparm references BMG 2006-07-18
+//      fprintf(qparm,"ac huffman tables:\n");         //removed qparm references BMG 2006-07-18
+//      fprintf(qparm,"(symbol length  code)\n");      //removed qparm references BMG 2006-07-18
   genehuf(acehufco, acehufsi, achuffcode, achuffsize, achuffval, aclastk);
 
   /* generate decoding tables */
@@ -111,9 +111,9 @@ void genehuf(short *ehufco, short *ehufsi, short *huffcode, char *huffsize,
     value = ((short)huffvalue[k]) & 0x00ff;
     ehufco[value] = huffcode[k];
     ehufsi[value] = huffsize[k];
-//		fprintf(qparm,"%#.2x\t%d\t%#x\n",        //removed qparm reference, BMG 2006-07-18
-//				huffvalue[k]&0x00ff,
-//				ehufsi[value],
+//              fprintf(qparm,"%#.2x\t%d\t%#x\n",        //removed qparm reference, BMG 2006-07-18
+//                              huffvalue[k]&0x00ff,
+//                              ehufsi[value],
 //                                ehufco[value] );
   }
 }

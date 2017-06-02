@@ -10,11 +10,6 @@
 #include <QXmlInputSource>
 #include <QXmlStreamWriter>
 
-// in the hdf5 library
-#include <hdf5.h>
-#include <hdf5_hl.h> 
-#include <H5Cpp.h>
-
 #include "BundleImage.h"
 #include "Camera.h"
 #include "FileName.h"
@@ -39,12 +34,12 @@ namespace Isis {
   /**
    * Construct this BundleObservationSolveSettings object from XML.
    *
-   * @param bundleSettingsFolder Where this settings XML resides - 
+   * @param bundleSettingsFolder Where this settings XML resides -
    *                             /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    */
   BundleObservationSolveSettings::BundleObservationSolveSettings(
-                                                             Project *project, 
+                                                             Project *project,
                                                              XmlStackedHandlerReader *xmlReader) {
     initialize();
     xmlReader->pushContentHandler(new XmlHandler(this, project));
@@ -61,7 +56,7 @@ namespace Isis {
    */
   BundleObservationSolveSettings::BundleObservationSolveSettings(
                                                              FileName xmlFile,
-                                                             Project *project, 
+                                                             Project *project,
                                                              XmlStackedHandlerReader *xmlReader) {
 
     initialize();
@@ -78,7 +73,7 @@ namespace Isis {
     xmlReader->setErrorHandler(new XmlHandler(this, project));
     bool success = xmlReader->parse(xmlInputSource);
     if (!success) {
-      throw IException(IException::Unknown, 
+      throw IException(IException::Unknown,
                        QString("Failed to parse xml file, [%1]").arg(xmlPath),
                         _FILEINFO_);
     }
@@ -114,7 +109,7 @@ namespace Isis {
 
     m_id = NULL;
     m_id = new QUuid(other.m_id->toString());
-     // TODO: add check to all copy constructors (verify other.xxx is not null) and operator= ??? 
+     // TODO: add check to all copy constructors (verify other.xxx is not null) and operator= ???
      // or intit all variables in all constructors
 
     m_instrumentId = other.m_instrumentId;
@@ -156,16 +151,16 @@ namespace Isis {
    * @internal
    *   @todo Check this (assignment operator)
    */
-  BundleObservationSolveSettings 
+  BundleObservationSolveSettings
       &BundleObservationSolveSettings::operator=(const BundleObservationSolveSettings &other) {
     if (&other != this) {
       delete m_id;
       m_id = NULL;
       m_id = new QUuid(other.m_id->toString());
-      
+
       m_instrumentId = other.m_instrumentId;
       m_observationNumbers = other.m_observationNumbers;
-      
+
       // pointing related
       m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
       m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
@@ -184,7 +179,7 @@ namespace Isis {
       m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
       m_positionInterpolationType = other.m_positionInterpolationType;
       m_positionAprioriSigma = other.m_positionAprioriSigma;
-      
+
     }
 
     return *this;
@@ -198,11 +193,11 @@ namespace Isis {
   void BundleObservationSolveSettings::initialize() {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
-    
+
     m_instrumentId = "";
 
     // Camera Pointing Options
-    // Defaults: 
+    // Defaults:
     //     m_instrumentPointingSolveOption = AnglesOnly;
     //     m_numberCamAngleCoefSolved = 1; // AnglesOnly;
     //     m_ckDegree = 2;
@@ -245,7 +240,7 @@ namespace Isis {
   /**
    * Accesses the instrument id for this observation.
    *
-   * @return @b QString Returns the instrument id for this observation 
+   * @return @b QString Returns the instrument id for this observation
    */
   QString BundleObservationSolveSettings::instrumentId() const {
     return m_instrumentId;
@@ -254,9 +249,9 @@ namespace Isis {
 
   /**
    * Associates an observation number with these solve settings.
-   * 
+   *
    * These solve settings are to be applied to any associated observations.
-   * 
+   *
    * @param observationNumber QString observation number to associate with these settings.
    */
   void BundleObservationSolveSettings::addObservationNumber(QString observationNumber) {
@@ -266,7 +261,7 @@ namespace Isis {
 
   /**
    * Returns a list of observation numbers associated with these solve settings.
-   * 
+   *
    * @return @b QSet<QString> Returns a QSet containing the associated observation numbers.
    */
   QSet<QString> BundleObservationSolveSettings::observationNumbers() const {
@@ -279,7 +274,7 @@ namespace Isis {
   // =============================================================================================//
 
 
-  /** 
+  /**
    * Translates a QString InstrumentPointingSolveOption to its enumerated value.
    *
    * @param option QString representation of the instrument pointing solve option
@@ -288,7 +283,7 @@ namespace Isis {
    *
    * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the enumerated
    *     value of the instrument pointing solve option
-   */ 
+   */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
       BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString option) {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
@@ -359,20 +354,20 @@ namespace Isis {
    * @param solveTwist Whether or not to solve for twist
    * @param ckDegree
    * @param ckSolveDegree
-   * @param solvePolynomialOverExisting Indicates whether the polynomial will be fit over an 
+   * @param solvePolynomialOverExisting Indicates whether the polynomial will be fit over an
    *                                    existing pointing polynomial
    * @param anglesAprioriSigma A priori angle values
    * @param angularVelocityAprioriSigma A priori angular velocity
    * @param angularAccelerationAprioriSigma A priori angular acceleration
-   */  
+   */
   void BundleObservationSolveSettings::setInstrumentPointingSettings(
-                                           InstrumentPointingSolveOption option, 
-                                           bool solveTwist, 
-                                           int ckDegree, 
+                                           InstrumentPointingSolveOption option,
+                                           bool solveTwist,
+                                           int ckDegree,
                                            int ckSolveDegree,
-                                           bool solvePolynomialOverExisting, 
-                                           double anglesAprioriSigma, 
-                                           double angularVelocityAprioriSigma, 
+                                           bool solvePolynomialOverExisting,
+                                           double anglesAprioriSigma,
+                                           double angularVelocityAprioriSigma,
                                            double angularAccelerationAprioriSigma) {
 
     // automatically set the solve option and ck degree to the user entered values
@@ -393,7 +388,7 @@ namespace Isis {
       // let spkDegree and spkSolveDegree default to 2, 2
       m_ckDegree = 2;
       m_ckSolveDegree = 2;
-      
+
       // solve for the appropriate number of coefficients, based on solve option enum
       m_numberCamAngleCoefSolved = ((int) option);
     }
@@ -428,7 +423,7 @@ namespace Isis {
 
     m_solveTwist = solveTwist; // dependent on solve option???
 
-    // Set the SpiceRotation interpolation type enum appropriately 
+    // Set the SpiceRotation interpolation type enum appropriately
     m_solvePointingPolynomialOverExisting = solvePolynomialOverExisting;
     if (m_solvePointingPolynomialOverExisting) {
       m_pointingInterpolationType = SpiceRotation::PolyFunctionOverSpice;
@@ -436,14 +431,14 @@ namespace Isis {
     else {
       m_pointingInterpolationType = SpiceRotation::PolyFunction;
     }
-  
+
   }
 
 
   /**
    * Accesses the instrument pointing solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the 
+   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the
    *     instrument pointing solve option
    */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
@@ -465,7 +460,7 @@ namespace Isis {
   /**
    * Accesses the degree of polynomial fit to original camera angles (ckDegree).
    *
-   * @return @b int Returns the degree of the polynomial fit to the original camera angles 
+   * @return @b int Returns the degree of the polynomial fit to the original camera angles
    */
   int BundleObservationSolveSettings::ckDegree() const {
     return m_ckDegree;
@@ -473,7 +468,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the degree of the camera angles polynomial being fit to in the bundle adjustment 
+   * Accesses the degree of the camera angles polynomial being fit to in the bundle adjustment
    * (ckSolveDegree).
    *
    * @return @b int Returns the degree of the camera angles polynomial in the bundle adjustment
@@ -486,7 +481,7 @@ namespace Isis {
   /**
    * Accesses the number of camera angle coefficients in the solution.
    *
-   * @return @b int Returns the number of camera angle coefficients in the solution 
+   * @return @b int Returns the number of camera angle coefficients in the solution
    */
   int BundleObservationSolveSettings::numberCameraAngleCoefficientsSolved() const {
     return m_numberCamAngleCoefSolved;
@@ -494,7 +489,7 @@ namespace Isis {
 
 
   /**
-   * Whether or not the solve polynomial will be fit over the existing pointing polynomial.  
+   * Whether or not the solve polynomial will be fit over the existing pointing polynomial.
    *
    * @return @b bool Indicates whether the polynomial will be fit over the existing pointing
    *                 polynomial
@@ -515,8 +510,8 @@ namespace Isis {
 
 
   /**
-   * Accesses the SpiceRotation interpolation type for the instrument pointing.  
-   * 
+   * Accesses the SpiceRotation interpolation type for the instrument pointing.
+   *
    * @return @b SpiceRotation::Source Returns the SpiceRotation interpolation type for pointing
    */
   SpiceRotation::Source BundleObservationSolveSettings::pointingInterpolationType() const {
@@ -610,17 +605,17 @@ namespace Isis {
    * @param spkSolveDegree
    * @param positionOverHermite Whether or not the polynomial will be fit over an existing Hermite
    *                            spline
-   * @param positionAprioriSigma A priori position sigma 
+   * @param positionAprioriSigma A priori position sigma
    * @param velocityAprioriSigma A priori velocity sigma
    * @param accelerationAprioriSigma A priori acceleration sigma
    */
   void BundleObservationSolveSettings::setInstrumentPositionSettings(
-                                           InstrumentPositionSolveOption option, 
-                                           int spkDegree, 
-                                           int spkSolveDegree, 
-                                           bool positionOverHermite, 
-                                           double positionAprioriSigma, 
-                                           double velocityAprioriSigma, 
+                                           InstrumentPositionSolveOption option,
+                                           int spkDegree,
+                                           int spkSolveDegree,
+                                           bool positionOverHermite,
+                                           double positionAprioriSigma,
+                                           double velocityAprioriSigma,
                                            double accelerationAprioriSigma) {
     // automatically set the solve option and spk degree to the user entered values
     m_instrumentPositionSolveOption = option;
@@ -672,7 +667,7 @@ namespace Isis {
       }
     }
 
-    // Set the SpicePosition interpolation type enum appropriately 
+    // Set the SpicePosition interpolation type enum appropriately
     m_solvePositionOverHermiteSpline = positionOverHermite;
     if (m_solvePositionOverHermiteSpline) {
       m_positionInterpolationType = SpicePosition::PolyFunctionOverHermiteConstant;
@@ -687,7 +682,7 @@ namespace Isis {
   /**
    * Accesses the instrument position solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the 
+   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the
    *     instrument position solve option
    */
   BundleObservationSolveSettings::InstrumentPositionSolveOption
@@ -741,7 +736,7 @@ namespace Isis {
   /**
    * Accesses the a priori position sigmas.
    *
-   * @return @b QList<double> Returns a QList of the a priori position sigmas 
+   * @return @b QList<double> Returns a QList of the a priori position sigmas
    */
   QList<double> BundleObservationSolveSettings::aprioriPositionSigmas() const {
     return m_positionAprioriSigma;
@@ -764,97 +759,6 @@ namespace Isis {
 
 
   /**
-   * Serializes this BundleObservationSolveSettings into a PvlObject.
-   *
-   * @param name Name of the pvl to create
-   *
-   * @return @b PvlObject Returns the serialized settings as a PvlObject
-   */
-  PvlObject BundleObservationSolveSettings::pvlObject(QString name) const {
-
-    QString pvlName = "";;
-    if (name == "") {
-      pvlName = instrumentId();
-    }
-    else {
-      pvlName = name;
-    }
-    PvlObject pvl(pvlName);
-
-    pvl += PvlKeyword("InstrumentPointingSolveOption", 
-                      instrumentPointingSolveOptionToString(instrumentPointingSolveOption()));
-    if (instrumentPointingSolveOption() > NoPointingFactors) {
-      pvl += PvlKeyword("NumberAngleCoefficientsSolved", 
-                        toString(numberCameraAngleCoefficientsSolved()));
-      pvl += PvlKeyword("CKDegree", toString(ckDegree()));
-      pvl += PvlKeyword("CKSolveDegree", toString(ckSolveDegree()));
-      pvl += PvlKeyword("SolveTwist", toString(solveTwist()));
-      pvl += PvlKeyword("SolvePointingPolynomialOverExisting", 
-                        toString(solvePolyOverPointing())); 
-      PvlKeyword angleSigmas("AngleAprioriSigmas");
-      for (int i = 0; i < aprioriPointingSigmas().size(); i++) {
-        if (IsSpecial(m_anglesAprioriSigma[i])) {
-          angleSigmas.addValue("N/A");
-        }
-        else {
-          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
-        }
-      }
-      pvl += angleSigmas;
-      
-      pvl += PvlKeyword("InstrumentPointingInterpolationType",
-                        toString((int)pointingInterpolationType()));  
-                        // TODO: omit from pvl if pointing option == None ??? 
-    }
-    else {
-      pvl += PvlKeyword("NumberAngleCoefficientsSolved", "N/A");
-      pvl += PvlKeyword("CKDegree", "N/A");
-      pvl += PvlKeyword("CKSolveDegree", "N/A");
-      pvl += PvlKeyword("SolveTwist", "N/A");
-      pvl += PvlKeyword("SolvePointingPolynomialOverExisting", "N/A");
-      pvl += PvlKeyword("AngleAprioriSigmas", "N/A");
-      pvl += PvlKeyword("InstrumentPointingInterpolationType", "N/A");
-    }
-
-
-    // position
-
-    pvl += PvlKeyword("InstrumentPositionSolveOption", 
-                      instrumentPositionSolveOptionToString(instrumentPositionSolveOption()));
-    if (instrumentPositionSolveOption() > NoPositionFactors) {
-      pvl += PvlKeyword("NumberPositionCoefficientsSolved", 
-                        toString(numberCameraPositionCoefficientsSolved()));
-      pvl += PvlKeyword("SPKDegree", toString(spkDegree()));
-      pvl += PvlKeyword("SPKSolveDegree", toString(spkSolveDegree()));
-      pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(solvePositionOverHermite()));
-    
-      PvlKeyword positionSigmas("PositionAprioriSigmas");
-      for (int i = 0; i < aprioriPositionSigmas().size(); i++) {
-        if (IsSpecial(m_positionAprioriSigma[i])) {
-          positionSigmas.addValue("N/A");
-        }
-        else {
-          positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
-        }
-      }
-      pvl += positionSigmas;
-    
-      pvl += PvlKeyword("InstrumentPositionInterpolationType",
-                        toString((int)positionInterpolationType()));
-    }
-    else {
-      pvl += PvlKeyword("NumberPositionCoefficientsSolved", "N/A");
-      pvl += PvlKeyword("SPKDegree", "N/A");
-      pvl += PvlKeyword("SPKSolveDegree", "N/A");
-      pvl += PvlKeyword("SolvePositionOverHermiteSpline", "N/A");
-      pvl += PvlKeyword("PositionAprioriSigmas", "N/A");
-      pvl += PvlKeyword("InstrumentPositionInterpolationType", "N/A");
-    }
-    return pvl;
-  }
-
-
-  /**
    * Saves this BundleObservationSolveSettings to an xml stream.
    *
    * @param stream A QXmlStreamWriter to write to
@@ -863,7 +767,7 @@ namespace Isis {
    * @internal
    *   @todo Does xml stuff need project???
    */
-  void BundleObservationSolveSettings::save(QXmlStreamWriter &stream, 
+  void BundleObservationSolveSettings::save(QXmlStreamWriter &stream,
                                             const Project *project) const {
 
     stream.writeStartElement("bundleObservationSolveSettings");
@@ -872,7 +776,7 @@ namespace Isis {
 
     // pointing related
     stream.writeStartElement("instrumentPointingOptions");
-    stream.writeAttribute("solveOption", 
+    stream.writeAttribute("solveOption",
                            instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
     stream.writeAttribute("degree", toString(m_ckDegree));
@@ -895,7 +799,7 @@ namespace Isis {
 
     // position related
     stream.writeStartElement("instrumentPositionOptions");
-    stream.writeAttribute("solveOption", 
+    stream.writeAttribute("solveOption",
                            instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("degree", toString(m_spkDegree));
@@ -929,7 +833,7 @@ namespace Isis {
    * @internal
    *   @todo Does xml stuff need project???
    */
-  BundleObservationSolveSettings::XmlHandler::XmlHandler(BundleObservationSolveSettings *settings, 
+  BundleObservationSolveSettings::XmlHandler::XmlHandler(BundleObservationSolveSettings *settings,
                                                          Project *project) {
     m_xmlHandlerObservationSettings = settings;
     m_xmlHandlerProject = project;  // TODO: does xml stuff need project???
@@ -941,12 +845,12 @@ namespace Isis {
    * XmlHandler destructor.
    */
   BundleObservationSolveSettings::XmlHandler::~XmlHandler() {
-    // do not delete this pointer... we don't own it, do we??? 
+    // do not delete this pointer... we don't own it, do we???
     // passed into StatCumProbDistDynCalc constructor as pointer
     // delete m_xmlHandlerProject;  // TODO: does xml stuff need project???
     m_xmlHandlerProject = NULL;
   }
-  
+
 
   /**
    * @param namespaceURI
@@ -959,14 +863,14 @@ namespace Isis {
    * @internal
    *   @todo Document if we decide to use Xml handlers for serialization
    */
-  bool BundleObservationSolveSettings::XmlHandler::startElement(const QString &namespaceURI, 
+  bool BundleObservationSolveSettings::XmlHandler::startElement(const QString &namespaceURI,
                                                                 const QString &localName,
                                                                 const QString &qName,
                                                                 const QXmlAttributes &atts) {
     m_xmlHandlerCharacters = "";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "instrumentPointingOptions") {
-        
+
         QString pointingSolveOption = atts.value("solveOption");
         if (!pointingSolveOption.isEmpty()) {
           m_xmlHandlerObservationSettings->m_instrumentPointingSolveOption
@@ -995,13 +899,13 @@ namespace Isis {
 
         QString solveOverExisting = atts.value("solveOverExisting");
         if (!solveOverExisting.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_solvePointingPolynomialOverExisting = 
+          m_xmlHandlerObservationSettings->m_solvePointingPolynomialOverExisting =
               toBool(solveOverExisting);
         }
 
         QString interpolationType = atts.value("interpolationType");
         if (!interpolationType.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_pointingInterpolationType = 
+          m_xmlHandlerObservationSettings->m_pointingInterpolationType =
               SpiceRotation::Source(toInt(interpolationType));
         }
 
@@ -1010,7 +914,7 @@ namespace Isis {
         m_xmlHandlerAprioriSigmas.clear();
       }
       else if (localName == "instrumentPositionOptions") {
-        
+
         QString positionSolveOption = atts.value("solveOption");
         if (!positionSolveOption.isEmpty()) {
           m_xmlHandlerObservationSettings->m_instrumentPositionSolveOption
@@ -1034,13 +938,13 @@ namespace Isis {
 
         QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_solvePositionOverHermiteSpline = 
+          m_xmlHandlerObservationSettings->m_solvePositionOverHermiteSpline =
               toBool(solveOverHermiteSpline);
         }
 
         QString interpolationType = atts.value("interpolationType");
         if (!interpolationType.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_positionInterpolationType = 
+          m_xmlHandlerObservationSettings->m_positionInterpolationType =
               SpicePosition::Source(toInt(interpolationType));
         }
       }
@@ -1076,7 +980,7 @@ namespace Isis {
    * @internal
    *   @todo Document if we use Xml handlers for serialization.
    */
-  bool BundleObservationSolveSettings::XmlHandler::endElement(const QString &namespaceURI, 
+  bool BundleObservationSolveSettings::XmlHandler::endElement(const QString &namespaceURI,
                                                               const QString &localName,
                                                               const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
@@ -1122,177 +1026,4 @@ namespace Isis {
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
-
-
-  /**
-   * Writes this BundleObservationSolveSettings to a stream.
-   *
-   * @param stream QDataStream to write state to
-   */
-  QDataStream &BundleObservationSolveSettings::write(QDataStream &stream) const {
-
-    stream << m_id->toString()
-           << m_instrumentId
-           << (qint32)m_instrumentPointingSolveOption
-           << (qint32)m_numberCamAngleCoefSolved
-           << (qint32)m_ckDegree
-           << (qint32)m_ckSolveDegree
-           << m_solveTwist
-           << m_solvePointingPolynomialOverExisting
-           << m_anglesAprioriSigma
-           << (qint32)m_pointingInterpolationType
-           << (qint32)m_instrumentPositionSolveOption
-           << (qint32)m_numberCamPosCoefSolved 
-           << (qint32)m_spkDegree
-           << (qint32)m_spkSolveDegree
-           << m_solvePositionOverHermiteSpline
-           << m_positionAprioriSigma
-           << (qint32)m_positionInterpolationType;
-
-    return stream;
-
-  }
-
-
-  /**
-   * Reads in the state of a BundleObservationSolveSettings from a stream.
-   *
-   * @param stream QDataStream to read state from
-   */
-  QDataStream &BundleObservationSolveSettings::read(QDataStream &stream) {
-
-    QString id;
-    qint32 anglesSolveOption, ckDegree, ckSolveDegree, numCamAngleCoefSolved, anglesInterpType,
-           positionSolveOption, spkDegree, spkSolveDegree, numCamPosCoefSolved, positionInterpType;
-
-    stream >> id 
-           >> m_instrumentId
-           >> anglesSolveOption
-           >> numCamAngleCoefSolved
-           >> ckDegree
-           >> ckSolveDegree
-           >> m_solveTwist
-           >> m_solvePointingPolynomialOverExisting
-           >> m_anglesAprioriSigma
-           >> anglesInterpType
-           >> positionSolveOption
-           >> numCamPosCoefSolved
-           >> spkDegree
-           >> spkSolveDegree
-           >> m_solvePositionOverHermiteSpline
-           >> m_positionAprioriSigma
-           >> positionInterpType;
-
-    delete m_id;
-    m_id = NULL;
-    m_id = new QUuid(id);
-
-    m_instrumentPointingSolveOption = (InstrumentPointingSolveOption)anglesSolveOption;
-    m_ckDegree = (int)ckDegree;
-    m_ckSolveDegree = (int)ckSolveDegree;
-    m_numberCamAngleCoefSolved = (int)numCamAngleCoefSolved;
-    m_pointingInterpolationType = (SpiceRotation::Source)anglesInterpType;
-    m_instrumentPositionSolveOption = (InstrumentPositionSolveOption)positionSolveOption;
-    m_spkDegree = (int)spkDegree;
-    m_spkSolveDegree = (int)spkSolveDegree;
-    m_numberCamPosCoefSolved = (int)numCamPosCoefSolved;
-    m_positionInterpolationType = (SpicePosition::Source)positionInterpType;
-
-    return stream;
-
-  }
-
-
-  /**
-   * Insertion operator.
-   *
-   * Overloads the insertion operator to write the state of a BundleObservationSolveSettings
-   * to a stream.
-   *
-   * @param stream QDataStream to write state to
-   * @param settings Reference to the BundleObservationSolveSettings to write
-   *
-   * @see BundleObservationSolveSettings::write(QDataStream &stream)
-   */
-  QDataStream &operator<<(QDataStream &stream, const BundleObservationSolveSettings &settings) {
-    return settings.write(stream);
-  }
-
-
-  /**
-   * Extraction operator.
-   *
-   * Overloads the extraction operator to read the state of a BundleObservationSolveSettings
-   * into this BundleObservationSolveSettings.
-   *
-   * @param stream QDataStream to read from
-   * @param settings Reference to the BundleObservationSolveSettings to read
-   */
-  QDataStream &operator>>(QDataStream &stream, BundleObservationSolveSettings &settings) {
-    return settings.read(stream);
-  }
-
-
-#if 0
-  /** 
-   *  H5 compound data type uses the offesets from the QDataStream returned by
-   *  the write(QDataStream &stream) method.
-   */
-  H5::CompType BundleObservationSolveSettings::compoundH5DataType() {
-
-    H5::CompType compoundDataType((size_t)   );
-
-    size_t offset = 0;
-
-    compoundDataType.insertMember("InstrumentId", offset, H5::PredType::C_S1);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("InstrumentPointingSolveOption", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("NumCamAngleCoefSolved", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("CkDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("CkSolveDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("SolveTwist", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("SolvePointingPolynomialOverExisting", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_instrumentId);
-???    compoundDataType.insertMember("AnglesAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("PointingInterpolationType", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("InstrumentPositionSolveOption", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_instrumentId);
-    compoundDataType.insertMember("NumCamPosCoefSolved", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_numberCamPosCoefSolved);
-    compoundDataType.insertMember("SpkDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_spkDegree);
-    compoundDataType.insertMember("SpkSolveDegree", offset, H5::PredType::NATIVE_INT);
-
-    offset += sizeof(m_spkSolveDegree);
-    compoundDataType.insertMember("SolvePositionOverHermiteSpline", offset, H5::PredType::NATIVE_HBOOL);
-
-    offset += sizeof(m_solvePositionOverHermiteSpline);
-???    compoundDataType.insertMember("PositionAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
-
-    offset += sizeof(m_positionAprioriSigma);
-    compoundDataType.insertMember("PositionInterpolationType", offset, H5::PredType::NATIVE_INT);
-
-    return compoundDataType;
-
-  }
-#endif
 }

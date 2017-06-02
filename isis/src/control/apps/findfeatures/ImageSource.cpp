@@ -1,8 +1,8 @@
 /**                                                                       
  4 @file                                                                  
- * $Revision: 6563 $
- * $Date: 2016-02-10 16:56:52 -0700 (Wed, 10 Feb 2016) $
- * $Id: ImageSource.cpp 6563 2016-02-10 23:56:52Z kbecker@GS.DOI.NET $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

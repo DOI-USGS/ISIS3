@@ -75,7 +75,28 @@ void IsisMain() {
     *   if (index($detector_id,"MEX_HRSC_SRC") < 0 &&
     *   $processing_level_id < 3)
     */
-  bool hasPrefix = (label["DETECTOR_ID"][0] != "MEX_HRSC_SRC" && (int)label["PROCESSING_LEVEL_ID"] < 3);
+
+  bool isSrcFile = (label["DETECTOR_ID"][0] != "MEX_HRSC_SRC");
+  bool mapProjRdr = ((int)label["PROCESSING_LEVEL_ID"] >= 3);
+
+  try {
+    if (!isSrcFile) {
+      QString msg = "File [" + ui.GetFileName("FROM");
+      msg += "] is SRC data and cannot be read.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (mapProjRdr) {
+      QString msg = "File [" + ui.GetFileName("FROM");
+      msg += "] is map projected and cannot be read.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  catch (IException e) {
+      QString msg = "File cannot be read by hrsc2isis, use pds2isis.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+  }
 
   TableField ephTimeField("EphemerisTime", TableField::Double);
   TableField expTimeField("ExposureTime", TableField::Double);
@@ -88,76 +109,65 @@ void IsisMain() {
 
   Table timesTable("LineScanTimes", timesRecord);
 
-  if(hasPrefix) {
-    p.SetDataPrefixBytes((int)label.findObject("IMAGE")["LINE_PREFIX_BYTES"]);
-    p.SaveDataPrefix();
+  p.SetDataPrefixBytes((int)label.findObject("IMAGE")["LINE_PREFIX_BYTES"]);
+  p.SaveDataPrefix();
 
-    p.Progress()->SetText("Reading Prefix Data");
-    p.StartProcess(IgnoreData);
+  p.Progress()->SetText("Reading Prefix Data");
+  p.StartProcess(IgnoreData);
 
-    // The prefix data is always in LSB format, regardless of the overall file format
-    EndianSwapper swapper("LSB");
+  // The prefix data is always in LSB format, regardless of the overall file format
+  EndianSwapper swapper("LSB");
 
-    std::vector<double> ephemerisTimes;
-    std::vector<double> exposureTimes;
-    std::vector< std::vector<char *> > prefix = p.DataPrefix();
+  std::vector<double> ephemerisTimes;
+  std::vector<double> exposureTimes;
+  std::vector< std::vector<char *> > prefix = p.DataPrefix();
 
-    for(int line = 0; line < p.Lines(); line++) {
-      double ephTime = swapper.Double((double *)prefix[0][line]);
-      double expTime = swapper.Float((float *)(prefix[0][line] + 8)) / 1000.0;
+  for(int line = 0; line < p.Lines(); line++) {
+    double ephTime = swapper.Double((double *)prefix[0][line]);
+    double expTime = swapper.Float((float *)(prefix[0][line] + 8)) / 1000.0;
 
-      if(line > 0) {
-        /**
-         * We know how many skipped lines with this equation. We take the
-         *   difference in the current line and the last line's time, which will
-         *   ideally be equal to the last line's exposure duration. We divide this by
-         *   the last line's exposure duration, and the result is the 1-based count of
-         *   how many exposures there were between the last line and the current line.
-         *   We subtract one in order to remove the known exposure, and the remaining should
-         *   be the 1-based count of how many lines were skipped. Add 0.5 to round up.
-         */
-        int skippedLines = (int)((ephTime - ephemerisTimes.back()) / exposureTimes.back() - 1.0 + 0.5);
+    if(line > 0) {
+      /**
+       * We know how many skipped lines with this equation. We take the
+       *   difference in the current line and the last line's time, which will
+       *   ideally be equal to the last line's exposure duration. We divide this by
+       *   the last line's exposure duration, and the result is the 1-based count of
+       *   how many exposures there were between the last line and the current line.
+       *   We subtract one in order to remove the known exposure, and the remaining should
+       *   be the 1-based count of how many lines were skipped. Add 0.5 to round up.
+       */
+      int skippedLines = (int)((ephTime - ephemerisTimes.back()) / exposureTimes.back() - 1.0 + 0.5);
 
-        for(int i = 0; i < skippedLines; i++) {
-          ephemerisTimes.push_back(ephemerisTimes.back() + exposureTimes.back());
-          exposureTimes.push_back(exposureTimes.back());
-          lineInFile.push_back(false);
-        }
-      }
-
-      ephemerisTimes.push_back(ephTime);
-      exposureTimes.push_back(expTime);
-      lineInFile.push_back(true);
-    }
-
-    double lastExp = 0.0;
-    for(unsigned int i = 0; i < ephemerisTimes.size(); i++) {
-      if(lastExp != exposureTimes[i]) {
-        lastExp = exposureTimes[i];
-        timesRecord[0] = ephemerisTimes[i];
-        timesRecord[1] = exposureTimes[i];
-        timesRecord[2] = (int)i + 1;
-        timesTable += timesRecord;
+      for(int i = 0; i < skippedLines; i++) {
+        ephemerisTimes.push_back(ephemerisTimes.back() + exposureTimes.back());
+        exposureTimes.push_back(exposureTimes.back());
+        lineInFile.push_back(false);
       }
     }
 
-    outCube->setDimensions(p.Samples(), lineInFile.size(), p.Bands());
+    ephemerisTimes.push_back(ephTime);
+    exposureTimes.push_back(expTime);
+    lineInFile.push_back(true);
   }
-  else {
-    //Checks if in file is rdr
-    FileName inFile = ui.GetFileName("FROM");
-    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
-    msg += " Use pds2isis.";
-    throw IException(IException::User, msg, _FILEINFO_);
+
+  double lastExp = 0.0;
+  for(unsigned int i = 0; i < ephemerisTimes.size(); i++) {
+    if(lastExp != exposureTimes[i]) {
+      lastExp = exposureTimes[i];
+      timesRecord[0] = ephemerisTimes[i];
+      timesRecord[1] = exposureTimes[i];
+      timesRecord[2] = (int)i + 1;
+      timesTable += timesRecord;
+    }
   }
+
+  outCube->setDimensions(p.Samples(), lineInFile.size(), p.Bands());
 
   p.Progress()->SetText("Importing");
   outCube->create(ui.GetFileName("TO"));
   p.StartProcess(WriteOutput);
 
-  if(hasPrefix) {
-    outCube->write(timesTable);
-  }
+  outCube->write(timesTable);
 
   // Get as many of the other labels as we can
   Pvl otherLabels;

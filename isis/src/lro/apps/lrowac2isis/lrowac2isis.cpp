@@ -485,7 +485,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // color offset doesn't apply to BW mode (single band cubes)
   if(colorOffset && viseven && viseven->bandCount() == 1) {
-    genericInstrument.push_back(PvlKeyword("ColorOffset", 0));
+    genericInstrument.push_back(PvlKeyword("ColorOffset", QString::number(0)));
   }
   else {
     genericInstrument.push_back(PvlKeyword("ColorOffset", toString(colorOffset)));

@@ -92,8 +92,8 @@ void IsisMain() {
 
     //Phases must be able to stretch across the entire cube
     if(totalSamples != phases[3]) {
-      QString required_samples(phases[3]);
-      QString bin_QString(binning_mode);
+      QString required_samples(QString::number(phases[3]));
+      QString bin_QString(QString::number(binning_mode));
       QString msg = "image must have exactly ";
       msg += required_samples;
       msg += " samples per line for binning mode ";

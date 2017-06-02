@@ -261,7 +261,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
     // We'll use this later, however, we do not write it to the labels.
     // if we didn't get in here, we'll be using the original image number,
     // otherwise, we'll use this modified image number.
-    imgNumber = QString((imgNum - scanNum));
+    imgNumber = QString::number(imgNum - scanNum);
   }
 
   // This next section handles modifying the starttime slightly and requires

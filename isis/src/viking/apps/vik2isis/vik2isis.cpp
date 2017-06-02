@@ -231,7 +231,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
     lines += key[i];
     samps += key[i+1];
     type += key[i+2];
-    valid += 0;
+    valid += QString::number(0);
   }
   res += lines;
   res += samps;

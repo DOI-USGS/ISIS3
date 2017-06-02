@@ -436,6 +436,11 @@ namespace Isis {
   /**
    * Get the current options from the matrix scene widget. This will be called when the widget is
    * first opened and when the displayed correlation matrix is changed.
+   *
+   * @internal
+   *   @history 2016-12-01 Ian Humphrey - Removed goodElements() and badElements() QList<double>
+   *                           declarations, as these are unused and were causing [-Wvexing-parse]
+   *                           warnings on the clang compiler by using the ()'s.
    */
   void MatrixOptionsDialog::readOptions() {
 
@@ -467,8 +472,8 @@ namespace Isis {
     // tolerance focus
     if (m_options->focusOption() == MatrixOptions::Tolerance) {
       m_focusToleranceLineEdit->setText( QString::number( m_options->focusValue() ) );
-      QList<double> goodElements();
-      QList<double> badElements();
+      //QList<double> goodElements();
+      //QList<double> badElements();
     }
     setFocusToleranceStatus(m_options->focusOption() == MatrixOptions::Tolerance);
 

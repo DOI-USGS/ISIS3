@@ -10,7 +10,7 @@
  *   and related material nor shall the fact of distribution constitute any such
  *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
- *
+ *i
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
@@ -26,6 +26,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
+#include "Distance.h"
 #include "EllipsoidShape.h"
 #include "IException.h"
 #include "Latitude.h"
@@ -51,17 +52,24 @@ using namespace Isis;
   */
 int main() {
   try {
+
+
+
+
+
     Preference::Preferences(true);
     QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();
-    std::vector<Distance> radii = c->target()->radii();
+    vector<Distance> radii = c->target()->radii();
+    cout <<  setprecision(10)<< "Radii=["<<radii[0].kilometers() << ","
+          <<radii[1].kilometers() << "," << radii[2].kilometers() << "]" << endl;
     Pvl &pvl = *cube.label();
     Spice spi(cube);
     Target targ(&spi, pvl);
     targ.setRadii(radii);
-
+    
     cout << "Begin testing Ellipsoid Shape Model class...." << endl;
 
     cout << endl << "  Testing constructors..."  << endl;
@@ -102,14 +110,7 @@ int main() {
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     c->SpacecraftSurfaceVector((double *) &lookB[0]);
-    /*
-  Sample/Line = 534/453
-  surface normal = -0.623384, -0.698838, 0.350738
-  Local normal = -0.581842, -0.703663, 0.407823
-    Phase                      = 40.787328112158
-    Incidence                  = 85.341094499768
-    Emission                   = 46.966269013795
-    */
+
     if (!shape.intersectSurface(sB, lookB)) {
         cout << "    ...  intersectSurface method failed" << endl;
         return -1;
@@ -117,7 +118,7 @@ int main() {
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     SurfacePoint *sp = shape.surfaceIntersection();
     cout << "     surface point = (" << sp->GetX().kilometers() << ", " <<
-      sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
+      sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal..." << endl;
     QVector<double *>  notUsed(4);
@@ -128,11 +129,18 @@ int main() {
     shape.calculateLocalNormal(notUsed);
     vector<double> myNormal(3);
     myNormal = shape.normal();
+
+    //Hand-calculated truth value:  [-0.6196003462957385, -0.7004971412244801, 0.3541174466282787]
+
+
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
     shape.calculateSurfaceNormal();
     myNormal = shape.normal();
+
+
+
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
@@ -143,7 +151,7 @@ int main() {
     cout << endl << "  Testing localRadius method ..." << endl;
     cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
                                                     Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
-    // Mars radii = 3397.      3397.         3375.
+
 
     cout << endl << "  Testing setHasIntersection method" << endl;
     shape.setHasIntersection(false);

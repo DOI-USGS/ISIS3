@@ -24,19 +24,23 @@
 #include <QtDebug>
 
 #include "Control.h"
-#include "ControlNet.h"
 #include "Directory.h"
 #include "IException.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
 
 /**
    * @brief Creates a WorkOrder that will set the active Control in the project.
-   * @param project  The Project that this work order should be interacting with.
+   * @param project The Project that this work order should be interacting with.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(Project *project) :
       WorkOrder(project) {
+
+    // This workorder is not undoable
+    m_isUndoable = false;
 
     QAction::setText(tr("Set Active Control Network") );
     QUndoCommand::setText(tr("Set Active Control Network"));
@@ -44,7 +48,7 @@ namespace Isis {
 
 
   /**
-   * @brief Copies the 'other' WorkOrdeer instance into this new instance.
+   * @brief Copies the 'other' WorkOrder instance into this new instance.
    * @param other The WorkOrder being copied.
    */
   SetActiveControlWorkOrder::SetActiveControlWorkOrder(const SetActiveControlWorkOrder &other) :
@@ -69,9 +73,9 @@ namespace Isis {
 
 
   /**
-   * @brief Determines if we can set this control as active.  
+   * @brief Determines if we can set this control as active.
    *
-   * @param Control *control
+   * @param controls (ControlList *) The ControlList chosen from the project tree.
    * @return  @b bool True if  we can set as active, False otherwise.
    */
   bool SetActiveControlWorkOrder::isExecutable(ControlList *controls) {
@@ -84,30 +88,42 @@ namespace Isis {
 
 
   /**
-   * @brief Attempt to set control as active control.
-   * @return @b bool True if successful, False otherwise.
+   * @brief Make sure an active ImageList has been chosen.
+   *  
+   * @return @b bool True if project has an active ImageList, False otherwise.
    */
-  bool SetActiveControlWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool SetActiveControlWorkOrder::setupExecution() {
 
+    bool success = WorkOrder::setupExecution();
     if (success) {
+      if (!project()->activeImageList()) {
 
-      if (project()->activeImageList()) {
-        project()->setActiveControl(controlList()->at(0));
-        project()->activeControl()->controlNet()->SetImages(*project()->activeImageList()->serialNumberList());
-        success = true;
-      }
-      else {
         QMessageBox::critical(NULL, tr("Unable to set active control."), 
                               tr("You must first choose an active Image List before setting "
-                                 "the active control net."));
+                              "the active control net."));
         success = false;
       }
-//    internalData.append(activeControl()->displayProperties()->displayName());
-//    setInternalData(internalData);
+      //  So far, so good, set the command text
+      else {
+        QUndoCommand::setText(tr("Set Active Control Network to [%1]").arg(
+                                 controlList()->at(0)->displayProperties()->displayName()));
+      }
     }
 
     return success;
+  }
+
+
+  /**
+   * @brief  Set the active control net for the project.  This allows any views to operate on
+   *               the same control net.  The active image list must be set before the active
+   *               control net is chosen.  If not, a critical message dialog is displayed and we
+   *               return false.
+   * 
+   */
+  void SetActiveControlWorkOrder::execute() {
+
+    project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
   }
 }
 

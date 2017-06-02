@@ -89,7 +89,7 @@ inline void fixLabels(PvlObject &obj) {
 void IsisMain() {
   const QString mdis2pdsProgram = "mdis2pds";
   const QString mdis2pdsVersion = "1.1";
-  const QString mdis2pdsRevision = "$Revision$";
+  const QString mdis2pdsRevision = "$Revision: 6715 $";
   const QString mdis2pdsRuntime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();

@@ -106,8 +106,6 @@ namespace Isis {
 
       PvlObject pvlObject();
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
 
     private:
       //! This map holds the images used to create this matrix and their associated parameters.
@@ -131,9 +129,7 @@ namespace Isis {
        */
       QList<SparseBlockColumnMatrix> *m_visibleBlocks;
   };
-  // operators to read/write CorrelationMatrix to/from binary disk file
-  QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix);
-  QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix);
+
 };
 
 Q_DECLARE_METATYPE(Isis::CorrelationMatrix);

@@ -1221,7 +1221,7 @@ Total Bands= "2"
 
 ********* Test imagePositions() ********
 Name:  "ImageLocation"
-File:  "/usgs/cpkgs/isis3/data/base/testData/isisTruth2.cub"
+File:  "isisTruth2.cub"
 StartSample:  "1"
 StartLine:  "3"
 ***********************************************************************************

@@ -36,16 +36,22 @@ namespace Isis {
 
 /**
    * @brief Creates a WorkOrder that will retrieve Target info.
+   *
+   * Facilitates creating a view for the target information. This work order is not
+   * undoable.
+   *
    * @param project  The Project that this work order should be interacting with.
    */
   TargetGetInfoWorkOrder::TargetGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
+    // This work order is not undoable
+    m_isUndoable = false;
     QAction::setText(tr("Get Info...") );
   }
 
 
   /**
-   * @brief Copies the 'other' WorkOrdeer instance into this new instance.
+   * @brief Copies the 'other' WorkOrder instance into this new instance.
    * @param other The WorkOrder being copied.
    */
   TargetGetInfoWorkOrder::TargetGetInfoWorkOrder(const TargetGetInfoWorkOrder &other) :
@@ -70,10 +76,14 @@ namespace Isis {
 
 
   /**
-   * @brief Determines if we already have a view for the target.  If we do, then we
+   * @brief Determines if we can get target info.
+   *
+   * Determines if we already have a view for the target.  If we do, then we
    * do not need to redisplay the object.
-   * @param targetBody
-   * @return  @b bool True if a view already exists, False otherwise.
+   *
+   * @param targetBody The target body to check for.
+   *
+   * @return bool Returns true if a view for the target already exists, false otherwise.
    */
   bool TargetGetInfoWorkOrder::isExecutable(TargetBodyQsp targetBody) {
     if (!targetBody)
@@ -91,11 +101,14 @@ namespace Isis {
 
 
   /**
-   * @brief Attempt to retrieve the Target info and view it.
-   * @return @b bool True if successful, False otherwise.
+   * @brief Attempt to retrieve the Target info.
+   *
+   * Attempts to retrieve the target body information to prepare for execution.
+   *
+   * @return bool Returns true if successful, false otherwise.
    */
-  bool TargetGetInfoWorkOrder::execute() {
-    bool success = WorkOrder::execute();
+  bool TargetGetInfoWorkOrder::setupExecution() {
+    bool success = WorkOrder::setupExecution();
 
     if (success) {
       QString targetDisplayName = targetBody()->displayProperties()->displayName();
@@ -111,23 +124,13 @@ namespace Isis {
 
 
   /**
-   * @brief Determines whether another WorkOrder depends upon TargetGetInfoWorkOrder.
-   * @param other  The WorkOrder being checked for dependency.
-   * @return @b bool  True if there is a dependency, False otherwise.
+   * @brief Executes this work order.
+   *
+   * Adds a target info view to the project; i.e., displays the target info widget.
    */
-  bool TargetGetInfoWorkOrder::dependsOn(WorkOrder *other) const {
-    // depend on types of ourselves.
-    return dynamic_cast<TargetGetInfoWorkOrder *>(other);
-  }
-
-
-  /**
-   * @brief  Redisplays the Target info.
-   */
-  void TargetGetInfoWorkOrder::syncRedo() {
+  void TargetGetInfoWorkOrder::execute() {
     TargetInfoWidget *targetInfoWidget =
         project()->directory()->addTargetInfoView(targetBody());
-
 
     if (!targetInfoWidget) {
       QString msg = "error displaying target info";
@@ -137,10 +140,12 @@ namespace Isis {
 
 
   /**
-   * @brief Deletes the last view. Currently this function is not implemented.
+   * @brief Determines whether another WorkOrder depends upon TargetGetInfoWorkOrder.
+   * @param other  The WorkOrder being checked for dependency.
+   * @return @b bool  True if there is a dependency, False otherwise.
    */
-  void TargetGetInfoWorkOrder::syncUndo() {
-    //delete project()->directory()->cnetEditorViews().last();
+  bool TargetGetInfoWorkOrder::dependsOn(WorkOrder *other) const {
+    // depend on types of ourselves.
+    return dynamic_cast<TargetGetInfoWorkOrder *>(other);
   }
 }
-

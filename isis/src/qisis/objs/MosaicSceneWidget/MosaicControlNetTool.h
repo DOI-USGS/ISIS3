@@ -52,6 +52,13 @@ namespace Isis {
    *                           checks for the existence of a Directory pointer in the openControlNet
    *                           and mouseButtonRelease methods.  If Directory point is NULL, IPCE
    *                           code not executed.  Fixes #4063.
+   *   @history 2017-01-03 Tracie Sucharski - If IPCE, set m_controlNet to active control net in the
+   *                           loadNetwork method and do not display Load/Close Network button if
+   *                           IPCE.
+   *   @history 2017-05-11 Tracie Sucharski - Tools can be created with a Null value for the
+   *                           MosaicSceneWidget, so need to check for Null value getWidget() in
+   *                           Tool constructor.  This was causing a segfault when accessing qmos
+   *                           help and a Qt connection error.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

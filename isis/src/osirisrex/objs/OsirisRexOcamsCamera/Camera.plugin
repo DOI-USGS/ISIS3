@@ -1,0 +1,18 @@
+Group = OSIRIS-REX/MAPCAM
+  Version = 1
+  Library = OsirisRexOcamsCamera
+  Routine = OsirisRexOcamsCameraPlugin
+EndGroup
+ 
+Group = OSIRIS-REX/POLYCAM
+  Version = 1
+  Library = OsirisRexOcamsCamera
+  Routine = OsirisRexOcamsCameraPlugin
+EndGroup
+ 
+Group = OSIRIS-REX/SAMCAM
+  Version = 1
+  Library = OsirisRexOcamsCamera
+  Routine = OsirisRexOcamsCameraPlugin
+EndGroup
+ 

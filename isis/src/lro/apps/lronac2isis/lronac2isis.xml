@@ -15,6 +15,13 @@
         <change name="Jacob Danton" date="2008-12-15">
             Original Version
         </change>
+      	<change name="Adam Paquette" date="2016-07-11">
+      	    Updated error messages to stack when necessary.
+      	</change>
+        <change name="Adam Paquette" date="2017-04-27">
+            Corrected error message stacking in lronac2isis, was not correctly dealt with on
+            2016-07-11
+        </change>
     </history>
 
     <category>

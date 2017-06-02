@@ -61,6 +61,7 @@ namespace Isis {
     return Process::SetInputCube(parameter, allRequirements);
   }
 
+
   /**
    * Opens an input cube file specified by the user with cube attributes and
    * requirements. For more information see Process::SetInputCube
@@ -93,20 +94,18 @@ namespace Isis {
    *
    * @param inCube - Pointer to input Cube
    */
-  void ProcessByLine::SetInputCube(Isis::Cube *inCube)
-  {
+  void ProcessByLine::SetInputCube(Isis::Cube *inCube) {
     Process::SetInputCube(inCube);
   }
 
 
-
-  void ProcessByLine::SetBricks(IOCubes cn){
+  void ProcessByLine::SetBricks(IOCubes cn) {
 
       switch(cn){
 
         case InPlace:
 
-          if(InputCubes.size() == 1) {
+          if (InputCubes.size() == 1) {
             SetBrickSize(InputCubes[0]->sampleCount(), 1, 1);
           }
 
@@ -116,7 +115,6 @@ namespace Isis {
 
           break;
 
-
         case InputOutput:
 
           SetInputBrickSize(InputCubes[0]->sampleCount(), 1, 1);
@@ -124,24 +122,17 @@ namespace Isis {
 
           break;
 
-
         case InputOutputList:
 
-          for(unsigned int i = 0; i < InputCubes.size(); i++) {
+          for (unsigned int i = 0; i < InputCubes.size(); i++) {
             SetInputBrickSize(InputCubes[i]->sampleCount(), 1, 1, i + 1);
           }
-          for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+          for (unsigned int i = 0; i < OutputCubes.size(); i++) {
             SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1, 1, i + 1);
           }
 
-
           break;
-
-
       }
-
-
-
   }
 
 
@@ -166,13 +157,10 @@ namespace Isis {
    *                                     written.
    */
   void ProcessByLine::StartProcess(void funct(Isis::Buffer &inout)) {
-
-
     VerifyCubes(InPlace);
     SetBricks(InPlace);    
     ProcessByBrick::StartProcess(funct);
   }
-
 
 
   /**
@@ -188,13 +176,10 @@ namespace Isis {
    * @throws Isis::IException::Message
    */
   void ProcessByLine::StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) {
-
       VerifyCubes(InputOutput);
       SetBricks(InputOutput);
       ProcessByBrick::StartProcess(funct);
   }
-
-
 
 
   /**
@@ -208,9 +193,8 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  void ProcessByLine::StartProcess( void funct(std::vector<Isis::Buffer *> &in,
+  void ProcessByLine::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                   std::vector<Isis::Buffer *> &out)) {
-
       VerifyCubes(InputOutputList);
       SetBricks(InputOutputList);    
       ProcessByBrick::StartProcess(funct);

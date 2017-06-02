@@ -4,7 +4,7 @@
   <brief>
     Creates a lat/lon polygon and writes it to the image
   </brief>
-  
+
   <description>
     <p>
       This applications creates a geometric polygon ("footprint") of the input
@@ -33,7 +33,7 @@
       must be run prior to running this application.
     </p>
   </description>
-  
+
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
@@ -44,10 +44,10 @@
         <item>cnetadd</item>
       </applications>
   </seeAlso>
-  
+
   <history>
     <change name="Tracie Sucharski" date="2005-07-19">
-      Original version 
+      Original version
     </change>
     <change name="Jacob Danton" date="2006-02-10">
       Changed input from a list of cube files to a single cube and added appTest.
@@ -74,11 +74,11 @@
       Updated to work with Geos3.0.0
     </change>
     <change name="Steven Koechle" date="2008-12-15">
-      Deletes old footprint (generated off cubes serial number) if its found. 
+      Deletes old footprint (generated off cubes serial number) if its found.
       New name for blob is just Footprint.
     </change>
     <change name="Steven Koechle" date="2009-04-17">
-      PIXINC parameter was removed, ImagePolygon now uses a new method of 
+      PIXINC parameter was removed, ImagePolygon now uses a new method of
       finding footprints
     </change>
     <change name="Steven Lambright" date="2009-05-29">
@@ -154,12 +154,15 @@
       Modified code to get TargetRadii using the cube label and mapping group rather than just the TargetName.
       References #3892
     </change>
+    <change name="christopher Combs" date="2017-06-01">
+      Removed terminal output from poleMultiBoundary apptest. Fixes #4548.
+    </change>
   </history>
-  
+
   <groups>
-    
+
     <group name="Files">
-      
+
       <parameter name="FROM">
         <type>cube</type>
         <fileMode>input</fileMode>
@@ -167,17 +170,17 @@
           Input cube
         </brief>
         <description>
-          The cube to initialize polygons.  
+          The cube to initialize polygons.
         </description>
         <filter>
           *.cub
         </filter>
       </parameter>
-      
+
     </group>
-    
+
     <group name="Options">
-      
+
       <parameter name="INCREASEPRECISION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -188,12 +191,12 @@
           invalid polygon. In addition, a results group will be created with
           the keywords SINC/LINC which reveal what SINC/LINC values were
           actually used for the creation of the footprint.
-          
+
           NOTE: This parameter can result in a drastic increase in running time
           as well as a change to user input values.
         </description>
       </parameter>
-      
+
       <parameter name="INCTYPE">
         <type>string</type>
         <default><item>LINCSINC</item></default>
@@ -244,11 +247,11 @@
           accurate)
         </brief>
         <description>
-          This is approximately how many lines in the input image 
+          This is approximately how many lines in the input image
           to skip for every point stored in the footprint.
         </description>
       </parameter>
-      
+
       <parameter name="SINC">
         <type>integer</type>
         <minimum inclusive="yes">1</minimum>
@@ -258,11 +261,11 @@
           accurate)
         </brief>
         <description>
-          This is approximately how many samples in the input image 
+          This is approximately how many samples in the input image
           to skip for every point stored in the footprint.
         </description>
       </parameter>
-      
+
       <parameter name="NUMVERTICES">
         <type>integer</type>
         <default><item>40</item></default>
@@ -290,12 +293,12 @@
         <description>
           When this value is provided, footprintinit will only consider points
           with an emission angle less than or equal to the provided value.
-          
+
           There should never be an emission angle above 90.  However,
           planet features can cause abnormalities.
         </description>
       </parameter>
-      
+
       <parameter name="MAXINCIDENCE">
         <type>double</type>
         <minimum inclusive="yes">0.0</minimum>
@@ -307,16 +310,16 @@
         <description>
           When this value is provided, footprintinit will only consider points
           with an incidence angle less than or equal to the provided value.
-          
+
           There should never be an incidence angle above 90. However,
           planet features can cause abnormalities.
         </description>
       </parameter>
-      
+
     </group>
-    
+
     <group name="Limb Test">
-      
+
       <parameter name="LIMBTEST">
         <type>string</type>
         <default><item>ELLIPSOID</item></default>
@@ -335,17 +338,17 @@
           <option value="SPICEINIT">
             <brief>Use Spiceinit Shape Model</brief>
             <description>
-              If a limb image is detected then use the shape model defined 
-              by spiceinit. This is 
+              If a limb image is detected then use the shape model defined
+              by spiceinit. This is
             </description>
           </option>
         </list>
       </parameter>
-      
+
     </group>
-    
+
     <group name="XY Test">
-      
+
       <parameter name="TESTXY">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -389,9 +392,9 @@
           *.map *.cub
         </filter>
       </parameter>
-      
+
     </group>
-    
+
   </groups>
-  
+
 </application>

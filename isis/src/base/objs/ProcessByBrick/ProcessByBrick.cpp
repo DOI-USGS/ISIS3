@@ -132,12 +132,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     *
     * @throws iException::Message
     */
-
-
-
-
-  void ProcessByBrick::VerifyCubes(IOCubes cn){
-
+    void ProcessByBrick::VerifyCubes(IOCubes cn){
 
       switch(cn){
 
@@ -152,7 +147,6 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
                   string m = "You haven't specified an input or output cube";
                        throw IException(IException::Programmer, m, _FILEINFO_);
-
               }
 
               break;
@@ -170,8 +164,6 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
                   }
 
               // The lines in the input and output must match
-
-
                if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
                    string m = "The number of lines in the input and output cubes ";
                    m += "must match";
@@ -200,8 +192,6 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
               }
 
               break;
-
-
 
             case InputOutputList:
 
@@ -247,9 +237,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
   *
   * @param nb Number of bands
   */
-
-
-  void ProcessByBrick::SetBrickSize(int ns, int nl, int nb) {
+ void ProcessByBrick::SetBrickSize(int ns, int nl, int nb) {
     SetInputBrickSize(ns, nl, nb);
     SetOutputBrickSize(ns, nl, nb);
     return;
@@ -730,6 +718,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
     bool haveInput;
     if (InputCubes.size() == 1) {
+
+      SetBricks(InPlace);
       //  Make sure the brick size has been set
       if (!p_inputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetInputBrickSize() method to set"
@@ -748,6 +738,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
           p_inputBrickLines[1], p_inputBrickBands[1], p_reverse);
     }
     else {
+      SetBricks(InPlace);
       //  Make sure the brick size has been set
       if (!p_outputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetOutputBrickSize() method to "
@@ -795,7 +786,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
       string m = "You must specify exactly one output cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-
+    SetBricks(InputOutput);
     //  Make sure the brick size has been set
     if (!p_inputBrickSizeSet || !p_outputBrickSizeSet) {
       string m = "Use the SetBrickSize(), SetInputBrickSize(), or "
@@ -886,6 +877,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
       string m = "You have not specified any input or output cubes";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
+
+    SetBricks(InputOutputList);
 
     //  Make sure the brick size has been set
     if(!p_inputBrickSizeSet && InputCubes.size() > 0) {

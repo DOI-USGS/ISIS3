@@ -28,7 +28,7 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   /**
-   * @description Mollweide Map Projection
+   * @brief Mollweide Map Projection
    *
    * This class provides methods for the forward and inverse equations of a
    * Mollweide Equal-Area map projection (for a sphere).

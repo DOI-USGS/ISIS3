@@ -109,7 +109,6 @@ namespace Isis {
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
 
-//      void savehdf5(FileName outputfilename) const;
 
     private:
       /**
@@ -179,7 +178,7 @@ namespace Isis {
   };
 
   /**
-   * @description GuiCameraQsp  Represents a smart pointer to a GuiCamera object.
+   * @brief GuiCameraQsp  Represents a smart pointer to a GuiCamera object.
    * It behaves exactly like a normal pointer, but it is thread-safe and it will delete the pointer
    *  it is holding when it goes out of scope, provided no other QSharedPointer objects
    * are referencing it.
@@ -187,9 +186,6 @@ namespace Isis {
 
   typedef QSharedPointer<GuiCamera> GuiCameraQsp;
 
-  // operators to read/write GuiCamera to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const GuiCamera &GuiCamera);
-  QDataStream &operator>>(QDataStream &stream, GuiCamera &GuiCamera);
 };
 
 Q_DECLARE_METATYPE(Isis::GuiCameraQsp);

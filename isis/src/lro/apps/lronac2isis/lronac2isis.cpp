@@ -75,7 +75,9 @@ void IsisMain() {
   }
   catch(IException &e) {
     QString msg = "The PDS header is missing important keyword(s).";
-    throw IException(IException::Io, msg, _FILEINFO_);
+    IException finalException(IException::Io, msg, _FILEINFO_);
+    finalException.append(e);
+    throw finalException;
   }
 
   id = id.simplified().trimmed();

@@ -61,6 +61,8 @@ namespace Isis {
    *                           causing bugs. As a result, the mouseButtonRelease
    *                           method did nothing so I removed that too. Zooming
    *                           happens on the rubberBandComplete slot.
+   *  @history 2017-05-10 Ian Humphrey - Modified zoomFit() so that when doing a "Fit in viewport"
+   *                          zoom, the image is centered properly in the viewport. Fixes #4756. 
    */
   class ZoomTool : public Tool {
       Q_OBJECT
@@ -69,7 +71,9 @@ namespace Isis {
       ZoomTool(QWidget *parent);
       void addTo(QMenu *menu);
 
-      //! Returns the name of the menu.
+      /**
+      *@return the name of the menu.
+      **/
       QString menuName() const {
         return "&View";
       }
@@ -118,9 +122,8 @@ namespace Isis {
       QAction *p_zoomFit; //!< Fit the cube in the viewport action.
 
       QLineEdit *p_zoomLineEdit; //!< Line edit for manual zoom factor.
-      double p_lastScale;
+      double p_lastScale; //!< Last scale.
   };
 };
 
 #endif
-

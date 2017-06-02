@@ -31,9 +31,10 @@ namespace Isis {
 
 
   /**
-   *  @brief  This is a child of class WorkOrder which is used for anything that performs
-   *  an action in a Project.  This class opens and displays a recent
-   *  project.
+   *  @brief This workOrder opens and displays a recent project.
+   *  If a project is currently open this workorder fails since
+   *  multiple projects are not currently supported.
+   *  This is synchronous and not undoable.
    *
    * @author 2014-04-13 Ken Edmundson
    *
@@ -42,6 +43,7 @@ namespace Isis {
    *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
    *              brought the code into compliance with ISIS3 coding standards.
    *              References #3944.
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
 
 
@@ -55,10 +57,13 @@ namespace Isis {
       virtual OpenRecentProjectWorkOrder *clone() const;
 
       virtual bool isExecutable(QString projectFileName);
-      bool execute();
+      bool setupExecution();
+      void execute();
 
     private:
       OpenRecentProjectWorkOrder &operator=(const OpenRecentProjectWorkOrder &rhs);
+
+      QString m_projectName;
   };
 }
 

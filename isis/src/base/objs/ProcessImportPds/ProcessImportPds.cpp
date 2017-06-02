@@ -157,6 +157,12 @@ namespace Isis {
     trnsStrm << "  InputPosition = UNCOMPRESSED_FILE" << endl;
     trnsStrm << "  InputKey = ^IMAGE" << endl;
     trnsStrm << "EndGroup" << endl;
+    trnsStrm << "Group = PdsCombinedSpectrum" << endl;
+    trnsStrm << "  InputPosition = ROOT" << endl;
+    trnsStrm << "  InputPosition = FILE" << endl;
+    trnsStrm << "  InputPosition = UNCOMPRESSED_FILE" << endl;
+    trnsStrm << "  InputKey = ^COMBINED_SPECTRUM" << endl;
+    trnsStrm << "EndGroup" << endl;
     trnsStrm << "Group = PdsTypeL0" << endl;
     trnsStrm << "  InputPosition = L0_FILE" << endl;
     trnsStrm << "  InputKey = ^L0_IMAGE" << endl;
@@ -188,7 +194,7 @@ namespace Isis {
     trnsStrm << "  InputPosition = COMPRESSED_FILE" << endl;
     trnsStrm << "  InputKey = FILE_NAME" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
-    trnsStrm << "EndGroup" << endl;   
+    trnsStrm << "EndGroup" << endl;
     trnsStrm << "END";
 
 
@@ -196,28 +202,20 @@ namespace Isis {
     //Determine if we are processing a QUBE whose
     //core data type is VAX_REAL
 
-    try{
-
-    PvlObject obj = p_pdsLabel.findObject("QUBE");
-    PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
-    PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
+    try {
+      PvlObject obj = p_pdsLabel.findObject("QUBE");
+      PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
+      PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
       //if ( (coreKey[0] == "VAX_REAL") && (suffixKey[0] =="VAX_REAL") )
 
       if (coreKey[0] == "VAX_REAL") {
-
-            ProcessImport::SetVAXConvert(true);
-        }
-
+        ProcessImport::SetVAXConvert(true);
+      }
     }
-    catch(IException &e){
-
-
+    catch (IException &e) {
     }
-
-
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
-
 
     // Check to see if we are dealing with a JPEG2000 file
     QString str;
@@ -254,8 +252,6 @@ namespace Isis {
     }
 
 
-
-
     // Call the correct label processing
     if ((allowedTypes & Image) == Image && pdsXlater.InputHasKeyword("PdsTypeImage")) {
 
@@ -285,6 +281,11 @@ namespace Isis {
     else if ((allowedTypes & Obs) == Obs && pdsXlater.InputHasKeyword("PdsTypeObs")) {
 
       ProcessPdsM3Label(pdsDataFile, Obs);
+    }
+    else if ((allowedTypes & CombinedSpectrum) == CombinedSpectrum &&
+              pdsXlater.InputHasKeyword("PdsCombinedSpectrum")) {
+
+      ProcessPdsCombinedSpectrumLabel(pdsDataFile);
     }
     else {
       QString msg = "Unknown label type in [" + p_labelFile + "]";
@@ -715,13 +716,22 @@ namespace Isis {
     SetDataSuffixBytes(suffix);
 
     str = pdsXlater.Translate("SuffixItemSize");
-    int trailer = toInt(str);
-    str = pdsXlater.Translate("AxisSuffixCount", 1);
-    trailer *= toInt(str);
-    str = pdsXlater.Translate("CoreSamples", samplePos);
-    trailer *= toInt(str);
-    trailer += suffix;
-    SetDataTrailerBytes(trailer);
+
+    // Only set DataTrailerBytes if we haven't already set it elsewhere. (It's inialized to 0.)
+    if (DataTrailerBytes() == 0) {
+      int trailer = toInt(str);
+      str = pdsXlater.Translate("AxisSuffixCount", 1);
+      trailer *= toInt(str);
+      str = pdsXlater.Translate("CoreSamples", samplePos);
+      trailer *= toInt(str);
+      trailer += suffix;
+      SetDataTrailerBytes(trailer); 
+    }
+
+    // Save the Data Trailer if it exists
+    if (DataTrailerBytes() != 0) {
+      SaveDataTrailer(); 
+    }
 
     ProcessPixelBitandType(pdsXlater);
 
@@ -858,6 +868,96 @@ namespace Isis {
 
     // Set any special pixel values, not qube, so use false
     ProcessSpecialPixels(pdsXlater, false);
+
+    //-----------------------------------------------------------------
+    // Find the data filename it may be the same as the label file
+    // OR the label file may contain a pointer to the data
+    //-----------------------------------------------------------------
+
+    // Use the name supplied by the application if it is there
+    if (pdsDataFile.length() > 0) {
+      SetInputFile(pdsDataFile);
+      ProcessDataFilePointer(pdsXlater, true);
+    }
+    // If the data is in JPEG 2000 format, then use the name of the file
+    // from the label
+    else if (p_jp2File.length() > 0) {
+      SetInputFile(p_jp2File);
+      ProcessDataFilePointer(pdsXlater, true);
+    }
+    // Use the "^IMAGE or ^QUBE" label to get the filename for the image data
+    // Get the path portion from user entered label file spec
+    else {
+      // Handle filename and offset
+      ProcessDataFilePointer(pdsXlater, false);
+    }
+
+    //------------------------------------------------------------
+    // Find the image data base and multiplier
+    //------------------------------------------------------------
+    str = pdsXlater.Translate("CoreBase");
+    SetBase(toDouble(str));
+    str = pdsXlater.Translate("CoreMultiplier");
+    SetMultiplier(toDouble(str));
+
+    // Find the organization of the image data
+    str = pdsXlater.Translate("CoreOrganization");
+
+    if (p_encodingType == JP2) {
+      SetOrganization(ProcessImport::JP2);
+    }
+    else if (str == "BSQ") {
+      SetOrganization(ProcessImport::BSQ);
+    }
+    else if (str == "BIP") {
+      SetOrganization(ProcessImport::BIP);
+    }
+    else if (str == "BIL") {
+      SetOrganization(ProcessImport::BIL);
+    }
+    else {
+      QString msg = "Unsupported axis order [" + str + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Process the PDS label of type CombinedSpectrum.
+   *
+   * @param pdsDataFile The name of the PDS data file where the actual image/cube
+   *                    data is stored. This parameter can be an empty QString, in
+   *                    which case the label information will be searched to find
+   *                    the data file name or the data will be assumed to be
+   *                    after the label information.
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessImportPds::ProcessPdsCombinedSpectrumLabel(const QString &pdsDataFile) {
+    Isis::FileName transFile(p_transDir + "/translations/pdsCombinedSpectrum.trn");
+    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
+
+    QString str;
+
+    str = pdsXlater.Translate("CoreLinePrefixBytes");
+    SetDataPrefixBytes(toInt(str));
+
+    str = pdsXlater.Translate("CoreLineSuffixBytes");
+    SetDataSuffixBytes(toInt(str));
+
+    ProcessPixelBitandType(pdsXlater);
+
+    str = pdsXlater.Translate("CoreByteOrder");    
+    SetByteOrder(Isis::ByteOrderEnumeration(str));
+
+    str = pdsXlater.Translate("CoreSamples");
+    int ns = toInt(str);
+    str = pdsXlater.Translate("CoreLines");
+    int nl = toInt(str);
+    str = pdsXlater.Translate("CoreBands");
+    int nb = toInt(str);
+
+    SetDimensions(ns, nl, nb);
 
     //-----------------------------------------------------------------
     // Find the data filename it may be the same as the label file
@@ -1494,11 +1594,11 @@ namespace Isis {
 
     xmult = -1.0;
     ymult = 1.0;
-    xoff = -0.5;
-    yoff = -0.5;
+    xoff = 0.5;
+    yoff = 0.5;
 
     //  Open projectionOffsetMults file
-    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY.def");
+    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY_V2.def");
 
     Isis::PvlObject &projDef = p.findObject("ProjectionOffsetMults",
                                             Pvl::Traverse);

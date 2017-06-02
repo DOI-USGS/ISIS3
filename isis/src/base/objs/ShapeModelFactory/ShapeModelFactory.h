@@ -30,7 +30,7 @@ namespace Isis {
 
   /**
    * This class is used to create ShapeModel objects.  It determines the type
-   * of shape model in the input Pvl object and creates the appropriate type of 
+   * of shape model in the input Pvl object and creates the appropriate type of
    * shape model.
    *
    * @author 2010-07-29 Debbie A. Cook
@@ -40,6 +40,9 @@ namespace Isis {
    *   @history 2014-01-14 - Jeannie Backer - Improved error message. Fixes #1957.
    *   @history 2015-03-08 - Jeannie Backer - Added implementation for NAIF DSK
    *                             models. References #2035.
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: added ReportError method to
+   *                          truncate paths before data directory. Allows test to pass when not
+   *                          using the default data area. Fixes #4738.
    */
   class ShapeModelFactory {
     public:

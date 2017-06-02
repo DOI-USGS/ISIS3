@@ -11,9 +11,6 @@ commands:
 	$(APPNAME) listall=yes \
 	           > $(OUTPUT)/listall.pvl
 	           >& /dev/null;
-	$(APPNAME) listmatchers=yes \
-	           toinfo=$(OUTPUT)/listmatchers.pvl \
-	           >& /dev/null;
 	$(APPNAME) algorithm=brisk/brisk \
 	           listspec=yes \
 	           toinfo=$(OUTPUT)/listspec.pvl \

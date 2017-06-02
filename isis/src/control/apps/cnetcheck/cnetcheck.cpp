@@ -73,7 +73,6 @@ QString g_delimiter;
 
 // Main program
 void IsisMain() {
-
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
 

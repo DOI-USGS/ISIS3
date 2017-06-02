@@ -53,10 +53,8 @@ Group = General
   Weighted        = false
   SolutionType    = 2
   SolveMethod     = 1
-  NonOverlaps     = (/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev-
-                     2.cub,
-                     /usgs/cpkgs/isis3/data/odyssey/testData/I02609002RDR.lev2-
-                     .cub)
+  NonOverlaps     = (data/odyssey/testData/I00824006RDR.lev2.cub,
+                     data/odyssey/testData/I02609002RDR.lev2.cub)
   HasCorrections  = false
 End_Group
      Write results to file...
@@ -140,8 +138,7 @@ Group = General
   SolveMethod     = 1
   NonOverlaps     = Null
   HasCorrections  = true
-  FileName        = /usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2-
-                    .cub
+  FileName        = data/odyssey/testData/I00824006RDR.lev2.cub
   Band1           = (0.80247733802282, -6.41865351231352e-05,
                      3.75633639030183e-04)
   Band2           = (0.79065929400895, -6.36729218508168e-05,
@@ -162,8 +159,7 @@ Group = General
                      5.26586798911814e-04)
   Band10          = (1.1365072636781, -6.00857909632202e-05,
                      1.68162009248859e-04)
-  FileName        = /usgs/cpkgs/isis3/data/odyssey/testData/I01523019RDR.lev2-
-                    .cub
+  FileName        = data/odyssey/testData/I01523019RDR.lev2.cub
   Band1           = (1.0, -1.25221260739074e-35, 3.09460986870763e-04)
   Band2           = (1.0, 1.2328347713385e-35, 3.08373709744676e-04)
   Band3           = (1.0, -2.48556416128503e-36, 3.91940207887308e-04)
@@ -174,8 +170,7 @@ Group = General
   Band8           = (1.0, -5.96696530716469e-36, 4.90828757009813e-04)
   Band9           = (1.0, 1.0677794001636e-35, 4.84059968314066e-04)
   Band10          = (1.0, 1.6178149252362e-36, 1.12636583098266e-04)
-  FileName        = /usgs/cpkgs/isis3/data/odyssey/testData/I02609002RDR.lev2-
-                    .cub
+  FileName        = data/odyssey/testData/I02609002RDR.lev2.cub
   Band1           = (1.9316157478611, 1.59619509035933e-04,
                      1.42658743858439e-04)
   Band2           = (1.932336336529, 1.57588763433619e-04,
@@ -8677,13 +8672,13 @@ Testing loadInputs exception ...
 **USER ERROR** The input file [HoldList.lst] must contain at least 2 file names.
 
 Testing errorCheck exception (1)...
-**USER ERROR** Number of bands do not match between cubes [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] and [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub].
+**USER ERROR** Number of bands do not match between cubes [data/odyssey/testData/I00824006RDR.lev2.cub] and [data/base/testData/isisTruth.cub].
 
 Testing errorCheck exception (2)...
-**USER ERROR** Mapping groups do not match between cubes [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] and [/usgs/cpkgs/isis3/data/odyssey/testData/I56632006EDR.lev2.cub].
+**USER ERROR** Mapping groups do not match between cubes [data/odyssey/testData/I00824006RDR.lev2.cub] and [data/odyssey/testData/I56632006EDR.lev2.cub].
 
 Testing validateInputStatistics exception (1)...
 **USER ERROR** Each input file in the FROM LIST must have a corresponding input file in the INPUT STATISTICS.
 
 Testing validateInputStatistics exception (2)...
-**USER ERROR** The from list file [/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub] does not have any corresponding file in the stats list.
+**USER ERROR** The from list file [data/odyssey/testData/I00824006RDR.lev2.cub] does not have any corresponding file in the stats list.

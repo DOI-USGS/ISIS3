@@ -31,9 +31,10 @@ namespace Isis {
 
 
   void MosaicGraphicsView::resizeEvent(QResizeEvent *event) {
-    if(event->oldSize().isEmpty() || p_resizeZooming) {
+    if(m_oldSize.isEmpty() || p_resizeZooming) {
       QRectF sceneRect(scene()->itemsBoundingRect());
       fitInView(sceneRect, Qt::KeepAspectRatio);
+      m_oldSize = event->size();
     }
 
     QGraphicsView::resizeEvent(event);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>540</width>
     <height>300</height>
    </rect>
   </property>
@@ -32,16 +32,13 @@
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
   </widget>
   <widget class="QWidget" name="jigsawButtonsLayoutWidget">
    <property name="geometry">
     <rect>
      <x>320</x>
      <y>10</y>
-     <width>189</width>
+     <width>208</width>
      <height>94</height>
     </rect>
    </property>
@@ -63,7 +60,7 @@
     <item row="2" column="0">
      <widget class="QCheckBox" name="useLastSettings">
       <property name="text">
-       <string>Use Last Settings</string>
+       <string>Use Last Accepted Settings</string>
       </property>
      </widget>
     </item>

@@ -8,6 +8,7 @@
 #include <QCloseEvent>
 #include <QPalette>
 #include <QPointer>
+#include <QString>
 #include <QStringList>
 
 

@@ -54,37 +54,6 @@ namespace Isis {
   }
 
 
-//  void ControlDisplayProperties::fromPvl(const PvlObject &pvl) {
-//    m_displayName = ((IString)pvl["DisplayName"][0]).ToQt();
-
-//    QByteArray hexValues(pvl["Values"][0].c_str());
-//    QDataStream valuesStream(QByteArray::fromHex(hexValues));
-//    valuesStream >> *m_propertyValues;
-//  }
-
-
-//  /**
-//   * Convert to Pvl for project files. This stores all of the data associated
-//   *   with all of the properties (but not what is supported). This also s  tores
-//   *   the cube filename.
-//   */
-//  PvlObject ControlDisplayProperties::toPvl() const {
-//    PvlObject output("DisplayProperties");
-//    output += PvlKeyword("DisplayName", m_displayName);
-
-//    QBuffer dataBuffer;
-//    dataBuffer.open(QIODevice::ReadWrite);
-
-//    QDataStream propsStream(&dataBuffer);
-//    propsStream << *m_propertyValues;
-//    dataBuffer.seek(0);
-
-//    output += PvlKeyword("Values", QString(dataBuffer.data().toHex()));
-
-//    return output;
-//  }
-
-
   /**
    * Call this with every property you support, otherwise they will not
    *   communicate properly between widgets.

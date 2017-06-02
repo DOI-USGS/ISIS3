@@ -7,6 +7,7 @@
 #include "Preference.h"
 #include "CameraFactory.h"
 #include "Target.h"
+#include "QRegularExpression"
 
   /**
    * This application tests the ShapeModelFactory class.
@@ -21,11 +22,11 @@ using namespace std;
 using namespace Isis;
 
 /**
- *  
- * @internal 
+ *
+ * @internal
  *   @history 2015-02-25 Jeannie Backer - Added test for Null ElevationModel. Added test for DSK Shape Model.
  *                           Code coverage: 81.818% scope, 84.058% line and 100% function.
- *  
+ *
  *   @todo code coverage - need RingPlane shape that passes
  *   @todo code coverage - need RingPlane shape that throws error on construction
  *   @todo code coverage - need Null shape that throws error on EllipsoidShape construction
@@ -34,6 +35,11 @@ using namespace Isis;
  *   @todo code coverage - need constructor (EllipsoidShape, PlaneShape, EquatorialCylindricalShape,
  *                           or DemShape to return null shape.
  */
+
+ void ReportError(QString err) {
+   cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+ }
+
 int main() {
   try {
     Isis::Preference::Preferences(true);
@@ -124,7 +130,7 @@ int main() {
     cout << "    Successfully created shape " << smElNull->name() << endl;
     delete smElNull;
 
-    // Test ShapeModel dem that's not Equatorial Cylindrical 
+    // Test ShapeModel dem that's not Equatorial Cylindrical
     cout << endl << "  Testing DEM not equatorial cylindrical" << endl;
     PvlGroup kern6 = kern1;
     kern6 += PvlKeyword("ShapeModel", dir3 + "ab102402.lev2.cub");
@@ -136,7 +142,7 @@ int main() {
     cout << "    Successfully created shape " << smDem->name() << endl;
     delete smDem;
 
-    // Test ShapeModel keyword with DSK 
+    // Test ShapeModel keyword with DSK
     cout << endl << "  Testing DSK file..." << endl;
     PvlGroup kern7 = kern1;
     FileName f7("$hayabusa/kernels/dsk");
@@ -231,7 +237,7 @@ int main() {
       delete smBadFile;
     }
     catch(Isis::IException &e) {
-      e.print();
+      ReportError(e.toString());
     }
 
     try {
@@ -250,7 +256,7 @@ int main() {
     catch (Isis::IException &e) {
       e.print();
     }
-  } 
+  }
   catch (IException &e) {
     IException(e, IException::Programmer,
               "\n\n\n------------Unit Test Failed.------------",

@@ -68,13 +68,16 @@ namespace Isis {
    *   @history 2012-04-10 Orrin Thomas - Added constructor parameters to read
    *                            from ControlNets automatically (For control measure
    *                            data.)
-   *   @history 2015-09-03  Tyler Wilson - Overrode Statistics::SetValidRange to 
-   *                        set the bin range as well as the statistical range 
+   *   @history 2015-09-03  Tyler Wilson - Overrode Statistics::SetValidRange to
+   *                        set the bin range as well as the statistical range
    *                        for the data.  The function Histogram::SetBinRange
-   *                        has been removed from this class.  
+   *                        has been removed from this class.
    *   @history 2016-04-20 Makayla Shepherd - Added UnsignedWord pixel type handling.
+   *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output file
+   *                           name in output PVL to allow the test to pass when not using the
+   *                           standard data areas. Fixes #4738.
    */
-  
+
   class Histogram : public Statistics {
     public:
       Histogram(double minimum, double maximum,
@@ -84,7 +87,7 @@ namespace Isis {
                 double endSample = Null, double endLine = Null, int bins = 0,
                 bool addCubeData = false);
 
-      //constuctors that use ControlNetworks to build histograms of ControlMeasure data 
+      //constuctors that use ControlNetworks to build histograms of ControlMeasure data
       Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins);
       Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, double binWidth);
 

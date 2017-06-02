@@ -15,7 +15,8 @@ namespace Isis {
    * @brief Write project images to a user-specified location
    *
    * Takes an imageList and writes it's images to disk at a user-specified location. This works
-   *   both with and without context (context menus and file menu).
+   *   both with and without context (context menus and file menu). This runs asynchronously and
+   *   is not undoable.
    *
    *  internalData() stores:
    *    ImageList name [OPTIONAL] - need context if this isn't present (see WorkOrder::imageList())
@@ -25,6 +26,7 @@ namespace Isis {
    * @author 2012-09-26 Tracie Sucharski
    *
    * @internal
+   *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    */
   class ExportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -38,10 +40,10 @@ namespace Isis {
       bool isExecutable(ImageList *images);
 
 
-      bool execute();
+      bool setupExecution();
 
-      void asyncRedo();
-      void postSyncRedo();
+      void execute();
+      void postExecution();
 
     private:
       /**

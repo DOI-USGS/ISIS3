@@ -38,9 +38,6 @@ These have partial coverage
     (m_bundleSettings.validateNetwork()==false) -- this is never the case for jigsaw, need to test elsewhere
 
 
- bool BundleAdjust::initializeCHOLMODLibraryVariables() {
-    ( m_rank <= 0 )
-
 Errors:
  void BundleAdjust::init(Progress *progress) {
     (image==false) for BundleImage* image = new BundleImage(camera, serialNumber, fileName);

@@ -22,10 +22,17 @@
  */
 #include "CNetSuiteMainWindow.h"
 
+#include <QtDebug>
+#include <QApplication>
+#include <QColor>
+#include <QDockWidget>
+#include <QMdiArea>
 #include <QObject>
 #include <QtWidgets>
 #include <QSettings>
+#include <QStatusBar>
 #include <QTreeView>
+#include <QVariant>
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -84,7 +91,7 @@ namespace Isis {
 
     QStringList args = QCoreApplication::arguments();
 /**
-    if (args.count() == 2) {    
+    if (args.count() == 2) {
       qDebug() << args.last();
       m_directory->project()->open(args.last());
     }
@@ -174,18 +181,20 @@ namespace Isis {
     centralWidget->setTabsMovable(true);
     centralWidget->setTabsClosable(true);
 
-    // ken testing
-    setActiveView(projectTreeView);
-    // ken testing
-
     if (args.count() == 2) {
       m_directory->project()->open(args.last());
     }
+
+    // ken testing  If this is used, we will not need to call updateMenuActions() or updateToolBar()
+    // above.  They are both called from setActiveView.
+    //  setActiveView(projectTreeView);
+    // ken testing
   }
 
 
   /**
-   * 
+   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a
+   * view which was detached from the MDI main window.
    *
    * @param[in] newWidget (QWidget *)
    */
@@ -201,6 +210,8 @@ namespace Isis {
       if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
         mdiArea->addSubWindow(newWidget);
         newWidget->show();
+        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
+        setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
       }
     }
   }
@@ -234,59 +245,71 @@ namespace Isis {
   void CNetSuiteMainWindow::updateMenuActions() {
 
     m_fileMenu->clear();
+    // Get Directory FileMenu actions
     foreach ( QAction *action, m_directory->fileMenuActions() ) {
       m_fileMenu->addAction(action);
     }
     m_fileMenu->addSeparator();
+    // Get FileMenu actions for the active view (eg. CubeDnView, Footprint2DView)
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->fileMenuActions() ) {
         m_fileMenu->addAction(action);
       }
     }
     m_fileMenu->addSeparator();
+    // Get FileMenu actions from the CNetsuiteMainWindow, Exit is the only action
     foreach ( QAction *action, m_fileMenuActions ) {
       m_fileMenu->addAction(action);
     }
 
     m_projectMenu->clear();
+    //  Get Project menu actions from Directory
     foreach ( QAction *action, m_directory->projectMenuActions() ) {
       m_projectMenu->addAction(action);
     }
     m_projectMenu->addSeparator();
+    //  Get Project menu actions from the active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->projectMenuActions() ) {
         m_projectMenu->addAction(action);
       }
     }
     m_projectMenu->addSeparator();
+    //  Get Project menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_projectMenuActions ) {
       m_projectMenu->addAction(action);
     }
 
     m_editMenu->clear();
+    // Get Edit menu actions from Directory
     foreach ( QAction *action, m_directory->editMenuActions() ) {
       m_editMenu->addAction(action);
     }
     m_editMenu->addSeparator();
+    // Get Edit menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->editMenuActions() ) {
         m_editMenu->addAction(action);
       }
     }
     m_editMenu->addSeparator();
+    // Get Edit menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_editMenuActions ) {
       m_editMenu->addAction(action);
     }
 
     m_viewMenu->clear();
+    // Get View menu actions from Directory
     foreach ( QAction *action, m_directory->viewMenuActions() ) {
       m_viewMenu->addAction(action);
     }
     m_viewMenu->addSeparator();
+    // Get View menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_viewMenuActions ) {
       m_viewMenu->addAction(action);
     }
     m_viewMenu->addSeparator();
+    // Get View menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->viewMenuActions() ) {
         m_viewMenu->addAction(action);
@@ -294,31 +317,37 @@ namespace Isis {
     }
 
     m_settingsMenu->clear();
+    // Get Settings menu actions from Directory
     foreach ( QAction *action, m_directory->settingsMenuActions() ) {
       m_settingsMenu->addAction(action);
     }
     m_settingsMenu->addSeparator();
+    // Get Settings menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->settingsMenuActions() ) {
         m_settingsMenu->addAction(action);
       }
     }
     m_settingsMenu->addSeparator();
+    // Get Settings menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_settingsMenuActions ) {
       m_settingsMenu->addAction(action);
     }
 
     m_helpMenu->clear();
+    // Get Help menu actions from Directory
     foreach ( QAction *action, m_directory->helpMenuActions() ) {
       m_helpMenu->addAction(action);
     }
     m_helpMenu->addSeparator();
+    // Get Help menu actions from active view
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->helpMenuActions() ) {
         m_helpMenu->addAction(action);
       }
     }
     m_helpMenu->addSeparator();
+    // Get Help menu actions from CNetSuiteMainWindow
     foreach ( QAction *action, m_helpMenuActions ) {
       m_helpMenu->addAction(action);
     }
@@ -408,7 +437,7 @@ namespace Isis {
         return true;
       }
     }
- 
+
     return QMainWindow::eventFilter(watched, event);
   }
 
@@ -499,6 +528,11 @@ namespace Isis {
     m_projectMenu = menuBar()->addMenu(tr("&Project"));
     m_projectMenu->setObjectName("projectMenu");
 
+    // Allow tool tips to be displayed for the project menu's actions (e.g. "Bundle Adjustment")
+    // This is a work around for Qt's what this text not working on disabled actions
+    // (even though the Qt documentation says it should work on disabled QAction's).
+    m_projectMenu->setToolTipsVisible(true);
+
     m_editMenu = menuBar()->addMenu(tr("&Edit"));
     m_editMenu->setObjectName("editMenu");
 
@@ -517,14 +551,14 @@ namespace Isis {
    * Write the window positioning and state information out to a
    * config file. This allows us to restore the settings when we
    * create another main window (the next time this program is run).
-   * 
+   *
    * The state will be saved according to the currently loaded project and its name.
    *
    * When no project is loaded (i.e. the default "Project" is open), the config file used is
    * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
    * When a project, ProjectName, is loaded, the config file used is
    * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
-   * 
+   *
    * @param[in] project Pointer to the project that is currently loaded (default is "Project")
    *
    * @internal
@@ -532,8 +566,8 @@ namespace Isis {
    *                           References #4358.
    */
   void CNetSuiteMainWindow::writeSettings(const Project *project) const {
-    // Ensure that we are not using a NULL pointer   
-    if (!project) { 
+    // Ensure that we are not using a NULL pointer
+    if (!project) {
       QString msg = "Cannot write settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

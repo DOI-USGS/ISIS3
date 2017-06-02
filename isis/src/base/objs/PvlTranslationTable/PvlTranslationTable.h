@@ -126,18 +126,17 @@ namespace Isis {
 
     public:
       // Constructors
-      PvlTranslationTable(Isis::FileName transFile);
+      PvlTranslationTable(FileName transFile);
       PvlTranslationTable(std::istream &istr);
       PvlTranslationTable();
 
-      //! Destroys the PvlTranslationTable object.
-      ~PvlTranslationTable() { };
+      virtual ~PvlTranslationTable();
 
       // Return the associated input group from the trans table
-      PvlKeyword InputGroup(const QString nName, const int inst = 0) const;
+      virtual PvlKeyword InputGroup(const QString nName, const int inst = 0) const;
 
       // Return the associated input keyword name from the trans table
-      QString InputKeywordName(const QString nName) const;
+      virtual QString InputKeywordName(const QString nName) const;
 
       // Return the associated input default value from the trans table
       QString InputDefault(const QString nName) const;
@@ -150,13 +149,11 @@ namespace Isis {
       void AddTable(const QString &transFile);
 
     protected:
-      Pvl &TranslationTable() {
-        return p_trnsTbl;
-      }
-      const Pvl &TranslationTable() const {
-        return p_trnsTbl;
-      }
+      Pvl &TranslationTable();
+      const Pvl &TranslationTable() const;
+      virtual std::vector< std::pair<QString, int> > validKeywords() const;
 
+      bool hasInputDefault(const QString nName);
       bool IsAuto(const QString nName);
       bool IsOptional(const QString nName);
       PvlKeyword &OutputPosition(const QString nName);

@@ -444,7 +444,7 @@ namespace Isis {
    * @param filename The file to write the image overlaps to
    */
   void ImageOverlapSet::WriteImageOverlaps(const QString &filename) {
-        
+            
     QString file = FileName(filename).expanded();
     bool failed = false;
     bool noOverlaps = false;
@@ -493,7 +493,6 @@ namespace Isis {
             p_writtenSoFar ++;
           }
         }
-        
         p_lonLatOverlapsMutex.unlock();
       }
             
@@ -505,23 +504,26 @@ namespace Isis {
     catch (...) {
       failed = true;
     }
-
+    
     /**
      * Don't wait for an unlock from FindImageOverlaps(...) if we're done
      * calculating.
      */
     if (p_calculatedSoFar == p_lonLatOverlaps.size()) {
-      if (p_threadedCalculate) {
+      if (p_threadedCalculate && !noOverlaps) {
+        p_calculatePolygonMutex.tryLock();
         p_calculatePolygonMutex.unlock();
       }
     }
 
     if (failed) {
+      p_calculatePolygonMutex.tryLock();
       p_calculatePolygonMutex.unlock();
       QString msg = "Unable to write the image overlap list to [" + filename + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if (noOverlaps) {
+      p_calculatePolygonMutex.tryLock();
       p_calculatePolygonMutex.unlock();
       QString msg = "No overlaps were found.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -554,6 +556,7 @@ namespace Isis {
       // unblock the writing process after every 10 polygons if we need to write
       if (p_calculatedSoFar % 10 == 0 && (!snlist || (p_lonLatOverlaps.size() > snlist->size()))) {
         if (p_threadedCalculate) {
+          p_calculatePolygonMutex.tryLock();
           p_calculatePolygonMutex.unlock();
         }
       }

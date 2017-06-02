@@ -129,9 +129,13 @@ namespace Isis {
   
     p_operators.push_back(new InfixOperator(1, "&"));
     p_operators.push_back(new InfixOperator(1, "and"));
+
+    p_operators.push_back(new InfixOperator(1, "&&"));
   
     p_operators.push_back(new InfixOperator(1, "|"));
     p_operators.push_back(new InfixOperator(1, "or"));
+
+    p_operators.push_back(new InfixOperator(1, "||"));
     return; 
   }
 

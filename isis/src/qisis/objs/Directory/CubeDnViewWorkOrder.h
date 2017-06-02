@@ -43,6 +43,9 @@ namespace Isis {
    *                          adding images to an existing view.
    *   @history 2016-11-02 Makayla Shepherd - Changed the display text from View Raw Cubes to 
    *                          Display Images. Fixes #4494. 
+   *   @history 2017-04-06 Makayla Shepherd - Added isUndoable, and renamed execute() to 
+   *                          setupExecution(), and syncRedo() to execute() according to the 
+   *                          WorkOrder redesign.
    */
   class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -55,12 +58,14 @@ namespace Isis {
 
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
+      
+      bool isUndoable() const;
 
-      bool execute();
+      bool setupExecution();
+      void execute();
 
     protected:
       bool dependsOn(WorkOrder *other) const;
-      void syncRedo();
 
     private:
       CubeDnViewWorkOrder &operator=(const CubeDnViewWorkOrder &rhs);

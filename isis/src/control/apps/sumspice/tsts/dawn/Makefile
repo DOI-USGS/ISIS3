@@ -1,4 +1,5 @@
 # this tests sumspice using cubelist and sumfilelist inputs on DAWN images
+# updated for addition of UPDATE, SUMTIME, and TOLOG 2016-12-06 Kristin Berry
 APPNAME = sumspice
 
 include $(ISISROOT)/make/isismake.tsts
@@ -15,8 +16,10 @@ commands:
 	# first run of sumspice updates the time
 	$(APPNAME) fromlist=$(OUTPUT)/cubelist.txt \
 	sumfilelist=$(OUTPUT)/sumfilelist.txt \
-	mode=updatetime \
+	sumtime=start\
+	update=times \
 	timediff=1.0 \
+	tolog=$(OUTPUT)/sumspiceUpdateClocksToLog.txt \
 	-log=$(OUTPUT)/sumspiceUpdateClocksLog.pvl \
 	> /dev/null;
 
@@ -66,7 +69,8 @@ commands:
 	# second run of sumspice updates the tables
 	$(APPNAME) fromlist=$(OUTPUT)/cubelist.txt \
 	sumfilelist=$(OUTPUT)/sumfilelist.txt \
-	mode=updatespice \
+	sumtime=start \
+	update=spice \
 	-log=$(OUTPUT)/sumspiceUpdateSpiceLog.pvl \
 	> /dev/null;
 

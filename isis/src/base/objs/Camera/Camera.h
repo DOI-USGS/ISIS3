@@ -2,8 +2,8 @@
 #define Camera_h
 /**
  * @file
- * $Revision$
- * $Date$
+ * $Revision: 7234 $
+ * $Date: 2016-11-12 14:04:38 -0700 (Sat, 12 Nov 2016) $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -232,6 +232,12 @@ namespace Isis {
    *                           to using the band the camera is set to. References #4476.
    *   @history 2016-10-21 Jeannie Backer - Reorder method signatures and member variable
    *                           declarations to fit ISIS coding standards. References #4476.
+   *   @history 2016-12-02 Victor Silva - Made changes to GetLocalNormal to calculate local normal
+   *                           accurately for LRO by changing 4 corner surrounding points from adding
+   *                           0.5 to adding 0.5 - DBL_MIN. Fixes #4560.
+   *   @history 2017-03-03 Tyler Wilson - Updated the oblique detector resolution function to correct
+   *                           an error in the original formula, and updated the documention for this
+   *                           function.  Fixes #4614.
    */
 
   class Camera : public Sensor {

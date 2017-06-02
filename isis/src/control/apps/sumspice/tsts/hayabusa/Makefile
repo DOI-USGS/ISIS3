@@ -1,4 +1,5 @@
 # this tests sumspice using a single cube and sumfile as inputs on a Hayabusa image
+# updated for addition of UPDATE, SUMTIME, and TOLOG 2016-12-06 Kristin Berry
 APPNAME = sumspice
 
 include $(ISISROOT)/make/isismake.tsts
@@ -10,7 +11,9 @@ commands:
 	# first run of sumspice updates the time
 	$(APPNAME) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	sumfile=$(INPUT)/N2395699394.SUM \
-	mode=updatetime \
+	sumtime=start \
+	update=times \
+	tolog=$(OUTPUT)/sumspiceUpdateClocksToLog.txt \
 	-log=$(OUTPUT)/sumspiceUpdateClocksLog.pvl \
 	> /dev/null;
 
@@ -53,7 +56,8 @@ commands:
 	# second run of sumspice updates the tables
 	$(APPNAME) from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	sumfile=$(INPUT)/N2395699394.SUM \
-	mode=updatespice \
+	sumtime=start \
+	update=spice \
 	-log=$(OUTPUT)/sumspiceUpdateSpiceLog.pvl \
 	> /dev/null;
 

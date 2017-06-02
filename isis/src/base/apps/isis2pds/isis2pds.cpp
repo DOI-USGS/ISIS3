@@ -63,6 +63,10 @@ void IsisMain() {
   if(ui.GetString("LABTYPE") == "FIXED")
     p.SetExportType(ProcessExportPds::Fixed);
 
+  if (ui.GetBoolean("CHECKSUM")) {
+    p.setCanGenerateChecksum(true);
+  }
+
   //Set the resolution to  Kilometers
   p.SetPdsResolution(ProcessExportPds::Kilometer);
 
@@ -73,6 +77,9 @@ void IsisMain() {
   ofstream oCube(outFileName.toLatin1().data());
   p.OutputLabel(oCube);
   p.StartProcess(oCube);
+  if (ui.GetBoolean("CHECKSUM")) {
+    p.updateChecksumInLabel(oCube);
+  }
   oCube.close();
   p.EndProcess();
 
