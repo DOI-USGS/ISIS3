@@ -58,7 +58,7 @@
         <li>Extra</li>
       </ol>
 
-      spiceinit will always try to use the highest quality kernels possible. This
+      The spiceinit program will always try to use the highest quality kernels possible. This
       only applies to kernels that are not specified manually. The
       kernel qualities are, from best to worst:
       <ol>
@@ -71,7 +71,7 @@
         <li>Reconstructed</li>
           These kernels are typically produced by a mission a few weeks after the target has been reached.
         <li>Predicted</li>
-          These are preliminary kernels produced by a mission and are the 
+          These are preliminary kernels produced by a mission and are the
           best-estimates of where the spacecraft will be at any given time.
         <li>Nadir</li>
           This is the worst quality kernel and is used as a last resort because it
@@ -79,7 +79,7 @@
       </ol>
     </p>
     <p>
-      The <b>InstrumentPositionQuality</b> and <b>InstrumentPointingQuality</b> keywords are 
+      The <b>InstrumentPositionQuality</b> and <b>InstrumentPointingQuality</b> keywords are
       added to the Kernels group to indicate the level of quality of the loaded kernels. At least
       one of the parameters CKPREDICTED, CKNADIR, CKRECON, or CKSMITHED must be entered.
       Furthermore, at least one of the parameters SPKPREDICTED,  SPKRECON, or SPKSMITHED must be
@@ -169,17 +169,17 @@
     </change>
     <change name="Steven Lambright" date="2007-08-10">
        Fixed so that when no spacecraft pointing is found, but frame kernels are, and Nadir is
-       allowed it still adds the Nadir keyword. 
+       allowed it still adds the Nadir keyword.
     </change>
     <change name="Steven Koechle" date="2007-10-05">
        Added a check to see if the cube had an existing polygon, if so delete it.
     </change>
     <change name="Steven Koechle" date="2007-10-25">
        Fixed Smithed enum, changed from C-Smithed.
-    </change> 
+    </change>
     <change name="Steven Koechle" date="2007-12-14">
-        Added error handling logic. If the user chose to use Nadir CK and 
-        another type, and the system found a file where the image falls in a gap 
+        Added error handling logic. If the user chose to use Nadir CK and
+        another type, and the system found a file where the image falls in a gap
         (no pointing is available) Nadir would never be calculated. Fixed.
     </change>
     <change name="Steven Lambright" date="2008-02-13">
@@ -199,7 +199,7 @@
         Fixed the propagation of the EXTRA Kernel.
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Steven Lambright" date="2008-05-19">
       Fixed documentation
@@ -250,8 +250,8 @@
        References #972.
     </change>
     <change name="Jeannie Backer" date="2013-02-26">
-      Added ability to load multiple ck database files from the system using a 
-      conf file. Changed methods to lower camel case to comply with Isis3 
+      Added ability to load multiple ck database files from the system using a
+      conf file. Changed methods to lower camel case to comply with Isis3
       standards. Added web example. References #924.
     </change>
     <change name="Tammy Becker" date="2014-03-31">
@@ -266,6 +266,10 @@
       and the default port to 443 (it was originally 80).  This is due to the recent https migration implementation
       from within the Department of the Interior, which was causing people on the outside of the DOI network
       to get an unrecognized server response error when attempting to download spice data.  Fixes #4552.
+    </change>
+    <change name="Christopher Combs" date="2017-06-01">
+      Removed examples with links leading to missing images. Created two new examples:
+      one with default settings and another with a user-chosen ShapeModel.
     </change>
   </history>
 
@@ -521,7 +525,7 @@
           NAIF kernel file to be used for the target attitude and shape in place
           of the automated attitude and shape kernel. The PCK kernel will be
           referenced in the keyword TargetAttitudeShape by the resulting Kernel
-          group.  If none is specified, spiceinit will use the latest kernel 
+          group.  If none is specified, spiceinit will use the latest kernel
           configuration file or kernel database file to find the appropriate kernel(s)
           for the given input file.
         </description>
@@ -541,9 +545,9 @@
         <description>
           NAIF kernel file to be used for the target position in place of the
           automated position kernel. The TSPK kernel will be referenced in the
-          keyword TargetPosition by the resulting Kernel group.  If none is 
+          keyword TargetPosition by the resulting Kernel group.  If none is
           specified, spiceinit will use the latest kernel configuration file or kernel
-          database file to find the appropriate kernel(s) for the given input 
+          database file to find the appropriate kernel(s) for the given input
           file.
         </description>
         <defaultPath>
@@ -562,9 +566,9 @@
         <description>
           NAIF kernel file to be used for the instrument in place of the
           automated instrument kernel. The IK kernel will be referenced in the
-          keyword Instrument by the resulting Kernel group.  If none is 
+          keyword Instrument by the resulting Kernel group.  If none is
           specified, spiceinit will use the latest kernel configuration file or kernel
-          database file to find the appropriate kernel(s) for the given input 
+          database file to find the appropriate kernel(s) for the given input
           file.
         </description>
         <defaultPath>
@@ -583,9 +587,9 @@
         <description>
           NAIF kernel file to be used for the spacecraft clock in place of the
           automated spacecraft clock kernel. The SCLK kernel will be referenced
-          in the keyword Instrument by the resulting Kernel group.  If none is 
+          in the keyword Instrument by the resulting Kernel group.  If none is
           specified, spiceinit will use the latest kernel configuration file or kernel
-          database file to find the appropriate kernel(s) for the given input 
+          database file to find the appropriate kernel(s) for the given input
           file.
         </description>
         <defaultPath>
@@ -603,9 +607,9 @@
         </brief>
         <description>
           NAIF kernel file to be used for the spacecraft pointing in place of
-          the automated spacecraft pointing kernel. The CK kernel will be 
-          referenced in the keyword InstrumentPointing by the resulting Kernel 
-          group. If none is specified, spiceinit will use the latest kernel 
+          the automated spacecraft pointing kernel. The CK kernel will be
+          referenced in the keyword InstrumentPointing by the resulting Kernel
+          group. If none is specified, spiceinit will use the latest kernel
           configuration file or kernel database file to find the appropriate kernel(s)
           for the given input file.
         </description>
@@ -627,8 +631,8 @@
            automated frames kernel. The FK kernel will be referenced in the
            keyword InstrumentPointing by the resulting Kernel group.
            Note: If you enter a filename for CK some instruments may require a
-           frame kernel as well. If none is specified, spiceinit will use the 
-           latest kernel configuration file or kernel database file to find the 
+           frame kernel as well. If none is specified, spiceinit will use the
+           latest kernel configuration file or kernel database file to find the
            appropriate kernel(s) for the given input file.
          </description>
          <defaultPath>
@@ -649,7 +653,7 @@
           NAIF kernel file to be used for the spacecraft position in place of
           the automated spacecraft position kernel. The SPK kernel will be
           referenced in the keyword InstrumentPosition by the resulting Kernel
-          group. If none is specified, spiceinit will use the latest kernel 
+          group. If none is specified, spiceinit will use the latest kernel
           configuration file or kernel database file to find the appropriate kernel(s)
           for the given input file.
         </description>
@@ -670,7 +674,7 @@
           NAIF formatted kernel file to be used for the ISIS specific instrument
           addendum kernel, in place of the automated. The IAK kernel will be
           referenced in the keyword InstrumentAddendum by the resulting Kernel
-          group. If none is specified, spiceinit will use the latest kernel 
+          group. If none is specified, spiceinit will use the latest kernel
           configuration file or kernel database file to find the appropriate kernel(s)
           for the given input file.
         </description>
@@ -735,7 +739,7 @@
             <brief>Search system for a default shape model</brief>
             <description>
               This option will search the default system data area ($ISIS3DATA/base/dems) for a
-              shape model that matches the target of the input cube.  If none are found then no
+              shape model that matches the target of the input cube.  If none are found, then no
               shape model will be used and the default ellipsoid parameters found in the
               planetary constants (PCK) file define the shape. The filename and path of the shape
               model loaded will be found in the cube labels Kernels Group in the <b>ShapeModel</b>
@@ -781,7 +785,7 @@
             Time padding (in seconds) to load from the kernels before the start time of the image
         </brief>
         <description>
-          When the kernels for an image are loaded, by default only what the image requires is 
+          When the kernels for an image are loaded, by default only what the image requires is
           loaded.  By setting this option, the loaded kernels start at the specified amount of
           time before the image start time. Using this option for framing cameras could
           significantly decrease the accuracy of the NAIF information because this will cause
@@ -836,13 +840,14 @@
         This example shows how to use spiceinit using the default parameters. That is, the SPICE
         data will be attached to the cube labels (attach=yes). Only reconstructed kernel types
         will be allowed for CK and SPK kernels, the default system kernels will be found in
-        the kernel database files, and no time parameters will be set. It shows how spiceinit
-        will default to the LOLA shapemodel for a cube that has the TargetName keyword in the
-        Instrument group set to "Moon."
+        the kernel database files, and no time parameters will be set.
+
+        Because there is no default elevation model for Titan, spiceinit will set
+        the ShapeModel keyword to "Null".
       </description>
       <terminalInterface>
         <commandLine>
-          from=inputCube.cub 
+          from=v1545949478_1.cub
         </commandLine>
         <description>
           An example of how to run this program with default parameters from the command line.
@@ -850,172 +855,191 @@
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image width="625" height="800" src="assets/images/spiceinit_apollo_gui.jpg">
+          <image width="625" height="800" src="assets/images/spiceinit_example1.jpg">
           <brief>
             Example GUI
           </brief>
             <description>
               An example of how to run this program using the GUI. Note, the
-              updated Kernel group can be seen in the log window.  
+              updated Kernel group can be seen in the log window.
             </description>
-            <thumbnail width="239" height="300" src="assets/thumbs/spiceinit_apollo_thumb.jpg" caption="Example of GUI command"/>
+            <thumbnail width="239" height="300" src="assets/thumbs/spiceinit_thumb1.jpg" caption="Example of GUI command"/>
           </image>
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/dataFiles/spiceinit_apollo_outputLabel.pvl">
+        <dataFile path="assets/dataFiles/v1545949478_1_after.pvl">
           <brief>
             Cube labels after spiceinit.
           </brief>
           <description>
             This is the label of the input cube after spiceinit has been
             run. The following groups were added to the cube's labels:
-              <pre>
-                Group = Kernels
-                  NaifFrameCode             = -915240
-                  LeapSecond                = $base/kernels/lsk/naif0010.tls
-                  TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
-                                              $base/kernels/pck/lunar_de403_1950-2199_pa.bp-
-                                              c, $base/kernels/fk/lunarMeanEarth001.tf)
-                  TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
-                  InstrumentPointing        = (Table,
-                                              $apollo15/kernels/ck/AS15_M_REV04_v2.bc,
-                                              $apollo15/kernels/fk/apollo15_v2.0001.tf)
-                  Instrument                = $apollo15/kernels/ik/apollo15_metric_v2.0001.-
-                                              ti
-                  SpacecraftClock           = $apollo15/kernels/sclk/apollo15.0001.tsc
-                  InstrumentPosition        = (Table,
-                                              $apollo15/kernels/spk/AS15_M_REV04_v2.bsp)
-                  InstrumentAddendum        = $apollo15/kernels/iak/apollo15MetricAddendum0-
-                                              02.ti
-                  ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
-                                              _pad.cub
-                  InstrumentPositionQuality = Reconstructed
-                  InstrumentPointingQuality = Reconstructed
-                  CameraVersion             = 2
-                End_Group
-
-                Group = Code
-                  StartTime                 = 1971-07-30T02:17:00.368
-                  SpacecraftAltitude        = 104609 meters
-                  ExposureDuration          = 90.9 milliseconds 
-                  ForwardMotionCompensation = False
-                  Column1                   = (1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1,
-                                              1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1,
-                                              1, 1)
-                  Column2                   = (1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
-                                              1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1,
-                                              0, 1)
-                  Column3                   = (1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1,
-                                              1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-                                              0, 1)
-                  Column4                   = (1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0,
-                                              1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                              0, 1)
-                End_Group
+            <pre>
+              Group = Kernels
+                NaifFrameCode             = -82370
+                LeapSecond                = $base/kernels/lsk/naif0012.tls
+                TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                             $cassini/kernels/pck/cpck27Mar2017.tpc)
+                TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+                InstrumentPointing        = (Table, $cassini/kernels/ck/06357_06362ra.bc,
+                                             $cassini/kernels/fk/cas_v40_usgs.tf)
+                Instrument                = Null
+                SpacecraftClock           = $cassini/kernels/sclk/cas00170.tsc
+                InstrumentPosition        = (Table,
+                                             $cassini/kernels/spk/070208R_SCPSE_06356_0700-
+                                             8.bsp)
+                InstrumentAddendum        = $cassini/kernels/iak/vimsAddendum03.ti
+                ShapeModel                = Null
+                InstrumentPositionQuality = Reconstructed
+                InstrumentPointingQuality = Reconstructed
+                CameraVersion             = 1
+              End_Group
 
               Object = Table
                 Name                = InstrumentPointing
-                StartByte           = 131168037
-                Bytes               = 64
-                Records             = 1
+                StartByte           = 6373579
+                Bytes               = 4352
+                Records             = 68
                 ByteOrder           = Lsb
-                TimeDependentFrames = (-915240, 1400015, 1)
-                CkTableStartTime    = -897039738.68168
-                CkTableEndTime      = -897039738.68168
-                CkTableOriginalSize = 1
+                TimeDependentFrames = (-82000, 1)
+                ConstantFrames      = (-82370, -82000)
+                ConstantRotation    = (0.99991568332482, 0.0014510663863786,
+                                       -0.012904287946602, 0.012904407824453,
+                                       -7.32810212777781e-05, 0.99991673197751,
+                                       0.0014499999195506, -0.99999894451756,
+                                       -9.19999948958952e-05)
+                CkTableStartTime    = 220528381.47991
+                CkTableEndTime      = 220529079.47551
+                CkTableOriginalSize = 4096
+                FrameTypeCode       = 3
                 Description         = "Created by spiceinit"
-                Kernels             = ($apollo15/kernels/ck/AS15_M_REV04_v2.bc,
-                                      $apollo15/kernels/fk/apollo15_v2.0001.tf)
-                                      
+                Kernels             = ($cassini/kernels/ck/06357_06362ra.bc,
+                                       $cassini/kernels/fk/cas_v40_usgs.tf)
+
                 Record Information
                 .
                 .
                 .
-                
+
               End_Object
 
               Object = Table
                 Name                 = InstrumentPosition
-                StartByte            = 131168101
-                Bytes                = 56
-                Records              = 1
+                StartByte            = 6377931
+                Bytes                = 6496
+                Records              = 116
                 ByteOrder            = Lsb
-                CacheType            = Linear
-                SpkTableStartTime    = -897039738.68168
-                SpkTableEndTime      = -897039738.68168
-                SpkTableOriginalSize = 1.0
+                CacheType            = HermiteSpline
+                SpkTableStartTime    = 220528381.47991
+                SpkTableEndTime      = 220529079.47551
+                SpkTableOriginalSize = 4096.0
                 Description          = "Created by spiceinit"
-                Kernels              = $apollo15/kernels/spk/AS15_M_REV04_v2.bsp
-                
+                Kernels              = $cassini/kernels/spk/070208R_SCPSE_06356_07008.bsp
+
                 Record Information
                 .
                 .
                 .
-                
+
+              End_Object
+
+              Object = Table
+                Name                = BodyRotation
+                StartByte           = 6384427
+                Bytes               = 128
+                Records             = 2
+                ByteOrder           = Lsb
+                TimeDependentFrames = (10044, 1)
+                CkTableStartTime    = 220528381.47991
+                CkTableEndTime      = 220529079.47551
+                CkTableOriginalSize = 2
+                FrameTypeCode       = 2
+                PoleRa              = (39.4827, 0.0, 0.0)
+                PoleDec             = (83.4279, 0.0, 0.0)
+                PrimeMeridian       = (186.5855, 22.5769768, 0.0)
+                PoleRaNutPrec       = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                PoleDecNutPrec      = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                PmNutPrec           = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                SysNutPrec0         = (353.32, 28.72, 177.4, 300.0, 316.45, 345.2, 29.8,
+                                       706.64, 57.44)
+                SysNutPrec1         = (75706.7, 75706.7, -36505.5, -7225.9, 506.2, -1016.3,
+                                       -52.1, 151413.4, 151413.4)
+                Description         = "Created by spiceinit"
+                Kernels             = ($base/kernels/spk/de405.bsp,
+                                       $base/kernels/pck/pck00009.tpc,
+                                       $cassini/kernels/pck/cpck27Mar2017.tpc)
+                SolarLongitude      = 312.76943291256
+
+                Record Information
+                .
+                .
+                .
+
               End_Object
 
               Object = Table
                 Name                 = SunPosition
-                StartByte            = 131168221
-                Bytes                = 56
-                Records              = 1
+                StartByte            = 6384555
+                Bytes                = 112
+                Records              = 2
                 ByteOrder            = Lsb
                 CacheType            = Linear
-                SpkTableStartTime    = -897039738.68168
-                SpkTableEndTime      = -897039738.68168
-                SpkTableOriginalSize = 1.0
+                SpkTableStartTime    = 220528381.47991
+                SpkTableEndTime      = 220529079.47551
+                SpkTableOriginalSize = 2.0
                 Description          = "Created by spiceinit"
                 Kernels              = $base/kernels/spk/de405.bsp
-                
+
                 Record Information
                 .
                 .
                 .
-                
+
               End_Object
 
               Object = NaifKeywords
-                BODY301_RADII           = (1737.4, 1737.4, 1737.4)
-                BODY_FRAME_CODE         = 310001
-                INS-915240_FOCAL_LENGTH = 76.054
-                INS-915240_PIXEL_PITCH  = 0.005
-                INS-915240_TRANSX       = (0.0, -0.005, 0.0)
-                INS-915240_TRANSY       = (0.0, 0.0, 0.005)
-                INS-915240_ITRANSS      = (0.0, -200.0, 0.0)
-                INS-915240_ITRANSL      = (0.0, 0.0, 200.0)
-                INS-915240_PP           = (-0.006, -0.002)
-                INS-915240_OD_K         = (-1.3361854e-06, 5.2261757e-10, -5.0728336e-14)
-                INS-915240_DECENTER     = (-5.4958195e-07, -4.608942e-11, 2.965907)
+                BODY606_RADII                    = (2575.0, 2575.0, 2575.0)
+                BODY_FRAME_CODE                  = 10044
+                CLOCK_ET_-82_1545949478_COMPUTED = 802c35fdfd49aa41
+                CLOCK_ET_-82_1545950172_COMPUTED = d3ea3269034aaa41
+                INS-82370_TRANSX                 = (0.0, 1.0, 0.0)
+                INS-82370_TRANSY                 = (0.0, 0.0, 1.0)
+                INS-82370_ITRANSS                = (0.0, 1.0, 0.0)
+                INS-82370_ITRANSL                = (0.0, 0.0, 1.0)
               End_Object
+              End
+
             </pre>
           </description>
           <parameterName>
             FROM
           </parameterName>
         </dataFile>
-      </dataFiles>    
+      </dataFiles>
     </example>
+
     <example>
       <brief>
-        Example of spiceinit with user defined options.
+        Example of spiceinit using a ShapeModel chosen by the user.
       </brief>
       <description>
-        This example shows how to run spiceinit with a user defined dem. This run of spiceinit will
-        also look for smithed CK kernels.
+        This example shows how to use spiceinit using a ShapeModel chosen by the user.
+
+        In this example, the input cube is of Mars, so we can use a ShapeModel
+        from $ISIS3DATA that was created specifically for use with Mars data.
       </description>
       <terminalInterface>
         <commandLine>
-          from=inputCube.cub cksmithed=true shape=user
-          model=/usgs/cpkgs/isis3/data/base/dems/ulcn2005_clean_0004.cub
+          from=hi2isis_RED0.cub shape=user model=$ISIS3DATA/base/dems/ulcn2005_lpo_0005.cub
         </commandLine>
         <description>
-          An example of how to run this program with user defined parameters from the command line.
+          An example of how to run this program with a chosen ShapeModel.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image width="640" height="800" src="assets/images/spiceinit_clementine_gui.jpg">
+          <image width="625" height="800" src="assets/images/spiceinit_example2.jpg">
           <brief>
             Example GUI
           </brief>
@@ -1023,208 +1047,133 @@
               An example of how to run this program using the GUI. Note, the
               updated Kernel group can be seen in the log window.
             </description>
-            <thumbnail width="240" height="300" src="assets/thumbs/spiceinit_clementine_thumb.jpg"
-                       caption="Example of GUI command"/>
+            <thumbnail width="239" height="300" src="assets/thumbs/spiceinit_thumb2.jpg" caption="Example of GUI command"/>
           </image>
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/dataFiles/spiceinit_clementine_outputLabel.pvl">
+        <dataFile path="assets/dataFiles/hi2isis_RED0_after.pvl">
           <brief>
             Cube labels after spiceinit.
           </brief>
           <description>
-            This is the cube labels of the input cube after spiceinit has been
+            This is the label of the input cube after spiceinit has been
             run. The following groups were added to the cube's labels:
             <pre>
-              Group = Kernels
-                NaifFrameCode             = -40002
-                LeapSecond                = $base/kernels/lsk/naif0009.tls
-                TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
-                                            $base/kernels/pck/lunar_de403_1950-2199_pa.bp-
-                                            c, $base/kernels/fk/lunarMeanEarth001.tf)
-                TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
-                InstrumentPointing        = (Table,
-                                            $Clementine1/kernels/ck/clem_ulcn2005_type2_1-
-                                            sc.bc,
-                                            $Clementine1/kernels/ck/clem_ulcn2005_1mn.bc,
-                                            $clementine1/kernels/fk/clem_v11.tf)
-                Instrument                = Null
-                SpacecraftClock           = $Clementine1/kernels/sclk/dspse002.tsc
-                InstrumentPosition        = (Table,
-                                            $Clementine1/kernels/spk/SPKMERGE_940219_9405-
-                                            04_CLEMV001b.bsp)
-                InstrumentAddendum        = $Clementine1/kernels/iak/uvvisAddendum003.ti
-                ShapeModel                = /usgs/cpkgs/isis3/data/base/dems/ulcn2005_cle-
-                                            an_0004.cub
-                InstrumentPositionQuality = Reconstructed
-                InstrumentPointingQuality = Smithed
-                CameraVersion             = 1
-              End_Group
-              .
-              .
-              .
               Object = Table
                 Name                = InstrumentPointing
-                StartByte           = 218054
-                Bytes               = 64
-                Records             = 1
+                StartByte           = 3343625
+                Bytes               = 1152
+                Records             = 18
                 ByteOrder           = Lsb
-                TimeDependentFrames = (-40000, 1)
-                ConstantFrames      = (-40002, -40000)
-                ConstantRotation    = (-0.0061086110412591, -0.99996607260776,
-                                      -0.0055261654481643, 0.99998079393998,
-                                      -0.0061027272118316, -0.0010809587141711,
-                                      0.0010471973598032, -0.0055326624686356,
-                                      0.99998414638618)
-                CkTableStartTime    = -184266197.17362
-                CkTableEndTime      = -184266197.17362
-                CkTableOriginalSize = 1
+                TimeDependentFrames = (-74000, -74900, 1)
+                ConstantFrames      = (-74690, -74000)
+                ConstantRotation    = (0.9999703083413, 0.0, -0.0077059999872177,
+                                       8.81584889031119e-06, 0.99999934560434,
+                                       0.0011439900269605, 0.0077059949444447,
+                                       -0.0011440239949305, 0.99996965396507)
+                CkTableStartTime    = 217006138.39688
+                CkTableEndTime      = 217006140.07063
+                CkTableOriginalSize = 5001
+                FrameTypeCode       = 3
                 Description         = "Created by spiceinit"
-                Kernels             = ($Clementine1/kernels/ck/clem_ulcn2005_type2_1sc.bc,
-                                      $Clementine1/kernels/ck/clem_ulcn2005_1mn.bc,
-                                      $clementine1/kernels/fk/clem_v11.tf)
+                Kernels             = ($mro/kernels/ck/mro_sc_psp_061114_061120.bc,
+                                       $mro/kernels/fk/mro_v15.tf)
+
                 Record Information
                 .
                 .
                 .
+
               End_Object
+
+              Object = Table
+                Name                 = InstrumentPosition
+                StartByte            = 3344777
+                Bytes                = 168
+                Records              = 3
+                ByteOrder            = Lsb
+                CacheType            = HermiteSpline
+                SpkTableStartTime    = 217006138.39688
+                SpkTableEndTime      = 217006140.07063
+                SpkTableOriginalSize = 5001.0
+                Description          = "Created by spiceinit"
+                Kernels              = $mro/kernels/spk/mro_psp1.bsp
+
+                Record Information
+                .
+                .
+                .
+
+              End_Object
+
+              Object = Table
+                Name                = BodyRotation
+                StartByte           = 3344945
+                Bytes               = 128
+                Records             = 2
+                ByteOrder           = Lsb
+                TimeDependentFrames = (10014, 1)
+                CkTableStartTime    = 217006138.39688
+                CkTableEndTime      = 217006140.07063
+                CkTableOriginalSize = 2
+                FrameTypeCode       = 2
+                PoleRa              = (317.68143, -0.1061, 0.0)
+                PoleDec             = (52.8865, -0.0609, 0.0)
+                PrimeMeridian       = (176.63, 350.89198226, 0.0)
+                Description         = "Created by spiceinit"
+                Kernels             = ($base/kernels/spk/de405.bsp,
+                                       $base/kernels/pck/pck00009.tpc)
+                SolarLongitude      = 136.5654319332
+
+                Record Information
+                .
+                .
+                .
+
+              End_Object
+
+              Object = Table
+                Name                 = SunPosition
+                StartByte            = 3345073
+                Bytes                = 112
+                Records              = 2
+                ByteOrder            = Lsb
+                CacheType            = Linear
+                SpkTableStartTime    = 217006138.39688
+                SpkTableEndTime      = 217006140.07063
+                SpkTableOriginalSize = 2.0
+                Description          = "Created by spiceinit"
+                Kernels              = $base/kernels/spk/de405.bsp
+
+                Record Information
+                .
+                .
+                .
+
+              End_Object
+
+              Object = NaifKeywords
+                BODY499_RADII                            = (3396.19, 3396.19, 3376.2)
+                BODY_FRAME_CODE                          = 10014
+                INS-74699_FOCAL_LENGTH                   = 11994.9988
+                INS-74699_PIXEL_PITCH                    = 0.012
+                CLOCK_ET_-74999_848201292:03460_COMPUTED = 7549cb7480dea941
+                INS-74602_TRANSX                         = (-96.9459, -3.4e-05, 0.012)
+                INS-74602_TRANSY                         = (60.0469, -0.012, -3.4e-05)
+                INS-74602_ITRANSS                        = (4981.07, -0.2353, -83.333)
+                INS-74602_ITRANSL                        = (8092.92, 83.333, -0.2353)
+                INS-74699_OD_K                           = (-0.0048509, 2.41312e-07,
+                                                            -1.62369e-13)
+              End_Object
+              End
             </pre>
           </description>
           <parameterName>
             FROM
           </parameterName>
         </dataFile>
-      </dataFiles> 
-    </example>
-    <example>
-      <brief>
-        This example shows how to run spiceinit with no shapemodel.
-      </brief>
-      <description>
-        This example shows how to run spiceinit with no shapemodel. The system has no shapemodel
-        for Europa.
-      </description>
-      <terminalInterface>
-        <commandLine>
-          from=inputCube.cub
-        </commandLine>
-        <description>
-          An example of how to run this program with default parameters from the command line.
-        </description>
-      </terminalInterface>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="642" height="800" src="assets/images/spiceinit_galileo_gui.jpg">
-          <brief>
-            Example GUI
-          </brief>
-            <description>
-              An example of how to run this program using the GUI. Note, the
-              updated Kernel group can be seen in the log window.
-            </description>
-            <thumbnail width="242" height="300" src="assets/thumbs/spiceinit_galileo_thumb.jpg"
-                       caption="Example of GUI command"/>
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-      <dataFiles>
-        <dataFile path="assets/dataFiles/spiceinit_galileo_outputLabel.pvl">
-          <brief>
-            Cube labels after spiceinit.
-          </brief>
-          <description>
-            This is the Kernels group that spiceinit added to the FROM cube:
-              <pre>
-                Group = Kernels
-                  NaifFrameCode             = -77001
-                  LeapSecond                = $base/kernels/lsk/naif0010.tls
-                  TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
-                  TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
-                  InstrumentPointing        = (Table,
-                                              $galileo/kernels/ck/CKmerge_type3.plt.bck)
-                  Instrument                = Null
-                  SpacecraftClock           = $galileo/kernels/sclk/mk00062b.tsc
-                  InstrumentPosition        = (Table, $galileo/kernels/spk/s000131a.bsp)
-                  InstrumentAddendum        = $galileo/kernels/iak/ssiAddendum004.ti
-                  ShapeModel                = Null
-                  InstrumentPositionQuality = Reconstructed
-                  InstrumentPointingQuality = Reconstructed
-                  CameraVersion             = 1
-                End_Group
-            </pre>
-          </description>
-          <parameterName>
-            FROM
-          </parameterName>
-        </dataFile>
-      </dataFiles> 
-    </example>
-    <example>
-      <brief>
-        Example of spiceinit with a ringplane image.
-      </brief>
-      <description>
-        This example shows how to use spiceinit for a ringplane image.
-      </description>
-      <terminalInterface>
-        <commandLine>
-          from=inputCube.cub
-        </commandLine>
-        <description>
-          An example of how to run this program with default parameters from the command line.
-        </description>
-      </terminalInterface>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="625" height="800" src="assets/images/spiceinit_cassini_gui.jpg">
-          <brief>
-            Example GUI
-          </brief>
-            <description>
-              An example of how to run this program using the GUI. Note, the
-              updated Kernel group can be seen in the log window.
-            </description>
-            <thumbnail width="239" height="300" src="assets/thumbs/spiceinit_cassini_thumb.jpg"
-                       caption="Example of GUI command"/>
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-      <dataFiles>
-        <dataFile path="assets/dataFiles/spiceinit_ringplane_outputLabel.pvl">
-          <brief>
-            Cube labels after spiceinit.
-          </brief>
-          <description>
-            This is the cube labels of the input cube after spiceinit has been
-            run. The following groups were added to the cube's labels:
-              <pre>
-                Group = Kernels
-                  NaifFrameCode             = -82361
-                  LeapSecond                = $base/kernels/lsk/naif0010.tls
-                  TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
-                                              $cassini/kernels/pck/cpck12Dec2013.tpc)
-                  TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
-                  InstrumentPointing        = (Table, $cassini/kernels/ck/09201_09206ra.bc,
-                                              $cassini/kernels/fk/cas_v40.tf)
-                  Instrument                = Null
-                  SpacecraftClock           = $cassini/kernels/sclk/cas00158.tsc
-                  InstrumentPosition        = (Table,
-                                              $cassini/kernels/spk/090921R_SCPSE_09200_0921-
-                                              5.bsp)
-                  InstrumentAddendum        = $cassini/kernels/iak/IssWAAddendum004.ti
-                  ShapeModel                = RingPlane
-                  InstrumentPositionQuality = Reconstructed
-                  InstrumentPointingQuality = Reconstructed
-                  CameraVersion             = 1
-                End_Group
-            </pre>
-          </description>
-          <parameterName>
-            FROM
-          </parameterName>
-        </dataFile>
-      </dataFiles> 
+      </dataFiles>
     </example>
   </examples>
 </application>

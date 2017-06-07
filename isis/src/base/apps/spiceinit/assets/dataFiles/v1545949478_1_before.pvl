@@ -1,0 +1,88 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 64
+      Lines   = 64
+      Bands   = 96
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = Cassini-Huygens
+    InstrumentId              = VIMS
+    Channel                   = VIS
+    TargetName                = TITAN
+    SpacecraftClockStartCount = 1545949489.188
+    SpacecraftClockStopCount  = 1545950183.157
+    StartTime                 = 2006-361T21:51:58.279
+    StopTime                  = 2006-361T22:03:31.576
+    NativeStartTime           = 1545949478.13981
+    NativeStopTime            = 1545950172.02769
+    InterlineDelayDuration    = 415.000000
+    ExposureDuration          = (160.000000 <IR>, 5000.000000 <VIS>)
+    SamplingMode              = NORMAL
+    XOffset                   = 1
+    ZOffset                   = 1
+    SwathWidth                = 64
+    SwathLength               = 64
+  End_Group
+
+  Group = BandBin
+    OriginalBand = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+                    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
+                    63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77,
+                    78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
+                    93, 94, 95, 96)
+    Center       = (0.35054, 0.35895, 0.36629, 0.37322, 0.37949, 0.38790,
+                    0.39518, 0.40252, 0.40955, 0.41731, 0.42436, 0.43184,
+                    0.43919, 0.44652, 0.45372, 0.46163, 0.46841, 0.47622,
+                    0.48629, 0.48967, 0.49777, 0.50628, 0.51222, 0.51963,
+                    0.52766, 0.53416, 0.54156, 0.54954, 0.55614, 0.56353,
+                    0.57131, 0.57810, 0.58548, 0.59312, 0.59938, 0.60757,
+                    0.61505, 0.62207, 0.62940, 0.63704, 0.64408, 0.65142,
+                    0.65910, 0.66609, 0.67342, 0.68102, 0.68803, 0.69535,
+                    0.70288, 0.71000, 0.71733, 0.72484, 0.73198, 0.73930,
+                    0.74676, 0.75396, 0.76128, 0.76874, 0.77595, 0.78328,
+                    0.79072, 0.79793, 0.80522, 0.81262, 0.81989, 0.82721,
+                    0.83463, 0.84190, 0.84922, 0.85663, 0.86391, 0.87122,
+                    0.87863, 0.88589, 0.89386, 0.90032, 0.90787, 0.91518,
+                    0.92254, 0.92983, 0.93713, 0.94445, 0.95177, 0.95907,
+                    0.96638, 0.97382, 0.98100, 0.98883, 0.99588, 1.00295,
+                    1.01005, 1.01695, 1.02471, 1.03195, 1.03865, 1.04598)
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -82370
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 6372624
+  Bytes     = 955
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 6356993
+  Bytes     = 15631
+End_Object
+End

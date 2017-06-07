@@ -1,0 +1,501 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 256
+      Lines   = 5000
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName              = "MARS RECONNAISSANCE ORBITER"
+    InstrumentId                = HIRISE
+    TargetName                  = Mars
+    StartTime                   = 2006-11-17T03:27:53.216
+    StopTime                    = 2006-11-17T03:27:54.890
+    ObservationStartCount       = 848201291:54379
+    SpacecraftClockStartCount   = 848201292:03460
+    SpacecraftClockStopCount    = 848201293:47615
+    ReadoutStartCount           = 848201298:37330
+    CalibrationStartTime        = 2006-11-17T03:27:53.207
+    CalibrationStartCount       = 848201292:02868
+    AnalogPowerStartTime        = -9999
+    AnalogPowerStartCount       = -9999
+    MissionPhaseName            = "PRIMARY SCIENCE PHASE"
+    LineExposureDuration        = 334.7500 <MICROSECONDS>
+    ScanExposureDuration        = 83.6875 <MICROSECONDS>
+    DeltaLineTimerCount         = 155
+    Summing                     = 4
+    Tdi                         = 8
+    FocusPositionCount          = 2020
+    PoweredCpmmFlag             = (On, On, On, On, On, On, On, On, On, On, On,
+                                   On, On, On)
+    CpmmNumber                  = 2
+    CcdId                       = RED2
+    ChannelNumber               = 0
+    LookupTableType             = Stored
+    LookupTableNumber           = 18
+    LookupTableMinimum          = -9998
+    LookupTableMaximum          = -9998
+    LookupTableMedian           = -9998
+    LookupTableKValue           = -9998
+    StimulationLampFlag         = (Off, Off, Off)
+    HeaterControlFlag           = (On, On, On, On, On, On, On, On, On, On, On,
+                                   On, On, On)
+    OptBnchFlexureTemperature   = 20.455 <C>
+    OptBnchMirrorTemperature    = 20.1949 <C>
+    OptBnchFoldFlatTemperature  = 20.5417 <C>
+    OptBnchFpaTemperature       = 19.8482 <C>
+    OptBnchFpeTemperature       = 19.5881 <C>
+    OptBnchLivingRmTemperature  = 20.1949 <C>
+    OptBnchBoxBeamTemperature   = 20.455 <C>
+    OptBnchCoverTemperature     = 20.1082 <C>
+    FieldStopTemperature        = 18.375 <C>
+    FpaPositiveYTemperature     = 19.1548 <C>
+    FpaNegativeYTemperature     = 19.0681 <C>
+    FpeTemperature              = 17.9418 <C>
+    PrimaryMirrorMntTemperature = 20.0215 <C>
+    PrimaryMirrorTemperature    = 20.3683 <C>
+    PrimaryMirrorBafTemperature = 0.414005 <C>
+    MsTrussLeg0ATemperature     = 20.3683 <C>
+    MsTrussLeg0BTemperature     = 20.5417 <C>
+    MsTrussLeg120ATemperature   = 19.5881 <C>
+    MsTrussLeg120BTemperature   = 20.2816 <C>
+    MsTrussLeg240ATemperature   = 19.6748 <C>
+    MsTrussLeg240BTemperature   = 19.9348 <C>
+    BarrelBaffleTemperature     = -21.006 <C>
+    SunShadeTemperature         = -28.7562 <C>
+    SpiderLeg30Temperature      = 17.7686 <C>
+    SpiderLeg120Temperature     = -9999
+    SpiderLeg240Temperature     = -9999
+    SecMirrorMtrRngTemperature  = 19.5881 <C>
+    SecMirrorTemperature        = 20.7151 <C>
+    SecMirrorBaffleTemperature  = -18.7871 <C>
+    IeaTemperature              = 25.8353 <C>
+    FocusMotorTemperature       = 21.4088 <C>
+    IePwsBoardTemperature       = 17.7363 <C>
+    CpmmPwsBoardTemperature     = 18.078 <C>
+    MechTlmBoardTemperature     = 35.0546 <C>
+    InstContBoardTemperature    = 34.6875 <C>
+    DllLockedFlag               = (YES, YES)
+    DllResetCount               = 0
+    DllLockedOnceFlag           = (YES, YES)
+    DllFrequenceCorrectCount    = 4
+    ADCTimingSetting            = -9999
+    Unlutted                    = TRUE
+  End_Group
+
+  Group = Archive
+    DataSetId              = MRO-M-HIRISE-2-EDR-V1.0
+    ProducerId             = UA
+    ObservationId          = PSP_001446_1790
+    ProductId              = PSP_001446_1790_RED2_0
+    ProductVersionId       = 1.0
+    EdrProductCreationTime = 2006-11-17T05:03:12
+    RationaleDescription   = Null
+    OrbitNumber            = 1446
+    SoftwareName           = "HiRISE_Observation v2.9 (2.43 2006/10/01
+                              05:41:12)"
+    ObservationStartTime   = 2006-11-17T03:27:52.993
+    ReadoutStartTime       = 2006-11-17T03:27:59.733
+    TrimLines              = 1836
+    FelicsCompressionFlag  = YES
+    IdFlightSoftwareName   = IE_FSW_V4
+  End_Group
+
+  Group = BandBin
+    Name   = Red
+    Center = 700 <NANOMETERS>
+    Width  = 300 <NANOMETERS>
+  End_Group
+
+  Group = Kernels
+    NaifIkCode                = -74699
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = (Table,
+                                 $mro/kernels/ck/mro_sc_psp_061114_061120.bc,
+                                 $mro/kernels/fk/mro_v15.tf)
+    Instrument                = $mro/kernels/ik/mro_hirise_v12.ti
+    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00064.65536.tsc
+    InstrumentPosition        = (Table, $mro/kernels/spk/mro_psp1.bsp)
+    InstrumentAddendum        = $mro/kernels/iak/hiriseAddendum006.ti
+    ShapeModel                = /usgs/cpkgs/isis3/data/base/dems/ulcn2005_lpo-
+                                _0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name      = "HiRISE Calibration Ancillary"
+  StartByte = 2687469
+  Bytes     = 3240
+  Records   = 27
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = GapFlag
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = LineNumber
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = BufferPixels
+    Type = Integer
+    Size = 12
+  End_Group
+
+  Group = Field
+    Name = DarkPixels
+    Type = Integer
+    Size = 16
+  End_Group
+End_Object
+
+Object = Table
+  Name      = "HiRISE Calibration Image"
+  StartByte = 2690709
+  Bytes     = 27648
+  Records   = 27
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = Calibration
+    Type = Integer
+    Size = 256
+  End_Group
+End_Object
+
+Object = Table
+  Name        = "HiRISE Ancillary"
+  StartByte   = 2718357
+  Bytes       = 600000
+  Records     = 5000
+  ByteOrder   = Lsb
+  Association = Lines
+
+  Group = Field
+    Name = GapFlag
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = LineNumber
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = BufferPixels
+    Type = Integer
+    Size = 12
+  End_Group
+
+  Group = Field
+    Name = DarkPixels
+    Type = Integer
+    Size = 16
+  End_Group
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 3343625
+  Bytes               = 1152
+  Records             = 18
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-74000, -74900, 1)
+  ConstantFrames      = (-74690, -74000)
+  ConstantRotation    = (0.9999703083413, 0.0, -0.0077059999872177,
+                         8.81584889031119e-06, 0.99999934560434,
+                         0.0011439900269605, 0.0077059949444447,
+                         -0.0011440239949305, 0.99996965396507)
+  CkTableStartTime    = 217006138.39688
+  CkTableEndTime      = 217006140.07063
+  CkTableOriginalSize = 5001
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($mro/kernels/ck/mro_sc_psp_061114_061120.bc,
+                         $mro/kernels/fk/mro_v15.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 3344777
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 217006138.39688
+  SpkTableEndTime      = 217006140.07063
+  SpkTableOriginalSize = 5001.0
+  Description          = "Created by spiceinit"
+  Kernels              = $mro/kernels/spk/mro_psp1.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 3344945
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 217006138.39688
+  CkTableEndTime      = 217006140.07063
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 2
+  PoleRa              = (317.68143, -0.1061, 0.0)
+  PoleDec             = (52.8865, -0.0609, 0.0)
+  PrimeMeridian       = (176.63, 350.89198226, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 136.5654319332
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 3345073
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 217006138.39688
+  SpkTableEndTime      = 217006140.07063
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de405.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 3345185
+  Bytes     = 1508
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 3318357
+  Bytes     = 25268
+End_Object
+
+Object = NaifKeywords
+  BODY499_RADII                            = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                          = 10014
+  INS-74699_FOCAL_LENGTH                   = 11994.9988
+  INS-74699_PIXEL_PITCH                    = 0.012
+  CLOCK_ET_-74999_848201292:03460_COMPUTED = 7549cb7480dea941
+  INS-74602_TRANSX                         = (-96.9459, -3.4e-05, 0.012)
+  INS-74602_TRANSY                         = (60.0469, -0.012, -3.4e-05)
+  INS-74602_ITRANSS                        = (4981.07, -0.2353, -83.333)
+  INS-74602_ITRANSL                        = (8092.92, 83.333, -0.2353)
+  INS-74699_OD_K                           = (-0.0048509, 2.41312e-07,
+                                              -1.62369e-13)
+End_Object
+End
