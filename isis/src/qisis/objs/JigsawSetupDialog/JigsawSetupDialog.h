@@ -45,6 +45,9 @@ namespace Isis {
    *   @history 2017-05-23 Tracie Sucharski - Added a QGroupBox for the target parameters so that
    *                           the box can be disabled/enabled rather than each parameter
    *                           separately.
+   *   @history 2017-06-07 Ian Humphrey - Modified fillFromSettings() so when the weightings are
+   *                           loaded into the text line edits they are set to modified, which
+   *                           allows for proper restoring of user defined weightings.
    */
 
   class JigsawSetupDialog : public QDialog {

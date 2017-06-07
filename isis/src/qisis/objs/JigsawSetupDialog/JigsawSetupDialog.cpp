@@ -340,40 +340,50 @@ namespace Isis {
     // weighting tab
     if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
       m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
+      m_ui->pointLatitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
       m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
+      m_ui->pointLongitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
       m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+      m_ui->pointRadiusSigmaLineEdit->setModified(true);
+
     }
 
     QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
 
     if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
       m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
+      m_ui->positionSigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
       m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
+      m_ui->velocitySigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
       m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
+      m_ui->accelerationSigmaLineEdit->setModified(true);
     }
 
     QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
 
     if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
       m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
+      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
       m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
+      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
       m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
+      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
     }
 
     // maximum liklihood tab
@@ -646,7 +656,7 @@ namespace Isis {
     else {
       cnetBox.setCurrentIndex(foundControlIndex);
     }
-  } 
+  }
 
 
   Control *JigsawSetupDialog::selectedControl() {
@@ -912,7 +922,7 @@ namespace Isis {
 
     TargetBodyQsp target = m_project->targetBodies().at(index);
     if (target) {
-      if (target->frameType() != Isis::SpiceRotation::BPC && 
+      if (target->frameType() != Isis::SpiceRotation::BPC &&
           target->frameType() != Isis::SpiceRotation::UNKNOWN) {
         m_ui->targetParametersMessage->hide();
 
@@ -941,7 +951,7 @@ namespace Isis {
         }
         m_ui->targetParametersMessage->setText(msg);
         m_ui->targetParametersMessage->show();
-        hideTargetParametersGroupBox(); 
+        hideTargetParametersGroupBox();
       }
 
       m_ui->aRadiusLineEdit->setText(toString(target->radiusA().kilometers()));
