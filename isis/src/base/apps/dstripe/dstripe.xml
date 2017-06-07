@@ -80,6 +80,9 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+     <change name="Kaj Williams" date="2017-06-05">
+      Now names the temp files with unique names, enabling parallel execution.
+    </change>
   </history>
 
   <groups>
