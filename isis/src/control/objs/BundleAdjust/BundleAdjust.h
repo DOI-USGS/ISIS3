@@ -280,6 +280,8 @@ namespace Isis {
    *                           colums and rows. In ::errorPropagation method, call to get Q matrix
    *                           from BundleControlPoint was creating a copy instead of getting a
    *                           reference. References #4664.
+   *   @history 2017-06-08 Makayla Shepherd - Modified imageLists() to close the image cube after
+   *                           adding it to the image list. Fixes #4908.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

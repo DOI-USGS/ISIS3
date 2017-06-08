@@ -110,6 +110,7 @@ namespace Isis {
       try {
         Image *image = new Image(fileName);
         append(image);
+        image->closeCube();
       }
       catch (IException &) {
       }
