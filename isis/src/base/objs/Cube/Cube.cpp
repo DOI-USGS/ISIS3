@@ -446,19 +446,22 @@ namespace Isis {
     }
 
     if (!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
-      QString msg = "Failed to create [" + m_labelFile->fileName() + "]";
+      QString msg = "Failed to create [" + m_labelFile->fileName() + "]. ";
+      msg += "Verify the output path exists and you have permission to write to the path.";
       cleanUp(false);
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     if (m_dataFile) {
       if (m_storesDnData && !m_dataFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
-        QString msg = "Failed to create [" + m_dataFile->fileName() + "]";
+        QString msg = "Failed to create [" + m_dataFile->fileName() + "]. ";
+        msg += "Verify the output path exists and you have permission to write to the path.";
         cleanUp(false);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       else if (!m_storesDnData && !m_dataFile->open(QIODevice::ReadOnly)) {
-        QString msg = "Failed to open [" + m_dataFile->fileName() + "] for reading";
+        QString msg = "Failed to open [" + m_dataFile->fileName() + "] for reading. ";
+        msg += "Verify the output path exists and you have permission to read from the path.";
         cleanUp(false);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
