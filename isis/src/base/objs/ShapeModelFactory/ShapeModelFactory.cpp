@@ -192,9 +192,6 @@ namespace Isis {
         }
 
         if (projection->IsEquatorialCylindrical()) {
-
-          delete shapeModelCube;
-
           // If the EquatorialCylindricalShape constructor throws an error or returns null, the
           // following exception will be appended to the fileError. (Later added to the finalError)
           QString msg = "Unable to construct a DEM shape model from the given "
@@ -230,6 +227,8 @@ namespace Isis {
           // in case no error was thrown, but constructor returned NULL
           fileError.append(IException(IException::Unknown, msg, _FILEINFO_));
         }
+        
+        delete shapeModelCube;
 
       }
 
