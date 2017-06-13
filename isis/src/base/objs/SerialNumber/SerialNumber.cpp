@@ -7,7 +7,7 @@
 #include "Pvl.h"
 #include "Cube.h"
 #include "Process.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "FileName.h"
 
 namespace Isis {
@@ -94,13 +94,13 @@ namespace Isis {
 
     // Get the mission name
     static QString missionTransFile = (QString) dataDir["base"] + "/translations/MissionName2DataDir.trn";
-    static PvlTranslationManager missionXlater(missionTransFile);
+    static PvlToPvlTranslationManager missionXlater(missionTransFile);
     missionXlater.SetLabel(label);
     QString mission = missionXlater.Translate("MissionName");
 
     // Get the instrument name
     static QString instTransFile = (QString) dataDir["base"] + "/translations/Instruments.trn";
-    static PvlTranslationManager instrumentXlater(instTransFile);
+    static PvlToPvlTranslationManager instrumentXlater(instTransFile);
     instrumentXlater.SetLabel(label);
     QString instrument = instrumentXlater.Translate("InstrumentName");
 
@@ -111,13 +111,13 @@ namespace Isis {
     //   needs to have the mission name and the instrument name.
 
     //  Create the static map to keep the translation managers in memory
-    static std::map<QString, PvlTranslationManager> missionTranslators;
+    static std::map<QString, PvlToPvlTranslationManager> missionTranslators;
 
     // Determine the key for this translation manager - must have both mission and instrument
     QString key = mission + "_" + instrument;
 
     // Try to find an existing translation manager with the key
-    std::map<QString, PvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
+    std::map<QString, PvlToPvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
 
     // If we don't succeed, create one
     if(translationIterator == missionTranslators.end()) {
@@ -128,7 +128,7 @@ namespace Isis {
 
       // use the translation file to generate keywords
       missionTranslators.insert(
-        std::pair<QString, PvlTranslationManager>(key, PvlTranslationManager(snFile.expanded()))
+        std::pair<QString, PvlToPvlTranslationManager>(key, PvlToPvlTranslationManager(snFile.expanded()))
       );
 
       translationIterator = missionTranslators.find(key);

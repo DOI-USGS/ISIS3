@@ -134,12 +134,12 @@ void IsisMain() {
 
   // Translate the Instrument group
   FileName transFile("$mro/translations/crismInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = "$mro/translations/crismArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   ocube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));

@@ -12,7 +12,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "OriginalLabel.h"
 #include "UserInterface.h"
 
@@ -129,10 +129,10 @@ void IsisMain() {
 
   Pvl newLabel;
 
-  Isis::PvlTranslationManager instXlater(label, instrumentTrans);
+  Isis::PvlToPvlTranslationManager instXlater(label, instrumentTrans);
   instXlater.Auto(newLabel);
 
-  Isis::PvlTranslationManager archXlater(label, archiveTrans);
+  Isis::PvlToPvlTranslationManager archXlater(label, archiveTrans);
   archXlater.Auto(newLabel);
 
   // Create the bandbin group

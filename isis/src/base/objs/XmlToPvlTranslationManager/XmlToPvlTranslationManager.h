@@ -116,13 +116,13 @@ namespace Isis {
    *
    * @internal
    *  @history 2017-01-12 Jeannie Backer - Original version. Adapted from
-   *                          PvlTranslationManager class. Fixes #4584.
+   *                          PvlToPvlTranslationManager class. Fixes #4584.
    *  @history 2017-01-13 Jeannie Backer and Jesse Mapel - Initial Translate
    *                          and Auto design. Added dependencies for uniquely
    *                          identifying input elements. Fixes #4584.
    *  @history 2017-01-18 Jesse Mapel - Updated documentation and error messages. Fixes #4584.
    *  @history 2017-01-25 Jesse Mapel - Created unit test. Fixes #4584.
-   *  @history 2017-05-30 Makayla Shepherd - Renamed from XmlTranslationManager to 
+   *  @history 2017-05-30 Makayla Shepherd - Renamed from XmlTranslationManager to
    *                          XmlToPvlTranslationManager. Fixes #4889.
    */
   class XmlToPvlTranslationManager : public LabelTranslationManager {
@@ -162,5 +162,3 @@ namespace Isis {
 };
 
 #endif
-
-

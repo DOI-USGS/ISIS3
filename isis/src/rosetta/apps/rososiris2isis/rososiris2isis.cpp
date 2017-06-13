@@ -73,17 +73,17 @@ void IsisMain() {
 
   // Translate the Archive group
   FileName transFile(transDir + "osirisArchive.trn");
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile = transDir + "osirisBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Instrument group
   transFile = transDir + "osirisInstrument.trn";
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Write the BandBin, Archive, and Instrument groups

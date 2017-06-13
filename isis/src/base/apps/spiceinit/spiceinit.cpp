@@ -16,7 +16,7 @@
 #include "KernelDb.h"
 #include "Longitude.h"
 #include "Process.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "SpiceClient.h"
 #include "SpiceClientStarter.h"
 #include "Table.h"
@@ -80,7 +80,7 @@ void IsisMain() {
                                     "translations/MissionName2DataDir.trn");
 
   // Get the mission translation manager ready
-  PvlTranslationManager missionXlater(lab, transFile);
+  PvlToPvlTranslationManager missionXlater(lab, transFile);
 
   // Get the mission name so we can search the correct DB's for kernels
   QString mission = missionXlater.Translate("MissionName");

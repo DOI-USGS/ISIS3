@@ -275,7 +275,7 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the translation manager ready
   Pvl inputLabel(labelFile.expanded());
-  PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();

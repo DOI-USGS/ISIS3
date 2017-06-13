@@ -209,7 +209,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
   Pvl *isisLabel = ocube->label();
   // Create an Instrument group
   FileName insTransFile(transDir + "mvicInstrument_fit.trn");
-  PvlTranslationManager insXlater(label, insTransFile.expanded());
+  PvlToPvlTranslationManager insXlater(label, insTransFile.expanded());
   insXlater.Auto(*(isisLabel));
 
   // Modify/add Instument group keywords not handled by the translater
@@ -263,7 +263,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
 
   // Create a Band Bin group
   FileName bandTransFile(transDir + "mvicBandBin_fit.trn");
-  PvlTranslationManager bandBinXlater(label, bandTransFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(label, bandTransFile.expanded());
   bandBinXlater.Auto(*(isisLabel));
   // Add units and OriginalBand keyword
   PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
@@ -293,18 +293,18 @@ void translateLabels(Pvl &label, Cube *ocube) {
 
   // Create an Archive group
   FileName archiveTransFile(transDir + "mvicArchive_fit.trn");
-  PvlTranslationManager archiveXlater(label, archiveTransFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(label, archiveTransFile.expanded());
   archiveXlater.Auto(*(isisLabel));
 
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "mvicKernels_fit.trn");
-  PvlTranslationManager kernelsXlater(label, kernelsTransFile.expanded());
+  PvlToPvlTranslationManager kernelsXlater(label, kernelsTransFile.expanded());
   kernelsXlater.Auto(*(isisLabel));
   
   // If Level 2 product, Create a RadiometricCalibration group
   if (label.hasKeyword("SOCL2VER", Pvl::Traverse)) {
     FileName calibrationTransFile(transDir + "mvicCalibration_fit.trn"); 
-    PvlTranslationManager calibrationXlater(label, calibrationTransFile.expanded());
+    PvlToPvlTranslationManager calibrationXlater(label, calibrationTransFile.expanded());
     calibrationXlater.Auto(*(isisLabel));
 
     //  Add comments to calibration keywords.  This is done by hand because the translation tables

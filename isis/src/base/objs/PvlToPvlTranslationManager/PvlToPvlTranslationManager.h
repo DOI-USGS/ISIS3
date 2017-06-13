@@ -1,5 +1,5 @@
-#ifndef PvlTranslationManager_h
-#define PvlTranslationManager_h
+#ifndef PvlToPvlTranslationManager_h
+#define PvlToPvlTranslationManager_h
 /**
  * @file
  * $Revision: 1.6 $
@@ -73,23 +73,25 @@ namespace Isis {
    *                                         using a dummy parameter.
    *  @history 2017-01-11 Jeannie Backer - Moved several methods to a generic
    *                          parent class, LabelTranslationManager. Fixes #4584.
+   *  @history 2017-06-13 Adam Paquette - Changed PvlTranslationManager file name to
+   *                          PvlToPvlTranslationManager. Fixes #4901.
    *  @todo 2005-02-15 Stuart Sides - add coded example and implementation example
    *                                  to class documentation, and finish
    *                                  documentation
    */
-  class PvlTranslationManager : public LabelTranslationManager {
+  class PvlToPvlTranslationManager : public LabelTranslationManager {
     public:
-      PvlTranslationManager(const QString &transFile);
+      PvlToPvlTranslationManager(const QString &transFile);
 
-      PvlTranslationManager(std::istream &transStrm);
+      PvlToPvlTranslationManager(std::istream &transStrm);
 
-      PvlTranslationManager(Pvl &inputLabel,
+      PvlToPvlTranslationManager(Pvl &inputLabel,
                             const QString &transFile);
 
-      PvlTranslationManager(Pvl &inputLabel,
+      PvlToPvlTranslationManager(Pvl &inputLabel,
                             std::istream &transStrm);
 
-      virtual ~PvlTranslationManager();
+      virtual ~PvlToPvlTranslationManager();
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
@@ -117,5 +119,3 @@ namespace Isis {
 };
 
 #endif
-
-

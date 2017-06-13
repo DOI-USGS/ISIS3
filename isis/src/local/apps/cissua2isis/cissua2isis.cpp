@@ -125,7 +125,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
 
   // Translate
   FileName transFile(transDir + "cissua2isis.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto((*outLabel));
 
   PvlGroup &inst = outLabel->findGroup("Instrument", Isis::PvlObject::Traverse);

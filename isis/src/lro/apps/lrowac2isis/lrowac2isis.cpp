@@ -462,7 +462,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // Translate the in
   FileName transFile(transDir + "lrowacInstrument.trn");
-  PvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
   instrumentXlater.Auto(isis3VisEven);
   instrumentXlater.Auto(isis3VisOdd);
   instrumentXlater.Auto(isis3UvEven);
@@ -470,7 +470,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // Translate the Archive group
   transFile = transDir + "lrowacArchive.trn";
-  PvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
 
   archiveXlater.Auto(isis3VisEven);
   archiveXlater.Auto(isis3VisOdd);

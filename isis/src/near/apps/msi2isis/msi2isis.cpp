@@ -15,7 +15,7 @@
 #include "Pvl.h"
 #include "PvlKeyword.h"
 #include "PvlGroup.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "UserInterface.h"
 
 using namespace Isis;
@@ -236,7 +236,7 @@ void translateMsiLabels(Pvl inputLabelPvl, Pvl *isisLabelPvl) {
 
   kernelsGrp += PvlKeyword("NaifFrameCode", "-93001");
 
-  PvlTranslationManager labelXlater(inputLabelPvl, 
+  PvlToPvlTranslationManager labelXlater(inputLabelPvl, 
                                     "$near/translations/nearImportPdsLabel.trn");
   labelXlater.Auto(*isisLabelPvl);
 

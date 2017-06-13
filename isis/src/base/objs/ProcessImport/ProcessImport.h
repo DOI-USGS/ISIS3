@@ -30,7 +30,7 @@
 #include "JP2Decoder.h"
 #include "PixelType.h"
 #include "Process.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "SpecialPixel.h"
 
 namespace Isis {

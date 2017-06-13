@@ -87,12 +87,12 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   transFile = transDir + "LoGeneralImport.trn";
   // Get the translation manager ready
-  PvlTranslationManager commonlabelXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager commonlabelXlater(inputLabel, transFile.expanded());
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();
   commonlabelXlater.Auto(*(outputLabel));
 
-  PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+  PvlToPvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
   labelXlater.Auto(*(outputLabel));
 
   PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);

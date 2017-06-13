@@ -58,7 +58,7 @@
        Fixed bug due to PVL refactor
     </change>
     <change name="Brendan George" date="2006-11-14">
-        Modified to comply with changes to PvlTranslationManager and
+        Modified to comply with changes to PvlToPvlTranslationManager and
         PvlTranslationTable
     </change>
     <change name="Kris Becker" date="2007-09-25">

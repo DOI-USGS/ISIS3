@@ -103,7 +103,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the translation manager ready
   Pvl labelPvl(labelFile.expanded());
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
 
   PvlGroup inst("Instrument");
 
@@ -202,7 +202,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   FileName transFileArchive(transDir + "/" + "translations/mocArchive.trn");
 
   // Get the translation manager ready for the archive group
-  PvlTranslationManager archiveXlater(labelPvl, transFileArchive.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFileArchive.expanded());
 
   PvlGroup arch("Archive");
 
@@ -279,7 +279,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   FileName transFileBandBin(transDir + "/" + "translations/mocBandBin.trn");
 
   // Get the translation manager ready for the BandBin group
-  PvlTranslationManager bandBinXlater(labelPvl, transFileBandBin.expanded());
+  PvlToPvlTranslationManager bandBinXlater(labelPvl, transFileBandBin.expanded());
 
 
 

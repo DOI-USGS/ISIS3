@@ -239,17 +239,17 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Translate the Instrument group
   FileName transFile(transDir + "hiriseInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile  = transDir + "hiriseBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "hiriseArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Create the Instrument group keyword CcdId from the ProductId

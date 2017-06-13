@@ -191,17 +191,17 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
 
   //Translate the Instrument group
   FileName transFile(transDir + "lronacInstrument.trn");
-  PvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive group
   transFile = transDir + "lronacArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   //Translate the BandBin group
   transFile = transDir + "lronacBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   Pvl lab(labelFile.expanded());

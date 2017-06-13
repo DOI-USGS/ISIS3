@@ -5,7 +5,7 @@
 
 #include "pds.h"
 #include "ProcessByLine.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
 #include "FileName.h"
@@ -104,7 +104,7 @@ void TranslateLabels(FileName in, Cube *ocube) {
   FileName transFile(transDir + "/translations/clementine.trn");
 
   Pvl pdsLab(in.expanded());
-  PvlTranslationManager labelXlater(pdsLab, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(pdsLab, transFile.expanded());
 
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();

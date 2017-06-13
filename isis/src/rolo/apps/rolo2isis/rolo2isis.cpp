@@ -3,7 +3,7 @@
 #include "UserInterface.h"
 #include "FileName.h"
 #include "Pvl.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 
 using namespace std;
 using namespace Isis;
@@ -24,25 +24,25 @@ void IsisMain() {
   FileName transFile;
   Pvl inputLabel(labelFile);
   Pvl outputLabel;
-  PvlTranslationManager *translator;
+  PvlToPvlTranslationManager *translator;
 
   // translate Mapping group
   transFile = transDir + "/" + "translations/roloMapping.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
+  translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate Instrument group
   transFile = transDir + "/" + "translations/roloInstrument.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
+  translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate BandBin group
   transFile = transDir + "/" + "translations/roloBandBin.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
+  translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   outputLabel.findGroup("BandBin").findKeyword("OriginalBand").setUnits(
     translator->Translate("BandBinUnit"));
@@ -57,7 +57,7 @@ void IsisMain() {
 
   // translate Archive group
   transFile = transDir + "/" + "translations/roloArchive.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
+  translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;

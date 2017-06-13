@@ -334,7 +334,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   transFile = transDir + "mariner10isis2.trn";
 
   // Get the translation manager ready
-  PvlTranslationManager translation(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager translation(inputLabel, transFile.expanded());
   Pvl *outputLabel = oCube->label();
   translation.Auto(*(outputLabel));
 

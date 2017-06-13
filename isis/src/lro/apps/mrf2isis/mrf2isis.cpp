@@ -77,12 +77,12 @@ void IsisMain() {
   if(id == "CHAN1-L-MRFFR-5-CDR-MAP-V1.0" || id == "LRO-L-MRFLRO-5-CDR-MAP-V1.0") {
     // Translate the BandBin group
     FileName transFile(transDir + "mrflev2BandBin.trn");
-    PvlTranslationManager bandBinXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = transDir + "mrflev2Archive.trn";
-    PvlTranslationManager archiveXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
     archiveXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, and Mapping groups to the output cube label
@@ -93,22 +93,22 @@ void IsisMain() {
   else {
     // Translate the BandBin group
     FileName transFile(transDir + "mrflev1BandBin.trn");
-    PvlTranslationManager bandBinXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = transDir + "mrflev1Archive.trn";
-    PvlTranslationManager archiveXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
     archiveXlater.Auto(otherLabels);
 
     // Translate the Instrument group
     transFile = transDir + "mrflev1Instrument.trn";
-    PvlTranslationManager instrumentXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlater(label, transFile.expanded());
     instrumentXlater.Auto(otherLabels);
 
     // Translate the Image group
     transFile = transDir + "mrflev1Image.trn";
-    PvlTranslationManager imageXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager imageXlater(label, transFile.expanded());
     imageXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, Instrument, and ImageInfo groups

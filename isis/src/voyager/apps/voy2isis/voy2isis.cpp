@@ -18,7 +18,7 @@
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -135,7 +135,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   FileName transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
-  PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl output label
   Pvl *outputLabel = ocube->label();
@@ -164,12 +164,12 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Translate the band bin group information
   if((QString)inst["InstrumentId"] == "WIDE_ANGLE_CAMERA") {
     FileName bandBinTransFile(missionDir + "/translations/voyager_wa_bandbin.trn");
-    PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+    PvlToPvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
     labelXlater.Auto(*(outputLabel));
   }
   else {
     FileName bandBinTransFile(missionDir + "/translations/voyager_na_bandbin.trn");
-    PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+    PvlToPvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
     labelXlater.Auto(*(outputLabel));
   }
 

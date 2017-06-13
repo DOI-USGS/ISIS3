@@ -1,5 +1,5 @@
 #include <sstream>
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "Preference.h"
 #include "IException.h"
 #include "IString.h"
@@ -153,9 +153,9 @@ int main(void) {
 
     trnsStrm << "End" << endl;
 
-    PvlTranslationManager transMgr(fLabel, trnsStrm);
+    PvlToPvlTranslationManager transMgr(fLabel, trnsStrm);
 
-    cout << "Testing PvlTranslationManager object" << endl;
+    cout << "Testing PvlToPvlTranslationManager object" << endl;
 
     cout << "  Testing InputValue member" << endl;
     cout << "    DataFileName    = " << transMgr.InputKeyword("DataFileName")[0] << endl;

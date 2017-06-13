@@ -150,7 +150,7 @@ void IsisMain() {
 
   // Create an Instrument group
   FileName insTransFile(transDir + "leisaInstrument_fit.trn");
-  PvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
+  PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
   insXlater.Auto(outLabel);
 
 // Modify/add Instument group keywords not handled by the translater
@@ -164,19 +164,19 @@ void IsisMain() {
 
   // Create an Archive group
   FileName archiveTransFile(transDir + "leisaArchive_fit.trn");
-  PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   //Create a Band Bin Group
   FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
-  PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
   bandBinXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "leisaKernels_fit.trn");
-  PvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
+  PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 
