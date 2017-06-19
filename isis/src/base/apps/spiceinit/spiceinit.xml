@@ -773,7 +773,10 @@
           Group in the <b>ShapeModel</b> keyword.
         </description>
         <defaultPath>$base//dems/</defaultPath>
-        <filter>*.cub</filter>
+        <filter>
+	  *.cub
+	  *.bds
+	</filter>
       </parameter>
     </group>
 
