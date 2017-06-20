@@ -79,8 +79,8 @@ bool ephemerisTime;
 bool UTC;
 bool localSolarTime;
 bool solarLongitude;
-bool morphology;
-bool albedo;
+bool morphologyRank;
+bool albedoRank;
 
 
 
@@ -100,7 +100,7 @@ struct MosData {
   double m_albedo;
 };
 
-// Computes the special MORPHOLOGY and ALBEDO planes
+// Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
 void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
@@ -194,8 +194,8 @@ void IsisMain() {
   UTC = false;
   localSolarTime = false;
   solarLongitude = false;  
-  morphology = false;
-  albedo = false;  
+  morphologyRank = false;
+  albedoRank = false;  
   
   
   if (!noCamera) {
@@ -246,8 +246,8 @@ void IsisMain() {
     if ((UTC = ui.GetBoolean("UTC"))) nbands++;
     if ((localSolarTime = ui.GetBoolean("LOCALSOLARTIME"))) nbands++;
     if ((solarLongitude = ui.GetBoolean("SOLARLONGITUDE"))) nbands++;   
-    if ((morphology = ui.GetBoolean("MORPHOLOGY"))) nbands++; 
-    if ((albedo = ui.GetBoolean("ALBEDO"))) nbands++;
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
+    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
     
   }
   if((dn = ui.GetBoolean("DN"))) nbands++;
@@ -327,8 +327,8 @@ void IsisMain() {
   if (UTC) name += "Coordinated Universal Time";
   if (localSolarTime) name += "Local Solar Time";
   if (solarLongitude) name += "Solar Longitude";
-  if (morphology) name += "Morphology";
-  if (albedo) name += "Albedo";
+  if (morphologyRank) name += "morphologyRank";
+  if (albedoRank) name += "albedoRank";
   
   
 
@@ -670,13 +670,13 @@ void camdev(Buffer &out) {
           index += 64 * 64;
         }
         // Special Mosaic indexes
-        if (morphology) {
+        if (morphologyRank) {
           if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
           out[index] = mosd.m_morph;
           index += 64 * 64;
         }
 
-        if (albedo) {
+        if (albedoRank) {
           if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
           out[index] = mosd.m_albedo;
           index += 64 * 64;
@@ -706,7 +706,7 @@ template <typename T>
   }
 
 
-// Computes the special MORPHOLOGY and ALBEDO planes
+// Computes the special morphologyRank and albedoRank planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md) {
   const double Epsilon(1.0E-8);
   Angle myphase;
@@ -723,14 +723,14 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
 
   md = MosData();  // Nullifies the data
   if (myemission.isValid()) {
-    // Compute MORPHOLOGY
+    // Compute morphologyRank
     double cose = cos(myemission.radians());
     if (fabs(cose) < Epsilon) cose = Epsilon;
     // Convert resolution to units of KM
     md.m_morph = (res / 1000.0) / cose;
 
     if (myincidence.isValid()) {
-      // Compute ALBEDO
+      // Compute albedoRank
       double cosi = cos(myincidence.radians());
       if (fabs(cosi) < Epsilon) cosi = Epsilon;
       //  Convert resolution to KM
