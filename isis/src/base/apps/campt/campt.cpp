@@ -108,7 +108,7 @@ QList<PvlGroup*> getCameraPointInfo(const UserInterface &ui,
   // Setup our parameters from ui and variables
   QList<PvlGroup*> cameraPoints;
   bool usePointList = ui.WasEntered("COORDLIST");
-  bool allowOutside = ui.WasEntered("ALLOWOUTSIDE");
+  bool allowOutside = ui.GetBoolean("ALLOWOUTSIDE");
   QString type;
   if (ui.WasEntered("COORDLIST")) {
     type = ui.GetString("COORDTYPE");
