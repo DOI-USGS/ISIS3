@@ -47,9 +47,11 @@ namespace Isis {
    *                            samples and lines were swapped.  References #1385.
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *   @history 2016-09-14 Ian Humphrey - Modified exportView() and print()- replaced deprecated
-   *                           static QPixmap::grabWidget with QWidget::grab to remove deprecation 
-   *                           warnings from stdout when using File->Print or File->Export View. 
+   *                           static QPixmap::grabWidget with QWidget::grab to remove deprecation
+   *                           warnings from stdout when using File->Print or File->Export View.
    *                           References #4304.
+   *   @history 2017-06-07 Christopher Combs - Changed saveAsEnlargedCube's catch block to stack
+   *                           errors and give a more accurate error message.
    */
   class FileTool : public Tool {
       Q_OBJECT

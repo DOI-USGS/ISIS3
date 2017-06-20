@@ -130,7 +130,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Close all cube viewports.";
     p_closeAll->setWhatsThis(whatsThis);
-    
+
     p_exit = new QAction(this);
     p_exit->setShortcut(Qt::CTRL + Qt::Key_Q);
     p_exit->setText("E&xit");
@@ -332,7 +332,7 @@ namespace Isis {
     Cube *ocube = NULL;
 
     // The output cube needs to be created if the scale is 1 since saveAs_FullResolution will be
-    //  called, which expects a cube.  
+    //  called, which expects a cube.
     //  NOTE:  This really should be cleaned up and the cube should be created in 1 place.
     if (p_saveAsDialog->getSaveAsType() != SaveAsDialog::ExportAsIs ||
        p_lastViewport->scale() == 1) {
@@ -350,7 +350,7 @@ namespace Isis {
       // start and end Samples and Lines
       double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
       p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
-   
+
       if (p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportFullRes ||
          p_lastViewport->scale() == 1) {
 //      int numSamples = (int)ceil(dEndSample-dStartSample);
@@ -381,8 +381,8 @@ namespace Isis {
    * @author Sharmila Prasad (4/26/2011)
    *
    * @param pInCube - Input Cube
-   * @param pOutCube - Output Cube 
-   *   
+   * @param pOutCube - Output Cube
+   *
    */
   void FileTool::saveAsEnlargedCube(Cube *icube, const QString & psOutFile) {
     double dScale = p_lastViewport->scale();
@@ -415,9 +415,12 @@ namespace Isis {
       delete imgEnlarge;
       delete interp;
 
-    } catch(IException &) {
-      QMessageBox::critical((QWidget *)parent(),
-                            "Error", "Cannot open file, please check permissions");
+    } catch(IException &e) {
+        // Stacks error message from Cube's create method
+        throw IException(e,
+            IException::Io,
+            QObject::tr("The cube could not be saved, unable to create the cube"),
+            _FILEINFO_);
     }
   }
 
@@ -428,7 +431,7 @@ namespace Isis {
    * @author Sharmila Prasad (4/26/2011)
    *
    * @param pInCube - Input Cube
-   * @param psOutFile - Output filename 
+   * @param psOutFile - Output filename
    */
   void FileTool::saveAsReducedCube(Cube *icube, const QString & psOutFile) {
 
@@ -454,32 +457,36 @@ namespace Isis {
       }
     }
 
-    ProcessByLine p;
-    p.SetInputCube (icube);
-    Cube *ocube = NULL;
     try {
+      ProcessByLine p;
+      p.SetInputCube (icube);
+      Cube *ocube = NULL;
       ocube = p.SetOutputCube(psOutFile, CubeAttributeOutput(""), ons, onl, inb);
       // Our processing routine only needs 1
       // the original set was for info about the cube only
       p.ClearInputCubes();
+
+      Cube *tempcube=new Cube;
+      tempcube->open(cubeViewport()->cube()->fileName(), "r");
+      Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
+      near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
+
+      p.ProcessCubeInPlace(*near, false);
+      near->UpdateOutputLabel(ocube);
+      p.EndProcess();
+
+      delete near;
+      near=NULL;
     }
-    catch(IException &) {
+    catch(IException &e) {
       // If there is a problem, catch it and close the cube so it isn't open next time around
       icube->close();
-      throw;
+      // Stacks error message from Cube's create method
+      throw IException(e,
+          IException::Io,
+          QObject::tr("The cube could not be saved, unable to create the cube"),
+          _FILEINFO_);
     }
-
-    Cube *tempcube=new Cube;
-    tempcube->open(cubeViewport()->cube()->fileName(), "r");
-    Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
-    near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
-
-    p.ProcessCubeInPlace(*near, false);
-    near->UpdateOutputLabel(ocube);
-    p.EndProcess();
-
-    delete near;
-    near=NULL;
   }
 
   /**
