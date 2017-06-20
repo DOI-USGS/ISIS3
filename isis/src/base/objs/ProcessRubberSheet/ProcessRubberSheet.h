@@ -111,6 +111,8 @@ namespace Isis {
    *                                            inheritance between Process and its
    *                                            child classes.  Made destructor virtual.
    *                                            References #2215.
+   *   @history 2017-06-09 Christopher Combs - Changed loop counter int in
+                               StartProcess to long long int. References #4611.
    *
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation
@@ -146,7 +148,7 @@ namespace Isis {
        * @param end End position; must be at least 4, a power of 2 and less than
        *          start
        */
-      void SetTiling(int start, int end) {
+      void SetTiling(long long start, long long end) {
         p_startQuadSize = start;
         p_endQuadSize = end;
       }
@@ -219,8 +221,8 @@ namespace Isis {
       double p_forceSamp; //!<
       double p_forceLine; //!<
 
-      int p_startQuadSize; //!<
-      int p_endQuadSize;   //!<
+      long long p_startQuadSize; //!<
+      long long p_endQuadSize;   //!<
 
       int m_patchStartSample;
       int m_patchStartLine;
