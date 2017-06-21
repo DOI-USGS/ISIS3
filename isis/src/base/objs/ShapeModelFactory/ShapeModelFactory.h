@@ -41,8 +41,10 @@ namespace Isis {
    *   @history 2015-03-08 - Jeannie Backer - Added implementation for NAIF DSK
    *                             models. References #2035.
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: added ReportError method to
-   *                          truncate paths before data directory. Allows test to pass when not
-   *                          using the default data area. Fixes #4738.
+   *                           truncate paths before data directory. Allows test to pass when not
+   *                           using the default data area. Fixes #4738.
+   *   @history 2017-06-08 Makayla Shepherd - Added a cube pointer deletion to fix a memory leak.
+   *                           Fixes #4890.
    */
   class ShapeModelFactory {
     public:

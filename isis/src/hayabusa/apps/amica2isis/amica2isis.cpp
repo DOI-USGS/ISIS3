@@ -105,17 +105,17 @@ void IsisMain ()
 
   // Translate the BandBin group
   FileName transFile (transDir + "amicaBandBin.trn");
-  PvlTranslationManager bandBinXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater (label, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile = transDir + "amicaArchive.trn";
-  PvlTranslationManager archiveXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater (label, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
   transFile = transDir + "amicaInstrument.trn";
-  PvlTranslationManager instrumentXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater (label, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   //  Create YearDoy keyword in Archive group

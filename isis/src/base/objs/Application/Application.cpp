@@ -42,6 +42,7 @@ extern int errno;
 #include <QCoreApplication>
 #include <QLocalSocket>
 #include <QString>
+#include <QTime>
 
 #include "Application.h"
 #include "Constants.h"    //is this still used in this class?
@@ -136,6 +137,7 @@ namespace Isis {
       if (!p_ui->IsInteractive()) {
         // Get the starting wall clock time
         p_datetime = DateTime(&p_startTime);
+        m_connectTime.start();
         p_startClock = clock();
 
         if (p_applicationForceGuiApp) {
@@ -205,6 +207,7 @@ namespace Isis {
 
               if (i != 0) {
                 p_datetime = DateTime(&p_startTime);
+                m_connectTime.start();
                 p_startClock = clock();
                 p_startDirectIO = DirectIO();
                 p_startPageFaults = PageFaults();
@@ -268,6 +271,7 @@ namespace Isis {
     if (p_ui->IsInteractive()) {
       p_startClock = clock();
       p_datetime = DateTime(&p_startTime);
+      m_connectTime.start();
       //cerr << "History GUI start clock=" << p_startClock << " time=" << p_startTime << endl;
     }
     PvlObject history(p_ui->ProgramName());
@@ -287,16 +291,14 @@ namespace Isis {
 
     return history;
   }
-
+//
   /**
    * Creates accounting PvlGroup
    *
    * @return PvlGroup Accounting Group
    */
   PvlGroup Application::Accounting() {
-    // Grab the ending time to compute connect time
-    time_t endTime = time(NULL);
-    double seconds = difftime(endTime, p_startTime);
+    double seconds = m_connectTime.elapsed() / 1000.0;
     int minutes = (int)(seconds / 60.0);
     seconds = seconds - minutes * 60.0;
     int hours = minutes / 60;

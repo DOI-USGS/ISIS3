@@ -147,13 +147,15 @@ namespace Isis {
    *                           Added cases to test creating bsq and large bsq cubes.
    *                           References #1689.
    *   @history 2015-01-30 Ian Humphrey - Deallocated copied cubes in unittest. References #2082.
-   *   @history 2015-06-22 Makayla Shepherd - Using putGroup() a group on the label of a read-only 
+   *   @history 2015-06-22 Makayla Shepherd - Using putGroup() a group on the label of a read-only
    *                           cube now throws an error.
    *   @history 2015-09-02 Tyler Wilson - Commented out first call to SetValidRange
    *                           in the call to the
    *                           historgram function. Also commented out a call to
    *                           Histogram::SetBinRange() because this function no longer
    *                           exists in Histogram.  See Ref. #2188.
+   *   @history 2017-06-08 Chris Combs - Made "Failed to create" error messages more descriptive.
+   *                           Fixes #833.
    */
   class Cube {
     public:
@@ -422,4 +424,3 @@ namespace Isis {
 Q_DECLARE_METATYPE(Isis::Cube *);
 
 #endif
-

@@ -2,7 +2,7 @@
 
 #include "iTime.h"
 #include "ProcessExportPds.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "PvlFormatPds.h"
 #include "OriginalLabel.h"
 
@@ -93,7 +93,7 @@ void IsisMain() {
   // Isis 3 cubes being exported for the first time
   if(!origLabel.hasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
 
-    PvlTranslationManager orig(origLabel, transDir + "LoOriginalExport.trn");
+    PvlToPvlTranslationManager orig(origLabel, transDir + "LoOriginalExport.trn");
     orig.Auto(pdsLabel);
 
     // Add elements of SCAN_PARAMETER keyword to label
@@ -120,14 +120,14 @@ void IsisMain() {
 
     // Label translation for strips
     if(qube.findGroup("ISIS_INSTRUMENT").hasKeyword("STRIP_NUMBER")) {
-      PvlTranslationManager orig(origLabel, transDir + "LoStripExport.trn");
+      PvlToPvlTranslationManager orig(origLabel, transDir + "LoStripExport.trn");
       orig.Auto(pdsLabel);
 
       pdsLabel.addKeyword(scanResolution, PvlContainer::Replace);
     }
     // Translation for level1 products
     else if(qube.findGroup("ISIS_INSTRUMENT").hasKeyword("START_TIME")) {
-      PvlTranslationManager orig(origLabel, transDir + "LoLevel1Export.trn");
+      PvlToPvlTranslationManager orig(origLabel, transDir + "LoLevel1Export.trn");
       orig.Auto(pdsLabel);
 
       pdsLabel.addKeyword(scanResolution, PvlContainer::Replace);
@@ -159,17 +159,17 @@ void IsisMain() {
   // Reexporting a product created by this program and reingested into Isis
   else {
 
-    PvlTranslationManager orig(origLabel, transDir + "LoReimportExport.trn");
+    PvlToPvlTranslationManager orig(origLabel, transDir + "LoReimportExport.trn");
     orig.Auto(pdsLabel);
 
     // Reexporting strips
     if(origLabel.hasKeyword("STRIP_NUMBER", Pvl::Traverse)) {
-      PvlTranslationManager strip(origLabel, transDir + "LoStripExport.trn");
+      PvlToPvlTranslationManager strip(origLabel, transDir + "LoStripExport.trn");
       strip.Auto(pdsLabel);
     }
     // Reexporting level 1 products
     else {
-      PvlTranslationManager lvl1(origLabel, transDir + "LoLevel1Export.trn");
+      PvlToPvlTranslationManager lvl1(origLabel, transDir + "LoLevel1Export.trn");
       lvl1.Auto(pdsLabel);
     }
   }
@@ -178,7 +178,7 @@ void IsisMain() {
   QString bandBinTransFile;
   if(iCube->label()->hasKeyword("FiducialId", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoFiducialExport.trn";
-    PvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
+    PvlToPvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
 
     // Change the units of FIDCUAIL_COORDINATE_MICRON from "um" to "<micron>"
@@ -195,7 +195,7 @@ void IsisMain() {
   }
   else if(iCube->label()->hasKeyword("BoresightSample", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoBoresightExport.trn";
-    PvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
+    PvlToPvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
   }
   else {

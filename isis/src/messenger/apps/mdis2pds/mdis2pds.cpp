@@ -15,7 +15,7 @@
 #include "OriginalLabel.h"
 #include "ProcessExportPds.h"
 #include "Progress.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -201,7 +201,7 @@ void IsisMain() {
 
   // Translates the ISIS labels along with the original EDR labels
   origLabel.addObject(*(incube->label()));
-  PvlTranslationManager labels(origLabel,
+  PvlToPvlTranslationManager labels(origLabel,
                                "$messenger/translations/mdisCDRLabel.trn");
   labels.Auto(pdsLabel);
 

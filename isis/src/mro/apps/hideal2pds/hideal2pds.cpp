@@ -22,7 +22,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "Table.h"
 #include "UserInterface.h"
 
@@ -139,7 +139,7 @@ void IsisMain() {
   QString isisLabelFile = ui.GetFileName("FROM");
 
   // Translate the keywords from the input cube label that go in the PDS label
-  PvlTranslationManager cubeLab(*(inputCube->label()), 
+  PvlToPvlTranslationManager cubeLab(*(inputCube->label()), 
                                 "$mro/translations/hiriseIdealPdsExportCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
@@ -150,7 +150,7 @@ void IsisMain() {
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
-  PvlTranslationManager orig(origLabel, "$mro/translations/hirisePdsRdrOriginalLabel.trn");
+  PvlToPvlTranslationManager orig(origLabel, "$mro/translations/hirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
   updatePdsLabelTimeParametersGroup(pdsLabel);

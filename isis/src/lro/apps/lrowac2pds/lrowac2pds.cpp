@@ -10,7 +10,7 @@
 #include "Stretch.h"
 #include "iTime.h"
 #include "ProcessExport.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "PvlFormatPds.h"
 #include "md5.h"
 #include "md5wrapper.h"
@@ -376,7 +376,7 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
 
     //Translate the Original Pds Label
     FileName transFile(transDir + "lrowacPdsLabelExport.trn");
-    PvlTranslationManager labelXlator(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager labelXlator(labelPvl, transFile.expanded());
     labelXlator.Auto(outLabel);
 
     // Copy any Translation changes over

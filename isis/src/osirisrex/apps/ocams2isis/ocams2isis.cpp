@@ -44,13 +44,13 @@ void IsisMain() {
 
   // Create an Instrument group
   FileName insTransFile(transDir + "ocamsInstrument_fit.trn");
-  PvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
+  PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
   insXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
   // Create a Band Bin group
   FileName bandTransFile(transDir + "ocamsBandBin_fit.trn");
-  PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
   bandBinXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
@@ -58,13 +58,13 @@ void IsisMain() {
   // OREx team reduced the output keywords, so this was commented out
   // Remove if all goes well with next release
   //FileName archiveTransFile(transDir + "ocamsArchive_fit.trn");
-  //PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
+  //PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   //archiveXlater.Auto(outLabel);
   //output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "ocamsKernels_fit.trn");
-  PvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
+  PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 

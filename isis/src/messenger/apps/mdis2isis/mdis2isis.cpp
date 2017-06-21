@@ -191,17 +191,17 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
 
   // Translate the Instrument group
   FileName transFile(transDir + "mdisInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile  = transDir + "mdisBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "mdisArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Create the Kernel Group

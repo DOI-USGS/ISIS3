@@ -161,7 +161,7 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
 
   Pvl pdsLabel(inFileName);
   Isis::FileName transFile(transDir + "/" + "translations/pdsQube.trn");
-  Isis::PvlTranslationManager pdsXlater(pdsLabel, transFile.expanded());
+  Isis::PvlToPvlTranslationManager pdsXlater(pdsLabel, transFile.expanded());
 
 
   TableField sideplaneLine("Line", Isis::TableField::Integer);
@@ -490,7 +490,7 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   Isis::FileName transFile(transDir + "/" + "translations/vimsPds.trn");
   PvlObject qube(pdsLab.findObject("Qube"));
   Pvl pdsLabel(pdsLab);
-  Isis::PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
+  Isis::PvlToPvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
 
   Pvl outputLabel;
   labelXlater.Auto(outputLabel);

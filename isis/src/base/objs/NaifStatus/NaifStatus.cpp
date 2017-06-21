@@ -28,7 +28,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "Pvl.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 
 namespace Isis {
   bool NaifStatus::initialized = false;
@@ -88,7 +88,7 @@ namespace Isis {
     errorDescription.addKeyword(PvlKeyword("LongMessage", naifLong));
     error.addGroup(errorDescription);
 
-    PvlTranslationManager trans(error, "$base/translations/NaifErrors.trn");
+    PvlToPvlTranslationManager trans(error, "$base/translations/NaifErrors.trn");
 
     try {
       errMsg = trans.Translate("ShortMessage");

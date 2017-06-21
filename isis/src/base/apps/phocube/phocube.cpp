@@ -41,8 +41,8 @@ bool spacecraftAzimuth;
 bool offnadirAngle;
 bool subSpacecraftGroundAzimuth;
 bool subSolarGroundAzimuth;
-bool morphology;
-bool albedo;
+bool morphologyRank;
+bool albedoRank;
 bool ra;
 bool declination;
 bool bodyFixedX;
@@ -65,7 +65,7 @@ struct MosData {
   double m_albedo;
 };
 
-// Computes the special MORPHOLOGY and ALBEDO planes
+// Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
 void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
@@ -126,8 +126,8 @@ void IsisMain() {
   offnadirAngle = false;
   subSpacecraftGroundAzimuth = false;
   subSolarGroundAzimuth = false;
-  morphology = false;
-  albedo = false;
+  morphologyRank = false;
+  albedoRank = false;
   northAzimuth = false;
   ra = false;
   declination = false;
@@ -149,8 +149,8 @@ void IsisMain() {
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
     if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
     if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
-    if ((morphology = ui.GetBoolean("MORPHOLOGY"))) nbands++; 
-    if ((albedo = ui.GetBoolean("ALBEDO"))) nbands++; 
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
+    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++; 
     if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
     if ((ra = ui.GetBoolean("RADEC"))) nbands++;
     if ((declination = ui.GetBoolean("RADEC"))) nbands++;
@@ -203,8 +203,8 @@ void IsisMain() {
   if (offnadirAngle) name += "OffNadir Angle";
   if (subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
   if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
-  if (morphology) name += "Morphology";
-  if (albedo) name += "Albedo";
+  if (morphologyRank) name += "Morphology Rank";
+  if (albedoRank) name += "Albedo Rank";
   if (ra) name += "Right Ascension";
   if (declination) name += "Declination";
   if (bodyFixedX) name += "Body Fixed X";
@@ -407,13 +407,13 @@ void phocube(Buffer &out) {
         }
 
         // Special Mosaic indexes
-        if (morphology) {
+        if (morphologyRank) {
           if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
           out[index] = mosd.m_morph;
           index += 64 * 64;
         }
 
-        if (albedo) {
+        if (albedoRank) {
           if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
           out[index] = mosd.m_albedo;
           index += 64 * 64;
@@ -473,7 +473,7 @@ template <typename T>
   }
 
 
-// Computes the special MORPHOLOGY and ALBEDO planes
+// Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md) {
   const double Epsilon(1.0E-8);
   Angle myphase;
@@ -490,14 +490,14 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
 
   md = MosData();  // Nullifies the data
   if (myemission.isValid()) {
-    // Compute MORPHOLOGY
+    // Compute MORPHOLOGYRANK
     double cose = cos(myemission.radians());
     if (fabs(cose) < Epsilon) cose = Epsilon;
     // Convert resolution to units of KM
     md.m_morph = (res / 1000.0) / cose;
 
     if (myincidence.isValid()) {
-      // Compute ALBEDO
+      // Compute ALBEDORANK
       double cosi = cos(myincidence.radians());
       if (fabs(cosi) < Epsilon) cosi = Epsilon;
       //  Convert resolution to KM

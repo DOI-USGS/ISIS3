@@ -195,7 +195,7 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube) {
   FileName transFile(transDir + "/translations/galileoSsi.trn");
 
   // Get the translation manager ready
-  PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));

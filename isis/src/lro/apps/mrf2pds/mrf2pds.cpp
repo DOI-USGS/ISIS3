@@ -5,7 +5,7 @@
 #include "IString.h"
 #include "Pvl.h"
 #include "ProcessExportMiniRFLroPds.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "OriginalLabel.h"
 #include "SerialNumberList.h"
 #include "Constants.h"
@@ -85,7 +85,7 @@ void IsisMain() {
 
     // Translates the ISIS labels along with the original EDR labels
     cOrigLabel.addObject(*(cInCube->label()));
-    PvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
+    PvlToPvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
     cCubeLabel2.Auto(pdsLabel);
 
 
@@ -93,11 +93,11 @@ void IsisMain() {
       PvlKeyword &cKeyMissionName = cInLabel->findObject("IsisCube").findGroup("Instrument").findKeyword("MissionName");
       int sFound = cKeyMissionName[0].indexOf("CHANDRAYAAN");
       if(sFound != -1) {
-        cCubeLabel2 = PvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelCH1.trn");
+        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelCH1.trn");
         cCubeLabel2.Auto(pdsLabel);
       }
       else {
-        cCubeLabel2 = PvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelLRO.trn");
+        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelLRO.trn");
         cCubeLabel2.Auto(pdsLabel);
       }
     }

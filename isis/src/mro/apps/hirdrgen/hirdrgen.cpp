@@ -14,7 +14,7 @@
 #include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PvlFormatPds.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 
 using namespace Isis;
 using namespace std;
@@ -168,7 +168,7 @@ void IsisMain() {
   Pvl &pdsLabel = p.StandardPdsLabel(type);
 
   // Translate the keywords from the input cube label that go in the PDS label
-  PvlTranslationManager cubeLab(*(icube2->label()),
+  PvlToPvlTranslationManager cubeLab(*(icube2->label()),
                                 "$mro/translations/hirisePdsRdrCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
@@ -180,7 +180,7 @@ void IsisMain() {
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
-  PvlTranslationManager orig(origLabel,
+  PvlToPvlTranslationManager orig(origLabel,
                              "$mro/translations/hirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 

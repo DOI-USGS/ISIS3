@@ -63,13 +63,13 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Translate the Archive group
   transFile = transDir + "merStructure.trn";
-  PvlTranslationManager structXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager structXlater(labelPvl, transFile.expanded());
   structXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("ARCHIVE", Pvl::Traverse));
 
   // Translate the Instrument group
   transFile = transDir + "merInstrument.trn";
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("INSTRUMENT", Pvl::Traverse));
 
@@ -81,13 +81,13 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Translate the Image_Request group
   transFile = transDir + "merImageRequest.trn";
-  PvlTranslationManager imageReqXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager imageReqXlater(labelPvl, transFile.expanded());
   imageReqXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
 
   // Translate the Subframe group
   transFile = transDir + "merSubframe.trn";
-  PvlTranslationManager subframeXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager subframeXlater(labelPvl, transFile.expanded());
   subframeXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
 }

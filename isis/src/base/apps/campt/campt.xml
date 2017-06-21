@@ -211,6 +211,12 @@ End_Group
       and now allow a developer to control the order in which fields are output in both PVL and
       CSV format.  References #476, #4100.
     </change>
+    <change name="Kaj Williams" date="2017-06-13">      
+      Resolved issue where the default value for the "allowoutside" parameter was supposed 
+      to be set to "true", but the default _behavior_ of campt was instead consistent with a 
+      setting of "false". In addition, corrected behavior where 
+      manually setting "allowoutside" to "false" was ignored. Ref # 2258.
+    </change>
   </history>
 
   <oldName>

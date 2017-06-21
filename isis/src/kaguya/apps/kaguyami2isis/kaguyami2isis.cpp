@@ -69,12 +69,12 @@ void IsisMain() {
 
   // Translate the Archive group
   transFile = transDir + "kaguyamiArchive.trn";
-  PvlTranslationManager archiveXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(inputLabel, transFile.expanded());
   archiveXlater.Auto(*(outputLabel));
 
   // Translate the Instrument group
   transFile = transDir + "kaguyamiInstrument.trn";
-  PvlTranslationManager instrumentXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(inputLabel, transFile.expanded());
   instrumentXlater.Auto(*(outputLabel));
     //trim trailing z's from the time strings
   PvlGroup &instGroup(outputLabel->findGroup("Instrument",Pvl::Traverse));
@@ -99,7 +99,7 @@ void IsisMain() {
 
   // Translate the BandBin group
   transFile = transDir + "kaguyamiBandBin.trn";
-  PvlTranslationManager bandBinXlater(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(inputLabel, transFile.expanded());
   bandBinXlater.Auto(*(outputLabel));
 
   //Set up the Kernels group

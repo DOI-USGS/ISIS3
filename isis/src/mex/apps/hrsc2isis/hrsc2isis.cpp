@@ -239,7 +239,7 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
 
   // Translate the Instrument group
   FileName transFile(transDir + "hrscInstrument.trn");
-  PvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   if(inLabels.hasKeyword("MACROPIXEL_SIZE")) {
@@ -260,12 +260,12 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
 
   // Translate the BandBin group
   transFile  = transDir + "hrscBandBin.trn";
-  PvlTranslationManager bandBinXlater(inLabels, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(inLabels, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "hrscArchive.trn";
-  PvlTranslationManager archiveXlater(inLabels, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(inLabels, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   std::map<QString, int> naifIkCodes;

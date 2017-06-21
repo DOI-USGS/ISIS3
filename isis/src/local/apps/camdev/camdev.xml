@@ -121,8 +121,8 @@
      <li>UTC</li>
      <li>LOCALSOLARTIME</li>
      <li>SOLARLONGITUDE</li>
-     <li>MORPHOLOGY</li>
-     <li>ALBEDO</li>
+     <li>MORPHOLOGYRANK</li>
+     <li>ALBEDORANK</li>
      </ul>
     The following options are available for Level2 images:
      <ul>
@@ -215,6 +215,9 @@
   <history>
     <change name="Makayla Shepherd" date="2015-09-22">
       Original version.
+    </change>
+    <change name="Kaj Williams" date="2017-06-09">
+      Renamed albedo to albedoRank, renamed morph (or morphology) to morphRank (or morphologyRank). Ref #4008.
     </change>
   </history>
 
@@ -319,8 +322,8 @@
               <item>NORTHAZIMUTH</item>
               <item>LOCALSOLARTIME</item>
               <item>SOLARLONGITUDE</item>
-              <item>MORPHOLOGY</item>
-              <item>ALBEDO</item>
+              <item>MORPHOLOGYRANK</item>
+              <item>ALBEDORANK</item>
             </exclusions>
           </option>
         </list>
@@ -807,20 +810,20 @@
           in band sequence of the output file. Solar Longitude is in degrees.
         </description>
       </parameter>
-      <parameter name="MORPHOLOGY">
+      <parameter name="MORPHOLOGYRANK">
          <type>boolean</type>
          <default><item>FALSE</item></default>
-         <brief>Create a Morphology index band</brief>
+         <brief>Create a Morphology rank band, used for ranking images based on favorable local emission angles.</brief>
          <description>
            <p>
              This band is computed from the <def link="Pixel Resolution">pixel resolution</def>
              and <def link="Emission Angle">emission angle</def> using the following formula:<br />  
-             <br />Morphology = PixelResolution / cos(EmissionAngle)<br /> <br />
+             <br />MorphologyRank = PixelResolution / cos(EmissionAngle)<br /> <br />
              The resulting output band can be used by <i>automos</i> to create a 
-             morphology-based mosaic product.  This option uses the 
+             morphologyRank-based mosaic product.  This option uses the 
              <def link="Local Emission Angle">local emission angle</def> if the input file
              is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
-             uses the default calculation (from the ellipsoid).  All computed values are 
+             uses the default calculation (from the ellipsoid).  All computed cosines are 
              tested for zero.  If the result is zero, then the value is set to a constant 
              value very close to zero.
            </p>
@@ -830,29 +833,29 @@
                Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
              </dt>
              <dd>
-               <b>priority=band type=keyword keyname=Name keyvalue=morphology criteria=lesser</b>.
+               <b>priority=band type=keyword keyname=Name keyvalue=morphologyRank criteria=lesser</b>.
              </dd>
              </dl>  
              See <i>automos</i> documentation for further details.
            </p>
          </description>
       </parameter>
-      <parameter name="ALBEDO">
+      <parameter name="ALBEDORANK">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create an Albedo index band</brief>
+        <brief>Create an Albedo rank band, used for ranking images based on favorable emission and incidence angles.</brief>
         <description>
           <p>
             This band is computed from the <def link="Pixel Resolution">pixel resolution</def>, 
             <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def> 
             using the following formula:<br /><br /> 
-            Albedo = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
-            The resulting output band can be used by <i>automos</i> to create an albedo-based
+            AlbedoRank = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
+            The resulting output band can be used by <i>automos</i> to create an albedoRank-based
             mosaic product.  This option always uses the  
             <def link="Local Emission Angle">local emission angle</def>  and 
             <def link="Local Incidence Angle">local incidence angle</def> if the input file
             is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
-            uses the default calculation (from the ellipsoid).  All computed values are 
+            uses the default calculation (from the ellipsoid).  All computed cosines are 
             tested for zero.  If the result is zero, then the value is set to a constant 
             value very close to zero.
           </p>
@@ -862,7 +865,7 @@
               Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
             </dt>
             <dd>
-            <b>priority=band type=keyword keyname=Name keyvalue=albedo 
+            <b>priority=band type=keyword keyname=Name keyvalue=albedoRank 
               criteria=lesser</b>.  
             </dd>
             </dl>  

@@ -18,7 +18,7 @@
 #include "ProcessExportPds.h"
 #include "ProgramLauncher.h"
 #include "Progress.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -198,7 +198,7 @@ void IsisMain() {
 
     // Translates the ISIS labels along with the original EDR labels
     origLabel.addObject(*from.label());
-    PvlTranslationManager labels(origLabel,
+    PvlToPvlTranslationManager labels(origLabel,
                                  "$messenger/translations/mdisDDRLabel.trn");
     labels.Auto(pdsLabel);
     p.CheckStatus();

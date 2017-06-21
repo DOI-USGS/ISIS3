@@ -13,7 +13,7 @@
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "Table.h"
 #include "UserInterface.h"
 
@@ -491,10 +491,10 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   FileName instrumentFile(transDir+instrument);
   FileName archiveFile(transDir+archive);
 
-  PvlTranslationManager archiveXlator(pdsLabel, archiveFile.expanded());
-  PvlTranslationManager instrumentXlator(pdsLabel, instrumentFile.expanded());
-  PvlTranslationManager coreBandBinXlator(pdsLabel,coreBandBinFile.expanded());
-  PvlTranslationManager suffixBandBinXlator(pdsLabel,suffixBandBinFile.expanded());
+  PvlToPvlTranslationManager archiveXlator(pdsLabel, archiveFile.expanded());
+  PvlToPvlTranslationManager instrumentXlator(pdsLabel, instrumentFile.expanded());
+  PvlToPvlTranslationManager coreBandBinXlator(pdsLabel,coreBandBinFile.expanded());
+  PvlToPvlTranslationManager suffixBandBinXlator(pdsLabel,suffixBandBinFile.expanded());
 
   archiveXlator.Auto(archiveLabel);
 

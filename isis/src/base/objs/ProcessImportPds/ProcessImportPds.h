@@ -30,7 +30,7 @@
 #include <QString>
 
 namespace Isis {
-  class PvlTranslationManager;
+  class PvlToPvlTranslationManager;
   class Table;
   /**
    * @brief Convert PDS archive files to Isis format
@@ -273,17 +273,17 @@ namespace Isis {
         JP2
       };
 
-      void ProcessDataFilePointer(PvlTranslationManager & pdsXlater,
+      void ProcessDataFilePointer(PvlToPvlTranslationManager & pdsXlater,
                                   const bool & calcOffsetOnly);
-      void ProcessPixelBitandType(PvlTranslationManager & pdsXlater);
-      void ProcessSpecialPixels(PvlTranslationManager & pdsXlater, const bool & isQube);
+      void ProcessPixelBitandType(PvlToPvlTranslationManager & pdsXlater);
+      void ProcessSpecialPixels(PvlToPvlTranslationManager & pdsXlater, const bool & isQube);
 
       void ProcessPdsImageLabel(const QString &pdsDataFile);
       void ProcessPdsQubeLabel(const QString &pdsDataFile, const QString &transFile);
       void ProcessPdsM3Label(const QString &pdsDataFile, PdsFileType fileType);
       void ProcessPdsCombinedSpectrumLabel(const QString &pdsDataFile);
 
-      void ExtractPdsProjection(PvlTranslationManager &pdsXlater);
+      void ExtractPdsProjection(PvlToPvlTranslationManager &pdsXlater);
       void GetProjectionOffsetMults(double &xoff, double &yoff,
                                     double &xmult, double &ymult);
 

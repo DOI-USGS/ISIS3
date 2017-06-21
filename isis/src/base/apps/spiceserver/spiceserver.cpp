@@ -20,7 +20,7 @@
 #include "Longitude.h"
 #include "Process.h"
 #include "Pvl.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "Table.h"
 #include "TextFile.h"
 
@@ -165,7 +165,7 @@ void IsisMain() {
     QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
 
     // Get the mission translation manager ready
-    PvlTranslationManager missionXlater(label, transFile);
+    PvlToPvlTranslationManager missionXlater(label, transFile);
 
     // Get the mission name so we can search the correct DB's for kernels
     QString mission = missionXlater.Translate("MissionName");

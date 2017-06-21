@@ -45,7 +45,7 @@ namespace Isis {
    *
    * @internal
    *  @history 2017-01-11 Jeannie Backer - Original Version. Code moved out of
-   *                          PvlTranslationManager to make a generic parent
+   *                          PvlToPvlTranslationManager to make a generic parent
    *                          class. Fixes #4584.
    *  @history 2017-01-20 Jesse Mapel - Updated documentation and unit test. Fixes #4584.
    */

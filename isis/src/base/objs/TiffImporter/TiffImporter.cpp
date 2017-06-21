@@ -15,7 +15,7 @@
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "TProjection.h"
 
 namespace Isis {
@@ -127,7 +127,7 @@ namespace Isis {
           if (transFile.fileExists()) {
             Pvl tmp; 
             tmp += PvlKeyword("Code", toString(coordSysType));
-            PvlTranslationManager geoTiffCodeTranslater(tmp, transFile.expanded());
+            PvlToPvlTranslationManager geoTiffCodeTranslater(tmp, transFile.expanded());
             geoTiffCodeTranslater.Auto(outPvl);
           }
         }

@@ -34,6 +34,7 @@
 #include <iostream>
 #include <fstream>
 #include <QString>
+#include <QTime>
 #include <string>
 #include <ctime>
 
@@ -108,8 +109,10 @@ namespace Isis {
    *                          Also needed to define a compiler directive,
    *                          USE_GUI_QAPP, to bypass a problem the Macs have
    *                          with using QApplication. References #575.
-   *   @history 2016-08-15 Adam Paquette - Reset locale after QApplication or 
+   *   @history 2016-08-15 Adam Paquette - Reset locale after QApplication or
    *                          QCoreApplication are instantiated. Fixes #3908.
+   *   @history 2017-06-08 Christopher Combs - Changed object used to calculate
+   *                          connectTime from  a time_t to a QTime. Fixes #4618.
    */
   class Application : public Environment {
     public:
@@ -161,7 +164,8 @@ namespace Isis {
       QLocalSocket *p_connectionToParent; //!<
       time_t p_startTime;                 //!<
       clock_t p_startClock;               //!<
-      QString p_datetime;             //!<
+      QTime m_connectTime;                //!< Used to calculate program's run time
+      QString p_datetime;                 //!<
       int p_startDirectIO;                //!<
       int p_startPageFaults;              //!<
       int p_startProcessSwaps;            //!<

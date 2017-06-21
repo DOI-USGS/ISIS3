@@ -1,4 +1,4 @@
-Testing PvlTranslationManager object
+Testing PvlToPvlTranslationManager object
   Testing InputValue member
     DataFileName    = SomeFile.dat
     StartByte       = 32

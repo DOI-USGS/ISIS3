@@ -40,6 +40,8 @@ namespace Isis {
    *                         pointer. TODO:  Currently, serialNumberList created the list on the
    *                         fly.  For speed, this needs to change so that when the ImageList
    *                         changes, update the serial number list.
+   * @history 2017-06-08 Makayla Shepherd - Modified ImageList(QStringList &) to close the image
+   *                         cubes after adding them to the list. Fixes #4908.
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT

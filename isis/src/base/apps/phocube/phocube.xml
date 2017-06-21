@@ -5,7 +5,7 @@ xsi:noNamespaceSchemaLocation=
 "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Creates photometric and geometric information bands for an image cube
+    Create photometric and geometric information bands for an image cube
   </brief>
 
   <description>
@@ -41,7 +41,7 @@ xsi:noNamespaceSchemaLocation=
     values over 90 degrees.  ISIS allows the computation of emission and incidence angles greater 
     than 90 degrees.   This feature allows representation of viewing and illumination conditions 
     where there is actual target body surface data beyond the limb or deep terminator boundary 
-    areas.  Applications such as photomet that applies photometric functions honor the 90 degree 
+    areas.  Applications such as photomet that applies photometric functions honor the 90-degree 
     boundary.    Applications such as photrim can be applied to the phocube output to replace the 
     angle values above 90 degrees to NULL.  There are certain processes that need these data, 
     therefore it is allowed. 
@@ -55,7 +55,7 @@ xsi:noNamespaceSchemaLocation=
     or a pre-defined equation.   
   </p>
   <p> 
-    The parameters "morphology" and "albedo" are specifically designed to be used
+    The parameters "morphologyRank" and "albedoRank" are specifically designed to be used
     by the ISIS3 mosaic programs.  A mosaic program will automatically compare 
     two pixel values to determine how each pixel is mosaicked into an output 
     file, which depends on whether a morphology-based or an albedo-based 
@@ -63,12 +63,12 @@ xsi:noNamespaceSchemaLocation=
     <def link="Digital Number">DN</def> value for every input pixel based on 
     the formulas listed below and outputs the value to a backplane band.  
     These backplane bands are used by the ISIS3 mosaic programs.  The following are 
-    equations for "morphology" and "albedo" options:
+    equations for "morphologyRank" and "albedoRank" options:
   <blockquote>
   <dl>
-    <dt>  Morphology </dt>
+    <dt>  MorphologyRank </dt>
     <dd>Equation = <def>PixelResolution</def>/cos(EmissionAngle)</dd>
-    <dt>  Albedo </dt>
+    <dt>  AlbedoRank </dt>
     <dd>Equation = PixelResolution * [(1/cos(<def>EmissionAngle</def>)) +
     (1/cos(<def>IncidenceAngle</def>))]</dd>
   </dl>
@@ -104,8 +104,8 @@ xsi:noNamespaceSchemaLocation=
      <li><def link="Spacecraft Azimuth">SPACECRAFTAZIMUTH</def></li>     
      <li><def link="SubSpacecraft Ground Azimuth">SUBSPACECRAFTGROUNDAZIMUTH</def></li>
      <li><def link="Subsolar Ground Azimuth">SUBSOLARGROUNDAZIMUTH</def></li>
-     <li>MORPHOLOGY</li>
-     <li><def link="Albedo">ALBEDO</def></li>
+     <li>MORPHOLOGYRANK</li>
+     <li>ALBEDORANK</li>
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      </ul>
@@ -299,7 +299,9 @@ xsi:noNamespaceSchemaLocation=
       Added an ObliqueDetectorResolution band.  This is an improvement over the previous DetectorResolution
       function (particularly for images taken near the limb of the target).  References #476, #4100.
     </change>
-
+		<change name="Kaj Williams" date="2017-06-09">
+      Renamed albedo to albedoRank, and morph (or morphology) to morphRank (or MorphologyRank). Ref #4008.
+    </change>
   </history>
 
   <category>
@@ -386,8 +388,8 @@ xsi:noNamespaceSchemaLocation=
               <item>OFFNADIRANGLE</item>
               <item>SUBSPACECRAFTGROUNDAZIMUTH</item>
               <item>SUBSOLARGROUNDAZIMUTH</item>
-              <item>MORPHOLOGY</item>
-              <item>ALBEDO</item>
+              <item>MORPHOLOGYRANK</item>
+              <item>ALBEDORANK</item>
               <item>NORTHAZIMUTH</item>
               <item>RADEC</item>
               <item>BODYFIXED</item>
@@ -628,20 +630,20 @@ xsi:noNamespaceSchemaLocation=
 	  SubSolarGroundAzimuth is in degrees.
         </description>
       </parameter>
-     <parameter name="MORPHOLOGY">
+     <parameter name="MORPHOLOGYRANK">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a morphology index band</brief>
+        <brief>Create a morphology rank band, used for ranking images based on favorable local emission angles.</brief>
         <description>
 	  <p>
             This band is computed from the <def link="Pixel Resolution">pixel resolution</def>
             and <def link="Emission Angle">emission angle</def> using the following formula:<br />  
-            <br />Morphology = PixelResolution / cos(EmissionAngle)<br /> <br />
+            <br />MorphologyRank = PixelResolution / cos(EmissionAngle)<br /> <br />
             The resulting output band can be used by <i>automos</i> to create a 
             morphology-based mosaic product.  This option uses the 
             <def link="Local Emission Angle">local emission angle</def> if the input file
             is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
-            uses the default calculation (from the ellipsoid).  All computed values are 
+            uses the default calculation (from the ellipsoid).  All computed cosines are 
 	    tested for zero.  If the result is zero, then the value is set to a constant 
 	    value very close to zero.
           </p>
@@ -651,29 +653,29 @@ xsi:noNamespaceSchemaLocation=
               Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
 	    </dt>
             <dd>
-	      <b>priority=band type=keyword keyname=Name keyvalue=morphology criteria=lesser</b>.
+	      <b>priority=band type=keyword keyname=Name keyvalue=morphologyRank criteria=lesser</b>.
 	    </dd>
 	    </dl>  
             See <i>automos</i> documentation for further details.
           </p>
         </description>
       </parameter>
-     <parameter name="ALBEDO">
+     <parameter name="ALBEDORANK">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create an albedo index band</brief>
+        <brief>Create an albedo rank band, used for ranking images based on favorable emission and incidence angles.</brief>
         <description>
           <p>
             This band is computed from the <def link="Pixel Resolution">pixel resolution</def>, 
             <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def> 
             using the following formula:<br /><br /> 
-	    Albedo = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
+	    AlbedoRank = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
 	    The resulting output band can be used by <i>automos</i> to create an albedo-based
 	    mosaic product.  This option always uses the  
 	    <def link="Local Emission Angle">local emission angle</def>  and 
 	    <def link="Local Incidence Angle">local incidence angle</def> if the input file
             is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
-            uses the default calculation (from the ellipsoid).  All computed values are 
+            uses the default calculation (from the ellipsoid).  All computed cosines are 
 	    tested for zero.  If the result is zero, then the value is set to a constant 
 	    value very close to zero.
           </p>
@@ -683,7 +685,7 @@ xsi:noNamespaceSchemaLocation=
               Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
 	    </dt>
             <dd>
-            <b>priority=band type=keyword keyname=Name keyvalue=albedo 
+            <b>priority=band type=keyword keyname=Name keyvalue=albedoRank 
               criteria=lesser</b>.  
 	    </dd>
 	    </dl>  
@@ -694,7 +696,7 @@ xsi:noNamespaceSchemaLocation=
       <parameter name="RADEC">
          <type>boolean</type>
          <default><item>FALSE</item></default>
-         <brief>Create bands for Right Ascention and Declination</brief>
+         <brief>Create bands for Right Ascension and Declination</brief>
          <description>
 	   If this parameter is true, the <def>Right Ascension</def>, and the 
 	   <def>Declination</def> will be calculated for every pixel and each will be placed into
@@ -720,16 +722,16 @@ xsi:noNamespaceSchemaLocation=
   
   <examples>
     <example>
-      <brief>Create latitude and morphology backplane bands</brief>
+      <brief>Create latitude and morphologyRank backplane bands</brief>
       <description>
         Within this example, <i>phocube</i> creates an output file with two bands 
-	that contain latitude information and computed morphology 
+	that contain latitude information and computed morphologyRank 
 	values, which are shown below as separate snapshots under "Output 
 	Images."  The input image file shown below under "Input Image" was 
 	not propagated to the <i>phocube</i> output file because DN is set to 
 	false.  If the <i>phocube</i> output file is projected and mosaicked, 
 	the mosaic file will contain the latitude information for the first 
-	band and the "morphology" values for the second band, but no image 
+	band and the "morphologyRank" values for the second band, but no image 
 	information from the input image will be included.  The "DN" 
 	parameter must be set to "true" if the output product is expected 
 	to contain the input image.
@@ -737,9 +739,9 @@ xsi:noNamespaceSchemaLocation=
       <terminalInterface>
         <commandLine>
 	 from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub phase=no emission=no incidence=no 
-	 longitude=no morphology=yes
+	 longitude=no morphologyRank=yes
         </commandLine>
-        <description>Run <i>phocube</i> to create latitude and morphology bands.</description>
+        <description>Run <i>phocube</i> to create latitude and morphologyRank bands.</description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
@@ -747,7 +749,7 @@ xsi:noNamespaceSchemaLocation=
             <brief>Example GUI</brief>
             <description>
               Screenshot of GUI version of the application.<br />  For this example,
-	      only "LATITUDE" and "MORPHOLOGY" are selected.  The pre-selected 
+	      only "LATITUDE" and "MORPHOLOGYRANK" are selected.  The pre-selected 
 	      options "PHASE," "EMISSION," "INCIDENCE," and "LONGITUDE" are 
 	      deselected to avoid creating these unwanted backplanes. 
             </description>
@@ -781,15 +783,15 @@ xsi:noNamespaceSchemaLocation=
           </parameterName>
         </image>
         <image src="assets/images/phocube_morph_band.png" width="496" height="496">
-          <brief>Output file band 2 (Morphology)</brief>
+          <brief>Output file band 2 (MorphologyRank)</brief>
           <description> 
             Screenshot of the second band in the output file.  This file contains the
-	    computed morphology values with 0.0 as the minimum, and 15.0 as the maximum 
+	    computed morphologyRank values with 0.0 as the minimum, and 15.0 as the maximum 
 	    value.  The minimum and maximum values were manually selected to brighten
 	    the image for visual presentation.  The actual range is between 2.8 and 41.5
 	    DN values.
           </description>
-          <thumbnail src="assets/thumbs/thumb_phocube_morph_band.png" caption="Output image band 2 (morphology)" width="200" height="200"/>
+          <thumbnail src="assets/thumbs/thumb_phocube_morph_band.png" caption="Output image band 2 (morphologyRank)" width="200" height="200"/>
           <parameterName>
             TO
           </parameterName>

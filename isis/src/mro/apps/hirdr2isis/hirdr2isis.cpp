@@ -35,12 +35,12 @@ void IsisMain() {
 
   // Translate the BandBin group
   FileName transFile(transDir + "hiriseRdrBandBin.trn");
-  PvlTranslationManager bandBinXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
   bandBinXlater.Auto(otherLabels);
 
   // Translate the Mosaic group
   transFile = transDir + "hiriseRdrMosaic.trn";
-  PvlTranslationManager archiveXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 
   // Write the BandBin, Archive, and Mapping groups to the output cube label

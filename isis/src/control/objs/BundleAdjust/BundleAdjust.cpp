@@ -2578,6 +2578,7 @@ namespace Isis {
         for (int i = 0; i < m_serialNumberList->size(); i++) {
           Image *image = new Image(m_serialNumberList->fileName(i));
           imgList->append(image);
+          image->closeCube();
         }
         m_imageLists.append(imgList);
       }

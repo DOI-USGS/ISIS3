@@ -41,7 +41,7 @@
 #include "PvlGroup.h"
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "SpecialPixel.h"
 #include "Table.h"
 #include "UserInterface.h"
@@ -148,7 +148,7 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   void ProcessImportPds::ProcessLabel(const QString &pdsDataFile, PdsFileType allowedTypes) {
-    // Create a temporary Isis::PvlTranslationManager so we can find out what
+    // Create a temporary Isis::PvlToPvlTranslationManager so we can find out what
     // type of PDS file this is (i.e., Qube or Image or SpectralQube)
     stringstream trnsStrm;
     trnsStrm << "Group = PdsTypeImage" << endl;
@@ -215,7 +215,7 @@ namespace Isis {
     catch (IException &e) {
     }
 
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
 
     // Check to see if we are dealing with a JPEG2000 file
     QString str;
@@ -310,7 +310,7 @@ namespace Isis {
    * SetInputFile and SetFileHeaderBytes, both are called during this method.
    * Will not do SetInputFile if calcOffsetOnly is true
    */
-  void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater,
+  void ProcessImportPds::ProcessDataFilePointer(Isis::PvlToPvlTranslationManager & pdsXlater,
         const bool & calcOffsetOnly) {
 
     const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
@@ -411,7 +411,7 @@ namespace Isis {
    * Handles PixelType and BitsPerPixel
    * Calls SetPixelType with the correct values
    */
-  void ProcessImportPds::ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater) {
+  void ProcessImportPds::ProcessPixelBitandType(Isis::PvlToPvlTranslationManager & pdsXlater) {
     QString str;
     str = pdsXlater.Translate("CoreBitsPerPixel");
     int bitsPerPixel = toInt(str);
@@ -458,7 +458,7 @@ namespace Isis {
   /**
    * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
-  void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
+  void ProcessImportPds::ProcessSpecialPixels(Isis::PvlToPvlTranslationManager & pdsXlater, const bool & isQube) {
     QString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
@@ -548,7 +548,7 @@ namespace Isis {
    */
   void ProcessImportPds::ProcessPdsImageLabel(const QString &pdsDataFile) {
     Isis::FileName transFile(p_transDir + "/translations/pdsImage.trn");
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     QString str;
 
@@ -650,7 +650,7 @@ namespace Isis {
 
     Isis::FileName tFile(p_transDir + "/translations/" + transFile);
 
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
     QString str;
 
@@ -841,7 +841,7 @@ namespace Isis {
       throw IException(IException::Programmer, "ProcessImportPds::ProcessPdsM3Label can only be "
                        "called with file type of L0, Rdn, Loc or Obs.", _FILEINFO_);
     }
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     QString str;
 
@@ -935,7 +935,7 @@ namespace Isis {
    */
   void ProcessImportPds::ProcessPdsCombinedSpectrumLabel(const QString &pdsDataFile) {
     Isis::FileName transFile(p_transDir + "/translations/pdsCombinedSpectrum.trn");
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     QString str;
 
@@ -1025,7 +1025,7 @@ namespace Isis {
    */
   void ProcessImportPds::TranslatePdsProjection(Isis::Pvl &lab) {
 
-    // Create a temporary Isis::PvlTranslationManager so we can find out what
+    // Create a temporary Isis::PvlToPvlTranslationManager so we can find out what
     // type of projection labels exist
     stringstream trnsStrm;
     trnsStrm << "Group = PdsProjectionTypeImage" << endl;
@@ -1043,7 +1043,7 @@ namespace Isis {
     trnsStrm << "EndGroup" << endl;
     trnsStrm << "END";
 
-    Isis::PvlTranslationManager projType(p_pdsLabel, trnsStrm);
+    Isis::PvlToPvlTranslationManager projType(p_pdsLabel, trnsStrm);
 
     // Set up the correct projection translation table for this label
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
@@ -1063,7 +1063,7 @@ namespace Isis {
       return;
     }
 
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     ExtractPdsProjection(pdsXlater);
 
@@ -1117,7 +1117,7 @@ namespace Isis {
 
     QString projSpecificFileName = "$base/translations/pdsImport";
     projSpecificFileName += p_projection + ".trn";
-    Isis::PvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
+    Isis::PvlToPvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
 
     lab.addGroup(mapGroup);
     specificXlater.Auto(lab);
@@ -1166,7 +1166,7 @@ namespace Isis {
    *                             MaximumLongitude2 for Magellan images.
    *
    */
-  void ProcessImportPds::ExtractPdsProjection(Isis::PvlTranslationManager &pdsXlater) {
+  void ProcessImportPds::ExtractPdsProjection(Isis::PvlToPvlTranslationManager &pdsXlater) {
 
     QString str;
 
@@ -1422,7 +1422,7 @@ namespace Isis {
   */
   void ProcessImportPds::IdentifySource(Isis::Pvl &inputLabel) {
 
-    // Create a temporary Isis::PvlTranslationManager so we can find out what
+    // Create a temporary Isis::PvlToPvlTranslationManager so we can find out what
     // type of input file we have
     stringstream trnsStrm;
     trnsStrm << "Group = PdsFile" << endl;
@@ -1435,7 +1435,7 @@ namespace Isis {
     trnsStrm << "EndGroup" << endl;
     trnsStrm << "END";
 
-    Isis::PvlTranslationManager sourceXlater(inputLabel, trnsStrm);
+    Isis::PvlToPvlTranslationManager sourceXlater(inputLabel, trnsStrm);
 
     if (sourceXlater.InputHasKeyword("PdsFile")) {
       p_source = PDS;
@@ -1510,7 +1510,7 @@ namespace Isis {
     QString transDir = (QString) dataDir["Base"];
 
     Isis::FileName transFile(transDir + "/" + "translations/isis2bandbin.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1528,7 +1528,7 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString transDir = (QString) dataDir["Base"];
     Isis::FileName transFile(transDir + "/" + "translations/isis2instrument.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1554,7 +1554,7 @@ namespace Isis {
   void ProcessImportPds::TranslatePdsBandBin(Isis::Pvl &lab) {
     // Set up a translater for PDS labels
     Isis::FileName transFile(p_transDir + "/" + "translations/pdsImageBandBin.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1570,7 +1570,7 @@ namespace Isis {
   void ProcessImportPds::TranslatePdsArchive(Isis::Pvl &lab) {
     // Set up a translater for PDS labels
     Isis::FileName transFile(p_transDir + "/" + "translations/pdsImageArchive.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
+    Isis::PvlToPvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);

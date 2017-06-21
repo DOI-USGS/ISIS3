@@ -227,12 +227,12 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
 
   //Translate the Instrument group
   FileName transFile(transDir + "mroctxInstrument.trn");
-  PvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive grooup
   transFile  = transDir + "mroctxArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Set up the BandBin groups

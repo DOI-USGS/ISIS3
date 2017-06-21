@@ -24,7 +24,8 @@ void IsisMain() {
 
   cerr << "Testing stats ... " << endl;
   cerr << endl;
-  ProgramLauncher::RunSystemCommand("greyscale to=unitTest.cub enddn=50.0 samples=50 lines=50");
+  ProgramLauncher::RunSystemCommand("greyscale to=unitTest.cub enddn=50.0 samples=50 lines=50 "
+        "-preference=$ISISROOT/src/base/objs/Preference/TestPreferences");
 
   ProgramLauncher::RunIsisProgram("stats",
         "from=unitTest.cub "

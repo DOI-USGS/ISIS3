@@ -75,15 +75,15 @@ void IsisMain() {
   QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
   
   FileName transFile(transDir + "tcmapBandBin.trn");
-  PvlTranslationManager bandBinXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
   bandBinXlater.Auto(otherLabels);
   
   transFile = transDir + "tcmapInstrument.trn";
-  PvlTranslationManager instXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager instXlater(label, transFile.expanded());
   instXlater.Auto(otherLabels);
   
   transFile = transDir + "tcmapArchive.trn";
-  PvlTranslationManager archiveXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
   
   if(otherLabels.hasGroup("Mapping") &&

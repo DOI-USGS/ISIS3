@@ -32,7 +32,7 @@
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlFormat.h"
-#include "PvlTranslationManager.h"
+#include "PvlToPvlTranslationManager.h"
 #include "PvlFormatPds.h"
 #include "SpecialPixel.h"
 #include "Table.h"
@@ -406,7 +406,7 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label();
     FileName transfile;
     transfile = "$base/translations/pdsExportImageImage.trn";
-    PvlTranslationManager Xlator(*inputLabel, transfile.expanded());
+    PvlToPvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
     // Calculate the core base/mult for this cube
@@ -550,7 +550,7 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label();
     FileName transfile;
     transfile = "$base/translations/pdsExportImageJP2.trn";
-    PvlTranslationManager Xlator(*inputLabel, transfile.expanded());
+    PvlToPvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
     // Calculate the core base/mult for this cube
@@ -691,18 +691,18 @@ namespace Isis {
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
     // Translate the common keywords for a PDS IMAGE_MAP_PROJECTION
-    PvlTranslationManager xlatGenProj(*inputLabel,
+    PvlToPvlTranslationManager xlatGenProj(*inputLabel,
                                       "$base/translations/pdsExportAllMapping.trn");
     xlatGenProj.Auto(outputPvl);
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
     QString projName = ProjectionName(*inputLabel);
-    PvlTranslationManager xlatSpecProj(*inputLabel,
+    PvlToPvlTranslationManager xlatSpecProj(*inputLabel,
                                        "$base/translations/pdsExport" + projName + ".trn");
     xlatSpecProj.Auto(outputPvl);
 
     // Translate the target name
-    PvlTranslationManager xlatTarget(*inputLabel,
+    PvlToPvlTranslationManager xlatTarget(*inputLabel,
                                      "$base/translations/pdsExportTarget.trn");
     xlatTarget.Auto(outputPvl);
 
