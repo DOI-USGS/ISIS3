@@ -81,6 +81,23 @@ namespace Isis {
 
 
   /**
+   * Constructs an item representing a file in the filesystem.
+   *
+   * @param[in] filename The full path to the file in the filesystem
+   * @param[in] treetext The name displayed in the project tree
+   * @param[in] filename A icon to display next to the treetext
+   */
+  ProjectItem::ProjectItem(FileItemQsp filename, QString treeText, QString toolTipText,
+                           QIcon icon) {
+    setEditable(false);
+    setData(QVariant::fromValue<FileItemQsp>(filename));
+    setText(treeText);
+    setToolTip(toolTipText);
+    setIcon(icon);
+  }
+
+
+  /**
    * Constructs an item from a BundleResults.
    *
    * @param[in] bundleResults (BundleResults) The BundleResults to

@@ -359,18 +359,18 @@ namespace Isis {
             // Append the CSV files to the Statistics in the project
             ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedResidualsFilename())),
-                            bundleSolutionInfo->savedResidualsFilename(),
-                            QIcon(":spacecraft") );
+                            "Measure Residuals", bundleSolutionInfo->savedResidualsFilename(),
+                            QIcon(":statistics") );
             pItem->child(2)->appendRow(residualsItem);
             ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedImagesFilename())),
-                            bundleSolutionInfo->savedImagesFilename(),
-                            QIcon(":spacecraft") );
+                            "Images", bundleSolutionInfo->savedImagesFilename(),
+                            QIcon(":statistics") );
             pItem->child(2)->appendRow(imagesItem);
             ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedPointsFilename())),
-                            bundleSolutionInfo->savedPointsFilename(),
-                            QIcon(":spacecraft") );
+                            "Control Points", bundleSolutionInfo->savedPointsFilename(),
+                            QIcon(":statistics") );
             pItem->child(2)->appendRow(pointsItem);
           }
         }

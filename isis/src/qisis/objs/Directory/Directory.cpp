@@ -443,9 +443,23 @@ namespace Isis {
 
     m_bundleObservationViews.append(result);
 
-    result->setWindowTitle( tr("Bundle Observation View %1").
+    QString str = fileItem->fileName();
+
+    if (str.contains("residuals")) {
+      result->setWindowTitle( tr("Measure Residuals").
                             arg( m_bundleObservationViews.count() ) );
     result->setObjectName( result->windowTitle() );
+    }
+    else if (str.contains("points")) {
+      result->setWindowTitle( tr("Control Points").
+                              arg( m_bundleObservationViews.count() ) );
+      result->setObjectName( result->windowTitle() );
+    }
+    else if (str.contains("images")) {
+      result->setWindowTitle( tr("Images").
+                            arg( m_bundleObservationViews.count() ) );
+    result->setObjectName( result->windowTitle() );
+    }
 
     emit newWidgetAvailable(result);
 
@@ -687,14 +701,15 @@ namespace Isis {
               this, SLOT(cleanupControlPointEditViewWidget(QObject *)));
       emit newWidgetAvailable(result);
 
-
-      m_chipViewports = new ChipViewportsWidget(result);
+// 2017-06-09 Ken commented out for Data Workshop demo
+//      m_chipViewports = new ChipViewportsWidget(result);
 //    connect(m_chipViewports, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupchipViewportWidges()));
-      m_chipViewports->setWindowTitle(tr("ChipViewport View"));
-      m_chipViewports->setObjectName(m_chipViewports->windowTitle());
-      m_chipViewports->setSerialNumberList(project()->activeImageList()->serialNumberList());
-      m_chipViewports->setControlNet(activeControl->controlNet(), activeControl->fileName());
-      emit newWidgetAvailable(m_chipViewports);
+//      m_chipViewports->setWindowTitle(tr("ChipViewport View"));
+//      m_chipViewports->setObjectName(m_chipViewports->windowTitle());
+//      m_chipViewports->setSerialNumberList(project()->activeImageList()->serialNumberList());
+//      m_chipViewports->setControlNet(activeControl->controlNet(), activeControl->fileName());
+//      emit newWidgetAvailable(m_chipViewports);
+// 2017-06-09 Ken commented out for Data Workshop demo
 
 
       //  Create connections between signals from control point edit view and equivalent directory
@@ -950,10 +965,11 @@ namespace Isis {
     }
     //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
     //  of ControlPointEditView
-    delete m_chipViewports;
-    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
-    delete m_controlPointEditViewWidget;
-
+//    delete m_chipViewports;
+//    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
+//    if (m_controlPointEditViewWidget) {
+//      delete m_controlPointEditViewWidget;
+//    }
   }
 
 
@@ -1129,12 +1145,12 @@ namespace Isis {
     return m_controlPointEditViewWidget;
   }
 
-
+/*
   ChipViewportsWidget *Directory::controlPointChipViewports() {
 
     return m_chipViewports;
   }
-
+*/
 
   /**
    * @brief Gets the ControlNetEditor associated with this the Directory.
@@ -1492,7 +1508,7 @@ namespace Isis {
       addControlPointEditView();
     }
     controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint, serialNumber);
-    controlPointChipViewports()->setPoint(controlPoint);
+//    controlPointChipViewports()->setPoint(controlPoint);
   }
 
 

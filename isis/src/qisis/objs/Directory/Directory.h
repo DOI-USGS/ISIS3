@@ -134,6 +134,9 @@ namespace Isis {
    *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint slot.
    *   @history 2017-05-23 Tracie Sucharski - Fixed all of the cleanup methods to properly remove
    *                           the correct view/widget from the lists.
+   *   @history 2017-06-14 Ken Edmundson - Commented out ChipViewport widget code.  This will be
+   *                           temporary until the widget is fully developed.
+
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -184,7 +187,7 @@ namespace Isis {
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
-      ChipViewportsWidget *controlPointChipViewports();
+//      ChipViewportsWidget *controlPointChipViewports();
 
 
 
@@ -335,7 +338,7 @@ namespace Isis {
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
-      QPointer <ChipViewportsWidget> m_chipViewports;
+      //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
       QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets; //!< List of SensorInfoWidgets
       QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets

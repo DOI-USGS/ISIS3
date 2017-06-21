@@ -37,8 +37,8 @@ namespace Isis {
   BundleObservationViewWorkOrder::BundleObservationViewWorkOrder(Project *project) :
       WorkOrder(project) {
     m_isUndoable = false;
-    QAction::setText(tr("View &Bundle Observation..."));
-    QUndoCommand::setText(tr("View &Bundle Observation..."));
+    QAction::setText(tr("&View..."));
+    QUndoCommand::setText(tr("View..."));
   }
 
 

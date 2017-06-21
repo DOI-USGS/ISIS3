@@ -104,11 +104,10 @@ namespace Isis {
    *     @history 2016-07-25 Tracie Sucharksi - Added support for Shapes.
    *     @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the
-   *                               the data management icon from 'data' to
-   *                               'data-management' in the setProject function.
-   *                               A naming conflict was causing strange warnings
-   *                               to show up on the command line when cnetsuite is launched,
-   *                               and this fixed it.  Fixes #3982.
+   *                             the data management icon from 'data' to 'data-management' in the
+   *                             setProject function. A naming conflict was causing strange warnings
+   *                             to show up on the command line when cnetsuite is launched, and this
+   *                             fixed it.  Fixes #3982.
    *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
    *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project
    *                               name.
@@ -120,6 +119,8 @@ namespace Isis {
    *     @history 2017-05-04 J Bonn -Added FileItem to project tree. Fixes #4838.
    *     @history 2017-05-04 Tracie Sucharski - Added isFileItem and fileItem methods and member
    *                           variables needed for WorkOrders.  Fixes #4839. Fixes #4840.
+   *     @history 2017-06-14 Ken Edmundson - Added constructor for FileItem type, including a
+   *                             tooltip.
    *
    */
   class ProjectItem : public QStandardItem {
@@ -146,7 +147,7 @@ namespace Isis {
       ProjectItem(TargetBodyQsp targetBody);
       ProjectItem(TargetBodyList *targetBodyList);
       ProjectItem(FileItemQsp filename, QString treeText, QIcon icon);
-
+      ProjectItem(FileItemQsp filename, QString treeText, QString toolTipText, QIcon icon);
 
       ~ProjectItem();
 

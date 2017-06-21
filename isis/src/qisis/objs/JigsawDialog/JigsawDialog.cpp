@@ -344,6 +344,10 @@ namespace Isis {
     m_bundleSolutionInfo->outputResiduals();
     m_bundleSolutionInfo->outputImagesCSV();
     m_bundleSolutionInfo->outputPointsCSV();
+
+    //  Write text summary file
+    m_bundleSolutionInfo->outputText();
+
     m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // create output control net
