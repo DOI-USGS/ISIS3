@@ -15,8 +15,11 @@
       Original version
     </change>
     <change name="Travis Addair" date="2009-07-31">
-      Added capabilities for unique tolerances and ignore keys for individual 
+      Added capabilities for unique tolerances and ignore keys for individual
       array elements within keywords
+    </change>
+    <change name="Christopher Combs" date="2017-06-16">
+      Added capability to ignore file paths for elements of PvlKeywords
     </change>
   </history>
 
@@ -126,8 +129,8 @@
         <image width="511" height="93" src="assets/images/ex1output.jpg">
           <brief>The results from comparing pvl1.pvl and pvl2.pvl</brief>
           <description>
-            This is the output after running this program on pvl1.pvl and pvl2.pvl. Since the input pvl files differed, it shows the first difference encountered. 
-            Notice it also says exactly where the difference was found and, if numerical, the tolerance. 
+            This is the output after running this program on pvl1.pvl and pvl2.pvl. Since the input pvl files differed, it shows the first difference encountered.
+            Notice it also says exactly where the difference was found and, if numerical, the tolerance.
           </description>
           <thumbnail width="200" height="36" caption="Results" src="assets/thumbs/ex1output.jpg" />
         </image>
@@ -180,7 +183,7 @@
         <image width="511" height="93" src="assets/images/ex2output.jpg">
           <brief>The results from comparing pvl1.pvl and pvl2.pvl</brief>
           <description>
-            This is the output after running this program on pvl1.pvl and pvl2.pvl. The input pvl files differed, 
+            This is the output after running this program on pvl1.pvl and pvl2.pvl. The input pvl files differed,
             but not more than specified by the tolerance so the results came back identicle.
           </description>
           <thumbnail width="200" height="36" caption="Results" src="assets/thumbs/ex2output.jpg" />
