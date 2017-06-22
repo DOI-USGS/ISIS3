@@ -16,9 +16,15 @@ commands:
 		file_prefix=$(OUTPUT)/ > /dev/null;
 	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 		| perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-		| $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+		| $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9][0-9]*\)/\1/g' \
 		| $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 		> $(OUTPUT)/largeDataset_bundleout.txt;
+	# The above command uses sed to do the following (in order):
+	# 1. remove cube filename paths
+	# 2. remove net filename paths
+	# 3. remove digits beyond the fifth decimal place of decimal numbers
+	# 4. remove date and time
+	# 5. remove number of iterations
 	$(CAT) $(OUTPUT)/residuals.csv \
 		| perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 		> $(OUTPUT)/largeDataset_residuals.csv;
