@@ -467,6 +467,41 @@ void IsisMain() {
     qDebug() << "";
   }
   remove("isisMosaic_01.cub");
+  
+  
+  // ***********************************************************
+  // Testing errors that can occur
+  qDebug() << "***********************************************************************************";
+  qDebug() << "Test Pvl Group [BandBin] for mismatch between input cube and established mosaic";
+  qDebug() << "    Create output mosaic";
+  qDebug() << "    Modify Group [BandBin] so it will differ";
+  qDebug() << "    Mosaic the same cube to verify proper error is thrown";
+
+  p.SetOutputCube("TO", 5, 5, 2);
+  p.EndProcess();
+  
+  ProcessMosaic m13;
+  m13.SetInputCube("FROM", 1, 1, 1, -1, -1, -1); 
+  Cube *c = m13.SetOutputCube("TO");
+  m13.StartProcess(1, 1, 1);
+  Pvl *pvl = c->label();
+  PvlKeyword &key = pvl->findKeyword("OriginalBand", Pvl::Traverse);
+  key[0] = "3";
+  m13.EndProcess();
+  
+  try {
+    ProcessMosaic m;
+    m.SetOutputCube("TO");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
+    m.StartProcess(1, 1, 1);
+    m.EndProcess();
+  }
+  catch (IException &e) {
+    e.print();
+    p.EndProcess();
+    qDebug() << "";
+  }
+  remove("isisMosaic_01.cub");
 }
 
 
