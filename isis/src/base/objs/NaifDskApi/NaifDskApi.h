@@ -30,12 +30,6 @@
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 
-extern "C" {
-  #include <SpiceDLA.h>
-  #include <SpiceDSK.h>
-  #include <pl02.h>
-}
-
 // Specs for convenient NAIF vectors and matrices
 #include <tnt/tnt_array1d.h>
 #include <tnt/tnt_array1d_utils.h>
@@ -58,6 +52,9 @@ namespace Isis {
    *   @history 2015-03-08 Jeannie Backer - Moved implementation of validate() methods to cpp file.
    *                           Added qdebug formatters for typedefs so that they can be easily
    *                           printed in unitTests. Added class to ISIS trunk. References #2035
+   *   @history 2017-06-28 Kris Becker - Updated DSK includes for NAIF N0066 release that now
+   *                           includes the DSK formally. The includes are now all in SpiceUsr.h.
+   *                           Removed SPICE includes from the cpp file as well. Fixes #4947.
    */
   
   // Basic type definitions

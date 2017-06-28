@@ -58,6 +58,9 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: added ReportError method to
    *                          truncate paths before data directory. Allows test to pass when not
    *                          using the default data area. Fixes #4738.
+   *   @history 2017-06-28 Kris Becker - Updated DSK includes for NAIF N0066 release that now
+   *                           includes the DSK formally. The includes are now all in SpiceUsr.h.
+   *                           Removed SPICE includes from the cpp file as well. Fixes #4947.
    */
   class NaifDskPlateModel {
 
