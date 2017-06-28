@@ -48,6 +48,7 @@ namespace Isis {
      *                           members and methods and removed implementation of these methods
      *                           since Camera now handles this. References #2335. Fixed 
      *                           indentation.
+     *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
      */        
     class ApolloPanoramicCamera : public LineScanCamera {
     public:
@@ -81,18 +82,32 @@ namespace Isis {
       */
       virtual int SpkReferenceId() const { return (1); }
 
-      /** Returns residual summary statistics from interior orientation as a PvlGroup
-       *
+      /** 
+       * Returns residual summary statistics from interior orientation as a PvlGroup
+       * 
+       * @return PvlGroup Residuals report.
        */
       PvlGroup intOriResidualsReport();
 
-      //! Max interior orientation residual vector length, accesor
+      /**
+       * Max interior orientation residual vector length, accesor
+       * 
+       * @return double Residual max
+       */
       double intOriResidualMax()   const { return m_residualMax; }
 
-      //! Mean (average) of interior orientation residual vector length, accesor
+      /**
+       * Mean (average) of interior orientation residual vector length, accesor
+       * 
+       * @return double Residual mean
+       */
       double intOriResidualMean()  const { return m_residualMean; }
 
-      //! Standard deviation of interior orientation residual vector length, accesor
+      /**
+       * Standard deviation of interior orientation residual vector length, accesor
+       * 
+       * @return double Residual standard deviation
+       */
       double intOriResidualStdev() const { return m_residualStdev; }
 
     private:
