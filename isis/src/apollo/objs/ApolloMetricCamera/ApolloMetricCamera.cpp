@@ -161,7 +161,7 @@ namespace Isis {
  * This is the function that is called in order to instantiate an
  * ApolloMetricCamera object.
  *
- * @param lab Cube labels
+ * @param cube Cube
  *
  * @return Camera* ApolloMetricCamera
  * @internal

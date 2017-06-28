@@ -58,6 +58,7 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
    */
   class ApolloMetricCamera : public FramingCamera {
     public:
