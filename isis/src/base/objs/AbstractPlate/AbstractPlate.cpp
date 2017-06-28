@@ -43,7 +43,6 @@ namespace Isis {
   AbstractPlate::AbstractPlate() {}
 
 
-
   /**
    * Empty destructor for an AbstractPlate object.
    *
@@ -54,13 +53,12 @@ namespace Isis {
   /**
    * Gets the name of this Plate type. 
    *  
-   * @return Then name of this plate, "AbstractPlate" 
+   * @return QString The name of this plate, "AbstractPlate" 
    *
    */
   QString AbstractPlate::name() const {
     return "AbstractPlate";
   }
-
 
 
   /**
