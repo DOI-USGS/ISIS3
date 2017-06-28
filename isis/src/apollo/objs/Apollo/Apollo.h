@@ -38,15 +38,33 @@ namespace Isis {
  *
  * @internal
  *   @history 2007-02-07 Jacob Danton - Original version
+ *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
  */
 
   class Apollo {
     public:
 
+      /**
+       * Constructor. Calls initialize() to set variables based on the QStrings passed in.
+       * 
+       * @param spacecraft The name of the spacecraft
+       * @param instrument The name of the instrument
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       */
       Apollo (QString spacecraft, QString instrument) {
         initialize(spacecraft.toUpper(), instrument.toUpper());
       };
 
+      
+      /**
+       * Constructor. Parses the filename passed in and sets the spacecraft name and instrument.
+       * Calls initialize() to set variables based on the spacecraft and instrument.
+       * 
+       * @param filename The image filename that will be parsed to get the spacecraft and instrument
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       */
       Apollo(QString filename) {
         QString spacecraft, instrument;
         if (filename.mid(0,4) == "AS15") spacecraft = "APOLLO 15";
@@ -70,28 +88,171 @@ namespace Isis {
         initialize(spacecraft, instrument);
       };
 
+      
       //! Destroys the Apollo object
       ~Apollo () {};
 
+      /**
+       * Checks if the instrument is an Apollo Metric camera.
+       * 
+       * @return bool True if the instrument is Metric
+       */
       bool IsMetric () {return p_instrumentId == "METRIC";}
+      
+      
+      /**
+       * Checks if the instrument is an Apollo Panoramic camera.
+       * 
+       * @return bool True if the instrument is Panoramic
+       */
       bool IsPanoramic () {return p_instrumentId == "PANORAMIC";}
+      
+      
+      /**
+       * Checks if the instrument is an Apollo Hasselblad camera.
+       * 
+       * @return bool True if the instrument is Hasselblad
+       */
       bool IsHasselblad () {return p_instrumentId == "HASSELBLAD";}
+      
+      
+      /**
+       * Checks if the spacecraft is Apollo 15
+       * 
+       * @return bool True if the spacecraft is Apollo 15
+       */
       bool IsApollo15 () {return p_spacecraftName == "APOLLO 15";}
+      
+      
+      /**
+       * Checks if the spacecraft is Apollo 16
+       * 
+       * @return bool True if the spacecraft is Apollo 16
+       */
       bool IsApollo16 () {return p_spacecraftName == "APOLLO 16";}
+      
+      
+      /**
+       * Checks if the spacecraft is Apollo 17
+       * 
+       * @return bool True if the spacecraft is Apollo 17
+       */
       bool IsApollo17 () {return p_spacecraftName == "APOLLO 17";}
+      
+      
+      /**
+       * Returns the width of the image. The image width is set in initialize() based on the 
+       * instrument.
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return int Width of the image.
+       */
       int Width () {return p_imageWidth;};
+      
+      
+      /**
+       * Returns the height of the image. The image height is set in initialize() based on the 
+       * instrument.
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return int Height of the image.
+       */
       int Height () {return p_imageHeight;};
+      
+      
+      /**
+       * Returns number of bands in the image. The number of bands is set in initialize() based on  
+       * the instrument.
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return int Bands of the image.
+       */
       int Bands () { return p_imageBands;};
+      
+      
+      /**
+       * Returns the reseau dimension of the image. The reseau dimenstion is set in initialize() 
+       * based on the instrument.
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return int Reseau dimension of the image.
+       */
       int ReseauDimension () {return p_reseauDimension;};
+      
+      
+      /**
+       * Returns pixel pitch for the image. The pixel patch is set in initialize() based on  
+       * the instrument. 
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return double Pixel pitch of the image.
+       */
       double PixelPitch () {return p_imagePixelPitch;};
+      
+      
+      /**
+       * Returns the spacecraft name.
+       * 
+       * @return QString Spacecraft name.
+       */
       QString SpacecraftName () {return p_spacecraftName;};
+      
+      
+      /**
+       * Returns the instrument ID.
+       * 
+       * @return QString Instrument ID.
+       */
       QString InstrumentId () {return p_instrumentId;};
+      
+      
+      /**
+       * Returns the NAIF frame code. The NAIF frame code is set in initialize() based on  the 
+       * spacecraft and instrument. 
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return QString NAIF frame code of the image.
+       */
       QString NaifFrameCode () {return p_naifFrameCode;};
+      
+      
+      /**
+       * Returns the target name which is always the Moon.
+       * 
+       * @return QString Moon.
+       */
       QString TargetName () {return "MOON";};
+      
+      
+      /**
+       * Returns the launch date of the mission. The launch date is set in initialize() based on the 
+       * spacecraft and instrument.
+       * 
+       * @see initialize(QString spacecraft, QString instrument)
+       * 
+       * @return QString Launch date of mission
+       */
       iTime LaunchDate () {return p_launchDate;};
 
       private:
 
+      /**
+       * Sets variables based on the spacecraft name and instrument.
+       * 
+       * @param spacecraft Spacecraft name
+       * @param instrument Instrument ID
+       * 
+       * @throws IException::Unknown "Unknown instrument"
+       * @throws IException::Unknown "Unknown spacecraft"
+       * 
+       * @return void
+       */
       void initialize(QString spacecraft, QString instrument) {
         if (instrument == "METRIC") {
           p_instrumentId = "METRIC";
@@ -107,7 +268,7 @@ namespace Isis {
           p_imageWidth = 231480; // 228987
           p_imageHeight = 23007;
           p_imageBands = 1;
-          p_imagePixelPitch =200.5;
+          p_imagePixelPitch = 200.5;
         }
         else if (instrument == "HASSELBLAD") {
           p_instrumentId = "HASSELBLAD";
@@ -149,10 +310,16 @@ namespace Isis {
         }
       }
 
-      int p_imageWidth, p_imageHeight, p_imageBands, p_reseauDimension;
-      double p_imagePixelPitch;
-      QString p_spacecraftName, p_instrumentId, p_naifFrameCode;
-      iTime p_launchDate;
+      
+      int p_imageWidth;           //!< Image width
+      int p_imageHeight;          //!< Image height
+      int p_imageBands;           //!< Number of bands in the image
+      int p_reseauDimension;      //!< Dimensions of the reseaus
+      double p_imagePixelPitch;   //!< Pixel pitch
+      QString p_spacecraftName;   //!< Spacecraft name
+      QString p_instrumentId;     //!< Instrument ID
+      QString p_naifFrameCode;    //!< NAIF frame code
+      iTime p_launchDate;         //!< Mission launch date
     };
 };
 
