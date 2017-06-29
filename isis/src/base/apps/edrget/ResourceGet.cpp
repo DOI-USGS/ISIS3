@@ -2,9 +2,12 @@
 
 #include <iostream>
 
+#include <QString>
 #include <QtCore>
 #include <QMessageBox>
 #include <QtNetwork>
+#include <QSysInfo>
+
 
 #include "Application.h"
 #include "IException.h"
@@ -86,10 +89,25 @@ namespace Isis {
     }
 
     // Establish the connection and start the GET request
-    m_networkMgr.connectToHost(url.host(), url.port() );
+    m_networkMgr.connectToHost(url.host(),url.port());
+
 
     // We obtain ownership of the QNetworkReply *, so need to delete later
+
     m_reply = m_networkMgr.get(QNetworkRequest(url));
+
+    QString productType(QSysInfo::productType());
+    productType = productType.toLower();
+
+    //If this is running on OS X, then this if statement gets around the SSL Handshaking
+    //errors because Qt is not looking for the DOI root certificate in the correct
+    //place.  Probably here:  /System/Library/Keychains/SystemRootCertificates.keychain
+    //which is where curl looks when downloading this file.
+
+    if (productType.contains("osx") ) {
+       m_reply->ignoreSslErrors();
+    }
+
 
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(connectionFinished()));
@@ -105,7 +123,7 @@ namespace Isis {
 
 
 
-   //tjw:  Timeout event handler monitors the ftp connection and gracefully
+   //Timeout event handler monitors the ftp connection and gracefully
   //closes and exits the application if a timeout occurs.
   void ResourceGet::connectionTimeout() {
       QString timeoutSecs = QString("Timeout error:  GET request exceeded ") +
@@ -129,6 +147,7 @@ namespace Isis {
       // Error message is already set if we encountered a TIMEOUT
       if (m_errorMessage.isEmpty()) {
         m_errorMessage = m_reply->errorString();
+        cout << m_errorMessage << endl;
       }
       
       if (m_errorMessage.contains("Timeout error")) {

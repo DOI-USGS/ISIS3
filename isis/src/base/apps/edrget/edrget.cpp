@@ -48,13 +48,10 @@ void IsisMain() {
       }
 
       //////////////////////////////////////////////////////////////////////////////////
-      // tjw(ref#2259):  The line below starts a child process that launches
+      // The line below starts a child process that launches
       // $ISISROOT/bin/edrget .  This was done because QMainWindow::instance()->exec()
       // which starts the event processing loop has already been called, and
       // cannot be called again to catch events from the FtpGet/HttpGet objects.
-      // Launching a child process appears to have been a quick and dirty way
-      // to get around this.  This code should be refactored under a future ticket.
-      // There is a lot of code duplication.
       //////////////////////////////////////////////////////////////////////////////////
 
       ProgramLauncher::RunIsisProgram("edrget", parameters);

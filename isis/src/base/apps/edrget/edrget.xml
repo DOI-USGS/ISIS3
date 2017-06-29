@@ -44,6 +44,12 @@ xsi:noNamespaceSchemaLocation=
     <change name="Makayla Shepherd" date="2017-03-02">
         Added https to reflect changes in the server.
     </change>
+    <change name="Tyler Wilson" date="2017-06-29">
+        Changed ResourceGet::getResource function.  If there are SSL handshaking errors
+        when attempting to download an https resource,
+        and this application is running on OS X, the network reply is instructed to
+        ignore the errors.  References #4771.
+    </change>
   </history>
 
 
