@@ -51,7 +51,7 @@ namespace Isis {
    * @return (bool) Indicates if there were any problems creating the local file to write to
    */
   bool ResourceGet::getResource(const QUrl &url, QString topath, int timeout) {
-    //tjw:
+
     m_timeOut = timeout;
 
     // Need to setup output file 
@@ -99,12 +99,12 @@ namespace Isis {
     QString productType(QSysInfo::productType());
     productType = productType.toLower();
 
-    //If this is running on OS X, then this if statement gets around the SSL Handshaking
+    //If this application is running on OS X, then this if statement gets around the SSL Handshaking
     //errors because Qt is not looking for the DOI root certificate in the correct
-    //place.  Probably here:  /System/Library/Keychains/SystemRootCertificates.keychain
-    //which is where curl looks when downloading this file.
+    //place. 
 
     if (productType.contains("osx") ) {
+       
        m_reply->ignoreSslErrors();
     }
 
@@ -147,7 +147,7 @@ namespace Isis {
       // Error message is already set if we encountered a TIMEOUT
       if (m_errorMessage.isEmpty()) {
         m_errorMessage = m_reply->errorString();
-        cout << m_errorMessage << endl;
+        
       }
       
       if (m_errorMessage.contains("Timeout error")) {
