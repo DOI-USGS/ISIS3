@@ -118,11 +118,15 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kimberly Oyama" date="2012-11-21">
       Added app tests for BIP and BIL formatted input. References #819.
     </change>
-    <change name="Tyler Wilson" data ="2016-02-25">
+    <change name="Tyler Wilson" date ="2016-02-25">
      Added an app test for opening Galileo NIMS qubes saved in VAX format.  Modified the filter
      tag on FROM parameter in this document to also recognize *.qub files.  All changes
      relating to converting VAX to IEEE were made in ProcessImport, ProcessImportPds.
      References:  #2368.
+    </change>
+    <change name="Summer Stapleton" date="2017-06-27">
+     Added conditional to check whether default offsets and multipliers where changed from their 
+     default values and log them if so.
     </change>
 	
   </history>

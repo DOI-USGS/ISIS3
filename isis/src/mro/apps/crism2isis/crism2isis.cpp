@@ -11,6 +11,7 @@ using namespace Isis;
 void IsisMain() {
   ProcessImportPds p;
   Pvl pdsLabel;
+  PvlGroup results;
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
@@ -24,7 +25,7 @@ void IsisMain() {
   Pvl outLabel;
 
   Pvl labelPvl(inFile.expanded());
-
+  
   QString prodType;
 
   if (labelPvl.hasKeyword("PRODUCT_TYPE")) {
@@ -111,6 +112,15 @@ void IsisMain() {
     //Translate the Mapping group
     p.TranslatePdsProjection(outLabel);
     ocube->putGroup(outLabel.findGroup("Mapping", Pvl::Traverse));
+    
+    //  Check for any change from the default projection offsets and multipliers to log
+    
+    if (p.GetProjectionOffsetChange()) {
+      results = p.GetProjectionOffsetGroup();
+      results[0].addComment("Projection offsets and multipliers have been changed from");
+      results[0].addComment("defaults. New values are below.");
+    }
+
   }
   else if (prodType.toUpper() == "TARGETED_RDR") {
   }
@@ -149,7 +159,7 @@ void IsisMain() {
   p.StartProcess();
   p.EndProcess();
 
-  PvlGroup results("Results");
+  results.setName("Results");
   results += PvlKeyword("Warning", 
                         "When using cam2map or cam2cam, images imported into "
                         "Isis3 using crism2isis should only be interpolated "

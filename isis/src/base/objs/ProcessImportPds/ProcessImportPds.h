@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "Pvl.h"
+#include "PvlGroup.h"
 #include <QString>
 
 namespace Isis {
@@ -218,6 +219,8 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: changed ReportError method to
    *                          truncate paths before data directory. Allows test to pass when not
    *                          using the default data area. Fixes #4738.
+   *   @history 2017-06-26 Summer Stapleton - Added functions to identify and report changes to 
+   *                          the default projection offsets and multipliers. Fixes #4887.
    *
    */
   class ProcessImportPds : public ProcessImport {
@@ -236,6 +239,8 @@ namespace Isis {
       };
       ProcessImportPds();
       virtual ~ProcessImportPds();
+      bool GetProjectionOffsetChange();
+      PvlGroup GetProjectionOffsetGroup();
       void SetPdsFile(const QString &pdsLabelFile, const QString &pdsDataFile,
                       Pvl &pdsLabel, PdsFileType allowedTypes = All);
       void SetPdsFile(const Pvl &pdsLabelPvl, const QString &pdsDataFile,
@@ -283,7 +288,7 @@ namespace Isis {
       void ProcessPdsM3Label(const QString &pdsDataFile, PdsFileType fileType);
       void ProcessPdsCombinedSpectrumLabel(const QString &pdsDataFile);
 
-      void ExtractPdsProjection(PvlToPvlTranslationManager &pdsXlater);
+      void ExtractPdsProjection(PvlToPvlTranslationManager &pdsXlater); 
       void GetProjectionOffsetMults(double &xoff, double &yoff,
                                     double &xmult, double &ymult);
 
@@ -309,6 +314,12 @@ namespace Isis {
       // Projection info
       QString p_projection;       /**< The name of the projection found in
                                              the PDS projection labels*/
+                                             
+      bool p_projectionOffsetChange;    /**< Whether the projection offsets were updated upon 
+                                            loading*/
+ 
+      PvlGroup p_projectionOffsetGroup;      /**< Log information for projection offsets*/
+                                           
       QString p_targetName;       //!<
       double p_equatorialRadius;      /**< Equatorial radius found in the PDS
                                            projection labels*/

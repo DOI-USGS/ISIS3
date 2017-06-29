@@ -83,6 +83,10 @@
       Added additional translation for other keywords in the
       PDS label. Fixes #1959.
     </change>
+    <change name="Summer Stapleton" date ="2017-06-27">
+     Added conditional to check whether default offsets and multipliers where changed from their 
+     default values and log them if so.
+    </change>
   </history>
 
   <category>
