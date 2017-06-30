@@ -27,10 +27,10 @@ namespace Isis {
   /**
    * @brief Store and/or manipulate pixel values
    *
-   * This class can store pixel information and also contains 
-   * utility methods for testing and modifying pixel and special 
-   * pixel values that can be used without instanteating the 
-   * class.  
+   * This class can store pixel information and also contains
+   * utility methods for testing and modifying pixel and special
+   * pixel values that can be used without instanteating the
+   * class.
    *
    * @ingroup Utility
    *
@@ -49,7 +49,7 @@ namespace Isis {
    *                                         several conversion methods
    *  @history 2009-02-03 Travis Addair - Modified documentation
    *           for clarity
-   *  
+   *
    *  @history 2015-05-11 Kristin Berry - Added ability to store
    *                                 pixel information/made class
    *                                 instantiatable and updated
@@ -63,11 +63,12 @@ namespace Isis {
   class Pixel {
     public:
       Pixel();
-      Pixel(int sample, int line, int band, double DN); 
-      Pixel(const Pixel& pixel); 
+      Pixel(int sample, int line, int band, double DN);
+      Pixel(const Pixel& pixel);
       virtual ~Pixel();
 
-      Pixel &operator=(const Pixel& other); 
+
+      Pixel &operator=(const Pixel& other);
 
       int line() const;
       int sample() const;
@@ -87,7 +88,7 @@ namespace Isis {
       static double ToDouble(const short int t);
       static double ToDouble(const short unsigned int t);
       static double ToDouble(const float t);
-      double ToDouble(); 
+      double ToDouble();
 
       static float ToFloat(const unsigned char d);
       static float ToFloat(const short int d);
@@ -96,7 +97,7 @@ namespace Isis {
       float ToFloat();
 
       static std::string ToString(double d);
-      std::string ToString(); 
+      std::string ToString();
 
       /**
        * Returns true if the input pixel is special. Not special implies it is valid to
@@ -117,7 +118,7 @@ namespace Isis {
        * @return bool
        */
       bool IsSpecial() {
-        return IsSpecial(m_DN); 
+        return IsSpecial(m_DN);
       }
 
       /**
@@ -152,7 +153,7 @@ namespace Isis {
        * @return bool
        */
       bool IsValid() {
-        return IsValid(m_DN); 
+        return IsValid(m_DN);
       }
 
       /**
@@ -165,14 +166,14 @@ namespace Isis {
       static inline bool IsNull(const double d) {
         return(d == NULL8);
       }
-   
+
      /**
        * Returns true if the input pixel is null
        *
        * @return bool
        */
       bool IsNull() {
-        return IsNull(m_DN); 
+        return IsNull(m_DN);
       }
 
       /**
@@ -192,7 +193,7 @@ namespace Isis {
        * @return bool
        */
       bool IsHigh() {
-        return IsHigh(m_DN); 
+        return IsHigh(m_DN);
       }
 
       /**
@@ -209,12 +210,10 @@ namespace Isis {
      /**
        * Returns true if the input pixel is one of the low saturation types
        *
-       * @param d Pixel value to test
-       *
        * @return bool
        */
       bool IsLow() {
-        return IsLow(m_DN); 
+        return IsLow(m_DN);
       }
 
       /**
@@ -234,7 +233,7 @@ namespace Isis {
        * @return bool
        */
       bool IsHrs() {
-        return IsHrs(m_DN); 
+        return IsHrs(m_DN);
       }
 
       /**
@@ -254,7 +253,7 @@ namespace Isis {
        * @return bool
        */
       bool IsHis() {
-        return IsHis(m_DN); 
+        return IsHis(m_DN);
       }
 
       /**
@@ -274,7 +273,7 @@ namespace Isis {
        * @return bool
        */
       bool IsLis() {
-        return IsLis(m_DN); 
+        return IsLis(m_DN);
       }
 
       /**
@@ -294,7 +293,7 @@ namespace Isis {
        * @return bool
        */
       bool IsLrs() {
-        return IsLrs(m_DN); 
+        return IsLrs(m_DN);
       }
 
   private:
@@ -308,7 +307,7 @@ namespace Isis {
     int m_band;
 
     //! DN of pixel
-    double m_DN; 
+    double m_DN;
 
   }; // end of pixel class
 }
