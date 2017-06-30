@@ -364,7 +364,7 @@ void IsisMain() {
       if ( isValid(m_p) ) {  // Handle valid points
         if ( !cnet.isNull() ) {
           if ( (true == setaprioribest) && !m_p->IsEditLocked() ) {
-            m_p->SetAdjustedSurfacePoint(m_p->GetBestSurfacePoint());
+            m_p->SetAprioriSurfacePoint(m_p->GetBestSurfacePoint());
           }
           cnet->AddPoint(m_p);
           oPoints++;
@@ -380,7 +380,7 @@ void IsisMain() {
     else {  // Handle points when not cleaning
       if ( !cnet.isNull() ) {
         if ( (true == setaprioribest) && !m_p->IsEditLocked() ) {
-          m_p->SetAdjustedSurfacePoint(m_p->GetBestSurfacePoint());
+          m_p->SetAprioriSurfacePoint(m_p->GetBestSurfacePoint());
         }
 
         cnet->AddPoint(m_p); 
