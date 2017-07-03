@@ -375,6 +375,8 @@ namespace Isis {
  *
  * @param dbg The QDebug we're printing into
  * @param angleToPrint The Angle to display
+ * 
+ * @return QDebug
  */
 QDebug operator<<(QDebug dbg, const Isis::Angle &angleToPrint) {
   dbg.nospace() << angleToPrint.radians() << " <radians> ("
