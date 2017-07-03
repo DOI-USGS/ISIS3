@@ -11,9 +11,16 @@ using std::min;
 using std::max;
 
 namespace Isis {
+  /**
+   * Empty constructor
+   * 
+   * @param pvl  Pvl object containing a valid Anisotropic2 specification
+   * @param pmodel PhotoModel object containing valid Anisotropic2 data
+   */
   Anisotropic2::Anisotropic2(Pvl &pvl, PhotoModel &pmodel) : AtmosModel(pvl, pmodel) {
   }
 
+  
   /**
    * Anisotropic atmospheric scattering with P1 single-particle
    * phase fn, in the second approximation.  This subroutine goes
@@ -337,6 +344,7 @@ namespace Isis {
     p_transs = p_trans0;
   }
 }
+
 
 extern "C" Isis::AtmosModel *Anisotropic2Plugin(Isis::Pvl &pvl,
     Isis::PhotoModel &pmodel) {
