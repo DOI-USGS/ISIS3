@@ -5,6 +5,12 @@
 #include "NormModel.h"
 
 namespace Isis {
+  /**
+   * Constructs an Albedo object.
+   * 
+   * @param pvl
+   * @param pmodel
+   */
   Albedo::Albedo(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
     PvlGroup &algorithm = pvl.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse);
 
@@ -49,6 +55,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Performs the normalization.
+   * 
+   * @param phase The phase angle.
+   * @param incidence The incidence angle.
+   * @param emission The emission angle.
+   * @param demincidence The local incidence angle
+   * @param dememission The local emission angle
+   * @param dn The DN value
+   * @param albedo ???
+   * @param mult ???
+   * @param base ???
+   */
   void Albedo::NormModelAlgorithm(double phase, double incidence,
                                   double emission, double demincidence, double dememission,
                                   double dn, double &albedo, double &mult, double &base) {
@@ -79,6 +98,7 @@ namespace Isis {
     }
   }
 
+  
   /**
     * Set the normalization function parameter. This is the
     * reference phase angle to which the image photometry will

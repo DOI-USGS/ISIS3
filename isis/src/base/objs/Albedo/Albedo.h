@@ -53,6 +53,7 @@ namespace Isis {
    *                      conditions in initialization
    *  @history 2010-11-30 Janet Barrett - Added ability to use photometric angles
    *                      from the ellipsoid or the DEM
+   *  @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
    *
    */
   class Albedo : public NormModel {
@@ -61,6 +62,17 @@ namespace Isis {
       virtual ~Albedo() {};
 
     protected:
+      /**
+       * Performs the normalization.
+       * 
+       * @param pha The phase angle.
+       * @param inc The incidence angle.
+       * @param ema The emission angle.
+       * @param dn The DN value
+       * @param albedo ???
+       * @param mult The multiplier of the image
+       * @param base The base of the image
+       */
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
                                         double dn, double &albedo, double &mult, double &base) {};
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
@@ -76,13 +88,13 @@ namespace Isis {
       void SetNormThresh(const double thresh);
       void SetNormAlbedo(const double albedo);
 
-      double p_normPsurfref;
-      double p_normPharef;
-      double p_normIncref;
-      double p_normEmaref;
-      double p_normThresh;
-      double p_normIncmat;
-      double p_normAlbedo;
+      double p_normPsurfref; //!< The Normal
+      double p_normPharef; //!< The reference phase angle
+      double p_normIncref; //!< The reference incidence angle
+      double p_normEmaref; //!< The reference emission angle
+      double p_normThresh; //!< Used to amplify variations in the input image
+      double p_normIncmat; //!< Incmat
+      double p_normAlbedo; //!< The albedo
   };
 };
 
