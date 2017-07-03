@@ -65,8 +65,8 @@ namespace Isis {
    * @param dememission The local emission angle
    * @param dn The DN value
    * @param albedo ???
-   * @param mult ???
-   * @param base ???
+   * @param mult The multiplier of the image
+   * @param base The base of the image
    */
   void Albedo::NormModelAlgorithm(double phase, double incidence,
                                   double emission, double demincidence, double dememission,

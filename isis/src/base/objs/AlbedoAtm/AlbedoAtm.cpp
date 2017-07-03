@@ -67,13 +67,17 @@ namespace Isis {
   }
 
   /**
-   * @param phase Value of phase angle.
-   * @param incidence  Value of incidence angle.
-   * @param emission Value of emission angle.
-   * @param dn
-   * @param albedo
-   * @param mult
-   * @param base
+   * Performs the normalization.
+   * 
+   * @param phase The phase angle.
+   * @param incidence The incidence angle.
+   * @param emission The emission angle.
+   * @param demincidence The local incidence angle
+   * @param dememission The local emission angle
+   * @param dn The DN value
+   * @param albedo ???
+   * @param mult The multiplier of the image
+   * @param base The base of the image
    * @internal
    *   @history 2008-11-05 Jeannie Walldren - Modified references
    *          to NumericalMethods class and replaced Isis::PI with

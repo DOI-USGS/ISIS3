@@ -53,7 +53,7 @@ namespace Isis {
    *                      conditions in initialization
    *  @history 2010-11-30 Janet Barrett - Added ability to use photometric angles
    *                      from the ellipsoid or the DEM
-   *  @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
+   *  @history 2017-07-03 Makayla Shepherd - Updated documentation. References #4807.
    *
    */
   class Albedo : public NormModel {
@@ -88,7 +88,7 @@ namespace Isis {
       void SetNormThresh(const double thresh);
       void SetNormAlbedo(const double albedo);
 
-      double p_normPsurfref; //!< The Normal
+      double p_normPsurfref; //!< ???
       double p_normPharef; //!< The reference phase angle
       double p_normIncref; //!< The reference incidence angle
       double p_normEmaref; //!< The reference emission angle
