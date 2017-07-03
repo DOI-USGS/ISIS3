@@ -7,6 +7,12 @@
 using std::max;
 
 namespace Isis {
+  /**
+   * Constructs an Anisotropic1 object
+   * 
+   * @param pvl  Pvl object containing a valid Anisotropic1 specification
+   * @param pmodel PhotoModel object containing valid Anisotropic1 data
+   */
   Anisotropic1::Anisotropic1(Pvl &pvl, PhotoModel &pmodel) : AtmosModel(pvl, pmodel) {
 
     // Set default values
