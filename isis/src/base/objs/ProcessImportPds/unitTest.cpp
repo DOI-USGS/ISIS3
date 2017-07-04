@@ -155,6 +155,31 @@ void IsisMain() {
   catch (Isis::IException &e) {
     ReportError(e.toString());
   }
+  
+  //  Test that defaults for projection offsets are changed and can be returned
+  {
+    cout << endl << "********************************************************************" << endl;
+    cout << "Test that defaults for projection offsets are changed and can be returned" << endl;
+    Isis::ProcessImportPds p;
+    Pvl plab;
+    p.SetPdsFile("$base/testData/ff17.lbl", "$base/testData/ff17.img", plab);
+    p.SetOutputCube("TO");
+    p.StartProcess();
+    Pvl proj;
+    p.TranslatePdsProjection(proj);
+    if (p.GetProjectionOffsetChange()) {
+      cout << "Projection offsets were changed. New values:" << endl;
+      PvlGroup group = p.GetProjectionOffsetGroup();
+      for (int i = 0; i < group.keywords(); i++) {
+        PvlKeyword temp = group[i];
+        cout << temp.name() + " = " + temp[0] << endl;
+      }
+    }
+    
+    p.EndProcess();
+    QFile::remove(Isis::Application::GetUserInterface().GetFileName("TO"));
+  }
+  
 }
 
 /**

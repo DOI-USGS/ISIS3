@@ -1199,8 +1199,14 @@ namespace Isis {
             }
           }
           else if (outKey[j] != inKey[k]) {
-            QString msg = "Pvl Group [BandBin] in Key[" + outKey.name() + "] In value" + inKey[k] +
-                         "and Out value=" + outKey[j] + " do not match";
+            QString msg = "The input cube [" + inLab->fileName() + "] and the base mosaic values "
+                           "of the Pvl Group [BandBin] for Keyword [" + outKey.name() + "] do not "
+                           "match. Base mosaic value at index [" + QString::number(j) + "] = " + 
+                           outKey[j] + ". Input cube value at index [" + QString::number(k) + "] = "
+                           + inKey[k] + ". **Note: use mapmos/automos MatchBandBin = false to "
+                           "override this check**";
+            //QString msg = "Pvl Group [BandBin] in Key[" + outKey.name() + "] In value" + inKey[k] +
+                         //"and Out value=" + outKey[j] + " do not match";
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }

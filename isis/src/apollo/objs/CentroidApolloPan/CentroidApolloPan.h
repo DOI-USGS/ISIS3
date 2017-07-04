@@ -37,9 +37,11 @@ namespace Isis {
    *                                                                        
    * @internal                                                              
    *   @history 2011-10-22 Orrin Thomas - Original version
+   *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
    */        
   class CentroidApolloPan : public Centroid {
   public:
+    
     CentroidApolloPan(double pixel_size_microns);
     virtual ~CentroidApolloPan();
     bool setPixelSize(double microns);
@@ -48,7 +50,7 @@ namespace Isis {
     int selectAdaptive(Chip *inputChip,Chip *selectionChip);
 
   private:
-    double m_pixelSize;  //pixel size in microns
+    double m_pixelSize;  //!< pixel size in microns
   };
 }
 #endif

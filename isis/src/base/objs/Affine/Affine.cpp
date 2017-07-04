@@ -227,6 +227,8 @@ namespace Isis {
    * are returned in a 3-dimensional vector
    *
    * @param var The coefficient vector index (1 or 2)
+   * 
+   * @return vector<double> Vector of coefficients
    */
   vector<double> Affine::Coefficients(int var) {
     int index = var - 1;
@@ -242,6 +244,8 @@ namespace Isis {
    * The coefficients are returned in a 3-dimensional vector
    *
    * @param var The inverse coefficient vector index
+   * 
+   * @return vector<double> Vector of inverse coefficients
    */
   vector<double> Affine::InverseCoefficients(int var) {
     int index = var - 1;

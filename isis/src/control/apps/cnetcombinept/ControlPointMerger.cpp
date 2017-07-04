@@ -145,6 +145,7 @@ namespace Isis {
   int ControlPointMerger::merge(ControlPoint *source, ControlPoint *candidate, 
                                 const Statistics &stats) {
     int nMerged(0);
+    bool setCandidateType = true;
 
     // Gut check to ensure we don't merge into ourself
     if ( source != candidate ) {
@@ -156,8 +157,18 @@ namespace Isis {
       ControlMeasureLogData data(ControlMeasureLogData::GoodnessOfFit,
                                   goodnessoffit);
 
-      // Consider only valid measures
+      // Consider only valid measures                  
       QList<ControlMeasure*> measures = candidate->getMeasures(true); 
+
+      //Check to see if reference measures for both source/candidate are the same.
+      if (source->GetRefMeasure() == candidate->GetRefMeasure()) {
+
+
+        setCandidateType = false;
+
+      }
+
+
       BOOST_FOREACH ( ControlMeasure *m, measures ) {
         if ( !source->HasSerialNumber(m->GetCubeSerialNumber()) ) {
           QScopedPointer<ControlMeasure> p_m(new ControlMeasure(*m));
@@ -166,15 +177,19 @@ namespace Isis {
           if ( candidate->GetRefMeasure() == m ) {
             p_m->SetResidual(residual, residual);
             p_m->SetLogData(data);
-          }
 
+
+          }
+          if (setCandidateType) {
+            p_m->SetType(ControlMeasure::Candidate);
+          }
           source->Add( p_m.take() ); 
           nMerged++;
         }
       }
       // Essentially disables this point meaning this point is already merged 
       // with another
-      if (nMerged > 0) candidate->SetIgnored(true);
+      candidate->SetIgnored(true);
     }
 
     return ( nMerged );

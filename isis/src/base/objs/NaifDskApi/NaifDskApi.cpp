@@ -23,15 +23,6 @@
  */ 
 #include "NaifDskApi.h"
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-
-extern "C" {
-  #include <SpiceDLA.h>
-  #include <SpiceDSK.h>
-  #include <pl02.h>
-}
-
 // Specs for convenient NAIF vectors and matrices
 #include <tnt/tnt_array1d.h>
 #include <tnt/tnt_array1d_utils.h>

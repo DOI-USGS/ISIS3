@@ -42,13 +42,6 @@
 #endif
 #include <QScopedPointer>
 
-#include <dsk_proto.h>
-#include <SpiceDLA.h>
-#include <SpiceDSK.h>
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZim.h>
-
 #include "FileName.h"
 #include "IException.h"
 #include "Intercept.h"

@@ -39,6 +39,10 @@
     <change name="Kristin Berry" date="2014-05-22"> 
 	Updated to work on PDS level 2 label files which lack the BAND_NAME field. 
     </change>
+    <change name="Summer Stapleton" date ="2017-06-27">
+     Added conditional to check whether default offsets and multipliers where changed from their 
+     default values and log them if so.
+    </change>
   </history>
 
   <category>

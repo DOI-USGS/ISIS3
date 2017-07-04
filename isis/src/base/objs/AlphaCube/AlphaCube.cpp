@@ -27,7 +27,11 @@
 using namespace std;
 
 namespace Isis {
-  //! Constructs an AlphaCube object using a PVL object.
+  /**
+   * Constructs an AlphaCube object using a PVL object.
+   * 
+   * @param cube The cube to write to
+   */
   AlphaCube::AlphaCube(Cube &cube) {
     Isis::PvlObject &isiscube = cube.label()->findObject("IsisCube");
     if(isiscube.hasGroup("AlphaCube")) {
@@ -55,9 +59,19 @@ namespace Isis {
     ComputeSlope();
   }
 
-  /** Constructs an AlphaCube object with a basic mapping from corner-to-corner,
+  /** 
+   * Constructs an AlphaCube object with a basic mapping from corner-to-corner,
    * beta 0.5,0.5 maps to alpha 0.5,0.5 and beta ns+0.5,nl+0.5 maps to alpha
    * ns+0.5, nl+0.5.
+   * 
+   * @param alphaSamples Number of alpha samples in the cube
+   * @param alphaLines Number of alpha lines in the cube
+   * @param betaSamples Number of beta samples in the cube
+   * @param betaLines Number of beta lines in the cube
+   * @param alphaSs Starting alpha sample
+   * @param alphaSl Starting alpha line
+   * @param alphaEs Ending alpha sample
+   * @param alphaEl Ending alpha line
    */
   AlphaCube::AlphaCube(int alphaSamples, int alphaLines,
                        int betaSamples, int betaLines,
@@ -76,8 +90,14 @@ namespace Isis {
     ComputeSlope();
   }
 
-  /** Constructs an AlphaCube object given alphaSamples, alphaLines,
-   *  betaSamples and betaLines.
+  /** 
+   * Constructs an AlphaCube object given alphaSamples, alphaLines,
+   * betaSamples and betaLines.
+   * 
+   * @param alphaSamples Number of alpha samples in the cube
+   * @param alphaLines Number of alpha lines in the cube
+   * @param betaSamples Number of beta samples in the cube
+   * @param betaLines Number of beta lines in the cube
    */
   AlphaCube::AlphaCube(int alphaSamples, int alphaLines,
                        int betaSamples, int betaLines) {
@@ -123,7 +143,7 @@ namespace Isis {
    * If not then is will write the keywords in the Instrument group if it exists.
    * Otherwise it will write to the AlphaCube group.
    *
-   * @param &pvl The PVL object to write to.
+   * @param &cube The cube to write to.
    *
    */
   void AlphaCube::UpdateGroup(Isis::Cube &cube) {

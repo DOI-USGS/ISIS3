@@ -157,6 +157,15 @@ void IsisMain() {
     }
     outcube->putGroup(kerns);
   }
+  
+  //  Check for and log any change from the default projection offsets and multipliers
+  if (p.GetProjectionOffsetChange()) {
+    PvlGroup results = p.GetProjectionOffsetGroup();
+    results.setName("Results");
+    results[0].addComment("Projection offsets and multipliers have been changed from");
+    results[0].addComment("defaults. New values are below.");
+    Application::Log(results);
+  }
 
   p.EndProcess();
 }

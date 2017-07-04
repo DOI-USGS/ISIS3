@@ -217,11 +217,11 @@ TIFFLIBDIR = -L$(ISIS3OPT)/lib
 TIFFLIB    = -ltiff
 
 #---------------------------------------------------------------------------
-# Set up for naif dsk and cspice libraries
+# Set up for naif cspice libraries. Update for N0066 Release (KJB 2017-06-28)
 #---------------------------------------------------------------------------
-NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/dsklib -I$(ISIS3LOCAL)/include/naif/
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/
 NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
-NAIFLIB    = -ldsklib -lcspice
+NAIFLIB    = -lcspice
 
 #---------------------------------------------------------------------------
 # Set up for TNT
@@ -416,7 +416,6 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsnappy.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libwebp*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libdbus*.dylib"
 
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsklib*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"

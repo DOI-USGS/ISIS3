@@ -92,6 +92,15 @@ void IsisMain() {
       (otherLabels.findGroup("Archive").keywords() > 0)) {
     ocube->putGroup(otherLabels.findGroup("Archive"));
   }
+  
+  //  Check for and log any change from the default projection offsets and multipliers
+  if (p.GetProjectionOffsetChange()) {
+    PvlGroup results = p.GetProjectionOffsetGroup();
+    results.setName("Results");
+    results[0].addComment("Projection offsets and multipliers have been changed from");
+    results[0].addComment("defaults. New values are below.");
+    Application::Log(results);
+  }
 
   p.EndProcess();
 

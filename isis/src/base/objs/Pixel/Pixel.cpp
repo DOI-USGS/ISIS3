@@ -28,22 +28,22 @@ namespace Isis {
 
   /**
    * @brief Constructs an empty Pixel
-   * 
+   *
    * @author 2015-08-05 Kristin Berry
    */
   Pixel::Pixel() {
     m_line = 0;
     m_sample = 0;
     m_band = 0;
-    m_DN = Isis::Null; 
+    m_DN = Isis::Null;
   }
 
 
   /**
    * @brief Constructs a Pixel given a line, sample, band, and DN.
-   * 
+   *
    * @author 2015-05-08 Kristin Berry
-   * 
+   *
    * @param line line coordinate
    * @param sample sample coordinate
    * @param band band coordinate
@@ -52,16 +52,16 @@ namespace Isis {
   Pixel::Pixel(int sample, int line, int band, double DN) {
     m_sample = sample;
     m_line = line;
-    m_band = band; 
-    m_DN = DN; 
+    m_band = band;
+    m_DN = DN;
   }
 
 
   /**
-   * @brief Constructs a Pixel, given a Pixel. 
-   * 
+   * @brief Constructs a Pixel, given a Pixel.
+   *
    * @author 2015-08-05 Kristin Berry
-   * 
+   *
    * @param pixel Pixel to copy
    */
   Pixel::Pixel(const Pixel& pixel) {
@@ -72,13 +72,19 @@ namespace Isis {
   }
 
 
-  //! Copy assignment operator 
+  /**
+   * Copy assignment operator
+   *
+   * @param other Pixel the Pixel to be copied
+   *
+   * @return Pixel Pointer to self
+   */
   Pixel &Pixel::operator=(const Pixel& other) {
     m_line = other.line();
-    m_sample = other.sample(); 
+    m_sample = other.sample();
     m_band = other.band();
-    m_DN = other.DN(); 
-    return *this; 
+    m_DN = other.DN();
+    return *this;
   }
 
 
@@ -86,25 +92,25 @@ namespace Isis {
   Pixel::~Pixel() {}
 
 
-  //! Returns the line coordinate of the Pixel
+  //! @return int The line coordinate of the Pixel
   int Pixel::line() const {
     return m_line;
   }
 
 
-  //! Returns the sample coordinate of the Pixel
+  //! @return int The sample coordinate of the Pixel
   int Pixel::sample() const {
     return m_sample;
   }
 
 
-  //! Returns the band coordinate of the Pixel
+  //! @return int The band coordinate of the Pixel
   int Pixel::band() const {
     return m_band;
   }
 
 
-  //! Returns the DN of the Pixel
+  //! @return double The DN value of the Pixel
   double Pixel::DN() const {
     return m_DN;
   }
@@ -143,12 +149,12 @@ namespace Isis {
 
   /**
    * Converts internal pixel value to an unsigned char pixel with
-   * special pixel translations 
+   * special pixel translations
    *
    * @return unsigned char The unsigned char pixel value
   */
   unsigned char Pixel::To8Bit() {
-    return To8Bit(m_DN); 
+    return To8Bit(m_DN);
   }
 
 
@@ -191,13 +197,13 @@ namespace Isis {
 
 
   /**
-   * Converts internal pixel value to a short int pixel with 
-   * special pixel translations 
-   *  
+   * Converts internal pixel value to a short int pixel with
+   * special pixel translations
+   *
    * @return short int The short int pixel value
    */
   short int Pixel::To16Bit() {
-    return To16Bit(m_DN); 
+    return To16Bit(m_DN);
   }
 
   /**
@@ -239,13 +245,13 @@ namespace Isis {
 
 
   /**
-   * Converts internal pixel value to a short int pixel with 
-   * special pixel translations 
-   *  
+   * Converts internal pixel value to a short int pixel with
+   * special pixel translations
+   *
    * @return short unsigned int The short int pixel value
    */
   short unsigned int Pixel::To16Ubit() {
-    return To16UBit(m_DN); 
+    return To16UBit(m_DN);
   }
 
   /**
@@ -270,12 +276,12 @@ namespace Isis {
 
   /**
    * Converts internal pixel value to float with special pixel
-   * translations 
+   * translations
    *
    * @return float The float pixel value
    */
   float Pixel::To32Bit() {
-    return To32Bit(m_DN); 
+    return To32Bit(m_DN);
   }
 
 
@@ -319,7 +325,7 @@ namespace Isis {
     }
     else                              return((double) d);
   }
-  
+
   /**
    * Converts short unsigned int pixels to double pixels with special pixel translations
    *
@@ -362,12 +368,12 @@ namespace Isis {
 
 
   /**
-   * Converts stored pixel value to a double. 
+   * Converts stored pixel value to a double.
    *
    * @return double The double pixel value
    */
   double Pixel::ToDouble() {
-    return m_DN; 
+    return m_DN;
   }
 
 
@@ -414,7 +420,7 @@ namespace Isis {
     else if(t > (double) VALID_MAX2) return(HIGH_REPR_SAT8);
     else                              return((float) t);
   }
-  
+
   /**
    * Converts short unsigned int to float with pixel translations and
    * care for overflows (underflows are assumed to cast to 0!)
@@ -458,15 +464,15 @@ namespace Isis {
   }
 
   /**
-   * Converts internal pixel value to float with pixel 
-   * translations and care for overflows (underflows are assumed 
-   * to cast to 0!) 
+   * Converts internal pixel value to float with pixel
+   * translations and care for overflows (underflows are assumed
+   * to cast to 0!)
    *
    * @return float The float pixel value
    */
   float Pixel::ToFloat() {
-    return ToFloat(m_DN); 
-  }  
+    return ToFloat(m_DN);
+  }
 
   /**
    * Takes a double pixel value and returns the name of the pixel type as a
@@ -496,6 +502,6 @@ namespace Isis {
    * @return string The name of the pixel type
    */
   string Pixel::ToString() {
-    return ToString(m_DN); 
+    return ToString(m_DN);
   }
 }

@@ -382,6 +382,9 @@
               Group = IgnoreKeys
               End_Group
 
+              Group = IgnoreFilePaths
+              End_Group
+
               End
             </code>
           </pre>
@@ -402,6 +405,14 @@
             </code>
           </pre>
           Note: The value of this keyword does not matter.
+
+          To ignore a file's path up until the name, Put a corresponding
+          keyword set to true inside the IgnoreFilePaths group.
+          <pre>
+            <code>
+              KeywordName = true
+            </code>
+          </pre>
           <br />
           With these formats in mind, to give a tolerance for the keyword
           StandardDeviation of 0.0000000001 and ignore the keyword FileName
@@ -414,6 +425,10 @@
 
               Group = IgnoreKeys
               FileName = true
+              End_Group
+
+              Group = IgnoreFilePaths
+              FilePath = true
               End_Group
 
               End
@@ -432,6 +447,7 @@
             <code>
               Object = IsisCube
               Object = Core
+              SomeFile = /foo/bar/fakefile.cub
               StartByte   = 65537
               Format      = Tile
               TileSamples = 128
@@ -460,9 +476,10 @@
             </code>
           </pre>
           The SomeCalculation keyword may vary by 0.000000001 and the
-          ByteOrder could be MSB or LSB. To compensate for this, you would add
-          a file named cubelabels.pvl.DIFF in the input folder with the
-          following:
+          ByteOrder could be MSB or LSB. SomeFile could have a different path if
+          the tester is not using the default data area. To compensate for
+          this, you would add a file named cubelabels.pvl.DIFF in the input
+          folder with the following:
           <pre>
             <code>
               Group = Tolerances
@@ -473,11 +490,15 @@
               ByteOrder = true
               End_Group
 
+              Group = IgnoreFilePaths
+              SomeFile = true
+              End_Group
+
               End
             </code>
           </pre>
-          This would ignore the value of ByteOrder always and SomeCalculation
-          if it were within the tolerance.
+          This would ignore the value of ByteOrder always, the path of SomeFile,
+          and the value of SomeCalculation if it were within the tolerance.
           <p>
             Finally, you can create unique tolerances and ignore keys for each
             element of an array contained within a keyword, like so:
@@ -493,13 +514,17 @@
               SomeArray =(false, true, false)
               End_Group
 
+              Group = IgnoreFilePaths
+              SomeArray = (false, false, true)
+              End_Group
+
               End
             </code>
           </pre>
           In the above case, the keyword SomeArray would have a tolerance of
           0.000000001 applied to the first element, a tolerance of 0.025
           applied to the third element, and the second element would be
-          ignored entirely.  
+          ignored entirely.
           <p>
             Just make sure when working with arrays that you have exactly the
             same number of tolerances/ignore keys for the keyword as there are
@@ -509,7 +534,7 @@
             AnotherArray could have 50 elements, but each element would have a
             tolerance of 0.000000001 applied to it.  Having multiple
             tolerances and ignore keys without matching the number of array
-            elements, however, will result in an error.  
+            elements, however, will result in an error.
           </p>
         </p>
 
@@ -707,17 +732,17 @@
           </li>
           <li>Add variables as needed</li>
           <ol>
-            <li type="a">e.g. add a tolerance to the output cube would be 
+            <li type="a">e.g. add a tolerance to the output cube would be
               ratioTruth1.cub.TOLERANCE = someValue </li>
           </ol>
           <li>Copy input files into the input directory</li>
           <ol>
-            <li type="a">In the example above copy isisTruth.cub into the input directory 
+            <li type="a">In the example above copy isisTruth.cub into the input directory
               from the $ISIS3DATA/base/testData area. </li>
           </ol>
           <li>Copy the truth file from the application test to the truth directory</li>
           <ol>
-            <li type="a">In the example above copy ratioTruth1.cub into the truth directory 
+            <li type="a">In the example above copy ratioTruth1.cub into the truth directory
               from the appTest directory of the ratio application </li>
           </ol>
           <li>Type

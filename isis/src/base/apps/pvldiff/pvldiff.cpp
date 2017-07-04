@@ -6,6 +6,7 @@
 #include "PvlContainer.h"
 #include "Pvl.h"
 #include "IException.h"
+#include "QRegularExpression"
 
 
 using namespace std;
@@ -15,6 +16,7 @@ bool filesMatch;
 QString differenceReason;
 PvlGroup tolerances;
 PvlGroup ignorekeys;
+PvlGroup ignorefilepaths;
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2);
@@ -25,6 +27,7 @@ void IsisMain() {
 
   tolerances = PvlGroup();
   ignorekeys = PvlGroup();
+  ignorefilepaths = PvlGroup();
   differenceReason = "";
   filesMatch = true;
 
@@ -40,6 +43,10 @@ void IsisMain() {
 
     if(diffFile.hasGroup("IgnoreKeys")) {
       ignorekeys = diffFile.findGroup("IgnoreKeys");
+    }
+
+    if(diffFile.hasGroup("IgnoreFilePaths")) {
+      ignorefilepaths = diffFile.findGroup("IgnoreFilePaths");
     }
   }
 
@@ -77,6 +84,8 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     return;
   }
 
+  // Make sure that  Tolerances, IgnoreKeys and IgnoreFilePaths each have either one argument that
+  // applies to all values in the keyword OR a one-to-one relationship between the two
   if(tolerances.hasKeyword(pvl1.name()) &&
       tolerances[pvl1.name()].size() > 1 &&
       pvl1.size() != tolerances[pvl1.name()].size()) {
@@ -93,9 +102,18 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  if (ignorefilepaths.hasKeyword(pvl1.name()) &&
+      ignorefilepaths[pvl1.name()].size() > 1 &&
+      pvl1.size() != ignorefilepaths[pvl1.name()].size()) {
+    QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
+    msg += "its number of filepath ignores in the DIFF file.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
   for(int i = 0; i < pvl1.size() && filesMatch; i++) {
     QString val1 = pvl1[i];
     QString val2 = pvl2[i];
+
     QString unit1 = pvl1.unit(i);
     QString unit2 = pvl2.unit(i);
 
@@ -103,6 +121,16 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     if(ignorekeys.hasKeyword(pvl1.name()) && ignorekeys[pvl1.name()].size() > 1) {
       ignoreIndex = i;
     }
+
+    // If we only have one value for the keyword, use it for all paths in the keyword's array,
+    // otherwise use the corresponding IgnoreFilePaths value
+    if (ignorefilepaths.hasKeyword(pvl1.name()) &&
+      (((ignorefilepaths[pvl1.name()].size() > 1 && ignorefilepaths[pvl1.name()][i] == "true") ||
+        (ignorefilepaths[pvl1.name()].size() == 1 && ignorefilepaths[pvl1.name()][0] == "true")))) {
+          val1 =  val1.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
+          val2 =  val2.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
+    }
+
 
     try {
       if(!ignorekeys.hasKeyword(pvl1.name()) ||

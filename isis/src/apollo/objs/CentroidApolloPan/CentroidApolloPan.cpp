@@ -36,7 +36,14 @@
 
 
 using namespace std;
+
 namespace Isis {
+
+  /**
+   * Constructs a CentroidApolloPan object.
+   * 
+   * @param pixelSizeMicrons The pixel size in microns
+   */
   CentroidApolloPan::CentroidApolloPan(double pixelSizeMicrons)
   {
     if( pixelSizeMicrons > 0)
@@ -45,8 +52,19 @@ namespace Isis {
       this->m_pixelSize = 5.0;  //if a negative or zero value is passed set the default
   }
 
+  
+  /**
+   * Destroys the CentroidApolloPan object
+   */
   CentroidApolloPan::~CentroidApolloPan(){};
 
+  /**
+   * Set the pixel size in microns
+   * 
+   * @param microns The pixel size value to set
+   * 
+   * @return bool Returns false if microns is <= 0, else true.
+   */
   bool CentroidApolloPan::setPixelSize(double microns)
   {
     if( microns <= 0)return false;
@@ -54,17 +72,30 @@ namespace Isis {
     return true;
   }
 
+  /**
+   * Given a range of DN this function creates a biniary chip for all continuous pixels that have 
+   * the DN within the specified range using the center pixel of the chip as the seed value 
+   * 
+   * @param inputChip Chip centered around some centroidable feature (dark or light continous 
+   *                  block of pixels)
+   * @param[out] selectionChip Binary chip of selected and unselected pixels
+   * 
+   * @return int Returns 0 if the input chips aren't 2D, else return 1
+   */
   int CentroidApolloPan::selectAdaptive(Chip *inputChip,Chip *selectionChip) {
     /*
-    Given a range of DN this function creates a biniary chip for all continuous pixels that have the DN within the specified range using the center pixel of the chip as the seed value
+    Given a range of DN this function creates a biniary chip for all continuous pixels that have the 
+    DN within the specified range using the center pixel of the chip as the seed value
     input:
       m_minDN,m_maxDN  set using the this->SetDNRange(..)
-      inputChip  chip centered around some centroidable feature (dark or light continous block of pixels)
+      inputChip  chip centered around some centroidable feature (dark or light continous block of 
+      pixels)
     
     output:
       selectionChip  binary chip of selected and unselected pixels
 
     */
+    
     //check the sizes of the chips and make the selectionChip match the inputChip
     int lines, samples;
 
@@ -127,28 +158,51 @@ namespace Isis {
   }  
 
 
-  int CentroidApolloPan::elipticalReduction(Chip *selectionChip, double percent_selected, double play, int patience_limit)
-  {
-    /*  The general elliptical reduction tool provided in the selection class is slow for the very large and potentially noisy ellipses of the apollo pan data
-      This method will take advantage of all the apriori knowlege we have of the size and orientation of the ellipse to speed up the process
-
-      Specifically we know:
-        semiMajor Axis,a, is approximately parrallel to the sample chip axis and is approximately 60 5-micron pixels long
-        semiMinor Axis,b, is approximately parrallel to the   line chip axis and is approximately 60 5-micron pixels long
-        Hence we know the center of the ellipse is on the range [a+1,Samples-a],[b+1,lines-b] (because the entire ellipse must be within the chip
-
-      this->pixel_size will be used to do any scalling neccessary
-
-      Algorithim:
-        Step 1: Compile an array of all points on the border of the selected area
-        Step 2: Choose a previously unused hypothesis center point from the range [a+1,samples-a],[b+1,lines-b]
-        Step 3: For a given hypothesized ellipse center in the search set, define the Ellipse.
-        Step 4: Do a least squares generization.  Any points within a distance of play pixels to the edge of the ellipse are included in the gernalization. The distance check is repeated for every iteration so the ellipse can effective grow to include more points.
-        Step 5: If the generization is successfully check to see if the area is at least as great as the current best, and that the ellipse is contained in the chip
-        Step 6: If the area is great enough check that the percent sellected is at least percent_selected.
-        Step 7: If all above tests are passed then we have a new Best ellipse and the number of consecutive emptySets is zeroed.  Otherwise emptySets++
-        Step 8: repeat steps 2 through 7 until pacience_limit consecquitive failures to find a better (larger area) elipse have occured
+  /**
+   * This method will take advantage of all the apriori knowlege we have of the size and orientation 
+   * of the ellipse to speed up elliptical reduction. 
+   * 
+   * The general elliptical reduction tool provided in the selection class is slow for the very 
+   * large and potentially noisy ellipses of the apollo pan data.
+   * 
+   * Specifically we know:
+   *    semiMajor Axis,a, is approximately parrallel to the sample chip axis and is 
+   *      approximately 60 5-micron pixels long
+   *    semiMinor Axis,b, is approximately parrallel to the   line chip axis and is 
+   *      approximately 60 5-micron pixels long
+   * 
+   * Hence we know the center of the ellipse is on the range [a+1,Samples-a],[b+1,lines-b] 
+   * (because the entire ellipse must be within the chip)
+   * 
+   * this->pixel_size will be used to do any scaling neccessary
+   * 
+   * Algorithim:
+   *    Step 1: Compile an array of all points on the border of the selected area
+   *    Step 2: Choose a previously unused hypothesis center point from the range 
+   *      [a+1,samples-a],[b+1,lines-b]
+   *    Step 3: For a given hypothesized ellipse center in the search set, define the Ellipse.
+   *    Step 4: Do a least squares generization.  Any points within a distance of play pixels to 
+   *      the edge of the ellipse are included in the gernalization. The distance check is repeated 
+   *      for every iteration so the ellipse can effective grow to include more points.
+   *    Step 5: If the generization is successfully check to see if the area is at least as great as 
+   *      the current best, and that the ellipse is contained in the chip
+   *    Step 6: If the area is great enough check that the percent selected is at least 
+   *      percent_selected.
+   *    Step 7: If all above tests are passed then we have a new Best ellipse and the number of 
+   *      consecutive emptySets is zeroed.  Otherwise emptySets++
+   *    Step 8: repeat steps 2 through 7 until pacience_limit consecquitive failures to find a 
+   *      better (larger area) elipse have occured
+   * 
+   * @param selectionChip Binary chip of selected and unselected pixels
+   * @param percent_selected Minimum percent of selected points
+   * @param play Distance allowed in the least squares generization
+   * @param patience_limit Maximum number of empty sets allowed
+   * 
+   * @return int Return 0 if there isn't an ellipse that meets the selection criteria, else return 1
    */
+  int CentroidApolloPan::elipticalReduction(Chip *selectionChip, double percent_selected, 
+                                            double play, int patience_limit)
+  {
     int i,j,k,l,
         emptySets,  //number of consecutive failures to find a better ellipse
         randPt,    //random potential center point selection
@@ -181,7 +235,12 @@ namespace Isis {
     i=int(floor(a+1.0));
 
     cen_pts.clear();
-    //inorder to concentrate the search near the center of the chip we'll varry the step size for the center search nodes quadratically from 1*5.0/m_pixelSize at the center to 5.0*5.0/m_pixelSize at the edge
+    
+    /*
+     * inorder to concentrate the search near the center of the chip we'll varry the step size for 
+     * the center search nodes quadratically from 1*5.0/m_pixelSize at the center to 
+     * 5.0*5.0/m_pixelSize at the edge
+     */
     double searchStep = 5.0*5.0/m_pixelSize;
     double aSearch,centerSample,centerLine,delta,cSearch;
     cSearch = searchStep/5.0;

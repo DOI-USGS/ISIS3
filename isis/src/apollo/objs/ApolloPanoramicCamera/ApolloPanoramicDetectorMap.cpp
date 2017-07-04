@@ -14,9 +14,9 @@ namespace Isis {
    * This method sets cube sample line coordinates from given Dector coordinates
    *
    * @param sample dector sample coordinate
-   *
    * @param line detector line coordinate
    *
+   * @return bool Always returns true
    */
     bool ApolloPanoramicDetectorMap::SetDetector(const double sample, const double line) {
       //given a detector coordinate and a time (read from the 'parent' camera class) 
@@ -43,9 +43,9 @@ namespace Isis {
    * This method sets dector sample line coordinates from given cube coordinates
    *
    * @param sample cube sample coordinate
-   *
    * @param line cube line coordinate
    *
+   * @return bool Always returns true
    */
     bool ApolloPanoramicDetectorMap::SetParent(const double sample, const double line) {
       //Given an image (aka 'Parent', aka encoder, aka machine) coordinate set the detector 
@@ -76,18 +76,14 @@ namespace Isis {
     /**
      * This method uses the ApolloPanIO class to compute transforamtion from cube to image 
      * (aka fiducial cooraintes)
-     *
-     * @return -1 failure
-     *
-     * @return  1 sucess
      * 
-     * @throws  No FID_MEASURES table found in cube blobs.
-     *
-     * @throws  Less than four FID_MEASURES found in cube blobs.
-     *
-     * @throws  Insufficient Fiducial Observations for computation of 
-     *          the interior orientation.\nAt least one vertical pair 
-     *          must be measured, many more is recomented.
+     * @throws  IException::User "No FID_MEASURES table found in cube blobs."
+     * @throws  IException::User "Less than four FID_MEASURES found in cube blobs."
+     * @throws  IException::User "Insufficient Fiducial Observations for computation of the interior
+     *                            orientation. At least one vertical pair must be measured, many 
+     *                            more is recomented."
+     * 
+     * @returns int Returns 1 on success and -1 on failure.
      */
     int ApolloPanoramicDetectorMap::initializeInteriorOrientation() {
       int i,nrec;

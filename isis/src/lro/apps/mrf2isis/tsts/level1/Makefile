@@ -7,3 +7,5 @@ commands:
 	to=$(OUTPUT)/FSL_CDR_LV1_00200_1Q.cub > /dev/null;
 	$(APPNAME) from=$(INPUT)/LSL_CDR_LV1_00300_1Q.LBL \
 	to=$(OUTPUT)/LSL_CDR_LV1_00300_1Q.cub > /dev/null;
+	catlab FROM=$(OUTPUT)/FSL_CDR_LV1_00200_1Q.cub to=$(OUTPUT)/FSL_CDR_LV1_00200_1Q.pvl > /dev/null;
+	catlab FROM=$(OUTPUT)/LSL_CDR_LV1_00300_1Q.cub to=$(OUTPUT)/LSL_CDR_LV1_00300_1Q.pvl > /dev/null;

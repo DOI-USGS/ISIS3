@@ -14,17 +14,23 @@ using namespace std;
 
 namespace Isis {
 
-  //! Constructs an ApolloPanIO object
+  /**
+   * Constructs an ApolloPanIO object
+   */
   ApolloPanIO::ApolloPanIO() {
     this->initialize();
   }
 
-  //! Destroys the ApolloPanObject
+  /**
+   * Destroys the ApolloPanObject
+   */
   ApolloPanIO::~ApolloPanIO() {
     //empty destructor....
   }
 
-  //! Initilizes member vairables in preparation for solving for the interior orientation affines
+  /**
+   * Initilizes member variables in preparation for solving for the interior orientation affines
+   */
   void ApolloPanIO::initialize() {
     int i;
 
@@ -569,9 +575,9 @@ namespace Isis {
    *
    * @param machineY Input, the y coordinate (line) in cube space
    *
-   * @param machineX Output, the x coordinate (sample) in cube space
+   * @param imageX Output, the x coordinate (sample) in cube space
    *
-   * @param machineY Output, the y coordinate (line) in cube space
+   * @param imageY Output, the y coordinate (line) in cube space
    *
    * @return 1  success
    * @return -1 failure, y coordinate to be converted is too small, it is not within the 
@@ -648,9 +654,9 @@ namespace Isis {
    * to a cube (sample, line) coordinates.
    * Call after computeInteriorOrienation()
    *
-   * @param machineX Input, the x coordinate (sample) in cube space
+   * @param imageX Input, the x coordinate (sample) in cube space
    *
-   * @param machineY INput, the y coordinate (line) in cube space
+   * @param imageY INput, the y coordinate (line) in cube space
    *
    * @param machineX Output, the x coordinate (sample) in cube space
    *

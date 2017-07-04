@@ -65,6 +65,17 @@
     <change name="Jesse Mapel" date="2016-12-06">
       Created new tests and updated documentation. References #4558.
     </change>
+    <change name="Tyler Wilson" date="2017-06-29">
+      Modified ControlPointMerger::merge function to properly hand combining control points
+      that contain the same control measures in each point.  Fixes #4869.
+    </change>
+    <change name="Tyler Wilson" date="2017-06-29">
+      Modified ControlPointMerger::merge function so that merged control measure types
+      are set to candidate (except when they have the same reference measure).  Fixes #4870.
+    </change>
+    <change name="Tyler Wilson" date="2017-06-29">
+      cnetcombinept now properly sets apriori lat/lon values to adjusted values.  Fixes #4772.
+    </change>
   </history>
 
   <category>

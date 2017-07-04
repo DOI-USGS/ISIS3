@@ -3,7 +3,7 @@
 #include <float.h>
 #include <iostream>
 
-#include <QGraphicsScene> 
+#include <QGraphicsScene>
 
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
@@ -43,7 +43,7 @@ namespace Isis {
   QRectF FindSpotGraphicsItem::calcRect() const {
     QRectF findRect;
 
-    if(!m_centerPoint->isNull()) {
+    if(m_centerPoint) {
       static const int size = 8;
       QPoint findSpotScreen =
           m_mosaicScene->getView()->mapFromScene(*m_centerPoint);
@@ -58,4 +58,3 @@ namespace Isis {
     return findRect;
   }
 }
-

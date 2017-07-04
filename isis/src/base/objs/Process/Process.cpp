@@ -619,7 +619,7 @@ namespace Isis {
         const PvlObject &object = fromLabels->object(j);
 
         if (object.isNamed("Table")) {
-          if (tableNames.isEmpty() || tableNames.contains(object["Name"])) { 
+          if (tableNames.isEmpty() || tableNames.contains(object["Name"])) {
             Blob table((QString) object["Name"], object.name());
             fromCube->read(table);
             OutputCubes[i]->write(table);
@@ -775,4 +775,3 @@ namespace Isis {
   }
 
 } // end namespace isis
-

@@ -146,11 +146,11 @@ TIFFLIBDIR = -L$(ISIS3LOCAL)/lib
 TIFFLIB    = -ltiff
 
 #---------------------------------------------------------------------------
-# Set up for naif dsk and cspice libraries
+# Set up for naif cspice libraries. Update for N0066 Release. (KJB 2017-06-28)
 #---------------------------------------------------------------------------
 NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif
 NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
-NAIFLIB    = -ldsk -lcspice
+NAIFLIB    = -lcspice
 
 #---------------------------------------------------------------------------
 # Set up for TNT
@@ -408,7 +408,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsk.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"

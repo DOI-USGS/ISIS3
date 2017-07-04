@@ -42,6 +42,9 @@ namespace Isis {
    * @see Gruen AutoReg MinimumGruen
    *
    * @author 2009-09-09 Kris Becker
+   * 
+   * @internal
+   *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
    *
    * @internal
    */
@@ -64,13 +67,19 @@ namespace Isis {
 
       /**
        * AdaptiveGruen is adaptive
+       * 
+       * @return bool Always True
        */
       virtual bool IsAdaptive() {
         return (true);
       }
 
     protected:
-      /** Return name of Algorithm */
+      /** 
+       * Return name of Algorithm 
+       * 
+       * @return QString The name of the algorithm
+       */
       virtual QString AlgorithmName() const {
         return ("AdaptiveGruen");
       }

@@ -54,6 +54,7 @@ namespace Isis {
    *                           "dd mm ss.ss" for angles provided in this format. 
    *   @history 2014-08-21 Jeannie Backer - Modified isValid to utilize the IsValidPixel()
    *                           method in the SpecialPixel header. References #1659.
+   *   @history 2017-07-03 Makayla Shepherd - Updated documentation. References #4807.
    */
   class Angle {
 

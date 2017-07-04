@@ -55,11 +55,13 @@ namespace Isis {
    *                           so that an actual cube isn't required in the future, but for now
    *                           this enables the control net GUI to create a camera from a cube
    *                           with no dimensions in the label.
+   *   @history 2017-07-03 Makayla Shepherd - Updated documentation. References #4807.
    *
    *   @todo 2005-04-06 Add coded example.
    */
   class AlphaCube {
     public:
+
       AlphaCube(Cube &cube);
       AlphaCube(int alphaSamples, int alphaLines,
                 int betaSamples, int betaLines);
@@ -67,41 +69,98 @@ namespace Isis {
                 int betaSamples, int betaLines,
                 double alphaSs, double alphaSl,
                 double alphaEs, double alphaEl);
-      //! Destroys the AlphaCube object.
+      
+      /**
+       * Destroys the AlphaCube object.
+       */
       ~AlphaCube() {};
 
-      //! Returns the number of lines in the alpha cube.
+      /**
+       * Returns the number of lines in the alpha cube.
+       * 
+       * @return int Number of lines in the alpha cube
+       */
       inline int AlphaLines() const {
         return p_alphaLines;
       };
-      //! Returns the number of samples in the alpha cube.
+      
+      
+      /**
+       * Returns the number of samples in the alpha cube.
+       * 
+       * @return int Number of samples in the alpha cube
+       */
       inline int AlphaSamples() const {
         return p_alphaSamples;
       };
-      //! Returns the number of lines in the beta cube.
+      
+      
+      /**
+       * Returns the number of lines in the beta cube.
+       * 
+       * @return int Number of lines in the beta cube
+       */
       inline int BetaLines() const {
         return p_betaLines;
       };
-      //! Returns the number of samples in the beta cube.
+      
+      
+      /**
+       * Returns the number of samples in the beta cube.
+       * 
+       * @return int Number of samples in the beta cube
+       */
       inline int BetaSamples() const {
         return p_betaSamples;
       };
-      //! Returns an alpha line given a beta line.
+      
+      
+      /**
+       * Returns an alpha line given a beta line.
+       * 
+       * @param betaLine The beta line
+       * 
+       * @return double Beta line
+       */
       inline double AlphaLine(double betaLine) {
         return p_lineSlope * (betaLine - 0.5) + p_alphaStartingLine;
-      }
-      //! Returns an alpha sample given a beta sample.
+      };
+      
+      
+      /**
+       * Returns an alpha sample given a beta sample.
+       * 
+       * @param betaSample The beta sample
+       * 
+       * @return double Beta sample
+       */
       inline double AlphaSample(double betaSample) {
         return p_sampSlope * (betaSample - 0.5) + p_alphaStartingSample;
-      }
-      //! Returns a beta line given an alpha line.
+      };
+      
+      
+      /**
+       * Returns a beta line given an alpha line.
+       * 
+       * @param alphaLine The alpha line
+       * 
+       * @return double Alpha line
+       */
       inline double BetaLine(double alphaLine) {
         return (alphaLine - p_alphaStartingLine) / p_lineSlope + 0.5;
-      }
-      //! Returns a beta sample given an alpha sample.
+      };
+      
+      
+      /**
+       * Returns a beta sample given an alpha sample.
+       * 
+       * @param alphaSample The alpha sample
+       * 
+       * @return double Alpha sample
+       */
       inline double BetaSample(double alphaSample) {
         return (alphaSample - p_alphaStartingSample) / p_sampSlope + 0.5;
-      }
+      };
 
       void UpdateGroup(Cube &cube);
 
@@ -109,16 +168,16 @@ namespace Isis {
 
     private:
       void ComputeSlope();
-      int p_alphaLines; /**< The number of alpha lines in the cube. */
-      int p_alphaSamples; /**< The number of alpha samples in the cube.*/
-      int p_betaLines; /**< The number of beta lines in the cube. */
-      int p_betaSamples; /**< The number of beta samples in the cube. */
-      double p_alphaStartingLine; /**< The starting alpha line. */
-      double p_alphaStartingSample; /**< The starting alpha sample. */
-      double p_alphaEndingLine; /**< The ending alpha line. */
-      double p_alphaEndingSample; /**< The ending alpha sample. */
-      double p_lineSlope; /**< The slope of the line. */
-      double p_sampSlope; /**< The slope of the sample set. */
+      int p_alphaLines; //!< The number of alpha lines in the cube.
+      int p_alphaSamples; //!< The number of alpha samples in the cube.
+      int p_betaLines; //!< The number of beta lines in the cube.
+      int p_betaSamples; //!< The number of beta samples in the cube.
+      double p_alphaStartingLine; //!< The starting alpha line.
+      double p_alphaStartingSample; //!< The starting alpha sample.
+      double p_alphaEndingLine; //!< The ending alpha line.
+      double p_alphaEndingSample; //!< The ending alpha sample.
+      double p_lineSlope; //!< The slope of the line.
+      double p_sampSlope; //!< The slope of the sample set.
   };
 };
 

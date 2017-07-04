@@ -376,6 +376,8 @@ namespace Isis {
     SessionLog::TheLog().AddResults(results);
 
     // See if the log file will be written to the terminal/gui
+    // The results group of the Sessoion::Log will be written later
+    // in Application::FunctionCleanup if TerminalOutput is on
     if (SessionLog::TheLog().TerminalOutput()) return;
 
     // See if we should write the info to our parents gui

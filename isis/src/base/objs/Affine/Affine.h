@@ -73,12 +73,13 @@ namespace Isis {
    *          inverse AMatrixs; added new method that inverts the matrix.
    * @history 2010-11-18 Kris Becker Fixed bug in inverse representation when
    *          scaling is applied to the current transform.
+   * @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
    *
    */
 
   class Affine {
     public:
-      typedef TNT::Array2D<double> AMatrix;
+      typedef TNT::Array2D<double> AMatrix; //!< Affine Matrix
       Affine();
       Affine(const AMatrix &a);
       ~Affine();
@@ -92,35 +93,61 @@ namespace Isis {
 
       void Compute(double x, double y);
 
-      //! Returns the computed x'
+      /**
+       * Returns the computed x'
+       * 
+       * @return double Computed x'
+       */
       double xp() const {
         return p_xp;
       };
 
-      //! Returns the computed y'
+      /**
+       * Returns the computed y'
+       * 
+       * @return double Computed y'
+       */
       double yp() const {
         return p_yp;
       };
 
       void ComputeInverse(double xp, double yp);
 
-      //! Returns the computed x
+      /**
+       * Returns the computed x
+       * 
+       * @return double Computed x
+       */
       double x() const {
         return p_x;
       };
 
-      //! Returns the computed y
+      /** 
+       * Returns the computed y
+       * 
+       * @return double Computed y
+       */
       double y() const {
         return p_y;
       };
 
       std::vector<double> Coefficients(int var);
       std::vector<double> InverseCoefficients(int var);
-      //! Returns the forward Affine matrix
+      
+      /**
+       * Returns the forward Affine matrix
+       * 
+       * @return AMatrix Forward Affine matrix
+       */
       AMatrix Forward() const {
         return (p_matrix.copy());
       }
-      //! Returns the inverse Affine matrix
+      
+      /**
+       * Returns the inverse Affine matrix
+       * 
+       * @return AMatrix Inverse Affine matrix
+       */
       AMatrix Inverse() const {
         return (p_invmat.copy());
       }

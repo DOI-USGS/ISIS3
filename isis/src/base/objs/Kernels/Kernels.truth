@@ -164,7 +164,7 @@ SPK
 Unknown kernels in list: 0
 
 
-Loading all, total loaded: 13
+Loading all, total loaded: 14
 $base/kernels/lsk/naif0009.tls
 $base/kernels/pck/pck00009.tpc
 $hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
@@ -178,8 +178,9 @@ $hayabusa/kernels/fk/itokawa_fixed.tf
 $hayabusa/kernels/ik/amica31.ti
 $hayabusa/kernels/iak/amicaAddendum001.ti
 $hayabusa/kernels/sclk/hayabusa.tsc
+$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds
 
-Check Load Status = 13
+Check Load Status = 14
 $base/kernels/lsk/naif0009.tls
 $base/kernels/pck/pck00009.tpc
 $hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
@@ -193,8 +194,9 @@ $hayabusa/kernels/fk/itokawa_fixed.tf
 $hayabusa/kernels/ik/amica31.ti
 $hayabusa/kernels/iak/amicaAddendum001.ti
 $hayabusa/kernels/sclk/hayabusa.tsc
+$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds
 
-Unload SPK,CK - Loaded: 8
+Unload SPK,CK - Loaded: 9
 $base/kernels/lsk/naif0009.tls
 $base/kernels/pck/pck00009.tpc
 $hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
@@ -203,6 +205,7 @@ $hayabusa/kernels/fk/itokawa_fixed.tf
 $hayabusa/kernels/ik/amica31.ti
 $hayabusa/kernels/iak/amicaAddendum001.ti
 $hayabusa/kernels/sclk/hayabusa.tsc
+$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds
 
 
 All Done - Should be 0 discovered: 0
