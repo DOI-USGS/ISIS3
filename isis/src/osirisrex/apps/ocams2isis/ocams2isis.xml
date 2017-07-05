@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="ocams2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-  
+
   <brief>
-    Import Osiris Rex Camera Suite (OCAMS) files into Isis format
+    Import OSIRIS-REx Camera Suite (OCAMS) files into ISIS format
   </brief>
   <description>
     <p>
-      This program will import FITS (Flexible Image Transport System) formatted files from the 
-      Osiris Rex MapCam, SamCam, and PolyCam instruments into the ISIS format. 
+      This program will import FITS (Flexible Image Transport System) formatted files from the
+      OSIRIS-REx MapCam, SamCam, and PolyCam instruments into the ISIS format.
     </p>
   </description>
-  
+
   <history>
     <change name="Janet Barrett" date="2014-04-02">
       Original version
-    </change> 
+    </change>
     <change name="Stuart C. Sides" date="2015-09-28">
       Updated to only include labels requested by the OSIRIS-REx team
-    </change> 
+    </change>
+    <change name="Cole Neubauer" date="2017-04-07">
+      Changed category from base program to supported mission
+    </change>
   </history>
 
   <seeAlso>
@@ -28,7 +31,7 @@
   </seeAlso>
 
   <category>
-    <categoryItem>Osiris Rex</categoryItem>
+    <missionItem>OSIRIS-REx</missionItem>
   </category>
 
   <groups>
@@ -37,12 +40,12 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          An Osiris Rex OCAMS FITS file to be converted to an ISIS cube
+          An OSIRIS-REx OCAMS FITS file to be converted to an ISIS cube
         </brief>
         <description>
-          Use this parameter to select the filename of an Osiris Rex MapCam, SamCam,
-          or PolyCam file to be converted to an ISIS cube. This is expected to be a 
-          FITS formatted file. 
+          Use this parameter to select the filename of an OSIRIS-REx MapCam, SamCam,
+          or PolyCam file to be converted to an ISIS cube. This is expected to be a
+          FITS formatted file.
         </description>
         <filter>
           *.fits
@@ -56,7 +59,7 @@
           Output ISIS cube file
         </brief>
         <description>
-          The output cube file that will contain the Osiris Rex OCAMS image in ISIS format.
+          The output cube file that will contain the OSIRIS-REx OCAMS image in ISIS format.
         </description>
         <filter>
           *.cub
