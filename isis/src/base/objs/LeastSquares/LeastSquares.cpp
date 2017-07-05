@@ -571,8 +571,8 @@ namespace Isis {
     p_degreesOfFreedom = p_sparseRows + p_constrainedParameters - p_sparseCols;
 
     if( p_degreesOfFreedom <= 0.0 ) {
-      printf("Observations: %d\nConstrained: %d\nParameters: %d\nDOF: %d\n",
-             p_sparseRows,p_constrainedParameters,p_sparseCols,p_degreesOfFreedom);
+//       printf("Observations: %d\nConstrained: %d\nParameters: %d\nDOF: %d\n",
+//              p_sparseRows,p_constrainedParameters,p_sparseCols,p_degreesOfFreedom);
       p_sigma0 = 1.0;
     }
     else
@@ -582,7 +582,7 @@ namespace Isis {
     p_sigma0 = sqrt(p_sigma0);
 
     // kle testing - output residuals and some stats
-    printf("Sigma0 = %20.10lf\nNumber of Observations = %d\nNumber of Parameters = %d\nNumber of Constrained Parameters = %d\nDOF = %d\n",p_sigma0,p_sparseRows,p_sparseCols,p_constrainedParameters,p_degreesOfFreedom);
+//     printf("Sigma0 = %20.10lf\nNumber of Observations = %d\nNumber of Parameters = %d\nNumber of Constrained Parameters = %d\nDOF = %d\n",p_sigma0,p_sparseRows,p_sparseCols,p_constrainedParameters,p_degreesOfFreedom);
 //    printf("printing residuals\n");
 //    for( int k = 0; k < p_sparseRows; k++ )
 //    {

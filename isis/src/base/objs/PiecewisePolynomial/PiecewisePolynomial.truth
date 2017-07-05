@@ -1,0 +1,201 @@
+Unit test for PiecewisePolynomial
+
+Create 1D PiecewisePolynomial:
+
+Number of segments: 1
+Space curve dimensions: 1
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  5.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+
+Fit to 1D data:
+
+Number of segments: 2
+Space curve dimensions: 1
+Polynomial degree: 2
+Polynomial knots:
+  -4.0
+  -0.45
+  4.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  1.71009
+  3.96381
+  1.41881
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  1.30584
+  2.16714
+  -0.577498
+
+Calculating residuals for 17 points.
+  -4.0  0.555796
+  -3.5  0.0328341
+  -3.0  0.412059
+  -2.5  0.58188
+  -2.0  0.542296
+  -1.5  0.293306
+  -1.0  0.165088
+  -0.5  0.832887
+  0.0  1.30584
+  0.5  0.495033
+  1.0  0.104523
+  1.5  0.492827
+  2.0  0.669881
+  2.5  0.635683
+  3.0  0.390234
+  3.5  0.0664653
+  4.0  0.734416
+RMS Error: 0.699203
+
+Create 3D PiecewisePolynomial:
+
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -6.0
+  4.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+Dimension 2 coefficients:
+  0.0
+  0.0
+  0.0
+Dimension 3 coefficients:
+  0.0
+  0.0
+  0.0
+
+Fit to 3D data:
+
+Number of segments: 3
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  -2.20163
+  -0.143386
+  3.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.326338
+  -1.81105
+  -0.474491
+Dimension 2 coefficients:
+  0.217688
+  0.459387
+  0.0170194
+Dimension 3 coefficients:
+  2.78236
+  -0.126021
+  -0.0170146
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  -0.143298
+  -2.23768
+  -0.571379
+Dimension 2 coefficients:
+  -0.0955277
+  0.174856
+  -0.0475988
+Dimension 3 coefficients:
+  3.09553
+  0.158469
+  0.0475944
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  -0.112189
+  -1.80376
+  0.941727
+Dimension 2 coefficients:
+  -0.074788
+  0.46414
+  0.961159
+Dimension 3 coefficients:
+  3.07479
+  -0.130813
+  -0.961156
+
+Calculating residuals for 17 points.
+  -5.0  0.026584
+  -4.5  0.0101199
+  -4.0  0.029289
+  -3.5  0.0309233
+  -3.0  0.0150228
+  -2.5  0.0184126
+  -2.0  0.0639684
+  -1.5  0.0723248
+  -1.0  0.0316254
+  -0.5  0.0581297
+  0.0  0.154185
+  0.5  0.0393608
+  1.0  0.0354222
+  1.5  0.0701638
+  2.0  0.0648641
+  2.5  0.0195231
+  3.0  0.0658593
+RMS Error: 0.0580648
+
+Test fitting to a single point
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 0
+Polynomial knots:
+  -1.797693e+308
+  1.797693e+308
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  -2.5
+Dimension 2 coefficients:
+  -1.66667
+Dimension 3 coefficients:
+  3.0
+
+Calculating residuals for 1 points.
+  -5.0  0.0
+RMS Error: 0.0
+
+Test error throws
+
+Attempt to evaluate at value outside of range:
+**PROGRAMMER ERROR** Failed evaluating piecewise polynomial at value [20.0].
+**PROGRAMMER ERROR** Value [20.0] is not within valid range [-4.0, 4.0].
+
+Polynomial fit errors:
+**PROGRAMMER ERROR** The number of input values [3] and data points [1] do not match.
+**PROGRAMMER ERROR** The number of data points [2] is insufficient to fit polynomials. at least [5] data points are required.
+**PROGRAMMER ERROR** Input values are not sorted in ascending order.
+**PROGRAMMER ERROR** Data point number [7] has the incorrect number of dimensions [2]. Expected [1] dimensions.
+**PROGRAMMER ERROR** Cannot compute curvature. The triangle between points is degenerate.
+
+Attempt to set to negative degree:
+**PROGRAMMER ERROR** Input degree [-1] must be greater than or equal to 0.
+
+Attempt to set non-positive dimensions:
+**PROGRAMMER ERROR** Input dimensions [0] must be greater than 0.
+
+Setting coefficients errors:
+**PROGRAMMER ERROR** Segment index [4] is invalid. Valid segment indices are between [0] and [1] inclusive.
+**PROGRAMMER ERROR** Invalid number of dimensions [1]. Expected [3] dimensions.
+**PROGRAMMER ERROR** Invalid number of coefficients [2] for dimension number [3]. Expected [3] coefficients.
+
+Attempt to set less than 2 knots:
+**PROGRAMMER ERROR** Invalid number of knots [1]. At least 2 knots must be specified.

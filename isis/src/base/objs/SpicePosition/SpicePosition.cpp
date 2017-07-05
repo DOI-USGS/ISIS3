@@ -86,6 +86,7 @@ namespace Isis {
     p_coefficients[2].clear();
     p_coordinate.resize(3);
     p_degree = 2;
+    m_segments = 1;
     p_degreeApplied = false;
     p_et = -DBL_MAX;
     p_fullCacheStartTime = 0;
@@ -846,11 +847,11 @@ namespace Isis {
   }
 
 
-  /** Set the coefficients of a polynomial fit to each of the components (X, Y, Z)
-   *  of the position vector for the time period covered by the cache,
-   *  component = c0 + c1*t + c2*t**2 + ... + cn*t**n,
-   *  where t = (time - p_baseTime) / p_timeScale.
-   *
+  /** 
+   * Set the coefficients of a polynomial fit to each of the components (X, Y, Z)
+   * of the position vector for the time period covered by the cache,
+   * component = c0 + c1*t + c2*t**2 + ... + cn*t**n,
+   * where t = (time - p_baseTime) / p_timeScale.
    */
   void SpicePosition::SetPolynomial(Source type) {
     std::vector<double> XC, YC, ZC;
@@ -859,111 +860,85 @@ namespace Isis {
     if (p_source == PolyFunction)
       return;
 
+    // Check that there is data available to fit a polynomial to
+    if ( p_cache.size() < 1 ) {
+      QString msg = "Cannot set a polynomial, no coordinate data is available.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     // Adjust the degree of the polynomial to the available data
-    if (p_cache.size() == 1) {
-      p_degree = 0;
-    }
-    else if (p_cache.size() == 2) {
-      p_degree = 1;
-    }
+    if ( p_degree > (int)p_cache.size() - 1 ) {
+      p_degree = p_cache.size() - 1;
 
-    //Check for polynomial over Hermite constant and initialize coefficients
-    if (type == PolyFunctionOverHermiteConstant) {
-      XC.assign(p_degree + 1, 0.);
-      YC.assign(p_degree + 1, 0.);
-      ZC.assign(p_degree + 1, 0.);
-      SetPolynomial(XC, YC, ZC, type);
-      return;
+      // Flag if velocity is available
+      p_hasVelocity = ( p_degree > 0 );
     }
 
-    Isis::PolynomialUnivariate function1(p_degree);       //!< Basis function fit to X
-    Isis::PolynomialUnivariate function2(p_degree);       //!< Basis function fit to Y
-    Isis::PolynomialUnivariate function3(p_degree);       //!< Basis function fit to Z
-
-    // Compute the base time
+    // Recompute the time scaling
     ComputeBaseTime();
-    std::vector<double> time;
 
-    if(p_cache.size() == 1) {
-      double t = p_cacheTime.at(0);
-      SetEphemerisTime(t);
-      XC.push_back(p_coordinate[0]);
-      YC.push_back(p_coordinate[1]);
-      ZC.push_back(p_coordinate[2]);
+    // Compute first and last times in scaled time.
+    //   If there is only one cached time, use the full extents.
+    //   Otherwise scale the first and last times.
+    double scaledFirstTime = -DBL_MAX;
+    double scaledLastTime = DBL_MAX;
+    if ( p_cacheTime.size() > 1) {
+      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
     }
-    else if(p_cache.size() == 2) {
-// Load the times and get the corresponding coordinates
-      double t1 = p_cacheTime.at(0);
-      SetEphemerisTime(t1);
-      std::vector<double> coord1 = p_coordinate;
-      t1 = (t1 - p_baseTime) / p_timeScale;
-      double t2 = p_cacheTime.at(1);
-      SetEphemerisTime(t2);
-      std::vector<double> coord2 = p_coordinate;
-      t2 = (t2 - p_baseTime) / p_timeScale;
-      double slope[3];
-      double intercept[3];
 
-// Compute the linear equation for each coordinate and save them
-      for(int cIndex = 0; cIndex < 3; cIndex++) {
-        Isis::LineEquation posline(t1, coord1[cIndex], t2, coord2[cIndex]);
-        slope[cIndex] = posline.Slope();
-        intercept[cIndex] = posline.Intercept();
+    // Initialize the zero polynomial.
+    m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
+
+    // If fitting a polynomial over hermite data, then do not fit the polynomial,
+    // just set the knots and move on.
+    // TODO Should poly over hermite allow multiple segments? JAM
+    if ( type == PolyFunctionOverHermiteConstant ) {
+      if ( m_segments > 1 ) {
+        std::vector<double> knots;
+        double knotStep = (scaledLastTime - scaledFirstTime) / m_segments;
+        for (int i = 0; i < m_segments + 1; i++) {
+          knots.push_back(scaledFirstTime + knotStep * i);
+        }
+        m_polynomial.setKnots(knots);
       }
-      XC.push_back(intercept[0]);
-      XC.push_back(slope[0]);
-      YC.push_back(intercept[1]);
-      YC.push_back(slope[1]);
-      ZC.push_back(intercept[2]);
-      ZC.push_back(slope[2]);
     }
+    // Otherwise, fit the polynomial over the coordinate evaluated at the
+    // values in the time cache.
     else {
-      LeastSquares *fitX = new LeastSquares(function1);
-      LeastSquares *fitY = new LeastSquares(function2);
-      LeastSquares *fitZ = new LeastSquares(function3);
-
-      // Load the known values to compute the fit equation
-      for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
-        double t = p_cacheTime.at(pos);
-        time.push_back( (t - p_baseTime) / p_timeScale);
-        SetEphemerisTime(t);
-        std::vector<double> coord = p_coordinate;
-
-        fitX->AddKnown(time, coord[0]);
-        fitY->AddKnown(time, coord[1]);
-        fitZ->AddKnown(time, coord[2]);
-        time.clear();
-      }
-      //Solve the equations for the coefficients
-      fitX->Solve();
-      fitY->Solve();
-      fitZ->Solve();
-
-      // Delete the least squares objects now that we have all the coefficients
-      delete fitX;
-      delete fitY;
-      delete fitZ;
-
-      // For now assume all three coordinates are fit to a polynomial function.
-      // Later they may each be fit to a unique basis function.
-      // Fill the coefficient vectors
-
-      for(int i = 0;  i < function1.Coefficients(); i++) {
-        XC.push_back(function1.Coefficient(i));
-        YC.push_back(function2.Coefficient(i));
-        ZC.push_back(function3.Coefficient(i));
+      // Collect data to fit the polynomial over.
+      std::vector<double> scaledTimes;
+      std::vector< std::vector<double> > coordinates;
+      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+        SetEphemerisTime( p_cacheTime[i] );
+        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+        coordinates.push_back( Coordinate() );
       }
 
+      // Fit the polynomial.
+      m_polynomial.fitPolynomials(scaledTimes, coordinates, m_segments);
     }
 
-    // Now that the coefficients have been calculated set the polynomial with them
-    SetPolynomial(XC, YC, ZC);
+    // Set the flag indicating p_degree has been applied to the spacecraft
+    // positions and the coefficients of the polynomials have been calculated.
+    p_degreeApplied = true;
+
+    // Reset the interpolation source
+    p_source = type;
+
+    // Update the current position
+    //   Reset p_et to force recalculation
+    double et = p_et;
+    p_et = -DBL_MAX;
+    SetEphemerisTime(et);
+
     return;
   }
 
 
 
-  /** Set the coefficients of a polynomial (parabola) fit to
+  /** 
+   * Set the coefficients of a polynomial fit to
    * each of the three coordinates of the position vector for the
    * time period covered by the cache, coord = c0 + c1*t + c2*t**2 + ... + cn*t**n,
    * where t = (time - p_baseTime) / p_timeScale.
@@ -978,24 +953,19 @@ namespace Isis {
   void SpicePosition::SetPolynomial(const std::vector<double>& XC,
                                     const std::vector<double>& YC,
                                     const std::vector<double>& ZC,
-                                    const Source type) {
-
-    Isis::PolynomialUnivariate function1(p_degree);
-    Isis::PolynomialUnivariate function2(p_degree);
-    Isis::PolynomialUnivariate function3(p_degree);
-
-    // Load the functions with the coefficients
-    function1.SetCoefficients(XC);
-    function2.SetCoefficients(YC);
-    function3.SetCoefficients(ZC);
+                                    const Source type,
+                                    const int segment) {
+    // TODO validate inputs
 
     // Compute the base time
     ComputeBaseTime();
 
-    // Save the current coefficients
-    p_coefficients[0] = XC;
-    p_coefficients[1] = YC;
-    p_coefficients[2] = ZC;
+    // Save the coefficients
+    std::vector< std::vector<double> > segmentCoefficients;
+    segmentCoefficients.push_back(XC);
+    segmentCoefficients.push_back(YC);
+    segmentCoefficients.push_back(ZC);
+    m_polynomial.setCoefficients(segment, segmentCoefficients);
 
     // Set the flag indicating p_degree has been applied to the spacecraft
     // positions and the coefficients of the polynomials have been saved.
@@ -1026,10 +996,12 @@ namespace Isis {
    */
   void SpicePosition::GetPolynomial(std::vector<double>& XC,
                                     std::vector<double>& YC,
-                                    std::vector<double>& ZC) {
-    XC = p_coefficients[0];
-    YC = p_coefficients[1];
-    ZC = p_coefficients[2];
+                                    std::vector<double>& ZC,
+                                    const int segment) {
+    std::vector< std::vector<double> > segmentCoefficients = m_polynomial.coefficients(segment);
+    XC = segmentCoefficients[0];
+    YC = segmentCoefficients[1];
+    ZC = segmentCoefficients[2];
 
     return;
   }
@@ -1648,36 +1620,78 @@ namespace Isis {
       p_degree = degree;
     }
 
-    // Otherwise the existing polynomials need to be either expanded ...
-    else if(p_degree < degree) {   // (increase the number of terms)
-      std::vector<double> coefX(p_coefficients[0]),
-          coefY(p_coefficients[1]),
-          coefZ(p_coefficients[2]);
-
-      for(int icoef = p_degree + 1;  icoef <= degree; icoef++) {
-        coefX.push_back(0.);
-        coefY.push_back(0.);
-        coefZ.push_back(0.);
+    // Otherwise adjust the degree.
+    //   If the new degree is less than the old degree, high order coefficients are truncated.
+    //   If the new degree is geater than the old degree, high order coefficients are set to 0.
+    else {
+      // Save the current coefficients and resize them
+      std::vector< std::vector<double> > xCoefficients,
+                                         yCoefficients,
+                                         zCoefficients;
+      for (int i = 0; i < m_segments; i++) {
+        std::vector<double> xCoef, yCoef, zCoef;
+        GetPolynomial(xCoef, yCoef, zCoef, i);
+        xCoef.resize(degree + 1, 0.0);
+        yCoef.resize(degree + 1, 0.0);
+        zCoef.resize(degree + 1, 0.0);
+        xCoefficients.push_back(xCoef);
+        yCoefficients.push_back(yCoef);
+        zCoefficients.push_back(zCoef);
       }
-      p_degree = degree;
-      SetPolynomial(coefX, coefY, coefZ);
-    }
-    // ... or reduced (decrease the number of terms)
-    else if(p_degree > degree) {
-      std::vector<double> coefX(degree + 1),
-          coefY(degree + 1),
-          coefZ(degree + 1);
 
-      for(int icoef = 0;  icoef <= degree;  icoef++) {
-        coefX.push_back(p_coefficients[0][icoef]);
-        coefY.push_back(p_coefficients[1][icoef]);
-        coefZ.push_back(p_coefficients[2][icoef]);
+      // Change the polynomial degree
+      m_polynomial.setDegree(degree);
+
+      // Reset the coefficients
+      for (int i = 0; i < m_segments; i++) {
+        std::vector< std::vector<double> > segmentCoefficients;
+        segmentCoefficients.push_back(xCoefficients[i]);
+        segmentCoefficients.push_back(yCoefficients[i]);
+        segmentCoefficients.push_back(zCoefficients[i]);
+        m_polynomial.setCoefficients(i, segmentCoefficients);
       }
-      p_degree = degree;
-      SetPolynomial(coefX, coefY, coefZ);
     }
   }
 
+
+  /**
+   * Set the number of segments in the polynomial. If there is an existing
+   * polynomial, then the closest polynomials with the new segments will be
+   * used.
+   * 
+   * @param segments The number of segments to use.
+   */
+  void SpicePosition::setPolynomialSegments(int segments) {
+    m_segments = segments;
+  }
+
+
+  /**
+   * Return the number of segments in the polynomial.
+   * 
+   * @return @b int The number of segments in the polynomial.
+   */
+  int SpicePosition::numPolynomialSegments() const {
+    return m_segments;
+  }
+
+
+  /**
+   * Return the knots in the polynomial.
+   * 
+   * @return @b std::vector<double> A vector containing the polynomial knots in et.
+   */
+  std::vector<double> SpicePosition::polynomialKnots() const {
+    std::vector<double> knots = m_polynomial.knots();
+
+    // The knots in the polynomial are stored in scaled time,
+    // so convert them back to et.
+    for (int i = 0; i < (int)knots.size(); i++) {
+      knots[i] = ( knots[i] * p_timeScale ) + p_baseTime;
+    }
+
+    return knots;
+  }
 
 
   /** Cache J2000 position over existing cached time range using
