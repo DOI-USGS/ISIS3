@@ -1,5 +1,5 @@
-#ifndef CNetSuiteMainWindow_H
-#define CNetSuiteMainWindow_H
+#ifndef IpceMainWindow_H
+#define IpceMainWindow_H
 /**
  * @file
  * $Revision: 1.19 $
@@ -34,7 +34,7 @@ namespace Isis {
   class Project;
 
   /**
-   * The main window for the cnetsuite appication. This handles most of the top-level GUI aspects of the program.
+   * The main window for the ipce appication. This handles most of the top-level GUI aspects of the program.
    *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
    *
@@ -72,10 +72,10 @@ namespace Isis {
    *                          was created.  Fixes #4488.  References #4526, ##4487.
    *   @history 2016-11-09 Ian Humphrey - Modified readSettings() and writeSettings() to take in
    *                           Project pointers to be used to properly read and write settings
-   *                           for the CNetSuiteMainWindow. Note that when running cnetsuite without
-   *                           opening a Project, the config file cnetsuite_Project.config is used.
+   *                           for the IpceMainWindow. Note that when running ipce without
+   *                           opening a Project, the config file ipce_Project.config is used.
    *                           Otherwise, when a project is open, the config file
-   *                           cnetsuite_ProjectName will be used to restore window geom.
+   *                           ipce_ProjectName will be used to restore window geom.
    *                           The m_permToolBar, m_activeToolBar, and m_toolPad now have object
    *                           names set, so the saveState() call within writeSettings() now works.
    *                           Fixes #4358.
@@ -85,12 +85,14 @@ namespace Isis {
    *   @history 2017-04-17 Ian Humphrey - Updated createMenus() to set tool tips (hover text)
    *                           visible so the JigsawWorkOrder tool tip can be displayed to user
    *                           (which indicates why it is disabled by default). Fixes #4749.
+   *   @history 2017-06-22 Tracie Sucharski - Renamed from CNetSuiteMainWindow when application was
+   *                           renamed to ipce from cnetsuite.
    */
-  class CNetSuiteMainWindow : public QMainWindow {
+  class IpceMainWindow : public QMainWindow {
       Q_OBJECT
     public:
-      explicit CNetSuiteMainWindow(QWidget *parent = 0);
-      ~CNetSuiteMainWindow();
+      explicit IpceMainWindow(QWidget *parent = 0);
+      ~IpceMainWindow();
 
     public slots:
       void addView(QWidget *newWidget);
@@ -116,7 +118,7 @@ namespace Isis {
       void reattachView();
 
     private:
-      Q_DISABLE_COPY(CNetSuiteMainWindow);
+      Q_DISABLE_COPY(IpceMainWindow);
 
       void applyMaxThreadCount();
       void createMenus();
@@ -170,4 +172,4 @@ namespace Isis {
   };
 }
 
-#endif // CNetSuiteMainWindow_H
+#endif // IpceMainWindow_H

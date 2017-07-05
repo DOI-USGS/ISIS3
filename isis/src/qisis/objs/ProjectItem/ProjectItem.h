@@ -106,7 +106,7 @@ namespace Isis {
    *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the
    *                             the data management icon from 'data' to 'data-management' in the
    *                             setProject function. A naming conflict was causing strange warnings
-   *                             to show up on the command line when cnetsuite is launched, and this
+   *                             to show up on the command line when ipce is launched, and this
    *                             fixed it.  Fixes #3982.
    *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
    *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project

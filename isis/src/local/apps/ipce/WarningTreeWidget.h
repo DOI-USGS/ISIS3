@@ -6,7 +6,7 @@
 namespace Isis {
 
   /**
-   * @brief Warning Widget for cnetsuite
+   * @brief Warning Widget for ipce
    *
    * @author 2012-05-29 Steven Lambright and Tracie Sucharski
    *

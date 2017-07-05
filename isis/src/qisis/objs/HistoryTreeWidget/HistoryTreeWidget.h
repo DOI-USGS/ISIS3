@@ -11,7 +11,7 @@ namespace Isis {
   class WorkOrder;
 
   /**
-   * @brief History Widget for cnetsuite
+   * @brief History Widget for ipce
    *
    * This widget shows the history of work orders performed on the project.
    *

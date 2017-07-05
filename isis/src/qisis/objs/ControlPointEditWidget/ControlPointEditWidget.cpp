@@ -275,7 +275,7 @@ namespace Isis {
     // create left vertical layout
     m_ptIdValue = new QLabel;
 
-//TODO 2014-07-22 TLS cnetsuite Handle ground control points SOON
+//TODO 2014-07-22 TLS ipce Handle ground control points SOON
     m_numMeasures = new QLabel;
 //  QHBoxLayout *pointInfoLayout = new QHBoxLayout;
 //  pointInfoLayout->addWidget(m_ptIdValue);
@@ -514,7 +514,7 @@ namespace Isis {
 
     // TODO   If network & snList already exists do some error checking
     // Make copy;  we add ground source files to the list, and we don't want to cause problems for
-    //  other cnetsuite entities that are using
+    //  other ipce entities that are using
 //  if (m_serialNumberList) {
 //    delete m_serialNumberList;
 //    m_serialNumberList = NULL;
@@ -1580,7 +1580,7 @@ namespace Isis {
    *   @history 2013-12-06 Tracie Sucharski - If changing point type to constrained or fixed make
    *                           sure reference measure is not ignored.
    */
-#if 0  //TODO 2014-07-22 TLS cnetsuite Handle ground control points SOON
+#if 0  //TODO 2014-07-22 TLS ipce Handle ground control points SOON
   void ControlPointEditWidget::setPointType (int pointType) {
     if (m_editPoint == NULL) return;
 
@@ -1595,7 +1595,7 @@ namespace Isis {
       return;
     }
 
-//TODO 07-07-2014 TLS cnetsuite This needs to be uncommented & handled correctly
+//TODO 07-07-2014 TLS ipce This needs to be uncommented & handled correctly
     bool unloadGround = false;
 //    if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free)
 //      unloadGround = true;
@@ -1610,7 +1610,7 @@ namespace Isis {
       return;
     }
 
-//TODO 07-07-2014 TLS cnetsuite This needs to be uncommented & handled correctly
+//TODO 07-07-2014 TLS ipce This needs to be uncommented & handled correctly
     //  If ground loaded, read temporary ground measure to the point
     if (pointType != ControlPoint::Free && m_groundOpen) {
 //    loadGroundMeasure();
@@ -2706,7 +2706,7 @@ namespace Isis {
   }
 
 
-  // 2014-07-21 TLS  Cnetsuite  This needs to be changed to return the help information or
+  // 2014-07-21 TLS  Ipce  This needs to be changed to return the help information or
   //              widget?? to the calling program, so that it can be added to a menu or toolbar.
 #if 0
   void ControlPointEditWidget::showHelp() {

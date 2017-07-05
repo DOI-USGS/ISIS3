@@ -57,7 +57,7 @@ namespace Isis {
 
   /**
    *
-   * @brief The main project for cnetsuite
+   * @brief The main project for ipce
    *
    * @author 2012-??-?? ???
    *
@@ -329,7 +329,7 @@ namespace Isis {
 
       /**
        * Emitted when project loaded
-       * receivers: CNetSuiteMainWindow, Directory, HistoryTreeWidget
+       * receivers: IpceMainWindow, Directory, HistoryTreeWidget
        */
       void projectLoaded(Project *);
 

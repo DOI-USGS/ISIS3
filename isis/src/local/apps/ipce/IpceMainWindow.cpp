@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "CNetSuiteMainWindow.h"
+#include "IpceMainWindow.h"
 
 #include <QtDebug>
 #include <QApplication>
@@ -62,7 +62,7 @@ namespace Isis {
    *   @history 2016-11-09 Ian Humphrey - Added default readSettings() call to load initial
    *                           default project window state. References #4358.
    */
-  CNetSuiteMainWindow::CNetSuiteMainWindow(QWidget *parent) :
+  IpceMainWindow::IpceMainWindow(QWidget *parent) :
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
@@ -198,7 +198,7 @@ namespace Isis {
    *
    * @param[in] newWidget (QWidget *)
    */
-  void CNetSuiteMainWindow::addView(QWidget *newWidget) {
+  void IpceMainWindow::addView(QWidget *newWidget) {
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ) {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
@@ -220,7 +220,7 @@ namespace Isis {
   /**
    * Cleans up the directory.
    */
-  CNetSuiteMainWindow::~CNetSuiteMainWindow() {
+  IpceMainWindow::~IpceMainWindow() {
     m_directory->deleteLater();
   }
 
@@ -230,7 +230,7 @@ namespace Isis {
    *
    * @param[in] view (AbstractProjectItemView *) The active view.
    */
-  void CNetSuiteMainWindow::setActiveView(AbstractProjectItemView *view) {
+  void IpceMainWindow::setActiveView(AbstractProjectItemView *view) {
     m_activeView = view;
     updateMenuActions();
     updateToolBarActions();
@@ -242,7 +242,7 @@ namespace Isis {
    * several sources. The QActions come from an internal list of
    * QActions, the Directory, and the active view.
    */
-  void CNetSuiteMainWindow::updateMenuActions() {
+  void IpceMainWindow::updateMenuActions() {
 
     m_fileMenu->clear();
     // Get Directory FileMenu actions
@@ -257,7 +257,7 @@ namespace Isis {
       }
     }
     m_fileMenu->addSeparator();
-    // Get FileMenu actions from the CNetsuiteMainWindow, Exit is the only action
+    // Get FileMenu actions from the ipceMainWindow, Exit is the only action
     foreach ( QAction *action, m_fileMenuActions ) {
       m_fileMenu->addAction(action);
     }
@@ -275,7 +275,7 @@ namespace Isis {
       }
     }
     m_projectMenu->addSeparator();
-    //  Get Project menu actions from CNetSuiteMainWindow
+    //  Get Project menu actions from IpceMainWindow
     foreach ( QAction *action, m_projectMenuActions ) {
       m_projectMenu->addAction(action);
     }
@@ -293,7 +293,7 @@ namespace Isis {
       }
     }
     m_editMenu->addSeparator();
-    // Get Edit menu actions from CNetSuiteMainWindow
+    // Get Edit menu actions from IpceMainWindow
     foreach ( QAction *action, m_editMenuActions ) {
       m_editMenu->addAction(action);
     }
@@ -304,7 +304,7 @@ namespace Isis {
       m_viewMenu->addAction(action);
     }
     m_viewMenu->addSeparator();
-    // Get View menu actions from CNetSuiteMainWindow
+    // Get View menu actions from IpceMainWindow
     foreach ( QAction *action, m_viewMenuActions ) {
       m_viewMenu->addAction(action);
     }
@@ -329,7 +329,7 @@ namespace Isis {
       }
     }
     m_settingsMenu->addSeparator();
-    // Get Settings menu actions from CNetSuiteMainWindow
+    // Get Settings menu actions from IpceMainWindow
     foreach ( QAction *action, m_settingsMenuActions ) {
       m_settingsMenu->addAction(action);
     }
@@ -347,7 +347,7 @@ namespace Isis {
       }
     }
     m_helpMenu->addSeparator();
-    // Get Help menu actions from CNetSuiteMainWindow
+    // Get Help menu actions from IpceMainWindow
     foreach ( QAction *action, m_helpMenuActions ) {
       m_helpMenu->addAction(action);
     }
@@ -359,7 +359,7 @@ namespace Isis {
    * several sources. Actions are taken from an internal list of
    * QActions, the Directory, and the active view.
    */
-  void CNetSuiteMainWindow::updateToolBarActions() {
+  void IpceMainWindow::updateToolBarActions() {
     m_permToolBar->clear();
     foreach( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
@@ -398,7 +398,7 @@ namespace Isis {
    * @param[in] watched (QObject *) The object being filtered.
    * @param[in] event (QEvent *) The event that may be filtered.
    */
-  bool CNetSuiteMainWindow::eventFilter(QObject *watched, QEvent *event) {
+  bool IpceMainWindow::eventFilter(QObject *watched, QEvent *event) {
     if ( AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>(watched) ) {
       if (event->type() == QEvent::DragEnter) {
         return true;
@@ -446,7 +446,7 @@ namespace Isis {
    * This method takes the max thread count setting and asks
    * QtConcurrent to respect it.
    */
-  void CNetSuiteMainWindow::applyMaxThreadCount() {
+  void IpceMainWindow::applyMaxThreadCount() {
     if (m_maxThreadCount <= 1) {
       // Allow QtConcurrent to use every core and starve the GUI thread
       QThreadPool::globalInstance()->setMaxThreadCount(QThread::idealThreadCount());
@@ -462,7 +462,7 @@ namespace Isis {
    * Initializes the internal lists of actions of the main window for
    * use in the menus and toolbars.
    */
-  void CNetSuiteMainWindow::initializeActions() {
+  void IpceMainWindow::initializeActions() {
     QAction *exitAction = new QAction("E&xit", this);
     exitAction->setIcon( QIcon::fromTheme("window-close") );
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
@@ -521,7 +521,7 @@ namespace Isis {
   /**
    * Creates the main menus of the menu bar.
    */
-  void CNetSuiteMainWindow::createMenus() {
+  void IpceMainWindow::createMenus() {
     m_fileMenu = menuBar()->addMenu(tr("&File"));
     m_fileMenu->setObjectName("fileMenu");
 
@@ -565,7 +565,7 @@ namespace Isis {
    *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
    *                           References #4358.
    */
-  void CNetSuiteMainWindow::writeSettings(const Project *project) const {
+  void IpceMainWindow::writeSettings(const Project *project) const {
     // Ensure that we are not using a NULL pointer
     if (!project) {
       QString msg = "Cannot write settings with a NULL Project pointer.";
@@ -589,9 +589,9 @@ namespace Isis {
   /**
    * Read the window positioning and state information from the config file.
    *
-   * When running cnetsuite without opening a project, the config file read is
+   * When running ipce without opening a project, the config file read is
    * $HOME/.Isis/$APPNAME/$APPNAME_Project.config
-   * Otherwise, when running cnetsuite and opening a project (ProjectName), the config file read is
+   * Otherwise, when running ipce and opening a project (ProjectName), the config file read is
    * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config
    *
    * @param[in] project (Project *) The project that was loaded.
@@ -599,14 +599,14 @@ namespace Isis {
    * @internal
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    */
-  void CNetSuiteMainWindow::readSettings(Project *project) {
+  void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
     if (!project) {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (project->name() == "Project") {
-      setWindowTitle("cnetsuite");
+      setWindowTitle("ipce");
     }
     else {
       setWindowTitle( project->name() );
@@ -636,7 +636,7 @@ namespace Isis {
    * Handle the close event by writing the window positioning and
    * state information before forwarding the event to the QMainWindow.
    */
-  void CNetSuiteMainWindow::closeEvent(QCloseEvent *event) {
+  void IpceMainWindow::closeEvent(QCloseEvent *event) {
     writeSettings(m_directory->project());
     QMainWindow::closeEvent(event);
   }
@@ -646,7 +646,7 @@ namespace Isis {
    * Ask the user how many threads to use in this program. This
    * includes the GUI thread.
    */
-  void CNetSuiteMainWindow::configureThreadLimit() {
+  void IpceMainWindow::configureThreadLimit() {
     bool ok = false;
 
     QStringList options;
@@ -681,7 +681,7 @@ namespace Isis {
    * Activate the What's This? cursor. This is useful for he What's
    * This? action in the help menu.
    */
-  void CNetSuiteMainWindow::enterWhatsThisMode() {
+  void IpceMainWindow::enterWhatsThisMode() {
     QWhatsThis::enterWhatsThisMode();
   }
 
@@ -693,7 +693,7 @@ namespace Isis {
    *
    * @param[in] window (QMdiSubWindow *) The active sub window.
    */
-  void CNetSuiteMainWindow::onSubWindowActivated(QMdiSubWindow * window) {
+  void IpceMainWindow::onSubWindowActivated(QMdiSubWindow * window) {
     if (window) {
       setActiveView( qobject_cast<AbstractProjectItemView *>( window->widget() ) );
     }
@@ -707,7 +707,7 @@ namespace Isis {
    * Toggles the view mode of the central QMdiArea between tabbed and
    * sub window mode.
    */
-  void CNetSuiteMainWindow::toggleViewMode() {
+  void IpceMainWindow::toggleViewMode() {
     QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
     if (mdiArea->viewMode() == QMdiArea::SubWindowView) {
       setTabbedViewMode();
@@ -722,7 +722,7 @@ namespace Isis {
    * Sets the QMdiArea in the central widget to the tabbed view mode
    * and updates the appropriate actions.
    */
-  void CNetSuiteMainWindow::setTabbedViewMode() {
+  void IpceMainWindow::setTabbedViewMode() {
     QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
     mdiArea->setViewMode(QMdiArea::TabbedView);
     m_cascadeViewsAction->setEnabled(false);
@@ -734,7 +734,7 @@ namespace Isis {
    * Sets the QMdiArea in the central widget to the sub window view
    * mode and updates the appropriate actions.
    */
-  void CNetSuiteMainWindow::setSubWindowViewMode() {
+  void IpceMainWindow::setSubWindowViewMode() {
     QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
     mdiArea->setViewMode(QMdiArea::SubWindowView);
     m_cascadeViewsAction->setEnabled(true);
@@ -750,7 +750,7 @@ namespace Isis {
    * toolbars and menu actions. A detached view will not be set as the
    * active view when it is activated.
    */
-  void CNetSuiteMainWindow::detachActiveView() {
+  void IpceMainWindow::detachActiveView() {
     AbstractProjectItemView *view = m_activeView;
 
     if (!m_activeView) {
@@ -859,7 +859,7 @@ namespace Isis {
    * the main window and the window that previously contained it is
    * deleted.
    */
-  void CNetSuiteMainWindow::reattachView() {
+  void IpceMainWindow::reattachView() {
     QAction *reattachAction = qobject_cast<QAction *>( sender() );
     if (!reattachAction) {
       return;

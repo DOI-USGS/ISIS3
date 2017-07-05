@@ -70,7 +70,7 @@ namespace Isis {
     // Maximum Likelihood Estimation Options no default in the constructor - must be set.
     m_maximumLikelihood.clear();
 
-    // Self Calibration ??? (from cnetsuite only)
+    // Self Calibration ??? (from ipce only)
 
     // Target Body
     m_solveTargetBody = false;
@@ -662,11 +662,11 @@ namespace Isis {
 
 
   // =============================================================================================//
-  // ======================== Self Calibration ??? (from cnetsuite only) =========================//
+  // ======================== Self Calibration ??? (from ipce only) =========================//
   // =============================================================================================//
 
   // =============================================================================================//
-  // ======================== Target Body ??? (from cnetsuite only) ==============================//
+  // ======================== Target Body ??? (from ipce only) ==============================//
   // =============================================================================================//
 
   /**

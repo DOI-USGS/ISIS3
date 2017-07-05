@@ -1,4 +1,4 @@
-APPNAME = cnetsuite
+APPNAME = ipce
 
 include $(ISISROOT)/make/isismake.tsts
 

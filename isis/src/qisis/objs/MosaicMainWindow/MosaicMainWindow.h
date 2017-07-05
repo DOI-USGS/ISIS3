@@ -46,7 +46,7 @@ namespace Isis {
    *                           MosaicSceneWidget.
    *   @history 2012-09-17 Steven Lambright - Restored the toolpad and active toolbar creation...
    *                           creation is now in both places, internalization into the scne is for
-   *                           cnetsuite only. This allows movement of toolbars/appropriate
+   *                           ipce only. This allows movement of toolbars/appropriate
    *                           placements of other widgets (progress bar, tracking in status, etc)
    *                           for qmos (aka this class).
    *   @history 2013-03-19 Steven Lambright - Fixed a problem where Open Project would

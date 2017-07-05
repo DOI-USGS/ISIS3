@@ -233,7 +233,7 @@ namespace Isis {
       bool setNumberHeldImages(SerialNumberList pHeldSnList,
                                SerialNumberList *pSnList);
 
-      // Correlation Matrix accessors for cnetsuite and mutators for bundle adjust.
+      // Correlation Matrix accessors for ipce and mutators for bundle adjust.
       CorrelationMatrix correlationMatrix() const;
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);

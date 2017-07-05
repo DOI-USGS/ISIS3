@@ -28,7 +28,7 @@
 
 #include "Gui.h"
 #include "IException.h"
-#include "CNetSuiteMainWindow.h"
+#include "IpceMainWindow.h"
 #include "QIsisApplication.h"
 
 using namespace std;
@@ -40,9 +40,9 @@ int main(int argc, char *argv[]) {
 
   try {
     QApplication *app = new QIsisApplication(argc, argv);
-    QApplication::setApplicationName("cnetsuite");
+    QApplication::setApplicationName("ipce");
 
-    CNetSuiteMainWindow *mainWindow = new CNetSuiteMainWindow();
+    IpceMainWindow *mainWindow = new IpceMainWindow();
 
     // We do not want a showMaximized call, as that will negate the settings read during the main
     // window's initialization. References #4358.

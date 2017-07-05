@@ -75,7 +75,7 @@ namespace Isis {
    *   @history 2012-07-30 Steven Lambright - The save action now has enabling/disabling of state
    *                           functional (as long as there are work orders in the undo stack).
    *   @history 2012-08-28 Tracie Sucharski - Instead of this class adding tabs to a TabWidget, it
-   *                           now emits a signal which is connected to cnetSuiteMainWindow to
+   *                           now emits a signal which is connected to ipceMainWindow to
    *                           create a new dock widget.  This class no longer needs the
    *                           viewContainer since it is not adding tabs.
    *   @history 2012-09-12 Steven Lambright - Added xml save/load capabilities, removed dead code
@@ -133,7 +133,7 @@ namespace Isis {
    *                           BundleObservationView.  Fixes #4839. Fixes #4840.
    *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint slot.
    *   @history 2017-05-23 Tracie Sucharski - Fixed all of the cleanup methods to properly remove
-   *                           the correct view/widget from the lists.
+   *                           the correct view/widget from the lists.  Fixes #4847.
    *   @history 2017-06-14 Ken Edmundson - Commented out ChipViewport widget code.  This will be
    *                           temporary until the widget is fully developed.
 
