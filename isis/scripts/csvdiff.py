@@ -100,7 +100,8 @@ if len(sys.argv) >= 4:
   for line in tolerances:
     if line.strip() != '':
       column, tolerance = line.strip().upper().split("=")
-      tolerance_map[column] = float(tolerance)
+      # Strip column and tolerance to allow for whitespace around "=" character
+      tolerance_map[column.strip()] = float(tolerance.strip())
 
   # Close the file
   tolerance_file.close()
