@@ -72,7 +72,7 @@
         The third process is to match key points from different images based on
         their feature descriptors. The trainer images can be matched to the
         query image (called a trainer to query match) or the query image can be
-        matched to the trainer images (calles a query to trainer match).
+        matched to the trainer images (called a query to trainer match).
         <i>findfeatures</i> performs both a trainer to query match and a query
         to trainer match. Algorithms for matching feature descriptors are
         called matchers.
@@ -80,30 +80,34 @@
       <p>
         The final step is to remove outlier matches. This helps improve the
         quality and accuracy of matches when conditions make matching
-        challenging. <i>findfeatures</i> uses a five step outlier removal
+        challenging. <i>findfeatures</i> uses a four step outlier removal
         process. At each step, matches are rejected and only the surviving
-        matches are used in the following step.  First, a ratio test comparing
-        the best and second best match for each point removes points that not
-        sufficiently distinct. Second, the matches are checked for symmetry. If
-        a match was made in the trainer to query match, but not in the query to
-        trainer match (or vice versa) then the match is removed. Third, the
-        homography matrices (projections from one image's perspective into
-        anothers) from the query image to the trainer images are computed using
-        the RANSAC algorithm and matches with a high residual are removed.
-        Fourth, the fundamental matrices between the trainer images and the
-        query image are computed using the RANSAC algorithm and matches that
-        are excluded by the RANSAC algorithm are removed. Finally, the
-        homography matrices from the query image to the trainer images are
-        computed again and matches with a high residual are removed.
+        matches are used in the following step.
       </p>
+      <ol>
+        <li>A ratio test comparing the best and second best match for each
+            point removes points that not sufficiently distinct.</li>
+        <li>The matches are checked for symmetry. If a match was made in the
+            trainer to query match, but not in the query to trainer match
+            (or vice versa) then the match is removed.</li>
+        <li>The fundamental matrices between the trainer images and the query
+            image are computed using the RANSAC algorithm and matches that
+            exceed the RANSAC tolerance are removed.</li>
+        <li>The homography matrices (projections from one image's perspective
+            into anothers) from the query image to the trainer images are
+            computed using the RANSAC algorithm and matches with a high
+            residual are removed.</li>
+      </ol>
       <p>
         Matches that survive the outlier rejection process are converted into
-        an output control network. From here, mutliple control networks created
+        an output control network. From here, multiple control networks created
         by systematic use of <i>findfeatures</i> can be combined into one
         regional or global control network with <i>cnetcombinept</i>. This can
-        result in extremely larget control networks. <i>cnetthinner</i> can be
-        used to reduce the size of the network without significantly degrading
-        its quality.
+        result in extremely large control networks. <i>cnetthinner</i> can be
+        used to reduce the size of the network while maintaining sufficient
+        distribution for use with the jigsaw application. If the control
+        network is going to be used to create a DEM, then it should not be
+        thinned.
       </p>
       <h3>Supported Image Formats</h3>
       <p>
@@ -128,6 +132,9 @@
         geometries be provided - only line/sample coorelations will be 
         computed in these cases.
       </p>
+      <p>
+        Note that all images are converted to 8-bit when read in.
+      </p>
       <h3>Specifying Algorithms and Robust Matcher Parameters</h3>
       <p>
         Detectors, extractors, matchers, and robust matcher parameters are
@@ -148,7 +155,7 @@
         detector. The entries consist of the parameter name followed by
         <code>:</code> and then the parameter value. After the detector
         component is <code>/</code> and then the extractor component,
-        <code>extractor[@param1:value@...]</code>. After the extractor
+        <code>extractor[@param1:value@...]</code> After the extractor
         component is <code>/</code> and then the matcher component,
         <code>[matcher@param1@value1@...]</code>. The extractor and matcher
         components are formatted the same way as the detector component. The
@@ -224,8 +231,8 @@
       <p>
         Choosing effective algorithms and parameters is critical to successful
         use of <i>findfeatures</i>. If a poor choice of algorithms and/or
-        parameters is made, <i>findfeatures</i> will usually still complete,
-        but the computation time and/or outpute control network quality will
+        parameters is made, <i>findfeatures</i> will usually complete,
+        but the computation time and/or output control network quality will
         suffer. <i>findfeatures</i> supports all of the OpenCV 3.1
         <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
         detectors, extractors</a>, and 
@@ -242,7 +249,7 @@
         little less daunting. First, when in doubt, trust the defaults. The
         defaults in <i>findfeatures</i> are designed to be a good fit for a
         wide range of scenarios. They are not a perfect fit for every situation
-        but a perfect fit ususally is not required. The detector and extractor
+        but a perfect fit usually is not required. The detector and extractor
         do not default to a specific algorithm, but the SIFT algorithm is a
         very robust algorithm that will produce a high quality output control
         network for most situations. The majority of more modern algorithms are
@@ -261,11 +268,11 @@
       </p>
       <p>
         Different detectors search for different types of features. For
-        example, the FAST algorithm searchs for corners, while blob detection
+        example, the FAST algorithm searches for corners, while blob detection
         algorithms search for regions that contrast their surroundings.
         When choosing which detector to use, consider the prominent features
         in the image set. The FAST algorithm would work well for finding key
-        points on a ridgeline, while a blob detection algorithm would work well
+        points on a linear feature, while a blob detection algorithm would work well
         for finding key points in nadir images of a heavily cratered area.
       </p>
       <p>
@@ -312,8 +319,8 @@
         ratio close to 0 will force <i>findfeatures</i> to consider only
         un-ambiguous matches and reject a large number of matches. If many,
         indistinct features are detected in each image, a low ratio will result
-        in  a smaller, higher quality control network. If few, indistinct
-        feates are detected in each image, a high ratio will prevent the
+        in  a smaller, higher quality control network. If few, non-distinct
+        features are detected in each image, a high ratio will prevent the
         control network from being too sparse. The <b>EPITOLERANCE</b> and
         <b>EPICONFIDENCE</b> parameters control how outliers are found when the
         fundamental matrices are computed. These parameters will have the
@@ -340,8 +347,8 @@
         introduce artifacts into some images, so the <b>SCHARR</b> option is
         available to apply a more accurate filter. These filters allows for
         improved detection when using an edge based detector (FAST, AGAST,
-        BRISK, etc.). If you are using an edge based detector and not detecting
-        a sufficient number of key points or your key points are not
+        BRISK, etc.). If an edge based detector is not detecting
+        a sufficient number of key points or the key points are not
         sufficienty distinct, these filters may increase the number of
         successful matches.
       </p>
@@ -390,7 +397,7 @@
               Apply the 
               <a href="https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf">
               RootSift</a> algorithm to the descriptors that 
-              normalizes SIFT-type of descriptors. The best description of 
+              normalizes SIFT-type of descriptors. A good description of 
               the application of this algorithm is described in 
               <a href="http://www.pyimagesearch.com/2015/04/13/implementing-rootsift-in-python-and-opencv/">
               this article</a>. In general, SIFT descriptors histograms are 
@@ -407,7 +414,7 @@
           <TD>
               The Epipolar algorithm in OpenCV requires a minimim of 8 
               points in order to properly compute the fundamental matrix. 
-              This parameter allowes the user to specify the minimum number 
+              This parameter allows the user to specify the minimum number 
               of points allowed.
           </TD>
         </TR>
@@ -538,7 +545,7 @@
           MSD stands for Maximal Self-Dissimilarities. It is based upon the
           idea that regions that vary significantly from their surroundings are
           easy to uniquely identify from different perspectives. The MSD
-          algorithm detects generic features, so it invariant to many image
+          algorithm detects generic features, so it is invariant to many image
           transformations and works well with stereo pairs.
         </TD>
         <TD>
@@ -738,7 +745,7 @@
         <TD>BRIEF</TD>
         <TD>Extractor</TD>
         <TD>
-          The BREIF algorithm extracts an extremely fast binary descriptor. If
+          The BRIEF algorithm extracts an extremely fast binary descriptor. If
           the query and trainer images are very similar, then the BRIEF
           algorithm offers unmatched speed. This speed comes at a cost, the
           BRIEF algorithm behaves very poorly if the query and trainer images
@@ -841,7 +848,7 @@
         <TD>Extractor</TD>
         <TD>
           The LUCID algorithm was designed to extract feature descriptors from
-          color images. It offers invarianve close to SURF and BRIEF with
+          color images. It offers invariance close to SURF and BRIEF with
           shorter computation times.
         </TD>
         <TD>
@@ -900,7 +907,7 @@
     </TABLE>
       <h3>Using Debugging to Diagnose Behavior</h3>
       <p>
-          An additional feature of <i>findfeatures</i> is a detaileddebugging 
+          An additional feature of <i>findfeatures</i> is a detailed debugging
           report of processing behavior in real time for all matching and 
           outlier detection  algorithms. The data produced by this option is 
           very useful to identify the exact processing step where some matching 
@@ -1012,7 +1019,7 @@
     <p>
         In the above example, lines 2-13 provide general information about the 
         program and compute environment. If MAXTHREADS were set to a value less 
-        than 8, number of total threads (line 11) would reflect this number. 
+        than 4, number of total threads (line 11) would reflect this number. 
         Line 15 specifies the precise time the matcher algorithm was invoked. 
         Line 18-25 shows the algorithm string specification, names of query 
         (MATCH) and train (FROM) images and the full and rendered sizes of 
@@ -1023,17 +1030,17 @@
         descriptors can be costly under some conditions. Users can restrict the 
         number of features detected by using the MAXPOINTS parameter specify the 
         maximum numnber of points to save. The values in brackets in lines 27 
-        and 28  will show the total amount of features rdetected if MAXPOINTS 
+        and 28  will show the total amount of features detected if MAXPOINTS 
         are used.
     </p>
     <p>
         Outlier detection begins at line 35. The Ratio test is performed first. 
-        Here the matcher algorithm is invoked for each match pair, irregardless 
+        Here the matcher algorithm is invoked for each match pair, regardless 
         of the number of train (FROMLIST) images provided. For each keypoint in 
         the query image, the two nearest matches in the train image are 
         computed and the results are reported in lines 39-42. Then the 
         bi-directional matches are computed in lines 43-46.  A bi-directional 
-        ratio test is compited for the query->train matches in lines 47-54 and 
+        ratio test is computed for the query->train matches in lines 47-54 and 
         then train->query in lines 55-62. You can see here that a significant 
         number of matches are removed in this step. Users can adjust this 
         behavior, retaining more points by setting the RATIO parameter closer to 
@@ -1096,7 +1103,7 @@
       <code>
            Recall = |correct matches| / |correspondences|
       </code>
-      Because the detected features are already determined, <em>Recall</em>only 
+      Because the detected features are already determined, <em>Recall</em> only 
       shows the performance of the feature descriptor and descriptor matcher. 
       The higher value of <em>Recall</em>, the better performance of descriptor 
       and matcher.
@@ -1122,10 +1129,10 @@
       MatchSolution group. Here is an example:
       <pre>
 Group = MatchSolution
-  Matcher      = surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
-  MatchedPairs = 1
-  Efficiency   = 0.016662437621585
-End_Group
+    Matcher      = surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
+    MatchedPairs = 1
+    Efficiency   = 0.040744395883265
+  End_Group
       </pre>
     </p>
     </description>
@@ -1174,6 +1181,10 @@ End_Group
        method to MatchImage and made the MatchImages used by each algorithm
        specification independent. Fixes #4765.
     </change>
+    <change name="Jesse Mapel" date="2017-06-23"> 
+       Corrected several errors in documentation. Fixed the MSER algorithm name.
+       Fixed AKAZE being flagged as only an extractor. Fixes #4950.
+    </change>
   </history> 
 
   <groups>
@@ -1190,7 +1201,8 @@ End_Group
           formats such as PNG, TIFF or JPEG. Essentially any image that can be 
           read by OpenCV's 
           <a href="http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#imread">
-          imread()</a>routine is supported.
+          imread()</a>routine is supported. All input images are converted to
+          8-bit when they are read.
         </description>
         <filter>
           *.cub
@@ -1208,7 +1220,8 @@ End_Group
           <p>
           Use this parameter to select a filename which contains a list of
           cube filenames. The cubes identified inside this file will be used
-          to create the control network. The following is an example of the 
+          to create the control network. All input images are converted to
+          8-bit when they are read. The following is an example of the 
           contents of a typical FROMLIST file:
           </p>
           <pre>
@@ -1238,7 +1251,8 @@ End_Group
         <description>
             Name of the image to match to. This will be the reference image in 
             the output control network. It is also referred to as the query 
-            image in OpenCV documentation.
+            image in OpenCV documentation. All input images are converted to
+            8-bit when they are read.
         </description>
         <filter>
           *.cub
@@ -1253,7 +1267,9 @@ End_Group
           <description>
                This file will contain the Control Point network results of 
                findfeatures in a binary format.  There will be no false or 
-               failed matches in the output control network file. 
+               failed matches in the output control network file. Using this
+               control network and TOLIST in the qnet application, the results
+               of findfeatures can be visually assessed.
           </description>
           <internalDefault>None</internalDefault>
           <filter>
@@ -1270,7 +1286,8 @@ End_Group
              network. For multi-image matching, some files may not have matches 
              detected. These files will not be written to TOLIST. The MATCH file 
              is always added first and all other images that have matches are 
-             added to TOLIST.
+             added to TOLIST. Using this list and the ONET in the qnet
+             application, the results of findfeatures can be visually assessed.
           </description>
           <internalDefault>None</internalDefault>
           <filter>*.lis</filter>
@@ -1338,11 +1355,10 @@ End_Group
                List result of ALGORITHM specification
             </brief> 
             <description>
-              This parameter will retrieve all the registered OpenCV 
-              algorithms available that can created by name.  The ones 
-              pertinent to this application are those prepended with 
-              "Feature2D" and "DescriptorMatcher".  However, this option lists
-              all of the registered OpenCV algorithms.
+              If true, information about the detector, extractor, matcher, and
+              parameters specified in the ALGORITHM or ALGOSPECFILE parameters
+              will be output. If multiple sets of algorithms are specified,
+              then the details for each set will be output.
             </description>
            <default><item>No</item></default>
         </parameter>
@@ -1354,10 +1370,7 @@ End_Group
             </brief> 
             <description>
               This parameter will retrieve all the registered OpenCV 
-              algorithms  available that can created by name.  The ones 
-              pertinent to this application are those prepended with 
-              "Feature2D" and "DescriptorMatcher".  However, this option lists 
-              all of the registered OpenCV algorithms.
+              algorithms  available that can created by name.
             </description>
            <default><item>No</item></default>
         </parameter>
@@ -1372,7 +1385,7 @@ End_Group
                 When an information option is requested (LISTSPEC), 
                 the user can provide the name of an output file here where the 
                 information, in the form of a PVL structure, will be written.  
-                If those any of those options are selected by the user, and 
+                If any of those options are selected by the user, and 
                 a file is not provided in this option, the output is written 
                 to the screen or GUI.
               </p>
@@ -1568,7 +1581,7 @@ End
            </brief>
            <description>
                For each feature point, we have two candidate matches 
-               in the other view. These are the two best ones based on the 
+               in the other image. These are the two best ones based on the 
                distance between their descriptors. If this measured distance is 
                very low for the best match, and much larger for the second best 
                match, we can safely accept the first match as a good one since 
@@ -1618,7 +1631,7 @@ End
               </brief>
               <description>
                 <p>
-                    if we consider the special case where two views of a scene are 
+                    If we consider the special case where two views of a scene are 
                     separated by a pure rotation, then it can be observed that the 
                     fourth column of the extrinsic matrix will be made of all 0s 
                     (that is, translation is null). As a result, the projective 
@@ -1796,7 +1809,7 @@ End
         <brief>Name of this control network</brief>
         <description>
             The ID or name of this particular control network. This string
-            will be added to the ouput control network file, and can be used
+            will be added to the output control network file, and can be used
             to identify the network.
         </description>
        <default><item>Features</item></default>
@@ -1826,7 +1839,7 @@ End
           <p>
             Note: Make sure there are enough "?"s for all the control
             points that might be created during this run. If all the possible
-            point IDs are exausted the program will exit with an error, and 
+            point IDs are exhausted the program will exit with an error, and 
             will not produce an output control network file. The number of
             control points created depends on the size and quantity of 
             image overlaps and the density of control points as defined
@@ -1837,7 +1850,7 @@ End
           </p>
           <ul>
             <li>POINTID="JohnDoe?????"</li>
-            <li>POINTID="Quad1_????></li>
+            <li>POINTID="Quad1_????"</li>
             <li>POINTID="JD_???_test1"</li>
           </ul>
         </description>
@@ -1877,7 +1890,7 @@ End
                There are two types of control network files that can be created             
                in this application: IMAGE and GROUND.  For IMAGE types, the pair 
                is assumed to be overlapping pairs where control measures for 
-               both images are crate.  For NETTYPE=GROUND, only the FROM file 
+               both images are created.  For NETTYPE=GROUND, only the FROM file 
                measure is recorded for purposes of dead reckoning of the image 
                using jigsaw.
             </description>
@@ -1894,7 +1907,7 @@ End
                 </option>
                <option value="GROUND">
                     <brief>
-                        Only create a ground network file for dead reconing 
+                        Only create a ground network file for dead reckoning 
                     </brief>
                     <description>
                        Create a control network with only the FROM image so that 
@@ -1928,7 +1941,7 @@ End
                 </option>
                 <option value="FROM">
                     <brief>
-                       Use the FROM file to compute geomtries for control points 
+                       Use the FROM file to compute geometries for control points 
                     </brief>
                     <description>
                         Selection of the FROM option indicates use of the FROM 
@@ -1940,7 +1953,7 @@ End
                 </option>
                <option value="MATCH">
                     <brief>
-                       Use the MATCH file to compute geomtries for control 
+                       Use the MATCH file to compute geometries for control 
                     points 
                     </brief>
                     <description>
@@ -2127,6 +2140,28 @@ Object = Algorithms
 
   Object = Algorithm
     CVVersion    = 3.1.0
+    Name         = AKAZE
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV AKAZE Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d8/d30/classcv_1_1AKAZE.html"
+    CreatedUsing = akaze
+    Aliases      = (akaze, detector.akaze, extractor.akaze, feature2d.akaze)
+
+    Group = Parameters
+      DescriptorChannels = 3
+      DescriptorSize     = 0
+      DescriptorType     = DESCRIPTOR_MLDB
+      Diffusivity        = DIFF_PM_G2
+      NOctaveLayers      = 4
+      NOctaves           = 4
+      Threshold          = 0.0010000000474975
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
     Name         = Blob
     Type         = Feature2D
     Features     = Detector
@@ -2267,14 +2302,14 @@ Object = Algorithms
 
   Object = Algorithm
     CVVersion    = 3.1.0
-    Name         = MSERA
+    Name         = MSER
     Type         = Feature2D
     Features     = Detector
-    Description  = "The OpenCV MSERA Feature2D detector/extractor algorithm.
+    Description  = "The OpenCV MSER Feature2D detector/extractor algorithm.
                     See the documentation at
                     http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html"
-    CreatedUsing = msera
-    Aliases      = (detector.msera, msera)
+    CreatedUsing = mser
+    Aliases      = (detector.mser, mser)
 
     Group = Parameters
       AreaThreshold = 1.01
@@ -2373,28 +2408,6 @@ Object = Algorithms
       NOctaveLayers    = 3
       NOctaves         = 4
       Upright          = No
-    End_Group
-  End_Object
-
-  Object = Algorithm
-    CVVersion    = 3.1.0
-    Name         = AKAZE
-    Type         = Feature2D
-    Features     = Extractor
-    Description  = "The OpenCV AKAZE Feature2D detector/extractor algorithm.
-                    See the documentation at
-                    http://docs.opencv.org/3.1.0/d8/d30/classcv_1_1AKAZE.html"
-    CreatedUsing = akaze
-    Aliases      = (akaze, extractor.akaze)
-
-    Group = Parameters
-      DescriptorChannels = 3
-      DescriptorSize     = 0
-      DescriptorType     = DESCRIPTOR_MLDB
-      Diffusivity        = DIFF_PM_G2
-      NOctaveLayers      = 4
-      NOctaves           = 4
-      Threshold          = 0.0010000000474975
     End_Group
   End_Object
 

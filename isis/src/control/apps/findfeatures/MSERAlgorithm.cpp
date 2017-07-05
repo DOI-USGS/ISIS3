@@ -34,7 +34,7 @@ namespace Isis {
    * Constructs the algorithm with default variables.
    */
   MSERAlgorithm::MSERAlgorithm() : 
-                 Feature2DAlgorithm("MSERA", "Feature2D",
+                 Feature2DAlgorithm("MSER", "Feature2D",
                                     MSERType::create()) {  
     setupParameters();
   }
@@ -48,7 +48,7 @@ namespace Isis {
    * @param config The config string used to construct cvars.
    */
   MSERAlgorithm::MSERAlgorithm(const PvlFlatMap &cvars, const QString &config) :
-                 Feature2DAlgorithm("MSERA", "Feature2D", 
+                 Feature2DAlgorithm("MSER", "Feature2D", 
                                     MSERType::create(), cvars) {
     setConfig(config);
     PvlFlatMap variables = setupParameters();
@@ -103,7 +103,7 @@ namespace Isis {
    * @return @b QString A description of the algorithm.
    */
   QString MSERAlgorithm::description() const {
-    QString desc = "The OpenCV MSERA Feature2D detector/extractor algorithm."
+    QString desc = "The OpenCV MSER Feature2D detector/extractor algorithm."
                    " See the documentation at "
      "http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html";
     return (desc);
