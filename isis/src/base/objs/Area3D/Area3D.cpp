@@ -125,6 +125,8 @@ namespace Isis {
 
   /**
    * Returns the leftmost X position of the 3D area.
+   * 
+   * @return Displacement The leftmost X position of the 3D area
    */
   Displacement Area3D::getStartX() const {
     Displacement startX;
@@ -138,6 +140,8 @@ namespace Isis {
 
   /**
    * Returns the topmost Y position of the 3D area.
+   * 
+   * @return Displacement The topmost Y position of the 3D area
    */
   Displacement Area3D::getStartY() const {
     Displacement startY;
@@ -151,6 +155,8 @@ namespace Isis {
 
   /**
    * Returns the frontmost Z position of the 3D area.
+   * 
+   * @return Displacement The frontmost Z position of the 3D area
    */
   Displacement Area3D::getStartZ() const {
     Displacement startZ;
@@ -164,6 +170,8 @@ namespace Isis {
 
   /**
    * Returns the width (in the X dimension) of the 3D area.
+   * 
+   * @return Displacement The width (in the X dimension) of the 3D area
    */
   Distance Area3D::getWidth() const {
     return Distance(
@@ -174,6 +182,8 @@ namespace Isis {
 
   /**
    * Returns the height (in the Y dimension) of the 3D area.
+   * 
+   * @return Displacement The height (in the Y dimension) of the 3D area
    */
   Distance Area3D::getHeight() const {
     return Distance(
@@ -184,6 +194,8 @@ namespace Isis {
 
   /**
    * Returns the depth (in the Z dimension) of the 3D area.
+   * 
+   * @return Displacement The depth (in the Z dimension) of the 3D area
    */
   Distance Area3D::getDepth() const {
     return Distance(
@@ -194,6 +206,8 @@ namespace Isis {
 
   /**
    * Returns the rightmost X position of the 3D area.
+   * 
+   * @return Displacement The rightmost X position of the 3D area
    */
   Displacement Area3D::getEndX() const {
     Displacement endX;
@@ -207,6 +221,8 @@ namespace Isis {
 
   /**
    * Returns the bottommost Y position of the 3D area.
+   * 
+   * @return Displacement The bottommost Y position of the 3D area
    */
   Displacement Area3D::getEndY() const {
     Displacement endY;
@@ -220,6 +236,8 @@ namespace Isis {
 
   /**
    * Returns the backmost Z position of the 3D area.
+   * 
+   * @return Displacement The backmost Z position of the 3D area
    */
   Displacement Area3D::getEndZ() const {
     Displacement endZ;
@@ -481,6 +499,8 @@ namespace Isis {
   /**
    * Returns true if all of the positions of the 3D area are
    *   valid (i.e. they are non-NULL).
+   * 
+   * @return bool True if all of the positions of the 3D area are valid (i.e. they are non-NULL).
    */
   bool Area3D::isValid() const {
     bool valid = true;
