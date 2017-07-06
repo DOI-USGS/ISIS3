@@ -38,7 +38,10 @@ namespace Isis {
  *  
  * @author 2014-07-01 Kris Becker 
  * @internal 
- *   @history 2014-07-01 Kris Becker - Original Version 
+ *   @history 2014-07-01 Kris Becker - Original Version
+ *   @history 2017-06-22 Jesse Mapel - Added a warning to render about
+ *                                     cv::Mat copying and modification.
+ *                                     References #4904.
  */
 
 class ImageTransform {

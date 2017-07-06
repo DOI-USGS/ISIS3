@@ -48,6 +48,20 @@ QString ImageTransform::name() const {
   return ( m_name );  
 }
 
+
+/**
+ * Perform the transformation on an image matrix.
+ * Child classes should override this method with to implement transformation
+ * process.
+ * 
+ * @param image The input image data matrix to transform.
+ * 
+ * @return @b cv::Mat The transformed matrix.
+ * 
+ * @note The cv::Mat class implicilty shares, so if the input image matrix, or
+ *       a copy of it, will be modified you need to clone() the matrix prior
+ *       to modification or the input matrix will be changed.
+ */
 cv::Mat ImageTransform::render(const cv::Mat &image) const {
  return (image);
 }

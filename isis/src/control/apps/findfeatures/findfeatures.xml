@@ -1181,6 +1181,12 @@ Group = MatchSolution
        method to MatchImage and made the MatchImages used by each algorithm
        specification independent. Fixes #4765.
     </change>
+    <change name="Jesse Mapel" date="2017-06-22"> 
+       Modified the Sobel and Scharr filters to create a deep copy of the image
+       before being applied. This corrects repeated applications of a Gaussian
+       filter when using these filters with multiple algorithm specifications.
+       Fixes #4904.
+    </change>
     <change name="Jesse Mapel" date="2017-06-23"> 
        Corrected several errors in documentation. Fixed the MSER algorithm name.
        Fixed AKAZE being flagged as only an extractor. Fixes #4950.
