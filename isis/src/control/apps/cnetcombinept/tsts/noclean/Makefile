@@ -12,5 +12,8 @@ commands:
 	           cleannet=false \
 	           cleanmeasures=false \
 	           > /dev/null;
+	cnetbin2pvl from=$(OUTPUT)/Equi065S355ED10.net to=$(OUTPUT)/Equi065S355ED10.pvl \
+			   > /dev/null;
 
 	$(RM) $(OUTPUT)/networks.lis;
+	$(RM) $(OUTPUT)/*.net
