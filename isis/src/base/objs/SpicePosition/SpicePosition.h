@@ -324,6 +324,7 @@ namespace Isis {
       void ClearCache();
       void LoadTimeCache();
       void CacheLabel(Table &table);
+      void PolynomialLabel(Table &table);
       std::vector<double> computeVelocityInTime(double time);
 
       int p_targetCode;                   //!< target body code

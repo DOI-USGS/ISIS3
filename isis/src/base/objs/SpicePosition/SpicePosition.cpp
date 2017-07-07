@@ -4,9 +4,10 @@
 #include <cfloat>
 #include <iomanip>
 
+#include <QByteArray>
+#include <QChar>
 #include <QString>
 #include <QStringList>
-#include <QChar>
 
 #include "BasisFunction.h"
 #include "IException.h"
@@ -15,6 +16,7 @@
 #include "NaifStatus.h"
 #include "NumericalApproximation.h"
 #include "PolynomialUnivariate.h"
+#include "Pvl.h"
 #include "TableField.h"
 
 namespace Isis {
@@ -434,27 +436,60 @@ namespace Isis {
       }
     }
     else {
-      // Coefficient table for postion coordinates x, y, and z
-      std::vector<double> coeffX, coeffY, coeffZ;
-
-      for (int r = 0; r < table.Records() - 1; r++) {
-        TableRecord &rec = table[r];
-
-        if(rec.Fields() != 3) {
-          // throw an error
+      int degree = 0;
+      int segments = 1;
+      std::vector<double> knots;
+      double baseTime = 0;
+      double timeScale = 1;
+      // Get the degree, knots, baseTime, and timeScale from the label if available
+      if ( table.Label().hasKeyword("PolynomialDegree")
+           && table.Label().hasKeyword("ExactBaseTime")
+           && table.Label().hasKeyword("ExactTimeScale")
+           && table.Label().hasKeyword("ExactPolynomialKnots") ) {
+        degree = table.Label().findKeyword("PolynomialDegree");
+        baseTime = Pvl::hexStringToDouble(table.Label().findKeyword("ExactBaseTime")[0]);
+        timeScale = Pvl::hexStringToDouble(table.Label().findKeyword("ExactTimeScale")[0]);
+        PvlKeyword knotsKey = table.Label().findKeyword("ExactPolynomialKnots");
+        segments = knotsKey.size() - 1;
+        for (int i = 0; i < knotsKey.size(); i++) {
+          knots.push_back(Pvl::hexStringToDouble(table.Label().findKeyword("ExactPolynomialKnots")[i]));
         }
-        coeffX.push_back((double)rec[0]);
-        coeffY.push_back((double)rec[1]);
-        coeffZ.push_back((double)rec[2]);
       }
-      // Take care of function time parameters
-      TableRecord &rec = table[table.Records()-1];
-      double baseTime = (double)rec[0];
-      double timeScale = (double)rec[1];
-      double degree = (double)rec[2];
+      // If these values are not in the label, then they are in the last record of the table
+      else {
+        TableRecord &rec = table[table.Records()-1];
+        baseTime = (double)rec[0];
+        timeScale = (double)rec[1];
+        degree = (double)rec[2];
+        knots.push_back(-DBL_MAX);
+        knots.push_back(DBL_MAX);
+      }
+
+      // Initialize polynomial
       SetPolynomialDegree((int) degree);
       SetOverrideBaseTime(baseTime, timeScale);
-      SetPolynomial(coeffX, coeffY, coeffZ);
+      m_polynomial.setKnots(knots);
+
+      for (int i = 0; i < segments; i++) {
+        // Coefficient table for postion coordinates x, y, and z
+        std::vector<double> coeffX, coeffY, coeffZ;
+        int startRecord = (degree + 1) * i;
+        int endRecord = (degree + 1) * (i + 1);
+
+        for (int r = startRecord; r < endRecord; r++) {
+          TableRecord &rec = table[r];
+
+          if(rec.Fields() != 3) {
+            // throw an error
+          }
+          coeffX.push_back((double)rec[0]);
+          coeffY.push_back((double)rec[1]);
+          coeffZ.push_back((double)rec[2]);
+        }
+        SetPolynomial(coeffX, coeffY, coeffZ, p_source, i);
+      }
+
+      // Flag if velocities can be computed
       if (degree > 0)  p_hasVelocity = true;
       if(degree == 0  && p_cacheVelocity.size() > 0) p_hasVelocity = true;
     }
@@ -532,9 +567,10 @@ namespace Isis {
       return table;
     }
 
-    else if(p_source == PolyFunction  &&  p_degree == 0  &&  p_fullCacheSize == 1)
+    else if(p_source == PolyFunction  &&  p_degree == 0  &&  p_fullCacheSize == 1) {
       // Just load the position for the single epoch
       return LineCache(tableName);
+    }
 
     // Load the coefficients for the curves fit to the 3 camera angles
     else if (p_source == PolyFunction) {
@@ -550,11 +586,14 @@ namespace Isis {
 
       Table table(tableName, record);
 
-      for(int cindex = 0; cindex < p_degree + 1; cindex++) {
-        record[0] = p_coefficients[0][cindex];
-        record[1] = p_coefficients[1][cindex];
-        record[2] = p_coefficients[2][cindex];
-        table += record;
+      for (int segmentIndex = 0; segmentIndex < numPolynomialSegments(); segmentIndex++) {
+        std::vector< std::vector<double> > segmentCoeffs = m_polynomial.coefficients(segmentIndex);
+        for(int cindex = 0; cindex < p_degree + 1; cindex++) {
+          record[0] = segmentCoeffs[0][cindex];
+          record[1] = segmentCoeffs[1][cindex];
+          record[2] = segmentCoeffs[2][cindex];
+          table += record;
+        }
       }
 
       // Load one more table entry with the time adjustments for the fit equation
@@ -564,6 +603,7 @@ namespace Isis {
       record[2] = (double) p_degree;
 
       CacheLabel(table);
+      PolynomialLabel(table);
       table += record;
       return table;
     }
@@ -578,7 +618,8 @@ namespace Isis {
 
 
 
-  /** Add labels to a SpicePosition table.
+  /** 
+   * Add labels to a SpicePosition table.
    *
    * Return a table containing the labels defining the position table.
    *
@@ -612,6 +653,39 @@ namespace Isis {
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("SpkTableOriginalSize");
       table.Label()["SpkTableOriginalSize"].addValue(toString(p_fullCacheSize));
+    }
+  }
+
+
+  /**
+   * Add polynomial keywords to a SpicePosition table. The knots, base time,
+   * and time scale are saved as both exact hex and human readable decimal
+   * numbers. Only the hex numbers are actually used.
+   * 
+   * @param[in,out] Table The Table to add keywords to.
+   */
+  void SpicePosition::PolynomialLabel(Table &table) {
+    table.Label() += PvlKeyword("PolynomialDegree");
+    table.Label()["PolynomialDegree"].addValue(toString(p_degree));
+
+    table.Label() += PvlKeyword("BaseTime");
+    table.Label()["BaseTime"].addValue(toString(p_baseTime));
+
+    table.Label() += PvlKeyword("ExactBaseTime");
+    table.Label()["ExactBaseTime"].addValue(Pvl::doubleToHexString(p_baseTime));
+
+    table.Label() += PvlKeyword("TimeScale");
+    table.Label()["TimeScale"].addValue(toString(p_timeScale));
+
+    table.Label() += PvlKeyword("ExactTimeScale");
+    table.Label()["ExactTimeScale"].addValue(Pvl::doubleToHexString(p_timeScale));
+
+    table.Label() += PvlKeyword("PolynomialKnots");
+    table.Label() += PvlKeyword("ExactPolynomialKnots");
+    std::vector<double> knots = polynomialKnots();
+    for (int i = 0; i < (int)knots.size(); i++) {
+      table.Label()["PolynomialKnots"].addValue(toString(knots[i]));
+      table.Label()["ExactPolynomialKnots"].addValue(Pvl::doubleToHexString(knots[i]));
     }
   }
 

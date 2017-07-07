@@ -131,6 +131,8 @@ namespace Isis {
    *  @history 2010-09-27 Sharmila Prasad - Validate a Pvl with the Template Pvl
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *  @history 2017-07-07 Jesse Mapel - Added methods to convert between doubles and hex stirngs.
+   *                          References #5000.
    */
   class Pvl : public Isis::PvlObject {
     public:
@@ -176,6 +178,10 @@ namespace Isis {
 
       //! Validate a Pvl with the Template Pvl
       void validatePvl(const Pvl & pPvl, Pvl & pPvlResults);
+
+      // Methods for storing exact doubles in strings
+      static double hexStringToDouble(const QString &hexString);
+      static QString doubleToHexString(const double &value);
 
     private:
       void init();
