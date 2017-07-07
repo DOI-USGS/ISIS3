@@ -81,9 +81,6 @@ namespace Isis {
 
     p_aberrationCorrection = "LT+S";
     p_baseTime = 0.;
-    p_coefficients[0].clear();
-    p_coefficients[1].clear();
-    p_coefficients[2].clear();
     p_coordinate.resize(3);
     p_degree = 2;
     m_segments = 1;
@@ -719,6 +716,8 @@ namespace Isis {
    *
    */
    Table SpicePosition::LoadHermiteCache(const QString &tableName) {
+     // TODO Check that the polynomial is at least degree 2! JAM
+
     // find the first and last time values
     double firstTime = p_fullCacheStartTime;
     double lastTime = p_fullCacheEndTime;
@@ -738,13 +737,6 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Load the polynomial functions
-    Isis::PolynomialUnivariate function1(p_degree);
-    Isis::PolynomialUnivariate function2(p_degree);
-    Isis::PolynomialUnivariate function3(p_degree);
-    function1.SetCoefficients(p_coefficients[0]);
-    function2.SetCoefficients(p_coefficients[1]);
-    function3.SetCoefficients(p_coefficients[2]);
 
     // Clear existing coordinates from cache
     ClearCache();
@@ -752,61 +744,51 @@ namespace Isis {
     // Set velocity vector to true since it is calculated
     p_hasVelocity = true;
 
-//    std::cout <<"time cache size is " << p_cacheTime.size() << std::endl;
-
-    // Calculate new postition coordinates from polynomials fit to coordinates &
-    // fill cache
-//    std::cout << "Before" << std::endl;
-//    double savetime = p_cacheTime.at(0);
-//    SetEphemerisTime(savetime);
-//    std::cout << "     at time " << savetime << std::endl;
-//    for (int i=0; i<3; i++) {
-//      std::cout << p_coordinate[i] << std::endl;
-//    }
-
-
     // find time for the extremum of each polynomial
-    // since this is only a 2nd degree polynomial,
-    // finding these extrema is simple
-    double b1 = function1.Coefficient(1);
-    double c1 = function1.Coefficient(2);
-    double extremumXtime = -b1 / (2.*c1) + p_baseTime; // extremum is time value for root of 1st derivative
-    // make sure we are in the domain
-    if(extremumXtime < firstTime) {
-      extremumXtime = firstTime;
-    }
-    if(extremumXtime > lastTime) {
-      extremumXtime = lastTime;
-    }
+    // TODO This assumes that the polynomial degree is 2 or less.
+    //      We should implement a generic root finding algorithm to
+    //      do this calculation. JAM
 
-    double b2 = function2.Coefficient(1);
-    double c2 = function2.Coefficient(2);
-    double extremumYtime = -b2 / (2.*c2) + p_baseTime;
-    // make sure we are in the domain
-    if(extremumYtime < firstTime) {
-      extremumYtime = firstTime;
-    }
-    if(extremumYtime > lastTime) {
-      extremumYtime = lastTime;
-    }
+    std::vector<double> xExtremums, yExtremums, zExtremums;
+    for (int i = 0; i < numPolynomialSegments(); i++) {
+      // Get the coefficients for the segments
+      std::vector< std::vector<double> > segmentCoefficients = m_polynomial.coefficients(i);
 
-    double b3 = function3.Coefficient(1);
-    double c3 = function3.Coefficient(2);
-    double extremumZtime = -b3 / (2.*c3) + p_baseTime;
-    // make sure we are in the domain
-    if(extremumZtime < firstTime) {
-      extremumZtime = firstTime;
-    }
-    if(extremumZtime > lastTime) {
-      extremumZtime = lastTime;
+      // Compute each extremum time
+      double xTime = -segmentCoefficients[0][1] / ( 2 * segmentCoefficients[0][2] );
+      xTime = xTime * p_timeScale + p_timeBias;
+      if(xTime < firstTime) {
+        xTime = firstTime;
+      }
+      if(xTime > lastTime) {
+        xTime = lastTime;
+      }
+
+      double yTime = -segmentCoefficients[1][1] / ( 2 * segmentCoefficients[1][2] );
+      yTime = yTime * p_timeScale + p_timeBias;
+      if(yTime < firstTime) {
+        yTime = firstTime;
+      }
+      if(yTime > lastTime) {
+        yTime = lastTime;
+      }
+
+      double zTime = -segmentCoefficients[2][1] / ( 2 * segmentCoefficients[2][2] );
+      zTime = zTime * p_timeScale + p_timeBias;
+      if(zTime < firstTime) {
+        zTime = firstTime;
+      }
+      if(zTime > lastTime) {
+        zTime = lastTime;
+      }
     }
 
     // refill the time vector
     p_cacheTime.clear();
     p_cacheTime.push_back(firstTime);
-    p_cacheTime.push_back(extremumXtime);
-    p_cacheTime.push_back(extremumYtime);
-    p_cacheTime.push_back(extremumZtime);
+    p_cacheTime.insert( p_cacheTime.end(), xExtremums.begin(), xExtremums.end() );
+    p_cacheTime.insert( p_cacheTime.end(), yExtremums.begin(), yExtremums.end() );
+    p_cacheTime.insert( p_cacheTime.end(), zExtremums.begin(), zExtremums.end() );
     p_cacheTime.push_back(lastTime);
     // we don't know order of extrema, so sort
     sort(p_cacheTime.begin(), p_cacheTime.end());
@@ -822,20 +804,17 @@ namespace Isis {
     }
 
     // add positions and velocities for these times
+    p_cache.clear();
+    p_cacheVelocity.clear();
     for(int i = 0; i < (int) p_cacheTime.size(); i++) {
+      // scale time
+      double time = ( p_cacheTime[i] - p_baseTime ) / p_timeScale;
+
       // x,y,z positions
-      double time;
-      time = p_cacheTime[i] - p_baseTime;
-      p_coordinate[0] = function1.Evaluate(time);
-      p_coordinate[1] = function2.Evaluate(time);
-      p_coordinate[2] = function3.Evaluate(time);
-      p_cache.push_back(p_coordinate);
+      p_cache.push_back( m_polynomial.evaluate(time) );
 
       // x,y,z velocities
-      p_velocity[0] = b1 + 2 * c1 * (p_cacheTime[i] - p_baseTime);
-      p_velocity[1] = b2 + 2 * c2 * (p_cacheTime[i] - p_baseTime);
-      p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
-      p_cacheVelocity.push_back(p_velocity);
+      p_cacheVelocity.push_back( computeVelocityInTime(time) );
     }
 
     p_source = HermiteCache;
@@ -854,14 +833,12 @@ namespace Isis {
    * where t = (time - p_baseTime) / p_timeScale.
    */
   void SpicePosition::SetPolynomial(Source type) {
-    std::vector<double> XC, YC, ZC;
-
     // Check to see if the position is already a Polynomial Function
     if (p_source == PolyFunction)
       return;
 
     // Check that there is data available to fit a polynomial to
-    if ( p_cache.size() < 1 ) {
+    if ( p_cache.empty() ) {
       QString msg = "Cannot set a polynomial, no coordinate data is available.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -871,7 +848,7 @@ namespace Isis {
       p_degree = p_cache.size() - 1;
 
       // Flag if velocity is available
-      p_hasVelocity = ( p_degree > 0 );
+      p_hasVelocity = ( p_degree > 0 || !p_cacheVelocity.empty() );
     }
 
     // Recompute the time scaling
@@ -1069,11 +1046,6 @@ namespace Isis {
     // Get the index of the coordinate to update with the partial derivative
     int coordIndex = partialVar;
 
-//  if(coeffIndex > 2) {
-//    QString msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
-//    throw IException(IException::Programmer, msg, _FILEINFO_);
-//  }
-//
     // Reset the coordinate to its derivative
     coordinate[coordIndex] = DPolynomial(coeffIndex);
     return coordinate;
@@ -1339,37 +1311,28 @@ namespace Isis {
    *   @history 2011-01-05 Debbie A. Cook - Original version
    */
   void SpicePosition::SetEphemerisTimePolyFunction() {
-    // Create the empty functions
-    Isis::PolynomialUnivariate functionX(p_degree);
-    Isis::PolynomialUnivariate functionY(p_degree);
-    Isis::PolynomialUnivariate functionZ(p_degree);
-
-    // Load the coefficients to define the functions
-    functionX.SetCoefficients(p_coefficients[0]);
-    functionY.SetCoefficients(p_coefficients[1]);
-    functionZ.SetCoefficients(p_coefficients[2]);
-
     // Normalize the time
-    double rtime;
-    rtime = (p_et - p_baseTime) / p_timeScale;
+    double scaledTime;
+    scaledTime = (p_et - p_baseTime) / p_timeScale;
 
-    // Evaluate the polynomials at current et to get position;
-    p_coordinate[0] = functionX.Evaluate(rtime);
-    p_coordinate[1] = functionY.Evaluate(rtime);
-    p_coordinate[2] = functionZ.Evaluate(rtime);
+    // Compute the coordinate
+    std::vector<double> coord = m_polynomial.evaluate(scaledTime);
+    p_coordinate[0] = coord[0];
+    p_coordinate[1] = coord[1];
+    p_coordinate[2] = coord[2];
 
+    // Compute the velocity, if available
     if(p_hasVelocity) {
 
-      if( p_degree == 0)
+      if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
-      else
-        p_velocity[0] = ComputeVelocityInTime(WRT_X);
-        p_velocity[1] = ComputeVelocityInTime(WRT_Y);
-        p_velocity[2] = ComputeVelocityInTime(WRT_Z);
-
-//         p_velocity[0] = functionX.DerivativeVar(rtime);
-//         p_velocity[1] = functionY.DerivativeVar(rtime);
-//         p_velocity[2] = functionZ.DerivativeVar(rtime);
+      }
+      else {
+        std::vector<double> veloc = computeVelocityInTime(p_et);
+        p_velocity[0] = veloc[0];
+        p_velocity[1] = veloc[1];
+        p_velocity[2] = veloc[2];
+      }
     }
   }
 
@@ -1388,8 +1351,6 @@ namespace Isis {
   void SpicePosition::SetEphemerisTimePolyFunctionOverHermiteConstant() {
     SetEphemerisTimeHermiteCache();
     std::vector<double> hermiteCoordinate = p_coordinate;
-
-//    std::cout << hermiteCoordinate << std::endl;
 
     std::vector<double> hermiteVelocity = p_velocity;
     SetEphemerisTimePolyFunction();
@@ -1618,6 +1579,7 @@ namespace Isis {
     // If polynomials have not been applied yet simply set the degree and return
     if(!p_degreeApplied) {
       p_degree = degree;
+      m_polynomial.setDegree(degree);
     }
 
     // Otherwise adjust the degree.
@@ -1694,8 +1656,9 @@ namespace Isis {
   }
 
 
-  /** Cache J2000 position over existing cached time range using
-   *  table
+  /**
+   * Cache J2000 position over existing cached time range using
+   * table
    *
    * This method will reload an internal cache with positions
    * formed from coordinates in a table
@@ -1741,23 +1704,26 @@ namespace Isis {
   }
 
 
-  /** Compute the velocity with respect to time instead of
-   *  scaled time.
+  /** 
+   * Compute the velocity with respect to time instead of
+   * scaled time.
+   * 
+   * @param time The time, in unscaled time, to compute the velocity at.
    *
-   * @param coef  A SpicePosition polynomial function partial type
-   *
-   * @internal
-   *   @history 2011-02-12 Debbie A. Cook - Original version.
+   * @return @b std::vector<double> The X, Y, Z velocities in time.
    */
-  double SpicePosition::ComputeVelocityInTime(PartialType var) {
-    double velocity = 0.;
+  std::vector<double> SpicePosition::computeVelocityInTime(double time) {
+    // Compute the velocity in scaled time
+    double scaledTime;
+    scaledTime = (time - p_baseTime) / p_timeScale;
+    std::vector<double> velocities = m_polynomial.derivativeVariable(scaledTime);
 
-    for (int icoef=1; icoef <= p_degree; icoef++) {
-      velocity += icoef*p_coefficients[var][icoef]*pow((p_et - p_baseTime), (icoef - 1))
-                  / pow(p_timeScale, icoef);
+    // Undo the scaling
+    for (int i = 0; i < (int)velocities.size(); i++) {
+      velocities[i] = velocities[i] / p_timeScale;
     }
 
-    return velocity;
+    return velocities;
   }
 
 

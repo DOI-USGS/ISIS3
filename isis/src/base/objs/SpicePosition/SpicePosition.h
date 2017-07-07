@@ -324,7 +324,7 @@ namespace Isis {
       void ClearCache();
       void LoadTimeCache();
       void CacheLabel(Table &table);
-      double ComputeVelocityInTime(PartialType var);
+      std::vector<double> computeVelocityInTime(double time);
 
       int p_targetCode;                   //!< target body code
       int p_observerCode;                 //!< observer body code

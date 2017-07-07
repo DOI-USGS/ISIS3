@@ -756,9 +756,13 @@ namespace Isis {
 
     //Reinitialize the polynomials
     std::vector<PolynomialUnivariate> coordinateVector;
-    coordinateVector.push_back( PolynomialUnivariate(degree) );
+    for (int i = 0; i < dimensions(); i++) {
+      coordinateVector.push_back( PolynomialUnivariate(degree) );
+    }
     m_polynomials.clear();
-    m_polynomials.resize(dimensions(), coordinateVector);
+    for (int i = 0; i < segments(); i++) {
+      m_polynomials.push_back(coordinateVector);
+    }
   }
 
 
