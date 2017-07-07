@@ -22,6 +22,9 @@
     <change name="Cole Neubauer" date="2017-04-07">
       Changed category from base program to supported mission
     </change>
+    <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
+      Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
+    </change>
   </history>
 
   <seeAlso>

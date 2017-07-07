@@ -44,7 +44,7 @@ void IsisMain() {
   Cube *output = pfits.SetOutputCube("TO");
 
   // Add instrument group if any keywords were put into it.
-  PvlGroup instGrp = pfits.standardInstrumentGroup(pfits.fitsLabel(0));
+  PvlGroup instGrp = pfits.standardInstrumentGroup(pfits.fitsImageLabel(0));
   if (instGrp.keywords() > 0) {
     
     output->label()->findObject("IsisCube") += instGrp;
@@ -52,7 +52,7 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += pfits.fitsLabel(0);
+  pvl += pfits.fitsImageLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 

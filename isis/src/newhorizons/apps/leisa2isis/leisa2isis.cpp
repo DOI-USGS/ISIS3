@@ -30,7 +30,7 @@ void IsisMain() {
   ProcessImportFits importFits;
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
   PvlGroup mainLabel;
-  mainLabel = importFits.fitsLabel(0);
+  mainLabel = importFits.fitsImageLabel(0);
 
   // Get the first label and make sure this is a New Horizons LEISA file
   if (!mainLabel.hasKeyword("MISSION") || !mainLabel.hasKeyword("INSTRU")) {
@@ -54,7 +54,7 @@ void IsisMain() {
   if (ui.WasEntered("ERRORMAP")) {
     PvlGroup extensionLabel; 
     try {
-      extensionLabel = importFits.fitsLabel(5);
+      extensionLabel = importFits.fitsImageLabel(5);
 /**      if (!extensionLabel.hasKeyword("XTENSION")) {
         QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
                       "LEISA FITS file. XTENSION keyword is missing in the fifth extension.")
@@ -87,7 +87,7 @@ void IsisMain() {
   if (ui.WasEntered("QUALITY") || replace) {
     PvlGroup  extensionLabel; 
     try {
-      extensionLabel = importFits.fitsLabel(6); 
+      extensionLabel = importFits.fitsImageLabel(6); 
 /**      if (!extensionLabel.hasKeyword("XTENSION")) {
         QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
                       "LEISA FITS file. XTENSION keyword is missing in the sixth extension.")
@@ -146,7 +146,7 @@ void IsisMain() {
 
   // Get the FITS label
   Pvl fitsLabel;
-  fitsLabel.addGroup(importFits.fitsLabel(0));
+  fitsLabel.addGroup(importFits.fitsImageLabel(0));
 
   // Create an Instrument group
   FileName insTransFile(transDir + "leisaInstrument_fit.trn");
@@ -209,7 +209,7 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += importFits.fitsLabel(0);
+  pvl += importFits.fitsImageLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 
@@ -256,7 +256,7 @@ void IsisMain() {
 
   // Import the ERRORMAP image. It is the 6th image in the FITS file (i.e., 5th extension)
   if (ui.WasEntered("ERRORMAP")) {
-    PvlGroup extensionLabel = importFits.fitsLabel(5);
+    PvlGroup extensionLabel = importFits.fitsImageLabel(5);
     importFits.SetOrganization(ProcessImport::BIL);
     importFits.setProcessFileStructure(5);
     Cube *output = importFits.SetOutputCube("ERRORMAP");
@@ -275,7 +275,7 @@ void IsisMain() {
 
   // Import the quality image. It is the 7th image in the FITS file (i.e., 6th extension)
   if (ui.WasEntered("QUALITY")) {
-    PvlGroup extensionLabel = importFits.fitsLabel(6);
+    PvlGroup extensionLabel = importFits.fitsImageLabel(6);
     importFits.SetOrganization(ProcessImport::BIL);
     importFits.setProcessFileStructure(6);
     Cube *output = importFits.SetOutputCube("QUALITY");

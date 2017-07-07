@@ -15,14 +15,17 @@
   
   <history>
     <change name="Mackenzie Boyd" date="2009-10-27">
-      Original version
+      Original version.
     </change> 
     <change name="Stuart Sides" date="2014-08-29">
       Added the ability to read image extensions.
     </change> 
     <change name="Kristin Berry" date="2015-06-02">
-	Added the ability to set the organization of the input file to BIL, BSQ, or BIP. 
-	Added tests for these new options.  
+      Added the ability to set the organization of the input file to BIL, BSQ, or BIP. 
+      Added tests for these new options.  
+    </change>
+    <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
+      Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
     </change>
   </history>
 
