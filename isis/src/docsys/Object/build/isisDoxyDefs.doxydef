@@ -100,6 +100,7 @@
  * @history  2016-08-25 Marjorie Hahn - Added OSIRIS-REx mission. References #4300.
  * @history  2016-09-12 Marjorie Hahn - Added the Apollo, Chandrayaan1, Dawn, Hayabusa, Hayabusa2, Kaguya, Mars Express, ROLO, Rosetta, and SMART1 missions. Fixes #4300.
  * @history  2017-01-19 Kristin Berry - Added the ExoMars Trace Gas Orbiter mission. References #4584
+ * @history  2017-06-26 Jesse Mapel - Added the Juno mission.
  * 
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
@@ -393,6 +394,17 @@
            * experience acquired from the Hayabusa mission.
            *
            * Mission site: http://global.jaxa.jp/projects/sat/hayabusa2/
+           *
+           */
+
+          // Juno
+          /**
+           * \defgroup  Juno                         Juno
+           *
+           * These objects provide functionality for manipulating data from the
+           * Juno mission to Jupiter.
+           * 
+           * Mission site: https://www.nasa.gov/mission_pages/juno/main/index.html
            *
            */
           

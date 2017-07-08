@@ -42,7 +42,10 @@
     <xs:documentation>2016-09-12 Marjorie Hahn - Added  missionItem_type enummeration for Hayabusa2.</xs:documentation>
   </xs:annotation>
   <xs:annotation>
-    <xs:documentation>2017-01-19 Kristin Berry - Added  missionItem_type enummeration for ExoMars Trace Gas Orbiter. References #4584</xs:documentation>
+    <xs:documentation>2017-01-19 Kristin Berry - Added  missionItem_type enummeration for ExoMars Trace Gas Orbiter. References #4584.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2017-06-26 Jesse Mapel - Added  missionItem_type enummeration for Juno.</xs:documentation>
   </xs:annotation>
   <xs:element name="application">
     <xs:annotation>
@@ -448,6 +451,7 @@
       <xs:enumeration value="Galileo"/>
       <xs:enumeration value="Hayabusa"/>
       <xs:enumeration value="Hayabusa2"/>
+      <xs:enumeration value="Juno"/>
       <xs:enumeration value="Kaguya"/>
       <xs:enumeration value="Lunar Orbiter"/>
       <xs:enumeration value="Lunar Reconnaissance Orbiter"/>
