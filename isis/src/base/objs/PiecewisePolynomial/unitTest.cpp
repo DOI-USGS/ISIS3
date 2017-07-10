@@ -71,14 +71,6 @@ int main(int argc, char *argv[]) {
 
   cout << endl << "Test error throws" << endl << endl;
 
-  try {
-    cout << "Attempt to evaluate at value outside of range:" << endl;
-    testPoly.evaluate(20);
-  }
-  catch(IException &e) {
-    e.print();
-  }
-
   cout << endl << "Polynomial fit errors:" << endl;
 
   try {

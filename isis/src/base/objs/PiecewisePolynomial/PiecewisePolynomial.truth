@@ -175,9 +175,6 @@ RMS Error: 0.0
 
 Test error throws
 
-Attempt to evaluate at value outside of range:
-**PROGRAMMER ERROR** Failed evaluating piecewise polynomial at value [20.0].
-**PROGRAMMER ERROR** Value [20.0] is not within valid range [-4.0, 4.0].
 
 Polynomial fit errors:
 **PROGRAMMER ERROR** The number of input values [3] and data points [1] do not match.

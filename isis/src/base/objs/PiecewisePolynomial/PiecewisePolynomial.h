@@ -57,15 +57,20 @@ namespace Isis {
 
       std::vector<double> evaluate(double value);
       std::vector<double> derivativeVariable(double value);
+
       void fitPolynomials(const std::vector<double> &values,
                           const std::vector< std::vector<double> > &data,
                           int segments);
+      // TODO Is 100 enough samples to default to? JAM
+      void refitPolynomials(int segments, int samples = 100);
 
       int degree() const;
       std::vector< std::vector<double> > coefficients(int segment) const;
       int dimensions() const;
       const std::vector<double> knots() const;
       int segments() const;
+
+      bool isZero() const;
 
       void setDegree(int degree);
       void setCoefficients(int segment,

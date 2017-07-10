@@ -264,6 +264,82 @@ Time           = -69382512
 Spacecraft (J) = -2908.5547 -1132.341 1981.0143
 Velocity (J) = -3.4897304 1.5779899 -2.6234689
 
+Test multi-segment polynomials.
+
+Knots:
+  -69382819
+  -69382718
+  -69382617
+  -69382512
+Object = Table
+  Name                 = TestPoly
+  StartByte            = 0
+  Bytes                = 0
+  Records              = Null
+  ByteOrder            = NULL
+  CacheType            = PolyFunction
+  SpkTableStartTime    = -69382819.360519
+  SpkTableEndTime      = -69382512.160519
+  SpkTableOriginalSize = 769.0
+  PolynomialDegree     = 2
+  BaseTime             = -69382665.760519
+  ExactBaseTime        = 7ec50a27c88a90c1
+  TimeScale            = 1.0
+  ExactTimeScale       = 000000000000f03f
+  PolynomialKnots      = (-69382819.360519, -69382717.861411,
+                          -69382616.940624, -69382512.160519)
+  ExactPolynomialKnots = (e52b718dca8a90c1, d31572f7c88a90c1,
+                          cf32c363c78a90c1, 185fa4c0c58a90c1)
+
+  Group = Field
+    Name = J2000SVX
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVY
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVZ
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+Time           = -69382819
+Spacecraft (J) = -1730.4182 -1562.2259 2691.2979
+Velocity (J) = -4.1463281 1.1966928 -1.9605873
+Time           = -69382785
+Spacecraft (J) = -1870.7818 -1520.5803 2622.9933
+Velocity (J) = -4.083457 1.2450695 -2.0442404
+Time           = -69382751
+Spacecraft (J) = -2009.0007 -1477.2845 2551.8353
+Velocity (J) = -4.0205859 1.2934463 -2.1278936
+Time           = -69382717
+Spacecraft (J) = -2145.0749 -1432.3386 2477.8239
+Velocity (J) = -3.9573421 1.3416386 -2.2112421
+Time           = -69382683
+Spacecraft (J) = -2278.8104 -1385.8385 2401.1175
+Velocity (J) = -3.8838282 1.3847514 -2.2862001
+Time           = -69382648
+Spacecraft (J) = -2410.0383 -1337.8678 2321.8542
+Velocity (J) = -3.8103144 1.4278641 -2.361158
+Time           = -69382614
+Spacecraft (J) = -2538.7577 -1288.4271 2240.0351
+Velocity (J) = -3.7361819 1.4704845 -2.4352904
+Time           = -69382580
+Spacecraft (J) = -2664.8111 -1237.6418 2155.8704
+Velocity (J) = -3.6545745 1.5071563 -2.499449
+Time           = -69382546
+Spacecraft (J) = -2788.0809 -1185.6056 2069.5172
+Velocity (J) = -3.5729671 1.5438282 -2.5636075
+Time           = -69382512
+Spacecraft (J) = -2908.5669 -1132.3184 1980.9754
+Velocity (J) = -3.4913597 1.5805 -2.627766
+
 Test calculation of first coefficient for spacecraft velocity
   Velocity vector for center time = (0,0,0)
 

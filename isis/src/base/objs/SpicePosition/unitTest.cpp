@@ -280,6 +280,31 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
+  cout << "Test multi-segment polynomials." << endl << endl;
+
+  // Convert from hermite to multi-segment polynomial
+  pos5.setPolynomialSegments(3);
+  pos5.SetPolynomialDegree(2);
+  pos5.SetPolynomial();
+  std::vector<double> polyKnots = pos5.polynomialKnots();
+  cout << "Knots:" << endl;
+  for (int i = 0; i < (int)polyKnots.size(); i++) {
+    cout << "  " << polyKnots[i] << endl;
+  }
+  Table testPolyTable = pos5.Cache("TestPoly");
+  cout << testPolyTable.Label() << endl;
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    pos5.SetEphemerisTime(t);
+    vector<double> p = pos5.Coordinate();
+    vector<double> v = pos5.Velocity();
+    cout << "Time           = " << t << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  
+  cout << endl;
+
   // Test radar  nan case when et = baseTime and attempt to calculate velocity partial for first
   // coefficient 
   cout << "Test calculation of first coefficient for spacecraft velocity" << endl;

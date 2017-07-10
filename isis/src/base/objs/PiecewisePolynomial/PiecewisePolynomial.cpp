@@ -105,20 +105,13 @@ namespace Isis {
    * @return @b std::vector<double> The output values.
    */
   std::vector<double> PiecewisePolynomial::evaluate(double value) {
-    try {
-      int knotIndex = segmentIndex(value);
+    int knotIndex = segmentIndex(value);
 
-      std::vector<double> output( dimensions() );
-      for (int i = 0; i < dimensions(); i++) {
-        output[i] = m_polynomials[knotIndex][i].Evaluate(value);
-      }
-      return output;
+    std::vector<double> output( dimensions() );
+    for (int i = 0; i < dimensions(); i++) {
+      output[i] = m_polynomials[knotIndex][i].Evaluate(value);
     }
-    catch (IException &e) {
-      QString msg = "Failed evaluating piecewise polynomial at value ["
-                    + toString(value) + "].";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
-    }
+    return output;
   }
 
 
@@ -143,37 +136,72 @@ namespace Isis {
 
   /**
    * Returns the index of the segment that a given value belongs to.
-   * If the value is less than the minimum value or greater than
-   * the maximum value, then an error is thrown.
+   * If the value is less than the lowest knot, then the first index is returned.
+   * If the value is greater than the highest knot, then the last index is returned.
    * 
    * @param value The value to find the segment for.
    * 
    * @return @b int The zero-based index of the segment.
-   * 
-   * @throws IException IException::Programmer "Value is not within valid range"
-   * 
-   * @TODO Do we really want to throw an error?  Maybe we should just return
-   *       the first/last index? JAM.
    */
   int PiecewisePolynomial::segmentIndex(double value) {
-    if ( value < m_knots.front() - 1e-10 || value > m_knots.back() + 1e-10 ) {
-      QString msg = "Value [" + toString(value) + "] is not within valid range [" +
-                    toString( m_knots.front() ) + ", " + toString( m_knots.back() ) +
-                    "].";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    if ( value == m_knots.back() ) {
-      return m_knots.size() - 2;
-    }
-    else if ( value == m_knots.front() ) {
-      return 0;
-    }
-
     std::vector<double>::const_iterator knotIt;
     knotIt = std::upper_bound(m_knots.begin(), m_knots.end(), value);
+    if (knotIt == m_knots.begin()) {
+      return 0;
+    }
+    else if (knotIt == m_knots.end()) {
+      return m_knots.size() - 2;
+    }
     int knotIndex = std::distance<std::vector<double>::const_iterator>(m_knots.begin(), knotIt);
     return knotIndex - 1;
+  }
+
+
+  /**
+   * Fit a new set of polynomials over the input number of segments. The
+   * existing polynomials are sampled to generate a new data set that the new
+   * polynomials are fit over.
+   * 
+   * @param segments The number of segments for the new polynomials.
+   * 
+   * @todo Is there a better way to refit the polynomials? Potentially
+   *       something to do with projecting the existing polynomials onto
+   *       the set of polynomials over the new knots. This would take some
+   *       serious calculations.
+   */
+  void PiecewisePolynomial::refitPolynomials(int segments, int samples) {
+
+    // Generate sample data.
+    std::vector<double> sampleValues;
+    std::vector< std::vector<double> > sampleData;
+    double firstSample = m_knots.front();
+    double lastSample = m_knots.back();
+
+    // If fitting over the zero polynomial, just take two samples
+    if ( isZero() ) {
+      sampleValues.push_back(firstSample);
+      sampleData.push_back(evaluate(firstSample));
+      sampleValues.push_back(lastSample);
+      sampleData.push_back(evaluate(lastSample));
+    }
+
+    // Otherwise sample as normal
+    double sampleRate = (lastSample - firstSample) / samples;
+    for (int i = 0; i < samples; i++) {
+      double currentValue = firstSample + sampleRate * i;
+      sampleValues.push_back(currentValue);
+      sampleData.push_back(evaluate(currentValue));
+    }
+
+    // Fit over the sample data.
+    try {
+      fitPolynomials(sampleValues, sampleData, segments);
+    }
+    catch(IException &e) {
+      QString msg = "Failed to refit polynomials to [" + toString(segments) 
+                    + "] segments.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -211,6 +239,7 @@ namespace Isis {
    * 
    * Checks the following:
    * <ul>
+   * <li>At least one segment is being used</li>
    * <li>The input values are sorted</li>
    * <li>There are the same number of input values and data points</li>
    * <li>The data points have the correct dimensions</li>
@@ -234,11 +263,20 @@ namespace Isis {
   void PiecewisePolynomial::validateData(const std::vector<double> &values,
                                          const std::vector< std::vector<double> > &data,
                                          int segmentCount) {
+    // Check that there is a valid segment count
+    if (segmentCount < 1) {
+      QString msg = "Cannot fit polynomials over [" + toString(segmentCount)
+                    + "] segments. There must be at least one segment.";
+    }
+
+    // Check that each value has an associated data point
     if ( values.size() != data.size() ) {
       QString msg = "The number of input values [" + toString( (int)values.size() ) +
                     "] and data points [" + toString( (int)data.size() ) + "] do not match.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    // Check the there is enough data to solve the fit
 
     // Without continuity conditions, we need 1 data point per coefficient
     int numPointsNeeded = segmentCount * (degree() + 1) * dimensions();
@@ -254,6 +292,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
+    // Check that everything is sorted
     for (int i = 0; i < (int)values.size() - 1; i++) {
       if ( values[i + 1] < values[i] ) {
         QString msg = "Input values are not sorted in ascending order.";
@@ -261,6 +300,7 @@ namespace Isis {
       }
     }
 
+    // Check that each data point is valid
     for (int i = 0; i < (int)data.size(); i++) {
       if ( (int)data[i].size() != dimensions() ) {
         QString msg = "Data point number [" + toString( i + 1 ) +
@@ -324,6 +364,20 @@ namespace Isis {
       return;
     }
 
+    // If there are only two data points, then use them as the end points and
+    // evenly distribute the knots based on value
+    if (values.size() == 2) {
+      std::vector<double> newKnots(segments + 1);
+      newKnots.front() = values.front();
+      newKnots.back() = values.back();
+      double segmentDistance = ( values.back() - values.front() ) / segments;
+      for (int i = 1; i < segments; i++) {
+        newKnots[i] = values.front() + segmentDistance * i;
+      }
+      setKnots(newKnots);
+      return;
+    }
+
     // =========================
     // = Setup storage vectors =
     // =========================
@@ -364,29 +418,43 @@ namespace Isis {
     // ===========================
 
     double segmentWeight = totalWeight / segments;
-    // We always take the first and last times plus padding for the knots.
+    // We always take the first and last times for the knots.
     std::vector<double> newKnots(segments + 1);
     newKnots.front() = values.front();
     newKnots.back() = values.back();
-    for (int i = 1; i < segments; i++) {
-      // Find the data point before the knot
-      std::vector<double>::iterator timeIt;
-      timeIt = std::upper_bound( cumulativeWeights.begin(),
-                                 cumulativeWeights.end(),
-                                 segmentWeight*i );
-      int preKnotIndex = std::distance( cumulativeWeights.begin(), timeIt ) - 1;
-      // Interpolate the actual knot location.
-      double remainingWeight = segmentWeight*i - cumulativeWeights[preKnotIndex];
-      // The following will not perform division by zero. There are two ways a
-      // point can have a candidate weight of 0. First, if the arc length on
-      // either side is 0. In this case the curvature calculation will fail
-      // because there is not enough information available. Second, if the
-      // curvature is 0. in this case, the cumulative weight at that point will
-      // be the same as the previous point. So, the upper_bound algorithm will
-      // never return a point with a candidate weight of 0.
-      double ratio = remainingWeight / candidateWeights[preKnotIndex+1];
-      newKnots[i] = ratio * values[preKnotIndex+1] +
-                    (1 - ratio) * values[preKnotIndex];
+
+    // If there is 0 curvature all along the curve, it's a straight line,
+    // then evenly distribute the knots based on the value
+    if ( fabs(totalWeight) < 1.0e-15 ) {
+      double segmentDistance = ( values.back() - values.front() ) / segments;
+      for (int i = 1; i < segments; i++) {
+        newKnots[i] = values.front() + segmentDistance * i;
+      }
+    }
+
+    // Otherwise distribute the knots based on the integral of the curvature
+    // over the arc length.
+    else {
+      for (int i = 1; i < segments; i++) {
+        // Find the data point before the knot
+        std::vector<double>::iterator timeIt;
+        timeIt = std::upper_bound( cumulativeWeights.begin(),
+                                  cumulativeWeights.end(),
+                                  segmentWeight*i );
+        int preKnotIndex = std::distance( cumulativeWeights.begin(), timeIt ) - 1;
+        // Interpolate the actual knot location.
+        double remainingWeight = segmentWeight*i - cumulativeWeights[preKnotIndex];
+        // The following will not perform division by zero. There are two ways a
+        // point can have a candidate weight of 0. First, if the arc length on
+        // either side is 0. In this case the curvature calculation will fail
+        // because there is not enough information available. Second, if the
+        // curvature is 0. in this case, the cumulative weight at that point will
+        // be the same as the previous point. So, the upper_bound algorithm will
+        // never return a point with a candidate weight of 0.
+        double ratio = remainingWeight / candidateWeights[preKnotIndex+1];
+        newKnots[i] = ratio * values[preKnotIndex+1] +
+                      (1 - ratio) * values[preKnotIndex];
+      }
     }
 
     // Save the new knot locations and reset the polynomials to zero polynomials.
@@ -733,6 +801,30 @@ namespace Isis {
    */
   int PiecewisePolynomial::segments() const {
     return m_knots.size() - 1;
+  }
+
+
+  /**
+   * Convenience method to check if the polynomial is the zero polynomial.
+   * 
+   * @return @b bool If the piecewise polynomial is the zerop polynomial.
+   */
+  bool PiecewisePolynomial::isZero() const {
+    // Check the coefficients for each segment
+    for (int i = 0; i < segments(); i++) {
+      std::vector< std::vector<double> > segmentCoeff = coefficients(i);
+      // Check the coefficients for each dimension
+      for (int j = 0; j < dimensions(); j++) {
+        for (int k = 0; k < degree() + 1; k++) {
+          if (segmentCoeff[j][k] != 0) {
+            return false;
+          }
+        }
+      }
+    }
+
+    // Every coefficient has been checked, so return true
+    return true;
   }
 
 

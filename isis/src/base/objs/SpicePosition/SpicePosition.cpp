@@ -1699,6 +1699,9 @@ namespace Isis {
    */
   void SpicePosition::setPolynomialSegments(int segments) {
     m_segments = segments;
+    if ( !m_polynomial.isZero() ) {
+      m_polynomial.refitPolynomials(segments);
+    }
   }
 
 
