@@ -21,6 +21,7 @@
 #include "LineEquation.h"
 #include "NaifStatus.h"
 #include "PolynomialUnivariate.h"
+#include "Pvl.h"
 #include "Quaternion.h"
 #include "Table.h"
 #include "TableField.h"
@@ -56,6 +57,7 @@ namespace Isis {
     p_matrixSet = false;
     p_et = -DBL_MAX;
     p_degree = 2;
+    m_segments = 1;
     p_degreeApplied = false;
     p_noOverride = true;
     p_axis1 = 3;
@@ -94,6 +96,7 @@ namespace Isis {
     p_et = -DBL_MAX;
     p_axisP = 3;
     p_degree = 2;
+    m_segments = 1;
     p_degreeApplied = false;
     p_noOverride = true;
     p_axis1 = 3;
@@ -140,6 +143,7 @@ namespace Isis {
     p_cacheAv = rotToCopy.p_cacheAv;
     p_av = rotToCopy.p_av;
     p_degree = rotToCopy.p_degree;
+    m_segments = rotToCopy.m_segments;
     p_axis1 = rotToCopy.p_axis1;
     p_axis2 = rotToCopy.p_axis2;
     p_axis3 = rotToCopy.p_axis3;
@@ -159,10 +163,6 @@ namespace Isis {
     p_timeScale = rotToCopy.p_timeScale;
     p_degreeApplied = rotToCopy.p_degreeApplied;
 
-//    for (std::vector<double>::size_type i = 0; i < rotToCopy.p_coefficients[0].size(); i++) 
-    for (int i = 0; i < 3; i++) 
-      p_coefficients[i] = rotToCopy.p_coefficients[i];
-
     p_noOverride = rotToCopy.p_noOverride;
     p_overrideBaseTime = rotToCopy.p_overrideBaseTime;
     p_overrideTimeScale = rotToCopy.p_overrideTimeScale;
@@ -176,6 +176,7 @@ namespace Isis {
     p_degree = rotToCopy.p_degree;
     p_hasAngularVelocity = rotToCopy.p_hasAngularVelocity;
     m_frameType = rotToCopy.m_frameType;
+    m_polynomial = rotToCopy.m_polynomial;
 
   }
 
@@ -550,28 +551,63 @@ namespace Isis {
 
     // coefficient table for angle1, angle2, and angle3
     else if (recFields == 3) {
-      std::vector<double> coeffAng1, coeffAng2, coeffAng3;
+      // Flag that the fit is a polynomial
+      p_source = PolyFunction;
 
-      for (int r = 0; r < table.Records() - 1; r++) {
-        TableRecord &rec = table[r];
-
-        if (rec.Fields() != recFields) {
-          // throw an error
+      int degree = 0;
+      int segments = 1;
+      std::vector<double> knots;
+      double baseTime = 0;
+      double timeScale = 1;
+      // Get the degree, knots, baseTime, and timeScale from the label if available
+      if ( table.Label().hasKeyword("PolynomialDegree")
+           && table.Label().hasKeyword("ExactBaseTime")
+           && table.Label().hasKeyword("ExactTimeScale")
+           && table.Label().hasKeyword("ExactPolynomialKnots") ) {
+        degree = table.Label().findKeyword("PolynomialDegree");
+        baseTime = Pvl::hexStringToDouble(table.Label().findKeyword("ExactBaseTime")[0]);
+        timeScale = Pvl::hexStringToDouble(table.Label().findKeyword("ExactTimeScale")[0]);
+        PvlKeyword knotsKey = table.Label().findKeyword("ExactPolynomialKnots");
+        segments = knotsKey.size() - 1;
+        for (int i = 0; i < knotsKey.size(); i++) {
+          knots.push_back(Pvl::hexStringToDouble(table.Label().findKeyword("ExactPolynomialKnots")[i]));
         }
-        coeffAng1.push_back((double)rec[0]);
-        coeffAng2.push_back((double)rec[1]);
-        coeffAng3.push_back((double)rec[2]);
+      }
+      // If these values are not in the label, then they are in the last record of the table
+      else {
+        TableRecord &rec = table[table.Records()-1];
+        baseTime = (double)rec[0];
+        timeScale = (double)rec[1];
+        degree = (double)rec[2];
+        knots.push_back(-DBL_MAX);
+        knots.push_back(DBL_MAX);
       }
 
-      // Take care of time parameters
-      TableRecord &rec = table[table.Records()-1];
-      double baseTime = (double)rec[0];
-      double timeScale = (double)rec[1];
-      double degree = (double)rec[2];
+      // Initialize polynomial
       SetPolynomialDegree((int) degree);
       SetOverrideBaseTime(baseTime, timeScale);
-      SetPolynomial(coeffAng1, coeffAng2, coeffAng3);
-      p_source = PolyFunction;
+      m_polynomial.setKnots(knots);
+
+      for (int i = 0; i < segments; i++) {
+        // Coefficient table for postion coordinates x, y, and z
+        std::vector<double> coeffX, coeffY, coeffZ;
+        int startRecord = (degree + 1) * i;
+        int endRecord = (degree + 1) * (i + 1);
+
+        for (int r = startRecord; r < endRecord; r++) {
+          TableRecord &rec = table[r];
+
+          if(rec.Fields() != 3) {
+            // throw an error
+          }
+          coeffX.push_back((double)rec[0]);
+          coeffY.push_back((double)rec[1]);
+          coeffZ.push_back((double)rec[2]);
+        }
+        SetPolynomial(coeffX, coeffY, coeffZ, p_source, i);
+      }
+
+      // Flag if velocities can be computed
       if (degree > 0)  p_hasAngularVelocity = true;
       if (degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
     }
@@ -713,12 +749,8 @@ namespace Isis {
     if (p_source == PolyFunctionOverSpice) {
       LineCache(tableName);
 
-      //std::cout << "Full cache size is " << p_cache.size() << endl;
-
       p_minimizeCache = Yes;
       LoadTimeCache();
-
-      //std::cout << "Minimized cache size is " << p_cache.size() << endl;
     }
 
     // Load the list of rotations and their corresponding times
@@ -787,21 +819,19 @@ namespace Isis {
 
       Table table(tableName, record);
 
-      for (int cindex = 0; cindex < p_degree + 1; cindex++) {
-        record[0] = p_coefficients[0][cindex];
-        record[1] = p_coefficients[1][cindex];
-        record[2] = p_coefficients[2][cindex];
-        table += record;
+      for (int segmentIndex = 0; segmentIndex < numPolynomialSegments(); segmentIndex++) {
+        std::vector< std::vector<double> > segmentCoeffs = m_polynomial.coefficients(segmentIndex);
+        for(int cindex = 0; cindex < p_degree + 1; cindex++) {
+          record[0] = segmentCoeffs[0][cindex];
+          record[1] = segmentCoeffs[1][cindex];
+          record[2] = segmentCoeffs[2][cindex];
+          table += record;
+        }
       }
-
-      // Load one more table entry with the time adjustments for the fit equation
-      // t = (et - baseTime)/ timeScale
-      record[0] = p_baseTime;
-      record[1] = p_timeScale;
-      record[2] = (double) p_degree;
 
       table += record;
       CacheLabel(table);
+      PolynomialLabel(table);
       return table;
     }
     else {
@@ -1110,6 +1140,39 @@ namespace Isis {
  // End section added 06-20-2015 DAC
 
     NaifStatus::CheckErrors();
+  }
+
+
+  /**
+   * Add polynomial keywords to a SpiceRotation table. The knots, base time,
+   * and time scale are saved as both exact hex and human readable decimal
+   * numbers. Only the hex numbers are actually used.
+   * 
+   * @param[in,out] Table The Table to add keywords to.
+   */
+  void SpiceRotation::PolynomialLabel(Table &table) {
+    table.Label() += PvlKeyword("PolynomialDegree");
+    table.Label()["PolynomialDegree"].addValue(toString(p_degree));
+
+    table.Label() += PvlKeyword("BaseTime");
+    table.Label()["BaseTime"].addValue(toString(p_baseTime));
+
+    table.Label() += PvlKeyword("ExactBaseTime");
+    table.Label()["ExactBaseTime"].addValue(Pvl::doubleToHexString(p_baseTime));
+
+    table.Label() += PvlKeyword("TimeScale");
+    table.Label()["TimeScale"].addValue(toString(p_timeScale));
+
+    table.Label() += PvlKeyword("ExactTimeScale");
+    table.Label()["ExactTimeScale"].addValue(Pvl::doubleToHexString(p_timeScale));
+
+    table.Label() += PvlKeyword("PolynomialKnots");
+    table.Label() += PvlKeyword("ExactPolynomialKnots");
+    std::vector<double> knots = polynomialKnots();
+    for (int i = 0; i < (int)knots.size(); i++) {
+      table.Label()["PolynomialKnots"].addValue(toString(knots[i]));
+      table.Label()["ExactPolynomialKnots"].addValue(Pvl::doubleToHexString(knots[i]));
+    }
   }
 
 
@@ -1555,135 +1618,80 @@ namespace Isis {
    */
   void SpiceRotation::SetPolynomial(const Source type) {
     NaifStatus::CheckErrors();
-    std::vector<double> coeffAng1, coeffAng2, coeffAng3;
 
-    // Rotation is already stored as a polynomial -- throw an error
+    // If rotation is already stored as a polynomial move on
     if (p_source == PolyFunction) {
       // Nothing to do
       return;
-//      QString msg = "Rotation already fit to a polynomial -- spiceint first to refit";
-//      throw IException(IException::User,msg,_FILEINFO_);
     }
 
-    // Adjust degree of polynomial on available data
-    if (p_cache.size() == 1) {
-      p_degree = 0;
-    }
-    else if (p_cache.size() == 2) {
-      p_degree = 1;
-    }
+    // Adjust the degree of the polynomial to the available data
+    if ( p_degree > (int)p_cache.size() - 1 ) {
+      p_degree = p_cache.size() - 1;
 
-    //Check for polynomial over original pointing constant and initialize coefficients
-    if (type == PolyFunctionOverSpice) {
-      coeffAng1.assign(p_degree + 1, 0.);
-      coeffAng2.assign(p_degree + 1, 0.);
-      coeffAng3.assign(p_degree + 1, 0.);
-      SetPolynomial(coeffAng1, coeffAng2, coeffAng3, type);
-      return;
+      // Flag if velocity is available
+      p_hasAngularVelocity = ( p_degree > 0 || !p_cacheAv.empty() );
     }
 
-    Isis::PolynomialUnivariate function1(p_degree);   //!< Basis function fit to 1st rotation angle
-    Isis::PolynomialUnivariate function2(p_degree);   //!< Basis function fit to 2nd rotation angle
-    Isis::PolynomialUnivariate function3(p_degree);   //!< Basis function fit to 3rd rotation angle
-    //
-    LeastSquares *fitAng1 = new LeastSquares(function1);
-    LeastSquares *fitAng2 = new LeastSquares(function2);
-    LeastSquares *fitAng3 = new LeastSquares(function3);
-
-    // Compute the base time
+    // Recompute the time scaling
     ComputeBaseTime();
-    std::vector<double> time;
 
-    if (p_cache.size() == 1) {
-      double t = p_cacheTime.at(0);
-      SetEphemerisTime(t);
-      std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
-      coeffAng1.push_back(angles[0]);
-      coeffAng2.push_back(angles[1]);
-      coeffAng3.push_back(angles[2]);
+    // Compute first and last times in scaled time.
+    //   If there is only one cached time, use the full extents.
+    //   Otherwise scale the first and last times.
+    double scaledFirstTime = -DBL_MAX;
+    double scaledLastTime = DBL_MAX;
+    if ( p_cacheTime.size() > 1) {
+      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
     }
-    else if (p_cache.size() == 2) {
-// Load the times and get the corresponding rotation angles
-      p_degree = 1;
-      double t1 = p_cacheTime.at(0);
-      SetEphemerisTime(t1);
-      t1 -= p_baseTime;
-      t1 = t1 / p_timeScale;
-      std::vector<double> angles1 = Angles(p_axis3, p_axis2, p_axis1);
-      double t2 = p_cacheTime.at(1);
-      SetEphemerisTime(t2);
-      t2 -= p_baseTime;
-      t2 = t2 / p_timeScale;
-      std::vector<double> angles2 = Angles(p_axis3, p_axis2, p_axis1);
-      angles2[0] = WrapAngle(angles1[0], angles2[0]);
-      angles2[2] = WrapAngle(angles1[2], angles2[2]);
-      double slope[3];
-      double intercept[3];
 
-// Compute the linear equation for each angle and save them
-      for (int angleIndex = 0; angleIndex < 3; angleIndex++) {
-        Isis::LineEquation angline(t1, angles1[angleIndex], t2, angles2[angleIndex]);
-        slope[angleIndex] = angline.Slope();
-        intercept[angleIndex] = angline.Intercept();
+    // Initialize the zero polynomial.
+    m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
+
+    // If fitting a polynomial over constant spice data, then do not fit the polynomial,
+    // just set the knots and move on.
+    if ( type == PolyFunctionOverSpice ) {
+      if ( m_segments > 1 ) {
+        std::vector<double> knots;
+        double knotStep = (scaledLastTime - scaledFirstTime) / m_segments;
+        for (int i = 0; i < m_segments + 1; i++) {
+          knots.push_back(scaledFirstTime + knotStep * i);
+        }
+        m_polynomial.setKnots(knots);
       }
-      coeffAng1.push_back(intercept[0]);
-      coeffAng1.push_back(slope[0]);
-      coeffAng2.push_back(intercept[1]);
-      coeffAng2.push_back(slope[1]);
-      coeffAng3.push_back(intercept[2]);
-      coeffAng3.push_back(slope[2]);
     }
+    // Otherwise, fit the polynomial over the coordinate evaluated at the
+    // values in the time cache.
     else {
-      // Load the known values to compute the fit equation
+      // Collect data to fit the polynomial over.
+      std::vector<double> scaledTimes;
+      std::vector< std::vector<double> > angles;
       double start1 = 0.; // value of 1st angle1 in cache
       double start3 = 0.; // value of 1st angle1 in cache
+      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+        // Compute the angles and save the scaled time
+        SetEphemerisTime( p_cacheTime[i] );
+        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
 
-      for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
-        double t = p_cacheTime.at(pos);
-        time.push_back((t - p_baseTime) / p_timeScale);
-        SetEphemerisTime(t);
-        std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
-
-// Fix 180/-180 crossovers on angles 1 and 3 before doing fit.
-        if (pos == 0) {
-          start1 = angles[0];
-          start3 = angles[2];
+        // Fix angle domain cross over and then save the angles
+        std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
+        if (i == 0) {
+          start1 = currentAngles[0];
+          start3 = currentAngles[2];
         }
         else {
-          angles[0] = WrapAngle(start1, angles[0]);
-          angles[2] = WrapAngle(start3, angles[2]);
+          currentAngles[0] = WrapAngle(start1, currentAngles[0]);
+          currentAngles[2] = WrapAngle(start3, currentAngles[2]);
         }
-
-        fitAng1->AddKnown(time, angles[0]);
-        fitAng2->AddKnown(time, angles[1]);
-        fitAng3->AddKnown(time, angles[2]);
-        time.clear();
-
-      }
-      //Solve the equations for the coefficients
-      fitAng1->Solve();
-      fitAng2->Solve();
-      fitAng3->Solve();
-
-      // Delete the least squares objects now that we have all the coefficients
-      delete fitAng1;
-      delete fitAng2;
-      delete fitAng3;
-
-      // For now assume all three angles are fit to a polynomial.  Later they may
-      // each be fit to a unique basis function.
-      // Fill the coefficient vectors
-
-      for (int i = 0;  i < function1.Coefficients(); i++) {
-        coeffAng1.push_back(function1.Coefficient(i));
-        coeffAng2.push_back(function2.Coefficient(i));
-        coeffAng3.push_back(function3.Coefficient(i));
+        angles.push_back( currentAngles );
       }
 
+      // Fit the polynomial.
+      m_polynomial.fitPolynomials(scaledTimes, angles, m_segments);
     }
 
-    // Now that the coefficients have been calculated set the polynomial with them
-    SetPolynomial(coeffAng1, coeffAng2, coeffAng3);
+    p_source = type;
 
     NaifStatus::CheckErrors();
     return;
@@ -1700,6 +1708,7 @@ namespace Isis {
    * @param[in] coeffAng2 Coefficients of fit to Angle 2
    * @param[in] coeffAng3 Coefficients of fit to Angle 3
    * @param[in] type Rotation source type
+   * @param[in] segment The segment to set coefficients for
    *
    * @internal
    *   @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types.
@@ -1707,31 +1716,29 @@ namespace Isis {
   void SpiceRotation::SetPolynomial(const std::vector<double> &coeffAng1,
                                     const std::vector<double> &coeffAng2,
                                     const std::vector<double> &coeffAng3,
-                                    const Source type) {
-
+                                    const Source type,
+                                    const int segment) {
     NaifStatus::CheckErrors();
-    Isis::PolynomialUnivariate function1(p_degree);
-    Isis::PolynomialUnivariate function2(p_degree);
-    Isis::PolynomialUnivariate function3(p_degree);
-
-    // Load the functions with the coefficients
-    function1.SetCoefficients(coeffAng1);
-    function2.SetCoefficients(coeffAng2);
-    function3.SetCoefficients(coeffAng3);
 
     // Compute the base time
     ComputeBaseTime();
-
-    // Save the current coefficients
-    p_coefficients[0] = coeffAng1;
-    p_coefficients[1] = coeffAng2;
-    p_coefficients[2] = coeffAng3;
 
     // Set the flag indicating p_degree has been applied to the camera angles, the
     // coefficients of the polynomials have been saved, and the cache reloaded from
     // the polynomials
     p_degreeApplied = true;
-    //    p_source = PolyFunction;
+
+    // Adjust the polynomial degree if needed
+    SetPolynomialDegree(p_degree);
+
+    // Save the current coefficients
+    std::vector< std::vector<double> > segmentCoefficients;
+    segmentCoefficients.push_back(coeffAng1);
+    segmentCoefficients.push_back(coeffAng2);
+    segmentCoefficients.push_back(coeffAng3);
+    m_polynomial.setCoefficients(segment, segmentCoefficients);
+
+    // Set the type to the input type
     p_source = type;
 
     // Update the current rotation
@@ -1866,10 +1873,13 @@ namespace Isis {
    */
   void SpiceRotation::GetPolynomial(std::vector<double> &coeffAng1,
                                     std::vector<double> &coeffAng2,
-                                    std::vector<double> &coeffAng3) {
-    coeffAng1 = p_coefficients[0];
-    coeffAng2 = p_coefficients[1];
-    coeffAng3 = p_coefficients[2];
+                                    std::vector<double> &coeffAng3,
+                                    const int segment) {
+
+    std::vector< std::vector<double> > segmentCoefficients = m_polynomial.coefficients(segment);
+    coeffAng1 = segmentCoefficients[0];
+    coeffAng2 = segmentCoefficients[1];
+    coeffAng3 = segmentCoefficients[2];
 
     return;
   }
@@ -2162,34 +2172,80 @@ namespace Isis {
       p_degree = degree;
     }
 
-    // Otherwise the existing polynomials need to be either expanded ...
-    else if (p_degree < degree) {   // (increase the number of terms)
-      std::vector<double> coefAngle1(p_coefficients[0]),
-          coefAngle2(p_coefficients[1]),
-          coefAngle3(p_coefficients[2]);
-
-      for (int icoef = p_degree + 1;  icoef <= degree; icoef++) {
-        coefAngle1.push_back(0.);
-        coefAngle2.push_back(0.);
-        coefAngle3.push_back(0.);
+    // Otherwise adjust the degree.
+    //   If the new degree is less than the old degree, high order coefficients are truncated.
+    //   If the new degree is geater than the old degree, high order coefficients are set to 0.
+    else {
+      // Save the current coefficients and resize them
+      std::vector< std::vector<double> > angle1Coefficients,
+                                         angle2Coefficients,
+                                         angle3Coefficients;
+      for (int i = 0; i < m_segments; i++) {
+        std::vector<double> coefAngle1, coefAngle2, coefAngle3;
+        GetPolynomial(coefAngle1, coefAngle2, coefAngle3, i);
+        coefAngle1.resize(degree + 1, 0.0);
+        coefAngle2.resize(degree + 1, 0.0);
+        coefAngle3.resize(degree + 1, 0.0);
+        angle1Coefficients.push_back(coefAngle1);
+        angle2Coefficients.push_back(coefAngle2);
+        angle3Coefficients.push_back(coefAngle3);
       }
-      p_degree = degree;
-      SetPolynomial(coefAngle1, coefAngle2, coefAngle3, p_source);
-    }
-    // ... or reduced (decrease the number of terms)
-    else if (p_degree > degree) {
-      std::vector<double> coefAngle1(degree + 1),
-          coefAngle2(degree + 1),
-          coefAngle3(degree + 1);
 
-      for (int icoef = 0;  icoef <= degree;  icoef++) {
-        coefAngle1[icoef] = p_coefficients[0][icoef];
-        coefAngle2[icoef] = p_coefficients[1][icoef];
-        coefAngle3[icoef] = p_coefficients[2][icoef];
+      // Change the polynomial degree
+      m_polynomial.setDegree(degree);
+
+      // Reset the coefficients
+      for (int i = 0; i < m_segments; i++) {
+        std::vector< std::vector<double> > segmentCoefficients;
+        segmentCoefficients.push_back(angle1Coefficients[i]);
+        segmentCoefficients.push_back(angle2Coefficients[i]);
+        segmentCoefficients.push_back(angle3Coefficients[i]);
+        m_polynomial.setCoefficients(i, segmentCoefficients);
       }
-      p_degree = degree;
-      SetPolynomial(coefAngle1, coefAngle2, coefAngle3, p_source);
     }
+  }
+
+
+  /**
+   * Set the number of segments in the polynomial. If there is an existing
+   * polynomial, then the closest polynomials with the new segments will be
+   * used.
+   * 
+   * @param segments The number of segments to use.
+   */
+  void SpiceRotation::setPolynomialSegments(int segmentCount) {
+    m_segments = segmentCount;
+    if ( !m_polynomial.isZero() ) {
+      m_polynomial.refitPolynomials(segmentCount);
+    }
+  }
+
+
+  /**
+   * Return the number of segments in the polynomial.
+   * 
+   * @return @b int The number of segments in the polynomial.
+   */
+  int SpiceRotation::numPolynomialSegments() const {
+    return m_segments;
+  }
+
+
+  /**
+   * Return the knots in the polynomial.
+   * 
+   * @return @b std::vector<double> A vector containing the polynomial knots in et.
+   */
+  std::vector<double> SpiceRotation::polynomialKnots() const {
+    std::vector<double> knots = m_polynomial.knots();
+
+    // The knots in the polynomial are stored in scaled time,
+    // so convert them back to et.
+    for (int i = 0; i < (int)knots.size(); i++) {
+      knots[i] = ( knots[i] * p_timeScale ) + p_baseTime;
+    }
+
+    return knots;
   }
 
 
@@ -2831,14 +2887,16 @@ namespace Isis {
       // Transpose to obtain row-major order
       xpose_c(dmatrix, dmatrix);
 
-      // To get the derivative of the polynomial fit to the angle with respect to time
-      // first create the function object for this angle and load its coefficients
-      Isis::PolynomialUnivariate function(p_degree);
-      function.SetCoefficients(p_coefficients[angleIndex]);
+      // Get the derivative of the polynomial fit to the angle with respect to time
 
-      // Evaluate the derivative of function at p_et
-      //      dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale);
-      dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale) / p_timeScale;
+      // Compute the scaled time
+      double scaledTime = (p_et - p_baseTime) / p_timeScale;
+
+      // Compute the derivative with respect to scaled time.
+      std::vector<double> derivatives = m_polynomial.derivativeVariable(scaledTime);
+
+      // Convert to the derivative in unscaled time.
+      dangle = derivatives[angleIndex] / p_timeScale;
 
       // Multiply dangle to complete dmatrix
       for (int row = 0;  row < 3;  row++) {
@@ -3218,30 +3276,20 @@ namespace Isis {
    * @return @b vector<double> Vector containing the three rotation angles.
    */
   std::vector<double> SpiceRotation::EvaluatePolyFunction() {
-   Isis::PolynomialUnivariate function1(p_degree);
-   Isis::PolynomialUnivariate function2(p_degree);
-   Isis::PolynomialUnivariate function3(p_degree);
+    // Compute the scaled time
+    double scaledTime = (p_et - p_baseTime) / p_timeScale;
 
-   // Load the functions with the coefficients
-   function1.SetCoefficients(p_coefficients[0]);
-   function2.SetCoefficients(p_coefficients[1]);
-   function3.SetCoefficients(p_coefficients[2]);
+    // Evaluate the polynomial at the scaled time
+    std::vector<double> angles = m_polynomial.evaluate(scaledTime);
 
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
-   std::vector<double> angles;
-   angles.push_back(function1.Evaluate(rtime));
-   angles.push_back(function2.Evaluate(rtime));
-   angles.push_back(function3.Evaluate(rtime));
-
-   // Get the first angle back into the range Naif expects [-180.,180.]
-   if (angles[0] <= -1 * pi_c()) {
-     angles[0] += twopi_c();
-   }
-   else if (angles[0] > pi_c()) {
-     angles[0] -= twopi_c();
-   }
-   return angles;
+    // Get the first angle back into the range Naif expects [-180.,180.]
+    if (angles[0] <= -1 * pi_c()) {
+      angles[0] += twopi_c();
+    }
+    else if (angles[0] > pi_c()) {
+      angles[0] -= twopi_c();
+    }
+    return angles;
   }
 
 
@@ -3253,40 +3301,33 @@ namespace Isis {
    */
   void SpiceRotation::setEphemerisTimePolyFunction() {
    NaifStatus::CheckErrors();
-   Isis::PolynomialUnivariate function1(p_degree);
-   Isis::PolynomialUnivariate function2(p_degree);
-   Isis::PolynomialUnivariate function3(p_degree);
 
-   // Load the functions with the coefficients
-   function1.SetCoefficients(p_coefficients[0]);
-   function2.SetCoefficients(p_coefficients[1]);
-   function3.SetCoefficients(p_coefficients[2]);
+   // Compute the scaled time
+    double scaledTime = (p_et - p_baseTime) / p_timeScale;
 
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
-   double angle1 = function1.Evaluate(rtime);
-   double angle2 = function2.Evaluate(rtime);
-   double angle3 = function3.Evaluate(rtime);
+    // Evaluate the polynomial at the scaled time
+    std::vector<double> angles = m_polynomial.evaluate(scaledTime);
 
-   // Get the first angle back into the range Naif expects [-180.,180.]
-   if (angle1 < -1 * pi_c()) {
-     angle1 += twopi_c();
-   }
-   else if (angle1 > pi_c()) {
-     angle1 -= twopi_c();
-   }
+    // Get the first angle back into the range Naif expects [-180.,180.]
+    if (angles[0] < -1 * pi_c()) {
+      angles[0] += twopi_c();
+    }
+    else if (angles[0] > pi_c()) {
+      angles[0] -= twopi_c();
+    }
 
-   eul2m_c((SpiceDouble) angle3, (SpiceDouble) angle2, (SpiceDouble) angle1,
-           p_axis3,              p_axis2,              p_axis1,
-           (SpiceDouble( *)[3]) &p_CJ[0]);
+    // Convert the angles into a rotation matrix
+    eul2m_c((SpiceDouble) angles[2], (SpiceDouble) angles[1], (SpiceDouble) angles[0],
+            p_axis3,              p_axis2,              p_axis1,
+            (SpiceDouble( *)[3]) &p_CJ[0]);
 
-   if (p_hasAngularVelocity) {
-     if ( p_degree == 0)
-       p_av = p_cacheAv[0];
-     else
-       ComputeAv();
-   }
-   NaifStatus::CheckErrors();
+    if (p_hasAngularVelocity) {
+      if ( p_degree == 0)
+        p_av = p_cacheAv[0];
+      else
+        ComputeAv();
+    }
+    NaifStatus::CheckErrors();
   }
 
 

@@ -596,12 +596,6 @@ namespace Isis {
         }
       }
 
-      // Load one more table entry with the time adjustments for the fit equation
-      // t = (et - baseTime)/ timeScale
-      record[0] = p_baseTime;
-      record[1] = p_timeScale;
-      record[2] = (double) p_degree;
-
       CacheLabel(table);
       PolynomialLabel(table);
       table += record;
@@ -943,7 +937,6 @@ namespace Isis {
 
     // If fitting a polynomial over hermite data, then do not fit the polynomial,
     // just set the knots and move on.
-    // TODO Should poly over hermite allow multiple segments? JAM
     if ( type == PolyFunctionOverHermiteConstant ) {
       if ( m_segments > 1 ) {
         std::vector<double> knots;
@@ -1010,6 +1003,9 @@ namespace Isis {
 
     // Compute the base time
     ComputeBaseTime();
+
+    // Adjust the polynomial degree if needed
+    SetPolynomialDegree(p_degree);
 
     // Save the coefficients
     std::vector< std::vector<double> > segmentCoefficients;
