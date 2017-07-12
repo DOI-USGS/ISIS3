@@ -533,10 +533,9 @@ namespace Isis {
     std::sort( distances.begin(), distances.end() );
 
     // If two points are very close together then the triangle is degenerate and
-    // we cannot compute curvature.
+    // we cannot compute curvature. So, just return 0 curvature.
     if (distances[0] < 1.0e-15) {
-      QString msg = "Cannot compute curvature. The triangle between points is degenerate.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      return 0.0;
     }
 
     // Modified Heron's formula to avoid square root of negatives when area is close to 0
