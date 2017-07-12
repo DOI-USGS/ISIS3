@@ -382,6 +382,7 @@ namespace Isis {
       void setPolynomialSegments(int segmentCount);
       int numPolynomialSegments() const;
       std::vector<double> polynomialKnots() const;
+      int polySegmentIndex(double et) const;
       Source GetSource();
       void SetSource(Source source);
       void ComputeBaseTime();

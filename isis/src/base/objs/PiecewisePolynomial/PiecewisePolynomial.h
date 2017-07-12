@@ -78,6 +78,8 @@ namespace Isis {
       void setDimensions(int dimensions);
       void setKnots(std::vector<double> &knots);
 
+      int segmentIndex(double value) const;
+
     private:
       void validateData(const std::vector<double> &values,
                         const std::vector< std::vector<double> > &data,
@@ -93,7 +95,6 @@ namespace Isis {
                               const std::vector<double> &secondPoint);
       void computePolynomials(const std::vector<double> &values,
                               const std::vector< std::vector<double> > &data);
-      int segmentIndex(double value);
       int derivativeCoefficient(int coeffOrder, int derivativeOrder);
 
       int m_degree; //< The degree of the polynomials.

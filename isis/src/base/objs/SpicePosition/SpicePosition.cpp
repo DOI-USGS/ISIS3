@@ -1730,6 +1730,21 @@ namespace Isis {
 
 
   /**
+   * Return the index of the polynomial segment that contains a given time.
+   * 
+   * @param et The time to find the segment index of.
+   * 
+   * @return @b int The index of the polynomial segment containing the time.
+   */
+  int SpicePosition::polySegmentIndex(double et) const {
+    // Scale the time
+    double scaledTime;
+    scaledTime = (p_et - p_baseTime) / p_timeScale;
+    return m_polynomial.segmentIndex(scaledTime);
+  }
+
+
+  /**
    * Cache J2000 position over existing cached time range using
    * table
    *

@@ -143,7 +143,7 @@ namespace Isis {
    * 
    * @return @b int The zero-based index of the segment.
    */
-  int PiecewisePolynomial::segmentIndex(double value) {
+  int PiecewisePolynomial::segmentIndex(double value) const {
     std::vector<double>::const_iterator knotIt;
     knotIt = std::upper_bound(m_knots.begin(), m_knots.end(), value);
     if (knotIt == m_knots.begin()) {

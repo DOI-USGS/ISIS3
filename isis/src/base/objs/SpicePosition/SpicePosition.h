@@ -265,6 +265,7 @@ namespace Isis {
 
       int numPolynomialSegments() const;
       std::vector<double> polynomialKnots() const;
+      int polySegmentIndex(double et) const;
 
       //! Return the source of the position
       Source GetSource() {
