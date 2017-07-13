@@ -118,10 +118,16 @@ namespace Isis {
       foreach (FileName fileName, fileNames) {
         if (fileName.extension() == "lis") {
           TextFile listFile(fileName.expanded());
+          QString path = fileName.path();
           QString lineOfListFile;
 
           while (listFile.GetLine(lineOfListFile)) {
-            stateToSave.append(lineOfListFile);
+            if (lineOfListFile.contains(path)){
+              stateToSave.append(lineOfListFile);
+            }
+            else {
+              stateToSave.append(path + "/" + lineOfListFile);
+            }
           }
         }
         else {
@@ -310,7 +316,7 @@ namespace Isis {
    *
    * Copies an image to be imported for this ImportImagesWorkOrder into the
    * associated project. If we are not copying the image data, the a .ecub file will be created that
-   * points to the original cube. Otherwise, a .cub will be copyied into the project and a .ecub
+   * points to the original cube. Otherwise, a .cub will be copied into the project and a .ecub
    * will be created in the project that references the copied cube.
    * Note that if too many errors occur, the copying
    * will not proceed for remaining images in the import and a NULL pointer will be returned.
@@ -427,7 +433,6 @@ namespace Isis {
 
       foreach (QString confirmedImage, confirmedImages) {
         QStringList fileNameAndId = confirmedImage.split(",");
-
         confirmedImagesFileNames.append(fileNameAndId.first());
 
         // Determine if there was already a unique id provided for the file.

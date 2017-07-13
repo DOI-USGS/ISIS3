@@ -67,6 +67,8 @@ namespace Isis {
    *                           asynchronous work order. Updated documentation. References #4732.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undo, imported
    *                           images are removed from the project tree. Fixes #4597.
+   *   @history 2017-06-06 Cole Neubauer - Added ability to have cube lists without full file path
+   *                           Fixes #4956
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
