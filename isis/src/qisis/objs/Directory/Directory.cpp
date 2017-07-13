@@ -447,8 +447,8 @@ namespace Isis {
 
     if (str.contains("residuals")) {
       result->setWindowTitle( tr("Measure Residuals").
-                            arg( m_bundleObservationViews.count() ) );
-    result->setObjectName( result->windowTitle() );
+                              arg( m_bundleObservationViews.count() ) );
+      result->setObjectName( result->windowTitle() );
     }
     else if (str.contains("points")) {
       result->setWindowTitle( tr("Control Points").
@@ -457,8 +457,8 @@ namespace Isis {
     }
     else if (str.contains("images")) {
       result->setWindowTitle( tr("Images").
-                            arg( m_bundleObservationViews.count() ) );
-    result->setObjectName( result->windowTitle() );
+                              arg( m_bundleObservationViews.count() ) );
+      result->setObjectName( result->windowTitle() );
     }
 
     emit newWidgetAvailable(result);
@@ -926,15 +926,12 @@ namespace Isis {
    * @brief Reomoves pointers to deleted ImageFileListWidget objects.
    */
   void Directory::cleanupFileListWidgets(QObject *obj) {
-//  qDebug()<<"Directory::cleanupFileListWidgets  obj = "<<obj;
+
     ImageFileListWidget *imageFileListWidget = static_cast<ImageFileListWidget *>(obj);
-//  qDebug()<<"                                          cast fileListWidget = "<<fileListWidget<<"  # = "<<m_fileListWidgets.count();
     if (!imageFileListWidget) {
       return;
     }
-//  qDebug()<<"Directory::cleanupFileListWidgets before remove # = "<<m_fileListWidgets.count();
     m_fileListWidgets.removeAll(imageFileListWidget);
-//  qDebug()<<"Directory::cleanupFileListWidgets  # = "<<m_fileListWidgets.count();
   }
 
 
@@ -942,15 +939,12 @@ namespace Isis {
    * @brief Removes pointers to deleted Footprint2DView objects.
    */
   void Directory::cleanupFootprint2DViewWidgets(QObject *obj) {
-//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  obj = "<<obj;
+
     Footprint2DView *footprintView = static_cast<Footprint2DView *>(obj);
-//  qDebug()<<"                                          cast footprintView = "<<footprintView<<"  # = "<<m_footprint2DViewWidgets.count();
     if (!footprintView) {
       return;
     }
-//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets before remove # = "<<m_footprint2DViewWidgets.count();
     m_footprint2DViewWidgets.removeAll(footprintView);
-//  qDebug()<<"Directory::cleanupFootprint2DViewWidgets  # = "<<m_footprint2DViewWidgets.count();
   }
 
 
@@ -967,9 +961,6 @@ namespace Isis {
     //  of ControlPointEditView
 //    delete m_chipViewports;
 //    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
-//    if (m_controlPointEditViewWidget) {
-//      delete m_controlPointEditViewWidget;
-//    }
   }
 
 

@@ -136,7 +136,12 @@ namespace Isis {
    *                           the correct view/widget from the lists.  Fixes #4847.
    *   @history 2017-06-14 Ken Edmundson - Commented out ChipViewport widget code.  This will be
    *                           temporary until the widget is fully developed.
-
+   *   @history 2017-07-10 Tracie Sucharski - Removed deletion of m_controlPointEditViewWidget.
+   *                           Because it is a QPointer, it is set to null when ControlPointEditView
+   *                           is destroyed.  Currently, cleanupControlPointEditViewWidget is not
+   *                           doing anything.  However, I'm leaving the method for now, because
+   *                           once the views are connected, we will probably need to cleanup the
+   *                           connections when the view is closed.  Fixes #4959.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -207,11 +212,11 @@ namespace Isis {
         //      qMakePair(footprint2DView->windowTitle(), footprint2DView->supportedActions(data)));
         //}
 
-        //results.append(restructureActions(actionPairings));
+//      results.append(restructureActions(actionPairings));
 
-        //if (!results.isEmpty()) {
-        //  results.append(NULL);
-        //}
+//      if (!results.isEmpty()) {
+//        results.append(NULL);
+//      }
 //      qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
         foreach (WorkOrder *workOrder, m_workOrders) {
           if (workOrder->isExecutable(data)) {
