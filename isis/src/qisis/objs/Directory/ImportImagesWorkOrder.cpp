@@ -507,6 +507,10 @@ namespace Isis {
       // See http://doc.qt.io/qt-5/threads-technologies.html#comparison-of-solutions
       m_newImages->moveToThread(thread());
 
+      if (m_newImages->isEmpty()) {
+        folder.removeRecursively();
+      }
+
       setInternalData(newInternalData);
     }
   }
