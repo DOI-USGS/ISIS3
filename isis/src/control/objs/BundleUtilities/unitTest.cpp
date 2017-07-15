@@ -296,6 +296,8 @@ int main(int argc, char *argv[]) {
     XmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);
     printXml(bsFromEmptyXml);
 
+    qXmlFile.remove();
+
     //bool deleted = qXmlFile.remove();
     //if (!deleted) {
     //  QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
