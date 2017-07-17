@@ -46,7 +46,7 @@ namespace Isis {
   /**
    * Constructs an empty model.
    *
-   * @param[in] parent (QObject *) The parent.
+   * @param parent (QObject *) The parent.
    */
   ProjectItemModel::ProjectItemModel(QObject *parent) : QStandardItemModel(parent) {
     m_selectionModel = new QItemSelectionModel(this, this);
@@ -107,7 +107,7 @@ namespace Isis {
    * Project as well as children items that correspond to various parts of the
    * Project.
    *
-   * @param[in] project (Project *) The Project to be added.
+   * @param project (Project *) The Project to be added.
    *
    * @return @b ProjectItem* The new item that corresponds to the Project.
    */
@@ -169,7 +169,7 @@ namespace Isis {
    *
    * @param data (const QVariant &) The data contained in the item.
    *
-   * @param data (int) The role of the data (see Qt::ItemDataRole).
+   * @param role (int) The role of the data (see Qt::ItemDataRole).
    *
    * @return @b ProjectItem* First project item found.
    */
@@ -192,7 +192,7 @@ namespace Isis {
   /**
    * Removes an item and its children from the model.
    *
-   * @param[in] item (ProjectItem *) The item to be removed.
+   * @param item (ProjectItem *) The item to be removed.
    */
   void ProjectItemModel::removeItem(ProjectItem *item) {
     if (!item) {
@@ -213,7 +213,7 @@ namespace Isis {
   /**
    * Removes a list of items and their children from the model.
    *
-   * @param[in] item (ProjectItem *) The items to be removed.
+   * @param items (ProjectItem *) The items to be removed.
    */
   void ProjectItemModel::removeItems(QList<ProjectItem *> items) {
     foreach (ProjectItem *item, items) {
@@ -225,7 +225,7 @@ namespace Isis {
   /**
    * Appends a top-level item to the model.
    *
-   * @param[in] item (ProjectItem *) The item to append.
+   * @param item (ProjectItem *) The item to append.
    */
   void ProjectItemModel::appendRow(ProjectItem *item) {
     QStandardItemModel::appendRow(item);
@@ -235,7 +235,7 @@ namespace Isis {
   /**
    * Returns the QModelIndex corresponding to a given ProjectItem.
    *
-   * @param[in] item (const ProjectItem *) The item.
+   * @param item (const ProjectItem *) The item.
    *
    * @return @b QModelIndex The index of the item.
    */
@@ -247,8 +247,8 @@ namespace Isis {
   /**
    * Inserts a top-level item at the given row.
    *
-   * @param[in] row (int) The row where the item will be inserted.
-   * @param[in] item (ProjectItem *) The item to insert.
+   * @param row (int) The row where the item will be inserted.
+   * @param item (ProjectItem *) The item to insert.
    */
   void ProjectItemModel::insertRow(int row, ProjectItem *item) {
     QStandardItemModel::insertRow(row, item);
@@ -258,7 +258,7 @@ namespace Isis {
   /**
    * Returns the top-level item at the given row.
    *
-   * @param[in] row (int) The row of the item.
+   * @param row (int) The row of the item.
    *
    * @return @b ProjectItem* The item at the row.
    */
@@ -270,7 +270,7 @@ namespace Isis {
   /**
    * Returns the ProjectItem corresponding to a given QModelIndex.
    *
-   * @param[in] index (const QModelIndex &) The index of the item.
+   * @param index (const QModelIndex &) The index of the item.
    *
    * @return @b ProjectItem* The item.
    */
@@ -282,8 +282,8 @@ namespace Isis {
   /**
    * Sets the item at the top-level row.
    *
-   * @param[in] row (int) The row where the item will be set.
-   * @param[in] item (ProjectItem *) The item to set the row to.
+   * @param row (int) The row where the item will be set.
+   * @param item (ProjectItem *) The item to set the row to.
    */
   void ProjectItemModel::setItem(int row, ProjectItem *item) {
     QStandardItemModel::setItem(row, item);
@@ -293,7 +293,7 @@ namespace Isis {
   /**
    * Removes the top-level row and returns the removed item.
    *
-   * @param[in] row (int) The row of the item to remove.
+   * @param row (int) The row of the item to remove.
    *
    * @return @b ProjectItem* The removed item.
    */
@@ -312,7 +312,7 @@ namespace Isis {
    * Slot to connect to the nameChanged() signal from a Project. Sets the name
    * of the ProjectItem that corresponds with the Project.
    *
-   * @param[in] newName (QString) The new name of the project
+   * @param newName (QString) The new name of the project
    */
   void ProjectItemModel::onNameChanged(QString newName) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -337,7 +337,7 @@ namespace Isis {
    * named "Results" of the item that corresponds to the Project that
    * sent the signal.
    *
-   * @param[in] bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo
+   * @param bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo
    *                                                      added to the Project.
    */
   void ProjectItemModel::onBundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo) {
@@ -385,7 +385,7 @@ namespace Isis {
    * item is added to the item that corresponds to the control's
    * ControlList.
    *
-   * @param[in] control (Control *) The Control added to the Project.
+   * @param control (Control *) The Control added to the Project.
    */
   void ProjectItemModel::onControlAdded(Control * control) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -422,7 +422,7 @@ namespace Isis {
    * Networks" of the item that corresponds to the Project that sent
    * the signal.
    *
-   * @param[in] controlList (ControlList *) The ControlList added to the
+   * @param controlList (ControlList *) The ControlList added to the
    *                                        Project.
    */
   void ProjectItemModel::onControlListAdded(ControlList * controlList) {
@@ -452,7 +452,7 @@ namespace Isis {
    * item is added to the item named "Images" of the item that
    * corresponds to the Project that sent the signal.
    *
-   * @param[in] imageList (ImageList *) The ImageList added to the Project.
+   * @param imageList (ImageList *) The ImageList added to the Project.
    */
   void ProjectItemModel::onImagesAdded(ImageList * imageList) {
 //  qDebug()<<"ProjectItemModel::onImagesAdded  before add rowCount = "<<rowCount();
@@ -482,7 +482,7 @@ namespace Isis {
    * to the ShapeList to the model. The item is added to the item named "Shape Models" of the item
    * that corresponds to the Project that sent the signal. 
    *
-   * @param[in] shapes (ShapeList *) The ShapeList added to the Project.
+   * @param shapes (ShapeList *) The ShapeList added to the Project.
    */
   void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -510,7 +510,7 @@ namespace Isis {
    * items are added to the item named "Target Body" of the item that
    * corresponds to the Project that sent the signal.
    *
-   * @param[in] targets (TargetBodyList *) The TargetBodyList of the Project.
+   * @param targets (TargetBodyList *) The TargetBodyList of the Project.
    */
   void ProjectItemModel::onTargetsAdded(TargetBodyList *targets) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -550,7 +550,7 @@ namespace Isis {
    * model. The items are added to the item named "Sensors" of the
    * item that corresponds to the Project that sent the signal.
    *
-   * @param[in] cameras (GuiCameraList *) The GuiCameraList of the Project.
+   * @param cameras (GuiCameraList *) The GuiCameraList of the Project.
    */
   void ProjectItemModel::onGuiCamerasAdded(GuiCameraList *cameras) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -591,8 +591,8 @@ namespace Isis {
    * model. Currently changes the selected property of Images that
    * correspond with selected or deselected items.
    *
-   * @param[in] selected (const QItemSelection &) The selected items.
-   * @param[in] deselected (const QItemSelection &) The deselected items.
+   * @param selected (const QItemSelection &) The selected items.
+   * @param deselected (const QItemSelection &) The deselected items.
    */
   void ProjectItemModel::onSelectionChanged(const QItemSelection &selected,
                                             const QItemSelection &deselected) {
@@ -625,10 +625,10 @@ namespace Isis {
    * QAbstractItemModel. Emits a corresponding itemAdded() signal for
    * each row inserted.
    *
-   * @param[in] parent (const QModelIndex &) The parent index where rows
+   * @param parent (const QModelIndex &) The parent index where rows
    *                                         were inserted.
-   * @param[in] start (int) The first row inserted (inclusive).
-   * @param[in] end (int) The last row inserted (inclusive).
+   * @param start (int) The first row inserted (inclusive).
+   * @param end (int) The last row inserted (inclusive).
    */
   void ProjectItemModel::onRowsInserted(const QModelIndex &parent, int start, int end) {
     for (int row=start; row <= end; row++) {
@@ -643,10 +643,10 @@ namespace Isis {
    * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a 
    * corresponding itemRemoved() signal for each row inserted. 
    *
-   * @param[in] parent (const QModelIndex &) The parent index where rows are to be removed.
+   * @param parent (const QModelIndex &) The parent index where rows are to be removed.
    *                                         
-   * @param[in] start (int) The first row to be removed (inclusive).
-   * @param[in] end (int) The last row to be removed (inclusive).
+   * @param start (int) The first row to be removed (inclusive).
+   * @param end (int) The last row to be removed (inclusive).
    */
   void ProjectItemModel::onRowsRemoved(const QModelIndex &parent, int start, int end) {
     for (int row=start; row <= end; row++) {
@@ -666,9 +666,9 @@ namespace Isis {
    *  
    * @see http://doc.qt.io/qt-5/modelview.html 
    *  
-   * @param[in] index (const QModelIndex &) Field which has been edited
-   * @param[in] value (const QVariant &) Value contained in the field
-   * @param[in] role (int) Will always be EditRole since field only contains text
+   * @param index (const QModelIndex &) Field which has been edited
+   * @param value (const QVariant &) Value contained in the field
+   * @param role (int) Will always be EditRole since field only contains text
    * 
    * @return bool Returns true if successful; otherwise false
    */
@@ -679,6 +679,26 @@ namespace Isis {
 
       QString name = value.toString();
       emit projectNameEdited(name);
+    }
+    else if (item->isBundleSolutionInfo() && role == Qt::EditRole) {
+      QString name = value.toString();
+      item->setText(name);
+      item->bundleSolutionInfo()->setName(name);
+    }
+    else if (item->isImageList() && role == Qt::EditRole) {
+      QString name = value.toString();
+      item->setText(name);
+      item->imageList()->setName(name);
+    }
+    else if (item->isControlList() && role == Qt::EditRole) {
+      QString name = value.toString();
+      item->setText(name);
+      item->controlList()->setName(name);
+    }
+    else if (item->isShapeList() && role == Qt::EditRole) {
+      QString name = value.toString();
+      item->setText(name);
+      item->shapeList()->setName(name);
     }
     return true;
   }
@@ -691,7 +711,7 @@ namespace Isis {
    *  
    * @see http://doc.qt.io/qt-5/modelview.html
    *  
-   * @param[in] index (const QModelIndex &) Field which has been edited
+   * @param index (const QModelIndex &) Field which has been edited
    * 
    * @return Qt::ItemFlags Add the ItemIsEditable to the standard flags.
    */

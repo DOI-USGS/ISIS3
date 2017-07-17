@@ -79,8 +79,6 @@ namespace Isis {
    * model->appendRow(item);
    * @endcode
    *
-   * @ingroup
-   *
    * @author 2015-10-21 Jeffrey Covington
    *  
    * @internal 
@@ -94,7 +92,10 @@ namespace Isis {
    *                           the ProjectItemTree, by double-clicking on the project name.  This
    *                           functionality required the addition of the setData and flags methods.
    *                           The projectNameEdited signal is also emitted.  Fixes #2295
-   *     @history 2017-05-04 J Bonn - Added FileItem to project tree. Fixes #4838.
+   *   @history 2017-05-04 J Bonn - Added FileItem to project tree. Fixes #4838.
+   *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
+   *                             imports, shape imports, and bundle solution info. Fixes #4855, 
+   *                             #4979, #4980.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -137,7 +138,17 @@ namespace Isis {
        * This signal is emitted when a ProjectItem is added to the model.
        */
       void itemAdded(ProjectItem *);
+      
+      
+      /**
+       * This signal is emitted when a ProjectItem is removed to the model.
+       */
       void itemRemoved(ProjectItem *);
+      
+      
+      /**
+       * This signal is emitted when the project name is edited.
+       */
       void projectNameEdited(QString);
 
     protected slots:

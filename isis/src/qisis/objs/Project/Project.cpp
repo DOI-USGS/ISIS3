@@ -1835,7 +1835,7 @@ namespace Isis {
               image, SLOT(updateFileName(Project *)));
 
       (*m_idToImageMap)[image->id()] = image;
-      createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
+      createOrRetrieveImageList(images.name())->append(image);
     }
 
     // We really can't have all of the cubes in memory before
@@ -2087,8 +2087,7 @@ namespace Isis {
               shape, SLOT(updateFileName(Project *)));
 
       (*m_idToShapeMap)[shape->id()] = shape;
-      createOrRetrieveShapeList(
-         FileName(shapes[0]->fileName()).dir().dirName())->append(shape);
+      createOrRetrieveShapeList(shapes.name())->append(shape);
     }
 
     // We really can't have all of the cubes in memory before

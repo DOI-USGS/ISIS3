@@ -104,6 +104,7 @@ namespace Isis {
    *   @history 2017-05-04 Ian Humphrey & Makayla Shepherd - Modified save() to write the bundle
    *                           solution info images to the correct directory in the project on disk.
    *                           Fixes #4804, #4837.
+   *   @history 2017-07-11 Makayla Shepherd - Added bundle naming capabilities. Fixes #4855.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -126,6 +127,7 @@ namespace Isis {
 
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
+      void setName(QString name);
 
       QString id() const;
       QString controlNetworkFileName() const;
@@ -133,6 +135,7 @@ namespace Isis {
       BundleResults bundleResults();
       QList<ImageList *> imageList();
       QString runTime() const;
+      QString name() const;
 
 
       bool outputImagesCSVHeader(std::ofstream &fpOut);
@@ -184,6 +187,7 @@ namespace Isis {
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
       QUuid              *m_id;
+      QString             m_name; //!< The name of the bundle. Defaults to the id
       QString             m_runTime; //!< The run time of the bundle adjust
       FileName           *m_controlNetworkFileName; //!< The name of the control network
       BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust

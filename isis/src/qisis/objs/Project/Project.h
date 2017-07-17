@@ -143,6 +143,9 @@ namespace Isis {
    *   @history 2017-05-17 Tracie Sucharski - Changed activeControl and activeImageList methods to
    *                           return default values if project contains a single control and a
    *                           single image list.  Fixes #4867.
+   *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
+   *                           imports, shape imports, and bundle solution info. Fixes #4855, 
+   *                           #4979, #4980.
    *                
    */
   class Project : public QObject {

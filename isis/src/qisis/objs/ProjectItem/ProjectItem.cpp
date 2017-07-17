@@ -198,7 +198,7 @@ namespace Isis {
    * @param[in] image (Image *) The Image to construct from.
    */
   ProjectItem::ProjectItem(Image *image) {
-    setEditable(false);
+    setEditable(true);
     setImage(image);
   }
 
@@ -209,7 +209,7 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList to construct from.
    */
   ProjectItem::ProjectItem(ImageList *imageList) {
-    setEditable(false);
+    setEditable(true);
     setImageList(imageList);
     foreach (Image *image, *imageList) {
       appendRow( new ProjectItem(image) );
@@ -711,7 +711,12 @@ namespace Isis {
    * @param[in] bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo.
    */
   void ProjectItem::setBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
-    setText( bundleSolutionInfo->runTime() );
+    if (bundleSolutionInfo->name() != "") {
+      setText( bundleSolutionInfo->name() );
+    }
+    else {
+      setText( bundleSolutionInfo->runTime() );
+    }
     setIcon( QIcon(":results") );
     setData( QVariant::fromValue<BundleSolutionInfo *>(bundleSolutionInfo) );
   }
