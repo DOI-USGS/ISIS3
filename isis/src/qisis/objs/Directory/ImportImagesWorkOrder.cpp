@@ -88,6 +88,20 @@ namespace Isis {
     return new ImportImagesWorkOrder(*this);
   }
 
+  
+  /**
+   * This method returns true if the user clicked on a project tree node with the text "Images". 
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are 
+   * appended to context menus.
+   * 
+   * @param item The ProjectItem that was clicked
+   * 
+   * @return bool True if the user clicked on a project tree node named "Shapes"
+   */
+  bool ImportImagesWorkOrder::isExecutable(ProjectItem *item) {
+    return (item->text() == "Images");
+  }
+  
 
   /**
    * @brief Sets up this work order before being executed.

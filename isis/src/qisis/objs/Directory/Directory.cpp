@@ -864,7 +864,7 @@ namespace Isis {
     project()->addToProject(workOrder);
   }
   
-
+  
   /**
    * @brief Gets the ProjectItemModel for this directory.
    * @return @b (ProjectItemModel *) Returns a pointer to the ProjectItemModel.

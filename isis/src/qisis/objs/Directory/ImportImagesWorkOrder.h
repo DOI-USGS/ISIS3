@@ -71,6 +71,8 @@ namespace Isis {
    *                           Fixes #4956
    *   @history 2017-07-14 Cole Neubauer - Added ability successfully import after failing to import
    *                           a set or list of images Fixes #5015
+   *   @history 2017-07-17 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
+   *                           in the context menu. Fixes #4968.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -81,6 +83,7 @@ namespace Isis {
 
       virtual ImportImagesWorkOrder *clone() const;
 
+      virtual bool isExecutable(ProjectItem *item);
       virtual bool setupExecution();
 
       virtual void execute();

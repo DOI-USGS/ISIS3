@@ -48,6 +48,8 @@ namespace Isis {
    *   @history 2017-04-12 JP Bonn - Updated to new workorder design.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undone, imported
    *                           shapes are removed from the project tree. Fixes #4597.
+   *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
+   *                           in the context menu. Fixes #4968.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -58,6 +60,7 @@ namespace Isis {
 
       virtual ImportShapesWorkOrder *clone() const;
 
+      virtual bool isExecutable(ProjectItem *item);
       bool setupExecution();
 
       void execute();

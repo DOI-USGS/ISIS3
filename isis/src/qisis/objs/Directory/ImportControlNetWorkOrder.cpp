@@ -39,6 +39,11 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order to import a control network.
+   * 
+   * @param *project Pointer to the project this work order belongs to
+   */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(Project *project) :
       WorkOrder(project) {
 
@@ -56,6 +61,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates a copy of the other ImportControlNetWorkOrder
+   * 
+   * @param &other ImportControlNetsWorkOrder to copy the state from
+   */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(const ImportControlNetWorkOrder &other) :
       WorkOrder(other) {
 
@@ -66,14 +76,37 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   ImportControlNetWorkOrder::~ImportControlNetWorkOrder() {
     delete m_watcher;
     m_watcher = NULL;
   }
 
 
+  /**
+   * This method clones the current ImportControlNetWorkOrder and returns it.
+   * 
+   * @return ImportControlNetWorkOrder Clone
+   */
   ImportControlNetWorkOrder *ImportControlNetWorkOrder::clone() const {
     return new ImportControlNetWorkOrder(*this);
+  }
+  
+  
+  /**
+   * This method returns true if the user clicked on a project tree node with the text 
+   * "Control Networks". 
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are 
+   * appended to context menus.
+   * 
+   * @param item The ProjectItem that was clicked
+   * 
+   * @return bool True if the user clicked on a project tree node named "Control Network"
+   */
+  bool ImportControlNetWorkOrder::isExecutable(ProjectItem *item) {
+    return (item->text() == "Control Networks");
   }
 
 

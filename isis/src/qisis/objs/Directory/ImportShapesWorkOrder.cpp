@@ -36,6 +36,11 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order to import a shape model.
+   * 
+   * @param *project Pointer to the project this work order belongs to
+   */
   ImportShapesWorkOrder::ImportShapesWorkOrder(Project *project) :
       WorkOrder(project) {
     // This workorder is synchronous and undoable.
@@ -49,21 +54,49 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates a copy of the other ImportShapesWorkOrder
+   * 
+   * @param &other ImportShapesWorkOrder to copy the state from
+   */
   ImportShapesWorkOrder::ImportShapesWorkOrder(const ImportShapesWorkOrder &other) :
       WorkOrder(other) {
     m_newShapes = NULL;
   }
 
 
+  /**
+   * Destructor
+   */
   ImportShapesWorkOrder::~ImportShapesWorkOrder() {
     delete m_newShapes;
     m_newShapes = NULL;
   }
 
 
+  /**
+   * This method clones the current ImportShapesWorkOrder and returns it.
+   * 
+   * @return ImportShapesWorkOrder Clone
+   */
   ImportShapesWorkOrder *ImportShapesWorkOrder::clone() const {
     return new ImportShapesWorkOrder(*this);
   }
+  
+  
+  /**
+   * This method returns true if the user clicked on a project tree node with the text "Shapes". 
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are 
+   * appended to context menus.
+   * 
+   * @param item The ProjectItem that was clicked
+   * 
+   * @return bool True if the user clicked on a project tree node named "Shapes"
+   */
+  bool ImportShapesWorkOrder::isExecutable(ProjectItem *item) {
+    return (item->text() == "Shapes");
+  }
+  
 
   /**
    * @brief Prompt the user for shape files to import and whether to copy DN data in to project.

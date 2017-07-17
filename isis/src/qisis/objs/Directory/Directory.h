@@ -284,7 +284,7 @@ namespace Isis {
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
-
+      
     private:
       /**
        * @author 2012-08-?? Steven Lambright

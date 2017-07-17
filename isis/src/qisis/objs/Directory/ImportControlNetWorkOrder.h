@@ -49,6 +49,8 @@ namespace Isis {
    *                           WorkOrder redesign. Fixes #4716.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so when undone, the imported
    *                           cnet(s) are removed from the project tree. Fixes #4597. 
+   *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
+   *                           in the context menu. Fixes #4968.
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -59,6 +61,7 @@ namespace Isis {
 
       virtual ImportControlNetWorkOrder *clone() const;
       
+      virtual bool isExecutable(ProjectItem *item);
       bool setupExecution();
       void execute();
 
