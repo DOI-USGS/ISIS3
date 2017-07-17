@@ -1176,6 +1176,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the time cache values.
+   */
+  std::vector<double> SpiceRotation::timeCache() const {
+    return (p_cacheTime);
+  }
+
+
   /** 
    * Return the camera angles at the center time of the observation
    *

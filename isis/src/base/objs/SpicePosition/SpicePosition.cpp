@@ -894,6 +894,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the time cache values.
+   */
+  std::vector<double> SpicePosition::timeCache() const {
+    return (p_cacheTime);
+  }
+
+
   /** 
    * Set the coefficients of a polynomial fit to each of the components (X, Y, Z)
    * of the position vector for the time period covered by the cache,

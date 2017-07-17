@@ -348,6 +348,8 @@ namespace Isis {
       void CacheLabel(Table &table);
       void PolynomialLabel(Table &table);
 
+      std::vector<double> timeCache() const;
+
       void LoadTimeCache();
 
       std::vector<double> Angles(int axis3, int axis2, int axis1);

@@ -240,6 +240,8 @@ namespace Isis {
 
       Table Cache(const QString &tableName);
 
+      std::vector<double> timeCache() const;
+
       //! Is this position cached
       bool IsCached() const {
         return (p_cache.size() > 0);

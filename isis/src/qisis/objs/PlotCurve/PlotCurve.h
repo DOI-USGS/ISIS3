@@ -89,7 +89,15 @@ namespace Isis {
          * The data is a wavelength. This is usually associated with a band and
          *   comes from the band bin group.
          */
-        Wavelength
+        Wavelength,
+        /**
+         * The data is ephemeris time.
+         */
+        EphemerisTime,
+        /**
+         * The data is in radians.
+         */
+        Radians
       };
 
       PlotCurve(Units xUnits, Units yUnits);
