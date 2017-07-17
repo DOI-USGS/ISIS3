@@ -8,8 +8,8 @@ namespace Isis {
   /**
    * Constructor, creates a new EphemeridesPlotWindow
    *
-   * @param title
-   * @param parent
+   * @param title The title of the plot window
+   * @param parent The parent widget of the plot
    */
   EphemeridesPlotWindow::EphemeridesPlotWindow(QString title, QWidget *parent) :
                        PlotWindow(title, PlotCurve::EphemerisTime,
@@ -31,8 +31,7 @@ namespace Isis {
   /**
    * Add a rotation curve to the plot.
    *
-   *
-   * @param curve
+   * @param curve The curve to be plotted.
    */
   void EphemeridesPlotWindow::addRotation(CubePlotCurve *curve) {
     curve->attach(plot());

@@ -27,7 +27,7 @@ namespace Isis {
   /**
    * Constructor creates a new EphemeridesPlotTool object.
    *
-   * @param parent
+   * @param parent The parent widget for the tool
    */
   EphemeridesPlotTool::EphemeridesPlotTool(QWidget *parent) : AbstractPlotTool(parent) {
     m_action = new QAction(this);
@@ -38,9 +38,8 @@ namespace Isis {
 
   /**
    * This method is called when the tool is activated by the
-   *   parent, or when the plot mode is changed. It's used to
-   *   activate or change the rubber banding mode to be either
-   *   rectangle or line, depending on the current plot type.
+   * parent. It enables the rubber band tool which is used to select the cube
+   * to view data from.
    */
   void EphemeridesPlotTool::enableRubberBandTool() {
     rubberBandTool()->setDrawActiveViewportOnly(true);
@@ -48,11 +47,11 @@ namespace Isis {
 
 
   /**
-   * This method adds the histogram tool to the tool pad.
+   * This method adds the ephemerides tool to the tool pad.
    *
-   * @param toolpad
+   * @param toolpad The tool pad to add this tool to
    *
-   * @return QAction*
+   * @return QAction* The action that activates the tool
    */
   QAction *EphemeridesPlotTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
@@ -81,8 +80,9 @@ namespace Isis {
 
 
   /**
-   * This method creates the default histogram plot window.
-   *
+   * This method creates the default plot window.
+   * 
+   * @return @b PlotWindow* A pointer to the created window.
    */
   PlotWindow *EphemeridesPlotTool::createWindow() {
     PlotWindow *window = new EphemeridesPlotWindow(
@@ -96,7 +96,6 @@ namespace Isis {
    * Called when the user has finished drawing with the rubber
    * band.  ChangePlot is called to plot the data within the
    * rubber band.
-   *
    */
   void EphemeridesPlotTool::rubberBandComplete() {
     if (selectedWindow()) {
@@ -162,10 +161,7 @@ namespace Isis {
 
   /**
    * This method sets up the names, line style, and color  of the
-   * all the plot items that will be used in this class. This
-   * method also fills the p_colors QList with the colors that
-   * will be used when the user copies and pastes (special) into
-   * another plot window.
+   * all the plot items that will be used in this class.
    */
   void EphemeridesPlotTool::validatePlotCurves() {
       EphemeridesPlotWindow *targetWindow = qobject_cast<EphemeridesPlotWindow *>(

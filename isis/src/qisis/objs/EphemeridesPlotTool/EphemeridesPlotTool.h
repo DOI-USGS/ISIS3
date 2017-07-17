@@ -16,27 +16,17 @@ namespace Isis {
   class MdiCubeViewport;
 
   /**
-  * @brief Tool for histograms
+  * Tool for visualizing cube ephemerides, instrument position and orientation.
+  * This tool plots the ephemeris data associated with the cube. The
+  * ephemerides may come from SPICE, cached values, bundle adjusted values, or
+  * other sources.
   *
   * @ingroup Visualization Tools
   *
-  * @author ????-??-?? Noah Hilt
+  * @author 2017-07-17 Jesse Mapel
   *
   * @internal
-  *  @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
-  *  @history 2012-01-18 Steven Lambright and Jai Rideout - Fixed issue where
-  *                          histograms were not created correctly for any bands
-  *                          but band 1. Added check for RGB mode. Fixes #668.
-  *  @history 2012-01-20 Steven Lambright - Completed documentation.
-  *  @history 2013-12-11 Janet Barrett - Fixed refreshPlot method so that it 
-  *                          checks the start sample and end sample for the
-  *                          plot and starts the plot at the minimum of the 
-  *                          2 samples. Fixes #1760.
-  *  @history 2016-04-28 Tracie Sucharski - Removed qwt refernces to merge with
-  *                          Qt5 library changes.
-  *  @history 2016-07-06 Adam Paquette - Fixed the histogram tool to analyze the
-  *                          appropriate pixels selected when using box banding
-  *                          
+  *  @history 2017-07-17 Jesse Mapel - Original Version
   */
   class EphemeridesPlotTool : public AbstractPlotTool {
       Q_OBJECT
@@ -74,8 +64,7 @@ namespace Isis {
       QPointer<CubePlotCurve> m_raCurve; /**! Plot curve for right ascension data. */
       QPointer<CubePlotCurve> m_decCurve; /**! Plot curve for declination data. */
       QPointer<CubePlotCurve> m_twiCurve; /**! Plot curve for twist data. */
-      //! This is the action that activates this tool
-      QAction *m_action;
+      QAction *m_action; /**! The action that activates this tool. */
   };
 };
 

@@ -171,26 +171,48 @@ namespace Isis {
    */
   void PiecewisePolynomial::refitPolynomials(int segments, int samples) {
 
+    if (segments < 1) {
+      QString msg = "Cannot refit polynomials over less than one segment.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     // Generate sample data.
     std::vector<double> sampleValues;
     std::vector< std::vector<double> > sampleData;
     double firstSample = m_knots.front();
     double lastSample = m_knots.back();
 
-    // If fitting over the zero polynomial, just take two samples
+    // If the knots are set to -DBL_MAX and DBL_MAX, then convert to
+    // values that we can do math with
+    if (firstSample == -DBL_MAX) {
+      firstSample = -100;
+    }
+    // If the knots are set to -DBL_MAX and DBL_MAX, then convert to
+    // values that we can do math with
+    if (lastSample == DBL_MAX) {
+      lastSample = 100;
+    }
+
+    // If fitting over the zero polynomial, spread out the knots and
+    // reinitialize the zero polynomials
     if ( isZero() ) {
-      sampleValues.push_back(firstSample);
-      sampleData.push_back(evaluate(firstSample));
-      sampleValues.push_back(lastSample);
-      sampleData.push_back(evaluate(lastSample));
+      std::vector<double> zeroKnots;
+      double knotRate = ( lastSample - firstSample ) / segments;
+      for (int i = 0; i < segments + 1; i++) {
+        zeroKnots.push_back(firstSample + knotRate * i);
+      }
+      setKnots(zeroKnots);
+      return;
     }
 
     // Otherwise sample as normal
-    double sampleRate = (lastSample - firstSample) / samples;
-    for (int i = 0; i < samples; i++) {
-      double currentValue = firstSample + sampleRate * i;
-      sampleValues.push_back(currentValue);
-      sampleData.push_back(evaluate(currentValue));
+    else {
+      double sampleRate = (lastSample - firstSample) / samples;
+      for (int i = 0; i < samples; i++) {
+        double currentValue = firstSample + sampleRate * i;
+        sampleValues.push_back(currentValue);
+        sampleData.push_back(evaluate(currentValue));
+      }
     }
 
     // Fit over the sample data.
@@ -592,7 +614,8 @@ namespace Isis {
   void PiecewisePolynomial::computePolynomials(const std::vector<double> &values,
                                                const std::vector< std::vector<double> > &data) {
 
-    /** Create the LeastSquares object to find the coefficients
+    /** 
+    Create the LeastSquares object to find the coefficients
     The coefficients are ordered based on the following:
 
     All of the coefficients for each segment are adjacent
@@ -847,8 +870,10 @@ namespace Isis {
 
     //Reinitialize the polynomials
     std::vector<PolynomialUnivariate> coordinateVector;
+    PolynomialUnivariate zeroPoly(degree);
+    zeroPoly.SetCoefficients( std::vector<double>(degree + 1, 0.0) );
     for (int i = 0; i < dimensions(); i++) {
-      coordinateVector.push_back( PolynomialUnivariate(degree) );
+      coordinateVector.push_back( zeroPoly );
     }
     m_polynomials.clear();
     for (int i = 0; i < segments(); i++) {

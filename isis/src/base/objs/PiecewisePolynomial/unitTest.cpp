@@ -21,6 +21,10 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for PiecewisePolynomial" << endl << endl;
 
+  cout << "Test default constructor" << endl << endl;
+  PiecewisePolynomial defaultPoly;
+  outputPolynomial(defaultPoly);
+
   cout << "Create 1D PiecewisePolynomial:" << endl << endl;
   PiecewisePolynomial testPoly(-5, 5, 2, 1);
   outputPolynomial(testPoly);
@@ -68,6 +72,39 @@ int main(int argc, char *argv[]) {
 
   cout << endl;
   output3DResiduals(times3D, pointPoly);
+
+  cout << endl << "Test copy constructor" << endl;
+  PiecewisePolynomial copyPoly(pointPoly);
+  outputPolynomial(copyPoly);
+
+  cout << endl << "Test assignment operator" << endl;
+  copyPoly = test3dPoly;
+  outputPolynomial(copyPoly);
+
+  cout << endl << "Test derivatives" << endl;
+  std::vector<double> test3dDerivatives = test3dPoly.derivativeVariable(0.0);
+  cout << "Derivatives at 0.0:" << endl;
+  cout << "  " << toString(test3dDerivatives[0]) << endl;
+  cout << "  " << toString(test3dDerivatives[1]) << endl;
+  cout << "  " << toString(test3dDerivatives[2]) << endl;
+
+  cout << endl << "Test segment index accessor" << endl;
+  cout << "Segment index for time -10.0: " << toString(test3dPoly.segmentIndex(-10.0)) << endl;
+  cout << "Segment index for time -1.0: " << toString(test3dPoly.segmentIndex(-1.0)) << endl;
+  cout << "Segment index for time 3.0: " << toString(test3dPoly.segmentIndex(3.0)) << endl;
+
+  cout << endl << "Test refitting polynomials" << endl;
+  cout << "Refit 3 segment, 3d polynomial to 5 segments." << endl;
+  copyPoly.refitPolynomials(5);
+  outputPolynomial(copyPoly);
+
+  cout << endl << "Refit 3d zero polynomial to 3 segments." << endl;
+  defaultPoly.refitPolynomials(3);
+  outputPolynomial(defaultPoly);
+
+  cout << endl << "Test changing the polynomials degree" << endl;
+  defaultPoly.setDegree(4);
+  outputPolynomial(defaultPoly);
 
   cout << endl << "Test error throws" << endl << endl;
 
@@ -136,6 +173,15 @@ int main(int argc, char *argv[]) {
     }
     PiecewisePolynomial badPoly(-5, 5, 0, 2);
     badPoly.fitPolynomials(badTimes, badPoints, 1);
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
+  cout << endl << "Polynomial refitting errors:" << endl;
+
+  try {
+    copyPoly.refitPolynomials(-3);
   }
   catch(IException &e) {
     e.print();

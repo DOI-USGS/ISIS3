@@ -8,7 +8,10 @@ class QDockWidget;
 namespace Isis {
 
   /**
-   * @author ????-??-?? Unknown
+   * A plot window to display ephemerides, position and rotation data, from a
+   * cube. This window is expected to be used by the EphemeridesPlotTool class.
+   * 
+   * @author 2017-07-17 Jesse Mapel
    *
    * @internal
    */
