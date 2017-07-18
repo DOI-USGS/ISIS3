@@ -73,7 +73,7 @@ namespace Isis {
 
   /**
    * @description Set up the execution.
-   *  
+   *
    * @return bool True if parent WordOrder can set up the execution.
    */
   bool RemoveImagesWorkOrder::setupExecution() {
@@ -85,27 +85,31 @@ namespace Isis {
 
 
   /**
-   * @description Remove an item from the project directory.
+   * @description Remove any selected items from the project directory.
    */
   void RemoveImagesWorkOrder::execute() {
-    qDebug()<<"RemoveImagesWorkOrder::execute  project()->directory()->model() = "<<project()->directory()->model();
-    ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    project()->directory()->model()->removeItem(currentItem);
-//  project()->removeImages(imageList());
+  //  qDebug()<<"RemoveImagesWorkOrder::execute  project()->directory()->model() = "<<project()->directory()->model();
+    QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
+    ImageList *images = project()->activeImageList();
+
+    foreach(ProjectItem *currentItem, selectedItems) {
+      Image *image = currentItem->image();
+      images->removeOne(image);
+    }
+    project()->directory()->model()->removeItems(selectedItems);
+
   }
 
 
   /**
    * @description This method returns false because this WorkOrder is not undoable.
-   * 
+   *
    * @see WorkOrder::isUndoable()
-   * 
+   *
    * @return bool Returns false because this WorkOrder is not undoable.
    */
   bool RemoveImagesWorkOrder::isUndoable() {
-    
+
     return false;
   }
 }
-
-
