@@ -613,13 +613,9 @@ namespace Isis {
    * @return @b (Footprint2DView*) A pointer to the Footprint2DView to display.
    */
   Footprint2DView *Directory::addFootprint2DView() {
-//  qDebug()<<"Directory::addFootprint2DView  this = "<<this;
     Footprint2DView *result = new Footprint2DView(this);
-//  qDebug()<<"Directory::addFootprint2DView internalModel after constructor = "<<result->internalModel();
-//  qDebug()<<"                              m_projectItemModel = "<<m_projectItemModel;
-    //  Set source model on Proxy
+
     result->setModel(m_projectItemModel);
-//  qDebug()<<"                              internalModel after setModel = "<<result->internalModel();
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
 
@@ -645,6 +641,14 @@ namespace Isis {
     //  I have one signal, controlChanged?
     connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
 
+    if (!project()->activeControl()) {
+      QList<QAction *> toolbar = result->toolPadActions();
+      QAction* cnetButton = toolbar[3];
+      cnetButton->setEnabled(false);
+      connect (project(), SIGNAL(activeControlSet(bool)),
+              cnetButton, SLOT(setEnabled(bool)));
+
+    }
     return result;
 
     /*
@@ -863,7 +867,7 @@ namespace Isis {
     RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
     project()->addToProject(workOrder);
   }
-  
+
 
   /**
    * @brief Gets the ProjectItemModel for this directory.

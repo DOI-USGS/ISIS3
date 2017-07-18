@@ -1192,7 +1192,7 @@ namespace Isis {
    * This can be used to check whenever there are control nets and images available
    * in the project. This is used for enabling the jigsaw work order on the Project menu when
    * a control net and image are available / loaded in the project.
-   * 
+   *
    * @see Project::Project(Directory &directory, QObject *parent)
    * @see Directory::initializeActions()
    */
@@ -1236,7 +1236,7 @@ namespace Isis {
     }
 
     activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
-    emit activeControlSet();
+    emit activeControlSet(true);
   }
 
 

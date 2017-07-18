@@ -142,9 +142,10 @@ namespace Isis {
    *                           doing anything.  However, I'm leaving the method for now, because
    *                           once the views are connected, we will probably need to cleanup the
    *                           connections when the view is closed.  Fixes #4959.
-   *  @history 2017-07-14 Cole Neubauer - Added a signal for IpceMainWindow to listen to to be
-   *                           available to bring the Warning tab to the top when a new warning
-   *                           is added Fixes #5041 
+   *   @history 2017-07-17 Cole Neubauer - Disabled CNet tool when a Footprint2DView is added if a
+   *                           control net is not active and slotted it to reenable when Project
+   *                           emits activeControlSet(bool).
+   *                           Fixes #5046
    */
   class Directory : public QObject {
     Q_OBJECT
