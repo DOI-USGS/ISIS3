@@ -66,7 +66,7 @@ namespace Isis {
    *                          updated for Qt5, comment call to saveState for window which caused
    *                          errors.  TODO:  Determine problem with saveState call.
    *  @history 2016-11-09  Tyler Wilson - Move a segment of code in the constructor from the beginning
-   *                          to the end.  This code loads a project from the command line instead of the 
+   *                          to the end.  This code loads a project from the command line instead of the
    *                          GUI, and it wasn't outputting warnings/errors to the warnings/error tab
    *                          when the project was loaded because it was being called before the GUI
    *                          was created.  Fixes #4488.  References #4526, ##4487.
@@ -87,6 +87,9 @@ namespace Isis {
    *                           (which indicates why it is disabled by default). Fixes #4749.
    *   @history 2017-06-22 Tracie Sucharski - Renamed from CNetSuiteMainWindow when application was
    *                           renamed to ipce from cnetsuite.
+   *  @history 2017-07-14 Cole Neubauer - Added private slot raiseWarningTab to be able to raise
+   *                           the warning tab when a new warning happens.
+   *                           Fixes #5041 
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -117,6 +120,7 @@ namespace Isis {
       void detachActiveView();
       void reattachView();
 
+      void raiseWarningTab();
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
@@ -134,7 +138,7 @@ namespace Isis {
       QPointer<Directory> m_directory;
 
       QDockWidget *m_projectDock;
-
+      QDockWidget *m_warningsDock;
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program
        *   at once. For now, the GUI consumes 1 thread and QtConcurrent

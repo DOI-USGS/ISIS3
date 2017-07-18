@@ -839,9 +839,9 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-   
+
     //  The model emits this signal when the user double-clicks on the project name, the parent
-    //  node located on the ProjectTreeView. 
+    //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
 
@@ -849,11 +849,11 @@ namespace Isis {
   }
 
 
-/** 
- * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
- * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+/**
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A
  * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
- *  
+ *
  * @param QString projectName New project name
  */
   void Directory::initiateRenameProjectWorkOrder(QString projectName) {
@@ -864,7 +864,7 @@ namespace Isis {
     project()->addToProject(workOrder);
   }
   
-  
+
   /**
    * @brief Gets the ProjectItemModel for this directory.
    * @return @b (ProjectItemModel *) Returns a pointer to the ProjectItemModel.
@@ -1168,6 +1168,7 @@ namespace Isis {
    */
   void Directory::showWarning(QString text) {
     m_warningTreeWidget->showWarning(text);
+    emit newWarning();
   }
 
 

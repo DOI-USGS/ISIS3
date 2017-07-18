@@ -142,6 +142,9 @@ namespace Isis {
    *                           doing anything.  However, I'm leaving the method for now, because
    *                           once the views are connected, we will probably need to cleanup the
    *                           connections when the view is closed.  Fixes #4959.
+   *  @history 2017-07-14 Cole Neubauer - Added a signal for IpceMainWindow to listen to to be
+   *                           available to bring the Warning tab to the top when a new warning
+   *                           is added Fixes #5041 
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -251,6 +254,7 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:
+      void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 
       void controlPointAdded(QString newPointId);

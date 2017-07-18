@@ -83,6 +83,8 @@ namespace Isis {
               this, SLOT( addView(QWidget *) ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
+      connect(m_directory, SIGNAL( newWarning() ),
+              this, SLOT( raiseWarningTab() ) );
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -110,16 +112,16 @@ namespace Isis {
 
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
-    QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
-    warningsDock->setObjectName("warningsDock");
-    warningsDock->setFeatures(QDockWidget::DockWidgetClosable |
+    m_warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
+    m_warningsDock->setObjectName("m_warningsDock");
+    m_warningsDock->setFeatures(QDockWidget::DockWidgetClosable |
                          QDockWidget::DockWidgetMovable |
                          QDockWidget::DockWidgetFloatable);
-    warningsDock->setWhatsThis(tr("This shows notices and warnings from all operations "
+    m_warningsDock->setWhatsThis(tr("This shows notices and warnings from all operations "
                           "on the current project."));
-    warningsDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    m_directory->setWarningContainer(warningsDock);
-    addDockWidget(Qt::BottomDockWidgetArea, warningsDock);
+    m_warningsDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+    m_directory->setWarningContainer(m_warningsDock);
+    addDockWidget(Qt::BottomDockWidgetArea, m_warningsDock);
 
     QDockWidget *historyDock = new QDockWidget("History", this, Qt::SubWindow);
     historyDock->setObjectName("historyDock");
@@ -130,7 +132,7 @@ namespace Isis {
     historyDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     addDockWidget(Qt::BottomDockWidgetArea, historyDock);
     m_directory->setHistoryContainer(historyDock);
-    tabifyDockWidget(warningsDock, historyDock);
+    tabifyDockWidget(m_warningsDock, historyDock);
 
     QDockWidget *progressDock = new QDockWidget("Progress", this, Qt::SubWindow);
     progressDock->setObjectName("progressDock");
@@ -142,7 +144,7 @@ namespace Isis {
     addDockWidget(Qt::BottomDockWidgetArea, progressDock);
     tabifyDockWidget(historyDock, progressDock);
 
-    warningsDock->raise();
+    m_warningsDock->raise();
 
     // Read settings from the default project, "Project"
     readSettings(m_directory->project());
@@ -879,6 +881,13 @@ namespace Isis {
     viewWindow->deleteLater();
 
     addView(view);
+  }
+
+/**
+ * Raises the warningWidget to the front of the tabs. Connected to warning signal from directory.
+ */
+  void IpceMainWindow::raiseWarningTab() {
+    m_warningsDock->raise();
   }
 
 }
