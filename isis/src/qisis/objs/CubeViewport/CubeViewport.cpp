@@ -291,6 +291,7 @@ namespace Isis {
     if(completed) {
       realProgress = 100;
       p_progressTimer->stop();
+      emit progressComplete();
       emit screenPixelsChanged();
     }
     else if(realProgress == 100) {
@@ -1119,7 +1120,7 @@ namespace Isis {
     if(p_blueBuffer && p_blueBuffer->working()){
       return;
     }
-
+    
     viewport()->repaint(rect);
   }
 
@@ -1937,7 +1938,6 @@ namespace Isis {
       }
     }
 
-
     if(p_camera) {
       p_camera->SetBand(band);
     }
@@ -1945,6 +1945,7 @@ namespace Isis {
     viewport()->repaint();
   }
 
+  
   void CubeViewport::forgetStretches() {
     for(int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
       if((*p_knownStretches)[stretch]) {

@@ -3,8 +3,13 @@
 #include <iostream>
 
 #include <QAction>
+#include <QList>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QPoint>
+#include <QRect>
 #include <QToolBar>
 
 #include "MdiCubeViewport.h"
@@ -115,15 +120,78 @@ namespace Isis {
    * @param ws
    */
   void WindowTool::addTo(Workspace *ws) {
+    p_mdiArea = ws->mdiArea();
     Tool::addTo(ws);
     connect(p_cascadeWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(cascadeSubWindows()));
-    connect(p_tileWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(tileSubWindows()));
+    connect(p_tileWindows, SIGNAL(triggered()), this, SLOT(tileViewports()));
     connect(p_prevWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(activatePreviousSubWindow()));
     connect(p_nextWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(activateNextSubWindow()));
     connect(p_closeWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeActiveSubWindow()));
     connect(p_closeAllWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeAllSubWindows()));
     connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
             this, SLOT(updateViewportCursor(MdiCubeViewport *)));
+  }
+
+
+  /**
+   * Helper function for determining the size of the viewports.
+   *
+   * @return Returns the size that the viewports should be.
+   * @internal
+   *  @history 2017-07-19 Tracie Sucharski - Original version.
+   */
+  int WindowTool::viewportSize() {
+    int numViewports = p_mdiArea->subWindowList().size();
+
+    double mdiWidth = p_mdiArea->width();
+    double mdiHeight = p_mdiArea->height();
+
+    double px = ceil(sqrt(numViewports*mdiWidth/mdiHeight));
+    double sx, sy;
+    if (floor(px*mdiHeight/mdiWidth)*px < numViewports) {
+      sx = mdiHeight/ceil(px*mdiHeight/mdiWidth);
+    }
+    else {
+      sx = mdiWidth/px;
+    }
+
+    double py = ceil(sqrt(numViewports * mdiHeight / mdiWidth));
+    if (floor(py*mdiWidth/mdiHeight)*py < numViewports) {
+      sy = mdiWidth/ceil(mdiWidth*py/mdiHeight);
+    }
+    else {
+      sy = mdiHeight/py;
+    }
+    
+    return std::max(sx,sy); 
+  }
+
+  
+  /**
+   * Tiles the cube viewports over the Cube DN View.
+   *
+   * @internal
+   *  @history 2017-07-19 Marjorie Hahn and Tracie Sucharski - Original version.
+   */
+  void WindowTool::tileViewports() {
+    int vpSize = viewportSize();
+
+    QPoint position(0, 0);
+    
+    QList<QMdiSubWindow *> windowList = p_mdiArea->subWindowList();
+    
+    for (int i = windowList.size() - 1; i >= 0; i--) {
+      QMdiSubWindow *window = windowList[i];
+      QRect rect(0, 0, vpSize, vpSize);
+      window->setGeometry(rect);
+      window->move(position);
+     
+      position.setX(position.x() + window->width());
+      if (position.x() + window->width() > p_mdiArea->width()) {
+        position.setX(0);
+        position.setY(position.y() + window->height());
+      }
+    }  
   }
 
 
@@ -193,11 +261,6 @@ namespace Isis {
   }
 
 
-  void newViewportOpened(CubeViewport *cvp) {
-    
-  }
-
-
   /**
    * Links all viewport windows in the workspace.
    *
@@ -224,23 +287,26 @@ namespace Isis {
   }
 
   /**
-   * toggles the cursor from an arrow to a crosshair.
+   * Toggles the cursor from an arrow to a crosshair.
    *
    */
   void WindowTool::changeCursor() {
-    if(p_changeCursor->text() == "Change cursor to arrow.") {
+    if (p_changeCursor->text() == "Change cursor to arrow.") {
       p_changeCursor->setText("Change cursor to crosshair.");
     }
     else {
       p_changeCursor->setText("Change cursor to arrow.");
     }
 
-    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
       updateViewportCursor(cubeViewportList()->at(i));
     }
   }
 
-
+  /**
+   * Updates the cursor over the viewport.
+   *
+   */
   void WindowTool::updateViewportCursor(MdiCubeViewport *cvp) {
     if (p_changeCursor->text() == "Change cursor to crosshair." &&
         cvp->viewport()->cursor().shape() != Qt::ArrowCursor) {

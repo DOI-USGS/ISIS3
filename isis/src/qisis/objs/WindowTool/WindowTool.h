@@ -4,6 +4,7 @@
 #include "Tool.h"
 
 class QAction;
+class QMdiArea;
 
 namespace Isis {
   class MdiCubeViewport;
@@ -26,7 +27,9 @@ namespace Isis {
       void addTo(Workspace *ws);
       void addToPermanent(QToolBar *toolbar);
 
-      //! Returns the menu name.
+      /** 
+       * @return the menu name
+       */
       QString menuName() const {
         return "&Window";
       }
@@ -42,10 +45,13 @@ namespace Isis {
       void unlinkWindows();
       void resizeWindows();
       void updateViewportCursor(MdiCubeViewport *);
+      void tileViewports();
 
     private:
+      int viewportSize();
 
     private:
+      QMdiArea *p_mdiArea;         //!< area where viewports are displayed
       QAction *p_cascadeWindows;   //!< cascade windows action
       QAction *p_tileWindows;      //!< tile windows action
       QAction *p_resizeWindows;    //!< resize windows action
