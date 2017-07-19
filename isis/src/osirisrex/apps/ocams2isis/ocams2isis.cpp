@@ -40,7 +40,7 @@ void IsisMain() {
 
   // Get the FITS label
   Pvl fitsLabel;
-  fitsLabel.addGroup(importFits.fitsLabel(0));
+  fitsLabel.addGroup(importFits.fitsImageLabel(0));
 
   // Create an Instrument group
   FileName insTransFile(transDir + "ocamsInstrument_fit.trn");
@@ -70,7 +70,7 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += importFits.fitsLabel(0);
+  pvl += importFits.fitsImageLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 

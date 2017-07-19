@@ -40,7 +40,6 @@ using namespace std;
 
 namespace Isis {
 
-  //! Constructs an empty FileName object.
   FileName::FileName() {
     m_d = new Data;
   }
@@ -62,7 +61,6 @@ namespace Isis {
   }
 
 
-  //! Destroys the FileName object.
   FileName::~FileName() {
   }
 
@@ -72,19 +70,6 @@ namespace Isis {
   }
 
 
-  /**
-   * @brief Returns the path.
-   * @returns the path portion of a filename. For *nix operating
-   * systems this includes everything upto but not including the
-   * last slash "/". For file names created without any slashes
-   * the current working directory will be returned.
-   * <pre>
-   *   for a full file specification of:
-   *   "/home/me/img/picture.jpg"
-   *   path() gives:
-   *   "/home/me/img"
-   * </pre>
-   */
   QString FileName::path() const {
     return QFileInfo(expanded()).path();
   }
@@ -331,12 +316,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Clears the current contents of the FileName object and reinitializes it with
-   * the argument.
-   *
-   * @param file File name to replace the current contents of the object.
-   */
   FileName &FileName::operator=(const FileName &rhs) {
     m_d = rhs.m_d;
     return *this;
@@ -362,7 +341,6 @@ namespace Isis {
 
     return equal;
   }
-
 
 
   bool FileName::operator!=(const FileName &rhs) {
@@ -464,10 +442,6 @@ namespace Isis {
   }
 
 
-  /**
-   * This verifies the class invariant when using versioning - that the FileName is in an acceptable
-   *     state to find file version numbers.
-   */
   void FileName::validateVersioningState() const {
     QString file = QFileInfo(expanded()).fileName();
 
@@ -488,7 +462,7 @@ namespace Isis {
       fileDatePattern.replace(QRegExp("\\{\\}"), "");
 
       fileDatePattern = "'" + fileDatePattern.replace(QRegExp("[{}]"), "'") + "'";
-   
+
       QString dated = QDate::currentDate().toString(fileDatePattern);
       if (file.contains("'")) {
         throw IException(IException::Unknown,
@@ -663,7 +637,6 @@ namespace Isis {
   QString FileName::Data::expanded(bool includeAttributes) const {
     QString result = *m_expandedFileNameString;
 
-
     if (!includeAttributes) {
       int attributesPos = result.indexOf("+");
 
@@ -674,4 +647,3 @@ namespace Isis {
     return result;
   }
 }
-

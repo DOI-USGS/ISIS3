@@ -23,6 +23,9 @@
     <change name="Kristin Berry" date="2015-06-22">
        Updated to add the option to change pixels in the input image to Nulls when the corresponding pixel in the QUALITY fits extension is  equal to 1, 2, or 8.
     </change>
+    <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
+      Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
+    </change>
   </history>
 
   <seeAlso>

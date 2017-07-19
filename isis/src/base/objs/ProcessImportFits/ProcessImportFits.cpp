@@ -22,11 +22,11 @@
 
 #include "ProcessImportFits.h"
 
-#include <iostream>
-#include <math.h>
-
 #include <QDebug>
 #include <QString>
+
+#include <iostream>
+#include <math.h>
 #include <sstream>
 
 #include "IException.h"
@@ -45,7 +45,8 @@ namespace Isis {
    * Constructor for ProcessImportFits
    */
   ProcessImportFits::ProcessImportFits() {
-    m_fitsLabels = NULL;
+    m_fitsImageLabels = NULL;
+    m_extraFitsLabels = NULL;
     m_headerSizes = NULL;
     m_dataStarts = NULL;
   }
@@ -55,7 +56,8 @@ namespace Isis {
    * Destructor for ProcessImportFits
    */
   ProcessImportFits::~ProcessImportFits() {
-    delete m_fitsLabels;
+    delete m_fitsImageLabels;
+    delete m_extraFitsLabels;
     delete m_headerSizes;
     delete m_dataStarts;
     m_file.close();
@@ -63,24 +65,26 @@ namespace Isis {
 
 
   /**
-   * Extract all the FITS labels from the file. This includes the labels for the main and each
-   * extensions
+   * Extract all the FITS labels from the file. This includes the image labels for the main 
+   * and each extensions as well as any extras. 
    *
    */
   void ProcessImportFits::extractFitsLabels() {
 
-    m_fitsLabels = new QList< PvlGroup * >;
+    m_fitsImageLabels = new QList< PvlGroup * >;
+    m_extraFitsLabels = new QList< PvlGroup * >;
     m_headerSizes = new QList < int >;
     m_dataStarts = new QList < int >;
 
-    // Process each FITS label area. Storing each in its own PvlGroup
+    // Process each FITS label area, storing each in its own PvlGroup.
     char readBuf[81];
     IString line = "";
     unsigned int place;
 
-    // The main FITS label starts at the beginning of the file
-    // FITS extension labels start after the previous data and on a 2080 byte boundry
-    // Each FITS keyword in all lables is store in 80 bytes (space padded to 80 if necessary)
+    // The main FITS label starts at the beginning of the file.
+    // FITS extension labels start after the previous data and on a 2880 byte boundry
+    // Each FITS keyword in all lables is stored in 80 bytes (space padded to 80 if
+    // necessary).
 
     // Start at the beginning of the file for the main FITS label
     m_file.seekg(0, std::ios_base::beg);
@@ -96,13 +100,18 @@ namespace Isis {
       place = 80;
 
       // Process each fits label record (80 bytes) and place keyword, value pairs into PvlKeywords
-      // with any associated comments
+      // with any associated comments.
       while (line.substr(0, 3) != "END") {
 
         // Check for blank lines
         if (line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
           // Name of keyword
           PvlKeyword label(line.Token(" =").ToQt()); // Stop on spaces OR equal sign
+          if (QString::compare(label.name(), "OBJECT", Qt::CaseInsensitive) == 0) {
+            label.setName("TARGET");
+            label.addComment("NOTE: This keyword name was changed from 'OBJECT' in the original "
+                             "fit header file.");
+          }
           // Remove up to beginning of data
           line.TrimHead(" =");
           line.TrimTail(" ");
@@ -145,8 +154,8 @@ namespace Isis {
       }
 
       // Save off the PvlGroup and the number of records read from this label
-      m_fitsLabels->push_back(fitsLabel);
-      m_headerSizes->push_back((int)ceil(place / 2880.0));
+      m_fitsImageLabels->append(fitsLabel);
+      m_headerSizes->append((int)ceil(place / 2880.0));
 
       // The file pointer should be pointing at the end of the record that contained "END"
       // Move the file pointer past the padding after the "END" (i.e., points to start of data)
@@ -154,46 +163,63 @@ namespace Isis {
       jump = m_headerSizes->last() * 2880 - place;
       m_file.seekg(jump, std::ios_base::cur);
 
-      m_dataStarts->push_back(m_file.tellg());
+      m_dataStarts->append(m_file.tellg());
 
-      // NOTE: For now we only handle image data (i.e., keywords BITPIX & NAXIS & NAXISx must exist)
       // Does this look like a label for a FITS image? Stop after the first label that does not
       // because we don't know how to move the file pointer past a non-image data extension.
-      if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") &&
-          fitsLabel->hasKeyword("NAXIS1")) {
-
-        int bytesPerPixel = 0;
-        bytesPerPixel = (int)((*fitsLabel)["BITPIX"]);
-        bytesPerPixel = std::abs(bytesPerPixel);
-        bytesPerPixel /= 8;
-
-        unsigned int axis1 = 1;
-        axis1 = toInt((*fitsLabel)["NAXIS1"]);
-
-        unsigned int axis2 = 1;
-        if (fitsLabel->hasKeyword("NAXIS2")) {
-          axis2 = toInt((*fitsLabel)["NAXIS2"]);
+      if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS")) {
+        
+        // This section can only handle image data 
+        // (i.e., keywords BITPIX & NAXIS & NAXISx must exist).
+        if((int)fitsLabel->findKeyword("NAXIS") > 0) {
+          int bytesPerPixel = 0;
+          bytesPerPixel = (int)((*fitsLabel)["BITPIX"]);
+          bytesPerPixel = std::abs(bytesPerPixel);
+          bytesPerPixel /= 8;
+          
+          unsigned int axis1 = 1;
+          axis1 = toInt((*fitsLabel)["NAXIS1"]);
+          
+          unsigned int axis2 = 1;
+          if (fitsLabel->hasKeyword("NAXIS2")) {
+            axis2 = toInt((*fitsLabel)["NAXIS2"]);
+          }
+          
+          unsigned int axis3 = 1;
+          if (fitsLabel->hasKeyword("NAXIS3")) {
+            axis3 = toInt((*fitsLabel)["NAXIS3"]);
+          }
+          
+          jump = (int)(ceil(bytesPerPixel * axis1 * axis2 * axis3 / 2880.0) * 2880.0);
+          m_file.seekg(jump, std::ios_base::cur);
         }
+        else {
+          // Note: this will allow us to read extra label sections that have 0 axes,
+          // but has image-related info (so BITPIX and NAXIS keywords exist). This
+          // includes informational labels, as seen at the beginning of hayabusa2
+          // images in this case, there is NO DATA, so no jump should be needed to
+          // get to the next section.
+          PvlGroup *extraLabelGroup = m_fitsImageLabels->last();
+          extraLabelGroup->setName("FitsExtras");
+          m_extraFitsLabels->append(extraLabelGroup);
 
-        unsigned int axis3 = 1;
-        if (fitsLabel->hasKeyword("NAXIS3")) {
-          axis3 = toInt((*fitsLabel)["NAXIS3"]);
+          m_fitsImageLabels->removeLast();
+          m_headerSizes->removeLast();
+          m_dataStarts->removeLast();
         }
-
-        jump = (int)(ceil(bytesPerPixel * axis1 * axis2 * axis3 / 2880.0) * 2880.0);
-        m_file.seekg(jump, std::ios_base::cur);
       }
       // Do we have at least on header that looks like it has image data? If so, we can continue,
       // but ignore the rest of the file because we don't know how to skip over a non-image data.
-      else if (m_fitsLabels->size() > 1) {
-        m_fitsLabels->pop_back();
-        m_headerSizes->pop_back();
-        m_dataStarts->pop_back();
+      else if (m_fitsImageLabels->size() > 1) {
+        m_fitsImageLabels->removeLast();
+        m_headerSizes->removeLast();
+        m_dataStarts->removeLast();
         break;
       }
+
       else {
-        QString msg = QObject::tr("The FITS file does not contain a section header that looks "
-                                  "like it describes an image [%1]").arg(m_name.toString());
+        QString msg = QObject::tr("The FITS file does not contain a section header that appears "
+                                  "to describe an image [%1].").arg(m_name.toString());
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -201,38 +227,86 @@ namespace Isis {
 
 
   /**
-   * Supplies the requested FITS label
+   * Supplies the extra FITS label corresponding to the given index. Zero
+   * returns the first label in the FITS header that has no data. To access 
+   * image labels, call fitsImageLabel().
+   *  
+   * @see fitsImageLabel() 
    *
-   * @param labelNumber FITS label number. zero (0) is the first/main label
-   * @return PvlGroup version of a FITS label corrisponding to requested label number
+   * @param labelNumber The index to the extra FITS header label. 
+   *  
+   * @return PvlGroup version of a FITS label corresponding to requested label number.
    */
-  PvlGroup ProcessImportFits::fitsLabel(int labelNumber) const {
-
-    if (labelNumber >= m_fitsLabels->size()) {
+  PvlGroup ProcessImportFits::extraFitsLabel(int labelNumber) const {
+    if (labelNumber >= m_extraFitsLabels->size()) {
       QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
-                                "past the last image in this FITS file. Image count is [%3]").arg(labelNumber).
-                                arg(m_name.expanded()).arg(m_fitsLabels->size()-1);
+                                "past the last extra group found in this FITS file. "
+                                "Extra label count is [%3]").arg(labelNumber).
+                                arg(m_name.expanded()).arg(m_extraFitsLabels->size()-1);
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (!m_fitsLabels) {
-      QString msg = QObject::tr("The FITS label has not been initialized, call setFitsFile first");
+    if (!m_extraFitsLabels) {
+      QString msg = QObject::tr("The FITS label has not been initialized, "
+                                "call setFitsFile() first.");
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    else if (m_fitsLabels->size() < labelNumber) {
-      QString msg = QObject::tr("The requested FITS label number does not exist from file [%1]").arg(m_name.toString());
+    else if (m_extraFitsLabels->size() < labelNumber) {
+      QString msg = QObject::tr("The requested FITS label number "
+                                "was not found in file [%1].").arg(m_name.toString());
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return *(*m_fitsLabels)[labelNumber];
+    return *(*m_extraFitsLabels)[labelNumber];
   }
 
 
   /**
-   * Return a populated instrument group
+   * Supplies the FITS image label corresponding to the given index. Zero 
+   * returns the first label that precedes actual image data. Extra labels that 
+   * have no data can be accessed by calling extraFitsLabel(). 
+   *  
+   * @see extraFitsLabel() 
    *
-   * @param a FITS label after being converted to a PvlGroup
-   * @return an instrument group filled with keywords from the FITS label
+   * @param labelNumber The index to the FITS header image label. 
+   *  
+   * @return PvlGroup version of a FITS label corresponding to requested label number.
+   */
+  PvlGroup ProcessImportFits::fitsImageLabel(int labelNumber) const {
+
+    if (labelNumber >= m_fitsImageLabels->size()) {
+      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+                                "past the last image group found in this FITS file. "
+                                "Image label count is [%3]").arg(labelNumber).
+                                arg(m_name.expanded()).arg(m_fitsImageLabels->size()-1);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (!m_fitsImageLabels) {
+      QString msg = QObject::tr("The FITS label has not been initialized, "
+                                "call setFitsFile first.");
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    else if (m_fitsImageLabels->size() < labelNumber) {
+      QString msg = QObject::tr("The requested FITS label number "
+                                "was not found in file [%1].").arg(m_name.toString());
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return *(*m_fitsImageLabels)[labelNumber];
+  }
+
+
+  /**
+   * Return a PVL instrument group populated with expected default values. 
+   *  
+   * NOTE: These values are not appropriate for all missions. See specific 
+   * mission documentation to verify that these are the keywords needed.
+   *
+   * @param fitsLabel A PVL group containing keywords from the FITS label.
+   *  
+   * @return PvlGroup An ISIS cube instrument group filled with keywords from 
+   *                  the given FITS label.
    */
   PvlGroup ProcessImportFits::standardInstrumentGroup(PvlGroup fitsLabel) const {
 
@@ -243,8 +317,8 @@ namespace Isis {
     if (fitsLabel.hasKeyword("DATE-OBS")) {
       inst += PvlKeyword("StartTime", fitsLabel["DATE-OBS"][0]);
     }
-    if (fitsLabel.hasKeyword("OBJECT")) {
-      inst += PvlKeyword("Target", fitsLabel["OBJECT"][0]);
+    if (fitsLabel.hasKeyword("TARGET")) {
+      inst += PvlKeyword("Target", fitsLabel["TARGET"][0]);
     }
     if (fitsLabel.hasKeyword("INSTRUME")) {
       inst += PvlKeyword("InstrumentId", fitsLabel["INSTRUME"][0]);
@@ -258,9 +332,10 @@ namespace Isis {
 
 
   /**
-   * Opens a FITS file and reads the FITS labels
+   * Opens a FITS image file with header and reads the FITS labels. Note: 
+   * This method does not handle detached label files. 
    *
-   * @param fitsFile Name of the FITS file to open
+   * @param fitsFile Name of the FITS file to open.
    */
   void ProcessImportFits::setFitsFile(FileName fitsFile) {
     m_name = fitsFile;
@@ -270,7 +345,8 @@ namespace Isis {
     m_file.open(fitsFile.expanded().toLocal8Bit().constData(), std::ios::in  | std::ios::binary);
 
     if (!m_file.is_open()) {
-      QString msg = QObject::tr("Unable to open FITS formatted file [%1]").arg(fitsFile.toString());
+      QString msg = QObject::tr("Unable to open FITS formatted file [%1].")
+                               .arg(fitsFile.toString());
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -278,9 +354,10 @@ namespace Isis {
     extractFitsLabels();
 
     // Check to make sure it is a FITS file we can handle
-    PvlGroup label = fitsLabel(0);
-    if (label["SIMPLE"][0] == "F") {
-      QString msg = QObject::tr("The file [%1] can not be processed. It is an unsupported format.").
+    PvlGroup label = fitsImageLabel(0);
+    if (label.hasKeyword("SIMPLE") && label["SIMPLE"][0] == "F") {
+      QString msg = QObject::tr("The file [%1] cannot be processed. "
+                                "It is an unsupported format.").
           arg(fitsFile.toString());
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -290,29 +367,29 @@ namespace Isis {
 
 
   /**
-   * Sets the Process file structure parameters based on the FITS labels of choice. NOTE: The
-   * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before
-   * the output file is created.
+   * Sets the Process file structure parameters based on the given image label index. 
+   *  
+   * NOTE: The (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of 
+   * samples before the output file is created. 
    *
-   * @param labelNumber FITS label number. Zero indicates the first/main label, one indicates the
-   *                    first extension, etc...
+   * @param labelNumber FITS image index. Zero indicates the first image label, one indicates
+   *                    the first image extension, etc...
    *
    */
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
-    if (labelNumber >= m_fitsLabels->size()) {
+    if (labelNumber >= m_fitsImageLabels->size()) {
       QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
-                                "past the last image in this FITS file [%3]").arg(labelNumber).
-                                arg(InputFile()).arg(m_fitsLabels->size()-1);
+                                "past the last image in this FITS file [%3].").arg(labelNumber).
+                                arg(InputFile()).arg(m_fitsImageLabels->size()-1);
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    PvlGroup label = *(*m_fitsLabels)[labelNumber];
+    PvlGroup label = *(*m_fitsImageLabels)[labelNumber];
 
     // Set the ProcessImport to skip over all the previous images and their labels and the label for
     // this image. Don't save this info (think memory)
     SetFileHeaderBytes((*m_dataStarts)[labelNumber]);
-    //SaveFileHeader();
 
     // Find pixel type. NOTE: There are several unsupported possiblites
     Isis::PixelType type;
@@ -331,14 +408,14 @@ namespace Isis {
         type = Isis::Real;
         break;
       case 64:
-        msg = "Signed 64 bit integer (long) pixel type is not supported at this time";
+        msg = "Signed 64-bit integer (long) pixel type is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
       case -64:
         type = Isis::Double;
         break;
       default:
-        msg = "Unknown pixel type [" + label["BITPIX"][0] + "] is not supported for imported";
+        msg = "Unknown pixel type [" + label["BITPIX"][0] + "] is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
     }
@@ -354,38 +431,47 @@ namespace Isis {
     // the number of samples.
     if (Organization() == BSQ) {
       if (toInt(label["NAXIS"][0]) == 2) {
-        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+        SetDimensions(toInt(label["NAXIS1"][0])
+                      - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
                       toInt(label["NAXIS2"][0]), 1);
       }
       else if (toInt(label["NAXIS"][0]) == 3) {
-        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+        SetDimensions(toInt(label["NAXIS1"][0]) 
+                      - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
                       toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
       }
       else {
-        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        QString msg = "NAXIS count of [" 
+                      + label["NAXIS"][0]
+                      + "] is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (Organization() == BIL) {
       if (toInt(label["NAXIS"][0]) == 2) {
-        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+        SetDimensions(toInt(label["NAXIS1"][0]) 
+                      - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
                       1, toInt(label["NAXIS2"][0]));
       }
       else if (toInt(label["NAXIS"][0]) == 3) {
-        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+        SetDimensions(toInt(label["NAXIS1"][0]) 
+                      - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
                       toInt(label["NAXIS3"][0]), toInt(label["NAXIS2"][0]));
       }
       else {
-        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        QString msg = "NAXIS count of [" 
+                      + label["NAXIS"][0] 
+                      + "] is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (Organization() == BIP) {
-      QString msg = "BIP (Band interleaved by pixel) organization is not supported at this time.";
+      QString msg = "BIP (Band Interleaved by Pixel) "
+                    "organization is not supported for FITS imports.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
-      QString msg = "Unknown organization is not supported.";
+      QString msg = "Unknown organization is not supported for FITS imports.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

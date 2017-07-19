@@ -35,7 +35,7 @@ void IsisMain() {
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
 
   // Get the first label and make sure this is a New Horizons LORRI file
-  PvlGroup mainLabel = importFits.fitsLabel(0);
+  PvlGroup mainLabel = importFits.fitsImageLabel(0);
   if (mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lor") {
     QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LORRI FITS "
     "file. Input file label value for MISSION is [%2] and INSTRU is [%3]").
@@ -45,7 +45,7 @@ void IsisMain() {
 
   // Get the label of extension #1 and make sure this is a New Horizons LORRI Error image
   if (ui.WasEntered("ERROR")) {
-    PvlGroup errorLabel = importFits.fitsLabel(1);
+    PvlGroup errorLabel = importFits.fitsImageLabel(1);
     if (errorLabel["XTENSION"][0] != "IMAGE" || errorLabel["EXTNAME"][0] != "LORRI Error image") {
       QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Error image. "
           "Input file label value for EXTNAME is [%2] and XTENSION is [%3]").
@@ -56,7 +56,7 @@ void IsisMain() {
 
   // Get the label of extension #2 and make sure this is a New Horizons LORRI Quality image
   if (ui.WasEntered("QUALITY")) {
-    PvlGroup qualityLabel = importFits.fitsLabel(2);
+    PvlGroup qualityLabel = importFits.fitsImageLabel(2);
     if (qualityLabel["XTENSION"][0] != "IMAGE" || 
         qualityLabel["EXTNAME"][0] != "LORRI Quality flag image") {
       QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Quality image. "
@@ -79,7 +79,7 @@ void IsisMain() {
 
   // Get the FITS label
   Pvl fitsLabel;
-  fitsLabel.addGroup(importFits.fitsLabel(0));
+  fitsLabel.addGroup(importFits.fitsImageLabel(0));
 
   // Create an Instrument group
   FileName insTransFile(transDir + "lorriInstrument_fit.trn");
@@ -115,7 +115,7 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += importFits.fitsLabel(0);
+  pvl += importFits.fitsImageLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 
@@ -134,7 +134,7 @@ void IsisMain() {
 
     // Save the input FITS label in the Cube original labels
     Pvl pvlError;
-    pvlError += importFits.fitsLabel(1);
+    pvlError += importFits.fitsImageLabel(1);
     OriginalLabel originals(pvlError);
     outputError->write(originals);
 
@@ -154,7 +154,7 @@ void IsisMain() {
 
     // Save the input FITS label in the Cube original labels
     Pvl pvlError;
-    pvlError += importFits.fitsLabel(2);
+    pvlError += importFits.fitsImageLabel(2);
     OriginalLabel originals(pvlError);
     outputError->write(originals);
 

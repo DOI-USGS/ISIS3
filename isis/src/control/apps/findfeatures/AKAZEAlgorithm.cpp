@@ -114,7 +114,7 @@ namespace Isis {
    * @return @b true if the algorithm has a detector. 
    */
   bool AKAZEAlgorithm::hasDetector() const { 
-    return false; 
+    return true; 
   }
 
 
