@@ -17,6 +17,8 @@ namespace Isis {
    *                           CubeViewPort.  Fixed include issues
    *   @history 2011-09-20 Steven Lambright - Cursors should remain consistent
    *                           between all viewports now. Fixes #195.
+   *   @history 2017-07-19 Marjorie Hahn and Tracie Sucharski - Implemented new
+   *                           viewport tiling scheme.
    */
   class WindowTool : public Tool {
       Q_OBJECT
