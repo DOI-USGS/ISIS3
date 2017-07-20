@@ -740,7 +740,12 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList.
    */
   void ProjectItem::setImageList(ImageList *imageList) {
-    setText( imageList->name() );
+    if (imageList->name() != "") {
+      setText( imageList->name() );
+    }
+    else {
+      setText( imageList->path() );
+    }
     setIcon( QIcon(":pictures") );
     setData( QVariant::fromValue<ImageList *>(imageList) );
   }
@@ -774,7 +779,12 @@ namespace Isis {
    * @param[in] shapeList (ShapeList *) The ShapeList.
    */
   void ProjectItem::setShapeList(ShapeList *shapeList) {
-    setText( shapeList->name() );
+    if (shapeList->name() != "") {
+      setText( shapeList->name() );
+    }
+    else {
+      setText( shapeList->path() );
+    }
     setIcon( QIcon(":dem") );
     setData( QVariant::fromValue<ShapeList *>(shapeList) );
   }

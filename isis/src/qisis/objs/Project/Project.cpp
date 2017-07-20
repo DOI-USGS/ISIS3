@@ -1835,7 +1835,12 @@ namespace Isis {
               image, SLOT(updateFileName(Project *)));
 
       (*m_idToImageMap)[image->id()] = image;
-      createOrRetrieveImageList(images.name())->append(image);
+      if (images.name() != "") {
+        createOrRetrieveImageList(images.name())->append(image);
+      }
+      else {
+        createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
+      }
     }
 
     // We really can't have all of the cubes in memory before
@@ -2087,7 +2092,13 @@ namespace Isis {
               shape, SLOT(updateFileName(Project *)));
 
       (*m_idToShapeMap)[shape->id()] = shape;
-      createOrRetrieveShapeList(shapes.name())->append(shape);
+      if (shapes.name() != "") {
+        createOrRetrieveShapeList(shapes.name())->append(shape);
+      }
+      else {
+        createOrRetrieveShapeList(FileName(shapes[0]->fileName()).dir().dirName())->append(shape);
+      }
+
     }
 
     // We really can't have all of the cubes in memory before
