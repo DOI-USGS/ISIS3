@@ -2267,7 +2267,7 @@ namespace Isis {
   int SpiceRotation::polySegmentIndex(double et) const {
     // Scale the time
     double scaledTime;
-    scaledTime = (p_et - p_baseTime) / p_timeScale;
+    scaledTime = (et - p_baseTime) / p_timeScale;
     return m_polynomial.segmentIndex(scaledTime);
   }
 
