@@ -38,6 +38,8 @@ namespace Isis {
      *                           the measure table.  If the point was chosen from the measure table,
      *                           the serial number of the measure is also passed. This was added for
      *                           IPCE, for the interaction with other views.
+     *   @history 2017-07-18 Christopher Combs - Fixed bug in which trying to edit a selected row
+     *                           would cause a segfault from m_activeCell being null. Fixes #4958.
      */
     class TableViewContent : public QAbstractScrollArea {
         Q_OBJECT

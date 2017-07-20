@@ -1363,17 +1363,29 @@ namespace Isis {
 
     void TableViewContent::editControlPoint() {
 
-      AbstractTreeItem *item = m_activeCell->first;
-
       ControlPoint *cp;
       QString serialNumber;
-      if (item->getPointerType() == AbstractTreeItem::Point) {
-        cp = (ControlPoint *) (item->getPointer()); 
+      AbstractTreeItem *item;
+
+      //  A single cell is chosen
+      if (m_model->getSelectedItems().count() == 0) {
+        item = m_activeCell->first;
       }
+      // A row is chosen
+      else {
+        item = m_lastDirectlySelectedRow;
+      }
+
+      //  Item chosen from the Point table view
+      if (item->getPointerType() == AbstractTreeItem::Point) {
+        cp = (ControlPoint *) (item->getPointer());
+      }
+      //  Item chosen from the Measure table view
       else {
         cp = (ControlPoint *) (item->parent()->getPointer());
         serialNumber = item->getData("Image ID").toString();
       }
+
 //    qDebug()<<"activeCell cpid = "<<cp->GetId()<<"  sn = "<<serialNumber;
 
       emit editControlPoint(cp, serialNumber);
@@ -1405,7 +1417,7 @@ namespace Isis {
       // Always allow editing of point.  Should we check for editLock??
       QList<AbstractTreeItem *> selectedRows = m_model->getSelectedItems();
       if (selectedRows.count() <= 1 && QApplication::applicationName() != "cneteditor") {
-        contextMenu.addAction(m_editControlPointAct); 
+        contextMenu.addAction(m_editControlPointAct);
       }
 
       // If there is a row selection, show a context menu if the user clicked
@@ -1417,7 +1429,7 @@ namespace Isis {
       // Only show the context menu for cells if the user right-clicked on the
       // active cell.
       if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
-        if (rowsWithActiveColumnSelected->size() > 1) 
+        if (rowsWithActiveColumnSelected->size() > 1)
           contextMenu.addAction(m_applyToSelectionAct);
 
         contextMenu.addAction(m_applyToAllAct);
