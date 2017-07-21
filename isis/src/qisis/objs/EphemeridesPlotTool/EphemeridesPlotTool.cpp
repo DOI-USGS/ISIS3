@@ -313,11 +313,22 @@ namespace Isis {
     }
 
     // Collect the angles
+    double start1 = 0.; // value of 1st angle1 in cache
+    double start3 = 0.; // value of 1st angle3 in cache
     for (int i = 0; i < (int)angleTimes.size(); i++) {
       instRotation->SetEphemerisTime(angleTimes[i]);
       // This assumes that the euler angles are 3, 1, 3 which matches how
       // polynomials are fit to them.
       std::vector<double> angles = instRotation->Angles(3, 1, 3);
+      // Fix angles crossing over the domain bound
+      if (i == 0) {
+        start1 = angles[0];
+        start3 = angles[2];
+      }
+      else {
+        angles[0] = instRotation->WrapAngle(start1, angles[0]);
+        angles[2] = instRotation->WrapAngle(start3, angles[2]);
+      }
       raAngles.push_back(angles[0]);
       decAngles.push_back(angles[1]);
       twiAngles.push_back(angles[2]);

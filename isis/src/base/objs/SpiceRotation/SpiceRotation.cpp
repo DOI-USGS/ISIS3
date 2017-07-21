@@ -1676,7 +1676,7 @@ namespace Isis {
       std::vector<double> scaledTimes;
       std::vector< std::vector<double> > angles;
       double start1 = 0.; // value of 1st angle1 in cache
-      double start3 = 0.; // value of 1st angle1 in cache
+      double start3 = 0.; // value of 1st angle3 in cache
       for (int i = 0; i < (int)p_cacheTime.size(); i++) {
         // Compute the angles and save the scaled time
         SetEphemerisTime( p_cacheTime[i] );
@@ -1703,6 +1703,76 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
     return;
+  }
+
+
+  /**
+   * Create a test polynomial fit over the cached rotation data.
+   * The polynomial works in scaled time, so all inputs must be adjusted
+   * by subtracting the base time and then dividing by the time scale.
+   * 
+   * @return @b PiecewisePolynomial A piecewise polynomial fit over the cached
+   *                                rotation data based on the segment count
+   *                                and polynomial degree.
+   */
+  PiecewisePolynomial SpiceRotation::testFit() {
+    NaifStatus::CheckErrors();
+
+    // If rotation is already stored as a polynomial move on
+    if (p_source == PolyFunction) {
+      return m_polynomial;
+    }
+
+    // Adjust the degree of the polynomial to the available data
+    double fitDegree = p_degree;
+    if ( fitDegree > (int)p_cache.size() - 1 ) {
+      fitDegree = p_cache.size() - 1;
+    }
+
+    // Recompute the time scaling
+    ComputeBaseTime();
+
+    // Compute first and last times in scaled time.
+    //   If there is only one cached time, use the full extents.
+    //   Otherwise scale the first and last times.
+    double scaledFirstTime = -DBL_MAX;
+    double scaledLastTime = DBL_MAX;
+    if ( p_cacheTime.size() > 1) {
+      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
+    }
+
+    // Initialize the zero polynomial.
+    PiecewisePolynomial testPoly(scaledFirstTime, scaledLastTime, fitDegree, 3);
+
+    // Collect data to fit the polynomial over.
+    std::vector<double> scaledTimes;
+    std::vector< std::vector<double> > angles;
+    double start1 = 0.; // value of 1st angle1 in cache
+    double start3 = 0.; // value of 1st angle1 in cache
+    for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+      // Compute the angles and save the scaled time
+      SetEphemerisTime( p_cacheTime[i] );
+      scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+
+      // Fix angle domain cross over and then save the angles
+      std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
+      if (i == 0) {
+        start1 = currentAngles[0];
+        start3 = currentAngles[2];
+      }
+      else {
+        currentAngles[0] = WrapAngle(start1, currentAngles[0]);
+        currentAngles[2] = WrapAngle(start3, currentAngles[2]);
+      }
+      angles.push_back( currentAngles );
+    }
+
+    // Fit the polynomial.
+    testPoly.fitPolynomials(scaledTimes, angles, m_segments);
+
+    NaifStatus::CheckErrors();
+    return testPoly;
   }
 
 

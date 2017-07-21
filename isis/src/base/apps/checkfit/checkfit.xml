@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="checkfit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Test the quality of polynomial fits to cube exterior orientation
+  </brief>
+
+  <description>
+    This program takes a list of cubes and tests the quality of the polynomial
+    fit over instrument position and pointing values. This emulates how the
+    jigsaw app converts exterior orientation into polynomials prior to
+    adjustment. Poor quality fits can result in jigsaw failing.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>rotate</item>
+      <item>flip</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jesse Mapel" date="2017-07-17">
+      Original version
+    </change>
+
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cubes to check
+        </brief>
+        <description>
+          The list of input cubes that a test polynomial fit will be done for.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file that contains the quality of fits
+        </brief>
+        <description>
+          This text file will contain the quality of fit for each input cube
+          sorted from best fit to worst fit. The first column is the cube name,
+          the second column is the quality of the instrument position fit, and
+          the third column is the quality of the instrument pointing fit.
+        </description>
+        <filter>
+          *.txt, *.csv
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Fit options">
+      <parameter name="SPKDEGREE">
+        <type>integer</type>
+        <brief>
+          The degree of the instrument position polynomial fit.
+        </brief>
+        <description>
+          The degree of the instrument position polynomial fit.
+        </description>
+        <minimum inclusive="yes">0</minimum>
+      </parameter>
+
+      <parameter name="SPKSEGMENTS">
+        <type>integer</type>
+        <brief>
+          The number of polynomial segments used in the instrument position fit.
+        </brief>
+        <description>
+          The number of polynomial segments used in the instrument position fit.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="CKDEGREE">
+        <type>integer</type>
+        <brief>
+          The degree of the instrument pointing polynomial fit.
+        </brief>
+        <description>
+          The degree of the instrument pointing polynomial fit.
+        </description>
+        <minimum inclusive="yes">0</minimum>
+      </parameter>
+
+      <parameter name="CKSEGMENTS">
+        <type>integer</type>
+        <brief>
+          The number of polynomial segments used in the instrument pointing fit.
+        </brief>
+        <description>
+          The number of polynomial segments used in the instrument pointing fit.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>

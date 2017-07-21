@@ -961,10 +961,28 @@ namespace Isis {
       // Collect data to fit the polynomial over.
       std::vector<double> scaledTimes;
       std::vector< std::vector<double> > coordinates;
-      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
-        SetEphemerisTime( p_cacheTime[i] );
-        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
-        coordinates.push_back( Coordinate() );
+      // Compute how many points are required to fit the data
+      //   This over estimates because the continuity conditions reduce the
+      //   number of samples required.
+      int requiredSamples = m_segments * ( p_degree + 1 ) * 3;
+      // Double it to ensure that each segment is sufficiently supported
+      requiredSamples *= 2;
+      // If there are not enough samples, generate more
+      if ( (int)p_cacheTime.size() < requiredSamples ) {
+        double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
+        for (int i = 0; i < requiredSamples; i++) {
+          double sampleTime = p_cacheTime.front() + sampleRate * i;
+          SetEphemerisTime( sampleTime );
+          scaledTimes.push_back( (sampleTime - p_baseTime) / p_timeScale);
+          coordinates.push_back( Coordinate() );
+        }
+      }
+      else {
+        for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+          SetEphemerisTime( p_cacheTime[i] );
+          scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+          coordinates.push_back( Coordinate() );
+        }
       }
 
       // Fit the polynomial.
@@ -987,6 +1005,81 @@ namespace Isis {
     return;
   }
 
+
+  /**
+   * Create a test polynomial fit over the cached position data.
+   * The polynomial works in scaled time, so all inputs must be adjusted
+   * by subtracting the base time and then dividing by the time scale.
+   * 
+   * @return @b PiecewisePolynomial A piecewise polynomial fit over the cached
+   *                                position data based on the segment count
+   *                                and polynomial degree.
+   */
+  PiecewisePolynomial SpicePosition::testFit() {
+    // Check to see if the position is already a Polynomial Function
+    if (p_source == PolyFunction)
+      return m_polynomial;
+
+    // Check that there is data available to fit a polynomial to
+    if ( p_cache.empty() ) {
+      QString msg = "Cannot set a polynomial, no coordinate data is available.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Adjust the degree of the polynomial to the available data
+    int fitDegree = p_degree;
+    if ( fitDegree > (int)p_cache.size() - 1 ) {
+      fitDegree = p_cache.size() - 1;
+    }
+
+    // Recompute the time scaling
+    ComputeBaseTime();
+
+    // Compute first and last times in scaled time.
+    //   If there is only one cached time, use the full extents.
+    //   Otherwise scale the first and last times.
+    double scaledFirstTime = -DBL_MAX;
+    double scaledLastTime = DBL_MAX;
+    if ( p_cacheTime.size() > 1) {
+      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
+    }
+
+    // Initialize the zero polynomial.
+    PiecewisePolynomial testPoly(scaledFirstTime, scaledLastTime, fitDegree, 3);
+
+    // Collect data to fit the polynomial over.
+    std::vector<double> scaledTimes;
+    std::vector< std::vector<double> > coordinates;
+    // Compute how many points are required
+    //   This over estimates because the continuity conditions reduce the
+    //   number of samples required.
+    int requiredSamples = m_segments * ( p_degree + 1 ) * 3;
+    // Double it to ensure that each segment is sufficiently supported
+    requiredSamples *= 2;
+    // If there are not enough samples, generate more
+    if ( (int)p_cacheTime.size() < requiredSamples ) {
+      double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
+      for (int i = 0; i < requiredSamples; i++) {
+        double sampleTime = p_cacheTime.front() + sampleRate * i;
+        SetEphemerisTime( sampleTime );
+        scaledTimes.push_back( (sampleTime - p_baseTime) / p_timeScale);
+        coordinates.push_back( Coordinate() );
+      }
+    }
+    else {
+      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+        SetEphemerisTime( p_cacheTime[i] );
+        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+        coordinates.push_back( Coordinate() );
+      }
+    }
+
+    // Fit the polynomial.
+    testPoly.fitPolynomials(scaledTimes, coordinates, m_segments);
+
+    return testPoly;
+  }
 
 
   /** 

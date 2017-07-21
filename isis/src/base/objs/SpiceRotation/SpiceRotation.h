@@ -359,6 +359,8 @@ namespace Isis {
 
       void SetPolynomial(const Source type=PolyFunction);
 
+      PiecewisePolynomial testFit();
+
       void SetPolynomial(const std::vector<double> &abcAng1,
                          const std::vector<double> &abcAng2,
                          const std::vector<double> &abcAng3,
