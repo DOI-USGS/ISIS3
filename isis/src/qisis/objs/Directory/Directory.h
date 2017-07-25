@@ -146,6 +146,9 @@ namespace Isis {
    *                           control net is not active and slotted it to reenable when Project
    *                           emits activeControlSet(bool).
    *                           Fixes #5046
+   *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
+   *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
+   *                           from the context menu Fixes #4996
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -142,7 +142,6 @@ namespace Isis {
       createWorkOrder<SensorGetInfoWorkOrder>();
       createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
-      createWorkOrder<ImageFileListViewWorkOrder>();
       createWorkOrder<BundleObservationViewWorkOrder>();
 
       //  Main menu actions
@@ -650,24 +649,6 @@ namespace Isis {
 
     }
     return result;
-
-    /*
-    //qDebug()<<"Directory::addFootprint2DView";
-    MosaicSceneWidget *result = new MosaicSceneWidget(NULL, true, true, this);
-
-    connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupFootprint2DViewWidgets() ) );
-
-    m_footprint2DViewWidgets.append(result);
-
-    result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
-    result->setObjectName(result->windowTitle());
-    result->setObjectName( result->windowTitle() );
-
-    emit newWidgetAvailable(result);
-
-    return result;
-    */
   }
 
 
@@ -818,6 +799,7 @@ namespace Isis {
    * @brief Add an imageFileList widget to the window.
    * @return @b (ImageFileListWidget *) A pointer to the widget to add to the window.
    */
+
   ImageFileListWidget *Directory::addImageFileListView() {
     //qDebug()<<"Directory::addImageFileListView";
     ImageFileListWidget *result = new ImageFileListWidget(this);
@@ -829,8 +811,6 @@ namespace Isis {
 
     result->setWindowTitle( tr("File List %1").arg( m_fileListWidgets.count() ) );
     result->setObjectName( result->windowTitle() );
-
-    emit newWidgetAvailable(result);
 
     return result;
   }
@@ -927,7 +907,7 @@ namespace Isis {
 
 
   /**
-   * @brief Reomoves pointers to deleted ImageFileListWidget objects.
+   * @brief Removes pointers to deleted ImageFileListWidget objects.
    */
   void Directory::cleanupFileListWidgets(QObject *obj) {
 

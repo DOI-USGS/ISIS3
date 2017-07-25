@@ -46,6 +46,8 @@ namespace Isis {
    *   @history 2016-06-07 Makayla Shepherd - Updated documentation. Fixes #3962.
    *   @history 2016-09-14 Ian Humphrey - Modified getLongHelp() - replaced deprecated static
    *                           QPixmap::grabWidget with QWidget::grab (Qt5). Fixes #4304.
+   *   @history 2017-07-18 Cole Neubauer - Added removeImages slot to be able to remove from the
+   *                           ImageFileList in IPCE Fixes #4996
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT
@@ -67,6 +69,7 @@ namespace Isis {
 
     public slots:
       void addImages(ImageList *images);
+      void removeImages(ImageList *images);
 
     protected:
       void contextMenuEvent(QContextMenuEvent *event);
@@ -116,4 +119,3 @@ namespace Isis {
 }
 
 #endif
-
