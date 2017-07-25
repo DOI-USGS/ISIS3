@@ -9,7 +9,7 @@ ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISCPPFLAGS += -g 
+  ISISCPPFLAGS += -g
   ISISCPPFLAGS += -O0
   ISISCPPFLAGS += -DDEBUG
   ifeq ($(findstring CWD, $(MODE)),CWD)
@@ -22,7 +22,7 @@ else
   ISISCPPFLAGS += -O1
 endif
 
-ISISCFLAGS = 
+ISISCFLAGS =
 
 #---------------------------------------------------------------------------
 # Linker options
@@ -32,7 +32,7 @@ SHAREDLIBEXT    = so
 
 ISISLDFLAGS  = -Wl,-E -Xlinker '-z' -Xlinker 'origin'
 ISISLDFLAGS += -Xlinker "-rpath" -Xlinker "${ISISROOT}/lib:${ISISROOT}/3rdParty/lib"
-ISISSYSLIBS = -pthread 
+ISISSYSLIBS = -pthread
 ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
@@ -45,7 +45,7 @@ endif
 #---------------------------------------------------------------------------
 # Shared library options
 #---------------------------------------------------------------------------
-ISISSHAREDFLAGS = $(ISISLDFLAGS) -shared 
+ISISSHAREDFLAGS = $(ISISLDFLAGS) -shared
 ISISSHAREDON    = -Wl,-whole-archive
 ISISSHAREDOFF   = -Wl,-no-whole-archive
 ISISARFLAGS     =
@@ -64,6 +64,9 @@ ISIS3SYSLIB := $(shell if [ -d /usr/lib64 ]; then echo "/usr/lib64"; else echo "
 ISIS3ALTSYSLIB := $(shell if [ -f /usr/lib/x86_64-linux-gnu/libgfortran.so.3 ]; then \
     echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
 ISIS3LOCAL  := /usgs/pkgs/local/$(ISISLOCALVERSION)
+
+# Set up path for OS specific locations of 3rd party licenses
+THIRDPARTYLICPATH := $(ISIS3LOCAL)/license/
 
 #---------------------------------------------------------------------------
 # Set up for cwd
@@ -122,24 +125,24 @@ RCC      = $(ISIS3LOCAL)/bin/rcc
 #---------------------------------------------------------------------------
 QWTINCDIR = -I$(ISIS3LOCAL)/include/qwt
 QWTLIBDIR = -L$(ISIS3LOCAL)/lib
-QWTLIB    = -lqwt 
+QWTLIB    = -lqwt
 
 #---------------------------------------------------------------------------
-# Set up for Xerces 
+# Set up for Xerces
 #---------------------------------------------------------------------------
 XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.2
 XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
-# Set up for geotiff 
+# Set up for geotiff
 #---------------------------------------------------------------------------
 GEOTIFFINCDIR = -I$(ISIS3LOCAL)/include/geotiff
 GEOTIFFLIBDIR = -L$(ISIS3LOCAL)/lib
 GEOTIFFLIB    = -lgeotiff
 
 #---------------------------------------------------------------------------
-# Set up for Tiff 
+# Set up for Tiff
 #---------------------------------------------------------------------------
 TIFFINCDIR = -I$(ISIS3LOCAL)/include/tiff/tiff-4.0.5
 TIFFLIBDIR = -L$(ISIS3LOCAL)/lib
@@ -157,14 +160,14 @@ NAIFLIB    = -lcspice
 #---------------------------------------------------------------------------
 TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt/tnt126 -I$(ISIS3LOCAL)/include/tnt/tnt126/tnt
 TNTLIBDIR =
-TNTLIB    = 
+TNTLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for JAMA
 #---------------------------------------------------------------------------
 JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama/jama125
 JAMALIBDIR =
-JAMALIB    = 
+JAMALIB    =
 
 #---------------------------------------------------------------------------
 # Set up for GEOS
@@ -189,8 +192,8 @@ GSLLIB    = -lgsl -lgslcblas
 #---------------------------------------------------------------------------
 # Set up for X11
 #---------------------------------------------------------------------------
-X11INCDIR = 
-X11LIBDIR = 
+X11INCDIR =
+X11LIBDIR =
 X11LIB    = -lX11
 
 #---------------------------------------------------------------------------
@@ -198,7 +201,7 @@ X11LIB    = -lX11
 #---------------------------------------------------------------------------
 GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm-5.0 -I$(ISIS3LOCAL)/include/gmm/gmm-5.0/gmm
 GMMLIBDIR =
-GMMLIB    = 
+GMMLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for SuperLU
@@ -243,8 +246,8 @@ ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
 # Set up for BOOST
 #---------------------------------------------------------------------------
 BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.59.0
-BOOSTLIBDIR = 
-BOOSTLIB    = 
+BOOSTLIBDIR =
+BOOSTLIB    =
 #BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
 #BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
 #              -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
@@ -253,21 +256,21 @@ BOOSTLIB    =
 #              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization
 
 #---------------------------------------------------------------------------
-# Set up for Cholmod libraries 
+# Set up for Cholmod libraries
 #---------------------------------------------------------------------------
 CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/SuiteSparse/SuiteSparse4.4.5/SuiteSparse
 CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
 CHOLMODLIB    = -lcholmod -lamd -lcamd -lccolamd -lcolamd -llapack -lsuitesparseconfig
 
 #---------------------------------------------------------------------------
-# Set up for HDF5 libraries 
+# Set up for HDF5 libraries
 #---------------------------------------------------------------------------
 HDF5INCDIR = -I$(ISIS3LOCAL)/include/hdf5
 HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
 HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 
 #---------------------------------------------------------------------------
-# Set up for OpenCV libraries 
+# Set up for OpenCV libraries
 #
 # Add the following line to your app's Makefile (see the NN notes)
 # ALLLIBS += $(OPENCVLIBS)
@@ -289,7 +292,7 @@ OPENCVLIBS   = -lopencv_calib3d -lopencv_core \
 # * Note that NNINCDIR is not added to ALLINCDIRS in isismake.os
 # * and NNLIB is not added to ALLLIBDIRS in isismake.os
 #
-# For now, if you want to use this library, modify your app's Makefile. 
+# For now, if you want to use this library, modify your app's Makefile.
 # Add an empty line after the last line in the Makefile, then add
 # ALLLIBS += $(NNLIB)
 # on a new line.

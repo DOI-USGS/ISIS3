@@ -92,6 +92,9 @@ DOXYGEN     = $(ISIS3OPT)/bin/doxygen
 DOT_PATH    = $(ISIS3OPT)/bin
 GREP        = $(ISIS3OPT)/bin/grep
 
+# Set up path for OS specific locations of 3rd party licenses
+THIRDPARTYLICPATH := /opt/usgs/$(ISISLOCALVERSION)/3rdParty/license/
+
 #---------------------------------------------------------------------------
 # Set up for cwd
 #---------------------------------------------------------------------------
