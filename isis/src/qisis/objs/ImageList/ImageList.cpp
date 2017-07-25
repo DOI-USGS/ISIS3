@@ -554,13 +554,20 @@ namespace Isis {
    *                                 ChangeTransparency, ChangeColor, RandomColor,
    *                                 ToggleShowLabel, ToggleShowFilled, ToggleShowCubeData,
    *                                 ToggleShowOutline.
+   * @internal
+   *   @history 2017-07-21 Marjorie Hahn - Removed unnecessary null project check around 
+   *                           the QActions for moveToTopAct, moveToTop, moveToBottomAct,
+   *                           moveToBottom, and zoomFit. This allows these actions to be
+   *                           available in IPCE as well as qmos. Fixes #5027.
    */
   QList<QAction *> ImageList::supportedActions(Project *project) {
+    
     QList<QAction *> actions;
-
+    
     // It turns out connect() statements cannot be templated, hence they aren't inside of
     //   createWorkOrder().
     if (allSupport(ImageDisplayProperties::Color)) {
+      
       QAction *alphaAction = createWorkOrder(project, ImageListActionWorkOrder::ChangeTransparency);
       if (!project) {
         connect(alphaAction, SIGNAL(triggered()),
@@ -575,7 +582,6 @@ namespace Isis {
       }
       actions.append(colorAction);
 
-
       QAction *ranColorAction = createWorkOrder(project, ImageListActionWorkOrder::RandomizeColor);
       if (!project) {
         connect(ranColorAction, SIGNAL(triggered()),
@@ -583,7 +589,6 @@ namespace Isis {
       }
       actions.append(ranColorAction);
     }
-
 
     if (allSupport(ImageDisplayProperties::ShowLabel)) {
       QAction *labelVisibleAction = createWorkOrder(project,
@@ -595,7 +600,6 @@ namespace Isis {
       actions.append(labelVisibleAction);
     }
 
-
     if (allSupport(ImageDisplayProperties::ShowFill)) {
       QAction *fillAction = createWorkOrder(project, ImageListActionWorkOrder::ToggleShowFilled);
       if (!project) {
@@ -604,7 +608,6 @@ namespace Isis {
       }
       actions.append(fillAction);
     }
-
 
     if (allSupport(ImageDisplayProperties::ShowDNs)) {
       QAction *cubeDataAction = createWorkOrder(project,
@@ -615,7 +618,6 @@ namespace Isis {
       }
       actions.append(cubeDataAction);
     }
-
 
     if (allSupport(ImageDisplayProperties::ShowOutline)) {
       QAction *outlineAction = createWorkOrder(project,
@@ -629,40 +631,40 @@ namespace Isis {
 
     actions.append(NULL);
 
-    if (!project) {
-      if (allSupport(ImageDisplayProperties::ZOrdering)) {
-        QAction *moveToTopAct = new QAction(tr("Bring to Front"), this);
-        QAction *moveUpAct = new QAction(tr("Bring Forward"), this);
-        QAction *moveToBottomAct = new QAction(tr("Send to Back"), this);
-        QAction *moveDownAct = new QAction(tr("Send Backward"), this);
+    if (allSupport(ImageDisplayProperties::ZOrdering)) {
+                
+      QAction *moveToTopAct = new QAction(tr("Bring to Front"), this);
+      QAction *moveUpAct = new QAction(tr("Bring Forward"), this);
+      QAction *moveToBottomAct = new QAction(tr("Send to Back"), this);
+      QAction *moveDownAct = new QAction(tr("Send Backward"), this);
 
-        foreach (Image *image, *this) {
-          connect(moveToTopAct, SIGNAL(triggered()),
-                  image->displayProperties(), SIGNAL(moveToTop()));
+      foreach (Image *image, *this) {
+        connect(moveToTopAct, SIGNAL(triggered()),
+                image->displayProperties(), SIGNAL(moveToTop()));
 
-          connect(moveUpAct, SIGNAL(triggered()),
-                  image->displayProperties(), SIGNAL(moveUpOne()));
+        connect(moveUpAct, SIGNAL(triggered()),
+                image->displayProperties(), SIGNAL(moveUpOne()));
 
-          connect(moveToBottomAct, SIGNAL(triggered()),
-                  image->displayProperties(), SIGNAL(moveToBottom()));
+        connect(moveToBottomAct, SIGNAL(triggered()),
+                image->displayProperties(), SIGNAL(moveToBottom()));
 
-          connect(moveDownAct, SIGNAL(triggered()),
-                  image->displayProperties(), SIGNAL(moveDownOne()));
-        }
-        actions.append(moveToTopAct);
-        actions.append(moveUpAct);
-        actions.append(moveToBottomAct);
-        actions.append(moveDownAct);
+        connect(moveDownAct, SIGNAL(triggered()),
+                image->displayProperties(), SIGNAL(moveDownOne()));
       }
+      
+      actions.append(moveToTopAct);
+      actions.append(moveUpAct);
+      actions.append(moveToBottomAct);
+      actions.append(moveDownAct);
+    }
 
-      actions.append(NULL);
+    actions.append(NULL);
 
-      if (size() == 1 && allSupport(ImageDisplayProperties::Zooming)) {
-        QAction *zoomFit = new QAction(tr("Zoom Fit"), this);
-        connect(zoomFit, SIGNAL(triggered()),
-                first()->displayProperties(), SIGNAL(zoomFit()));
-        actions.append(zoomFit);
-      }
+    if (size() == 1 && allSupport(ImageDisplayProperties::Zooming)) {
+      QAction *zoomFit = new QAction(tr("Zoom Fit"), this);
+      connect(zoomFit, SIGNAL(triggered()),
+              first()->displayProperties(), SIGNAL(zoomFit()));
+      actions.append(zoomFit);
     }
 
     return actions;
