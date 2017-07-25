@@ -13,6 +13,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "FileName.h"
+#include "Histogram.h"
 #include "IException.h"
 #include "PiecewisePolynomial.h"
 #include "Progress.h"
@@ -97,60 +98,20 @@ QPair<double, double> testFit(FileName inCubeFile, int positionDegree, int posit
   // Fit the position
   instPosition->SetPolynomialDegree(positionDegree);
   instPosition->setPolynomialSegments(positionSegments);
-  PiecewisePolynomial positionPoly = instPosition->testFit();
+  PiecewisePolynomial positionPoly = instPosition->fitPolynomial(positionDegree, positionSegments);
 
   // Fit the rotation
   instRotation->SetPolynomialDegree(pointingDegree);
   instRotation->setPolynomialSegments(pointingSegments);
-  PiecewisePolynomial rotationPoly = instRotation->testFit();
+  PiecewisePolynomial rotationPoly = instRotation->fitPolynomial(pointingDegree, pointingSegments);
 
   // Compute the position RMS
-  double sumSquaredPositionError = 0;
-  double positionBaseTime = instPosition->GetBaseTime();
-  double positionTimeScale = instPosition->GetTimeScale();
-  std::vector<double> positionSampleTimes = instPosition->timeCache();
-  int positionSampleCount = positionSampleTimes.size();
-  for (int i = 0; i < positionSampleCount; i++) {
-    double error = 0;
-    double scaledTime = (positionSampleTimes[i] - positionBaseTime) / positionTimeScale;
-    std::vector<double> measuredCoord = instPosition->SetEphemerisTime(positionSampleTimes[i]);
-    std::vector<double> estimatedCoord = positionPoly.evaluate(scaledTime);
-    error += (measuredCoord[0] - estimatedCoord[0]) * (measuredCoord[0] - estimatedCoord[0]);
-    error += (measuredCoord[1] - estimatedCoord[1]) * (measuredCoord[1] - estimatedCoord[1]);
-    error += (measuredCoord[2] - estimatedCoord[2]) * (measuredCoord[2] - estimatedCoord[2]);
-    sumSquaredPositionError += sqrt(error);
-  }
-  double positionRMS = sqrt(sumSquaredPositionError / positionSampleCount);
+  Histogram positionHist = instPosition->computeError(positionPoly);
+  double positionRMS = positionHist.Rms();
 
   // Compute the rotation RMS
-  double sumSquaredRotationError = 0;
-  double rotationBaseTime = instRotation->GetBaseTime();
-  double rotationTimeScale = instRotation->GetTimeScale();
-  std::vector<double> rotationSampleTimes = instRotation->timeCache();
-  int rotationSampleCount = rotationSampleTimes.size();
-  double start1 = 0.; // value of 1st angle1 in cache
-  double start3 = 0.; // value of 1st angle3 in cache
-  for (int i = 0; i < rotationSampleCount; i++) {
-    double error = 0;
-    double scaledTime = (rotationSampleTimes[i] - rotationBaseTime) / rotationTimeScale;
-    instRotation->SetEphemerisTime(rotationSampleTimes[i]);
-    std::vector<double> measuredAngles = instRotation->Angles(3, 1, 3);
-    // Fix the angles crossing the domain bound
-    if (i == 0) {
-      start1 = measuredAngles[0];
-      start3 = measuredAngles[2];
-    }
-    else {
-      measuredAngles[0] = instRotation->WrapAngle(start1, measuredAngles[0]);
-      measuredAngles[2] = instRotation->WrapAngle(start3, measuredAngles[2]);
-    }
-    std::vector<double> estimatedAngles = rotationPoly.evaluate(scaledTime);
-    error += (measuredAngles[0] - estimatedAngles[0]) * (measuredAngles[0] - estimatedAngles[0]);
-    error += (measuredAngles[1] - estimatedAngles[1]) * (measuredAngles[1] - estimatedAngles[1]);
-    error += (measuredAngles[2] - estimatedAngles[2]) * (measuredAngles[2] - estimatedAngles[2]);
-    sumSquaredRotationError += sqrt(error);
-  }
-  double rotationRMS = sqrt(sumSquaredRotationError / rotationSampleCount);
+  Histogram rotationHist = instRotation->computeError(rotationPoly);
+  double rotationRMS = rotationHist.Rms();
 
   return QPair<double, double>(positionRMS, rotationRMS);
 }

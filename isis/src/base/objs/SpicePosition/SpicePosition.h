@@ -29,6 +29,7 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+#include "Histogram.h"
 #include "Table.h"
 #include "PiecewisePolynomial.h"
 #include "PolynomialUnivariate.h"
@@ -249,7 +250,8 @@ namespace Isis {
 
       void SetPolynomial(const Source type = PolyFunction);
 
-      PiecewisePolynomial testFit();
+      PiecewisePolynomial fitPolynomial(const int degree,
+                                        const int segmentCount = 1);
 
       void SetPolynomial(const std::vector<double>& XC,
                          const std::vector<double>& YC,
@@ -270,6 +272,8 @@ namespace Isis {
       int numPolynomialSegments() const;
       std::vector<double> polynomialKnots() const;
       int polySegmentIndex(double et) const;
+
+      Histogram computeError(PiecewisePolynomial poly);
 
       //! Return the source of the position
       Source GetSource() {

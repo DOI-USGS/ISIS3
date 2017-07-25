@@ -9,7 +9,8 @@
     This program takes a list of cubes and tests the quality of the polynomial
     fit over instrument position and pointing values. This emulates how the
     jigsaw app converts exterior orientation into polynomials prior to
-    adjustment. Poor quality fits can result in jigsaw failing.
+    adjustment. This app can be used to help determine jigsaw parameters that
+    will work well with a data set.
   </description>
 
   <category>
@@ -18,8 +19,7 @@
 
   <seeAlso>
     <applications>
-      <item>rotate</item>
-      <item>flip</item>
+      <item>jigsaw</item>
     </applications>
   </seeAlso>
 
@@ -27,7 +27,6 @@
     <change name="Jesse Mapel" date="2017-07-17">
       Original version
     </change>
-
   </history>
 
   <groups>
@@ -39,7 +38,9 @@
           List of input cubes to check
         </brief>
         <description>
-          The list of input cubes that a test polynomial fit will be done for.
+          The list of input cubes that test polynomial fits will be done for.
+          Each cube will have polnomials fit over its instrument position and
+          instrument pointing.
         </description>
         <filter>
           *.lis
@@ -53,10 +54,11 @@
           Output file that contains the quality of fits
         </brief>
         <description>
-          This text file will contain the quality of fit for each input cube
-          sorted from best fit to worst fit. The first column is the cube name,
-          the second column is the quality of the instrument position fit, and
-          the third column is the quality of the instrument pointing fit.
+          This text file will contain the quality of fit for each input cube.
+          The first column is the cube name, the second column is the RMS error
+          of the instrument position fit in kilometers, and the third column is
+          the RMS error of the instrument pointing fit in radians. Any cubes
+          for which the process fails will not be included in this output file.
         </description>
         <filter>
           *.txt, *.csv
@@ -68,23 +70,37 @@
       <parameter name="SPKDEGREE">
         <type>integer</type>
         <brief>
-          The degree of the instrument position polynomial fit.
+          The degree of the instrument position polynomial fits.
         </brief>
         <description>
-          The degree of the instrument position polynomial fit.
+          The degree of the instrument position polynomial fits. This
+          corresponds to the SPKSOLVEDEGREE parameter in the jigsaw
+          application. It is recommended that a fit no higher than 2nd degree
+          is used. High degree polynomial fits often result in overfitting with
+          minimal gain. Increasing the number of segments with lower degree
+          polynomial fits is suggested when working with highly volatile data.
         </description>
         <minimum inclusive="yes">0</minimum>
+        <default>
+          <item>2</item>
+        </default>
       </parameter>
 
       <parameter name="SPKSEGMENTS">
         <type>integer</type>
         <brief>
-          The number of polynomial segments used in the instrument position fit.
+          The number of polynomial segments used in the instrument position
+          fits.
         </brief>
         <description>
-          The number of polynomial segments used in the instrument position fit.
+          The number of polynomial segments used in the instrument position
+          fits. Increasing the number of segments with lower degree polynomial
+          fits is suggested when working with highly volatile data.
         </description>
         <minimum inclusive="yes">1</minimum>
+        <default>
+          <item>1</item>
+        </default>
       </parameter>
 
       <parameter name="CKDEGREE">
@@ -93,20 +109,34 @@
           The degree of the instrument pointing polynomial fit.
         </brief>
         <description>
-          The degree of the instrument pointing polynomial fit.
+          The degree of the instrument pointing polynomial fit. This
+          corresponds to the CKSOLVEDEGREE parameter in the jigsaw
+          application. It is recommended that a fit no higher than 2nd degree
+          is used. High degree polynomial fits often result in overfitting with
+          minimal gain. Increasing the number of segments with lower degree
+          polynomial fits is suggested when working with highly volatile data.
         </description>
         <minimum inclusive="yes">0</minimum>
+        <default>
+          <item>2</item>
+        </default>
       </parameter>
 
       <parameter name="CKSEGMENTS">
         <type>integer</type>
         <brief>
-          The number of polynomial segments used in the instrument pointing fit.
+          The number of polynomial segments used in the instrument pointing
+          fit.
         </brief>
         <description>
-          The number of polynomial segments used in the instrument pointing fit.
+          The number of polynomial segments used in the instrument pointing
+          fit. Increasing the number of segments with lower degree polynomial
+          fits is suggested when working with highly volatile data.
         </description>
         <minimum inclusive="yes">1</minimum>
+        <default>
+          <item>1</item>
+        </default>
       </parameter>
     </group>
   </groups>

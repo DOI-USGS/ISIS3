@@ -895,10 +895,20 @@ namespace Isis {
 
 
   /**
-   * Returns the time cache values.
+   * Returns the time cache values. If the cache is reduced, this will return
+   * the original unreduced time cache.
    */
   std::vector<double> SpicePosition::timeCache() const {
-    return (p_cacheTime);
+    if ((int)p_fullCacheSize != (int)p_cacheTime.size()) {
+      std::vector<double> fullTimeCache;
+      fullTimeCache.resize(p_fullCacheSize);
+      double sampleRate = (p_fullCacheEndTime - p_fullCacheStartTime) / p_fullCacheSize;
+      for (int i = 0; i < (int)p_fullCacheSize; i++) {
+        fullTimeCache[i] = p_fullCacheStartTime + sampleRate * i;
+      }
+      return fullTimeCache;
+    }
+    return p_cacheTime;
   }
 
 
@@ -919,33 +929,25 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Adjust the degree of the polynomial to the available data
-    if ( p_degree > (int)p_cache.size() - 1 ) {
-      p_degree = p_cache.size() - 1;
-
-      // Flag if velocity is available
-      p_hasVelocity = ( p_degree > 0 || !p_cacheVelocity.empty() );
-    }
-
     // Recompute the time scaling
     ComputeBaseTime();
 
-    // Compute first and last times in scaled time.
-    //   If there is only one cached time, use the full extents.
-    //   Otherwise scale the first and last times.
-    double scaledFirstTime = -DBL_MAX;
-    double scaledLastTime = DBL_MAX;
-    if ( p_cacheTime.size() > 1) {
-      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
-      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
-    }
-
-    // Initialize the zero polynomial.
-    m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
-
-    // If fitting a polynomial over hermite data, then do not fit the polynomial,
-    // just set the knots and move on.
+    // If fitting a polynomial over hermite data, then do not fit the polynomial.
+    // Create a zero polynomial, set the knots and move on.
     if ( type == PolyFunctionOverHermiteConstant ) {
+      // Compute first and last times in scaled time.
+      //   If there is only one cached time, use the full extents.
+      //   Otherwise scale the first and last times.
+      double scaledFirstTime = -DBL_MAX;
+      double scaledLastTime = DBL_MAX;
+      if ( p_cacheTime.size() > 1) {
+        scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+        scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
+      }
+
+      // Initialize the zero polynomial.
+      m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
+
       if ( m_segments > 1 ) {
         std::vector<double> knots;
         double knotStep = (scaledLastTime - scaledFirstTime) / m_segments;
@@ -955,38 +957,10 @@ namespace Isis {
         m_polynomial.setKnots(knots);
       }
     }
-    // Otherwise, fit the polynomial over the coordinate evaluated at the
-    // values in the time cache.
-    else {
-      // Collect data to fit the polynomial over.
-      std::vector<double> scaledTimes;
-      std::vector< std::vector<double> > coordinates;
-      // Compute how many points are required to fit the data
-      //   This over estimates because the continuity conditions reduce the
-      //   number of samples required.
-      int requiredSamples = m_segments * ( p_degree + 1 ) * 3;
-      // Double it to ensure that each segment is sufficiently supported
-      requiredSamples *= 2;
-      // If there are not enough samples, generate more
-      if ( (int)p_cacheTime.size() < requiredSamples ) {
-        double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
-        for (int i = 0; i < requiredSamples; i++) {
-          double sampleTime = p_cacheTime.front() + sampleRate * i;
-          SetEphemerisTime( sampleTime );
-          scaledTimes.push_back( (sampleTime - p_baseTime) / p_timeScale);
-          coordinates.push_back( Coordinate() );
-        }
-      }
-      else {
-        for (int i = 0; i < (int)p_cacheTime.size(); i++) {
-          SetEphemerisTime( p_cacheTime[i] );
-          scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
-          coordinates.push_back( Coordinate() );
-        }
-      }
 
-      // Fit the polynomial.
-      m_polynomial.fitPolynomials(scaledTimes, coordinates, m_segments);
+    // Otherwise, fit the polynomial.
+    else {
+      m_polynomial = fitPolynomial(p_degree, m_segments);
     }
 
     // Set the flag indicating p_degree has been applied to the spacecraft
@@ -1007,29 +981,31 @@ namespace Isis {
 
 
   /**
-   * Create a test polynomial fit over the cached position data.
+   * Create a polynomial fit over the cached position data.
    * The polynomial works in scaled time, so all inputs must be adjusted
    * by subtracting the base time and then dividing by the time scale.
+   * 
+   * @param segmentCount The number of segments for the piecewise polynomial
+   *                     fit. Defaults to 1.
+   * @param degree The degree of the piecewise polynomial fit.
    * 
    * @return @b PiecewisePolynomial A piecewise polynomial fit over the cached
    *                                position data based on the segment count
    *                                and polynomial degree.
    */
-  PiecewisePolynomial SpicePosition::testFit() {
+  PiecewisePolynomial SpicePosition::fitPolynomial(const int degree,
+                                                   const int segmentCount) {
     // Check to see if the position is already a Polynomial Function
-    if (p_source == PolyFunction)
+    if (p_source == PolyFunction
+        && p_degree == degree
+        && m_segments == segmentCount) {
       return m_polynomial;
+    }
 
     // Check that there is data available to fit a polynomial to
     if ( p_cache.empty() ) {
       QString msg = "Cannot set a polynomial, no coordinate data is available.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    // Adjust the degree of the polynomial to the available data
-    int fitDegree = p_degree;
-    if ( fitDegree > (int)p_cache.size() - 1 ) {
-      fitDegree = p_cache.size() - 1;
     }
 
     // Recompute the time scaling
@@ -1046,7 +1022,7 @@ namespace Isis {
     }
 
     // Initialize the zero polynomial.
-    PiecewisePolynomial testPoly(scaledFirstTime, scaledLastTime, fitDegree, 3);
+    PiecewisePolynomial positionPoly(scaledFirstTime, scaledLastTime, degree, 3);
 
     // Collect data to fit the polynomial over.
     std::vector<double> scaledTimes;
@@ -1054,9 +1030,9 @@ namespace Isis {
     // Compute how many points are required
     //   This over estimates because the continuity conditions reduce the
     //   number of samples required.
-    int requiredSamples = m_segments * ( p_degree + 1 ) * 3;
-    // Double it to ensure that each segment is sufficiently supported
-    requiredSamples *= 2;
+    int requiredSamples = segmentCount * ( degree + 1 ) * 3;
+    // Triple the number of samples just to be sure there are enough in each segments
+    requiredSamples *= 3;
     // If there are not enough samples, generate more
     if ( (int)p_cacheTime.size() < requiredSamples ) {
       double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
@@ -1076,9 +1052,15 @@ namespace Isis {
     }
 
     // Fit the polynomial.
-    testPoly.fitPolynomials(scaledTimes, coordinates, m_segments);
+    try {
+      positionPoly.fitPolynomials(scaledTimes, coordinates, segmentCount);
+    }
+    catch (IException &e) {
+      QString msg = "Failed fitting polynomial over cached position data.";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
 
-    return testPoly;
+    return positionPoly;
   }
 
 
@@ -1796,7 +1778,7 @@ namespace Isis {
    */
   void SpicePosition::setPolynomialSegments(int segments) {
     m_segments = segments;
-    if ( !m_polynomial.isZero() ) {
+    if ( p_degreeApplied ) {
       m_polynomial.refitPolynomials(segments);
     }
   }
@@ -1842,6 +1824,40 @@ namespace Isis {
     double scaledTime;
     scaledTime = (et - p_baseTime) / p_timeScale;
     return m_polynomial.segmentIndex(scaledTime);
+  }
+
+
+  /**
+   * Compute the error between a polynomial and the stored position data.
+   * 
+   * @param poly The polynomial to compare with. It is assumed that the
+   *             polynomial uses the same time scaling as this.
+   * 
+   * @return @b Histogram A histogram object containg the distance error in km.
+   */
+  Histogram SpicePosition::computeError(PiecewisePolynomial poly) {
+    // TODO check the input poly
+
+    // Compute the errors
+    double error;
+    std::vector<double> sampleTimes, sampleErrors, measuredCoord, polyCoord;
+    sampleTimes = timeCache();
+    for (int i = 0; i < (int)sampleTimes.size(); i++) {
+      error = 0;
+      measuredCoord = SetEphemerisTime(sampleTimes[i]);
+      polyCoord = poly.evaluate( (sampleTimes[i] - p_baseTime) / p_timeScale );
+      error += (measuredCoord[0] - polyCoord[0]) * (measuredCoord[0] - polyCoord[0]);
+      error += (measuredCoord[1] - polyCoord[1]) * (measuredCoord[1] - polyCoord[1]);
+      error += (measuredCoord[2] - polyCoord[2]) * (measuredCoord[2] - polyCoord[2]);
+      sampleErrors.push_back(sqrt(error));
+    }
+
+    // Create the output histogram
+    double minError = *std::min_element(sampleErrors.begin(), sampleErrors.end());
+    double maxError = *std::max_element(sampleErrors.begin(), sampleErrors.end());
+    Histogram errorHist(minError, maxError);
+    errorHist.AddData(&sampleErrors[0], sampleErrors.size());
+    return errorHist;
   }
 
 

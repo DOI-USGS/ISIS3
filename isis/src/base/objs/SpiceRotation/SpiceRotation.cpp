@@ -1177,10 +1177,19 @@ namespace Isis {
 
 
   /**
-   * Returns the time cache values.
+   * Returns the time cache values. If the cache is reduced, this will return
+   * the original unreduced time cache.
    */
   std::vector<double> SpiceRotation::timeCache() const {
-    return (p_cacheTime);
+    if (p_fullCacheSize != (int)p_cacheTime.size()) {
+      std::vector<double> fullTimeCache(p_fullCacheSize);
+      double sampleRate = (p_fullCacheEndTime - p_fullCacheStartTime) / p_fullCacheSize;
+      for (int i = 0; i < p_fullCacheSize; i++) {
+        fullTimeCache[i] = p_fullCacheStartTime + sampleRate * i;
+      }
+      return fullTimeCache;
+    }
+    return p_cacheTime;
   }
 
 
@@ -1633,33 +1642,25 @@ namespace Isis {
       return;
     }
 
-    // Adjust the degree of the polynomial to the available data
-    if ( p_degree > (int)p_cache.size() - 1 ) {
-      p_degree = p_cache.size() - 1;
-
-      // Flag if velocity is available
-      p_hasAngularVelocity = ( p_degree > 0 || !p_cacheAv.empty() );
-    }
-
     // Recompute the time scaling
     ComputeBaseTime();
 
-    // Compute first and last times in scaled time.
-    //   If there is only one cached time, use the full extents.
-    //   Otherwise scale the first and last times.
-    double scaledFirstTime = -DBL_MAX;
-    double scaledLastTime = DBL_MAX;
-    if ( p_cacheTime.size() > 1) {
-      scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
-      scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
-    }
-
-    // Initialize the zero polynomial.
-    m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
-
-    // If fitting a polynomial over constant spice data, then do not fit the polynomial,
-    // just set the knots and move on.
+    // If fitting a polynomial over constant spice data, then do not fit the polynomial.
+    // Create a zero polynomial, set the knots and move on.
     if ( type == PolyFunctionOverSpice ) {
+      // Compute first and last times in scaled time.
+      //   If there is only one cached time, use the full extents.
+      //   Otherwise scale the first and last times.
+      double scaledFirstTime = -DBL_MAX;
+      double scaledLastTime = DBL_MAX;
+      if ( p_cacheTime.size() > 1) {
+        scaledFirstTime = (p_cacheTime.front() - p_baseTime) / p_timeScale;
+        scaledLastTime = (p_cacheTime.back() - p_baseTime) / p_timeScale;
+      }
+
+      // Initialize the zero polynomial.
+      m_polynomial = PiecewisePolynomial(scaledFirstTime, scaledLastTime, p_degree, 3);
+
       if ( m_segments > 1 ) {
         std::vector<double> knots;
         double knotStep = (scaledLastTime - scaledFirstTime) / m_segments;
@@ -1669,34 +1670,9 @@ namespace Isis {
         m_polynomial.setKnots(knots);
       }
     }
-    // Otherwise, fit the polynomial over the coordinate evaluated at the
-    // values in the time cache.
+    // Otherwise, fit the polynomial.
     else {
-      // Collect data to fit the polynomial over.
-      std::vector<double> scaledTimes;
-      std::vector< std::vector<double> > angles;
-      double start1 = 0.; // value of 1st angle1 in cache
-      double start3 = 0.; // value of 1st angle3 in cache
-      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
-        // Compute the angles and save the scaled time
-        SetEphemerisTime( p_cacheTime[i] );
-        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
-
-        // Fix angle domain cross over and then save the angles
-        std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
-        if (i == 0) {
-          start1 = currentAngles[0];
-          start3 = currentAngles[2];
-        }
-        else {
-          currentAngles[0] = WrapAngle(start1, currentAngles[0]);
-          currentAngles[2] = WrapAngle(start3, currentAngles[2]);
-        }
-        angles.push_back( currentAngles );
-      }
-
-      // Fit the polynomial.
-      m_polynomial.fitPolynomials(scaledTimes, angles, m_segments);
+      m_polynomial = fitPolynomial(p_degree, m_segments);
     }
 
     p_source = type;
@@ -1711,20 +1687,27 @@ namespace Isis {
    * The polynomial works in scaled time, so all inputs must be adjusted
    * by subtracting the base time and then dividing by the time scale.
    * 
+   * @param segmentCount The number of segments for the piecewise polynomial
+   *                     fit. Defaults to 1.
+   * @param degree The degree of the piecewise polynomial fit.
+   * 
    * @return @b PiecewisePolynomial A piecewise polynomial fit over the cached
    *                                rotation data based on the segment count
    *                                and polynomial degree.
    */
-  PiecewisePolynomial SpiceRotation::testFit() {
+  PiecewisePolynomial SpiceRotation::fitPolynomial(const int degree,
+                                                   const int segmentCount) {
     NaifStatus::CheckErrors();
 
     // If rotation is already stored as a polynomial move on
-    if (p_source == PolyFunction) {
+    if (p_source == PolyFunction
+        && p_degree == degree
+        && m_segments == segmentCount) {
       return m_polynomial;
     }
 
     // Adjust the degree of the polynomial to the available data
-    double fitDegree = p_degree;
+    double fitDegree = degree;
     if ( fitDegree > (int)p_cache.size() - 1 ) {
       fitDegree = p_cache.size() - 1;
     }
@@ -1743,36 +1726,73 @@ namespace Isis {
     }
 
     // Initialize the zero polynomial.
-    PiecewisePolynomial testPoly(scaledFirstTime, scaledLastTime, fitDegree, 3);
+    PiecewisePolynomial anglePoly(scaledFirstTime, scaledLastTime, fitDegree, 3);
 
     // Collect data to fit the polynomial over.
     std::vector<double> scaledTimes;
     std::vector< std::vector<double> > angles;
     double start1 = 0.; // value of 1st angle1 in cache
     double start3 = 0.; // value of 1st angle1 in cache
-    for (int i = 0; i < (int)p_cacheTime.size(); i++) {
-      // Compute the angles and save the scaled time
-      SetEphemerisTime( p_cacheTime[i] );
-      scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+    // Compute how many points are required
+    //   This over estimates because the continuity conditions reduce the
+    //   number of samples required.
+    int requiredSamples = segmentCount * ( degree + 1 ) * 3;
+    // Triple the number of samples just to be sure there are enough in each segments
+    requiredSamples *= 3;
 
-      // Fix angle domain cross over and then save the angles
-      std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
-      if (i == 0) {
-        start1 = currentAngles[0];
-        start3 = currentAngles[2];
+    // If there are not enough samples, generate equally spaced samples times
+    // based on the extents of the time cache
+    if ( (int)p_cacheTime.size() < requiredSamples ) {
+      double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
+      for (int i = 0; i < requiredSamples; i++) {
+        double sampleTime = p_cacheTime.front() + sampleRate * i;
+        SetEphemerisTime( sampleTime );
+        scaledTimes.push_back( (sampleTime - p_baseTime) / p_timeScale);
+
+        // Fix angle domain cross over and then save the angles
+        std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
+        if (i == 0) {
+          start1 = currentAngles[0];
+          start3 = currentAngles[2];
+        }
+        else {
+          currentAngles[0] = WrapAngle(start1, currentAngles[0]);
+          currentAngles[2] = WrapAngle(start3, currentAngles[2]);
+        }
+        angles.push_back( currentAngles );
       }
-      else {
-        currentAngles[0] = WrapAngle(start1, currentAngles[0]);
-        currentAngles[2] = WrapAngle(start3, currentAngles[2]);
+    }
+    // Otherwise sample at the cached times
+    else {
+      for (int i = 0; i < (int)p_cacheTime.size(); i++) {
+        SetEphemerisTime( p_cacheTime[i] );
+        scaledTimes.push_back( (p_cacheTime[i] - p_baseTime) / p_timeScale);
+
+        // Fix angle domain cross over and then save the angles
+        std::vector<double> currentAngles = Angles(p_axis3, p_axis2, p_axis1);
+        if (i == 0) {
+          start1 = currentAngles[0];
+          start3 = currentAngles[2];
+        }
+        else {
+          currentAngles[0] = WrapAngle(start1, currentAngles[0]);
+          currentAngles[2] = WrapAngle(start3, currentAngles[2]);
+        }
+        angles.push_back( currentAngles );
       }
-      angles.push_back( currentAngles );
     }
 
     // Fit the polynomial.
-    testPoly.fitPolynomials(scaledTimes, angles, m_segments);
+    try {
+      anglePoly.fitPolynomials(scaledTimes, angles, segmentCount);
+    }
+    catch (IException &e) {
+      QString msg = "Failed fitting polynomial over cached rotation data.";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
 
     NaifStatus::CheckErrors();
-    return testPoly;
+    return anglePoly;
   }
 
 
@@ -2293,7 +2313,7 @@ namespace Isis {
    */
   void SpiceRotation::setPolynomialSegments(int segmentCount) {
     m_segments = segmentCount;
-    if ( !m_polynomial.isZero() ) {
+    if ( p_degreeApplied ) {
       m_polynomial.refitPolynomials(segmentCount);
     }
   }
@@ -2339,6 +2359,51 @@ namespace Isis {
     double scaledTime;
     scaledTime = (et - p_baseTime) / p_timeScale;
     return m_polynomial.segmentIndex(scaledTime);
+  }
+
+
+  /**
+   * Compute the error between a polynomial and the stored rotation data.
+   * 
+   * @param poly The polynomial to compare with. It is assumed that the
+   *             polynomial uses the same time scaling as this.
+   * 
+   * @return @b Histogram A histogram object containg the rotation error in radians.
+   */
+  Histogram SpiceRotation::computeError(PiecewisePolynomial poly) {
+    // TODO check the input poly
+
+    // Compute the errors
+    double error;
+    std::vector<double> sampleTimes, sampleErrors, measuredAngle, polyAngle;
+    sampleTimes = timeCache();
+    double start1 = 0.; // value of 1st angle1 in cache
+    double start3 = 0.; // value of 1st angle1 in cache
+    for (int i = 0; i < (int)sampleTimes.size(); i++) {
+      error = 0;
+      SetEphemerisTime(sampleTimes[i]);
+      measuredAngle = Angles(p_axis3, p_axis2, p_axis1);
+      if (i == 0) {
+        start1 = measuredAngle[0];
+        start3 = measuredAngle[2];
+      }
+      else {
+        measuredAngle[0] = WrapAngle(start1, measuredAngle[0]);
+        measuredAngle[2] = WrapAngle(start3, measuredAngle[2]);
+      }
+      polyAngle = poly.evaluate( (sampleTimes[i] - p_baseTime) / p_timeScale );
+      error += (measuredAngle[0] - polyAngle[0]) * (measuredAngle[0] - polyAngle[0]);
+      error += (measuredAngle[1] - polyAngle[1]) * (measuredAngle[1] - polyAngle[1]);
+      error += (measuredAngle[2] - polyAngle[2]) * (measuredAngle[2] - polyAngle[2]);
+      sampleErrors.push_back(sqrt(error));
+    }
+
+    // Create the output histogram
+    double minError = *std::min_element(sampleErrors.begin(), sampleErrors.end());
+    double maxError = *std::max_element(sampleErrors.begin(), sampleErrors.end());
+    Histogram errorHist(minError, maxError);
+    errorHist.AddData(&sampleErrors[0], sampleErrors.size());
+    return errorHist;
   }
 
 
