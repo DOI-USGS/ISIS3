@@ -55,7 +55,6 @@
 #include "IException.h"
 #include "ImageList.h"
 #include "ImageReader.h"
-#include "IException.h"
 #include "ProgressBar.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -93,6 +92,8 @@ namespace Isis {
     m_warnings = NULL;
     m_workOrderHistory = NULL;
     m_isTemporaryProject = true;
+    m_isOpen = false;
+    m_isClean = true;
     m_activeControl = NULL;
     m_activeImageList = NULL;
 
@@ -408,6 +409,22 @@ namespace Isis {
   }
 
 
+ /**
+  * Function to clear out all values in a project essentially making it a new project object.
+  */
+  void Project::clear(){
+    m_images->clear();
+    m_shapes->clear();
+    m_controls->clear();
+    m_targets->clear();
+    m_guiCameras->clear();
+    m_bundleSolutionInfo->clear();
+    m_workOrderHistory->clear();
+    directory()->clean();
+    setName("Project");
+  }
+
+
   ImageList *Project::createOrRetrieveImageList(QString name) {
     ImageList *result = imageList(name);
     if (!result) {
@@ -712,6 +729,7 @@ namespace Isis {
 
   /**
    * Read the given cube file names as Images and add them to the project.
+   * @param QStringList names of imageFiles
    */
   void Project::addImages(QStringList imageFiles) {
 //  qDebug()<<"Project::addImages(QStringList imageFiles)";
@@ -724,6 +742,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Read the given cube file names as Images and add them to the project.
+   * @param ImageList
+   */
   void Project::addImages(ImageList newImages) {
 //  qDebug()<<"Project::addImages(ImageList newImages";
     imagesReady(newImages);
@@ -762,6 +784,7 @@ namespace Isis {
 
   /**
    * Read the given shape model cube file names as Images and add them to the project.
+   * @param QStringList of shape Files names
    */
   void Project::addShapes(QStringList shapeFiles) {
     if (m_numShapesCurrentlyReading == 0) {
@@ -772,12 +795,19 @@ namespace Isis {
     m_shapeReader->read(shapeFiles);
   }
 
-
+  /**
+   * Read the given shape model cube file names as Images and add them to the project.
+   * @param ShapeList
+   */
   void Project::addShapes(ShapeList newShapes) {
     shapesReady(newShapes);
   }
 
 
+  /**
+   * Given the id return the corrsponding control net
+   * @param QString id of control net
+   */
   Control *Project::control(QString id) {
     return (*m_idToControlMap)[id];
   }
@@ -820,6 +850,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Loads bundle solution info into project
+   * @param BundleSolutionInfo
+   */
   void Project::loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
     m_bundleSolutionInfo->append(bundleSolutionInfo);
 
@@ -848,26 +882,65 @@ namespace Isis {
    *                  calls.  The exception information is not piped to the Warnings tab
    *                  in the GUI instead of the command line, and the application starts
    *                  instead of executing prematurely.  Fixes #4488.
+   *   @history 2017-07-24 Cole Neubauer -  Moved all exception checking in Open function to
+   *                           beginning of function to avoid clearing a project when an invalid
+   *                           directory is chosen Fixes #4969
    * */
   void Project::open(QString projectPathStr) {
-
-    m_isTemporaryProject = false;
-
     FileName projectPath(projectPathStr);
-    XmlHandler handler(this);
-
-    XmlStackedHandlerReader reader;
-    reader.pushContentHandler(&handler);
-    reader.setErrorHandler(&handler);
-
     QString projectXmlPath = projectPath.toString() + "/project.xml";
     QFile file(projectXmlPath);
+
     if ( !file.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                        .arg(projectXmlPath),
                        _FILEINFO_);
     }
+
+    QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
+    QFile historyFile(projectXmlHistoryPath);
+
+    if ( !historyFile.open(QFile::ReadOnly) ) {
+      throw IException(IException::Io,
+                       QString("Unable to open [%1] with read access")
+                               .arg(projectXmlHistoryPath),
+                       _FILEINFO_);
+    }
+
+    QString projectXmlWarningsPath = projectPath.toString() + "/warnings.xml";
+    QFile warningsFile(projectXmlWarningsPath);
+
+    if (!warningsFile.open(QFile::ReadOnly)) {
+      throw IException(IException::Io,
+                       QString("Unable to open [%1] with read access")
+                       .arg(projectXmlWarningsPath),
+                       _FILEINFO_);
+    }
+
+    QString directoryXmlPath = projectPath.toString() + "/directory.xml";
+    QFile directoryFile(directoryXmlPath);
+
+    if (!directoryFile.open(QFile::ReadOnly)) {
+      throw IException(IException::Io,
+                       QString("Unable to open [%1] with read access")
+                       .arg(directoryXmlPath),
+                       _FILEINFO_);
+    }
+
+    if (isOpen()) {
+      clear();
+    }
+
+    m_isTemporaryProject = false;
+
+    XmlHandler handler(this);
+
+    XmlStackedHandlerReader reader;
+    reader.pushContentHandler(&handler);
+    reader.setErrorHandler(&handler);
+
+
 
     QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot = projectPath.expanded();
@@ -891,16 +964,6 @@ namespace Isis {
       directory()->showWarning(e.what());
     }
 
-    QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
-    QFile historyFile(projectXmlHistoryPath);
-
-    if ( !historyFile.open(QFile::ReadOnly) ) {
-      throw IException(IException::Io,
-                       QString("Unable to open [%1] with read access")
-                               .arg(projectXmlHistoryPath),
-                       _FILEINFO_);
-    }
-
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
 
@@ -914,19 +977,9 @@ namespace Isis {
       directory()->showWarning(e.toString());
       }
     catch (std::exception &e) {
-       directory()->showWarning(QString("Failed to read history from project[%1]")
+      directory()->showWarning(QString("Failed to read history from project[%1]")
                                 .arg(projectPath.original()));
       directory()->showWarning(e.what());
-    }
-
-    QString projectXmlWarningsPath = projectPath.toString() + "/warnings.xml";
-    QFile warningsFile(projectXmlWarningsPath);
-
-    if (!warningsFile.open(QFile::ReadOnly)) {
-      throw IException(IException::Io,
-                       QString("Unable to open [%1] with read access")
-                       .arg(projectXmlWarningsPath),
-                       _FILEINFO_);
     }
 
     reader.pushContentHandler(&handler);
@@ -934,17 +987,6 @@ namespace Isis {
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
     if (!reader.parse(xmlWarningsInputSource)) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectPath.original()));
-    }
-
-    QString directoryXmlPath = projectPath.toString() + "/directory.xml";
-    QFile directoryFile(directoryXmlPath);
-
-
-    if (!directoryFile.open(QFile::ReadOnly)) {
-      throw IException(IException::Io,
-                       QString("Unable to open [%1] with read access")
-                       .arg(directoryXmlPath),
-                       _FILEINFO_);
     }
 
     reader.pushContentHandler(&handler);
@@ -988,7 +1030,7 @@ namespace Isis {
 //         }
       }
     }
-
+    m_isOpen = true;
     emit projectLoaded(this);
   }
 
@@ -998,11 +1040,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Return an image given its id
+   * @param QString id
+   * @return Image matching id
+   */
   Image *Project::image(QString id) {
     return (*m_idToImageMap)[id];
   }
 
 
+  /**
+   * Return an imagelist given its name
+   * @param QString name
+   * @return Imagelist matching name
+   */
   ImageList *Project::imageList(QString name) {
     QListIterator<ImageList *> it(*m_images);
 
@@ -1017,11 +1069,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Return a shape given its id
+   * @param QString id
+   * @return Shape matching id
+   */
   Shape *Project::shape(QString id) {
     return (*m_idToShapeMap)[id];
   }
 
 
+  /**
+   * Return a shapelist given its name
+   * @param QString name
+   * @return Shapelist matching name
+   */
   ShapeList *Project::shapeList(QString name) {
     QListIterator<ShapeList *> it(*m_shapes);
 
@@ -1036,11 +1098,44 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns if the project is a temp project or not
+   * @return bool true if the project is temporary false otherwise
+   */
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
 
 
+ /**
+  * Accessor to determine whether a current project is Open
+  */
+  bool Project::isOpen() {
+    return m_isOpen;
+  }
+
+
+ /**
+  * Accessor to determine whether the curren project is Unsaved
+  */
+  bool Project::isClean() {
+    return m_isClean;
+  }
+
+
+ /**
+  * Function to change the clean state of the project
+  * @param the boolean value to set the clean state to
+  */
+  void Project::setClean(bool value) {
+    m_isClean = value;
+  }
+
+
+  /**
+   * Return the last not undone workorder
+   * @return WorkOrder
+   */
   WorkOrder *Project::lastNotUndoneWorkOrder() {
     WorkOrder *result = NULL;
     QListIterator< QPointer<WorkOrder> > it(*m_workOrderHistory);
@@ -1066,6 +1161,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Return the last not undone workorder
+   * @return WorkOrder
+   */
   const WorkOrder *Project::lastNotUndoneWorkOrder() const {
     const WorkOrder *result = NULL;
     QListIterator< QPointer<WorkOrder> > it(*m_workOrderHistory);
@@ -1112,6 +1211,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the Projects stack of QUndoCommands
+   * @return QUndoStack
+   */
   QUndoStack *Project::undoStack() {
     return &m_undoStack;
   }
@@ -1147,11 +1250,17 @@ namespace Isis {
   }
 
 
+  /**
+   * Locks program if another spot in code is still running and called this function
+   */
   void Project::waitForImageReaderFinished() {
     QMutexLocker locker(m_imageReadingMutex);
   }
 
 
+  /**
+   * Locks program if another spot in code is still running and called this function
+   */
   void Project::waitForShapeReaderFinished() {
     QMutexLocker locker(m_shapeReadingMutex);
   }
@@ -1219,16 +1328,12 @@ namespace Isis {
    *                           whether from the workorder or calling this method directly from the
    *                           project loading.  TODO:  should project loading call the WorkOrder
    *                           rather than this method directly?
+   *  @history 2017-07-25 Cole Neubauer - Removed code that stops a new control from
+   *                           being choosen Fixes #4969
    *
    */
   void Project::setActiveControl(QString displayName) {
 
-    if (m_activeControl) {
-      QString message = "Currently you cannot change the active control when one is already set.  "
-                        "This functionality will be implemented in a future release.";
-      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
-      return;
-    }
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
     if (item && item->isControl()) {
       m_activeControl = item->control();
@@ -1281,15 +1386,11 @@ namespace Isis {
    *                           Controls are loaded before the setActiveImageList is loaded, there
    *                           will be a correct correspondence between the displayName and
    *                           ImageList.
+   *  @history 2017-07-25 Cole Neubauer - Removed code that stops a new imageList from
+   *                           being choosen Fixes #4969
    */
   void Project::setActiveImageList(QString displayName) {
 
-    if (m_activeImageList) {
-      QString message = "Currently you cannot change the active imageList when one is already set.  "
-                        "This functionality will be implemented in a future release.";
-      QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
-      return;
-    }
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
     if (item && item->isImageList()) {
       m_activeImageList = item->imageList();
@@ -1340,12 +1441,20 @@ namespace Isis {
   }
 
 
+  /**
+   * Return controls in project
+   * @return QList of ControlList
+   */
   QList<ControlList *> Project::controls() {
-
     return *m_controls;
   }
 
 
+  /**
+   * Return controlslist matching name in Project
+   * @param QString name of controllist to be returned
+   * @return ControlList matching name
+   */
   ControlList *Project::controlList(QString name) {
     QListIterator< ControlList * > it(*m_controls);
 
@@ -1400,11 +1509,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Return the projects shapelist
+   * @return Qlist of Shapelist
+   */
   QList<ShapeList *> Project::shapes() {
     return *m_shapes;
   }
 
 
+  /**
+   * Return projects imagelist
+   * @return Imagelist
+   */
   QList<ImageList *> Project::images() {
     return *m_images;
   }
@@ -1430,6 +1547,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Return TargetBodyList in Project
+   */
   TargetBodyList Project::targetBodies() {
     return *m_targets;
   }
@@ -1455,6 +1575,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Return BundleSolutionInfo objects in Project
+   * @return QList of BundleSolutionInfo
+   */
   QList<BundleSolutionInfo *> Project::bundleSolutionInfo() {
     return *m_bundleSolutionInfo;
   }
@@ -1793,7 +1917,6 @@ namespace Isis {
           // hand.
           workOrder->redo();
         }
-
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)
         m_workOrderHistory->removeAll(NULL);
       }
@@ -1824,6 +1947,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Prepare new images for opening
+   * @param Imagelist of images
+   */
   void Project::imagesReady(ImageList images) {
 
     m_numImagesCurrentlyReading -= images.count();
@@ -1958,9 +2085,9 @@ namespace Isis {
 
   /**
    * An image is being deleted from the project
+   * @param QObject image object to be closed
    */
   void Project::imageClosed(QObject *imageObj) {
-//  qDebug()<<"Project::imageClosed";
     QMutableListIterator<ImageList *> it(*m_images);
     while (it.hasNext()) {
       ImageList *list = it.next();
@@ -1978,6 +2105,7 @@ namespace Isis {
 
   /**
    * An image list is being deleted from the project.
+   * @param QObject list of images to be deleted
    */
   void Project::imageListDeleted(QObject *imageListObj) {
     int indexToRemove = m_images->indexOf(static_cast<ImageList *>(imageListObj));

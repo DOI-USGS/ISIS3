@@ -35,9 +35,9 @@ namespace Isis {
 
   /**
    * This method sets the text of the work order.
-   * 
+   *
    * @param project The Project that we are going to find the correlation matrix of.
-   * 
+   *
    */
   MatrixViewWorkOrder::MatrixViewWorkOrder(Project *project) :
       WorkOrder(project) {
@@ -46,7 +46,7 @@ namespace Isis {
 
   /**
    * This method is for debugging.
-   * 
+   *
    *  @param other The MatrixViewWorkOrder being debugged.
    */
   MatrixViewWorkOrder::MatrixViewWorkOrder(const MatrixViewWorkOrder &other) :
@@ -62,7 +62,7 @@ namespace Isis {
 
   /**
    * This method clones the MatrixViewWorkOrder
-   * 
+   *
    * @return @b MatrixViewWorkOrder Returns a clone of the MatrixViewWorkOrder
    */
   MatrixViewWorkOrder *MatrixViewWorkOrder::clone() const {
@@ -75,7 +75,7 @@ namespace Isis {
    *
    * @param matrix The correlation matrix that we want to view.
    *
-   * @return @b bool True if data (passed to this method as the matrix parameter by 
+   * @return @b bool True if data (passed to this method as the matrix parameter by
    *                 supportedActions) is of type CorrelationMatrix.
    */
   bool MatrixViewWorkOrder::isExecutable(CorrelationMatrix matrix) {
@@ -143,23 +143,23 @@ namespace Isis {
     return success;
   }
 
-  
+
   /**
    * @brief This method returns true if other depends on a MatrixViewWorkOrder
-   * 
+   *
    * @param other we want to check for dependancies
-   * 
-   * @return @b bool True if WorkOrder depends on a MatrixViewWorkOrder 
-   * 
+   *
+   * @return @b bool True if WorkOrder depends on a MatrixViewWorkOrder
+   *
    */
   bool MatrixViewWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<MatrixViewWorkOrder *>(other);
   }
-  
+
 
   /**
-   * @brief This method computes and displays the correlation matrix. 
+   * @brief This method computes and displays the correlation matrix.
    */
   void MatrixViewWorkOrder::execute() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
@@ -176,11 +176,12 @@ namespace Isis {
       QString msg = "The Correlation Matrix for this bundle could not be displayed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    project()->setClean(false);
   }
 
-  
+
   /**
-   * @brief This method deletes the last matrix viewed. 
+   * @brief This method deletes the last matrix viewed.
    */
   void MatrixViewWorkOrder::undoExecution() {
     if (internalData()[1] == "new view") {
@@ -188,4 +189,3 @@ namespace Isis {
     }
   }
 }
-

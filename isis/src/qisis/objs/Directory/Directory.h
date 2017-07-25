@@ -149,6 +149,10 @@ namespace Isis {
    *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
    *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
    *                           from the context menu Fixes #4996
+   *   @history 2017-07-12 Cole Neubauer - Added clean function to directory that clears everything
+   *                           from a previous project when opening a new one. This functionality
+   *                           had to be added because a new directory can not be created to support
+   *                           a new project being opened. Fixes #4969
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -156,6 +160,7 @@ namespace Isis {
       explicit Directory(QObject *parent = 0);
       ~Directory();
 
+      void clean();
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
       void setRecentProjectsList(QStringList recentProjects);
@@ -258,6 +263,7 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:
+      void directoryCleaned();
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 

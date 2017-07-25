@@ -91,10 +91,10 @@ namespace Isis {
       //project()->directory()->addCnetEditorView(controlList().first());
       project()->directory()->addCnetEditorView(controlList()->at(i));
     }
+    project()->setClean(false);
   }
 
   void CnetEditorViewWorkOrder::undoExecution() {
     delete project()->directory()->cnetEditorViews().last();
   }
 }
-

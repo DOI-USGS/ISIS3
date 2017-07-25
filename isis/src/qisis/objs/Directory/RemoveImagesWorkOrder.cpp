@@ -98,6 +98,8 @@ namespace Isis {
     }
     project()->directory()->model()->removeItems(selectedItems);
 
+
+    project()->setClean(false);
   }
 
 

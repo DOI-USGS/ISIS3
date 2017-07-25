@@ -28,17 +28,18 @@ namespace Isis {
   class ImageList;
   class Project;
 
-  /** 
+  /**
    * Removes selected images from current project.
    * This executes synchronously and is not undoable.
-   * 
+   *
    * @author 2016-07-28 Tracie Sucharski
-   * 
-   * @internal 
-   *   @history 2017-04-07 Marjorie Hahn - Updated method names and documentation 
+   *
+   * @internal
+   *   @history 2017-04-07 Marjorie Hahn - Updated method names and documentation
    *                           to match new work order design.
    *
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class RemoveImagesWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -30,15 +30,16 @@ namespace Isis {
   /**
    *
    * This is a child of the WorkOrder class which is used for anything that performs an action in a
-   * Project.  This WorkOrder adds a BundleObservationView to the project.  This runs synchronously 
+   * Project.  This WorkOrder adds a BundleObservationView to the project.  This runs synchronously
    * and is not undoable.
    *
-   * @todo Some thought should probably be given to whether we actually want view WorkOrders to be 
+   * @todo Some thought should probably be given to whether we actually want view WorkOrders to be
    * saved in the history.
    *
    * @author 2017-05-04 Tracie Sucharski
    *
    * @internal
+   *  @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class BundleObservationViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -58,4 +59,3 @@ namespace Isis {
   };
 }
 #endif
-

@@ -73,6 +73,7 @@ namespace Isis {
    *                           a set or list of images Fixes #5015
    *   @history 2017-07-17 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -27,19 +27,19 @@ namespace Isis {
   class Project;
   class ShapeList;
   /**
-   * @brief View an image list's footprints in a footprint view. 
+   * @brief View an image list's footprints in a footprint view.
    *
-   * Adding a Footprint2DView to the Project is not undo-able, so all functionality to add the view 
-   * is put into the execute method.  We want a WorkOrder rather than simply a QAction so that the 
+   * Adding a Footprint2DView to the Project is not undo-able, so all functionality to add the view
+   * is put into the execute method.  We want a WorkOrder rather than simply a QAction so that the
    * WorkOrder is added to the history.
    *
-   * @todo Some thought should probably be given to whether we actually want view WorkOrders to be 
+   * @todo Some thought should probably be given to whether we actually want view WorkOrders to be
    * saved in the history.
    *
    * @author 2012-09-19 Steven Lambright
    *
    * @internal
-   *   @history 2016-01-08 Jeffrey Covington - Updated for new Footprint2DView, syncUndo() 
+   *   @history 2016-01-08 Jeffrey Covington - Updated for new Footprint2DView, syncUndo()
    *                          was removed, and execute now uses WorkOrder's execute() method
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3954.
    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards for
@@ -55,6 +55,7 @@ namespace Isis {
    *   @history 2017-04-10 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
    *                           execute to setupExecution, and moving the actual work to the execute
    *                           method.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -75,4 +76,3 @@ namespace Isis {
   };
 }
 #endif
-

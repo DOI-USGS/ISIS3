@@ -119,6 +119,7 @@ namespace Isis {
    */
   void ViewControlNet3DWorkOrder::execute() {
     //project()->directory()->addCnetEditorView(controlList().first());
+    //project()->setClean(false);
   }
 
 
@@ -129,4 +130,3 @@ namespace Isis {
     //delete project()->directory()->cnetEditorViews().last();
   }
 }
-

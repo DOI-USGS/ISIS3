@@ -252,6 +252,7 @@ namespace Isis {
       // Recall in setupExecution() that first element in internal data is copy|nocopy,
       // and rest of elements are the expanded names of images to import.
       importConfirmedImages(internalData().mid(1), (internalData()[0] == "copy"));
+      project()->setClean(false);
     }
   }
 

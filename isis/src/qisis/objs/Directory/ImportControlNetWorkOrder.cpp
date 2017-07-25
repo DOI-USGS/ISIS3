@@ -247,5 +247,6 @@ namespace Isis {
 
     Control *control = m_watcher->resultAt(ready);
     project()->addControl(control);
+    project()->setClean(false);
   }
 }

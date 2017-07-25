@@ -36,11 +36,11 @@
 #include "ProjectItemModel.h"
 
 namespace Isis {
-  
-  /** 
-   * Creates a work order to view image footprints. This WorkOrder is not undoable and runs 
+
+  /**
+   * Creates a work order to view image footprints. This WorkOrder is not undoable and runs
    * synchronously.
-   * 
+   *
    * @param Project *project Pointer to the project this work order belongs to.
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
@@ -74,23 +74,23 @@ namespace Isis {
 
   /**
    * @brief This method clones the current Footprint2DViewWorkOrder and returns it.
-   * 
+   *
    * @return @b Footprint2DViewWorkOrder that was cloned
    */
   Footprint2DViewWorkOrder *Footprint2DViewWorkOrder::clone() const {
 
     return new Footprint2DViewWorkOrder(*this);
   }
-  
+
 
   /**
-   * @brief This method returns true if one of an image in ImageList images isFootprintable, 
+   * @brief This method returns true if one of an image in ImageList images isFootprintable,
    *              False if none of the images has a footprint. This is used by
    *              Directory::supportedActions(DataType data) to determine what actions are appended
    *              to context menus.
-   * 
+   *
    * @param images ImageList of images
-   * 
+   *
    * @return @b bool True if one of the images in ImagesList images isFootprintable
    */
   bool Footprint2DViewWorkOrder::isExecutable(ImageList *images) {
@@ -105,7 +105,7 @@ namespace Isis {
 
 
   /**
-   * @brief This method returns true if one of the shapes in ShapeList isFootprintable, False 
+   * @brief This method returns true if one of the shapes in ShapeList isFootprintable, False
    *              if none of shapes have a footprint.  This is used by
    *              Directory::supportedActions(DataType data) to determine what actions are appended
    *              to context menus.
@@ -129,8 +129,8 @@ namespace Isis {
    * @brief Setup this WorkOrder for execution.  Prompt for whether these footprints should be
    *              displayed in a new view or an existing view.  This calls
    *              WorkOrder::setupExecution().
-   * 
-   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created, 
+   *
+   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created,
    *         otherwise returns False.
    */
   bool Footprint2DViewWorkOrder::setupExecution() {
@@ -192,9 +192,9 @@ namespace Isis {
 
 
   /**
-   * @brief This either adds a new Footprint2DView containing the selected images or adds the 
+   * @brief This either adds a new Footprint2DView containing the selected images or adds the
    *              image's footprints to an existing Footprint2DView.
-   *  
+   *
    */
   void Footprint2DViewWorkOrder::execute() {
 
@@ -211,6 +211,6 @@ namespace Isis {
     }
 
     view->addItems( selectedItems );
+    project()->setClean(false);
   }
 }
-

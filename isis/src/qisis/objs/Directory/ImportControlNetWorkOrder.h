@@ -33,22 +33,23 @@ namespace Isis {
   class Progress;
   class Project;
 
-  /** 
-   * @brief Add control networks to a project 
-   *  
+  /**
+   * @brief Add control networks to a project
+   *
    * Asks the user for a list of control nets and copies them into the project.
-   * 
+   *
    * @author 2012-06-05 Ken Edmundson and Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2012-09-11 Tracie Sucharski and Steven Lambright - Added asynchronous functionality
    *                           for redo.
    *   @history 2017-04-04 Makayla Shepherd - Combined syncRedo and asyncRedo into execute, changed
    *                           execute to setupExecution, and renamed postSyncRedo to postExecution
-   *                           and undoSyncRedo to undoExecution. This was done to match the 
+   *                           and undoSyncRedo to undoExecution. This was done to match the
    *                           WorkOrder redesign. Fixes #4716.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so when undone, the imported
-   *                           cnet(s) are removed from the project tree. Fixes #4597. 
+   *                           cnet(s) are removed from the project tree. Fixes #4597.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
    */
@@ -60,7 +61,7 @@ namespace Isis {
       ~ImportControlNetWorkOrder();
 
       virtual ImportControlNetWorkOrder *clone() const;
-      
+
       virtual bool isExecutable(ProjectItem *item);
       bool setupExecution();
       void execute();

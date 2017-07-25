@@ -265,6 +265,28 @@ namespace Isis {
 
 
   /**
+   * @brief Cleans directory of everything to do with the current project.
+   *
+   * This function was implemented to be called from the Project::Open function
+   * to allow for a new project to be opened in IPCE.
+   */
+  void Directory::clean() {
+    m_bundleObservationViews.clear();
+    m_cnetEditorViewWidgets.clear();
+    m_cubeDnViewWidgets.clear();
+    m_fileListWidgets.clear();
+    m_footprint2DViewWidgets.clear();
+    m_controlPointEditViewWidget.clear();
+    m_matrixViewWidgets.clear();
+    m_sensorInfoWidgets.clear();
+    m_targetInfoWidgets.clear();
+    m_projectItemModel->clean();
+    m_historyTreeWidget.clear();
+    emit directoryCleaned();
+  }
+
+
+  /**
    * @brief Initializes the actions that the Directory can provide to a main window.
    *
    * Any work orders that need to be disabled by default can be done so here.

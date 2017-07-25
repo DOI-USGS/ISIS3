@@ -50,6 +50,7 @@ namespace Isis {
    *                           shapes are removed from the project tree. Fixes #4597.
    *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -75,10 +76,10 @@ namespace Isis {
        * This copies the given shape model cube(s) into the project. This is designed to work with
        *   QtConcurrentMap.  TODO::  TLS 2016-07-13  If large DEM, do not allow DN data to be
        *   copied??
-       *  
-       * @author 2016-07-06 Tracie Sucharski 
-       *  
-       * @internal 
+       *
+       * @author 2016-07-06 Tracie Sucharski
+       *
+       * @internal
        */
       class OriginalFileToProjectCubeFunctor :
           public std::unary_function<const FileName &, Cube *> {

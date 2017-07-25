@@ -81,6 +81,8 @@ namespace Isis {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
+      connect(m_directory, SIGNAL( directoryCleaned() ),
+              this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
@@ -217,7 +219,35 @@ namespace Isis {
       }
     }
   }
+  /**
+   * Removes All Views in main window, connected to directory signal directoryCleaned()
+   */
+  void IpceMainWindow::removeAllViews() {
+    setWindowTitle("ipce");
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    if (mdiArea){
+      QMdiSubWindow* window = new QMdiSubWindow();
+      window->show();
+      window->activateWindow();
+      mdiArea->addSubWindow(window);
+      mdiArea->closeAllSubWindows();
+      delete window;
+    }
+    if(!m_detachedViews.isEmpty()) {
+      foreach(QMainWindow* view, m_detachedViews) {
+        view->close();
+      }
+    }
 
+    QList<QDockWidget *> docks = tabifiedDockWidgets(m_projectDock);
+    if(docks.count() > 1) {
+      foreach(QDockWidget* widget, docks) {
+        if(widget != m_projectDock) {
+          delete widget;
+        }
+      }
+    }
+  }
 
   /**
    * Cleans up the directory.
@@ -766,6 +796,7 @@ namespace Isis {
     }
 
     QMainWindow *newWindow = new QMainWindow(this, Qt::Window);
+    m_detachedViews.append(newWindow);
     newWindow->setCentralWidget(view);
     newWindow->setWindowTitle( view->windowTitle() );
 

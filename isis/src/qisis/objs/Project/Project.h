@@ -147,6 +147,8 @@ namespace Isis {
    *                           imports, shape imports, and bundle solution info. Fixes #4855, 
    *                           #4979, #4980.
    *                
+   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
+   *                           allow for opening of a new project. Fixes #4969
    *
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
@@ -175,14 +177,18 @@ namespace Isis {
       void addShapes(ShapeList newShapes);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void clear();
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
       ImageList *imageList(QString name);
       Shape *shape(QString id);
       ShapeList *shapeList(QString name);
-//       CorrelationMatrix *correlationMatrix();
+      // CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
+      bool isOpen();
+      bool isClean();
+      void setClean(bool value);
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
@@ -225,6 +231,10 @@ namespace Isis {
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
 
+      /**
+       * Return BundleSettings objects in Project
+       * @return BundleSettings
+       */
       BundleSettings *bundleSettings() {return m_bundleSettings;}
 
       QProgressBar *progress();
@@ -346,8 +356,13 @@ namespace Isis {
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
-
+      /**
+       * Emitted when work order starts
+       */
       void workOrderStarting(WorkOrder *);
+      /**
+       * Emitted when work order ends
+       */
       void workOrderFinished(WorkOrder *);
 
     public slots:
@@ -415,6 +430,7 @@ namespace Isis {
       };
 
     private:
+
       QDir *m_projectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
@@ -455,6 +471,8 @@ namespace Isis {
       QPointer<ImageReader> m_imageReader;
       //QList<QPair<QString, Data> > m_storedWarnings;
       bool m_isTemporaryProject;
+      bool m_isOpen; //! used to determine whether a project is currently open
+      bool m_isClean; //! used to determine whether a project's changes are unsaved
 
       int m_numImagesCurrentlyReading;
 

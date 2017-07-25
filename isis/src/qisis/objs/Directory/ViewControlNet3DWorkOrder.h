@@ -37,6 +37,7 @@ namespace Isis {
    *              brought the code into compliance with ISIS3 coding standards.
    *              References #3944.
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class ViewControlNet3DWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -61,4 +62,3 @@ namespace Isis {
   };
 }
 #endif
-

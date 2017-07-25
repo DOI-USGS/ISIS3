@@ -202,6 +202,7 @@ namespace Isis {
   void ImportShapesWorkOrder::execute() {
     if (internalData().count() > 0) {
       importConfirmedShapes(internalData().mid(1), (internalData()[0] == "copy"));
+      project()->setClean(false);
     }
   }
 

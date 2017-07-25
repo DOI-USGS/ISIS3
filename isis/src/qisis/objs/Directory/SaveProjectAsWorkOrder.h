@@ -42,6 +42,7 @@ namespace Isis {
    *   @history 2017-04-11 Ian Humphrey - Updated the work order according to the redesign of
    *                           WorkOrder. Separated setup and execution steps into setupExecution
    *                           and execution(). Fixes #4763.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class SaveProjectAsWorkOrder : public WorkOrder {
       Q_OBJECT

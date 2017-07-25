@@ -53,11 +53,11 @@ namespace Isis {
     connect(m_selectionModel, SIGNAL(selectionChanged(const QItemSelection &,
                                                       const QItemSelection &) ),
             this, SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &) ) );
-                                    
-    connect( this, SIGNAL(rowsInserted(const QModelIndex &, int, int)), 
+
+    connect( this, SIGNAL(rowsInserted(const QModelIndex &, int, int)),
              this, SLOT(onRowsInserted(const QModelIndex &, int, int)) );
 
-    connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), 
+    connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),
              this, SLOT(onRowsRemoved(const QModelIndex &, int, int)) );
 
   }
@@ -70,9 +70,9 @@ namespace Isis {
 
   }
 
-  
+
   /**
-   * You cannot drop mime data into the ProjectItemModel. 
+   * You cannot drop mime data into the ProjectItemModel.
    *
    * @see ProjectItemProxyModel
    *
@@ -91,7 +91,7 @@ namespace Isis {
     return false;
   }
 
-  
+
   /**
    * Returns the internal selection model.
    *
@@ -154,7 +154,7 @@ namespace Isis {
   QList<ProjectItem *> ProjectItemModel::selectedItems() {
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
-    
+
     foreach ( QModelIndex index, selection.indexes() ) {
       items.append( itemFromIndex(index) );
     }
@@ -220,7 +220,7 @@ namespace Isis {
       removeItem(item);
     }
   }
-  
+
 
   /**
    * Appends a top-level item to the model.
@@ -243,7 +243,7 @@ namespace Isis {
     return QStandardItemModel::indexFromItem(item);
   }
 
-  
+
   /**
    * Inserts a top-level item at the given row.
    *
@@ -278,7 +278,7 @@ namespace Isis {
     return static_cast<ProjectItem *>( QStandardItemModel::itemFromIndex(index) );
   }
 
-  
+
   /**
    * Sets the item at the top-level row.
    *
@@ -288,8 +288,8 @@ namespace Isis {
   void ProjectItemModel::setItem(int row, ProjectItem *item) {
     QStandardItemModel::setItem(row, item);
   }
-  
-  
+
+
   /**
    * Removes the top-level row and returns the removed item.
    *
@@ -299,7 +299,7 @@ namespace Isis {
    */
   ProjectItem *ProjectItemModel::takeItem(int row) {
     QList<QStandardItem *> items = QStandardItemModel::takeRow(row);
-    
+
     if ( items.isEmpty() ) {
       return 0;
     }
@@ -329,7 +329,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Slot to connect to the bundleSolutionInfoAdded() signal from a
    * project. Adds a ProjectItem that corresponds to the
@@ -457,11 +457,11 @@ namespace Isis {
   void ProjectItemModel::onImagesAdded(ImageList * imageList) {
 //  qDebug()<<"ProjectItemModel::onImagesAdded  before add rowCount = "<<rowCount();
     Project *project = qobject_cast<Project *>( sender() );
-    
+
     if (!project) {
       return;
     }
-    
+
     for (int i=0; i<rowCount(); i++) {
       ProjectItem *projectItem = item(i);
       if (projectItem->project() == project) {
@@ -480,13 +480,13 @@ namespace Isis {
   /**
    * Slot to connect to the shapesAdded() signal from a Project. Adds a ProjectItem that corresponds
    * to the ShapeList to the model. The item is added to the item named "Shape Models" of the item
-   * that corresponds to the Project that sent the signal. 
+   * that corresponds to the Project that sent the signal.
    *
    * @param shapes (ShapeList *) The ShapeList added to the Project.
    */
   void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
     Project *project = qobject_cast<Project *>( sender() );
-    
+
     if (!project) {
       return;
     }
@@ -542,8 +542,8 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
    * Slot to connect to the guiCamerasAdded() signal from a
    * Project. Adds items that correspond to the cameras to the
@@ -640,11 +640,11 @@ namespace Isis {
 
 
   /**
-   * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a 
-   * corresponding itemRemoved() signal for each row inserted. 
+   * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a
+   * corresponding itemRemoved() signal for each row inserted.
    *
    * @param parent (const QModelIndex &) The parent index where rows are to be removed.
-   *                                         
+   *
    * @param start (int) The first row to be removed (inclusive).
    * @param end (int) The last row to be removed (inclusive).
    */
@@ -660,16 +660,16 @@ namespace Isis {
 
 
   /**
-   * This virtual method was added to handle changing the project name by double-clicking the 
-   * project name on the project tree.  It was required by Qt in order to allow editing 
-   * capabilities. 
-   *  
-   * @see http://doc.qt.io/qt-5/modelview.html 
-   *  
+   * This virtual method was added to handle changing the project name by double-clicking the
+   * project name on the project tree.  It was required by Qt in order to allow editing
+   * capabilities.
+   *
+   * @see http://doc.qt.io/qt-5/modelview.html
+   *
    * @param index (const QModelIndex &) Field which has been edited
    * @param value (const QVariant &) Value contained in the field
    * @param role (int) Will always be EditRole since field only contains text
-   * 
+   *
    * @return bool Returns true if successful; otherwise false
    */
   bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
@@ -705,19 +705,38 @@ namespace Isis {
 
 
   /**
-   * This virtual method was added to handle changing the project name by double-clicking the 
-   * project name on the project tree.  It was required by Qt in order to allow editing 
-   * capabilities. 
-   *  
+   * This virtual method was added to handle changing the project name by double-clicking the
+   * project name on the project tree.  It was required by Qt in order to allow editing
+   * capabilities.
+   *
    * @see http://doc.qt.io/qt-5/modelview.html
-   *  
+   *
    * @param index (const QModelIndex &) Field which has been edited
-   * 
+   *
    * @return Qt::ItemFlags Add the ItemIsEditable to the standard flags.
    */
   Qt::ItemFlags ProjectItemModel::flags(const QModelIndex &index) const {
 
     return Qt::ItemIsEditable | QStandardItemModel::flags(index);
   }
-}
 
+ /**
+  * Used to clean the ProjectItemModel of everything but the headers
+  */
+  void ProjectItemModel::clean() {
+
+    for (int i=0; i<rowCount(); i++) {
+      ProjectItem *projectItem = item(i);
+      if (projectItem->project()) {
+        for (int j=0; j < projectItem->rowCount(); j++) {
+          if (projectItem->hasChildren()) {
+            ProjectItem *subProjectItem = projectItem->child(j);
+            while (subProjectItem->hasChildren()) {
+              removeItem(subProjectItem->child(0));
+            }
+          }
+        }
+      }
+    }
+  }
+}
