@@ -141,7 +141,19 @@ namespace Isis {
 
       PvlGroup plugin;
       try {
-        plugin = m_cameraPlugin.findGroup(group);
+        bool found = false;
+        // Find the most recent (last) version of the camera model
+        for (int i = m_cameraPlugin.groups() - 1; i >= 0; i--) {
+          if (m_cameraPlugin.group(i) == group) {
+            plugin = m_cameraPlugin.group(i);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          QString msg = "Unable to find PVL group [" + group + "].";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
       }
       catch(IException &e) {
         QString msg = "Unsupported camera model, unable to find plugin for ";
