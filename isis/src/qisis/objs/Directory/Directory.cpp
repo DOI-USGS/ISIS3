@@ -271,6 +271,8 @@ namespace Isis {
    * to allow for a new project to be opened in IPCE.
    */
   void Directory::clean() {
+    m_historyTreeWidget->clear();
+    m_warningTreeWidget->clear();
     m_bundleObservationViews.clear();
     m_cnetEditorViewWidgets.clear();
     m_cubeDnViewWidgets.clear();
@@ -281,7 +283,6 @@ namespace Isis {
     m_sensorInfoWidgets.clear();
     m_targetInfoWidgets.clear();
     m_projectItemModel->clean();
-    m_historyTreeWidget.clear();
     emit directoryCleaned();
   }
 

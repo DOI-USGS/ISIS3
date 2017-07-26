@@ -36,6 +36,8 @@ namespace Isis {
    *   @history 2016-08-25 Adam Paqeutte - Updated documentation. Fixes #4299.
    *   @history 2017-01-20 Tracie Sucharski - Add UndoCommand text to prevent error message.
    *                          Fixes #2146.
+   *   @history 2017-07-18 Cole Neubauer - Finished implementing Close Project work order.
+   *                          Fixes #4521
    */
   class CloseProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -48,6 +50,7 @@ namespace Isis {
 
       virtual bool isExecutable();
       bool setupExecution();
+      void execute();
 
     signals:
 

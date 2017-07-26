@@ -422,6 +422,7 @@ namespace Isis {
     m_workOrderHistory->clear();
     directory()->clean();
     setName("Project");
+    setClean(true);
   }
 
 
