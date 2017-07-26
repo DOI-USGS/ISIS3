@@ -207,13 +207,15 @@ namespace Isis {
    */
   void ImportImagesWorkOrder::undoExecution() {
     project()->waitForImageReaderFinished();
-    ImageList *list = project()->images().last();
-    // Remove the images from disk.
-    list->deleteFromDisk(project());
-    // Remove the images from the model, which updates the tree view.
-    ProjectItem *currentItem =
-        project()->directory()->model()->findItemData(QVariant::fromValue(list));
-    project()->directory()->model()->removeItem(currentItem);
+    if (project()->images().size() > 0) {
+      ImageList *list = project()->images().last();
+      // Remove the images from disk.
+      list->deleteFromDisk( project() );
+      // Remove the images from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData( QVariant::fromValue(list) );
+      project()->directory()->model()->removeItem(currentItem);
+    }
   }
 
 
@@ -227,12 +229,14 @@ namespace Isis {
    * @see WorkOrder::postUndoExecution()
    */
   void ImportImagesWorkOrder::postUndoExecution() {
-    QPointer<ImageList> imagesWeAdded = project()->images().last();
+    if (project()->images().size() > 0) {
+      QPointer<ImageList> imagesWeAdded = project()->images().last();
 
-    foreach (Image *image, *imagesWeAdded) {
-      delete image;
+      foreach (Image *image, *imagesWeAdded) {
+        delete image;
+      }
+      delete imagesWeAdded;
     }
-    delete imagesWeAdded;
   }
 
 

@@ -174,25 +174,29 @@ namespace Isis {
     */
   void ImportShapesWorkOrder::undoExecution() {
     project()->waitForShapeReaderFinished();
-    ShapeList *list = project()->shapes().last();
-    // Remove the shapes from disk.
-    list->deleteFromDisk(project());
-    // Remove the shapes from the model, which updates the tree view.
-    ProjectItem *currentItem =
-        project()->directory()->model()->findItemData(QVariant::fromValue(list));
-    project()->directory()->model()->removeItem(currentItem);
+    if (project()->shapes().size() > 0) {
+      ShapeList *list = project()->shapes().last();
+      // Remove the shapes from disk.
+      list->deleteFromDisk( project() );
+      // Remove the shapes from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData( QVariant::fromValue(list) );
+      project()->directory()->model()->removeItem(currentItem);
+    }
   }
 
   /**
     * @brief delete the imported shapes from the project.
     */
   void ImportShapesWorkOrder::postUndoExecution() {
-    QPointer<ShapeList> shapesWeAdded = project()->shapes().last();
+    if (project()->shapes().size() > 0) {
+      QPointer<ShapeList> shapesWeAdded = project()->shapes().last();
 
-    foreach (Shape *shape, *shapesWeAdded) {
-      delete shape;
+      foreach (Shape *shape, *shapesWeAdded) {
+        delete shape;
+      }
+      delete shapesWeAdded;
     }
-    delete shapesWeAdded;
   }
 
   /**
@@ -225,6 +229,13 @@ namespace Isis {
   }
 
 
+  /**
+   * OriginalFileToProjectFunctor constructor
+   * 
+   * @param *guiThread The thread for the gui
+   * @param destinationFolder The folder to copy the DN data to
+   * @param copyDnData Determines if the DN data will be copied to the project
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::OriginalFileToProjectCubeFunctor(
       QThread *guiThread, QDir destinationFolder, bool copyDnData) : m_errors(new IException),
       m_numErrors(new int(0)) {
@@ -234,6 +245,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Copy constructor
+   * 
+   * @param &other OriginalFileToProjectCubeFunctor to copy
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::OriginalFileToProjectCubeFunctor(
       const OriginalFileToProjectCubeFunctor &other) : m_errors(other.m_errors),
       m_numErrors(other.m_numErrors) {
@@ -243,6 +259,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::~OriginalFileToProjectCubeFunctor() {
     m_destinationFolder = QDir();
     m_copyDnData = false;
@@ -250,6 +269,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates ecubs and copies the DN data of the cubes, if m_copyDnData is true.
+   *
+   * @param &original Imported shape cube
+   * 
+   * @return Cube Copy of the imported shape cube
+   */
   Cube *ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::operator()(
       const FileName &original) {
     Cube *result = NULL;
@@ -294,6 +320,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the errors from importing
+   * 
+   * @return IException The import errors
+   */
   IException ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::errors() const {
     IException result;
 

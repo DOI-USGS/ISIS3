@@ -207,17 +207,25 @@ namespace Isis {
    */
   void ImportControlNetWorkOrder::undoExecution() {
     if (m_watcher->isFinished()) {
-      ControlList *list = project()->controls().last();
-      // Remove the controls from disk.
-      list->deleteFromDisk(project());
-      // Remove the controls from the model, which updates the tree view.
-      ProjectItem *currentItem =
-          project()->directory()->model()->findItemData(QVariant::fromValue(list));
-      project()->directory()->model()->removeItem(currentItem);
+      if (project()->controls().size() > 0) {
+        ControlList *list = project()->controls().last();
+        // Remove the controls from disk.
+        list->deleteFromDisk( project() );
+        // Remove the controls from the model, which updates the tree view.
+        ProjectItem *currentItem =
+            project()->directory()->model()->findItemData( QVariant::fromValue(list) );
+        project()->directory()->model()->removeItem(currentItem);
+      }
     }
   }
 
 
+  /**
+   * CreateControlsFunctor constructor
+   * 
+   * @param project The project
+   * @param destinationFolder The directory to copy to
+   */
   ImportControlNetWorkOrder::CreateControlsFunctor::CreateControlsFunctor(
       Project *project, QDir destinationFolder) {
     m_project = project;
@@ -225,6 +233,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Reads and writes the control network(s) asynchronously
+   *
+   * @param &cnetFileNameAndProgress QPair of control net filenames, and the progress
+   *
+   * @return Control Pointer to the Control created from the import 
+   */
   Control *ImportControlNetWorkOrder::CreateControlsFunctor::operator()(
       const QPair<FileName, Progress *> &cnetFileNameAndProgress) {
 
@@ -243,6 +258,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Adds the control net to the project
+   * 
+   * @param ready Index of the control net that is ready
+   */
   void ImportControlNetWorkOrder::cnetReady(int ready) {
 
     Control *control = m_watcher->resultAt(ready);

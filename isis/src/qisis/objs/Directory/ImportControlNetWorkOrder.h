@@ -52,6 +52,8 @@ namespace Isis {
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
+   *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
+   *                           is undone. Fixes #5043.
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -90,13 +92,13 @@ namespace Isis {
           Control *operator()(const QPair<FileName, Progress *> &cnetFilename);
 
         private:
-          Project *m_project;
-          QDir m_destinationFolder;
+          Project *m_project; //!< The project to import to
+          QDir m_destinationFolder; //!< The directory to copy the control net too
       };
 
     private:
-      QFutureWatcher<Control *> *m_watcher;
-      QList<Progress *> m_readProgresses;
+      QFutureWatcher<Control *> *m_watcher; //!< QFutureWatcher, allows for asynchronous import
+      QList<Progress *> m_readProgresses; //!< Keeps track of import progress
   };
 }
 #endif // ImportControlNetWorkOrder_H

@@ -74,6 +74,8 @@ namespace Isis {
    *   @history 2017-07-17 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
+   *                           is undone. Fixes #5043.
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -121,21 +123,21 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder; //! Directory where to import the images to.
-          bool m_copyDnData; //! Indicates whether the cube data will be copied to the project.
-          QThread *m_guiThread; //! Pointer to the GUI thread. Not used?
+          QDir m_destinationFolder; //!< Directory where to import the images to.
+          bool m_copyDnData; //!< Indicates whether the cube data will be copied to the project.
+          QThread *m_guiThread; //!< Pointer to the GUI thread. Not used?
 
-          QMutex m_errorsLock; //! Mutex lock for appending errors and incrementing error count.
-          QSharedPointer<IException> m_errors; //! Stores any errors that occur during import.
-          QSharedPointer<int> m_numErrors; //! Number of errors that occur during import.
+          QMutex m_errorsLock; //!< Mutex lock for appending errors and incrementing error count.
+          QSharedPointer<IException> m_errors; //!< Stores any errors that occur during import.
+          QSharedPointer<int> m_numErrors; //!< Number of errors that occur during import.
       };
 
     private:
       void importConfirmedImages(QStringList confirmedImages, bool copyDnData);
 
     private:
-      ImageList *m_newImages; //! List of images that are being imported in this work order.
-      QString m_warning; //! String of any errors/warnings that occurred during import.
+      ImageList *m_newImages; //!< List of images that are being imported in this work order.
+      QString m_warning; //!< String of any errors/warnings that occurred during import.
   };
 }
 #endif // ImportImagesWorkOrder_H
