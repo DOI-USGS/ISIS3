@@ -1,0 +1,127 @@
+Unit Test for Hyb2OncCamera...
+
+----------------------------------------------
+Test for Telecopic Camera...
+FileName:  "hyb2_onc_20151204_041012_tbf_l2a.fit.cub"
+CK Frame:  -37100
+
+Kernel IDs: 
+CK Frame ID      =  -37000
+CK Reference ID  =  1
+SPK Target ID    =  -37
+SPK Reference ID =  1
+
+Spacecraft Name Long:   "Hayabusa2"
+Spacecraft Name Short:  "Hayabusa2"
+Instrument Name Long:   "Optical Navigation Camera - Telescopic Camera"
+Instrument Name Short:  "ONC-T"
+
+Shutter open  =  "502474280.7291458"
+Shutter close =  "502474280.7291541"
+
+For upper left corner ...
+DeltaSample =  -522.936
+DeltaLine   =  -489.534
+
+For upper right corner ...
+DeltaSample =  500.132
+DeltaLine   =  -489.531
+
+For lower left corner ...
+DeltaSample =  -522.943
+DeltaLine   =  533.544
+
+For lower right corner ...
+DeltaSample =  500.138
+DeltaLine   =  533.54
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+DeltaSample =  -11.9
+DeltaLine   =  21.5
+
+
+----------------------------------------------
+Test for W1 Camera...
+FileName:  "hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub"
+CK Frame:  -37110
+
+Kernel IDs: 
+CK Frame ID      =  -37000
+CK Reference ID  =  1
+SPK Target ID    =  -37
+SPK Reference ID =  1
+
+Spacecraft Name Long:   "Hayabusa2"
+Spacecraft Name Short:  "Hayabusa2"
+Instrument Name Long:   "Optical Navigation Camera - W1 Camera"
+Instrument Name Short:  "ONC-W1"
+
+Shutter open  =  "502476937.6921466"
+Shutter close =  "502476937.6921548"
+
+For upper left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For upper right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+DeltaSample =  0.804601
+DeltaLine   =  0.683101
+
+
+----------------------------------------------
+Test for W2 Camera...
+FileName:  "hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub"
+CK Frame:  -37120
+
+Kernel IDs: 
+CK Frame ID      =  -37000
+CK Reference ID  =  1
+SPK Target ID    =  -37
+SPK Reference ID =  1
+
+Spacecraft Name Long:   "Hayabusa2"
+Spacecraft Name Short:  "Hayabusa2"
+Instrument Name Long:   "Optical Navigation Camera - W2 Camera"
+Instrument Name Short:  "ONC-W2"
+
+Shutter open  =  "502399866.4151246"
+Shutter close =  "502399866.4151273"
+
+For upper left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For upper right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower left corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For lower right corner ...
+DeltaSample = No Intersection
+DeltaLine   = No Intersection
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+DeltaSample =  1.87917
+DeltaLine   =  -3.92022
+

@@ -1,0 +1,17 @@
+Group = Hayabusa-2/ONC-W1
+  Version = 1
+  Library = Hyb2OncCamera
+  Routine = Hyb2OncCameraPlugin
+EndGroup
+
+Group = Hayabusa-2/ONC-W2
+  Version = 1
+  Library = Hyb2OncCamera
+  Routine = Hyb2OncCameraPlugin
+EndGroup
+ 
+Group = Hayabusa-2/ONC-T
+  Version = 1
+  Library = Hyb2OncCamera
+  Routine = Hyb2OncCameraPlugin
+EndGroup
