@@ -2392,6 +2392,8 @@ namespace Isis {
         measuredAngle[2] = WrapAngle(start3, measuredAngle[2]);
       }
       polyAngle = poly.evaluate( (sampleTimes[i] - p_baseTime) / p_timeScale );
+      polyAngle[0] = WrapAngle(start1, polyAngle[0]);
+      polyAngle[2] = WrapAngle(start3, polyAngle[2]);
       error += (measuredAngle[0] - polyAngle[0]) * (measuredAngle[0] - polyAngle[0]);
       error += (measuredAngle[1] - polyAngle[1]) * (measuredAngle[1] - polyAngle[1]);
       error += (measuredAngle[2] - polyAngle[2]) * (measuredAngle[2] - polyAngle[2]);

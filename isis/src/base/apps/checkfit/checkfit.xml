@@ -51,14 +51,13 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output file that contains the quality of fits
+          Output file that contains information about the quality of fits.
         </brief>
         <description>
           This text file will contain the quality of fit for each input cube.
-          The first column is the cube name, the second column is the RMS error
-          of the instrument position fit in kilometers, and the third column is
-          the RMS error of the instrument pointing fit in radians. Any cubes
-          for which the process fails will not be included in this output file.
+          Each row contains information and statistics about the instrument
+          position and pointing fit. If there is an existing file with the same
+          name, then it will be overwritten.
         </description>
         <filter>
           *.txt, *.csv
