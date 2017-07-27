@@ -16,10 +16,10 @@
         Raw image data file (.fit) (specified in <em>FROM</em> label)
       </li>
       <li>
-        Output ISIS file name (.cub) (<em>TO</em>)
+        Output ISIS file name (.cub) (specified in <em>TO</em> label)
       </li>
       <li>
-        Users may need to override the target name (<em>TARGET</em>). 
+        Target name if target must be overridden (specified in <em>TARGET</em>). 
       </li>
     </ul>
     <p>
@@ -33,7 +33,7 @@
       TARGET_NAME keyword 
       </li>
       <li>
-         Define TARGET = "SKY" to later project the data with 
+         To define TARGET = "SKY" to later project the data with 
         <em>skymap</em>.
       </li>
     </ul>
@@ -45,7 +45,7 @@
     </p>
     <p>
        The mission purpose is to rendezvous with (and provide a sample return from) 
-       the apollo asteroid 162173 Ryugu, a Cg-type asteroid. 
+       the Apollo asteroid 162173 Ryugu, a Cg-type asteroid. 
     </p> 
     <h2>Instrument Overview</h2>
     <p>
