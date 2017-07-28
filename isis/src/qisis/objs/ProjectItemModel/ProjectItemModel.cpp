@@ -21,14 +21,18 @@
 #include "IsisDebug.h"
 
 #include "ProjectItemModel.h"
-
+#include <QDebug>
 #include <QItemSelection>
 #include <QList>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QModelIndex>
 #include <QObject>
+#include <QRegExp>
+#include <QRegExpValidator>
 #include <QStandardItemModel>
 #include <QString>
+#include <QValidator>
 
 #include "BundleSolutionInfo.h"
 #include "Control.h"
@@ -342,6 +346,7 @@ namespace Isis {
    */
   void ProjectItemModel::onBundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(bundleSolutionInfo->name() );
 
     if (!project) {
       return;
@@ -389,6 +394,7 @@ namespace Isis {
    */
   void ProjectItemModel::onControlAdded(Control * control) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(control->id() );
 
     if (!project) {
       return;
@@ -427,6 +433,7 @@ namespace Isis {
    */
   void ProjectItemModel::onControlListAdded(ControlList * controlList) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(controlList->name() );
 
     if (!project) {
       return;
@@ -457,7 +464,7 @@ namespace Isis {
   void ProjectItemModel::onImagesAdded(ImageList * imageList) {
 //  qDebug()<<"ProjectItemModel::onImagesAdded  before add rowCount = "<<rowCount();
     Project *project = qobject_cast<Project *>( sender() );
-
+    m_reservedNames.append(imageList->name() );
     if (!project) {
       return;
     }
@@ -486,7 +493,8 @@ namespace Isis {
    */
   void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
     Project *project = qobject_cast<Project *>( sender() );
-
+    m_reservedNames.append(shapes->name());
+    
     if (!project) {
       return;
     }
@@ -514,6 +522,7 @@ namespace Isis {
    */
   void ProjectItemModel::onTargetsAdded(TargetBodyList *targets) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(targets->name() );
 
     if (!project) {
       return;
@@ -554,6 +563,7 @@ namespace Isis {
    */
   void ProjectItemModel::onGuiCamerasAdded(GuiCameraList *cameras) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(cameras->name() );
 
     if (!project) {
       return;
@@ -674,33 +684,43 @@ namespace Isis {
    */
   bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
-    ProjectItem *item = itemFromIndex(index);
-    if (item->isProject() && role == Qt::EditRole) {
+     ProjectItem *item = itemFromIndex(index);
 
-      QString name = value.toString();
-      emit projectNameEdited(name);
-    }
+     QString name = value.toString();
+
+     bool rejected =rejectName(m_reservedNames,name);
+
+     if (rejected) {      
+       QMessageBox nameRejected;
+       nameRejected.setText("That name is already in use within this project.");
+       nameRejected.exec();
+       return true;
+     }
+
+     m_reservedNames.append(name);
+
+     if (item->isProject() && role == Qt::EditRole) {
+          emit projectNameEdited(name);
+     }
+
     else if (item->isBundleSolutionInfo() && role == Qt::EditRole) {
-      QString name = value.toString();
       item->setText(name);
       item->bundleSolutionInfo()->setName(name);
     }
     else if (item->isImageList() && role == Qt::EditRole) {
-      QString name = value.toString();
       item->setText(name);
       item->imageList()->setName(name);
     }
     else if (item->isControlList() && role == Qt::EditRole) {
-      QString name = value.toString();
       item->setText(name);
       item->controlList()->setName(name);
     }
     else if (item->isShapeList() && role == Qt::EditRole) {
-      QString name = value.toString();
       item->setText(name);
       item->shapeList()->setName(name);
     }
     return true;
+
   }
 
 
@@ -720,23 +740,55 @@ namespace Isis {
     return Qt::ItemIsEditable | QStandardItemModel::flags(index);
   }
 
- /**
-  * Used to clean the ProjectItemModel of everything but the headers
-  */
-  void ProjectItemModel::clean() {
 
-    for (int i=0; i<rowCount(); i++) {
-      ProjectItem *projectItem = item(i);
-      if (projectItem->project()) {
-        for (int j=0; j < projectItem->rowCount(); j++) {
-          if (projectItem->hasChildren()) {
-            ProjectItem *subProjectItem = projectItem->child(j);
-            while (subProjectItem->hasChildren()) {
-              removeItem(subProjectItem->child(0));
-            }
-          }
-        }
+
+  /**
+   * @brief Checks to see if we are adding a reserved name to the project
+   * (ex. If we are adding an ImageList, and giving it the same name as another
+   * ImageList, or ShapesList, or something else).
+   * @param reserved  The list of reserved names we cannot use.
+   * @param target The name we are querying to see if it is in the reserved list.
+   * @return True if target is in the reserved list, False other.
+   */
+  bool ProjectItemModel::rejectName(QStringList &reserved, QString target) {
+
+
+    QRegExpValidator valid;
+    QValidator::State state;
+    int pos =0;
+    foreach (QString name, reserved) {
+
+      QRegExp rx(name);
+      valid.setRegExp(rx);
+      state = valid.validate(target,pos);
+
+      if (state == 2) {
+        return true;
       }
-    }
+    } //end for
+
+    return false;
   }
+
+  /**
+   * Used to clean the ProjectItemModel of everything but the headers
+   */
+   void ProjectItemModel::clean() {
+
+     for (int i=0; i<rowCount(); i++) {
+       ProjectItem *projectItem = item(i);
+       if (projectItem->project()) {
+         for (int j=0; j < projectItem->rowCount(); j++) {
+           if (projectItem->hasChildren()) {
+             ProjectItem *subProjectItem = projectItem->child(j);
+             while (subProjectItem->hasChildren()) {
+               removeItem(subProjectItem->child(0));
+             }
+           }
+         }
+       }
+     }
+   }
+
+
 }
