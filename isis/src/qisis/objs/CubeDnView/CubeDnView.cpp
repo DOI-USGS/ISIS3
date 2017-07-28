@@ -23,6 +23,7 @@
 #include "CubeDnView.h"
 
 #include <QAction>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMdiArea>
@@ -106,6 +107,12 @@ namespace Isis {
 
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
+
+    Project *activeProject = directory->project();
+    // These connect signals listen to the active project, and if a control network
+    // or list of control networks is added, then the enableIPCETool() function is called.
+    connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableIPCETool()));
+    connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableIPCETool()));
 
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -192,15 +199,6 @@ namespace Isis {
     layout->addWidget(statusBar);
     tools->append(new TrackTool(statusBar));
 
-//  QnetNavTool *ntool = new QnetNavTool(qnetTool, this);
-//  tools->append(ntool);
-//  tools->append(qnetTool);
-//
-//  connect(qnetTool, SIGNAL(showNavTool()), ntool, SLOT(showNavTool()));
-
-    //QMenuBar *menuBar = new QMenuBar;
-    //QMap<QString, QMenu *> subMenus;
-
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
     
@@ -255,6 +253,23 @@ namespace Isis {
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
+  }
+
+
+  /**
+   * @description enableIPCETool:  This is a slot function which
+   * is called when the active project emits a signal to the CubeDnView
+   * object after a control network (or a list of control networks)
+   * has been added.  It enables the control network editor tool if it
+   * has been disabled.
+   */
+  void CubeDnView::enableIPCETool() {
+
+    foreach (QAction * action, m_toolPadActions) {
+      if (action->objectName() == "IpceTool") {
+        action->setDisabled(false);
+      }
+    }
   }
 
 
