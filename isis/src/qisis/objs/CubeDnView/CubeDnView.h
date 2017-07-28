@@ -72,7 +72,7 @@ namespace Isis {
    *   @history 2017-01-02 Tracie Sucharski - Moved IpceTool to first tool on tool bar, change
    *                           icon to match the Footprint2DView.
    *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal.
-   *   @history 2017-07-18 Tyler Wilson - Added a slot function (enableIPCETool) which is called
+   *   @history 2017-07-27 Tyler Wilson - Added a slot function (enableIPCETool) which is called
    *                           when a control network (or list of control networks) is added to
    *                           the active project.  Fixes #4994.
    */
