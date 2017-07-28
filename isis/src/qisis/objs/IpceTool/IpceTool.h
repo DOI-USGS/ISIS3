@@ -41,6 +41,10 @@ namespace Isis {
    *   @history 2016-10-25 Tracie Sucharski - Check for existence of Control net in the
    *                           paintViewport method.
    *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal. 
+   *   @history 2017-07-18 Tyler Wilson - Added the ability for the Ipce tool to check and see
+   *                           if control nets exist within the current project within
+   *                           the toolPadAction function.  If no control nets exist within the
+   *                           project, the Ipce tool is disabled on start-up.  Fixes #4994.
    *                           
    */
   class IpceTool : public Tool {

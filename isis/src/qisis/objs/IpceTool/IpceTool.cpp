@@ -14,6 +14,7 @@
 #include <QString>
 
 #include "Application.h"
+#include "ControlList.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -59,20 +60,42 @@ namespace Isis {
     * @return @b QAction* Pointer to Tie tool action
     *
     * @internal
+    *   @history 2017-07-25 Tyler Wilson - Set the
+    *       object name for the QAction in this 
+    *       method.  It provides a convenient key
+    *       to search through a list of actions in
+    *       other classes.  References #4994.
+    *
     */
    QAction *IpceTool::toolPadAction(ToolPad *pad) {
+     
+
      QAction *action = new QAction(pad);
-//   action->setIcon(QPixmap(toolIconDir()+"/stock_draw-connector-with-arrows.png"));
      action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
      action->setShortcut(Qt::Key_T);
-//     QObject::connect(action,SIGNAL(triggered(bool)),this,SLOT(showNavWindow(bool)));
+
+     //The object name is being set and used as a key to search with for this action in 
+     //other classes (ie. CubeDnView)
+     action->setObjectName("IpceTool");
+
+     QList<ControlList *> cnets = m_directory->project()->controls();
+
+     //Check to see if there are any control nets within the project.
+     //If not, then this action should be disabled.
+     if (cnets.isEmpty()) {
+       action->setDisabled(true);
+     }
+
      return action;
    }
 
 
+
+
    void IpceTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
+
      refresh();
    }
 
