@@ -100,7 +100,7 @@ namespace Isis {
    *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
    *                             imports, shape imports, and bundle solution info. Fixes #4855,
    *                             #4979, #4980.
-   *   @history 2017-07-20 Tyler Wilson - Added the ability to validate and restrict what names
+   *   @history 2017-07-27 Tyler Wilson - Added the ability to validate and restrict what names
    *                             a user can name things like ImageLists/ShapeLists/ControlLists.
    *                             (ie. this class maintains a QStringList of reserved words which
    *                             cannot be used for naming objects).  Fixes #5047.
