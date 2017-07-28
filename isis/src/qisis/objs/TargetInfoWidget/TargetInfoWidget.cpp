@@ -1,6 +1,7 @@
 #include "TargetInfoWidget.h"
 #include "ui_TargetInfoWidget.h"
-
+#include <QFont>
+#include <QFontInfo>
 #include <QPixmap>
 
 #include "Directory.h"
@@ -92,38 +93,52 @@ namespace Isis {
    * @return @b QString The poleRightAscensionLabel text
    */
   QString TargetInfoWidget::formatPoleRaString() {
-    std::vector<Angle> poleRaCoefs = m_target->poleRaCoefs();
-    std::vector<double> poleRaNutPrecCoefs = m_target->poleRaNutPrecCoefs();
 
-    const QChar degChar(0260);
     QString poleRaString = "";
-    QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (poleRaCoefs[1].degrees() < 0.0 ) {
-      poleRaString.append(tr("%1%3 - %2T").arg(poleRaCoefs[0].degrees()).arg(-poleRaCoefs[1]
+    if (m_target->frameType() != Isis::SpiceRotation::BPC &&
+        m_target->frameType() != Isis::SpiceRotation::UNKNOWN ) {
+
+      std::vector<Angle> poleRaCoefs = m_target->poleRaCoefs();
+      std::vector<double> poleRaNutPrecCoefs = m_target->poleRaNutPrecCoefs();
+
+      const QChar degChar(0260);
+      QString coefLetter = m_target->naifPlanetSystemName().at(0);
+
+      if (poleRaCoefs[1].degrees() < 0.0 ) {
+        poleRaString.append(tr("%1%3 - %2T").arg(poleRaCoefs[0].degrees()).arg(-poleRaCoefs[1]
           .degrees()).arg(degChar));
-    }
+      }
+      else {
+        poleRaString.append(tr("%1%3 + %2T").arg(poleRaCoefs[0].degrees()).arg(poleRaCoefs[1]
+          .degrees()).arg(degChar));
+      }
+
+      QString tmp;
+      int nCoefs = poleRaNutPrecCoefs.size();;
+      for (int i = 0; i < nCoefs; i++) {
+        if (poleRaNutPrecCoefs[i] < 0.0 ) {
+          tmp.append(tr(" - %1%2%3").arg(-poleRaNutPrecCoefs[i]).arg("sin %1").arg(coefLetter)
+                                  .arg(i+1));
+        }
+        else if (poleRaNutPrecCoefs[i] > 0.0 ) {
+          tmp.append(tr(" + %1%2%3").arg(poleRaNutPrecCoefs[i]).arg("sin %1").arg(coefLetter)
+                                  .arg(i+1));
+        }
+      }
+
+      poleRaString.append(tmp);
+
+      return poleRaString;
+
+      }
+
     else {
-      poleRaString.append(tr("%1%3 + %2T").arg(poleRaCoefs[0].degrees()).arg(poleRaCoefs[1]
-          .degrees()).arg(degChar));
+         errorMsg();
+         return poleRaString;
     }
 
-    QString tmp;
-    int nCoefs = poleRaNutPrecCoefs.size();;
-    for (int i = 0; i < nCoefs; i++) {
-      if (poleRaNutPrecCoefs[i] < 0.0 ) {
-        tmp.append(tr(" - %1%2%3").arg(-poleRaNutPrecCoefs[i]).arg("sin %1").arg(coefLetter)
-                                  .arg(i+1));
-      }
-      else if (poleRaNutPrecCoefs[i] > 0.0 ) {
-        tmp.append(tr(" + %1%2%3").arg(poleRaNutPrecCoefs[i]).arg("sin %1").arg(coefLetter)
-                                  .arg(i+1));
-      }
-    }
 
-    poleRaString.append(tmp);
-
-    return poleRaString;
   }
 
 
@@ -133,38 +148,52 @@ namespace Isis {
    * @return @b QString The poleDeclinationLabel text
    */
   QString TargetInfoWidget::formatPoleDecString() {
-    std::vector<Angle> poleDecCoefs = m_target->poleDecCoefs();
-    std::vector<double> poleDecNutPrecCoefs = m_target->poleDecNutPrecCoefs();
 
-    const QChar degChar(0260);
     QString poleDecString = "";
-    QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (poleDecCoefs[1].degrees() < 0.0 ) {
-      poleDecString.append(tr("%1%3 - %2T").arg(poleDecCoefs[0].degrees()).arg(-poleDecCoefs[1]
+    if (m_target->frameType() != Isis::SpiceRotation::BPC &&
+        m_target->frameType() != Isis::SpiceRotation::UNKNOWN ) {
+
+      std::vector<Angle> poleDecCoefs = m_target->poleDecCoefs();
+      std::vector<double> poleDecNutPrecCoefs = m_target->poleDecNutPrecCoefs();
+
+      const QChar degChar(0260);
+
+      QString coefLetter = m_target->naifPlanetSystemName().at(0);
+
+      if (poleDecCoefs[1].degrees() < 0.0 ) {
+        poleDecString.append(tr("%1%3 - %2T").arg(poleDecCoefs[0].degrees()).arg(-poleDecCoefs[1]
           .degrees()).arg(degChar));
-    }
+      }
+      else {
+        poleDecString.append(tr("%1%3 + %2T").arg(poleDecCoefs[0].degrees()).arg(poleDecCoefs[1]
+          .degrees()).arg(degChar));
+      }
+
+      QString tmp;
+      int nCoefs = poleDecNutPrecCoefs.size();
+
+      for (int i = 0; i < nCoefs; i++) {
+        if (poleDecNutPrecCoefs[i] < 0.0 ) {
+          tmp.append(tr(" - %1%2%3").arg(-poleDecNutPrecCoefs[i]).arg("cos %1").arg(coefLetter)
+                                  .arg(i+1));
+        }
+        else if (poleDecNutPrecCoefs[i] > 0.0 ) {
+          tmp.append(tr(" + %1%2%3").arg(poleDecNutPrecCoefs[i]).arg("cos %1").arg(coefLetter)
+                                  .arg(i+1));
+        }
+      }
+
+      poleDecString.append(tmp);
+      return poleDecString;
+
+    }//end if
+
     else {
-      poleDecString.append(tr("%1%3 + %2T").arg(poleDecCoefs[0].degrees()).arg(poleDecCoefs[1]
-          .degrees()).arg(degChar));
+          errorMsg();
+          return poleDecString;
     }
 
-    QString tmp;
-    int nCoefs = poleDecNutPrecCoefs.size();;
-    for (int i = 0; i < nCoefs; i++) {
-      if (poleDecNutPrecCoefs[i] < 0.0 ) {
-        tmp.append(tr(" - %1%2%3").arg(-poleDecNutPrecCoefs[i]).arg("cos %1").arg(coefLetter)
-                                  .arg(i+1));
-      }
-      else if (poleDecNutPrecCoefs[i] > 0.0 ) {
-        tmp.append(tr(" + %1%2%3").arg(poleDecNutPrecCoefs[i]).arg("cos %1").arg(coefLetter)
-                                  .arg(i+1));
-      }
-    }
-
-    poleDecString.append(tmp);
-
-    return poleDecString;
   }
 
 
@@ -174,43 +203,101 @@ namespace Isis {
    * @return @b QString The polePMOffsetLabel text
    */
   QString TargetInfoWidget::formatPmString() {
-    std::vector<Angle> pmCoefs = m_target->pmCoefs();
-    std::vector<double> pmNutPrecCoefs = m_target->pmNutPrecCoefs();
 
-    const QChar degChar(0260);
     QString pmString = "";
-    QString coefLetter = m_target->naifPlanetSystemName().at(0);
 
-    if (pmCoefs[1].degrees() < 0.0 ) {
-      pmString.append(tr("%1%3 - %2d").arg(pmCoefs[0].degrees()).arg(-pmCoefs[1].degrees())
+    if (m_target->frameType() != Isis::SpiceRotation::BPC &&
+        m_target->frameType() != Isis::SpiceRotation::UNKNOWN )
+    {
+
+      std::vector<Angle> pmCoefs = m_target->pmCoefs();
+      std::vector<double> pmNutPrecCoefs = m_target->pmNutPrecCoefs();
+
+      const QChar degChar(0260);
+
+      QString coefLetter = m_target->naifPlanetSystemName().at(0);
+
+      if (pmCoefs[1].degrees() < 0.0 ) {
+        pmString.append(tr("%1%3 - %2d").arg(pmCoefs[0].degrees()).arg(-pmCoefs[1].degrees())
           .arg(degChar));
-    }
-    else if (pmCoefs[1].degrees() > 0.0 ) {
-      pmString.append(tr("%1%3 + %2d").arg(pmCoefs[0].degrees()).arg(pmCoefs[1].degrees())
+      }
+      else if (pmCoefs[1].degrees() > 0.0 ) {
+        pmString.append(tr("%1%3 + %2d").arg(pmCoefs[0].degrees()).arg(pmCoefs[1].degrees())
           .arg(degChar));
-    }
-
-    if (pmCoefs[2].degrees() < 0.0 ) {
-      pmString.append(tr(" - %2d^2").arg(-pmCoefs[2].degrees()));
-    }
-    else if (pmCoefs[2].degrees() > 0.0 ) {
-      pmString.append(tr(" + %2d^2").arg(pmCoefs[2].degrees()));
-    }
-
-
-    QString tmp;
-    int nCoefs = pmNutPrecCoefs.size();;
-    for (int i = 0; i < nCoefs; i++) {
-      if (pmNutPrecCoefs[i] < 0.0 ) {
-        tmp.append(tr(" - %1%2%3").arg(-pmNutPrecCoefs[i]).arg("sin %1").arg(coefLetter).arg(i+1));
       }
-      else if (pmNutPrecCoefs[i] > 0.0 ) {
-        tmp.append(tr(" + %1%2%3").arg(pmNutPrecCoefs[i]).arg("sin %1").arg(coefLetter).arg(i+1));
+
+      if (pmCoefs[2].degrees() < 0.0 ) {
+        pmString.append(tr(" - %2d^2").arg(-pmCoefs[2].degrees()));
       }
+      else if (pmCoefs[2].degrees() > 0.0 ) {
+        pmString.append(tr(" + %2d^2").arg(pmCoefs[2].degrees()));
+      }
+
+      QString tmp;
+      int nCoefs = pmNutPrecCoefs.size();
+
+      for (int i = 0; i < nCoefs; i++) {
+        if (pmNutPrecCoefs[i] < 0.0 ) {
+          tmp.append(tr(" - %1%2%3").arg(-pmNutPrecCoefs[i]).arg("sin %1").arg(coefLetter).arg(i+1));
+        }
+        else if (pmNutPrecCoefs[i] > 0.0 ) {
+          tmp.append(tr(" + %1%2%3").arg(pmNutPrecCoefs[i]).arg("sin %1").arg(coefLetter).arg(i+1));
+        }
+      } //end-for
+
+      pmString.append(tmp);
+      return pmString;
+
+    }//end outer-if
+    else {
+         errorMsg();
+         return pmString;
+    } //end outer else
+
+  }
+
+
+
+  /**
+   * Displays an error message on the Prime Meridian/Pole Position tabs of the TargetInfoWidget
+   * in the event that the target body parameters could not be retrieved from the cube.
+   *
+   */
+  void TargetInfoWidget::errorMsg() {
+
+    QFont font;
+    font.setPointSize(9);
+    font.setBold(true);
+    font.setWeight(75);
+    m_ui->label->setFont(font);
+    m_ui->label_6->setFont(font);
+
+    QString msg1="";
+    QString msg2="";
+
+    m_ui->label->setFont(font);
+    m_ui->label_6->setFont(font);
+    m_ui->label_2->clear();
+
+    if (m_target->displayProperties()->displayName() == "MOON") {
+      msg1 = "Target body parameters cannot be solved for the Moon.";
     }
+    else {
+              msg2 = "Target body information\n"
+                       "is not on the cube labels.\n"
+                       "This has no impact on most\n"
+                       "operations.  However, to view\n"
+                       "or bundle adjust the target body\n"
+                       "parameters you will need to rerun\n"
+                       "spiceinit.";
 
-    pmString.append(tmp);
+              m_ui->label->setText(
+                    QApplication::translate("TargetInfoWidget",
+                                            msg2.toLatin1().data(), 0));
+              m_ui->label_6->setText(
+                    QApplication::translate("TargetInfoWidget",
+                                            msg2.toLatin1().data(), 0));
+    } //end inner-else
 
-    return pmString;
   }
 }
