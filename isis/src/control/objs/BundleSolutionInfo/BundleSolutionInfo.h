@@ -105,6 +105,7 @@ namespace Isis {
    *                           solution info images to the correct directory in the project on disk.
    *                           Fixes #4804, #4837.
    *   @history 2017-07-11 Makayla Shepherd - Added bundle naming capabilities. Fixes #4855.
+   *   @history 2017-07-28 Makayla Shepherd - Fixed the default naming tag. Fixes #5069.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

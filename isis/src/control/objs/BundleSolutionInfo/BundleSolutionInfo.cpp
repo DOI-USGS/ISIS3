@@ -131,7 +131,12 @@ namespace Isis {
 
       m_runTime = src.m_runTime;
       
-      m_name = m_runTime;
+      if (src.m_name == "" || src.m_name == src.m_runTime) {
+        m_name = m_runTime;
+      }
+      else {
+        m_name = src.m_name;
+      }
 
       delete m_controlNetworkFileName;
       m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
@@ -203,7 +208,7 @@ namespace Isis {
 
 
   /**
-   * Sets the run time
+   * Sets the run time, and the name if a name is not already set.
    *
    * @param runTime The run time.
    */
@@ -218,6 +223,9 @@ namespace Isis {
     //                    _FILEINFO_);
     // }
     m_runTime = runTime;
+    if (m_name == m_runTime || m_name == "") {
+      m_name = runTime;
+    }
   }
 
 
