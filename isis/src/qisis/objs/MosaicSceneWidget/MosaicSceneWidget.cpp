@@ -1296,6 +1296,8 @@ namespace Isis {
 
       connect(mosItem, SIGNAL(changed(const QList<QRectF> &)),
               m_graphicsView, SLOT(updateScene(const QList<QRectF> &)));
+      connect(mosItem, SIGNAL(mosaicCubeClosed(Image *)), 
+              this, SIGNAL(mosCubeClosed(Image *)));
 
       // We want everything to have a unique Z value so we can manage the z order
       //   well.

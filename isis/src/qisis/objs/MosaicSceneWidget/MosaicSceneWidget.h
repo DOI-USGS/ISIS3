@@ -136,7 +136,8 @@ namespace Isis {
    *   @history 2016-11-07 Ian Humphrey - Restored the startElement() functionality so footprints
    *                           can be correctly loaded from an XML storing the MosaicScenWidget's
    *                           state. Fixes #4486.
-   * 
+   *   @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
+   *                           footprint. Fixes #5050.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -264,6 +265,8 @@ namespace Isis {
 
       void deleteControlPoint(QString pointId);
       void controlPointDeleted();
+      
+      void mosCubeClosed(Image *);
 
     public slots:
       void addImages(ImageList);

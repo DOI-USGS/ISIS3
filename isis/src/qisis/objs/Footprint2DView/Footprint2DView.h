@@ -60,6 +60,8 @@ namespace Isis {
    *   @history 2017-02-06 Tracie Sucharski - Added status bar for the track tool.  Fixes #4475.
    *   @history 2017-07-18 Cole Neubauer - Moved creation of the ImageFileListWidget into
    *                           Footprint2DView to more mirror the Qmos window.  Fixes #4996.
+   *   @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
+   *                           footprint. Fixes #5050.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -90,6 +92,7 @@ namespace Isis {
       void onItemAdded(ProjectItem *item);
       void onItemRemoved(ProjectItem *item);
       void onQueueSelectionChanged();
+      void onMosItemRemoved(Image *image);
 
     private:
       MosaicSceneWidget *m_sceneWidget; //!< The scene widget

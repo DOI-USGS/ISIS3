@@ -88,6 +88,9 @@ namespace Isis {
 
     connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
             this, SIGNAL(createControlPoint(double, double)));
+    
+    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
+            this, SLOT(onMosItemRemoved(Image *)));
 
     // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
     // This is done to redraw the control points on the cube viewports
@@ -243,6 +246,27 @@ namespace Isis {
     }
   }
 
+  
+  /**
+   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed 
+   * using the Close Cube context menu.
+   * 
+   * @param image The image that was closed and needs to be removed
+   */
+  void Footprint2DView::onMosItemRemoved(Image *image) {
+    if (image) {
+      ImageList images;
+      images.append(image);
+
+      m_sceneWidget->removeImages(images);
+      m_fileListWidget->removeImages(&(images));
+
+      if ( m_imageItemMap.value( image ) ) {
+        m_imageItemMap.remove( image );
+      }
+    }
+  }
+  
 
   /**
    * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
