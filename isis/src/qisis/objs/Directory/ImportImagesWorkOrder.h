@@ -71,6 +71,8 @@ namespace Isis {
    *                           Fixes #4956
    *   @history 2017-07-14 Cole Neubauer - Added ability successfully import after failing to import
    *                           a set or list of images Fixes #5015
+   *   @history 2017-07-14 Cole Neubauer - Made import statement more descriptive when importing a
+   *                           cube list Fixes #5042
    *   @history 2017-07-17 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969

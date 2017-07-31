@@ -182,7 +182,11 @@ namespace Isis {
     if (fileNames.count() > 1) {
       QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
     }
-    else if (fileNames.count() == 1) {
+    else if (fileNames.count() == 1 && stateToSave.count() > 2) {
+      QUndoCommand::setText(tr("Import %1 Images from %2").arg(
+                    QString::number(stateToSave.count() - 1), fileNames.first()));
+    }
+    else {
       QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
     }
 
