@@ -55,6 +55,8 @@ namespace Isis {
    *   @history 2017-04-10 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
    *                           execute to setupExecution, and moving the actual work to the execute
    *                           method.
+   *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
+   *                           Fixes #4715
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
@@ -68,6 +70,7 @@ namespace Isis {
 
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
+      bool isSavedToHistory() const;
       virtual bool setupExecution();
       virtual void execute();
 

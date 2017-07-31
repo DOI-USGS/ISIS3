@@ -37,7 +37,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Clean up allocated memory
    */
@@ -106,49 +105,51 @@ namespace Isis {
    * @param workOrder The work order to display the history for
    */
   void HistoryTreeWidget::addToHistory(WorkOrder *workOrder) {
-    QString data = workOrder->bestText();
+    //if (workOrder->isSavedToHistory()) {
+      QString data = workOrder->bestText();
 
-    connect(workOrder, SIGNAL(destroyed(QObject *)),
-            this, SLOT(removeFromHistory(QObject *)));
+      connect(workOrder, SIGNAL(destroyed(QObject *)),
+              this, SLOT(removeFromHistory(QObject *)));
 
-    QStringList columnData;
-    columnData.append(data);
-    columnData.append("");
-    columnData.append(workOrder->executionTime().toString());
+      QStringList columnData;
+      columnData.append(data);
+      columnData.append("");
+      columnData.append(workOrder->executionTime().toString());
 
-    QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
-    newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
+      QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
+      newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
 
-    // Do font for save work orders or work orders not on QUndoStack
-    if (workOrder->createsCleanState() || !workOrder->isUndoable()) {
-      QFont saveFont = newItem->font(0);
-      saveFont.setBold(true);
-      saveFont.setItalic(true);
-      newItem->setFont(0, saveFont);
-      newItem->setForeground(0, Qt::gray);
-    }
+      // Do font for save work orders or work orders not on QUndoStack
+      if (workOrder->createsCleanState() || !workOrder->isUndoable()) {
+        QFont saveFont = newItem->font(0);
+        saveFont.setBold(true);
+        saveFont.setItalic(true);
+        newItem->setFont(0, saveFont);
+        newItem->setForeground(0, Qt::gray);
+      }
 
-    // Do font for progress text
-    QFont progressFont = newItem->font(1);
-    progressFont.setItalic(true);
-    newItem->setFont(1, progressFont);
-    newItem->setForeground(1, Qt::gray);
+      // Do font for progress text
+      QFont progressFont = newItem->font(1);
+      progressFont.setItalic(true);
+      newItem->setFont(1, progressFont);
+      newItem->setForeground(1, Qt::gray);
 
-    invisibleRootItem()->addChild(newItem);
+      invisibleRootItem()->addChild(newItem);
 
-    connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
-            this, SLOT(updateStatus(WorkOrder *)));
-    connect(workOrder, SIGNAL(creatingProgress(WorkOrder *)),
-            this, SLOT(updateProgressWidgets()));
-    connect(workOrder, SIGNAL(deletingProgress(WorkOrder *)),
-            this, SLOT(updateProgressWidgets()));
+      connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
+              this, SLOT(updateStatus(WorkOrder *)));
+      connect(workOrder, SIGNAL(creatingProgress(WorkOrder *)),
+              this, SLOT(updateProgressWidgets()));
+      connect(workOrder, SIGNAL(deletingProgress(WorkOrder *)),
+              this, SLOT(updateProgressWidgets()));
 
-    if (workOrder->progressBar()) {
-      setItemWidget(newItem, 1, workOrder->progressBar());
-    }
+      if (workOrder->progressBar()) {
+        setItemWidget(newItem, 1, workOrder->progressBar());
+      }
 
-    scrollToItem(newItem);
-    refit();
+      scrollToItem(newItem);
+      refit();
+  //  }
   }
 
 

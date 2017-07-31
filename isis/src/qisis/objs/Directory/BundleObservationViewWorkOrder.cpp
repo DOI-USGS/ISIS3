@@ -37,6 +37,7 @@ namespace Isis {
   BundleObservationViewWorkOrder::BundleObservationViewWorkOrder(Project *project) :
       WorkOrder(project) {
     m_isUndoable = false;
+    m_isSavedToHistory = false;
     QAction::setText(tr("&View..."));
     QUndoCommand::setText(tr("View..."));
   }
@@ -112,7 +113,6 @@ namespace Isis {
    *
    */
   void BundleObservationViewWorkOrder::execute() {
-
     //ProjectItem * selectedItem = project()->directory()->model()->selectedItems();
     project()->directory()->addBundleObservationView(fileItem());
     project()->setClean(false);

@@ -45,8 +45,9 @@ namespace Isis {
    */
   Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
       WorkOrder(project) {
-    m_isUndoable = false;
     QAction::setText(tr("View &Footprints..."));
+    m_isUndoable = false;
+    m_isSavedToHistory = false;
   }
 
 

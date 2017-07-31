@@ -143,17 +143,17 @@ namespace Isis {
    *   @history 2017-05-17 Tracie Sucharski - Changed activeControl and activeImageList methods to
    *                           return default values if project contains a single control and a
    *                           single image list.  Fixes #4867.
-   *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
-   *                           imports, shape imports, and bundle solution info. Fixes #4855, 
+   *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image
+   *                           imports, shape imports, and bundle solution info. Fixes #4855,
    *                           #4979, #4980.
-   *                
-   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969
-   *
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
    *                           Fixes #5046
+   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
+   *                           allow for opening of a new project. Fixes #4969
+   *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
+   *                           Fixes #4715
    */
   class Project : public QObject {
     Q_OBJECT
@@ -192,6 +192,7 @@ namespace Isis {
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
+      QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
       void setName(QString newName);
@@ -477,6 +478,7 @@ namespace Isis {
       int m_numImagesCurrentlyReading;
 
       QMutex *m_mutex;
+      QMutex *m_workOrderMutex;
       QMutex *m_imageReadingMutex;
 
       int m_numShapesCurrentlyReading;

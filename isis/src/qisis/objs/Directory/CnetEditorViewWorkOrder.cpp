@@ -42,6 +42,7 @@ namespace Isis {
   CnetEditorViewWorkOrder::CnetEditorViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View &Network..."));
+    m_isSavedToHistory = false;
   }
 
 
@@ -87,6 +88,7 @@ namespace Isis {
 
 
   void CnetEditorViewWorkOrder::execute() {
+
     for (int i = 0; i < controlList()->size(); i++) {
       //project()->directory()->addCnetEditorView(controlList().first());
       project()->directory()->addCnetEditorView(controlList()->at(i));

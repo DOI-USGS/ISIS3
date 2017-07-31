@@ -42,10 +42,10 @@ namespace Isis {
   */
   SensorGetInfoWorkOrder::SensorGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
-
-    // Currently undo is not implemented.
-    m_isUndoable = false;
     QAction::setText(tr("Get Info...") );
+    // Currently undo is not implemented.
+    m_isUndoable =false;
+    m_isSavedToHistory = false;
   }
 
 
@@ -134,6 +134,7 @@ namespace Isis {
    * @brief  Redisplays the sensor view.
    */
   void SensorGetInfoWorkOrder::execute() {
+
     SensorInfoWidget *sensorInfoWidget =
         project()->directory()->addSensorInfoView(guiCamera() );
 
@@ -152,4 +153,3 @@ namespace Isis {
     //delete project()->directory()->cnetEditorViews().last();
   }
 }
-

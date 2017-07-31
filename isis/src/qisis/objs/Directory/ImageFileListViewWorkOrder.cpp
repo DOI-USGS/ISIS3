@@ -34,6 +34,7 @@ namespace Isis {
   ImageFileListViewWorkOrder::ImageFileListViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View File &Names..."));
+    m_isSavedToHistory = false;
   }
 
 
@@ -140,6 +141,7 @@ namespace Isis {
    * currentItem() to that.
    */
   void ImageFileListViewWorkOrder::execute() {
+
     int viewToUse = internalData().first().toInt();
 
     ImageFileListWidget *fileListToUse = NULL;

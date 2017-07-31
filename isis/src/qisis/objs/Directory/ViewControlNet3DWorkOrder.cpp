@@ -41,7 +41,8 @@ namespace Isis {
   ViewControlNet3DWorkOrder::ViewControlNet3DWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&View ControlNet 3D..."));
-  }
+    m_isSavedToHistory = false;
+}
 
 
   /**
@@ -118,6 +119,7 @@ namespace Isis {
    * @brief Display the 3D control network.  Currently not implemented.
    */
   void ViewControlNet3DWorkOrder::execute() {
+
     //project()->directory()->addCnetEditorView(controlList().first());
     //project()->setClean(false);
   }

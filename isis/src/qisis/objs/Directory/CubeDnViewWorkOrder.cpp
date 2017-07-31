@@ -46,6 +46,7 @@ namespace Isis {
   CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("Display &Images..."));
+    m_isSavedToHistory = false;
   }
 
   /**
@@ -115,6 +116,7 @@ namespace Isis {
    */
   bool CubeDnViewWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
+
 
     if (success) {
       QStringList viewOptions;

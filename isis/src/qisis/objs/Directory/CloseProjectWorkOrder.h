@@ -38,6 +38,8 @@ namespace Isis {
    *                          Fixes #2146.
    *   @history 2017-07-18 Cole Neubauer - Finished implementing Close Project work order.
    *                          Fixes #4521
+   *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
+   *                           Fixes #4715
    */
   class CloseProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -51,6 +53,7 @@ namespace Isis {
       virtual bool isExecutable();
       bool setupExecution();
       void execute();
+
 
     signals:
 

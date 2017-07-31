@@ -42,6 +42,7 @@ namespace Isis {
   MatrixViewWorkOrder::MatrixViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText( tr("View Correlation &Matrix...") );
+    m_isSavedToHistory = false;
   }
 
   /**
@@ -162,6 +163,7 @@ namespace Isis {
    * @brief This method computes and displays the correlation matrix.
    */
   void MatrixViewWorkOrder::execute() {
+
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
     CorrelationMatrix corrMat = correlationMatrix();
     /*

@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QFutureWatcher>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -63,6 +64,7 @@ namespace Isis {
     m_fileItem = FileItemQsp();
 
     m_isUndoable = true;
+    m_isSavedToHistory = true;
     m_isSynchronous = true;
 
     m_createsCleanState = false;
@@ -122,6 +124,7 @@ namespace Isis {
     m_internalData = other.m_internalData;
 
     m_isUndoable = other.m_isUndoable;
+    m_isSavedToHistory = other.m_isSavedToHistory;
     m_isSynchronous = other.m_isSynchronous;
 
     m_createsCleanState = other.m_createsCleanState;
@@ -773,6 +776,17 @@ namespace Isis {
 
 
   /**
+   * @brief Returns true if this work order is to be shown in History, otherwise false.
+   *
+   * @return @b (bool) Returns True if this work order is to be shown in History
+   */
+  bool WorkOrder::isSavedToHistory() const {
+     QMutexLocker locker(project()->workOrderMutex());
+     return m_isSavedToHistory;
+  }
+
+
+  /**
    * @brief Returns true if this work order is run synchronously, otherwise false.
    *
    * @return @b (bool) Returns True if this work order is run synchronously
@@ -963,7 +977,6 @@ namespace Isis {
 
   /**
    * @brief Starts (or enqueues) a redo. This should not be re-implemented by children.
-   *
    */
   void WorkOrder::redo() {
     if (!isInStableState()) {

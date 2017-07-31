@@ -100,6 +100,7 @@ namespace Isis {
     m_numImagesCurrentlyReading = 0;
 
     m_mutex = NULL;
+    m_workOrderMutex = NULL;
     m_imageReadingMutex = NULL;
 
     m_numShapesCurrentlyReading = 0;
@@ -172,7 +173,7 @@ namespace Isis {
     //  TODO TLS 2016-07-13  This seems to only be used by ControlNet when SetTarget is called.
     //     This needs to be better documented, possibly renamed or redesigned??
     m_mutex = new QMutex;
-
+    m_workOrderMutex = new QMutex;
     // image reader
     m_imageReader = new ImageReader(m_mutex, true);
 
@@ -884,8 +885,8 @@ namespace Isis {
    *                  in the GUI instead of the command line, and the application starts
    *                  instead of executing prematurely.  Fixes #4488.
    *   @history 2017-07-24 Cole Neubauer -  Moved all exception checking in Open function to
-   *                           beginning of function to avoid clearing a project when an invalid
-   *                           directory is chosen Fixes #4969
+   *                  beginning of function to avoid clearing a project when an invalid
+   *                  directory is chosen Fixes #4969
    * */
   void Project::open(QString projectPathStr) {
     FileName projectPath(projectPathStr);
@@ -1899,7 +1900,9 @@ namespace Isis {
 
         m_workOrderHistory->append(workOrder);
 
-        emit workOrderStarting(workOrder);
+        if (workOrder->isSavedToHistory()) {
+          emit workOrderStarting(workOrder);
+        }
 
         // Work orders that create clean states (save, save as) don't belong on the undo stack.
         //   Instead, we tell the undo stack that we're now clean.
@@ -2270,6 +2273,11 @@ namespace Isis {
   Project::XmlHandler::XmlHandler(Project *project) {
     m_project = project;
     m_workOrder = NULL;
+  }
+
+
+  QMutex *Project::workOrderMutex() {
+    return m_workOrderMutex;
   }
 
 

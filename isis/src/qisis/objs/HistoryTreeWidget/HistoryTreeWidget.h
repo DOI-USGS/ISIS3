@@ -28,7 +28,8 @@ namespace Isis {
    *                           out and italicized.
    *   @history 2017-04-05 Tracie Sucharski - For the last change, method name was changed from
    *                           onUndoStack to isUndoable.
-   *  
+   *   @history 2017-07-24 Cole Neubauer - Added check in addToHistory() to check if a WorkOrder
+   *                           should be added to the HistoryTree Fixes #4715
    */
   class HistoryTreeWidget : public QTreeWidget {
       Q_OBJECT

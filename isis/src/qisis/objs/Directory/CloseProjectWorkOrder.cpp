@@ -43,7 +43,7 @@ namespace Isis {
       WorkOrder(project) {
     QAction::setText(tr("&Close Project"));
     QUndoCommand::setText(tr("Close Project"));
-
+    m_isSavedToHistory = false;
     setCreatesCleanState(true);
   }
 
@@ -87,6 +87,7 @@ namespace Isis {
    */
   bool CloseProjectWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
+
     if (success && !project()->isClean() && project()->isOpen() ) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon,
               QString("Current Project Has Unsaved Changes"),
