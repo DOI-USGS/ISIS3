@@ -208,6 +208,7 @@ namespace Isis {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
       dock->setAttribute(Qt::WA_DeleteOnClose, true);
       dock->setWidget(newWidget);
+      dock->setObjectName(newWidget->windowTitle());
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
     else {

@@ -92,7 +92,9 @@ namespace Isis {
    *                           when opening a new project. Fixes #4969
    *  @history 2017-07-14 Cole Neubauer - Added private slot raiseWarningTab to be able to raise
    *                           the warning tab when a new warning happens.
-   *                           Fixes #5041 
+   *                           Fixes #5041
+   *  @history 2017-07-14 Cole Neubauer - Set Object name for Target/Sensor Widgets in addView
+   *                           Fixes #5059 
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
