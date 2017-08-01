@@ -2276,6 +2276,16 @@ namespace Isis {
   }
 
 
+ /**
+  * This function returns a QMutex. This was needed to be able to deal with a threading issue with
+  * Work Order functions returning a member variable. This is used by creating a QMutexLocker
+  * inside of a function accessing a member variable and using the returned QMutex from this
+  * function as a parameter. Because the QMutexLocker was created in the function accessing the
+  * member variable when the function exits the QMutexLocker is destroyed and the QMutex is
+  * unlocked.
+  *
+  * @return QMutex
+  */
   QMutex *Project::workOrderMutex() {
     return m_workOrderMutex;
   }

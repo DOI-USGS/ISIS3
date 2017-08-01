@@ -154,6 +154,8 @@ namespace Isis {
    *                           allow for opening of a new project. Fixes #4969
    *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
    *                           Fixes #4715
+   *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
+   *                           Fixes #5082
    */
   class Project : public QObject {
     Q_OBJECT

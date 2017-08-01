@@ -301,6 +301,8 @@ namespace Isis {
    *                           BundleObservationViewWorkOrder. Fixes #4838, #4839, #4840.
    *   @history 2017-07-24 Cole Neubauer - Created isSavedToHistory() to be able to keep Views from
    *                           being added to the HistoryTree Fixes #4715
+   *   @history 2017-07-31 Cole Neubauer - Added a QTMutexLocker to every function that returns a
+   *                           member variable function Fixes #5082
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT

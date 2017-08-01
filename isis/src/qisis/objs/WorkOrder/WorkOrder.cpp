@@ -603,6 +603,7 @@ namespace Isis {
    * @return @b (ImageList*) A pointer to the ImageList.
    */
   ImageList *WorkOrder::imageList() {
+    QMutexLocker locker(project()->workOrderMutex());
     if (!m_imageList) {
       bool anyImagesAreNull = false;
 
@@ -634,6 +635,7 @@ namespace Isis {
    * @return @b (ShapeList*) A pointer to the ShapeList.
    */
   ShapeList *WorkOrder::shapeList() {
+    QMutexLocker locker(project()->workOrderMutex());
     if (!m_shapeList) {
       bool anyShapesAreNull = false;
 
@@ -666,6 +668,7 @@ namespace Isis {
    * @return A CorrelationMatrix.
    */
   CorrelationMatrix WorkOrder::correlationMatrix() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_correlationMatrix;
   }
 
@@ -675,6 +678,7 @@ namespace Isis {
    * @return QPointer<ControlList>  Returns m_controlList.
    */
   QPointer<ControlList> WorkOrder::controlList() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_controlList;
   }
 
@@ -704,6 +708,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the TargetBody.
    */
   TargetBodyQsp WorkOrder::targetBody() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_targetBody;
   }
 
@@ -713,6 +718,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the guiCamera.
    */
   GuiCameraQsp WorkOrder::guiCamera() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_guiCamera;
   }
 
@@ -722,6 +728,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the fileItem.
    */
   FileItemQsp WorkOrder::fileItem() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_fileItem;
   }
 
@@ -771,6 +778,7 @@ namespace Isis {
    * @return @b (bool) Returns True if this work order is undoable, false if it is not.
    */
   bool WorkOrder::isUndoable() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_isUndoable;
   }
 
@@ -792,6 +800,7 @@ namespace Isis {
    * @return @b (bool) Returns True if this work order is run synchronously
    */
   bool WorkOrder::isSynchronous() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_isSynchronous;
   }
 
@@ -801,6 +810,7 @@ namespace Isis {
    * @return @b Returns True if the Project has been saved to disk.  False if it has not.
    */
   bool WorkOrder::createsCleanState() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_createsCleanState;
   }
 
@@ -810,6 +820,7 @@ namespace Isis {
    * @return @b QDateTime The execution time.
    */
   QDateTime WorkOrder::executionTime() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_executionTime;
   }
 
@@ -828,6 +839,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder is executing a redo.  Returns False if it is not.
    */
   bool WorkOrder::isRedoing() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderRedoing;
   }
 
@@ -837,6 +849,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder has completed a Redo.  False if it has not.
    */
   bool WorkOrder::isRedone() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderRedone;
   }
 
@@ -846,6 +859,7 @@ namespace Isis {
    * @return @b bool Returns True if the current status is WorkOrderUndoing, False otherwise.
    */
   bool WorkOrder::isUndoing() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderUndoing;
   }
 
@@ -855,6 +869,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder has been undone.  False if it has not.
    */
   bool WorkOrder::isUndone() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderUndone;
   }
 
@@ -865,6 +880,7 @@ namespace Isis {
    * it's actions.  Returns False if it has not.
    */
   bool WorkOrder::modifiesDiskState() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_modifiesDiskState;
   }
 
@@ -874,6 +890,7 @@ namespace Isis {
    * @return @b QPointer pointing to the next WorkOrder.
    */
   WorkOrder *WorkOrder::next() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_nextWorkOrder;
   }
 
@@ -883,6 +900,7 @@ namespace Isis {
    * @return @b QPointer pointing to the previous WorkOrder.
    */
   WorkOrder *WorkOrder::previous() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_previousWorkOrder;
   }
 
@@ -892,6 +910,7 @@ namespace Isis {
    * @return @b QString A string representation of the current WorkOrder status.
    */
   QString WorkOrder::statusText() const {
+    QMutexLocker locker(project()->workOrderMutex());
     QString result = toString(m_status);
 
     if (m_secondsElapsed) {
@@ -912,6 +931,7 @@ namespace Isis {
    * @return A QPointer to the ProgessBar.
    */
   ProgressBar *WorkOrder::progressBar() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressBar;
   }
 
@@ -1262,6 +1282,7 @@ namespace Isis {
    * @return @b int The minimum value.
    */
   int WorkOrder::progressMin() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressRangeMinValue;
   }
 
@@ -1271,6 +1292,7 @@ namespace Isis {
    * @return @b int The maximum value.
    */
   int WorkOrder::progressMax() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressRangeMaxValue;
   }
 
@@ -1280,6 +1302,7 @@ namespace Isis {
    * @return @b int Returns the current progress value.
    */
   int WorkOrder::progressValue() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressValue;
   }
 
@@ -1309,6 +1332,7 @@ namespace Isis {
    * @return @b QStringList Returns the internal data object.
    */
   QStringList WorkOrder::internalData() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_internalData;
   }
 
