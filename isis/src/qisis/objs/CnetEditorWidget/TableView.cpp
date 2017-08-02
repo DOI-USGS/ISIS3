@@ -80,9 +80,9 @@ namespace Isis {
     connect(m_content, SIGNAL(tableSelectionChanged()),
         this, SIGNAL(selectionChanged()));
     connect(m_content,
-        SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
+        SIGNAL(rebuildModels(QList< AbstractTreeItem * >)),
         this,
-        SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
+        SIGNAL(rebuildModels(QList< AbstractTreeItem * >)));
     connect(m_content, SIGNAL(horizontalScrollBarValueChanged(int)),
         m_header, SLOT(updateHeaderOffset(int)));
     connect(m_content, SIGNAL(modelDataChanged()),

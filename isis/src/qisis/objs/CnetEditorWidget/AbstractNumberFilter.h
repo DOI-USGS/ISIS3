@@ -37,7 +37,7 @@ namespace Isis {
 
 
     protected:
-      using Isis::CnetViz::AbstractFilter::evaluate;
+      using Isis::AbstractFilter::evaluate;
       bool evaluate(double) const;
       QString descriptionSuffix() const;
       bool lessThan() const;

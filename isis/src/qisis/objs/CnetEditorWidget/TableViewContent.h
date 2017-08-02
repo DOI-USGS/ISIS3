@@ -53,7 +53,7 @@ namespace Isis {
 
 
     signals:
-      void rebuildModels(QList< CnetViz::AbstractTreeItem * >);
+      void rebuildModels(QList< AbstractTreeItem * >);
       void modelDataChanged();
       void tableSelectionChanged();
       void tableSelectionChanged(QList< AbstractTreeItem * >);
