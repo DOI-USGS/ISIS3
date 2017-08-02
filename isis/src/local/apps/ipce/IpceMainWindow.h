@@ -95,6 +95,9 @@ namespace Isis {
    *                           Fixes #5041
    *  @history 2017-07-14 Cole Neubauer - Set Object name for Target/Sensor Widgets in addView
    *                           Fixes #5059 
+   *                           Fixes #5041
+   *  @history 2017-07-26 Cole Neubauer - Changed the closevent funtion to check if a project is
+   *                           and prompt user accordingly Fixes #4960
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

@@ -234,15 +234,15 @@ namespace Isis {
       mdiArea->closeAllSubWindows();
       delete window;
     }
-    if(!m_detachedViews.isEmpty()) {
-      foreach(QMainWindow* view, m_detachedViews) {
+    if (!m_detachedViews.isEmpty()) {
+      foreach ( QMainWindow* view, m_detachedViews ) {
         view->close();
       }
     }
 
     QList<QDockWidget *> docks = tabifiedDockWidgets(m_projectDock);
     if(docks.count() > 1) {
-      foreach(QDockWidget* widget, docks) {
+      foreach ( QDockWidget* widget, docks ) {
         if(widget != m_projectDock) {
           delete widget;
         }
@@ -394,10 +394,10 @@ namespace Isis {
    */
   void IpceMainWindow::updateToolBarActions() {
     m_permToolBar->clear();
-    foreach( QAction *action, m_directory->permToolBarActions() ) {
+    foreach ( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
     }
-    foreach(QAction *action, m_permToolBarActions) {
+    foreach (QAction *action, m_permToolBarActions) {
       m_permToolBar->addAction(action);
     }
     m_permToolBar->addSeparator();
@@ -670,8 +670,26 @@ namespace Isis {
    * state information before forwarding the event to the QMainWindow.
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
+    if (!m_directory->project()->isClean()) {
+      QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
+                             QString("Would you like to save your current project?"),
+                             NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+      QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+      box->addButton("Don't Save", QMessageBox::RejectRole);
+      QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+      box->exec();
+
+      if (box->clickedButton() == (QAbstractButton*)cancel) {
+        event->ignore();
+        return;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)save) {
+        m_directory->project()->save();
+      }
+    }
     writeSettings(m_directory->project());
     QMainWindow::closeEvent(event);
+
   }
 
 
@@ -914,6 +932,7 @@ namespace Isis {
 
     addView(view);
   }
+
 
 /**
  * Raises the warningWidget to the front of the tabs. Connected to warning signal from directory.

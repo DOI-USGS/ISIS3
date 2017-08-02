@@ -40,6 +40,7 @@ namespace Isis {
    *
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-31 Cole Neubauer - Fixed images not removing correctly Fixes #4998
    */
   class RemoveImagesWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -354,7 +354,7 @@ namespace Isis {
     // Write the new jigged control net with correct path to results folder + runtime
     FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
-    
+
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
     // Iterate through all of the image lists (the "imports" in the project).
@@ -432,7 +432,7 @@ namespace Isis {
     //TODO: delete bundle results object
 
 //       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
-
+    m_project->setClean(false);
   }
 
 

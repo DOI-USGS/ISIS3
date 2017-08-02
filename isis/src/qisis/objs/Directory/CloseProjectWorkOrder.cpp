@@ -87,8 +87,7 @@ namespace Isis {
    */
   bool CloseProjectWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
-
-    if (success && !project()->isClean() && project()->isOpen() ) {
+    if (success && !project()->isClean()) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon,
               QString("Current Project Has Unsaved Changes"),
               QString("Would you like to save your current project?"),

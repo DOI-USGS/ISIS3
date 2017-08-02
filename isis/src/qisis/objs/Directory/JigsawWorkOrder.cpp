@@ -164,6 +164,5 @@ namespace Isis {
     JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl);
     runDialog->setAttribute(Qt::WA_DeleteOnClose);
     runDialog->show();
-    project()->setClean(false);
   }
 }

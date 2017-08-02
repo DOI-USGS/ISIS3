@@ -489,7 +489,6 @@ namespace Isis {
 
     if ( !m_images->isEmpty() ) {
       stream.writeStartElement("imageLists");
-
       for (int i = 0; i < m_images->count(); i++) {
         m_images->at(i)->save(stream, this, newProjectRoot);
       }
@@ -1131,6 +1130,7 @@ namespace Isis {
   */
   void Project::setClean(bool value) {
     m_isClean = value;
+    m_undoStack.cleanChanged(value);
   }
 
 
@@ -2081,9 +2081,11 @@ namespace Isis {
     foreach (Image *image, imageList) {
       delete image;
     }
-
-    //  If imageList part of project, remove list
-
+    foreach (ImageList *list, *m_images) {
+      if (list->name() == imageList.name()) {
+        m_images->removeOne(list);
+      }
+    }
   }
 
 

@@ -337,6 +337,7 @@ namespace Isis {
     QAction *saveAction = m_saveProjectWorkOrder->clone();
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
     saveAction->setIcon( QIcon(":save") );
+    saveAction->setDisabled(true);
     connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
              saveAction, SLOT( setDisabled(bool) ) );
     fileMenu->addAction(saveAction);

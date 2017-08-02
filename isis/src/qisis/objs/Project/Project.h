@@ -156,6 +156,7 @@ namespace Isis {
    *                           Fixes #4715
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
    *                           Fixes #5082
+   *   @history 2017-08-02 Cole Neubauer - Made setClean emit a signal from undoStack. Fixes #4960
    */
   class Project : public QObject {
     Q_OBJECT

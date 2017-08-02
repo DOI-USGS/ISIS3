@@ -88,17 +88,22 @@ namespace Isis {
    * @description Remove any selected items from the project directory.
    */
   void RemoveImagesWorkOrder::execute() {
-  //  qDebug()<<"RemoveImagesWorkOrder::execute  project()->directory()->model() = "<<project()->directory()->model();
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
-    ImageList *images = project()->activeImageList();
+    QList<ImageList *>   images = project()->images();
 
     foreach(ProjectItem *currentItem, selectedItems) {
-      Image *image = currentItem->image();
-      images->removeOne(image);
+
+      if (currentItem->isImageList()) {
+        project()->removeImages(*(currentItem->imageList()));
+      }
+      else {
+        Image *image = currentItem->image();
+        foreach (ImageList* list, project()->images()) {
+          list->removeAll(image);
+        }
+      }
     }
     project()->directory()->model()->removeItems(selectedItems);
-
-
     project()->setClean(false);
   }
 

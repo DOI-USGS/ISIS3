@@ -154,6 +154,7 @@ namespace Isis {
    *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
    *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
    *                           from the context menu Fixes #4996
+   *   @history 2017-07-26 Cole Neubauer -Set save button to default be disabled Fixes #4960
    *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
    *                           current edit control point ID.  Fixes #5007, #5008.
    */
