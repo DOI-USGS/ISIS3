@@ -172,7 +172,11 @@ namespace Isis {
 
     // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
     // This is done to redraw the control points on the cube viewports
-    connect(this, SIGNAL(controlPointAdded(QString)), ipceTool, SLOT(refresh()));
+    connect(this, SIGNAL(controlPointAdded(QString)), ipceTool, SLOT(paintAllViewports()));
+
+    //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
+    //  CubeViewports.
+    connect(this, SIGNAL(redrawMeasures()), ipceTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
     tools->append(new ZoomTool(this));

@@ -18,6 +18,8 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "ControlPointEditView.h"
+#include "ControlPointEditWidget.h"
 #include "CubeDnView.h"
 #include "Directory.h"
 #include "IException.h"
@@ -91,12 +93,17 @@ namespace Isis {
    }
 
 
-
-
+   /**
+    * Set the active control net to be used for editing 
+    *  
+    * @param cnet (ControlNet *)  The active control net from Directory that is being used for 
+    *             editing
+    */
    void IpceTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
-
-     refresh();
+     // TODO:  TLS 7-25-17  This method is called by Project::open before there are any viewports,
+     // so the following command seg faults.  Need to add check for viewports or ??
+     //paintAllViewports();
    }
 
 
@@ -191,20 +198,19 @@ namespace Isis {
       }
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
-//    qDebug()<<"IpceTool::mouseButton  lat = "<<lat<<"  lon = "<<lon;
       emit createControlPoint(lat, lon, cvp->cube(), isGroundSource);
-//      if (m_groundOpen && file == m_groundCube->fileName()) {
-//        createFixedPoint (lat,lon);
-//      }
-//      else {
-//        createPoint(lat,lon);
-//      }
     }
   }
 
 
+  /**
+   * This will draw the control measures on the given cube viewport 
+   * 
+   * @param vp (MdiCubeViewport *) Cube viewport control measures are drawn on
+   * @param painter (QPainter)  The painter used for the drawing
+   */
   void IpceTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
-//  qDebug()<<"IpceTool::paintViewport";
+
     if (m_controlNet) {
       drawAllMeasurements(vp, painter);
     }
@@ -212,35 +218,33 @@ namespace Isis {
 
 
   /**
-   * This method will repaint the given Point ID in each viewport
-   * Note: The pointId parameter is here even though it's not used because
-   * the signal (IpceTool::editPointChanged connected to this slot is also
-   * connected to another slot (QnetNavTool::updateEditPoint which needs the
-   * point Id.  TODO:  Clean this up, use 2 different signals?
-   *
-   * @param pointId
+   * This method will repaint the Control Points in each viewport
    *
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
-  void IpceTool::paintAllViewports(QString pointId) {
-//  qDebug()<<"IpceTool::paintAllViewports";
+  void IpceTool::paintAllViewports() {
 
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools
     // if point has been deleted, this will remove it from the main window
-    MdiCubeViewport *vp;
-    for (int i=0; i<(int)cubeViewportList()->size(); i++) {
-      vp = (*(cubeViewportList()))[i];
-       vp->viewport()->update();
+    if (cubeViewportList()) {
+      MdiCubeViewport *vp;
+      for (int i=0; i<(int)cubeViewportList()->size(); i++) {
+        vp = (*(cubeViewportList()))[i];
+         vp->viewport()->update();
+      }
     }
   }
 
+
   /**
-   * Draw all measurments which are on this viewPort
-   * @param vp Viewport whose measurements will be drawn
-   * @param painter
+   * Draw all measurments located on the image in this viewPort 
+   *  
+   * @param vp (MdiCubeViewport *) Viewport where measurements will be drawn
+   * @param painter (QPainter *) Does the actual drawing on the viewport widget 
+   *  
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -258,9 +262,11 @@ namespace Isis {
    *                          that does not yet have any control points.
    *   @history 2011-11-09 Tracie Sucharski - If there are no measures for
    *                          this cube, return.
+   *   @history 2017-07-31 Tracie Sucharski - The current edit point will be drawn in red as a
+   *                          crosshair enclosed by circle.
    */
   void IpceTool::drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter) {
-//  qDebug()<<"IpceTool::drawAllMeasurements  m_controlNet = "<<m_controlNet<<" # points = "<<m_controlNet->GetNumPoints();
+
     // Without a controlnetwork there are no points, or if new net, no points
     if (m_controlNet == 0 || m_controlNet->GetNumPoints() == 0) return;
 
@@ -273,9 +279,10 @@ namespace Isis {
 //      drawGroundMeasures(vp, painter);
 //      return;
 //    }
+
     if (!m_controlNet->GetCubeSerials().contains(
                       serialNumber)) return;
-//    if (!m_serialNumberList->hasSerialNumber(serialNumber)) return;
+
     QList<ControlMeasure *> measures =
         m_controlNet->GetMeasuresInCube(serialNumber);
     // loop through all measures contained in this cube
@@ -305,51 +312,36 @@ namespace Isis {
       painter->drawLine(x - 5, y, x + 5, y);
       painter->drawLine(x, y - 5, x, y + 5);
     }
-//    // if IpceTool is open,
-//    if (m_editPoint != NULL) {
-//      // and the selected point is in the image,
-//      if (m_editPoint->HasSerialNumber(serialNumber)) {
-//        // find the measurement
-//        double samp = (*m_editPoint)[serialNumber]->GetSample();
-//        double line = (*m_editPoint)[serialNumber]->GetLine();
-//        int x, y;
-//        vp->cubeToViewport(samp, line, x, y);
-//        // set point marker red
+    // if IpceTool is open, the editPointId will contain the ControlPoint Id of the current edit
+    // point.
+    ControlPoint *currentEditPoint = NULL;
+    if (m_directory->controlPointEditView()) {
+      currentEditPoint = m_directory->controlPointEditView()->controlPointEditWidget()->editPoint();
+    }
+    if (currentEditPoint && m_controlNet->ContainsPoint(currentEditPoint->GetId())) {
+      // Selected point is in the image,
+      if (currentEditPoint->HasSerialNumber(serialNumber)) {
+        // find the measurement
+        double samp = (*currentEditPoint)[serialNumber]->GetSample();
+        double line = (*currentEditPoint)[serialNumber]->GetLine();
+        int x, y;
+        vp->cubeToViewport(samp, line, x, y);
+
+        QPainterPath path;
+        //  Draw circle, then crosshair inside circle
+        path.addEllipse(QPointF(x,y), 5., 5.);
+        path.moveTo(x, y-5);
+        path.lineTo(x, y+5);
+        path.moveTo(x-5, y);
+        path.lineTo(x+5, y);
+
 //        QBrush brush(Qt::red);
-//        // set point marker bold - line width 2
-//        QPen pen(brush, 2);
-//        // draw the selected point in each image last so it's on top of the rest of the points
-//        painter->setPen(pen);
-//        painter->drawLine(x - 5, y, x + 5, y);
-//        painter->drawLine(x, y - 5, x, y + 5);
-//      }
-//    }
-  }
-
-
-  /**
-   * Refresh all necessary widgets in IpceTool including the PointEditor and
-   * CubeViewports.
-   *
-   * @author 2008-12-09 Tracie Sucharski
-   *
-   * @internal
-   * @history 2010-12-15 Tracie Sucharski - Before setting m_editPoint to NULL,
-   *                        release memory.  TODO: Why is the first if statement
-   *                        being done???
-   * @history 2011-10-20 Tracie Sucharski - If no control points exist in the
-   *                        network, emit proper signal and make sure editor
-   *                        and measure table are hidden.
-   *
-   */
-  void IpceTool::refresh() {
-//  qDebug()<<"IpceTool::refresh   control net = "<<m_controlNet;
-//    if (m_editPoint == NULL) {
-//      paintAllViewports("");
-//    }
-//    else {
-//      paintAllViewports(m_editPoint->GetId());
-//    }
+        QPen pen(QPen(Qt::red, 0.0));
+        // draw the selected point in each image last so it's on top of the rest of the points
+        painter->setPen(pen);
+        painter->drawPath(path);
+      }
+    }
   }
 }
 

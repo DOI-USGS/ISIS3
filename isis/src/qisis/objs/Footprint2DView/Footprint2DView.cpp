@@ -92,10 +92,9 @@ namespace Isis {
     connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
             this, SLOT(onMosItemRemoved(Image *)));
 
-    // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
-    // This is done to redraw the control points on the cube viewports
-    connect(this, SIGNAL(controlPointAdded(QString)),
-            m_sceneWidget, SIGNAL(controlPointAdded(QString)));
+    //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
+    //  the footprints.
+    connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
     QHBoxLayout *viewlayout = new QHBoxLayout();

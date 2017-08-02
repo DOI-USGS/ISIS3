@@ -75,6 +75,9 @@ namespace Isis {
    *   @history 2017-07-27 Tyler Wilson - Added a slot function (enableIPCETool) which is called
    *                           when a control network (or list of control networks) is added to
    *                           the active project.  Fixes #4994.
+   *   @history 2017-08-02 Tracie Sucharski - Added redrawMeasures signal which calls a slot in
+   *                           ipce tool to redraw control measures on cube viewports. Fixes #5007,
+   *                           #5008.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -111,6 +114,7 @@ namespace Isis {
                               bool isGroundSource = false);
 
       void controlPointAdded(QString newPointId);
+      void redrawMeasures();
 
     public slots:
       void addItem(ProjectItem *item);

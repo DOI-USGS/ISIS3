@@ -43,6 +43,7 @@ class QSplitter;
 class QTabWidget;
 
 namespace Isis {
+  class AbstractProjectItemView;
   class BundleObservation;
   class BundleObservationView;
   class ChipViewportsWidget;
@@ -142,6 +143,10 @@ namespace Isis {
    *                           doing anything.  However, I'm leaving the method for now, because
    *                           once the views are connected, we will probably need to cleanup the
    *                           connections when the view is closed.  Fixes #4959.
+   *   @history 2017-07-12 Cole Neubauer - Added clean function to directory that clears everything
+   *                           from a previous project when opening a new one. This functionality
+   *                           had to be added because a new directory can not be created to support
+   *                           a new project being opened. Fixes #4969
    *   @history 2017-07-17 Cole Neubauer - Disabled CNet tool when a Footprint2DView is added if a
    *                           control net is not active and slotted it to reenable when Project
    *                           emits activeControlSet(bool).
@@ -149,10 +154,8 @@ namespace Isis {
    *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
    *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
    *                           from the context menu Fixes #4996
-   *   @history 2017-07-12 Cole Neubauer - Added clean function to directory that clears everything
-   *                           from a previous project when opening a new one. This functionality
-   *                           had to be added because a new directory can not be created to support
-   *                           a new project being opened. Fixes #4969
+   *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
+   *                           current edit control point ID.  Fixes #5007, #5008.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -206,6 +209,8 @@ namespace Isis {
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
 
+      // Return the control point Id currently in the ControlPointEditWidget, if it exists
+      QString editPointId();
 
 
       /**
@@ -217,12 +222,12 @@ namespace Isis {
       QList<QAction *> supportedActions(DataType data) {
         QList<QAction *> results;
 
-        //QList< QPair< QString, QList<QAction *> > > actionPairings;
+//      QList< QPair< QString, QList<QAction *> > > actionPairings;
 
         //foreach (MosaicSceneWidget *footprint2DView, m_footprint2DViewWidgets) {
-        //  actionPairings.append(
+//        actionPairings.append(
         //      qMakePair(footprint2DView->windowTitle(), footprint2DView->supportedActions(data)));
-        //}
+//      }
 
 //      results.append(restructureActions(actionPairings));
 
@@ -267,8 +272,9 @@ namespace Isis {
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 
-      void controlPointAdded(QString newPointId);
       void cnetModified();
+      void controlPointAdded(QString newPointId);
+      void redrawMeasures();
 
     public slots:
       void cleanupBundleObservationViews(QObject *);
@@ -298,7 +304,7 @@ namespace Isis {
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
-      
+
     private:
       /**
        * @author 2012-08-?? Steven Lambright
@@ -393,6 +399,7 @@ namespace Isis {
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
 
+      QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
   };
 }
 

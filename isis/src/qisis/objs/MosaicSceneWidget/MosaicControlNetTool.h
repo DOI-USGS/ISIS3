@@ -59,6 +59,11 @@ namespace Isis {
    *                           MosaicSceneWidget, so need to check for Null value getWidget() in
    *                           Tool constructor.  This was causing a segfault when accessing qmos
    *                           help and a Qt connection error.
+   *   @history 2017-07-06 Tracie Sucharski - Added documentation for conditional code necessary for
+   *                           ipce application.
+   *   @history 2017-08-02 Tracie Sucharski - Added slot to rebuild the graphics items that depict
+   *                           the control points.  This is used to update these items if a control
+   *                           point was added or deleted.  Fixes #5007, #5008.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -112,6 +117,7 @@ namespace Isis {
       void deleteControlPoint(QString controlPointId);
 
     public slots:
+      void rebuildPointGraphics();
       void displayNewControlPoint(QString pointId);
       void displayChangedControlPoint(QString pointId);
       void displayUponControlPointDeletion();

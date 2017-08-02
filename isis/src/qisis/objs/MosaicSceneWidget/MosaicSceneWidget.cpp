@@ -130,23 +130,7 @@ namespace Isis {
             this, SIGNAL(createControlPoint(double, double)));
 
     // Pass on signals to the MosaicControlNetTool
-    connect(this, SIGNAL(controlPointAdded(QString)),
-            cnetTool, SLOT(displayNewControlPoint(QString)));
-
-//
-//  connect( this, SIGNAL( controlPointChanged(QString) ),
-//           m_tools->last(), SLOT( displayChangedControlPoint(QString) ) );
-//
-//  // Tell the editor that we want to delete a point.
-//  connect( m_tools->last(), SIGNAL( deleteControlPoint(QString) ),
-//           this, SIGNAL( deleteControlPoint(QString) ) );
-//
-//  // Tell the tool that the editor deleted the point and it can redraw.
-//  connect( this, SIGNAL( controlPointDeleted() ),
-//           m_tools->last(), SLOT( displayUponControlPointDeletion() ) );
-//
-//     delete control point from scene
-    
+    connect(this, SIGNAL(cnetModified()), cnetTool, SLOT(rebuildPointGraphics()));
         
     m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));

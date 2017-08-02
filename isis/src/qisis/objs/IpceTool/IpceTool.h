@@ -40,11 +40,14 @@ namespace Isis {
    *                           query for shapes and other data from the project.
    *   @history 2016-10-25 Tracie Sucharski - Check for existence of Control net in the
    *                           paintViewport method.
-   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal. 
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal.
    *   @history 2017-07-27 Tyler Wilson - Added the ability for the Ipce tool to check and see
    *                           if control nets exist within the current project within
    *                           the toolPadAction function.  If no control nets exist within the
    *                           project, the Ipce tool is disabled on start-up.  Fixes #4994.
+   *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
+   *                           center crosshair in red.  Removed refresh method; it was not being
+   *                           used.  Fixes #5007, #5008.
    *                           
    */
   class IpceTool : public Tool {
@@ -63,9 +66,6 @@ namespace Isis {
       void createControlPoint(double latitude, double longitude, Cube *cube,
                               bool isGroundSource = false);
 
-    public slots:
-      void refresh();
-
     protected:
       QAction *toolPadAction(ToolPad *pad);
 
@@ -73,7 +73,7 @@ namespace Isis {
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
 
     private slots:
-      void paintAllViewports (QString pointId );
+      void paintAllViewports();
 
     private:
       void createActions();

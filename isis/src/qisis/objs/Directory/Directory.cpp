@@ -165,6 +165,7 @@ namespace Isis {
     }
 
     initializeActions();
+    m_editPointId = "";
   }
 
 
@@ -572,7 +573,7 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
-    //  Connections for point editing between views
+    //  Connections for control point editing between views
     connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
@@ -609,9 +610,7 @@ namespace Isis {
 
     emit newWidgetAvailable(result);
 
-    // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
-    // exist.
-    // TODO 2016-09-27 TLS  Find BETTER WAY
+    //  Connections between mouse button events from view and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
@@ -621,10 +620,10 @@ namespace Isis {
     connect(result, SIGNAL(createControlPoint(double, double, Cube *, bool)),
             this, SLOT(createControlPoint(double, double, Cube *, bool)));
 
-    // This causes the control points to be re-drawn on the viewports
-    // TODO 2016-09-27 TLS Same needs to happen anytime a point is changed,deleted, so can
-    //  I have one signal, controlChanged?
-    connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
+    //  This signal is connected to the CubeDnView signal which connects to the slot,
+    //  IpceTool::paintAllViewports().
+    connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
+    connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
     return result;
   }
@@ -637,6 +636,7 @@ namespace Isis {
   Footprint2DView *Directory::addFootprint2DView() {
     Footprint2DView *result = new Footprint2DView(this);
 
+    //  Set source model on Proxy
     result->setModel(m_projectItemModel);
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
@@ -646,9 +646,7 @@ namespace Isis {
 
     emit newWidgetAvailable(result);
 
-    // The only reason I need this SLOTs, are to create the control point edit view if it doesn't
-    // exist.
-    // TODO 2016-09-27 TLS  Find BETTER WAY
+    //  Connections between mouse button events from view and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
             this, SLOT(modifyControlPoint(ControlPoint *)));
 
@@ -658,18 +656,20 @@ namespace Isis {
     connect(result, SIGNAL(createControlPoint(double, double)),
             this, SLOT(createControlPoint(double, double)));
 
-    // This causes the control points to be re-drawn on the footprint view
-    // TODO 2016-09-27 TLS Same needs to happen anytime a point is changed,deleted, so can
-    //  I have one signal, controlChanged?
-    connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
+    connect(this, SIGNAL(cnetModified()), result->mosaicSceneWidget(), SIGNAL(cnetModified()));
 
+    //  This signal is connected to the MosaicGraphicsScene::update(), which eventually calls
+    //  ControlNetGraphicsItem::paint(), then ControlPointGraphicsItem::paint().
+    connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
+
+    //  Control Net tool will only be active if the project has an active Control.  Note:  This
+    //  assumes the Control Net tool is the 4th in the toolpad.
     if (!project()->activeControl()) {
       QList<QAction *> toolbar = result->toolPadActions();
       QAction* cnetButton = toolbar[3];
       cnetButton->setEnabled(false);
       connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetButton, SLOT(setEnabled(bool)));
-
+               cnetButton, SLOT(setEnabled(bool)));
     }
     return result;
   }
@@ -677,7 +677,6 @@ namespace Isis {
 
   ControlPointEditView *Directory::addControlPointEditView() {
 
-//  qDebug()<<"Directory::addControlPointEditor  cnetFile = "<<cnetFilename;
     if (!controlPointEditView()) {
       //  TODO  Need parent for controlPointWidget
       ControlPointEditView *result = new ControlPointEditView(this);
@@ -722,10 +721,8 @@ namespace Isis {
 
       //  Create connections between signals from control point edit view and equivalent directory
       //  signals that can then be connected to other views that display control nets.
-      // TODO 2016-09-27 TLS Same needs to happen anytime a point is changed,deleted, so can
-      //  I have one signal, controlChanged?
-      connect(result->controlPointEditWidget(), SIGNAL(controlPointAdded(QString)),
-              this, SIGNAL(controlPointAdded(QString)));
+      connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
+              this, SIGNAL(cnetModified()));
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
@@ -846,9 +843,9 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-
+   
     //  The model emits this signal when the user double-clicks on the project name, the parent
-    //  node located on the ProjectTreeView.
+    //  node located on the ProjectTreeView. 
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
 
@@ -856,11 +853,11 @@ namespace Isis {
   }
 
 
-/**
- * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user
- * double-clicks the project name, the parent node located on the ProjectTreeView.  A
+/** 
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
  * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
- *
+ *  
  * @param QString projectName New project name
  */
   void Directory::initiateRenameProjectWorkOrder(QString projectName) {
@@ -870,7 +867,7 @@ namespace Isis {
     RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
     project()->addToProject(workOrder);
   }
-
+  
 
   /**
    * @brief Gets the ProjectItemModel for this directory.
@@ -1494,45 +1491,95 @@ namespace Isis {
       //qDebug() << "\t\tMos items: " << m_footprint2DViewWidgets.at(0);
       connect(m_controlPointEditWidget, SIGNAL(controlPointChanged(QString)),
               m_footprint2DViewWidgets.at(0), SIGNAL(controlPointChanged(QString)));
-      connect(m_controlPointEditWidget, SIGNAL(controlPointAdded(QString)),
-              m_footprint2DViewWidgets.at(0), SIGNAL(controlPointAdded(QString)));
     }
 #endif
   }
 
 
+  /**
+   * Slot that is connected from a left mouse button operation on views 
+   *  
+   * @param controlPoint (ControlPoint *) The control point selected from view for editing
+   * @param serialNumber (QString) The serial number of Cube that was used to select control point 
+   *                     from the CubeDnView.  This parameter will be empty if control point was
+   *                     selected from Footprint2DView.
+   *  
+   */
   void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
     if (!controlPointEditView()) {
       addControlPointEditView();
     }
+    m_editPointId = controlPoint->GetId();
+    emit redrawMeasures();
+
     controlPointEditView()->controlPointEditWidget()->setEditPoint(controlPoint, serialNumber);
-//    controlPointChipViewports()->setPoint(controlPoint);
   }
 
 
+  /**
+   * Slot that is connected from a middle mouse button operation on views 
+   *  
+   * @param controlPoint (ControlPoint *) The control point selected from view for editing
+   *  
+   */
   void Directory::deleteControlPoint(ControlPoint *controlPoint) {
 
     if (!controlPointEditView()) {
       addControlPointEditView();
     }
+    m_editPointId = controlPoint->GetId();
+ 
+    //  Update views with point to be deleted shown as current edit point
+    emit redrawMeasures();
+
     controlPointEditView()->controlPointEditWidget()->deletePoint(controlPoint);
   }
 
 
+  /**
+   * Slot that is connected from a right mouse button operation on views 
+   *  
+   * @param latitude (double) Latitude location where the control point was created
+   * @param longitude (double) Longitude location where the control point was created
+   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control 
+   *                     point.  This parameter will be empty if control point was selected from
+   *                     Footprint2DView.
+   * @param isGroundSource (bool) Indicates whether the Cube in the CubeDnView that was used to select
+   *                     location for new control point is a ground source.  This parameter will be
+   *                     empty if control point was selected from Footprint2DView.
+   *  
+   */
   void Directory::createControlPoint(double latitude, double longitude, Cube *cube,
                                      bool isGroundSource) {
 
     if (!controlPointEditView()) {
       addControlPointEditView();
-
     }
     controlPointEditView()->controlPointEditWidget()->createControlPoint(
         latitude, longitude, cube, isGroundSource);
+
+    m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
   }
 
+
+  /**
+   * Autosave for control net.  The control net is auto saved to the same directory as the input 
+   * net.  It is saved to controlNetFilename.net.bak. 
+   * 
+   */
   void Directory::makeBackupActiveControl() {
 
     project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
+  }
+
+
+  /**
+   * Return the current control point id loaded in the ControlPointEditWidget
+   * 
+   * @return @b QString Id of the control point loaded in the ControlPointEditWidget
+   */
+  QString Directory::editPointId() {
+    return m_editPointId;
   }
 }

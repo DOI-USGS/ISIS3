@@ -62,7 +62,10 @@ namespace Isis {
    *   @history 2017-01-05 Tracie Sucharski - Allow a new ground source location to be entered which
    *                           includes allowing the option to change the location in the active
    *                           control for all ground points.
-   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the setEditPoint slot. 
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the setEditPoint slot.
+   *   @history 2017-08-02 Tracie Sucharski - Added methods to return the current editPoint and
+   *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
+   *                           #5008.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -71,30 +74,8 @@ namespace Isis {
       ControlPointEditWidget(Directory *directory, QWidget *parent, bool addMeasures = false);
       virtual ~ControlPointEditWidget();
 
-      //! Measure column values for the measure table
-      enum MeasureColumns{
-        FILENAME,
-        CUBESN,
-        SAMPLE,
-        LINE,
-        APRIORISAMPLE,
-        APRIORILINE,
-        SAMPLERESIDUAL,
-        LINERESIDUAL,
-        RESIDUALMAGNITUDE,
-        SAMPLESHIFT,
-        LINESHIFT,
-        PIXELSHIFT,
-        GOODNESSOFFIT,
-        IGNORED,
-        EDITLOCK,
-        TYPE
-      };
-      //! Number of entries (columns) in the measure table
-      static const int NUMCOLUMNS = 16;
-
-      QString measureColumnToString(MeasureColumns column);
-
+      QString editPointId();
+      ControlPoint *editPoint();
 
     signals:
       void controlPointChanged(QString pointId);
@@ -118,7 +99,6 @@ namespace Isis {
                               bool isGroundSource = false);
 
       void updatePointInfo(ControlPoint &updatedPoint);
-//    void refresh();
 
     protected:
       bool eventFilter(QObject *o,QEvent *e);
@@ -126,7 +106,6 @@ namespace Isis {
     private slots:
 //    void enterWhatsThisMode();
       void saveNet();
-//    void saveAsNet();
 //    void addMeasure();
 //    void setPointType (int pointType);
       void setLockPoint (bool ignore);
@@ -251,12 +230,11 @@ namespace Isis {
       QScopedPointer<Cube> m_leftCube; //!< Left cube
       QScopedPointer<Cube> m_rightCube; //!< Right cube
 
-      QList<Cube *> m_pointCubes;
-
-      QString m_groundSN;
-      bool m_changeAllGroundLocation;
-      bool m_changeGroundLocationInNet;
-      QString m_newGroundDir;
+      QString m_groundSN; //!< Serial number of ground source file
+      bool m_changeAllGroundLocation; //!< Change the ground source location of all fixed,
+                                      //!  constrained points in the network
+      bool m_changeGroundLocationInNet; //!< Change the ground source location 
+      QString m_newGroundDir; //!< Contains the ground source location
   };
 };
 #endif

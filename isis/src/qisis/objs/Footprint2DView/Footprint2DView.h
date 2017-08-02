@@ -62,6 +62,8 @@ namespace Isis {
    *                           Footprint2DView to more mirror the Qmos window.  Fixes #4996.
    *   @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
    *                           footprint. Fixes #5050.
+   *   @history 2017-08-02 Tracie Sucharski - Fixed connections between views for control point
+   *                           editing.  Fixes #5007, #5008.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -83,6 +85,7 @@ namespace Isis {
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude);
 
+      void redrawMeasures();
       void controlPointAdded(QString newPointId);
 
     protected:

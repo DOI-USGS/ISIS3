@@ -138,6 +138,11 @@ namespace Isis {
    *                           state. Fixes #4486.
    *   @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
    *                           footprint. Fixes #5050.
+   *   @history 2017-08-02 Tracie Sucharski - Added cnetModified signal to indicate that the control
+   *                           point graphics items need to be rebuilt since either a control point
+   *                           was deleted or added to the control net.  Renamed deleteControlPoint
+   *                           signal to controlPointDeleted.  Removed some unneeded connections.
+   *                           Fixes #5007, #5008.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -260,10 +265,8 @@ namespace Isis {
 
       void controlPointSelected(ControlPoint *);
 
+      void cnetModified();
       void controlPointChanged(QString pointId);
-      void controlPointAdded(QString pointId);
-
-      void deleteControlPoint(QString pointId);
       void controlPointDeleted();
       
       void mosCubeClosed(Image *);

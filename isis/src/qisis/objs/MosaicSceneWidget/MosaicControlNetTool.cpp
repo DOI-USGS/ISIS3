@@ -464,6 +464,15 @@ namespace Isis {
   }
   
 
+  /**
+   * Slot used to re-create the graphics items that depict the control points
+   * 
+   */
+  void MosaicControlNetTool::rebuildPointGraphics() {
+    m_controlNetGraphics->buildChildren();
+  }
+
+
   void MosaicControlNetTool::displayChangedControlPoint(QString changedControlPoint) {
     m_controlNetGraphics->clearControlPointGraphicsItem(changedControlPoint);
     m_controlNetGraphics->buildChildren();
@@ -495,6 +504,7 @@ namespace Isis {
       delete m_controlNetGraphics;
     }
 
+    // If qmos (not ipce) application
     if (m_controlNet && !getWidget()->directory()) {
       delete m_controlNet;
       m_controlNet = NULL;
@@ -554,6 +564,8 @@ namespace Isis {
    *
    */
   void MosaicControlNetTool::openControlNet() {
+
+    // If qmos (not ipce) application
     if (!getWidget()->directory()) {
       // Bring up a file dialog for user to select their cnet file.
       QString netFile = FileDialog::getOpenFileName(getWidget(),
@@ -571,6 +583,7 @@ namespace Isis {
       }
     }
     else {
+      //  If ipce application, there must be an active control net and active image list.
       if (!getWidget()->directory()->project()->activeControl()) {
         // Error and return to Select Tool
         QString message = "No active control network chosen.  Choose an active image list then an"
@@ -600,9 +613,12 @@ namespace Isis {
 
     if (m_controlNetFile.size() > 0) {
       try {
+        //  If qmos application create new control net from chosen filename
         if (!getWidget()->directory()) {
           m_controlNet = new ControlNet(m_controlNetFile);
         }
+        //  If ipce application, get the active control net from the project.  This control has
+        //  already been read into memory.
         else {
           m_controlNet = getWidget()->directory()->project()->activeControl()->controlNet();
         }
