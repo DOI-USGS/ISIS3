@@ -8,107 +8,106 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    AbstractParentItem::AbstractParentItem(AbstractTreeItem *parent) :
-      AbstractTreeItem(parent) {
+  AbstractParentItem::AbstractParentItem(AbstractTreeItem *parent) :
+    AbstractTreeItem(parent) {
+    m_children = NULL;
+    m_firstVisibleChild = NULL;
+    m_lastVisibleChild = NULL;
+    m_children = new QList< AbstractTreeItem * >;
+  }
+
+
+  AbstractParentItem::~AbstractParentItem() {
+    if (m_children) {
+      for (int i = 0; i < m_children->size(); i++) {
+        delete(*m_children)[i];
+        (*m_children)[i] = NULL;
+      }
+      delete m_children;
       m_children = NULL;
+    }
+
+    if (m_firstVisibleChild) {
       m_firstVisibleChild = NULL;
+    }
+
+    if (m_lastVisibleChild) {
       m_lastVisibleChild = NULL;
-      m_children = new QList< AbstractTreeItem * >;
-    }
-
-
-    AbstractParentItem::~AbstractParentItem() {
-      if (m_children) {
-        for (int i = 0; i < m_children->size(); i++) {
-          delete(*m_children)[i];
-          (*m_children)[i] = NULL;
-        }
-        delete m_children;
-        m_children = NULL;
-      }
-
-      if (m_firstVisibleChild) {
-        m_firstVisibleChild = NULL;
-      }
-
-      if (m_lastVisibleChild) {
-        m_lastVisibleChild = NULL;
-      }
-    }
-
-
-    AbstractTreeItem *AbstractParentItem::childAt(int row) const {
-      ASSERT(m_children);
-      ASSERT(row >= 0 && row < m_children->size());
-      return m_children->value(row);
-    }
-
-
-    QList< AbstractTreeItem * > AbstractParentItem::getChildren() const {
-      ASSERT(m_children);
-      return *m_children;
-    }
-
-
-    AbstractTreeItem *AbstractParentItem::getFirstVisibleChild() const {
-      return m_firstVisibleChild;
-    }
-
-
-    AbstractTreeItem *AbstractParentItem::getLastVisibleChild() const {
-      return m_lastVisibleChild;
-    }
-
-
-    int AbstractParentItem::indexOf(AbstractTreeItem *child) const {
-      ASSERT(child);
-      ASSERT(m_children);
-      return m_children->indexOf(child);
-    }
-
-
-    int AbstractParentItem::childCount() const {
-      ASSERT(m_children);
-      return m_children->size();
-    }
-
-
-    void AbstractParentItem::addChild(AbstractTreeItem *child) {
-      ASSERT(child);
-      ASSERT(m_children);
-      ASSERT(!dynamic_cast< RootItem * >(child));
-
-      //     if (!m_firstVisibleChild && child->isVisible())
-      //     {
-      //       m_firstVisibleChild = child;
-      //       m_lastVisibleChild = child;
-      //     }
-      //
-      //     AbstractTreeItem * childWithNewNext = NULL;
-      //     if (m_lastVisibleChild && m_firstVisibleChild != child)
-      //     {
-      //       childWithNewNext = m_lastVisibleChild;
-      //     }
-
-      m_children->append(child);
-      child->setParent(this);
-
-      //     if (childWithNewNext && child->isVisible())
-      //     {
-      //       childWithNewNext->setNextVisiblePeer(child);
-      //       m_lastVisibleChild = child;
-      //     }
-    }
-
-
-    void AbstractParentItem::setFirstVisibleChild(AbstractTreeItem *child) {
-      m_firstVisibleChild = child;
-    }
-
-
-    void AbstractParentItem::setLastVisibleChild(AbstractTreeItem *child) {
-      m_lastVisibleChild = child;
     }
   }
+
+
+  AbstractTreeItem *AbstractParentItem::childAt(int row) const {
+    ASSERT(m_children);
+    ASSERT(row >= 0 && row < m_children->size());
+    return m_children->value(row);
+  }
+
+
+  QList< AbstractTreeItem * > AbstractParentItem::getChildren() const {
+    ASSERT(m_children);
+    return *m_children;
+  }
+
+
+  AbstractTreeItem *AbstractParentItem::getFirstVisibleChild() const {
+    return m_firstVisibleChild;
+  }
+
+
+  AbstractTreeItem *AbstractParentItem::getLastVisibleChild() const {
+    return m_lastVisibleChild;
+  }
+
+
+  int AbstractParentItem::indexOf(AbstractTreeItem *child) const {
+    ASSERT(child);
+    ASSERT(m_children);
+    return m_children->indexOf(child);
+  }
+
+
+  int AbstractParentItem::childCount() const {
+    ASSERT(m_children);
+    return m_children->size();
+  }
+
+
+  void AbstractParentItem::addChild(AbstractTreeItem *child) {
+    ASSERT(child);
+    ASSERT(m_children);
+    ASSERT(!dynamic_cast< RootItem * >(child));
+
+    //     if (!m_firstVisibleChild && child->isVisible())
+    //     {
+    //       m_firstVisibleChild = child;
+    //       m_lastVisibleChild = child;
+    //     }
+    //
+    //     AbstractTreeItem * childWithNewNext = NULL;
+    //     if (m_lastVisibleChild && m_firstVisibleChild != child)
+    //     {
+    //       childWithNewNext = m_lastVisibleChild;
+    //     }
+
+    m_children->append(child);
+    child->setParent(this);
+
+    //     if (childWithNewNext && child->isVisible())
+    //     {
+    //       childWithNewNext->setNextVisiblePeer(child);
+    //       m_lastVisibleChild = child;
+    //     }
+  }
+
+
+  void AbstractParentItem::setFirstVisibleChild(AbstractTreeItem *child) {
+    m_firstVisibleChild = child;
+  }
+
+
+  void AbstractParentItem::setLastVisibleChild(AbstractTreeItem *child) {
+    m_lastVisibleChild = child;
+  }
 }
+

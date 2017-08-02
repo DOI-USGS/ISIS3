@@ -11,67 +11,65 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    MeasureIgnoredFilter::MeasureIgnoredFilter(
-      AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-      AbstractFilter(flag, minimumForSuccess) {
-    }
+  MeasureIgnoredFilter::MeasureIgnoredFilter(
+    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
+    AbstractFilter(flag, minimumForSuccess) {
+  }
 
 
-    MeasureIgnoredFilter::~MeasureIgnoredFilter() {
-    }
+  MeasureIgnoredFilter::~MeasureIgnoredFilter() {
+  }
 
 
-    bool MeasureIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
-      return AbstractFilter::evaluateImageFromMeasureFilter(node);
-    }
+  bool MeasureIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(node);
+  }
 
 
-    bool MeasureIgnoredFilter::evaluate(const ControlPoint *point) const {
-      return AbstractFilter::evaluatePointFromMeasureFilter(point);
-    }
+  bool MeasureIgnoredFilter::evaluate(const ControlPoint *point) const {
+    return AbstractFilter::evaluatePointFromMeasureFilter(point);
+  }
 
 
-    bool MeasureIgnoredFilter::evaluate(const ControlMeasure *measure) const {
-      return AbstractFilter::evaluate(measure, &ControlMeasure::IsIgnored);
-    }
+  bool MeasureIgnoredFilter::evaluate(const ControlMeasure *measure) const {
+    return AbstractFilter::evaluate(measure, &ControlMeasure::IsIgnored);
+  }
 
 
-    AbstractFilter *MeasureIgnoredFilter::clone() const {
-      return new MeasureIgnoredFilter(*this);
-    }
+  AbstractFilter *MeasureIgnoredFilter::clone() const {
+    return new MeasureIgnoredFilter(*this);
+  }
 
 
-    QString MeasureIgnoredFilter::getImageDescription() const {
-      QString description = AbstractFilter::getImageDescription();
-      if (getMinForSuccess() == 1)
-        description += "measure that is ";
-      else
-        description += "measures that are ";
+  QString MeasureIgnoredFilter::getImageDescription() const {
+    QString description = AbstractFilter::getImageDescription();
+    if (getMinForSuccess() == 1)
+      description += "measure that is ";
+    else
+      description += "measures that are ";
 
-      if (inclusive())
-        description += "ignored";
-      else
-        description += "not ignored";
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
 
-      return description;
-    }
-
-
-    QString MeasureIgnoredFilter::getPointDescription() const {
-      return getImageDescription();
-    }
+    return description;
+  }
 
 
-    QString MeasureIgnoredFilter::getMeasureDescription() const {
-      QString description = "are ";
+  QString MeasureIgnoredFilter::getPointDescription() const {
+    return getImageDescription();
+  }
 
-      if (inclusive())
-        description += "ignored";
-      else
-        description += "not ignored";
 
-      return description;
-    }
+  QString MeasureIgnoredFilter::getMeasureDescription() const {
+    QString description = "are ";
+
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
+
+    return description;
   }
 }

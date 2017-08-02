@@ -15,159 +15,157 @@ class QString;
 class QToolBar;
 
 namespace Isis {
+  class AbstractTableModel;
+  class AbstractTreeItem;
   class ControlNet;
   class ControlPoint;
+  class FilterWidget;
+  class ImageImageTreeModel;
+  class ImagePointTreeModel;
+  class MeasureTableModel;
+  class PointMeasureTreeModel;
+  class PointTableModel;
+  class TableView;
+  class TreeView;
+}
 
-  namespace CnetViz {
-    class AbstractTableModel;
-    class AbstractTreeItem;
-    class FilterWidget;
-    class ImageImageTreeModel;
-    class ImagePointTreeModel;
-    class MeasureTableModel;
-    class PointMeasureTreeModel;
-    class PointTableModel;
-    class TableView;
-    class TreeView;
-  }
+/**
+ * This widget provides full editing, filtering and viewing capabilities for
+ * the raw data in a control network. The raw data is, for example, chooser
+ * name or cube serial number. The display is all textual. Please use
+ * the widget accessors to appropriately place the various ancillary sections
+ * of the editor.
+ *
+ * @author ????-??-?? Eric Hyer
+ *
+ * @internal
+ *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
+ *                           to not violate licensing terms). Fixes #1041.
+ *   @history 2017-05-18 Tracie Sucharski - Added a signal to indicate the control point chosen
+ *                           from either the point table or the measure table.  If the point was
+ *                           chosen from the measure table, the serial number of the measure is
+ *                           also passed.  This was added for IPCE, for the interaction with other
+ *                           views.
+ *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+ */
+class CnetEditorWidget : public QWidget {
+    Q_OBJECT
 
-  /**
-   * This widget provides full editing, filtering and viewing capabilities for
-   * the raw data in a control network. The raw data is, for example, chooser
-   * name or cube serial number. The display is all textual. Please use
-   * the widget accessors to appropriately place the various ancillary sections
-   * of the editor.
-   *
-   * @author ????-??-?? Eric Hyer
-   *
-   * @internal
-   *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
-   *                           to not violate licensing terms). Fixes #1041.
-   *   @history 2017-05-18 Tracie Sucharski - Added a signal to indicate the control point chosen
-   *                           from either the point table or the measure table.  If the point was
-   *                           chosen from the measure table, the serial number of the measure is
-   *                           also passed.  This was added for IPCE, for the interaction with other
-   *                           views.
-   */
-  class CnetEditorWidget : public QWidget {
-      Q_OBJECT
-
-    public:
-      enum View {
-        PointView,
-        ImageView,
-        ConnectionView
-      };
+  public:
+    enum View {
+      PointView,
+      ImageView,
+      ConnectionView
+    };
 
 
-    public:
-      CnetEditorWidget(ControlNet *, QString);
-      virtual ~CnetEditorWidget();
-      void readSettings();
-      void writeSettings();
+  public:
+    CnetEditorWidget(ControlNet *, QString);
+    virtual ~CnetEditorWidget();
+    void readSettings();
+    void writeSettings();
 
-      QWidget *pointTreeView();
-      QWidget *serialTreeView();
-      QWidget *connectionTreeView();
-      QWidget *pointFilterWidget();
-      QWidget *serialFilterWidget();
-      QWidget *connectionFilterWidget();
+    QWidget *pointTreeView();
+    QWidget *serialTreeView();
+    QWidget *connectionTreeView();
+    QWidget *pointFilterWidget();
+    QWidget *serialFilterWidget();
+    QWidget *connectionFilterWidget();
 
-      CnetViz::AbstractTableModel *measureTableModel();
-      CnetViz::AbstractTableModel *pointTableModel();
+    CnetViz::AbstractTableModel *measureTableModel();
+    CnetViz::AbstractTableModel *pointTableModel();
 
-      QMap< QAction *, QList< QString > > menuActions();
-      QMap< QString, QList< QAction * > > toolBarActions();
+    QMap< QAction *, QList< QString > > menuActions();
+    QMap< QString, QList< QAction * > > toolBarActions();
 
-      ControlNet *filteredNetwork() const;
+    ControlNet *filteredNetwork() const;
 
-      bool measureTableSortingEnabled() const;
-      int measureTableSortLimit() const;
-      bool pointTableSortingEnabled() const;
-      int pointTableSortLimit() const;
+    bool measureTableSortingEnabled() const;
+    int measureTableSortLimit() const;
+    bool pointTableSortingEnabled() const;
+    int pointTableSortLimit() const;
 
-      void setMeasureTableSortingEnabled(bool enabled);
-      void setMeasureTableSortLimit(int limit);
-      void setPointTableSortingEnabled(bool enabled);
-      void setPointTableSortLimit(int limit);
-
-
-    public slots:
-      void configSorting();
-      void setTablesFrozen(bool);
-      void rebuildModels();
+    void setMeasureTableSortingEnabled(bool enabled);
+    void setMeasureTableSortLimit(int limit);
+    void setPointTableSortingEnabled(bool enabled);
+    void setPointTableSortLimit(int limit);
 
 
-    signals:
-      void cnetModified();
-
-      void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
-
-
-    private:
-      void nullify();
-      QBoxLayout *createMainLayout();
-      void createActions();
-      void createPointTreeView();
-      void createSerialTreeView();
-      void createConnectionTreeView();
-      void createFilterArea();
-      void createPointTableView();
-      void createMeasureTableView();
-      void upgradeVersion();
-      void handleTableFilterCountsChanged(int visibleRows, int totalRows,
-          QGroupBox *box, QString initialText);
+  public slots:
+    void configSorting();
+    void setTablesFrozen(bool);
+    void rebuildModels();
 
 
-    private slots:
-      void rebuildModels(QList< CnetViz::AbstractTreeItem * > itemsToDelete);
+  signals:
+    void cnetModified();
 
-      void pointColToggled();
-      void measureColToggled();
-
-      void handlePointTableFilterCountsChanged(int visibleRows, int totalRows);
-      void handleMeasureTableFilterCountsChanged(int visibleRows,
-          int totalRows);
+    void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
 
 
-    private: // data
-      bool m_updatingSelection;
-      ControlNet *m_controlNet;
-      QString *m_workingVersion;
-      static const QString VERSION;
+  private:
+    void nullify();
+    QBoxLayout *createMainLayout();
+    void createActions();
+    void createPointTreeView();
+    void createSerialTreeView();
+    void createConnectionTreeView();
+    void createFilterArea();
+    void createPointTableView();
+    void createMeasureTableView();
+    void upgradeVersion();
+    void handleTableFilterCountsChanged(int visibleRows, int totalRows,
+        QGroupBox *box, QString initialText);
 
 
-    private: // widgets
-      CnetViz::TreeView *m_pointTreeView;
-      CnetViz::TreeView *m_imageTreeView;
-      CnetViz::TreeView *m_connectionTreeView;
+  private slots:
+    void rebuildModels(QList< CnetViz::AbstractTreeItem * > itemsToDelete);
 
-      CnetViz::TableView *m_pointTableView;
-      CnetViz::TableView *m_measureTableView;
+    void pointColToggled();
+    void measureColToggled();
 
-      QGroupBox *m_pointTableBox;
-      QGroupBox *m_measureTableBox;
+    void handlePointTableFilterCountsChanged(int visibleRows, int totalRows);
+    void handleMeasureTableFilterCountsChanged(int visibleRows,
+        int totalRows);
 
-      QScrollArea *m_filterArea;
 
-      QWidget *m_pointFilterWidget;
-      QWidget *m_serialFilterWidget;
-      QWidget *m_connectionFilterWidget;
+  private: // data
+    bool m_updatingSelection;
+    ControlNet *m_controlNet;
+    QString *m_workingVersion;
+    static const QString VERSION;
 
-      CnetViz::PointMeasureTreeModel *m_pointModel;
-      CnetViz::ImagePointTreeModel *m_imageModel;
-      CnetViz::ImageImageTreeModel *m_connectionModel;
 
-      CnetViz::PointTableModel *m_pointTableModel;
-      CnetViz::MeasureTableModel *m_measureTableModel;
+  private: // widgets
+    CnetViz::TreeView *m_pointTreeView;
+    CnetViz::TreeView *m_imageTreeView;
+    CnetViz::TreeView *m_connectionTreeView;
 
-      QSplitter *m_mainSplitter;
+    CnetViz::TableView *m_pointTableView;
+    CnetViz::TableView *m_measureTableView;
 
-      QMap< QAction *, QList< QString > > * m_menuActions;
-      QMap< QString, QList< QAction * > > * m_toolBarActions;
+    QGroupBox *m_pointTableBox;
+    QGroupBox *m_measureTableBox;
 
-      QString *m_settingsPath;
-  };
+    QScrollArea *m_filterArea;
+
+    QWidget *m_pointFilterWidget;
+    QWidget *m_serialFilterWidget;
+    QWidget *m_connectionFilterWidget;
+
+    CnetViz::PointMeasureTreeModel *m_pointModel;
+    CnetViz::ImagePointTreeModel *m_imageModel;
+    CnetViz::ImageImageTreeModel *m_connectionModel;
+
+    CnetViz::PointTableModel *m_pointTableModel;
+    CnetViz::MeasureTableModel *m_measureTableModel;
+
+    QSplitter *m_mainSplitter;
+
+    QMap< QAction *, QList< QString > > * m_menuActions;
+    QMap< QString, QList< QAction * > > * m_toolBarActions;
+
+    QString *m_settingsPath;
 }
 
 #endif

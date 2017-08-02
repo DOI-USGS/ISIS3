@@ -50,7 +50,6 @@
 
 
 namespace Isis {
-  using namespace CnetViz;
 
 //**************************************************************
 //**************************************************************
@@ -401,9 +400,9 @@ namespace Isis {
         m_pointTreeView, SLOT(handleModelSelectionChanged()));
 
     connect(m_pointTableView,
-        SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
+        SIGNAL(rebuildModels(QList< AbstractTreeItem * >)),
         this,
-        SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
+        SLOT(rebuildModels(QList< AbstractTreeItem * >)));
 
     connect(m_pointTableView, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(handlePointTableFilterCountsChanged(int, int)));
@@ -451,9 +450,9 @@ namespace Isis {
     connect(m_measureTableView, SIGNAL(selectionChanged()),
         m_pointTreeView, SLOT(handleModelSelectionChanged()));
     connect(m_measureTableView,
-        SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
+        SIGNAL(rebuildModels(QList< AbstractTreeItem * >)),
         this,
-        SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
+        SLOT(rebuildModels(QList< AbstractTreeItem * >)));
 
     connect(m_measureTableView, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(handleMeasureTableFilterCountsChanged(int, int)));
@@ -648,12 +647,12 @@ namespace Isis {
   }
 
 
-  CnetViz::AbstractTableModel *CnetEditorWidget::measureTableModel() {
+  AbstractTableModel *CnetEditorWidget::measureTableModel() {
     return m_measureTableModel;
   }
 
 
-  CnetViz::AbstractTableModel *CnetEditorWidget::pointTableModel() {
+  AbstractTableModel *CnetEditorWidget::pointTableModel() {
     return m_pointTableModel;
   }
 

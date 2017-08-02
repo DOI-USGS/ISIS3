@@ -14,70 +14,68 @@ using std::cerr;
 
 
 namespace Isis {
-  namespace CnetViz {
-    PointJigsawRejectedFilter::PointJigsawRejectedFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
-    }
+  PointJigsawRejectedFilter::PointJigsawRejectedFilter(
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+  }
 
 
-    PointJigsawRejectedFilter::PointJigsawRejectedFilter(
-      const AbstractFilter &other) : AbstractFilter(other) {
-    }
+  PointJigsawRejectedFilter::PointJigsawRejectedFilter(
+    const AbstractFilter &other) : AbstractFilter(other) {
+  }
 
 
-    PointJigsawRejectedFilter::~PointJigsawRejectedFilter() {
-    }
+  PointJigsawRejectedFilter::~PointJigsawRejectedFilter() {
+  }
 
 
-    bool PointJigsawRejectedFilter::evaluate(
-      const ControlCubeGraphNode *node) const {
-      return AbstractFilter::evaluateImageFromPointFilter(node);
-    }
+  bool PointJigsawRejectedFilter::evaluate(
+    const ControlCubeGraphNode *node) const {
+    return AbstractFilter::evaluateImageFromPointFilter(node);
+  }
 
 
-    bool PointJigsawRejectedFilter::evaluate(const ControlPoint *point) const {
-      return AbstractFilter::evaluate(point, &ControlPoint::IsRejected);
-    }
+  bool PointJigsawRejectedFilter::evaluate(const ControlPoint *point) const {
+    return AbstractFilter::evaluate(point, &ControlPoint::IsRejected);
+  }
 
 
-    bool PointJigsawRejectedFilter::evaluate(const ControlMeasure *measure) const {
-      return true;
-    }
+  bool PointJigsawRejectedFilter::evaluate(const ControlMeasure *measure) const {
+    return true;
+  }
 
 
-    AbstractFilter *PointJigsawRejectedFilter::clone() const {
-      return new PointJigsawRejectedFilter(*this);
-    }
+  AbstractFilter *PointJigsawRejectedFilter::clone() const {
+    return new PointJigsawRejectedFilter(*this);
+  }
 
 
-    QString PointJigsawRejectedFilter::getImageDescription() const {
-      QString description = AbstractFilter::getImageDescription();
+  QString PointJigsawRejectedFilter::getImageDescription() const {
+    QString description = AbstractFilter::getImageDescription();
 
-      if (getMinForSuccess() == 1)
-        description += "point that is ";
-      else
-        description += "points that are ";
+    if (getMinForSuccess() == 1)
+      description += "point that is ";
+    else
+      description += "points that are ";
 
-      if (inclusive())
-        description += "jigsaw rejected";
-      else
-        description += "not jigsaw rejected";
+    if (inclusive())
+      description += "jigsaw rejected";
+    else
+      description += "not jigsaw rejected";
 
-      return description;
-    }
+    return description;
+  }
 
 
-    QString PointJigsawRejectedFilter::getPointDescription() const {
-      QString description = "are ";
+  QString PointJigsawRejectedFilter::getPointDescription() const {
+    QString description = "are ";
 
-      if (inclusive())
-        description += "jigsaw rejected";
-      else
-        description += "not jigsaw rejected";
+    if (inclusive())
+      description += "jigsaw rejected";
+    else
+      description += "not jigsaw rejected";
 
-      return description;
-    }
+    return description;
   }
 }
 

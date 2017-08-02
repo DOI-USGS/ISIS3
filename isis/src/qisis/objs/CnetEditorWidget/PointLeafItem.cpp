@@ -4,14 +4,12 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    PointLeafItem::PointLeafItem(ControlPoint *cp, int avgCharWidth,
-        AbstractTreeItem *parent) : AbstractTreeItem(parent),
-      AbstractPointItem(cp, avgCharWidth) {
-    }
+  PointLeafItem::PointLeafItem(ControlPoint *cp, int avgCharWidth,
+      AbstractTreeItem *parent) : AbstractTreeItem(parent),
+    AbstractPointItem(cp, avgCharWidth) {
+  }
 
 
-    PointLeafItem::~PointLeafItem() {
-    }
+  PointLeafItem::~PointLeafItem() {
   }
 }
