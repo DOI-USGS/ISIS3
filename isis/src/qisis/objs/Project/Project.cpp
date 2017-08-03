@@ -28,6 +28,7 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QFile>
 #include <QFileDialog>
 #include <QFuture>
 #include <QFutureWatcher>
@@ -37,6 +38,7 @@
 #include <QProgressBar>
 #include <QStringList>
 #include <QtDebug>
+#include <QTextStream>
 #include <QXmlStreamWriter>
 
 #include "BundleSolutionInfo.h"
@@ -77,6 +79,7 @@ namespace Isis {
       QObject(parent) {
     //qDebug()<<"Project::Project";
     m_bundleSettings = NULL;
+    m_clearing = false;
     m_directory = &directory;
     m_projectRoot = NULL;
     m_cnetRoot = NULL;
@@ -238,32 +241,6 @@ namespace Isis {
    * Clean up the project. This will bring the Project back to a safe on-disk state.
    */
   Project::~Project() {
-    if (m_isTemporaryProject) {
-      deleteAllProjectFiles();
-    }
-    else {
-      int undoStackIndex = m_undoStack.index();
-      int undoStackCleanIndex = m_undoStack.cleanIndex();
-
-      int undoNeededToRestoreDiskState = undoStackIndex;
-
-      // Go back through the stack looking for the last "clean" state
-      // for the project.  If workorders are found that change the disk
-      // state undo all workorders up to and including those workorders.
-      // Ideally the project has been saved by one of the workorders
-      // (state set to clean) and nothing needs to be undone.
-      for (int i = undoStackIndex - 1; i >= undoStackCleanIndex; i--) {
-        const WorkOrder *currentWorkOrder =
-              dynamic_cast<const WorkOrder *>( m_undoStack.command(i) );
-        if ( currentWorkOrder && currentWorkOrder->modifiesDiskState() ) {
-          undoNeededToRestoreDiskState = i;
-        }
-      }
-
-      if (undoNeededToRestoreDiskState != undoStackIndex) {
-        m_undoStack.setIndex(undoNeededToRestoreDiskState);
-      }
-    }
 
     if (m_images) {
       foreach (ImageList *imageList, *m_images) {
@@ -410,10 +387,148 @@ namespace Isis {
   }
 
 
- /**
-  * Function to clear out all values in a project essentially making it a new project object.
-  */
-  void Project::clear(){
+  /**
+   * Function to clear out all values in a project essentially making it a new project object.
+   * This function is also respoinsible for cleaning any directories created when importing but
+   * are no longer a part of the project.
+   */
+  void Project::clear() {
+    m_clearing = true;
+
+    // We need to look through the project.xml and remove every directory not in the project
+    QStringList shapeDirList;
+    bool shapes = false;
+    QStringList imageDirList;
+    bool images = false;
+    QStringList cnetDirList;
+    bool controls = false;
+    QStringList bundleDirList;
+    bool bundles = false;
+    QFile projectXml(projectRoot() + "/project.xml");
+
+    if (projectXml.open(QIODevice::ReadOnly)) {
+      QTextStream projectXmlInput(&projectXml);
+
+      while (!projectXmlInput.atEnd() ) {
+        QString line = projectXmlInput.readLine();
+
+        if (controls || line.contains("<controlNets>") ) {
+          controls = true;
+
+          if (line.contains("</controlNets>") ) {
+            controls = false;
+          }
+
+          else if (!line.contains("<controlNets>") ) {
+            cnetDirList.append(line.split('"').at(3));
+          }
+        }
+
+        else if (images || line.contains("<imageLists>") ) {
+          images = true;
+
+          if (line.contains("</imageLists>")) {
+            images = false;
+          }
+
+          else if (!line.contains("<imageLists>") ) {
+            imageDirList.append(line.split('"').at(3).simplified());
+          }
+        }
+
+        else if (shapes ||line.contains("<shapeLists>")) {
+          shapes = true;
+
+          if (line.contains("</shapeLists>") ) {
+            shapes = false;
+          }
+
+          else if (!line.contains("<shapeLists>") ) {
+            shapeDirList.append(line.split('"').at(3));
+          }
+        }
+
+        else if (bundles ||line.contains("<bundleSolutionInfo>") ) {
+          bundles = true;
+
+          if (line.contains("</bundleSolutionInfo>") ) {
+            bundles = false;
+          }
+
+          else if (line.contains("<runTime>") ) {
+            bundleDirList.append(line.split('>').at(1).split('<').at(0));
+          }
+        }
+      }
+
+        QDir cnetsDir(m_projectRoot->path() + "/cnets/");
+        cnetsDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+        QStringList cnetsList = cnetsDir.entryList();
+        foreach (QString dir, cnetsList) {
+          dir = dir.simplified();
+
+          if ( !cnetDirList.contains(dir) ) {
+            QDir tempDir(cnetsDir.path() + "/" + dir);
+            tempDir.removeRecursively();
+          }
+        }
+
+        QDir imagesDir(m_projectRoot->path() + "/images/");
+        imagesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+        QStringList imagesList = imagesDir.entryList();
+        foreach (QString dir, imagesList) {
+          dir = dir.simplified();
+
+          if ( !imageDirList.contains(dir) ) {
+            QDir tempDir(imagesDir.path() + "/" + dir);
+            tempDir.removeRecursively();
+          }
+        }
+
+        QDir shapesDir(m_projectRoot->path() + "/shapes/");
+        shapesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+        QStringList shapesList = shapesDir.entryList();
+        foreach (QString dir, shapesList) {
+          dir = dir.simplified();
+
+          if ( !shapeDirList.contains(dir) ) {
+            QDir tempDir(shapesDir.path() + "/" + dir);
+            tempDir.removeRecursively();
+          }
+        }
+
+        QDir bundlesDir(m_projectRoot->path() + "/results/bundle/");
+        bundlesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+        QStringList bundleList = bundlesDir.entryList();
+        foreach (QString dir, bundleList) {
+          dir = dir.simplified();
+
+          if ( !bundleDirList.contains(dir) ) {
+            QDir tempDir(bundlesDir.path() + "/" + dir);
+            tempDir.removeRecursively();
+          }
+        }
+
+        projectXml.close();
+      }
+
+    try {
+      QString tmpFolder = QDir::temp().absolutePath() + "/"
+            + Environment::userName() + "_"
+            + QApplication::applicationName() + "_" + QString::number( getpid() );
+      QDir temp(tmpFolder + "/tmpProject");
+      m_projectRoot = new QDir(temp);
+    }
+
+    catch (IException &e) {
+      throw IException(e, IException::Programmer, "Error creating project folders.", _FILEINFO_);
+    }
+
+    catch (std::exception &e) {
+      throw IException(IException::Programmer,
+          tr("Error creating project folders [%1]").arg( e.what() ), _FILEINFO_);
+    }
+
     m_images->clear();
     m_shapes->clear();
     m_controls->clear();
@@ -424,6 +539,11 @@ namespace Isis {
     directory()->clean();
     setName("Project");
     setClean(true);
+  }
+
+
+  bool Project::clearing() {
+    return m_clearing;
   }
 
 
@@ -748,7 +868,6 @@ namespace Isis {
    * @param ImageList
    */
   void Project::addImages(ImageList newImages) {
-//  qDebug()<<"Project::addImages(ImageList newImages";
     imagesReady(newImages);
   }
 
@@ -929,10 +1048,10 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    if (isOpen()) {
+    if (isOpen() || !isClean()) {
       clear();
     }
-
+    m_clearing = false;
     m_isTemporaryProject = false;
 
     XmlHandler handler(this);

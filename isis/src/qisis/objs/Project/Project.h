@@ -147,6 +147,11 @@ namespace Isis {
    *                           imports, shape imports, and bundle solution info. Fixes #4855,
    *                           #4979, #4980.
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
+   *
+   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
+   *                           allow for opening of a new project. Fixes #4969
+   *
+   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
    *                           Fixes #5046
@@ -157,6 +162,8 @@ namespace Isis {
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
    *                           Fixes #5082
    *   @history 2017-08-02 Cole Neubauer - Made setClean emit a signal from undoStack. Fixes #4960
+   *   @history 2017-08-03 Cole Neubauer - Parsed XML to remove leftover files not in project
+   *                           Fixes #5046
    */
   class Project : public QObject {
     Q_OBJECT
@@ -181,6 +188,7 @@ namespace Isis {
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void clear();
+      bool clearing(); //! Accessor for if the project is clearing or not
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
@@ -191,13 +199,13 @@ namespace Isis {
       bool isTemporaryProject() const;
       bool isOpen();
       bool isClean();
-      void setClean(bool value);
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
       QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
+      void setClean(bool value);
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
@@ -477,7 +485,7 @@ namespace Isis {
       bool m_isTemporaryProject;
       bool m_isOpen; //! used to determine whether a project is currently open
       bool m_isClean; //! used to determine whether a project's changes are unsaved
-
+      bool m_clearing; //! used to negate segfaults happening in post undos when clearning project
       int m_numImagesCurrentlyReading;
 
       QMutex *m_mutex;

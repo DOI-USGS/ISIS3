@@ -105,7 +105,6 @@ namespace Isis {
    * @param workOrder The work order to display the history for
    */
   void HistoryTreeWidget::addToHistory(WorkOrder *workOrder) {
-    //if (workOrder->isSavedToHistory()) {
       QString data = workOrder->bestText();
 
       connect(workOrder, SIGNAL(destroyed(QObject *)),
@@ -149,7 +148,6 @@ namespace Isis {
 
       scrollToItem(newItem);
       refit();
-  //  }
   }
 
 
@@ -162,11 +160,17 @@ namespace Isis {
    *   resize event.
    */
   void HistoryTreeWidget::updateProgressWidgets() {
+    if(m_project->clearing()){
+      return;
+    }
     for (int i = 0; i < invisibleRootItem()->childCount(); i++) {
       QTreeWidgetItem *item = invisibleRootItem()->child(i);
+      if (item->data(0, Qt::UserRole).isNull() ) {
+        return;
+      }
       WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
 
-      if (workOrder && itemWidget(item, 1) != workOrder->progressBar()) {
+      if (workOrder && itemWidget(item, 1) != workOrder->progressBar() ) {
         setItemWidget(item, 1, workOrder->progressBar());
       }
     }
@@ -282,6 +286,8 @@ namespace Isis {
 
 
   void HistoryTreeWidget::updateStatus(WorkOrder *workOrder) {
-    undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
+    if (undoCommandToTreeItem(workOrder)) {
+      undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
+    }
   }
 }

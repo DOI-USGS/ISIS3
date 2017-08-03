@@ -118,5 +118,6 @@ namespace Isis {
   */
   void CloseProjectWorkOrder::execute() {
     project()->clear();
+    project()->setClean(true);
   }
 }

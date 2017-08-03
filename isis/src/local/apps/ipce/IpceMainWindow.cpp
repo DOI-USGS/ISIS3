@@ -250,6 +250,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Cleans up the directory.
    */
