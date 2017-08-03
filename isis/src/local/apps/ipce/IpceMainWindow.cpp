@@ -688,6 +688,7 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
+    m_directory->project()->clear();
     writeSettings(m_directory->project());
     QMainWindow::closeEvent(event);
 
