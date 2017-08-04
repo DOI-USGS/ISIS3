@@ -633,12 +633,13 @@ namespace Isis {
 
     if (allSupport(ImageDisplayProperties::ZOrdering)) {
                 
-      QAction *moveToTopAct = new QAction(tr("Bring to Front"), this);
-      QAction *moveUpAct = new QAction(tr("Bring Forward"), this);
-      QAction *moveToBottomAct = new QAction(tr("Send to Back"), this);
-      QAction *moveDownAct = new QAction(tr("Send Backward"), this);
+      QAction *moveToTopAct = createWorkOrder(project, ImageListActionWorkOrder::MoveToTop);
+      QAction *moveUpAct = createWorkOrder(project, ImageListActionWorkOrder::MoveUpOne);
+      QAction *moveToBottomAct = createWorkOrder(project, ImageListActionWorkOrder::MoveToBottom);
+      QAction *moveDownAct = createWorkOrder(project, ImageListActionWorkOrder::MoveDownOne);
 
       foreach (Image *image, *this) {
+        
         connect(moveToTopAct, SIGNAL(triggered()),
                 image->displayProperties(), SIGNAL(moveToTop()));
 
@@ -661,7 +662,7 @@ namespace Isis {
     actions.append(NULL);
 
     if (size() == 1 && allSupport(ImageDisplayProperties::Zooming)) {
-      QAction *zoomFit = new QAction(tr("Zoom Fit"), this);
+      QAction *zoomFit = createWorkOrder(project, ImageListActionWorkOrder::ZoomFit);
       connect(zoomFit, SIGNAL(triggered()),
               first()->displayProperties(), SIGNAL(zoomFit()));
       actions.append(zoomFit);
@@ -1026,7 +1027,7 @@ namespace Isis {
       }
     }
   }
-
+  
 
   /**
    * Prompts the user for an alpha value. If the user selects
@@ -1317,7 +1318,7 @@ namespace Isis {
 
     return results;
   }
-
+  
 
   /**
    * Create an XML Handler (reader) that can populate the Image list class data.
