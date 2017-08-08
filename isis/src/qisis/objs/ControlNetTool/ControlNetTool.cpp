@@ -1,4 +1,4 @@
-#include "IpceTool.h"
+#include "ControlNetTool.h"
 
 #include <sstream>
 #include <vector>
@@ -44,14 +44,14 @@ namespace Isis {
    * @internal
    *
    */
-  IpceTool::IpceTool (Directory *directory, QWidget *parent) : Tool(parent) {
+  ControlNetTool::ControlNetTool (Directory *directory, QWidget *parent) : Tool(parent) {
 
     m_directory = directory;
     m_view = qobject_cast<CubeDnView *>(parent);
   }
 
 
-  IpceTool::~IpceTool () {
+  ControlNetTool::~ControlNetTool () {
   }
 
 
@@ -63,23 +63,23 @@ namespace Isis {
     *
     * @internal
     *   @history 2017-07-25 Tyler Wilson - Set the
-    *       object name for the QAction in this 
+    *       object name for the QAction in this
     *       method.  It provides a convenient key
     *       to search through a list of actions in
     *       other classes.  References #4994.
     *
     */
-   QAction *IpceTool::toolPadAction(ToolPad *pad) {
-     
+   QAction *ControlNetTool::toolPadAction(ToolPad *pad) {
+
 
      QAction *action = new QAction(pad);
      action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
      action->setShortcut(Qt::Key_T);
 
-     //The object name is being set and used as a key to search with for this action in 
+     //The object name is being set and used as a key to search with for this action in
      //other classes (ie. CubeDnView)
-     action->setObjectName("IpceTool");
+     action->setObjectName("ControlNetTool");
 
      QList<ControlList *> cnets = m_directory->project()->controls();
 
@@ -94,12 +94,12 @@ namespace Isis {
 
 
    /**
-    * Set the active control net to be used for editing 
-    *  
-    * @param cnet (ControlNet *)  The active control net from Directory that is being used for 
+    * Set the active control net to be used for editing
+    *
+    * @param cnet (ControlNet *)  The active control net from Directory that is being used for
     *             editing
     */
-   void IpceTool::setControlNet(ControlNet *cnet) {
+   void ControlNetTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
      // TODO:  TLS 7-25-17  This method is called by Project::open before there are any viewports,
      // so the following command seg faults.  Need to add check for viewports or ??
@@ -117,7 +117,7 @@ namespace Isis {
    *
    * @internal
    */
-  void IpceTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
+  void ControlNetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
@@ -134,7 +134,7 @@ namespace Isis {
 //      if (sn == m_groundSN) {
 //        QString message = "Cannot select point for editing on ground source.  Select ";
 //        message += "point using un-projected images or the Navigator Window.";
-//        QMessageBox::critical(m_ipceTool, "Error", message);
+//        QMessageBox::critical(m_ControlNetTool, "Error", message);
 //        return;
 //      }
 
@@ -147,27 +147,27 @@ namespace Isis {
       catch (IException &ie) {
         QString message = "No points exist for editing. Create points using the right mouse";
         message += " button.";
-        QMessageBox::warning(m_ipceTool, "Warning", message);
+        QMessageBox::warning(m_ControlNetTool, "Warning", message);
         return;
       }
     }
-    
+
     else if (s == Qt::MidButton) {
 
       if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
         QString message = "No points exist for deleting.  Create points ";
         message += "using the right mouse button.";
-        QMessageBox::warning(m_ipceTool, "Warning", message);
+        QMessageBox::warning(m_ControlNetTool, "Warning", message);
         return;
       }
 
 //      if (m_groundOpen && file == m_groundCube->fileName()) {
 //        QString message = "Cannot select point for deleting on ground source.  Select ";
 //        message += "point using un-projected images or the Navigator Window.";
-//        QMessageBox::critical(m_ipceTool, "Error", message);
+//        QMessageBox::critical(m_ControlNetTool, "Error", message);
 //        return;
 //      }
- 
+
       //  Find closest control point in network
       ControlPoint *point = NULL;
       try {
@@ -176,13 +176,13 @@ namespace Isis {
         if (point == NULL) {
           QString message = "No points exist for deleting.  Create points ";
           message += "using the right mouse button.";
-          QMessageBox::warning(m_ipceTool, "Warning", message);
+          QMessageBox::warning(m_ControlNetTool, "Warning", message);
           return;
         }
       }
       catch (IException &e) {
         QString message = "Cannot find point on this image for deleting.";
-        QMessageBox::critical(m_ipceTool, "Error", message);
+        QMessageBox::critical(m_ControlNetTool, "Error", message);
         return;
       }
 
@@ -204,12 +204,12 @@ namespace Isis {
 
 
   /**
-   * This will draw the control measures on the given cube viewport 
-   * 
+   * This will draw the control measures on the given cube viewport
+   *
    * @param vp (MdiCubeViewport *) Cube viewport control measures are drawn on
    * @param painter (QPainter)  The painter used for the drawing
    */
-  void IpceTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
+  void ControlNetTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 
     if (m_controlNet) {
       drawAllMeasurements(vp, painter);
@@ -224,7 +224,7 @@ namespace Isis {
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
-  void IpceTool::paintAllViewports() {
+  void ControlNetTool::paintAllViewports() {
 
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools
@@ -240,19 +240,19 @@ namespace Isis {
 
 
   /**
-   * Draw all measurments located on the image in this viewPort 
-   *  
+   * Draw all measurments located on the image in this viewPort
+   *
    * @param vp (MdiCubeViewport *) Viewport where measurements will be drawn
-   * @param painter (QPainter *) Does the actual drawing on the viewport widget 
-   *  
+   * @param painter (QPainter *) Does the actual drawing on the viewport widget
+   *
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    *   @history 2010-06-08 Jeannie Walldren - Fixed bug that was causing ignored
-   *                          measures not be drawn as yellow unless IpceTool was
+   *                          measures not be drawn as yellow unless ControlNetTool was
    *                          open
    *   @history 2010-07-01 Jeannie Walldren - Modified to draw points selected in
-   *                          IpceTool last so they lay on top of all other points
+   *                          ControlNetTool last so they lay on top of all other points
    *                          in the image.
    *   @history 2011-04-15 Tracie Sucharski - Fixed bug which was causing all
    *                          measures to be drawn on all cubes.  Also removed
@@ -265,7 +265,7 @@ namespace Isis {
    *   @history 2017-07-31 Tracie Sucharski - The current edit point will be drawn in red as a
    *                          crosshair enclosed by circle.
    */
-  void IpceTool::drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter) {
+  void ControlNetTool::drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter) {
 
     // Without a controlnetwork there are no points, or if new net, no points
     if (m_controlNet == 0 || m_controlNet->GetNumPoints() == 0) return;
@@ -312,7 +312,7 @@ namespace Isis {
       painter->drawLine(x - 5, y, x + 5, y);
       painter->drawLine(x, y - 5, x, y + 5);
     }
-    // if IpceTool is open, the editPointId will contain the ControlPoint Id of the current edit
+    // if ControlNetTool is open, the editPointId will contain the ControlPoint Id of the current edit
     // point.
     ControlPoint *currentEditPoint = NULL;
     if (m_directory->controlPointEditView()) {
@@ -344,4 +344,3 @@ namespace Isis {
     }
   }
 }
-
