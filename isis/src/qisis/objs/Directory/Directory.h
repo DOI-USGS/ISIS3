@@ -159,6 +159,8 @@ namespace Isis {
    *   @history 2017-07-26 Cole Neubauer -Set save button to default be disabled Fixes #4960
    *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
    *                           current edit control point ID.  Fixes #5007, #5008.
+   *   @history 2017-08-07 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
+   *                           Fixes #5090
    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a 
    *                           control net without having an active control net set. Fixes #5048.
    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when right clicking a
@@ -299,7 +301,7 @@ namespace Isis {
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
-      //  Slots in response to mouse clicks on CubeDnView (IpceTool) and
+      //  Slots in response to mouse clicks on CubeDnView (ControlNetTool) and
       //    Footprint2DView (MosaicControlNetTool)
       void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deleteControlPoint(ControlPoint *controlPoint);

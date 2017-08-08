@@ -645,7 +645,7 @@ namespace Isis {
             this, SLOT(createControlPoint(double, double, Cube *, bool)));
 
     //  This signal is connected to the CubeDnView signal which connects to the slot,
-    //  IpceTool::paintAllViewports().
+    // IpceTool::paintAllViewports()
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
@@ -875,9 +875,9 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-   
+
     //  The model emits this signal when the user double-clicks on the project name, the parent
-    //  node located on the ProjectTreeView. 
+    //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
 
@@ -885,11 +885,11 @@ namespace Isis {
   }
 
 
-/** 
- * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
- * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+/**
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A
  * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
- *  
+ *
  * @param QString projectName New project name
  */
   void Directory::initiateRenameProjectWorkOrder(QString projectName) {
@@ -899,7 +899,7 @@ namespace Isis {
     RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
     project()->addToProject(workOrder);
   }
-  
+
 
   /**
    * @brief Gets the ProjectItemModel for this directory.
@@ -1529,13 +1529,13 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a left mouse button operation on views 
-   *  
+   * Slot that is connected from a left mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   * @param serialNumber (QString) The serial number of Cube that was used to select control point 
+   * @param serialNumber (QString) The serial number of Cube that was used to select control point
    *                     from the CubeDnView.  This parameter will be empty if control point was
    *                     selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
@@ -1552,10 +1552,10 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a middle mouse button operation on views 
-   *  
+   * Slot that is connected from a middle mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   *  
+   *
    */
   void Directory::deleteControlPoint(ControlPoint *controlPoint) {
 
@@ -1565,7 +1565,7 @@ namespace Isis {
       }
     }
     m_editPointId = controlPoint->GetId();
- 
+
     //  Update views with point to be deleted shown as current edit point
     emit redrawMeasures();
 
@@ -1574,17 +1574,17 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a right mouse button operation on views 
-   *  
+   * Slot that is connected from a right mouse button operation on views
+   *
    * @param latitude (double) Latitude location where the control point was created
    * @param longitude (double) Longitude location where the control point was created
-   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control 
+   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control
    *                     point.  This parameter will be empty if control point was selected from
    *                     Footprint2DView.
    * @param isGroundSource (bool) Indicates whether the Cube in the CubeDnView that was used to select
    *                     location for new control point is a ground source.  This parameter will be
    *                     empty if control point was selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::createControlPoint(double latitude, double longitude, Cube *cube,
                                      bool isGroundSource) {
@@ -1602,9 +1602,9 @@ namespace Isis {
 
 
   /**
-   * Autosave for control net.  The control net is auto saved to the same directory as the input 
-   * net.  It is saved to controlNetFilename.net.bak. 
-   * 
+   * Autosave for control net.  The control net is auto saved to the same directory as the input
+   * net.  It is saved to controlNetFilename.net.bak.
+   *
    */
   void Directory::makeBackupActiveControl() {
 
@@ -1614,7 +1614,7 @@ namespace Isis {
 
   /**
    * Return the current control point id loaded in the ControlPointEditWidget
-   * 
+   *
    * @return @b QString Id of the control point loaded in the ControlPointEditWidget
    */
   QString Directory::editPointId() {
