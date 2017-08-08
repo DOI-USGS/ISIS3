@@ -17,14 +17,19 @@
 #include <QString>
 #include <QVBoxLayout>
 
+#include "AbstractTableModel.h"
+#include "AbstractTreeModel.h"
 #include "TableColumn.h"
 #include "TableColumnList.h"
 #include "TableView.h"
-#include "AbstractTreeModel.h"
-#include "AbstractTableModel.h"
 
 
 namespace Isis {
+  /**
+    * Constructor
+    * 
+    * @param someModel The table model
+    */
   TableViewHeader::TableViewHeader(AbstractTableModel *someModel) {
     nullify();
 
@@ -53,16 +58,29 @@ namespace Isis {
   }
 
 
+  /**
+    * Destructor
+    */
   TableViewHeader::~TableViewHeader() {
     m_columns = NULL;
   }
 
 
+  /**
+    * Sets the column list
+    * 
+    * @param cols The column list
+    */
   void TableViewHeader::setColumns(TableColumnList *cols) {
     m_columns = cols;
   }
 
 
+  /**
+    * Returns the minimum size based on the font
+    * 
+    * @return QSize Minimum size allowed
+    */
   QSize TableViewHeader::minimumSizeHint() const {
     return QSize(0, QFontMetrics(font()).height() + 6);
     /*QFontMetrics(font()).width(text->join("")) + 15,
@@ -70,11 +88,23 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the minimum size based on the font
+    * 
+    * @see minimumSizeHint
+    * 
+    * @return QSize Minimum size allowed
+    */
   QSize TableViewHeader::sizeHint() const {
     return minimumSizeHint();
   }
 
 
+  /**
+    * Connects the table model to the functions that handle changes
+    * 
+    * @param someModel The table model to connect
+    */
   void TableViewHeader::setModel(AbstractTableModel *someModel) {
     if (m_model) {
       disconnect(m_model, SIGNAL(filterProgressChanged(int)),
@@ -132,6 +162,12 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the visible columns, and geometry when the filter count changes
+    * 
+    * @param visibleTopLevelItemCount Number of visible top level items
+    * @param topLevelItemCount Number of top level items
+    */
   void TableViewHeader::handleFilterCountsChanged(
     int visibleTopLevelItemCount, int topLevelItemCount) {
     m_visibleCount = visibleTopLevelItemCount;
@@ -153,12 +189,22 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the header offset 
+    * 
+    * @param newOffset The new header offset
+    */
   void TableViewHeader::updateHeaderOffset(int newOffset) {
     m_horizontalOffset = newOffset;
     update();
   }
 
 
+  /**
+    * Overrides QWidget::mousePressEvent
+    * 
+    * @param event The mouse press event
+    */
   void TableViewHeader::mousePressEvent(QMouseEvent *event) {
     QPoint mousePos = event->pos();
 
@@ -187,6 +233,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QWidget::mouseMoveEvent
+    * 
+    * @param event The mouse move event
+    */
   void TableViewHeader::mouseMoveEvent(QMouseEvent *event) {
     QPoint mousePos = event->pos();
 
@@ -218,6 +269,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QWidget::mouseReleaseEvent
+    * 
+    * @param event The mouse release event
+    */
   void TableViewHeader::mouseReleaseEvent(QMouseEvent *event) {
     bool wasLastCol =
       m_clickedColumnEdge >= m_columns->getVisibleColumns().size() - 2;
@@ -253,6 +309,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Repaints the header
+    * 
+    * @param event The paint event
+    */
   void TableViewHeader::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing |
@@ -268,12 +329,22 @@ namespace Isis {
   }
 
 
+  /**
+    * Sets all the member variables to NULL
+    */
   void TableViewHeader::nullify() {
     m_model = NULL;
     m_columns = NULL;
   }
 
 
+  /**
+    * Returns the visible column rectangle
+    * 
+    * @param column Column to check
+    * 
+    * @return QRect The visible column rectangle
+    */
   QRect TableViewHeader::getColumnRect(int column) const {
     QRect colRect;
 
@@ -293,6 +364,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the column under the mouse
+    * 
+    * @param mousePos The mouse position
+    * 
+    * @return int Index of the column under the mouse
+    */
   int  TableViewHeader::getMousedColumn(QPoint mousePos) {
     int mousedColumn = -1;
 
@@ -308,6 +386,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the edge of the column under the mouse
+    * 
+    * @param mousePos The mouse position
+    * 
+    * @return int Index of the column edge under the mouse
+    */
   int TableViewHeader::getMousedColumnEdge(QPoint mousePos) {
     int edge = -1;
 
@@ -328,6 +413,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns if the mouse is at the edge of a resizeable column
+    * 
+    * @param mousePos The mouse position
+    * 
+    * @return bool True if the mouse is at the edge fo a resizable column
+    */
   bool TableViewHeader::mouseAtResizableColumnEdge(QPoint mousePos) {
     int columnNum = getMousedColumn(mousePos);
 
@@ -355,6 +447,12 @@ namespace Isis {
   }
 
 
+  /**
+    * Repaints the header
+    * 
+    * @param painter The QPainter
+    * @param rowHeight The new row height
+    */
   void TableViewHeader::paintHeader(QPainter *painter, int rowHeight) {
     int visibleColWidth = -m_horizontalOffset;
     TableColumnList visibleCols = m_columns->getVisibleColumns();
@@ -488,6 +586,16 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the progress bar
+    * 
+    * @param painter The QPainter
+    * @param rect The progress bar
+    * @param min The minimum progress value
+    * @param max The maximum progress value
+    * @param value Current progress value
+    * @param over100 Bool if the progress can go over 100
+    */
   void TableViewHeader::paintProgress(QPainter *painter,
       const QRect &rect, int min, int max, int value, bool over100) {
     double progressPercent = 1.0;
@@ -506,12 +614,23 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the current filter progress value
+    * 
+    * @param newProgress New progress value
+    */
   void TableViewHeader::updateFilterProgress(int newProgress) {
     m_filterProgress = newProgress;
     update();
   }
 
 
+  /**
+    * Updates the range of the filter progress
+    * 
+    * @param min The minimum progress
+    * @param max The maximum progress
+    */
   void TableViewHeader::updateFilterProgressRange(int min, int max) {
     m_filterProgressMin = min;
     m_filterProgressMax = max;
@@ -519,12 +638,23 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the current rebuild progress value
+    * 
+    * @param newProgress New progress value
+    */
   void TableViewHeader::updateRebuildProgress(int newProgress) {
     m_rebuildProgress = newProgress;
     update();
   }
 
 
+  /**
+    * Updates the range of the rebuild progress
+    * 
+    * @param min The minimum progress
+    * @param max The maximum progress
+    */
   void TableViewHeader::updateRebuildProgressRange(int min, int max) {
     m_rebuildProgressMin = min;
     m_rebuildProgressMax = max;
@@ -532,12 +662,23 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the current sort progress value
+    * 
+    * @param newProgress New progress value
+    */
   void TableViewHeader::updateSortProgress(int newProgress) {
     m_sortProgress = newProgress;
     update();
   }
 
 
+  /**
+    * Updates the range of the sort progress
+    * 
+    * @param min The minimum progress
+    * @param max The maximum progress
+    */
   void TableViewHeader::updateSortProgressRange(int min, int max) {
     m_sortProgressMin = min;
     m_sortProgressMax = max;

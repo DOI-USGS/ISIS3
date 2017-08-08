@@ -29,24 +29,27 @@ namespace Isis {
   class TreeView;
 
   /**
-  * This widget provides full editing, filtering and viewing capabilities for
-  * the raw data in a control network. The raw data is, for example, chooser
-  * name or cube serial number. The display is all textual. Please use
-  * the widget accessors to appropriately place the various ancillary sections
-  * of the editor.
-  *
-  * @author ????-??-?? Eric Hyer
-  *
-  * @internal
-  *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
-  *                           to not violate licensing terms). Fixes #1041.
-  *   @history 2017-05-18 Tracie Sucharski - Added a signal to indicate the control point chosen
-  *                           from either the point table or the measure table.  If the point was
-  *                           chosen from the measure table, the serial number of the measure is
-  *                           also passed.  This was added for IPCE, for the interaction with other
-  *                           views.
-  *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-  */
+   * This widget provides full editing, filtering and viewing capabilities for
+   * the raw data in a control network. The raw data is, for example, chooser
+   * name or cube serial number. The display is all textual. Please use
+   * the widget accessors to appropriately place the various ancillary sections
+   * of the editor.
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
+   *                           to not violate licensing terms). Fixes #1041.
+   *   @history 2017-05-18 Tracie Sucharski - Added a signal to indicate the control point chosen
+   *                           from either the point table or the measure table.  If the point was
+   *                           chosen from the measure table, the serial number of the measure is
+   *                           also passed.  This was added for IPCE, for the interaction with other
+   *                           views.
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
+   *                           to edit a control point when there is not an active control network.
+   *                           Fixes #5048.
+   */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
 
@@ -57,8 +60,6 @@ namespace Isis {
         ConnectionView
       };
 
-
-    public:
       CnetEditorWidget(ControlNet *, QString);
       virtual ~CnetEditorWidget();
       void readSettings();
@@ -70,6 +71,10 @@ namespace Isis {
       QWidget *pointFilterWidget();
       QWidget *serialFilterWidget();
       QWidget *connectionFilterWidget();
+      TableView *pointTableView();
+      TableView *measureTableView();
+      ControlNet *control();
+      
 
       AbstractTableModel *measureTableModel();
       AbstractTableModel *pointTableModel();
@@ -98,24 +103,7 @@ namespace Isis {
 
     signals:
       void cnetModified();
-
       void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
-
-
-    private:
-      void nullify();
-      QBoxLayout *createMainLayout();
-      void createActions();
-      void createPointTreeView();
-      void createSerialTreeView();
-      void createConnectionTreeView();
-      void createFilterArea();
-      void createPointTableView();
-      void createMeasureTableView();
-      void upgradeVersion();
-      void handleTableFilterCountsChanged(int visibleRows, int totalRows,
-          QGroupBox *box, QString initialText);
-
 
     private slots:
       void rebuildModels(QList< AbstractTreeItem * > itemsToDelete);
@@ -127,44 +115,57 @@ namespace Isis {
       void handleMeasureTableFilterCountsChanged(int visibleRows,
           int totalRows);
 
+    private: 
+      //methods
+      void nullify();
+      QBoxLayout *createMainLayout();
+      void createActions();
+      void createPointTreeView();
+      void createSerialTreeView();
+      void createConnectionTreeView();
+      void createFilterArea();
+      void createPointTableView();
+      void createMeasureTableView();
+      void upgradeVersion();
+      void handleTableFilterCountsChanged(int visibleRows, int totalRows,
+                                          QGroupBox *box, QString initialText);
+      
+      // data
+      bool m_updatingSelection;                                 //!< Updates selection
+      ControlNet *m_controlNet;                                 //!< Control network for this widget
+      QString *m_workingVersion;                                //!< Working version
+      static const QString VERSION;                             //!< Version
+      
+      //widgets
+      TreeView *m_pointTreeView;                       //!< Point tree view
+      TreeView *m_imageTreeView;                       //!< Image tree view
+      TreeView *m_connectionTreeView;                  //!< Connection tree view
 
-    private: // data
-      bool m_updatingSelection;
-      ControlNet *m_controlNet;
-      QString *m_workingVersion;
-      static const QString VERSION;
+      TableView *m_pointTableView;                     //!< Point table view
+      TableView *m_measureTableView;                   //!< Measure table view
 
+      QGroupBox *m_pointTableBox;                               //!< Point table box
+      QGroupBox *m_measureTableBox;                             //!< Measure table box
 
-    private: // widgets
-      TreeView *m_pointTreeView;
-      TreeView *m_imageTreeView;
-      TreeView *m_connectionTreeView;
+      QScrollArea *m_filterArea;                                //!< Scroll area for filters
 
-      TableView *m_pointTableView;
-      TableView *m_measureTableView;
+      QWidget *m_pointFilterWidget;                             //!< Point filter widget
+      QWidget *m_serialFilterWidget;                            //!< Serial filter widget
+      QWidget *m_connectionFilterWidget;                        //!< Connection filter widget
 
-      QGroupBox *m_pointTableBox;
-      QGroupBox *m_measureTableBox;
+      PointMeasureTreeModel *m_pointModel;             //!< Point tree model
+      ImagePointTreeModel *m_imageModel;               //!< Image tree model
+      ImageImageTreeModel *m_connectionModel;          //!< Connection tree model
 
-      QScrollArea *m_filterArea;
+      PointTableModel *m_pointTableModel;              //!< Point table model
+      MeasureTableModel *m_measureTableModel;          //!< Measure table model
 
-      QWidget *m_pointFilterWidget;
-      QWidget *m_serialFilterWidget;
-      QWidget *m_connectionFilterWidget;
+      QSplitter *m_mainSplitter;                                //!< Splitter
 
-      PointMeasureTreeModel *m_pointModel;
-      ImagePointTreeModel *m_imageModel;
-      ImageImageTreeModel *m_connectionModel;
+      QMap< QAction *, QList< QString > > * m_menuActions;      //!< QMap of menu actions
+      QMap< QString, QList< QAction * > > * m_toolBarActions;   //!< QMap of tool bar actions
 
-      PointTableModel *m_pointTableModel;
-      MeasureTableModel *m_measureTableModel;
-
-      QSplitter *m_mainSplitter;
-
-      QMap< QAction *, QList< QString > > * m_menuActions;
-      QMap< QString, QList< QAction * > > * m_toolBarActions;
-
-      QString *m_settingsPath;
+      QString *m_settingsPath; //!< Path to read/write settings
   };
 }
 

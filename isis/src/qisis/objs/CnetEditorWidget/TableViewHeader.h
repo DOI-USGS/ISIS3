@@ -16,12 +16,13 @@ namespace Isis {
   class TableColumnList;
 
   /**
-   * @author ????-??-?? Unknown
-   *
-   * @internal
-   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   */
+    * @author ????-??-?? Unknown
+    *
+    * @internal
+    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+    *   @history 2017-08-08 Makayla Shepherd - Updated documentation.
+    */
   class TableViewHeader : public QWidget {
 
       Q_OBJECT

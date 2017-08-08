@@ -84,6 +84,8 @@
 #include "SensorInfoWidget.h"
 #include "SetActiveControlWorkOrder.h"
 #include "SetActiveImageListWorkOrder.h"
+#include "TableView.h"
+#include "TableViewContent.h"
 #include "TargetInfoWidget.h"
 #include "TargetGetInfoWorkOrder.h"
 #include "WarningTreeWidget.h"
@@ -125,6 +127,9 @@ namespace Isis {
 //     connect( m_project, SIGNAL(projectLoaded(Project *) ),
 //              this, SLOT(updateRecentProjects(Project *) ) );
 //
+
+    connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
+    
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
 
@@ -445,6 +450,21 @@ namespace Isis {
     m_recentProjects.append(recentProjects);
   }
 
+  
+  void Directory::newActiveControl(bool newControl) {
+    foreach(CnetEditorWidget *cnetEditorView, m_cnetEditorViewWidgets) {
+      if (cnetEditorView->control() == project()->activeControl()->controlNet()) {
+        cnetEditorView->pointTableView()->content()->setActiveControlNet(true);
+        cnetEditorView->measureTableView()->content()->setActiveControlNet(true);
+      }
+      else {
+        cnetEditorView->pointTableView()->content()->setActiveControlNet(false);
+        cnetEditorView->measureTableView()->content()->setActiveControlNet(false);
+      }
+    }
+  }
+
+  
 
   /**
    * @brief Public accessor for the list of recent projects.
@@ -570,7 +590,11 @@ namespace Isis {
     filterViews->addTab( mainWidget->connectionFilterWidget(), tr("Filter Connections") );
     resultLayout->addWidget(filterViews, row, 1, 1, 1);
     row++;
-
+    
+    if (project()->activeControl() && mainWidget->control() == project()->activeControl()->controlNet()) {
+      mainWidget->pointTableView()->content()->setActiveControlNet(true);
+      mainWidget->measureTableView()->content()->setActiveControlNet(true);
+    }
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
@@ -582,8 +606,7 @@ namespace Isis {
     connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
     // Connection between other views & cneteditor
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
-
-
+    
     m_cnetEditorViewWidgets.append(mainWidget);
 
     result->setWindowTitle(title);
@@ -665,6 +688,14 @@ namespace Isis {
 
     //  Control Net tool will only be active if the project has an active Control.  Note:  This
     //  assumes the Control Net tool is the 4th in the toolpad.
+    connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
+
+    //  This signal is connected to the MosaicGraphicsScene::update(), which eventually calls
+    //  ControlNetGraphicsItem::paint(), then ControlPointGraphicsItem::paint().
+    connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
+
+    //  Control Net tool will only be active if the project has an active Control.  Note:  This
+    //  assumes the Control Net tool is the 4th in the toolpad.
     if (!project()->activeControl()) {
       QList<QAction *> toolbar = result->toolPadActions();
       QAction* cnetButton = toolbar[3];
@@ -694,7 +725,7 @@ namespace Isis {
       }
       result->controlPointEditWidget()->setControl(activeControl);
 
-      if (!project()->activeImageList()->serialNumberList()) {
+      if (!project()->activeImageList() || !project()->activeImageList()->serialNumberList()) {
         QString message = "No active image list chosen.  Choose an active image list on the project "
                           "tree.\n";
         QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
@@ -1509,7 +1540,9 @@ namespace Isis {
   void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
     if (!controlPointEditView()) {
-      addControlPointEditView();
+      if (!addControlPointEditView()) {
+        return;
+      }
     }
     m_editPointId = controlPoint->GetId();
     emit redrawMeasures();
@@ -1527,7 +1560,9 @@ namespace Isis {
   void Directory::deleteControlPoint(ControlPoint *controlPoint) {
 
     if (!controlPointEditView()) {
-      addControlPointEditView();
+      if (!addControlPointEditView()) {
+        return;
+      }
     }
     m_editPointId = controlPoint->GetId();
  
@@ -1555,7 +1590,9 @@ namespace Isis {
                                      bool isGroundSource) {
 
     if (!controlPointEditView()) {
-      addControlPointEditView();
+      if (!addControlPointEditView()) {
+        return;
+      }
     }
     controlPointEditView()->controlPointEditWidget()->createControlPoint(
         latitude, longitude, cube, isGroundSource);

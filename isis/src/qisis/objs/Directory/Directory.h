@@ -149,14 +149,20 @@ namespace Isis {
    *                           a new project being opened. Fixes #4969
    *   @history 2017-07-17 Cole Neubauer - Disabled CNet tool when a Footprint2DView is added if a
    *                           control net is not active and slotted it to reenable when Project
-   *                           emits activeControlSet(bool).
-   *                           Fixes #5046
+   *                           emits activeControlSet(bool). Fixes #5046.
+   *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
+   *                           to edit a control point when there is not an active control network.
+   *                           Fixes #5048.
    *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
    *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
    *                           from the context menu Fixes #4996
    *   @history 2017-07-26 Cole Neubauer -Set save button to default be disabled Fixes #4960
    *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
    *                           current edit control point ID.  Fixes #5007, #5008.
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a 
+   *                           control net without having an active control net set. Fixes #5048.
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when right clicking a
+   *                           control network when it is the only item on the project. Fixes #5071.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -305,7 +311,8 @@ namespace Isis {
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
-
+      void newActiveControl(bool newControl);
+      
     private:
       /**
        * @author 2012-08-?? Steven Lambright

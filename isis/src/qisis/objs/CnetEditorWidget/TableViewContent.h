@@ -26,20 +26,23 @@ namespace Isis {
   class TableView;
 
   /**
-   * @author ????-??-?? Unknown
-   *
-   * @internal
-   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-   *   @history 2017-05-18 Tracie Sucharski - Added a new QAction showing on the context menu
-   *                           allowing a control point to be edited in IPCE.  Added signal to
-   *                           indicate the control point chosen from either the point table or
-   *                           the measure table.  If the point was chosen from the measure table,
-   *                           the serial number of the measure is also passed. This was added for
-   *                           IPCE, for the interaction with other views.
-   *   @history 2017-07-18 Christopher Combs - Fixed bug in which trying to edit a selected row
-   *                           would cause a segfault from m_activeCell being null. Fixes #4958.
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   */
+    * @author ????-??-?? Unknown
+    *
+    * @internal
+    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+    *   @history 2017-05-18 Tracie Sucharski - Added a new QAction showing on the context menu
+    *                           allowing a control point to be edited in IPCE.  Added signal to
+    *                           indicate the control point chosen from either the point table or
+    *                           the measure table.  If the point was chosen from the measure table,
+    *                           the serial number of the measure is also passed. This was added for
+    *                           IPCE, for the interaction with other views.
+    *   @history 2017-07-18 Christopher Combs - Fixed bug in which trying to edit a selected row
+    *                           would cause a segfault from m_activeCell being null. Fixes #4958.
+    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when 
+    *                           attempting to edit a control point when there is not an active 
+    *                           control network. Fixes #5048.
+    */
   class TableViewContent : public QAbstractScrollArea {
       Q_OBJECT
 
@@ -50,6 +53,7 @@ namespace Isis {
       QSize sizeHint() const;
       AbstractTableModel *getModel();
       //       void setModel(AbstractTableModel * someModel);
+      void setActiveControlNet(bool activeNet);
 
 
     signals:
@@ -174,6 +178,8 @@ namespace Isis {
       * This action edits selected control point or if measure selected, edit parent control pt
       */
       QAction *m_editControlPointAct;
+      
+      bool m_activeControlNet;
 
 
     private:

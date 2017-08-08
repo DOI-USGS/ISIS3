@@ -17,7 +17,14 @@
 #include "TableColumnList.h"
 
 
-namespace Isis {
+namespace Isis {  
+  /**
+    * Constructor
+    * 
+    * @param someModel The abstract table model to view
+    * @param pathForSettings The path to read/write settings to
+    * @param objName The name of the object
+    */
   TableView::TableView(AbstractTableModel *someModel,
       QString pathForSettings,
       QString objName) {
@@ -106,6 +113,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Destructor
+    */
   TableView::~TableView() {
     // save column widths
     ASSERT(objectName().size());
@@ -138,11 +148,22 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the horizontal header
+    * 
+    * @return TableViewHeader The horizontal header
+    */
   TableViewHeader *TableView::getHorizontalHeader() {
     return m_header;
   }
 
 
+  /**
+    * Sets the specified column visible or invisible
+    * 
+    * @param column The column to change the visibility of
+    * @param visible The visibility setting
+    */
   void TableView::setColumnVisible(QString column, bool visible) {
     for (int i = 0; i < m_columns->size(); i++) {
       TableColumn *col = (*m_columns)[i];
@@ -152,8 +173,23 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the model
+    * 
+    * @return AbstractTableModel The model
+    */
   AbstractTableModel *TableView::getModel() {
     return m_content->getModel();
+  }
+  
+  
+  /**
+    * Returns the content of the table
+    * 
+    * @return TableViewContent The content of the table
+    */
+  TableViewContent *TableView::content() {
+    return m_content;
   }
 
 
@@ -205,6 +241,11 @@ namespace Isis {
   //   }
   
 
+  /**
+    * Displays warnings for a table
+    * 
+    * @param warning The waarning that will be displayed
+    */
   void TableView::displayWarning(AbstractTableModel::Warning warning) {
     switch (warning) {
       case AbstractTableModel::SortingDisabled:
@@ -228,7 +269,9 @@ namespace Isis {
     }
   }
 
-
+  /**
+    * Handles refreshing the content when the model selection is changed.
+    */
   void TableView::handleModelSelectionChanged() {
     m_content->refresh();
   }
@@ -240,7 +283,9 @@ namespace Isis {
     m_content->scrollTo(newlySelectedItems);
   }
 
-
+  /**
+    * Sets all member variables to NULL
+    */ 
   void TableView::nullify() {
     m_header = NULL;
     m_content = NULL;

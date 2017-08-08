@@ -35,6 +35,11 @@
 
 
 namespace Isis {
+  /**
+    * Constructor
+    * 
+    * @param someModel The abstract table model
+    */
   TableViewContent::TableViewContent(AbstractTableModel *someModel) {
     nullify();
 
@@ -84,9 +89,14 @@ namespace Isis {
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
         this, SLOT(showContextMenu(QPoint)));
+    
+    m_activeControlNet = false;
   }
 
 
+  /**
+    * Destructor
+    */
   TableViewContent::~TableViewContent() {
     delete m_items;
     m_items = NULL;
@@ -119,16 +129,33 @@ namespace Isis {
   }
 
 
+  /**
+    * Returns the minimum size hint
+    * 
+    * @return QSize Minimum size hint
+    */
   QSize TableViewContent::minimumSizeHint() const {
     return QWidget::minimumSizeHint();
   }
 
 
+  /**
+    * Returns the minimum size hint
+    * 
+    * @see TableViewContent::minimumSizeHint()
+    * 
+    * @return QSize Minimum size hint
+    */
   QSize TableViewContent::sizeHint() const {
     return minimumSizeHint();
   }
 
 
+  /**
+    * Returns the model
+    * 
+    * @return AbstractTableModel The model of the table
+    */
   AbstractTableModel *TableViewContent::getModel() {
     ASSERT(m_model);
     return m_model;
@@ -172,7 +199,20 @@ namespace Isis {
   //     refresh();
   //   }
 
+  
+  /**
+    * Sets if there is an active control net
+    * 
+    * @param bool The bool if there is an active control net
+    */
+  void TableViewContent::setActiveControlNet(bool activeNet) {
+    m_activeControlNet = activeNet;
+  }
+  
 
+  /**
+    * Refreshes the table and viewport
+    */
   void TableViewContent::refresh() {
     if (m_model) {
       if (!m_model->isFiltering()) {
@@ -195,6 +235,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the horizontal scroll bar
+    * 
+    * @param scrollRight True if the horizontal scroll bar has scrolled right
+    */
   void TableViewContent::updateHorizontalScrollBar(bool scrollRight) {
     if (m_columns) {
       int range = 0;
@@ -213,6 +258,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Scrolls to the selected items 
+    * 
+    * @param newlySelectedItems Newly selected items to scroll to
+    */
   void TableViewContent::scrollTo(
     QList< AbstractTreeItem * > newlySelectedItems) {
     if (newlySelectedItems.size())
@@ -220,6 +270,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Scrolls to the selected item
+    * 
+    * @param newlySelectedItem Newly selected item to scroll to
+    */
   void TableViewContent::scrollTo(AbstractTreeItem *newlySelectedItem) {
     int row = getModel()->indexOfVisibleItem(newlySelectedItem);
 
@@ -241,11 +296,24 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QObject::eventFilter
+    * 
+    * @param target The object that was changed 
+    * @param event The event that was triggered
+    * 
+    * @return bool True if the event is filtered out
+    */
   bool TableViewContent::eventFilter(QObject *target, QEvent *event) {
     return QObject::eventFilter(target, event);
   }
 
 
+  /**
+    * Overrides QWidget::mouseDoubleClickEvent. 
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::mouseDoubleClickEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
       int rowNum = event->pos().y() / m_rowHeight;
@@ -268,6 +336,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QWidget::mousePressEvent.
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::mousePressEvent(QMouseEvent *event) {
 
     if (event->buttons() & Qt::LeftButton) {
@@ -389,10 +462,20 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QWidget::mouseReleaseEvent. Empty function
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::mouseReleaseEvent(QMouseEvent *event) {
   }
 
 
+  /**
+    * Overrides QWidget::mouseMoveEvent.
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::mouseMoveEvent(QMouseEvent *event) {
     if (!m_editWidget) {
       if (event->buttons() & Qt::LeftButton) {
@@ -454,11 +537,21 @@ namespace Isis {
   }
 
 
+  /**
+    * Overrides QWidget::leaveEvent
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::leaveEvent(QEvent *event) {
     //     viewport()->update();
   }
 
 
+  /**
+    * Overrides QWidget::keyPressEvent
+    * 
+    * @param event QMouseEvent
+    */
   void TableViewContent::keyPressEvent(QKeyEvent *event) {
     Qt::Key key = (Qt::Key) event->key();
 
@@ -661,6 +754,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Saves the data from the cell the user was modifying
+    */
   void TableViewContent::finishEditing() {
     if (m_editWidget) {
       TableColumn *col =
@@ -676,6 +772,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Shifts the active cell up
+    */
   void TableViewContent::moveActiveCellUp() {
     int activeIndex = m_items->indexOf(m_activeCell->first);
     if (activeIndex != -1) {
@@ -693,6 +792,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Changes the viewport when the active cell is moved.
+    */
   void TableViewContent::moveActiveCellDown() {
     int activeIndex = m_items->indexOf(m_activeCell->first);
     if (activeIndex != -1) {
@@ -711,6 +813,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Changes the viewport when the active cell is moved.
+    */
   void TableViewContent::moveActiveCellLeft() {
     m_activeCell->second = qMax(1, m_activeCell->second - 1);
     int leftMostVisibleCol = getColumnFromScreenX(0);
@@ -724,6 +829,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Changes the viewport when the active cell is moved.
+    */
   void TableViewContent::moveActiveCellRight() {
     m_activeCell->second = qMin(m_columns->getVisibleColumns().size() - 1,
         m_activeCell->second + 1);
@@ -738,6 +846,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Paints the table when there is a paint event. Overrides QWidget::paintEvent
+    * 
+    * @param event The paint event
+    */
   void TableViewContent::paintEvent(QPaintEvent *event) {
     ASSERT(m_model);
     ASSERT(m_columns);
@@ -856,6 +969,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the table when it is resized. 
+    * 
+    * @param event Resize event
+    */
   void TableViewContent::resizeEvent(QResizeEvent *event) {
     QAbstractScrollArea::resizeEvent(event);
     updateHorizontalScrollBar();
@@ -863,12 +981,21 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the item list when the user scrolls
+    * 
+    * @param dx X scroll
+    * @param dy Y scroll
+    */
   void TableViewContent::scrollContentsBy(int dx, int dy) {
     QAbstractScrollArea::scrollContentsBy(dx, dy);
     updateItemList();
   }
 
 
+  /**
+    * Clears all member variables
+    */
   void TableViewContent::nullify() {
     m_parentView = NULL;
     m_model = NULL;
@@ -887,6 +1014,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Rebuilds the models when the data is changed
+    * 
+    * @param col The table column that changed
+    */
   void TableViewContent::cellDataChanged(const TableColumn *col) {
     if (col->hasNetworkStructureEffect())
       emit rebuildModels(QList< AbstractTreeItem * >());
@@ -895,12 +1027,18 @@ namespace Isis {
   }
 
 
+  /**
+    * Clears the active cell
+    */
   void TableViewContent::clearActiveCell() {
     m_activeCell->first = NULL;
     m_activeCell->second = -1;
   }
 
 
+  /**
+    * Clears the selected column
+    */
   void TableViewContent::clearColumnSelection() {
     ASSERT(m_lastShiftArrowSelectedCell);
     m_lastShiftArrowSelectedCell->first = NULL;
@@ -908,6 +1046,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Copies the selected cells
+    * 
+    * @param allCells Determines if all of the visible rows should be copied
+    */
   void TableViewContent::copyCellSelection(bool allCells) {
     if (hasActiveCell()) {
       TableColumn *col = m_columns->getVisibleColumns()[m_activeCell->second];
@@ -959,6 +1102,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Builds the menus
+    */
   void TableViewContent::createActions() {
     m_applyToSelectionAct = new QAction(tr("Copy to selected cells"), this);
     m_applyToSelectionAct->setStatusTip(tr("Copy the contents of this cell to the"
@@ -986,47 +1132,74 @@ namespace Isis {
   }
 
 
+  /**
+    * Calculates the visible range of a column and returns the index of the column
+    *
+    * @param screenX X value of the screen size 
+    * 
+    * @return int Column that fits the screen, or if there aren't any columns that fit -1
+    */
   int TableViewContent::getColumnFromScreenX(int screenX) const {
-    int column = -1;
 
-    for (int i = 0;
-        column == -1 && i < m_columns->getVisibleColumns().size();
-        i++) {
+    for (int i = 0; i < m_columns->getVisibleColumns().size(); i++) {
       QPair<int, int> cellXRange(m_columns->getVisibleXRange(i));
       int deltaX = -horizontalScrollBar()->value();
 
       if (cellXRange.first + deltaX < screenX &&
           cellXRange.second  + deltaX > screenX) {
-        column = i;
+        return i;
       }
     }
 
-    return column;
+    return -1;
   }
 
 
+  /**
+    * Calculates the visible range of a row and returns the index of the column
+    *
+    * @param screenY Y value of the screen size 
+    * 
+    * @return int Row that fits the screen, or if there aren't any columns that fit -1
+    */
   int TableViewContent::getRowFromScreenY(int screenY) const {
-    int rowNum = -1;
     int calculatedRowNum = screenY / m_rowHeight;
 
     if (calculatedRowNum >= 0 && calculatedRowNum < m_items->size() &&
         screenY >= 0 && screenY <= viewport()->height())
-      rowNum = calculatedRowNum;
+      return calculatedRowNum;
 
-    return rowNum;
+    return -1;
   }
 
 
+  /**
+    * Checks if there is an active cell
+    * 
+    * @return bool True if there is an active cell
+    */
   bool TableViewContent::hasActiveCell() const {
     return (m_activeCell->first && m_activeCell->second >= 0);
   }
 
 
+  /**
+    * Checks if there is a row selected
+    * 
+    * @return bool True if there is a row selected
+    */
   bool TableViewContent::hasRowSelection() const {
     return (m_model->getSelectedItems().size());
   }
 
 
+  /**
+    * Checks if the mouse is in the selected cells
+    * 
+    * @param mousePos Mouse position
+    * 
+    * @return bool True if the mouse is in the selected cells
+    */
   bool TableViewContent::mouseInCellSelection(QPoint mousePos) const {
     int colNum = getColumnFromScreenX(mousePos.x());
     AbstractTreeItem *row = m_items->at(getRowFromScreenY(mousePos.y()));
@@ -1036,6 +1209,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Checks if the mouse is in the selected row
+    * 
+    * @param mousePos Mouse position
+    * 
+    * @return bool True if the mouse is in the selected row
+    */
   bool TableViewContent::mouseInRowSelection(QPoint mousePos) const {
     AbstractTreeItem *row = m_items->at(getRowFromScreenY(mousePos.y()));
 
@@ -1043,6 +1223,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Checks if the row number is valid
+    * 
+    * @param rowNum Row to check
+    * 
+    * @return bool True if the row is greater or equal to 0 and less than m_items->size()
+    */
   bool TableViewContent::rowIsValid(int rowNum) const {
     bool valid = false;
 
@@ -1053,6 +1240,13 @@ namespace Isis {
   }
 
 
+  /**
+    * Checks if the column number is valid
+    * 
+    * @param colNum Column to check
+    * 
+    * @return bool True if the column is greater or equal to 0 and less than m_items->size()
+    */
   bool TableViewContent::columnIsValid(int colNum) const {
     bool valid = false;
 
@@ -1063,6 +1257,14 @@ namespace Isis {
   }
 
 
+  /**
+    * Checks if the cell is editable
+    * 
+    * @param rowNum The cell's row
+    * @param colNum The cell's column
+    * 
+    * @return bool True if the cell is selectable and editable
+    */
   bool TableViewContent::cellIsEditable(int rowNum, int colNum) const {
     ASSERT(rowNum >= 0 && rowNum < m_items->size());
     ASSERT(colNum >= 0 && colNum < m_columns->getVisibleColumns().size());
@@ -1079,11 +1281,27 @@ namespace Isis {
   }
 
 
+  /**
+    * Checks if the column has a non empty title
+    * 
+    * @param colNum The column to check
+    * 
+    * @return bool True if the column has a non-empty title
+    */
   bool TableViewContent::isDataColumn(int colNum) const {
+    //TODO: Figure out what this does and if we can do it in a less confusing and roundabout way
     return m_columns->getVisibleColumns()[colNum]->getTitle().size();
   }
 
 
+  /**
+    * Repaints the row
+    * 
+    * @param painter The QPainter
+    * @param rowNum The row to repaint
+    * @param absolutePosition The row position
+    * @param relativePosition The row position in the visible area 
+    */
   void TableViewContent::paintRow(QPainter *painter, int rowNum,
       QPoint absolutePosition, QPoint relativePosition) {
     ASSERT(m_items);
@@ -1226,6 +1444,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates which cell is active
+    * 
+    * @param screenPos The position of the active cell
+    */
   void TableViewContent::updateActiveCell(QPoint screenPos) {
     if (m_editWidget && m_activeCell->first && m_activeCell->second >= 0) {
       try {
@@ -1274,6 +1497,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates which column is selected
+    * 
+    * @param item The new selected group
+    */
   void TableViewContent::updateColumnGroupSelection(AbstractTreeItem *item) {
     // delete current row selection
     foreach (AbstractTreeItem * row, *m_lastShiftSelection) {
@@ -1297,8 +1525,14 @@ namespace Isis {
   }
 
 
-  QList< AbstractTreeItem * >
-  TableViewContent::updateRowGroupSelection(int lastRow) {
+  /**
+    * Updates which row is selected
+    * 
+    * @param lastRow The index of the last row
+    * 
+    * @return QList< AbstractTreeItem * > The newly selected row
+    */
+  QList< AbstractTreeItem * > TableViewContent::updateRowGroupSelection(int lastRow) {
     foreach (AbstractTreeItem * row, *m_lastShiftSelection) {
       if (row->getPointerType() == AbstractTreeItem::Point)
         foreach (AbstractTreeItem * child, row->getChildren())
@@ -1332,16 +1566,29 @@ namespace Isis {
   }
 
 
+  /**
+    * Copies selected cells
+    * 
+    * @see copyCellSelection
+    */
   void TableViewContent::copySelection() {
     copyCellSelection(false);
   }
 
 
+  /**
+    * Copies all of the cells
+    * 
+    * @see copyCellSelection
+    */
   void TableViewContent::copyAll() {
     copyCellSelection(true);
   }
 
 
+  /**
+    * Deletes the selected rows
+    */
   void TableViewContent::deleteSelectedRows() {
     // Prompt the user for confirmation before deletion.
     QMessageBox::StandardButton status = QMessageBox::warning(
@@ -1360,6 +1607,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Retrieves the control point from the selected cells for editing
+    */
   void TableViewContent::editControlPoint() {
 
     ControlPoint *cp;
@@ -1391,6 +1641,9 @@ namespace Isis {
   }
 
 
+  /**
+    * Updates the item list
+    */
   void TableViewContent::updateItemList() {
     ASSERT(m_items);
 
@@ -1408,6 +1661,11 @@ namespace Isis {
   }
 
 
+  /**
+    * Populates the context menus based on where the user clicked
+    * 
+    * @param mouseLocation Location of the mouse
+    */
   void TableViewContent::showContextMenu(QPoint mouseLocation) {
     QMenu contextMenu(this);
 
@@ -1415,15 +1673,45 @@ namespace Isis {
     // TODO: 2017-05-17 TLS
     // Always allow editing of point.  Should we check for editLock??
     QList<AbstractTreeItem *> selectedRows = m_model->getSelectedItems();
-    if (selectedRows.count() <= 1 && QApplication::applicationName() != "cneteditor") {
-      contextMenu.addAction(m_editControlPointAct);
-    }
+    
 
     // If there is a row selection, show a context menu if the user clicked
     // anywhere on any of the selected row(s).
-    if (hasRowSelection() && mouseInRowSelection(mouseLocation)) {
-      contextMenu.addAction(m_deleteSelectedRowsAct);
+    
+    if (QApplication::applicationName() != "cneteditor") {
+      if (m_activeControlNet) {
+        m_editControlPointAct->setEnabled(true);
+        m_deleteSelectedRowsAct->setEnabled(true);
+        m_applyToSelectionAct->setEnabled(true);
+        m_applyToAllAct->setEnabled(true);
+      }
+      else {
+        m_editControlPointAct->setEnabled(false);
+        m_deleteSelectedRowsAct->setEnabled(false);
+        m_applyToSelectionAct->setEnabled(false);
+        m_applyToAllAct->setEnabled(false);
+      }
+      
+      if (hasActiveCell() && selectedRows.count() <= 1) {
+        contextMenu.addAction(m_editControlPointAct);
+      }
+      if (hasRowSelection() && mouseInRowSelection(mouseLocation)) {
+        contextMenu.addAction(m_deleteSelectedRowsAct);
+      }
+
+      // Only show the context menu for cells if the user right-clicked on the
+      // active cell.
+      if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
+        if (rowsWithActiveColumnSelected->size() > 1)
+          contextMenu.addAction(m_applyToSelectionAct);
+
+        contextMenu.addAction(m_applyToAllAct);
+      }
     }
+    else {
+      if (hasRowSelection() && mouseInRowSelection(mouseLocation)) {
+        contextMenu.addAction(m_deleteSelectedRowsAct);
+      }
 
     // Only show the context menu for cells if the user right-clicked on the
     // active cell.
@@ -1431,7 +1719,8 @@ namespace Isis {
       if (rowsWithActiveColumnSelected->size() > 1)
         contextMenu.addAction(m_applyToSelectionAct);
 
-      contextMenu.addAction(m_applyToAllAct);
+        contextMenu.addAction(m_applyToAllAct);
+      }
     }
     contextMenu.exec(mapToGlobal(mouseLocation));
   }

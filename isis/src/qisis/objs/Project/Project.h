@@ -149,21 +149,22 @@ namespace Isis {
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *
    *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969
-   *
+   *                           allow for opening of a new project. Fixes #4969.
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
-   *                           Fixes #5046
+   *                           Fixes #5046.
    *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
    *                           allow for opening of a new project. Fixes #4969
    *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
-   *                           Fixes #4715
+   *                           Fixes #4715.
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
-   *                           Fixes #5082
+   *                           Fixes #5082.
    *   @history 2017-08-02 Cole Neubauer - Made setClean emit a signal from undoStack. Fixes #4960
    *   @history 2017-08-03 Cole Neubauer - Parsed XML to remove leftover files not in project
-   *                           Fixes #5046
+   *                           Fixes #5046.
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a 
+   *                           control net without having an active control net set. Fixes #5048.
    */
   class Project : public QObject {
     Q_OBJECT
