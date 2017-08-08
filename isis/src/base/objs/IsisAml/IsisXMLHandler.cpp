@@ -155,7 +155,6 @@ void IsisXMLHandler::ignorableWhitespace(const XMLCh *const chars,
 }
 
 
-
 void IsisXMLHandler::processingInstruction(const XMLCh *const target,
     const XMLCh *const data) {
 }
