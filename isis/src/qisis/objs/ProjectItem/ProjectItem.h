@@ -121,9 +121,11 @@ namespace Isis {
    *                           variables needed for WorkOrders.  Fixes #4839. Fixes #4840.
    *     @history 2017-06-14 Ken Edmundson - Added constructor for FileItem type, including a
    *                             tooltip.
-   *     @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
-   *                             imports, shape imports, and bundle solution info. Fixes #4855, 
+   *     @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image
+   *                             imports, shape imports, and bundle solution info. Fixes #4855,
    *                             #4979, #4980.
+   *     @history 2017-08-03 Cole Neubauer - Explicitely set the color of each new ProjectItem to
+   *                             Qt::Black Fixes #5095
    *
    */
   class ProjectItem : public QStandardItem {
