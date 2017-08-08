@@ -197,19 +197,29 @@ namespace Isis {
    * Removes an item and its children from the model.
    *
    * @param item (ProjectItem *) The item to be removed.
+   * 
+   * @internal
+   *   @history 2017-08-08 Marjorie Hahn - Added a check so that if the item to be removed 
+   *                           has any children then they can be removed first. Fixes #5074.
    */
   void ProjectItemModel::removeItem(ProjectItem *item) {
     if (!item) {
       return;
     }
-//  qDebug()<<"ProjectItemModel::removeItem item= "<<item;
-    if ( ProjectItem *parentItem = item->parent() ) {
-//    qDebug()<<"ProjectItemModel::removeItem  ParentItem ";
-      removeRow( item->row(), parentItem->index() );
+    
+    // remove any children the item has first
+    if (item->hasChildren()) {
+      for (int row = (item->rowCount() - 1); row >= 0; row--) {
+        removeRow(item->child(row)->row(), item->index());
+      }
+    }
+    
+    if (ProjectItem *parentItem = item->parent()) {
+      // remove the item from its parent
+      removeRow(item->row(), parentItem->index());
     }
     else {
-//    qDebug()<<"ProjectItemModel::removeItem item row =  "<<item->row();
-      removeRow( item->row() );
+      removeRow(item->row());
     }
   }
 

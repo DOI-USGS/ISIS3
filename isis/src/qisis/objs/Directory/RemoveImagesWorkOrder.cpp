@@ -75,6 +75,7 @@ namespace Isis {
    * @description Set up the execution.
    *
    * @return bool True if parent WordOrder can set up the execution.
+   * 
    */
   bool RemoveImagesWorkOrder::setupExecution() {
 
@@ -86,21 +87,38 @@ namespace Isis {
 
   /**
    * @description Remove any selected items from the project directory.
+   * 
+   * @internal
+   *   @history 2017-08-08 Marjorie Hahn - Created a conditional to check if the currently 
+   *                           selected item to be deleted is actually an image list, so that
+   *                           each image can be removed one by one. Fixes #5074.
    */
   void RemoveImagesWorkOrder::execute() {
+
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
-    QList<ImageList *>   images = project()->images();
+    QList<ImageList *> projectImageLists = project()->images();
 
-    foreach(ProjectItem *currentItem, selectedItems) {
-
-      if (currentItem->isImageList()) {
-        project()->removeImages(*(currentItem->imageList()));
+    foreach (ProjectItem *selectedItem, selectedItems) {
+      
+      if (selectedItem->isImage()) {
+        Image *selectedImage = selectedItem->image();
+        foreach (ImageList* projectImageList, projectImageLists) {
+          projectImageList->removeAll(selectedImage);
+        }
+      }
+      else if (selectedItem->isImageList()) {
+        ImageList *selectedImageList = selectedItem->imageList();
+        foreach (Image *selectedImage, *selectedImageList) {
+          foreach (ImageList* projectImageList, projectImageLists) {
+            projectImageList->removeAll(selectedImage);
+          }
+        }
+        project()->removeImages(*selectedImageList);
       }
       else {
-        Image *image = currentItem->image();
-        foreach (ImageList* list, project()->images()) {
-          list->removeAll(image);
-        }
+        throw IException(IException::User, 
+                         "Item cannot be removed from the project.", 
+                         _FILEINFO_);
       }
     }
     

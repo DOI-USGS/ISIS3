@@ -98,12 +98,14 @@ namespace Isis {
    *                           while keeping headers, needed to remove old projects data when
    *                           opening a new one Fixes #4969
    *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image 
-   *                             imports, shape imports, and bundle solution info. Fixes #4855,
-   *                             #4979, #4980.
+   *                           imports, shape imports, and bundle solution info. Fixes #4855,
+   *                           #4979, #4980.
    *   @history 2017-07-27 Tyler Wilson - Added the ability to validate and restrict what names
-   *                             a user can name things like ImageLists/ShapeLists/ControlLists.
-   *                             (ie. this class maintains a QStringList of reserved words which
-   *                             cannot be used for naming objects).  Fixes #5047.
+   *                           a user can name things like ImageLists/ShapeLists/ControlLists.
+   *                           (ie. this class maintains a QStringList of reserved words which
+   *                           cannot be used for naming objects).  Fixes #5047.
+   *   @history 2017-08-08 Marjorie Hahn - Modified removeItem() so that if the item to be removed 
+   *                           has any children then they can be removed first. Fixes #5074.
    */
   class ProjectItemModel : public QStandardItemModel {
 
