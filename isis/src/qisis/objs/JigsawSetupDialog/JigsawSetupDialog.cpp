@@ -338,14 +338,14 @@ namespace Isis {
     m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
     // weighting tab
-    if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
-      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord1AprioriSigma()) ) {
+      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalPointCoord1AprioriSigma()));
     }
-    if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
-      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord2AprioriSigma()) ) {
+      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalPointCoord2AprioriSigma()));
     }
-    if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
-      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord3AprioriSigma()) ) {
+      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalPointCoord3AprioriSigma()));
     }
 
     QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
@@ -409,6 +409,7 @@ namespace Isis {
                               m_ui->updateCubeLabelCheckBox->isChecked(),
                               m_ui->errorPropagationCheckBox->isChecked(),
                               m_ui->radiusCheckBox->isChecked(),
+                              SurfacePoint::Latitudinal, SurfacePoint::Latitudinal,
                               latitudeSigma,
                               longitudeSigma,
                               radiusSigma);

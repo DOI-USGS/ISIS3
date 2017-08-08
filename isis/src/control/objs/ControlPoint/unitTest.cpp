@@ -16,7 +16,7 @@ using namespace std;
 using namespace boost::numeric::ublas;
 using namespace Isis;
 
-void printPoint(ControlPoint &p);
+void printPoint(ControlPoint &p, bool = false);
 
 /**
   * @brief Test ControlPoint object for accuracy and correct behavior.
@@ -32,6 +32,10 @@ void printPoint(ControlPoint &p);
   * @history 2015-02-17  Andrew Stebenne, changed a reference to a local filesystem to a dummy file 
   *                         (dummy.cub) to make it clearer that the .cub file being referenced
   *                         wasn't necessary.
+  * @history 2017-06-02 Debbie A. Cook - Added test for outputting control net data for
+  *                          a control net with coordinate type = Rectangular.  This test will not 
+  *                          be fully implemented until coordinate type is added to the protocol 
+  *                          buffer.
   */
 int main() {
   Preference::Preferences(true);
@@ -257,7 +261,7 @@ int main() {
   }
 }
 
-void printPoint(Isis::ControlPoint &p) {
+void printPoint(Isis::ControlPoint &p, bool testRect) {
   bool wasLocked = p.IsEditLocked();
   p.SetEditLock(false);
   p.SetChooserName("cnetref");
@@ -287,4 +291,19 @@ void printPoint(Isis::ControlPoint &p) {
   Pvl tmp("./tmp.net");
   cout << "Printing point:\n" << tmp << "\nDone printing point." << endl << endl;
   remove("./tmp.net");
+
+  // Add test with coordinate type set to Rectangular *** TBD *** Add test once
+  //  changes are made to the protocol buffer.
+  if (testRect) {
+    ControlNet recNet;
+    recNet.AddPoint(copyPoint);
+    recNet.SetNetworkId("Identifier");
+    recNet.SetCreatedDate("Yesterday");
+    recNet.SetModifiedDate("Yesterday");
+    recNet.Write("./tmpR.net", true);
+    Pvl tmpR("./tmpR.net");
+    cout << "Printing rectangular net point:\n" << tmp << "\nDone printing point."
+         << endl << endl;
+    remove("./tmpR.net");
+  }
 }

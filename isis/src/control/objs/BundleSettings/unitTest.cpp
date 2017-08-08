@@ -47,6 +47,8 @@ void printXml(const T &);
   *                           most likely going to move to HDF5. Fixes #4327.
   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() and replaced with the XML save().
   *                           Fixes #4797.
+  *   @history 2017-06-25 Debbie A. Cook - Updated to reflect added argument for control point
+  *                           coordinate type.  References #4649 and #501.
   *
   *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
   *         this should be fixed as part of #4292.
@@ -166,8 +168,11 @@ int main(int argc, char *argv[]) {
     // reset all...
     // validate the network
     copySettings.setValidateNetwork(true);
+    // Assume for now the user interface will prevent any invalid coordinate types in the
+    // setSolveOptions call.
     // set the solve options
-    copySettings.setSolveOptions(true, true, true, true, 1000.0, 2000.0, 3000.0);
+    copySettings.setSolveOptions(true, true, true, true, SurfacePoint::Rectangular,
+                                 1000.0, 2000.0, 3000.0);
     // set outlier rejection
     copySettings.setOutlierRejection(true, 4.0);
     // create and fill the list of observation solve settings... then set
@@ -203,7 +208,7 @@ int main(int argc, char *argv[]) {
     // now for test coverage, call some more resets
     // SolveObservationMode = UpdateCubeLabel = ErrorPropagation = true and
     // SolveRadius = OutlierRejection = false
-    settings.setSolveOptions(true, true, true, false);
+    settings.setSolveOptions(true, true, true, false, SurfacePoint::Latitudinal);
     settings.setOutlierRejection(false);
     settings.setOutputFilePrefix("TestFilePrefix");
     printXml<BundleSettings>(settings);

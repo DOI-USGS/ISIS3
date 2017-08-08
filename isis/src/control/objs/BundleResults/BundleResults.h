@@ -39,6 +39,7 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlObject.h"
 #include "Statistics.h" // ???
+#include "SurfacePoint.h"
 #include "XmlStackedHandler.h"
 
 // Qt Library
@@ -84,6 +85,9 @@ namespace Isis {
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
    *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
    *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
+   *   @history 2017-05-30 Debbie A. Cook - generalized control point coordinates.  Methods changed:
+   *                            copy constructor, assignment operator, initialize,  References 
+   *                           #4649 and #501.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -104,15 +108,15 @@ namespace Isis {
       void setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
                                     QVector<Statistics> rmsImageSampleResiduals,
                                     QVector<Statistics> rmsImageResiduals);
-      void setSigmaLatitudeRange(Distance minLatDist, Distance maxLatDist,
-                                 QString minLatPointId, QString maxLatPointId);
-      void setSigmaLongitudeRange(Distance minLonDist, Distance maxLonDist,
-                                  QString minLonPointId, QString maxLonPointId);
-      void setSigmaRadiusRange(Distance minRadDist, Distance maxRadDist,
-                               QString minRadPointId, QString maxRadPointId);
-      void setRmsFromSigmaStatistics(double rmsFromSigmaLatStats,
-                                     double rmsFromSigmaLonStats,
-                                     double rmsFromSigmaRadStats);
+      void setSigmaCoord1Range(Distance minCoord1Dist, Distance maxCoord1Dist,
+                                 QString minCoord1PointId, QString maxCoord1PointId);
+      void setSigmaCoord2Range(Distance minCoord2Dist, Distance maxCoord2Dist,
+                                  QString minCoord2PointId, QString maxCoord2PointId);
+      void setSigmaCoord3Range(Distance minCoord3Dist, Distance maxCoord3Dist,
+                               QString minCoord3PointId, QString maxCoord3PointId);
+      void setRmsFromSigmaStatistics(double rmsFromSigmaCoord1Stats,
+                                     double rmsFromSigmaCoord2Stats,
+                                     double rmsFromSigmaCoord3Stats);
       void maximumLikelihoodSetUp(
           QList< QPair< MaximumLikelihoodWFunctions::Model, double > > modelsWithQuantiles);
       void printMaximumLikelihoodTierInformation();
@@ -182,21 +186,26 @@ namespace Isis {
       QVector<Statistics> rmsImageRASigmas() const;      // currently unused ???
       QVector<Statistics> rmsImageDECSigmas() const;     // currently unused ???
       QVector<Statistics> rmsImageTWISTSigmas() const;   // currently unused ???
-      Distance minSigmaLatitudeDistance() const;
-      Distance maxSigmaLatitudeDistance() const;
-      Distance minSigmaLongitudeDistance() const;
-      Distance maxSigmaLongitudeDistance() const;
-      Distance minSigmaRadiusDistance() const;
-      Distance maxSigmaRadiusDistance() const;
-      QString maxSigmaLatitudePointId() const;
-      QString minSigmaLatitudePointId() const;
-      QString minSigmaLongitudePointId() const;
-      QString maxSigmaLongitudePointId() const;
-      QString minSigmaRadiusPointId() const;
-      QString maxSigmaRadiusPointId() const;
-      double sigmaLatitudeStatisticsRms() const;
-      double sigmaLongitudeStatisticsRms() const;
-      double sigmaRadiusStatisticsRms() const;
+      // *** TODO *** Will we ever want to request a specific coordinate type?
+      //   (Lat or X) or just whatever is the designated type?
+      SurfacePoint::CoordinateType coordTypeReports();
+
+      Distance minSigmaCoord1Distance() const;
+      Distance maxSigmaCoord1Distance() const;
+      Distance minSigmaCoord2Distance() const;
+      Distance maxSigmaCoord2Distance() const;
+      Distance minSigmaCoord3Distance() const;
+      Distance maxSigmaCoord3Distance() const;
+      QString maxSigmaCoord1PointId() const;
+      QString minSigmaCoord1PointId() const;
+      QString minSigmaCoord2PointId() const;
+      QString maxSigmaCoord2PointId() const;
+      QString minSigmaCoord3PointId() const;
+      QString maxSigmaCoord3PointId() const;
+      double sigmaCoord1StatisticsRms() const;
+      double sigmaCoord2StatisticsRms() const;
+      double sigmaCoord3StatisticsRms() const;
+      
       double rmsRx() const;  // currently unused ???
       double rmsRy() const;  // currently unused ???
       double rmsRxy() const; // currently unused ???
@@ -289,7 +298,6 @@ namespace Isis {
 
       CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
 
-
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
       // Currently set but unused
       int m_numberIgnoredPoints;              //!< number of ignored points
@@ -315,9 +323,9 @@ namespace Isis {
       double m_elapsedTimeErrorProp;           //!< elapsed time for error propagation
       double m_radiansToMeters;                //!< radian to meters conversion factor for the body
       bool m_converged;
-
+      
       // Variables for output methods in BundleSolutionInfo
-
+      
       QVector<BundleControlPointQsp> m_bundleControlPoints; /**< The vector of BundleControlPoints
                                                                  from BundleAdjust.  Equivalent to
                                                                  the output control net minus
@@ -358,23 +366,23 @@ namespace Isis {
       //!< The root mean square image twist sigmas.
       QVector<Statistics> m_rmsImageTWISTSigmas; // unset and unused ???
 
-      Distance m_minSigmaLatitudeDistance;  //!< The minimum sigma latitude distance.
-      Distance m_maxSigmaLatitudeDistance;  //!< The maximum sigma latitude distance.
-      Distance m_minSigmaLongitudeDistance; //!< The minimum sigma longitude distance.
-      Distance m_maxSigmaLongitudeDistance; //!< The maximum sigma longitude distance.
-      Distance m_minSigmaRadiusDistance;    //!< The minimum sigma radius distance.
-      Distance m_maxSigmaRadiusDistance;    //!< The maximum sigma radius distance.
+      Distance m_minSigmaCoord1Distance;  //!< The minimum sigma latitude distance.
+      Distance m_maxSigmaCoord1Distance;  //!< The maximum sigma latitude distance.
+      Distance m_minSigmaCoord2Distance; //!< The minimum sigma longitude distance.
+      Distance m_maxSigmaCoord2Distance; //!< The maximum sigma longitude distance.
+      Distance m_minSigmaCoord3Distance;    //!< The minimum sigma radius distance.
+      Distance m_maxSigmaCoord3Distance;    //!< The maximum sigma radius distance.
 
-      QString m_minSigmaLatitudePointId;    //!< The minimum sigma latitude point id.
-      QString m_maxSigmaLatitudePointId;    //!< The maximum sigma latitude point id.
-      QString m_minSigmaLongitudePointId;   //!< The minimum sigma longitude point id.
-      QString m_maxSigmaLongitudePointId;   //!< The maximum sigma longitude point id.
-      QString m_minSigmaRadiusPointId;      //!< The minimum sigma radius point id.
-      QString m_maxSigmaRadiusPointId;      //!< The maximum sigma radius point id.
+      QString m_minSigmaCoord1PointId;    //!< The minimum sigma coordinate 1 point id.
+      QString m_maxSigmaCoord1PointId;    //!< The maximum sigma coordinate 1 point id.
+      QString m_minSigmaCoord2PointId;   //!< The minimum sigma coordinate 2 point id.
+      QString m_maxSigmaCoord2PointId;   //!< The maximum sigma coordinate2 point id.
+      QString m_minSigmaCoord3PointId;      //!< The minimum sigma coordinate 3 point id.
+      QString m_maxSigmaCoord3PointId;      //!< The maximum sigma coordinate 3 point id.
 
-      double m_rmsSigmaLatitudeStats;       //!< rms of adjusted Latitude sigmas
-      double m_rmsSigmaLongitudeStats;      //!< rms of adjusted Longitude sigmas
-      double m_rmsSigmaRadiusStats;         //!< rms of adjusted Radius sigmas
+      double m_rmsSigmaCoord1Stats;       //!< rms of adjusted Latitude sigmas
+      double m_rmsSigmaCoord2Stats;      //!< rms of adjusted Longitude sigmas
+      double m_rmsSigmaCoord3Stats;         //!< rms of adjusted Radius sigmas
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation

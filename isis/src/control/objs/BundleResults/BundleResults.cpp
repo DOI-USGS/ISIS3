@@ -1,5 +1,4 @@
 #include "BundleResults.h"
-
 #include <QDataStream>
 #include <QDebug>
 #include <QString>
@@ -33,8 +32,8 @@ using namespace boost::numeric::ublas;
 namespace Isis {
 
   /**
-   * Constructs a BundleSettings object.
-   *
+   * Constructs a Results object.
+   * 
    * @param parent The Qt-relationship parent.
    */
   BundleResults::BundleResults(QObject *parent) : QObject(parent) {
@@ -53,7 +52,7 @@ namespace Isis {
 
 
   /**
-   * Construct this BundleSettings object from XML.
+   * Construct this BundleResults object from XML.
    *
    * @param bundleSettingsFolder Where the settings XML for this bundle adjustment
    *                             resides - /work/.../projectRoot/images/import1
@@ -73,7 +72,7 @@ namespace Isis {
 
 
   /**
-   * Copy constructor for BundleResults.  Creates this BundleSettings object as a copy
+   * Copy constructor for BundleResults.  Creates this BundleResults object as a copy
    * of another BundleResults object.
    *
    * @param src The other BundleResults object to be copied.
@@ -113,21 +112,21 @@ namespace Isis {
         m_rmsImageRASigmas(src.m_rmsImageRASigmas),
         m_rmsImageDECSigmas(src.m_rmsImageDECSigmas),
         m_rmsImageTWISTSigmas(src.m_rmsImageTWISTSigmas),
-        m_minSigmaLatitudeDistance(src.m_minSigmaLatitudeDistance),
-        m_maxSigmaLatitudeDistance(src.m_maxSigmaLatitudeDistance),
-        m_minSigmaLongitudeDistance(src.m_minSigmaLongitudeDistance),
-        m_maxSigmaLongitudeDistance(src.m_maxSigmaLongitudeDistance),
-        m_minSigmaRadiusDistance(src.m_minSigmaRadiusDistance),
-        m_maxSigmaRadiusDistance(src.m_maxSigmaRadiusDistance),
-        m_minSigmaLatitudePointId(src.m_minSigmaLatitudePointId),
-        m_maxSigmaLatitudePointId(src.m_maxSigmaLatitudePointId),
-        m_minSigmaLongitudePointId(src.m_minSigmaLongitudePointId),
-        m_maxSigmaLongitudePointId(src.m_maxSigmaLongitudePointId),
-        m_minSigmaRadiusPointId(src.m_minSigmaRadiusPointId),
-        m_maxSigmaRadiusPointId(src.m_maxSigmaRadiusPointId),
-        m_rmsSigmaLatitudeStats(src.m_rmsSigmaLatitudeStats),
-        m_rmsSigmaLongitudeStats(src.m_rmsSigmaLongitudeStats),
-        m_rmsSigmaRadiusStats(src.m_rmsSigmaRadiusStats),
+        m_minSigmaCoord1Distance(src.m_minSigmaCoord1Distance),
+        m_maxSigmaCoord1Distance(src.m_maxSigmaCoord1Distance),
+        m_minSigmaCoord2Distance(src.m_minSigmaCoord2Distance),
+        m_maxSigmaCoord2Distance(src.m_maxSigmaCoord2Distance),
+        m_minSigmaCoord3Distance(src.m_minSigmaCoord3Distance),
+        m_maxSigmaCoord3Distance(src.m_maxSigmaCoord3Distance),
+        m_minSigmaCoord1PointId(src.m_minSigmaCoord1PointId),
+        m_maxSigmaCoord1PointId(src.m_maxSigmaCoord1PointId),
+        m_minSigmaCoord2PointId(src.m_minSigmaCoord2PointId),
+        m_maxSigmaCoord2PointId(src.m_maxSigmaCoord2PointId),
+        m_minSigmaCoord3PointId(src.m_minSigmaCoord3PointId),
+        m_maxSigmaCoord3PointId(src.m_maxSigmaCoord3PointId),
+        m_rmsSigmaCoord1Stats(src.m_rmsSigmaCoord1Stats),
+        m_rmsSigmaCoord2Stats(src.m_rmsSigmaCoord2Stats),
+        m_rmsSigmaCoord3Stats(src.m_rmsSigmaCoord3Stats),
         m_maximumLikelihoodFunctions(src.m_maximumLikelihoodFunctions),
         m_maximumLikelihoodIndex(src.m_maximumLikelihoodIndex),
         m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
@@ -199,21 +198,21 @@ namespace Isis {
       m_rmsImageRASigmas = src.m_rmsImageRASigmas;
       m_rmsImageDECSigmas = src.m_rmsImageDECSigmas;
       m_rmsImageTWISTSigmas = src.m_rmsImageTWISTSigmas;
-      m_minSigmaLatitudeDistance = src.m_minSigmaLatitudeDistance;
-      m_maxSigmaLatitudeDistance = src.m_maxSigmaLatitudeDistance;
-      m_minSigmaLongitudeDistance = src.m_minSigmaLongitudeDistance;
-      m_maxSigmaLongitudeDistance = src.m_maxSigmaLongitudeDistance;
-      m_minSigmaRadiusDistance = src.m_minSigmaRadiusDistance;
-      m_maxSigmaRadiusDistance = src.m_maxSigmaRadiusDistance;
-      m_minSigmaLatitudePointId = src.m_minSigmaLatitudePointId;
-      m_maxSigmaLatitudePointId = src.m_maxSigmaLatitudePointId;
-      m_minSigmaLongitudePointId = src.m_minSigmaLongitudePointId;
-      m_maxSigmaLongitudePointId = src.m_maxSigmaLongitudePointId;
-      m_minSigmaRadiusPointId = src.m_minSigmaRadiusPointId;
-      m_maxSigmaRadiusPointId = src.m_maxSigmaRadiusPointId;
-      m_rmsSigmaLatitudeStats = src.m_rmsSigmaLatitudeStats;
-      m_rmsSigmaLongitudeStats = src.m_rmsSigmaLongitudeStats;
-      m_rmsSigmaRadiusStats = src.m_rmsSigmaRadiusStats;
+      m_minSigmaCoord1Distance = src.m_minSigmaCoord1Distance;
+      m_maxSigmaCoord1Distance = src.m_maxSigmaCoord1Distance;
+      m_minSigmaCoord2Distance = src.m_minSigmaCoord2Distance;
+      m_maxSigmaCoord2Distance = src.m_maxSigmaCoord2Distance;
+      m_minSigmaCoord3Distance = src.m_minSigmaCoord3Distance;
+      m_maxSigmaCoord3Distance = src.m_maxSigmaCoord3Distance;
+      m_minSigmaCoord1PointId = src.m_minSigmaCoord1PointId;
+      m_maxSigmaCoord1PointId = src.m_maxSigmaCoord1PointId;
+      m_minSigmaCoord2PointId = src.m_minSigmaCoord2PointId;
+      m_maxSigmaCoord2PointId = src.m_maxSigmaCoord2PointId;
+      m_minSigmaCoord3PointId = src.m_minSigmaCoord3PointId;
+      m_maxSigmaCoord3PointId = src.m_maxSigmaCoord3PointId;
+      m_rmsSigmaCoord1Stats = src.m_rmsSigmaCoord1Stats;
+      m_rmsSigmaCoord2Stats = src.m_rmsSigmaCoord2Stats;
+      m_rmsSigmaCoord3Stats = src.m_rmsSigmaCoord3Stats;
       m_maximumLikelihoodFunctions = src.m_maximumLikelihoodFunctions;
       m_maximumLikelihoodIndex = src.m_maximumLikelihoodIndex;
 
@@ -245,8 +244,6 @@ namespace Isis {
 
     // set in BundleAdjust init()
     m_numberHeldImages = 0;
-
-    // members set while computing bundle stats
     m_rmsImageSampleResiduals.clear();
     m_rmsImageLineResiduals.clear();
     m_rmsImageResiduals.clear();
@@ -257,23 +254,24 @@ namespace Isis {
     m_rmsImageDECSigmas.clear();
     m_rmsImageTWISTSigmas.clear();
 
-    // initialize lat/lon/rad boundaries
-    m_minSigmaLatitudeDistance.setMeters(1.0e+12);
-    m_maxSigmaLatitudeDistance.setMeters(0.0);
-    m_minSigmaLongitudeDistance.setMeters(1.0e+12);
-    m_maxSigmaLongitudeDistance.setMeters(0.0);;
-    m_minSigmaRadiusDistance.setMeters(1.0e+12);
-    m_maxSigmaRadiusDistance.setMeters(0.0);
-    m_minSigmaLatitudePointId = "";
-    m_maxSigmaLatitudePointId = "";
-    m_minSigmaLongitudePointId = "";
-    m_maxSigmaLongitudePointId = "";
-    m_minSigmaRadiusPointId = "";
-    m_maxSigmaRadiusPointId = "";
+    // Initialize coordinate sigma boundaries.  Units are meters for both
+    // latitudinal and rectangular coordinates
+    m_minSigmaCoord1Distance.setMeters(1.0e+12);
+    m_maxSigmaCoord1Distance.setMeters(0.0);
+    m_minSigmaCoord2Distance.setMeters(1.0e+12);
+    m_maxSigmaCoord2Distance.setMeters(0.0);;
+    m_minSigmaCoord3Distance.setMeters(1.0e+12);
+    m_maxSigmaCoord3Distance.setMeters(0.0);
+    m_minSigmaCoord1PointId = "";
+    m_maxSigmaCoord1PointId = "";
+    m_minSigmaCoord2PointId = "";
+    m_maxSigmaCoord2PointId = "";
+    m_minSigmaCoord3PointId = "";
+    m_maxSigmaCoord3PointId = "";
 
-    m_rmsSigmaLatitudeStats = 0.0;
-    m_rmsSigmaLongitudeStats = 0.0;
-    m_rmsSigmaRadiusStats = 0.0;
+    m_rmsSigmaCoord1Stats = 0.0;
+    m_rmsSigmaCoord2Stats = 0.0;
+    m_rmsSigmaCoord3Stats = 0.0;
 
 
     // set by compute residuals
@@ -374,12 +372,12 @@ namespace Isis {
    * @param minLatPointId The new minimum sigma latitude point id.
    * @param maxLatPointId The new maximum sigma latitude point id.
    */
-  void BundleResults::setSigmaLatitudeRange(Distance minLatDist, Distance maxLatDist,
-                                            QString minLatPointId, QString maxLatPointId) {
-    m_minSigmaLatitudeDistance = minLatDist;
-    m_maxSigmaLatitudeDistance = maxLatDist;
-    m_minSigmaLatitudePointId  = minLatPointId;
-    m_maxSigmaLatitudePointId  = maxLatPointId;
+  void BundleResults::setSigmaCoord1Range(Distance minCoord1Dist, Distance maxCoord1Dist,
+                                            QString minCoord1PointId, QString maxCoord1PointId) {
+    m_minSigmaCoord1Distance = minCoord1Dist;
+    m_maxSigmaCoord1Distance = maxCoord1Dist;
+    m_minSigmaCoord1PointId  = minCoord1PointId;
+    m_maxSigmaCoord1PointId  = maxCoord1PointId;
   }
 
 
@@ -391,12 +389,12 @@ namespace Isis {
    * @param minLonPointId The new minimum sigma longitude point id.
    * @param maxLonPointId The new maximum sigma longitude point id.
    */
-  void BundleResults::setSigmaLongitudeRange(Distance minLonDist, Distance maxLonDist,
-                                             QString minLonPointId, QString maxLonPointId) {
-    m_minSigmaLongitudeDistance = minLonDist;
-    m_maxSigmaLongitudeDistance = maxLonDist;
-    m_minSigmaLongitudePointId  = minLonPointId;
-    m_maxSigmaLongitudePointId  = maxLonPointId;
+  void BundleResults::setSigmaCoord2Range(Distance minCoord2Dist, Distance maxCoord2Dist,
+                                             QString minCoord2PointId, QString maxCoord2PointId) {
+    m_minSigmaCoord2Distance = minCoord2Dist;
+    m_maxSigmaCoord2Distance = maxCoord2Dist;
+    m_minSigmaCoord2PointId  = minCoord2PointId;
+    m_maxSigmaCoord2PointId  = maxCoord2PointId;
   }
 
 
@@ -408,12 +406,12 @@ namespace Isis {
    * @param minRadPointId The new minimum sigma radius point id.
    * @param maxRadPointId The new maximum sigma radius point id.
    */
-  void BundleResults::setSigmaRadiusRange(Distance minRadDist, Distance maxRadDist,
-                                          QString minRadPointId, QString maxRadPointId) {
-    m_minSigmaRadiusDistance = minRadDist;
-    m_maxSigmaRadiusDistance = maxRadDist;
-    m_minSigmaRadiusPointId  = minRadPointId;
-    m_maxSigmaRadiusPointId  = maxRadPointId;
+  void BundleResults::setSigmaCoord3Range(Distance minCoord3Dist, Distance maxCoord3Dist,
+                                          QString minCoord3PointId, QString maxCoord3PointId) {
+    m_minSigmaCoord3Distance = minCoord3Dist;
+    m_maxSigmaCoord3Distance = maxCoord3Dist;
+    m_minSigmaCoord3PointId  = minCoord3PointId;
+    m_maxSigmaCoord3PointId  = maxCoord3PointId;
   }
 
 
@@ -425,12 +423,12 @@ namespace Isis {
    * @param rmsFromSigmaLonStats The new RMS value of the adjusted longitude sigmas.
    * @param rmsFromSigmaRadStats The new RMS value of the adjusted radius sigmas.
    */
-  void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaLatStats,
-                                                double rmsFromSigmaLonStats,
-                                                double rmsFromSigmaRadStats) {
-    m_rmsSigmaLatitudeStats = rmsFromSigmaLatStats;
-    m_rmsSigmaLongitudeStats = rmsFromSigmaLonStats;
-    m_rmsSigmaRadiusStats = rmsFromSigmaRadStats;
+  void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaCoord1Stats,
+                                                double rmsFromSigmaCoord2Stats,
+                                                double rmsFromSigmaCoord3Stats) {
+    m_rmsSigmaCoord1Stats = rmsFromSigmaCoord1Stats;
+    m_rmsSigmaCoord2Stats = rmsFromSigmaCoord2Stats;
+    m_rmsSigmaCoord3Stats = rmsFromSigmaCoord3Stats;
   }
 
 
@@ -966,8 +964,8 @@ namespace Isis {
    *
    * @return @b Distance The minimum sigma latitude.
    */
-  Distance BundleResults::minSigmaLatitudeDistance() const {
-    return m_minSigmaLatitudeDistance;
+  Distance BundleResults::minSigmaCoord1Distance() const {
+    return m_minSigmaCoord1Distance;
   }
 
 
@@ -976,8 +974,8 @@ namespace Isis {
    *
    * @return @b Distance The maximum sigma latitude.
    */
-  Distance BundleResults::maxSigmaLatitudeDistance() const {
-    return m_maxSigmaLatitudeDistance;
+  Distance BundleResults::maxSigmaCoord1Distance() const {
+    return m_maxSigmaCoord1Distance;
   }
 
 
@@ -986,8 +984,8 @@ namespace Isis {
    *
    * @return @b Distance The minimum sigma longitude.
    */
-  Distance BundleResults::minSigmaLongitudeDistance() const {
-    return m_minSigmaLongitudeDistance;
+  Distance BundleResults::minSigmaCoord2Distance() const {
+    return m_minSigmaCoord2Distance;
   }
 
 
@@ -996,8 +994,8 @@ namespace Isis {
    *
    * @return @b Distance The maximum sigma longitude.
    */
-  Distance BundleResults::maxSigmaLongitudeDistance() const {
-    return m_maxSigmaLongitudeDistance;
+  Distance BundleResults::maxSigmaCoord2Distance() const {
+    return m_maxSigmaCoord2Distance;
   }
 
 
@@ -1006,8 +1004,8 @@ namespace Isis {
    *
    * @return @b Distance The minimum sigma redius.
    */
-  Distance BundleResults::minSigmaRadiusDistance() const {
-    return m_minSigmaRadiusDistance;
+  Distance BundleResults::minSigmaCoord3Distance() const {
+    return m_minSigmaCoord3Distance;
   }
 
 
@@ -1016,8 +1014,8 @@ namespace Isis {
    *
    * @return @b Distance The maximum sigma radius.
    */
-  Distance BundleResults::maxSigmaRadiusDistance() const {
-    return m_maxSigmaRadiusDistance;
+  Distance BundleResults::maxSigmaCoord3Distance() const {
+    return m_maxSigmaCoord3Distance;
   }
 
 
@@ -1026,8 +1024,8 @@ namespace Isis {
    *
    * @return @b @QString The minimum sigma latitude point id.
    */
-  QString BundleResults::minSigmaLatitudePointId() const {
-    return m_minSigmaLatitudePointId;
+  QString BundleResults::minSigmaCoord1PointId() const {
+    return m_minSigmaCoord1PointId;
   }
 
 
@@ -1036,8 +1034,8 @@ namespace Isis {
    *
    * @return @b @QString The maximum sigma latitude point id.
    */
-  QString BundleResults::maxSigmaLatitudePointId() const {
-    return m_maxSigmaLatitudePointId;
+  QString BundleResults::maxSigmaCoord1PointId() const {
+    return m_maxSigmaCoord1PointId;
   }
 
 
@@ -1046,8 +1044,8 @@ namespace Isis {
    *
    * @return @b @QString The minimum sigma longitude point id.
    */
-  QString BundleResults::minSigmaLongitudePointId() const {
-    return m_minSigmaLongitudePointId;
+  QString BundleResults::minSigmaCoord2PointId() const {
+    return m_minSigmaCoord2PointId;
   }
 
 
@@ -1056,8 +1054,8 @@ namespace Isis {
    *
    * @return @b @QString The maximum sigma longitude point id.
    */
-  QString BundleResults::maxSigmaLongitudePointId() const {
-    return m_maxSigmaLongitudePointId;
+  QString BundleResults::maxSigmaCoord2PointId() const {
+    return m_maxSigmaCoord2PointId;
   }
 
 
@@ -1066,8 +1064,8 @@ namespace Isis {
    *
    * @return @b @QString The minimum sigma radius point id.
    */
-  QString BundleResults::minSigmaRadiusPointId() const {
-    return m_minSigmaRadiusPointId;
+  QString BundleResults::minSigmaCoord3PointId() const {
+    return m_minSigmaCoord3PointId;
   }
 
 
@@ -1076,8 +1074,8 @@ namespace Isis {
    *
    * @return @b @QString The maximum sigma radius point id.
    */
-  QString BundleResults::maxSigmaRadiusPointId() const {
-    return m_maxSigmaRadiusPointId;
+  QString BundleResults::maxSigmaCoord3PointId() const {
+    return m_maxSigmaCoord3PointId;
   }
 
 
@@ -1086,8 +1084,8 @@ namespace Isis {
    *
    * @return @b double The RMS of the adjusted latitude sigmas.
    */
-  double BundleResults::sigmaLatitudeStatisticsRms() const {
-    return m_rmsSigmaLatitudeStats;
+  double BundleResults::sigmaCoord1StatisticsRms() const {
+    return m_rmsSigmaCoord1Stats;
   }
 
 
@@ -1096,8 +1094,8 @@ namespace Isis {
    *
    * @return @b double The RMS of the adjusted longitude sigmas.
    */
-  double BundleResults::sigmaLongitudeStatisticsRms() const {
-    return m_rmsSigmaLongitudeStats;
+  double BundleResults::sigmaCoord2StatisticsRms() const {
+    return m_rmsSigmaCoord2Stats;
   }
 
 
@@ -1106,8 +1104,8 @@ namespace Isis {
    *
    * @return @b double The RMS of the adjusted radius sigmas.
    */
-  double BundleResults::sigmaRadiusStatisticsRms() const {
-    return m_rmsSigmaRadiusStats;
+  double BundleResults::sigmaCoord3StatisticsRms() const {
+    return m_rmsSigmaCoord3Stats;
   }
 
 
@@ -1450,6 +1448,26 @@ namespace Isis {
   }
 
 
+  SurfacePoint::CoordinateType BundleResults::coordTypeReports() {
+    // Get the coordinate type from the output net if it exists.  Otherwise use the default.
+    SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
+    if (m_outNet  && m_outNet->IsValid()) {
+        type = outputControlNet()->GetCoordType();
+    }
+    return type;
+  }
+
+
+  // SurfacePoint::CoordinateType BundleResults::coordTypeBundle() {
+  //   // Get the coordinate type from the output net if it exists.  Otherwise use the default.
+  //   SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
+  //   if (m_outNet  && m_outNet->IsValid()) {
+  //       type = outputControlNet()->GetCoordType();
+  //   }
+  //   return type;
+  // }
+
+
   /**
    * Saves the BundleResults object to an XML file.
    *
@@ -1457,6 +1475,12 @@ namespace Isis {
    * @param project The project that the BundleResults object belongs to.
    */
   void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {
+    // Get the coordinate type from the output net if it exists.  Otherwise use the default.
+    SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
+    if (m_outNet  && m_outNet->IsValid()) {
+        coordType = outputControlNet()->GetCoordType();
+    }
+    
     stream.writeStartElement("bundleResults");
     stream.writeStartElement("correlationMatrix");
     stream.writeAttribute("correlationFileName",
@@ -1506,9 +1530,22 @@ namespace Isis {
     stream.writeAttribute("xy", toString(rmsRxy()));
     stream.writeEndElement(); // end residuals element
     stream.writeStartElement("sigmas");
-    stream.writeAttribute("lat", toString(sigmaLatitudeStatisticsRms()));
-    stream.writeAttribute("lon", toString(sigmaLongitudeStatisticsRms()));
-    stream.writeAttribute("rad", toString(sigmaRadiusStatisticsRms()));
+
+    switch (coordType) {
+      case SurfacePoint::Latitudinal:
+        stream.writeAttribute("lat", toString(sigmaCoord1StatisticsRms())); 
+        stream.writeAttribute("lon", toString(sigmaCoord2StatisticsRms())); 
+        stream.writeAttribute("rad", toString(sigmaCoord3StatisticsRms()));
+        break;
+      case SurfacePoint::Rectangular:
+        stream.writeAttribute("x", toString(sigmaCoord1StatisticsRms())); 
+        stream.writeAttribute("y", toString(sigmaCoord2StatisticsRms())); 
+        stream.writeAttribute("z", toString(sigmaCoord3StatisticsRms()));
+        break;
+      default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(coordType) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     stream.writeEndElement(); // end sigmas element
 
     stream.writeStartElement("imageResidualsLists");
@@ -1603,33 +1640,66 @@ namespace Isis {
     stream.writeEndElement(); // end elapsed time
 
     stream.writeStartElement("minMaxSigmas");
-    stream.writeStartElement("minLat");
-    stream.writeAttribute("value", toString(minSigmaLatitudeDistance().meters()));
-    stream.writeAttribute("pointId", minSigmaLatitudePointId());
-    stream.writeEndElement();
-    stream.writeStartElement("maxLat");
-    stream.writeAttribute("value", toString(maxSigmaLatitudeDistance().meters()));
-    stream.writeAttribute("pointId", maxSigmaLatitudePointId());
-    stream.writeEndElement();
-    stream.writeStartElement("minLon");
-    stream.writeAttribute("value", toString(minSigmaLongitudeDistance().meters()));
-    stream.writeAttribute("pointId", minSigmaLongitudePointId());
-    stream.writeEndElement();
-    stream.writeStartElement("maxLon");
-    stream.writeAttribute("value", toString(maxSigmaLongitudeDistance().meters()));
-    stream.writeAttribute("pointId", maxSigmaLongitudePointId());
-    stream.writeEndElement();
-    stream.writeStartElement("minRad");
-    stream.writeAttribute("value", toString(minSigmaRadiusDistance().meters()));
-    stream.writeAttribute("pointId", minSigmaRadiusPointId());
-    stream.writeEndElement();
-    stream.writeStartElement("maxRad");
-    stream.writeAttribute("value", toString(maxSigmaRadiusDistance().meters()));
-    stream.writeAttribute("pointId", maxSigmaRadiusPointId());
-    stream.writeEndElement();
+    switch (coordType) {
+      case SurfacePoint::Latitudinal:
+        stream.writeStartElement("minLat");
+        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord1PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxLat");
+        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord1PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("minLon");
+        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord2PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxLon");
+        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord2PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("minRad");
+        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord3PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxRad");
+        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord3PointId()); 
+        stream.writeEndElement();
+        break;
+      case SurfacePoint::Rectangular:
+        stream.writeStartElement("minX");
+        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord1PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxX");
+        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord1PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("minY");
+        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord2PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxY");
+        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord2PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("minZ");
+        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters())); 
+        stream.writeAttribute("pointId", minSigmaCoord3PointId()); 
+        stream.writeEndElement();
+        stream.writeStartElement("maxZ");
+        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters())); 
+        stream.writeAttribute("pointId", maxSigmaCoord3PointId()); 
+        stream.writeEndElement();
+        break;
+      default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(coordType) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     stream.writeEndElement(); // end minMaxSigmas
 
-    // call max likelihood setup from startElement to fill the rest of these values...
+    // call max likelihood setup from startElement to fill the rest of these values... 
     stream.writeStartElement("maximumLikelihoodEstimation");
     stream.writeAttribute("numberModels", toString(numberMaximumLikelihoodModels()));
     stream.writeAttribute("maximumLikelihoodIndex", toString(maximumLikelihoodModelIndex()));
@@ -1720,7 +1790,7 @@ namespace Isis {
                                                const QString &qName,
                                                const QXmlAttributes &atts) {
     m_xmlHandlerCharacters = "";
-
+   
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
       if (qName == "correlationMatrix") {
@@ -1764,17 +1834,27 @@ namespace Isis {
       else if (qName == "sigmas") {
         QString lat = atts.value("lat");
         if (!lat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaLatitudeStats = toDouble(lat);
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord1Stats = toDouble(lat);
         }
-
         QString lon = atts.value("lon");
         if (!lon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaLongitudeStats = toDouble(lon);
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord2Stats = toDouble(lon);
         }
-
         QString rad = atts.value("rad");
         if (!rad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaRadiusStats = toDouble(rad);
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord3Stats = toDouble(rad);
+        }
+        QString x = atts.value("x");
+        if (!x.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord1Stats = toDouble(x);
+        }
+        QString y = atts.value("y");
+        if (!y.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord2Stats = toDouble(y);
+        }
+        QString z = atts.value("z");
+        if (!z.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rmsSigmaCoord3Stats = toDouble(z);
         }
       }
       else if (qName == "residualsList") {
@@ -1860,68 +1940,153 @@ namespace Isis {
       else if (qName == "minLat") {
         QString minLat = atts.value("value");
         if (!minLat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaLatitudeDistance.setMeters(toDouble(minLat));
+          m_xmlHandlerBundleResults->m_minSigmaCoord1Distance.setMeters(toDouble(minLat));
         }
 
         QString minLatPointId = atts.value("pointId");
         if (!minLatPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaLatitudePointId = minLatPointId;
+          m_xmlHandlerBundleResults->m_minSigmaCoord1PointId = minLatPointId;
+        }
+
+      }
+      else if (qName == "minX") {
+        QString minX = atts.value("value");
+        if (!minX.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord1Distance.setMeters(toDouble(minX));
+        }
+
+        QString minXPointId = atts.value("pointId");
+        if (!minXPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord1PointId = minXPointId;
         }
       }
       else if (qName == "maxLat") {
         QString maxLat = atts.value("value");
         if (!maxLat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaLatitudeDistance.setMeters(toDouble(maxLat));
+          m_xmlHandlerBundleResults->m_maxSigmaCoord1Distance.setMeters(toDouble(maxLat));
         }
 
         QString maxLatPointId = atts.value("pointId");
         if (!maxLatPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaLatitudePointId = maxLatPointId;
+          m_xmlHandlerBundleResults->m_maxSigmaCoord1PointId = maxLatPointId;
         }
+
+      }
+      else if (qName == "maxX") {
+
+        QString maxX = atts.value("value");
+        if (!maxX.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord1Distance.setMeters(toDouble(maxX));
+        }
+
+        QString maxXPointId = atts.value("pointId");
+        if (!maxXPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord1PointId = maxXPointId;
+        }
+
       }
       else if (qName == "minLon") {
+
         QString minLon = atts.value("value");
         if (!minLon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaLongitudeDistance.setMeters(toDouble(minLon));
+          m_xmlHandlerBundleResults->m_minSigmaCoord2Distance.setMeters(toDouble(minLon));
         }
 
         QString minLonPointId = atts.value("pointId");
         if (!minLonPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaLongitudePointId = minLonPointId;
+          m_xmlHandlerBundleResults->m_minSigmaCoord2PointId = minLonPointId;
         }
+
+      }
+      else if (qName == "minY") {
+
+        QString minY = atts.value("value");
+        if (!minY.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord2Distance.setMeters(toDouble(minY));
+        }
+
+        QString minYPointId = atts.value("pointId");
+        if (!minYPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord2PointId = minYPointId;
+        }
+
       }
       else if (qName == "maxLon") {
+
         QString maxLon = atts.value("value");
         if (!maxLon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaLongitudeDistance.setMeters(toDouble(maxLon));
+          m_xmlHandlerBundleResults->m_maxSigmaCoord2Distance.setMeters(toDouble(maxLon));
         }
 
         QString maxLonPointId = atts.value("pointId");
         if (!maxLonPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaLongitudePointId = maxLonPointId;
+          m_xmlHandlerBundleResults->m_maxSigmaCoord2PointId = maxLonPointId;
         }
+
+      }
+      else if (qName == "maxY") {
+        QString maxY = atts.value("value");
+        if (!maxY.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord2Distance.setMeters(toDouble(maxY));
+        }
+
+        QString maxYPointId = atts.value("pointId");
+        if (!maxYPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord2PointId = maxYPointId;
+        }
+
       }
       else if (qName == "minRad") {
+
         QString minRad = atts.value("value");
         if (!minRad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaRadiusDistance.setMeters(toDouble(minRad));
+          m_xmlHandlerBundleResults->m_minSigmaCoord3Distance.setMeters(toDouble(minRad));
         }
 
         QString minRadPointId = atts.value("pointId");
         if (!minRadPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaRadiusPointId = minRadPointId;
+          m_xmlHandlerBundleResults->m_minSigmaCoord3PointId = minRadPointId;
         }
+
+      }
+      else if (qName == "minZ") {
+
+        QString minZ = atts.value("value");
+        if (!minZ.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord3Distance.setMeters(toDouble(minZ));
+        }
+
+        QString minZPointId = atts.value("pointId");
+        if (!minZPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaCoord3PointId = minZPointId;
+        }
+
       }
       else if (qName == "maxRad") {
+
         QString maxRad = atts.value("value");
         if (!maxRad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaRadiusDistance.setMeters(toDouble(maxRad));
+          m_xmlHandlerBundleResults->m_maxSigmaCoord3Distance.setMeters(toDouble(maxRad));
         }
 
         QString maxRadPointId = atts.value("pointId");
         if (!maxRadPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaRadiusPointId = maxRadPointId;
+          m_xmlHandlerBundleResults->m_maxSigmaCoord3PointId = maxRadPointId;
         }
+
+      }
+      else if (qName == "maxZ") {
+
+        QString maxZ = atts.value("value");
+        if (!maxZ.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord3Distance.setMeters(toDouble(maxZ));
+        }
+
+        QString maxZPointId = atts.value("pointId");
+        if (!maxZPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaCoord3PointId = maxZPointId;
+        }
+
       }
       else if (qName == "maximumLikelihoodEstimation") {
         QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");

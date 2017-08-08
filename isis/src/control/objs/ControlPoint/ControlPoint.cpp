@@ -16,7 +16,7 @@
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
-#include "ControlNet.h"
+//#include "ControlNet.h"
 #include "ControlNetFile.h"
 #include "ControlNetFile.h"
 #include "ControlNetFileV0002.pb.h"
@@ -59,6 +59,7 @@ namespace Isis {
     referenceMeasure = NULL;
     numberOfRejectedMeasures = 0;
     constraintStatus.reset();
+    // coordType = SurfacePoint::Latitudinal;
   }
 
 
@@ -107,6 +108,7 @@ namespace Isis {
     adjustedSurfacePoint = other.adjustedSurfacePoint;
     numberOfRejectedMeasures = other.numberOfRejectedMeasures;
     constraintStatus = other.constraintStatus;
+    // coordType = other.coordType;
   }
 
 
@@ -237,32 +239,45 @@ namespace Isis {
         Displacement(fileEntry.aprioriy(), Displacement::Meters),
         Displacement(fileEntry.aprioriz(), Displacement::Meters));
 
+      // Set the rectangular covariance matrix
       if (fileEntry.aprioricovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        covar(0, 0) = fileEntry.aprioricovar(0);
-        covar(0, 1) = fileEntry.aprioricovar(1);
-        covar(0, 2) = fileEntry.aprioricovar(2);
-        covar(1, 1) = fileEntry.aprioricovar(3);
-        covar(1, 2) = fileEntry.aprioricovar(4);
-        covar(2, 2) = fileEntry.aprioricovar(5);
+        covar(0, 0) = fileEntry.aprioricovar(0)/1.0e6;
+        covar(0, 1) = fileEntry.aprioricovar(1)/1.0e6;
+        covar(0, 2) = fileEntry.aprioricovar(2)/1.0e6;
+        covar(1, 1) = fileEntry.aprioricovar(3)/1.0e6;
+        covar(1, 2) = fileEntry.aprioricovar(4)/1.0e6;
+        covar(2, 2) = fileEntry.aprioricovar(5)/1.0e6;
+        // covar(0, 0) = fileEntry.aprioricovar(0);
+        // covar(0, 1) = fileEntry.aprioricovar(1);
+        // covar(0, 2) = fileEntry.aprioricovar(2);
+        // covar(1, 1) = fileEntry.aprioricovar(3);
+        // covar(1, 2) = fileEntry.aprioricovar(4);
+        // covar(2, 2) = fileEntry.aprioricovar(5);
         apriori.SetRectangularMatrix(covar);
 
         if (Displacement(covar(0, 0), Displacement::Meters).isValid() ||
             Displacement(covar(1, 1), Displacement::Meters).isValid()) {
+          // The conversion from Rectangular to Latitudinal coordinates uses
+          // Rectangular X and Y for computing latitude, longitude, and radius.
+          // *** TBD ***
+          // These calls will need to be changed to generic coordinates when
+          // ControlNetFileV0002.bp is updated
           if (fileEntry.latitudeconstrained())
-            constraintStatus.set(LatitudeConstrained);
+            constraintStatus.set(Coord1Constrained);
           if (fileEntry.longitudeconstrained())
-            constraintStatus.set(LongitudeConstrained);
+            constraintStatus.set(Coord2Constrained);
           if (fileEntry.radiusconstrained())
-            constraintStatus.set(RadiusConstrained);
+            constraintStatus.set(Coord3Constrained);
         }
+        // Only latitude and radius are calculated from Z
         else if (Displacement(covar(2, 2), Displacement::Meters).isValid()) {
           if (fileEntry.latitudeconstrained())
-            constraintStatus.set(LatitudeConstrained);
+            constraintStatus.set(Coord1Constrained);
           if (fileEntry.radiusconstrained())
-            constraintStatus.set(RadiusConstrained);
+            constraintStatus.set(Coord3Constrained);
         }
       }
 
@@ -336,6 +351,7 @@ namespace Isis {
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriRadiusSource = RadiusSource::None;
     constraintStatus.reset();
+    // coordType = SurfacePoint::Latitudinal;
   }
 
   /**
@@ -930,18 +946,34 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
     SurfacePoint aprioriSP) {
+    SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
     if (parentNetwork) {
       std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
       aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
+      coordType = parentNetwork->GetCoordType();
     }
     if (editLock)
       return PointLocked;
-    if (aprioriSP.GetLatSigma().isValid())
-      constraintStatus.set(LatitudeConstrained);
-    if (aprioriSP.GetLonSigma().isValid())
-      constraintStatus.set(LongitudeConstrained);
-    if (aprioriSP.GetLocalRadiusSigma().isValid())
-      constraintStatus.set(RadiusConstrained);
+    // ***TBD*** Does it make sense to try to do a generic check here? The
+    // data types are different (angles vs distance) so for now do a switch.
+    switch (coordType) {      
+      case SurfacePoint::Latitudinal:
+        if (aprioriSP.GetLatSigma().isValid())
+          constraintStatus.set(Coord1Constrained);
+        if (aprioriSP.GetLonSigma().isValid())
+          constraintStatus.set(Coord2Constrained);
+        if (aprioriSP.GetLocalRadiusSigma().isValid())
+          constraintStatus.set(Coord3Constrained);
+        break;
+      case SurfacePoint::Rectangular:
+        if (aprioriSP.GetXSigma().isValid())
+          constraintStatus.set(Coord1Constrained);
+        if (aprioriSP.GetYSigma().isValid())
+          constraintStatus.set(Coord2Constrained);
+        if (aprioriSP.GetZSigma().isValid())
+          constraintStatus.set(Coord3Constrained);
+      }
+        
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -1012,6 +1044,9 @@ namespace Isis {
    *                               points, which are already left unchanged by
    *                               ComputeApriori. If a free point is editLocked
    *                               the editLock will be ignored by this method.
+   *  @history 2017-04-25 Debbie A. Cook - change constraint status calls
+   *                               to use generic coordinate names (Coord1, Coord2,
+   *                               and Coord3).
    *
    * @return Status Success or PointLocked
    */
@@ -1021,7 +1056,7 @@ namespace Isis {
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
     // 2013-11-12 KLE I think this check should include points with any
-    // number of constrained coordinates???
+    // number of constrained coordinates???  I think I agree DAC. 
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
         QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
@@ -1096,12 +1131,12 @@ namespace Isis {
     // coordinates, then we use the a priori surface point coordinates that
     // have been given via other means (e.g. through qnet or cneteditor)
     // 2013-11-12 KLE Is the next check better as "if Fixed or if # of
-    // constrained coordinates > 1" ???
-    else if (GetType() == Fixed
-        || NumberOfConstrainedCoordinates() == 3
-        || IsLatitudeConstrained()
-        || IsLongitudeConstrained()
-        || IsRadiusConstrained()) {
+    // constrained coordinates > 1" ???  Yes, use || constraintStatus.any() after checking for fixed.
+    else if (GetType() == Fixed || constraintStatus.any()) {
+        // || NumberOfConstrainedCoordinates() == 3
+        // || IsCoord1Constrained()
+        // || IsCoord2Constrained()
+        // || IsCoord3Constrained()) {
       
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
@@ -1109,6 +1144,7 @@ namespace Isis {
       return Success;
     }
 
+    // Beyond this point, we assume the point is free ***TBD*** confirm this
     // Did we have any measures?
     if (goodMeasures == 0) {
       QString msg = "ControlPoint [" + GetId() + "] has no measures which "
@@ -1116,7 +1152,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Compute the averages
+    // Compute the averages if all coordinates are free
     //if (NumberOfConstrainedCoordinates() == 0) {
     if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
       double avgX = xB / goodMeasures;
@@ -1130,14 +1166,16 @@ namespace Isis {
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
     }
-    // Since we are not solving yet for x,y,and z in the bundle directly,
-    // longitude must be constrained.  This constrains x and y as well.
-    else {
-      aprioriSurfacePoint.SetRectangular(
-        aprioriSurfacePoint.GetX(),
-        aprioriSurfacePoint.GetY(),
-        Displacement((zB / goodMeasures), Displacement::Kilometers));
-    }
+    // *** TBD *** This block appears to never get executed.  All cases fall into a
+    // previous if or else block.  It was not added in response to a bug according
+    // to history entries either.  I commented it out on 5/31/2017.  If no problems
+    // occur in the next 6 months, it can likely be deleted.
+    // else {
+    //   aprioriSurfacePoint.SetRectangular(
+    //     aprioriSurfacePoint.GetX(),
+    //     aprioriSurfacePoint.GetY(),
+    //     Displacement((zB / goodMeasures), Displacement::Kilometers));
+    // }
 
     adjustedSurfacePoint = aprioriSurfacePoint;
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
@@ -1194,7 +1232,7 @@ namespace Isis {
       double cuLine;
       CameraFocalPlaneMap *fpmap = m->Camera()->FocalPlaneMap();
 
-      // Map the lat/lon/radius of the control point through the Spice of the
+      // Map the coordinates of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
@@ -1343,7 +1381,7 @@ namespace Isis {
       Camera *cam = m->Camera();
       double cudx, cudy;
 
-      // Map the lat/lon/radius of the control point through the Spice of the
+      // Map the coordinates of the control point through the Spice of the
       // measurement sample/line to get the computed undistorted focal plane
       // coordinates (mm if not radar).  This works for radar too because in
       // the undistorted focal plane, y has not been set to 0 (set to 0 when
@@ -1692,16 +1730,16 @@ namespace Isis {
     return constraintStatus.any();
   }
 
-  bool ControlPoint::IsLatitudeConstrained() {
-    return constraintStatus[LatitudeConstrained];
+  bool ControlPoint::IsCoord1Constrained() {
+    return constraintStatus[Coord1Constrained];
   }
 
-  bool ControlPoint::IsLongitudeConstrained() {
-    return constraintStatus[LongitudeConstrained];
+  bool ControlPoint::IsCoord2Constrained() {
+    return constraintStatus[Coord2Constrained];
   }
 
-  bool ControlPoint::IsRadiusConstrained() {
-    return constraintStatus[RadiusConstrained];
+  bool ControlPoint::IsCoord3Constrained() {
+    return constraintStatus[Coord3Constrained];
   }
 
   int ControlPoint::NumberOfConstrainedCoordinates() {
@@ -2001,7 +2039,9 @@ namespace Isis {
         other.referenceExplicitlySet == referenceExplicitlySet &&
         other.numberOfRejectedMeasures == numberOfRejectedMeasures &&
         other.cubeSerials == cubeSerials &&
+        // other.coordType == coordType &&
         other.referenceMeasure == referenceMeasure;
+
   }
 
 
@@ -2020,6 +2060,7 @@ namespace Isis {
    *                          deleted some calls that were already handled in
    *                          AddMeasure.
    *   @history 2011-10-03 Tracie Sucharski - Unlock measures before Deleting
+   *   @history 2017-04-25 Debbie A. Cook - added coordType copy.
    */
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
@@ -2059,6 +2100,7 @@ namespace Isis {
       adjustedSurfacePoint = other.adjustedSurfacePoint;
       numberOfRejectedMeasures = other.numberOfRejectedMeasures;
       constraintStatus = other.constraintStatus;
+      // coordType = other.coordType;
     }
 
     return *this;
@@ -2305,13 +2347,14 @@ namespace Isis {
         fileEntry.add_aprioricovar(covar(1, 2));
         fileEntry.add_aprioricovar(covar(2, 2));
       }
-      if (constraintStatus.test(LatitudeConstrained))
+      // ***TBD*** change the fileEntry function names to generic version
+      if (constraintStatus.test(Coord1Constrained))
 //      if (!IsLatitudeConstrained())
         fileEntry.set_latitudeconstrained(true);
-      if (constraintStatus.test(LongitudeConstrained))
+      if (constraintStatus.test(Coord2Constrained))
 //      if (!IsLongitudeConstrained())
         fileEntry.set_longitudeconstrained(true);
-      if (constraintStatus.test(RadiusConstrained))
+      if (constraintStatus.test(Coord3Constrained))
 //      if (!IsRadiusConstrained())
         fileEntry.set_radiusconstrained(true);
     }

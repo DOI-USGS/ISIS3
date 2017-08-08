@@ -35,6 +35,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
+#include "SurfacePoint.h"
 #include "XmlStackedHandler.h"
 
 class QDataStream;
@@ -102,6 +103,18 @@ namespace Isis {
    *                           USEPVL being removed from jigsaw.  References #4316.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
    *
+   *   @history 2017-06-25 Debbie Cook - Added m_cpCoordTypeReports and m_cpCoordTypeBundle. 
+   *                           The 2nd type determines how control point coordinates are entered 
+   *                           into the the matrix and interpreted throughout the adjustment.  The 
+   *                           1st type determines the coordinate type of control points in reports.
+   *                           Added the new coordinate type as an argument to SetSolveOptions.  
+   *                           Changed GlobalAprioriSigmas names to more generic names:  Latitude to
+   *                           PointCoord1, Longitude to PointCoord2, and Radius to PointCoord3 so
+   *                           they can be used for either lat/lon/radius or x/y/z.  Also added 
+   *                           accessor methods, CoordTypeReports() & CoordTypeBundle()
+   *                           for the new coordinate type members.
+   *                           References #4649 and #501.
+   *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
    *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
@@ -147,15 +160,19 @@ namespace Isis {
                            bool updateCubeLabel = false,
                            bool errorPropagation = false,
                            bool solveRadius = false,
-                           double globalLatitudeAprioriSigma = Isis::Null,
-                           double globalLongitudeAprioriSigma = Isis::Null,
-                           double globalRadiusAprioriSigma = Isis::Null);
-      void setOutlierRejection(bool outlierRejection,
+                           SurfacePoint::CoordinateType coordTypeBundle = SurfacePoint::Latitudinal,
+                           SurfacePoint::CoordinateType coordTypeReports = SurfacePoint::Latitudinal,
+                           double globalPointCoord1AprioriSigma = Isis::Null, 
+                           double globalPointCoord2AprioriSigma = Isis::Null, 
+                           double globalPointCoord3AprioriSigma = Isis::Null); 
+      void setOutlierRejection(bool outlierRejection, 
                                double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
 
       // accessors
+      SurfacePoint::CoordinateType controlPointCoordTypeReports() const;
+      SurfacePoint::CoordinateType controlPointCoordTypeBundle() const;
       bool createInverseMatrix() const;
       bool solveObservationMode() const;
       bool solveRadius() const;
@@ -163,9 +180,13 @@ namespace Isis {
       bool errorPropagation() const;
       bool outlierRejection() const;
       double outlierRejectionMultiplier() const;
-      double globalLatitudeAprioriSigma() const;
-      double globalLongitudeAprioriSigma() const;
-      double globalRadiusAprioriSigma() const;
+// These sigmas are either for planetocentric lat/lon/radius or body-fixed x/y/z
+      double globalPointCoord1AprioriSigma() const;
+      double globalPointCoord2AprioriSigma() const;
+      double globalPointCoord3AprioriSigma() const;
+      /* double globalLatitudeAprioriSigma() const; */
+      /* double globalLongitudeAprioriSigma() const; */
+      /* double globalRadiusAprioriSigma() const; */
 
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
@@ -338,9 +359,12 @@ namespace Isis {
                                                 Defaults to 1, so no change if rejection = false.*/
 
       // Parameter Uncertainties (Weighting)
-      double m_globalLatitudeAprioriSigma;  //!< The global a priori sigma for latitude.
-      double m_globalLongitudeAprioriSigma; //!< The global a priori sigma for longitude.
-      double m_globalRadiusAprioriSigma;    //!< The global a priori sigma for radius.
+      /* double m_globalLatitudeAprioriSigma;  //!< The global a priori sigma for latitude. */
+      /* double m_globalLongitudeAprioriSigma; //!< The global a priori sigma for longitude. */
+      /* double m_globalRadiusAprioriSigma;    //!< The global a priori sigma for radius. */
+      double m_globalPointCoord1AprioriSigma;   //!< The global a priori sigma for latitude or X.
+      double m_globalPointCoord2AprioriSigma;   //!< The global a priori sigma for longitude or Y.
+      double m_globalPointCoord3AprioriSigma;   //!< The global a priori sigma for radius or Z.
 
       // QList of observation solve settings
       QList<BundleObservationSolveSettings> m_observationSolveSettings; //!<
@@ -371,7 +395,12 @@ namespace Isis {
       bool m_solveTargetBody; //!< Indicates whether to solve for target body.
       BundleTargetBodyQsp m_bundleTargetBody; /**< A pointer to the target body
                                                    settings and information.*/
-
+      // Control Points
+      //      SurfacePoint::CoordinateType m_bcpCoordType;  /**< Indicates the coordinate type for
+      SurfacePoint::CoordinateType m_cpCoordTypeReports;  /**< Indicates the coordinate type for
+                                                   outputting control points in reports.  */
+      SurfacePoint::CoordinateType m_cpCoordTypeBundle;     /**< Indicates the coordinate type used 
+                                                    for control points in the bundle adjustment */
       // Output Options
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want
                                           output files to be written to the current directory, the

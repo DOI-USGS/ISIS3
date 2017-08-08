@@ -308,7 +308,7 @@ namespace Isis {
 
   /**
    * Set surface point in rectangular coordinates with its variance/covariance
-   *   matrix in meters squared.
+   *   matrix in kilometers squared.
    *
    * @param x  x value of body-fixed coordinate of surface point
    * @param y  y value of body-fixed coordinate of surface point
@@ -325,12 +325,33 @@ namespace Isis {
 
 
   /**
+   * Set surface point in rectangular coordinates with its variance/covariance
+   *   matrix in kilometers squared.
+   *
+   * @param x  x value of body-fixed coordinate of surface point
+   * @param y  y value of body-fixed coordinate of surface point
+   * @param z  z value of body-fixed coordinate of surface point
+   *
+   * @return void
+   */
+  void SurfacePoint::SetRectangularCoordinates(const Displacement &x,
+                                                                                     const Displacement &y,
+                                                                                     const Displacement &z) {
+    SetRectangularPoint(x, y, z);
+  }
+
+
+  /**
    * Set the rectangular sigmas into the rectangular variance/covariance
-   *   matrix.
+   *   matrix with diagonal element units of km^2, km^2, and km^2..
    *
    * @param xSigma x sigma of body-fixed coordinate of surface point
    * @param ySigma y sigma of body-fixed coordinate of surface point
    * @param zSigma z sigma of body-fixed coordinate of surface point
+   *
+   * @internal
+   *   @history  2017-07-25 Debbie A. Cook  Added documentation and corrected units for diagonal 
+   *                                                       elements to be km^2 instead of m^2.
    */
   void SurfacePoint::SetRectangularSigmas(const Distance &xSigma,
                                           const Distance &ySigma,
@@ -344,9 +365,9 @@ namespace Isis {
 
     symmetric_matrix<double,upper> covar(3);
     covar.clear();
-    covar(0,0) = xSigma.meters() * xSigma.meters();
-    covar(1,1) = ySigma.meters() * ySigma.meters();
-    covar(2,2) = zSigma.meters() * zSigma.meters();
+    covar(0,0) = xSigma.kilometers() * xSigma.kilometers();
+    covar(1,1) = ySigma.kilometers() * ySigma.kilometers();
+    covar(2,2) = zSigma.kilometers() * zSigma.kilometers();
     SetRectangularMatrix(covar);
   }
 
@@ -354,7 +375,7 @@ namespace Isis {
   /**
    * Set rectangular covariance matrix
    *
-   * @param covar Rectangular variance/covariance matrix (units are m**2)
+   * @param covar Rectangular variance/covariance matrix (units are km**2)
    *
    * @return void
    */
@@ -376,10 +397,10 @@ namespace Isis {
 
     SpiceDouble rectMat[3][3];
 
-    // Compute the local radius of the surface point
-    double x2  = p_x->meters() * p_x->meters();
-    double y2  = p_y->meters() * p_y->meters();
-    double z   = p_z->meters();
+    // Compute the local radius of the surface point in kilometers
+    double x2  = p_x->kilometers() * p_x->kilometers();
+    double y2  = p_y->kilometers() * p_y->kilometers();
+    double z   = p_z->kilometers();
     double radius = sqrt(x2 + y2 + z*z);
 
     // Should we use a matrix utility?
@@ -392,18 +413,18 @@ namespace Isis {
 
     // Compute the Jacobian
     SpiceDouble J[3][3];
-    double zOverR = p_z->meters() / radius;
+    double zOverR = p_z->kilometers() / radius;
     double r2 = radius*radius;
     double denom = r2*radius*sqrt(1.0 - (zOverR*zOverR));
-    J[0][0] = -p_x->meters() * p_z->meters() / denom;
-    J[0][1] = -p_y->meters() * p_z->meters() / denom;
-    J[0][2] = (r2 - p_z->meters() * p_z->meters()) / denom;
-    J[1][0] = -p_y->meters() / (x2 + y2);
-    J[1][1] = p_x->meters() / (x2 + y2);
+    J[0][0] = -p_x->kilometers() * p_z->kilometers() / denom;
+    J[0][1] = -p_y->kilometers() * p_z->kilometers() / denom;
+    J[0][2] = (r2 - p_z->kilometers() * p_z->kilometers()) / denom;
+    J[1][0] = -p_y->kilometers() / (x2 + y2);
+    J[1][1] = p_x->kilometers() / (x2 + y2);
     J[1][2] = 0.0;
-    J[2][0] = p_x->meters() / radius;
-    J[2][1] = p_y->meters() / radius;
-    J[2][2] = p_z->meters() / radius;
+    J[2][0] = p_x->kilometers() / radius;
+    J[2][1] = p_y->kilometers() / radius;
+    J[2][2] = p_z->kilometers() / radius;
 
     if(!p_sphereCovar)
       p_sphereCovar = new symmetric_matrix<double, upper>(3);
@@ -508,11 +529,16 @@ namespace Isis {
 
 
   /**
-   * Set the spherical sigmas into the spherical variance/covariance matrix.
+   * Set the spherical sigmas into the spherical variance/covariance matrix in diagonal units of 
+   *  radians^2, radians^2, km^2.
    *
    * @param latSigma Latitude sigma of body-fixed coordinate of surface point
    * @param lonSigma Longitude sigma of body-fixed coordinate of surface point
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point
+   *
+   * @internal
+   *   @history  2017-07-25 Debbie A. Cook  Added documentation and corrected units for covar(2,2) 
+   *                                                                 to be km^2 instead of m^2.
    */
   void SurfacePoint::SetSphericalSigmas(const Angle &latSigma,
                                         const Angle &lonSigma,
@@ -526,7 +552,7 @@ namespace Isis {
       covar(0,0) =  sphericalCoordinate*sphericalCoordinate;
       sphericalCoordinate = (double) lonSigma.radians();
       covar(1,1) = sphericalCoordinate*sphericalCoordinate;
-      sphericalCoordinate = (double) radiusSigma.meters();
+      sphericalCoordinate = (double) radiusSigma.kilometers();
       covar(2,2) = sphericalCoordinate*sphericalCoordinate;
 
       SetSphericalMatrix(covar);
@@ -542,22 +568,26 @@ namespace Isis {
 
 
   /**
-   * Set the spherical sigmas (in meters) into the spherical variance/covariance
+   * Set the spherical sigmas (in Distance units) into the spherical variance/covariance
    *   matrix.
    *
    * @param latSigma Latitude sigma of body-fixed coordinate of surface point
-   *                  in meters
+   *                  as a Distance
    * @param lonSigma Longitude sigma of body-fixed coordinate of surface point
-   *                  in meters
+   *                  as a Distance
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point
-   *                  in meters
+   *                  as a Distance
+   *
+   * @internal
+   *   @history  2017-07-25 Debbie A. Cook  Corrected documentation and corrected conversion of
+   *                                               longitude sigma Distance to longitude sigma Angle
    */
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {
 
     if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->isValid() ||
         !p_minorAxis->isValid() || !p_polarAxis->isValid()) {
-      IString msg = "In order to use sigmas in meter units, the equitorial "
+      IString msg = "In order to use sigmas in meter units, the equatorial "
         "radius must be set with a call to SetRadii or an appropriate "
         "constructor";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -568,11 +598,25 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    double scaledLatSig = latSigma / *p_majorAxis;
-    double scaledLonSig = lonSigma * cos((double)GetLatitude().radians())
-                                   / *p_majorAxis;
-    SetSphericalSigmas( Angle(scaledLatSig, Angle::Radians),
-                        Angle(scaledLonSig, Angle::Radians), radiusSigma);
+    double latSigRadians = latSigma / *p_majorAxis;
+    double scaler = cos((double)GetLatitude().radians());
+    double lonSigRadians;
+    
+    // *** TODO *** Find a good value for epsilon
+    if (scaler > 0.0000000000000001) {             
+      // The next computation is equivalent to
+      //   metersToRadians = 1.0 / () * *p_majorAxis)
+      //   lonSigRadians = lonSigma * metersToRadians
+      lonSigRadians = lonSigma / (scaler * *p_majorAxis);
+    }
+    else {
+      //  Brent Archinal suggested setting sigma to pi in the case of a point near the pole
+      lonSigRadians = PI;
+    }
+      
+    SetSphericalSigmas( Angle(latSigRadians, Angle::Radians),
+                                      Angle(lonSigRadians, Angle::Radians),
+                                      radiusSigma);
   }
 
 
@@ -616,7 +660,7 @@ namespace Isis {
     // Get the lat/lon/radius of the point
     double lat = (double) GetLatitude().radians();
     double lon = (double) GetLongitude().radians();
-    double radius = (double) GetLocalRadius().meters();
+    double radius = (double) GetLocalRadius().kilometers();
 
     // Compute the Jacobian
     SpiceDouble J[3][3];
@@ -649,13 +693,132 @@ namespace Isis {
     (*p_rectCovar)(1,1) = mat[1][1];
     (*p_rectCovar)(1,2) = mat[1][2];
     (*p_rectCovar)(2,2) = mat[2][2];
-
+    
 //     std::cout<<"Rcovar = "<<p_rectCovar(0,0)<<" "<<p_rectCovar(0,1)<<" "<<p_rectCovar(0,2)<<std::endl
 //              <<"         "<<p_rectCovar(1,0)<<" "<<p_rectCovar(1,1)<<" "<<p_rectCovar(1,2)<<std::endl
 //              <<"         "<<p_rectCovar(2,0)<<" "<<p_rectCovar(2,1)<<" "<<p_rectCovar(2,2)<<std::endl;
   }
+  
+
+  /**
+   * Set  covariance matrix
+   *
+   * @param covar variance/covariance matrix
+   *
+   * @return void
+   */
+  void SurfacePoint::SetMatrix(CoordinateType type, const symmetric_matrix<double, upper>& covar) {
+
+    switch (type) {   
+      case Latitudinal:
+        SetSphericalMatrix(covar);
+        break;
+      case Rectangular:
+        SetRectangularMatrix(covar);
+        break;
+      default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
 
 
+   /**
+   * Compute partial derivative of the conversion of the body-fixed surface point coordinate to the 
+   * specified coordinate type.
+   *
+   * @param covar variance/covariance matrix
+   *
+   * @return void
+   */
+  std::vector<double> SurfacePoint::Partial(CoordinateType type, CoordIndex index) {
+    std::vector<double> derivative(3);
+    switch (type) {
+      case Latitudinal:
+        derivative = LatitudinalDerivative(index);
+        break;
+      case Rectangular:
+        derivative = RectangularDerivative(index);
+        break;
+      default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return derivative;
+  } 
+
+
+   /**
+   * Compute partial derivative of the conversion of the latitudinal coordinates to body-fixed 
+   *   rectangular coordinates with respect to the indicated coordinate.
+   *
+   * @param index Coordinate index
+   *
+   * @return @b std::vector<double>  The derivative of the latitudinal to body-fixed vector
+   */
+  std::vector<double> SurfacePoint::LatitudinalDerivative(CoordIndex index) {
+    std::vector<double> derivative(3);
+    double rlat = GetLatitude().radians();
+    double rlon = GetLongitude().radians();
+    double sinLon = sin(rlon);
+    double cosLon = cos(rlon);
+    double sinLat = sin(rlat);
+    double cosLat = cos(rlat);
+    double radkm = GetLocalRadius().kilometers();
+
+    switch (index) {
+      case One:
+        derivative[0] = -radkm * sinLat * cosLon;
+        derivative[1] = -radkm * sinLon * sinLat;
+        derivative[2] =  radkm * cosLat;
+        break;
+      case Two:
+        derivative[0] = -radkm * cosLat * sinLon;
+        derivative[1] =  radkm * cosLat * cosLon;
+        derivative[2] =  0.0;
+        break;
+      case Three:
+        derivative[0] = cosLon * cosLat;
+        derivative[1] = sinLon * cosLat;
+        derivative[2] = sinLat;
+        break;
+      default:
+        IString msg = "Invalid coordinate index  (must be less than 3).";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return derivative;
+  } 
+
+
+   /**
+   * Compute partial derivative of the body-fixed rectangular coordinates with respect to the 
+   *   indicated coordinate.
+   *
+   * @param index Coordinate index
+   *
+   * @return @b std::vector<double>  The derivative of the body-fixed vector
+   */
+  std::vector<double> SurfacePoint::RectangularDerivative(CoordIndex index) {
+    std::vector<double> derivative(3,0.0);
+
+    switch (index) {
+      case One:
+        derivative[0] = 1.;
+        break;
+      case Two:
+        derivative[1] =  1.;
+        break;
+      case Three:
+        derivative[2] = 1.;
+        break;
+      default:
+        IString msg = "Invalid coordinate index  (must be less than 3).";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return derivative;
+  }
+
+  
   /**
    * A naif array is a c-style array of size 3. The element types are double...
    * keep in mind a SpiceDouble is a double. The values' units are
@@ -783,6 +946,370 @@ namespace Isis {
   }
 
 
+  /**
+   * This method returns a coordinate of a SurfacePoint
+   *
+   * @param type The coordinate type to return (see CoordinateType in .h file)
+   * @param index The coordinate index to return (1 <= index <= 3)
+   * @param units The units in which to return the coordinate value (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::GetCoord(CoordinateType type, CoordIndex index, CoordUnits units) {
+    // TODO *** Is there a better way to satisfy the compiler that a value will be initialized? 
+    //                 Don't the enums take care of preventing any other possibilities? no
+    double value = 0.;
+    
+    switch (type) {
+      
+      case Latitudinal:
+      
+        switch (index) {
+            
+          case One:  // Latitude
+            value = LatToDouble(GetLatitude(), units);
+            break;
+            
+          case Two:  // Longitude
+            value = LonToDouble(GetLongitude(), units);
+            break;
+            
+          case Three:  // LocalRadius
+            value = DistanceToDouble(GetLocalRadius(), units);
+            break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+      case Rectangular:
+      
+        switch (index) {
+            
+          case One:  // X
+            value = DisplacementToDouble(GetX(), units);
+            break;
+            
+          case Two: // Y
+            value = DisplacementToDouble(GetY(), units);
+            break;
+            
+          case Three:  // Z
+            value = DisplacementToDouble(GetZ(), units);
+            break;
+            
+          default:
+            IString msg = "Invalid coordinate index  enum (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+       default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return value;
+  }
+
+
+  /**
+   * This method returns a sigma of a SurfacePoint coordinate
+   *
+   * @param type The coordinate type to return (see CoordinateType in .h file)
+   * @param index The coordinate index to return (1 <= index <= 3)
+   * @param units The units in which to return the coordinate value (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::GetSigma(CoordinateType type, CoordIndex index, CoordUnits units) {
+    double value = 0;  // See first TODO in GetCoord
+    
+    switch (type) {
+      
+      case Latitudinal:
+      
+        switch (index) {
+            
+          case One:
+            value = DistanceToDouble(GetLatSigmaDistance(), units);
+            break;
+            
+          case Two:
+             value = DistanceToDouble(GetLonSigmaDistance(), units);
+             break;
+            
+          case Three:
+             value = DistanceToDouble(GetLocalRadiusSigma(), units);
+             break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+      case Rectangular:
+      
+        switch (index) {
+            
+          case One:
+            value = DistanceToDouble(GetXSigma(), units);
+            break;
+            
+          case Two:
+             value = DistanceToDouble(GetYSigma(), units);
+             break;
+            
+          case Three:
+             value = DistanceToDouble(GetZSigma(), units);
+             break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+       default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+            
+    return value;
+  }
+
+
+  /**
+   * This method returns a sigma of a SurfacePoint coordinate as a Distance
+   *
+   * @param type The coordinate type to return (see CoordinateType in .h file)
+   * @param index The coordinate index to return (1 <= index <= 3)
+   *
+   */
+  Distance SurfacePoint::GetSigmaDistance(CoordinateType type,
+                                                         CoordIndex index) {
+    Distance dist = Distance();  // See first TODO in GetCoord
+    
+    switch (type) {
+      
+      case Latitudinal:
+      
+        switch (index) {
+            
+          case One:
+            dist = GetLatSigmaDistance();
+            break;
+            
+          case Two:
+             dist = GetLonSigmaDistance();
+             break;
+            
+          case Three:
+             dist = GetLocalRadiusSigma();
+             break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+      case Rectangular:
+      
+        switch (index) {
+            
+          case One:
+            dist = GetXSigma();
+            break;
+            
+          case Two:
+             dist = GetYSigma();
+             break;
+            
+          case Three:
+             dist = GetZSigma();
+             break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+       default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+            
+    return dist;
+  }
+
+
+  /**
+   * This method returns a double version of a Displacement in the specified units
+   *
+   * @param disp The displacement to convert to a double
+   * @param units The units in which to return the displacement (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::DisplacementToDouble(Displacement disp, CoordUnits units) {
+    double value;
+    
+    switch (units) {
+      
+        case Meters:
+          value = disp.meters();
+          break;
+          
+        case Kilometers:
+          value = disp.kilometers();
+          break;
+          
+        default:
+           IString msg = "Unrecognized unit for a Displacement (must be meters or kilometers).";
+           throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    return value;
+  }
+      
+
+  /**
+   * This method returns a double version of a Distance in the specified units
+   *
+   * @param dist The distance to convert to a double
+   * @param units The units in which to return the distance (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::DistanceToDouble(Distance dist, CoordUnits units) {
+    double value;
+    
+    switch (units) {
+      
+        case Meters:
+          value = dist.meters();
+          break;
+          
+        case Kilometers:
+          value = dist.kilometers();
+          break;
+          
+        default:
+           IString msg = "Unrecognized unit for a Distance (not meters or kilometers).";
+           throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    return value;
+  }
+
+
+  /**
+   * This method returns a double version of a Latitude in the specified units
+   *
+   * @param lat The latitude to convert to a double
+   * @param units The units in which to return the latitude (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::LatToDouble(Latitude lat, CoordUnits units) {
+    double value;
+    
+    switch (units) {
+      
+      case Radians:
+        value = GetLatitude().radians();
+        break;
+
+      case Degrees:
+        value = GetLatitude().degrees();
+        break;
+
+       default:
+         IString msg = "Invalid unit for latitude (must be Radians or Degrees).";
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return value;
+  }
+
+
+  /**
+   * This method converts the given string value to a SurfacePoint::CoordinateType
+   * enumeration.  Currently (March 31, 2017) accepted inputs are listed below.  
+   * This method is case insensitive.
+   *
+   * @param type The coordinate type name to be converted
+   * @return @b CoordinateType The enumeration corresponding to the input name
+   *
+   */
+  SurfacePoint::CoordinateType
+                 SurfacePoint::stringToCoordinateType(QString type)  {
+    if (type.compare("LATITUDINAL", Qt::CaseInsensitive) == 0) {
+      return SurfacePoint::Latitudinal;
+    }
+    else if (type.compare("RECTANGULAR", Qt::CaseInsensitive) == 0) {
+      return SurfacePoint::Rectangular;
+    }
+    else throw IException(IException::Programmer,
+                          "Unknown coordinate type for a SurfacePoint [" + type + "].",
+                          _FILEINFO_);
+  }
+
+
+  /**
+   * Converts the given SurfacePoint::CoordinateType enumeration to a string. 
+   * This method is used to print the type of control point coordinates used in 
+   * the bundle adjustment. 
+   * 
+   * @param type The Coordinate Type enumeration to be converted.
+   * 
+   * @return @b QString The name associated with the given CoordinateType.
+   * 
+   * @throw Isis::Exception::Programmer "Unknown SurfacePoint CoordinateType enum."
+   */
+  QString SurfacePoint::coordinateTypeToString(
+                                               SurfacePoint::CoordinateType type) {
+    switch (type) {
+      
+      case Latitudinal:
+        return "Latitudinal";
+        break;
+        
+      case Rectangular:
+        return "Rectangular";
+        break;
+
+       default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  
+  /**
+   * This method returns a double version of a Longitude in the specified units
+   *
+   * @param lon The longitude to convert to a double
+   * @param units The units in which to return the longitude (see CoordinateUnits in .h file)
+   *
+   */
+  double SurfacePoint::LonToDouble(Longitude lon, CoordUnits units) {
+    double value;
+    
+    switch (units) {
+      
+      case Radians:
+        value = GetLongitude().radians();
+        break;
+
+      case Degrees:
+        value = GetLongitude().degrees();
+        break;
+
+       default:
+         IString msg = "Invalid unit for longitude (must be Radians of Degrees).";
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return value;
+  }
+  
+    
   Displacement SurfacePoint::GetX() const {
     if(!p_x) return Displacement();
 
@@ -807,21 +1334,146 @@ namespace Isis {
   Distance SurfacePoint::GetXSigma() const {
     if(!p_rectCovar) return Distance();
 
-    return Distance(sqrt((*p_rectCovar)(0, 0)), Distance::Meters);
+    return Distance(sqrt((*p_rectCovar)(0, 0)), Distance::Kilometers);
   }
 
 
   Distance SurfacePoint::GetYSigma() const {
     if(!p_rectCovar) return Distance();
 
-    return Distance(sqrt((*p_rectCovar)(1, 1)), Distance::Meters);
+    return Distance(sqrt((*p_rectCovar)(1, 1)), Distance::Kilometers);
   }
 
 
   Distance SurfacePoint::GetZSigma() const {
     if(!p_rectCovar) return Distance();
 
-    return Distance(sqrt((*p_rectCovar)(2, 2)), Distance::Meters);
+    return Distance(sqrt((*p_rectCovar)(2, 2)), Distance::Kilometers);
+  }
+
+
+  /**
+   * This method returns the weight of a SurfacePoint coordinate
+   * Note:  At this time a units argument is not included.  If BundleAdjust
+   *            is modified to allow different distance or displacement units
+   *            other than kilometers, the units argument can be added similar
+   *            to the GetCoord and GetSigma methods.  Angle weights are in
+   *            1/rad^2 and distance and displacements are in 1/km^2
+   *
+   * @param type The coordinate type to return (see CoordinateType in .h file)
+   * @param index The coordinate index to return (1 <= index <= 3)
+   *
+   *
+   */
+  double SurfacePoint::GetWeight(CoordinateType type, CoordIndex index) {
+    // TODO *** Add tests for new method(s) to unitTest.
+    double value = 0;  // See first TODO in GetCoord
+    
+    switch (type) {
+      
+      case Latitudinal:
+      
+        switch (index) {
+            
+          case One:
+            value = GetLatWeight();  // 1/radians**2
+            break;
+            
+          case Two:
+            value = GetLonWeight();  // 1/radians**2
+            break;
+            
+          case Three:
+            value = GetLocalRadiusWeight();  // 1/km**2
+            break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+      case Rectangular:
+      
+        switch (index) {
+            
+          case One:
+            value = GetXWeight();   // 1/km**2
+            break;
+            
+          case Two:
+            value = GetYWeight();   // 1/km**2
+            break;
+            
+          case Three:
+            value = GetZWeight();  // 1/km**2
+            break;
+            
+          default:
+            IString msg = "Invalid coordinate index  (must be less than 3).";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        break;
+
+       default:
+         IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return value;
+  }
+
+  
+  /**
+  * Return X weight for bundle adjustment
+  * Units are 1/(kilometers)^2
+  *
+  */
+  double SurfacePoint::GetXWeight() const {
+
+    double dXSigma = GetXSigma().kilometers();
+
+    if (dXSigma <= 0.0 ) {
+        IString msg = "SurfacePoint::GetXWeight(): Sigma <= 0.0";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return 1.0/(dXSigma*dXSigma);
+  }
+
+
+  /**
+  * Return Y weight for bundle adjustment
+  * Units are 1/(kilometers)^2
+  *
+  */
+  double SurfacePoint::GetYWeight() const {
+
+    double dYSigma = GetYSigma().kilometers();
+
+    if (dYSigma <= 0.0 ) {
+        IString msg = "SurfacePoint::GetYWeight(): Sigma <= 0.0";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return 1.0/(dYSigma*dYSigma);
+  }
+
+
+  /**
+  * Return Z weight for bundle adjustment
+  * Units are 1/(kilometers)^2
+  *
+  */
+  double SurfacePoint::GetZWeight() const {
+
+    double dZSigma = GetZSigma().kilometers();
+
+    if (dZSigma <= 0.0 ) {
+        IString msg = "SurfacePoint::GetZWeight(): Sigma <= 0.0";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return 1.0/(dZSigma*dZSigma);
   }
 
 
@@ -914,7 +1566,7 @@ namespace Isis {
 
 
   /**
-   * Return the latitude sigma in meters
+   * Return the latitude sigma as a Distance
    *
    */
     Distance SurfacePoint::GetLatSigmaDistance() const {
@@ -926,7 +1578,7 @@ namespace Isis {
         if (latSigma.isValid()) {
           if (!p_majorAxis || !p_majorAxis->isValid()) {
             IString msg = "In order to calculate sigmas in meter units, the "
-              "equitorial radius must be set with a call to SetRadii.";
+              "equatorial radius must be set with a call to SetRadii.";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
 
@@ -940,7 +1592,11 @@ namespace Isis {
 
 
   /**
-   * Return the longiitude sigma in meters
+   * Return the longiitude sigma as a Distance
+   *
+   * @internal
+   *   @history  2017-07-25 Debbie A. Cook  Corrected documentation and corrected conversion of
+   *                                               longitude sigma Distance to longitude sigma Angle
    *
    */
   Distance SurfacePoint::GetLonSigmaDistance() const {
@@ -952,7 +1608,7 @@ namespace Isis {
       if (lonSigma.isValid()) {
         if (!p_majorAxis || !p_majorAxis->isValid()) {
           IString msg = "In order to calculate sigmas in meter units, the "
-            "equitorial radius must be set with a call to SetRadii.";
+            "equatorial radius must be set with a call to SetRadii.";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -961,7 +1617,10 @@ namespace Isis {
 
         // Convert from radians to meters and return
         if (scaler != 0.)
-          lonSigmaDistance = lonSigma.radians() * *p_majorAxis / scaler;
+          lonSigmaDistance = lonSigma.radians() * *p_majorAxis * scaler;
+          // The above conversion is equivalent to
+          //    radiansToMeters = scaler * *p_majorAxis;
+        //      lonSigmaDistance = lonSigma.radians() * radiansToMeters;
       }
     }
 
@@ -973,7 +1632,7 @@ namespace Isis {
     if(!p_sphereCovar)
       return Distance();
 
-    return Distance(sqrt((*p_sphereCovar)(2, 2)), Distance::Meters);
+    return Distance(sqrt((*p_sphereCovar)(2, 2)), Distance::Kilometers);
   }
 
 
@@ -1022,7 +1681,7 @@ namespace Isis {
 
   /**
   * Return radius weight for bundle adjustment
-  * Units are 1/(meters)^2
+  * Units are 1/(kilometers)^2
   *
   */
   double SurfacePoint::GetLocalRadiusWeight() const {

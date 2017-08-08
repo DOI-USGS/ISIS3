@@ -18,7 +18,7 @@
  *   USGS in connection therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   $ISISROOT/dc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QString>
 
+#include "ControlNet.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -37,7 +38,7 @@ class QStringList;
 
 namespace Isis {
   class ControlMeasure;
-  class ControlNet;
+  //  class ControlNet;
   class ControlPointFileEntryV0002;
   class Latitude;
   class Longitude;
@@ -335,6 +336,11 @@ namespace Isis {
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
    *                           initialized in ControlPointFileEntryV0002 
    *                           constructor (Merged by Kristin Berry. Fixes #2392) 
+   *   @history 2017-05-25 Debbie A. Cook - Added member ControlPointCoordType with a default of
+   *                            Latitudinal.  Also add a setter (TBD) and an accessor method for it.  Made 
+   *                            values  for enum ConstraintStatus generic.  Changed
+   *                             LatitudeConstrained to Coord1Constrained, etc..  Removed coordType as a member.
+   *                            References #4649 and #501.
    */
   class ControlPoint : public QObject {
 
@@ -404,9 +410,12 @@ namespace Isis {
          *             coordinates as well, but for now BundleAdjust uses spherical
          *             coordinates only.
          */
-        LatitudeConstrained = 0,
-        LongitudeConstrained = 1,
-        RadiusConstrained = 2,
+        Coord1Constrained = 0,
+        Coord2Constrained = 1,
+        Coord3Constrained = 2,
+//        LatitudeConstrained = 0,
+//        LongitudeConstrained = 1,
+//        RadiusConstrained = 2,
 //      XConstrained = 3,
 //      YConstrained = 4,
 //      ZConstrained = 5;
@@ -497,14 +506,18 @@ namespace Isis {
       QString GetId() const;
       bool IsIgnored() const;
       bool IsValid() const;
+      // Can we get rid of this? It doesn't appear to be used anywhere.  *** ToDo ***
       bool IsInvalid() const;
       bool IsFixed() const;
 
       bool HasAprioriCoordinates();
       bool IsConstrained();
-      bool IsLatitudeConstrained();
-      bool IsLongitudeConstrained();
-      bool IsRadiusConstrained();
+//    bool IsLatitudeConstrained();
+//    bool IsLongitudeConstrained();
+//    bool IsRadiusConstrained();
+      bool IsCoord1Constrained();
+      bool IsCoord2Constrained();
+      bool IsCoord3Constrained();
       int NumberOfConstrainedCoordinates();
 
       static QString PointTypeToString(PointType type);
@@ -512,6 +525,7 @@ namespace Isis {
 
       QString GetPointTypeString() const;
       PointType GetType() const;
+//     SurfacePoint::CoordinateType getCoordType() const;
 
       static QString RadiusSourceToString(RadiusSource::Source source);
       static RadiusSource::Source StringToRadiusSource(QString str);
@@ -630,7 +644,7 @@ namespace Isis {
 
       /**
        * This stores the constraint status of the a priori SurfacePoint
-       *   @todo Eventually add x, y, and z
+       *   @todo Eventually add x, y, and z.  Instead we made generic coordinates
        */
       std::bitset<6> constraintStatus;
 
@@ -687,6 +701,9 @@ namespace Isis {
        * of the measures.
        */
       int numberOfRejectedMeasures;
+        
+      //! BundleControlPoint coordinate type.  This will default to Latitudinal, but is initialized from the parent Net.
+//      SurfacePoint::CoordinateType coordType;
   };
 }
 

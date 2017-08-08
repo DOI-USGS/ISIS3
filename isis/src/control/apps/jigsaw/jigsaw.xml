@@ -1015,6 +1015,89 @@
       </parameter>
     </group>
 
+    <group name="Control Point Parameters">
+      <parameter name="CONTROL_POINT_COORDINATE_TYPE_BUNDLE">
+        <type>string</type>
+        <brief> Coordinate type to use for bundling and outputting control points</brief>
+        <default>
+          <item>LATITUDINAL</item>
+        </default>
+        <description>
+          This parameter indicates which coordinate type will be used to present
+          the control points in the bundle adjustment and bundle output.  
+        </description>
+        <list>
+          <option value="LATITUDINAL">
+            <brief> Coordinates will be planetocentric latitudinal</brief>
+            <description>
+              If this option is selected all control points will be adjusted, corrected,
+              and reported in planetocentric latitudinal coordinates (latitude,
+              longitude, and radius).  
+            </description>
+          <exclusions>
+            <item>POINT_X_SIGMA</item>
+            <item>POINT_Y_SIGMA</item>
+            <item>POINT_Z_SIGMA</item>
+            <item>OVEREXISTING</item>
+          </exclusions>
+          </option>
+
+          <option value="RECTANGULAR">
+            <brief> Coordinates will be body-fixed rectangular</brief>
+            <description>
+              If this option is selected all control points will be adjusted, corrected,
+              and reported in body-fixed rectangular coordinates (X, Y, and Z).  
+            </description>
+            <exclusions>
+              <item>POINT_LATITUDE_SIGMA</item>
+              <item>POINT_LONGITUDE_SIGMA</item>
+              <item>POINT_RADIUS_SIGMA</item>
+            </exclusions>
+          </option>
+        </list>
+       </parameter>
+      <parameter name="CONTROL_POINT_COORDINATE_TYPE_REPORTS">
+        <type>string</type>
+        <brief> Coordinate type to use for bundling and outputting control points</brief>
+        <default>
+          <item>LATITUDINAL</item>
+        </default>
+        <description>
+          This parameter indicates which coordinate type will be used to present
+          the control points in the bundle adjustment and bundle output.  
+        </description>
+        <list>
+          <option value="LATITUDINAL">
+            <brief> Coordinates will be planetocentric latitudinal</brief>
+            <description>
+              If this option is selected all control points will be adjusted, corrected,
+              and reported in planetocentric latitudinal coordinates (latitude,
+              longitude, and radius).  
+            </description>
+          <exclusions>
+            <item>POINT_X_SIGMA</item>
+            <item>POINT_Y_SIGMA</item>
+            <item>POINT_Z_SIGMA</item>
+            <item>OVEREXISTING</item>
+          </exclusions>
+          </option>
+
+          <option value="RECTANGULAR">
+            <brief> Coordinates will be body-fixed rectangular</brief>
+            <description>
+              If this option is selected all control points will be adjusted, corrected,
+              and reported in body-fixed rectangular coordinates (X, Y, and Z).  
+            </description>
+            <exclusions>
+              <item>POINT_LATITUDE_SIGMA</item>
+              <item>POINT_LONGITUDE_SIGMA</item>
+              <item>POINT_RADIUS_SIGMA</item>
+            </exclusions>
+          </option>
+        </list>
+       </parameter>
+    </group>
+    
       <group name="Parameter Uncertainties">
         <parameter name="POINT_LATITUDE_SIGMA">
           <brief> Global latitude uncertainty for all points (meters)
@@ -1057,6 +1140,42 @@
           </inclusions>
         </parameter>
 
+        <parameter name="POINT_X_SIGMA">
+          <brief> Global body-fixed X uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This optional value will be used as the global  
+            uncertainty for all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+
+        <parameter name="POINT_Y_SIGMA">
+          <brief> Global body-fixed X uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This optional value will be used as the global  
+            uncertainty for all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+
+        <parameter name="POINT_Z_SIGMA">
+          <brief> Global body-fixed X uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This optional value will be used as the global  
+            uncertainty for all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+        
         <parameter name="SPACECRAFT_POSITION_SIGMA">
           <brief> Global uncertainty for spacecraft coordinates (meters)
           </brief>

@@ -12,7 +12,7 @@
 #include "Preference.h"
 #include "SurfacePoint.h"
 
-#include "boost/numeric/ublas/symmetric.hpp"
+#include <boost/numeric/ublas/symmetric.hpp>
 
 using namespace Isis;
 using namespace std;
@@ -25,6 +25,12 @@ using namespace boost::numeric::ublas;
  * @internal
  *   @history 2015-02-20 Jeannie Backer - Added print statement for
  *            latitude, longitude and radius weight accessor methods.
+ *   @history 2017-05-27 Debbie A. Cook - Added tests for new methods:
+ *            GetCoord, GetSigma, GetWeight, GetXSigma, GetYSigma, 
+ *            GetZsigma, LatToDouble, LonToDouble, DistanceToDouble,
+ *            DisplacementToDouble, and enum types CoordinateType, 
+ *            CoordUnits, and CoordIndex.  Fixed incorrect units in report for
+ *            latSig and lonSig.
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
@@ -44,9 +50,9 @@ int main(int argc, char *argv[]) {
     symmetric_matrix<double,upper> covar;
     covar.resize(3);
     covar.clear();
-    covar(0,0) = 100.;
-    covar(1,1) = 2500.;
-    covar(2,2) = 400.;
+    covar(0,0) = .0001;
+    covar(1,1) = .0025;
+    covar(2,2) = .0004;
 
     spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
                          Displacement(734.4311949, Displacement::Meters),
@@ -98,11 +104,13 @@ int main(int argc, char *argv[]) {
 
     cout << endl;
     cout << "2-Testing spherical set of point and variance/covariance matrix ..."
-         << endl;
+            << endl;
+      // Usage note:  In order to get accurate results, the full correlation matrix should be
+      // used as opposed to only setting the diagonal elements with the sigmas. 
     cout << " with lat=" << lat << " degrees, lon=" << lon << " degrees, radius="
          << radius << " m" << endl;
-    cout << " latitude sigma=" << latSig << " m, longitude sigma=" << lonSig
-         << " m, radiusSig=" << radSig << " m" << endl;
+    cout << " latitude sigma=" << latSig << " deg, longitude sigma=" << lonSig
+         << " deg, radiusSig=" << radSig << " m" << endl;
     Isis::SurfacePoint spSphere;
     spSphere.SetSpherical(Latitude(lat, Angle::Degrees),
                           Longitude(lon, Angle::Degrees),
@@ -184,7 +192,7 @@ int main(int argc, char *argv[]) {
                          Distance(1000., Distance::Meters),
                          Angle(1.64192315,Angle::Degrees),
                          Angle(1.78752107, Angle::Degrees),
-                         Distance(38.454887335682053718134171237789,
+                         Distance( 38.454887335682053718134171237789,
                                   Distance::Meters));
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
@@ -258,12 +266,227 @@ int main(int argc, char *argv[]) {
         Longitude(-45, Angle::Degrees), Distance(10, Distance::Kilometers));
     cout << "Longitude (from -45): " << spSphere3.GetLongitude().degrees()
          << endl << endl;
-
   }
   catch(Isis::IException &e) {
     e.print();
   }
 
+    // Test new code added to support solving and outputting control points in body-fixed
+    // x/y/z (RECTANGULAR)
+    
+    // Set a point for testing - Use coordinate data from test 1
+    Isis::SurfacePoint spRec1;
+    spRec1.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+                          Displacement(734.4311949, Displacement::Meters),
+                          Displacement(529.919264, Displacement::Meters));
+    
+    cout << "Testing error conditions in GetCoord, GetSigma, GetWeight, LatToDouble, "
+         << endl << "LonToDouble,  GetSigmaDistance, DistanceToDouble, and DisplacementToDouble..."
+         << endl << endl;
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Rectangular GetCoord with incorrect unit Degrees" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::One,
+                                   SurfacePoint::Degrees);
+    cout << "X-degrees = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Rectangular GetCoord with incorrect unit Radians" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::One,
+                                   SurfacePoint::Radians);
+    cout << "X-radians = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Rectangular GetCoord with incorrect unit Degrees" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Three,
+                                   SurfacePoint::Degrees);
+    cout << "Local Radius-degrees = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Latitudinal GetCoord with incorrect unit Radians for local radius" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Three,
+                                   SurfacePoint::Radians);
+    cout << "Local Radius-radians = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Latitudinal GetCoord with incorrect unit Kilometers for latitude" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::One,
+                                   SurfacePoint::Kilometers);
+    cout << "Latitude-kilometers = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test DisplacementToDouble error conditions. (DistanceToDouble, LatToDouble, and LonToDouble)
+      cout << "  ...Test Latitudinal GetCoord with incorrect unit Meters for longitude" << endl;
+    double value = spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Two,
+                                   SurfacePoint::Kilometers);
+    cout << "Longitude-meters = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test point coordinates only set.  Try GetWeight.  Set sigmas. Try GetWeight. Set body radii.
+    // Try GetWeight and GetCoord for all possibilities
+      cout << endl;
+      cout << "Test error statements: case where weights are requested after only coordinates "
+              << "have  been set..." << endl;
+    double value = spRec1.GetWeight(SurfacePoint::Rectangular, SurfacePoint::One);
+    cout << "X sigma-degrees = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test GetWeight after point coordinates and sigmas have been set. Try GetWeight. Set body 
+    // radii.  Try GetWeight, GetSigma and GetCoord for all possibilities.
+      cout << endl;
+      cout << "...Testing GetCoord, GetSigma, and GetWeight...  " << endl << endl;
+      spRec1.SetRectangularSigmas(Distance(10.,Distance::Meters),
+                                Distance(50., Distance::Meters),
+                                Distance(20., Distance::Meters));
+
+      cout << "Rectangular Coordinates kilometers:  "  << "X= ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::One,
+                              SurfacePoint::Kilometers);
+      cout << "   Y = ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::Two,
+                              SurfacePoint::Kilometers);
+      cout << "   Z = ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::Three,
+                              SurfacePoint::Kilometers);
+      cout << endl;
+
+      cout << "Rectangular Coordinates meters:  "  << "X= ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::One, SurfacePoint::Meters);
+      cout << "   Y = ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::Two, SurfacePoint::Meters);
+      cout << "   Z = ";
+      cout << spRec1.GetCoord(SurfacePoint::Rectangular, SurfacePoint::Three, SurfacePoint::Meters);
+      cout << endl;
+      
+      cout << "Rectangular sigmas kilometers:  "  << "X= ";
+      cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::One,
+                              SurfacePoint::Kilometers);
+      cout << "   Y = ";
+      cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::Two,
+                              SurfacePoint::Kilometers);
+      cout << "   Z = ";
+      cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::Three,
+                              SurfacePoint::Kilometers);
+      cout << endl;
+      
+      cout << "Using GetSigmaDistance, Rectangular sigmas kilometers:  "  << "X= ";
+      cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::One)
+        .kilometers();
+      cout << "   Y = ";
+      cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::Two)
+        .kilometers();
+      cout << "   Z = ";
+      cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::Three)
+        .kilometers();
+      cout << endl;
+
+    cout << "Rectangular sigmas meters:  "  << "X= ";
+    cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::One, SurfacePoint::Meters);
+    cout << "   Y = ";
+    cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::Two, SurfacePoint::Meters);
+    cout << "   Z = ";
+    cout << spRec1.GetSigma(SurfacePoint::Rectangular, SurfacePoint::Three, SurfacePoint::Meters);
+    cout << endl;
+
+    cout << "Using GetSigmaDistance, Rectangular sigmas meters:  "  << "X= ";
+    cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::One).meters();
+    cout << "   Y = ";
+    cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::Two).meters();
+    cout << "   Z = ";
+    cout << spRec1.GetSigmaDistance(SurfacePoint::Rectangular, SurfacePoint::Three).meters();
+    cout << endl;
+    
+    cout << "Rectangular Weights kilometers:  "  << "X = "; 
+    cout << spRec1.GetWeight(SurfacePoint::Rectangular, SurfacePoint::One) <<  "  Y = " 
+             << spRec1.GetWeight(SurfacePoint::Rectangular, SurfacePoint::Two) << "  Z = " 
+             << spRec1.GetWeight(SurfacePoint::Rectangular, SurfacePoint::Three) << endl;
+
+    cout << "Latitudinal Coordinates radians:  "  << "Latitude= ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::One, SurfacePoint::Radians);
+    cout << "   Longitude = ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Two, SurfacePoint::Radians);
+    cout << "   Local Radius = ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Three,
+                            SurfacePoint::Kilometers);
+    cout << endl;
+
+    cout << "Latitudinal Coordinates degrees:  "  << "Latitude= ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::One, SurfacePoint::Degrees);
+    cout << "   Longitude = ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Two, SurfacePoint::Degrees);
+    cout << "   Local Radius = ";
+    cout << spRec1.GetCoord(SurfacePoint::Latitudinal, SurfacePoint::Three, SurfacePoint::Meters);
+    cout << endl;
+    
+    cout << "Latitudinal weight degrees:  "  << "Latitude= ";
+    cout << spRec1.GetWeight(SurfacePoint::Latitudinal, SurfacePoint::One);
+    cout << "   Longitude = ";
+    cout << spRec1.GetWeight(SurfacePoint::Latitudinal, SurfacePoint::Two);
+    cout << "   Local Radius = ";
+    cout << spRec1.GetWeight(SurfacePoint::Latitudinal, SurfacePoint::Three);
+    cout << endl << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    // Test stringToCoordType and coordinateTypeToString
+    QString ctypeStr = "Latitudinal";
+    SurfacePoint::CoordinateType ctype = spRec1.stringToCoordinateType(ctypeStr);
+    cout << "Testing stringToCoordinateType with Latitudinal:  coordType = " << ctype << endl;
+    cout << "Testing coordinateTypeToString with coordType = 0:  coordTypeStr = " <<
+      spRec1.coordinateTypeToString(ctype)  << endl;
+    ctypeStr = "RectanGular";
+    ctype = spRec1.stringToCoordinateType(ctypeStr);
+    cout << "Testing stringToCoordinateType with Rectangular:  coordType = " << ctype << endl; 
+    cout << "Testing coordinateTypeToString with coordType = 1:  coordTypeStr = " << 
+         spRec1.coordinateTypeToString(ctype) << endl;
+    try {
+    // Test invalid coordinate type error condition
+      cout << endl;
+      cout << "Test invalid coordinate type error condition." << endl;
+      ctypeStr = "Garbage";
+      ctype = spRec1.stringToCoordinateType(ctypeStr);
+      cout << "Testing stringToCoordinateType with Garbage:  coordType = " << ctype << endl;
+   }
+   catch(Isis::IException &e) {
+     e.print();
+  }
+
+  cout << endl;
   cout << "Test computational methods..." << endl;
   cout << "  SphericalDistanceToPoint (i.e. haversine): ";
 

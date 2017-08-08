@@ -36,16 +36,18 @@
 namespace Isis {
 
   class ControlMeasure;
+  class LinearAlgebra;
+  class SparseBlockMatrix;
 
   /**
-   * This class holds information about a control point that BundleAdjust needs to run corretly.
+   * This class holds information about a control point that BundleAdjust needs to run correctly.
    * 
    * This class was created to extract functionality from BundleAdjust and wrap a ControlPoint
    * with the extra necessary information to correctly perform a bundle adjustment.
    *
    * Note that only non-ignored control points should be used to construct a BundleControlPoint.
    * Similarly, a BundleControlPoint should only contain non-ignored control measures.
-   * 
+   *
    * @author 2014-05-22 Ken Edmundson
    *
    * @internal
@@ -67,16 +69,41 @@ namespace Isis {
    *   @history 2016-10-27 Tyler Wilson - Modified formatRadiusAprioriSigmaString, formatAprioriSigmaString,
    *                          and formatBundleOutputDetailString to accept a third argument (bool solveRadius)
    *                          with a default value = false.  References #4317.
+   *   @history 2017-07-26 Debbie A. Cook - Added BundleSettings and metersToRadians as arguments 
+   *                           to constructor and moved setWeights call from BundleAdjust::init to 
+   *                           here.   Added m_bundleControlPointCoordinateType.  This option 
+   *                           determines how control point coordinates are entered into 
+   *                           BundleControlPoint, interpreted throughout the adjustment, and 
+   *                           output. The coordinate type needs to be in this class, because
+   *                           BundleControlPoints are created without a parent control net and added to 
+   *                           a control net later.  Made format methods generic in regards to coordinate type.
+   *                           Merged methods formatLatitudeAdjustedSigmaString, 
+   *                           formatLongitudeAdjustedSigmaString, and formatRadiusAdjustedSigmaString
+   *                           into a single generic coordinate method with an additional argument 
+   *                           for the coordinate index.  Did a similar merge for the family of  
+   *                           methods like formatLatitudeAprioriSigmaString.  Moved some of the
+   *                           functionality from BundleAdjust to this class as a new method 
+   *                           applyParameterCorrections.  Also had to move BundleAdjust method 
+   *                           productAlphaAV to this class to support applyParameterCorrections.
+   *                           References #4649 and #501.
    */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
     public:
-      BundleControlPoint(ControlPoint *point); // default constructor
+      // default constructor
+      BundleControlPoint(BundleSettingsQsp bundleSettings,
+                         ControlPoint *point,
+                         double metersToRadians);
+      // copy constructor
       BundleControlPoint(const BundleControlPoint &src);
+
+      //destructor
       ~BundleControlPoint();
 
-      // copy
+      // equals operator
       BundleControlPoint &operator=(const BundleControlPoint &src);// ??? not implemented
+
+      // copy method
       void copy(const BundleControlPoint &src);
 
       // mutators
@@ -86,7 +113,15 @@ namespace Isis {
       void setNumberOfRejectedMeasures(int numRejected);
       void setRejected(bool reject);
       void setWeights(const BundleSettingsQsp settings, double metersToRadians);
+      void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor); 
       void zeroNumberOfRejectedMeasures();
+      void productAlphaAV(double alpha,
+                          SparseBlockMatrix &sparseNormals,
+                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
+                          SparseBlockRowMatrix                                &Q,
+                          LinearAlgebra::Vector                               &v1);
+      void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+           SparseBlockMatrix &sparseNormals, double factor, const BundleTargetBodyQsp target);
 
       // accessors
       ControlPoint *rawControlPoint() const;
@@ -97,6 +132,8 @@ namespace Isis {
       SurfacePoint adjustedSurfacePoint() const;
       QString id() const;
       ControlPoint::PointType type() const;
+      SurfacePoint::CoordinateType coordTypeReports() const;
+      SurfacePoint::CoordinateType coordTypeBundle() const;
       boost::numeric::ublas::bounded_vector< double, 3 > &corrections();
       boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();
@@ -107,21 +144,31 @@ namespace Isis {
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
       QString formatBundleOutputDetailString(bool errorPropagation, double RTM, bool solveRadius=false) const;
+      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation, double RTM,
+                                                        bool solveRadius=false) const;
+      QString formatBundleRectangularOutputDetailString(bool errorPropagation) const;
       QString formatValue(double value, int fieldWidth, int precision) const;
-      QString formatAprioriSigmaString(int type, int fieldWidth, int precision, bool solveRadius=false) const;
-      QString formatLatitudeAprioriSigmaString(int fieldWidth, int precision) const;
-      QString formatLongitudeAprioriSigmaString(int fieldWidth, int precision) const;
-      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision, bool solveRadius=false) const;
-      QString formatAdjustedSigmaString(int type, int fieldWidth, int precision,
+      QString formatAprioriSigmaString(SurfacePoint::CoordIndex index, int fieldWidth,
+                                       int precision, bool solveRadius=false) const;
+      QString formatCoordAprioriSigmaString(SurfacePoint::CoordIndex index, int fieldWidth,
+                                            int precision, bool solveRadius=false) const;
+      QString formatAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                         bool errorPropagation) const;
-      QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
+      QString formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                                 bool errorPropagation) const;
-      QString formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
-                                                 bool errorPropagation) const;
-      QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
-                                              bool errorPropagation) const;
+//    QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
+//                                              bool errorPropagation) const;
+//    QString formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
+//                                               bool errorPropagation) const;
+//    QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
+//                                            bool errorPropagation) const;
 
     private:
+      // methods
+      void updateAdjustedSurfacePointLatitudinally(double factor,
+                                                   const BundleTargetBodyQsp target);
+      void updateAdjustedSurfacePointRectangularly(double factor);
+      
       //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;
 
@@ -137,6 +184,9 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;
       //! The CholMod matrix associated with this point
       SparseBlockRowMatrix m_cholmodQMatrix;
+      //! BundleControlPoint coordinate type
+      SurfacePoint::CoordinateType m_coordTypeReports;
+      SurfacePoint::CoordinateType m_coordTypeBundle;
   };
 
   // typedefs

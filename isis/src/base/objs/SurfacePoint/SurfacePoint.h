@@ -25,9 +25,13 @@
 #include <vector>
 #include <cmath>
 
+// Qt library
+#include <QString>
+
 #include "boost/numeric/ublas/symmetric.hpp"
 #include "boost/numeric/ublas/io.hpp"
 
+// ISIS library
 #include "Displacement.h"
 #include "Distance.h"
 #include "Angle.h"
@@ -81,10 +85,45 @@ namespace Isis {
    *   @history 2011-10-06 Steven Lambright - Get*SigmaDistance will no longer
    *                           throw an exception if there is no stored sigma
    *                           and there is no stored target radii.
+   *   @history 2017-06-25 Debbie A. Cook - Added CoordinateType, CoordUnits, and CoordIndex
+   *                           to support new convenience methods GetCoord, GetSigma, and GetWeight.
+   *                           Also added methods GetXWeight, GetYWeight, GetZWeight, LatToDouble, 
+   *                           LonToDouble, DistanceToDouble, DisplacementToDouble,  
+   *                           getCoordSigmaDistance, stringToCoordinateType, and 
+   *                           coordinateTypeToString.  Fixed comment in GetLocalRadiusWeight method 
+   *                           to indicate kilometers instead of meters.  References #4649 and #501.
+   *   @history 2017-07-25 Debbie A. Cook - corrected covar(2,2) units in SetSphericalSigmas,
+   *                           and all diagonal units in SetRectangularSigmas.  Corrected spelling 
+   *                           of equatorial in comments.  Corrected conversion of longitude sigma
+   *                           from meters to radians in SetSphericalSigmasDistance and from radians
+   *                           to meters in GetLonSigmaDistance.  Fixed SetRectangularMatrix to take
+   *                           input in km instead of m.
+   *                           
    */
 
   class SurfacePoint {
     public:
+
+      // definitions
+      /**
+       * Defines the coordinate typ, units, and coordinate index  for some of the output methods
+       */
+      enum CoordinateType {
+        Latitudinal,                       /**< Planetocentric latitudinal (lat/lon/rad) coordinates */
+        Rectangular                   /**< Body-fixed rectangular x/y/z coordinates */
+      }; 
+      enum CoordUnits {
+        Degrees,
+        Kilometers,
+        Meters,
+        Radians
+      };
+      enum CoordIndex {
+        One=0,
+        Two=1,
+        Three=2
+    };
+      
       // Constructors
 //      SurfacePoint(const std::vector <double> radii);
       SurfacePoint();
@@ -117,10 +156,12 @@ namespace Isis {
       void SetRectangular(const Displacement x, const Displacement y, const Displacement z,
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
 
+      void SetRectangularCoordinates(const Displacement &x, const Displacement &y,
+                                   const Displacement &z);
+
       //! Set surface point and sigmas in rectangular coordinates and convert to planetocentric
       void SetRectangularSigmas(const Distance &xSigma, const Distance &ySigma,
                                 const Distance &zSigma);
-
 
       void SetRectangularMatrix(
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
@@ -157,14 +198,33 @@ namespace Isis {
 
       void ResetLocalRadius(const Distance &radius);
       bool Valid() const;
-
+      
+// Generic utilities for convenience
+      
+      //! Set the covariance matrix
+      void SetMatrix(CoordinateType type,
+         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);        
+   
+      //! Compute partial derivative of conversion from body-fixed coordinates to the specified
+      //    coordinate type with respect to the indicated coordinate (specified by index).     
+      std::vector<double> Partial(CoordinateType type, CoordIndex index);
+      
 // Output methods
+      double GetCoord(CoordinateType type, CoordIndex index, CoordUnits units);
+      // Consider making this GetSigmaDistance and use the Distance methods to specify units for
+      // maximum flexibility and safety. ***TBD***
+      double GetSigma(CoordinateType type, CoordIndex index, CoordUnits units);
+      Distance GetSigmaDistance(CoordinateType type, CoordIndex index);
+      double GetWeight(CoordinateType type, CoordIndex index);
       Displacement GetX() const;
       Displacement GetY() const;
       Displacement GetZ() const;
       Distance GetXSigma() const;
       Distance GetYSigma() const;
       Distance GetZSigma() const;
+      double GetXWeight() const;
+      double GetYWeight() const;
+      double GetZWeight() const;
       boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
         GetRectangularMatrix() const;
       Latitude GetLatitude() const; 
@@ -181,10 +241,20 @@ namespace Isis {
       boost::numeric::ublas::symmetric_matrix
           <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
 
+// Conversion methods (for convenience)
+      double DisplacementToDouble(Displacement disp, CoordUnits units);
+      double DistanceToDouble(Distance dist, CoordUnits units);
+      double LatToDouble(Latitude lat, CoordUnits units);
+      double LonToDouble(Longitude lon, CoordUnits units);
+      static CoordinateType stringToCoordinateType(QString type);
+      static QString coordinateTypeToString(CoordinateType type);
+        
 // Computational methods
       Distance GetDistanceToPoint(const SurfacePoint &other) const;
       Distance GetDistanceToPoint(const SurfacePoint &other,
           const Distance &sphereRadius) const;
+      std::vector<double> LatitudinalDerivative(CoordIndex index);
+      std::vector<double> RectangularDerivative(CoordIndex index);
 
 // Misc methods
       void ToNaifArray(double naifOutput[3]) const;

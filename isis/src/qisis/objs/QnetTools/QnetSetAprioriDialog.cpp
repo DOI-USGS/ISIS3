@@ -551,9 +551,9 @@ namespace Isis {
       // longitude must be constrained.  This constrains x and y as well.
       else if (!(pt->GetPointTypeString() == "Fixed") &&
                !(pt->NumberOfConstrainedCoordinates() == 3) &&
-               !pt->IsLatitudeConstrained() &&
-               !pt->IsLongitudeConstrained() &&
-               !pt->IsRadiusConstrained()){
+               !pt->IsCoord1Constrained() &&
+               !pt->IsCoord2Constrained() &&
+               !pt->IsCoord3Constrained()){
         
         aprioriSurfacePoint.SetRectangular(
           Displacement(aprioriSurfacePoint.GetX().meters(), Displacement::Meters),

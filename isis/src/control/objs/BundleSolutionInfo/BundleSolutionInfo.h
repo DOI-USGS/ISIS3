@@ -27,6 +27,7 @@
 #include <QString>
 
 #include "BundleSettings.h"
+#include "SurfacePoint.h"
 
 #include "XmlStackedHandler.h"
 
@@ -144,6 +145,9 @@ namespace Isis {
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
+      QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                    SurfacePoint::CoordIndex coordInx) const;
+      
     public slots:
       void updateFileName(Project *);
 
@@ -169,6 +173,8 @@ namespace Isis {
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
+          QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                        SurfacePoint::CoordIndex coordIdx) const;
 
         private:
           Q_DISABLE_COPY(XmlHandler);

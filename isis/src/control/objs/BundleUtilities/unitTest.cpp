@@ -1,15 +1,3 @@
-#include <QByteArray>
-#include <QDebug>
-#include <QDataStream>
-#include <QFile>
-#include <QIODevice>
-#include <QString>
-#include <QXmlInputSource>
-#include <QXmlStreamWriter>
-
-#include <boost/numeric/ublas/symmetric.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-
 #include "Angle.h"
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
@@ -20,6 +8,7 @@
 #include "BundleSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
@@ -36,6 +25,18 @@
 #include "Target.h"
 #include "XmlStackedHandlerReader.h"
 
+#include <QByteArray>
+#include <QDebug>
+#include <QDataStream>
+#include <QFile>
+#include <QIODevice>
+#include <QString>
+#include <QXmlInputSource>
+#include <QXmlStreamWriter>
+
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+
 using namespace std;
 using namespace Isis;
 
@@ -49,6 +50,12 @@ void printXml(const BundleObservationSolveSettings &);
  *
  * @internal
  *   @history 2014-12-11 - Original version.
+ *   @history 2017-06-26 Debbie A. Cook - Updated to reflect changes made to BundleControlPoint. 
+ *                               Some tests were no longer valid and new tests were added to exercise the
+ *                               new option of adjusting in Rectangular coordinates.  The Latitudinal covariance
+ *                               was being populated only along the diagonal (using the latitudinal sigmas).  This
+ *                               produced inaccurate results.  Now it is created by converting  the rectangular 
+ *                               covariance matrix to latitudinal.  References #4649 and #501.
  */
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
@@ -98,6 +105,16 @@ namespace Isis {
  *   @history 2016-12-01 Ian Humphrey - Added extra qDebug() stream so the "apply param
  *                           corrections successful?" string will be in the unitTest output.
  *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
+ *   @history 2017-03-05 Debbie A. Cook - updated to conform to changes made to 
+ *                            BundleControlPointConstructor.  Fixed test 
+ *                             "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0"
+ *                             to output radius type as free instead of N/A under Inital Accuracy column and
+ *                             fixed weight value to be 0.  Corrections were made by creating a new contol
+ *                             point when the settings were changed instead of just calling setWeights.
+ *                             Deleted tests "Modified FreePoint - setWeights, "Modify FixedPoint -  
+ *                             setWeights() and ModifyConstrainedPoint - setWeights()" since 
+ *                             setWeights is always called in the constructor now.  References 
+ *                             #4649 and #501
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -579,8 +596,11 @@ int main(int argc, char *argv[]) {
     #if 0
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
     #endif
-    qDebug() << "Create FreePoint with free point containing 2 measures..."
-        << "(note that first measure is ignored, second measure is not ignored)";
+    // #1 Test free point with default settings (solveRadius=false), no apriori coordinate values or
+    //       sigmas (other settings: observation mode = false, update =false, errorProp = false)
+    qDebug() << "BCP test 1 - Create FreePoint with free point containing 2 measures "
+          "(note that first measure is ignored, second measure is not ignored)";
+    qDebug()  << "     and no apriori or adjusted coordinate values or sigmas set...";
     ControlPoint *freePoint = new ControlPoint("FreePoint");
     ControlMeasure *cm1 = new ControlMeasure;
     cm1->SetCubeSerialNumber("Ignored");
@@ -592,9 +612,12 @@ int main(int argc, char *argv[]) {
     cm2->SetCoordinate(1.0, 2.0);
     cm2->SetResidual(-3.0, 4.0);
     freePoint->Add(cm2);
-    BundleControlPoint bcp1(freePoint);
-    bool errorProp = false;
+// Moved these lines up from below (DAC 2-25-2017)
+    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
     double radiansToMeters = 10.0;
+    double metersToRadians = 1.0 / radiansToMeters;
+    BundleControlPoint bcp1(settings, freePoint, metersToRadians);
+    bool errorProp = false;
 
     qDebug() << "Type of BundleControlPoint 1:" << bcp1.type();
 
@@ -611,10 +634,11 @@ int main(int argc, char *argv[]) {
     bcp1.zeroNumberOfRejectedMeasures();
     qDebug() << "Zero out number of rejected measures:" << bcp1.numberOfRejectedMeasures();
 
-    // ??? these print outs are not pretty... fix???
+    // ??? these print outs are not pretty... fix??? 
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
-    // ??? these print outs are not pretty... fix???
+    // ??? these print outs are not pretty... fix??? improved somewhat 6-9-2017
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    // Test free point.  Settings same, but errorProp = true)
     errorProp = true;
     // ??? these print outs are not pretty... fix???
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
@@ -622,7 +646,9 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     qDebug() << "";
 
-    qDebug() << "Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()";
+// #2 Same as test 1, but assign coordinate values (0., 0., 10.) to adjusted surface points of FREE 
+//       point with solve radius still false -- radius weight is fixed (1.0e+50).  Other coordinates are free
+    qDebug() << "BCP test 2 - Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()";
     SurfacePoint sp1(Latitude(0.0, Angle::Degrees),
                      Longitude(0.0, Angle::Degrees),
                      Distance(10.0, Distance::Meters));
@@ -637,13 +663,22 @@ int main(int argc, char *argv[]) {
     // ??? these print outs are not pretty... fix???
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
 
-    qDebug() << "Modify FreePoint - setWeights() - solveRadius=false";
-    // default solveRadius=false
-    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
-    double metersToRadians = 1.0 / radiansToMeters;
-    bcp1.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    // Same but look at values of aprioriSigmas, weights, corrections, etc.
+    // qDebug() << "Modify FreePoint - setWeights() - solveRadius=false";
+    // Deleted summary and detail output here since it is duplicated now that the BCP and the
+    // constructor always calls setWeights now.;
+// Before the change, test2 checked default settings and default weights.  Omitted test checked
+// BCP creation using a blank settings (equivalent to no settings) and a setWeights call that only
+// specifies solveRadius to false, which is the same as the default.
+// default solveRadius=false
+
+    // These now commented lines were moved to before creation of bcp1 and
+    //   setWeights now happens in BundleControlPoint constructor (DAC 2-25-2017)
+    // BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    // double metersToRadians = 1.0 / radiansToMeters;
+    // bcp1.setWeights(settings, metersToRadians);
+    // qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
+    // qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     boost::numeric::ublas::bounded_vector< double, 3 > aprioriSigmas = bcp1.aprioriSigmas();
     boost::numeric::ublas::bounded_vector< double, 3 > weights = bcp1.weights();
     //??? never set 000??? init to 1.0e+50???
@@ -669,14 +704,30 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Residual rms:" << bcp1.residualRms();
     qDebug() << "";
+// end test 2
 
-    qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0";
-    settings->setSolveOptions(false, false, false, true, Isis::Null);
-    bcp1.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp1.aprioriSigmas();
-    weights = bcp1.weights();
+    // #3 Test free point with solveRadius=true (default), no corrections or valid sigmas
+    qDebug() << "BCP test 3 - Create FreePoint - identical to previous, but with solveRadius=true";
+    qDebug() << " and apriori lat/lon/rad <= 0.  Test adding a measure to a BundleControlPoint.";
+//  Create a new BundleControlPoint like the previous one with settings to indicate radius is free
+    settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
+                              SurfacePoint::Latitudinal, Isis::Null);
+    BundleControlPoint bcp1a(settings, freePoint, metersToRadians);
+    bcp1a.setAdjustedSurfacePoint(sp1);
+    BundleMeasure bcm1a = *(bcp1a.addMeasure(cm1));
+//  Note:  This test was abusing the setWeights method of BundleControlPoint.
+//  It was using setWeights to update bcp1 with new BundleSettings; in particular,
+//  it was changing the solveRadius bool from false to true.  This did not work
+//  properly because setWeights was designed to update weights after they were
+//  initialized by the constructor.  The radius weight was set to 1.0e+50 when bcp1
+//  was created with solveRadius set to false.  When setWeights was used to update
+//  the settings, the radius weight was not changed back.  setWeights should NOT
+//  be used to update BundleSettings.  This is likely only a test issue.
+    qDebug().noquote() << bcp1a.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1a.formatBundleOutputDetailString(errorProp, radiansToMeters,
+                                                          true);
+    aprioriSigmas = bcp1a.aprioriSigmas();
+    weights = bcp1a.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
@@ -684,13 +735,19 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0";
-    settings->setSolveOptions(false, false, false, true, 2.0, 3.0, 4.0);
-    bcp1.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp1.aprioriSigmas();
-    weights = bcp1.weights();
+// #4 Test with global sigmas now.  Everything else is the same as test #3.
+    qDebug() << "BCP test 4 - Create FreePoint - solveRadius=true, apriori lat/lon/rad > 0 ";
+    qDebug() << "                    from globals - coordinate type = Latitudinal";
+    settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal, 
+                              SurfacePoint::Latitudinal, 2.0, 3.0, 4.0);
+    BundleControlPoint bcp1b(settings, freePoint, metersToRadians);
+    bcp1b.setAdjustedSurfacePoint(sp1);
+    BundleMeasure bcm1b = *(bcp1b.addMeasure(cm1));
+    // bcp1.setWeights(settings, metersToRadians);
+    qDebug().noquote() << bcp1b.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1b.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp1b.aprioriSigmas();
+    weights = bcp1b.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
@@ -698,33 +755,44 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    ControlPoint *cp = bcp1.rawControlPoint();
+    ControlPoint *cp = bcp1b.rawControlPoint();
     qDebug() << "Raw control point equal to original?    " << toString(*cp == *freePoint);
-    qDebug() << "Raw control point is rejected?          " << toString(bcp1.isRejected());
-    SurfacePoint sp = bcp1.adjustedSurfacePoint();
+    qDebug() << "Raw control point is rejected?          " << toString(bcp1b.isRejected());
+    SurfacePoint sp = bcp1b.adjustedSurfacePoint();
     qDebug() << "Adjusted SurfacePoint (Lat, Lon, Rad) = "
                << toString(sp.GetLatitude().degrees())
                << toString(sp.GetLongitude().degrees())
                << toString(sp.GetLocalRadius().meters());
     qDebug() << "";
 
-    qDebug() << "Create FixedPoint from empty fixed point, adjusted surface point (90, 180, 10)...";
+// Testing of Free point settings is complete
+
+//  Fixed point tests
+    qDebug() << "BCP test 5 - Create FixedPoint from empty fixed point, solveRadius = F"
+                            " adjusted surface point (90, 180, 10)...";
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
     fixedPoint->SetType(ControlPoint::Fixed);
-    BundleControlPoint *bcp3 = new BundleControlPoint(fixedPoint);
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal,
+                              SurfacePoint::Latitudinal, Isis::Null);
+    BundleControlPoint *bcp3a = new BundleControlPoint(settings, fixedPoint, metersToRadians);
     SurfacePoint sp2(Latitude(90.0, Angle::Degrees),
                      Longitude(180.0, Angle::Degrees),
                      Distance(10.0, Distance::Meters));
-    bcp3->setAdjustedSurfacePoint(sp2);
-    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
+    bcp3a->setAdjustedSurfacePoint(sp2);
+    qDebug().noquote() << bcp3a->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3a->formatBundleOutputDetailString(errorProp, radiansToMeters);
 
-    qDebug() << "Modify FixedPoint - setWeights()";
-    bcp3->setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp3->aprioriSigmas();
-    weights = bcp3->weights();
+    qDebug() << "BCP test 6 - Create FixedPoint from empty fixed point, solveRadius = True";  
+    qDebug() << " adjusted surface point (90, 180, 10)...";
+settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
+                          SurfacePoint::Latitudinal, Isis::Null);
+    BundleControlPoint *bcp3b = new BundleControlPoint(settings, fixedPoint, metersToRadians);
+    bcp3b->setAdjustedSurfacePoint(sp2);
+    qDebug().noquote() << bcp3b->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3b->formatBundleOutputDetailString(errorProp, radiansToMeters,
+                                                           true);
+    aprioriSigmas = bcp3b->aprioriSigmas();
+    weights = bcp3b->weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
@@ -732,21 +800,21 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    qDebug() << "Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)...";
+// Testing of FixedPoint output completed
+
+// #7 ConstrainedPoint test with surface point with coordinates only.  SolveRadius is false.
+     qDebug() << "BCP test 7 - Create ConstrainedPoint with solveRadius=false and adjusted "
+                            "surface point (0, 0, 10), no constraints set, coordType=Latitudinal ...";
     ControlPoint *constrainedPoint = new ControlPoint("ConstrainedPoint");
     constrainedPoint->SetType(ControlPoint::Constrained);
-    BundleControlPoint bcp4(constrainedPoint);
-    bcp4.setAdjustedSurfacePoint(sp1);
-    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
-
-    qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=false";
     settings->setSolveOptions(false, false, false, false);
-    bcp4.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp4.aprioriSigmas();
-    weights = bcp4.weights();
+    BundleControlPoint bcp4a(settings, constrainedPoint, metersToRadians);
+    bcp4a.setAdjustedSurfacePoint(sp1);
+    // bcp4.setWeights(settings, metersToRadians);
+    qDebug().noquote() << bcp4a.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4a.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp4a.aprioriSigmas();
+    weights = bcp4a.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
@@ -754,14 +822,19 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
-                "apriori lat/lon/rad <= 0";
+// #8 ConstrainedPoint with no constraints, but solveRadius=true
+    qDebug() << "BCP test 8 - Create ConstrainedPoint - no constraints, solveRadius=true, "
+               "apriori lat/lon/rad <= 0, ";
+    qDebug() << "     and adjustedsurface point (0, 0, 10)";
     settings->setSolveOptions(false, false, false, true);
-    bcp4.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp4.aprioriSigmas();
-    weights = bcp4.weights();
+    // bcp4.setWeights(settings, metersToRadians);
+    BundleControlPoint bcp4b(settings, constrainedPoint, metersToRadians);
+    bcp4b.setAdjustedSurfacePoint(sp1);
+    qDebug().noquote() << bcp4b.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4b.formatBundleOutputDetailString(errorProp, radiansToMeters,
+                                                          true);
+    aprioriSigmas = bcp4b.aprioriSigmas();
+    weights = bcp4b.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
@@ -769,14 +842,18 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
-                "apriori lat/lon/rad > 0";
-    settings->setSolveOptions(false, false, false, true, 2.0, 3.0, 4.0);
-    bcp4.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp4.aprioriSigmas();
-    weights = bcp4.weights();
+// #9 ConstrainedPoint with no constraints set, solveRadius=true, and valid global sigmas.
+    qDebug() << "BCP test 9 - Create ConstrainedPoint - no constraints,  solveRadius=true,"
+                " apriori lat/lon/rad > 0 (valid global sigmas)";
+    settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
+                               SurfacePoint::Latitudinal, 2.0, 3.0, 4.0);
+    // bcp4.setWeights(settings, metersToRadians);
+    BundleControlPoint bcp4c(settings, constrainedPoint, metersToRadians);
+    bcp4c.setAdjustedSurfacePoint(sp1);
+    qDebug().noquote() << bcp4c.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4c.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp4c.aprioriSigmas();
+    weights = bcp4c.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
@@ -785,8 +862,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "";
 
-    qDebug() << "Create ConstrainedPoint from constrained point with adjusted surface point "
-                "(32, 120, 1000)...";
+// #10 ConstrainedPoint with apriori and adjusted surface points fully set and solveRadius=F.
+    qDebug() << "BCP test 10 - Create ConstrainedPoint from constrained point with adjusted  ";
+    qDebug() << "    pt (32, 120, 1000) & apriori pt with constraints from covar, solveRadius=F...";
     SurfacePoint aprioriSurfPt;
     aprioriSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
                            Distance(1000.0, Distance::Meters),
@@ -794,34 +872,52 @@ int main(int argc, char *argv[]) {
     boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covar;
     covar.resize(3);
     covar.clear();
-    covar(0,0) = 100.0;
-    covar(1,1) = 2500.0;
-    covar(2,2) = 400.0;
+    covar(0,0) = .0001;
+    covar(1,1) = .0025;
+    covar(2,2) = .0004;
     aprioriSurfPt.SetRectangular(Displacement(-424.024048, Displacement::Meters),
                                  Displacement(734.4311949, Displacement::Meters),
                                  Displacement(529.919264, Displacement::Meters), covar);
+// Extract the covar matrix converted to latitudinal coordinates now to use for test 10.
+// Usage note:  In order to get accurate results, the full correlation matrix should be
+// used as opposed to only setting the diagonal elements with the sigmas. 
+    boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covarLat(3);
+    covarLat.clear();
+    covarLat = aprioriSurfPt.GetSphericalMatrix();
+
+// These results match what is being set in adjusted surface point.  
+    Angle latSigma = aprioriSurfPt.GetLatSigma();
+    Angle lonSigma = aprioriSurfPt.GetLonSigma();
+    Distance localRad = aprioriSurfPt.GetLocalRadiusSigma();
     constrainedPoint->SetAprioriSurfacePoint(aprioriSurfPt);
-    BundleControlPoint bcp5(constrainedPoint);
+    settings->setSolveOptions(false, false, false, false);
+    BundleControlPoint bcp5a(settings, constrainedPoint, metersToRadians);
     SurfacePoint adjustedSurfPt(constrainedPoint->GetAdjustedSurfacePoint());
     adjustedSurfPt.SetSpherical(Latitude(32., Angle::Degrees),
                                 Longitude(120., Angle::Degrees),
                                 Distance(1000., Distance::Meters),
-                                Angle(1.64192315,Angle::Degrees),
-                                Angle(1.78752107, Angle::Degrees),
-                                Distance(38.454887335682053718134171237789, Distance::Meters));
+                                covarLat);
+                                // Angle(1.64192315,Angle::Degrees),
+                                // Angle(1.78752107, Angle::Degrees),
+                                // Distance(38.454887335682053718134171237789, Distance::Meters));
     adjustedSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
                             Distance(1000.0, Distance::Meters),
                             Distance(1000.0, Distance::Meters));
-    bcp5.setAdjustedSurfacePoint(adjustedSurfPt);
-    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained";
-    bcp5.setWeights(settings, metersToRadians);
-    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug().noquote() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    aprioriSigmas = bcp5.aprioriSigmas(); // these values were verified by comparing against
+    bcp5a.setAdjustedSurfacePoint(adjustedSurfPt);
+    qDebug().noquote() << bcp5a.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp5a.formatBundleOutputDetailString(errorProp, radiansToMeters);
+
+// #11 ConstrainedPoint with apriori and adjusted surface points fully set and solveRadius=T.
+    qDebug() << "BCP test 11 - Create ConstrainedPoint from constrained point with adjusted  surface"
+                " pt (32, 120, 1000) ";
+    qDebug() << "     & apriori pt with constraints from covar, solveRadius=T...";
+    settings->setSolveOptions(false, false, false, true);
+    BundleControlPoint bcp5b(settings, constrainedPoint, metersToRadians);
+    qDebug().noquote() << bcp5b.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp5b.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp5b.aprioriSigmas(); // these values were verified by comparing against
                                           // SurfacePoint truth data
-    weights = bcp5.weights();
+    weights = bcp5b.weights();
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
@@ -829,31 +925,140 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "";
 
-    qDebug() << "Create copy of FreePoint using copy constructor...";
-    BundleControlPoint bcp2(bcp1);
+// #12 FreePoint - test copy constructor by copying bcp1b
+    qDebug() << "BCP test 12 - Create copy of FreePoint using copy constructor...";
+// Should we use bundleSettings or settings here?
+    BundleControlPoint bcp2(bcp1b);
     qDebug().noquote() << bcp2.formatBundleOutputSummaryString(errorProp);
     //solveForRadius = false by default in formatBundleDetailString
     qDebug() << "Output for formatBundleOutputDetailString(...) with solveForRadius = false:";
     qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     //solveForRadius = true
-    qDebug() << "Output for formatBundleOutputDetailString(...) with solveForRadius = true:";
+    qDebug() << "BCP test 13 - Output for formatBundleOutputDetailString(...) with "
+                           "solveForRadius = true:";
     qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters,true);
 
     qDebug() << "";
 
-    qDebug() << "Overwrite existing object with FixedPoint information...";
-    bcp2.copy(*bcp3);
+    qDebug() << "BCP test 14 - Overwrite existing object with FixedPoint information...";
+    bcp2.copy(*bcp3b);
     qDebug().noquote() << bcp2.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
     qDebug() << "";
+
+    qDebug() << "BCP test 15 - Coordtype=Rect, Free, solveRad=F";
+    // ControlNet net(SurfacePoint::Rectangular);
+    // net.AddPoint(bcp1.rawControlPoint());
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                          SurfacePoint::Rectangular);
+    BundleControlPoint bcp1c(settings, freePoint, metersToRadians);
+    qDebug().noquote() << bcp1c.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1c.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    weights = bcp1c.weights();
+    qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
+    qDebug() << "";
+
+    qDebug() << "BCP test 16 - Coordtype=Rect, Free, solveRad=T";
+    settings->setSolveOptions(false, false, false, true, SurfacePoint::Rectangular,
+                              SurfacePoint::Rectangular, 2.0, 3.0, 4.0);
+    BundleControlPoint bcp1d(settings, freePoint, metersToRadians);
+    qDebug().noquote() << bcp1d.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1d.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    weights = bcp1d.weights();
+    qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
+    qDebug() << "";
+    qDebug() << "";
+
+    qDebug() << "BCP test 17 - Coordtype=Rect, Fixed, solveRad=F";
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                              SurfacePoint::Rectangular, 2.0, 3.0, 4.0);
+    sp2.SetRectangular(Displacement(0.0, Displacement::Meters),
+                     Displacement(0.0, Displacement::Meters),
+                     Displacement(1000.0, Displacement::Meters));
+    BundleControlPoint *bcp3c = new BundleControlPoint(settings, fixedPoint, metersToRadians);
+    bcp3c->setAdjustedSurfacePoint(sp2);
+    qDebug().noquote() << bcp3c->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3c->formatBundleOutputDetailString(errorProp, radiansToMeters);
+    weights = bcp3c->weights();
+    qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
+    qDebug() << "";
+    qDebug() << "";
+
+// #18 ConstrainedPoint test with surface point with coordinates only.  SolveRadius is false.
+     qDebug() << "BCP test 18 - Create ConstrainedPoint with solveRadius=false and adjusted "
+                            "surface point (0, 0, 1000), no constraints set, and coordType = Rect ...";
+    SurfacePoint sp3(Displacement(0.0, Displacement::Meters),
+                     Displacement(0.0, Displacement::Meters),
+                     Displacement(1000.0, Displacement::Meters));
+    ControlPoint *constrainedPointRect = new ControlPoint("ConstrainedPoint");
+    constrainedPointRect->SetType(ControlPoint::Constrained);
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                          SurfacePoint::Rectangular);
+    BundleControlPoint bcp4d(settings, constrainedPointRect, metersToRadians);
+    bcp4d.setAdjustedSurfacePoint(sp3);
+    qDebug().noquote() << bcp4d.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4d.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp4d.aprioriSigmas();
+    weights = bcp4d.weights();
+    qDebug() << "aprioriSigmas:  "
+               << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
+               << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
+               << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
+    qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
+    qDebug() << "";
+
+// #19 ConstrainedPoint test with surface point with coordinates only.  SolveRadius is false.
+     qDebug() << "BCP test 19 - Create ConstrainedPoint with solveRadius=false and adjusted "
+                            "surface point (0, 0, 1000), valid globals, and coordType = Rect ...";
+    // SurfacePoint sp3(Displacement(0.0, Displacement::Meters),
+    //                  Displacement(0.0, Displacement::Meters),
+    //                  Displacement(1000.0, Displacement::Meters));
+    // ControlPoint *constrainedPointRect = new ControlPoint("ConstrainedPoint");
+    // constrainedPointRect->SetType(ControlPoint::Constrained);
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                              SurfacePoint::Rectangular, 2.0, 3.0, 4.0);
+    BundleControlPoint bcp4e(settings, constrainedPointRect, metersToRadians);
+    bcp4e.setAdjustedSurfacePoint(sp3);
+    qDebug().noquote() << bcp4e.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4e.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    aprioriSigmas = bcp4e.aprioriSigmas();
+    weights = bcp4e.weights();
+    qDebug() << "aprioriSigmas:  "
+               << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
+               << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
+               << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
+    qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
+    qDebug() << "";
+
+// #20 ConstrainedPoint with apriori and adjusted surface points fully set and solveRadius=F.
+    qDebug() << "BCP test 20 - Create ConstrainedPoint from constrained point with adjusted  ";
+    qDebug() << " pt (32, 120, 1000) & apriori pt from Test 10 with constraints from covar, solveRadius=F, ";
+    qDebug() << "coordType=Rectangular...";
+    qDebug() << "";
+// This test uses an apriori surface point set with rectangular coordinates and sigmas.  The adjusted
+// surface point is set with latitudinal coordinates equivalent to the apriori surface point coordinates.
+// The covar for the adjusted surface point is generated from the apriori covar converted to latitudinal
+// coordinates.  Using just the sigmas to set the diagonal elements of the covar is not accurate.
+    constrainedPointRect->SetAprioriSurfacePoint(aprioriSurfPt);
+settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular, SurfacePoint::Rectangular);
+    BundleControlPoint bcp5c(settings, constrainedPointRect, metersToRadians);
+    bcp5c.setAdjustedSurfacePoint(adjustedSurfPt);
+    qDebug().noquote() << bcp5c.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp5c.formatBundleOutputDetailString(errorProp, radiansToMeters);
+
+// #21 Test error condition - invalid BundleControlPoint coordinate type
+    qDebug() << "BCP test 21 - Test invalid coordinate type  ";
+    qDebug() << "";
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::CoordinateType(3));
+
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleMeasure...";
 
     // TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 86% //TODO update when SquishCoco works again
-    BundleMeasure bundleMeasure(cm2, bcp3);
+    BundleMeasure bundleMeasure(cm2, bcp3b);
 
     try {
       bundleMeasure.observationSolveSettings();

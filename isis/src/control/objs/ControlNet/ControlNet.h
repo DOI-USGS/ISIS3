@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "ControlNetFile.h"
+#include "SurfacePoint.h"
 
 #include <QString>
 
@@ -203,6 +204,10 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Added check to SetImages() to make sure it isn't called
    *                           more than once, which messes up the p_cameraList member. References
    *                           #4293.
+   *   @history 2017-05-30 Debbie A. Cook - Added an optional argument to the constructior 
+   *                           for the control point coordinate type.  At this point this value is only 
+   *                           stored in the active ControlNet.  It will be added to the stored 
+   *                           ControlNet at a later date.  References #4649 and #501.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -211,9 +216,10 @@ namespace Isis {
       friend class ControlPoint;
 
     public:
-      ControlNet();
+      ControlNet(SurfacePoint::CoordinateType = SurfacePoint::Latitudinal);
       ControlNet(const ControlNet &other);
-      ControlNet(const QString &filename, Progress *progress = 0);
+      ControlNet(const QString &filename, Progress *progress = 0,
+                 SurfacePoint::CoordinateType = SurfacePoint::Latitudinal);
 
       ~ControlNet();
 
@@ -280,6 +286,7 @@ namespace Isis {
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
+      SurfacePoint::CoordinateType GetCoordType();
 
       void SetCreatedDate(const QString &date);
       void SetDescription(const QString &newDescription);
@@ -295,6 +302,7 @@ namespace Isis {
       void SetTarget(const QString &target,
                      const QVector<Distance> &radii);
       void SetUserName(const QString &name);
+      void SetCoordType(SurfacePoint::CoordinateType coordType);
 
       void swap(ControlNet &other);
       ControlNet &operator=(const ControlNet &other);
@@ -439,7 +447,8 @@ namespace Isis {
       std::vector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool p_invalid;  //!< If the Control Network is currently invalid
-      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
+      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
+      SurfacePoint::CoordinateType m_coordType; //!< The coordinate type of the control points
   };
 
   //! This typedef is for future implementation of target body

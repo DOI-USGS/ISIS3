@@ -58,9 +58,9 @@ namespace Isis {
     m_outlierRejectionMultiplier = 1.0;
 
     // Parameter Uncertainties (Weighting)
-    m_globalLatitudeAprioriSigma  = Isis::Null;
-    m_globalLongitudeAprioriSigma = Isis::Null;
-    m_globalRadiusAprioriSigma    = Isis::Null;
+    m_globalPointCoord1AprioriSigma  = Isis::Null;
+    m_globalPointCoord2AprioriSigma = Isis::Null;
+    m_globalPointCoord3AprioriSigma    = Isis::Null;
 
     // Convergence Criteria
     m_convergenceCriteria = BundleSettings::Sigma0;
@@ -78,6 +78,10 @@ namespace Isis {
 //    m_solveTargetBodyZeroMeridian = false;
 //    m_solveTargetBodyRotationRate = false;
 //    m_solveTargetBodyRadiusMethod = None;
+
+    //Control Points
+    m_cpCoordTypeReports = SurfacePoint::Latitudinal;
+    m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
 
     // Output Options
     m_outputFilePrefix = "";
@@ -123,9 +127,9 @@ namespace Isis {
         m_createInverseMatrix(other.m_createInverseMatrix),
         m_outlierRejection(other.m_outlierRejection),
         m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
-        m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
-        m_globalLongitudeAprioriSigma(other.m_globalLongitudeAprioriSigma),
-        m_globalRadiusAprioriSigma(other.m_globalRadiusAprioriSigma),
+        m_globalPointCoord1AprioriSigma(other.m_globalPointCoord1AprioriSigma),
+        m_globalPointCoord2AprioriSigma(other.m_globalPointCoord2AprioriSigma),
+        m_globalPointCoord3AprioriSigma(other.m_globalPointCoord3AprioriSigma),
         m_observationSolveSettings(other.m_observationSolveSettings),
         m_convergenceCriteria(other.m_convergenceCriteria),
         m_convergenceCriteriaThreshold(other.m_convergenceCriteriaThreshold),
@@ -133,6 +137,8 @@ namespace Isis {
         m_maximumLikelihood(other.m_maximumLikelihood),
         m_solveTargetBody(other.m_solveTargetBody),
         m_bundleTargetBody(other.m_bundleTargetBody),
+        m_cpCoordTypeReports(other.m_cpCoordTypeReports),
+        m_cpCoordTypeBundle(other.m_cpCoordTypeBundle),
         m_outputFilePrefix(other.m_outputFilePrefix){
   }
 
@@ -151,6 +157,10 @@ namespace Isis {
    * @param other The BundleSettings object to be copied.
    *
    * @return @b BundleSettings& A reference to the copied BundleSettings object.
+   *
+   * @internal
+   *   @history 2017-07-04 Debbie A. Cook - Added new coordType members and made
+   *                           global coordinate names generic.
    */
   BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
     if (&other != this) {
@@ -162,15 +172,17 @@ namespace Isis {
       m_createInverseMatrix = other.m_createInverseMatrix;
       m_outlierRejection = other.m_outlierRejection;
       m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
-      m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
-      m_globalLongitudeAprioriSigma = other.m_globalLongitudeAprioriSigma;
-      m_globalRadiusAprioriSigma = other.m_globalRadiusAprioriSigma;
+      m_globalPointCoord1AprioriSigma = other.m_globalPointCoord1AprioriSigma;
+      m_globalPointCoord2AprioriSigma = other.m_globalPointCoord2AprioriSigma;
+      m_globalPointCoord3AprioriSigma = other.m_globalPointCoord3AprioriSigma;
       m_observationSolveSettings = other.m_observationSolveSettings;
       m_convergenceCriteria = other.m_convergenceCriteria;
       m_convergenceCriteriaThreshold = other.m_convergenceCriteriaThreshold;
       m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
       m_solveTargetBody = other.m_solveTargetBody;
       m_bundleTargetBody = other.m_bundleTargetBody;
+      m_cpCoordTypeReports = other.m_cpCoordTypeReports;
+      m_cpCoordTypeBundle = other.m_cpCoordTypeBundle;
       m_maximumLikelihood = other.m_maximumLikelihood;
       m_outputFilePrefix = other.m_outputFilePrefix;
     }
@@ -223,41 +235,60 @@ namespace Isis {
    * @param errorPropagation A boolean value indicating whether to use the
    *                         cholmod library's error propagation.
    * @param solveRadius A boolean value indicating whether to solve for radius.
-   * @param globalLatitudeAprioriSigma The global a priori sigma for latitude.
-   * @param globalLongitudeAprioriSigma The global a priori sigma for longitude.
-   * @param globalRadiusAprioriSigma The global a priori sigma for radius.
+   * @param coordType The type of coordinates used for control points
+   * @param globalPointCoord1AprioriSigma The global a priori sigma for latitude.
+   * @param globalPointCoord2AprioriSigma The global a priori sigma for longitude.
+   * @param globalPointCoord3AprioriSigma The global a priori sigma for radius.
    */
   void BundleSettings::setSolveOptions(bool solveObservationMode,
                                        bool updateCubeLabel,
                                        bool errorPropagation,
                                        bool solveRadius,
-                                       double globalLatitudeAprioriSigma,
-                                       double globalLongitudeAprioriSigma,
-                                       double globalRadiusAprioriSigma) {
+                                       SurfacePoint::CoordinateType coordTypeBundle,
+                                       SurfacePoint::CoordinateType coordTypeReports,
+                                       double globalPointCoord1AprioriSigma, 
+                                       double globalPointCoord2AprioriSigma, 
+                                       double globalPointCoord3AprioriSigma) {
     m_solveObservationMode = solveObservationMode;
     m_solveRadius = solveRadius;
     m_updateCubeLabel = updateCubeLabel;
-    m_errorPropagation = errorPropagation;
+    m_errorPropagation = errorPropagation;      
+    m_cpCoordTypeReports = coordTypeReports;
+    m_cpCoordTypeBundle = coordTypeBundle;
+    // m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
 
-    if (globalLatitudeAprioriSigma > 0.0) { // otherwise, we leave as default Isis::Null
-      m_globalLatitudeAprioriSigma = globalLatitudeAprioriSigma;
+    if (globalPointCoord1AprioriSigma > 0.0) { // otherwise, we leave as default Isis::Null
+      m_globalPointCoord1AprioriSigma = globalPointCoord1AprioriSigma;
     }
     else {
-      m_globalLatitudeAprioriSigma = Isis::Null;
+      m_globalPointCoord1AprioriSigma = Isis::Null;
     }
 
-    if (globalLongitudeAprioriSigma > 0.0) {
-      m_globalLongitudeAprioriSigma = globalLongitudeAprioriSigma;
+    if (globalPointCoord2AprioriSigma > 0.0) {
+      m_globalPointCoord2AprioriSigma = globalPointCoord2AprioriSigma;
     }
     else {
-      m_globalLongitudeAprioriSigma = Isis::Null;
+      m_globalPointCoord2AprioriSigma = Isis::Null;
     }
 
-    if (m_solveRadius && globalRadiusAprioriSigma > 0.0) {
-      m_globalRadiusAprioriSigma = globalRadiusAprioriSigma;
+    // This is ugly.  *** TODO *** Revisit this section to try to find a cleaner solution.
+    // I think we will have to do similar checking other places.
+    // See pvlObject, save,   (DAC 03-29-2017)
+    if (coordTypeBundle == SurfacePoint::Latitudinal) {
+      if (m_solveRadius && globalPointCoord3AprioriSigma > 0.0) {
+        m_globalPointCoord3AprioriSigma = globalPointCoord3AprioriSigma;
+      }
+      else {
+      m_globalPointCoord3AprioriSigma = Isis::Null;
+      }
     }
-    else {
-      m_globalRadiusAprioriSigma = Isis::Null;
+    else if (coordTypeBundle == SurfacePoint::Rectangular) {
+      if (globalPointCoord3AprioriSigma > 0.0) {
+        m_globalPointCoord3AprioriSigma = globalPointCoord3AprioriSigma;
+      }
+      else {
+      m_globalPointCoord3AprioriSigma = Isis::Null;
+      }
     }
   }
 
@@ -290,6 +321,33 @@ namespace Isis {
   void BundleSettings::setObservationSolveOptions(
       QList<BundleObservationSolveSettings> obsSolveSettingsList) {
     m_observationSolveSettings = obsSolveSettingsList;
+  }
+
+
+  /**
+   * Indicates the control point coordinate type for reports.
+   *
+   * This method returns the control point coordinate setting for reporting control points.
+   *
+   * @return @b SurfacePoint::CoordinateType Returns the control point coordinate type setting
+   *
+   */
+  SurfacePoint::CoordinateType BundleSettings::controlPointCoordTypeReports() const {
+    return (m_cpCoordTypeReports);
+  }
+
+
+  /**
+   * Indicates the control point coordinate type for the actual bundle adjust.
+   *
+   * This method returns the control point coordinate setting for performing the  bundle adjust.
+   *
+   * @return @b SurfacePoint::CoordinateType Returns the control point coordinate type setting
+   *
+   * @see BundleAdjust::errorPropagation()
+   */
+  SurfacePoint::CoordinateType BundleSettings::controlPointCoordTypeBundle() const {
+    return (m_cpCoordTypeBundle);
   }
 
 
@@ -395,35 +453,35 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma latitude value for this bundle
-   * adjustment.
-   *
-   * @return @b double The global a priori sigma for latitude.
+   * Retrieves the global a priori sigma for 1st coordinate value of point for 
+   *  this bundle adjustment. 
+   * 
+   * @return @b double The global a priori sigma for point coordinate 1.
    */
-  double BundleSettings::globalLatitudeAprioriSigma() const {
-    return m_globalLatitudeAprioriSigma;
+  double BundleSettings::globalPointCoord1AprioriSigma() const {
+    return m_globalPointCoord1AprioriSigma;
   }
 
 
   /**
-   * Retrieves the global a priori sigma longitude value for this bundle
-   * adjustment.
-   *
-   * @return @b double The global a priori sigma for longitude.
+   * Retrieves the global a priori sigma for 2nd coordinate value of point for 
+   * this bundle adjustment. 
+   * 
+   * @return @b double The global a priori sigma for point coordinate 2.
    */
-  double BundleSettings::globalLongitudeAprioriSigma() const {
-    return m_globalLongitudeAprioriSigma;
+  double BundleSettings::globalPointCoord2AprioriSigma() const {
+    return m_globalPointCoord2AprioriSigma;
   }
 
 
   /**
-   * Retrieves the global a priori sigma radius value for this bundle
-   * adjustment.
-   *
-   * @return @b double The global a priori sigma for radius.
+   * Retrieves the global a priori sigma 3rd coordinate value of point for
+   *  this bundle adjustment. 
+   * 
+   * @return @b double The global a priori sigma for point coordinate 3.
    */
-  double BundleSettings::globalRadiusAprioriSigma() const {
-    return m_globalRadiusAprioriSigma;
+  double BundleSettings::globalPointCoord3AprioriSigma() const {
+    return m_globalPointCoord3AprioriSigma;
   }
 
 
@@ -953,6 +1011,9 @@ namespace Isis {
    *
    * @param stream The stream to write serialized XML output
    * @param project The project that contains the settings
+   * @internal
+   *   @history 2017-05-30 Debbie A. Cook - Added controlPointCoordType to the xml stream
+   *                           and made global coordinate names generic.
    */
   void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {
     stream.writeStartElement("bundleSettings");
@@ -964,29 +1025,31 @@ namespace Isis {
     stream.writeStartElement("solveOptions");
     stream.writeAttribute("solveObservationMode", toString(solveObservationMode()));
     stream.writeAttribute("solveRadius", toString(solveRadius()));
+    stream.writeAttribute("controlPointCoordTypeReports", toString(controlPointCoordTypeReports()));
+    stream.writeAttribute("controlPointCoordTypeBundle", toString(controlPointCoordTypeBundle()));
     stream.writeAttribute("updateCubeLabel", toString(updateCubeLabel()));
     stream.writeAttribute("errorPropagation", toString(errorPropagation()));
     stream.writeAttribute("createInverseMatrix", toString(createInverseMatrix()));
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
-    if (IsSpecial(globalLatitudeAprioriSigma())) {
-      stream.writeAttribute("latitude", "N/A");
+    if (IsSpecial(globalPointCoord1AprioriSigma())) {
+      stream.writeAttribute("pointCoord1", "N/A");
     }
     else {
-      stream.writeAttribute("latitude", toString(globalLatitudeAprioriSigma()));
+      stream.writeAttribute("pointCoord1", toString(globalPointCoord1AprioriSigma()));
     }
-    if (IsSpecial(globalLongitudeAprioriSigma())) {
-      stream.writeAttribute("longitude", "N/A");
-    }
-    else {
-      stream.writeAttribute("longitude", toString(globalLongitudeAprioriSigma()));
-    }
-    if (IsSpecial(globalRadiusAprioriSigma())) {
-      stream.writeAttribute("radius", "N/A");
+    if (IsSpecial(globalPointCoord2AprioriSigma())) {
+      stream.writeAttribute("pointCoord2", "N/A");
     }
     else {
-      stream.writeAttribute("radius", toString(globalRadiusAprioriSigma()));
+      stream.writeAttribute("pointCoord2", toString(globalPointCoord2AprioriSigma()));
+    }
+    if (IsSpecial(globalPointCoord3AprioriSigma())) {
+      stream.writeAttribute("pointCoord3", "N/A");
+    }
+    else {
+      stream.writeAttribute("pointCoord3", toString(globalPointCoord3AprioriSigma()));
     }
     stream.writeEndElement();
 
@@ -1072,6 +1135,10 @@ namespace Isis {
    * @param attributes The list of attributes for the tag.
    *
    * @return @b bool Indicates whether to continue reading the XML (usually true).
+   *
+   * @internal
+   *   @history 2017-05-30 Debbie A. Cook - Added controlPointCoordTypes to the pvl
+   *                           and made global coordinate names generic.
    */
   bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI,
                                                 const QString &localName,
@@ -1093,6 +1160,18 @@ namespace Isis {
           m_xmlHandlerBundleSettings->m_solveRadius = toBool(solveRadiusStr);
         }
 
+        QString coordTypeReportsStr = attributes.value("controlPointCoordinateTypeReports");
+        if (!coordTypeReportsStr.isEmpty()) {
+          m_xmlHandlerBundleSettings->m_cpCoordTypeReports =
+            SurfacePoint::stringToCoordinateType(coordTypeReportsStr);
+        }
+
+        QString coordTypeBundleStr = attributes.value("controlPointCoordinateTypeBundle");
+        if (!coordTypeBundleStr.isEmpty()) {
+          m_xmlHandlerBundleSettings->m_cpCoordTypeBundle =
+            SurfacePoint::stringToCoordinateType(coordTypeBundleStr);
+        }
+
         QString updateCubeLabelStr = attributes.value("updateCubeLabel");
         if (!updateCubeLabelStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(updateCubeLabelStr);
@@ -1110,38 +1189,38 @@ namespace Isis {
       }
       else if (localName == "aprioriSigmas") {
 
-        QString globalLatitudeAprioriSigmaStr = attributes.value("latitude");
-        m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = Isis::Null;
+        QString globalPointCoord1AprioriSigmaStr = attributes.value("pointCoord1");
+        m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma = Isis::Null;
         // TODO: why do I need to init this one and not other sigmas???
-        if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
-          if (globalLatitudeAprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = Isis::Null;
+        if (!globalPointCoord1AprioriSigmaStr.isEmpty()) {
+          if (globalPointCoord1AprioriSigmaStr == "N/A") {
+            m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma = Isis::Null;
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma
-                = toDouble(globalLatitudeAprioriSigmaStr);
+            m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma
+                = toDouble(globalPointCoord1AprioriSigmaStr);
           }
         }
 
-        QString globalLongitudeAprioriSigmaStr = attributes.value("longitude");
-        if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
-          if (globalLongitudeAprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma = Isis::Null;
+        QString globalPointCoord2AprioriSigmaStr = attributes.value("pointCoord2");
+        if (!globalPointCoord2AprioriSigmaStr.isEmpty()) {
+          if (globalPointCoord2AprioriSigmaStr == "N/A") {
+            m_xmlHandlerBundleSettings->m_globalPointCoord2AprioriSigma = Isis::Null;
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma
-                = toDouble(globalLongitudeAprioriSigmaStr);
+            m_xmlHandlerBundleSettings->m_globalPointCoord2AprioriSigma
+                = toDouble(globalPointCoord2AprioriSigmaStr);
           }
         }
 
-        QString globalRadiusAprioriSigmaStr = attributes.value("radius");
-        if (!globalRadiusAprioriSigmaStr.isEmpty()) {
-          if (globalRadiusAprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = Isis::Null;
+        QString globalPointCoord3AprioriSigmaStr = attributes.value("radius");
+        if (!globalPointCoord3AprioriSigmaStr.isEmpty()) {
+          if (globalPointCoord3AprioriSigmaStr == "N/A") {
+            m_xmlHandlerBundleSettings->m_globalPointCoord3AprioriSigma = Isis::Null;
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma
-                = toDouble(globalRadiusAprioriSigmaStr);
+            m_xmlHandlerBundleSettings->m_globalPointCoord3AprioriSigma
+                = toDouble(globalPointCoord3AprioriSigmaStr);
           }
         }
       }

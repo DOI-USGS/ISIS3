@@ -117,8 +117,11 @@ int main(int argc, char *argv[]) {
     ControlNet outNet;
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
-    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
-    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    double metersToRadians = 1./23.68;  // Use what BundleResults used
+    BundleControlPointQsp freeBundleControlPoint(
+                                     new BundleControlPoint(settings, freePoint, metersToRadians));
+    BundleControlPointQsp fixedBundleControlPoint(
+                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
@@ -165,6 +168,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
     XmlStackedHandlerReader reader1;
     BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    // Now manually set the control net in BundleSolutionInfo's BundleResults to
+    //  complete its initialization.  This seems awkward.
+    bsFromXml1.bundleResults().setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml1);  // Save comparison output to log file
 
@@ -332,6 +338,28 @@ int main(int argc, char *argv[]) {
     if (residualsOutput.exists()) {
       residualsOutput.remove();
     }
+    
+    // Test output for case where control point coordinate type = Rectangular.
+    // Use BundleSolutionInfo = bsFromXml1, with
+    // ControlNet = outNet (needs to be updated to have coordType = Rectangular)
+    // BundleSettings = settings (updated to have coordType = Rectangular)
+    // This functionality is already tested in BundleResults.  Do we need this section??? (DAC)
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular);
+    BundleControlPointQsp freeBundleControlPointR(
+                                     new BundleControlPoint(settings, freePoint, metersToRadians));
+    BundleControlPointQsp fixedBundleControlPointR(
+                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
+    bundleControlPointVector.clear();
+    bundleControlPointVector.append(freeBundleControlPoint);
+    bundleControlPointVector.append(fixedBundleControlPoint);
+    BundleResults statisticsR;
+    statisticsR.setBundleControlPoints(bundleControlPointVector);
+    outNet.SetCoordType(SurfacePoint::Rectangular);
+    statisticsR.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+    statisticsR.setObservations(observationVector);
+    BundleSolutionInfo info(settings, cnetFile, statisticsR, imgList, parent);
+
+    printXml(info);
 
   }
   catch (IException &e) {
