@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.os
 
 all:  install
 
-install: libs plugins
+install: libs license plugins
 
 #libs: license
 libs:
@@ -65,11 +65,11 @@ libs:
 	    cat DarwinErrors.lis;                                            \
 	  fi;                                                                \
 	  $(RM) DarwinErrors.lis DarwinLibs.lis;                             \
-	fi                                                                 
+	fi
 
 license:
 	echo $(CURTIMESTAMP) "  Obtaining licenses";                         \
-	$(RSYNC) -a /usgs/pkgs/local/$(ISISLOCALVERSION)/license/            \
+	$(RSYNC) -a $(THIRDPARTYLICPATH)														         \
 	  $(ISISROOT)/3rdParty/license/
 
 plugins:
@@ -103,7 +103,7 @@ clean:
 	    $(RM) -rf $$plugs; \
 	  fi \
 	done;
-	
+
 #----------------------------------------------------------------------------
 # Use to see values of variables
 #  Example: make print-HOST_OS

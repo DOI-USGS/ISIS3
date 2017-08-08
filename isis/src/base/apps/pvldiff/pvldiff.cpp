@@ -3,11 +3,11 @@
 #include <cmath>
 #include <float.h>
 
+#include <QRegularExpression>
+
+#include "IException.h"
 #include "PvlContainer.h"
 #include "Pvl.h"
-#include "IException.h"
-#include "QRegularExpression"
-
 
 using namespace std;
 using namespace Isis;
@@ -15,45 +15,45 @@ using namespace Isis;
 bool filesMatch;
 QString differenceReason;
 PvlGroup tolerances;
-PvlGroup ignorekeys;
-PvlGroup ignorefilepaths;
+PvlGroup ignoreKeys;
+PvlGroup ignoreFilePaths;
 
-void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
-void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2);
-void CompareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2);
+void compareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
+void compareObjects(const PvlObject &pvl1, const PvlObject &pvl2);
+void compareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   tolerances = PvlGroup();
-  ignorekeys = PvlGroup();
-  ignorefilepaths = PvlGroup();
+  ignoreKeys = PvlGroup();
+  ignoreFilePaths = PvlGroup();
   differenceReason = "";
   filesMatch = true;
 
   const Pvl file1(ui.GetFileName("FROM"));
   const Pvl file2(ui.GetFileName("FROM2"));
 
-  if(ui.WasEntered("DIFF")) {
+  if ( ui.WasEntered("DIFF") ) {
     Pvl diffFile(ui.GetFileName("DIFF"));
 
-    if(diffFile.hasGroup("Tolerances")) {
+    if ( diffFile.hasGroup("Tolerances") ) {
       tolerances = diffFile.findGroup("Tolerances");
     }
 
-    if(diffFile.hasGroup("IgnoreKeys")) {
-      ignorekeys = diffFile.findGroup("IgnoreKeys");
+    if (diffFile.hasGroup("IgnoreKeys") ) {
+      ignoreKeys = diffFile.findGroup("IgnoreKeys");
     }
 
-    if(diffFile.hasGroup("IgnoreFilePaths")) {
-      ignorefilepaths = diffFile.findGroup("IgnoreFilePaths");
+    if (diffFile.hasGroup("IgnoreFilePaths") ) {
+      ignoreFilePaths = diffFile.findGroup("IgnoreFilePaths");
     }
   }
 
-  CompareObjects(file1, file2);
+  compareObjects(file1, file2);
 
   PvlGroup differences("Results");
-  if(filesMatch) {
+  if (filesMatch) {
     differences += PvlKeyword("Compare", "Identical");
   }
   else {
@@ -63,7 +63,7 @@ void IsisMain() {
 
   Application::Log(differences);
 
-  if(ui.WasEntered("TO")) {
+  if ( ui.WasEntered("TO") ) {
     Pvl out;
     out.addGroup(differences);
     out.write(ui.GetFileName("TO"));
@@ -72,13 +72,13 @@ void IsisMain() {
   differenceReason = "";
 }
 
-void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
-  if(pvl1.name().compare(pvl2.name()) != 0) {
+void compareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
+  if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Keyword '" + pvl1.name() + "' does not match keyword '" + pvl2.name() + "'";
   }
 
-  if(pvl1.size() != pvl2.size()) {
+  if ( pvl1.size() != pvl2.size() ) {
     filesMatch = false;
     differenceReason = "Keyword '" + pvl1.name() + "' size does not match.";
     return;
@@ -86,31 +86,37 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
 
   // Make sure that  Tolerances, IgnoreKeys and IgnoreFilePaths each have either one argument that
   // applies to all values in the keyword OR a one-to-one relationship between the two
-  if(tolerances.hasKeyword(pvl1.name()) &&
-      tolerances[pvl1.name()].size() > 1 &&
-      pvl1.size() != tolerances[pvl1.name()].size()) {
+  if ( tolerances.hasKeyword(pvl1.name() ) &&
+       tolerances[pvl1.name()].size() > 1 &&
+       pvl1.size() != tolerances[pvl1.name()].size() ) {
+
     QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
+
   }
 
-  if(ignorekeys.hasKeyword(pvl1.name()) &&
-      ignorekeys[pvl1.name()].size() > 1 &&
-      pvl1.size() != ignorekeys[pvl1.name()].size()) {
+  if ( ignoreKeys.hasKeyword(pvl1.name()) &&
+       ignoreKeys[pvl1.name()].size() > 1 &&
+       pvl1.size() != ignoreKeys[pvl1.name()].size() ) {
+
     QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
+
   }
 
-  if (ignorefilepaths.hasKeyword(pvl1.name()) &&
-      ignorefilepaths[pvl1.name()].size() > 1 &&
-      pvl1.size() != ignorefilepaths[pvl1.name()].size()) {
+  if ( ignoreFilePaths.hasKeyword(pvl1.name()) &&
+       ignoreFilePaths[pvl1.name()].size() > 1 &&
+       pvl1.size() != ignoreFilePaths[pvl1.name()].size() ) {
+
     QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
     msg += "its number of filepath ignores in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
+
   }
 
-  for(int i = 0; i < pvl1.size() && filesMatch; i++) {
+  for (int i = 0; i < pvl1.size() && filesMatch; i++) {
     QString val1 = pvl1[i];
     QString val2 = pvl2[i];
 
@@ -118,25 +124,25 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     QString unit2 = pvl2.unit(i);
 
     int ignoreIndex = 0;
-    if(ignorekeys.hasKeyword(pvl1.name()) && ignorekeys[pvl1.name()].size() > 1) {
+    if ( ignoreKeys.hasKeyword(pvl1.name()) && ignoreKeys[pvl1.name()].size() > 1 ) {
       ignoreIndex = i;
     }
 
     // If we only have one value for the keyword, use it for all paths in the keyword's array,
     // otherwise use the corresponding IgnoreFilePaths value
-    if (ignorefilepaths.hasKeyword(pvl1.name()) &&
-      (((ignorefilepaths[pvl1.name()].size() > 1 && ignorefilepaths[pvl1.name()][i] == "true") ||
-        (ignorefilepaths[pvl1.name()].size() == 1 && ignorefilepaths[pvl1.name()][0] == "true")))) {
-          val1 =  val1.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
-          val2 =  val2.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
+    if ( ignoreFilePaths.hasKeyword(pvl1.name()) &&
+         (((ignoreFilePaths[pvl1.name()].size() > 1 && ignoreFilePaths[pvl1.name()][i] == "true") ||
+         (ignoreFilePaths[pvl1.name()].size() == 1 && ignoreFilePaths[pvl1.name()][0] == "true"))) ) {
+      val1 =  val1.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
+      val2 =  val2.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
     }
 
 
     try {
-      if(!ignorekeys.hasKeyword(pvl1.name()) ||
-          ignorekeys[pvl1.name()][ignoreIndex] == "false") {
+      if ( !ignoreKeys.hasKeyword(pvl1.name()) ||
+          ignoreKeys[pvl1.name()][ignoreIndex] == "false" ) {
 
-        if(unit1.toLower() != unit2.toLower()) {
+        if ( unit1.toLower() != unit2.toLower() ) {
           filesMatch = false;
           differenceReason = "Keyword '" + pvl1.name() + "': units do not match.";
           return;
@@ -145,15 +151,15 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
         double tolerance = 0.0;
         double difference = abs(toDouble(val1) - toDouble(val2));
 
-        if(tolerances.hasKeyword(pvl1.name())) {
+        if ( tolerances.hasKeyword(pvl1.name()) ) {
           tolerance = toDouble(
               (tolerances[pvl1.name()].size() == 1) ?
                  tolerances[pvl1.name()][0] : tolerances[pvl1.name()][i]);
         }
 
-        if(difference > tolerance) {
+        if ( difference > tolerance ) {
           filesMatch = false;
-          if(pvl1.size() == 1) {
+          if ( pvl1.size() == 1 ) {
             differenceReason = "Keyword '" + pvl1.name() + "': difference is " +
                                toString(difference);
           }
@@ -165,8 +171,8 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
         }
       }
     }
-    catch(IException &) {
-      if(val1.toLower() != val2.toLower()) {
+    catch (IException &) {
+      if ( val1.toLower() != val2.toLower() ) {
         filesMatch = false;
         differenceReason = "Keyword '" + pvl1.name() + "': values do not "
             "match.";
@@ -175,60 +181,60 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   }
 }
 
-void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
-  if(pvl1.name().compare(pvl2.name()) != 0) {
+void compareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
+  if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " does not match " +
         pvl2.name();
   }
 
-  if(pvl1.keywords() != pvl2.keywords()) {
+  if ( pvl1.keywords() != pvl2.keywords() ) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " has varying keyword counts.";
   }
 
-  if(pvl1.groups() != pvl2.groups()) {
+  if ( pvl1.groups() != pvl2.groups() ) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " has varying group counts.";
   }
 
-  if(pvl1.objects() != pvl2.objects()) {
+  if ( pvl1.objects() != pvl2.objects())  {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " has varying object counts.";
   }
 
-  if(!filesMatch) {
+  if (!filesMatch) {
     return;
   }
 
-  for(int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
-    CompareKeywords(pvl1[keyword], pvl2[keyword]);
+  for (int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
+    compareKeywords(pvl1[keyword], pvl2[keyword]);
   }
 
-  for(int object = 0; object < pvl1.objects() && filesMatch; object++) {
-    CompareObjects(pvl1.object(object), pvl2.object(object));
+  for (int object = 0; object < pvl1.objects() && filesMatch; object++) {
+    compareObjects(pvl1.object(object), pvl2.object(object));
   }
 
-  for(int group = 0; group < pvl1.groups() && filesMatch; group++) {
-    CompareGroups(pvl1.group(group), pvl2.group(group));
+  for (int group = 0; group < pvl1.groups() && filesMatch; group++) {
+    compareGroups(pvl1.group(group), pvl2.group(group));
   }
 
-  if(!filesMatch && pvl1.name().compare("Root") != 0) {
+  if ( !filesMatch && pvl1.name().compare("Root") != 0 ) {
     differenceReason = "Object " + pvl1.name() + ": " + differenceReason;
   }
 }
 
-void CompareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2) {
-  if(pvl1.keywords() != pvl2.keywords()) {
+void compareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2) {
+  if ( pvl1.keywords() != pvl2.keywords() ) {
     filesMatch = false;
     return;
   }
 
-  for(int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
-    CompareKeywords(pvl1[keyword], pvl2[keyword]);
+  for (int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
+    compareKeywords(pvl1[keyword], pvl2[keyword]);
   }
 
-  if(!filesMatch) {
+  if (!filesMatch) {
     differenceReason = "Group " + pvl1.name() + ": " + differenceReason;
   }
 }

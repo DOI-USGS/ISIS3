@@ -30,3 +30,10 @@ Version: **ERROR** Unable to locate latest camera model version number from grou
 **ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
 **ERROR** Unable to find PVL group [BOGUSSPACECRAFT/BOGUSINSTRUMENT].
 
+Testing that newest camera version is read from plugin ...
+(Expecting Version 2)
+Version: 2
+
+**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** The camera model used to create a camera for this cube is out of date, please re-run spiceinit on the file or process with an old Isis version that has the correct camera model.
+
