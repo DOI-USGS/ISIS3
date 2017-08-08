@@ -20,7 +20,11 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Image.h"
 #include "ImageList.h"
+#include "IException.h"
+
+#include <iostream>
 
 #include <QAction>
 #include <QColorDialog>
@@ -41,6 +45,8 @@
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
 
+using namespace std;
+
 namespace Isis {
   /**
    * Creates an image list from an image list name and path (does not read Images).
@@ -50,6 +56,7 @@ namespace Isis {
    * @param parent The Qt-relationship parent.
    */
   ImageList::ImageList(QString name, QString path, QObject *parent) : QObject(parent) {
+
     m_name = name;
     m_path = path;
   }
@@ -668,6 +675,7 @@ namespace Isis {
       actions.append(zoomFit);
     }
 
+
     return actions;
   }
 
@@ -778,7 +786,8 @@ namespace Isis {
    * @param newProjectRoot The path to the root directory for the new project.
    * 
    * @throws iException::Io "Failed to create directory"
-   * @throws iException::Io "Unable to save image information because new file could not be opened for writing"
+   * @throws iException::Io "Unable to save image information because new file could not
+   *         be opened for writing"
    */
   void ImageList::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
       const {
@@ -833,8 +842,15 @@ namespace Isis {
             .arg(newProgressValue, countWidth, 10, paddingChar)
             .arg(count()));
       progressDialog.setValue(newProgressValue);
-      future.resultAt(i);
+      try {
+          future.resultAt(i);
+        }
+      catch(std::exception &e) {
+        QString msg("Could not save ImageList: "+this->name() );
+        throw IException(IException::Io,msg,_FILEINFO_);
+      }
     }
+
 
     progressLabel->setText(tr("Finalizing..."));
     progressDialog.setRange(0, 0);
@@ -892,7 +908,9 @@ namespace Isis {
    * @see save
    */
   void *ImageList::CopyImageDataFunctor::operator()(Image * const &imageToCopy) {
+
     imageToCopy->copyToNewProjectRoot(m_project, m_newProjectRoot);
+
     return NULL;
   }
 
