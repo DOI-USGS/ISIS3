@@ -49,6 +49,7 @@ namespace Isis {
    *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
    *                           to edit a control point when there is not an active control network.
    *                           Fixes #5048.
+   *   @history 2017-08-09 Christopher Combs - Added Apriori lat, lon, and radius labels. Fixes#5066
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -170,4 +171,3 @@ namespace Isis {
 }
 
 #endif
-
