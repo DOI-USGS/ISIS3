@@ -58,16 +58,22 @@ void IsisMain() {
   
   BundleSettingsQsp settings = bundleSettings(ui);
   BundleAdjust *bundleAdjustment = NULL;
-  // Get the held list if entered and prep for bundle adjustment
-  if (ui.WasEntered("HELDLIST")) {
-    QString heldList = ui.GetFileName("HELDLIST");
-    // Update the control network so that any control points intersecting a held image are fixed
-    ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
-    bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
+  try {
+    // Get the held list if entered and prep for bundle adjustment
+    if (ui.WasEntered("HELDLIST")) {
+      QString heldList = ui.GetFileName("HELDLIST");
+      // Update the control network so that any control points intersecting a held image are fixed
+      ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
+      bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
+    }
+    else {
+      bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
+    }
   }
-  else {
-    bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
+  catch (IException &e) {
+    throw;
   }
+
 
   // Bundle adjust the network
   try {
