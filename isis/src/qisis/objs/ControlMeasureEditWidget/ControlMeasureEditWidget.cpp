@@ -335,7 +335,7 @@ namespace Isis {
     //  the update sample/line label
     connect(m_leftView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateLeftPositionLabel(double)));
-    
+
     // we want to allow this connection so that if a changed point is saved
     // and the same image is showing in both viewports, the left will refresh.
     connect(this, SIGNAL(updateLeftView(double, double)),
@@ -399,7 +399,7 @@ namespace Isis {
     //  Create chips for left and right
     m_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
     m_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
-    
+
     QButtonGroup *bgroup = new QButtonGroup();
     m_nogeom = new QRadioButton();
     m_nogeom->setChecked(true);
@@ -513,6 +513,24 @@ namespace Isis {
     vlayout->addWidget(circle);
     vlayout->addWidget(m_slider);
     gridLayout->addLayout(vlayout, row++, 2);
+
+    // Show sample / line for measure of chips shown
+    m_leftSampLinePosition = new QLabel();
+    m_leftSampLinePosition->setToolTip("Sample/Line under the crosshair");
+    gridLayout->addWidget(m_leftSampLinePosition, row, 0);
+    m_rightSampLinePosition = new QLabel();
+    m_rightSampLinePosition->setToolTip("Sample/Line under the crosshair");
+    gridLayout->addWidget(m_rightSampLinePosition, row++, 1);
+
+    if (m_useGeometry) {
+      //  Show lat / lon for measure of chips shown
+      m_leftLatLonPosition = new QLabel();
+      m_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(m_leftLatLonPosition, row, 0);
+      m_rightLatLonPosition = new QLabel();
+      m_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(m_rightLatLonPosition, row++, 1);
+    }
 
     //  Add auto registration extension
     m_autoRegExtension = new QWidget;
@@ -756,7 +774,7 @@ namespace Isis {
    *
    * @param rightMeasure[in]  Measure displayed in right ChipViewport
    * @param rightCube[in]     Cube of measure displayed in right ChipViewport
-   * @param pointId[in]       Control point id associated with the measure 
+   * @param pointId[in]       Control point id associated with the measure
    *
    * @author Tracie Sucharski
    * @internal
@@ -836,17 +854,32 @@ namespace Isis {
    *
    * @param zoomFactor[in]  zoom factor
    *
-   * @author Tracie Sucharski 
-   *  
-   * @internal 
+   * @author Tracie Sucharski
+   *
+   * @internal
    *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
    *                          right viewports.  TODO:  Re-think design, should this be put
    *                          somewhere else.  This was the fastest solution for now.
+   *   @history 2017-08-03 Christopher Combs - Added label updates for sample, line, lat and lon
    */
   void ControlMeasureEditWidget::updateLeftPositionLabel(double zoomFactor) {
+    QString pos = "Sample: " + QString::number(m_leftView->tackSample()) +
+                  "    Line:  " + QString::number(m_leftView->tackLine());
+    m_leftSampLinePosition->setText(pos);
+
+    if (m_useGeometry) {
+      //  Get lat/lon from point in left
+      m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine());
+      double lat = m_leftGroundMap->UniversalLatitude();
+      double lon = m_leftGroundMap->UniversalLongitude();
+
+      pos = "Latitude: " + QString::number(lat) +
+            "    Longitude:  " + QString::number(lon);
+      m_leftLatLonPosition->setText(pos);
+    }
 
     //  Print zoom scale factor
-    QString pos = "Zoom Factor: " + QString::number(zoomFactor);
+    pos = "Zoom Factor: " + QString::number(zoomFactor);
     m_leftZoomFactor->setText(pos);
 
     //  If zooms are linked, make right match left
@@ -862,19 +895,40 @@ namespace Isis {
    * @param zoomFactor[in]  zoom factor
    *
    * @author Tracie Sucharski
+   *
+   * @internal
+   *   @history 2017-08-03 Christopher Combs - Added label updates for sample, line, lat and lon
    */
   void ControlMeasureEditWidget::updateRightPositionLabel(double zoomFactor) {
 
     // If registration Info is on, turn off
-    if ( m_autoRegShown ) {
+    if (m_autoRegShown) {
       //  Undo Registration
       m_autoRegShown = false;
       m_autoRegExtension->hide();
       m_autoReg->setText("Register");
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
+      m_autoReg->setShortcut(Qt::Key_R);
+    }
+
+    QString pos = "Sample: " + QString::number(m_rightView->tackSample()) +
+                  "    Line:  " + QString::number(m_rightView->tackLine());
+    m_rightSampLinePosition->setText(pos);
+
+    if (m_useGeometry) {
+      //  Get lat/lon from point in right
+      m_rightGroundMap->SetImage(m_rightView->tackSample(), m_rightView->tackLine());
+      double lat = m_rightGroundMap->UniversalLatitude();
+      double lon = m_rightGroundMap->UniversalLongitude();
+
+      pos = "Latitude: " + QString::number(lat) +
+            "    Longitude:  " + QString::number(lon);
+      m_rightLatLonPosition->setText(pos);
     }
 
     //  Print zoom scale factor
-    QString pos = "Zoom Factor: " + QString::number(zoomFactor);
+    pos = "Zoom Factor: " + QString::number(zoomFactor);
     m_rightZoomFactor->setText(pos);
 
   }
@@ -1260,13 +1314,13 @@ namespace Isis {
   /**
    * Slot to enable the rotate dial
    *
-   * @internal 
+   * @internal
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and reload chip
   */
   void ControlMeasureEditWidget::setRotate() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    //  Text needs to be reset because it was changed to 
+    //  Text needs to be reset because it was changed to
     //  indicate why it's greyed out
     QString text = "Zoom in 2X";
     m_rightZoomIn->setEnabled(true);
@@ -1348,7 +1402,7 @@ namespace Isis {
   /**
    * Slot to turn off geom
    *
-   * @internal 
+   * @internal
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and rotate dial, then reload chip
   */
   void ControlMeasureEditWidget::setNoGeom() {
@@ -1486,7 +1540,7 @@ namespace Isis {
    * from which to select a filename.  This file is then
    * registered and set as the new template.
    *
-   * @param fn Template filename 
+   * @param fn Template filename
    *
    * @author Tracie Sucharski
    * @internal
@@ -1713,7 +1767,6 @@ namespace Isis {
     if (m_blinkIndexRight > m_blinkChipViewportListRight.size()-1) {
       m_blinkIndexRight = 0;
     }
-    m_rightView->loadView(*(m_blinkChipViewportListRight)[m_blinkIndexRight]); 
+    m_rightView->loadView(*(m_blinkChipViewportListRight)[m_blinkIndexRight]);
   }
 }
-
