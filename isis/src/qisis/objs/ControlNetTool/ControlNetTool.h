@@ -1,5 +1,5 @@
-#ifndef IpceTool_h
-#define IpceTool_h
+#ifndef ControlNetTool_h
+#define ControlNetTool_h
 
 #include "Tool.h"
 #include "ControlPoint.h"
@@ -51,12 +51,12 @@ namespace Isis {
    *   @history 2017-08-09 Cole Neubauer - Added loadNetwork() for changing inbetween active
    *                           networks Fixes #4567
    */
-  class IpceTool : public Tool {
+  class ControlNetTool : public Tool {
     Q_OBJECT
 
     public:
-      IpceTool (Directory *directory, QWidget *parent);
-      virtual ~IpceTool ();
+      ControlNetTool (Directory *directory, QWidget *parent);
+      virtual ~ControlNetTool ();
 
       void setControlNet(ControlNet *controlNet);
       void paintViewport (MdiCubeViewport *cvp, QPainter *painter);
@@ -84,7 +84,7 @@ namespace Isis {
       void createMenus();
       void drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter);
 
-      QPointer<MainWindow> m_ipceTool;
+      QPointer<MainWindow> m_ControlNetTool;
       Directory *m_directory;
       CubeDnView *m_view;
 
