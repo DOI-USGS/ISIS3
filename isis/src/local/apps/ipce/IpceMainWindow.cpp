@@ -30,6 +30,7 @@
 #include <QObject>
 #include <QtWidgets>
 #include <QSettings>
+#include <QSize>
 #include <QStatusBar>
 #include <QTreeView>
 #include <QVariant>
@@ -171,6 +172,12 @@ namespace Isis {
     m_permToolBar = new QToolBar(this);
     m_activeToolBar = new QToolBar(this);
     m_toolPad = new QToolBar(this);
+    
+    QSize iconSize(25, 45);
+
+    m_permToolBar->setIconSize(iconSize);
+    m_activeToolBar->setIconSize(iconSize);
+    m_toolPad->setIconSize(iconSize);
 
     m_permToolBar->setObjectName("PermanentToolBar");
     m_activeToolBar->setObjectName("ActiveToolBar");
@@ -394,6 +401,7 @@ namespace Isis {
    * QActions, the Directory, and the active view.
    */
   void IpceMainWindow::updateToolBarActions() {
+            
     m_permToolBar->clear();
     foreach ( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
@@ -414,7 +422,7 @@ namespace Isis {
         m_activeToolBar->addAction(action);
       }
     }
-
+    
     m_toolPad->clear();
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->toolPadActions() ) {

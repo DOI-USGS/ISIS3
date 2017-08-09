@@ -44,32 +44,32 @@ namespace Isis {
    *   @history 2012-08-28 Tracie Sucharski - The Directory no longer takes a container it its
    *                           constructor.
    *   @history 2012-09-17 Steven Lambright - Dock widgets now delete themselves on close. This
-   *                          gives the user the correct options when proceeding in the interface,
-   *                          but undo/redo are not implemented (it needs to eventually be
-   *                          encapsulated in a work order). The undo/redo didn't work correctly
-   *                          anyways before setting this flag, so it's an improvement. Example
-   *                          change: If I close Footprint View 1, I'm no longer asked if I want
-   *                          to view images in footprint view 1.
+   *                           gives the user the correct options when proceeding in the interface,
+   *                           but undo/redo are not implemented (it needs to eventually be
+   *                           encapsulated in a work order). The undo/redo didn't work correctly
+   *                           anyways before setting this flag, so it's an improvement. Example
+   *                           change: If I close Footprint View 1, I'm no longer asked if I want
+   *                           to view images in footprint view 1.
    *   @history 2015-10-05 Jeffrey Covington - Replaced the ProjectTreeWidget
-   *                          with a ProjectItemTreeView. Added the
-   *                          eventFilter() method for intercepting some
-   *                          events from views.
+   *                           with a ProjectItemTreeView. Added the
+   *                           eventFilter() method for intercepting some
+   *                           events from views.
    *   @history 2016-01-04 Jeffrey Covington - Added a QMdiArea as the central widget
-   *                          of the main window. The menus and toolbars are now solely
-   *                          handled by the main window. Menus, context menus, and
-   *                          toolbars are populated with actions recieved from the Directory
-   *                          the active view, and the main window. Both WorkOrders and
-   *                          regular QActions can be used in menus and toolbars. Views can
-   *                          now be detached from the main window into their own independent
-   *                          window with internalized menus and toolbars.
+   *                           of the main window. The menus and toolbars are now solely
+   *                           handled by the main window. Menus, context menus, and
+   *                           toolbars are populated with actions recieved from the Directory
+   *                           the active view, and the main window. Both WorkOrders and
+   *                           regular QActions can be used in menus and toolbars. Views can
+   *                           now be detached from the main window into their own independent
+   *                           window with internalized menus and toolbars.
    *   @history 2016-10-20 Tracie Sucharski - Clean up included headers that are commented out,
-   *                          updated for Qt5, comment call to saveState for window which caused
-   *                          errors.  TODO:  Determine problem with saveState call.
-   *  @history 2016-11-09  Tyler Wilson - Move a segment of code in the constructor from the beginning
-   *                          to the end.  This code loads a project from the command line instead of the
-   *                          GUI, and it wasn't outputting warnings/errors to the warnings/error tab
-   *                          when the project was loaded because it was being called before the GUI
-   *                          was created.  Fixes #4488.  References #4526, ##4487.
+   *                           updated for Qt5, comment call to saveState for window which caused
+   *                           errors.  TODO:  Determine problem with saveState call.
+   *   @history 2016-11-09 Tyler Wilson - Move a segment of code in the constructor from the beginning
+   *                           to the end.  This code loads a project from the command line instead of the
+   *                           GUI, and it wasn't outputting warnings/errors to the warnings/error tab
+   *                           when the project was loaded because it was being called before the GUI
+   *                           was created.  Fixes #4488.  References #4526, ##4487.
    *   @history 2016-11-09 Ian Humphrey - Modified readSettings() and writeSettings() to take in
    *                           Project pointers to be used to properly read and write settings
    *                           for the IpceMainWindow. Note that when running ipce without
@@ -90,14 +90,17 @@ namespace Isis {
    *   @history 2017-07-12 Cole Neubauer - Added removeAllViews function and m_detachedViews member
    *                           variable. Needed to clear out an old projects views from the window
    *                           when opening a new project. Fixes #4969
-   *  @history 2017-07-14 Cole Neubauer - Added private slot raiseWarningTab to be able to raise
+   *   @history 2017-07-14 Cole Neubauer - Added private slot raiseWarningTab to be able to raise
    *                           the warning tab when a new warning happens.
    *                           Fixes #5041
-   *  @history 2017-07-14 Cole Neubauer - Set Object name for Target/Sensor Widgets in addView
+   *   @history 2017-07-14 Cole Neubauer - Set Object name for Target/Sensor Widgets in addView
    *                           Fixes #5059 
    *                           Fixes #5041
-   *  @history 2017-07-26 Cole Neubauer - Changed the closevent funtion to check if a project is
+   *   @history 2017-07-26 Cole Neubauer - Changed the closevent funtion to check if a project is
    *                           and prompt user accordingly Fixes #4960
+   *   @history 2017-08-09 Marjorie Hahn - Hard-coded the size of the icons in the toolbar to 
+   *                           temporarily fix the shift in size when switching between views 
+   *                           until docked widgets are implemented. Fixes #5084.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
