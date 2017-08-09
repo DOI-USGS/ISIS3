@@ -62,6 +62,8 @@ namespace Isis {
    *   @history 2017-01-05 Tracie Sucharski - Allow a new ground source location to be entered which
    *                           includes allowing the option to change the location in the active
    *                           control for all ground points.
+   *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+   *                           SerialNumberList.remove()
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT

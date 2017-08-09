@@ -64,6 +64,8 @@ namespace Isis {
    *  @history 2011-10-05 Sharmila Prasad - Report double values with 10 digit precision
    *  @history 2011-11-03 Sharmila Prasad - Added functionality to filter by Convex Hull Ratio
    *  @history 2011-12-29 Sharmila Prasad - Updated GoodnessOfFit Filter. Fixes Mantis #652
+   *  @history 2017-08-08 Adam Goins - Changed references to SerialNumberList::Delete() to 
+   *                                     SerialNumberList::remove()
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:

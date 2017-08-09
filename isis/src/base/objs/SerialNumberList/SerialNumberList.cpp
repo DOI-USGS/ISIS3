@@ -79,7 +79,7 @@ namespace Isis {
    *
    * @author 2010-09-09 Sharmila Prasad
    */
-  void SerialNumberList::Delete(const QString &sn) {
+  void SerialNumberList::remove(const QString &sn) {
     int index = serialNumberIndex(sn);
     QString sFileName = fileName(sn);
 

@@ -561,7 +561,7 @@ namespace Isis {
     //  the old before adding the new.
     if (!m_groundSN.isEmpty()) {
       if (m_serialNumberList->hasSerialNumber(m_groundSN)) {
-        m_serialNumberList->Delete(m_groundSN);
+        m_serialNumberList->remove(m_groundSN);
         m_groundSN.clear();
       }
     }

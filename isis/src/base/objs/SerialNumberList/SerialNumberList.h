@@ -73,6 +73,8 @@ namespace Isis {
    *                          serial number and a filename.
    *  @history 2016-06-02 Ian Humphrey - Removed SpacecraftInstrumentId method prototypes
    *                          Fixes #3967.
+   *  @history 2017-08-09 Adam Goins - Modified code to be consistent with ISIS coding standards
+   *                          Fixes #3991.
    */
 
   class SerialNumberList {
@@ -86,7 +88,7 @@ namespace Isis {
       void add(const char *serialNumber, const char *filename);
       bool hasSerialNumber(QString sn);
       
-      void Delete(const QString &sn);
+      void remove(const QString &sn);
 
       int size() const;
       QString fileName(const QString &sn);

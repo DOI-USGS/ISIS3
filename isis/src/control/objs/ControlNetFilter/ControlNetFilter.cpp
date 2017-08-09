@@ -1140,7 +1140,7 @@ namespace Isis {
       double convexHullRatio = imgStats[imgConvexHullRatio];
       if (convexHullRatio < dGreater || convexHullRatio > dLesser){
         FilterOutMeasuresBySerialNum(sSerialNum);
-        mSerialNumFilter.Delete(sSerialNum);
+        mSerialNumFilter.remove(sSerialNum);
       }
       else if (pbLastFilter) {
         mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
@@ -1197,7 +1197,7 @@ namespace Isis {
           }
           else {
             FilterOutMeasuresBySerialNum(sSerialNum);
-            mSerialNumFilter.Delete(sSerialNum);
+            mSerialNumFilter.remove(sSerialNum);
             break;
           }
         }
@@ -1262,7 +1262,7 @@ namespace Isis {
       double numPoints = imgStats[imgTotalPoints];
       if (numPoints < iGreaterPoints || numPoints > iLessPoints){
         FilterOutMeasuresBySerialNum(sSerialNum);
-        mSerialNumFilter.Delete(sSerialNum);
+        mSerialNumFilter.remove(sSerialNum);
       }
       else if (pbLastFilter) {
         mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
@@ -1446,7 +1446,7 @@ namespace Isis {
       } //end Loop Point1
       if (!bMatchDistance) {
         FilterOutMeasuresBySerialNum(sSerialNum);
-        mSerialNumFilter.Delete(sSerialNum);
+        mSerialNumFilter.remove(sSerialNum);
       }
       else if (pbLastFilter) {
         vector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));

@@ -691,7 +691,7 @@ namespace Isis {
           //
           // Remove old serial number & change to filename
           FileName fileName = Isis::FileName(list.fileName(sn));
-          list.Delete(sn);
+          list.remove(sn);
           list.add(fileName.name(),fileName.expanded());
           // Add new serial number as filename
           list.add(Isis::FileName(mvp->cube()->fileName()).name(),

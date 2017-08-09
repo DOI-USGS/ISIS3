@@ -246,6 +246,8 @@ namespace Isis {
    *                           radius source open, there is not a point selected, and a ground 
    *                           source is opened, the tool will exhibit the same behavior as before. 
    *                           Fixes #2099.
+   *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+   *                           SerialNumberList.remove()
    *                           
    */
   class QnetTool : public Tool {
