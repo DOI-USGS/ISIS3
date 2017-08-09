@@ -90,7 +90,6 @@ namespace Isis {
   void CnetEditorViewWorkOrder::execute() {
 
     for (int i = 0; i < controlList()->size(); i++) {
-      //project()->directory()->addCnetEditorView(controlList().first());
       project()->directory()->addCnetEditorView(controlList()->at(i));
     }
     project()->setClean(false);

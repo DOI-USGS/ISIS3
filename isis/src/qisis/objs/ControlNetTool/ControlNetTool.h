@@ -1,5 +1,5 @@
-#ifndef ControlNetTool_h
-#define ControlNetTool_h
+#ifndef IpceTool_h
+#define IpceTool_h
 
 #include "Tool.h"
 #include "ControlPoint.h"
@@ -48,16 +48,15 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
    *                           center crosshair in red.  Removed refresh method; it was not being
    *                           used.  Fixes #5007, #5008.
-   *   @history 2017-08-03 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
-   *                           Fixes #5090
-   *
+   *   @history 2017-08-09 Cole Neubauer - Added loadNetwork() for changing inbetween active
+   *                           networks Fixes #4567
    */
-  class ControlNetTool : public Tool {
+  class IpceTool : public Tool {
     Q_OBJECT
 
     public:
-      ControlNetTool (Directory *directory, QWidget *parent);
-      virtual ~ControlNetTool ();
+      IpceTool (Directory *directory, QWidget *parent);
+      virtual ~IpceTool ();
 
       void setControlNet(ControlNet *controlNet);
       void paintViewport (MdiCubeViewport *cvp, QPainter *painter);
@@ -67,6 +66,9 @@ namespace Isis {
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube,
                               bool isGroundSource = false);
+
+    public slots:
+      void loadNetwork();
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
@@ -82,7 +84,7 @@ namespace Isis {
       void createMenus();
       void drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter);
 
-      QPointer<MainWindow> m_ControlNetTool;
+      QPointer<MainWindow> m_ipceTool;
       Directory *m_directory;
       CubeDnView *m_view;
 

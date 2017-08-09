@@ -40,6 +40,9 @@ namespace Isis {
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-08-09 Cole Neubauer - Created a try catch around a previously unprotected error
+   *                           to handle errors thrown in the workorder that halted execution.
+   *                           Fixes #5026
    */
   class MatrixViewWorkOrder : public WorkOrder {
       Q_OBJECT

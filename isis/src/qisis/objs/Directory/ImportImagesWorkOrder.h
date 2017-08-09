@@ -78,6 +78,9 @@ namespace Isis {
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
    *                           is undone. Fixes #5043.
+   *   @history 2017-08-03 Cole Neubauer - Created a try catch around a previously unprotected error
+   *                           to handle errors thrown in the workorder that halted execution.
+   *                           Fixes #5026
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

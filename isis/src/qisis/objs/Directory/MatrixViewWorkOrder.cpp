@@ -163,22 +163,27 @@ namespace Isis {
    * @brief This method computes and displays the correlation matrix.
    */
   void MatrixViewWorkOrder::execute() {
-
-    MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
-    CorrelationMatrix corrMat = correlationMatrix();
-    /*
-     * Since computing the correlation matrix is potentially time consuming we only want to
-     * do it if the user wants to see it.
-     */
-    corrMat.computeCorrelationMatrix();
-    matrixViewToUse->setUpOptions(corrMat);
-    matrixViewToUse->drawElements(corrMat);
-    matrixViewToUse->drawGrid(corrMat);
-    if (matrixViewToUse == NULL) {
-      QString msg = "The Correlation Matrix for this bundle could not be displayed";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+    try {
+      MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
+      CorrelationMatrix corrMat = correlationMatrix();
+      /*
+       * Since computing the correlation matrix is potentially time consuming we only want to
+       * do it if the user wants to see it.
+       */
+      corrMat.computeCorrelationMatrix();
+      matrixViewToUse->setUpOptions(corrMat);
+      matrixViewToUse->drawElements(corrMat);
+      matrixViewToUse->drawGrid(corrMat);
+      if (matrixViewToUse == NULL) {
+        QString msg = "The Correlation Matrix for this bundle could not be displayed";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      project()->setClean(false);
     }
-    project()->setClean(false);
+    catch (IException e) {
+      m_status = WorkOrderFinished;
+      QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
+    }
   }
 
 

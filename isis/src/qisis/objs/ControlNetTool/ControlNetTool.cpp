@@ -70,9 +70,7 @@ namespace Isis {
     *
     */
    QAction *ControlNetTool::toolPadAction(ToolPad *pad) {
-
-
-     QAction *action = new QAction(pad);
+     QAction *action = new QAction(this);
      action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
      action->setShortcut(Qt::Key_T);
@@ -104,6 +102,11 @@ namespace Isis {
      // TODO:  TLS 7-25-17  This method is called by Project::open before there are any viewports,
      // so the following command seg faults.  Need to add check for viewports or ??
      //paintAllViewports();
+   }
+
+
+   void ControlNetTool::loadNetwork() {
+     setControlNet(m_directory->project()->activeControl()->controlNet());
    }
 
 

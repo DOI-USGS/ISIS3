@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMultiMap>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -48,6 +49,7 @@ namespace Isis {
   class BundleObservationView;
   class ChipViewportsWidget;
   class CnetEditorWidget;
+  class Control;
   class ControlNet;
   class ControlPointEditView;
   class CubeDnView;
@@ -161,10 +163,15 @@ namespace Isis {
    *                           current edit control point ID.  Fixes #5007, #5008.
    *   @history 2017-08-07 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
    *                           Fixes #5090
-   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a 
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a
    *                           control net without having an active control net set. Fixes #5048.
    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when right clicking a
    *                           control network when it is the only item on the project. Fixes #5071.
+   *   @history 2017-08-09 Cole Neubauer - Disabled Ipce tool when a CubeDnView is added if a
+   *                           control net is not active and slotted to reenable when Project
+   *                           emits activeControlSet(bool). Added a m_controlmap variable to hold
+   *                           which Controls are currently being used and closes the controls not
+   *                           needed at the moment Fixes #5026
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -314,7 +321,7 @@ namespace Isis {
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
       void newActiveControl(bool newControl);
-      
+
     private:
       /**
        * @author 2012-08-?? Steven Lambright
@@ -408,6 +415,8 @@ namespace Isis {
       QList<QAction *> m_permToolBarActions; //!< List of perm ToolBar actions
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
+
+      QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
   };

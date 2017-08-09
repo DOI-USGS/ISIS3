@@ -1450,18 +1450,43 @@ namespace Isis {
    *                           project loading.  TODO:  should project loading call the WorkOrder
    *                           rather than this method directly?
    *  @history 2017-07-25 Cole Neubauer - Removed code that stops a new control from
-   *                           being choosen Fixes #4969
+   *                           being chosen Fixes #4969
+   *  @history 2017-08-02 Cole Neubauer - Added functionality to switch between active controls
+   *                           Fixes #4567
    *
    */
   void Project::setActiveControl(QString displayName) {
+    Control *previousControl = m_activeControl;
+    if (m_activeControl) {
+      emit activeControlSet(false);
+      ProjectItem *item = directory()->model()->findItemData(m_activeControl->
+                          displayProperties()->displayName(), Qt::DisplayRole);
+      item->setTextColor(Qt::black);
+      m_activeControl->closeControlNet();
+    }
 
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
     if (item && item->isControl()) {
       m_activeControl = item->control();
-      item->setTextColor(Qt::darkGreen);
-    }
 
-    activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+      try {
+        activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+        item->setTextColor(Qt::darkGreen);
+      }
+      catch(IException e){
+        if (previousControl) {
+          m_activeControl = previousControl;
+          item = directory()->model()->findItemData(m_activeControl->
+                              displayProperties()->displayName(), Qt::DisplayRole);
+          item->setTextColor(Qt::darkGreen);
+          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+        }
+        else {
+          m_activeControl = NULL;
+        }
+        throw IException(e);
+      }
+    }
     emit activeControlSet(true);
   }
 
@@ -1509,15 +1534,41 @@ namespace Isis {
    *                           ImageList.
    *  @history 2017-07-25 Cole Neubauer - Removed code that stops a new imageList from
    *                           being choosen Fixes #4969
+   *  @history 2017-08-02 Cole Neubauer - Added functionality to switch between active imagelist
+   *                           Fixes #4567
    */
   void Project::setActiveImageList(QString displayName) {
-
+    ImageList *previousImageList = m_activeImageList;
+    if (m_activeImageList) {
+      ProjectItem *item = directory()->model()->findItemData(m_activeImageList->
+                    name(), Qt::DisplayRole);
+      item->setTextColor(Qt::black);
+    }
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
     if (item && item->isImageList()) {
       m_activeImageList = item->imageList();
+
+      if (m_activeControl) {
+        try {
+          activeControl()->controlNet()->SetImages(*(m_activeImageList->serialNumberList()));
+        }
+        catch(IException e){
+          if (previousImageList) {
+            m_activeImageList = previousImageList;
+            item = directory()->model()->findItemData(m_activeImageList->
+                          name(), Qt::DisplayRole);
+            item->setTextColor(Qt::darkGreen);
+            activeControl()->controlNet()->SetImages(*(m_activeImageList->serialNumberList()));
+          }
+          else {
+            m_activeImageList = NULL;
+          }
+          throw IException(e);
+        }
+      }
       item->setTextColor(Qt::darkGreen);
+      emit activeImageListSet();
     }
-    emit activeImageListSet();
   }
 
 
@@ -2038,6 +2089,7 @@ namespace Isis {
         else {
           // If we get this far the WorkOrder is not-undoable therefore we have to call redo by
           // hand.
+
           workOrder->redo();
         }
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)

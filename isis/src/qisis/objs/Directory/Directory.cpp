@@ -69,6 +69,7 @@
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
+#include "MosaicControlNetTool.h"
 #include "MosaicSceneWidget.h"
 #include "OpenProjectWorkOrder.h"
 #include "OpenRecentProjectWorkOrder.h"
@@ -88,6 +89,7 @@
 #include "TableViewContent.h"
 #include "TargetInfoWidget.h"
 #include "TargetGetInfoWorkOrder.h"
+#include "ToolPad.h"
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
 #include "Workspace.h"
@@ -517,6 +519,7 @@ namespace Isis {
    * @return @b (CnetEditorWidget *) The view to add to the window.
    */
   CnetEditorWidget *Directory::addCnetEditorView(Control *network) {
+
     QString title = tr("Cnet Editor View %1").arg( network->displayProperties()->displayName() );
 
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
@@ -532,7 +535,6 @@ namespace Isis {
     QMenuBar *menuBar = new QMenuBar;
     resultLayout->addWidget(menuBar, row, 0, 1, 2);
     row++;
-
     CnetEditorWidget *mainWidget =
         new CnetEditorWidget( network->controlNet(), configFile.expanded() );
     resultLayout->addWidget(mainWidget, row, 0, 1, 2);
@@ -608,6 +610,7 @@ namespace Isis {
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
     
     m_cnetEditorViewWidgets.append(mainWidget);
+    m_controlMap.insertMulti(network, result);
 
     result->setWindowTitle(title);
     result->setObjectName(title);
@@ -648,6 +651,18 @@ namespace Isis {
     // IpceTool::paintAllViewports()
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
+
+    if (!project()->activeControl()) {
+      QList<QAction *> toolbar = result->toolPadActions();
+      QAction* cnetAction = toolbar[0];
+      MosaicControlNetTool *cnetButton = static_cast<MosaicControlNetTool *>(cnetAction->parent());
+
+      cnetAction->setEnabled(false);
+      connect (project(), SIGNAL(activeControlSet(bool)),
+              cnetAction, SLOT(setEnabled(bool)));
+      connect (project(), SIGNAL(activeControlSet(bool)),
+              cnetButton, SLOT(loadNetwork()));
+    }
 
     return result;
   }
@@ -698,11 +713,16 @@ namespace Isis {
     //  assumes the Control Net tool is the 4th in the toolpad.
     if (!project()->activeControl()) {
       QList<QAction *> toolbar = result->toolPadActions();
-      QAction* cnetButton = toolbar[3];
-      cnetButton->setEnabled(false);
+      QAction* cnetAction = toolbar[3];
+      MosaicControlNetTool *cnetButton = static_cast<MosaicControlNetTool *>(cnetAction->parent());
+
+      cnetAction->setEnabled(false);
       connect (project(), SIGNAL(activeControlSet(bool)),
-               cnetButton, SLOT(setEnabled(bool)));
+              cnetAction, SLOT(setEnabled(bool)));
+      connect (project(), SIGNAL(activeControlSet(bool)),
+              cnetButton, SLOT(loadNetwork()));
     }
+
     return result;
   }
 
@@ -936,11 +956,19 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-
     CnetEditorWidget *cnetEditorWidget = static_cast<CnetEditorWidget *>(obj);
     if (!cnetEditorWidget) {
       return;
     }
+
+    Control *control = m_controlMap.key(cnetEditorWidget);
+
+    m_controlMap.remove(control, cnetEditorWidget);
+
+    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {
+      control->closeControlNet();
+    }
+
     m_cnetEditorViewWidgets.removeAll(cnetEditorWidget);
   }
 
@@ -987,17 +1015,17 @@ namespace Isis {
   /**
    * @brief Delete the ControlPointEditWidget and set it's pointer to NULL.
    */
-  void Directory::cleanupControlPointEditViewWidget(QObject *obj) {
+   void Directory::cleanupControlPointEditViewWidget(QObject *obj) {
 
-    ControlPointEditView *controlPointEditView = static_cast<ControlPointEditView *>(obj);
-    if (!controlPointEditView) {
-      return;
-    }
-    //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
-    //  of ControlPointEditView
-//    delete m_chipViewports;
-//    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
-  }
+     ControlPointEditView *controlPointEditView = static_cast<ControlPointEditView *>(obj);
+     if (!controlPointEditView) {
+       return;
+     }
+     //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
+     //  of ControlPointEditView
+ //    delete m_chipViewports;
+ //    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
+   }
 
 
   /**
@@ -1609,6 +1637,7 @@ namespace Isis {
   void Directory::makeBackupActiveControl() {
 
     project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
+    delete project()->activeControl()->controlNet();
   }
 
 

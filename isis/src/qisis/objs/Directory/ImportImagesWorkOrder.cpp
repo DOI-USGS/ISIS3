@@ -88,20 +88,20 @@ namespace Isis {
     return new ImportImagesWorkOrder(*this);
   }
 
-  
+
   /**
-   * This method returns true if the user clicked on a project tree node with the text "Images". 
-   * This is used by Directory::supportedActions(DataType data) to determine what actions are 
+   * This method returns true if the user clicked on a project tree node with the text "Images".
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are
    * appended to context menus.
-   * 
+   *
    * @param item The ProjectItem that was clicked
-   * 
+   *
    * @return bool True if the user clicked on a project tree node named "Shapes"
    */
   bool ImportImagesWorkOrder::isExecutable(ProjectItem *item) {
     return (item->text() == "Images");
   }
-  
+
 
   /**
    * @brief Sets up this work order before being executed.
@@ -119,84 +119,90 @@ namespace Isis {
    * @return bool Returns true if the setup was successful.
    */
   bool ImportImagesWorkOrder::setupExecution() {
-    WorkOrder::setupExecution();
+    try {
+      WorkOrder::setupExecution();
 
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        qobject_cast<QWidget *>(parent()),
-        tr("Import Images"), "",
-        tr("Isis cubes and list files (*.cub *.lis);;All Files (*)"));
+      QStringList fileNames = QFileDialog::getOpenFileNames(
+          qobject_cast<QWidget *>(parent()),
+          tr("Import Images"), "",
+          tr("Isis cubes and list files (*.cub *.lis);;All Files (*)"));
 
-    QStringList stateToSave;
+      QStringList stateToSave;
 
-    if (!fileNames.isEmpty()) {
-      foreach (FileName fileName, fileNames) {
-        if (fileName.extension() == "lis") {
-          TextFile listFile(fileName.expanded());
-          QString path = fileName.path();
-          QString lineOfListFile;
+      if (!fileNames.isEmpty()) {
+        foreach (FileName fileName, fileNames) {
+          if (fileName.extension() == "lis") {
+            TextFile listFile(fileName.expanded());
+            QString path = fileName.path();
+            QString lineOfListFile;
 
-          while (listFile.GetLine(lineOfListFile)) {
-            if (lineOfListFile.contains(path)){
-              stateToSave.append(lineOfListFile);
-            }
-            else {
-              stateToSave.append(path + "/" + lineOfListFile);
+            while (listFile.GetLine(lineOfListFile)) {
+              if (lineOfListFile.contains(path)){
+                stateToSave.append(lineOfListFile);
+              }
+              else {
+                stateToSave.append(path + "/" + lineOfListFile);
+              }
             }
           }
-        }
-        else {
-          stateToSave.append(fileName.original());
+          else {
+            stateToSave.append(fileName.original());
+          }
         }
       }
+
+      QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
+      if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
+        saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
+                 tr("Save Project Before Importing Images"),
+                 tr("Would you like to save your project <b>before</b> importing images? It can be "
+                    "slow to save your project after these images have been loaded if you do not "
+                    "save now."),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                 QMessageBox::Yes);
+      }
+
+      if (saveProjectAnswer == QMessageBox::Yes) {
+        SaveProjectWorkOrder saveWorkOrder(project());
+        saveWorkOrder.trigger();
+      }
+
+      QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
+      if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
+        copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
+                 tr("Copy Images into Project"),
+                 tr("Should images (DN data) be copied into project?"),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                 QMessageBox::Yes);
+      }
+
+      bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
+
+      stateToSave.prepend(copyDnData? "copy" : "nocopy");
+
+      if (fileNames.count() > 1) {
+        QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
+      }
+      else if (fileNames.count() == 1 && stateToSave.count() > 2) {
+        QUndoCommand::setText(tr("Import %1 Images from %2").arg(
+                      QString::number(stateToSave.count() - 1), fileNames.first()));
+      }
+      else {
+        QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
+      }
+
+      // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
+      setInternalData(stateToSave);
+
+      bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
+                      copyImagesAnswer != QMessageBox::Cancel;
+
+      return doImport;
     }
-
-    QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
-    if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
-      saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
-               tr("Save Project Before Importing Images"),
-               tr("Would you like to save your project <b>before</b> importing images? It can be "
-                  "slow to save your project after these images have been loaded if you do not "
-                  "save now."),
-               QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-               QMessageBox::Yes);
+    catch (IException e) {
+        QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
+        return false;
     }
-
-    if (saveProjectAnswer == QMessageBox::Yes) {
-      SaveProjectWorkOrder saveWorkOrder(project());
-      saveWorkOrder.trigger();
-    }
-
-    QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
-    if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
-      copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
-               tr("Copy Images into Project"),
-               tr("Should images (DN data) be copied into project?"),
-               QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-               QMessageBox::Yes);
-    }
-
-    bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
-
-    stateToSave.prepend(copyDnData? "copy" : "nocopy");
-
-    if (fileNames.count() > 1) {
-      QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
-    }
-    else if (fileNames.count() == 1 && stateToSave.count() > 2) {
-      QUndoCommand::setText(tr("Import %1 Images from %2").arg(
-                    QString::number(stateToSave.count() - 1), fileNames.first()));
-    }
-    else {
-      QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
-    }
-
-    // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
-    setInternalData(stateToSave);
-
-    bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
-                    copyImagesAnswer != QMessageBox::Cancel;
-
-    return doImport;
   }
 
 
@@ -255,12 +261,17 @@ namespace Isis {
    * @see WorkOrder::execute()
    */
   void ImportImagesWorkOrder::execute() {
-    QObject tmpObj;
-    if (internalData().count() > 0) {
-      // Recall in setupExecution() that first element in internal data is copy|nocopy,
-      // and rest of elements are the expanded names of images to import.
-      importConfirmedImages(internalData().mid(1), (internalData()[0] == "copy"));
-      project()->setClean(false);
+    try {
+      QObject tmpObj;
+      if (internalData().count() > 0) {
+        // Recall in setupExecution() that first element in internal data is copy|nocopy,
+        // and rest of elements are the expanded names of images to import.
+        importConfirmedImages(internalData().mid(1), (internalData()[0] == "copy"));
+        project()->setClean(false);
+      }
+    }
+    catch (IException e) {
+        QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
 
@@ -276,13 +287,18 @@ namespace Isis {
    * @see WorkOrder::postExecution()
    */
   void ImportImagesWorkOrder::postExecution() {
-    if (!m_newImages->isEmpty()) {
-      project()->addImages(*m_newImages);
+    try {
+      if (!m_newImages->isEmpty()) {
+        project()->addImages(*m_newImages);
 
-      delete m_newImages;
-      m_newImages = NULL;
+        delete m_newImages;
+        m_newImages = NULL;
+      }
     }
-
+    catch (IException e) {
+      m_status = WorkOrderFinished;
+      m_warning.append(e.what());
+    }
     if (m_warning != "") {
       project()->warn(m_warning);
     }
@@ -382,13 +398,13 @@ namespace Isis {
       }
       // When we encounter an exception, update the m_errors and m_numErrors to with the exception
       // that occurred.
-      catch (IException &e) {
-        m_errorsLock.lock();
+      catch (...) {
+      //  m_errorsLock.lock();
 
-        m_errors->append(e);
-        (*m_numErrors)++;
+      //  m_errors->append(e);
+      //  (*m_numErrors)++;
 
-        m_errorsLock.unlock();
+        //m_errorsLock.unlock();
       }
     }
 
@@ -439,102 +455,107 @@ namespace Isis {
    *                   inside of the project.
    */
   void ImportImagesWorkOrder::importConfirmedImages(QStringList confirmedImages, bool copyDnData) {
-    if (!confirmedImages.isEmpty()) {
-      QDir folder = project()->addImageFolder("import");
+    try {
+      if (!confirmedImages.isEmpty()) {
+        QDir folder = project()->addImageFolder("import");
 
-      setProgressRange(0, confirmedImages.count());
+        setProgressRange(0, confirmedImages.count());
 
-      // We are creating a new QObject within an asynchronous execute(), which means that this
-      // variable, m_newImages, has thread affinity with a thread in the gloabal thread pool
-      // (i.e. m_newImages lives in a thread in the global thread pool).
-      // see WorkOrder::redo().
-      m_newImages = new ImageList;
-      m_newImages->reserve(confirmedImages.count());
+        // We are creating a new QObject within an asynchronous execute(), which means that this
+        // variable, m_newImages, has thread affinity with a thread in the gloabal thread pool
+        // (i.e. m_newImages lives in a thread in the global thread pool).
+        // see WorkOrder::redo().
+        m_newImages = new ImageList;
+        m_newImages->reserve(confirmedImages.count());
 
-      QStringList confirmedImagesFileNames;
-      QStringList confirmedImagesIds;
+        QStringList confirmedImagesFileNames;
+        QStringList confirmedImagesIds;
 
-      foreach (QString confirmedImage, confirmedImages) {
-        QStringList fileNameAndId = confirmedImage.split(",");
-        confirmedImagesFileNames.append(fileNameAndId.first());
+        foreach (QString confirmedImage, confirmedImages) {
+          QStringList fileNameAndId = confirmedImage.split(",");
+          confirmedImagesFileNames.append(fileNameAndId.first());
 
-        // Determine if there was already a unique id provided for the file.
-        if (fileNameAndId.count() == 2) {
-          confirmedImagesIds.append(fileNameAndId.last());
-        }
-        else {
-          confirmedImagesIds.append(QString());
-        }
-      }
-
-      OriginalFileToProjectCubeFunctor functor(thread(), folder, copyDnData);
-      // Start concurrently copying the images to import.
-      QFuture<Cube *> future = QtConcurrent::mapped(confirmedImagesFileNames, functor);
-
-      // The new internal data will store the copied files as well as their associated unique id's.
-      QStringList newInternalData;
-      newInternalData.append(internalData().first());
-
-      // By releasing a thread from the global thread pool, we are effectively temporarily
-      // increasing the max number of available threads. This is useful when a thread goes to sleep
-      // waiting for more work, so we can allow other threads to continue.
-      // See Qt's QThreadPool::releaseThread() documentation.
-      QThreadPool::globalInstance()->releaseThread();
-      for (int i = 0; i < confirmedImages.count(); i++) {
-        setProgressValue(i);
-
-        // This will wait for the result at i to finish (the functor invocation finishes) and
-        // get the cube.
-        Cube *cube = future.resultAt(i);
-
-        if (cube) {
-          // Create a new image from the result in the thread spawned in WorkOrder::redo().
-          Image *newImage = new Image(future.resultAt(i));
-
-          // Either use a unique id that was already provided or create one for the new image.
-          if (confirmedImagesIds[i].isEmpty()) {
-            confirmedImagesIds[i] = newImage->id();
+          // Determine if there was already a unique id provided for the file.
+          if (fileNameAndId.count() == 2) {
+            confirmedImagesIds.append(fileNameAndId.last());
           }
           else {
-            newImage->setId(confirmedImagesIds[i]);
+            confirmedImagesIds.append(QString());
           }
-
-          QStringList imageInternalData;
-          imageInternalData.append(confirmedImagesFileNames[i]);
-          imageInternalData.append(confirmedImagesIds[i]);
-
-          newInternalData.append(imageInternalData.join(","));
-
-          m_newImages->append(newImage);
-
-          // Move the new image back and its display properities to the GUI thread.
-          // Note: thread() returns the GUI thread because this ImportImagesWorkOrder lives
-          // (was created) in the GUI thread.
-          newImage->moveToThread(thread());
-          newImage->displayProperties()->moveToThread(thread());
-
-          newImage->closeCube();
         }
+
+        OriginalFileToProjectCubeFunctor functor(thread(), folder, copyDnData);
+        // Start concurrently copying the images to import.
+        QFuture<Cube *> future = QtConcurrent::mapped(confirmedImagesFileNames, functor);
+
+        // The new internal data will store the copied files as well as their associated unique id's.
+        QStringList newInternalData;
+        newInternalData.append(internalData().first());
+
+        // By releasing a thread from the global thread pool, we are effectively temporarily
+        // increasing the max number of available threads. This is useful when a thread goes to sleep
+        // waiting for more work, so we can allow other threads to continue.
+        // See Qt's QThreadPool::releaseThread() documentation.
+        QThreadPool::globalInstance()->releaseThread();
+        for (int i = 0; i < confirmedImages.count(); i++) {
+          setProgressValue(i);
+
+          // This will wait for the result at i to finish (the functor invocation finishes) and
+          // get the cube.
+          Cube *cube = future.resultAt(i);
+
+          if (cube) {
+            // Create a new image from the result in the thread spawned in WorkOrder::redo().
+            Image *newImage = new Image(future.resultAt(i));
+
+            // Either use a unique id that was already provided or create one for the new image.
+            if (confirmedImagesIds[i].isEmpty()) {
+              confirmedImagesIds[i] = newImage->id();
+            }
+            else {
+              newImage->setId(confirmedImagesIds[i]);
+            }
+
+            QStringList imageInternalData;
+            imageInternalData.append(confirmedImagesFileNames[i]);
+            imageInternalData.append(confirmedImagesIds[i]);
+
+            newInternalData.append(imageInternalData.join(","));
+
+            m_newImages->append(newImage);
+
+            // Move the new image back and its display properities to the GUI thread.
+            // Note: thread() returns the GUI thread because this ImportImagesWorkOrder lives
+            // (was created) in the GUI thread.
+            newImage->moveToThread(thread());
+            newImage->displayProperties()->moveToThread(thread());
+
+            newImage->closeCube();
+          }
+        }
+        // Since we temporarily increased the max thread count (by releasing a thread), make sure
+        // to re-reserve the thread for the global thread pool's accounting.
+        // See Qt's QThreadPool::reserveThread().
+        QThreadPool::globalInstance()->reserveThread();
+
+        m_warning = functor.errors().toString();
+
+        // Recall that m_newImages has thread affinity with a thread in the global thread pool.
+        // Move it to the GUI-thread because these threads in the pool do not run in an event loop,
+        // so they cannot process events.
+        // See https://doc.qt.io/qt-5/threads-qobject.html#per-thread-event-loop
+        // See http://doc.qt.io/qt-5/threads-technologies.html#comparison-of-solutions
+        m_newImages->moveToThread(thread());
+
+        if (m_newImages->isEmpty()) {
+          folder.removeRecursively();
+        }
+
+        setInternalData(newInternalData);
       }
-      // Since we temporarily increased the max thread count (by releasing a thread), make sure
-      // to re-reserve the thread for the global thread pool's accounting.
-      // See Qt's QThreadPool::reserveThread().
-      QThreadPool::globalInstance()->reserveThread();
-
-      m_warning = functor.errors().toString();
-
-      // Recall that m_newImages has thread affinity with a thread in the global thread pool.
-      // Move it to the GUI-thread because these threads in the pool do not run in an event loop,
-      // so they cannot process events.
-      // See https://doc.qt.io/qt-5/threads-qobject.html#per-thread-event-loop
-      // See http://doc.qt.io/qt-5/threads-technologies.html#comparison-of-solutions
-      m_newImages->moveToThread(thread());
-
-      if (m_newImages->isEmpty()) {
-        folder.removeRecursively();
-      }
-
-      setInternalData(newInternalData);
+    }
+    catch (IException e) {
+        QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
 }

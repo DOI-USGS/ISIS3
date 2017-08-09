@@ -165,6 +165,8 @@ namespace Isis {
    *                           Fixes #5046.
    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a 
    *                           control net without having an active control net set. Fixes #5048.
+   *   @history 2017-08-07 Cole Neubauer - Added functionality to switch between active controls and
+   *                           ImageList Fixes #4567
    */
   class Project : public QObject {
     Q_OBJECT

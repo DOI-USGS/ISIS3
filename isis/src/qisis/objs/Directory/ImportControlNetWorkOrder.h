@@ -49,11 +49,13 @@ namespace Isis {
    *                           WorkOrder redesign. Fixes #4716.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so when undone, the imported
    *                           cnet(s) are removed from the project tree. Fixes #4597.
-   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call Fixes #4969
    *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
    *                           in the context menu. Fixes #4968.
    *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
    *                           is undone. Fixes #5043.
+   *   @history 2017-08-02 Cole Neubauer - Refactored import so it closes the controlNet after
+   *                           Control is created Fixes #5026
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT

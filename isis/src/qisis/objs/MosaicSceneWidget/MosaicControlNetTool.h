@@ -17,7 +17,7 @@ namespace Isis {
 
   /**
    * //TODO: Remove debug printout & comment
-   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal. 
+   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal.
    *                           Is there a better design?  This might go away if we emit signals,
    *                           which only IPCE classes would connect to.
    * @brief Handles Control Net displays
@@ -64,6 +64,7 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Added slot to rebuild the graphics items that depict
    *                           the control points.  This is used to update these items if a control
    *                           point was added or deleted.  Fixes #5007, #5008.
+   *   @history 2017-08-02 Cole Neubauer - Moved loadNetwork into public slot Fixes #4567
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -121,6 +122,7 @@ namespace Isis {
       void displayNewControlPoint(QString pointId);
       void displayChangedControlPoint(QString pointId);
       void displayUponControlPointDeletion();
+      void loadNetwork();
 
     protected:
       QAction *getPrimaryAction();
@@ -134,7 +136,6 @@ namespace Isis {
       void displayControlNet();
       void displayConnectivity();
       void closeNetwork();
-      void loadNetwork();
       void randomizeColors();
 
       void objectDestroyed(QObject *);
@@ -167,4 +168,3 @@ namespace Isis {
 };
 
 #endif
-

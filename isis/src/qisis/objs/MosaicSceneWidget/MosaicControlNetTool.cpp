@@ -99,8 +99,8 @@ namespace Isis {
     //  Why can't the getControlNetHelp and getGridHelp pass in the current MosaicSceneWidget?
     if (getWidget() && !getWidget()->directory()) {
       m_closeNetwork = new QPushButton("Close Network");
-      m_closeNetwork->setEnabled(false);
-      m_closeNetwork->setVisible(false);
+      m_closeNetwork->setEnabled(true);
+      m_closeNetwork->setVisible(true);
       m_closeNetwork->setToolTip("Close the currently open control network");
       connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
       connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
@@ -462,7 +462,6 @@ namespace Isis {
       }
     }
   }
-  
 
   /**
    * Slot used to re-create the graphics items that depict the control points
@@ -591,11 +590,11 @@ namespace Isis {
         QMessageBox::critical(getWidget(), "Error", message);
         return;
       }
-      m_controlNetFile = getWidget()->directory()->project()->activeControl()->fileName(); 
+      m_controlNetFile = getWidget()->directory()->project()->activeControl()->fileName();
     }
 
     if (!m_controlNetFile.isEmpty()) {
-      loadNetwork(); 
+      loadNetwork();
       if (m_displayControlNetButton) m_displayControlNetButton->setChecked(true);
     }
   }
@@ -665,7 +664,7 @@ namespace Isis {
   }
 
 
-  // TODO: why did we remove the error checks? 
+  // TODO: why did we remove the error checks?
   void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton mouseButton) {
 
     if (!isActive() || !m_controlNet) return;
@@ -692,7 +691,7 @@ namespace Isis {
 
     }
     else if (mouseButton == Qt::MidButton) {
-      
+
 
       cp = m_controlNetGraphics->findClosestControlPoint();
       if (!cp) {
@@ -702,7 +701,7 @@ namespace Isis {
         QMessageBox::warning(getWidget(), "Warning", message);
         return;
       }
-      
+
       emit deleteControlPoint(cp);
       //       deletePoint(point); // what should happen here?
     }

@@ -33,14 +33,17 @@ namespace Isis {
    *
    * @author 2016-06-22 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    * @history 2016-09-19 Tracie Sucharski - Call SetImages on the control net to initialize cameras.
-   * @history 2017-01-09 Tracie Sucharski - Moved the SetImages step to the 
+   * @history 2017-01-09 Tracie Sucharski - Moved the SetImages step to the
    *                         Project::setActiveControl.
-   * @history 2017-01-30 Tracie Sucharski - Print active control in the Undo text. 
+   * @history 2017-01-30 Tracie Sucharski - Print active control in the Undo text.
    *          2017-04-04 Tracie Sucharski - Updated to reflect the new WorkOrder design, renaming
    *                         execute to setupExecution, and moving the actual work to execute.
    *                         Fixes #4717, #4728.
+   * @history 2017-08-03 Cole Neubauer - Created a try catch around a previously unprotected error
+   *                         to handle errors thrown in the workorder that halted execution.
+   *                         Fixes #5026
    */
 
   class SetActiveControlWorkOrder : public WorkOrder {
@@ -62,4 +65,3 @@ namespace Isis {
   };
 }
 #endif
-

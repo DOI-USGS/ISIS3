@@ -1036,6 +1036,7 @@ namespace Isis {
       }
 
       if (mustQueueThisRedo && !isUndoing() && !isRedoing()) {
+
         m_queuedAction = RedoQueuedAction;
 
         QString queueStatusText;

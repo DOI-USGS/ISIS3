@@ -303,6 +303,8 @@ namespace Isis {
    *                           being added to the HistoryTree Fixes #4715
    *   @history 2017-07-31 Cole Neubauer - Added a QTMutexLocker to every function that returns a
    *                           member variable function Fixes #5082
+   *   @history 2017-08-02 Cole Neubauer - Moved m_status to protected so children can set it
+   *                           if a workorder errors Fixes #5026
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -527,6 +529,8 @@ namespace Isis {
         */
        bool m_isSavedToHistory;
 
+       WorkOrderStatus m_status;
+
     private:
       WorkOrder &operator=(const WorkOrder &rhs);
 
@@ -544,7 +548,6 @@ namespace Isis {
        */
       bool m_modifiesDiskState;
 
-      WorkOrderStatus m_status;
       QueuedWorkOrderAction m_queuedAction;
 
       /**

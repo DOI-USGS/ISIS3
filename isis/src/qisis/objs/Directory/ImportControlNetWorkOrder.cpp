@@ -41,7 +41,7 @@ namespace Isis {
 
   /**
    * Creates a work order to import a control network.
-   * 
+   *
    * @param *project Pointer to the project this work order belongs to
    */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(Project *project) :
@@ -63,7 +63,7 @@ namespace Isis {
 
   /**
    * Creates a copy of the other ImportControlNetWorkOrder
-   * 
+   *
    * @param &other ImportControlNetsWorkOrder to copy the state from
    */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(const ImportControlNetWorkOrder &other) :
@@ -87,22 +87,22 @@ namespace Isis {
 
   /**
    * This method clones the current ImportControlNetWorkOrder and returns it.
-   * 
+   *
    * @return ImportControlNetWorkOrder Clone
    */
   ImportControlNetWorkOrder *ImportControlNetWorkOrder::clone() const {
     return new ImportControlNetWorkOrder(*this);
   }
-  
-  
+
+
   /**
-   * This method returns true if the user clicked on a project tree node with the text 
-   * "Control Networks". 
-   * This is used by Directory::supportedActions(DataType data) to determine what actions are 
+   * This method returns true if the user clicked on a project tree node with the text
+   * "Control Networks".
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are
    * appended to context menus.
-   * 
+   *
    * @param item The ProjectItem that was clicked
-   * 
+   *
    * @return bool True if the user clicked on a project tree node named "Control Network"
    */
   bool ImportControlNetWorkOrder::isExecutable(ProjectItem *item) {
@@ -227,7 +227,7 @@ namespace Isis {
    * @param destinationFolder The directory to copy to
    */
   ImportControlNetWorkOrder::CreateControlsFunctor::CreateControlsFunctor(
-      Project *project, QDir destinationFolder) {
+    Project *project, QDir destinationFolder) {
     m_project = project;
     m_destinationFolder = destinationFolder;
   }
@@ -253,7 +253,11 @@ namespace Isis {
 
     cnet->Write(destination);
 
-    Control *control = new Control(cnet, destination);
+    delete cnet;
+    cnet = NULL;
+
+    Control *control = new Control(m_project, destination);
+    control->closeControlNet();
     return control;
   }
 

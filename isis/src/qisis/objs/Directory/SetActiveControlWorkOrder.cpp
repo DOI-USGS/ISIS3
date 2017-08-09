@@ -89,7 +89,7 @@ namespace Isis {
 
   /**
    * @brief Make sure an active ImageList has been chosen.
-   *  
+   *
    * @return @b bool True if project has an active ImageList, False otherwise.
    */
   bool SetActiveControlWorkOrder::setupExecution() {
@@ -98,7 +98,7 @@ namespace Isis {
     if (success) {
       if (!project()->activeImageList()) {
 
-        QMessageBox::critical(NULL, tr("Unable to set active control."), 
+        QMessageBox::critical(NULL, tr("Unable to set active control."),
                               tr("You must first choose an active Image List before setting "
                               "the active control net."));
         success = false;
@@ -119,11 +119,15 @@ namespace Isis {
    *               the same control net.  The active image list must be set before the active
    *               control net is chosen.  If not, a critical message dialog is displayed and we
    *               return false.
-   * 
+   *
    */
   void SetActiveControlWorkOrder::execute() {
-
-    project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
+    try {
+      project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
+    }
+    catch (IException e) {
+      m_status = WorkOrderFinished;
+      QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
+    }
   }
 }
-
