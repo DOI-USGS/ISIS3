@@ -305,6 +305,10 @@ namespace Isis {
 //  pointInfoLayout->addWidget(m_ptIdValue);
 //  pointInfoLayout->addWidget(m_numMeasures);
 
+    m_aprioriLatitude = new QLabel;
+    m_aprioriLongitude = new QLabel;
+    m_aprioriRadius = new QLabel;
+
     // create right vertical layout's top layout
     m_lockPoint = new QCheckBox("Edit Lock Point");
     connect(m_lockPoint, SIGNAL(clicked(bool)), this, SLOT(setLockPoint(bool)));
@@ -332,6 +336,9 @@ namespace Isis {
     QVBoxLayout * mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_ptIdValue);
     mainLayout->addWidget(m_numMeasures);
+    mainLayout->addWidget(m_aprioriLatitude);
+    mainLayout->addWidget(m_aprioriLongitude);
+    mainLayout->addWidget(m_aprioriRadius);
     mainLayout->addWidget(m_lockPoint);
     mainLayout->addWidget(m_ignorePoint);
     mainLayout->addLayout(pointTypeLayout);
@@ -799,6 +806,38 @@ namespace Isis {
     QString ptsize = "Number of Measures:  " +
                    QString::number(m_editPoint->GetNumMeasures());
     m_numMeasures->setText(ptsize);
+
+
+    SurfacePoint surfPoint = m_editPoint->GetAprioriSurfacePoint();
+    QString lat, lon, rad;
+
+    //  Write apriori latitude
+    if (surfPoint.GetLatitude().degrees() == Null) {
+      lat = "Apriori Latitude:  Null";
+    }
+    else {
+      lat = "Apriori Latitude:  " + QString::number(surfPoint.GetLatitude().degrees());
+    }
+    m_aprioriLatitude->setText(lat);
+
+    //  Write apriori longitude
+    if (surfPoint.GetLongitude().degrees() == Null) {
+      lon = "Apriori Longitude:  Null";
+    }
+    else {
+      lon = "Apriori Longitude:  " + QString::number(surfPoint.GetLongitude().degrees());
+
+    }
+    m_aprioriLongitude->setText(lon);
+
+    //  Write apriori radius
+    if (surfPoint.GetLocalRadius().meters() == Null) {
+      rad = "Apriori Radius:  Null";
+    }
+    else {
+      rad = "Apriori Radius:  " + QString::number(surfPoint.GetLocalRadius().meters(), 'f', 2);
+    }
+    m_aprioriRadius->setText(rad);
 
     //  Set EditLock box correctly
     m_lockPoint->setChecked(m_editPoint->IsEditLocked());

@@ -68,6 +68,8 @@ namespace Isis {
    *                           #5008.
    *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
    *                           measures in the ChipViewports. Fixes #5070.
+   *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to
+   *                           the dialog. Fixes #5066.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -200,6 +202,9 @@ namespace Isis {
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
+      QPointer<QLabel> m_aprioriLatitude;
+      QPointer<QLabel> m_aprioriLongitude;
+      QPointer<QLabel> m_aprioriRadius;
 
       QPointer<QCheckBox> m_lockPoint; //!< Checkbox that locks/unlocks the current point
       QPointer<QCheckBox> m_ignorePoint; //!< Checkbox to ignore the current point
