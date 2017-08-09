@@ -55,7 +55,7 @@ namespace Isis {
    *
    * @author 2014-06-25 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
    *                           query for shapes and other data from the project.
@@ -66,6 +66,8 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Added methods to return the current editPoint and
    *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
    *                           #5008.
+   *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
+   *                           measures in the ChipViewports. Fixes #5070.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -105,6 +107,7 @@ namespace Isis {
 
     private slots:
 //    void enterWhatsThisMode();
+      void reloadPoint();
       void saveNet();
 //    void addMeasure();
 //    void setPointType (int pointType);
@@ -183,6 +186,7 @@ namespace Isis {
       //! Pointer to control measure editor widget
       QPointer<ControlMeasureEditWidget> m_measureEditor;
 
+      QPointer<QPushButton> m_reloadPoint; //!< Button to reload current point to saved measures
       QPointer<QPushButton> m_savePoint; //!< Button to save current point being edited
       QPalette m_saveDefaultPalette; //!< Default color pallet of the "Save Point" button
 
@@ -196,7 +200,7 @@ namespace Isis {
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
-      
+
       QPointer<QCheckBox> m_lockPoint; //!< Checkbox that locks/unlocks the current point
       QPointer<QCheckBox> m_ignorePoint; //!< Checkbox to ignore the current point
       QPointer<QLabel> m_leftReference; //!< Label indicating if left measure is the reference
@@ -233,7 +237,7 @@ namespace Isis {
       QString m_groundSN; //!< Serial number of ground source file
       bool m_changeAllGroundLocation; //!< Change the ground source location of all fixed,
                                       //!  constrained points in the network
-      bool m_changeGroundLocationInNet; //!< Change the ground source location 
+      bool m_changeGroundLocationInNet; //!< Change the ground source location
       QString m_newGroundDir; //!< Contains the ground source location
   };
 };
