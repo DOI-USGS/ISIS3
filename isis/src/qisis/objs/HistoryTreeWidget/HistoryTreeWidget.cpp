@@ -24,6 +24,7 @@ namespace Isis {
 
     setHeaderLabels(headers);
 
+
     connect(m_project, SIGNAL(workOrderStarting(WorkOrder *)),
             this, SLOT(addToHistory(WorkOrder *)));
     connect(m_project, SIGNAL(projectLoaded(Project *)),
@@ -35,6 +36,7 @@ namespace Isis {
 
     refit();
   }
+
 
 
   /**
@@ -105,26 +107,28 @@ namespace Isis {
    * @param workOrder The work order to display the history for
    */
   void HistoryTreeWidget::addToHistory(WorkOrder *workOrder) {
-      QString data = workOrder->bestText();
 
-      connect(workOrder, SIGNAL(destroyed(QObject *)),
-              this, SLOT(removeFromHistory(QObject *)));
+    QString data = workOrder->bestText();
 
-      QStringList columnData;
-      columnData.append(data);
-      columnData.append("");
-      columnData.append(workOrder->executionTime().toString());
 
-      QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
-      newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
+    connect(workOrder, SIGNAL(destroyed(QObject *)),
+                this, SLOT(removeFromHistory(QObject *)));
 
-      // Do font for save work orders or work orders not on QUndoStack
-      if (workOrder->createsCleanState() || !workOrder->isUndoable()) {
-        QFont saveFont = newItem->font(0);
-        saveFont.setBold(true);
-        saveFont.setItalic(true);
-        newItem->setFont(0, saveFont);
-        newItem->setForeground(0, Qt::gray);
+    QStringList columnData;
+    columnData.append(data);
+    columnData.append("");
+    columnData.append(workOrder->executionTime().toString());
+
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
+    newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
+
+    // Do font for save work orders or work orders not on QUndoStack
+    if (workOrder->createsCleanState() || !workOrder->isUndoable()) {
+      QFont saveFont = newItem->font(0);
+      saveFont.setBold(true);
+      saveFont.setItalic(true);
+      newItem->setFont(0, saveFont);
+      newItem->setForeground(0, Qt::gray);
       }
 
       // Do font for progress text
@@ -133,21 +137,28 @@ namespace Isis {
       newItem->setFont(1, progressFont);
       newItem->setForeground(1, Qt::gray);
 
-      invisibleRootItem()->addChild(newItem);
+
+      this->insertTopLevelItem(0,newItem);
 
       connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
-              this, SLOT(updateStatus(WorkOrder *)));
+                this, SLOT(updateStatus(WorkOrder *)));
       connect(workOrder, SIGNAL(creatingProgress(WorkOrder *)),
-              this, SLOT(updateProgressWidgets()));
+                this, SLOT(updateProgressWidgets()));
       connect(workOrder, SIGNAL(deletingProgress(WorkOrder *)),
-              this, SLOT(updateProgressWidgets()));
+                this, SLOT(updateProgressWidgets()));
 
-      if (workOrder->progressBar()) {
-        setItemWidget(newItem, 1, workOrder->progressBar());
+
+      //Sometimes the pointer returned by this call is 0 (hence the check).
+      //So we are not creating a progress bar for every work order which would
+      //include those that do not need it.
+
+      if(workOrder->progressBar() )  {
+        this->setItemWidget(newItem, 1, new ProgressBar );
       }
-
       scrollToItem(newItem);
       refit();
+      return;
+
   }
 
 
@@ -160,17 +171,11 @@ namespace Isis {
    *   resize event.
    */
   void HistoryTreeWidget::updateProgressWidgets() {
-    if(m_project->clearing()){
-      return;
-    }
     for (int i = 0; i < invisibleRootItem()->childCount(); i++) {
       QTreeWidgetItem *item = invisibleRootItem()->child(i);
-      if (item->data(0, Qt::UserRole).isNull() ) {
-        return;
-      }
       WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
 
-      if (workOrder && itemWidget(item, 1) != workOrder->progressBar() ) {
+      if (workOrder && itemWidget(item, 1) != workOrder->progressBar()) {
         setItemWidget(item, 1, workOrder->progressBar());
       }
     }
@@ -286,8 +291,6 @@ namespace Isis {
 
 
   void HistoryTreeWidget::updateStatus(WorkOrder *workOrder) {
-    if (undoCommandToTreeItem(workOrder)) {
-      undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
-    }
+    undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
   }
 }
