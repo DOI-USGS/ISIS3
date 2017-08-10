@@ -43,6 +43,10 @@ namespace Isis {
    *                           WorkOrder. Separated setup and execution steps into setupExecution
    *                           and execution(). Fixes #4763.
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-08-08 Cole Neubauer - Removed project()->setClean call because
+   *                            project()->open() calls clear() which changes it appropriately,
+   *                            added open call in execution to load the newly saved project #5103
+   *
    */
   class SaveProjectAsWorkOrder : public WorkOrder {
       Q_OBJECT
