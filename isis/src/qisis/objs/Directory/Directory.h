@@ -172,6 +172,8 @@ namespace Isis {
    *                           emits activeControlSet(bool). Added a m_controlmap variable to hold
    *                           which Controls are currently being used and closes the controls not
    *                           needed at the moment Fixes #5026
+   *   @history 2017-08-11 Christopher Combs - Added serialization of CnetEditorWidgets to save()
+   *                           and startElement(). Fixes #4989.
    */
   class Directory : public QObject {
     Q_OBJECT

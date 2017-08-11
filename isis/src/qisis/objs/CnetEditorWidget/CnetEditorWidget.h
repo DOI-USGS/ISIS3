@@ -4,6 +4,8 @@
 
 #include <QWidget>
 
+#include "XmlStackedHandler.h"
+
 class QAction;
 class QBoxLayout;
 class QGroupBox;
@@ -13,12 +15,27 @@ class QScrollArea;
 class QSplitter;
 class QString;
 class QToolBar;
+class QXmlStreamWriter;
+class QXmlAttributes;
 
 namespace Isis {
   class AbstractTableModel;
   class AbstractTreeItem;
+  class Control;
   class ControlNet;
   class ControlPoint;
+  class Directory;
+  class FileName;
+  class Image;
+  class MosaicGraphicsView;
+  class MosaicSceneItem;
+  class MosaicTool;
+  class ProgressBar;
+  class Projection;
+  class Project;
+  class PvlGroup;
+  class PvlObject;
+  class ToolPad;
   class FilterWidget;
   class ImageImageTreeModel;
   class ImagePointTreeModel;
@@ -49,7 +66,11 @@ namespace Isis {
    *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
    *                           to edit a control point when there is not an active control network.
    *                           Fixes #5048.
-   *   @history 2017-08-09 Christopher Combs - Added Apriori lat, lon, and radius labels. Fixes#5066
+   *   @history 2017-08-10 Christopher Combs - Added Apriori lat, lon, and radius labels. Fixes#5066
+   *   @history 2017-08-11 Christopher Combs - Changed constructor to take in a Control instead of
+   *                           a ControlNet. Added load and save methods as well as an XmlHandler
+   *                           to allow for serialization of the widget into the project.
+   *                           Fixes #4989.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -61,7 +82,7 @@ namespace Isis {
         ConnectionView
       };
 
-      CnetEditorWidget(ControlNet *, QString);
+      CnetEditorWidget(Control *control, QString pathForSettings);
       virtual ~CnetEditorWidget();
       void readSettings();
       void writeSettings();
@@ -75,7 +96,7 @@ namespace Isis {
       TableView *pointTableView();
       TableView *measureTableView();
       ControlNet *control();
-      
+
 
       AbstractTableModel *measureTableModel();
       AbstractTableModel *pointTableModel();
@@ -94,6 +115,9 @@ namespace Isis {
       void setMeasureTableSortLimit(int limit);
       void setPointTableSortingEnabled(bool enabled);
       void setPointTableSortLimit(int limit);
+
+      void load(XmlStackedHandlerReader *xmlReader);
+      void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot);
 
 
     public slots:
@@ -116,7 +140,7 @@ namespace Isis {
       void handleMeasureTableFilterCountsChanged(int visibleRows,
           int totalRows);
 
-    private: 
+    private:
       //methods
       void nullify();
       QBoxLayout *createMainLayout();
@@ -130,13 +154,13 @@ namespace Isis {
       void upgradeVersion();
       void handleTableFilterCountsChanged(int visibleRows, int totalRows,
                                           QGroupBox *box, QString initialText);
-      
+
       // data
       bool m_updatingSelection;                                 //!< Updates selection
-      ControlNet *m_controlNet;                                 //!< Control network for this widget
+      Control *m_control;                                       //!< Control for this widget
       QString *m_workingVersion;                                //!< Working version
       static const QString VERSION;                             //!< Version
-      
+
       //widgets
       TreeView *m_pointTreeView;                       //!< Point tree view
       TreeView *m_imageTreeView;                       //!< Image tree view
@@ -167,6 +191,30 @@ namespace Isis {
       QMap< QString, QList< QAction * > > * m_toolBarActions;   //!< QMap of tool bar actions
 
       QString *m_settingsPath; //!< Path to read/write settings
+
+
+    private:
+      /**
+       * @author 2017-07-25 Christopher Combs
+       *
+       * This class is a placeholder for future plans to serialize more of
+       * CnetEditorWidget's configurations when saving a project.
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(CnetEditorWidget *cnetEditor);
+          ~XmlHandler();
+
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                  const QString &qName);
+
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+
+          CnetEditorWidget *m_cnetEditor;
+      };
   };
 }
 

@@ -535,8 +535,7 @@ namespace Isis {
     QMenuBar *menuBar = new QMenuBar;
     resultLayout->addWidget(menuBar, row, 0, 1, 2);
     row++;
-    CnetEditorWidget *mainWidget =
-        new CnetEditorWidget( network->controlNet(), configFile.expanded() );
+    CnetEditorWidget *mainWidget = new CnetEditorWidget(network, configFile.expanded());
     resultLayout->addWidget(mainWidget, row, 0, 1, 2);
     row++;
 
@@ -1307,6 +1306,18 @@ namespace Isis {
       stream.writeEndElement();
     }
 
+        // Save cnetEditorViews
+    if ( !m_cnetEditorViewWidgets.isEmpty() ) {
+      stream.writeStartElement("cnetEditorViews");
+
+      foreach (CnetEditorWidget *cnetEditorWidget, m_cnetEditorViewWidgets) {
+        cnetEditorWidget->save(stream, project(), newProjectRoot);
+      }
+
+      stream.writeEndElement();
+    }
+
+
     stream.writeEndElement();
   }
 
@@ -1355,6 +1366,10 @@ namespace Isis {
       }
       else if (localName == "cubeDnView") {
         m_directory->addCubeDnView()->load(reader(), m_directory->project());
+      }
+      else if (localName == "control") {
+        QString id = atts.value("id");
+        m_directory->addCnetEditorView(m_directory->project()->control(id));
       }
     }
 

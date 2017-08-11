@@ -26,13 +26,14 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWhatsThis>
-
+#include <QtXml>
 
 #include "AbstractMeasureItem.h"
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
 #include "CnetDisplayProperties.h"
 #include "CnetEditorSortConfigDialog.h"
+#include "Control.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -44,9 +45,12 @@
 #include "MeasureTableModel.h"
 #include "PointMeasureTreeModel.h"
 #include "PointTableModel.h"
+#include "Project.h"
 #include "TableView.h"
 #include "TableViewHeader.h"
 #include "TreeView.h"
+#include "XmlStackedHandler.h"
+#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -62,14 +66,7 @@ namespace Isis {
 //**************************************************************
 
 
-  /**
-   * Constructor
-   * 
-   * @param cNet Control network to work on 
-   * @param pathForSettings Where to write the settings
-   */
-  CnetEditorWidget::CnetEditorWidget(ControlNet *cNet,
-      QString pathForSettings) {
+  CnetEditorWidget::CnetEditorWidget(Control *control, QString pathForSettings) {
     nullify();
 
     m_workingVersion = new QString;
@@ -78,7 +75,7 @@ namespace Isis {
 
     m_updatingSelection = false;
 
-    m_controlNet = cNet;
+    m_control = control;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
         this, SLOT(rebuildModels()));
 
@@ -158,7 +155,7 @@ namespace Isis {
 
   /**
    * Sets all member variables to NULL
-   */ 
+   */
   void CnetEditorWidget::nullify() {
     m_pointTreeView = NULL;
     m_imageTreeView = NULL;
@@ -188,7 +185,7 @@ namespace Isis {
     m_serialFilterWidget = NULL;
     m_connectionFilterWidget = NULL;
 
-    m_controlNet = NULL;
+    m_control = NULL;
     m_settingsPath = NULL;
     m_workingVersion = NULL;
   }
@@ -196,7 +193,7 @@ namespace Isis {
 
   /**
    * Deletes the current models, clears the tree, and rebuilds the models
-   * 
+   *
    * @param itemsToDelete Tree to clear
    */
   void CnetEditorWidget::rebuildModels(QList<AbstractTreeItem *> itemsToDelete) {
@@ -340,7 +337,7 @@ namespace Isis {
   void CnetEditorWidget::createPointTreeView() {
     m_pointTreeView = new TreeView();
     m_pointTreeView->setTitle("Point View");
-    m_pointModel = new PointMeasureTreeModel(m_controlNet, m_pointTreeView, qApp);
+    m_pointModel = new PointMeasureTreeModel(m_control->controlNet(), m_pointTreeView, qApp);
     m_pointTreeView->setModel(m_pointModel);
   }
 
@@ -351,7 +348,7 @@ namespace Isis {
   void CnetEditorWidget::createSerialTreeView() {
     m_imageTreeView = new TreeView();
     m_imageTreeView->setTitle("Cube View");
-    m_imageModel = new ImagePointTreeModel(m_controlNet, m_imageTreeView, qApp);
+    m_imageModel = new ImagePointTreeModel(m_control->controlNet(), m_imageTreeView, qApp);
     m_imageTreeView->setModel(m_imageModel);
   }
 
@@ -362,7 +359,7 @@ namespace Isis {
   void CnetEditorWidget::createConnectionTreeView() {
     m_connectionTreeView = new TreeView();
     m_connectionTreeView->setTitle("Cube Connection View");
-    m_connectionModel = new ImageImageTreeModel(m_controlNet, m_connectionTreeView, qApp);
+    m_connectionModel = new ImageImageTreeModel(m_control->controlNet(), m_connectionTreeView, qApp);
     m_connectionTreeView->setModel(m_connectionModel);
   }
 
@@ -547,14 +544,14 @@ namespace Isis {
           actions[i]->isChecked());
   }
 
-  
+
   /**
    * Handles point table filter changes.
-   * 
+   *
    * @param visibleRows Number of visible rows
    * @param totalRows Total number of rows
-   * 
-   * @see handleTableFilterCountsChanged(int visibleRows, int totalRows, QGroupBox *box, 
+   *
+   * @see handleTableFilterCountsChanged(int visibleRows, int totalRows, QGroupBox *box,
    *                                     QString initialText)
    */
   void CnetEditorWidget::handlePointTableFilterCountsChanged(
@@ -566,11 +563,11 @@ namespace Isis {
 
   /**
    * Handles measure table filter changes
-   * 
+   *
    * @param visibleRows Number of visible rows
    * @param totalRows Total number of rows
-   * 
-   * @see handleTableFilterCountsChanged(int visibleRows, int totalRows, QGroupBox *box, 
+   *
+   * @see handleTableFilterCountsChanged(int visibleRows, int totalRows, QGroupBox *box,
    *                                     QString initialText)
    */
   void CnetEditorWidget::handleMeasureTableFilterCountsChanged(
@@ -582,7 +579,7 @@ namespace Isis {
 
   /**
    * Handles any table filter changes
-   * 
+   *
    * @param visibleRows Number of visible rows
    * @param totalRows Total number of rows
    * @param box The table box to change
@@ -703,12 +700,12 @@ namespace Isis {
         pointTableSortLimit());
   }
 
-  
+
   /**
    * Returns the point tree view
-   * 
+   *
    * @return QWidget The point tree view
-   */ 
+   */
   QWidget *CnetEditorWidget::pointTreeView() {
     return m_pointTreeView;
   }
@@ -716,7 +713,7 @@ namespace Isis {
 
   /**
    * Returns the serial tree view
-   * 
+   *
    * @return QWidget The serial tree view
    */
   QWidget *CnetEditorWidget::serialTreeView() {
@@ -726,7 +723,7 @@ namespace Isis {
 
   /**
    * Returns the connection tree view
-   * 
+   *
    * @return QWidget The connection tree view
    */
   QWidget *CnetEditorWidget::connectionTreeView() {
@@ -736,7 +733,7 @@ namespace Isis {
 
   /**
    * Returns the point filter widget
-   * 
+   *
    * @return QWidget The point filter widget
    */
   QWidget *CnetEditorWidget::pointFilterWidget() {
@@ -746,7 +743,7 @@ namespace Isis {
 
   /**
    * Returns the serial filter widget
-   * 
+   *
    * @return QWidget The serial filter widget
    */
   QWidget *CnetEditorWidget::serialFilterWidget() {
@@ -756,27 +753,27 @@ namespace Isis {
 
   /**
    * Returns the connection filter widget
-   * 
+   *
    * @return QWidget The connection filter widget
    */
   QWidget *CnetEditorWidget::connectionFilterWidget() {
     return m_connectionFilterWidget;
   }
-  
-  
+
+
   /**
    * Returns the point table view
-   * 
+   *
    * @return TableView The point table view
    */
   TableView *CnetEditorWidget::pointTableView() {
     return m_pointTableView;
   }
-  
-  
+
+
   /**
    * Returns the measure table view
-   * 
+   *
    * @return TableView The measure table view
    */
   TableView *CnetEditorWidget::measureTableView() {
@@ -786,7 +783,7 @@ namespace Isis {
 
   /**
    * Returns the measure table model
-   * 
+   *
    * @return AbstractTableModel The measure table model
    */
   AbstractTableModel *CnetEditorWidget::measureTableModel() {
@@ -796,27 +793,27 @@ namespace Isis {
 
   /**
    * Returns the point table model
-   * 
+   *
    * @return AbstractTableModel The point table model
    */
   AbstractTableModel *CnetEditorWidget::pointTableModel() {
     return m_pointTableModel;
   }
-  
-  
+
+
   /**
    * Returns the control network
-   * 
+   *
    * @return ControlNet The control network
    */
   ControlNet *CnetEditorWidget::control() {
-    return m_controlNet;
+    return m_control->controlNet();
   }
 
 
   /**
    * Returns the menu actions
-   * 
+   *
    * @return QMap< QAction *, QList< QString > > QMap of menu actions
    */
   QMap< QAction *, QList< QString > > CnetEditorWidget::menuActions() {
@@ -827,7 +824,7 @@ namespace Isis {
 
   /**
    * Returns the tool bar actions
-   * 
+   *
    * @return QMap< QAction *, QList< QString > > QMap of tool bar actions
    */
   QMap< QString, QList< QAction * > > CnetEditorWidget::toolBarActions() {
@@ -838,11 +835,11 @@ namespace Isis {
 
   /**
    * Returns the filtered control net
-   * 
+   *
    * @return ControlNet Filtered control network
    */
   ControlNet *CnetEditorWidget::filteredNetwork() const {
-    ControlNet *filteredCnet = new ControlNet(*m_controlNet);
+    ControlNet *filteredCnet = new ControlNet(*(m_control->controlNet()));
 
     QList<AbstractTreeItem *> networkItems = m_pointModel->getItems(0, -1,
         AbstractTreeModel::MeasureItems | AbstractTreeModel::PointItems, true);
@@ -938,7 +935,7 @@ namespace Isis {
 
   /**
    * Returns true if the measure table can be sorted
-   * 
+   *
    * @return bool True if sorting is enabled on the measure table
    */
   bool CnetEditorWidget::measureTableSortingEnabled() const {
@@ -948,7 +945,7 @@ namespace Isis {
 
   /**
    * Returns the sorting limit for the measure table
-   * 
+   *
    * @return int The sorting limit for the measure table
    */
   int CnetEditorWidget::measureTableSortLimit() const {
@@ -958,7 +955,7 @@ namespace Isis {
 
   /**
    * Returns true if the point table can be sorted
-   * 
+   *
    * @return bool True if sorting is enabled on the point table
    */
   bool CnetEditorWidget::pointTableSortingEnabled() const {
@@ -968,7 +965,7 @@ namespace Isis {
 
   /**
    * Returns the sorting limit for the point table
-   * 
+   *
    * @return int The sorting limit for the point table
    */
   int CnetEditorWidget::pointTableSortLimit() const {
@@ -978,7 +975,7 @@ namespace Isis {
 
   /**
    * Sets if the measure table can be sorted
-   * 
+   *
    * @param bool Bool if the table can be sorted or not
    */
   void CnetEditorWidget::setMeasureTableSortingEnabled(bool enabled) {
@@ -988,7 +985,7 @@ namespace Isis {
 
   /**
    * Sets the measure table sorting limit
-   * 
+   *
    * @param int Sorting limit
    */
   void CnetEditorWidget::setMeasureTableSortLimit(int limit) {
@@ -998,7 +995,7 @@ namespace Isis {
 
   /**
    * Sets if the point table can be sorted
-   * 
+   *
    * @param bool Bool if the table can be sorted or not
    */
   void CnetEditorWidget::setPointTableSortingEnabled(bool enabled) {
@@ -1008,7 +1005,7 @@ namespace Isis {
 
   /**
    * Sets the point table sorting limit
-   * 
+   *
    * @param int Sorting limit
    */
   void CnetEditorWidget::setPointTableSortLimit(int limit) {
@@ -1028,7 +1025,7 @@ namespace Isis {
 
   /**
    * Sets if the tables are frozen
-   * 
+   *
    * @param bool Bool that freezes the tables or not
    */
   void CnetEditorWidget::setTablesFrozen(bool freezeTables) {
@@ -1043,5 +1040,82 @@ namespace Isis {
       m_connectionModel->setFrozen(false);
     }
   }
-}
 
+
+  /**
+   * This method pushes a new XmlHandler into the parser stack.
+   *
+   * @param xmlReader This is the parser stack.
+   */
+  void CnetEditorWidget::load(XmlStackedHandlerReader *xmlReader) {
+    xmlReader->pushContentHandler(new XmlHandler(this));
+  }
+
+
+  /**
+   * This method saves the Controls object ids to the stream.
+   *
+   * @param stream The stream that will output to directory.xml
+   * @param project The project to save the users settings to
+   * @param newProjectRoot New project's root directory
+   */
+  void CnetEditorWidget::save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) {
+    stream.writeStartElement("control");
+    stream.writeAttribute("id", m_control->id());
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * Creates an XmlHandler for cnetEditor
+   *
+   * @param cnetEditor The widget to be serialized
+   */
+  CnetEditorWidget::XmlHandler::XmlHandler(CnetEditorWidget *cnetEditor) {
+    m_cnetEditor = cnetEditor;
+  }
+
+
+  /**
+   * Destructor
+   */
+  CnetEditorWidget::XmlHandler::~XmlHandler() {
+    delete m_cnetEditor;
+    m_cnetEditor = NULL;
+  }
+
+
+  /**
+   * Placeholder for later serialization of CnetEditorWidgets
+   *
+   * @param cnetEditor The widget to be serialized
+   * @param namespaceURI ???
+   * @param localName Determines what attributes to retrieve from atts.
+   * @param qName ???
+   * @param atts Stores the attributes.
+   *
+   * @return @b bool The result of XmlStackedHandler's startElement() method.
+   */
+  bool CnetEditorWidget::XmlHandler::startElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
+    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
+    return result;
+  }
+
+
+  /**
+   * This method calls XmlStackedHandler's endElement() and dereferences pointers according to
+   * the value of localName.
+   *
+   * @param namespaceURI ???
+   * @param localName Determines which pointers to dereference.
+   * @param qName ???
+   *
+   * @return @b bool The result of XmlStackedHandler's endElement() method.
+   */
+  bool CnetEditorWidget::XmlHandler::endElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName) {
+    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
+    return result;
+  }
+}
