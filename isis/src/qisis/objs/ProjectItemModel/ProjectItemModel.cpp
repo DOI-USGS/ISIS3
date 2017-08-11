@@ -197,23 +197,23 @@ namespace Isis {
    * Removes an item and its children from the model.
    *
    * @param item (ProjectItem *) The item to be removed.
-   * 
+   *
    * @internal
-   *   @history 2017-08-08 Marjorie Hahn - Added a check so that if the item to be removed 
+   *   @history 2017-08-08 Marjorie Hahn - Added a check so that if the item to be removed
    *                           has any children then they can be removed first. Fixes #5074.
    */
   void ProjectItemModel::removeItem(ProjectItem *item) {
     if (!item) {
       return;
     }
-    
+
     // remove any children the item has first
     if (item->hasChildren()) {
       for (int row = (item->rowCount() - 1); row >= 0; row--) {
         removeRow(item->child(row)->row(), item->index());
       }
     }
-    
+
     if (ProjectItem *parentItem = item->parent()) {
       // remove the item from its parent
       removeRow(item->row(), parentItem->index());
@@ -341,6 +341,7 @@ namespace Isis {
         projectItem->setText(newName);
       }
     }
+    project->setClean(false);
   }
 
 
@@ -504,7 +505,7 @@ namespace Isis {
   void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
     Project *project = qobject_cast<Project *>( sender() );
     m_reservedNames.append(shapes->name());
-    
+
     if (!project) {
       return;
     }
@@ -700,7 +701,7 @@ namespace Isis {
 
      bool rejected =rejectName(m_reservedNames,name);
 
-     if (rejected) {      
+     if (rejected) {
        QMessageBox nameRejected;
        nameRejected.setText("That name is already in use within this project.");
        nameRejected.exec();
@@ -729,8 +730,8 @@ namespace Isis {
       item->setText(name);
       item->shapeList()->setName(name);
     }
-    return true;
 
+    return true;
   }
 
 

@@ -773,7 +773,10 @@ namespace Isis {
 
 
   /**
-   * @brief Returns true if this work order is undoable, otherwise false.
+   * @brief Returns true if this work order is undoable, otherwise false. This needs to be set to
+   *        true and createsCleanState needs to be set to false in order for a WorkOrder to appear
+   *        on the undoStack. This should be done by setting the member variable and should not be
+   *        overloading this function.
    *
    * @return @b (bool) Returns True if this work order is undoable, false if it is not.
    */
@@ -806,7 +809,10 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the CleanState status (whether the Project has been saved to disk or not).
+   * @brief Returns the CleanState status (whether the Project has been saved to disk or not). If
+   *        this is set to true the work order will avoid being put on the undo stack, meaning it
+   *        will not be undoable. It will also set the undo stack to a clean state, by doing this it
+   *        makes all previous workorders done before the save to be no longer undoable.
    * @return @b Returns True if the Project has been saved to disk.  False if it has not.
    */
   bool WorkOrder::createsCleanState() const {
@@ -1629,7 +1635,8 @@ namespace Isis {
    * @brief Declare that this work order is saving the project.
    * This makes the work order not appear in the undo stack (cannot undo/redo), and instead it is
    * marked as a 'clean' state of the project. The QUndoCommand undo/redo will never be called.
-   * The default for createsCleanState is false.
+   * The default for createsCleanState is false. If this is set to true all wrokorders before this
+   * call will be locked.
    * @param createsCleanState True if this work order is going to save the project to disk,
    * False otherwise.
    */

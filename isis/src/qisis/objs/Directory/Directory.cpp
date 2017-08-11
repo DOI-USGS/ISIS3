@@ -131,7 +131,7 @@ namespace Isis {
 //
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
-    
+
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
 
@@ -452,7 +452,7 @@ namespace Isis {
     m_recentProjects.append(recentProjects);
   }
 
-  
+
   void Directory::newActiveControl(bool newControl) {
     foreach(CnetEditorWidget *cnetEditorView, m_cnetEditorViewWidgets) {
       if (cnetEditorView->control() == project()->activeControl()->controlNet()) {
@@ -466,7 +466,7 @@ namespace Isis {
     }
   }
 
-  
+
 
   /**
    * @brief Public accessor for the list of recent projects.
@@ -591,7 +591,7 @@ namespace Isis {
     filterViews->addTab( mainWidget->connectionFilterWidget(), tr("Filter Connections") );
     resultLayout->addWidget(filterViews, row, 1, 1, 1);
     row++;
-    
+
     if (project()->activeControl() && mainWidget->control() == project()->activeControl()->controlNet()) {
       mainWidget->pointTableView()->content()->setActiveControlNet(true);
       mainWidget->measureTableView()->content()->setActiveControlNet(true);
@@ -607,7 +607,7 @@ namespace Isis {
     connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
     // Connection between other views & cneteditor
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
-    
+
     m_cnetEditorViewWidgets.append(mainWidget);
     m_controlMap.insertMulti(network, result);
 
@@ -948,6 +948,7 @@ namespace Isis {
       return;
     }
     m_bundleObservationViews.removeAll(bundleObservationView);
+    m_project->setClean(false);
   }
 
 
@@ -969,6 +970,7 @@ namespace Isis {
     }
 
     m_cnetEditorViewWidgets.removeAll(cnetEditorWidget);
+    m_project->setClean(false);
   }
 
 
@@ -982,6 +984,7 @@ namespace Isis {
       return;
     }
     m_cubeDnViewWidgets.removeAll(cubeDnView);
+    m_project->setClean(false);
   }
 
 
@@ -995,6 +998,7 @@ namespace Isis {
       return;
     }
     m_fileListWidgets.removeAll(imageFileListWidget);
+    m_project->setClean(false);
   }
 
 
@@ -1008,6 +1012,7 @@ namespace Isis {
       return;
     }
     m_footprint2DViewWidgets.removeAll(footprintView);
+    m_project->setClean(false);
   }
 
 
@@ -1020,6 +1025,7 @@ namespace Isis {
      if (!controlPointEditView) {
        return;
      }
+     m_project->setClean(false);
      //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
      //  of ControlPointEditView
  //    delete m_chipViewports;
@@ -1037,6 +1043,7 @@ namespace Isis {
       return;
     }
     m_matrixViewWidgets.removeAll(matrixWidget);
+    m_project->setClean(false);
   }
 
 
@@ -1050,6 +1057,7 @@ namespace Isis {
       return;
     }
     m_sensorInfoWidgets.removeAll(sensorInfoWidget);
+    m_project->setClean(false);
   }
 
 
@@ -1063,6 +1071,7 @@ namespace Isis {
       return;
     }
     m_targetInfoWidgets.removeAll(targetInfoWidget);
+    m_project->setClean(false);
   }
 
 

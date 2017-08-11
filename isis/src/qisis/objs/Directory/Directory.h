@@ -174,6 +174,9 @@ namespace Isis {
    *                           needed at the moment Fixes #5026
    *   @history 2017-08-11 Christopher Combs - Added serialization of CnetEditorWidgets to save()
    *                           and startElement(). Fixes #4989.
+   *   @history 2017-08-11 Cole Neubauer - Added project setClean(false) call to all views cleanup
+   *                           slot. This will make a a view closing be treated as a project change
+   *                           Fixes #5113
    */
   class Directory : public QObject {
     Q_OBJECT

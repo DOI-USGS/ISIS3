@@ -1236,7 +1236,8 @@ namespace Isis {
 
 
  /**
-  * Accessor to determine whether the curren project is Unsaved
+  * Accessor to determine whether the current project is Unsaved. This is used to determine how the
+  * program should react with things like opening a new project or closing he window.
   */
   bool Project::isClean() {
     return m_isClean;
@@ -1244,7 +1245,9 @@ namespace Isis {
 
 
  /**
-  * Function to change the clean state of the project
+  * Function to change the clean state of the project. This is needed because not every action that
+  * changes the project is a workorder. This needs to be called everytime a user would consider an
+  * action changing the project. This also explicitely sets the undoStack to the same value passed.
   * @param the boolean value to set the clean state to
   */
   void Project::setClean(bool value) {

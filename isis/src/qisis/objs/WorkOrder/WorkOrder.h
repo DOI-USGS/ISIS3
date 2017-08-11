@@ -124,7 +124,8 @@ namespace Isis {
    *   For asynchronous WorkOrders any memory allocations that aren't deallocated within
    *   execute() will need to be moved to the GUI thread.  @see ImportImagesWorkOrder::execute
    *   for an example of an asynchronous WorkOrder that allocates memory. setProgressValue()
-   *   can be used to update the progress bar in the GUI.
+   *   can be used to update the progress bar in the GUI. Any member variables being accessed by an
+   *   asynchronous workorder will need to have a QMutex locker so they can be thread safe
    *
    *   *postExecution*
    *   postExecution() runs on the GUI thread so it should not perform any long running operations.
@@ -157,13 +158,13 @@ namespace Isis {
    *   *setCreatesCleanState*
    *   This is used to indicate the WorkOrder has set the state back to an unchanged state from which
    *   the project was originally opened.  This is used by open, save, and close project WorkOrders. Unlikely
-   *   to be needed by other WorkOrders.
+   *   to be needed by other WorkOrders. This can needs to be set to false to be able to have an undoable
+   *   workorder
    *
    *   *setModifiesDiskState*
-   *   WorkOrders should call this to indicate they modify the disk state.  The WorkOrder should
-   *   implement the undoExecution method if this is set to true.  (This flag is used by the Project to
-   *   indicate the disk state should be restored back to the original state if the project is
-   *   closed without saving.)
+   *   WorkOrders should call this to indicate they modify the disk state, this should be set to true to
+   *   be able to have an undoable workorder.  The WorkOrder should implement the undoExecution method
+   *   if this is set to true.
    *
    *
    *   **WorkOrder Diagrams**
@@ -305,6 +306,8 @@ namespace Isis {
    *                           member variable function Fixes #5082
    *   @history 2017-08-02 Cole Neubauer - Moved m_status to protected so children can set it
    *                           if a workorder errors Fixes #5026
+   *   @history 2017-08-11 Cole Neubauer - Updated documentation for accessor methods and when one
+   *                           of these accessors should be used in the workorder template #5113
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -641,7 +644,7 @@ namespace Isis {
 
 
       /**
-       * @brief A pointer to the ProgressBar.
+     * @brief A pointer to the ProgressBar.
        */
       QPointer<ProgressBar> m_progressBar;
 

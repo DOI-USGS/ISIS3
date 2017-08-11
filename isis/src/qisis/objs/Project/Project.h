@@ -169,6 +169,7 @@ namespace Isis {
    *                           ImageList Fixes #4567
    *   @history 2017-08-11 Cole Neubauer - Removed unnecessary code in controlClosed that was
    *                           a segfault causing. Fixes #5064
+   *   @history 2017-08-11 Cole Neubauer - Updated documentation for setClean and isClean #5113
    */
   class Project : public QObject {
     Q_OBJECT
