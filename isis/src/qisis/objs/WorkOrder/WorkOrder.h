@@ -81,7 +81,8 @@ namespace Isis {
    *
    *   The constructor for the WorkOrder must set m_isUndoable and m_isSynchronous to the appropriate
    *   values. The constructor must call the base WorkOrder constructor.  The default is
-   *   synchronous and undoable.
+   *   synchronous and undoable. If an import WorkOrder is being implemented the import must be
+   *   some type of object and implement certain slots.
    *
    *   All information required to execute the WorkOrder should be saved in the WorkOrder
    *   in the setupExecution() method.  Since WorkOrders may be serialized and may run on
