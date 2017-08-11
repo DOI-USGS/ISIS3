@@ -2348,6 +2348,16 @@ namespace Isis {
 
 
   /**
+   * Return the knots in the polynomial in scaled time.
+   * 
+   * @return @b std::vector<double> A vector containing the polynomial knots in scaled time.
+   */
+  std::vector<double> SpiceRotation::scaledPolynomialKnots() const {
+    return m_polynomial.knots();
+  }
+
+
+  /**
    * Return the index of the polynomial segment that contains a given time.
    * 
    * @param et The time to find the segment index of.

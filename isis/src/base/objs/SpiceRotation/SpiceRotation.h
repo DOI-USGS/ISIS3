@@ -388,6 +388,7 @@ namespace Isis {
       void setPolynomialSegments(int segmentCount);
       int numPolynomialSegments() const;
       std::vector<double> polynomialKnots() const;
+      std::vector<double> scaledPolynomialKnots() const;
       int polySegmentIndex(double et) const;
       Histogram computeError(PiecewisePolynomial poly);
       Source GetSource();
