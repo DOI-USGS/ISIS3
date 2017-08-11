@@ -49,7 +49,7 @@ namespace Isis {
 
     // This is an asynchronous workorder
     m_isSynchronous = false;
-
+    m_list = NULL;
     m_watcher = NULL;
 
     QAction::setText(tr("Import &Control Networks..."));
@@ -68,11 +68,9 @@ namespace Isis {
    */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(const ImportControlNetWorkOrder &other) :
       WorkOrder(other) {
-
     m_watcher = NULL;
     m_watcher = new QFutureWatcher<Control *>;
     connect(m_watcher, SIGNAL(resultReadyAt(int)), this, SLOT(cnetReady(int)));
-
   }
 
 
@@ -146,7 +144,6 @@ namespace Isis {
    * syncRedo() and asyncRedo().
    */
   void ImportControlNetWorkOrder::execute() {
-
     QDir cnetFolder = project()->addCnetFolder("controlNetworks");
 
     QStringList cnetFileNames = internalData();
@@ -159,8 +156,9 @@ namespace Isis {
       m_readProgresses.append(readProgress);
     }
 
+    CreateControlsFunctor functor(project(), cnetFolder);
     m_watcher->setFuture(QtConcurrent::mapped(cnetFileNamesAndProgress,
-                                              CreateControlsFunctor(project(), cnetFolder)));
+                                              functor));
 
     while (!m_watcher->isFinished()) {
       setProgressRange(0, 100 * m_readProgresses.count());
@@ -181,6 +179,8 @@ namespace Isis {
 
       setProgressValue(totalProgress);
 
+      m_warning = functor.errors().toString();
+
       QThread::yieldCurrentThread();
     }
   }
@@ -192,12 +192,22 @@ namespace Isis {
    * from postSyncRedo() to postExecution().
    */
   void ImportControlNetWorkOrder::postExecution() {
+    if (!m_list) {
+      project()->undoStack()->undo();
+      m_list = NULL;
+    }
+
+    if (m_warning != "") {
+      project()->warn(m_warning);
+    }
 
     foreach (Progress *progress, m_readProgresses) {
       delete progress;
     }
+    m_status = WorkOrderFinished;
     m_readProgresses.clear();
   }
+
 
   /**
    * @brief Deletes the control network
@@ -206,30 +216,50 @@ namespace Isis {
    * renamed from undoSyncRedo() to undoExecution().
    */
   void ImportControlNetWorkOrder::undoExecution() {
-    if (m_watcher->isFinished()) {
-      if (project()->controls().size() > 0) {
-        ControlList *list = project()->controls().last();
-        // Remove the controls from disk.
-        list->deleteFromDisk( project() );
-        // Remove the controls from the model, which updates the tree view.
-        ProjectItem *currentItem =
-            project()->directory()->model()->findItemData( QVariant::fromValue(list) );
-        project()->directory()->model()->removeItem(currentItem);
+    if (m_list && project()->controls().size() > 0 && m_watcher->isFinished()) {
+      // Remove the controls from disk.
+      m_list->deleteFromDisk( project() );
+      // Remove the controls from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData( QVariant::fromValue(m_list) );
+      project()->directory()->model()->removeItem(currentItem);
+
+      foreach (Control *control, *m_list) {
+        delete control;
       }
+      delete m_list;
     }
   }
 
 
   /**
    * CreateControlsFunctor constructor
-   * 
+   *
    * @param project The project
    * @param destinationFolder The directory to copy to
    */
   ImportControlNetWorkOrder::CreateControlsFunctor::CreateControlsFunctor(
-    Project *project, QDir destinationFolder) {
+    Project *project, QDir destinationFolder) : m_errors(new IException) {
     m_project = project;
     m_destinationFolder = destinationFolder;
+  }
+
+
+  /**
+   * @brief Indicates if any errors occurred during the import.
+   *
+   * Returns an IException that details any errors that occurred during the import.
+   * Note that if there have been 20 or more errors, the exception returned will indicate that the
+   * import was aborted because too many errors have occurred.
+   *
+   * @return IExecption Returns an IException indicating what errors occured during the import.
+   */
+  IException ImportControlNetWorkOrder::CreateControlsFunctor::errors() const {
+    IException result;
+
+    result.append(*m_errors);
+
+    return result;
   }
 
 
@@ -238,39 +268,53 @@ namespace Isis {
    *
    * @param &cnetFileNameAndProgress QPair of control net filenames, and the progress
    *
-   * @return Control Pointer to the Control created from the import 
+   * @return Control Pointer to the Control created from the import
    */
   Control *ImportControlNetWorkOrder::CreateControlsFunctor::operator()(
-      const QPair<FileName, Progress *> &cnetFileNameAndProgress) {
+    const QPair<FileName, Progress *> &cnetFileNameAndProgress) {
 
-    QString cnetFileName = cnetFileNameAndProgress.first.original();
-    ControlNet *cnet = new ControlNet();
-    cnet->SetMutex(m_project->mutex());
-    cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
+    Control *control = NULL;
+    try {
+      QString cnetFileName = cnetFileNameAndProgress.first.original();
+      ControlNet *cnet = new ControlNet();
+      cnet->SetMutex(m_project->mutex());
+      cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
 
-    QString baseFilename = FileName(cnetFileName).name();
-    QString destination = m_destinationFolder.canonicalPath() + "/" + baseFilename;
+      QString baseFilename = FileName(cnetFileName).name();
+      QString destination = m_destinationFolder.canonicalPath() + "/" + baseFilename;
 
-    cnet->Write(destination);
+      cnet->Write(destination);
 
-    delete cnet;
-    cnet = NULL;
+      delete cnet;
+      cnet = NULL;
 
-    Control *control = new Control(m_project, destination);
-    control->closeControlNet();
+      control = new Control(m_project, destination);
+      control->closeControlNet();
+    }
+    catch (IException &e) {
+      m_errors->append(e);
+      return NULL;
+    }
     return control;
   }
 
 
   /**
    * Adds the control net to the project
-   * 
+   *
    * @param ready Index of the control net that is ready
    */
   void ImportControlNetWorkOrder::cnetReady(int ready) {
-
+    QMutexLocker locker(project()->workOrderMutex());
     Control *control = m_watcher->resultAt(ready);
-    project()->addControl(control);
-    project()->setClean(false);
+
+    if (control) {
+      project()->addControl(control);
+      m_list = project()->controls().last();
+      project()->setClean(false);
+    }
+    else {
+      m_list = NULL;
+    }
   }
 }

@@ -53,6 +53,10 @@ namespace Isis {
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
    *                           is undone. Fixes #5043.
+   *   @history 2017-08-11 Cole Neubauer - Added a pointer to the project item added by the work
+   *                           order. This pointer is used in the Undo funtions. Also unrelated
+   *                           to this ticket fixed importing of a cube list with relative paths
+   *                           #5064
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -99,7 +103,7 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder; //!< Directory where the DN data is going to be stored 
+          QDir m_destinationFolder; //!< Directory where the DN data is going to be stored
           bool m_copyDnData; //!< Stores if the user wants to copy the DN data or not
           QThread *m_guiThread; //!< The GUI thread
 
@@ -113,6 +117,7 @@ namespace Isis {
 
     private:
       ShapeList *m_newShapes; //!< List of shapes
+      ShapeList *m_list; //!< List of shapes this workorder added to the project
       QString m_warning; //!< QString of warning text
   };
 }

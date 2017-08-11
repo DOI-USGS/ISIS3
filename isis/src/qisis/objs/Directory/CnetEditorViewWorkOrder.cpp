@@ -43,6 +43,7 @@ namespace Isis {
       WorkOrder(project) {
     QAction::setText(tr("View &Network..."));
     m_isSavedToHistory = false;
+    m_isUndoable = false;
   }
 
 

@@ -37,6 +37,8 @@ namespace Isis {
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
+   *                          Fixes #5064
    */
   class CnetEditorViewWorkOrder : public WorkOrder {
       Q_OBJECT

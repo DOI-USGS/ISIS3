@@ -36,6 +36,7 @@ namespace Isis {
 
   RemoveImagesWorkOrder::RemoveImagesWorkOrder(Project *project) :  WorkOrder(project) {
 
+    m_isUndoable = false;
     QAction::setText(tr("&Delete images from project..."));
     QUndoCommand::setText(tr("Delete images from project"));
 
@@ -124,18 +125,5 @@ namespace Isis {
     
     project()->directory()->model()->removeItems(selectedItems);
     project()->setClean(false);
-  }
-
-
-  /**
-   * @description This method returns false because this WorkOrder is not undoable.
-   *
-   * @see WorkOrder::isUndoable()
-   *
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool RemoveImagesWorkOrder::isUndoable() {
-
-    return false;
   }
 }

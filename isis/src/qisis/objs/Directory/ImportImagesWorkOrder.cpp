@@ -48,6 +48,7 @@ namespace Isis {
     // This is an asynchronous work order
     m_isSynchronous = false;
     m_newImages = NULL;
+    m_list = NULL;
 
     QAction::setText(tr("Import &Images..."));
     QUndoCommand::setText(tr("Import Images"));
@@ -63,6 +64,7 @@ namespace Isis {
   ImportImagesWorkOrder::ImportImagesWorkOrder(const ImportImagesWorkOrder &other) :
       WorkOrder(other) {
     m_newImages = NULL;
+    m_list = other.m_list;
   }
 
 
@@ -74,6 +76,8 @@ namespace Isis {
   ImportImagesWorkOrder::~ImportImagesWorkOrder() {
     delete m_newImages;
     m_newImages = NULL;
+
+    m_list = NULL;
   }
 
 
@@ -149,60 +153,62 @@ namespace Isis {
             stateToSave.append(fileName.original());
           }
         }
+
+        QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
+        if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
+          saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
+                   tr("Save Project Before Importing Images"),
+                   tr("Would you like to save your project <b>before</b> importing images? It can be "
+                      "slow to save your project after these images have been loaded if you do not "
+                      "save now."),
+                   QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                   QMessageBox::Yes);
+        }
+
+        if (saveProjectAnswer == QMessageBox::Yes) {
+          SaveProjectWorkOrder saveWorkOrder(project());
+          saveWorkOrder.trigger();
+        }
+
+        QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
+        if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
+          copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
+                   tr("Copy Images into Project"),
+                   tr("Should images (DN data) be copied into project?"),
+                   QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                   QMessageBox::Yes);
+        }
+
+        bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
+
+        stateToSave.prepend(copyDnData? "copy" : "nocopy");
+
+        if (fileNames.count() > 1) {
+          QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
+        }
+        else if (fileNames.count() == 1 && stateToSave.count() > 2) {
+          QUndoCommand::setText(tr("Import %1 Images from %2").arg(
+                        QString::number(stateToSave.count() - 1), fileNames.first()));
+        }
+        else {
+          QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
+        }
+
+        // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
+        setInternalData(stateToSave);
+
+        bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
+                        copyImagesAnswer != QMessageBox::Cancel;
+
+        return doImport;
       }
 
-      QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
-      if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
-        saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
-                 tr("Save Project Before Importing Images"),
-                 tr("Would you like to save your project <b>before</b> importing images? It can be "
-                    "slow to save your project after these images have been loaded if you do not "
-                    "save now."),
-                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                 QMessageBox::Yes);
-      }
-
-      if (saveProjectAnswer == QMessageBox::Yes) {
-        SaveProjectWorkOrder saveWorkOrder(project());
-        saveWorkOrder.trigger();
-      }
-
-      QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
-      if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
-        copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
-                 tr("Copy Images into Project"),
-                 tr("Should images (DN data) be copied into project?"),
-                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                 QMessageBox::Yes);
-      }
-
-      bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
-
-      stateToSave.prepend(copyDnData? "copy" : "nocopy");
-
-      if (fileNames.count() > 1) {
-        QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
-      }
-      else if (fileNames.count() == 1 && stateToSave.count() > 2) {
-        QUndoCommand::setText(tr("Import %1 Images from %2").arg(
-                      QString::number(stateToSave.count() - 1), fileNames.first()));
-      }
-      else {
-        QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
-      }
-
-      // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
-      setInternalData(stateToSave);
-
-      bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
-                      copyImagesAnswer != QMessageBox::Cancel;
-
-      return doImport;
     }
     catch (IException e) {
-        QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
-        return false;
+      QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
+    return false;
+
   }
 
 
@@ -216,14 +222,13 @@ namespace Isis {
    * @see WorkOrder::undoExecution()
    */
   void ImportImagesWorkOrder::undoExecution() {
-    project()->waitForImageReaderFinished();
-    if (project()->images().size() > 0) {
-      ImageList *list = project()->images().last();
+    if (m_list && project()->images().size() > 0 ) {
+      project()->waitForImageReaderFinished();
       // Remove the images from disk.
-      list->deleteFromDisk( project() );
+      m_list->deleteFromDisk( project() );
       // Remove the images from the model, which updates the tree view.
       ProjectItem *currentItem =
-          project()->directory()->model()->findItemData( QVariant::fromValue(list) );
+          project()->directory()->model()->findItemData( QVariant::fromValue(m_list) );
       project()->directory()->model()->removeItem(currentItem);
     }
   }
@@ -239,13 +244,11 @@ namespace Isis {
    * @see WorkOrder::postUndoExecution()
    */
   void ImportImagesWorkOrder::postUndoExecution() {
-    if (project()->images().size() > 0) {
-      QPointer<ImageList> imagesWeAdded = project()->images().last();
-
-      foreach (Image *image, *imagesWeAdded) {
+    if (m_list && project()->images().size() > 0 ) {
+      foreach (Image *image, *m_list) {
         delete image;
       }
-      delete imagesWeAdded;
+      delete m_list;
     }
   }
 
@@ -290,6 +293,7 @@ namespace Isis {
     try {
       if (!m_newImages->isEmpty()) {
         project()->addImages(*m_newImages);
+      m_list = project()->images().last();
 
         delete m_newImages;
         m_newImages = NULL;

@@ -45,6 +45,7 @@ namespace Isis {
    */
   CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
+    m_isUndoable = false;
     QAction::setText(tr("Display &Images..."));
     m_isSavedToHistory = false;
   }
@@ -93,16 +94,6 @@ namespace Isis {
     return (shapes->count() > 0 && shapes->count() < 20);
   }
 
-  /**
-   * @brief This method returns false because this WorkOrder is not undoable.
-   *
-   * @see WorkOrder::isUndoable()
-   *
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool CubeDnViewWorkOrder::isUndoable() const {
-    return false;
-  }
 
 
   /**

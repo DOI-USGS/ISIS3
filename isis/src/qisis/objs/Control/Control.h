@@ -57,6 +57,8 @@ namespace Isis {
    *                           object needs to assign a mutex when the control net is opened and by
    *                           doing this internally we can Close control nets and not have to
    *                           track whether this step has happened Fixes #5026
+   *   @history 2017-08-11 Cole Neuabuer - Added try catch throw to make it so importing an invalid
+   *                           control net throws some type of error/warning Fixes #5064
    */
   class Control : public QObject {
     Q_OBJECT

@@ -48,6 +48,8 @@ namespace Isis {
    *                          WorkOrder redesign.
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
+   *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
+   *                          Fixes #5064
    */
   class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT

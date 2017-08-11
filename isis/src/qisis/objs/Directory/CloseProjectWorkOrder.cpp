@@ -44,6 +44,7 @@ namespace Isis {
     QAction::setText(tr("&Close Project"));
     QUndoCommand::setText(tr("Close Project"));
     m_isSavedToHistory = false;
+    m_isUndoable = false;
     setCreatesCleanState(true);
   }
 

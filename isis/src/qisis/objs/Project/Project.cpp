@@ -2296,17 +2296,6 @@ namespace Isis {
    * A control is being deleted from the project
    */
   void Project::controlClosed(QObject *controlObj) {
-    QMutableListIterator<ControlList *> it(*m_controls);
-    while ( it.hasNext() ) {
-      ControlList *list = it.next();
-
-      int foundElement = list->indexOf( (Control *)controlObj );
-
-      if (foundElement != -1) {
-        list->removeAt(foundElement);
-      }
-    }
-
     m_idToControlMap->remove(m_idToControlMap->key((Control *)controlObj));
   }
 

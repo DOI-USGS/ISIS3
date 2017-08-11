@@ -42,6 +42,8 @@ namespace Isis {
    *                          Fixes #4960
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
+   *   @history 2017-08-11 Cole Neubauer - set isUndoable parent member variable
+   *                          Fixes #5064
    */
   class CloseProjectWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -24,8 +24,13 @@
  */
 #include "WorkOrder.h"
 
+#include <functional>
+
 #include <QDir>
 #include <QFutureWatcher>
+#include <QString>
+
+#include "IException.h"
 
 namespace Isis {
   class Control;
@@ -35,7 +40,7 @@ namespace Isis {
 
   /**
    * @brief Add control networks to a project
-   *
+   *c
    * Asks the user for a list of control nets and copies them into the project.
    *
    * @author 2012-06-05 Ken Edmundson and Tracie Sucharski
@@ -54,7 +59,9 @@ namespace Isis {
    *                           in the context menu. Fixes #4968.
    *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
    *                           is undone. Fixes #5043.
-   *   @history 2017-08-02 Cole Neubauer - Refactored import so it closes the controlNet after
+   *   @history 2017-07-28 Cole Neubauer - Added a pointer to the project item added by the work
+   *                           order. This pointer is used in the Undo funtions. #5064
+   *   @history 2017-08-11 Cole Neubauer - Refactored import so it closes the controlNet after
    *                           Control is created Fixes #5026
    */
   class ImportControlNetWorkOrder : public WorkOrder {
@@ -92,15 +99,19 @@ namespace Isis {
         public:
           CreateControlsFunctor(Project *project, QDir destinationFolder);
           Control *operator()(const QPair<FileName, Progress *> &cnetFilename);
+          IException errors() const;
 
         private:
           Project *m_project; //!< The project to import to
           QDir m_destinationFolder; //!< The directory to copy the control net too
+          QSharedPointer<IException> m_errors; //!< Stores any errors that occur during import.
       };
 
     private:
       QFutureWatcher<Control *> *m_watcher; //!< QFutureWatcher, allows for asynchronous import
+      ControlList *m_list; //!< List of controls added to project
       QList<Progress *> m_readProgresses; //!< Keeps track of import progress
+      QString m_warning; //!< String of any errors/warnings that occurred during import.
   };
 }
 #endif // ImportControlNetWorkOrder_H

@@ -35,6 +35,7 @@ namespace Isis {
       WorkOrder(project) {
     QAction::setText(tr("View File &Names..."));
     m_isSavedToHistory = false;
+    m_isUndoable = false;
   }
 
 
@@ -56,17 +57,6 @@ namespace Isis {
     return !images->isEmpty();
   }
 
-
-  /**
-   * @brief This method returns false because this WorkOrder is not undoable.
-   *
-   * @see WorkOrder::isUndoable()
-   *
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool ImageFileListViewWorkOrder::isUndoable() const {
-    return false;
-  }
 
 
   /**

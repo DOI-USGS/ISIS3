@@ -32,7 +32,12 @@ namespace Isis {
     m_displayProperties = NULL;
     m_project = NULL;
 
-    openControlNet();
+    try {
+      openControlNet();
+    }
+    catch (IException &e) {
+      throw IException(e, IException::Programmer, "Error opening control net.", _FILEINFO_);
+    }
 
     m_displayProperties
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
@@ -112,9 +117,6 @@ namespace Isis {
 
     delete m_id;
     m_id = NULL;
-
-    delete m_project;
-    m_project = NULL;
 
     //  Image is a "Qt" parent of display properties, so the Image QObject
     //    destructor will take care of deleting the display props. See call to
