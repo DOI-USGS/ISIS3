@@ -65,6 +65,7 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
+#include "ImportTemplateWorkOrder.h"
 #include "ImageFileListWidget.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
@@ -157,6 +158,7 @@ namespace Isis {
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
       m_importImagesWorkOrder = createWorkOrder<ImportImagesWorkOrder>();
       m_importShapesWorkOrder = createWorkOrder<ImportShapesWorkOrder>();
+      m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
@@ -316,7 +318,6 @@ namespace Isis {
     QAction *openProjectAction = m_openProjectWorkOrder->clone();
     openProjectAction->setIcon(QIcon(":open") );
     fileMenu->addAction(openProjectAction);
-
     m_permToolBarActions.append(openProjectAction);
 
     QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
@@ -361,6 +362,7 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
+    importMenu->addAction(m_importTemplateWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
 

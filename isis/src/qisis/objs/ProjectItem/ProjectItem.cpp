@@ -342,6 +342,10 @@ namespace Isis {
     spaceCraftItem->setSpacecraft();
     appendRow(spaceCraftItem);
 
+    ProjectItem *templatesItem = new ProjectItem();
+    templatesItem->setTemplate();
+    appendRow(templatesItem);
+
     appendRow( new ProjectItem( project->bundleSolutionInfo() ) );
   }
 
@@ -533,6 +537,11 @@ namespace Isis {
    */
   FileItemQsp ProjectItem::fileItem() const {
     return data().value<FileItemQsp>();
+  }
+
+
+  bool ProjectItem::isTemplate() const {
+    return data().canConvert<QString>();
   }
 
 
@@ -832,6 +841,24 @@ namespace Isis {
     setData( QVariant() );
   }
 
+  void ProjectItem::setTemplate() {
+    setText("Templates");
+    setIcon( QIcon(":folder") );
+    setData( QVariant() );
+
+    ProjectItem *mapsItem = new ProjectItem();
+    mapsItem->setText("Maps");
+    mapsItem->setIcon( QIcon(":folder") );
+    mapsItem->setData( QVariant() );
+    appendRow(mapsItem);
+
+    ProjectItem *registrationsItem = new ProjectItem();
+    registrationsItem->setText("Registrations");
+    registrationsItem->setIcon( QIcon(":folder") );
+    registrationsItem->setData( QVariant() );
+    appendRow(registrationsItem);
+  }
+
 
   /**
    * Sets the text, icon, and data corresponding to a Control.
@@ -945,6 +972,7 @@ namespace Isis {
     setIcon( QIcon(":spacecraft") );
     setData( QVariant() );
   }
+
 
 
   /**

@@ -626,6 +626,18 @@ namespace Isis {
       stream.writeEndElement();
     }
 
+    if ( !m_templates.isEmpty() ) {
+      stream.writeStartElement("templates");
+
+      for (int i = 0; i < m_templates.count(); i++) {
+        stream.writeStartElement("template");
+        stream.writeAttribute("fileName", m_templates.at(i).dir().dirName() + "/" + m_templates.at(i).name());
+        stream.writeEndElement();
+      }
+
+      stream.writeEndElement();
+    }
+
     //  Write general look of gui, including docked widges
 //  QVariant geo_data = saveGeometry();
 //  QVariant layout_data = saveState();
@@ -915,12 +927,53 @@ namespace Isis {
     m_shapeReader->read(shapeFiles);
   }
 
+
   /**
    * Read the given shape model cube file names as Images and add them to the project.
    * @param ShapeList
    */
   void Project::addShapes(ShapeList newShapes) {
     shapesReady(newShapes);
+  }
+
+
+  /**
+   * Add new templates to m_templates and update project item model
+   *
+   * @param newFileList QList of FileNames for each new imported template
+   */
+  void Project::addTemplates(QList<FileName> newFileList) {
+    m_templates.append(newFileList);
+    emit templatesAdded(newFileList);
+  }
+
+
+  /**
+   * Remove a FileName from m_templates
+   *
+   * @param file FileName to be removed
+   */
+  void Project::removeTemplate(FileName file) {
+    m_templates.removeOne(file);
+  }
+
+
+  /**
+   * Create and navigate to the appropriate template type folder in the project directory.
+   *
+   * @param prefix The name of the director under templates/ to store the template file.
+   */
+  QDir Project::addTemplateFolder(QString prefix) {
+    QDir templateFolder = templateRoot();
+
+    if ( !templateFolder.mkpath(prefix) ) {
+      throw IException(IException::Io,
+          tr("Could not create template directory [%1] in [%2].")
+            .arg(prefix).arg( templateFolder.absolutePath() ),
+          _FILEINFO_);
+    }
+
+    return templateFolder;
   }
 
 
@@ -1703,6 +1756,36 @@ namespace Isis {
 
 
   /**
+   * Appends the root directory name 'templates' to the project .
+   *
+   * @return The path to the root directory of the templates data.
+   */
+  QString Project::templateRoot(QString projectRoot) {
+    return projectRoot + "/templates";
+  }
+
+
+  /**
+   * Accessor for the root directory of the template data.
+   *
+   * @return The path to the root directory of the template data.
+   */
+  QString Project::templateRoot() const {
+    return templateRoot( m_projectRoot->path() );
+  }
+
+
+  /**
+   * Return template FileNames
+   *
+   * @return QList of FileName
+   */
+  QList<FileName> Project::templates() {
+    return m_templates;
+  }
+
+
+  /**
    * Appends the root directory name 'targets' to the project .
    *
    * @return The path to the root directory of the target body data.
@@ -1806,6 +1889,11 @@ namespace Isis {
              .arg( resultsRoot() ) );
     }
 
+    if ( !m_projectRoot->rmdir( templateRoot() ) ) {
+      warn( tr("Did not properly clean up templates folder [%1] in project")
+             .arg( templateRoot() ) );
+    }
+
     if ( !m_projectRoot->rmpath( m_projectRoot->path() ) ) {
       warn( tr("Did not properly clean up project in [%1]").arg( m_projectRoot->path() ) );
     }
@@ -1818,8 +1906,21 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
+    QString oldRoot = templateRoot();
     *m_projectRoot = newProjectRoot;
+
     emit projectRelocated(this);
+
+    addTemplateFolder("maps");
+    addTemplateFolder("registrations");
+
+    // This is a temporary fix until we create an object for Templates
+    foreach (FileName templateFile, templates()) {
+      QFile::copy(oldRoot + "/" + templateFile.toString(), templateRoot() + "/" + templateFile.toString());
+      ProjectItem *currentItem =
+          directory()->model()->findItemData(QVariant::fromValue(templateFile.toString()));
+      currentItem->setData(QVariant(templateFile.toString()));
+    }
   }
 
 
@@ -2476,6 +2577,9 @@ namespace Isis {
       else if (localName == "shapeLists") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
+      else if (localName == "template") {
+        m_templates.append(FileName(m_project->templateRoot() + "/" + atts.value("fileName")));
+      }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
         QString type = atts.value("type");
@@ -2562,6 +2666,9 @@ namespace Isis {
       foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
         m_project->addBundleSolutionInfo(bundleInfo);
       }
+    }
+    else if (localName == "templates") {
+      m_project->addTemplates(m_templates);
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

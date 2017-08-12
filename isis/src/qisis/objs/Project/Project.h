@@ -170,6 +170,10 @@ namespace Isis {
    *   @history 2017-08-11 Cole Neubauer - Removed unnecessary code in controlClosed that was
    *                           a segfault causing. Fixes #5064
    *   @history 2017-08-11 Cole Neubauer - Updated documentation for setClean and isClean #5113
+   *   @history 2017-08-11 Christopher Combs - Added addTemplates(), removeTemplate(),
+   *                           addTemplateFolder(), templateRoot(), and m_templates as well as
+   *                           serialization and structure for importing template filenames
+   *                           Fixes #5086.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -191,6 +195,8 @@ namespace Isis {
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
+      void addTemplates(QList<FileName> templateFiles);
+      QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void clear();
@@ -245,6 +251,11 @@ namespace Isis {
       static QString bundleSolutionInfoRoot(QString projectRoot);
       QString bundleSolutionInfoRoot() const;
       QList<BundleSolutionInfo *> bundleSolutionInfo();
+
+      static QString templateRoot(QString projectRoot);
+      QString templateRoot() const;
+      QList<FileName> templates();
+      void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
@@ -383,6 +394,8 @@ namespace Isis {
        */
       void workOrderFinished(WorkOrder *);
 
+      void templatesAdded(QList<FileName> newFileList);
+
     public slots:
       void open(QString);
 
@@ -444,6 +457,7 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
+          QList<FileName> m_templates;
           WorkOrder *m_workOrder;
       };
 
@@ -457,6 +471,7 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
+      QList<FileName> m_templates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

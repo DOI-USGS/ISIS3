@@ -12,6 +12,7 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
+#include "ImportTemplateWorkOrder.h"
 #include "IString.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixViewWorkOrder.h"
@@ -38,9 +39,9 @@ namespace Isis {
    *
    * @param project The project to give to the work order constructor
    * @param type The work order type (class name) - for example "Isis::ImportImagesWorkOrder"
-   * 
+   *
    * @throws IException::Unknown "Could not create the work order through WorkOrderFactory"
-   * 
+   *
    * @return @b WorkOrder Returns the instantiated WorkOrder
    */
   WorkOrder *WorkOrderFactory::create(Project *project, QString type) {
@@ -57,6 +58,7 @@ namespace Isis {
     tryType<ImportControlNetWorkOrder>(type, project, result);
     tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportShapesWorkOrder>(type, project, result);
+    tryType<ImportTemplateWorkOrder>(type, project, result);
     tryType<JigsawWorkOrder>(type, project, result);
     tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);

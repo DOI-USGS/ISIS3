@@ -126,6 +126,8 @@ namespace Isis {
    *                             #4979, #4980.
    *     @history 2017-08-03 Cole Neubauer - Explicitely set the color of each new ProjectItem to
    *                             Qt::Black Fixes #5095
+   *     @history 2017-08-11 Christopher Combs - Added isTemplate() and setTemplate() to allow for
+   *                             imported templates to show on the project tree. Fixes #5086.
    *
    */
   class ProjectItem : public QStandardItem {
@@ -185,6 +187,7 @@ namespace Isis {
       bool isGuiCamera() const;
       bool isTargetBody() const;
       bool isFileItem() const;
+      bool isTemplate() const;
 
       void setProjectItem(ProjectItem *item);
       void setBundleResults(BundleResults bundleResults);
@@ -207,6 +210,7 @@ namespace Isis {
       void setSpacecraft();
       void setTargetBody(TargetBodyQsp targetBody);
       void setTargetBodyList();
+      void setTemplate();
 
       ProjectItem *findItemData(const QVariant &value, int role = Qt::UserRole+1);
 

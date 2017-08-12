@@ -25,6 +25,8 @@
 
 #include <QStandardItemModel>
 
+#include "FileName.h"
+
 class QItemSelection;
 class QItemSelectionModel;
 class QMimeData;
@@ -39,6 +41,7 @@ namespace Isis {
   class BundleSolutionInfo;
   class Control;
   class ControlList;
+  class FileName;
   class GuiCameraList;
   class ImageList;
   class Project;
@@ -109,6 +112,8 @@ namespace Isis {
    *   @history 2017-08-11 Cole Neubauer - Added a project setClean(false) call to onNameChanged
    *                           slot. This will make a name change be treated as a project change
    *                           Fixes #5113
+   *   @history 2017-08-11 Christopher Combs - Added onTemplatesAdded() and connected it to the
+   *                           signal sent by Project. Fixes #5086.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -176,6 +181,7 @@ namespace Isis {
       void onControlAdded(Control *control);
       void onControlListAdded(ControlList *controlList);
       void onTargetsAdded(TargetBodyList *targets);
+      void onTemplatesAdded(QList<FileName> newFileList);
       void onGuiCamerasAdded(GuiCameraList *cameras);
       void onRowsInserted(const QModelIndex &parent, int start, int end);
       void onRowsRemoved(const QModelIndex &parent, int start, int end);

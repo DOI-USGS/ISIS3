@@ -131,6 +131,8 @@ namespace Isis {
             this, SLOT( onShapesAdded(ShapeList *) ) );
     connect(project, SIGNAL( targetsAdded(TargetBodyList *) ),
             this, SLOT( onTargetsAdded(TargetBodyList *) ) );
+    connect(project, SIGNAL( templatesAdded(QList<FileName>)),
+            this, SLOT( onTemplatesAdded(QList<FileName>)));
     connect(project, SIGNAL( guiCamerasAdded(GuiCameraList *) ),
             this, SLOT( onGuiCamerasAdded(GuiCameraList *) ) );
     ProjectItem *projectItem = new ProjectItem(project);
@@ -388,6 +390,47 @@ namespace Isis {
                             "Control Points", bundleSolutionInfo->savedPointsFilename(),
                             QIcon(":statistics") );
             pItem->child(2)->appendRow(pointsItem);
+          }
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Slot connected to the templatesAdded() signal from a project. Adds a ProjectItem for
+   * each newly added template FileName to the model. The Item is added to the corresponding
+   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ).
+   *
+   * @param newFileList QList of FileNames being added to the project.
+   */
+  void ProjectItemModel::onTemplatesAdded(QList<FileName> newFileList) {
+    Project *project = qobject_cast<Project *>( sender() );
+
+    if (!project) {
+      return;
+    }
+
+    for (int i = 0; i<rowCount(); i++) {
+      ProjectItem *projectItem = item(i);
+      if (projectItem->project() == project) {
+        for (int j = 0; j < projectItem->rowCount(); j++) {
+          ProjectItem *templatesItem = projectItem->child(j);
+          if (templatesItem->text() == "Templates"){
+            foreach (FileName newFile, newFileList) {
+              QString type = newFile.dir().dirName();
+              for (int k = 0; k < templatesItem->rowCount(); k++) {
+                ProjectItem *templateType = templatesItem->child(k);
+                if (templateType->text().toLower() == type) {
+                  ProjectItem *fileItem = new ProjectItem(FileItemQsp(
+                    new FileItem(newFile.expanded())),
+                    newFile.name(),
+                    QIcon(":folder"));
+                  fileItem->setData(QVariant(newFile.toString()));
+                  templateType->appendRow(fileItem);
+                }
+              }
+            }
           }
         }
       }
@@ -730,7 +773,9 @@ namespace Isis {
       item->setText(name);
       item->shapeList()->setName(name);
     }
-
+    else if (item->isTemplate() && role == Qt::EditRole) {
+      item->setText(name);
+    }
     return true;
   }
 

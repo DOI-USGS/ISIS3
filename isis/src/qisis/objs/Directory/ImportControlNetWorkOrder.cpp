@@ -137,6 +137,7 @@ namespace Isis {
     return internalData().count() > 0;
   }
 
+
   /**
    * @brief Imports the control network asynchronously.
    *
@@ -184,6 +185,7 @@ namespace Isis {
       QThread::yieldCurrentThread();
     }
   }
+
 
   /**
    * @brief Clears progress.
