@@ -1,0 +1,40 @@
+Testing BulletTargetShape
+
+
+Testing default constructor
+
+Target name:  ""
+Maximum distance in kilometers:  0
+btCollisionBody pointer is valid?  false
+
+
+Testing load constructor
+Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+
+Target name:  ""
+Maximum distance in kilometers:  0.683956
+btCollisionBody pointer is valid?  true
+
+
+Testing load constructor with cube
+Testing with  "$hayabusa/testData/st_2391934788_v.cub" ...
+
+Target shape pointer is valid? false
+
+
+Testing load constructor with other extension
+Testing with  "$base/testData/xmlTestLabel.xml" ...
+
+Target shape pointer is valid? false
+
+
+Testing collision body constructor
+Target name:  "Itokawa"
+Maximum distance in kilometers:  0.683956
+btCollisionBody pointer is valid?  true
+
+
+Testing null collision body constructor
+Target name:  "Null"
+Maximum distance in kilometers:  0
+btCollisionBody pointer is valid?  false

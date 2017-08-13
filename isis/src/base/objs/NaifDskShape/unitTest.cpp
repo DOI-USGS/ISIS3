@@ -121,6 +121,17 @@ int main(int argc, char *argv[]) {
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
     qDebug() << "";
 
+    qDebug() << "";
+    qDebug() << "Now that we have a surface point, testing intersectSurface using surfacepoint"
+                " from parent class..."; 
+    shapeModelFromPvlElevation.intersectSurface(xp, obsPos);
+    qDebug() << "Do we have an intersection? " << shapeModelFromPvlElevation.hasIntersection();
+
+    qDebug() << "Testing intersectSurface using lat/lon from parent class..."; 
+    shapeModelFromPvlElevation.intersectSurface(xp.GetLatitude(), xp.GetLongitude(), obsPos);
+    qDebug() << "Do we have an intersection? " << shapeModelFromPvlElevation.hasIntersection();
+    qDebug() << "";
+
     qDebug() << "Find local radius given lat/lon";
     Latitude lat(0, Angle::Degrees);
     Longitude lon(0, Angle::Degrees);

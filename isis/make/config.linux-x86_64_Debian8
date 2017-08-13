@@ -246,14 +246,13 @@ ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
 # Set up for BOOST
 #---------------------------------------------------------------------------
 BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.59.0
-BOOSTLIBDIR =
-BOOSTLIB    =
-#BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
-#BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
-#              -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
-#              -lboost_math_tr1 -lboost_prg_exec_monitor -lboost_program_options \
-#              -lboost_regex -lboost_serialization -lboost_signals -lboost_system \
-#              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization
+BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
+BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
+              -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
+              -lboost_math_tr1 -lboost_prg_exec_monitor -lboost_program_options \
+              -lboost_regex -lboost_serialization -lboost_signals -lboost_system \
+              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization \
+              -lboost_timer -lboost_chrono
 
 #---------------------------------------------------------------------------
 # Set up for Cholmod libraries
@@ -268,6 +267,42 @@ CHOLMODLIB    = -lcholmod -lamd -lcamd -lccolamd -lcolamd -llapack -lsuitesparse
 HDF5INCDIR = -I$(ISIS3LOCAL)/include/hdf5
 HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
 HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+
+#---------------------------------------------------------------------------
+# Set up for PCL libraries
+#---------------------------------------------------------------------------
+PCLINCDIR = -I$(ISIS3LOCAL)/include/pcl-1.8
+PCLLIBDIR = -L$(ISIS3LOCAL)/lib
+PCLLIB    = -lpcl_common -lpcl_octree -lpcl_io
+
+#---------------------------------------------------------------------------
+# Set up for Eigen (link to include files only, no library)
+#---------------------------------------------------------------------------
+EIGENINCDIR = -I$(ISIS3LOCAL)/include/eigen
+
+#---------------------------------------------------------------------------
+# Set up for VTK
+#---------------------------------------------------------------------------
+VTKINCDIR = -I$(ISIS3LOCAL)/include/vtk-7.1
+VTKLIBDIR = -L$(ISIS3LOCAL)/lib
+VTKLIB    = -lvtksys-7.1
+
+#---------------------------------------------------------------------------
+# Set up for FLANN
+#---------------------------------------------------------------------------
+FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
+
+#---------------------------------------------------------------------------
+# Set up for QHull
+#---------------------------------------------------------------------------
+QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
+
+#---------------------------------------------------------------------------
+# Set up for Embree libraries 
+#---------------------------------------------------------------------------
+EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
+EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
+EMBREELIB    = -lembree
 
 #---------------------------------------------------------------------------
 # Set up for OpenCV libraries
@@ -302,6 +337,19 @@ NNINCDIR = -I$(ISIS3LOCAL)/include/nn
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
+# Setup for Bullet Physics library
+#---------------------------------------------------------------------------
+#BULLETLIB     = -lBullet2FileLoader -lBullet3Collision -lBullet3Common          \
+#                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
+#                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
+#                -lBulletSoftBody    -lLinearMath
+BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
+                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
+                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
+                -lLinearMath 
+BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
+
+#---------------------------------------------------------------------------
 # Final generic setup for includes at the top level
 #---------------------------------------------------------------------------
 DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
@@ -310,7 +358,7 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
-#  Libraries
+# Qt Libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.6.*[^g]"
@@ -436,10 +484,8 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgsl*.so*"
 #THIRDPARTYLIBS    += "/lib64/libreadline.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.so*"
 
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_cpp.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl_cpp.so*"
+# HDF5 libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5*.so*"
 
 # Add all the OpenCV libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libopencv_*.so*"
@@ -448,10 +494,36 @@ THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavcodec.so*)
 THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavformat.so*)
 THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavutil.so*)
 
+# Bullet Libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Common.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Dynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Geometry.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3OpenCL_clew.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletCollision.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletDynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletInverseDynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletSoftBody.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath.so*"
+
+# Add the Point Cloud Libraries and PCL dependencies
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libflann*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqhull*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libvtk*.so*"
+
+# Add the Embree library
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libembree.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
+
+# Add the Boost libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libboost*.so*"
+
 # Add system libraries that need their rpath's patched to $ORIGIN
 PATCHLIBS += "$(ISIS3SYSLIB)/libsnappy.so*" # Qt5WebEngine dependency
 PATCHLIBS += "$(ISIS3SYSLIB)/libsrtp.so*"   # Qt5WebEngine dependency
-
+PATCHLIBS += "$(ISIS3LOCAL)/lib/libvtksys*.so*"
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"
