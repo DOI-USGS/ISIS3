@@ -20,9 +20,9 @@
 
 #include <QDebug>
 
-#include "IException.h"
-
 #include "BulletDskShape.h"
+#include "IException.h"
+#include "Preference.h"
 
 using namespace Isis;
 
@@ -31,6 +31,8 @@ using namespace Isis;
  */
 int main(int argc, char *argv[]) {
   try {
+    Preference::Preferences(true);
+
     qDebug() << "Testing BulletDskShape";
     qDebug() << endl;
 

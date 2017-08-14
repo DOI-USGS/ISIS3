@@ -17,6 +17,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <cmath>
+
 #include <QDebug>
 
 #include "Angle.h"
@@ -39,6 +41,8 @@
 using namespace Isis;
 
 void outputModelStatus(EmbreeShapeModel &embreeModel);
+
+double roundToPrecision(double value, double precision);
 
 /** 
  * Unit test for Embree Ray Tracing Kernels
@@ -331,9 +335,9 @@ void outputModelStatus(EmbreeShapeModel &embreeModel) {
     embreeIntersection = embreeModel.surfaceIntersection();
     qDebug() << qSetRealNumberPrecision(4)
               << "  Surface Point: ("
-              << embreeIntersection->GetX().kilometers() << ", "
-              << embreeIntersection->GetY().kilometers() << ", "
-              << embreeIntersection->GetZ().kilometers() << ")";
+              << roundToPrecision(embreeIntersection->GetX().kilometers(), 0.0001) << ", "
+              << roundToPrecision(embreeIntersection->GetY().kilometers(), 0.0001) << ", "
+              << roundToPrecision(embreeIntersection->GetZ().kilometers(), 0.0001) << ")";
   }
   qDebug() << "Model has normal? " << embreeModel.hasNormal();
   std::vector<double> embreeNormal;
@@ -345,4 +349,8 @@ void outputModelStatus(EmbreeShapeModel &embreeModel) {
               << embreeNormal[2] << ")";
   }
   qDebug() << "";
+}
+
+double roundToPrecision(double value, double precision) {
+  return value - fmod(value, precision);
 }

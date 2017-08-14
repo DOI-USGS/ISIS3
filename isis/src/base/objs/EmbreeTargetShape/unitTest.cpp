@@ -17,6 +17,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <cmath>
+
 #include <QDebug>
 #include <QVector>
 
@@ -53,6 +55,8 @@ void outputOcclusion(EmbreeTargetShape &embreeShape,
                      LinearAlgebra::Vector &observer,
                      LinearAlgebra::Vector &lookDirection,
                      unsigned ignorePrimID = RTC_INVALID_GEOMETRY_ID);
+
+double roundToPrecision(double value, double precision);
 
 /** 
  * Unit test for Embree Ray Tracing Kernels
@@ -313,11 +317,10 @@ void outputIntersection(EmbreeTargetShape &embreeShape,
     RayHitInformation intersectionInfo = embreeShape.getHitInformation(ray, i);
     qDebug() << "Intersection" << (i + 1) << "information:";
     qDebug() << "  Primitive ID:  " << intersectionInfo.primID;
-    qDebug() << qSetRealNumberPrecision(3)
-            << "  Intersection:   ("
-            << intersectionInfo.intersection[0] << ","
-            << intersectionInfo.intersection[1] << ","
-            << intersectionInfo.intersection[2] << ")";
+    qDebug() << "  Intersection:   ("
+            << roundToPrecision(intersectionInfo.intersection[0], 0.0001) << ","
+            << roundToPrecision(intersectionInfo.intersection[1], 0.0001) << ","
+            << roundToPrecision(intersectionInfo.intersection[2], 0.0001) << ")";
     qDebug() << "  Surface normal: ("
             << intersectionInfo.surfaceNormal[0] << ","
             << intersectionInfo.surfaceNormal[1] << ","
@@ -385,11 +388,14 @@ void outputOcclusionRay(RTCOcclusionRay &ray) {
 void outputRayHitInformation(RayHitInformation &hit) {
   qDebug() << "Ray Hit Information";
   qDebug() << "  Primitive ID: " << hit.primID;
-  qDebug() << qSetRealNumberPrecision(3)
-           << "  Intersection: (" << hit.intersection[0] << ","
-                                  << hit.intersection[1] << "," 
-                                  << hit.intersection[2] << ")";
+  qDebug() << "  Intersection: (" << roundToPrecision(hit.intersection[0], 0.0001) << ","
+                                  << roundToPrecision(hit.intersection[1], 0.0001) << "," 
+                                  << roundToPrecision(hit.intersection[2], 0.0001) << ")";
   qDebug() << "  Surface Normal: (" << hit.intersection[0] << ","
                                     << hit.intersection[1] << "," 
                                     << hit.intersection[2] << ")";
+}
+
+double roundToPrecision(double value, double precision) {
+  return value - fmod(value, precision);
 }
