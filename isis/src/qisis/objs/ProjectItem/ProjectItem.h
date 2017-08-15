@@ -128,6 +128,8 @@ namespace Isis {
    *                             Qt::Black Fixes #5095
    *     @history 2017-08-11 Christopher Combs - Added isTemplate() and setTemplate() to allow for
    *                             imported templates to show on the project tree. Fixes #5086.
+   *     @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                             source images. Fixes #5105.
    *
    */
   class ProjectItem : public QStandardItem {

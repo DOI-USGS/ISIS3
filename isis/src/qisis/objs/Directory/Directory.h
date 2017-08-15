@@ -177,6 +177,8 @@ namespace Isis {
    *   @history 2017-08-11 Cole Neubauer - Added project setClean(false) call to all views cleanup
    *                           slot. This will make a a view closing be treated as a project change
    *                           Fixes #5113
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -378,17 +378,20 @@ namespace Isis {
             ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedResidualsFilename())),
                             "Measure Residuals", bundleSolutionInfo->savedResidualsFilename(),
-                            QIcon(":statistics") );
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(residualsItem);
             ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedImagesFilename())),
                             "Images", bundleSolutionInfo->savedImagesFilename(),
-                            QIcon(":statistics") );
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(imagesItem);
             ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedPointsFilename())),
                             "Control Points", bundleSolutionInfo->savedPointsFilename(),
-                            QIcon(":statistics") );
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(pointsItem);
           }
         }

@@ -48,6 +48,8 @@ namespace Isis {
    *   @history 2017-06-07 Ian Humphrey - Modified fillFromSettings() so when the weightings are
    *                           loaded into the text line edits they are set to modified, which
    *                           allows for proper restoring of user defined weightings.
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
    */
 
   class JigsawSetupDialog : public QDialog {

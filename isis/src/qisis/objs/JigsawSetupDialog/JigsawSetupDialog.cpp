@@ -99,15 +99,20 @@ namespace Isis {
       QString name = target->displayProperties()->displayName();
 
       if (name == "MOON")
-        m_ui->targetBodyComboBox->addItem(QIcon(":moon"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/weather-clear-night.png").expanded()), name, v);
       else if (name == "Enceladus")
-        m_ui->targetBodyComboBox->addItem(QIcon(":enceladus"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_enceladus.png").expanded()), name, v);
       else if (name == "Mars")
-        m_ui->targetBodyComboBox->addItem(QIcon(":mars"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_mars.png").expanded()), name, v);
       else if (name == "Titan")
-        m_ui->targetBodyComboBox->addItem(QIcon(":titan"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_titan.png").expanded()), name, v);
       else
-        m_ui->targetBodyComboBox->addItem(QIcon(":moonPhase"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/weather-clear-night.png").expanded()), name, v);
     }
 
     m_ui->radiiButtonGroup->setId(m_ui->noneRadiiRadioButton,0);

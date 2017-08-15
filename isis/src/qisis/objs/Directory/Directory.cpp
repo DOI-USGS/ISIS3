@@ -316,7 +316,8 @@ namespace Isis {
     //fileMenu->addAction(m_importImagesWorkOrder->clone());
 
     QAction *openProjectAction = m_openProjectWorkOrder->clone();
-    openProjectAction->setIcon(QIcon(":open") );
+    openProjectAction->setIcon(QIcon(FileName(
+                "$base/icons/archive-insert-directory.png").expanded()));
     fileMenu->addAction(openProjectAction);
     m_permToolBarActions.append(openProjectAction);
 
@@ -344,7 +345,8 @@ namespace Isis {
 
     QAction *saveAction = m_saveProjectWorkOrder->clone();
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
-    saveAction->setIcon( QIcon(":save") );
+    saveAction->setIcon( QIcon(FileName("$base/icons/document-save.png")
+                                        .expanded()));
     saveAction->setDisabled(true);
     connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
              saveAction, SLOT( setDisabled(bool) ) );
@@ -352,7 +354,8 @@ namespace Isis {
     m_permToolBarActions.append(saveAction);
 
     QAction *saveAsAction = m_saveProjectAsWorkOrder->clone();
-    saveAsAction->setIcon(QIcon(":saveAs"));
+    saveAsAction->setIcon(QIcon(FileName("$base/icons/document-save-as.png")
+                                         .expanded()));
     fileMenu->addAction(saveAsAction);
     m_permToolBarActions.append(saveAsAction);
 

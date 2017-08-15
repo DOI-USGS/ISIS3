@@ -34,12 +34,15 @@ namespace Isis {
 
     QPixmap image;
     if (displayName.contains("ISSNA")) {
+      // TODO Find legal image for this!
       image.load(":cassini-iss-nac");
     }
     else if (displayName.contains("Metric")) {
-      image.load(":apollo-metric-camera");
+      image.load(FileName("$base/images/nasa_apollo_metric_camera.png")
+                          .expanded());
     }
     else if (displayName.contains("HiRISE")) {
+      // TODO Find legal image for this!
       image.load(":hirise-camera");
     }
 

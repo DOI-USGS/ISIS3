@@ -31,5 +31,8 @@
    <change name="Tracie Sucharski" date="2017-06-22">
      Changed name of application from cnetsuite to ipce.
    </change>
+   <change name="Summer Stapleton" date="2017-08-14">
+     Updated ipce to only include licensed or open source images and icons. Fixes #5105.
+   </change>
   </history>
 </application>

@@ -114,6 +114,8 @@ namespace Isis {
    *                           Fixes #5113
    *   @history 2017-08-11 Christopher Combs - Added onTemplatesAdded() and connected it to the
    *                           signal sent by Project. Fixes #5086.
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
    */
   class ProjectItemModel : public QStandardItemModel {
 
