@@ -210,7 +210,7 @@ GMMLIB    =
 #---------------------------------------------------------------------------
 SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu4.3
 SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
-SUPERLULIB    = -lsuperlu_4.3 -lblas -lgfortran
+SUPERLULIB    = -lsuperlu_4.3 -l:libblas.so.3 -lgfortran
 
 #---------------------------------------------------------------------------
 # Set up for Google Protocol Buffers (ProtoBuf)
