@@ -262,6 +262,7 @@ namespace Isis {
    */
   PvlGroup Target::radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup) {
     PvlGroup mapping = mapGroup;
+
     // Check to see if the mapGroup already has the target radii.
     // If BOTH radii are already in the mapGroup then just return the given
     // mapping group as is.
@@ -311,39 +312,61 @@ namespace Isis {
     catch (IException &e) {
       // If all previous attempts fail, look for the radii using the body frame
       // code in the NaifKeywords object.
-      // Note: We will only look in the given label for the values after NAIF
+      // Note: We will only look in the given label for the values after SPICELIB 
       // routines have failed to preserve backwards compatibility (since this
       // label check is new).
       if (cubeLab.hasObject("NaifKeywords")) {
 
         PvlObject naifKeywords = cubeLab.findObject("NaifKeywords");
-        if (naifKeywords.hasKeyword("BODY_FRAME_CODE")) {
 
-          PvlKeyword bodyFrame = naifKeywords.findKeyword("BODY_FRAME_CODE");
-          QString radiiKeyword = "BODY" 
-                                 + bodyFrame[0]
-                                 + "_RADII";
+        try {
+
+          // Try using the value of the BODY_FRAME_CODE keyword in the NaifKeywords PVL object
+          if (naifKeywords.hasKeyword("BODY_FRAME_CODE")) {
+
+            PvlKeyword bodyFrame = naifKeywords.findKeyword("BODY_FRAME_CODE");
+            QString radiiKeyword = "BODY" + bodyFrame[0] + "_RADII";
+
+            if (naifKeywords.hasKeyword(radiiKeyword)) {
+              PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
+              mapping.addKeyword( PvlKeyword("EquatorialRadius",
+                                             toString(toDouble(radii[0]) * 1000.0),
+                                             "meters"),
+                                  PvlContainer::Replace);
+              mapping.addKeyword( PvlKeyword("PolarRadius",
+                                             toString(toDouble(radii[2]) * 1000.0), 
+                                             "meters"),
+                                  PvlContainer::Replace);
+              return mapping;
+            }
+            // Try getting the radii using the BODY_FRAME_CODE with SPICELIB
+            else {
+              PvlGroup radiiGroup = Target::radiiGroup(toInt(bodyFrame[0]));
+              // Now APPEND the EquatorialRadius and PolorRadius
+              mapping.addKeyword( radiiGroup.findKeyword("EquatorialRadius"), PvlContainer::Replace);
+              mapping.addKeyword( radiiGroup.findKeyword("PolarRadius"),      PvlContainer::Replace);
+              return mapping;
+
+
+            }
+          }
+        }
+        catch (IException &e) {
+
+          // Try using the BODYbodycode_RADII keyword in the NaifKeywords PVL object
+          SpiceInt bodyCode = 0;
+          bodyCode = lookupNaifBodyCode(target);
+          QString radiiKeyword = "BODY" + toString(int(bodyCode)) + "_RADII";
 
           if (naifKeywords.hasKeyword(radiiKeyword)) {
             PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
             mapping.addKeyword( PvlKeyword("EquatorialRadius",
-                                           toString(toDouble(radii[0]) * 1000.0),
-                                           "meters"),
-                                PvlContainer::Replace);
+                                           toString(toDouble(radii[0]) * 1000.0), "meters"),
+                                           PvlContainer::Replace);
             mapping.addKeyword( PvlKeyword("PolarRadius",
-                                           toString(toDouble(radii[2]) * 1000.0), 
-                                           "meters"),
-                                PvlContainer::Replace);
+                                           toString(toDouble(radii[2]) * 1000.0), "meters"),
+                                           PvlContainer::Replace);
             return mapping;
-          }
-          else {
-            PvlGroup radiiGroup = Target::radiiGroup(toInt(bodyFrame[0]));
-            // Now APPEND the EquatorialRadius and PolorRadius
-            mapping.addKeyword( radiiGroup.findKeyword("EquatorialRadius"), PvlContainer::Replace);
-            mapping.addKeyword( radiiGroup.findKeyword("PolarRadius"),      PvlContainer::Replace);
-            return mapping;
-
-
           }
         }
       }
@@ -421,6 +444,8 @@ namespace Isis {
 
     // Load the most recent target attitude and shape kernel for NAIF
     static bool pckLoaded = false;
+
+    NaifStatus::CheckErrors();
 
     FileName kern("$base/kernels/pck/pck?????.tpc");
     kern = kern.highestVersion();
