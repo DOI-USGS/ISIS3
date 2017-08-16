@@ -355,7 +355,13 @@ namespace Isis {
 
           // Try using the BODYbodycode_RADII keyword in the NaifKeywords PVL object
           SpiceInt bodyCode = 0;
-          bodyCode = lookupNaifBodyCode(target);
+          try {
+            bodyCode = lookupNaifBodyCode(target);
+          }
+          catch (IException &e2) {
+            throw IException(e, IException::Unknown, e2.what(), _FILEINFO_);
+          }
+
           QString radiiKeyword = "BODY" + toString(int(bodyCode)) + "_RADII";
 
           if (naifKeywords.hasKeyword(radiiKeyword)) {

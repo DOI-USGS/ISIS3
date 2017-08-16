@@ -191,6 +191,7 @@ End_Group
 
 RETURNS: 
 
+**ERROR** **I/O ERROR** Could not convert Target [Chewbaca] to NAIF body code.
 **ERROR** Unable to find radii for target code [2101955]. Target code was not found in furnished kernels.
 **ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(KERNELVARNOTFOUND)]. The Naif error is [The variable BODY2101955_RADII could not be found in the kernel pool.].
 -------------------------------
