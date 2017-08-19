@@ -1024,7 +1024,7 @@ namespace Isis {
     unsigned int minPrecision = 13;
     while(failed) {
       try {
-        std::auto_ptr< geos::geom::Geometry > resultAuto =
+        std::unique_ptr< geos::geom::Geometry > resultAuto =
           BinaryOp(geomFirst, geomSecond, geos::operation::overlay::overlayOp(code));
         failed = false;
         result = resultAuto->clone();

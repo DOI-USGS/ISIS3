@@ -1388,13 +1388,15 @@ namespace Isis {
 
     if(p_hasVelocity) {
 
-      if( p_degree == 0)
+      if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
-      else
+      }
+      else { 
         p_velocity[0] = ComputeVelocityInTime(WRT_X);
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
-
+      }
+        
 //         p_velocity[0] = functionX.DerivativeVar(rtime);
 //         p_velocity[1] = functionY.DerivativeVar(rtime);
 //         p_velocity[2] = functionZ.DerivativeVar(rtime);

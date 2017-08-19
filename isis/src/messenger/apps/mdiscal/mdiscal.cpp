@@ -201,7 +201,7 @@ void IsisMain() {
     }
   }
 
-  auto_ptr<DarkModelPixel> darkModel;
+  unique_ptr<DarkModelPixel> darkModel;
   if (darkCurr == "NONE") {
     g_darkCurrentMode = DarkCurrentNone;
   } 
@@ -240,7 +240,7 @@ void IsisMain() {
     } 
     else {
       // read in dark current table variables and report the filename used
-      darkModel = auto_ptr<DarkModelPixel>(new DarkModelPixel(pxlBin, 
+      darkModel = unique_ptr<DarkModelPixel>(new DarkModelPixel(pxlBin, 
                                                               g_ccdTemperature, 
                                                               g_exposureDuration));
       darkCurrentFile = darkModel->loadCoefficients(g_isNarrowAngleCamera, g_isBinnedData);

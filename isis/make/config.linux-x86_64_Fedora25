@@ -2,11 +2,12 @@
 # Compiler options
 #---------------------------------------------------------------------------
 
-ISISCPPFLAGS  = -Wall
+ISISCPPFLAGS = -Wall
 ISISCPPFLAGS += -std=c++14
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
 ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
+#ISISCPPFLAGS += -Wno-misleading-indentation
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS += -g
@@ -160,7 +161,7 @@ NAIFLIB    = -lcspice
 #---------------------------------------------------------------------------
 # Set up for TNT
 #---------------------------------------------------------------------------
-TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt/tnt126 -I$(ISIS3LOCAL)/include/tnt/tnt126/tnt
+TNTINCDIR = -isystem $(ISIS3LOCAL)/include/tnt/tnt126 -isystem $(ISIS3LOCAL)/include/tnt/tnt126/tnt
 TNTLIBDIR =
 TNTLIB    =
 
@@ -174,7 +175,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.5.0
+GEOSINCDIR = -isystem $(ISIS3LOCAL)/include/geos/geos3.5.0
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
 GEOSLIB    = -lgeos-3.5.0 -lgeos_c
 
@@ -201,7 +202,7 @@ X11LIB    = -lX11
 #---------------------------------------------------------------------------
 # Set up for GMM
 #---------------------------------------------------------------------------
-GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm-5.0 -I$(ISIS3LOCAL)/include/gmm/gmm-5.0/gmm
+GMMINCDIR = -isystem $(ISIS3LOCAL)/include/gmm/gmm-5.0 -isystem $(ISIS3LOCAL)/include/gmm/gmm-5.0/gmm
 GMMLIBDIR =
 GMMLIB    =
 
@@ -247,7 +248,7 @@ ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
 #---------------------------------------------------------------------------
 # Set up for BOOST
 #---------------------------------------------------------------------------
-BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.59.0
+BOOSTINCDIR = -isystem $(ISIS3LOCAL)/include/boost/boost1.59.0
 BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
 BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
               -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
@@ -273,9 +274,9 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 # Set up for PCL libraries
 #---------------------------------------------------------------------------
-#PCLINCDIR = -I$(ISIS3LOCAL)/include/pcl-1.8
-#PCLLIBDIR = -L$(ISIS3LOCAL)/lib
-#PCLLIB    = -lpcl_common -lpcl_octree -lpcl_io
+PCLINCDIR = -I$(ISIS3LOCAL)/include/pcl-1.8
+PCLLIBDIR = -L$(ISIS3LOCAL)/lib
+PCLLIB    = -lpcl_common -lpcl_octree -lpcl_io
 
 #---------------------------------------------------------------------------
 # Set up for Eigen (link to include files only, no library)
@@ -285,14 +286,14 @@ EIGENINCDIR = -I$(ISIS3LOCAL)/include/eigen
 #---------------------------------------------------------------------------
 # Set up for VTK
 #---------------------------------------------------------------------------
-#VTKINCDIR = -I$(ISIS3LOCAL)/include/vtk-7.1
-#VTKLIBDIR = -L$(ISIS3LOCAL)/lib
-#VTKLIB    = -lvtksys-7.1
+VTKINCDIR = -I$(ISIS3LOCAL)/include/vtk-7.1
+VTKLIBDIR = -L$(ISIS3LOCAL)/lib
+VTKLIB    = -lvtksys-7.1
 
 #---------------------------------------------------------------------------
 # Set up for FLANN
 #---------------------------------------------------------------------------
-#FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
+FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 
 #---------------------------------------------------------------------------
 # Set up for QHull
@@ -302,9 +303,9 @@ EIGENINCDIR = -I$(ISIS3LOCAL)/include/eigen
 #---------------------------------------------------------------------------
 # Set up for Embree libraries 
 #---------------------------------------------------------------------------
-#EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
-#EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
-#EMBREELIB    = -lembree
+EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
+EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
+EMBREELIB    = -lembree
 
 #---------------------------------------------------------------------------
 # Set up for OpenCV libraries 
@@ -341,16 +342,21 @@ NNLIB = -lnn
 #---------------------------------------------------------------------------
 # Setup for Bullet Physics library
 #---------------------------------------------------------------------------
-#BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
-#                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
-#                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
-#                -lBulletSoftBody    -lLinearMath 
+BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
+                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
+                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
+                -lBulletSoftBody    -lLinearMath 
 #BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
 #                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
 #                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
 #                -lLinearMath 
-#BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
-#BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
+BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
+BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
+
+#---------------------------------------------------------------------------
+# TBB
+#---------------------------------------------------------------------------
+TBBLIBS = -l:libtbb.so.2
 
 #---------------------------------------------------------------------------
 # Final generic setup for includes at the top level
@@ -501,28 +507,28 @@ THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavutil.so*)
 
 
 # Bullet Libraries
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Common.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Dynamics.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Geometry.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3OpenCL_clew.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletCollision.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletDynamics.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletInverseDynamics.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletSoftBody.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Common.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Dynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Geometry.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3OpenCL_clew.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletCollision.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletDynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletInverseDynamics.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletSoftBody.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath.so*"
 
 
 # Add the Point Cloud Libraries and PCL dependencies
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl*.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libflann*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libflann*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqhull*.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libvtk*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libvtk*.so*"
 
 # Add the Embree library
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libembree.so*"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libembree.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
 
 # Add the Boost libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libboost*.so*"

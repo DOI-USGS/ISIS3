@@ -175,7 +175,10 @@ namespace Isis {
    *                            any NAIF errors were signaled. References #2248.
    *   @history 2015-08-25 Kristin Berry - Moved check to make sure a polynomial exists to earlier in
    *                           LoadHermiteCache. Was failing due to lack of a polynomial with a
-   *                           confusing error message before the check. 
+   *                           confusing error message before the check.
+   *   @history 2017-08-18 Tyler Wilson, Summer Stapleton, Ian Humphrey -  Added opening/closing brackets
+   *                           to SetEphemerisTimePolyFunction() so this class compiles without warnings
+   *                           under C++14. References #4809.   
    */
   class SpicePosition {
     public:
