@@ -11,5 +11,8 @@ commands:
 	$(APPNAME) from=$(INPUT)/PSP_001414_1780_RED5.balance.cropped.cub \
 	to=$(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.cub > /dev/null;
 	catlab from=$(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.cub \
+	  > $(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.pvl.tmp;
+	$(SED) 's+/.*/input/+input/+' $(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.pvl.tmp \
 	  > $(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.pvl;
+	$(RM) $(OUTPUT)/PSP_001414_1780_RED5.balance.cropped.noproj.pvl.tmp;
 	$(RM) print.prt > /dev/null;
