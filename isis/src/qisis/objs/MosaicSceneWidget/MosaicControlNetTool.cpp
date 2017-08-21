@@ -99,8 +99,8 @@ namespace Isis {
     //  Why can't the getControlNetHelp and getGridHelp pass in the current MosaicSceneWidget?
     if (getWidget() && !getWidget()->directory()) {
       m_closeNetwork = new QPushButton("Close Network");
-      m_closeNetwork->setEnabled(true);
-      m_closeNetwork->setVisible(true);
+      m_closeNetwork->setEnabled(false);
+      m_closeNetwork->setVisible(false);
       m_closeNetwork->setToolTip("Close the currently open control network");
       connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
       connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
@@ -462,13 +462,16 @@ namespace Isis {
       }
     }
   }
+  
 
   /**
    * Slot used to re-create the graphics items that depict the control points
    * 
    */
   void MosaicControlNetTool::rebuildPointGraphics() {
-    m_controlNetGraphics->buildChildren();
+    if (m_controlNetGraphics) {
+      m_controlNetGraphics->buildChildren();
+    }
   }
 
 
@@ -590,11 +593,11 @@ namespace Isis {
         QMessageBox::critical(getWidget(), "Error", message);
         return;
       }
-      m_controlNetFile = getWidget()->directory()->project()->activeControl()->fileName();
+      m_controlNetFile = getWidget()->directory()->project()->activeControl()->fileName(); 
     }
 
     if (!m_controlNetFile.isEmpty()) {
-      loadNetwork();
+      loadNetwork(); 
       if (m_displayControlNetButton) m_displayControlNetButton->setChecked(true);
     }
   }
@@ -664,9 +667,8 @@ namespace Isis {
   }
 
 
-  // TODO: why did we remove the error checks?
+  // TODO: why did we remove the error checks? 
   void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton mouseButton) {
-
     if (!isActive() || !m_controlNet) return;
 
     // If not IPCE, return, qmos does not use this code
@@ -678,7 +680,7 @@ namespace Isis {
     if (mouseButton == Qt::LeftButton) {
 
       //  Find closes point
-      cp = m_controlNetGraphics->findClosestControlPoint();
+      cp = m_controlNetGraphics->findClosestControlPoint(point);
 
       // TODO  move the emit into the if so that we do not need to do early return.
       // The user did not click close enough to a point for findClosestControlPoint to find a point.
@@ -686,14 +688,11 @@ namespace Isis {
         return;
       }
       emit modifyControlPoint(cp);
-//    getWidget()->directory()->controlPointEditView()->controlPointEditWidget()->setEditPoint(cp);
-//    getWidget()->directory()->controlPointChipViewports()->setPoint(cp);
-
     }
     else if (mouseButton == Qt::MidButton) {
+      
 
-
-      cp = m_controlNetGraphics->findClosestControlPoint();
+      cp = m_controlNetGraphics->findClosestControlPoint(point);
       if (!cp) {
       // TODO Figure out how to get this error message in the right place
         QString message = "No points exist for deleting. Create points "
@@ -701,7 +700,7 @@ namespace Isis {
         QMessageBox::warning(getWidget(), "Warning", message);
         return;
       }
-
+      
       emit deleteControlPoint(cp);
       //       deletePoint(point); // what should happen here?
     }

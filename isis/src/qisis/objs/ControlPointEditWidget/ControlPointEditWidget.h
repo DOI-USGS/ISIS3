@@ -70,6 +70,12 @@ namespace Isis {
    *                           measures in the ChipViewports. Fixes #5070.
    *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to
    *                           the dialog. Fixes #5066.
+   *   @history 2017-08-11 Tracie Sucharski - Added shortcuts for Save Point, Save Net.
+   *                           Fixes #4982.
+   *   @history 2017-08-11 Tracie Sucharski - Fixed save point and colorization of buttons.
+   *                           Fixes #4984.
+   *   @history 2017-08-15 Tracie Sucharski - When ControlPoint is deleted, set the visibility of
+   *                           this widget to false, then to true in loadPoint().  Fixes #5073.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT

@@ -139,6 +139,11 @@ namespace Isis {
     *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
     *   @history 2017-07-27  Christopher Combs - Added sample, line, lat, and lon labels.
     *                           Fixes #5067.
+    *   @history 2017-08-11 Tracie Sucharski - Added shortcuts for find,
+    *                           registration/undo-registration, save measure. Fixes #4982.
+    *   @history 2017-08-11 Tracie Sucharski - Created a new ControlMeasure when editing points so
+    *                           that the edit ControlPoint is no changed until user selects
+    *                           "Save Measures", and colorize save buttons.  Fixes #4984.
     *
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

@@ -152,12 +152,13 @@ namespace Isis {
    *   @history 2017-07-17 Cole Neubauer - Disabled CNet tool when a Footprint2DView is added if a
    *                           control net is not active and slotted it to reenable when Project
    *                           emits activeControlSet(bool). Fixes #5046.
-   *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
-   *                           to edit a control point when there is not an active control network.
-   *                           Fixes #5048.
+   *                           Fixes #5046
    *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
    *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
    *                           from the context menu Fixes #4996
+   *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
+   *                           to edit a control point when there is not an active control network.
+   *                           Fixes #5048.
    *   @history 2017-07-26 Cole Neubauer -Set save button to default be disabled Fixes #4960
    *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
    *                           current edit control point ID.  Fixes #5007, #5008.
@@ -179,6 +180,10 @@ namespace Isis {
    *                           Fixes #5113
    *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
    *                           source images. Fixes #5105.
+   *   @history 2017-08-15 Tracie Sucharski - Added comments explaing connections for control point
+   *                           editing actions between views.
+   *   @history 2017-08-18 Tracie Sucharski - Removed deletion of control net from
+   *                           ::makeBackupActiveControl, don't know why it was being deleted.
    */
   class Directory : public QObject {
     Q_OBJECT
