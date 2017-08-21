@@ -4000,7 +4000,7 @@ namespace Isis {
     }
 
     // Remove from serial number list
-    m_serialNumberList->Delete(m_groundSN);
+    m_serialNumberList->remove(m_groundSN);
 
     //  If the loaded point is a fixed point, see if there is a temporary measure
     //  holding the coordinate information for the currentground source. If so,

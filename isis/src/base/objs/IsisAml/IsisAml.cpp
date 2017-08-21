@@ -3024,6 +3024,7 @@ void IsisAml::StartParser(const char *xmlfile) {
   }
 
   catch(const XERCES::XMLException &toCatch) {
+
     QString message = "Error during XML parser initialization" +
                      (QString)XERCES::XMLString::transcode(toCatch.getMessage());
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
@@ -3067,12 +3068,23 @@ void IsisAml::StartParser(const char *xmlfile) {
     appHandler = new IsisXMLApplication(encodingName, expandNamespaces, parser, mydata);
     parser->parse(xmlfile);
   }
-  catch(const XERCES::XMLException &toCatch) {
-    QString message = "Error in application XML file: " +
+  catch (const XERCES::XMLException &toCatch) {
+    QString message = "Error in application XML file: " + 
                      (QString)XERCES::XMLString::transcode(toCatch.getMessage());
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     XERCES::XMLPlatformUtils::Terminate();
     return;
+  }
+  // This Exception is thrown whenever an error is encountered while parsing an XML file.
+  // Stacked error messages are generated containing the file path and additional data about where the error occurred.
+  catch (Isis::IException &e) {
+      QString filePath = (QString) xmlfile;
+      QString previousErrorMessage = (QString) e.toString();
+      QString additionalErrorMessage = "Error while parsing application XML file [" + filePath + "]";
+
+      throw Isis::IException(Isis::IException::Programmer, additionalErrorMessage + "\n" + previousErrorMessage, _FILEINFO_);
+      XERCES::XMLPlatformUtils::Terminate();
+      return;
   }
 
   //  Delete the parser

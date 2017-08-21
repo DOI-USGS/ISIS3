@@ -1,8 +1,10 @@
 #include "Isis.h"
+
 #include <complex>
+
+#include "AlphaCube.h"
 #include "FourierTransform.h"
 #include "ProcessByTile.h"
-#include "AlphaCube.h"
 
 using namespace std;
 using namespace Isis;
@@ -65,10 +67,26 @@ void IsisMain() {
   sProc.SetInputCube(tmpPhaseFileName, cai);
 
   // the final output cube is cropped back to the original size
-  sProc.SetOutputCube("TO", initSamples, initLines, numBands);
+  Cube *outputCube = sProc.SetOutputCube("TO", initSamples, initLines, numBands);
 
   //Start the sample proccessing
   sProc.ProcessCubes(&IFFT1);
+
+  // Remove the AlphaCube if the alpha and beta dimensions match the output cube dimensions
+  // (i.e. remove this group if it didn't exist before running fft).
+  int outputSamples = outputCube->sampleCount();
+  int outputLines = outputCube->lineCount();
+  if (initSamples == outputSamples
+      && initLines == outputLines 
+      && acube.AlphaSamples() == outputSamples
+      && acube.AlphaLines() == outputLines) {
+    Pvl *label = outputCube->label();
+    PvlObject &isisCube = label->findObject("IsisCube");
+    if (isisCube.hasGroup("AlphaCube")) {
+      isisCube.deleteGroup("AlphaCube");
+    }
+  }
+
   sProc.Finalize();
 
   remove(tmpMagFileName.toLatin1().data());

@@ -67,6 +67,13 @@ namespace Isis {
    *   @history 2017-05-19 Tyler Wilson - Removed the calculateEllipsoidalSurfaceNormal() function,
    *                           as this is now being handled in the EllipsoidShape class.
    *                           References #1028.
+   *   @history 2017-03-23 Kris Becker - added isVisibleFrom() and two
+   *                            intersectSurface() methods to address real
+   *                            occlusions. It is recommended that derived
+   *                            models reimplement this method! Also made
+   *                            setSurfacePoint() & clearSurfacePoint() virtual
+   *                            to give some hope of a consistent internal state
+   *                            in derived models.
    */
   class ShapeModel {
     public:
@@ -84,6 +91,18 @@ namespace Isis {
       // Intersect the shape model
       virtual bool intersectSurface(std::vector<double> observerPos,
                                     std::vector<double> lookDirection)=0;
+
+      // These two methods are for optional testing of occlusions when checking
+      // specific locations on the body from the observer. The first uses 
+      // localRadius() by default and so may be OK as is. 
+      virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
+                                    const std::vector<double> &observerPos,
+                                    const bool &backCheck = true);
+      virtual bool intersectSurface(const SurfacePoint &surfpt, 
+                                    const std::vector<double> &observerPos,
+                                    const bool &backCheck = true);
+                                 
+
 
       // Return the surface intersection
       SurfacePoint *surfaceIntersection() const;
@@ -103,7 +122,7 @@ namespace Isis {
       virtual void calculateSurfaceNormal() = 0;
 
       // Clear current point
-      void clearSurfacePoint();
+      virtual void clearSurfacePoint();
 
       // Calculate the emission angle of the current intersection point
       virtual double emissionAngle(const std::vector<double> & sB);
@@ -135,10 +154,14 @@ namespace Isis {
       void setHasIntersection(bool b);
 
       // Set current surface point
-      void setSurfacePoint(const SurfacePoint &surfacePoint);
+      virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
 
       // Return the normal (surface or local) of the current intersection point
       std::vector<double>  normal();
+
+      // Determine if the internal intercept is occluded from the observer/lookdir
+      virtual bool isVisibleFrom(const std::vector<double> observerPos,
+                                 const std::vector<double> lookDirection);
 
     protected:
 
@@ -149,7 +172,7 @@ namespace Isis {
       // Set shape name
       void setName(QString name);
 
-      //void calculateEllipsoidalSurfaceNormal();
+      void calculateEllipsoidalSurfaceNormal();
       bool hasEllipsoidIntersection();
 
       // Intersect ellipse

@@ -52,8 +52,11 @@ namespace Isis {
    *                           now call calculateLocalNormal(), which calculates the normal
    *                           vector to an ellipsoid.  Prior to this, they were calling
    *                           ShapeModel::calculateEllipsoidalSurfaceNormal() function
-   *                           which was incorrectly returning the normal vector to a
-   *                           sphere and not an ellipsoid.  Fixes #1028.
+   *                           which was incorrectly returning the normal vector to a sphere and not
+   *                           an ellipsoid.  Fixes #1028.
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *                            intersectSurface methods in ShapeModel are accessible by
+   *                            EllipsoidShape.
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:
@@ -63,6 +66,9 @@ namespace Isis {
 
       //! Destructor
       ~EllipsoidShape() { };
+
+      // Make parent functions visible
+      using Isis::ShapeModel::intersectSurface; 
 
       //! Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,

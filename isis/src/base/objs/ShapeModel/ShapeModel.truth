@@ -48,15 +48,26 @@ Begin testing Shape Model base class....
   Testing localRadius method ...
     Local radius = 6357.02
 
+  Testing intersection with occlusion check...
+    Do we have an intersection? 1
+    Do we have an ellipsoid intersection? 1
+    Is the intersection visible? 0
+    Is the intersection visible from just above it? 1
+    Calculate the ellipsoid normal
+      Do we have a normal? 1
+      local normal = (-0.623384, -0.698838, 0.350738)
+
   Testing setHasIntersection method
     Do we have an intersection? 0
     Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
+    Attempt to calculate the ellipsoid normal without an intersection
+**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
 
   Testing setSurfacePoint method ...
      Do we have an intersection? 1
     Get the resolution:         1
-     surface point = (-2123.36, -2380.37, 1194.68)
+     surface point = (-3962.86, -4442.53, 2229.65)
 
   Testing ellipsoid methods in base class
     Do we have an intersection? 0

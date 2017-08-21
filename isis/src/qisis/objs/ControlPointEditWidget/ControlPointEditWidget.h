@@ -66,6 +66,8 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Added methods to return the current editPoint and
    *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
    *                           #5008.
+  *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+  *                            SerialNumberList.remove()
    *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
    *                           measures in the ChipViewports. Fixes #5070.
    *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to

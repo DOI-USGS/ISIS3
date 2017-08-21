@@ -59,6 +59,9 @@ namespace Isis {
    *  @history 2016-05-18 Jeannie Backer - Removed unused lookupNaifBodyCode() method that takes no
    *                          input parameters (since it was replaced with lookupNaifBodyCode(Pvl)).
    *                          References #3934.
+   *  @history 2017-08-14 Stuart Sides - Added the ability to use a target code and the
+   *                          NaifKeywords to find the radii. Added so osirisrex and spicelib v66.
+   *                          References #4947.
    */
   class Target {
 

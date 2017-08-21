@@ -145,9 +145,9 @@ int main() {
     // Test ShapeModel keyword with DSK
     cout << endl << "  Testing DSK file..." << endl;
     PvlGroup kern7 = kern1;
-    FileName f7("$hayabusa/kernels/dsk");
+    FileName f7("$base/testData");
     QString dir7 = f7.expanded() + "/";
-    kern7 += PvlKeyword("ShapeModel", dir7 + "hay_a_amica_5_itokawashape_v1_0_512q.bds");
+    kern7 += PvlKeyword("ShapeModel", dir7 + "hay_a_amica_5_itokawashape_v1_0_64q.bds");
     Pvl lab7;
     lab7.addGroup(inst2);
     lab7.addGroup(kern7);
@@ -155,6 +155,34 @@ int main() {
     ShapeModel *smShDsk = ShapeModelFactory::create(&targShDsk, lab7);
     cout << "    Successfully created shape " << smShDsk->name() << endl;
     delete smShDsk;
+
+    // Test ShapeModel keyword with DSK and Embree ray tracing
+    cout << endl << "  Testing DSK file with Embree ray tracing engine..." << endl;
+    PvlGroup kern8 = kern7;
+    kern8 += PvlKeyword("RayTraceEngine", "embree");
+    kern8 += PvlKeyword("OnError", "fail");
+    kern8 += PvlKeyword("BulletCubeSupported", "No");
+    Pvl lab8;
+    lab8.addGroup(inst2);
+    lab8.addGroup(kern8);
+    Target targEmbree(NULL, lab8);
+    ShapeModel *smEmbree = ShapeModelFactory::create(&targEmbree, lab8);
+    cout << "    Successfully created shape " << smEmbree->name() << endl;
+    delete smEmbree;
+
+    // Test ShapeModel keyword with DSK and Bullet ray tracing
+    cout << endl << "  Testing DSK file with Bullet ray tracing engine..." << endl;
+    PvlGroup kern9 = kern7;
+    kern9 += PvlKeyword("RayTraceEngine", "bullet");
+    kern9 += PvlKeyword("OnError", "fail");
+    kern9 += PvlKeyword("BulletCubeSupported", "No");
+    Pvl lab9;
+    lab9.addGroup(inst2);
+    lab9.addGroup(kern9);
+    Target targBullet(NULL, lab9);
+    ShapeModel *smBullet= ShapeModelFactory::create(&targBullet, lab9);
+    cout << "    Successfully created shape " << smBullet->name() << endl;
+    delete smBullet;
 
     // Create Spice and Target objects for sky test
     Target skyTarget(NULL, lab1);
@@ -204,6 +232,15 @@ int main() {
     // cout << "Successfully created shape " << sm->name() << endl;
     // delete sm;
     // cube.close();
+
+//    cout << endl << "  Testing Bullet..." << endl;
+
+    // Load IsisPreferences file that specifies Bullet
+//    Isis::Preference::Preferences().Load("./IsisPreferences_bullet"); //TODO: move to test data area);
+    
+//    cout << endl << "  Testing Embree..." << endl;
+    // Load IsisPreferences file that specifies Embree
+//    Isis::Preference::Preferences().Load("./IsisPreferences_embree"); //TODO: move to test data area
 
     cout << endl << "=========================== Testing Errors ===========================" << endl;
     try {

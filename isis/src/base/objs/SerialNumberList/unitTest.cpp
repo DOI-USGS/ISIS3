@@ -18,6 +18,7 @@ using namespace std;
  * @internal
  *   @history 2015-12-22 Jeannie Backer - Improved test coverage.
  *   @history 2016-06-02 Ian Humphrey - Improved test coverage.
+ *   @history 2017-08-08 Adam Goins - modified snl.Delete() to snl.remove()
  *  
  *   @todo Test error throws from add(const QString &filename, bool def2filename) :
  *         "Invalid serial number [Unknown]"
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     cout << endl << endl;
     cout << "Deleting first SerialNumber in the list..." << endl;
-    snl.Delete(snl.serialNumber(0));
+    snl.remove(snl.serialNumber(0));
     cout << "new list size = " << snl.size() << endl;
     cout << "new list serial numbers: " << endl;
     for(int i = 0; i < snl.size(); i++) {

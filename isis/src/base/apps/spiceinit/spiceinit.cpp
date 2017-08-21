@@ -39,6 +39,7 @@ void IsisMain() {
   // Open the input cube
   Process p;
   UserInterface &ui = Application::GetUserInterface();
+
   CubeAttributeInput cai;
   Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
   // Make sure at least one CK & SPK quality was selected
@@ -239,7 +240,6 @@ void IsisMain() {
                        "Unable to initialize camera model",
                        _FILEINFO_);
   }
-
   p.EndProcess();
 }
 
@@ -264,6 +264,10 @@ void getUserEnteredKernel(const QString &param, Kernel &kernel) {
   }
 }
 
+/** 
+  * This fuction now also adds any ShapeModel information specified in a
+  * preferences file to the Kernels group.
+ */  
 bool tryKernels(Cube *icube, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
@@ -367,6 +371,22 @@ bool tryKernels(Cube *icube, Process &p,
   if (currentKernels.hasKeyword("EndPadding"))
     currentKernels.deleteKeyword("EndPadding");
 
+  if (currentKernels.hasKeyword("RayTraceEngine")) {
+    currentKernels.deleteKeyword("RayTraceEngine");
+  }
+
+  if (currentKernels.hasKeyword("OnError")) {
+    currentKernels.deleteKeyword("OnError");
+  }
+
+  if (currentKernels.hasKeyword("CubeSupported")) {
+    currentKernels.deleteKeyword("CubeSupported");
+  }
+
+  if (currentKernels.hasKeyword("Tolerance")) {
+    currentKernels.deleteKeyword("Tolerance");
+  }
+
   // Add any time padding the user specified to the spice group
   if (ui.GetDouble("STARTPAD") > DBL_EPSILON) {
     currentKernels.addKeyword(PvlKeyword("StartPadding",
@@ -390,6 +410,7 @@ bool tryKernels(Cube *icube, Process &p,
     Camera *cam;
     try {
       cam = icube->camera();
+      currentKernels = icube->group("Kernels");
       Application::Log(currentKernels);
     }
     catch(IException &e) {

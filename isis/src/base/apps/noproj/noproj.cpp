@@ -363,6 +363,12 @@ void IsisMain() {
   PvlObject &o = toLabel->findObject("IsisCube");
   o.deleteGroup("OriginalInstrument");
   o.addGroup(fromInst);
+
+  // Remove AlphaCube in output cube since noproj changes image geometries
+  // (can't undo a noproj or uncrop a noproj'd image etc)
+  if (o.hasGroup("AlphaCube")) {
+    o.deleteGroup("AlphaCube");
+  }
   toCube.close();
 }
 

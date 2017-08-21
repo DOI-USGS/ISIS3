@@ -317,7 +317,14 @@ ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
 #---------------------------------------------------------------------------
 BOOSTINCDIR = "-isystem $(ISIS3OPT)/include"
 BOOSTLIBDIR = -L$(ISIS3OPT)/lib
-BOOSTLIB    =
+BOOSTLIB    = -lboost_date_time-mt -lboost_filesystem-mt -lboost_graph-mt \
+              -lboost_math_c99f-mt -lboost_math_c99l-mt -lboost_math_c99-mt \
+              -lboost_math_tr1f-mt -lboost_math_tr1l-mt -lboost_math_tr1-mt \
+              -lboost_prg_exec_monitor-mt -lboost_program_options-mt \
+              -lboost_regex-mt -lboost_serialization-mt -lboost_signals-mt \
+              -lboost_system-mt -lboost_thread-mt -lboost_unit_test_framework-mt \
+              -lboost_wave-mt -lboost_wserialization-mt -lboost_timer-mt \
+              -lboost_chrono-mt
 
 #---------------------------------------------------------------------------
 # Set up for Cholmod Libraries
@@ -365,6 +372,44 @@ NNINCDIR = -I$(ISIS3LOCAL)/include/nn
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
+# Setup for Bullet Physics library
+#---------------------------------------------------------------------------
+#BULLETLIB     = -lBullet2FileLoader -lBullet3Collision -lBullet3Common          \
+#                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
+#                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
+#                -lBulletSoftBody    -lLinearMath
+BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
+                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
+                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
+                -lLinearMath 
+BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
+BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
+
+#---------------------------------------------------------------------------
+# Set up for PCL Python framework
+#---------------------------------------------------------------------------
+PCLPYDIR      = $(ISIS3OPT)
+PCLPYFRAMES   = $(PCLPYDIR)/Library/Frameworks
+ifeq (,$(findstring $(PCLPYFRAMES)/Python.framework,$(wildcard $(PCLPYFRAMES)/Python.framework )))
+  PCLPYFRAMES  = $(ISIS3OPT)/lib
+endif
+
+#---------------------------------------------------------------------------
+# Set up for PCL libraries 
+#---------------------------------------------------------------------------
+PCLINCDIR = -I$(ISIS3LOCAL)/include/pcl-1.8
+PCLLIBDIR = -L$(ISIS3LOCAL)/lib
+PCLLIB    = -lpcl_common -lpcl_octree -lpcl_io                                \
+            -framework Python -lintl
+VTKLIB    = -lvtksys-7.0.1
+EMBREELIB = -lembree
+
+#---------------------------------------------------------------------------
+# Set up for Eigen (link to include files only, no library) 
+#---------------------------------------------------------------------------
+EIGENINCDIR = -I$(ISIS3OPT)/include/eigen3
+
+#---------------------------------------------------------------------------
 # Final generic setup for includes at the top level
 #---------------------------------------------------------------------------
 DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
@@ -373,7 +418,7 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
-#  Libraries
+# Qt Libraries
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXmlPatterns.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXml.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtNetwork.framework"
@@ -525,6 +570,34 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicudata*.dylib"
 
 # libgeotiff depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libproj*.dylib"
+
+# Bullet Libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Common*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Dynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Geometry*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3OpenCL_clew*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletCollision*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletDynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletInverseDynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletSoftBody*.dylib"
+
+# Add the Point Cloud Libraries and PCL dependencies
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl_*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libflann*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libqhull*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvtk*.dylib"
+THIRDPARTYLIBS    += "$(PCLPYFRAMES)/Python.framework"
+
+# Add the Embree library
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libembree*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtbb*.dylib"
+
+# Add the Boost libraries
+#THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libboost_system-mt*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libboost*.dylib"
 
 #  Plugins
 THIRDPARTYPLUGINS +=  "$(QTDIR)/plugins/"
