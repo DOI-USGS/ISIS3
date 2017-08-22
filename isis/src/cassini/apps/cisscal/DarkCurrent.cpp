@@ -1083,7 +1083,9 @@ namespace Isis {
           p_hotpixfile = FileName(fileList[i]);
       }
     }
+
     p_hotpixfile = darkDir + p_hotpixfile.baseName() + ".tab";
+
     return;
   }//end FindDarkFiles
 
@@ -1196,104 +1198,102 @@ namespace Isis {
       dparamCube.read(*darkCoefficients);
       dparamCube.close();
 
-      CisscalFile *hotPixFile = new CisscalFile(p_hotpixfile.expanded());
-      int num_params = 8;
-      long numHotPixels = hotPixFile->LineCount();
-      vector<double> exptimes;
-      vector<double> tgrid(num_params);
-      vector <vector <double> > v1(num_params);
+      if (p_hotpixfile.baseName() != "") {
+        std::cout << p_hotpixfile.baseName() << '\n';
+        CisscalFile *hotPixFile = new CisscalFile(p_hotpixfile.expanded());
+        int num_params = 8;
+        long numHotPixels = hotPixFile->LineCount();
+        vector<double> exptimes;
+        vector<double> tgrid(num_params);
+        vector <vector <double> > v1(num_params);
 
-      for(int i = 0; i < num_params; i++) {
-        v1[i].resize(num_params);
-        switch(i) {
-          case 0:
-            tgrid[i] = 0.0;
-            break;
-          case 1:
-            tgrid[i] = 10.0;
-            break;
-          case 2:
-            tgrid[i] = 32.0;
-            break;
-          case 3:
-            tgrid[i] = 100.0;
-            break;
-          case 4:
-            tgrid[i] = 220.0;
-            break;
-          case 5:
-            tgrid[i] = 320.0;
-            break;
-          case 6:
-            tgrid[i] = 460.0;
-            break;
-          case 7:
-            tgrid[i] = 1200.0;
-            break;
-          default:
-            tgrid[i] = Null;
-        }
-      }
-
-      QString exposureLine;
-      hotPixFile->GetLine(exposureLine);
-      exposureLine=exposureLine.simplified().trimmed();
-      QStringList exposureLineList = exposureLine.split(' ');
-      for (int j = 2; j < exposureLineList.size(); j++ ){
-        exptimes.push_back(toDouble(exposureLineList[j]));
-      }
-      QString junk;
-      hotPixFile->GetLine(junk); //this line is gain values which are not used
-
-      int x;
-      int y;
-      double hotsat;
-      vector<double> elec;
-      for(long i = 0; i < numHotPixels; i++){
-        QString line;
-        hotPixFile->GetLine(line);
-        if(line == "") {
-          break;
-        }
-        line = line.simplified();
-        QStringList lineList = line.split(' ');
-        // make hotpix corrections
-        x = floor((toDouble(lineList[0]) / 1024) * p_samples);
-        y = floor((toDouble(lineList[1]) / 1024) * p_lines);
-        elec.resize(lineList.size() - 3);
-        for (unsigned int j = 0; j < elec.size(); j ++){
-          elec[j] = (toDouble(lineList[j + 2]));
-        }
-        hotsat = toDouble(lineList.back());
-
-        if (hotsat != 0.0) {
-          double maxExp;
-          if (hotsat > 0.0) {
-            maxExp = exptimes[hotsat - 1];
+        for(int i = 0; i < num_params; i++) {
+          v1[i].resize(num_params);
+          switch(i) {
+            case 0:
+              tgrid[i] = 0.0;
+              break;
+            case 1:
+              tgrid[i] = 10.0;
+              break;
+            case 2:
+              tgrid[i] = 32.0;
+              break;
+            case 3:
+              tgrid[i] = 100.0;
+              break;
+            case 4:
+              tgrid[i] = 220.0;
+              break;
+            case 5:
+              tgrid[i] = 320.0;
+              break;
+            case 6:
+              tgrid[i] = 460.0;
+              break;
+            case 7:
+              tgrid[i] = 1200.0;
+              break;
+            default:
+              tgrid[i] = Null;
           }
-          else {
-            maxExp = *(std::max_element(exptimes.begin(), exptimes.end()));
-          }
+        }
 
-          IDLLinearInterpolation interpol;
-          for (unsigned int j = 0; j < exptimes.size(); j++) {
-            if (exptimes[j] <= maxExp) {
-              interpol.insert(exptimes[j], elec[j]);
+        QString exposureLine;
+        hotPixFile->GetLine(exposureLine);
+        exposureLine=exposureLine.simplified().trimmed();
+        QStringList exposureLineList = exposureLine.split(' ');
+        for (int j = 2; j < exposureLineList.size(); j++ ){
+          exptimes.push_back(toDouble(exposureLineList[j]));
+        }
+        QString junk;
+        hotPixFile->GetLine(junk); //this line is gain values which are not used
+
+        int x;
+        int y;
+        double hotsat;
+        vector<double> elec;
+        for(long i = 0; i < numHotPixels; i++){
+          QString line;
+          hotPixFile->GetLine(line);
+          if(line == "") {
+            break;
+          }
+          line = line.simplified();
+          QStringList lineList = line.split(' ');
+          // make hotpix corrections
+          x = floor((toDouble(lineList[0]) / 1024) * p_samples);
+          y = floor((toDouble(lineList[1]) / 1024) * p_lines);
+          elec.resize(lineList.size() - 3);
+          for (unsigned int j = 0; j < elec.size(); j ++){
+            elec[j] = (toDouble(lineList[j + 2]));
+          }
+          hotsat = toDouble(lineList.back());
+
+          if (hotsat != 0.0) {
+            double maxExp;
+            if (hotsat > 0.0) {
+              maxExp = exptimes[hotsat - 1];
+            }
+            else {
+              maxExp = *(std::max_element(exptimes.begin(), exptimes.end()));
+            }
+
+            IDLLinearInterpolation interpol;
+            for (unsigned int j = 0; j < exptimes.size(); j++) {
+              if (exptimes[j] <= maxExp) {
+                interpol.insert(exptimes[j], elec[j]);
+              }
+            }
+            if (interpol.size() > 1) {
+              for (int j = 0; j < 8; j++){
+                (*darkCoefficients)[darkCoefficients->Index(x+1, y+1, j+1)] = interpol.evaluate(tgrid[j]);
+              }
             }
           }
-          if (interpol.size() > 1) {
-            for (int j = 0; j < 8; j++){
-              (*darkCoefficients)[darkCoefficients->Index(x+1, y+1, j+1)] = interpol.evaluate(tgrid[j]);
-            }
-          }
         }
       }
-      for(int x = 0; x < 256 ; x ++) {
-        for (int y = 0; y < 256 ; y++) {
-          for (int j = 0; j < 8; j++){
-          }
-        }
-      }
+
       // Assume WAC dark current is 0 for 0.005 ms. This is not the case for
       // the NAC where there are negative values near the left edge of the frame:
       if(!p_narrow) {
