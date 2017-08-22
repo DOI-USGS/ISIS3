@@ -10,8 +10,11 @@
 #include "ImageTreeWidget.h"
 #include "PvlObject.h"
 
+class QLabel;
+class QLineEdit;
 class QProgressBar;
 class QSettings;
+class QToolBar;
 class QTreeWidgetItem;
 
 namespace Isis {
@@ -48,6 +51,7 @@ namespace Isis {
    *                           QPixmap::grabWidget with QWidget::grab (Qt5). Fixes #4304.
    *   @history 2017-07-18 Cole Neubauer - Added removeImages slot to be able to remove from the
    *                           ImageFileList in IPCE Fixes #4996
+   *   @history 2017-08-22 Cole Neuabuer - Added ability to search ImageFileListWidget. Fixes #1556
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT
@@ -70,6 +74,8 @@ namespace Isis {
     public slots:
       void addImages(ImageList *images);
       void removeImages(ImageList *images);
+      void clear();
+      void filterFileList();
 
     protected:
       void contextMenuEvent(QContextMenuEvent *event);
@@ -113,6 +119,12 @@ namespace Isis {
       QPointer<ProgressBar> m_progress; //!< The ProgressBar of the ImageFileListWidget
       //! Serialized (file) version of this object
       QScopedPointer<PvlObject> m_serialized;
+
+      QToolBar *m_searchToolbar; //!< Tool bar for the FileList widget to search
+      QLineEdit *m_searchLineEdit;
+      QLabel *m_fileCount;
+
+
       ImageTreeWidget *m_tree; //!< Tree item associated with this mosaic item
       Directory *m_directory; //!< The directory of the project
   };
