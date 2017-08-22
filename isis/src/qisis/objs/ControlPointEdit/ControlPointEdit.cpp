@@ -67,13 +67,13 @@ namespace Isis {
     p_rightCube = 0;
     p_leftGroundMap = 0;
     p_rightGroundMap = 0;
-    
+
     p_templateFileName = "$base/templates/autoreg/qnetReg.def";
 
     createPointEditor(parent);
     if (cnet != NULL) emit newControlNetwork(cnet);
   }
-  
+
 
   ControlPointEdit::~ControlPointEdit() {
 
@@ -103,9 +103,9 @@ namespace Isis {
    *                           value of the new private variable,
    *                           p_templateFileName, to the previously hard-coded
    *                           template filename.
-   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Find (F), Register (R), 
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Find (F), Register (R),
    *                           Undo Registration (U), and Save Measure (M) buttons.
-   *                           Fixes #2324. 
+   *                           Fixes #2324.
    */
   void ControlPointEdit::createPointEditor(QWidget *parent) {
     // Place everything in a grid
@@ -311,7 +311,7 @@ namespace Isis {
     // the update sample/line label
     connect(p_leftView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateLeftPositionLabel(double)));
-    
+
     // we want to allow this connection so that if a changed point is saved
     // and the same image is showing in both viewports, the left will refresh.
     connect(this, SIGNAL(updateLeftView(double, double)),
@@ -375,7 +375,7 @@ namespace Isis {
     // Create chips for left and right
     p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
     p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
-    
+
     QButtonGroup *bgroup = new QButtonGroup();
     p_nogeom = new QRadioButton();
     p_nogeom->setChecked(true);
@@ -774,9 +774,9 @@ namespace Isis {
    *
    * @param zoomFactor  Input  zoom factor
    *
-   * @author Tracie Sucharski 
-   *  
-   * @internal 
+   * @author Tracie Sucharski
+   *
+   * @internal
    *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
    *                          right viewports.  TODO:  Re-think design, should this be put
    *                          somewhere else.  This was the fastest solution for now.
@@ -899,8 +899,8 @@ namespace Isis {
     }
 
   }
-  
-  
+
+
   /**
    * Sub-pixel register point in right chipViewport with point in
    * left.
@@ -931,7 +931,7 @@ namespace Isis {
    *
    */
   void ControlPointEdit::registerPoint() {
-    
+
     // if the auto registration factory has not been initialized, do it here
     if (p_autoRegFact == NULL) {
       try {
@@ -947,9 +947,9 @@ namespace Isis {
         QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
-      } 
+      }
     }
-    
+
     if (p_autoRegShown) {
       // Undo Registration
       p_autoRegShown = false;
@@ -969,7 +969,7 @@ namespace Isis {
     p_autoRegAttempted = true;
 
     try {
-      p_autoRegFact->PatternChip()->TackCube(p_leftMeasure->GetSample(), 
+      p_autoRegFact->PatternChip()->TackCube(p_leftMeasure->GetSample(),
                                              p_leftMeasure->GetLine());
       p_autoRegFact->PatternChip()->Load(*p_leftCube);
       p_autoRegFact->SearchChip()->TackCube(p_rightMeasure->GetSample(),
@@ -1073,7 +1073,7 @@ namespace Isis {
     p_autoReg->setShortcut(Qt::Key_U);
   }
 
-  
+
   /**
    * Save control measure under the crosshair in right ChipViewport
    * @internal
@@ -1104,7 +1104,7 @@ namespace Isis {
    *                           can be saved.
    *   @history 2015-01-09 Ian Humphrey - Modified to prevent segmentation fault that arises when
    *                           registering, opening a template file, and saving the measure. This
-   *                           was caused by not handling the exception thrown by 
+   *                           was caused by not handling the exception thrown by
    *                           ControlMeasure::SetLogData(), which produces undefined behavior
    *                           within the Qt signal-slot connection mechanism.
    */
@@ -1134,7 +1134,7 @@ namespace Isis {
           p_rightMeasure->SetLogData(ControlMeasureLogData(
                                      ControlMeasureLogData::MaximumPixelZScore,
                                      maxZScore));
-        } 
+        }
         // need to handle exception that SetLogData throws if our data is invalid -
         // unhandled exceptions thrown in Qt signal and slot connections produce undefined behavior
         catch (IException &e) {
@@ -1142,7 +1142,7 @@ namespace Isis {
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           return;
         }
-        
+
         //  Reset AprioriSample/Line to the current coordinate, before the
         //  coordinate is updated with the registered coordinate.
         p_rightMeasure->SetAprioriSample(p_rightMeasure->GetSample());
@@ -1264,13 +1264,13 @@ namespace Isis {
 
   /**
    * Slot to enable the rotate dial
-   * @internal 
+   * @internal
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and reload chip
   */
   void ControlPointEdit::setRotate() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    //  Text needs to be reset because it was changed to 
+    //  Text needs to be reset because it was changed to
     //  indicate why it's greyed out
     QString text = "Zoom in 2X";
     p_rightZoomIn->setEnabled(true);
@@ -1349,7 +1349,7 @@ namespace Isis {
 
   /**
    * Slot to turn off geom
-   * @internal 
+   * @internal
    *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and rotate dial, then reload chip
   */
   void ControlPointEdit::setNoGeom() {
@@ -1492,7 +1492,7 @@ namespace Isis {
    *                          only allow the template file to be modified if
    *                          registration is successfull, otherwise the
    *                          original template file is kept.
-   *   @history 2014-12-11 Ian Humphrey - Modified code so opening a template file will undo 
+   *   @history 2014-12-11 Ian Humphrey - Modified code so opening a template file will undo
    *                           registration if a point is already registered.
    */
   bool ControlPointEdit::setTemplateFile(QString fn) {
@@ -1514,12 +1514,12 @@ namespace Isis {
       p_autoRegFact = reg;
 
       p_templateFileName = fn;
-      
+
       // undo registration if a point is already registered
       // this prevents the user from saving a measure with invalid data
       if (p_autoRegShown)
         registerPoint();
-      
+
       return true;
     }
     catch (IException &e) {
@@ -1606,4 +1606,3 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand(command);
   }
 }
-

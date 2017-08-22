@@ -21,6 +21,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-07-10 Ken Edmundson - Original version.
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
    */
   class SensorInfoWidget : public QFrame {
     Q_OBJECT

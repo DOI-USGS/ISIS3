@@ -19,6 +19,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include <ostream>
 #include <cfloat>
 #include <cmath>
@@ -36,6 +37,7 @@
 #include "Application.h"
 #include "CnetSuppression.h"
 #include "CnetManager.h"
+#include "IException.h"
 #include "Progress.h"
 
 #include "tnt/tnt_array2d.h"
@@ -70,11 +72,11 @@ namespace Isis {
                                    m_area() {
 
     Progress progress;
+    try {
     m_cnet.reset(new ControlNet(cnetfile, &progress));
-
-    if (!m_cnet->IsValid()) {
-      QString msg = QString("Control Net filename [%1] is invalid.").arg(cnetfile);
-      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    catch (IException &e) {
+      throw e;
     }
 
     m_points = m_cnet->take(); 

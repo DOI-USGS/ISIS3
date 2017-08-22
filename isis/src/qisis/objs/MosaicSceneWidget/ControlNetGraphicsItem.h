@@ -29,6 +29,10 @@ namespace Isis {
    *                           findClosestControlPoint method and making buildChildren and
    *                           clearControlPointGraphicsItem public slots.
    *                           Fixes #4479
+   *   @history 2017-08-15 Tracie Sucharski - Fixed possible seg fault in findClosestControlPoint()
+   *                           when clicking away from a control point.  Changed
+   *                           findClosestControlPoint to take the point location to search for
+   *                           a control point.  Removed mouseReleaseEvent as it is not being used.
    */
   class ControlNetGraphicsItem : public QGraphicsObject {
       Q_OBJECT
@@ -46,14 +50,11 @@ namespace Isis {
       void setArrowsVisible(bool visible, bool colorByMeasureCount, int measureCount,
                             bool colorByJigsawError, double residualMagnitude);
 
-      ControlPoint *findClosestControlPoint();
+      ControlPoint *findClosestControlPoint(QPointF locationPoint);
 
     public slots:
       void buildChildren();
       void clearControlPointGraphicsItem(QString pointId);
-
-    protected:
-      virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     private:
       //  Returns apriori x/y in first point, adjusted x/y in 2nd point

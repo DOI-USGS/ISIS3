@@ -9,24 +9,22 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    BusyLeafItem::BusyLeafItem(AbstractTreeItem *parent)
-      : AbstractTreeItem(parent), AbstractNullDataItem() {
-      calcDataWidth(1);
-    }
+  BusyLeafItem::BusyLeafItem(AbstractTreeItem *parent)
+    : AbstractTreeItem(parent), AbstractNullDataItem() {
+    calcDataWidth(1);
+  }
 
 
-    BusyLeafItem::~BusyLeafItem() {
-    }
+  BusyLeafItem::~BusyLeafItem() {
+  }
 
 
-    QVariant BusyLeafItem::getData() const {
-      return QVariant("Working...");
-    }
+  QVariant BusyLeafItem::getData() const {
+    return QVariant("Working...");
+  }
 
 
-    bool BusyLeafItem::isSelectable() const {
-      return false;
-    }
+  bool BusyLeafItem::isSelectable() const {
+    return false;
   }
 }

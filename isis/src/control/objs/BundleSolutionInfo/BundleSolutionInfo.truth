@@ -4,6 +4,7 @@ Serializing results from the settings/cnet/statistics constructor...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -96,6 +97,7 @@ Serializing test XML object to file...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -187,6 +189,7 @@ Testing XML: Object deserialized as (should match object above):
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -277,6 +280,7 @@ Testing copy constructor...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -367,6 +371,7 @@ Testing assignment operator to set this equal to itself...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -457,6 +462,7 @@ Testing assignment operator to create a new results object...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name></name>
         <runTime></runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -547,6 +553,7 @@ Testing mutator methods...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name>xxx</name>
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV></imagesCSV>
@@ -648,6 +655,7 @@ Serializing test XML object to file...
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name>xxx</name>
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV>bundleout_images.csv</imagesCSV>
@@ -750,6 +758,7 @@ Testing XML: Object deserialized as (should match object above):
 <bundleSolutionInfo>
     <generalAttributes>
         
+        <name>xxx</name>
         <runTime>xxx</runTime>
         <fileName>cnetfile.net</fileName>
         <imagesCSV>bundleout_images.csv</imagesCSV>

@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMultiMap>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -43,10 +44,12 @@ class QSplitter;
 class QTabWidget;
 
 namespace Isis {
+  class AbstractProjectItemView;
   class BundleObservation;
   class BundleObservationView;
   class ChipViewportsWidget;
   class CnetEditorWidget;
+  class Control;
   class ControlNet;
   class ControlPointEditView;
   class CubeDnView;
@@ -75,7 +78,7 @@ namespace Isis {
    *   @history 2012-07-30 Steven Lambright - The save action now has enabling/disabling of state
    *                           functional (as long as there are work orders in the undo stack).
    *   @history 2012-08-28 Tracie Sucharski - Instead of this class adding tabs to a TabWidget, it
-   *                           now emits a signal which is connected to cnetSuiteMainWindow to
+   *                           now emits a signal which is connected to ipceMainWindow to
    *                           create a new dock widget.  This class no longer needs the
    *                           viewContainer since it is not adding tabs.
    *   @history 2012-09-12 Steven Lambright - Added xml save/load capabilities, removed dead code
@@ -131,6 +134,56 @@ namespace Isis {
    *                           project. Otherwise, it is disabled until then. Fixes #4819.
    *   @history 2017-05-03 Tracie Sucharski - Added methods and member variables for the
    *                           BundleObservationView.  Fixes #4839. Fixes #4840.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint slot.
+   *   @history 2017-05-23 Tracie Sucharski - Fixed all of the cleanup methods to properly remove
+   *                           the correct view/widget from the lists.  Fixes #4847.
+   *   @history 2017-06-14 Ken Edmundson - Commented out ChipViewport widget code.  This will be
+   *                           temporary until the widget is fully developed.
+   *   @history 2017-07-10 Tracie Sucharski - Removed deletion of m_controlPointEditViewWidget.
+   *                           Because it is a QPointer, it is set to null when ControlPointEditView
+   *                           is destroyed.  Currently, cleanupControlPointEditViewWidget is not
+   *                           doing anything.  However, I'm leaving the method for now, because
+   *                           once the views are connected, we will probably need to cleanup the
+   *                           connections when the view is closed.  Fixes #4959.
+   *   @history 2017-07-12 Cole Neubauer - Added clean function to directory that clears everything
+   *                           from a previous project when opening a new one. This functionality
+   *                           had to be added because a new directory can not be created to support
+   *                           a new project being opened. Fixes #4969
+   *   @history 2017-07-17 Cole Neubauer - Disabled CNet tool when a Footprint2DView is added if a
+   *                           control net is not active and slotted it to reenable when Project
+   *                           emits activeControlSet(bool). Fixes #5046.
+   *                           Fixes #5046
+   *   @history 2017-07-18 Cole Neubauer - Because the ImageFileListWidget now exists only inside
+   *                           the Footprint2DView the ImageFileListWidgetWorkOrder was removed
+   *                           from the context menu Fixes #4996
+   *   @history 2017-07-24 Makayla Shepherd - Fixed a seg fault in ipce that occurs when attempting
+   *                           to edit a control point when there is not an active control network.
+   *                           Fixes #5048.
+   *   @history 2017-07-26 Cole Neubauer -Set save button to default be disabled Fixes #4960
+   *   @history 2017-08-02 Tracie Sucharski - Add member variable and accessor method for the
+   *                           current edit control point ID.  Fixes #5007, #5008.
+   *   @history 2017-08-07 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
+   *                           Fixes #5090
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a
+   *                           control net without having an active control net set. Fixes #5048.
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when right clicking a
+   *                           control network when it is the only item on the project. Fixes #5071.
+   *   @history 2017-08-09 Cole Neubauer - Disabled Ipce tool when a CubeDnView is added if a
+   *                           control net is not active and slotted to reenable when Project
+   *                           emits activeControlSet(bool). Added a m_controlmap variable to hold
+   *                           which Controls are currently being used and closes the controls not
+   *                           needed at the moment Fixes #5026
+   *   @history 2017-08-11 Christopher Combs - Added serialization of CnetEditorWidgets to save()
+   *                           and startElement(). Fixes #4989.
+   *   @history 2017-08-11 Cole Neubauer - Added project setClean(false) call to all views cleanup
+   *                           slot. This will make a a view closing be treated as a project change
+   *                           Fixes #5113
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
+   *   @history 2017-08-15 Tracie Sucharski - Added comments explaing connections for control point
+   *                           editing actions between views.
+   *   @history 2017-08-18 Tracie Sucharski - Removed deletion of control net from
+   *                           ::makeBackupActiveControl, don't know why it was being deleted.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -138,6 +191,7 @@ namespace Isis {
       explicit Directory(QObject *parent = 0);
       ~Directory();
 
+      void clean();
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
       void setRecentProjectsList(QStringList recentProjects);
@@ -181,8 +235,10 @@ namespace Isis {
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
-      ChipViewportsWidget *controlPointChipViewports();
+//      ChipViewportsWidget *controlPointChipViewports();
 
+      // Return the control point Id currently in the ControlPointEditWidget, if it exists
+      QString editPointId();
 
 
       /**
@@ -194,18 +250,18 @@ namespace Isis {
       QList<QAction *> supportedActions(DataType data) {
         QList<QAction *> results;
 
-        //QList< QPair< QString, QList<QAction *> > > actionPairings;
+//      QList< QPair< QString, QList<QAction *> > > actionPairings;
 
         //foreach (MosaicSceneWidget *footprint2DView, m_footprint2DViewWidgets) {
-        //  actionPairings.append(
+//        actionPairings.append(
         //      qMakePair(footprint2DView->windowTitle(), footprint2DView->supportedActions(data)));
-        //}
+//      }
 
-        //results.append(restructureActions(actionPairings));
+//      results.append(restructureActions(actionPairings));
 
-        //if (!results.isEmpty()) {
-        //  results.append(NULL);
-        //}
+//      if (!results.isEmpty()) {
+//        results.append(NULL);
+//      }
 //      qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
         foreach (WorkOrder *workOrder, m_workOrders) {
           if (workOrder->isExecutable(data)) {
@@ -240,37 +296,43 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:
+      void directoryCleaned();
+      void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 
+      void cnetModified();
       void controlPointAdded(QString newPointId);
+      void redrawMeasures();
 
     public slots:
-      void cleanupBundleObservationViews();
-      void cleanupCnetEditorViewWidgets();
-      void cleanupCubeDnViewWidgets();
-      void cleanupFileListWidgets();
+      void cleanupBundleObservationViews(QObject *);
+      void cleanupCnetEditorViewWidgets(QObject *);
+      void cleanupCubeDnViewWidgets(QObject *);
+      void cleanupFileListWidgets(QObject *);
       void cleanupFootprint2DViewWidgets(QObject *);
-      void cleanupControlPointEditViewWidget();
-      void cleanupMatrixViewWidgets();
-      void cleanupSensorInfoWidgets();
-      void cleanupTargetInfoWidgets();
+      void cleanupControlPointEditViewWidget(QObject *);
+      void cleanupMatrixViewWidgets(QObject *);
+      void cleanupSensorInfoWidgets(QObject *);
+      void cleanupTargetInfoWidgets(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
-      //  Slots in response to mouse clicks on CubeDnView (IpceTool) and
+      //  Slots in response to mouse clicks on CubeDnView (ControlNetTool) and
       //    Footprint2DView (MosaicControlNetTool)
-      void modifyControlPoint(ControlPoint *controlPoint);
+      void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube = 0,
                               bool isGroundSource = false);
+
 
       void updateRecentProjects(Project *project);
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
+      void newActiveControl(bool newControl);
 
     private:
       /**
@@ -330,7 +392,7 @@ namespace Isis {
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
-      QPointer <ChipViewportsWidget> m_chipViewports;
+      //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
       QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets; //!< List of SensorInfoWidgets
       QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets
@@ -351,6 +413,7 @@ namespace Isis {
       QPointer<WorkOrder> m_saveProjectAsWorkOrder; //!< The Save Project As WorkOrder.
       QPointer<WorkOrder> m_openRecentProjectWorkOrder; //!< The Open Recent Project WorkOrder.
       QPointer<WorkOrder> m_closeProjectWorkOrder; //!< The Close Project WorkOrder
+      QPointer<WorkOrder> m_importTemplateWorkOrder; //!< The Import Template WorkOrder
 
       QPointer<WorkOrder> m_runJigsawWorkOrder; //!< The Run Jigsaw WorkOrder
       QPointer<WorkOrder> m_renameProjectWorkOrder; //!< The Rename Project WorkOrder
@@ -366,6 +429,9 @@ namespace Isis {
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
 
+      QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
+
+      QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
   };
 }
 

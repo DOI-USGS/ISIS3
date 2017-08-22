@@ -17,55 +17,53 @@ using std::swap;
 
 
 namespace Isis {
-  namespace CnetViz {
-    ImageImageFilterSelector::ImageImageFilterSelector() {
-      nullify();
-      createSelector();
-    }
+  ImageImageFilterSelector::ImageImageFilterSelector() {
+    nullify();
+    createSelector();
+  }
 
 
-    ImageImageFilterSelector::ImageImageFilterSelector(
-      const ImageImageFilterSelector &other) {
-      createSelector();
-      getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
-      if (other.getFilter())
-        setFilter(other.getFilter()->clone());
-    }
+  ImageImageFilterSelector::ImageImageFilterSelector(
+    const ImageImageFilterSelector &other) {
+    createSelector();
+    getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
+    if (other.getFilter())
+      setFilter(other.getFilter()->clone());
+  }
 
 
-    ImageImageFilterSelector::~ImageImageFilterSelector() {
-    }
+  ImageImageFilterSelector::~ImageImageFilterSelector() {
+  }
 
 
-    ImageImageFilterSelector &ImageImageFilterSelector::operator=(
-      const ImageImageFilterSelector &other) {
-      *((AbstractFilterSelector *) this) = other;
-      return *this;
-    }
+  ImageImageFilterSelector &ImageImageFilterSelector::operator=(
+    const ImageImageFilterSelector &other) {
+    *((AbstractFilterSelector *) this) = other;
+    return *this;
+  }
 
 
-    void ImageImageFilterSelector::createSelector() {
-      AbstractFilterSelector::createSelector();
+  void ImageImageFilterSelector::createSelector() {
+    AbstractFilterSelector::createSelector();
 
-      //     selector->addItem("Point Id");
-    }
+    //     selector->addItem("Point Id");
+  }
 
 
-    void ImageImageFilterSelector::changeFilter(int index) {
-      deleteFilter();
+  void ImageImageFilterSelector::changeFilter(int index) {
+    deleteFilter();
 
-      if (index != 0) {
-        //       switch (index)
-        //       {
-        //         case 1:
-        //           filter = new PointIdFilter;
-        //           break;
-        //         case 2:
-        //           filter = new PointIdFilter;
-        //           break;
-        //       }
-        //
-      }
+    if (index != 0) {
+      //       switch (index)
+      //       {
+      //         case 1:
+      //           filter = new PointIdFilter;
+      //           break;
+      //         case 2:
+      //           filter = new PointIdFilter;
+      //           break;
+      //       }
+      //
     }
   }
 }

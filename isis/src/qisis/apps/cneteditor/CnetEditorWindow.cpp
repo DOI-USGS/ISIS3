@@ -601,7 +601,7 @@ namespace Isis {
       QString currentFile = *curFile;
       closeNetwork(false);
       *curFile = currentFile;
-      networkLoaded(filteredCnet);
+      networkLoaded(filteredCnet, currentFile);
 
       if (newCubeListFileName != "")
         loadCubeList(newCubeListFileName);
@@ -701,10 +701,10 @@ namespace Isis {
   }
 
 
-  void CnetEditorWindow::networkLoaded(ControlNet *net) {
+  void CnetEditorWindow::networkLoaded(ControlNet *net, QString currentFile) {
 
-    cnet = net;
-    editorWidget = new CnetEditorWidget(cnet, FileName(
+    Control *control = new Control(net, currentFile);
+    editorWidget = new CnetEditorWidget(control, FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded());
     populateMenus();
     populateToolBars();
@@ -728,7 +728,7 @@ namespace Isis {
 
   void CnetEditorWindow::networkLoaded(QList<Control *> nets) {
     ASSERT(nets.count() == 1);
-    networkLoaded(nets.first()->controlNet());
+    networkLoaded(nets.first()->controlNet(), nets.first()->fileName());
   }
 
 

@@ -15,96 +15,95 @@ class QResizeEvent;
 
 
 namespace Isis {
-  namespace CnetViz {
-    class AbstractTreeItem;
-    class TreeView;
-    class AbstractTreeModel;
+  class AbstractTreeItem;
+  class AbstractTreeModel;
+  class TreeView;
 
-    /**
-     * @author ????-??-?? Unknown
-     *
-     * @internal
-     *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-     */
-    class TreeViewContent : public QAbstractScrollArea {
-        Q_OBJECT
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   */
+  class TreeViewContent : public QAbstractScrollArea {
+      Q_OBJECT
 
-      public:
-        TreeViewContent(QWidget *parent);
-        virtual ~TreeViewContent();
-        QSize minimumSizeHint() const;
-        QSize sizeHint() const;
-        AbstractTreeModel *getModel();
-        void setModel(AbstractTreeModel *someModel);
-
-
-      signals:
-        void treeSelectionChanged();
-        void treeSelectionChanged(QList< AbstractTreeItem * >);
+    public:
+      TreeViewContent(QWidget *parent);
+      virtual ~TreeViewContent();
+      QSize minimumSizeHint() const;
+      QSize sizeHint() const;
+      AbstractTreeModel *getModel();
+      void setModel(AbstractTreeModel *someModel);
 
 
-      public slots:
-        void refresh();
+    signals:
+      void treeSelectionChanged();
+      void treeSelectionChanged(QList< AbstractTreeItem * >);
 
 
-      protected:
-        bool eventFilter(QObject *target, QEvent *event);
-        void keyPressEvent(QKeyEvent *event);
-        void leaveEvent(QEvent *event);
-        void mouseDoubleClickEvent(QMouseEvent *event);
-        void mouseMoveEvent(QMouseEvent *event);
-        void mousePressEvent(QMouseEvent *event);
-        void mouseReleaseEvent(QMouseEvent *event);
-        void paintEvent(QPaintEvent *event);
-        void resizeEvent(QResizeEvent *event);
-        void scrollContentsBy(int dx, int dy);
+    public slots:
+      void refresh();
 
 
-      private:
-        TreeViewContent(const TreeViewContent &other);
-        TreeViewContent &operator=(const TreeViewContent &other);
+    protected:
+      bool eventFilter(QObject *target, QEvent *event);
+      void keyPressEvent(QKeyEvent *event);
+      void leaveEvent(QEvent *event);
+      void mouseDoubleClickEvent(QMouseEvent *event);
+      void mouseMoveEvent(QMouseEvent *event);
+      void mousePressEvent(QMouseEvent *event);
+      void mouseReleaseEvent(QMouseEvent *event);
+      void paintEvent(QPaintEvent *event);
+      void resizeEvent(QResizeEvent *event);
+      void scrollContentsBy(int dx, int dy);
 
 
-      private:
-        void nullify();
-        void paintItemText(QPainter *, int, QPoint, QPoint);
-        void drawCollapsedArrow(QPainter *, QRect);
-        void drawExpandedArrow(QPainter *, QRect);
-        QRect getArrowRect(AbstractTreeItem *item) const;
+    private:
+      TreeViewContent(const TreeViewContent &other);
+      TreeViewContent &operator=(const TreeViewContent &other);
 
 
-      private slots:
-        void scrollTo(QList< AbstractTreeItem * >);
-        void scrollTo(AbstractTreeItem *);
-        void setAlternatingRowColors(bool);
-        void updateItemList();
+    private:
+      void nullify();
+      void paintItemText(QPainter *, int, QPoint, QPoint);
+      void drawCollapsedArrow(QPainter *, QRect);
+      void drawExpandedArrow(QPainter *, QRect);
+      QRect getArrowRect(AbstractTreeItem *item) const;
 
 
-      private:
-        TreeView *m_parentView;
-        AbstractTreeModel *m_model;
-        QList< AbstractTreeItem * > * m_items;
-
-        //! The bool is true if the arrow in the item was pressed
-        QPair< AbstractTreeItem *, bool > * m_pressedItem;
-
-        //! The bool is true if the mouse is hovering over the arrow
-        QPair< AbstractTreeItem *, bool > * m_hoveredItem;
-
-        AbstractTreeItem *m_lastDirectlySelectedItem;
-        QList<AbstractTreeItem *> * m_lastShiftSelection;
-
-        QPoint *m_mousePressPos;
-        int m_rowHeight;
-        int m_contentWidth;
-        bool m_alternatingRowColors;
+    private slots:
+      void scrollTo(QList< AbstractTreeItem * >);
+      void scrollTo(AbstractTreeItem *);
+      void setAlternatingRowColors(bool);
+      void updateItemList();
 
 
-      private:
-        static const int ITEM_PADDING = 4;
-        static const int ITEM_INDENTATION = 23;
-    };
-  }
+    private:
+      TreeView *m_parentView;
+      AbstractTreeModel *m_model;
+      QList< AbstractTreeItem * > * m_items;
+
+      //! The bool is true if the arrow in the item was pressed
+      QPair< AbstractTreeItem *, bool > * m_pressedItem;
+
+      //! The bool is true if the mouse is hovering over the arrow
+      QPair< AbstractTreeItem *, bool > * m_hoveredItem;
+
+      AbstractTreeItem *m_lastDirectlySelectedItem;
+      QList<AbstractTreeItem *> * m_lastShiftSelection;
+
+      QPoint *m_mousePressPos;
+      int m_rowHeight;
+      int m_contentWidth;
+      bool m_alternatingRowColors;
+
+
+    private:
+      static const int ITEM_PADDING = 4;
+      static const int ITEM_INDENTATION = 23;
+  };
 }
 
 #endif

@@ -13,94 +13,92 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    AbstractStringFilter::AbstractStringFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
-      nullify();
-      createWidget();
-    }
+  AbstractStringFilter::AbstractStringFilter(
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    nullify();
+    createWidget();
+  }
 
-    AbstractStringFilter::AbstractStringFilter(
-      const AbstractStringFilter &other) : AbstractFilter(other) {
-      nullify();
-      createWidget();
+  AbstractStringFilter::AbstractStringFilter(
+    const AbstractStringFilter &other) : AbstractFilter(other) {
+    nullify();
+    createWidget();
 
-      m_lineEdit->setText(other.m_lineEdit->text());
-    }
-
+    m_lineEdit->setText(other.m_lineEdit->text());
+  }
 
 
-    AbstractStringFilter::~AbstractStringFilter() {
-      if (m_lineEditText) {
-        delete m_lineEditText;
-        m_lineEditText = NULL;
-      }
-    }
 
-
-    void AbstractStringFilter::nullify() {
-      m_lineEdit = NULL;
+  AbstractStringFilter::~AbstractStringFilter() {
+    if (m_lineEditText) {
+      delete m_lineEditText;
       m_lineEditText = NULL;
     }
+  }
 
 
-    void AbstractStringFilter::createWidget() {
-      m_lineEditText = new QString;
+  void AbstractStringFilter::nullify() {
+    m_lineEdit = NULL;
+    m_lineEditText = NULL;
+  }
 
-      m_lineEdit = new QLineEdit;
-      m_lineEdit->setMinimumWidth(250);
-      connect(m_lineEdit, SIGNAL(textChanged(QString)),
-          this, SLOT(updateLineEditText(QString)));
-      connect(m_lineEdit, SIGNAL(textChanged(QString)),
-          this, SIGNAL(filterChanged()));
 
-      QHBoxLayout *layout = new QHBoxLayout;
-      QMargins margins = layout->contentsMargins();
-      margins.setTop(0);
-      margins.setBottom(0);
-      layout->setContentsMargins(margins);
-      layout->addWidget(m_lineEdit);
-      layout->addStretch();
+  void AbstractStringFilter::createWidget() {
+    m_lineEditText = new QString;
 
-      getMainLayout()->addLayout(layout);
+    m_lineEdit = new QLineEdit;
+    m_lineEdit->setMinimumWidth(250);
+    connect(m_lineEdit, SIGNAL(textChanged(QString)),
+        this, SLOT(updateLineEditText(QString)));
+    connect(m_lineEdit, SIGNAL(textChanged(QString)),
+        this, SIGNAL(filterChanged()));
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    QMargins margins = layout->contentsMargins();
+    margins.setTop(0);
+    margins.setBottom(0);
+    layout->setContentsMargins(margins);
+    layout->addWidget(m_lineEdit);
+    layout->addStretch();
+
+    getMainLayout()->addLayout(layout);
+  }
+
+
+  bool AbstractStringFilter::evaluate(QString str) const {
+    bool evaluation = true;
+
+    // multiple threads reading the lineEditText so lock it
+    QString text = *m_lineEditText;
+
+    if (text.size() >= 1) {
+      bool match = str.contains(text, Qt::CaseInsensitive);
+
+      // inclusive() and match must either be both true or both false
+      evaluation = !(inclusive() ^ match);
     }
 
-
-    bool AbstractStringFilter::evaluate(QString str) const {
-      bool evaluation = true;
-
-      // multiple threads reading the lineEditText so lock it
-      QString text = *m_lineEditText;
-
-      if (text.size() >= 1) {
-        bool match = str.contains(text, Qt::CaseInsensitive);
-
-        // inclusive() and match must either be both true or both false
-        evaluation = !(inclusive() ^ match);
-      }
-
-      return evaluation;
-    }
+    return evaluation;
+  }
 
 
-    QString AbstractStringFilter::descriptionSuffix() const {
-      QString suffix;
+  QString AbstractStringFilter::descriptionSuffix() const {
+    QString suffix;
 
-      if (inclusive())
-        suffix += "containing \"";
-      else
-        suffix += "not containing \"";
+    if (inclusive())
+      suffix += "containing \"";
+    else
+      suffix += "not containing \"";
 
-      suffix += *m_lineEditText;
+    suffix += *m_lineEditText;
 
-      suffix += "\"";
-      return suffix;
-    }
+    suffix += "\"";
+    return suffix;
+  }
 
 
-    void AbstractStringFilter::updateLineEditText(QString newText) {
-      *m_lineEditText = newText;
-    }
+  void AbstractStringFilter::updateLineEditText(QString newText) {
+    *m_lineEditText = newText;
   }
 }

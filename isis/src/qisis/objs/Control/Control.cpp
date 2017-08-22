@@ -30,8 +30,35 @@ namespace Isis {
 
     m_controlNet = NULL;
     m_displayProperties = NULL;
+    m_project = NULL;
 
-    openControlNet();
+    try {
+      openControlNet();
+    }
+    catch (IException &e) {
+      throw IException(e, IException::Programmer, "Error opening control net.", _FILEINFO_);
+    }
+
+    m_displayProperties
+        = new ControlDisplayProperties(FileName(m_fileName).name(), this);
+
+    m_id = new QUuid(QUuid::createUuid());
+  }
+
+
+  /**
+   * Create a Control from control net located on disk associated with a Project.
+   *
+   * @param cNetFileName The name of the control net on disk
+   * @param parent The Qt-relationship parent
+   */
+  Control::Control(Project *project, QString cNetFileName, QObject *parent) : QObject(parent) {
+
+    m_fileName = cNetFileName;
+
+    m_controlNet = NULL;
+    m_displayProperties = NULL;
+    m_project = project;
 
     m_displayProperties
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
@@ -42,7 +69,7 @@ namespace Isis {
 
   /**
    * Create a Control from a control network that has already been created and read from disk.
-   *  
+   *
    * @param controlNet The actual control network
    * @param cnetFileName The name of the control net on disk
    * @param parent The Qt-relationship parent
@@ -54,6 +81,7 @@ namespace Isis {
 
     m_controlNet = controlNet;
     m_displayProperties = NULL;
+    m_project = NULL;
 
     m_displayProperties
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
@@ -64,9 +92,9 @@ namespace Isis {
 
   /**
    * Construct this control from XML.
-   *  
+   *
    * @param cnetFolder Location of control xml
-   * @param xmlReader An XML reader that's up to an <control/> tag.  
+   * @param xmlReader An XML reader that's up to an <control/> tag.
    * @param parent The Qt-relationship parent
    */
   Control::Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
@@ -74,6 +102,7 @@ namespace Isis {
     m_controlNet = NULL;
     m_displayProperties = NULL;
     m_id = NULL;
+    m_project = NULL;
 
     xmlReader->pushContentHandler(new XmlHandler(this, cnetFolder));
   }
@@ -97,10 +126,10 @@ namespace Isis {
 
 
   /**
-   * Open and return a pointer to the ControlNet for this Control. 
-   *  
-   * @see openControlNet() 
-   * @return @b ControlNet* Pointer to the ControlNet object associated with 
+   * Open and return a pointer to the ControlNet for this Control.
+   *
+   * @see openControlNet()
+   * @return @b ControlNet* Pointer to the ControlNet object associated with
    *         this Control.
    */
   ControlNet *Control::controlNet() {
@@ -113,15 +142,19 @@ namespace Isis {
 
 
   /**
-   * Sets the ControlNet from the control net file name provided in the 
-   * constructor. 
-   *  
+   * Sets the ControlNet from the control net file name provided in the
+   * constructor.
+   *
    * @throws IException::Programmer  "Error opening control net."
    */
   void Control::openControlNet() {
     if (!m_controlNet) {
       try {
         m_controlNet = new ControlNet(m_fileName);
+        if (m_project) {
+          m_controlNet->SetMutex(m_project->mutex());
+        }
+
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Error opening control net.", _FILEINFO_);
@@ -132,9 +165,9 @@ namespace Isis {
 
   /**
    * Cleans up the ControlNet pointer. This method should be called
-   * once there is no more need for this network because the OS will limit 
-   * how many of these can be open. 
-   */  
+   * once there is no more need for this network because the OS will limit
+   * how many of these can be open.
+   */
   void Control::closeControlNet() {
     if (m_controlNet) {
       delete m_controlNet;
@@ -145,7 +178,7 @@ namespace Isis {
 
   /**
    * Access a pointer to the display properties for the control network.
-   * 
+   *
    * @return @b ControlDisplayProperties * A pointer to the display properties.
    */
   ControlDisplayProperties *Control::displayProperties() {
@@ -155,7 +188,7 @@ namespace Isis {
 
   /**
    * Access a const pointer to the display properties for the control network.
-   * 
+   *
    * @return @b ControlDisplayProperties * A pointer to the display properties.
    */
   const ControlDisplayProperties *Control::displayProperties() const {
@@ -165,7 +198,7 @@ namespace Isis {
 
   /**
    * Access the name of the control network file associated with this Control.
-   * 
+   *
    * @return @b QString The file name of the control network.
    */
   QString Control::fileName() const {
@@ -175,7 +208,7 @@ namespace Isis {
 
   /**
    * Access the unique ID associated with this Control.
-   * 
+   *
    * @return @b QString The Control ID.
    */
   QString Control::id() const {
@@ -184,10 +217,10 @@ namespace Isis {
 
 
   /**
-   * Copies the files of the given Project to the given location. 
-   *  
+   * Copies the files of the given Project to the given location.
+   *
    * @param project A pointer to the Project.
-   * @param newProjectRoot The name of the new root directory where the project 
+   * @param newProjectRoot The name of the new root directory where the project
    *                       will be copied.
    */
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
@@ -203,8 +236,8 @@ namespace Isis {
 
   /**
    * Delete the control net from disk. The control net will no longer be accessible until you call
-   * updateFileName(). 
-   *  
+   * updateFileName().
+   *
    * @throws IException::Io  "Could not remove file."
    */
   void Control::deleteFromDisk() {
@@ -238,12 +271,12 @@ namespace Isis {
 
 
   /**
-   * Method to write this Control object's member data to an XML stream. 
-   *  
+   * Method to write this Control object's member data to an XML stream.
+   *
    * @param stream The stream to which the Control will be saved.
    * @param project The Project to which this Control will be added.
    * @param newProjectRoot The location of the project root directory.
-   * 
+   *
    */
   void Control::save(QXmlStreamWriter &stream, const Project *project,
                      FileName newProjectRoot) const {
@@ -259,11 +292,11 @@ namespace Isis {
 
 
   /**
-   * Constructor for the Control object's XmlHandler 
-   *  
+   * Constructor for the Control object's XmlHandler
+   *
    * @param control A pointer to the Control object.
    * @param cnetFolder The name of the folder for the Control xml
-   * 
+   *
    */
   Control::XmlHandler::XmlHandler(Control *control, FileName cnetFolder) {
     m_xmlHandlerControl = control;
@@ -272,15 +305,15 @@ namespace Isis {
 
 
   /**
-   * Method to read the given XML formatted attribute for a Control object 
-   * into the XmlHandler. 
-   *  
+   * Method to read the given XML formatted attribute for a Control object
+   * into the XmlHandler.
+   *
    * @param namespaceURI ???
    * @param localName The keyword name given to the member variable in the XML.
    * @param qName ???
-   * @param atts The attribute containing the keyword value for the given 
+   * @param atts The attribute containing the keyword value for the given
    *             localName.
-   *  
+   *
    * @return @b bool Indicates whether the localName is recognized.
    */
   bool Control::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
@@ -299,7 +332,6 @@ namespace Isis {
 
         if (!fileName.isEmpty()) {
           m_xmlHandlerControl->m_fileName = m_xmlHandlerCnetFolderName.expanded() + "/" + fileName;
-          m_xmlHandlerControl->openControlNet();
         }
       }
       else if (localName == "displayProperties") {
@@ -310,6 +342,3 @@ namespace Isis {
     return true;
   }
 }
-
-
-

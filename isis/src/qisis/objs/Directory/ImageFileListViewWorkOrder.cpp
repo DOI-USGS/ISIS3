@@ -34,6 +34,8 @@ namespace Isis {
   ImageFileListViewWorkOrder::ImageFileListViewWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("View File &Names..."));
+    m_isSavedToHistory = false;
+    m_isUndoable = false;
   }
 
 
@@ -54,27 +56,16 @@ namespace Isis {
   bool ImageFileListViewWorkOrder::isExecutable(ImageList *images) {
     return !images->isEmpty();
   }
-  
-  
-  /**
-   * @brief This method returns false because this WorkOrder is not undoable.
-   * 
-   * @see WorkOrder::isUndoable()
-   * 
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool ImageFileListViewWorkOrder::isUndoable() const {
-    return false;
-  }
 
-  
+
+
   /**
-   * @brief This method asks the user what view they want to see their image list in. The user 
-   * can select an existing view or they can create a new view. The user's choice is then saved 
-   * using setInternalData(). 
-   * 
+   * @brief This method asks the user what view they want to see their image list in. The user
+   * can select an existing view or they can create a new view. The user's choice is then saved
+   * using setInternalData().
+   *
    * @see WorkOrder::setupExecution()
-   * 
+   *
    * @return @b bool True if WorkOrder::setupExecution() returns true.
    */
   bool ImageFileListViewWorkOrder::setupExecution() {
@@ -134,12 +125,13 @@ namespace Isis {
     return success;
   }
 
-  
+
   /**
-   * @brief This method adds a new image file list to the project's directory and then adds 
-   * currentItem() to that. 
+   * @brief This method adds a new image file list to the project's directory and then adds
+   * currentItem() to that.
    */
   void ImageFileListViewWorkOrder::execute() {
+
     int viewToUse = internalData().first().toInt();
 
     ImageFileListWidget *fileListToUse = NULL;
@@ -151,5 +143,6 @@ namespace Isis {
     }
 
     fileListToUse->addImages(imageList());
+    project()->setClean(false);
   }
 }

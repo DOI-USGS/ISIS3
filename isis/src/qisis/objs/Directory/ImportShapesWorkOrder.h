@@ -48,6 +48,15 @@ namespace Isis {
    *   @history 2017-04-12 JP Bonn - Updated to new workorder design.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undone, imported
    *                           shapes are removed from the project tree. Fixes #4597.
+   *   @history 2017-07-13 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
+   *                           in the context menu. Fixes #4968.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
+   *                           is undone. Fixes #5043.
+   *   @history 2017-08-11 Cole Neubauer - Added a pointer to the project item added by the work
+   *                           order. This pointer is used in the Undo funtions. Also unrelated
+   *                           to this ticket fixed importing of a cube list with relative paths
+   *                           #5064
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -58,6 +67,7 @@ namespace Isis {
 
       virtual ImportShapesWorkOrder *clone() const;
 
+      virtual bool isExecutable(ProjectItem *item);
       bool setupExecution();
 
       void execute();
@@ -72,10 +82,10 @@ namespace Isis {
        * This copies the given shape model cube(s) into the project. This is designed to work with
        *   QtConcurrentMap.  TODO::  TLS 2016-07-13  If large DEM, do not allow DN data to be
        *   copied??
-       *  
-       * @author 2016-07-06 Tracie Sucharski 
-       *  
-       * @internal 
+       *
+       * @author 2016-07-06 Tracie Sucharski
+       *
+       * @internal
        */
       class OriginalFileToProjectCubeFunctor :
           public std::unary_function<const FileName &, Cube *> {
@@ -93,21 +103,22 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder;
-          bool m_copyDnData;
-          QThread *m_guiThread;
+          QDir m_destinationFolder; //!< Directory where the DN data is going to be stored
+          bool m_copyDnData; //!< Stores if the user wants to copy the DN data or not
+          QThread *m_guiThread; //!< The GUI thread
 
-          QMutex m_errorsLock;
-          QSharedPointer<IException> m_errors;
-          QSharedPointer<int> m_numErrors;
+          QMutex m_errorsLock; //!< Mutex lock for errors
+          QSharedPointer<IException> m_errors; //!< Shared pointers for errors
+          QSharedPointer<int> m_numErrors; //!< Number of errors that have occured
       };
 
     private:
       void importConfirmedShapes(QStringList confirmedShapes, bool copyDnData);
 
     private:
-      ShapeList *m_newShapes;
-      QString m_warning;
+      ShapeList *m_newShapes; //!< List of shapes
+      ShapeList *m_list; //!< List of shapes this workorder added to the project
+      QString m_warning; //!< QString of warning text
   };
 }
 #endif // ImportShapesWorkOrder_H

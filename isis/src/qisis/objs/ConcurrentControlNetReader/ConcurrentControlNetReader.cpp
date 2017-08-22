@@ -151,11 +151,12 @@ namespace Isis {
       QFuture<Control *> networks = QtConcurrent::mapped(functorInput,
                                     FileNameToControlFunctor(QThread::currentThread()));
             
-      Control * control = networks.result();
-      ControlNet * cnet = control->controlNet();
-      if (!cnet->IsValid()) {
-        throw IException();
-      }  
+      try {
+        networks.result();
+      }
+      catch (IException &e) {
+        throw e;
+      }
       
       if (!m_progressBar.isNull()) {
         m_progressBar->setVisible(true);

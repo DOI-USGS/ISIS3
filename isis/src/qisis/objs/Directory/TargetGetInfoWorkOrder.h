@@ -43,6 +43,8 @@ namespace Isis {
    *                           setupExecution() and execute(). Removed syncRedo() and syncUndo().
    *                           Set m_isUndoable to false as work order is not undoable.
    *                           Fixes #4737.
+   *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
+   *                           Fixes #4715
    */
   class TargetGetInfoWorkOrder : public WorkOrder {
       Q_OBJECT

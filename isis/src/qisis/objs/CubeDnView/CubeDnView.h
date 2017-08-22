@@ -38,7 +38,7 @@ class QToolBar;
 class QXmlStreamWriter;
 
 namespace Isis {
-  
+
   class ControlPoint;
   class Cube;
   class Directory;
@@ -49,13 +49,13 @@ namespace Isis {
   class ToolPad;
   class Workspace;
   class XmlStackedHandlerReader;
-  
+
   /**
-   * View that displays cubes in a QView-like way. 
+   * View that displays cubes in a QView-like way.
    *
    * @author 2016-01-13 Jeffrey Covington
-   *  
-   * @internal 
+   *
+   * @internal
    *   @history 2016-01-13 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards.
    *                           Fixes #4004.
@@ -71,6 +71,15 @@ namespace Isis {
    *                           opening projects.
    *   @history 2017-01-02 Tracie Sucharski - Moved IpceTool to first tool on tool bar, change
    *                           icon to match the Footprint2DView.
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the modifyControlPoint signal.
+   *   @history 2017-07-27 Tyler Wilson - Added a slot function (enableIPCETool) which is called
+   *                           when a control network (or list of control networks) is added to
+   *                           the active project.  Fixes #4994.
+   *   @history 2017-08-02 Tracie Sucharski - Added redrawMeasures signal which calls a slot in
+   *                           ipce tool to redraw control measures on cube viewports. Fixes #5007,
+   *                           #5008.
+   *   @history 2017-08-03 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
+   *                           Fixes #5090
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -98,17 +107,21 @@ namespace Isis {
       void load(XmlStackedHandlerReader *xmlReader, Project *project);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+
+
     signals:
-      void modifyControlPoint(ControlPoint *controlPoint);
+      void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber);
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude, Cube *cube,
                               bool isGroundSource = false);
 
       void controlPointAdded(QString newPointId);
+      void redrawMeasures();
 
     public slots:
       void addItem(ProjectItem *item);
-    
+      void enableControlNetTool();
+
     private slots:
       void onCurrentChanged(const QModelIndex &current);
       void onCubeViewportActivated(MdiCubeViewport *);
@@ -124,8 +137,8 @@ namespace Isis {
       /**
        * @author 2012-09-?? Steven Lambright
        *
-       * @internal 
-       *   @history 2016-11-07 Tracie Sucharski - Implemented for CubeDnView 
+       * @internal
+       *   @history 2016-11-07 Tracie Sucharski - Implemented for CubeDnView
        */
       class XmlHandler : public XmlStackedHandler {
         public:
@@ -155,7 +168,7 @@ namespace Isis {
       QMenu *m_helpMenu; //!< Help menu for storing actions
 
       QAction *m_separatorAction; //!< A separator action that is reused
-      
+
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions

@@ -24,106 +24,104 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    PointMeasureTreeModel::PointMeasureTreeModel(ControlNet *controlNet,
-        TreeView *v, QObject *parent) :
-      AbstractTreeModel(controlNet, v, parent) {
-      rebuildItems();
+  PointMeasureTreeModel::PointMeasureTreeModel(ControlNet *controlNet,
+      TreeView *v, QObject *parent) :
+    AbstractTreeModel(controlNet, v, parent) {
+    rebuildItems();
+  }
+
+
+  PointMeasureTreeModel::~PointMeasureTreeModel() {
+  }
+
+
+  PointMeasureTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
+    AbstractTreeModel *tm, QThread *tt) {
+    m_treeModel = tm;
+    m_targetThread = tt;
+    m_avgCharWidth = QFontMetrics(
+        m_treeModel->getView()->getContentFont()).averageCharWidth();
+  }
+
+
+  PointMeasureTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
+    const CreateRootItemFunctor &other) {
+    m_treeModel = other.m_treeModel;
+    m_targetThread = other.m_targetThread;
+    m_avgCharWidth = other.m_avgCharWidth;
+  }
+
+  PointMeasureTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
+    m_treeModel = NULL;
+  }
+
+
+  PointParentItem *PointMeasureTreeModel::CreateRootItemFunctor::operator()(
+    ControlPoint *const &point) const {
+    PointParentItem *pointItem = new PointParentItem(point, m_avgCharWidth);
+    pointItem->moveToThread(m_targetThread);
+
+    for (int j = 0; j < point->GetNumMeasures(); j++) {
+      const ControlMeasure *measure = point->GetMeasure(j);
+      ASSERT(measure);
+
+      MeasureLeafItem *measureItem = new MeasureLeafItem(
+        const_cast< ControlMeasure * >(measure), m_avgCharWidth, pointItem);
+      measureItem->moveToThread(m_targetThread);
+
+      pointItem->addChild(measureItem);
     }
 
+    return pointItem;
+  }
 
-    PointMeasureTreeModel::~PointMeasureTreeModel() {
+
+  void PointMeasureTreeModel::CreateRootItemFunctor::addToRootItem(
+    QAtomicPointer< RootItem > & root, PointParentItem *const &item) {
+
+    // Allocate a new root item if our root is NULL
+    if (root.testAndSetOrdered(NULL, new RootItem)) {
+      root.loadAcquire()->moveToThread(item->thread());
     }
 
-
-    PointMeasureTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-      AbstractTreeModel *tm, QThread *tt) {
-      m_treeModel = tm;
-      m_targetThread = tt;
-      m_avgCharWidth = QFontMetrics(
-          m_treeModel->getView()->getContentFont()).averageCharWidth();
-    }
+    if (item)
+      root.loadAcquire()->addChild(item);
+  }
 
 
-    PointMeasureTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-      const CreateRootItemFunctor &other) {
+  PointMeasureTreeModel::CreateRootItemFunctor &
+  PointMeasureTreeModel::CreateRootItemFunctor::operator=(
+    const CreateRootItemFunctor &other) {
+    if (this != &other) {
       m_treeModel = other.m_treeModel;
-      m_targetThread = other.m_targetThread;
       m_avgCharWidth = other.m_avgCharWidth;
     }
 
-    PointMeasureTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
-      m_treeModel = NULL;
+    return *this;
+  }
+
+  void PointMeasureTreeModel::rebuildItems() {
+    if (!isFrozen()) {
+      emit cancelSort();
+      setRebuilding(true);
+      emit filterCountsChanged(-1, getTopLevelItemCount());
+      QFuture< QAtomicPointer< RootItem > > futureRoot;
+      if (getRebuildWatcher()->isStarted()) {
+        futureRoot = getRebuildWatcher()->future();
+        futureRoot.cancel();
+      }
+
+      ASSERT(getControlNetwork());
+      futureRoot = QtConcurrent::mappedReduced(
+          getControlNetwork()->GetPoints(),
+          CreateRootItemFunctor(this, QThread::currentThread()),
+          &CreateRootItemFunctor::addToRootItem,
+          QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
+
+      getRebuildWatcher()->setFuture(futureRoot);
     }
-
-
-    PointParentItem *PointMeasureTreeModel::CreateRootItemFunctor::operator()(
-      ControlPoint *const &point) const {
-      PointParentItem *pointItem = new PointParentItem(point, m_avgCharWidth);
-      pointItem->moveToThread(m_targetThread);
-
-      for (int j = 0; j < point->GetNumMeasures(); j++) {
-        const ControlMeasure *measure = point->GetMeasure(j);
-        ASSERT(measure);
-
-        MeasureLeafItem *measureItem = new MeasureLeafItem(
-          const_cast< ControlMeasure * >(measure), m_avgCharWidth, pointItem);
-        measureItem->moveToThread(m_targetThread);
-
-        pointItem->addChild(measureItem);
-      }
-
-      return pointItem;
-    }
-
-
-    void PointMeasureTreeModel::CreateRootItemFunctor::addToRootItem(
-      QAtomicPointer< RootItem > & root, PointParentItem *const &item) {
-
-      // Allocate a new root item if our root is NULL
-      if (root.testAndSetOrdered(NULL, new RootItem)) {
-        root.loadAcquire()->moveToThread(item->thread());
-      }
-
-      if (item)
-        root.loadAcquire()->addChild(item);
-    }
-
-
-    PointMeasureTreeModel::CreateRootItemFunctor &
-    PointMeasureTreeModel::CreateRootItemFunctor::operator=(
-      const CreateRootItemFunctor &other) {
-      if (this != &other) {
-        m_treeModel = other.m_treeModel;
-        m_avgCharWidth = other.m_avgCharWidth;
-      }
-
-      return *this;
-    }
-
-    void PointMeasureTreeModel::rebuildItems() {
-      if (!isFrozen()) {
-        emit cancelSort();
-        setRebuilding(true);
-        emit filterCountsChanged(-1, getTopLevelItemCount());
-        QFuture< QAtomicPointer< RootItem > > futureRoot;
-        if (getRebuildWatcher()->isStarted()) {
-          futureRoot = getRebuildWatcher()->future();
-          futureRoot.cancel();
-        }
-
-        ASSERT(getControlNetwork());
-        futureRoot = QtConcurrent::mappedReduced(
-            getControlNetwork()->GetPoints(),
-            CreateRootItemFunctor(this, QThread::currentThread()),
-            &CreateRootItemFunctor::addToRootItem,
-            QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
-
-        getRebuildWatcher()->setFuture(futureRoot);
-      }
-      else {
-        queueRebuild();
-      }
+    else {
+      queueRebuild();
     }
   }
 }

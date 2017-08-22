@@ -10,79 +10,78 @@ class QSize;
 class QString;
 
 namespace Isis {
-  namespace CnetViz {
-    class TreeViewContent;
+  class TreeViewContent;
 
-    /**
-     * @author ????-??-?? Unknown
-     *
-     * @internal
-     *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-     */
-    class TreeViewHeader : public QWidget {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   */
+  class TreeViewHeader : public QWidget {
 
-        Q_OBJECT
+      Q_OBJECT
 
-      public:
-        explicit TreeViewHeader(TreeViewContent *someContent,
-            QWidget *parent);
-        TreeViewHeader(const TreeViewHeader &other);
-        virtual ~TreeViewHeader();
-        QSize minimumSizeHint() const;
-        QString getText();
-        void setText(QString text);
-
-
-        QSize sizeHint() const {
-          return minimumSizeHint();
-        }
-
-        TreeViewHeader &operator=(const TreeViewHeader &other);
+    public:
+      explicit TreeViewHeader(TreeViewContent *someContent,
+          QWidget *parent);
+      TreeViewHeader(const TreeViewHeader &other);
+      virtual ~TreeViewHeader();
+      QSize minimumSizeHint() const;
+      QString getText();
+      void setText(QString text);
 
 
-      public slots:
-        void setActive(bool);
-        void handleFilterCountsChanged(int visibleTopLevelItemCount,
-            int topLevelItemCount);
+      QSize sizeHint() const {
+        return minimumSizeHint();
+      }
+
+      TreeViewHeader &operator=(const TreeViewHeader &other);
 
 
-      signals:
-        void activated();
+    public slots:
+      void setActive(bool);
+      void handleFilterCountsChanged(int visibleTopLevelItemCount,
+          int topLevelItemCount);
 
 
-      protected:
-        void mouseReleaseEvent(QMouseEvent *event);
-        void paintEvent(QPaintEvent *event);
+    signals:
+      void activated();
 
 
-      private: // methods
-        void nullify();
-        void paintHeader(QPainter *painter, int rowheight);
-        void paintProgress(QPainter *painter, const QRect &rect, int min,
-            int max, int value);
+    protected:
+      void mouseReleaseEvent(QMouseEvent *event);
+      void paintEvent(QPaintEvent *event);
 
 
-      private slots:
-        void updateFilterProgress(int newProgress);
-        void updateFilterProgressRange(int min, int max);
-        void updateRebuildProgress(int newProgress);
-        void updateRebuildProgressRange(int min, int max);
+    private: // methods
+      void nullify();
+      void paintHeader(QPainter *painter, int rowheight);
+      void paintProgress(QPainter *painter, const QRect &rect, int min,
+          int max, int value);
 
 
-      private: // data
-        TreeViewContent *m_content;
-        QString *m_headerText;
-        int m_filterProgress;
-        int m_filterProgressMin;
-        int m_filterProgressMax;
-        int m_rebuildProgress;
-        int m_rebuildProgressMin;
-        int m_rebuildProgressMax;
-        bool m_active;
-        int m_visibleCount;
-        int m_totalCount;
-    };
-  }
+    private slots:
+      void updateFilterProgress(int newProgress);
+      void updateFilterProgressRange(int min, int max);
+      void updateRebuildProgress(int newProgress);
+      void updateRebuildProgressRange(int min, int max);
+
+
+    private: // data
+      TreeViewContent *m_content;
+      QString *m_headerText;
+      int m_filterProgress;
+      int m_filterProgressMin;
+      int m_filterProgressMax;
+      int m_rebuildProgress;
+      int m_rebuildProgressMin;
+      int m_rebuildProgressMax;
+      bool m_active;
+      int m_visibleCount;
+      int m_totalCount;
+  };
 }
 
 

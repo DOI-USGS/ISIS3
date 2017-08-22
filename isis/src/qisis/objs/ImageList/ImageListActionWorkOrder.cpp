@@ -15,6 +15,8 @@ namespace Isis {
    */
   ImageListActionWorkOrder::ImageListActionWorkOrder(Project *project) :
       WorkOrder(project) {
+        
+    m_isSavedToHistory = false;
   }
 
 
@@ -25,7 +27,10 @@ namespace Isis {
    * @param project The project that the work order is for
    */
   ImageListActionWorkOrder::ImageListActionWorkOrder(Action action, Project *project) :
-      WorkOrder(project) {
+      WorkOrder(project) {      
+    
+    m_isSavedToHistory = false;
+    
     QAction::setText(toString(action));
     QUndoCommand::setText(toString(action));
 
@@ -42,6 +47,9 @@ namespace Isis {
    */
   ImageListActionWorkOrder::ImageListActionWorkOrder(
       const ImageListActionWorkOrder &other) : WorkOrder(other) {
+              
+    m_isSavedToHistory = false; 
+        
     foreach (const Image *image, *other.imageList()) {
       connect(this, SIGNAL(bringToFront()), image->displayProperties(), SIGNAL(moveToTop()));
     }
@@ -104,7 +112,6 @@ namespace Isis {
 
   /**
    * @brief If needed, prompt the user for input and save it.  ChangeTransparency, ChangeColor,
-   * 
    * and potentially ToggleShowLabel will prompt for input from the user. This was renamed from 
    * execute() to setupExecution() according to WorkOrder's redesign.
    * 
@@ -171,6 +178,21 @@ namespace Isis {
 
         case ToggleShowOutline:
           break;
+          
+        case MoveToTop:
+          break;
+          
+        case MoveUpOne:
+          break;
+          
+        case MoveToBottom:
+          break;
+          
+        case MoveDownOne:
+          break;
+          
+        case ZoomFit:
+          break;
       }
 
       setInternalData(state);
@@ -182,7 +204,7 @@ namespace Isis {
 
   /**
    * @brief Perform the action stored in the work order and update the work order's
-   * internal data with the restuls of the action. 
+   * internal data with the results of the action. 
    * 
    * @see ImageList::saveAndApplyAlpha
    * @see ImageList::saveAndApplyColor
@@ -239,6 +261,21 @@ namespace Isis {
         state = state.mid(0, 1);
         state.append(imageList()->saveAndToggleShowOutline());
         break;
+        
+      case MoveToTop:
+        break;
+        
+      case MoveUpOne:
+        break;
+        
+      case MoveToBottom:
+        break;
+        
+      case MoveDownOne:
+        break;
+        
+      case ZoomFit:
+        break;
     }
 
     setInternalData(state);
@@ -291,6 +328,21 @@ namespace Isis {
 
       case ToggleShowOutline:
         imageList()->applyShowOutline(state.mid(1));
+        break;
+        
+      case MoveToTop:
+        break;
+        
+      case MoveUpOne:
+        break;
+        
+      case MoveToBottom:
+        break;
+        
+      case MoveDownOne:
+        break;
+        
+      case ZoomFit:
         break;
     }
 
@@ -397,6 +449,26 @@ namespace Isis {
       case ToggleShowOutline:
         result = tr("Toggle Show Outline");
         break;
+        
+      case MoveToTop:
+        result = tr("Bring to Front");
+        break;
+        
+      case MoveUpOne:
+        result = tr("Bring Forward");
+        break;
+        
+      case MoveToBottom:
+        result = tr("Send to Back");
+        break;
+        
+      case MoveDownOne:
+        result = tr("Send Backward");
+        break;
+        
+      case ZoomFit:
+        result = tr("Zoom Fit");
+        break;
     }
 
     return result;
@@ -414,8 +486,8 @@ namespace Isis {
       QString actionString) {
     Action result = UnknownAction;
 
-    for (Action act = UnknownAction;
-         result == UnknownAction && act <= ToggleShowOutline;
+    for (Action act = FirstAction;
+         result == UnknownAction && act <= LastAction;
          act = (Action)(act + 1)) {
       if (toString(act).toUpper() == actionString.toUpper()) {
         result = act;

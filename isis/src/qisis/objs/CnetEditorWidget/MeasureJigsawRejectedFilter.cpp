@@ -14,68 +14,66 @@ using std::cerr;
 
 
 namespace Isis {
-  namespace CnetViz {
-    MeasureJigsawRejectedFilter::MeasureJigsawRejectedFilter(
-      AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-      AbstractFilter(flag, minimumForSuccess) {
-    }
+  MeasureJigsawRejectedFilter::MeasureJigsawRejectedFilter(
+    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
+    AbstractFilter(flag, minimumForSuccess) {
+  }
 
 
-    MeasureJigsawRejectedFilter::~MeasureJigsawRejectedFilter() {
-    }
+  MeasureJigsawRejectedFilter::~MeasureJigsawRejectedFilter() {
+  }
 
 
-    bool MeasureJigsawRejectedFilter::evaluate(const ControlCubeGraphNode *node) const {
-      return AbstractFilter::evaluateImageFromMeasureFilter(node);
-    }
+  bool MeasureJigsawRejectedFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(node);
+  }
 
 
-    bool MeasureJigsawRejectedFilter::evaluate(const ControlPoint *point) const {
-      return AbstractFilter::evaluatePointFromMeasureFilter(point);
-    }
+  bool MeasureJigsawRejectedFilter::evaluate(const ControlPoint *point) const {
+    return AbstractFilter::evaluatePointFromMeasureFilter(point);
+  }
 
 
-    bool MeasureJigsawRejectedFilter::evaluate(const ControlMeasure *measure) const {
-      return AbstractFilter::evaluate(measure, &ControlMeasure::IsRejected);
-    }
+  bool MeasureJigsawRejectedFilter::evaluate(const ControlMeasure *measure) const {
+    return AbstractFilter::evaluate(measure, &ControlMeasure::IsRejected);
+  }
 
 
-    AbstractFilter *MeasureJigsawRejectedFilter::clone() const {
-      return new MeasureJigsawRejectedFilter(*this);
-    }
+  AbstractFilter *MeasureJigsawRejectedFilter::clone() const {
+    return new MeasureJigsawRejectedFilter(*this);
+  }
 
 
-    QString MeasureJigsawRejectedFilter::getImageDescription() const {
-      QString description = AbstractFilter::getImageDescription();
-      if (getMinForSuccess() == 1)
-        description += "measure that is ";
-      else
-        description += "measures that are ";
+  QString MeasureJigsawRejectedFilter::getImageDescription() const {
+    QString description = AbstractFilter::getImageDescription();
+    if (getMinForSuccess() == 1)
+      description += "measure that is ";
+    else
+      description += "measures that are ";
 
-      if (inclusive())
-        description += "jigsaw rejected";
-      else
-        description += "not jigsaw rejected";
+    if (inclusive())
+      description += "jigsaw rejected";
+    else
+      description += "not jigsaw rejected";
 
-      return description;
-    }
-
-
-    QString MeasureJigsawRejectedFilter::getPointDescription() const {
-      return getImageDescription();
-    }
+    return description;
+  }
 
 
-    QString MeasureJigsawRejectedFilter::getMeasureDescription() const {
-      QString description = "are ";
+  QString MeasureJigsawRejectedFilter::getPointDescription() const {
+    return getImageDescription();
+  }
 
-      if (inclusive())
-        description += "jigsaw rejected";
-      else
-        description += "not jigsaw rejected";
 
-      return description;
-    }
+  QString MeasureJigsawRejectedFilter::getMeasureDescription() const {
+    QString description = "are ";
+
+    if (inclusive())
+      description += "jigsaw rejected";
+    else
+      description += "not jigsaw rejected";
+
+    return description;
   }
 }
 

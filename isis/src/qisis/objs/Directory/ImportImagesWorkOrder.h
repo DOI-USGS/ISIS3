@@ -67,6 +67,22 @@ namespace Isis {
    *                           asynchronous work order. Updated documentation. References #4732.
    *   @history 2017-05-01 Ian Humphrey - Updated undoExecution() so that when undo, imported
    *                           images are removed from the project tree. Fixes #4597.
+   *   @history 2017-07-06 Cole Neubauer - Added ability to have cube lists without full file path
+   *                           Fixes #4956
+   *   @history 2017-07-14 Cole Neubauer - Added ability successfully import after failing to import
+   *                           a set or list of images Fixes #5015
+   *   @history 2017-07-14 Cole Neubauer - Made import statement more descriptive when importing a
+   *                           cube list Fixes #5042
+   *   @history 2017-07-17 Makayla Shepherd - Added isExecutable(ProjectItem) to allow for importing
+   *                           in the context menu. Fixes #4968.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
+   *                           is undone. Fixes #5043.
+   *   @history 2017-07-28 Cole Neubauer - Added a pointer to the project item added by the work
+   *                           order. This pointer is used in the Undo funtions #5064
+   *   @history 2017-08-11 Cole Neubauer - Created a try catch around a previously unprotected error
+   *                           to handle errors thrown in the workorder that halted execution.
+   *                           Fixes #5026
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -77,6 +93,7 @@ namespace Isis {
 
       virtual ImportImagesWorkOrder *clone() const;
 
+      virtual bool isExecutable(ProjectItem *item);
       virtual bool setupExecution();
 
       virtual void execute();
@@ -113,21 +130,22 @@ namespace Isis {
           //! Not implemented
           OriginalFileToProjectCubeFunctor &operator=(const OriginalFileToProjectCubeFunctor &rhs);
 
-          QDir m_destinationFolder; //! Directory where to import the images to.
-          bool m_copyDnData; //! Indicates whether the cube data will be copied to the project.
-          QThread *m_guiThread; //! Pointer to the GUI thread. Not used?
+          QDir m_destinationFolder; //!< Directory where to import the images to.
+          bool m_copyDnData; //!< Indicates whether the cube data will be copied to the project.
+          QThread *m_guiThread; //!< Pointer to the GUI thread. Not used?
 
-          QMutex m_errorsLock; //! Mutex lock for appending errors and incrementing error count.
-          QSharedPointer<IException> m_errors; //! Stores any errors that occur during import.
-          QSharedPointer<int> m_numErrors; //! Number of errors that occur during import.
+          QMutex m_errorsLock; //!< Mutex lock for appending errors and incrementing error count.
+          QSharedPointer<IException> m_errors; //!< Stores any errors that occur during import.
+          QSharedPointer<int> m_numErrors; //!< Number of errors that occur during import.
       };
 
     private:
       void importConfirmedImages(QStringList confirmedImages, bool copyDnData);
 
     private:
-      ImageList *m_newImages; //! List of images that are being imported in this work order.
-      QString m_warning; //! String of any errors/warnings that occurred during import.
+      ImageList *m_newImages; //!< List of images that are being imported in this work order.
+      ImageList *m_list; //!< List of images that was succesfully imported into project.
+      QString m_warning; //!< String of any errors/warnings that occurred during import.
   };
 }
 #endif // ImportImagesWorkOrder_H

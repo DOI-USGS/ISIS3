@@ -9,10 +9,14 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QMessageBox>
+#include <QBrush>
+#include <QPainterPath>
+#include <QPen>
 
 #include "Constants.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
+#include "Directory.h"
 #include "FileName.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
@@ -90,8 +94,16 @@ namespace Isis {
   }
 
 
+  /**
+   * This virtual paint method is called anytime an update() or paintEvent() is called
+   * 
+   * @param painter (QPainter *) Painter used to draw
+   * @param style (QStyleOptionGraphicsItem *) Describes parameters used to draw a QGraphicsItem
+   * @param widget (QWidget *) Optional argument which indicates the widget that is being painted on
+   */
   void ControlPointGraphicsItem::paint(QPainter *painter,
       const QStyleOptionGraphicsItem *style,  QWidget * widget) {
+
     QRectF fullRect = calcRect();
     QRectF crosshairRect = calcCrosshairRect();
 
@@ -113,8 +125,23 @@ namespace Isis {
       QPointF centerTop(center.x(), crosshairRect.top());
       QPointF centerBottom(center.x(), crosshairRect.bottom());
 
-      painter->drawLine(centerLeft, centerRight);
-      painter->drawLine(centerTop, centerBottom);
+      if (m_mosaicScene->directory() &&
+          m_mosaicScene->directory()->editPointId() == m_controlPoint->GetId()) {
+        QPainterPath path;
+        //  Draw circle, then crosshair inside circle
+        path.addEllipse(crosshairRect);
+        path.moveTo(centerTop);
+        path.lineTo(centerBottom);
+        path.moveTo(centerLeft);
+        path.lineTo(centerRight);
+
+        painter->setPen(QPen(Qt::red, 0.0));
+        painter->drawPath(path);
+      }
+      else {
+        painter->drawLine(centerLeft, centerRight); 
+        painter->drawLine(centerTop, centerBottom);
+      }
 
       if (!m_origPoint->isNull() && *m_origPoint != *m_centerPoint
          && m_showArrow) {
@@ -161,7 +188,6 @@ namespace Isis {
           painter->setPen(finalColor);
           painter->setBrush(finalColor);
         }
-
         painter->drawLine(*m_origPoint, *m_centerPoint);
 
         QPolygonF arrowHead = calcArrowHead();

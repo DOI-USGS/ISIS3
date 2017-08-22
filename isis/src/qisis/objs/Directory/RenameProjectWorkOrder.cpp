@@ -33,12 +33,12 @@
 
 namespace Isis {
 
-  /** 
-   * Creates a work order to rename the project using the given new project name. This constructor 
-   * is only called if user double-clicks the project name on the project tree.  This WorkOrder is 
-   * undoable and runs synchronously. 
-   * 
-   * @param QString newName New project name 
+  /**
+   * Creates a work order to rename the project using the given new project name. This constructor
+   * is only called if user double-clicks the project name on the project tree.  This WorkOrder is
+   * undoable and runs synchronously.
+   *
+   * @param QString newName New project name
    * @param Project *project Pointer to the project this work order belongs to.
    */
   RenameProjectWorkOrder::RenameProjectWorkOrder(QString newName, Project *project) :
@@ -49,7 +49,7 @@ namespace Isis {
     QAction::setText(tr("&Rename Project..."));
     QUndoCommand::setText(tr("Rename Project"));
 
-    
+
     QStringList internalData;
     internalData.append(project->name());
     internalData.append(newName);
@@ -57,9 +57,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Creates a work order to rename the project. This WorkOrder is undoable and runs synchronously.
-   * 
+   *
    * @param Project *project Pointer to the project this work order belongs to.
    */
   RenameProjectWorkOrder::RenameProjectWorkOrder(Project *project) :
@@ -97,7 +97,7 @@ namespace Isis {
 
   /**
    * @brief This method clones the current RenameProjectWorkOrder and returns it.
-   * 
+   *
    * @return @b Footprint2DViewWorkOrder that was cloned
    */
   RenameProjectWorkOrder *RenameProjectWorkOrder::clone() const {
@@ -106,15 +106,15 @@ namespace Isis {
 
 
   /**
-   * @brief This method returns true if the user clicked on the project name on the project tree, or 
+   * @brief This method returns true if the user clicked on the project name on the project tree, or
    *              selected "Rename Project" from the Project menu, otherwise False. This is used by
    *              Directory::supportedActions(DataType data) to determine what actions are appended
    *              to context menus.
-   * 
-   * @param Context context This indicates whether this WorkOrder is  part of a Project.  Context is 
+   *
+   * @param Context context This indicates whether this WorkOrder is  part of a Project.  Context is
    *                an enum defined in WorkOrder with two possible values: NoContext,ProjectContext.
-   * 
-   * @return @b bool True if user selected 
+   *
+   * @return @b bool True if user selected
    */
   bool RenameProjectWorkOrder::isExecutable(Context context) {
     return (context == ProjectContext);
@@ -122,10 +122,10 @@ namespace Isis {
 
 
   /**
-   * @brief Setup this WorkOrder for execution.  Prompt for new project name and make sure it is a 
+   * @brief Setup this WorkOrder for execution.  Prompt for new project name and make sure it is a
    *              valid directory location.  This calls WorkOrder::setupExecution().
-   * 
-   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created, 
+   *
+   * @return @b bool True if WorkOrder::execute() returns true and footprints can be created,
    *         otherwise returns False.
    */
   bool RenameProjectWorkOrder::setupExecution() {
@@ -173,9 +173,9 @@ namespace Isis {
 
 
  /**
-   * This WorkOrder is only dependent on another RenameProjectWorkOrder.  It cannot be run if 
-   * another RenameProjectWorkOrder is currently being executed. 
-   *        
+   * This WorkOrder is only dependent on another RenameProjectWorkOrder.  It cannot be run if
+   * another RenameProjectWorkOrder is currently being executed.
+   *
    * @param other  The WorkOrder being checked for dependency.
    * @return @b bool  True if there is the other WorkOrder is another RenameProjectWorkOrder, False
    *         otherwise.
@@ -188,10 +188,11 @@ namespace Isis {
 
   /**
    * @brief This will rename the project.
-   *  
+   *
    */
   void RenameProjectWorkOrder::execute() {
     project()->setName(internalData()[1]);
+    project()->setClean(false);
   }
 
 
@@ -207,4 +208,3 @@ namespace Isis {
     project()->setName(internalData()[0]);
   }
 }
-

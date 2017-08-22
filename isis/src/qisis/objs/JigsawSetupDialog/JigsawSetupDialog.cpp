@@ -99,15 +99,20 @@ namespace Isis {
       QString name = target->displayProperties()->displayName();
 
       if (name == "MOON")
-        m_ui->targetBodyComboBox->addItem(QIcon(":moon"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/weather-clear-night.png").expanded()), name, v);
       else if (name == "Enceladus")
-        m_ui->targetBodyComboBox->addItem(QIcon(":enceladus"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_enceladus.png").expanded()), name, v);
       else if (name == "Mars")
-        m_ui->targetBodyComboBox->addItem(QIcon(":mars"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_mars.png").expanded()), name, v);
       else if (name == "Titan")
-        m_ui->targetBodyComboBox->addItem(QIcon(":titan"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/nasa_titan.png").expanded()), name, v);
       else
-        m_ui->targetBodyComboBox->addItem(QIcon(":moonPhase"), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
+                  "$base/icons/weather-clear-night.png").expanded()), name, v);
     }
 
     m_ui->radiiButtonGroup->setId(m_ui->noneRadiiRadioButton,0);
@@ -340,40 +345,50 @@ namespace Isis {
     // weighting tab
     if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
       m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
+      m_ui->pointLatitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
       m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
+      m_ui->pointLongitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
       m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+      m_ui->pointRadiusSigmaLineEdit->setModified(true);
+
     }
 
     QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
 
     if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
       m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
+      m_ui->positionSigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
       m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
+      m_ui->velocitySigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
       m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
+      m_ui->accelerationSigmaLineEdit->setModified(true);
     }
 
     QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
 
     if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
       m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
+      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
       m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
+      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
     }
 
     if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
       m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
+      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
     }
 
     // maximum liklihood tab
@@ -646,7 +661,7 @@ namespace Isis {
     else {
       cnetBox.setCurrentIndex(foundControlIndex);
     }
-  } 
+  }
 
 
   Control *JigsawSetupDialog::selectedControl() {
@@ -912,13 +927,15 @@ namespace Isis {
 
     TargetBodyQsp target = m_project->targetBodies().at(index);
     if (target) {
+      if (target->frameType() != Isis::SpiceRotation::BPC &&
+          target->frameType() != Isis::SpiceRotation::UNKNOWN) {
+        m_ui->targetParametersMessage->hide();
 
-      if (target->frameType() != Isis::SpiceRotation::BPC) {
         std::vector<Angle> raCoefs = target->poleRaCoefs();
         std::vector<Angle> decCoefs = target->poleDecCoefs();
         std::vector<Angle> pmCoefs = target->pmCoefs();
 
-        showTargetAngleWidgets();
+        showTargetParametersGroupBox();
 
         m_ui->rightAscensionLineEdit->setText(toString(raCoefs[0].degrees()));
         m_ui->rightAscensionVelocityLineEdit->setText(toString(raCoefs[1].degrees()));
@@ -928,7 +945,18 @@ namespace Isis {
         m_ui->spinRateLineEdit->setText(toString(pmCoefs[1].degrees()));
       }
       else {
-        hideTargetAngleWidgets();
+        // Formulate message indicating why target parameters are disabled
+        QString msg;
+        if (target->displayProperties()->displayName() == "MOON") {
+          msg = "Target body parameter cannot be solved for the Moon.";
+        }
+        else {
+          msg = "The body frame type is unknown.  If you want to solve the target body parameters, "
+                "you must run spiceinit on the cubes.";
+        }
+        m_ui->targetParametersMessage->setText(msg);
+        m_ui->targetParametersMessage->show();
+        hideTargetParametersGroupBox();
       }
 
       m_ui->aRadiusLineEdit->setText(toString(target->radiusA().kilometers()));
@@ -1064,58 +1092,12 @@ namespace Isis {
     update();
   }
 
-  void JigsawSetupDialog::showTargetAngleWidgets() {
-    m_ui->rightAscensionLineEdit->show();
-    m_ui->rightAscensionVelocityLineEdit->show();
-    m_ui->declinationLineEdit->show();
-    m_ui->declinationVelocityLineEdit->show();
-    m_ui->primeMeridianOffsetLineEdit->show();
-    m_ui->spinRateLineEdit->show();
-
-    m_ui->rightAscensionSigmaLineEdit->show();
-    m_ui->rightAscensionVelocitySigmaLineEdit->show();
-    m_ui->declinationSigmaLineEdit->show();
-    m_ui->declinationVelocitySigmaLineEdit->show();
-    m_ui->primeMeridianOffsetSigmaLineEdit->show();
-    m_ui->spinRateSigmaLineEdit->show();
-
-    m_ui->poleRaCheckBox->show();
-    m_ui->poleRaVelocityCheckBox->show();
-    m_ui->poleDecCheckBox->show();
-    m_ui->poleDecVelocityCheckBox->show();
-    m_ui->primeMeridianOffsetCheckBox->show();
-    m_ui->spinRateCheckBox->show();
-
-    m_ui->parameterLabel->show();
-    m_ui->valueLabel->show();
-    m_ui->sigmaLabel->show();
+  void JigsawSetupDialog::showTargetParametersGroupBox() {
+    m_ui->targetParametersGroupBox->setEnabled(true);
   }
 
 
-  void JigsawSetupDialog::hideTargetAngleWidgets() {
-    m_ui->rightAscensionLineEdit->hide();
-    m_ui->rightAscensionVelocityLineEdit->hide();
-    m_ui->declinationLineEdit->hide();
-    m_ui->declinationVelocityLineEdit->hide();
-    m_ui->primeMeridianOffsetLineEdit->hide();
-    m_ui->spinRateLineEdit->hide();
-
-    m_ui->rightAscensionSigmaLineEdit->hide();
-    m_ui->rightAscensionVelocitySigmaLineEdit->hide();
-    m_ui->declinationSigmaLineEdit->hide();
-    m_ui->declinationVelocitySigmaLineEdit->hide();
-    m_ui->primeMeridianOffsetSigmaLineEdit->hide();
-    m_ui->spinRateSigmaLineEdit->hide();
-
-    m_ui->poleRaCheckBox->hide();
-    m_ui->poleRaVelocityCheckBox->hide();
-    m_ui->poleDecCheckBox->hide();
-    m_ui->poleDecVelocityCheckBox->hide();
-    m_ui->primeMeridianOffsetCheckBox->hide();
-    m_ui->spinRateCheckBox->hide();
-
-    m_ui->parameterLabel->hide();
-    m_ui->valueLabel->hide();
-    m_ui->sigmaLabel->hide();
+  void JigsawSetupDialog::hideTargetParametersGroupBox() {
+    m_ui->targetParametersGroupBox->setEnabled(false);
   }
 }

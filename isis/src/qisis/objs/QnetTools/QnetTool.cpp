@@ -18,7 +18,7 @@
 
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
-#include "QnetNewPointDialog.h"
+#include "NewControlPointDialog.h"
 #include "QnetFixedPointDialog.h"
 #include "Workspace.h"
 
@@ -1695,7 +1695,8 @@ namespace Isis {
       }
     }
 
-    QnetNewPointDialog *newPointDialog = new QnetNewPointDialog(this, m_lastUsedPointId);
+    NewControlPointDialog *newPointDialog =
+        new NewControlPointDialog(m_controlNet, m_serialNumberList, m_lastUsedPointId);
     newPointDialog->setFiles(pointFiles);
     if (newPointDialog->exec()) {
       m_lastUsedPointId = newPointDialog->pointId();
@@ -1765,6 +1766,7 @@ namespace Isis {
       // emit signal so the nav tool can update edit point
       emit editPointChanged(m_editPoint->GetId());
       colorizeSaveButton();
+      delete newPointDialog;
 
     }
   }
@@ -2240,8 +2242,8 @@ namespace Isis {
    *                          labels.  Fixes #1018
    *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to
    *                          findPointLocation() and createTemporaryGroundMeasure().
-   *   @history 2016-10-07 Makayla Shepherd - Added radius source handling if there is a ground 
-   *                          source and there is not a radius source already open. 
+   *   @history 2016-10-07 Makayla Shepherd - Added radius source handling if there is a ground
+   *                          source and there is not a radius source already open.
    */
   void QnetTool::loadPoint () {
 
@@ -2291,7 +2293,7 @@ namespace Isis {
         createTemporaryGroundMeasure();
       }
     }
-    
+
     //  Load a radius source if there isn't a radius source already open, and there is a ground source
     if (m_groundOpen && !m_demOpen) {
       openReferenceRadius();
@@ -3351,7 +3353,7 @@ namespace Isis {
    * @param fn The file path of the new template file
    */
   void QnetTool::loadTemplateFile(QString fn) {
-    
+
     QFile file(FileName(fn).expanded());
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
@@ -3655,7 +3657,7 @@ namespace Isis {
     QString filter = "Isis cubes (*.cub *.cub.*);;";
     filter += "Detached labels (*.lbl);;";
     filter += "All (*)";
-    
+
     QString ground = QFileDialog::getOpenFileName((QWidget*)parent(),
                                                   "Open ground source",
                                                   ".",
@@ -3756,13 +3758,13 @@ namespace Isis {
                 this, SLOT(groundViewportClosed(CubeViewport *)), Qt::UniqueConnection);
       }
     }
-    
+
     if (!m_demOpen) {
       //  If there isn't a radius source already open and there is a point selected
       if (m_editPoint != NULL) {
         openReferenceRadius();
       }
-      
+
       //  Determine file type of ground for setting AprioriSurfacePointSource
       //  and AprioriRadiusSource.
       else if (m_groundCube->hasTable("ShapeModelStatistics")) {
@@ -3818,7 +3820,7 @@ namespace Isis {
 
     if (m_editPoint != NULL &&
         (m_editPoint->GetType() != ControlPoint::Free)) loadPoint();
-    
+
 
     emit refreshNavList();
     QApplication::restoreOverrideCursor();
@@ -3852,13 +3854,13 @@ namespace Isis {
       initDem(dem);
 
   }
-  
-  /** 
+
+  /**
    * Open a radius source using the shape model of the reference measure of m_editPoint
-   * 
+   *
    * @author 2016-10-07 Makayla Shepherd - Changed radius source handling and moved it from OpenGround.
-   * 
-   * 
+   *
+   *
    */
   void QnetTool::openReferenceRadius() {
     //Get the reference image's shape model
@@ -3867,7 +3869,7 @@ namespace Isis {
     QScopedPointer<Cube> referenceCube(new Cube(referenceFileName, "r"));
     PvlGroup kernels = referenceCube->group("Kernels");
     QString shapeFile = kernels["ShapeModel"];
-    
+
     //  If the reference measure has a shape model cube then set that as the radius
     //  This will NOT WORK for shape model files (not the default of Null or Ellipsoid)
     //  that are not cubes
@@ -3878,25 +3880,25 @@ namespace Isis {
       else {
         m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
       }
-      
+
       m_radiusSourceFile = shapeFile;
-      
+
       //  Open shape file for reading radius later
       initDem(shapeFile);  //This will write the labels for us
     }
-    
+
     //  If no shape model then use the ABC of the target body
     else {
       m_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
       Spice *refSpice = new Spice(*referenceCube);
       Distance refRadii[3];
       refSpice->radii(refRadii);
-      m_demFile = QString::number(refRadii[0].meters()) + ", " + 
+      m_demFile = QString::number(refRadii[0].meters()) + ", " +
                   QString::number(refRadii[1].meters()) + ", " +
                   QString::number(refRadii[2].meters());
-                  
+
       m_radiusSourceFile = "";
-      
+
       //  Write out the labels
       m_groundFileNameLabel->setText("Ground Source File:  " + m_groundFile);
       m_radiusFileNameLabel->setText("Radius Source:  " + m_demFile);

@@ -36,6 +36,7 @@ namespace Isis {
 
   RemoveImagesWorkOrder::RemoveImagesWorkOrder(Project *project) :  WorkOrder(project) {
 
+    m_isUndoable = false;
     QAction::setText(tr("&Delete images from project..."));
     QUndoCommand::setText(tr("Delete images from project"));
 
@@ -73,8 +74,9 @@ namespace Isis {
 
   /**
    * @description Set up the execution.
-   *  
+   *
    * @return bool True if parent WordOrder can set up the execution.
+   * 
    */
   bool RemoveImagesWorkOrder::setupExecution() {
 
@@ -85,27 +87,43 @@ namespace Isis {
 
 
   /**
-   * @description Remove an item from the project directory.
+   * @description Remove any selected items from the project directory.
+   * 
+   * @internal
+   *   @history 2017-08-08 Marjorie Hahn - Created a conditional to check if the currently 
+   *                           selected item to be deleted is actually an image list, so that
+   *                           each image can be removed one by one. Fixes #5074.
    */
   void RemoveImagesWorkOrder::execute() {
-    qDebug()<<"RemoveImagesWorkOrder::execute  project()->directory()->model() = "<<project()->directory()->model();
-    ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    project()->directory()->model()->removeItem(currentItem);
-//  project()->removeImages(imageList());
-  }
 
+    QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
+    QList<ImageList *> projectImageLists = project()->images();
 
-  /**
-   * @description This method returns false because this WorkOrder is not undoable.
-   * 
-   * @see WorkOrder::isUndoable()
-   * 
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool RemoveImagesWorkOrder::isUndoable() {
+    foreach (ProjectItem *selectedItem, selectedItems) {
+      
+      if (selectedItem->isImage()) {
+        Image *selectedImage = selectedItem->image();
+        foreach (ImageList* projectImageList, projectImageLists) {
+          projectImageList->removeAll(selectedImage);
+        }
+      }
+      else if (selectedItem->isImageList()) {
+        ImageList *selectedImageList = selectedItem->imageList();
+        foreach (Image *selectedImage, *selectedImageList) {
+          foreach (ImageList* projectImageList, projectImageLists) {
+            projectImageList->removeAll(selectedImage);
+          }
+        }
+        project()->removeImages(*selectedImageList);
+      }
+      else {
+        throw IException(IException::User, 
+                         "Item cannot be removed from the project.", 
+                         _FILEINFO_);
+      }
+    }
     
-    return false;
+    project()->directory()->model()->removeItems(selectedItems);
+    project()->setClean(false);
   }
 }
-
-

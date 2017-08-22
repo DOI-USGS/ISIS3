@@ -588,8 +588,14 @@ namespace Isis {
 
       menu.addSeparator();
       QAction *removeAction = menu.addAction("Close Cube");
-      connect(removeAction, SIGNAL(triggered()),
-              m_image, SLOT(deleteLater()));
+      
+      if (QApplication::applicationName() == "qmos") {
+        connect(removeAction, SIGNAL(triggered()),
+                m_image, SLOT(deleteLater()));
+      }
+      else {
+        connect(removeAction, SIGNAL(triggered()), SLOT(onCloseCube()));
+      }
 
       menu.exec(event->screenPos());
     }
@@ -602,6 +608,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Emits a signal when Close Cube is selected from the context menu
+   */
+  void MosaicSceneItem::onCloseCube() {
+    emit mosaicCubeClosed(m_image);
+  }
+  
+  
   /**
    * This applies the displayProperties and selectability. It's
    *   called updateChildren because the child items are the

@@ -12,8 +12,6 @@
 #include "AbstractTableModel.h"
 #include "CnetEditorWidget.h"
 
-using namespace Isis::CnetViz;
-
 namespace Isis {
   /**
    * Create a config dialog that configures the given FeatureCnetEditorSort.

@@ -30,6 +30,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "SaveProjectWorkOrder.h"
 #include "ProgressBar.h"
 #include "Project.h"
 
@@ -102,15 +103,29 @@ namespace Isis {
 
     // We dislike the progress bar
     delete progressBar();
+    
+    if (success && !project()->isClean() && project()->isOpen() ) {
+      QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
+                             QString("Would you like to save your current project?"),
+                             NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+      QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+      QPushButton *dontsave = box->addButton("Don't Save", QMessageBox::RejectRole);
+      QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+      box->exec();
 
-    // If more than this work order is in the history, don't allow this operation
-    if (success && project()->workOrderHistory().count()) {
-      QMessageBox::critical(NULL, tr("Unable To Open a Project"),
-                            tr("Opening a new project is not implemented yet because there is no "
-                               "checking for changes to the current open project."));
-      success = false;
+      if (box->clickedButton() == (QAbstractButton*)cancel) {
+        success = false;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)dontsave) {
+        success = true;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)save) {
+        SaveProjectWorkOrder *workOrder = new SaveProjectWorkOrder(project());
+        project()->addToProject(workOrder);
+      }
     }
-    else if (success) {
+
+    if (success) {
       m_projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
                                                               tr("Select Project Directory"));
 
@@ -128,10 +143,10 @@ namespace Isis {
 
   /**
    * @brief  Open the chosen project folder.
-   * 
+   *
    */
   void OpenProjectWorkOrder::execute() {
-
     project()->open(m_projectName);
+    project()->setClean(true);
   }
 }
