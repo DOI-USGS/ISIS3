@@ -20,6 +20,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QDir>
+#include <algorithm>
 #include <cmath>  //use ceiling and floor functions
 #include <vector>
 #include "Application.h"
@@ -58,6 +60,7 @@ namespace Isis {
     p_gainMode = cissLab.GainModeId();
     p_narrow = cissLab.NarrowAngle();
     p_sum = toString(cissLab.SummingMode());
+    p_imageTime = cissLab.ImageTime();
 
     if(cissLab.ReadoutCycleIndex() == "Unknown") {
       p_readoutIndex = -999;
@@ -173,9 +176,18 @@ namespace Isis {
       }
     }
     if(notzero != 0) {
+      double DNSatPoint;
+      if (p_dataConvType == "8Bit") {
+        DNSatPoint = 255.0;
+      }
+      else {
+        DNSatPoint = 4095.0;
+      }
       // correct for gain:
       double gain2, gainRatio;
+      int ESatPoint;
       if(p_narrow) {
+        ESatPoint = 1.237e5;
         gain2 = 30.27;
         switch(p_gainMode) { // GainState()){
           case 215: //gs = 0:
@@ -197,6 +209,7 @@ namespace Isis {
         }
       }
       else {
+        ESatPoint = 1.133e5;
         gain2 = 27.68;
         switch(p_gainMode) { // GainState()){
           case 215://0:
@@ -220,6 +233,9 @@ namespace Isis {
       for(unsigned int i = 0; i < dark_e.size(); i++) {
         for(unsigned int j = 0; j < dark_e[0].size(); j++) {
           dark_DN[i][j] = (dark_e[i][j] / (gain2 / gainRatio));
+          if (dark_DN[i][j] >= DNSatPoint || dark_e[i][j] >= ESatPoint){
+            dark_DN[i][j] = DNSatPoint;
+          }
         }
       }
       return dark_DN;
@@ -1044,8 +1060,30 @@ namespace Isis {
     else {
       instModeId += "full";
     }
-    p_dparamfile = darkDir + instrumentId + "_median_dark_parameters" + "?????" + "." + instModeId + ".cub";
-    p_dparamfile = p_dparamfile.highestVersion();
+    p_dparamfile = darkDir + instrumentId + "_dark_parameters" + "." + instModeId + ".cub";
+
+    // needs to check directory for closeest epochs and compare
+    double closestEpochFileNum = 0;
+    QStringList fileList = QDir(darkDir).entryList();
+    QString instrument;
+    if (p_narrow) {
+      instrument = "NAC";
+    }
+    else {
+      instrument = "WAC";
+    }
+    double imgTime = p_imageTime.mid(0, 4).toDouble() + (p_imageTime.mid(5, 3).toDouble() / 365);
+    for(int i = 0; i < fileList.count(); i++){
+      if (FileName(fileList[i]).baseName().mid(0, 3) != instrument){
+        continue;
+      }
+      double currentEpoch = FileName(fileList[i]).baseName().mid(10, 6).toDouble();
+      if (abs(currentEpoch - imgTime) < abs(closestEpochFileNum - imgTime)) { // find closest epoch
+          closestEpochFileNum = currentEpoch;
+          p_hotpixfile = FileName(fileList[i]);
+      }
+    }
+    p_hotpixfile = darkDir + p_hotpixfile.baseName() + ".tab";
     return;
   }//end FindDarkFiles
 
@@ -1157,6 +1195,105 @@ namespace Isis {
       darkCoefficients->SetBasePosition(1, 1, 1);
       dparamCube.read(*darkCoefficients);
       dparamCube.close();
+
+      CisscalFile *hotPixFile = new CisscalFile(p_hotpixfile.expanded());
+      int num_params = 8;
+      long numHotPixels = hotPixFile->LineCount();
+      vector<double> exptimes;
+      vector<double> tgrid(num_params);
+      vector <vector <double> > v1(num_params);
+
+      for(int i = 0; i < num_params; i++) {
+        v1[i].resize(num_params);
+        switch(i) {
+          case 0:
+            tgrid[i] = 0.0;
+            break;
+          case 1:
+            tgrid[i] = 10.0;
+            break;
+          case 2:
+            tgrid[i] = 32.0;
+            break;
+          case 3:
+            tgrid[i] = 100.0;
+            break;
+          case 4:
+            tgrid[i] = 220.0;
+            break;
+          case 5:
+            tgrid[i] = 320.0;
+            break;
+          case 6:
+            tgrid[i] = 460.0;
+            break;
+          case 7:
+            tgrid[i] = 1200.0;
+            break;
+          default:
+            tgrid[i] = Null;
+        }
+      }
+
+      QString exposureLine;
+      hotPixFile->GetLine(exposureLine);
+      exposureLine=exposureLine.simplified().trimmed();
+      QStringList exposureLineList = exposureLine.split(' ');
+      for (int j = 2; j < exposureLineList.size(); j++ ){
+        exptimes.push_back(toDouble(exposureLineList[j]));
+      }
+      QString junk;
+      hotPixFile->GetLine(junk); //this line is gain values which are not used
+
+      int x;
+      int y;
+      double hotsat;
+      vector<double> elec;
+      for(long i = 0; i < numHotPixels; i++){
+        QString line;
+        hotPixFile->GetLine(line);
+        if(line == "") {
+          break;
+        }
+        line = line.simplified();
+        QStringList lineList = line.split(' ');
+        // make hotpix corrections
+        x = floor((toDouble(lineList[0]) / 1024) * p_samples);
+        y = floor((toDouble(lineList[1]) / 1024) * p_lines);
+        elec.resize(lineList.size() - 3);
+        for (unsigned int j = 0; j < elec.size(); j ++){
+          elec[j] = (toDouble(lineList[j + 2]));
+        }
+        hotsat = toDouble(lineList.back());
+
+        if (hotsat != 0.0) {
+          double maxExp;
+          if (hotsat > 0.0) {
+            maxExp = exptimes[hotsat - 1];
+          }
+          else {
+            maxExp = *(std::max_element(exptimes.begin(), exptimes.end()));
+          }
+
+          IDLLinearInterpolation interpol;
+          for (unsigned int j = 0; j < exptimes.size(); j++) {
+            if (exptimes[j] <= maxExp) {
+              interpol.insert(exptimes[j], elec[j]);
+            }
+          }
+          if (interpol.size() > 1) {
+            for (int j = 0; j < 8; j++){
+              (*darkCoefficients)[darkCoefficients->Index(x+1, y+1, j+1)] = interpol.evaluate(tgrid[j]);
+            }
+          }
+        }
+      }
+      for(int x = 0; x < 256 ; x ++) {
+        for (int y = 0; y < 256 ; y++) {
+          for (int j = 0; j < 8; j++){
+          }
+        }
+      }
       // Assume WAC dark current is 0 for 0.005 ms. This is not the case for
       // the NAC where there are negative values near the left edge of the frame:
       if(!p_narrow) {
@@ -1207,6 +1344,9 @@ namespace Isis {
       }
       // correct for the average bias distortion at the beginning of each line:
       if(p_narrow) {
+        // They gave a new bias file to compare against but it currently
+        // is not implemented in the IDL code as it is commented out in their code.
+/*
         CisscalFile *biasDist = new CisscalFile(p_bdpath.expanded());
         vector<double> samp, bias_distortion;
         for(int i = 0; i < biasDist->LineCount(); i++) {
@@ -1225,6 +1365,7 @@ namespace Isis {
             dark_e[i][j] = dark_e[i][j] - bias_distortion[i];
           }
         }
+*/
       }
       return dark_e;
     }
@@ -1259,7 +1400,10 @@ namespace Isis {
     vector <vector <double> > dark(p_samples), v1(num_params);
     vector <double> temp(p_samples), tgrid(num_params);
     vector <double> c(2), timespan(2);
-
+    for(int i = 0; i < 256 ; i ++) {
+      for (int line = 0; line < 256 ; line++) {
+      }
+    }
     for(unsigned int i = 0; i < dark.size(); i++) {
       dark[i].resize(p_lines);
     }
@@ -1336,5 +1480,28 @@ namespace Isis {
     }
     return dark;
   }//end MakeManyLineDark
-}//end namespace Isis
 
+
+  double DarkCurrent::IDLLinearInterpolation::evaluate(const double input) const{
+    double lowKey, highKey, slope;
+    IDLLinearInterpolation::const_iterator lowIt = lowerBound(input);
+    if (lowIt == begin()){
+      lowKey = lowIt.key();
+      highKey = (++lowIt).key();
+    }
+    else if (lowIt == end()){
+      highKey = (--lowIt).key();
+      lowKey = (--lowIt).key();
+    }
+    else {
+      highKey = lowIt.key();
+      lowKey = (--lowIt).key();
+    }
+    if (fabs(highKey - lowKey) < 1.0e-10) {
+      QString msg("Cannot Interpolate Repeated X Values");
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    slope = (value(highKey) - value(lowKey)) / (highKey - lowKey);
+    return slope * (input - lowKey) + value(lowKey);
+  }
+}//end namespace Isis

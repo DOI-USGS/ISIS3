@@ -69,18 +69,19 @@
       This step consists of two parts: dust ring removal  and division by flat
       field.  <strong>Dust ring removal</strong>  only applies to images from
       narrow angle cameras.  This process masks a dust ring found on images and,
-      if the image has SummingMode equal to 1 (i.e. it is a full, 1024x1024
-      image) and is recent (after 286th day of 2003), divides out a mottle map.
+      if the image is recent (after 286th day of 2003), divides out a mottle map.
       <strong> Flat field correction </strong> is applied to all images. During
       this process, each pixel is divided by the average of the center of the
       image.  For SummingMode 2 or 4, the results from this method diverge from
       the IDL results due to differences in the bilinear method used to expand
       the flat file image.  Flat field correction requires no user defined
       parameters. If narrow angle, it uses a dust ring file found in the Cassini
-      calibration dustring directory.  If narrow and full, it also uses a mottle
-      file and an effective wavelength file found in dustring and efficiency
-      directories. And, for any image a slope database and a flat file are used,
-      found in slope and slope/slope2flat directories.
+      calibration dustring directory. The dust ring file is determined by the epoch
+      number associated with the file, the program choses the file with the largest
+      epoch before the time stamp of the image being calibrated. It also uses a
+      mottle file and an effective wavelength file found in dustring and efficiency
+      directories. And, for any image a slope database and a flat file are used,found
+      in slope and slope/slope2flat directories.
     </p>
     <p>
       <strong>
@@ -112,12 +113,11 @@
         Step 7: Divide by Correction Factor
       </strong>
       This step is implemented in order to force theory and observation to match.
-      It consists of 2 processes.  First, if polarized, (i.e. a filter value of
-      IRP0, IRP90, P0, P60, or P120) the image is divided by a polarization
-      factor.  Next, the image is divided by its correction factor.  This step
-      requires no user defined parameters. It uses a polarization factor file
-      and a correction factor file found in the Cassini calibration correction
-      directory.
+      It consists of 2 processes.  First, the image is divided by its correction
+      factor. Next, if the target of the image is Jupiter it is divided by another
+      correction factor specific to Jupiter images. This step requires no user defined
+      parameters. It uses a correction factor file and Jupiter correction factor found
+      in the Cassini calibration correction directory.
     </p>
     <p>
     <strong>
@@ -206,9 +206,9 @@
       Cassini ISS Image Calibration: Theoretical Basis, and In-flight Calibration of the Cassini Imaging Science Subsystem Cameras
       to local assests in case the pdf sites are taken down. Fixes #2358.
     </change>
-    <change name="Christopher Combs" date="2017-05-19">
-      Changed pvl.DIFF of input for all app tests to ignore file names. Allows test to pass when not
-      using default data area. Fixes #4738.
+    <change name="Cole Neubauer" date="2017-06-08">
+      Updated cisscal and documentation to better reflect the steps as of idl cisscal program
+      version, 3.8, and added capabilities to use new dustrings files based on epoch.. Fixes #4708
     </change>
   </history>
 
@@ -264,7 +264,7 @@
         </title>
         <source>
           <filename></filename>
-          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/report/</path>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v3/document/report/</path>
         </source>
         <author>Cassini ISS Development Team</author>
         <publisher>Planetary Data System Rings Node</publisher>
@@ -275,7 +275,7 @@
         </title>
         <source>
           <filename> </filename>
-          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/report/iss/7.0/7.0.html</path>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v3/document/report/iss/7.0/7.0.html</path>
         </source>
         <author>Alfred McEwen and James Winburn</author>
         <publisher>Planetary Data System Rings Node</publisher>

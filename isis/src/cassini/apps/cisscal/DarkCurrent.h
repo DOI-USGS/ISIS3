@@ -23,6 +23,7 @@
  */
 
 #include <QString>
+#include <QMap>
 #include <vector>
 #include "FileName.h"
 
@@ -50,6 +51,7 @@ namespace Isis {
    *  @history 2010-07-19 Jeannie Walldren - Fixed formatting.
    *  @history 2016-08-28 Kelvin Rodriguez - Removed usused private member variables to
    *           eliminate unused member variables warnings in clang. Part of porting to OS X 10.11.
+   *  @history 2917-08-22 Cole Neubauer - Updated DarkCurrent for latest Cisscal upgrade
    */
   class DarkCurrent {
     public:
@@ -66,8 +68,11 @@ namespace Isis {
       FileName DarkParameterFile()  {
         return p_dparamfile;
       };
+      class IDLLinearInterpolation : public QMap<double,double> {
+        public:
+          double evaluate( const double input) const;
 
-
+      };
     private:
       double ComputeLineTime(int lline);
       void   FindDarkFiles();
@@ -80,6 +85,7 @@ namespace Isis {
       int p_samples;          //!< Number of samples in the image.
       FileName p_bdpath;      //!< Bias distortion table for the image.  Only exists for narrow camera images.
       FileName p_dparamfile;  //!< Dark parameters file for the image.
+      FileName p_hotpixfile;  //!< Erroneously bright hotpixels to encorporate into Dark Parameters.
 
       //LABEL VARIABLES
       int p_btsm;                   //!< Value dependent upon <b>PvlKeyword</b> DelayedReadoutFlag. Valid values are: "No"=0, "Yes"=1, "Unknown"=-1.  Called "botsim" or "btsm" in IDL code.
@@ -94,7 +100,7 @@ namespace Isis {
       int p_readoutOrder;           //!< Value of <b>PvlKeyword</b> ReadoutOrder from the labels of the image. Valid values are: NAC first = 0, WAC first = 1.  Called "roo" in IDL code.
       QString p_sum;                //!< Summing mode, as found in the labels of the image.  This integer is created as an QString so that it may be added to a QString.  Called "sum" in IDL code.
       int p_telemetryRate;          //!< Telemetry rate of the image in packets per second.  This is dependent on the range of the instrument data rate.  Called "cdsr" in IDL code.
-
+      QString p_imageTime;          //!<Actual Time Stamp On Photo.
       std::vector <std::vector <double> > p_startTime;    //!< Array of start times for each pixel of the image.
       std::vector <std::vector <double> > p_endTime;      //!< Array of end times for each pixel of the image.
       std::vector <std::vector <double> > p_duration;     //!< Array of durations for each pixel of the image.
