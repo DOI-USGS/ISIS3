@@ -25,6 +25,9 @@
     <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
       Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
     </change>
+    <change name="Jeannie Backer" date="2017-08-23">
+      Updated to translate PolyCam kernels separately from other cameras. Fixes #5128
+    </change>
   </history>
 
   <seeAlso>

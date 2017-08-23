@@ -54,16 +54,16 @@ void IsisMain() {
   bandBinXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
-  // Create an Archive group
-  // OREx team reduced the output keywords, so this was commented out
-  // Remove if all goes well with next release
-  //FileName archiveTransFile(transDir + "ocamsArchive_fit.trn");
-  //PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
-  //archiveXlater.Auto(outLabel);
-  //output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
-
   // Create a Kernels group
-  FileName kernelsTransFile(transDir + "ocamsKernels_fit.trn");
+  QString kernelsTransFileName = "";
+  QString instrument = outLabel.findGroup("Instrument", Pvl::Traverse)["InstrumentId"];
+  if (QString::compare(instrument, "PolyCam", Qt::CaseInsensitive) == 0) {
+    kernelsTransFileName = transDir + "ocamsPolyCamKernels_fit.trn";
+  }
+  else {
+    kernelsTransFileName = transDir + "ocamsKernels_fit.trn";
+  }
+  FileName kernelsTransFile(kernelsTransFileName);
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
@@ -75,7 +75,6 @@ void IsisMain() {
   output->write(originals);
 
   // Convert the image data
-  //importFits.StartProcess(Convert);
   importFits.StartProcess();
   importFits.Finalize();
 }
