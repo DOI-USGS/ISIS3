@@ -184,6 +184,9 @@ namespace Isis {
    *                           editing actions between views.
    *   @history 2017-08-18 Tracie Sucharski - Removed deletion of control net from
    *                           ::makeBackupActiveControl, don't know why it was being deleted.
+   *   @history 2017-08-23 Tracie Sucharski - Fixed some code involving connections in
+   *                           in ::addFootprint2DView which got messed up in a svn merge.  Removed
+   *                           unused signal, controlPointAdded.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -301,7 +304,6 @@ namespace Isis {
       void newWidgetAvailable(QWidget *newWidget);
 
       void cnetModified();
-      void controlPointAdded(QString newPointId);
       void redrawMeasures();
 
     public slots:
