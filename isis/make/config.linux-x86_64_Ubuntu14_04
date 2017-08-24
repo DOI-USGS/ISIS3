@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 
 ISISCPPFLAGS  = -Wall
-ISISCPPFLAGS += -std=c++14
+ISISCPPFLAGS += -std=c++11
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
 ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
