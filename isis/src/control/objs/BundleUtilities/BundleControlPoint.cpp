@@ -744,6 +744,15 @@ namespace Isis {
    *            When solveRadius is false, the point radius is heavily weighted
    * 
    * @return @b QString The formatted output detailed string.
+   * 
+   * @internal
+   *  @history 2017-08-24 Debbie A. Cook - Revised units of cor_rad to be km instead of meters
+   *                                                     when outputting latitudical corrections in degrees.  Fixed
+   *                                                     coordinate type for rectPoint to be Displacement::Kilometers
+   *                                                     instead of Distance::Kilometers.  Corrected conversions
+   *                                                     of corrections in lat/longitudinal degrees to rectangular meters.
+   *                                                     Fixed output of radius corrections in km.  It was outputting
+   *                                                     Z corrections.
    */
   QString BundleControlPoint::formatBundleLatitudinalOutputDetailString(
                                                              bool errorPropagation,
@@ -761,9 +770,10 @@ namespace Isis {
     // point corrections and initial sigmas
     double cor_lat_dd = 0.;                // lat correction, decimal degs
     double cor_lon_dd = 0.;               // lon correction, decimal degs
-    double cor_rad_m  = 0.;              // radius correction, meters
+    double cor_rad_km  = 0.;             // radius correction, kilometers
     double cor_lat_m = 0.;                 // lat correction, meters
     double cor_lon_m = 0.;                // lon correction, meters
+    double cor_rad_m  = 0.;              // radius correction, meters
     double latInit = Isis::Null;
     double lonInit = Isis::Null;
     double radInit = Isis::Null;
@@ -777,22 +787,23 @@ namespace Isis {
       double zCor = m_corrections(2);  // km
       
       if (!IsSpecial(x) && !IsSpecial(y) && !IsSpecial(z)) {
-        SurfacePoint rectPoint(Displacement(x - xCor, Distance::Kilometers),
-                              Displacement(y - yCor, Distance::Kilometers),
-                              Displacement(z - zCor, Distance::Kilometers));
+        SurfacePoint rectPoint(Displacement(x - xCor, Displacement::Kilometers),
+                              Displacement(y - yCor, Displacement::Kilometers),
+                              Displacement(z - zCor, Displacement::Kilometers));
         latInit = rectPoint.GetLatitude().degrees();
         lonInit = rectPoint.GetLongitude().degrees();
         radInit = rectPoint.GetLocalRadius().kilometers();
         if (!IsSpecial(lat)) {
           cor_lat_dd = (lat - latInit); // degrees
-          cor_lat_m  =  cor_lat_dd/RTM;
+          cor_lat_m  =  cor_lat_dd * DEG2RAD * RTM;
         }
         if (!IsSpecial(lon)) {
           cor_lon_dd = (lon - lonInit); // degrees
           cor_lon_m  =  cor_lon_dd * DEG2RAD * RTM * cos(lat*DEG2RAD);  // lon corrections meters
         }
         if (!IsSpecial(rad)) {
-          cor_rad_m  =  (rad - radInit) * 1000.;
+          cor_rad_km  =  rad - radInit;
+          cor_rad_m  =  cor_rad_km * 1000.;
         }
       }
     }
@@ -804,6 +815,7 @@ namespace Isis {
 
       cor_lat_m = m_corrections(0) * RTM;                     // lat correction, meters
       cor_lon_m = m_corrections(1) * RTM * cos(lat*DEG2RAD);  // lon correction, meters
+      cor_rad_km = m_corrections(2);
 
       if (!IsSpecial(lat)) {
         latInit = lat - cor_lat_dd;
@@ -869,7 +881,7 @@ namespace Isis {
     idx = SurfacePoint::Three;
     output += QString("    RADIUS%1%2%3%4%5%6\n\n")
          .arg(formatValue(radInit, 17, 8))                             // km
-         .arg(formatValue(m_corrections(2), 21, 8))            // km
+         .arg(formatValue(cor_rad_km, 21, 8))                    // km
          .arg(formatValue(cor_rad_m, 20, 8))                      // m
          .arg(formatValue(rad, 20, 8))                                  // km
          .arg(formatCoordAprioriSigmaString(idx, 18,8, solveRadius))               // m
@@ -885,6 +897,10 @@ namespace Isis {
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
    * @return @b QString The formatted output detailed string.
+   * 
+   * @internal
+   *  @history 2017-08-24 Debbie A. Cook - Corrected units reported in comments to correctly report 
+   *                                                       km and also in label line.
    */
  QString BundleControlPoint::formatBundleRectangularOutputDetailString
                                                         (bool errorPropagation) const {
@@ -921,22 +937,22 @@ namespace Isis {
         ZInit = latPoint.GetZ().kilometers();
         cor_X_m = Isis::Null;
         if (!IsSpecial(X)) {
-          cor_X_m = (X - XInit) * 1000.; // meters
+          cor_X_m = (X - XInit); // kilometers
         }
         cor_Y_m = Isis::Null;
         if (!IsSpecial(Y)) {
-          cor_Y_m = (Y - YInit) * 1000.; // meters
+          cor_Y_m = (Y - YInit); // kilometers
         }
         cor_Z_m = Isis::Null;
         if (!IsSpecial(Z)) {
-          cor_Z_m = (Z - ZInit) * 1000.; // meters
+          cor_Z_m = (Z - ZInit); // kilometers
         }
       }
     }
     else if  (m_coordTypeBundle == SurfacePoint::Rectangular) {
-      cor_X_m = m_corrections(0) * 1000.;                     // X correction, meters
-      cor_Y_m = m_corrections(1) * 1000.;                     // Y correction, meters
-      cor_Z_m = m_corrections(2) * 1000.;                    // Z correction, meters
+      cor_X_m = m_corrections(0);                     // X correction, kilometers
+      cor_Y_m = m_corrections(1);                     // Y correction, kilometers
+      cor_Z_m = m_corrections(2);                    // Z correction, kilometers
       if (!IsSpecial(X)) {
         XInit = X - m_corrections(0); // km
       }
@@ -968,14 +984,14 @@ namespace Isis {
                        "     Initial              Final\n"
                        "   Coordinate         Value             Correction            Value         "
                        "    Accuracy          Accuracy\n"
-                       "                    (km/km/km)           (Meters)           (km/km/km)         "
+                       "                    (km/km/km)             (km)           (km/km/km)         "
                        " (Meters)          (Meters)\n";
     output += labels;
 
     SurfacePoint::CoordIndex idx = SurfacePoint::One;
     output += QString(" BODY-FIXED-X%1%2%3%4%5\n")
             .arg(formatValue(XInit, 17, 8))                                       // km
-            .arg(formatValue(cor_X_m, 20, 8))                                // m 
+            .arg(formatValue(cor_X_m, 20, 8))                                // km 
             .arg(formatValue(X, 20, 8))                                           // km
             .arg(formatCoordAprioriSigmaString(idx, 18,8, true))   // m
             .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m 
@@ -983,7 +999,7 @@ namespace Isis {
     idx = SurfacePoint::Two;
     output += QString(" BODY-FIXED-Y%1%2%3%4%5\n")
             .arg(formatValue(YInit, 17, 8))                                        // km
-            .arg(formatValue(cor_Y_m, 20, 8))                                 // m
+            .arg(formatValue(cor_Y_m, 20, 8))                                 // km
             .arg(formatValue(Y, 20, 8))                                             // km
             .arg(formatCoordAprioriSigmaString(idx, 18, 8,  true))  // m
             .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m
@@ -991,7 +1007,7 @@ namespace Isis {
     idx = SurfacePoint::Three;
     output += QString(" BODY-FIXED-Z%1%2%3%4%5\n\n")
             .arg(formatValue(ZInit, 17, 8))                                        // km
-            .arg(formatValue(cor_Z_m, 20, 8))                                 // m
+            .arg(formatValue(cor_Z_m, 20, 8))                                 // km
             .arg(formatValue(Z, 20, 8))                                             // km
       // Set solveRadius to true to avoid limiting output information for Z.
       // Set radius does not really apply to rectangular coordinates.
@@ -1000,95 +1016,6 @@ namespace Isis {
 
     return output;
   }
-
-
-  /**
-   * Formats a detailed output string table for this BundleControlPoint. 
-   *  
-   * @param errorPropagation Indicates whether error propagation was selected.
-   * @param RTM Conversion factor from radians to meters. Used to convert the 
-   *            latitude and longitude corrections to meters.
-   * 
-   * @return @b QString The formatted output detailed string.
-   */
-  // QString BundleControlPoint::formatBundleOutputDetailStringXYZ(bool errorPropagation,
-  //                                                            bool solveRadius) const {
-
-  //   int numRays     = numberOfMeasures();
-  //   int numGoodRays = numRays - numberOfRejectedMeasures();
-  //   double x         = m_controlPoint->GetAdjustedSurfacePoint().GetX().kilometers();
-  //   double y         = m_controlPoint->GetAdjustedSurfacePoint().GetY().kilometers();
-  //   double z         = m_controlPoint->GetAdjustedSurfacePoint().GetZ().kilometers();
-
-  //   // ??? corrections is always zero ??? never set in this class ???
-  //   // point corrections and initial sigmas  -- Do we want corrections in km or m? If km do we need these doubles???
-  //   double cor_bfX_m = m_corrections(0) * 1000.;                 // Body-fixed X correction, meters
-  //   double cor_bfY_m = m_corrections(1) * 1000.;                 // Body-fixed Y correction, meters
-  //   double cor_bfZ_m  = m_corrections(2) * 1000.;                // Body-fixed Z correction, meters
-
-  //   // Unlike lat/lon/radius mode, only print the point correction in one form:  meters for XYZ mode.
-    
-  //   // Ask Ken about this section of code.  How shall we handle this functionality for XYZ if at all?
-  //   double xInit = Isis::Null;
-  //   if (!IsSpecial(x)) {
-  //     xInit = x - m_corrections(0);  // km
-  //   }
-
-  //   double yInit = Isis::Null;
-  //   if (!IsSpecial(y)) {
-  //     yInit = y - m_corrections(1);  // km
-  //   }
-
-  //   double zInit = Isis::Null;
-  //   if (!IsSpecial(z)) {
-  //     zInit = z -m_corrections(2);  / km 
-  //   }
-
-  //   QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
-
-  //   QString output;
-
-  //   output = QString(" Label: %1\nStatus: %2\n  Rays: %3 of %4\n")
-  //                       .arg(id())
-  //                       .arg(pointType)
-  //                       .arg(numGoodRays)
-  //                       .arg(numRays);
-
-  //   QString labels = "\n     Point            Initial               Total        "
-  //                    "      Final             Initial             Final\n"
-  //                    "Coordinate             Value             Correction        "
-  //                    "    Value             Accuracy          Accuracy\n"
-  //                    "                    (km/km/km)           (Meters)         "
-  //                    "  (km/km/km)          (Meters)          (Meters)\n";
-  //   output += labels;
-
-  //   output += QString("  BODY-FIXED X%1%2%3%4%5%6\n")
-  //                     .arg(formatValue(xInit, 17, 8))                               // km
-  //                     .arg(formatValue(cor_bfX_m, 21, 8))                     // m
-  //                     .arg(formatValue(x, 20, 8))                                    // km
-  //     // The following 2 methods need to be written or should we just have a generic method?
-  //                     .arg(formatXAprioriSigmaString(18,8))                  // m
-  //                     .arg(formatXAdjustedSigmaString(18,8,errorPropagation)); // m 
-
-  //   output += QString(" BODY-FIXED Y%1%2%3%4%5%6\n")
-  //                     .arg(formatValue(yInit, 17, 8))                                // km
-  //                     .arg(formatValue(cor_bfY_dd, 21, 8))                     // m
-  //                     .arg(formatValue(y, 20, 8))                                     // km
-  //     // The following 2 methods need to be written or should we just have a generic method?
-  //                     .arg(formatYAprioriSigmaString(18,8))                   // m
-  //                     .arg(formatZAdjustedSigmaString(18,8,errorPropagation)); // m
-
-  //   output += QString("  BODY-FIXED Z%1%2%3%4%5%6\n\n")
-  //                     .arg(formatValue(zInit, 17, 8))                                // km
-  //                     .arg(formatValue(cor_bfZ, 21, 8))                          // m
-  //                     .arg(formatValue(z, 20, 8))                                     // km
-  //     // What do we do if solveRadius is on? Do we just compute the radius for each point at the end?
-  //     // The following 2 methods need to be written or should we just have a generic method?
-  //                     .arg(formatZAprioriSigmaString(18,8,errorPropagation))     // m
-  //                     .arg(formatZAdjustedSigmaString(18,8,errorPropagation)); // m
-
-  //   return output;
-  // }
 
 
   /**
@@ -1129,7 +1056,7 @@ namespace Isis {
     QString aprioriSigmaStr;
     QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
     // std:: cout << "PointType = " << pointType << std::endl;
-    if (pointType == "CONSTRAINED"||!solveRadius) {
+    if (pointType == "CONSTRAINED" || !solveRadius) {
         pointType = "N/A";
     }
     double sigma = m_aprioriSigmas[int(index)];
