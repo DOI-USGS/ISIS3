@@ -1482,6 +1482,19 @@ namespace Isis {
   }//end MakeManyLineDark
 
 
+  /**
+  * @brief Evaluates Interpol value for tgrid.
+  *
+  * Used to find the estimated values for tgrid that may or may not have an actual value saved in
+  * tgrid. A new class and function was made to better mirror the way IDL's interpol function works
+  *
+  * @param input Value to be evaluated
+  *
+  * @returns estimate using m*x+b
+  *
+  * @internal
+  *   @history 2017-08-24 Cole Neubauer Original Version
+  */
   double DarkCurrent::IDLLinearInterpolation::evaluate(const double input) const{
     double lowKey, highKey, slope;
     IDLLinearInterpolation::const_iterator lowIt = lowerBound(input);

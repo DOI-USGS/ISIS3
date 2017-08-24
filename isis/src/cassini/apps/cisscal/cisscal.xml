@@ -201,7 +201,7 @@
     <change name="Jeannie Backer" date="2013-03-16">
       Added new appTest to make sure that the dust ring file location is tested. References #775.
     </change>
-    <change name="Adam Paquette" data="2016-08-31">
+    <change name="Adam Paquette" date="2016-08-31">
       Updated the pdf links to Cassini ISS Software Interface Specification, CISSCAL User Guide,
       Cassini ISS Image Calibration: Theoretical Basis, and In-flight Calibration of the Cassini Imaging Science Subsystem Cameras
       to local assests in case the pdf sites are taken down. Fixes #2358.
