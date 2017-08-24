@@ -8,54 +8,94 @@ UnitTest for SurfacePoint
     lat = 0.55850536 radians, lon = 2.0943951 radians, radius = 1000 meters
     latitude sigma=1.64192315 degrees, longitude sigma=1.78752107 degrees, radius sigma=38.4548873 m
     latitude sigma=0.0286569649 radians, longitude sigma=0.0311981281 radians, radius sigma=38.4548873 m
-    latitude sigma=28.6569649 m, longitude sigma=36.7881588 m, radius sigma=38.4548873 m
+    latitude sigma=28.6569649 m, longitude sigma=26.4575131 m, radius sigma=38.4548873 m
     latitude weight =1217.69806, longitude weight =1027.40796, radius weight =676.233861
-    spherical covariance matrix = 0.00082122164  0.000649383279  -0.674095535
-                                  0.000649383279  0.000973323195  -1.03923048
-                                  -0.674095535  -1.03923048  1478.77836
+    spherical covariance matrix = 0.00082122164  0.000649383279  -0.000674095535
+                                  0.000649383279  0.000973323195  -0.00103923048
+                                  -0.000674095535  -0.00103923048  0.00147877836
   Input rectangular sigmas = 10/50/20
 
 2-Testing spherical set of point and variance/covariance matrix ...
  with lat=32 degrees, lon=120 degrees, radius=1000 m
- latitude sigma=1.64192315 m, longitude sigma=1.78752107 m, radiusSig=38.4548873 m
+ latitude sigma=1.64192315 deg, longitude sigma=1.78752107 deg, radiusSig=38.4548873 m
   Output rectangular...
     x=-424.024048 m, y=734.431195 m, z=529.919264 m
     X sigma=10 m, Y sigma=50 m, Z sigma=20 m
-    rectangular covariance matrix =        100         0         0
-                                             0      2500         0
-                                             0         0       400
+    rectangular covariance matrix =     0.0001         0         0
+                                             0    0.0025         0
+                                             0         0    0.0004
 3-Testing rectangular set with point and sigmas only...
   Output spherical...
     lat=32 degrees, lon=120 degrees, radius=1000m
     latitude sigma=1.64192315 degrees, longitude sigma=1.78752107 degrees, radius sigma=38.4548873m
-    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.674095535
-                                 0.000649383279  0.000973323195  -1.03923048
-                                 -0.674095535  -1.03923048  1478.77836
+    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.000674095535
+                                 0.000649383279  0.000973323195  -0.00103923048
+                                 -0.000674095535  -0.00103923048  0.00147877836
 
 4-Testing planetocentric set with point and sigmas only in degrees ...
   4a-Output rectangular from degrees...
     x=-424.024048 m, y=734.431195 m, z=529.919264 m
     X sigma =29.1295681 m, Y sigma = 33.8466425 m, Z sigma = 31.7155018m
-    rectangular covariance matrix = 848.531739  -257.264514  -147.752015
-                                    -257.264514  1145.59521  255.913997
-                                    -147.752015  255.913997  1005.87306
+    rectangular covariance matrix = 0.000848531739  -0.000257264514  -0.000147752015
+                                    -0.000257264514  0.00114559521  0.000255913997
+                                    -0.000147752015  0.000255913997  0.00100587306
   4b-Output rectangular from radians...
     x=-424.024046 m, y=734.431196 m, z=529.919264 m
     X sigma = 29.1295681 m, Y sigma = 33.8466425 m, Z sigma = 31.7155018m
-    rectangular covariance matrix = 848.531737  -257.264513  -147.752014
-                                    -257.264513  1145.59521  255.913997
-                                    -147.752014  255.913997  1005.87305
+    rectangular covariance matrix = 0.000848531737  -0.000257264513  -0.000147752014
+                                    -0.000257264513  0.00114559521  0.000255913997
+                                    -0.000147752014  0.000255913997  0.00100587305
 
 5-Testing copy constructor
   Output spherical...
     lat=32 degrees, lon=120 degrees, radius=1000 m
     latitude sigma = 1.64192315 degrees, longitude sigma = 1.78752107 degrees, radius sigma = 38.4548873 m
-    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.674095535
-                                 0.000649383279  0.000973323195  -1.03923048
-                                 -0.674095535  -1.03923048  1478.77836
+    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.000674095535
+                                 0.000649383279  0.000973323195  -0.00103923048
+                                 -0.000674095535  -0.00103923048  0.00147877836
 
 Testing Longitude Accessor...
 Longitude (from -45): 315
+
+Testing error conditions in GetCoord, GetSigma, GetWeight, LatToDouble, 
+LonToDouble,  GetSigmaDistance, DistanceToDouble, and DisplacementToDouble...
+
+  ...Test Rectangular GetCoord with incorrect unit Degrees
+**PROGRAMMER ERROR** Unrecognized unit for a Displacement (must be meters or kilometers).
+  ...Test Rectangular GetCoord with incorrect unit Radians
+**PROGRAMMER ERROR** Unrecognized unit for a Displacement (must be meters or kilometers).
+  ...Test Rectangular GetCoord with incorrect unit Degrees
+**PROGRAMMER ERROR** Unrecognized unit for a Distance (not meters or kilometers).
+  ...Test Latitudinal GetCoord with incorrect unit Radians for local radius
+**PROGRAMMER ERROR** Unrecognized unit for a Distance (not meters or kilometers).
+  ...Test Latitudinal GetCoord with incorrect unit Kilometers for latitude
+**PROGRAMMER ERROR** Invalid unit for latitude (must be Radians or Degrees).
+  ...Test Latitudinal GetCoord with incorrect unit Meters for longitude
+**PROGRAMMER ERROR** Invalid unit for longitude (must be Radians of Degrees).
+
+Test error statements: case where weights are requested after only coordinates have  been set...
+**PROGRAMMER ERROR** SurfacePoint::GetXWeight(): Sigma <= 0.0.
+
+...Testing GetCoord, GetSigma, and GetWeight...  
+
+Rectangular Coordinates kilometers:  X= -0.424024048   Y = 0.734431195   Z = 0.529919264
+Rectangular Coordinates meters:  X= -424.024048   Y = 734.431195   Z = 529.919264
+Rectangular sigmas kilometers:  X= 0.01   Y = 0.05   Z = 0.02
+Using GetSigmaDistance, Rectangular sigmas kilometers:  X= 0.01   Y = 0.05   Z = 0.02
+Rectangular sigmas meters:  X= 10   Y = 50   Z = 20
+Using GetSigmaDistance, Rectangular sigmas meters:  X= 10   Y = 50   Z = 20
+Rectangular Weights kilometers:  X = 10000  Y = 400  Z = 2500
+Latitudinal Coordinates radians:  Latitude= 0.55850536   Longitude = 2.0943951   Local Radius = 1
+Latitudinal Coordinates degrees:  Latitude= 32   Longitude = 120   Local Radius = 1000
+Latitudinal weight degrees:  Latitude= 1217.69806   Longitude = 1027.40796   Local Radius = 676.233861
+
+Testing stringToCoordinateType with Latitudinal:  coordType = 0
+Testing coordinateTypeToString with coordType = 0:  coordTypeStr = Latitudinal
+Testing stringToCoordinateType with Rectangular:  coordType = 1
+Testing coordinateTypeToString with coordType = 1:  coordTypeStr = Rectangular
+
+Test invalid coordinate type error condition.
+**PROGRAMMER ERROR** Unknown coordinate type for a SurfacePoint [Garbage].
 
 Test computational methods...
   SphericalDistanceToPoint (i.e. haversine): 1570.79633 meters
