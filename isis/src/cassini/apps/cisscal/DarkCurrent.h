@@ -51,7 +51,7 @@ namespace Isis {
    *  @history 2010-07-19 Jeannie Walldren - Fixed formatting.
    *  @history 2016-08-28 Kelvin Rodriguez - Removed usused private member variables to
    *           eliminate unused member variables warnings in clang. Part of porting to OS X 10.11.
-   *  @history 2917-08-22 Cole Neubauer - Updated DarkCurrent for latest Cisscal upgrade
+   *  @history 2017-08-22 Cole Neubauer - Updated DarkCurrent for latest Cisscal upgrade
    */
   class DarkCurrent {
     public:
@@ -68,10 +68,19 @@ namespace Isis {
       FileName DarkParameterFile()  {
         return p_dparamfile;
       };
+      /**
+       * @brief Compute IDL LinearInterpolation
+       *
+       * This class was created in order to mimic IDL's Linear Interpol method
+       *
+       * @author 2017-08-24 Cole Neubauer
+       *
+       * @internal
+       *  @history 2017-08-22 Cole Neubauer - Original Version
+       */
       class IDLLinearInterpolation : public QMap<double,double> {
         public:
           double evaluate( const double input) const;
-
       };
     private:
       double ComputeLineTime(int lline);
