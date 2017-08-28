@@ -195,10 +195,12 @@ namespace Isis {
 
     private:
       /**
-       * @author 2017-07-25 Christopher Combs
-       *
        * This class is a placeholder for future plans to serialize more of
        * CnetEditorWidget's configurations when saving a project.
+       *  
+       * @author 2017-07-25 Christopher Combs
+       *  
+       * @internal 
        */
       class XmlHandler : public XmlStackedHandler {
         public:
