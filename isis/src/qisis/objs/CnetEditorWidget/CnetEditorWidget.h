@@ -200,7 +200,6 @@ namespace Isis {
        *  
        * @author 2017-07-25 Christopher Combs
        *  
-       * @internal 
        */
       class XmlHandler : public XmlStackedHandler {
         public:
