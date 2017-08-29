@@ -82,6 +82,8 @@ namespace Isis {
    *                           #2089.
    *   @history 2016-09-14 Ian Humphrey - Modified printPlot() and save() - replaced deprecated
    *                           static QPixmap::grabWidget with QWidget::grab. References #4304.
+   *   @history 2017-05-19 Adam Paquette - Uncommented and modified code for a help menu
+   *                           in the plotting tools. Fixes #2126 
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT
