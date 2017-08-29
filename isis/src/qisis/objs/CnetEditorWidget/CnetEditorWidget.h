@@ -199,7 +199,10 @@ namespace Isis {
        * CnetEditorWidget's configurations when saving a project.
        *  
        * @author 2017-07-25 Christopher Combs
-       *  
+       * @internal
+       *   @history 2017-07-25 Christopher Combs - Added Xml StackedHandler class
+       *                           to implement serialization of the CnetEditorWidget.
+       *                           References #4989.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
