@@ -238,6 +238,7 @@ namespace Isis {
    *   @history 2017-03-03 Tyler Wilson - Updated the oblique detector resolution function to correct
    *                           an error in the original formula, and updated the documention for this
    *                           function.  Fixes #4614.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
 
   class Camera : public Sensor {
@@ -491,8 +492,8 @@ namespace Isis {
       // of the way Radar works - there is no set focal length for the
       // instrument, so the focal length needs to be set each time the
       // slant range changes.
-      friend class RadarGroundMap;
-      friend class RadarSlantRangeMap;
+      friend class RadarGroundMap;      //!< A friend class to calculate focal length
+      friend class RadarSlantRangeMap;  //!< A friend class to calculate focal length
 
       QString m_instrumentNameLong;  //!< Full instrument name
       QString m_instrumentNameShort; //!< Shortened instrument name
@@ -524,8 +525,8 @@ namespace Isis {
       double p_maxobliqueres;                //!< The maximum oblique resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
-      bool p_groundRangeComputed;            /**!< Flag showing if ground range
-                                                  was computed successfully.*/
+      /** Flag showing if ground range was computed successfully.*/
+      bool p_groundRangeComputed;
 
       bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed
 
@@ -544,8 +545,8 @@ namespace Isis {
       double p_maxra;                        //!< The maxumum right ascension
       double p_minra180;                     //!< The minimum right ascension in the 180 domain
       double p_maxra180;                     //!< The maximum right ascension in the 180 domain
-      bool p_raDecRangeComputed;             /**!< Flag showing if the raDec range
-                                                  has been computed successfully.*/
+      /** Flag showing if the raDec range has been computed successfully.*/
+      bool p_raDecRangeComputed;
 
       double p_minRingRadius;                //!< The minimum ring radius
       double p_maxRingRadius;                //!< The maximum ring radius
@@ -553,8 +554,8 @@ namespace Isis {
       double p_maxRingLongitude;             //!< The maximum ring longitude (azimuth)
       double p_minRingLongitude180;          //!< The minimum ring longitude in the 180 domain
       double p_maxRingLongitude180;          //!< The maximum ring longitude in the 180 domain
-      bool p_ringRangeComputed;              /**!< Flag showing if ring range
-                                                  was computed successfully.*/
+      /** Flag showing if ring range was computed successfully.*/
+      bool p_ringRangeComputed;
 
       AlphaCube *p_alphaCube;                //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child
@@ -566,10 +567,10 @@ namespace Isis {
       CameraGroundMap *p_groundMap;          //!< A pointer to the GroundMap
       CameraSkyMap *p_skyMap;                //!< A pointer to the SkyMap
 
-      int p_geometricTilingStartSize; /**< The ideal geometric tile size to start with when
-                                           projecting*/
-      int p_geometricTilingEndSize;   /**< The ideal geometric tile size to end with when
-                                           projecting*/
+      /** The ideal geometric tile size to start with when projecting*/
+      int p_geometricTilingStartSize;
+      /** The ideal geometric tile size to end with when projecting*/
+      int p_geometricTilingEndSize;
 
   };
 };

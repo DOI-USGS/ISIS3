@@ -59,6 +59,7 @@ namespace Isis {
    *                           construct. Please see Camera for more information.
    *   @history 2017-7-11 Summer Stapleton - Added functionality to find the most recent (last) 
    *                           version of the camera model
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
 
   class CameraFactory {
@@ -79,7 +80,7 @@ namespace Isis {
       //! Destroys the CameraFactory object
       ~CameraFactory() {};
 
-      static Plugin m_cameraPlugin;
+      static Plugin m_cameraPlugin;   //!< The plugin file for the camera
   };
 };
 

@@ -97,6 +97,7 @@ namespace Isis {
    *                           computing output pixels coordinates.
    *   @history 2015-07-06 David Miller - Modified code to better reflect current Coding Standards.
    *                           Updated truth data. Fixes #2273
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class Chip {
     public:
@@ -109,21 +110,21 @@ namespace Isis {
       bool IsInsideChip(double sample, double line);
 
       /**
-       * @brief Return the number of samples in the chip
+       * @returns The number of samples in the chip
        */
       inline int Samples() const {
         return m_chipSamples;
       };
 
       /**
-       * @brief Return the number of lines in the chip
+       * @returns The number of lines in the chip
        */
       inline int Lines() const {
         return m_chipLines;
       };
 
       /**
-       * @brief Returns the expanded filename of the cube from which this chip was chipped.
+       * @returns The expanded filename of the cube from which this chip was chipped.
        */
       inline QString FileName() const {
         return m_filename;
@@ -154,6 +155,8 @@ namespace Isis {
        *
        * @param sample  Sample position to load (1-based)
        * @param line    Line position to load (1-based)
+       * 
+       * @returns (double) The value of the chip at the specified line/sample
        */
       inline double GetValue(int sample, int line) {
         return m_buf[line-1][sample-1];
@@ -170,6 +173,8 @@ namespace Isis {
        *
        * @param sample  Sample position to get (1-based)
        * @param line    Line position to get (1-based)
+       * 
+       * @returns (double) The value of the chip at the specified line/sample
        */
       inline double GetValue(int sample, int line) const {
         return m_buf[line-1][sample-1];
@@ -178,22 +183,22 @@ namespace Isis {
       void TackCube(const double cubeSample, const double cubeLine);
 
       /**
-       * @brief Return the fixed tack sample of the chip.
-       *
        * This method returns a chip's fixed tack sample; the middle of the chip. It is a chip
        * coordinate, not a cube coordinate. For example, a chip with 5 samples will return 3,
        * the middle pixel. A chip with 4 samples will return 2.
+       * 
+       * @returns The fixed tack sample of the chip.
        */
       inline int TackSample() const {
         return m_tackSample;
       };
 
       /**
-       * @brief Return the fixed tack line of the chip.
-       *
        * This method returns a chip's fixed tack line; the middle of the chip. It is a chip
        * coordinate, not a cube coordinate. For example, a chip with 5 lines will return 3,
        * the middle pixel. A chip with 4 lines will return 2.
+       * 
+       * @returns The fixed tack line of the chip.
        */
       inline int TackLine() const {
         return m_tackLine;
@@ -208,24 +213,32 @@ namespace Isis {
 
       void SetChipPosition(const double sample, const double line);
 
-      //! Returns cube sample after invoking SetChipPosition
+      /**
+       * @returns The cube sample after invoking SetChipPosition
+       */
       inline double CubeSample() const {
         return m_cubeSample;
       };
 
-      //! Returns cube line after invoking SetChipPosition
+      /**
+       * @returns The cube line after invoking SetChipPosition
+       */
       inline double CubeLine() const {
         return m_cubeLine;
       };
 
       void SetCubePosition(const double sample, const double line);
 
-      //! Returns chip sample after invoking SetCubePosition
+      /**
+       * @returns The chip sample after invoking SetCubePosition
+       */
       double ChipSample() const {
         return m_chipSample;
       };
 
-      //! Returns chip line after invoking SetCubePosition
+      /**
+       * @returns The chip line after invoking SetCubePosition
+       */
       double ChipLine() const {
         return m_chipLine;
       };
@@ -235,11 +248,11 @@ namespace Isis {
       bool IsValid(double percentage);
 
       /**
-       * @brief Returns whether the value at the given sample,
-       * line position is within the valid range
-       *
        * @param sample  Sample position
        * @param line    Line position
+       * 
+       * @returns (bool) Whether the value at the given sample,
+       * line position is within the valid range
        */
       inline bool IsValid(int sample, int line) {
         double value = GetValue(sample, line);
@@ -248,6 +261,15 @@ namespace Isis {
         return true;
       }
 
+      /**
+       * Return if total number of valid pixels in chip meets a specified percentage of the entire chip.
+       *
+       * @param percentage The percentage that the valid pixels percentage must exceed
+       *
+       * @return bool Returns true if the percentage of valid pixels is greater than the
+       *              specified percentage, and false if it is not
+       */
+      bool IsValid(double percentage);
       Chip Extract(int samples, int lines, int samp, int line);
       void Extract(int samp, int line, Chip &output);
       Isis::Statistics *Statistics();

@@ -15,6 +15,7 @@ namespace Isis {
    * @author 2012-08-?? Steven Lambright and Stuart Sides
    *
    * @internal
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class Color {
     public:
@@ -24,8 +25,18 @@ namespace Isis {
 
     private:
       Color();
+      /**
+       * Unused constructor?
+       * 
+       * @returns ???
+       */
       Color(const Color &);
       ~Color();
+      /**
+       * This function does not appear to be in use
+       * 
+       * @returns ???
+       */
       Color &operator=(const Color &);
   };
 }

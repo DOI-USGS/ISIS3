@@ -41,6 +41,22 @@ namespace Isis {
    *   Calculator::Negative for an example.
    */
 
+
+  //! Constructor
+  Calculator::Calculator() {
+    p_valStack = NULL;
+
+    p_valStack = new QStack< QVector<double> >();
+  }
+
+  //! Destructor
+  Calculator::~Calculator() {
+    if(p_valStack) {
+      delete p_valStack;
+      p_valStack = NULL;
+    }
+  }
+
   /**
    * Returns the nagative of the input parameter.
    *
@@ -297,21 +313,6 @@ namespace Isis {
     return (a < b) ? a : b;
   }
 
-
-  //! Constructor
-  Calculator::Calculator() {
-    p_valStack = NULL;
-
-    p_valStack = new QStack< QVector<double> >();
-  }
-
-  //! Constructor
-  Calculator::~Calculator() {
-    if(p_valStack) {
-      delete p_valStack;
-      p_valStack = NULL;
-    }
-  }
 
 
   /**
@@ -879,7 +880,11 @@ namespace Isis {
 
   // Stack methods
 
-  //! Get the current stack size
+  /**
+   * Get the current stack size
+   * 
+   * @return int Number of arguments in the stack
+   */
   int Calculator::StackSize() {
     return p_valStack->size();
   }

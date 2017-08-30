@@ -61,6 +61,7 @@ namespace Isis {
    *           min/max operations now ignore special pixels.
    *  @history 2010-04-08 Steven Lambright - Made min, max have proper
    *           implementations and vectors are now QVectors.
+   *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    */
   class Calculator {
@@ -89,8 +90,8 @@ namespace Isis {
       void MaximumPixel();
       void MinimumLine();
       void MaximumLine();
-      void Minimum2();
-      void Maximum2();
+      void Minimum2(); //!< Not implemented in Calculator.cpp
+      void Maximum2(); //!< Not implemented in Calculator.cpp
       void GreaterThan();
       void LessThan();
       void Equal();

@@ -228,6 +228,8 @@ namespace Isis {
    * that may exist in the BLOB to its appropriate double precision value.
    *
    * @param [in] value (int) Integer value to convert
+   *
+   * @returns (double) The calculated double precision value
    */
   double Blobber::int2ToDouble(int value) const {
     if (value == NULL2) return NULL8;

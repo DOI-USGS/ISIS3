@@ -87,6 +87,7 @@ namespace Isis {
    *                           scripts processors might be running when outputting files in
    *                           csv format.  Column order is important in this case.
    *                           References #476,#4100.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    **/
   class CameraPointInfo {
@@ -114,10 +115,10 @@ namespace Isis {
     private:
       bool CheckCube();
       virtual PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
-      CubeManager *m_usedCubes;
-      Cube *m_currentCube;
-      Camera *m_camera;
-      bool m_csvOutput;
+      CubeManager *m_usedCubes; //!< The cubeManager used to open the current cube
+      Cube *m_currentCube;      //!< The cube to extract camera information from
+      Camera *m_camera;         //!< The camera to extract point information from
+      bool m_csvOutput;         //!< Boolean to keep track of output format (CSV or PVL)
   };
 };
 
