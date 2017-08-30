@@ -44,7 +44,7 @@ namespace Isis {
  //     cout << "Testing RosettaVirtisCamera...\n";
 
     Pvl &lab = *cube.label();
-    PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
+//    PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
     PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
 
     QString instrumentId = inst["InstrumentId"];
