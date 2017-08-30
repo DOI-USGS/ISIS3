@@ -55,7 +55,9 @@ namespace Isis {
    *            those out and keep what it can.
    *   @history 2011-05-20 Steven Lambright To180 now catches all errors as it
    *            should and also works in more cases.
-   *
+   *   @history 2017-08-30 Ian Humphrey - Modified the BinaryOp call to release the auto_ptr
+   *                           geos returns and store it in a unique_ptr (clang c++11).
+   *                           References #4809.
    */
 
   class UniversalGroundMap;

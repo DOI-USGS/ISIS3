@@ -61,6 +61,8 @@ namespace Isis {
    *           min/max operations now ignore special pixels.
    *  @history 2010-04-08 Steven Lambright - Made min, max have proper
    *           implementations and vectors are now QVectors.
+   *  @history 2017-08-30 Tyler Wilson and Ian Humphrey - provided std:: namespace for isnan
+   *                          to fix ambiguity error when using c++11. References #4809.
    *
    */
   class Calculator {

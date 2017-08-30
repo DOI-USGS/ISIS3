@@ -278,8 +278,8 @@ namespace Isis {
    */
   double MaximumOperator(double a, double b) {
 
-    if (isnan(a)) return (a);
-    if (isnan(b)) return (b);
+    if (std::isnan(a)) return (a);
+    if (std::isnan(b)) return (b);
     return (a > b) ? a : b;
   }
 
@@ -292,8 +292,8 @@ namespace Isis {
    * @return The smaller of the two
    */
   double MinimumOperator(double a, double b) {
-    if (isnan(a)) return (a);
-    if (isnan(b)) return (b);
+    if (std::isnan(a)) return (a);
+    if (std::isnan(b)) return (b);
     return (a < b) ? a : b;
   }
 
@@ -968,7 +968,7 @@ namespace Isis {
 
     if(keepSpecials) {
       for(int i = 0; i < (int)top.size(); i++) {
-        if(isnan(top[i])) {
+        if(std::isnan(top[i])) {
           top[i] = Isis::Null;
         }
         // Test for +INFINITY
