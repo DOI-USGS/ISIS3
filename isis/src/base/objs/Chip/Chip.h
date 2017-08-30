@@ -245,7 +245,6 @@ namespace Isis {
 
       void SetValidRange(const double minimum = Isis::ValidMinimum,
                          const double maximum = Isis::ValidMaximum);
-      bool IsValid(double percentage);
 
       /**
        * @param sample  Sample position
