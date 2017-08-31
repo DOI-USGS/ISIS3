@@ -29,7 +29,10 @@
       Modified filename parameters to be cube parameters where necessary
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
+    </change>
+    <change name="Kelvin Rodriguez" date="2016-06-27">
+      Added examples
     </change>
   </history>
 
@@ -103,4 +106,58 @@
 
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief> Artificial Cube as input. </brief>
+      <description>
+        This example shows how the Outline application draws boundaries around contiguous pixels.
+      </description>
+      <terminalInterface>
+        <commandLine> IN=in.cub OUT=out.cub BOUNDARY=255 CLEAR=False EDGES=True
+        </commandLine>
+        <description>
+        This will set the borders around the contiguous pixels to 255 and will leave the pixels
+        contained within the regions at their original value.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/snapshots/input-snapshot.png" width="800" height="800">
+          <brief> Input image for outline</brief>
+          <description>
+            This is the 800 by 800 input image for the outline example.
+            This is an artificial cube for the sake of demonstration.
+          </description>
+          <thumbnail caption=" Input artificial cube." src="assets/thumbnails/input-thumbnail.png" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/snapshots/output-snapshot.png" width="800" height="800">
+          <brief> Output image for outline</brief>
+          <description>
+            This is the 800 by 800 output image demonstrating the results of Outline.
+            White lines (DN = 255) mark the boundaries between contiguous pixels.
+            This is with Clear=False, Edges=True and Boundary=255.
+          </description>
+          <thumbnail caption="Output image clearly demonstrating the boundaries created by Outline." src="assets/thumbnails/output-thumbnail.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="469" height="400" src="assets/snapshots/gui-snapshot.png">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI for yhr Outline application.
+            </description>
+            <thumbnail width="113" height="200" caption="Outline Gui" src="assets/thumbnails/gui-thumbnail.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
 </application>
