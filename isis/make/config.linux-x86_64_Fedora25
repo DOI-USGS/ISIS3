@@ -175,9 +175,9 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -isystem $(ISIS3LOCAL)/include/geos/geos3.5.0
+GEOSINCDIR = -isystem $(ISIS3LOCAL)/include/geos/geos3.5.1
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
-GEOSLIB    = -lgeos-3.5.0 -lgeos_c
+GEOSLIB    = -lgeos-3.5.1 -lgeos_c
 
 #---------------------------------------------------------------------------
 # Set up for the GNU Scientific Library (GSL).  Note that this setup
@@ -211,7 +211,7 @@ GMMLIB    =
 #---------------------------------------------------------------------------
 SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu4.3
 SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
-SUPERLULIB    = -lsuperlu_4.3 -l:libblas.so.3 -lgfortran
+SUPERLULIB    = -lsuperlu_4.3 -l:libblas.so.3 -l:libgfortran.so.3
 
 #---------------------------------------------------------------------------
 # Set up for Google Protocol Buffers (ProtoBuf)
