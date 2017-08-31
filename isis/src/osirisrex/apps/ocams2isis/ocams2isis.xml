@@ -28,6 +28,10 @@
     <change name="Jeannie Backer" date="2017-08-23">
       Updated to translate PolyCam kernels separately from other cameras. Fixes #5128
     </change>
+    <change name="Jeannie Backer" date="2017-08-25">
+      Reverted code to only deal with a single kernels translation file for all instruments. Added 
+      PolyCamFocusPositionNaifId keyoword to kernels translation file. References #5127
+    </change>
   </history>
 
   <seeAlso>

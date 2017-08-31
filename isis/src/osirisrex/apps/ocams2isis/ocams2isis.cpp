@@ -48,6 +48,7 @@ void IsisMain() {
   insXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
+
   // Create a Band Bin group
   FileName bandTransFile(transDir + "ocamsBandBin_fit.trn");
   PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
@@ -55,15 +56,7 @@ void IsisMain() {
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
   // Create a Kernels group
-  QString kernelsTransFileName = "";
-  QString instrument = outLabel.findGroup("Instrument", Pvl::Traverse)["InstrumentId"];
-  if (QString::compare(instrument, "PolyCam", Qt::CaseInsensitive) == 0) {
-    kernelsTransFileName = transDir + "ocamsPolyCamKernels_fit.trn";
-  }
-  else {
-    kernelsTransFileName = transDir + "ocamsKernels_fit.trn";
-  }
-  FileName kernelsTransFile(kernelsTransFileName);
+  FileName kernelsTransFile(transDir + "ocamsKernels_fit.trn");
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));

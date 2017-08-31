@@ -43,7 +43,10 @@ void testLineSamp(Camera *cam, double sample, double line);
  *   @history 2015-11-10 Stuart C. Sides - Original version (PolyCam test).
  *   @history 2016-12-27 Jeannie Backer - Added test for MapCam. Added placeholder
  *                           for SamCam test (when we have an image we can spiceinit).
- *
+ *   @history 2017-08-29 Jeannie Backer - Added test for PolyCam and MapCam with
+ *                           PolyCamFocusPositionNaifId keyword.
+ *   
+ * 
  */
 
 int main(void) {
@@ -52,22 +55,36 @@ int main(void) {
   cout << "Unit Test for OsirisRexOcamsCamera..." << endl;
   try {
 
-    cout << "\nTesting PolyCam..." << endl;
+    cout << "\nTesting PolyCam (backwards compatibility)..." << endl;
     Cube polyCamCube("$osirisrex/testData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
     double knownLat = 13.9465663689936950;
     double knownLon = 349.0213035062322433;
     double sample = 512.0; 
     double line = 512.0;
     testCamera(polyCamCube, sample, line, knownLat, knownLon);
+    cout << "\nTesting PolyCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
+    Cube polyCamCube2("$osirisrex/testData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
+    knownLat = -5.5191879351483450;
+    knownLon = 349.6939492565607566;
+    sample = 512.0; 
+    line = 512.0;
+    testCamera(polyCamCube2, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
 
-    cout << "\nTesting MapCam..." << endl;
+    cout << "\nTesting MapCam (backwards compatibility)..." << endl;
     Cube mapCamCube("$osirisrex/testData/D19030320000.cub", "r");
     knownLat = 73.9976065262802933;
     knownLon = 149.3814386120742768;
     sample = 512.0; 
     line = 512.0;
     testCamera(mapCamCube, sample, line, knownLat, knownLon);
+    cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
+    Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
+    knownLat = -19.2944483457740930;
+    knownLon = 145.9504680080907804;
+    sample = 512.0; 
+    line = 512.0;
+    testCamera(mapCamCube2, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
 
 /*
@@ -93,7 +110,7 @@ void testCamera(Cube &cube,
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *) CameraFactory::Create(cube);
   cout << "FileName: " << FileName(cube.fileName()).name() << endl;
-  cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
+  cout << "NAIF Frame ID: " << cam->instrumentRotation()->Frame() << endl << endl;
   cout.setf(std::ios::fixed);
   cout << setprecision(9);
 
@@ -168,8 +185,8 @@ void testLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = " << deltaLine << endl << endl;
   }
   else {
-    cout << "DeltaSample = ERROR" << endl;
-    cout << "DeltaLine = ERROR" << endl << endl;
+    cout << "DeltaSample = NO INTERSECTION" << endl;
+    cout << "DeltaLine = NO INTERSECTION" << endl << endl;
   }
 }
 
