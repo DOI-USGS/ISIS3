@@ -172,7 +172,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.5.0
+GEOSINCDIR = -isystem $(ISIS3LOCAL)/include/geos/geos3.5.0
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
 GEOSLIB    = -lgeos-3.5.0 -lgeos_c
 
