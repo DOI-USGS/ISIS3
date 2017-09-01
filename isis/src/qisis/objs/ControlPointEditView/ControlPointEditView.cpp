@@ -95,6 +95,7 @@ namespace Isis {
    * Destructor
    */
   ControlPointEditView::~ControlPointEditView() {
+    delete m_controlPointEditWidget;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -111,7 +112,7 @@ namespace Isis {
    * @return (ControlPointEditWidget *) The ControlPointEditWidget used to
    *         display the footprints.
    */
-  ControlPointEditWidget *ControlPointEditView::controlPointEditWidget() const {
+  ControlPointEditWidget *ControlPointEditView::controlPointEditWidget() {
     return m_controlPointEditWidget;
   }
 

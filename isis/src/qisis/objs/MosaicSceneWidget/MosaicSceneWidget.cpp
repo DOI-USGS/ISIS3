@@ -118,7 +118,7 @@ namespace Isis {
     MosaicControlNetTool *cnetTool = new MosaicControlNetTool(this);
     m_tools->append(cnetTool);
 
-    //  Pass on Signals emitted from IpceTool
+    //  Pass on Signals emitted from MosaicControlNetTool
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
     connect(cnetTool, SIGNAL(modifyControlPoint(ControlPoint *)),
             this, SIGNAL(modifyControlPoint(ControlPoint *)));
@@ -130,23 +130,7 @@ namespace Isis {
             this, SIGNAL(createControlPoint(double, double)));
 
     // Pass on signals to the MosaicControlNetTool
-    connect(this, SIGNAL(controlPointAdded(QString)),
-            cnetTool, SLOT(displayNewControlPoint(QString)));
-
-//
-//  connect( this, SIGNAL( controlPointChanged(QString) ),
-//           m_tools->last(), SLOT( displayChangedControlPoint(QString) ) );
-//
-//  // Tell the editor that we want to delete a point.
-//  connect( m_tools->last(), SIGNAL( deleteControlPoint(QString) ),
-//           this, SIGNAL( deleteControlPoint(QString) ) );
-//
-//  // Tell the tool that the editor deleted the point and it can redraw.
-//  connect( this, SIGNAL( controlPointDeleted() ),
-//           m_tools->last(), SLOT( displayUponControlPointDeletion() ) );
-//
-//     delete control point from scene
-    
+    connect(this, SIGNAL(cnetModified()), cnetTool, SLOT(rebuildPointGraphics()));
         
     m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));
@@ -1296,6 +1280,8 @@ namespace Isis {
 
       connect(mosItem, SIGNAL(changed(const QList<QRectF> &)),
               m_graphicsView, SLOT(updateScene(const QList<QRectF> &)));
+      connect(mosItem, SIGNAL(mosaicCubeClosed(Image *)), 
+              this, SIGNAL(mosCubeClosed(Image *)));
 
       // We want everything to have a unique Z value so we can manage the z order
       //   well.

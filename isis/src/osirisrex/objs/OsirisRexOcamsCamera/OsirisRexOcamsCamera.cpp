@@ -20,6 +20,7 @@
 
 #include "OsirisRexOcamsCamera.h"
 
+#include <QDebug>
 #include <QString>
 
 #include "CameraDetectorMap.h"
@@ -48,32 +49,46 @@ namespace Isis {
     m_spacecraftNameLong = "OSIRIS-REx";
     m_spacecraftNameShort = "OSIRIS-REx";
 
-    int ikCode = naifIkCode();
+    // The general IK code will be used to retrieve the transx,
+    // transy, transs and transl from the iak. The focus position specific
+    // IK code will be used to find pixel pitch and ccd center in the ik.
+    int frameCode = naifIkCode();
 
-    if (ikCode == -64361) {
+    if (frameCode == -64361) {
       m_instrumentNameLong = "Mapping Camera";
       m_instrumentNameShort = "MapCam";
     }
-    else if (ikCode <= -64362) {
+    else if (frameCode == -64362) {
       m_instrumentNameLong = "Sampling Camera";
       m_instrumentNameShort = "SamCam";
-    }
-    else if (ikCode <= -64360) {
+    } // IK values for polycam: -64360 (general) and -64616 to -64500 (focus specific)
+    else if (frameCode == -64360) {
       m_instrumentNameLong = "PolyMath Camera";
       m_instrumentNameShort = "PolyCam";
     }
+    else {
+      QString msg = "Unable to construct OSIRIS-REx camera model. "
+                    "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
+    Pvl &lab = *cube.label();
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    QString ikCode = toString(frameCode);
+    if (inst.hasKeyword("PolyCamFocusPositionNaifId")) {
+      if (QString::compare("NONE", inst["PolyCamFocusPositionNaifId"], Qt::CaseInsensitive) != 0) {
+        ikCode = inst["PolyCamFocusPositionNaifId"][0];
+      }
+    }
 
-    SetFocalLength();
+    QString focalLength = "INS" + ikCode + "_FOCAL_LENGTH";
+    SetFocalLength(getDouble(focalLength));
 
     // The instrument kernel contains pixel pitch in microns, so convert it to mm.
-    QString pitch = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
+    QString pitch = "INS" + ikCode + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(pitch) / 1000.0);
 
     // Get the start time in et
-    Pvl &lab = *cube.label();
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-
     // Set the observation time and exposure duration
     QString clockCount = inst["SpacecraftClockStartCount"];
     double startTime = getClockTime(clockCount).Et();
@@ -86,14 +101,15 @@ namespace Isis {
     // Setup detector map
     new CameraDetectorMap(this);
 
-    // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    // Setup focal plane map using the general IK code for the given camera
+    // Note that this is not the specific naifIkCode() value for PolyCam
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, frameCode);
 
     // The instrument kernel contains a CCD_CENTER keyword instead of BORESIGHT_LINE
     // and BORESIGHT_SAMPLE keywords.
     focalMap->SetDetectorOrigin(
-        Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER", 0) + 1.0,
-        Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER", 1) + 1.0);
+        Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 0) + 1.0,
+        Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
 
     // Setup distortion map
     new CameraDistortionMap(this);

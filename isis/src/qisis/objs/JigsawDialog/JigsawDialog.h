@@ -74,6 +74,9 @@ namespace Isis {
    *   @history 2017-05-16 Tracie Sucharski - Disable Close button if jigsaw has been run, force
    *                           selection of accept or reject.  Once a choice has been made,
    *                           re-enable the Close button.
+   *   @history 2017-06-14 Ken Edmundson - Write text summary file.
+   *   @history 2017-07-27 Cole Neubauer - Added a project->setClean call if the bundle results are
+   *                           accepted. Fixes #4960
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT

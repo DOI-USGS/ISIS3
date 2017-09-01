@@ -27,6 +27,7 @@ namespace Isis {
 
     connect(m_viewport, SIGNAL(progressChanged(int)),
             progressBar, SLOT(setValue(int)));
+    connect(m_viewport, SIGNAL(progressComplete()), progressBar, SLOT(hide()));
     connect(this, SIGNAL(closeViewport(CubeViewport *)),
             m_viewport, SIGNAL(viewportClosed(CubeViewport *)));
     widget()->layout()->addWidget(progressBar);

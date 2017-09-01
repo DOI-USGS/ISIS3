@@ -44,6 +44,11 @@ namespace Isis {
    *   @history 2016-12-27 Jeannie Backer - Fixed coding standards. Improved docuementation.
    *                           Fixed CKFrameId() to return the spacecraft ID rather than the MapCam
    *                           ID. Added tests. Moved from branch into trunk. Fixes #4570.
+   *   @history 2017-08-25 Jeannie Backer - Updated to handle multiple focus postition IK
+   *                           codes for PolyCam frames. We read PolyCamFocusPositionNaifId from
+   *                           the Instrument group for focus position specific values (such ase
+   *                           focal length) and we read NaifFrameId from the Kernels group the
+   *                           instrument frame code. Fixes #5127
    *
    */
   class OsirisRexOcamsCamera : public FramingCamera {

@@ -104,11 +104,10 @@ namespace Isis {
    *     @history 2016-07-25 Tracie Sucharksi - Added support for Shapes.
    *     @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    *     @history 2016-11-10 Tyler Wilson - Changed the alias reference to the
-   *                               the data management icon from 'data' to
-   *                               'data-management' in the setProject function.
-   *                               A naming conflict was causing strange warnings
-   *                               to show up on the command line when cnetsuite is launched,
-   *                               and this fixed it.  Fixes #3982.
+   *                             the data management icon from 'data' to 'data-management' in the
+   *                             setProject function. A naming conflict was causing strange warnings
+   *                             to show up on the command line when ipce is launched, and this
+   *                             fixed it.  Fixes #3982.
    *     @history 2016-12-02 Tracie Sucharski - Added ability to change text color for and item.
    *     @history 2017-04-17 Tracie Sucharski - Turn off editing on all items except for the project
    *                               name.
@@ -120,6 +119,17 @@ namespace Isis {
    *     @history 2017-05-04 J Bonn -Added FileItem to project tree. Fixes #4838.
    *     @history 2017-05-04 Tracie Sucharski - Added isFileItem and fileItem methods and member
    *                           variables needed for WorkOrders.  Fixes #4839. Fixes #4840.
+   *     @history 2017-06-14 Ken Edmundson - Added constructor for FileItem type, including a
+   *                             tooltip.
+   *     @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image
+   *                             imports, shape imports, and bundle solution info. Fixes #4855,
+   *                             #4979, #4980.
+   *     @history 2017-08-03 Cole Neubauer - Explicitely set the color of each new ProjectItem to
+   *                             Qt::Black Fixes #5095
+   *     @history 2017-08-11 Christopher Combs - Added isTemplate() and setTemplate() to allow for
+   *                             imported templates to show on the project tree. Fixes #5086.
+   *     @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                             source images. Fixes #5105.
    *
    */
   class ProjectItem : public QStandardItem {
@@ -146,7 +156,7 @@ namespace Isis {
       ProjectItem(TargetBodyQsp targetBody);
       ProjectItem(TargetBodyList *targetBodyList);
       ProjectItem(FileItemQsp filename, QString treeText, QIcon icon);
-
+      ProjectItem(FileItemQsp filename, QString treeText, QString toolTipText, QIcon icon);
 
       ~ProjectItem();
 
@@ -179,6 +189,7 @@ namespace Isis {
       bool isGuiCamera() const;
       bool isTargetBody() const;
       bool isFileItem() const;
+      bool isTemplate() const;
 
       void setProjectItem(ProjectItem *item);
       void setBundleResults(BundleResults bundleResults);
@@ -201,6 +212,7 @@ namespace Isis {
       void setSpacecraft();
       void setTargetBody(TargetBodyQsp targetBody);
       void setTargetBodyList();
+      void setTemplate();
 
       ProjectItem *findItemData(const QVariant &value, int role = Qt::UserRole+1);
 

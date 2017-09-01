@@ -34,6 +34,8 @@ namespace Isis {
 
   /**
    * Creates a Camera object using Pvl Specifications
+   * 
+   * @param cube The original cube with the current version camera model
    *
    * @return Camera* The Camera object created
    *
@@ -99,6 +101,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Reads the appropriate plugin file for the camera
+   */
   void CameraFactory::initPlugin() {
     if (m_cameraPlugin.fileName() == "") {
       FileName localFile("Camera.plugin");
@@ -113,9 +118,9 @@ namespace Isis {
 
 
   /**
-   * This looks up the current camera model version from the cube labels.
+   * This looks up the current camera model version from the cube.
    *
-   * @param lab Input Cube Labels
+   * @param cube Input cube
    *
    * @return int Latest Camera Version
    */
@@ -124,6 +129,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Looks up the current camera model version in the pvl labels.
+   * 
+   * @param lab The pvl labels
+   * 
+   * @returns The current camera model version
+   */
   int CameraFactory::CameraVersion(Pvl &lab) {
     // Try to load a plugin file in the current working directory and then
     // load the system file

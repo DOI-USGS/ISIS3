@@ -40,6 +40,8 @@ namespace Isis {
     m_id = new QUuid(QUuid::createUuid());
 
     m_runTime = "";
+    
+    m_name = m_runTime; 
 
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
 
@@ -64,6 +66,7 @@ namespace Isis {
                                          //TODO does xml stuff need project???
     m_id = new QUuid(QUuid::createUuid());
     m_runTime = "";
+    m_name = m_runTime;
     m_controlNetworkFileName = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
@@ -81,6 +84,7 @@ namespace Isis {
    */
   BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
       : m_id(new QUuid(QUuid::createUuid())),
+        m_name(src.m_name),
         m_runTime(src.m_runTime),
         m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
@@ -126,6 +130,13 @@ namespace Isis {
       m_id = new QUuid(QUuid::createUuid());
 
       m_runTime = src.m_runTime;
+      
+      if (src.m_name == "" || src.m_name == src.m_runTime) {
+        m_name = m_runTime;
+      }
+      else {
+        m_name = src.m_name;
+      }
 
       delete m_controlNetworkFileName;
       m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
@@ -197,7 +208,7 @@ namespace Isis {
 
 
   /**
-   * Sets the run time
+   * Sets the run time, and the name if a name is not already set.
    *
    * @param runTime The run time.
    */
@@ -212,6 +223,9 @@ namespace Isis {
     //                    _FILEINFO_);
     // }
     m_runTime = runTime;
+    if (m_name == m_runTime || m_name == "") {
+      m_name = runTime;
+    }
   }
 
 
@@ -263,13 +277,35 @@ namespace Isis {
     }
   }
 
-/**
-* Returns the images used in the bundle
-*
-* @return m_imageList The image list used in the bundle
-*/
+  
+  /**
+   * Returns the images used in the bundle
+   *
+   * @return m_imageList The image list used in the bundle
+   */
   QList<ImageList *> BundleSolutionInfo::imageList() {
     return *m_images;
+  }
+  
+  
+  /**
+   * Sets the name of the bundle.
+   * 
+   * @param name QString of the new name
+   */
+  void BundleSolutionInfo::setName(QString name) {
+    m_name = name;
+  }
+  
+  
+  /** 
+   * Returns the name of the bundle. The name defaults to the id, unless the name has been set using 
+   * setName()
+   * 
+   * @return QString Name of the bundle
+   */
+  QString BundleSolutionInfo::name() const {
+    return m_name;
   }
 
 
@@ -1433,6 +1469,7 @@ namespace Isis {
     // save ID, cnet file name, and run time to stream
     stream.writeStartElement("generalAttributes");
     stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
     stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
     stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
@@ -1547,6 +1584,9 @@ namespace Isis {
       assert(m_xmlHandlerBundleSolutionInfo->m_id);
       delete m_xmlHandlerBundleSolutionInfo->m_id;
       m_xmlHandlerBundleSolutionInfo->m_id = new QUuid(m_xmlHandlerCharacters);
+    }
+    else if (localName == "name") {
+      m_xmlHandlerBundleSolutionInfo->m_name = m_xmlHandlerCharacters;
     }
     else if (localName == "runTime") {
       m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;

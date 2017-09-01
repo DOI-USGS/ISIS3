@@ -15,82 +15,80 @@ class QPushButton;
 class QReadWriteLock;
 
 namespace Isis {
+  class AbstractFilter;
   class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
 
-  namespace CnetViz {
-    class AbstractFilter;
+  /**
+   * @brief Base class for filter selectors
+   *
+   * Filter selectors are combo boxes with filters as elements. A filter
+   * selector has only one active filter at a time. These allow the user to
+   * choose which filter to apply to the control net.
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+   *   @history 2015-11-16 Ian Humphrey - Removed embedded close button icon. References #1041.
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   */
+  class AbstractFilterSelector : public QWidget {
+      Q_OBJECT
 
-    /**
-     * @brief Base class for filter selectors
-     *
-     * Filter selectors are combo boxes with filters as elements. A filter
-     * selector has only one active filter at a time. These allow the user to
-     * choose which filter to apply to the control net.
-     *
-     * @author ????-??-?? Eric Hyer
-     *
-     * @internal
-     *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-     *   @history 2015-11-16 Ian Humphrey - Removed embedded close button icon. References #1041.
-     */
-    class AbstractFilterSelector : public QWidget {
-        Q_OBJECT
-
-      signals:
-        void close(AbstractFilterSelector *);
-        void filterChanged();
-        void sizeChanged();
+    signals:
+      void close(AbstractFilterSelector *);
+      void filterChanged();
+      void sizeChanged();
 
 
-      public:
-        AbstractFilterSelector();
-        virtual ~AbstractFilterSelector();
+    public:
+      AbstractFilterSelector();
+      virtual ~AbstractFilterSelector();
 
-        template< typename Evaluatable >
-        bool evaluate(const Evaluatable *evaluatable) const {
-          return m_filter && m_filter->evaluate(evaluatable);
-        }
+      template< typename Evaluatable >
+      bool evaluate(const Evaluatable *evaluatable) const {
+        return m_filter && m_filter->evaluate(evaluatable);
+      }
 
-        bool hasFilter() const;
-        bool hasFilter(bool (AbstractFilter:: *)() const) const;
+      bool hasFilter() const;
+      bool hasFilter(bool (AbstractFilter:: *)() const) const;
 
-        QString getDescription(QString(AbstractFilter:: *)() const) const;
+      QString getDescription(QString(AbstractFilter:: *)() const) const;
 
-        AbstractFilterSelector &operator=(const AbstractFilterSelector &other);
-
-
-      public slots:
-        void sendClose();
+      AbstractFilterSelector &operator=(const AbstractFilterSelector &other);
 
 
-      protected:
-        void nullify();
-        virtual void createSelector();
-        QComboBox *getSelector() const;
-        QHBoxLayout *getMainLayout() const;
-        AbstractFilter *getFilter() const;
-        void setFilter(AbstractFilter *);
+    public slots:
+      void sendClose();
 
 
-      protected slots:
-        virtual void changeFilter(int index) = 0;
-        virtual void deleteFilter();
+    protected:
+      void nullify();
+      virtual void createSelector();
+      QComboBox *getSelector() const;
+      QHBoxLayout *getMainLayout() const;
+      AbstractFilter *getFilter() const;
+      void setFilter(AbstractFilter *);
 
 
-        // disable copying of this class which can't exist anyway ....uhhuh...yeah
-      private:
-        AbstractFilterSelector(const AbstractFilterSelector &other);
+    protected slots:
+      virtual void changeFilter(int index) = 0;
+      virtual void deleteFilter();
 
 
-      private:
-        QComboBox *m_selector;
-        QHBoxLayout *m_mainLayout;
-        QPushButton *m_closeButton;
-        AbstractFilter *m_filter;
-    };
-  }
+      // disable copying of this class which can't exist anyway ....uhhuh...yeah
+    private:
+      AbstractFilterSelector(const AbstractFilterSelector &other);
+
+
+    private:
+      QComboBox *m_selector;
+      QHBoxLayout *m_mainLayout;
+      QPushButton *m_closeButton;
+      AbstractFilter *m_filter;
+  };
 }
 
 #endif

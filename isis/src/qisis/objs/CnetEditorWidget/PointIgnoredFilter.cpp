@@ -11,68 +11,66 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    PointIgnoredFilter::PointIgnoredFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
-    }
+  PointIgnoredFilter::PointIgnoredFilter(
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+  }
 
 
-    PointIgnoredFilter::PointIgnoredFilter(const AbstractFilter &other)
-      : AbstractFilter(other) {
-    }
+  PointIgnoredFilter::PointIgnoredFilter(const AbstractFilter &other)
+    : AbstractFilter(other) {
+  }
 
 
-    PointIgnoredFilter::~PointIgnoredFilter() {
-    }
+  PointIgnoredFilter::~PointIgnoredFilter() {
+  }
 
 
-    bool PointIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
-      return AbstractFilter::evaluateImageFromPointFilter(node);
-    }
+  bool PointIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return AbstractFilter::evaluateImageFromPointFilter(node);
+  }
 
 
-    bool PointIgnoredFilter::evaluate(const ControlPoint *point) const {
-      return AbstractFilter::evaluate(point, &ControlPoint::IsIgnored);
-    }
+  bool PointIgnoredFilter::evaluate(const ControlPoint *point) const {
+    return AbstractFilter::evaluate(point, &ControlPoint::IsIgnored);
+  }
 
 
-    bool PointIgnoredFilter::evaluate(const ControlMeasure *measure) const {
-      return true;
-    }
+  bool PointIgnoredFilter::evaluate(const ControlMeasure *measure) const {
+    return true;
+  }
 
 
-    AbstractFilter *PointIgnoredFilter::clone() const {
-      return new PointIgnoredFilter(*this);
-    }
+  AbstractFilter *PointIgnoredFilter::clone() const {
+    return new PointIgnoredFilter(*this);
+  }
 
 
-    QString PointIgnoredFilter::getImageDescription() const {
-      QString description = AbstractFilter::getImageDescription();
+  QString PointIgnoredFilter::getImageDescription() const {
+    QString description = AbstractFilter::getImageDescription();
 
-      if (getMinForSuccess() == 1)
-        description += "point that is ";
-      else
-        description += "points that are ";
+    if (getMinForSuccess() == 1)
+      description += "point that is ";
+    else
+      description += "points that are ";
 
-      if (inclusive())
-        description += "ignored";
-      else
-        description += "not ignored";
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
 
-      return description;
-    }
+    return description;
+  }
 
 
-    QString PointIgnoredFilter::getPointDescription() const {
-      QString description = "are ";
+  QString PointIgnoredFilter::getPointDescription() const {
+    QString description = "are ";
 
-      if (inclusive())
-        description += "ignored";
-      else
-        description += "not ignored";
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
 
-      return description;
-    }
+    return description;
   }
 }

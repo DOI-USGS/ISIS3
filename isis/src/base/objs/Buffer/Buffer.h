@@ -64,6 +64,7 @@ namespace Isis {
    *                           also. References #961.
    *   @history 2012-11-19 Steven Lambright - Added CopyOverlapFrom() for use as a quicker IO
    *                           than going back to Cube. References #1232.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class Buffer {
     public:

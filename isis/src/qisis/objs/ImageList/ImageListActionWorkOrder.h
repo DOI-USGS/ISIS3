@@ -55,6 +55,8 @@ namespace Isis {
    *   @history 2016-06-08 Jesse Mapel - Added documentation.  Fixes #3995.
    *   @history 2017-04-07 Makayla Shepherd - Renamed syncRedo() to execute() and syncUndo() to 
    *                           undoExecution() according to the WorkOrder redesign.
+   *   @history 2017-08-04 Marjorie Hahn - Added Bring to Front, Bring Forward, Send to Back, Send 
+   *                           Backwards, and Zoom Fit actions. Fixes #5055.
    */
   class ImageListActionWorkOrder : public WorkOrder {
     Q_OBJECT
@@ -64,14 +66,21 @@ namespace Isis {
        * Type of action to be performed by the work order
        */
       enum Action {
-        UnknownAction = 0,  //!< Unkown action
+        UnknownAction = 0,  //!< Unknown action
         ChangeTransparency, //!< Change the alpha values of the image list
         ChangeColor,        //!< Change the color values of the image list
         RandomizeColor,     //!< Set each image in the list to a random color
         ToggleShowLabel,    //!< Show or hide each image's display name
         ToggleShowFilled,   //!< Show or hide each image's fill area
         ToggleShowCubeData, //!< Show or hide each image's DNs
-        ToggleShowOutline   //!< Show or hide each image's outline
+        ToggleShowOutline,  //!< Show or hide each image's outline
+        MoveToTop,          //!< Move the image to the front 
+        MoveUpOne,          //!< Move the image forward
+        MoveToBottom,       //!< Move the image to the back
+        MoveDownOne,        //!< Move the image backward
+        ZoomFit,            //!< Zoom in on the image so that it fits the screen
+        FirstAction = UnknownAction,
+        LastAction = ZoomFit,
       };
 
       ImageListActionWorkOrder(Project *project);

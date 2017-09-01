@@ -36,12 +36,18 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order to import a shape model.
+   *
+   * @param *project Pointer to the project this work order belongs to
+   */
   ImportShapesWorkOrder::ImportShapesWorkOrder(Project *project) :
       WorkOrder(project) {
     // This workorder is synchronous and undoable.
     m_isUndoable = true;
     m_isSynchronous = false;
     m_newShapes = NULL;
+    m_list = NULL;
 
     QAction::setText(tr("Import &Shape Models..."));
     QUndoCommand::setText(tr("Import Shape Models"));
@@ -49,21 +55,53 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates a copy of the other ImportShapesWorkOrder
+   *
+   * @param &other ImportShapesWorkOrder to copy the state from
+   */
   ImportShapesWorkOrder::ImportShapesWorkOrder(const ImportShapesWorkOrder &other) :
       WorkOrder(other) {
     m_newShapes = NULL;
+    m_list = other.m_list;
   }
 
 
+  /**
+   * Destructor
+   */
   ImportShapesWorkOrder::~ImportShapesWorkOrder() {
     delete m_newShapes;
     m_newShapes = NULL;
+
+    delete m_list;
+    m_list = NULL;
   }
 
 
+  /**
+   * This method clones the current ImportShapesWorkOrder and returns it.
+   *
+   * @return ImportShapesWorkOrder Clone
+   */
   ImportShapesWorkOrder *ImportShapesWorkOrder::clone() const {
     return new ImportShapesWorkOrder(*this);
   }
+
+
+  /**
+   * This method returns true if the user clicked on a project tree node with the text "Shapes".
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are
+   * appended to context menus.
+   *
+   * @param item The ProjectItem that was clicked
+   *
+   * @return bool True if the user clicked on a project tree node named "Shapes"
+   */
+  bool ImportShapesWorkOrder::isExecutable(ProjectItem *item) {
+    return (item->text() == "Shapes");
+  }
+
 
   /**
    * @brief Prompt the user for shape files to import and whether to copy DN data in to project.
@@ -94,10 +132,16 @@ namespace Isis {
       foreach (FileName fileName, fileNames) {
         if (fileName.extension() == "lis") {
           TextFile listFile(fileName.expanded());
+          QString path = fileName.path();
           QString lineOfListFile;
 
           while (listFile.GetLine(lineOfListFile)) {
-            stateToSave.append(lineOfListFile);
+            if (lineOfListFile.contains(path)){
+              stateToSave.append(lineOfListFile);
+            }
+            else {
+              stateToSave.append(path + "/" + lineOfListFile);
+            }
           }
         }
         else {
@@ -140,26 +184,27 @@ namespace Isis {
     * Note: postUndoExecution() deletes shapes from project.
     */
   void ImportShapesWorkOrder::undoExecution() {
-    project()->waitForShapeReaderFinished();
-    ShapeList *list = project()->shapes().last();
-    // Remove the shapes from disk.
-    list->deleteFromDisk(project());
-    // Remove the shapes from the model, which updates the tree view.
-    ProjectItem *currentItem =
-        project()->directory()->model()->findItemData(QVariant::fromValue(list));
-    project()->directory()->model()->removeItem(currentItem);
+    if (m_list && project()->shapes().size() > 0 ) {
+      project()->waitForShapeReaderFinished();
+      // Remove the shapes from disk.
+      m_list->deleteFromDisk( project() );
+      // Remove the shapes from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData( QVariant::fromValue(m_list) );
+      project()->directory()->model()->removeItem(currentItem);
+    }
   }
 
   /**
     * @brief delete the imported shapes from the project.
     */
   void ImportShapesWorkOrder::postUndoExecution() {
-    QPointer<ShapeList> shapesWeAdded = project()->shapes().last();
-
-    foreach (Shape *shape, *shapesWeAdded) {
-      delete shape;
+    if (m_list && project()->shapes().size() > 0 ) {
+      foreach (Shape *shape, *m_list) {
+        delete shape;
+      }
+      delete m_list;
     }
-    delete shapesWeAdded;
   }
 
   /**
@@ -169,6 +214,7 @@ namespace Isis {
   void ImportShapesWorkOrder::execute() {
     if (internalData().count() > 0) {
       importConfirmedShapes(internalData().mid(1), (internalData()[0] == "copy"));
+      project()->setClean(false);
     }
   }
 
@@ -178,11 +224,15 @@ namespace Isis {
     * If there was an error on import display a error message to the user.
     */
   void ImportShapesWorkOrder::postExecution() {
-    if (!m_newShapes->isEmpty()) {
+    if (m_newShapes && !m_newShapes->isEmpty()) {
       project()->addShapes(*m_newShapes);
+      m_list = project()->shapes().last();
 
       delete m_newShapes;
       m_newShapes = NULL;
+    }
+    else {
+      project()->undoStack()->undo();
     }
 
     if (m_warning != "") {
@@ -191,6 +241,13 @@ namespace Isis {
   }
 
 
+  /**
+   * OriginalFileToProjectFunctor constructor
+   *
+   * @param *guiThread The thread for the gui
+   * @param destinationFolder The folder to copy the DN data to
+   * @param copyDnData Determines if the DN data will be copied to the project
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::OriginalFileToProjectCubeFunctor(
       QThread *guiThread, QDir destinationFolder, bool copyDnData) : m_errors(new IException),
       m_numErrors(new int(0)) {
@@ -200,6 +257,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Copy constructor
+   *
+   * @param &other OriginalFileToProjectCubeFunctor to copy
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::OriginalFileToProjectCubeFunctor(
       const OriginalFileToProjectCubeFunctor &other) : m_errors(other.m_errors),
       m_numErrors(other.m_numErrors) {
@@ -209,6 +271,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor
+   */
   ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::~OriginalFileToProjectCubeFunctor() {
     m_destinationFolder = QDir();
     m_copyDnData = false;
@@ -216,6 +281,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates ecubs and copies the DN data of the cubes, if m_copyDnData is true.
+   *
+   * @param &original Imported shape cube
+   *
+   * @return Cube Copy of the imported shape cube
+   */
   Cube *ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::operator()(
       const FileName &original) {
     Cube *result = NULL;
@@ -260,6 +332,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the errors from importing
+   *
+   * @return IException The import errors
+   */
   IException ImportShapesWorkOrder::OriginalFileToProjectCubeFunctor::errors() const {
     IException result;
 

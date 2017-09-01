@@ -55,15 +55,29 @@ namespace Isis {
    *
    * @author 2014-06-25 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
    *                           query for shapes and other data from the project.
    *   @history 2017-01-05 Tracie Sucharski - Allow a new ground source location to be entered which
    *                           includes allowing the option to change the location in the active
    *                           control for all ground points.
-   *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
-   *                           SerialNumberList.remove()
+   *   @history 2017-05-18 Tracie Sucharski - Added serialNumber to the setEditPoint slot.
+   *   @history 2017-08-02 Tracie Sucharski - Added methods to return the current editPoint and
+   *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
+   *                           #5008.
+  *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+  *                            SerialNumberList.remove()
+   *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
+   *                           measures in the ChipViewports. Fixes #5070.
+   *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to
+   *                           the dialog. Fixes #5066.
+   *   @history 2017-08-11 Tracie Sucharski - Added shortcuts for Save Point, Save Net.
+   *                           Fixes #4982.
+   *   @history 2017-08-11 Tracie Sucharski - Fixed save point and colorization of buttons.
+   *                           Fixes #4984.
+   *   @history 2017-08-15 Tracie Sucharski - When ControlPoint is deleted, set the visibility of
+   *                           this widget to false, then to true in loadPoint().  Fixes #5073.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -72,30 +86,8 @@ namespace Isis {
       ControlPointEditWidget(Directory *directory, QWidget *parent, bool addMeasures = false);
       virtual ~ControlPointEditWidget();
 
-      //! Measure column values for the measure table
-      enum MeasureColumns{
-        FILENAME,
-        CUBESN,
-        SAMPLE,
-        LINE,
-        APRIORISAMPLE,
-        APRIORILINE,
-        SAMPLERESIDUAL,
-        LINERESIDUAL,
-        RESIDUALMAGNITUDE,
-        SAMPLESHIFT,
-        LINESHIFT,
-        PIXELSHIFT,
-        GOODNESSOFFIT,
-        IGNORED,
-        EDITLOCK,
-        TYPE
-      };
-      //! Number of entries (columns) in the measure table
-      static const int NUMCOLUMNS = 16;
-
-      QString measureColumnToString(MeasureColumns column);
-
+      QString editPointId();
+      ControlPoint *editPoint();
 
     signals:
       void controlPointChanged(QString pointId);
@@ -103,7 +95,7 @@ namespace Isis {
       void ignorePointChanged();
       void ignoreLeftChanged();
       void ignoreRightChanged();
-      void netChanged();
+      void cnetModified();
       void newControlNetwork(ControlNet *);
       void stretchChipViewport(Stretch *, CubeViewport *);
       void measureChanged();
@@ -112,22 +104,21 @@ namespace Isis {
     public slots:
       void setSerialNumberList(SerialNumberList *snList);
       void setControl(Control *control);
-      void setEditPoint(ControlPoint *controlPoint);
+      void setEditPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deletePoint(ControlPoint *controlPoint);
 
       void createControlPoint(double latitude, double longitude, Cube *cube = 0,
                               bool isGroundSource = false);
 
       void updatePointInfo(ControlPoint &updatedPoint);
-//    void refresh();
 
     protected:
       bool eventFilter(QObject *o,QEvent *e);
 
     private slots:
 //    void enterWhatsThisMode();
+      void reloadPoint();
       void saveNet();
-//    void saveAsNet();
 //    void addMeasure();
 //    void setPointType (int pointType);
       void setLockPoint (bool ignore);
@@ -164,7 +155,7 @@ namespace Isis {
     private:
       void createActions();
 
-      void loadPoint();
+      void loadPoint(QString serialNumber = "");
       void loadMeasureTable();
       void createPointEditor(QWidget *parent, bool addMeasures);
       QSplitter * createTopSplitter();
@@ -190,7 +181,7 @@ namespace Isis {
 
       QString m_cnetFileName; //!< Filename of the control network that is being modified
       QPointer<QLabel> m_cnetFileNameLabel; //!< Label with name of the control network file
-      bool m_netChanged; //!< Indicates if the control network has been modified
+      bool m_cnetModified; //!< Indicates if the control network has been modified
 
       QPointer<QAction> m_closePointEditor; //!< Action to close the point editor
 
@@ -205,6 +196,7 @@ namespace Isis {
       //! Pointer to control measure editor widget
       QPointer<ControlMeasureEditWidget> m_measureEditor;
 
+      QPointer<QPushButton> m_reloadPoint; //!< Button to reload current point to saved measures
       QPointer<QPushButton> m_savePoint; //!< Button to save current point being edited
       QPalette m_saveDefaultPalette; //!< Default color pallet of the "Save Point" button
 
@@ -218,7 +210,10 @@ namespace Isis {
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
-      
+      QPointer<QLabel> m_aprioriLatitude;
+      QPointer<QLabel> m_aprioriLongitude;
+      QPointer<QLabel> m_aprioriRadius;
+
       QPointer<QCheckBox> m_lockPoint; //!< Checkbox that locks/unlocks the current point
       QPointer<QCheckBox> m_ignorePoint; //!< Checkbox to ignore the current point
       QPointer<QLabel> m_leftReference; //!< Label indicating if left measure is the reference
@@ -252,12 +247,11 @@ namespace Isis {
       QScopedPointer<Cube> m_leftCube; //!< Left cube
       QScopedPointer<Cube> m_rightCube; //!< Right cube
 
-      QList<Cube *> m_pointCubes;
-
-      QString m_groundSN;
-      bool m_changeAllGroundLocation;
-      bool m_changeGroundLocationInNet;
-      QString m_newGroundDir;
+      QString m_groundSN; //!< Serial number of ground source file
+      bool m_changeAllGroundLocation; //!< Change the ground source location of all fixed,
+                                      //!  constrained points in the network
+      bool m_changeGroundLocationInNet; //!< Change the ground source location
+      QString m_newGroundDir; //!< Contains the ground source location
   };
 };
 #endif

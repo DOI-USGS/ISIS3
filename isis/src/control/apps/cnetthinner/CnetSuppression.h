@@ -51,6 +51,8 @@ namespace Isis {
  * @internal 
  *   @history 2016-09-30 Kris Becker - Original Version
  *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
+ *   @history 2017-08-09 Summer Stapleton - Added a try-catch in constructor to throw proper
+ *                         error for invalid control net. Fixes #5068.
  * 
  */
   class CnetSuppression : public CnetManager {

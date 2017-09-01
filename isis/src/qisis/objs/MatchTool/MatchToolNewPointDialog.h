@@ -13,9 +13,9 @@ class QStringList;
 namespace Isis {
   class ControlNet;
   /**
-   * @author 2012-05-04 Tracie Sucharski - Adapted from QnetMatchToolNewPointDialog 
-   *  
-   * @internal 
+   * @author 2012-05-04 Tracie Sucharski - Adapted from QnetMatchToolNewPointDialog
+   *
+   * @internal
    *   @history 2012-10-03 Tracie Sucharski - Remove static pointId value.  Instead, pass into
    *                          costructor from location of instantiation.
    */
@@ -52,5 +52,3 @@ namespace Isis {
 };
 
 #endif
-
-

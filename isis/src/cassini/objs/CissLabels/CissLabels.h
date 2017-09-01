@@ -43,6 +43,7 @@ namespace Isis {
    *  @history 2008-11-05 Jeannie Walldren - Original Version
    *  @history 2008-11-07 Jeannie Walldren - Fixed documentation.
    *  @history 2011-05-03 Jeannie Walldren - Fixed documentation.
+   *  @history 2017-08-22 Cole Neubauer - Added labels for latest Cisscal upgrade
    */
 
   class CissLabels {
@@ -417,6 +418,31 @@ namespace Isis {
       };
 
 
+      /**
+       * @brief Returns the TargetName label as a QString.
+       *
+       *  Returns the TargetName from the labels as a QString.
+       *  The returned value is the lower case name of subject of the image.
+       *
+       *  @returns @b QString TargetName
+       */
+       inline QString          TargetName()                const {
+         return p_targetName.toLower();
+       };
+
+
+       /**
+        * @brief Returns the Time the photo was taken as a QString.
+        *
+        *  Returns the ImageTime from the labels as a QString.
+        *  The returned value is the lower case name of subject of the image.
+        *
+        *  @returns @b QString TargetName
+        */
+        inline QString          ImageTime()                const {
+          return p_imageTime.toLower();
+        };
+
     private:
       void Init(Pvl &lab);
       void ReadLabels(Pvl &lab);
@@ -469,6 +495,10 @@ namespace Isis {
       QString p_shutterModeId;
       //! Value of the PDS keyword SummingMode in the cube's labels
       int p_summingMode;
+      //! Value of the PDS keyword TargetName in the cube's labels
+      QString p_targetName;
+      //! Value of the PDS Keyword ImageTime in the cube's labels
+      QString p_imageTime;
   };
 };
 

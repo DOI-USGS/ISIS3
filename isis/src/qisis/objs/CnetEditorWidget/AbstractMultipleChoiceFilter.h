@@ -11,47 +11,46 @@ class QString;
 
 
 namespace Isis {
-  namespace CnetViz {
-    class AbstractFilterSelector;
+  class AbstractFilterSelector;
 
-    /**
-     * @brief Base class for combo box type filters
-     *
-     * This class is the base class that all filters that use combo boxes.
-     *
-     * @author ????-??-?? Eric Hyer
-     *
-     * @internal
-     *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-     */
-    class AbstractMultipleChoiceFilter : public AbstractFilter {
-        Q_OBJECT
+  /**
+   * @brief Base class for combo box type filters
+   *
+   * This class is the base class that all filters that use combo boxes.
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   */
+  class AbstractMultipleChoiceFilter : public AbstractFilter {
+      Q_OBJECT
 
-      public:
-        AbstractMultipleChoiceFilter(AbstractFilter::FilterEffectivenessFlag,
-            int minimumForSuccess = -1);
-        AbstractMultipleChoiceFilter(const AbstractMultipleChoiceFilter &other);
-        virtual ~AbstractMultipleChoiceFilter();
-
-
-      protected:
-        void createWidget(QStringList options);
-        QString const &getCurrentChoice() const;
-        using Isis::CnetViz::AbstractFilter::evaluate;
-
-      private:
-        void nullify();
+    public:
+      AbstractMultipleChoiceFilter(AbstractFilter::FilterEffectivenessFlag,
+          int minimumForSuccess = -1);
+      AbstractMultipleChoiceFilter(const AbstractMultipleChoiceFilter &other);
+      virtual ~AbstractMultipleChoiceFilter();
 
 
-      private slots:
-        void updateCurChoice(QString);
+    protected:
+      void createWidget(QStringList options);
+      QString const &getCurrentChoice() const;
+      using Isis::AbstractFilter::evaluate;
+
+    private:
+      void nullify();
 
 
-      private:
-        QComboBox *m_combo;
-        QString *m_curChoice;
-    };
-  }
+    private slots:
+      void updateCurChoice(QString);
+
+
+    private:
+      QComboBox *m_combo;
+      QString *m_curChoice;
+  };
 }
 
 #endif

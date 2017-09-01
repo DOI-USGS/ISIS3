@@ -57,7 +57,7 @@ namespace Isis {
 
   /**
    *
-   * @brief The main project for cnetsuite
+   * @brief The main project for ipce
    *
    * @author 2012-??-?? ???
    *
@@ -127,7 +127,7 @@ namespace Isis {
    *                           the JigsawWorkOrder on the main window menu. Fixes #4749. Also,
    *                           modified addToProject so that not undoable work orders have their
    *                           redo called instead of execute.
-   *   @history 2017-04-25 Ian Humphrey - Added checkControlsAndImagesAvailable() slot and 
+   *   @history 2017-04-25 Ian Humphrey - Added checkControlsAndImagesAvailable() slot and
    *                           controlsAndImagesAvailble() signal. These are used by internally
    *                           by Project constructor to listen for when a control and image are
    *                           added, used externally by directory to enable the jigsaw work order
@@ -143,7 +143,37 @@ namespace Isis {
    *   @history 2017-05-17 Tracie Sucharski - Changed activeControl and activeImageList methods to
    *                           return default values if project contains a single control and a
    *                           single image list.  Fixes #4867.
-   *                
+   *   @history 2017-07-13 Makayla Shepherd - Added the ability to change the name of image
+   *                           imports, shape imports, and bundle solution info. Fixes #4855,
+   *                           #4979, #4980.
+   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
+   *
+   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
+   *                           allow for opening of a new project. Fixes #4969.
+   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
+   *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
+   *                           reenable the CNet Tool when a control net is made active.
+   *                           Fixes #5046.
+   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
+   *                           allow for opening of a new project. Fixes #4969
+   *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
+   *                           Fixes #4715.
+   *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
+   *                           Fixes #5082.
+   *   @history 2017-08-02 Cole Neubauer - Made setClean emit a signal from undoStack. Fixes #4960
+   *   @history 2017-08-03 Cole Neubauer - Parsed XML to remove leftover files not in project
+   *                           Fixes #5046.
+   *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault that occurs when trying to edit a
+   *                           control net without having an active control net set. Fixes #5048.
+   *   @history 2017-08-07 Cole Neubauer - Added functionality to switch between active controls and
+   *                           ImageList Fixes #4567
+   *   @history 2017-08-11 Cole Neubauer - Removed unnecessary code in controlClosed that was
+   *                           a segfault causing. Fixes #5064
+   *   @history 2017-08-11 Cole Neubauer - Updated documentation for setClean and isClean #5113
+   *   @history 2017-08-11 Christopher Combs - Added addTemplates(), removeTemplate(),
+   *                           addTemplateFolder(), templateRoot(), and m_templates as well as
+   *                           serialization and structure for importing template filenames
+   *                           Fixes #5086.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -165,21 +195,29 @@ namespace Isis {
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
+      void addTemplates(QList<FileName> templateFiles);
+      QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void clear();
+      bool clearing(); //! Accessor for if the project is clearing or not
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
       ImageList *imageList(QString name);
       Shape *shape(QString id);
       ShapeList *shapeList(QString name);
-//       CorrelationMatrix *correlationMatrix();
+      // CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
+      bool isOpen();
+      bool isClean();
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
       QString name() const;
+      QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
+      void setClean(bool value);
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
@@ -214,9 +252,18 @@ namespace Isis {
       QString bundleSolutionInfoRoot() const;
       QList<BundleSolutionInfo *> bundleSolutionInfo();
 
+      static QString templateRoot(QString projectRoot);
+      QString templateRoot() const;
+      QList<FileName> templates();
+      void removeTemplate(FileName file);
+
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
 
+      /**
+       * Return BundleSettings objects in Project
+       * @return BundleSettings
+       */
       BundleSettings *bundleSettings() {return m_bundleSettings;}
 
       QProgressBar *progress();
@@ -254,7 +301,7 @@ namespace Isis {
        * Emitted when an active control is set.
        * receivers: Project::checkActiveControlAndImageList
        */
-      void activeControlSet();
+      void activeControlSet(bool boolean);
 
       /**
        * Emitted when all controls have been removed from the Project.
@@ -329,7 +376,7 @@ namespace Isis {
 
       /**
        * Emitted when project loaded
-       * receivers: CNetSuiteMainWindow, Directory, HistoryTreeWidget
+       * receivers: IpceMainWindow, Directory, HistoryTreeWidget
        */
       void projectLoaded(Project *);
 
@@ -338,9 +385,16 @@ namespace Isis {
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
-
+      /**
+       * Emitted when work order starts
+       */
       void workOrderStarting(WorkOrder *);
+      /**
+       * Emitted when work order ends
+       */
       void workOrderFinished(WorkOrder *);
+
+      void templatesAdded(QList<FileName> newFileList);
 
     public slots:
       void open(QString);
@@ -403,10 +457,12 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
+          QList<FileName> m_templates;
           WorkOrder *m_workOrder;
       };
 
     private:
+
       QDir *m_projectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
@@ -415,6 +471,7 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
+      QList<FileName> m_templates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
@@ -447,10 +504,13 @@ namespace Isis {
       QPointer<ImageReader> m_imageReader;
       //QList<QPair<QString, Data> > m_storedWarnings;
       bool m_isTemporaryProject;
-
+      bool m_isOpen; //! used to determine whether a project is currently open
+      bool m_isClean; //! used to determine whether a project's changes are unsaved
+      bool m_clearing; //! used to negate segfaults happening in post undos when clearning project
       int m_numImagesCurrentlyReading;
 
       QMutex *m_mutex;
+      QMutex *m_workOrderMutex;
       QMutex *m_imageReadingMutex;
 
       int m_numShapesCurrentlyReading;

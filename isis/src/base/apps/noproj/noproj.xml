@@ -7,11 +7,17 @@
   </brief>
 
   <description>
+    <p>
     This program will modify the cube labels for the Ideal camera.
     The original Instrument group is renamed OriginalInstrument and a new
     instrument group is created for the Ideal Camera.  The cube data
     is modified when this program runs cam2cam, creating the noproj'd
     output cube with camera distortions removed.
+    </p>
+    <p>
+    Note that noproj will not propagate AlphaCube groups from the match cube into the output
+    cube since noproj is resampling the image.
+    </p>
   </description>
 
   <history>
@@ -54,6 +60,9 @@
       TransY (becomes IDEAL_TRANSY), TransS0 (becomes IDEAL_TRANSS), TransL0 (becomes IDEAL_TRANSL),
       PixelPitch (becomes IDEAL_PIXEL_PITCH), and FocalLength (becomes IDEAL_FOCAL_LENGTH).
       Fixes #1094.
+    </change>
+    <change name="Ian Humphrey" date="2017-08-19">
+      No longer propagates AlphaCube group to output cube. Fixes #4907.
     </change>
   </history>
 

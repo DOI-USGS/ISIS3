@@ -435,8 +435,7 @@ namespace Isis {
   /**
    * Sets the lat/lon/radius values to get the sample/line values
    *
-   * @param latitude Latitude coordinate of the point
-   * @param longitude Longitude coordinate of the point
+   * @param surfacePt The point used for calculation
    *
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
@@ -1651,10 +1650,9 @@ namespace Isis {
    * vector, which can be done only once for all angles using this method.
    *
    * @param phase The local phase angle to be calculated
-   *
-   * @param emission The local emission angle to be calculated
-   *
    * @param incidence The local incidence angle to be calculated
+   * @param emission The local emission angle to be calculated
+   * @param success A boolean to keep track of whether normal is valid
    */
   void Camera::LocalPhotometricAngles(Angle & phase, Angle & incidence,
       Angle & emission, bool &success) {
@@ -2018,7 +2016,6 @@ namespace Isis {
    * the selected ground point to the north pole. For image azimuths, the initial ray is the vector
    * from the selected image location to the right, horizontally.    *
    *
-   * @param radius The Radius
    * @param lat The Latitude
    * @param lon The Longitude
    *
@@ -2475,6 +2472,8 @@ namespace Isis {
    * close time) is the maximum value of those ephemeris times. This method must
    * be called before a call to the Spice::createCache() method.  It is called
    * in the LoadCache() method.
+   * 
+   * @returns pair<double, double> A pair containing the start and end ephemeris times
    *
    * @throw iException::Programmer - "Unable to find time range for the
    *             spice kernels."
@@ -2519,6 +2518,11 @@ namespace Isis {
    * of lines in the beta cube and adds 1, since we need at least 2 points for
    * interpolation. This method must be called before a call to the
    * Spice::createCache() method.  It is called in the LoadCache() method.
+   * 
+   * @param startTime Starting ephemeris time to cache
+   * @param endTime Ending ephemeris time to cache
+   * 
+   * @returns int The  calculated spice cache size
    *
    * @throw iException::Programmer - "A cache has already been created."
    * @see createCache()
@@ -2752,6 +2756,8 @@ namespace Isis {
    * Returns the pixel ifov offsets from center of pixel, which defaults to the
    * (pixel pitch * summing mode ) / 2.  If an instrument has a non-square ifov, it must implement
    * this method to return the offsets from the center of the pixel.
+   * 
+   * @returns QList<QPointF> A list of offsets
    *
    */
    QList<QPointF> Camera::PixelIfovOffsets() {

@@ -4,14 +4,12 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    MeasureLeafItem::MeasureLeafItem(ControlMeasure *cm,
-        int avgCharWidth, AbstractTreeItem *parent)
-      : AbstractTreeItem(parent), AbstractMeasureItem(cm, avgCharWidth) {
-    }
+  MeasureLeafItem::MeasureLeafItem(ControlMeasure *cm,
+      int avgCharWidth, AbstractTreeItem *parent)
+    : AbstractTreeItem(parent), AbstractMeasureItem(cm, avgCharWidth) {
+  }
 
 
-    MeasureLeafItem::~MeasureLeafItem() {
-    }
+  MeasureLeafItem::~MeasureLeafItem() {
   }
 }

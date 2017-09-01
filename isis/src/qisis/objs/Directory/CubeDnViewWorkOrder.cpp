@@ -39,13 +39,15 @@ namespace Isis {
 
   /**
    * This method sets the text of the work order.
-   * 
+   *
    * @param project The Project that we are going to work with.
-   * 
+   *
    */
   CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
+    m_isUndoable = false;
     QAction::setText(tr("Display &Images..."));
+    m_isSavedToHistory = false;
   }
 
   /**
@@ -63,7 +65,7 @@ namespace Isis {
 
   /**
    * This method clones the CubeDnViewWorkOrder
-   * 
+   *
    * @return @b CubeDnViewWorkOrder Returns a clone of the CubeDnViewWorkOrder
    */
   CubeDnViewWorkOrder *CubeDnViewWorkOrder::clone() const {
@@ -74,7 +76,7 @@ namespace Isis {
    * This check is used by Directory::supportedActions(DataType data).
    *
    * @param images ImageList we are checking
-   * 
+   *
    * @return @b bool True if the number of images is greater than 0 and less than 50.
    */
   bool CubeDnViewWorkOrder::isExecutable(ImageList *images) {
@@ -85,36 +87,27 @@ namespace Isis {
    * This check is used by Directory::supportedActions(DataType data).
    *
    * @param images ShapeList we are checking
-   * 
+   *
    * @return @b bool True if the number of shapes is greater than 0 and less than 20.
    */
   bool CubeDnViewWorkOrder::isExecutable(ShapeList *shapes) {
     return (shapes->count() > 0 && shapes->count() < 20);
   }
-  
-  /**
-   * @brief This method returns false because this WorkOrder is not undoable.
-   * 
-   * @see WorkOrder::isUndoable()
-   * 
-   * @return bool Returns false because this WorkOrder is not undoable.
-   */
-  bool CubeDnViewWorkOrder::isUndoable() const {
-    return false;
-  }
 
-  
+
+
   /**
-   * @brief This method asks the user what view they want to see their cube list in. The user 
-   * can select an existing vew or they can create a new view. The user's choice is then saved using 
-   * setInternalData(). 
-   * 
+   * @brief This method asks the user what view they want to see their cube list in. The user
+   * can select an existing vew or they can create a new view. The user's choice is then saved using
+   * setInternalData().
+   *
    * @see WorkOrder::setupExecution()
-   * 
+   *
    * @return @b bool True if WorkOrder::setupExecution() returns true.
    */
   bool CubeDnViewWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
+
 
     if (success) {
       QStringList viewOptions;
@@ -162,8 +155,8 @@ namespace Isis {
 
 
   /**
-   * @brief This method adds a new CubeDnView to the project's directory and then adds 
-   * currentItem() to that. 
+   * @brief This method adds a new CubeDnView to the project's directory and then adds
+   * currentItem() to that.
    */
   void CubeDnViewWorkOrder::execute() {
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
@@ -177,22 +170,22 @@ namespace Isis {
     else {
       view = project()->directory()->cubeDnViews()[viewToUse];
     }
-   
+
     view->addItems(selectedItems);
+    project()->setClean(false);
   }
-  
-  
+
+
     /**
    * This method returns true if other depends on a CubeDnViewWorkOrder
-   * 
+   *
    * @param order the WorkOrder we want to check for dependancies
-   * 
+   *
    * @return @b bool True if WorkOrder depends on a CubeDnViewWorkOrder
-   * 
+   *
    */
   bool CubeDnViewWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
     return dynamic_cast<CubeDnViewWorkOrder *>(other);
   }
 }
-

@@ -44,9 +44,10 @@ namespace Isis {
    */
   TargetGetInfoWorkOrder::TargetGetInfoWorkOrder(Project *project) :
       WorkOrder(project) {
+    QAction::setText(tr("Get Info...") );
     // This work order is not undoable
     m_isUndoable = false;
-    QAction::setText(tr("Get Info...") );
+    m_isSavedToHistory = false;
   }
 
 
@@ -129,6 +130,7 @@ namespace Isis {
    * Adds a target info view to the project; i.e., displays the target info widget.
    */
   void TargetGetInfoWorkOrder::execute() {
+
     TargetInfoWidget *targetInfoWidget =
         project()->directory()->addTargetInfoView(targetBody());
 

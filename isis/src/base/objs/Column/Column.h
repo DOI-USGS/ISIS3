@@ -49,6 +49,7 @@ namespace Isis {
    *   @history 2012-09-20 Steven Lambright - Improved unit test, fixed bug where uninitialized
    *                           member variables were causing errors to be thrown sometimes.
    *                           Fixes #1125.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class Column {
     public:

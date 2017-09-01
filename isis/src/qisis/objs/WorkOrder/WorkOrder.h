@@ -81,7 +81,8 @@ namespace Isis {
    *
    *   The constructor for the WorkOrder must set m_isUndoable and m_isSynchronous to the appropriate
    *   values. The constructor must call the base WorkOrder constructor.  The default is
-   *   synchronous and undoable.
+   *   synchronous and undoable. If an import WorkOrder is being implemented the import must be
+   *   some type of object and implement certain slots.
    *
    *   All information required to execute the WorkOrder should be saved in the WorkOrder
    *   in the setupExecution() method.  Since WorkOrders may be serialized and may run on
@@ -90,10 +91,10 @@ namespace Isis {
    *   WorkOrder::setInternalData() in the following calls:
    *   setupExecution(), postExecution(), postUndoExecution().
    *   Workorders may use member variables to pass data between the execute() and postExecution()
-   *   methods and also between the undoExecution() and undoPostExecution() methods since 
-   *   serialization can not happen between these calls.  For asynchronous WorkOrders the 
-   *   execute()/postExecution() and undoExecution()/undoPostExecution() methods are on 
-   *   different threads so any allocated memory moved between the non-GUI and GUI threads 
+   *   methods and also between the undoExecution() and undoPostExecution() methods since
+   *   serialization can not happen between these calls.  For asynchronous WorkOrders the
+   *   execute()/postExecution() and undoExecution()/undoPostExecution() methods are on
+   *   different threads so any allocated memory moved between the non-GUI and GUI threads
    *   between methods.
    *
    *   Serialization is handled by the base WorkOrder class.  Since all state is saved
@@ -124,7 +125,8 @@ namespace Isis {
    *   For asynchronous WorkOrders any memory allocations that aren't deallocated within
    *   execute() will need to be moved to the GUI thread.  @see ImportImagesWorkOrder::execute
    *   for an example of an asynchronous WorkOrder that allocates memory. setProgressValue()
-   *   can be used to update the progress bar in the GUI.
+   *   can be used to update the progress bar in the GUI. Any member variables being accessed by an
+   *   asynchronous workorder will need to have a QMutex locker so they can be thread safe
    *
    *   *postExecution*
    *   postExecution() runs on the GUI thread so it should not perform any long running operations.
@@ -157,13 +159,13 @@ namespace Isis {
    *   *setCreatesCleanState*
    *   This is used to indicate the WorkOrder has set the state back to an unchanged state from which
    *   the project was originally opened.  This is used by open, save, and close project WorkOrders. Unlikely
-   *   to be needed by other WorkOrders.
+   *   to be needed by other WorkOrders. This can needs to be set to false to be able to have an undoable
+   *   workorder
    *
    *   *setModifiesDiskState*
-   *   WorkOrders should call this to indicate they modify the disk state.  The WorkOrder should 
-   *   implement the undoExecution method if this is set to true.  (This flag is used by the Project to 
-   *   indicate the disk state should be restored back to the original state if the project is 
-   *   closed without saving.)
+   *   WorkOrders should call this to indicate they modify the disk state, this should be set to true to
+   *   be able to have an undoable workorder.  The WorkOrder should implement the undoExecution method
+   *   if this is set to true.
    *
    *
    *   **WorkOrder Diagrams**
@@ -209,42 +211,42 @@ namespace Isis {
    * participant WorkOrder
    * participant Project
    * participant HistoryTreeWidget
-   * 
+   *
    * User -> WorkOrder: Menuclick
-   * 
+   *
    * activate WorkOrder
-   * 
+   *
    * WorkOrder -> WorkOrder: addCloneToProject
    * activate WorkOrder
-   * 
+   *
    * WorkOrder -> Project : addToProject
    * activate Project
-   * 
+   *
    *  Project -> WorkOrder : setPrevious
-   * 
+   *
    * Project -> WorkOrder : **setupExecution**
    * activate WorkOrder
    * WorkOrder -> Project
    * deactivate WorkOrder
-   * 
+   *
    *  Project -> WorkOrder : setNextWorkorder
    *
    * Project -> HistoryTreeWidget : << signal:workOrderStarting >>
    * Project <-- HistoryTreeWidget : slot:addToHistory
-   * 
+   *
    * Project -> WorkOrder: **execute**
    * activate WorkOrder
    * WorkOrder -> Project
    * deactivate WorkOrder
-   * 
+   *
    * Project  -> WorkOrder
    * deactivate Project
-   * 
+   *
    * deactivate WorkOrder
-   * 
+   *
    * WorkOrder -> HistoryTreeWidget : << signal:destroyed >>
    * WorkOrder <-- HistoryTreeWidget : slot:removeFromHistory
-   * 
+   *
    * deactivate WorkOrder
    * @enduml
    *
@@ -299,6 +301,14 @@ namespace Isis {
    *                           what's this and tool tip (hover text) state.
    *   @history 2017-05-05 Tracie Sucharski - Added functionality for FileItem types and added
    *                           BundleObservationViewWorkOrder. Fixes #4838, #4839, #4840.
+   *   @history 2017-07-24 Cole Neubauer - Created isSavedToHistory() to be able to keep Views from
+   *                           being added to the HistoryTree Fixes #4715
+   *   @history 2017-07-31 Cole Neubauer - Added a QTMutexLocker to every function that returns a
+   *                           member variable function Fixes #5082
+   *   @history 2017-08-02 Cole Neubauer - Moved m_status to protected so children can set it
+   *                           if a workorder errors Fixes #5026
+   *   @history 2017-08-11 Cole Neubauer - Updated documentation for accessor methods and when one
+   *                           of these accessors should be used in the workorder template #5113
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -367,6 +377,7 @@ namespace Isis {
 
       QString bestText() const;
       bool isUndoable() const;
+      bool isSavedToHistory() const;
       bool isSynchronous() const;
       bool createsCleanState() const;
       QDateTime executionTime() const;
@@ -414,7 +425,7 @@ namespace Isis {
       const ShapeList *shapeList() const;
 
       CorrelationMatrix correlationMatrix();
-      
+
       QPointer<ControlList> controlList();
 
       TargetBodyQsp targetBody();
@@ -472,7 +483,7 @@ namespace Isis {
         UndoQueuedAction
       };
 
-      /**        
+      /**
        * @brief This class is used for processing an XML file containing information
        * about a WorkOrder.
        *
@@ -508,12 +519,21 @@ namespace Isis {
        */
       bool m_isUndoable;
 
-      /**
+       /**
         * This is defaulted to true. If true, the work order will be executed on the GUI
         * thread synchronously. If false, then the work order will be queued for execution
         * on a non-GUI thread and will not block the GUI.
         */
        bool m_isSynchronous;
+
+       /**
+        * Set the work order to be shown in the HistoryTreeWidget.
+        * This is defaulted to true. If true the work order will be shown in the
+        * HistoryTreeWidget if false it will not be shown.
+        */
+       bool m_isSavedToHistory;
+
+       WorkOrderStatus m_status;
 
     private:
       WorkOrder &operator=(const WorkOrder &rhs);
@@ -532,7 +552,6 @@ namespace Isis {
        */
       bool m_modifiesDiskState;
 
-      WorkOrderStatus m_status;
       QueuedWorkOrderAction m_queuedAction;
 
       /**
@@ -580,8 +599,8 @@ namespace Isis {
       QStringList m_imageIds;
 
       /**
-       * A QStringList of unique shape identifiers for all of the shapes this WorkOrder is dealing 
-       * with. 
+       * A QStringList of unique shape identifiers for all of the shapes this WorkOrder is dealing
+       * with.
        */
       QStringList m_shapeIds;
 
@@ -626,7 +645,7 @@ namespace Isis {
 
 
       /**
-       * @brief A pointer to the ProgressBar.
+     * @brief A pointer to the ProgressBar.
        */
       QPointer<ProgressBar> m_progressBar;
 

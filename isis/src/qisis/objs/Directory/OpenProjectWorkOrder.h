@@ -43,6 +43,8 @@ namespace Isis {
    *   @history 2017-04-06 Tracie Sucharski - Refactor for the new WorkOrder design, renaming
    *                           execute to setupExecution, and moving the actual work to the execute
    *                           method.
+   *   @history 2017-07-12 Cole Neubauer - In setupExecution added functionallity to open a new
+   *                           project while there is a project currently open. Fixes #4969
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -62,6 +64,7 @@ namespace Isis {
     private:
       OpenProjectWorkOrder &operator=(const OpenProjectWorkOrder &rhs);
 
+      bool m_startingState;
       QString m_projectName;
   };
 }

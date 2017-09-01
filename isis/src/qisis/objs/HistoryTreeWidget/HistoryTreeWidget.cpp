@@ -37,7 +37,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Clean up allocated memory
    */
@@ -106,10 +105,12 @@ namespace Isis {
    * @param workOrder The work order to display the history for
    */
   void HistoryTreeWidget::addToHistory(WorkOrder *workOrder) {
+
     QString data = workOrder->bestText();
 
+
     connect(workOrder, SIGNAL(destroyed(QObject *)),
-            this, SLOT(removeFromHistory(QObject *)));
+                this, SLOT(removeFromHistory(QObject *)));
 
     QStringList columnData;
     columnData.append(data);
@@ -126,29 +127,33 @@ namespace Isis {
       saveFont.setItalic(true);
       newItem->setFont(0, saveFont);
       newItem->setForeground(0, Qt::gray);
-    }
+      }
 
-    // Do font for progress text
-    QFont progressFont = newItem->font(1);
-    progressFont.setItalic(true);
-    newItem->setFont(1, progressFont);
-    newItem->setForeground(1, Qt::gray);
+      // Do font for progress text
+      QFont progressFont = newItem->font(1);
+      progressFont.setItalic(true);
+      newItem->setFont(1, progressFont);
+      newItem->setForeground(1, Qt::gray);
 
-    invisibleRootItem()->addChild(newItem);
+      this->insertTopLevelItem(0, newItem);
 
-    connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
-            this, SLOT(updateStatus(WorkOrder *)));
-    connect(workOrder, SIGNAL(creatingProgress(WorkOrder *)),
-            this, SLOT(updateProgressWidgets()));
-    connect(workOrder, SIGNAL(deletingProgress(WorkOrder *)),
-            this, SLOT(updateProgressWidgets()));
+      connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
+                this, SLOT(updateStatus(WorkOrder *)));
+      connect(workOrder, SIGNAL(creatingProgress(WorkOrder *)),
+                this, SLOT(updateProgressWidgets()));
+      connect(workOrder, SIGNAL(deletingProgress(WorkOrder *)),
+                this, SLOT(updateProgressWidgets()));
 
-    if (workOrder->progressBar()) {
-      setItemWidget(newItem, 1, workOrder->progressBar());
-    }
 
-    scrollToItem(newItem);
-    refit();
+      //Sometimes the pointer returned by this call is 0 (hence the check).
+      //So we are not creating a progress bar for every work order which would
+      //include those that do not need it.
+
+      if(workOrder->progressBar() )  {
+        this->setItemWidget(newItem, 1, new ProgressBar );
+      }
+      scrollToItem(newItem);
+      refit();
   }
 
 
@@ -161,12 +166,15 @@ namespace Isis {
    *   resize event.
    */
   void HistoryTreeWidget::updateProgressWidgets() {
-    for (int i = 0; i < invisibleRootItem()->childCount(); i++) {
-      QTreeWidgetItem *item = invisibleRootItem()->child(i);
-      WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
-
-      if (workOrder && itemWidget(item, 1) != workOrder->progressBar()) {
-        setItemWidget(item, 1, workOrder->progressBar());
+    if( !m_project->clearing() ){
+      for (int i = 0; i < invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = invisibleRootItem()->child(i);
+        if (item->data(0, Qt::UserRole).toString() != "") {
+          WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
+          if (workOrder && itemWidget(item, 1) != workOrder->progressBar()) {
+            setItemWidget(item, 1, workOrder->progressBar());
+          }
+        }
       }
     }
   }
@@ -222,13 +230,13 @@ namespace Isis {
    * A work order was lost... compensate by removing it from the tree.
    */
   void HistoryTreeWidget::removeFromHistory(QObject *deletedObject) {
-    QTreeWidgetItem *itemToRemove = undoCommandToTreeItem(
-        (QUndoCommand *)((WorkOrder *)deletedObject));
+    QTreeWidgetItem *itemToRemove = undoCommandToTreeItem( (QUndoCommand *)((WorkOrder *)deletedObject));
 
     if (itemToRemove) {
-      int indexToDelete = invisibleRootItem()->indexOfChild(itemToRemove);
 
+      int indexToDelete = invisibleRootItem()->indexOfChild(itemToRemove);
       if (indexToDelete < invisibleRootItem()->childCount()) {
+
         // Clear progress bar widget
         setItemWidget(invisibleRootItem()->child(indexToDelete), 1, NULL);
 
@@ -248,17 +256,17 @@ namespace Isis {
    */
   QTreeWidgetItem *HistoryTreeWidget::undoCommandToTreeItem(const QUndoCommand *undoCommand) {
     QTreeWidgetItem *result = NULL;
-
     if (undoCommand) {
       for (int i = invisibleRootItem()->childCount() - 1; !result && i >= 0; i--) {
         QTreeWidgetItem *item = invisibleRootItem()->child(i);
-        WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
+        if (item->data(0, Qt::UserRole).toString() != "" ) {
+          WorkOrder *workOrder = item->data(0, Qt::UserRole).value<WorkOrder *>();
 
-        if (undoCommand == workOrder)
-          result = item;
+          if (undoCommand == workOrder)
+            result = item;
+        }
       }
     }
-
     return result;
   }
 
@@ -281,6 +289,9 @@ namespace Isis {
 
 
   void HistoryTreeWidget::updateStatus(WorkOrder *workOrder) {
-    undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
+    if (undoCommandToTreeItem(workOrder)) {
+      undoCommandToTreeItem(workOrder)->setText(1, workOrder->statusText());
+    }
+
   }
 }

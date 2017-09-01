@@ -75,6 +75,8 @@ namespace Isis {
     p_shutterModeId         = (QString) inst["ShutterModeId"];           //valid values: BothSim, NacOnly, WacOnly
     p_summingMode           = (int)    inst["SummingMode"];             //valid values: 1, 2, 4
     p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);  //valid values: real numbers
+    p_imageTime             = (QString) inst["ImageTime"];
+    p_targetName            = (QString) inst["TargetName"];           // valid values: may change overtime, any subject of a Cassini image
     // Get values out of the archive group
     PvlGroup &arch    = lab.findGroup("Archive", Pvl::Traverse);
     p_imageNumber           = (double) arch["ImageNumber"];
@@ -145,4 +147,3 @@ namespace Isis {
     return;
   }
 }
-

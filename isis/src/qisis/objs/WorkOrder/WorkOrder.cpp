@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QFutureWatcher>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -63,6 +64,7 @@ namespace Isis {
     m_fileItem = FileItemQsp();
 
     m_isUndoable = true;
+    m_isSavedToHistory = true;
     m_isSynchronous = true;
 
     m_createsCleanState = false;
@@ -122,6 +124,7 @@ namespace Isis {
     m_internalData = other.m_internalData;
 
     m_isUndoable = other.m_isUndoable;
+    m_isSavedToHistory = other.m_isSavedToHistory;
     m_isSynchronous = other.m_isSynchronous;
 
     m_createsCleanState = other.m_createsCleanState;
@@ -600,6 +603,7 @@ namespace Isis {
    * @return @b (ImageList*) A pointer to the ImageList.
    */
   ImageList *WorkOrder::imageList() {
+    QMutexLocker locker(project()->workOrderMutex());
     if (!m_imageList) {
       bool anyImagesAreNull = false;
 
@@ -631,6 +635,7 @@ namespace Isis {
    * @return @b (ShapeList*) A pointer to the ShapeList.
    */
   ShapeList *WorkOrder::shapeList() {
+    QMutexLocker locker(project()->workOrderMutex());
     if (!m_shapeList) {
       bool anyShapesAreNull = false;
 
@@ -663,6 +668,7 @@ namespace Isis {
    * @return A CorrelationMatrix.
    */
   CorrelationMatrix WorkOrder::correlationMatrix() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_correlationMatrix;
   }
 
@@ -672,6 +678,7 @@ namespace Isis {
    * @return QPointer<ControlList>  Returns m_controlList.
    */
   QPointer<ControlList> WorkOrder::controlList() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_controlList;
   }
 
@@ -701,6 +708,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the TargetBody.
    */
   TargetBodyQsp WorkOrder::targetBody() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_targetBody;
   }
 
@@ -710,6 +718,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the guiCamera.
    */
   GuiCameraQsp WorkOrder::guiCamera() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_guiCamera;
   }
 
@@ -719,6 +728,7 @@ namespace Isis {
    * @return @b QSharedPointer Returns a shared pointer to the fileItem.
    */
   FileItemQsp WorkOrder::fileItem() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_fileItem;
   }
 
@@ -763,12 +773,27 @@ namespace Isis {
 
 
   /**
-   * @brief Returns true if this work order is undoable, otherwise false.
+   * @brief Returns true if this work order is undoable, otherwise false. This needs to be set to
+   *        true and createsCleanState needs to be set to false in order for a WorkOrder to appear
+   *        on the undoStack. This should be done by setting the member variable and should not be
+   *        overloading this function.
    *
    * @return @b (bool) Returns True if this work order is undoable, false if it is not.
    */
   bool WorkOrder::isUndoable() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_isUndoable;
+  }
+
+
+  /**
+   * @brief Returns true if this work order is to be shown in History, otherwise false.
+   *
+   * @return @b (bool) Returns True if this work order is to be shown in History
+   */
+  bool WorkOrder::isSavedToHistory() const {
+     QMutexLocker locker(project()->workOrderMutex());
+     return m_isSavedToHistory;
   }
 
 
@@ -778,15 +803,20 @@ namespace Isis {
    * @return @b (bool) Returns True if this work order is run synchronously
    */
   bool WorkOrder::isSynchronous() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_isSynchronous;
   }
 
 
   /**
-   * @brief Returns the CleanState status (whether the Project has been saved to disk or not).
+   * @brief Returns the CleanState status (whether the Project has been saved to disk or not). If
+   *        this is set to true the work order will avoid being put on the undo stack, meaning it
+   *        will not be undoable. It will also set the undo stack to a clean state, by doing this it
+   *        makes all previous workorders done before the save to be no longer undoable.
    * @return @b Returns True if the Project has been saved to disk.  False if it has not.
    */
   bool WorkOrder::createsCleanState() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_createsCleanState;
   }
 
@@ -796,6 +826,7 @@ namespace Isis {
    * @return @b QDateTime The execution time.
    */
   QDateTime WorkOrder::executionTime() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_executionTime;
   }
 
@@ -814,6 +845,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder is executing a redo.  Returns False if it is not.
    */
   bool WorkOrder::isRedoing() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderRedoing;
   }
 
@@ -823,6 +855,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder has completed a Redo.  False if it has not.
    */
   bool WorkOrder::isRedone() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderRedone;
   }
 
@@ -832,6 +865,7 @@ namespace Isis {
    * @return @b bool Returns True if the current status is WorkOrderUndoing, False otherwise.
    */
   bool WorkOrder::isUndoing() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderUndoing;
   }
 
@@ -841,6 +875,7 @@ namespace Isis {
    * @return @b bool Returns True if the WorkOrder has been undone.  False if it has not.
    */
   bool WorkOrder::isUndone() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_status == WorkOrderUndone;
   }
 
@@ -851,6 +886,7 @@ namespace Isis {
    * it's actions.  Returns False if it has not.
    */
   bool WorkOrder::modifiesDiskState() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_modifiesDiskState;
   }
 
@@ -860,6 +896,7 @@ namespace Isis {
    * @return @b QPointer pointing to the next WorkOrder.
    */
   WorkOrder *WorkOrder::next() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_nextWorkOrder;
   }
 
@@ -869,6 +906,7 @@ namespace Isis {
    * @return @b QPointer pointing to the previous WorkOrder.
    */
   WorkOrder *WorkOrder::previous() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_previousWorkOrder;
   }
 
@@ -878,6 +916,7 @@ namespace Isis {
    * @return @b QString A string representation of the current WorkOrder status.
    */
   QString WorkOrder::statusText() const {
+    QMutexLocker locker(project()->workOrderMutex());
     QString result = toString(m_status);
 
     if (m_secondsElapsed) {
@@ -898,6 +937,7 @@ namespace Isis {
    * @return A QPointer to the ProgessBar.
    */
   ProgressBar *WorkOrder::progressBar() {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressBar;
   }
 
@@ -963,7 +1003,6 @@ namespace Isis {
 
   /**
    * @brief Starts (or enqueues) a redo. This should not be re-implemented by children.
-   *
    */
   void WorkOrder::redo() {
     if (!isInStableState()) {
@@ -1003,6 +1042,7 @@ namespace Isis {
       }
 
       if (mustQueueThisRedo && !isUndoing() && !isRedoing()) {
+
         m_queuedAction = RedoQueuedAction;
 
         QString queueStatusText;
@@ -1249,6 +1289,7 @@ namespace Isis {
    * @return @b int The minimum value.
    */
   int WorkOrder::progressMin() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressRangeMinValue;
   }
 
@@ -1258,6 +1299,7 @@ namespace Isis {
    * @return @b int The maximum value.
    */
   int WorkOrder::progressMax() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressRangeMaxValue;
   }
 
@@ -1267,6 +1309,7 @@ namespace Isis {
    * @return @b int Returns the current progress value.
    */
   int WorkOrder::progressValue() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_progressValue;
   }
 
@@ -1296,6 +1339,7 @@ namespace Isis {
    * @return @b QStringList Returns the internal data object.
    */
   QStringList WorkOrder::internalData() const {
+    QMutexLocker locker(project()->workOrderMutex());
     return m_internalData;
   }
 
@@ -1591,7 +1635,8 @@ namespace Isis {
    * @brief Declare that this work order is saving the project.
    * This makes the work order not appear in the undo stack (cannot undo/redo), and instead it is
    * marked as a 'clean' state of the project. The QUndoCommand undo/redo will never be called.
-   * The default for createsCleanState is false.
+   * The default for createsCleanState is false. If this is set to true all wrokorders before this
+   * call will be locked.
    * @param createsCleanState True if this work order is going to save the project to disk,
    * False otherwise.
    */

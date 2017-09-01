@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include <QMap>
+#include <QPointer>
 #include <QToolBar>
 #include <QWidgetAction>
 
@@ -57,7 +58,7 @@ class ControlPointEditView : public AbstractProjectItemView {
     virtual QList<QAction *> activeToolBarActions();
     virtual QList<QAction *> toolPadActions();
 
-    ControlPointEditWidget *controlPointEditWidget() const;
+    ControlPointEditWidget *controlPointEditWidget();
 
 //  setEditPoint(ControlPoint *editPoint);
 //  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
@@ -69,7 +70,7 @@ class ControlPointEditView : public AbstractProjectItemView {
   private slots:
 
   private:
-    ControlPointEditWidget *m_controlPointEditWidget;
+    QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
 
     QToolBar *m_permToolBar; //!< The permanent tool bar
