@@ -86,6 +86,9 @@ namespace Isis {
    *                           applyParameterCorrections.  Also had to move BundleAdjust method 
    *                           productAlphaAV to this class to support applyParameterCorrections.
    *                           References #4649 and #501.
+   *  @history 2017-08-24 Debbie A. Cook - Revised output units to be compatible with output from
+   *                           previous versions, corrected units throughout in comments and code.
+   *                           Reference #TBD.
    */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
