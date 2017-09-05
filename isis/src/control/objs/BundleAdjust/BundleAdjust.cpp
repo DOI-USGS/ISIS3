@@ -1279,9 +1279,6 @@ namespace Isis {
         = bundleControlPoint->corrections();
 
     if (weights(0) > 0.0) {
-//      weights(0) = weights(0)/1.0e+6;
-//      weights(1) = weights(1)/1.0e+6;
-//      weights(2) = weights(2)/1.0e+6;
       N22(0,0) += weights(0);
       n2(0) += (-weights(0) * corrections(0));
       m_bundleResults.incrementNumberConstrainedPointParameters(1);
