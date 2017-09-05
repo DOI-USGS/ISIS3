@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
     // setSolveOptions call.
     // set the solve options
     copySettings.setSolveOptions(true, true, true, true, SurfacePoint::Rectangular,
-                                 1000.0, 2000.0, 3000.0);
+                                  SurfacePoint::Rectangular, 1000.0, 2000.0, 3000.0);
     // set outlier rejection
     copySettings.setOutlierRejection(true, 4.0);
     // create and fill the list of observation solve settings... then set
