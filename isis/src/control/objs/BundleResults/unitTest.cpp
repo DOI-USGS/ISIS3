@@ -317,7 +317,8 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "Testing rectangular coordinate type in control net and settings";
-    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular);
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                              SurfacePoint::Rectangular);
     // outNetRect.SetCoordType(SurfacePoint::Rectangular);
     outNet.SetCoordType(SurfacePoint::Rectangular);
     BundleControlPointQsp freeRBundleControlPoint(
