@@ -117,9 +117,13 @@ namespace Isis {
    *   representation (protocol buffer), and log data,
    *   construct the control point.
    *
-   * @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
+   * @internal
+   *   @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
    *          calls to avoid resetting the surface points with no radii
-   * @history 2015-11-03  Kris Becker - invalid flag was not being initialized
+   *   @history 2015-11-03  Kris Becker - invalid flag was not being initialized
+   *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix from m**2
+   *          to km**2 for both apriori and adjusted points to avoid multiple unit 
+   *          conversions in the BundleAdjust.
    */
   ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
       const Distance &majorRad, const Distance &minorRad,
@@ -239,17 +243,18 @@ namespace Isis {
         Displacement(fileEntry.aprioriy(), Displacement::Meters),
         Displacement(fileEntry.aprioriz(), Displacement::Meters));
 
-      // Set the rectangular covariance matrix
+      // Set the apriori rectangular covariance matrix from the control net
       if (fileEntry.aprioricovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        covar(0, 0) = fileEntry.aprioricovar(0)/1.0e6;
-        covar(0, 1) = fileEntry.aprioricovar(1)/1.0e6;
-        covar(0, 2) = fileEntry.aprioricovar(2)/1.0e6;
-        covar(1, 1) = fileEntry.aprioricovar(3)/1.0e6;
-        covar(1, 2) = fileEntry.aprioricovar(4)/1.0e6;
-        covar(2, 2) = fileEntry.aprioricovar(5)/1.0e6;
+        // Convert stored entries in meters**2 to km**2 for bundle adjustment
+        covar(0, 0) = fileEntry.aprioricovar(0)*1.0e-6;
+        covar(0, 1) = fileEntry.aprioricovar(1)*1.0e-6;
+        covar(0, 2) = fileEntry.aprioricovar(2)*1.0e-6;
+        covar(1, 1) = fileEntry.aprioricovar(3)*1.0e-6;
+        covar(1, 2) = fileEntry.aprioricovar(4)*1.0e-6;
+        covar(2, 2) = fileEntry.aprioricovar(5)*1.0e-6;
         // covar(0, 0) = fileEntry.aprioricovar(0);
         // covar(0, 1) = fileEntry.aprioricovar(1);
         // covar(0, 2) = fileEntry.aprioricovar(2);
@@ -258,8 +263,8 @@ namespace Isis {
         // covar(2, 2) = fileEntry.aprioricovar(5);
         apriori.SetRectangularMatrix(covar);
 
-        if (Displacement(covar(0, 0), Displacement::Meters).isValid() ||
-            Displacement(covar(1, 1), Displacement::Meters).isValid()) {
+        if (Displacement(covar(0, 0), Displacement::Kilometers).isValid() ||
+            Displacement(covar(1, 1), Displacement::Kilometers).isValid()) {
           // The conversion from Rectangular to Latitudinal coordinates uses
           // Rectangular X and Y for computing latitude, longitude, and radius.
           // *** TBD ***
@@ -292,16 +297,24 @@ namespace Isis {
         Displacement(fileEntry.adjustedy(), Displacement::Meters),
         Displacement(fileEntry.adjustedz(), Displacement::Meters));
 
+      // Set the adjusted rectangular covariance matrix from the control net
       if (fileEntry.adjustedcovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        covar(0, 0) = fileEntry.adjustedcovar(0);
-        covar(0, 1) = fileEntry.adjustedcovar(1);
-        covar(0, 2) = fileEntry.adjustedcovar(2);
-        covar(1, 1) = fileEntry.adjustedcovar(3);
-        covar(1, 2) = fileEntry.adjustedcovar(4);
-        covar(2, 2) = fileEntry.adjustedcovar(5);
+        // covar(0, 0) = fileEntry.adjustedcovar(0);
+        // covar(0, 1) = fileEntry.adjustedcovar(1);
+        // covar(0, 2) = fileEntry.adjustedcovar(2);
+        // covar(1, 1) = fileEntry.adjustedcovar(3);
+        // covar(1, 2) = fileEntry.adjustedcovar(4);
+        // covar(2, 2) = fileEntry.adjustedcovar(5);
+        // Convert stored entries in meters**2 to km**2 for bundle adjustment
+        covar(0, 0) = fileEntry.adjustedcovar(0)*1.0e-6;
+        covar(0, 1) = fileEntry.adjustedcovar(1)*1.0e-6;
+        covar(0, 2) = fileEntry.adjustedcovar(2)*1.0e-6;
+        covar(1, 1) = fileEntry.adjustedcovar(3)*1.0e-6;
+        covar(1, 2) = fileEntry.adjustedcovar(4)*1.0e-6;
+        covar(2, 2) = fileEntry.adjustedcovar(5)*1.0e-6;
         adjusted.SetRectangularMatrix(covar);
       }
 
@@ -2228,6 +2241,11 @@ namespace Isis {
   /**
    * Set jigsaw rejected flag for all measures to false
    * and set the jigsaw rejected flag for the point itself to false
+   *
+   * @internal
+   *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix from m**2
+   *          to km**2 for both apriori and adjusted points to avoid multiple unit 
+   *          conversions in the BundleAdjust.
    */
   void ControlPoint::ClearJigsawRejected() {
     int nmeasures = measures->size();
@@ -2337,15 +2355,17 @@ namespace Isis {
       fileEntry.set_aprioriz(apriori.GetZ().meters());
 
       symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
+      // Convert units from km**2 back to meters**2 for output
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
           covar(0, 2) != 0. || covar(1, 1) != 0. ||
           covar(1, 2) != 0. || covar(2, 2) != 0.) {
-        fileEntry.add_aprioricovar(covar(0, 0));
-        fileEntry.add_aprioricovar(covar(0, 1));
-        fileEntry.add_aprioricovar(covar(0, 2));
-        fileEntry.add_aprioricovar(covar(1, 1));
-        fileEntry.add_aprioricovar(covar(1, 2));
-        fileEntry.add_aprioricovar(covar(2, 2));
+        // Convert bundle adjusted entries in km**2 to m**2 for storage
+        fileEntry.add_aprioricovar(covar(0, 0)*1.0e6);
+        fileEntry.add_aprioricovar(covar(0, 1)*1.0e6);
+        fileEntry.add_aprioricovar(covar(0, 2)*1.0e6);
+        fileEntry.add_aprioricovar(covar(1, 1)*1.0e6);
+        fileEntry.add_aprioricovar(covar(1, 2)*1.0e6);
+        fileEntry.add_aprioricovar(covar(2, 2)*1.0e6);
       }
       // ***TBD*** change the fileEntry function names to generic version
       if (constraintStatus.test(Coord1Constrained))
@@ -2370,12 +2390,13 @@ namespace Isis {
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
           covar(0, 2) != 0. || covar(1, 1) != 0. ||
           covar(1, 2) != 0. || covar(2, 2) != 0.) {
-        fileEntry.add_adjustedcovar(covar(0, 0));
-        fileEntry.add_adjustedcovar(covar(0, 1));
-        fileEntry.add_adjustedcovar(covar(0, 2));
-        fileEntry.add_adjustedcovar(covar(1, 1));
-        fileEntry.add_adjustedcovar(covar(1, 2));
-        fileEntry.add_adjustedcovar(covar(2, 2));
+        // Convert units from km**2 back to meters**2 for output to control net
+        fileEntry.add_adjustedcovar(covar(0, 0)*1.0e6);
+        fileEntry.add_adjustedcovar(covar(0, 1)*1.0e6);
+        fileEntry.add_adjustedcovar(covar(0, 2)*1.0e6);
+        fileEntry.add_adjustedcovar(covar(1, 1)*1.0e6);
+        fileEntry.add_adjustedcovar(covar(1, 2)*1.0e6);
+        fileEntry.add_adjustedcovar(covar(2, 2)*1.0e6);
       }
     }
 

@@ -341,6 +341,11 @@ namespace Isis {
    *                            values  for enum ConstraintStatus generic.  Changed
    *                             LatitudeConstrained to Coord1Constrained, etc..  Removed coordType as a member.
    *                            References #4649 and #501.
+   *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix units  from m**2
+   *                            to km**2 for both apriori and adjusted points to avoid multiple unit 
+   *                           conversions in the BundleAdjust in the FileEntryV0002 version of the 
+   *                           constructor and likewise modified the method ToFileEntry to convert
+   *                           the var/covar entries back to meters**2.
    */
   class ControlPoint : public QObject {
 
