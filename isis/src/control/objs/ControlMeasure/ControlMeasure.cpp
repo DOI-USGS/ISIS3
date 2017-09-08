@@ -762,7 +762,13 @@ namespace Isis {
   }
 
 
-  //! Return Residual magnitude
+  /**
+   * Return Residual magnitude. Returns Isis:Null when p_lineResidual or p_sampleResidual not
+   * specifically set after call to constructor. (This calculation is normally done within the
+   * jigsaw app)
+   * 
+   * @returns (double) The residual magnitude
+   */
   double ControlMeasure::GetResidualMagnitude() const {
     if(IsSpecial(p_lineResidual) || IsSpecial(p_sampleResidual))
       return Null;
