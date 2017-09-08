@@ -76,6 +76,10 @@ namespace Isis {
    *                            now appears if you have edited your file but not saved it - not when
    *                            clicking "Save." This was a minimal fix (I left a lot of problems
    *                            to be solved at a later date). Fixes #854.
+   *   @history  2017-08-11 Adam Goins - Added a line of code to recreate a cube with "r" permissions
+   *                            attempting to open it with "rw" permission failed. This fixes an issue
+   *                            where the cube would segfault if it was being edited without "w" permission.
+   *                            Fixes # 2097 
    */
   class EditTool : public Tool {
       Q_OBJECT
