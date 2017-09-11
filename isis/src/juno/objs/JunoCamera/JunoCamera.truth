@@ -1,0 +1,33 @@
+Unit Test for JunoCamera...
+FileName:  "JNCE_2013282_00M00099_V01_BLUE_0004.cub"
+CK Frame:  -61500
+
+Kernel IDs: 
+CK Frame ID =  -61500
+CK Reference ID =  1
+SPK Target ID =  -61
+SPK Reference ID =  1
+
+Shutter open =  434617659.036347926
+Shutter close =  434617668.63634795
+Focal Length =  10.9563699999999997
+
+For upper left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For upper right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
