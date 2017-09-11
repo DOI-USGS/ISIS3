@@ -30,6 +30,7 @@
 #include "Reduce.h"
 #include "SaveAsDialog.h"
 #include "SubArea.h"
+#include "ViewportMainWindow.h"
 #include "Workspace.h"
 
 namespace Isis {
@@ -112,6 +113,17 @@ namespace Isis {
     connect(p_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
     p_exportView->setEnabled(false);
 
+    p_exportToList = new QAction(parent);
+    p_exportToList->setText("Export to List");
+    p_exportToList->setIcon(QPixmap(toolIconDir() + "/fileexport.png"));
+    p_exportToList->setToolTip("Export active cubes to a .lis file");
+    whatsThis =
+      "<b>Function:</b> Save all open cubes \
+       to a .lis file containing their file names";
+    p_exportToList->setWhatsThis(whatsThis);
+    connect(p_exportToList, SIGNAL(triggered()), this, SLOT(exportToList()));
+    p_exportToList->setEnabled(false);
+
     p_print = new QAction(parent);
     p_print->setText("&Print...");
     p_print->setShortcut(Qt::CTRL + Qt::Key_P);
@@ -147,6 +159,7 @@ namespace Isis {
     activate(true);
   }
 
+  
   /**
    * Adds the file tool's actions to the menu
    *
@@ -159,11 +172,13 @@ namespace Isis {
     menu->addAction(p_saveAs);
     menu->addAction(p_saveInfo);
     menu->addAction(p_exportView);
+    menu->addAction(p_exportToList);
     menu->addAction(p_print);
     menu->addAction(p_closeAll);
     menu->addAction(p_exit);
   }
 
+  
   /**
    * Connects the fileSelected signal to the workspace's addCubeViewport slot
    *
@@ -178,6 +193,7 @@ namespace Isis {
     connect(p_closeAll, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeAllSubWindows()));
   }
 
+  
   /**
    * Adds the file tool's actions to the permanent toolbar
    *
@@ -190,6 +206,7 @@ namespace Isis {
     perm->addAction(p_exit);
   }
 
+  
   /**
    * This method allows the user to navigate and open a cube with a file dialog.
    *
@@ -210,6 +227,7 @@ namespace Isis {
             p_workSpace, SLOT(addCubeViewport(QString)));
   }
 
+  
   /**
    * This method allows the user to navigate and browse cubes with a file dialog .
    *
@@ -229,6 +247,7 @@ namespace Isis {
             p_workSpace, SLOT(addBrowseView(QString)));
   }
 
+  
   /**
    * This method saves any changes made to the current cube, these
    * changes are finalized! There is no undoing once a save has
@@ -248,6 +267,7 @@ namespace Isis {
     cubeViewport()->cube()->reopen("rw");
   }
 
+  
   /**
    * SaveAs Action - Displays the FileDialog with the filterlist (*.cub) to select
    * the output cube. This dialog additionally displays radio buttons for choices
@@ -284,6 +304,7 @@ namespace Isis {
     p_saveAsDialog->show();
   }
 
+  
   /**
    * Save input image as a cube into specified output file as FullImage or
    * ExportAsIs or ExportFullRes option
@@ -374,14 +395,15 @@ namespace Isis {
     p_lastDir = psOutFile;
   }
 
+  
   /**
    * For AsIs option, save the enlarged input image visible in the viewport window
    * using the Enlarge functionality
    *
    * @author Sharmila Prasad (4/26/2011)
    *
-   * @param pInCube - Input Cube
-   * @param pOutCube - Output Cube
+   * @param icube - Input Cube
+   * @param psOutFile - Output Cube
    *
    */
   void FileTool::saveAsEnlargedCube(Cube *icube, const QString & psOutFile) {
@@ -424,13 +446,14 @@ namespace Isis {
     }
   }
 
+  
   /**
    * For AsIs option, save the reduced input image visible in the viewport window
    * using the Reduce functionality
    *
    * @author Sharmila Prasad (4/26/2011)
    *
-   * @param pInCube - Input Cube
+   * @param icube - Input Cube
    * @param psOutFile - Output filename
    */
   void FileTool::saveAsReducedCube(Cube *icube, const QString & psOutFile) {
@@ -489,13 +512,14 @@ namespace Isis {
     }
   }
 
+  
   /**
    * AsIs option, save the input image visible in the viewport window Enlarged/Reduced
    *
    * @author Sharmila Prasad (4/26/2011)
    *
-   * @param pInCube - Input Cube
-   * @param pOutCube - Output Cube
+   * @param icube - Input Cube
+   * @param psOutFile - Output Cube
    */
   void FileTool::saveAs_AsIs(Cube *icube, const QString & psOutFile) {
     double dScale = p_lastViewport->scale();
@@ -509,13 +533,14 @@ namespace Isis {
     }
   }
 
+  
   /**
    * Copy input image details into the output given output images's dimension.
    * Info like instrument, history are transferred to output image
    *
    * @param icube        - input image
    * @param ocube        - output image
-   * @param outAtt       - output cube attributes
+   * @param psOutFile      - output cube attributes
    * @param piNumSamples - out samples
    * @param piNumLines   - out lines
    * @param piNumBands   - out bands
@@ -621,6 +646,7 @@ namespace Isis {
     }
   }
 
+  
   /**
    * This method essentially creates a new cube, copies the
    * current cube (and any changes made to it) to the new cube,
@@ -628,8 +654,8 @@ namespace Isis {
    * it. Finally it sets the cubeviewport's cube to the new saved
    * cube.
    *
-   * @param pInCube  - input image
-   * @param pOutCube - output image
+   * @param icube  - input image
+   * @param ocube - output image
    */
   void FileTool::saveAsFullImage(Cube *icube, Cube *ocube) {
     //Start the copy process line by line
@@ -657,6 +683,7 @@ namespace Isis {
     }
   }
 
+  
   /**
    * Full Resolution option, save the input image visible in the viewport window
    * Enlarged/Reduced in full resolution
@@ -709,6 +736,7 @@ namespace Isis {
     }
   }
 
+  
   /**
    * Saves the whatsthis info of the cubeviewport to
    * user specified output file
@@ -742,6 +770,7 @@ namespace Isis {
     whatsThisPvl.write(output);
   }
 
+  
   /**
    * This method copies from the input buffer to the output buffer
    *
@@ -752,6 +781,7 @@ namespace Isis {
     out.Copy(in);
   }
 
+  
   /**
    * This slot emits a signal to discard all changes to the
    * current viewport
@@ -761,6 +791,7 @@ namespace Isis {
     emit discardChanges(cubeViewport());
   }
 
+  
   /**
    * This method allows the user to export the current view as an image file.
    *
@@ -808,6 +839,64 @@ namespace Isis {
     }
   }
 
+  
+  /**
+   * @brief FileTool::exportToList
+   *
+   * This method exports the file names of all active cubes into a .lis file by looping through
+   * The ViewportMainWindow and grabbing the file names from the active child CubeViewports.
+   *
+   * @author Adam Goins
+   */
+  void FileTool::exportToList() {
+      if (cubeViewport() == NULL) {
+        QMessageBox::information((QWidget *)parent(), "Error", "No active cubes to export");
+        return;
+      }
+
+      // The ViewportMainWindow is the parent container to the FileTool.
+      // We need to grab that object so that we can loop through it's children 
+      // To find the active cube viewports.
+      ViewportMainWindow* window = dynamic_cast<ViewportMainWindow*>(parent());
+      
+      if (window == NULL) {
+        QMessageBox::critical((QWidget *)parent(), "Error", "There was an error reading the viewport window.");
+        return;
+      }
+
+      QList<CubeViewport*> openCubes = window->findChildren<CubeViewport*>();
+      QList<QString> cubeFilePaths;
+
+      for (int i = 0; i < openCubes.size(); i++) {
+
+          CubeViewport* cubeViewport = openCubes.value(i);
+
+          QString cubeFileName(cubeViewport->cube()->fileName());
+          cubeFilePaths.append(cubeFileName);
+      }
+
+      QString fileName = QFileDialog::getSaveFileName((QWidget *) parent(),
+                                                      "Export to cube list",
+                                                      ".",
+                                                      "Cube List (*.lis)");
+
+      if (!fileName.contains(".lis")) {
+          fileName.append(".lis");
+      }
+
+      QFile outputFile(fileName);
+      outputFile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+      QTextStream out(&outputFile);
+
+      // Write each cube filename onto it's own line inside of that file.
+      for (int i = 0; i < cubeFilePaths.size(); i++){
+          out << cubeFilePaths.value(i) << "\n";
+      }
+      outputFile.close();
+  }
+
+  
   /**
    * This method allows the user to print the current viewport.
    *
@@ -844,6 +933,7 @@ namespace Isis {
     }
   }
 
+  
   /**
    * Try to close all open cubes and save/discard if necessary.
    */
@@ -866,6 +956,7 @@ namespace Isis {
     return true;
   }
 
+  
   /**
    * Exit the program, this slot called when the exit is chosen from the File menu
    *
@@ -902,6 +993,7 @@ namespace Isis {
       p_print->setEnabled(false);
       p_save->setEnabled(false);
       p_exportView->setEnabled(false);
+      p_exportToList->setEnabled(false);
       p_saveAs->setEnabled(false);
       p_saveInfo->setEnabled(false);
     }
@@ -931,6 +1023,7 @@ namespace Isis {
       }
       p_print->setEnabled(true);
       p_exportView->setEnabled(true);
+      p_exportToList->setEnabled(true);
       p_saveAs->setEnabled(true);
       p_saveInfo->setEnabled(true);
     }
