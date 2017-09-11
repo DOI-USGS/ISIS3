@@ -24,12 +24,13 @@
 #include "CameraDistortionMap.h"
 
 namespace Isis {
-  /** Camera distortion map constructor
+  /** 
+   * Camera distortion map constructor
    *
-   * Create a camera distortion map.  This class maps between distorted
-   * and undistorted focal plane x/y's.  The default mapping is the
-   * identity, that is, the focal plane x/y and undistorted focal plane
-   * x/y will be identical.
+   * Create a radial camera distortion map.  This class maps between 
+   * distorted and undistorted focal plane x/y's.  The default mapping 
+   * is the identity, that is, the focal plane x/y and undistorted 
+   * focal plane x/y will be identical. 
    *
    * @param parent        the parent camera that will use this distortion map
    * @param zDirection    the direction of the focal plane Z-axis
@@ -43,7 +44,15 @@ namespace Isis {
   }
 
 
-  /** Load distortion coefficients
+  /**
+   * Destructor for the ISIS3 default camera distortion map. 
+   */
+  CameraDistortionMap::~CameraDistortionMap() {
+  }
+
+
+  /** 
+   * Load distortion coefficients
    *
    * This method loads the distortion coefficients from the instrument
    * kernel.  The coefficients in the NAIF instrument kernel are
@@ -70,7 +79,8 @@ namespace Isis {
   }
 
 
-  /** Compute undistorted focal plane x/y
+  /** 
+   * Compute undistorted focal plane x/y
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
    * This virtual method can be used to apply various techniques for removing
@@ -114,7 +124,8 @@ namespace Isis {
   }
 
 
-  /** Compute distorted focal plane x/y
+  /** 
+   * Compute distorted focal plane x/y
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
    * This virtual method is used to apply various techniques for adding
@@ -191,19 +202,79 @@ namespace Isis {
   }
 
 
-  /**
-   * @returns The optical distortion of polynomial coefficients
+  /** 
+   * Retrieve the distortion coefficients used for this model. 
+   *  
+   * @returns The optical distortion of polynomial coefficients.
    */
   std::vector<double> CameraDistortionMap::OpticalDistortionCoefficients() const {
     return p_odk;
   }
 
 
-  /**
+  /** 
+   * Gets the z-direction for this camera. The direction is represented as 
+   * +/- 1. 
    * @returns The direction of the focal plane Z-axis
    */
   double CameraDistortionMap::ZDirection() const {
     return p_zDirection;
+  }
+
+
+  /** 
+   * Gets the x-value in the focal plane coordinate system. This is represented 
+   * in millimeters from the origin. 
+   *  
+   * @returns The distorted focal plane x.
+   */
+  double FocalPlaneX() const {
+    return p_focalPlaneX;
+  }
+  
+
+  /**
+   * Gets the y-value in the focal plane coordinate system. This is represented 
+   * in millimeters from the origin.
+   *  
+   * @returns The distorted focal plane y.
+   */
+  double FocalPlaneY() const {
+    return p_focalPlaneY;
+  }
+  
+
+  /**
+   * Gets the x-value in the undistorted focal plane coordinate system. This is represented 
+   * in millimeters from the origin.
+   * 
+   *@returns The undistorted focal plane x
+   */
+  double UndistortedFocalPlaneX() const {
+    return p_undistortedFocalPlaneX;
+  }
+  
+
+  /**
+   * Gets the y-value in the undistorted focal plane coordinate system. This is represented 
+   * in millimeters from the origin. 
+   *  
+   * @returns The undistorted focal plane y
+   */
+  double UndistortedFocalPlaneY() const {
+    return p_undistortedFocalPlaneY;
+  }
+  
+
+  /**
+   * Gets the z-value in the undistorted focal plane coordinate system. This is 
+   * represented as the focal length, in millimeters, with the sign indicating 
+   * z-direction. 
+   *  
+   * @returns The undistorted focal plane z
+   */
+  double UndistortedFocalPlaneZ() const {
+    return p_zDirection * p_camera->FocalLength();
   }
 
 }

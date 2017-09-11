@@ -35,7 +35,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestSampLine(Camera *cam, double samp, double line);
 
 /**
  * Unit test for Juno's JunoCam instrument.
@@ -43,6 +43,7 @@ void TestLineSamp(Camera *cam, double samp, double line);
  * @author 2017-09-11 Jesse Mapel
  * @internal
  *   @history 2017-09-11 Jesse Mapel - Original version.
+ *   @history 2017-09-11 Jeannie Backer - Updated test data.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -52,10 +53,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = -60.9701087981032046;
-    double knownLon = 268.988342485061139;
+    double knownLat = -45.4762320380959295;
+    double knownLon = 278.270465938390657;
 
-    Cube c("$juno/testData/JNCE_2013282_00M00099_V01_BLUE_0004.cub", "r");
+    Cube c("$juno/testData/JNCE_2013282_00M00099_V01_METHANE_0003.cub", "r");
     JunoCamera *cam = (JunoCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
@@ -83,19 +84,19 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
-    TestLineSamp(cam, 1250, 1.0);
+    TestSampLine(cam, 952.0, 1.0);
 
     qDebug() << "For upper right corner ...";
-    TestLineSamp(cam, cam->Samples(), 1.0);
+    TestSampLine(cam, 1630.0, 1.0);
 
     qDebug() << "For lower left corner ...";
-    TestLineSamp(cam, 1250, cam->Lines());
+    TestSampLine(cam, 1005.0, cam->Lines());
 
     qDebug() << "For lower right corner ...";
-    TestLineSamp(cam, cam->Samples(), cam->Lines());
+    TestSampLine(cam, 1630.0, cam->Lines());
 
-    double samp = 1435;
-    double line = 75;
+    double samp = 1300;
+    double line = 64;
     qDebug() << "For center pixel position ...";
 
     if(!cam->SetImage(samp, line)) {
@@ -124,7 +125,7 @@ int main(void) {
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
+void TestSampLine(Camera *cam, double samp, double line) {
   bool success = cam->SetImage(samp, line);
 
   if(success) {
@@ -135,7 +136,7 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     double deltaSamp = samp - cam->Sample();
     double deltaLine = line - cam->Line();
     if(fabs(deltaSamp) < 1.0e-3) deltaSamp = 0.0;
-    if(fabs(deltaLine) < 1.0e-4) deltaLine = 0.0;
+    if(fabs(deltaLine) < 1.0e-3) deltaLine = 0.0;
     qDebug() << "DeltaSample = " << deltaSamp;
     qDebug() << "DeltaLine = " << deltaLine;
     qDebug() << "";

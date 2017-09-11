@@ -50,16 +50,18 @@ namespace Isis {
    *                           since no unitTest exists. Fixed indentation
    *                           of history entries.  References #1490.
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *   @history 2017-09-04 Kristin Berry - Made SetDistortion virtual so that
+   *                           individual camera model distortion maps can
+   *                           set the values.
    *
    */
   class CameraDistortionMap {
     public:
       CameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
-      void SetDistortion(int naifIkCode);
+      virtual void SetDistortion(int naifIkCode);
 
-      //! Destructor
-      virtual ~CameraDistortionMap() {}
+      virtual ~CameraDistortionMap();
 
       virtual bool SetFocalPlane(double dx, double dy);
 
@@ -68,41 +70,11 @@ namespace Isis {
       std::vector<double> OpticalDistortionCoefficients() const;
 
       double ZDirection() const;
-
-      /**
-       * @returns The distorted focal plane x
-       */
-      inline double FocalPlaneX() const {
-        return p_focalPlaneX;
-      }
-
-      /**
-       * @returns The distorted focal plane y
-       */
-      inline double FocalPlaneY() const {
-        return p_focalPlaneY;
-      }
-
-      /**
-       *@returns The undistorted focal plane x
-       */
-      inline double UndistortedFocalPlaneX() const {
-        return p_undistortedFocalPlaneX;
-      }
-
-      /**
-       * @returns The undistorted focal plane y
-       */
-      inline double UndistortedFocalPlaneY() const {
-        return p_undistortedFocalPlaneY;
-      }
-
-      /**
-       * @returns The undistorted focal plane z
-       */
-      inline double UndistortedFocalPlaneZ() const {
-        return p_zDirection * p_camera->FocalLength();
-      }
+      double FocalPlaneX() const;
+      double FocalPlaneY() const;
+      double UndistortedFocalPlaneX() const;
+      double UndistortedFocalPlaneY() const;
+      double UndistortedFocalPlaneZ() const;
 
     protected:
       Camera *p_camera;                 //!< The camera to distort/undistort
