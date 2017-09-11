@@ -338,28 +338,14 @@ int main(int argc, char *argv[]) {
     if (residualsOutput.exists()) {
       residualsOutput.remove();
     }
-    
-    // Test output for case where control point coordinate type = Rectangular.
-    // Use BundleSolutionInfo = bsFromXml1, with
-    // ControlNet = outNet (needs to be updated to have coordType = Rectangular)
-    // BundleSettings = settings (updated to have coordType = Rectangular)
-    // This functionality is already tested in BundleResults.  Do we need this section??? (DAC)
-    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular);
-    BundleControlPointQsp freeBundleControlPointR(
-                                     new BundleControlPoint(settings, freePoint, metersToRadians));
-    BundleControlPointQsp fixedBundleControlPointR(
-                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
-    bundleControlPointVector.clear();
-    bundleControlPointVector.append(freeBundleControlPoint);
-    bundleControlPointVector.append(fixedBundleControlPoint);
-    BundleResults statisticsR;
-    statisticsR.setBundleControlPoints(bundleControlPointVector);
-    outNet.SetCoordType(SurfacePoint::Rectangular);
-    statisticsR.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
-    statisticsR.setObservations(observationVector);
-    BundleSolutionInfo info(settings, cnetFile, statisticsR, imgList, parent);
+    FileName imagesCsv("./bundleout_images.csv");
+    QFile imagesOutput(imagesCsv.expanded());
+    if (imagesOutput.exists()) {
+      imagesOutput.remove();
+    }
 
-    printXml(info);
+    qXmlFile1.remove();
+    qXmlFile2.remove();
 
   }
   catch (IException &e) {

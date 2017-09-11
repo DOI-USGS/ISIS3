@@ -271,6 +271,11 @@
       Removed examples with links leading to missing images. Created two new examples:
       one with default settings and another with a user-chosen ShapeModel.
     </change>
+    <change name="Kristin Berry" date="2017-06-06">
+      Updated spiceinit to retain ShapeModel-related keywords set by the ShapeModelFactory and add them to the kernel
+      group. Like other keywords in the kernels group, if they are present at the beginning of a spiceinit run (if we are re-spiceiniting) 
+      they are removed. 
+    </change>
   </history>
 
   <oldName>

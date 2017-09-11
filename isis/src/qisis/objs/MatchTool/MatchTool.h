@@ -207,6 +207,8 @@ namespace Isis {
    *                         handle these shortcuts. References #2324.
    * @history 2016-08-28 Kelvin Rodriguez - Removed unused member variables to eliminate warnings
    *                         in clang. Part of porting to OS X 10.11
+   * @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+   *                           SerialNumberList.remove()
    */
   class MatchTool : public Tool {
     Q_OBJECT

@@ -1,0 +1,8 @@
+# $Id: darwin_bin_paths.lis,v 1.0 2018/06/20 jmapel Exp $
+# Default 3rdParty locations for Max OS X libraries.  The first column servers
+# as a pattern to search all cooked library paths and replace with second
+# column.  Order is crtical as more complete paths must come before 
+# directories higher in the hierarchy.
+# This file is for specifically fixing binaries in frameworks that link against
+# libraries in the 3rdParty/libs directory.
+/opt/usgs/(.*?)/ports/lib        @loader_path/../../..

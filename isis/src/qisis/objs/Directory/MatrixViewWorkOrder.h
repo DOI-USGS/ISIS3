@@ -28,15 +28,21 @@ namespace Isis {
   class CorrelationMatrix;
 
   /**
-   * This work order will open a MatrixSceneWidget and display the correlation matrix. 
+   * This work order will open a MatrixSceneWidget and display the correlation matrix.
    *
    * @author 2014-07-14 Kimberly Oyama
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Adapted from Mosaic2DViewWorkOrder.
    *   @history 2016-06-06 Makayla Shepherd - Updated documentation. Fixes #3993.
-   *   @history 2017-04-10 Makayla Shepherd - Renamed syncRedo() to execute() and syncUndo() to 
+   *   @history 2017-04-10 Makayla Shepherd - Renamed syncRedo() to execute() and syncUndo() to
    *                           undoExecution() according to the WorkOrder redesign.
+   *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
+   *                           Fixes #4715
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-08-09 Cole Neubauer - Created a try catch around a previously unprotected error
+   *                           to handle errors thrown in the workorder that halted execution.
+   *                           Fixes #5026
    */
   class MatrixViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -49,7 +55,7 @@ namespace Isis {
 
       virtual bool isExecutable(CorrelationMatrix matrix);
       bool setupExecution();
-      
+
       void execute();
       void undoExecution();
 
@@ -62,4 +68,3 @@ namespace Isis {
   };
 }
 #endif
-

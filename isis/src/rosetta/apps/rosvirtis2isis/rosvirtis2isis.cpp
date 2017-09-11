@@ -24,7 +24,8 @@ using namespace Isis;
 
 // helper functions
 QByteArray pvlFix(QString fileName);
-int word(int byte1, int byte2);
+int word(const char byte1, const char byte2);
+int swapb(const unsigned short int word);
 double translateScet(int word1, int word2, int word3);
 bool isValid(int word);
 
@@ -173,6 +174,7 @@ void IsisMain ()
   std::vector< char * > hkData = p.DataTrailer();
   for (unsigned int i=0; i < hkData.size() ; i++) {
     const char *hk = hkData.at(i);
+    const unsigned short *uihk = reinterpret_cast<const unsigned short *> (hk);
 
     // Each data trailer can contain multiple 82-word records, but we only need 1 / line
     int start = 0;
@@ -190,20 +192,18 @@ void IsisMain ()
 
           // If Sine or Cosine, pre-process before sending to conversion.
           if (tableNum == 63) { // SIN
-            int HK_bit = (int) (temp) & 4095;
-            int HK_sign = (int) (temp/4096) & 1;
-            temp = (int) HK_bit * HK_sign;
-          }
-          if (tableNum == 64) { // COS
+            int HK_bit = (int) (((unsigned short int) temp) & 4095);
+            int HK_sign = (unsigned short int) (temp/4096.0) & 1;
+            rec[tableNum] = equations[tableNum].Evaluate((HK_sign * 1.0) * (HK_bit * 1.0));
+          } else if (tableNum == 64) { // COS
             temp = (int) (temp) & 4095;
-          }
-
-          // Specical one-to-many cases (Flags or Statistics)
-          if (tableNum == 2) { // # of Subslices / first seial num 2-3
+            rec[tableNum] = equations[tableNum].Evaluate(temp * 1.0);
+          } else if (tableNum == 2) { // # of Subslices / first seial num 2-3
             rec[tableNum] = hk[start+k]*1.0;
             rec[tableNum+1] = hk[start+k+1]*1.0;
             tableNum++;
-          } else if (tableNum == 4) { // Data Type 4-9
+          } // Specical one-to-many cases (Flags or Statistics)
+          else if (tableNum == 4) { // Data Type 4-9
             rec[tableNum] = (int)(temp/-32768) & 1;
             rec[tableNum+1] = (int)(temp/16384) & 1;
             rec[tableNum+2] = (int)(temp/8192) & 1;
@@ -279,11 +279,18 @@ void IsisMain ()
       }
       else {
         // Convert SCET records (3 words -> one output SCET)
+        int uk = k/2;
+#if 0
         int word1 = word(hk[start+k], hk[start+k+1]);
         int word2 = word(hk[start+k+2], hk[start+k+3]);
         int word3 = word(hk[start+k+4], hk[start+k+5]);
+#else
+        int word1 = swapb(uihk[uk]);
+        int word2 = swapb(uihk[uk+1]);
+        int word3 = swapb(uihk[uk+2]);
+#endif
 
-        int result;
+        double result;
 
         // If any of the words comprising the SCET are invalid, the whole thing is invalid.
         if (isValid(word1) && isValid(word2) && isValid(word3)) {
@@ -329,13 +336,16 @@ void IsisMain ()
   outcube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
   // Add correct kernels and output Kernel group for VIRTIS_M IR vs. VIS.
-  // VIRTIS_H is not supported.
+  // VIRTIS_H is also supported.
   PvlGroup kerns("Kernels");
   if (channelid == "VIRTIS_M_IR") {
-    kerns += PvlKeyword("NaifFrameCode", toString(-226212));
+    kerns += PvlKeyword("NaifFrameCode", toString(-226213));
   }
   else if (channelid == "VIRTIS_M_VIS") {
-    kerns += PvlKeyword("NaifFrameCode", toString(-226214));
+    kerns += PvlKeyword("NaifFrameCode", toString(-226211));
+  }
+  else if (channelid == "VIRTIS_H") {
+    kerns += PvlKeyword("NaifFrameCode", toString(-226220));
   }
   else {
     QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
@@ -356,17 +366,29 @@ void IsisMain ()
  *
  * @return int 2-word byte
  */
-int word(int byte1, int byte2)
+int word(const char byte1, const char byte2)
 {
-  int result = 65535;
-  if (!(((int) byte1 == -1) && ((int) byte2 == -1))) {
-    result = 0;
-    result += ((int)byte1) << 8;
-    result += ((int) byte2);
-  }
-  return result;
+  union {
+    unsigned short int w;
+    char b[2];
+  } swapper;
+
+  swapper.b[0] = byte2;
+  swapper.b[1] = byte1;
+  return swapper.w;
 }
 
+int swapb(const unsigned short int word) {
+  union {
+    unsigned short int w;
+    char b[2];
+  } swapper;
+
+  swapper.w = word;
+  swap(swapper.b[0], swapper.b[1]);
+
+  return ( (int) swapper.w);
+}
 
 /**
  * Translate the three constituent VIRTIS HK words into a 3-word SCET
@@ -380,7 +402,7 @@ int word(int byte1, int byte2)
  */
 double translateScet(int word1, int word2, int word3)
 {
-  return (unsigned long) (word1* pow(2.0,16.0)) + (unsigned long) word2 + (double) (word3)/pow(2.0,16.0);
+  return (((double) word1 * pow(2.0,16.0)) + (double) word2 + ((double) word3)/pow(2.0,16.0));
 }
 
 
@@ -440,7 +462,7 @@ QByteArray pvlFix(QString fileName){
       pvlLines[i].append(",");
     }
     else if (local.contains("SPICE_FILE_NAME") || withinSpice) {
-      if (local.contains(")")) {
+      if (local.contains(")") || local.contains("NULL")) {
         withinSpice = false;
       }
       else {

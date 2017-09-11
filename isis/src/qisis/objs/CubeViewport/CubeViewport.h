@@ -421,6 +421,7 @@ namespace Isis {
        * Emitted with current progress (0 to 100) when working
        */
       void progressChanged(int);
+      void progressComplete();
 
       /**
        * Emitted when a brick is no longer needed, should only be sent

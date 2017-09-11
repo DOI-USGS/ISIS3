@@ -41,11 +41,15 @@ namespace Isis {
    *   @history 2016-07-27 Tracie Sucharski - Added support for shape models.
    *   @history 2016-09-09 Tracie Sucharski - Put option to choose either creating a new view or
    *                          adding images to an existing view.
-   *   @history 2016-11-02 Makayla Shepherd - Changed the display text from View Raw Cubes to 
-   *                          Display Images. Fixes #4494. 
-   *   @history 2017-04-06 Makayla Shepherd - Added isUndoable, and renamed execute() to 
-   *                          setupExecution(), and syncRedo() to execute() according to the 
+   *   @history 2016-11-02 Makayla Shepherd - Changed the display text from View Raw Cubes to
+   *                          Display Images. Fixes #4494.
+   *   @history 2017-04-06 Makayla Shepherd - Added isUndoable, and renamed execute() to
+   *                          setupExecution(), and syncRedo() to execute() according to the
    *                          WorkOrder redesign.
+   *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
+   *                           Fixes #4715
+   *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
+   *                          Fixes #5064
    */
   class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -58,7 +62,7 @@ namespace Isis {
 
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(ShapeList *shapes);
-      
+
       bool isUndoable() const;
 
       bool setupExecution();
@@ -72,4 +76,3 @@ namespace Isis {
   };
 }
 #endif
-

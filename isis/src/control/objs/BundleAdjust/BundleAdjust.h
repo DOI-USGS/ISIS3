@@ -282,7 +282,10 @@ namespace Isis {
    *                           reference. References #4664.
    *   @history 2017-06-08 Makayla Shepherd - Modified imageLists() to close the image cube after
    *                           adding it to the image list. Fixes #4908.
-   *   @history 2017-07-31 Debbie A. Cook - Added BundleSettingsQsp as argument to
+   *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
+   *                           in each of the constructors to verify valid control net input.
+   *                           Fixes #5068.
+   *   @history 2017-09-01 Debbie A. Cook - Added BundleSettingsQsp as argument to
    *                            BundleControlPoint constructor and moved setWeights call from 
    *                            BundleAdjust::init to BundleControlPoint constructor.  Don't allow
    *                            solving for triaxial radii when coordinate type is not Latitudinal. 

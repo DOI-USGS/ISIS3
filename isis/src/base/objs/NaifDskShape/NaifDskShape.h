@@ -50,6 +50,9 @@ namespace Isis {
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
    *                           References #2214
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *                            intersectSurface methods in ShapeModel are accessible by
+   *                            EllipsoidShape.
    *   @todo Remove Model from name to match other derived classes
    */
   class NaifDskShape : public ShapeModel {
@@ -61,6 +64,9 @@ namespace Isis {
 
       // Destructor
       ~NaifDskShape();
+
+      // Make parent functions visible
+      using Isis::ShapeModel::intersectSurface;
 
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,

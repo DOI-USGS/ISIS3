@@ -17,6 +17,7 @@
 #include "FileName.h"
 #include "LeastSquares.h"
 #include "NumericalApproximation.h"
+#include "Pixel.h"
 #include "PolynomialUnivariate.h"
 #include "ProcessByLine.h"
 #include "Preference.h"
@@ -27,6 +28,7 @@
 #include "UserInterface.h"
 #include "IException.h"
 #include "IString.h"
+#include <QDir>
 
 using namespace Isis;
 using namespace std;
@@ -63,6 +65,7 @@ namespace gbl {
   vector <vector <double> > dark_DN;
   // flatfield variables
   FileName dustFile;
+  FileName dustFile2;
   FileName mottleFile;
   double strengthFactor;
   bool dustCorrection, mottleCorrection, flatCorrection;
@@ -75,7 +78,7 @@ namespace gbl {
   double sumFactor;
   double efficiencyFactor;
   //correction factor variables
-  double polarizationFactor;
+  double jupiterCorrectionFactor;
   double correctionFactor;
 }
 
@@ -100,7 +103,7 @@ void IsisMain() {
   gbl::opticsArea = 1.0;
   gbl::sumFactor  = 1.0;
   gbl::efficiencyFactor = 1.0;
-  gbl::polarizationFactor = 1.0;
+  gbl::jupiterCorrectionFactor = 1.0;
   gbl::correctionFactor = 1.0;
 
   // Set up our ProcessByLine objects
@@ -228,12 +231,16 @@ void IsisMain() {
   if(gbl::mottleCorrection) { // Calibrate() parameter in[3]
     secondpass.SetInputCube(gbl::mottleFile.expanded(), att);
   }
+  if (gbl::dustCorrection && !gbl::cissLab->AntibloomingOn()) {  // Calibrate() parameter in[4]
+    secondpass.SetInputCube(gbl::dustFile2.expanded(), att);
+  }
   // this pass will call the Calibrate method
   secondpass.Progress()->SetText("Calibrating image...");
   outcube->putGroup(gbl::calgrp);
   secondpass.StartProcess(gbl::Calibrate);
   secondpass.EndProcess();
   gbl::calgrp.clear();
+
   return;
 
 } //END MAIN
@@ -254,16 +261,20 @@ void IsisMain() {
  *   @history 2009-05-27 Jeannie Walldren - Added polarization
  *            factor correction.  Updated ConstOffset value per
  *            new idl cisscal version, 3.6.
+ *   @history 2017-06-08 Cole Neubauer - Added dustfile2 correction.
+ *            Updated ConstOffset value to match new idl cisscal version, 3.8.
  */
 void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer *flat = 0;
   Buffer *dustCorr = 0;
   Buffer *mottleCorr = 0;
+  Buffer *dustCorr2 = 0;
   if(gbl::flatCorrection) {
     flat = in[1];
   }
   if(gbl::dustCorrection) {
     dustCorr = in[2];
+    dustCorr2= in[4];
     if(gbl::mottleCorrection) {
       mottleCorr = in[3];
     }
@@ -307,12 +318,14 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
       else {
         outLine[sampIndex] = (outLine[sampIndex]) * (gbl::stretch.Map((int) outLine[sampIndex]));
       }
-
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
       // STEP 5)  flatfield correction
       // 5a1: dust ring correction
       if(gbl::dustCorrection) {
         outLine[sampIndex] = (outLine[sampIndex]) * ((*dustCorr)[sampIndex]);
+        if (!gbl::cissLab->AntibloomingOn()) {
+            outLine[sampIndex] = (outLine[sampIndex] * ((*dustCorr2)[sampIndex]));
+        }
         // 5a2: mottle correction
         if(gbl::mottleCorrection) {
           outLine[sampIndex] = (outLine[sampIndex]) * (1 - ((gbl::strengthFactor) * ((*mottleCorr)[sampIndex]) / 1000.0));
@@ -320,9 +333,11 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
       }
       // 5b: divide by flats
       if(gbl::flatCorrection) {
+        if(Isis::IsSpecial((*flat)[sampIndex])){
+          (*flat)[sampIndex] = 1;
+        }
         outLine[sampIndex] = outLine[sampIndex] / ((*flat)[sampIndex]);
       }
-
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
       // STEP 6)  convert DN to flux
       // 6a DN to Electrons
@@ -340,12 +355,18 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
         //  for the WAC. Use this until better data available. (12/1/2005 - BDK)
         //  UPDATE: Used azimuthal ring scans to pin down WAC to around 1.8 ms.
         //  (1/18/2006 - BDK)
+        //  UPDATE #2: S58 SPICA data gives WAC shutter offset of about 2.86 ms.
+        //  (9/21/2010 - BDK)
+        // UPDATE #3: Rhea SATCAL obs from rev 163 give NAC offset of 2.74 and
+        // WAC offset of 2.67 ms, much less noisy results than using stars.
+        // (1/31/2013 - BDK)
+
         double ConstOffset;
         if(gbl::cissLab->InstrumentId() == "ISSNA") {
-          ConstOffset = 2.85;
+          ConstOffset = 2.75;
         }
         else {
-          ConstOffset = 1.8;
+          ConstOffset = 2.67;
         }
         exposureTime = exposureTime - ConstOffset;
         outLine[sampIndex] = outLine[sampIndex] * 1000 / exposureTime;  // 1000 to scale ms to seconds
@@ -354,15 +375,22 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
       outLine[sampIndex] = outLine[sampIndex] * gbl::sumFactor / (gbl::solidAngle * gbl::opticsArea);
       // 6d Divide By Efficiency
       outLine[sampIndex] = outLine[sampIndex] / gbl::efficiencyFactor;
-
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
       // STEP 7)  correction factors
-      outLine[sampIndex] = outLine[sampIndex] / (gbl::correctionFactor * gbl::polarizationFactor);
-
+      outLine[sampIndex] = outLine[sampIndex] * ((gbl::jupiterCorrectionFactor / gbl::correctionFactor));
+      if (outLine[sampIndex] < 0) {
+        outLine[sampIndex] = 0;
+      }
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
+    else if (IsSpecial(bitweightCorrected[sampIndex][lineIndex])) {
+      outLine[sampIndex] = bitweightCorrected[sampIndex][lineIndex];
     }
     else {
       outLine[sampIndex] = bitweightCorrected[sampIndex][lineIndex];
+      if (outLine[sampIndex] < 0) {
+        outLine[sampIndex] = 0;
+      }
     }
   }
   return;
@@ -371,7 +399,6 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
 
 //=====4 Bitweight Methods=======================================================================//
 // These methods are modelled after IDL CISSCAL's cassimg_bitweightcorrect.pro
-
 /**
  * The purpose of this method is to copy the input to output if
  * no bitweight correction occurs.
@@ -417,7 +444,6 @@ void gbl::BitweightCorrect(Buffer &in) {
     if(IsValidPixel(in[sampIndex])) {
       gbl::bitweightCorrected[sampIndex][lineIndex] = gbl::stretch.Map(in[sampIndex]);
     }
-    //Handle special pixels
     else {
       gbl::bitweightCorrected[sampIndex][lineIndex] = in[sampIndex];
     }
@@ -613,7 +639,6 @@ vector<double> gbl::OverclockFit() {
   if(avg[0] > 2 * avg[1]) {
     avg[0] = avg[1];
   }
-
   // initialize eqn
   eqn.push_back(0.0);
   for(unsigned int i = 0; i < avg.size(); i++) {
@@ -638,7 +663,6 @@ vector<double> gbl::OverclockFit() {
   for(unsigned int i = 0; i < overclocks.size(); i++) {
     eqn[0] = (double)(i + 1);
     overclockfit.push_back(lsq.Evaluate(eqn));
-
   }
   //return a copy of the vector of linear fitted overclocks
   // this will be used as the bias
@@ -715,6 +739,7 @@ void gbl::Linearize() {
   vector <double> DN_VALS, C_VALS;
   // Get the directory where the CISS linearize directory is.
   FileName linearLUT(gbl::GetCalibrationDirectory("linearize") + lut);
+
   if(!linearLUT.fileExists()) {
     throw IException(IException::Io,
                      "Unable to calibrate image. LinearityCorrectionTable ***"
@@ -792,24 +817,40 @@ void gbl::FindDustRingParameters() {
   gbl::dustCorrection = true;
   gbl::calgrp += PvlKeyword("DustRingCorrectionPerformed", "Yes");
   gbl::calgrp.findKeyword("DustRingCorrectionPerformed").addComment("DustRing Correction Parameters");
+  // needs to check directory for current epochs and compare
+  double imgNumber = gbl::cissLab->ImageNumber();
+  long largestEpochFileNum = 0;
+  QStringList fileList = QDir(gbl::GetCalibrationDirectory("dustring")).entryList();
+  for(int i = 0; i < fileList.count(); i++){
+    long currentEpoch = FileName(fileList[i]).baseName().mid(13, 10).toInt();
+    if (currentEpoch > largestEpochFileNum && currentEpoch <= imgNumber) {
+        largestEpochFileNum = currentEpoch;
+    }
+  }
+
   // get name of dust file
-  gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_venus."
-                   + gbl::cissLab->InstrumentModeId() + ".cub");
-  if(!gbl::dustFile.fileExists()) { // dustring file not found, stop calibration
-    throw IException(IException::Io,
-                     "Unable to calibrate image. DustRingFile ***"
-                     + gbl::dustFile.expanded() + "*** not found.", _FILEINFO_);
+  gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_" + QString::number(largestEpochFileNum)
+                   + "." + gbl::cissLab->InstrumentModeId() + ".cub");
+  if(!gbl::dustFile.fileExists()) { // dustring file not found, assume file uses old dustring files
+    gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_venus."
+                    + gbl::cissLab->InstrumentModeId() + ".cub");
+    if(!gbl::dustFile.fileExists()) { // dustring file not found, stop calibration
+      throw IException(IException::Io,
+                      "Unable to calibrate image. DustRingFile ***"
+                      + gbl::dustFile.expanded() + "*** not found.", _FILEINFO_);
+    }
   }
   gbl::calgrp += PvlKeyword("DustRingFile", gbl::dustFile.expanded());
-
-  // No mottle correct for summation mode other than 1
-  if(gbl::cissLab->SummingMode() != 1) {
-    gbl::mottleCorrection = false;
-    gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: Summing mode is " + toString(gbl::cissLab->SummingMode()));
-    gbl::calgrp += PvlKeyword("MottleFile", "Not applicable: No mottle correction");
-    gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", "Not applicable: No mottle correction");
-    gbl::calgrp += PvlKeyword("StrengthFactor", "Not applicable: No mottle correction");
-    return;
+  // if anti-blooming correction is off correct ring at sample=887, line=388
+  if (!gbl::cissLab->AntibloomingOn()) {
+    gbl::dustFile2 = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_aboff"
+                      + "." + gbl::cissLab->InstrumentModeId() +".cub");
+    if(!gbl::dustFile2.fileExists()) { // dustring file not found, stop calibration
+      throw IException(IException::Io,
+                       "Unable to calibrate image. DustRingFile2 ***"
+                       + gbl::dustFile2.expanded() + "*** not found.", _FILEINFO_);
+    }
+    gbl::calgrp += PvlKeyword("DustRingFile2", gbl::dustFile2.expanded());
   }
 
   // No Mottling correction for images before sclk=1444733393: (i.e., 2003-286T10:28:04)
@@ -823,8 +864,9 @@ void gbl::FindDustRingParameters() {
     return;
   }
 
-  // Mottling correction for full images after 2003-286T10:28:04
-  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring") + "nac_mottle_1444733393.full.cub");
+  // Mottling correction for images after 2003-286T10:28:04
+  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring") + "nac_mottle_1444733393."+
+                      gbl::cissLab->InstrumentModeId() + ".cub");
   if(!gbl::mottleFile.fileExists()) { // mottle file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. MottleFile ***"
@@ -838,9 +880,12 @@ void gbl::FindDustRingParameters() {
   vector <int> filterIndex(2);
   filterIndex[0] = gbl::cissLab->FilterIndex()[0];
   filterIndex[1] = gbl::cissLab->FilterIndex()[1];
-  if(filterIndex[0] == 17 && filterIndex[1] == 18) { //filter combo CL1/CL2
+
+  if((filterIndex[0] == 17 || filterIndex[0] == 21 || filterIndex[0] == 22 || filterIndex[0] ==  23 \
+      || filterIndex[0] == 35) && filterIndex[1] == 18) { //filter combo CL1 or P0 or P60 or P120 or IRP0/CL2
     filterIndex[0] = -1;
   }
+
   if((filterIndex[0] < 17 && filterIndex[1] < 17) || (filterIndex[0] >= 17 && filterIndex[1] >= 17)) {
     gbl::strengthFactor = 0.0;
     // use effective wavelength to estimate strength factor:
@@ -1270,6 +1315,18 @@ void gbl::DivideByAreaPixel() {
  */
 
 void gbl::FindEfficiencyFactor(QString fluxunits) {
+  // for polarized filter combinations, use corresponding clear transmission:
+  QString filter1 = gbl::cissLab->FilterName()[0];
+  QString filter2 = gbl::cissLab->FilterName()[1];
+  if(filter1 == "IRP0" || filter1 == "P120" || filter1 == "P60" || filter1 == "P0"
+      || filter2 == "IRP90" || filter2 == "IRP0") {
+    if(gbl::cissLab->InstrumentId() == "ISSNA") {
+      filter1 = "CL1";
+    }
+    if(gbl::cissLab->InstrumentId() == "ISSWA") {
+      filter2 = "CL2";
+    }
+  }
 
   gbl::calgrp += PvlKeyword("DividedByEfficiency", "Yes");
   gbl::calgrp += PvlKeyword("EfficiencyFactorMethod", fluxunits);
@@ -1280,8 +1337,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
 
   FileName transfile(gbl::GetCalibrationDirectory("efficiency/systrans")
                      + gbl::cissLab->InstrumentId().toLower()
-                     + gbl::cissLab->FilterName()[0].toLower()
-                     + gbl::cissLab->FilterName()[1].toLower() + "_systrans.tab");
+                     + filter1.toLower()
+                     + filter2.toLower() + "_systrans.tab");
   if(!transfile.fileExists()) { // transmission file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. TransmissionFile ***"
@@ -1541,84 +1598,22 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
  *            FindCorrectionFactor since code was added to find
  *            the polarization correction factor, when
  *            available.
+ *   @history 2017-06-08 Cole Neubauer - removed polarization correcton
+ *            factor and added Jupiter correction factor to match 3.8 update
  */
 void gbl::FindCorrectionFactors() {
   QString filter1 = gbl::cissLab->FilterName()[0];
   QString filter2 = gbl::cissLab->FilterName()[1];
-  // check if polarized filters
   if(filter1 == "IRP0" || filter1 == "P120" || filter1 == "P60" || filter1 == "P0"
       || filter2 == "IRP90" || filter2 == "IRP0") {
-    FileName polarizationFactorFile(gbl::GetCalibrationDirectory("correction") + "pol_correction.tab");
-    if(!polarizationFactorFile.fileExists()) { // correction factor file not found, stop calibration
-      throw IException(IException::Io,
-                       "Unable to calibrate image. PolarizationFactorFile ***"
-                       + polarizationFactorFile.expanded() + "*** not found.", _FILEINFO_);
+    if(gbl::cissLab->InstrumentId() == "ISSNA") {
+      filter1 = "CL1";
     }
-    gbl::calgrp += PvlKeyword("PolarizationFactorPerformed", "Yes");
-    gbl::calgrp.findKeyword("PolarizationFactorPerformed").addComment("Correction Factor Parameters");
-    gbl::calgrp += PvlKeyword("PolarizationFactorFile", polarizationFactorFile.expanded());
-    CisscalFile *polFact = new CisscalFile(polarizationFactorFile.expanded());
-    gbl::polarizationFactor = 0.0;
-    QString col1, col2, col3, col4;
-    for(int i = 0; i < polFact->LineCount(); i++) {
-      QString line;
-      polFact->GetLine(line);  //assigns value to line
-      line = line.simplified().trimmed();
-      QStringList cols = line.split(" ");
-      col1 = cols.takeFirst();
-      if(col1 == gbl::cissLab->InstrumentId()) {
-        col2 = cols.takeFirst();
-        if(col2 == gbl::cissLab->FilterName()[0]) {
-          col3 = cols.takeFirst();
-          if(col3 == gbl::cissLab->FilterName()[1]) {
-            col4 = cols.takeFirst();
-            if(col4 == "") {
-              gbl::polarizationFactor = 1.0;
-              // dividing by polarization factor of 1.0 implies this correction is not performed
-              gbl::calgrp.findKeyword("PolarizationFactorPerformed").setValue("No: PolarizationFactorFile contained no factor for filter combination");
-            }
-            else {
-              gbl::polarizationFactor = toDouble(col4);
-            }
-            break;
-          }
-          else {
-            continue;
-          }
-        }
-        else {
-          continue;
-        }
-      }
-      else {
-        continue;
-      }
-    }
-    polFact->Close();
-
-    // if no factor was found for instrument ID and filter combination
-    if(gbl::polarizationFactor == 0.0) {
-      gbl::polarizationFactor = 1.0;
-      // dividing by polarization factor of 1.0 implies this correction is not performed
-      gbl::calgrp.findKeyword("PolarizationFactorPerformed").setValue("No: PolarizationFactorFile contained no factor for filter combination");
-    }
-    else {
-      // polarization factor is defined such that they are applied with the correction factor for the related CLR/Filter pair
-      if(gbl::cissLab->InstrumentId() == "ISSNA") {
-        filter1 = "CL1";
-      }
-      if(gbl::cissLab->InstrumentId() == "ISSWA") {
-        filter2 = "CL2";
-      }
-    }
-    gbl::calgrp += PvlKeyword("PolarizationFactor", toString(gbl::polarizationFactor));
-
+    if(gbl::cissLab->InstrumentId() == "ISSWA") {
+      filter2 = "CL2";
+   }
   }
-  else {
-    // no polarization correction - gbl::polarizationFactor already initialized to 1 in main()
-    gbl::calgrp += PvlKeyword("PolarizationFactorPerformed", "No");
-    gbl::calgrp.findKeyword("PolarizationFactorPerformed").addComment("Correction Factor Parameters");
-  }
+  // First Apply Standard Correction Factors
   // Get the directory where the CISS calibration directories are.
   FileName correctionFactorFile(gbl::GetCalibrationDirectory("correction") + "correctionfactors_qecorr.tab");
   if(!correctionFactorFile.fileExists()) { // correction factor file not found, stop calibration
@@ -1627,6 +1622,8 @@ void gbl::FindCorrectionFactors() {
                      + correctionFactorFile.expanded() + "*** not found.", _FILEINFO_);
   }
   gbl::calgrp += PvlKeyword("CorrectionFactorPerformed", "Yes");
+  gbl::calgrp.findKeyword("CorrectionFactorPerformed").addComment("Correction Factor Parameters");
+
   gbl::calgrp += PvlKeyword("CorrectionFactorFile", correctionFactorFile.expanded());
   CisscalFile *corrFact = new CisscalFile(correctionFactorFile.expanded());
   gbl::correctionFactor = 0.0;
@@ -1672,8 +1669,70 @@ void gbl::FindCorrectionFactors() {
     gbl::correctionFactor = 1.0;
     // dividing by correction factor of 1.0 implies this correction is not performed
     gbl::calgrp.findKeyword("CorrectionFactorPerformed").setValue("No: CorrectionFactorFile contained no factor for filter combination");
+    gbl::calgrp.findKeyword("CorrectionFactorPerformed").addComment("Correction Factor Parameters");
+
   }
   gbl::calgrp += PvlKeyword("CorrectionFactor", toString(gbl::correctionFactor));
+  // Now find Jupiter correction if neccesary
+  if (gbl::cissLab->TargetName() == QString("jupiter")){
+    FileName jupiterCorrectionFactorFile(gbl::GetCalibrationDirectory("correction") + "jupiter_correction.tab");
+    if(!jupiterCorrectionFactorFile.fileExists()) { // correction factor file not found, stop calibration
+      throw IException(IException::Io,
+                       "Unable to calibrate image. JupiterCorrectionFactorFile ***"
+                       + jupiterCorrectionFactorFile.expanded() + "*** not found.", _FILEINFO_);
+    }
+    gbl::calgrp += PvlKeyword("JupiterCorrectionFactorPerformed", "Yes");
+    gbl::calgrp += PvlKeyword("JupiterCorrectionFactorFile", jupiterCorrectionFactorFile.expanded());
+    CisscalFile *jCorrFact = new CisscalFile(jupiterCorrectionFactorFile.expanded());
+    gbl::jupiterCorrectionFactor = 0.0;
+    for(int i = 0; i < jCorrFact->LineCount(); i++) {
+      QString line;
+      jCorrFact->GetLine(line);  //assigns value to line
+      line = line.simplified().trimmed();
+      QStringList cols = line.split(" ");
+      col1 = cols.takeFirst();
+      if(col1 == gbl::cissLab->InstrumentId()) {
+        col2 = cols.takeFirst();
+        if(col2 == filter1) {
+          col3 = cols.takeFirst();
+          if(col3 == filter2) {
+            col4 = cols.takeFirst();
+            if(col4 == "") {
+              gbl::jupiterCorrectionFactor = 1.0;
+              // dividing 1.0 by correction factor implies this correction is not performed
+              gbl::calgrp.findKeyword("JupiterCorrectionFactorPerformed").setValue("No: JupiterCorrectionFactorFile contained no factor for filter combination");
+            }
+            else {
+              gbl::jupiterCorrectionFactor = toDouble(col4);
+            }
+            break;
+          }
+          else {
+            continue;
+          }
+        }
+        else {
+          continue;
+        }
+      }
+      else {
+        continue;
+      }
+    }
+    jCorrFact->Close();
+
+    // if no factor was found for instrument ID and filter combination
+      if(gbl::jupiterCorrectionFactor == 0.0) {
+        gbl::jupiterCorrectionFactor = 1.0;
+        // dividing 1.0 by correction factor implies this correction is not performed
+        gbl::calgrp.findKeyword("JupiterCorrectionFactorPerformed").setValue("No: JupiterCorrectionFactorFile contained no factor for filter combination");
+      }
+    //}
+    else {
+      gbl::jupiterCorrectionFactor = 1.0;
+    }
+  }
+  gbl::calgrp += PvlKeyword("JupiterCorrectionFactor", toString(gbl::jupiterCorrectionFactor));
   return;
 }
 //=====End Correction Factor Methods=============================================================//
@@ -1694,4 +1753,3 @@ QString gbl::GetCalibrationDirectory(QString calibrationType) {
   QString missionDir = (QString) dataDir["Cassini"];
   return missionDir + "/calibration/" + calibrationType + "/";
 }
-

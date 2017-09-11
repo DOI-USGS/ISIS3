@@ -1,0 +1,199 @@
+Testing default shape model
+Model name:  "Embree"
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+
+
+Get an instance of the target manager
+
+Create an EmbreeShapeModel from a string
+
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+Testing accessors
+  Tolerance:  1.79769e+308
+Modify tolerance
+  Tolerance:  0.001
+  Is a DEM?:  false
+
+Create an EmbreeShapeModel from a pvl with ShapeModel keyword
+
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+
+Create an EmbreeShapeModel from a pvl with ElevationModel keyword
+
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+
+Testing observer look direction intersection
+
+
+Intersection inputs:
+  Observer position: ( 1000 ,  0 ,  0 )
+  Look direction:    ( -1 ,  0 ,  0 )
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
+Model has normal?  true
+  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+
+
+Testing observer look direction non-intersection
+
+
+Intersection inputs:
+  Observer position: ( 1000 ,  1000 ,  1000 )
+  Look direction:    ( 1 ,  1 ,  1 )
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+
+Testing latitude, longitude intersection
+
+
+Intersection inputs:
+  Latitude:   45
+  Longitude:  85
+  Observer position for occlusion: ( 10 ,  10 ,  10 )
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.0087 ,  0.0886 ,  0.0878 )
+Model has normal?  true
+  Surface Normal: ( -0.04559 ,  0.672259 ,  0.738911 )
+
+
+Testing latitude, longitude occlusion
+
+
+Using  "$hayabusa/testData/st_2391934788_v.cub"
+Intersection inputs:
+  Latitude:   0
+  Longitude:  282
+  Observer position for occlusion: ( -14.4159 ,  -7.85735 ,  0.395277 )
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+Intersecting Embree shape model without occlusion
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.0255 ,  -0.1383 ,  -0.0001 )
+Model has normal?  true
+  Surface Normal: ( 0.397582 ,  -0.895341 ,  -0.200733 )
+
+
+Testing surface point intersection
+
+
+Intersection inputs:
+  Surface Point: ( -0.216129 ,  -0.0786646 ,  0 )
+  Observer position for occlusion: ( -14.4159 ,  -7.85735 ,  0.395277 )
+  Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( -0.2165 ,  -0.0778 ,  0 )
+Model has normal?  true
+  Surface Normal: ( -0.73405 ,  -0.654923 ,  0.17957 )
+
+
+Testing surface point occlusion
+
+
+Intersection inputs:
+  Surface Point: ( 0.122788 ,  0.696364 ,  -0.707107 )
+  Observer position for occlusion: ( -14.4159 ,  -7.85735 ,  0.395277 )
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  false
+Model has normal?  false
+
+Intersecting Embree shape model without occlusion
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
+Model has normal?  true
+  Surface Normal: ( 0.250858 ,  0.57346 ,  -0.779881 )
+
+
+Testing local radius
+
+
+Local radius point
+  Latitude:   35
+  Longitude:  270
+Radius:  0.123904
+Checking that shape model status did not change
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
+Model has normal?  true
+  Surface Normal: ( 0.250858 ,  0.57346 ,  -0.779881 )
+
+Testing visibility check
+
+
+Intersecting Embree shape model
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
+Model has normal?  true
+  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+
+Intersection is visible from same position and look direction?  true
+Intersection is visible with non-intersecting look?  false
+Intersection is visible from the opposite side?  false
+Increase the tolerance to 10 km
+Intersection is now visible from the opposite side?  true
+Testing default ellipsoid normal
+
+
+Starting model status
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
+Model has normal?  true
+  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+
+Model status after recalculating
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
+Model has normal?  true
+  Surface Normal: ( 0.999747 ,  -0.0209697 ,  0.00810027 )
+
+Testing photometric angles
+
+
+Embree shape model status:
+Model has intersection?  true
+  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
+Model has normal?  true
+  Surface Normal: ( 0.999747 ,  -0.0209697 ,  0.00810027 )
+
+Emission angle:  1.28823
+Incidence angle:  6.92945
+Testing errors
+
+
+ShapeModel with a bad file name
+[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**USER ERROR** Cannot create a EmbreeShape from NotADSKFile.
+**I/O ERROR** Failed creating an EmbreeTargetShape from [NotADSKFile].
+**I/O ERROR** Failed loading target shape file [NotADSKFile].
+[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**USER ERROR** Cannot create a EmbreeShape from NotADSKFile.
+**I/O ERROR** Failed creating an EmbreeTargetShape from [NotADSKFile].
+**I/O ERROR** Failed loading target shape file [NotADSKFile].

@@ -36,6 +36,7 @@ namespace Isis {
    *   @history 2017-04-12 Tracie Sucharski - Refactored to match new WorkOrder design, renaming
    *                           execute to setupExecution, syncUndo to execute, and syncUndo to
    *                           undoExecution. Fixes #4745.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class RenameProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -62,4 +63,3 @@ namespace Isis {
   };
 }
 #endif
-

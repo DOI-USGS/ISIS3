@@ -107,6 +107,7 @@ namespace Isis {
    *                           and added padding to control statements to fit
    *                           coding standards. Added padding to control
    *                           statements. References #1169.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class Blobber {
     public:

@@ -49,6 +49,7 @@ namespace Isis {
    *                           These are tested by application socetlinescankeywords
    *                           since no unitTest exists. Fixed indentation
    *                           of history entries.  References #1490.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    */
   class CameraDistortionMap {
@@ -68,41 +69,51 @@ namespace Isis {
 
       double ZDirection() const;
 
-      //! Return distorted focal plane x
+      /**
+       * @returns The distorted focal plane x
+       */
       inline double FocalPlaneX() const {
         return p_focalPlaneX;
       }
 
-      //! Return distorted focal plane y
+      /**
+       * @returns The distorted focal plane y
+       */
       inline double FocalPlaneY() const {
         return p_focalPlaneY;
       }
 
-      //! Return undistorted focal plane x
+      /**
+       *@returns The undistorted focal plane x
+       */
       inline double UndistortedFocalPlaneX() const {
         return p_undistortedFocalPlaneX;
       }
 
-      //! Return undistorted focal plane y
+      /**
+       * @returns The undistorted focal plane y
+       */
       inline double UndistortedFocalPlaneY() const {
         return p_undistortedFocalPlaneY;
       }
 
-      //! Return undistorted focal plane z
+      /**
+       * @returns The undistorted focal plane z
+       */
       inline double UndistortedFocalPlaneZ() const {
         return p_zDirection * p_camera->FocalLength();
       }
 
     protected:
-      Camera *p_camera;
+      Camera *p_camera;                 //!< The camera to distort/undistort
 
-      double p_focalPlaneX;
-      double p_focalPlaneY;
-      double p_undistortedFocalPlaneX;
-      double p_undistortedFocalPlaneY;
-      double p_zDirection;
+      double p_focalPlaneX;             //!< Distorted focal plane x
+      double p_focalPlaneY;             //!< Distorted focal plane y
+      double p_undistortedFocalPlaneX;  //!< Undistorted focal plane x
+      double p_undistortedFocalPlaneY;  //!< Undistorted focal plane y
+      double p_zDirection;              //!< Undistorted focal plane z
 
-      std::vector<double> p_odk;
+      std::vector<double> p_odk;        //!< Vector of distortion coefficients
   };
 };
 #endif

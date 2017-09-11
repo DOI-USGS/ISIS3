@@ -175,6 +175,10 @@ namespace Isis {
    *                           the long and short spacecraft and instrument names.
    *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
    *                           closer to ISIS coding standards. References #1438
+   *   @history 2017-03-23 Kris Becker - Added support for occlusion checks. Modified
+   *                            SetLocalGround(bool backCheck) to make a callback to the
+   *                            ShapeModel::isOccludedFrom() to test for point
+   *                            visability.
    */
   class Sensor : public Spice {
     public:

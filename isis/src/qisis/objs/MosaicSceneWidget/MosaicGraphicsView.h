@@ -13,7 +13,7 @@ namespace Isis {
    * @internal
    *   @history 2017-01-27 Tracie Sucharski - Added member variable to save the size of the graphics
    *                          view, because there is a bug in Qt's QResizeEvent::oldSize() method.
-   *                          This only happens when this is used from cnetsuite in a QMdiSubWindow.
+   *                          This only happens when this is used from ipce in a QMdiSubWindow.
    *                          See https://bugreports.qt.io/browse/QTBUG-32446.
    */
   class MosaicGraphicsView : public QGraphicsView {

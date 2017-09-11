@@ -25,9 +25,13 @@
 
 #include <string>
 
+#include "BulletShapeModel.h"
+#include "BulletTargetShape.h"
 #include "Cube.h"
 #include "DemShape.h"
 #include "EllipsoidShape.h"
+#include "EmbreeShapeModel.h"
+#include "EmbreeTargetManager.h"
 #include "EquatorialCylindricalShape.h"
 #include "FileName.h"
 #include "IException.h"
@@ -36,8 +40,11 @@
 #include "NaifStatus.h"
 #include "PlaneShape.h"
 #include "Projection.h"
+#include "Preference.h"
 #include "Pvl.h"
+#include "PvlFlatMap.h"
 #include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "Target.h"
 
 using namespace std;
@@ -46,20 +53,40 @@ namespace Isis {
   /**
    * Constructor is private to avoid instantiating the class.  Use the Create method.
    *
-   * @author dcook (7/29/2010)
+   * @author 2010-01-29 Debbie Cook
    */
-  ShapeModelFactory::ShapeModelFactory() {}
+  ShapeModelFactory::ShapeModelFactory() {
+  }
+
 
   //! Destructor
-  ShapeModelFactory::~ShapeModelFactory() {}
+  ShapeModelFactory::~ShapeModelFactory() {
+  }
+
 
   /**
-   *
+   * Construct a valid shape model from the given target and contents of kernels 
+   * group. If the Kernels group does not have a ShapeModel or ElevationModel 
+   * specified, then the default model is an ellipsoidal shape. 
+   * 
+   * @param target Pointer to target body model.
+   * @param pvl Pvl containing a Kernels group.
+   * 
+   * @return ShapeModel* Pointer to the created ShapeModel object.
+   * 
+   * @author 2017-03-17 Kris Becker
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
 
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.findGroup("Kernels", Pvl::Traverse);
+
+    // Get user preferences to determine preferred model
+    PvlFlatMap parameters(kernelsPvlGroup);
+    if ( Preference::Preferences().hasGroup("ShapeModel") ) {
+      parameters.merge(PvlFlatMap(Preference::Preferences().findGroup("ShapeModel")));
+    }
+
     // Do we need a sky shape model, member variable, or neither? For now treat sky as ellipsoid
     bool skyTarget = target->isSky();
 
@@ -131,12 +158,100 @@ namespace Isis {
       // in case no error was thrown, but constructor returned NULL
       finalError.append(IException(IException::Unknown, msg, _FILEINFO_));
     }
-    else { // assume shape model given is a NAIF DSK or DEM cube file name
+    else { // assume shape model given is a Bullet, Embree, NAIF DSK or DEM cube file name
+
+      QString preferred = parameters.get("RayTraceEngine", "None").toLower();
+      QString onerror   = parameters.get("OnError", "Continue").toLower();
+      bool    cubeSupported = toBool(parameters.get("CubeSupported", "False"));
+      double  tolerance = toDouble(parameters.get("Tolerance", toString(DBL_MAX)));
 
       // A file error message will be appened to the finalError, if no shape model is constructed.
       QString fileErrorMsg = "Invalid shape model file ["
                              + shapeModelFilenames + "] in Kernels group.";
       IException fileError(IException::Io, fileErrorMsg, _FILEINFO_);
+
+      //-------------- Check for bullet engine first -------------------------------//
+      if ( "bullet" == preferred ) {
+        // Check to see of ISIS cube DEMs get a pass
+        FileName v_shapefile(shapeModelFilenames);
+        QString ext = v_shapefile.extension().toLower();
+        bool cubeErrorContinue = ( ("cub" == ext) && (!cubeSupported) );
+
+        try {
+          BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
+          if ( 0 == bullet ) {
+
+            // Bullet failed to load the kernel...test failure conditions
+            if ( ("cub" == ext) && cubeSupported ) {
+              onerror = "fail";   // This is fatal no matter the condition
+              QString mess = "Bullet could not initialize ISIS Cube DEM";
+              throw IException(IException::Unknown, mess, _FILEINFO_);
+            }
+
+            // Always throw an error in this case 
+            QString b_msg = "Bullet could not initialize DEM!";
+            throw IException(IException::Unknown, b_msg, _FILEINFO_);            
+          }
+          else {
+
+            // Allocate the real shape model
+            BulletShapeModel *b_model = new BulletShapeModel(bullet, target, pvl);
+            b_model->setTolerance(tolerance);
+
+            // Do this here, otherwise default behavior will ensue from here on out
+            kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
+            kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
+            kernelsPvlGroup.addKeyword(PvlKeyword("CubeSupported", toString(cubeSupported)),
+                                                  PvlContainer::Replace);
+            kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
+                                                  PvlContainer::Replace);
+
+            return ( b_model );
+          }
+        } catch (IException &ie) {
+          fileError.append(ie);
+          QString mess = "Unable to create preferred BulletShapeModel";
+          fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
+          if ( ("fail" == onerror) && (!cubeErrorContinue) ) throw fileError;
+        }
+
+        // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23) 
+      }
+      
+      //-------------- Check for Embree engine -------------------------------//
+      if ( "embree" == preferred ) {
+
+        // Check to see of ISIS cube DEMs get a pass
+        FileName v_shapefile(shapeModelFilenames);
+        QString ext = v_shapefile.extension().toLower();
+        // TODO make an embreeCubeSupported boolean and check that instead
+        bool cubeErrorContinue = ( ("cub" == ext) && (!cubeSupported) );
+
+        try {
+
+          // Allocate the shape model
+          EmbreeTargetManager *targetManager = EmbreeTargetManager::getInstance();
+          EmbreeShapeModel *embreeModel = new EmbreeShapeModel(target, shapeModelFilenames,
+                                                               targetManager);
+          embreeModel->setTolerance(tolerance);
+
+          // Do this here, otherwise default behavior will ensue from here on out
+          kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("CubeSupported", toString(cubeSupported)),
+                                                PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
+                                                PvlContainer::Replace);
+
+          return ( embreeModel );
+          
+        } catch (IException &ie) {
+          fileError.append(ie);
+          QString mess = "Unable to create preferred EmbreeShapeModel";
+          fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
+          if ( ("fail" == onerror) && (!cubeErrorContinue) ) throw fileError;
+        }
+      }
 
       //-------------- Is the shape model a NAIF DSK? ------------------------------//
 

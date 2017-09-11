@@ -1,0 +1,32 @@
+Testing BulletWorldManager
+
+
+Testing default constructor
+
+World name:  "Body-Fixed-Coordinate-System"
+World size:  0
+
+
+Testing with a name
+World name:  "TestWorld"
+World size:  0
+
+
+Adding  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+
+World size:  1
+
+Test intersection
+Ray start: ( -10 ,  0 ,  0 )
+Ray end: ( 10 ,  0 ,  0 )
+Closest intersection: ( -0.248228 ,  0 ,  0 )
+
+Get the first target shape by index
+Target name:  ""
+Get the first target shape by name
+Target name:  ""
+
+Get a non-existant target by name
+Target pointer is valid? false
+
+Get the bullet world pointer

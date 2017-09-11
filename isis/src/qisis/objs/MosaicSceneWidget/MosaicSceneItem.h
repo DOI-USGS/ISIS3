@@ -41,6 +41,8 @@ namespace Isis {
    *                          Fixes #2208.
    *  @history 2016-05-18 Ian Humphrey - Explicitly made outlines cosmetic so that they always
    *                          appear as 1 pixel wide on screen (Qt4 to Qt5).
+   *  @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
+   *                          footprint. Fixes #5050.
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT
@@ -68,6 +70,7 @@ namespace Isis {
     signals:
       void colorChanged();
       void changed(const QList<QRectF> &);
+      void mosaicCubeClosed(Image *);
 
     public slots:
       void cubeDisplayChanged();
@@ -80,6 +83,7 @@ namespace Isis {
 
     private slots:
       void lostCubeDisplay();
+      void onCloseCube();
 
     private:
       MosaicSceneItem(const MosaicSceneItem &); //!< cannot copy

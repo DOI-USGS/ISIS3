@@ -3,12 +3,13 @@
 <application name="rosvirtis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import PDS formatted Rosetta VIRTIS image into an ISIS cube
+    Import PDS formatted Rosetta VIRTIS image into an ISIS cube.
   </brief>
 
   <description>
     <p>
-    This program will import and convert a PDS-formatted Rosetta VIRTIS-M image into an ISIS cube, and is designed to work with data available in the draft data area on PDS as of 04/25/2016, and with any officially released data as of 11/01/2016. VIRTIS-H data are not currently supported. 
+    This program will import and convert a PDS-formatted Rosetta VIRTIS-M or VIRTIS-H image into an ISIS cube.
+    This program is designed to work with data available in the draft data area on PDS as of 04/25/2016 and with any officially released data as of 11/01/2016. 
     </p>
     <p>
       The output cube will contain a substantial housekeeping data table named "HK." It contains, in order, the HK values for each line of the cube as described on pg 66-67 of the VIRTIS EAICD. 
@@ -26,6 +27,7 @@
     <h2>Instrument Overview</h2>
    <p>
      VIRTIS-M is a mapping spectrometer onboard the Rosetta mission comprised of two components: VIRTIS-M-VIS, and VIRTIS-M-IR. VIRTIS-M-VIS is the visible component, and VIRTIS-M-IR is the infrared component. 
+     VIRTIS-H is a high resolution infrared spectrometer (1840-4990 nm).
    </p>
     <h2>Data Archive</h2>
     <p>
@@ -46,6 +48,12 @@
     </change>
     <change name="Kristin Berry" date="2016-11-01">
        Add ability to ingest housekeeping data.  
+    </change>
+    <change name="Kaj Williams" date="2017-08-24">
+       Add ability to ingest VIRTIS-H files. References #5130.  
+    </change>
+    <change name="Kris Becker and Kaj Williams" date="2017-08-24">
+       Fix issues with the translation of housekeeping data. Fixes #5131.
     </change>
   </history>
 

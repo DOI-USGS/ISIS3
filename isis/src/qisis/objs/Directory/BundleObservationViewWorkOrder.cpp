@@ -27,18 +27,19 @@
 #include "Project.h"
 
 namespace Isis {
-  
-  /** 
-   * Creates a work order to view BundleObservation. This WorkOrder is not undoable and runs 
-   * synchronously. 
-   * 
+
+  /**
+   * Creates a work order to view BundleObservation. This WorkOrder is not undoable and runs
+   * synchronously.
+   *
    * @param Project *project Pointer to the project this work order belongs to.
    */
   BundleObservationViewWorkOrder::BundleObservationViewWorkOrder(Project *project) :
       WorkOrder(project) {
     m_isUndoable = false;
-    QAction::setText(tr("View &Bundle Observation..."));
-    QUndoCommand::setText(tr("View &Bundle Observation..."));
+    m_isSavedToHistory = false;
+    QAction::setText(tr("&View..."));
+    QUndoCommand::setText(tr("View..."));
   }
 
 
@@ -54,7 +55,7 @@ namespace Isis {
 
 
   /**
-   * @brief Destructor to clean up any memory that this work order allocates. 
+   * @brief Destructor to clean up any memory that this work order allocates.
    */
    BundleObservationViewWorkOrder::~BundleObservationViewWorkOrder() {
   }
@@ -62,28 +63,28 @@ namespace Isis {
 
   /**
    * @brief This method clones the current BundleObservationViewWorkOrder and returns it.
-   * 
+   *
    * @return @b BundleObservationViewWorkOrder that was cloned
    */
   BundleObservationViewWorkOrder *BundleObservationViewWorkOrder::clone() const {
 
     return new BundleObservationViewWorkOrder(*this);
   }
-  
+
 
   /**
-   * @brief 
+   * @brief
    *              False if none of the images has a footprint. This is used by
    *              Directory::supportedActions(DataType data) to determine what actions are appended
    *              to context menus.
-   * 
+   *
    * @param images ImageList of images
-   * 
+   *
    * @return @b bool True if one of the images in ImagesList images isFootprintable
    */
   bool BundleObservationViewWorkOrder::isExecutable(FileItemQsp fileItem) {
     bool result = false;
-   
+
     if (fileItem) {
       result = true;
     }
@@ -93,28 +94,28 @@ namespace Isis {
 
   /**
    * @brief Setup this WorkOrder for execution.
-   * 
-   * @return @b bool True if WorkOrder::execute() returns true and BundleObservationView can be 
-   *                 displayed, otherwise return False. 
+   *
+   * @return @b bool True if WorkOrder::execute() returns true and BundleObservationView can be
+   *                 displayed, otherwise return False.
    */
   bool BundleObservationViewWorkOrder::setupExecution() {
 
     bool success = WorkOrder::setupExecution();
-    return success; 
+    return success;
   }
 
 
   /**
-   * @brief This adds a new BundleObservationView to the project. 
-   *  
-   * @todo  When BundleObservation is serialized, get the BundleObservation and pass 
-   *        into Directory::addBundleObservationView. 
-   *  
+   * @brief This adds a new BundleObservationView to the project.
+   *
+   * @todo  When BundleObservation is serialized, get the BundleObservation and pass
+   *        into Directory::addBundleObservationView.
+   *
    */
   void BundleObservationViewWorkOrder::execute() {
-
     //ProjectItem * selectedItem = project()->directory()->model()->selectedItems();
     project()->directory()->addBundleObservationView(fileItem());
+    project()->setClean(false);
   }
 
 }

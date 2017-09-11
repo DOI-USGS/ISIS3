@@ -53,10 +53,6 @@ using namespace Isis;
 int main() {
   try {
 
-
-
-
-
     Preference::Preferences(true);
     QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
@@ -119,6 +115,14 @@ int main() {
     SurfacePoint *sp = shape.surfaceIntersection();
     cout << "     surface point = (" << sp->GetX().kilometers() << ", " <<
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
+
+    cout << endl << " Testing intersectSurface using surfacepoint from parent class..." << endl; 
+    shape.intersectSurface(*sp, sB);
+    cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+
+    cout << endl << " Testing intersectSurface using lat/lon from parent class..." << endl; 
+    shape.intersectSurface(sp->GetLatitude(), sp->GetLongitude(), sB);
+    cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal..." << endl;
     QVector<double *>  notUsed(4);

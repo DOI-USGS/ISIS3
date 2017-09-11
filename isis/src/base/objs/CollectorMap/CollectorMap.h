@@ -424,6 +424,8 @@ namespace Isis {
    *             when it *must* use the method from the one it is being created
    *             from. (g++ 4.1 on Suse 10.1 didn't like this bug at all!)
    *    @history 2008-06-18 Christopher Austin Fixed Documentation
+   *    @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   * 
    */
   template < typename K, typename T,
            template <class> class ComparePolicy = SimpleCompare,
@@ -433,7 +435,7 @@ namespace Isis {
   class CollectorMap : public RemovalPolicy<T>, public CopyPolicy<T> {
     public:
       typedef T                                      CollectorType; //!< Data type
-      //! A multimap attacking a key to a CollectorType and a ComparePolicy<CollectorType>
+      /** A multimap attacking a key to a CollectorType and a ComparePolicy<CollectorType>*/
       typedef std::multimap<K, CollectorType, ComparePolicy<K> > CollectorList;
       //! CollectorList iterator type declaration
       typedef typename CollectorList::iterator       CollectorIter;
@@ -503,6 +505,8 @@ namespace Isis {
        * in the CopyPolicy.
        *
        * @param cmap The CollectorMap to be copied
+       * 
+       * @returns Pointer to this CollectorMap
        */
       CollectorMap &operator=(const CollectorMap &cmap) {
         if(&cmap != this) {
@@ -589,6 +593,8 @@ namespace Isis {
        * @brief Const version returning the value associated with the given name
        *
        * @param key Key to fetch the value for
+       * 
+       * @returns The value associated with the given name
        */
       const T &get(const K &key) const {
         CollectorConstIter cItr = _list.find(key);

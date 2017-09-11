@@ -42,6 +42,9 @@ namespace Isis {
    *   @history 2017-04-11 Ian Humphrey - Removed isUndoable() and instead set inherited
    *                           m_isUndoable to false in constructor to indicate it is not undoable.
    *                           References #4734.
+   *   @history 2017-08-03 Cole Neubauer - Created a try catch around a previously unprotected
+   *                           error to handle errors thrown in the workorder that halted
+   *                           execution. Fixes #5026
    */
 
   class SetActiveImageListWorkOrder : public WorkOrder {

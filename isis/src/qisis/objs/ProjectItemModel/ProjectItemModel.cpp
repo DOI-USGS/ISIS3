@@ -21,14 +21,18 @@
 #include "IsisDebug.h"
 
 #include "ProjectItemModel.h"
-
+#include <QDebug>
 #include <QItemSelection>
 #include <QList>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QModelIndex>
 #include <QObject>
+#include <QRegExp>
+#include <QRegExpValidator>
 #include <QStandardItemModel>
 #include <QString>
+#include <QValidator>
 
 #include "BundleSolutionInfo.h"
 #include "Control.h"
@@ -46,18 +50,18 @@ namespace Isis {
   /**
    * Constructs an empty model.
    *
-   * @param[in] parent (QObject *) The parent.
+   * @param parent (QObject *) The parent.
    */
   ProjectItemModel::ProjectItemModel(QObject *parent) : QStandardItemModel(parent) {
     m_selectionModel = new QItemSelectionModel(this, this);
     connect(m_selectionModel, SIGNAL(selectionChanged(const QItemSelection &,
                                                       const QItemSelection &) ),
             this, SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &) ) );
-                                    
-    connect( this, SIGNAL(rowsInserted(const QModelIndex &, int, int)), 
+
+    connect( this, SIGNAL(rowsInserted(const QModelIndex &, int, int)),
              this, SLOT(onRowsInserted(const QModelIndex &, int, int)) );
 
-    connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), 
+    connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),
              this, SLOT(onRowsRemoved(const QModelIndex &, int, int)) );
 
   }
@@ -70,9 +74,9 @@ namespace Isis {
 
   }
 
-  
+
   /**
-   * You cannot drop mime data into the ProjectItemModel. 
+   * You cannot drop mime data into the ProjectItemModel.
    *
    * @see ProjectItemProxyModel
    *
@@ -91,7 +95,7 @@ namespace Isis {
     return false;
   }
 
-  
+
   /**
    * Returns the internal selection model.
    *
@@ -107,7 +111,7 @@ namespace Isis {
    * Project as well as children items that correspond to various parts of the
    * Project.
    *
-   * @param[in] project (Project *) The Project to be added.
+   * @param project (Project *) The Project to be added.
    *
    * @return @b ProjectItem* The new item that corresponds to the Project.
    */
@@ -127,6 +131,8 @@ namespace Isis {
             this, SLOT( onShapesAdded(ShapeList *) ) );
     connect(project, SIGNAL( targetsAdded(TargetBodyList *) ),
             this, SLOT( onTargetsAdded(TargetBodyList *) ) );
+    connect(project, SIGNAL( templatesAdded(QList<FileName>)),
+            this, SLOT( onTemplatesAdded(QList<FileName>)));
     connect(project, SIGNAL( guiCamerasAdded(GuiCameraList *) ),
             this, SLOT( onGuiCamerasAdded(GuiCameraList *) ) );
     ProjectItem *projectItem = new ProjectItem(project);
@@ -154,7 +160,7 @@ namespace Isis {
   QList<ProjectItem *> ProjectItemModel::selectedItems() {
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
-    
+
     foreach ( QModelIndex index, selection.indexes() ) {
       items.append( itemFromIndex(index) );
     }
@@ -169,7 +175,7 @@ namespace Isis {
    *
    * @param data (const QVariant &) The data contained in the item.
    *
-   * @param data (int) The role of the data (see Qt::ItemDataRole).
+   * @param role (int) The role of the data (see Qt::ItemDataRole).
    *
    * @return @b ProjectItem* First project item found.
    */
@@ -192,20 +198,30 @@ namespace Isis {
   /**
    * Removes an item and its children from the model.
    *
-   * @param[in] item (ProjectItem *) The item to be removed.
+   * @param item (ProjectItem *) The item to be removed.
+   *
+   * @internal
+   *   @history 2017-08-08 Marjorie Hahn - Added a check so that if the item to be removed
+   *                           has any children then they can be removed first. Fixes #5074.
    */
   void ProjectItemModel::removeItem(ProjectItem *item) {
     if (!item) {
       return;
     }
-//  qDebug()<<"ProjectItemModel::removeItem item= "<<item;
-    if ( ProjectItem *parentItem = item->parent() ) {
-//    qDebug()<<"ProjectItemModel::removeItem  ParentItem ";
-      removeRow( item->row(), parentItem->index() );
+
+    // remove any children the item has first
+    if (item->hasChildren()) {
+      for (int row = (item->rowCount() - 1); row >= 0; row--) {
+        removeRow(item->child(row)->row(), item->index());
+      }
+    }
+
+    if (ProjectItem *parentItem = item->parent()) {
+      // remove the item from its parent
+      removeRow(item->row(), parentItem->index());
     }
     else {
-//    qDebug()<<"ProjectItemModel::removeItem item row =  "<<item->row();
-      removeRow( item->row() );
+      removeRow(item->row());
     }
   }
 
@@ -213,19 +229,19 @@ namespace Isis {
   /**
    * Removes a list of items and their children from the model.
    *
-   * @param[in] item (ProjectItem *) The items to be removed.
+   * @param items (ProjectItem *) The items to be removed.
    */
   void ProjectItemModel::removeItems(QList<ProjectItem *> items) {
     foreach (ProjectItem *item, items) {
       removeItem(item);
     }
   }
-  
+
 
   /**
    * Appends a top-level item to the model.
    *
-   * @param[in] item (ProjectItem *) The item to append.
+   * @param item (ProjectItem *) The item to append.
    */
   void ProjectItemModel::appendRow(ProjectItem *item) {
     QStandardItemModel::appendRow(item);
@@ -235,7 +251,7 @@ namespace Isis {
   /**
    * Returns the QModelIndex corresponding to a given ProjectItem.
    *
-   * @param[in] item (const ProjectItem *) The item.
+   * @param item (const ProjectItem *) The item.
    *
    * @return @b QModelIndex The index of the item.
    */
@@ -243,12 +259,12 @@ namespace Isis {
     return QStandardItemModel::indexFromItem(item);
   }
 
-  
+
   /**
    * Inserts a top-level item at the given row.
    *
-   * @param[in] row (int) The row where the item will be inserted.
-   * @param[in] item (ProjectItem *) The item to insert.
+   * @param row (int) The row where the item will be inserted.
+   * @param item (ProjectItem *) The item to insert.
    */
   void ProjectItemModel::insertRow(int row, ProjectItem *item) {
     QStandardItemModel::insertRow(row, item);
@@ -258,7 +274,7 @@ namespace Isis {
   /**
    * Returns the top-level item at the given row.
    *
-   * @param[in] row (int) The row of the item.
+   * @param row (int) The row of the item.
    *
    * @return @b ProjectItem* The item at the row.
    */
@@ -270,7 +286,7 @@ namespace Isis {
   /**
    * Returns the ProjectItem corresponding to a given QModelIndex.
    *
-   * @param[in] index (const QModelIndex &) The index of the item.
+   * @param index (const QModelIndex &) The index of the item.
    *
    * @return @b ProjectItem* The item.
    */
@@ -278,28 +294,28 @@ namespace Isis {
     return static_cast<ProjectItem *>( QStandardItemModel::itemFromIndex(index) );
   }
 
-  
+
   /**
    * Sets the item at the top-level row.
    *
-   * @param[in] row (int) The row where the item will be set.
-   * @param[in] item (ProjectItem *) The item to set the row to.
+   * @param row (int) The row where the item will be set.
+   * @param item (ProjectItem *) The item to set the row to.
    */
   void ProjectItemModel::setItem(int row, ProjectItem *item) {
     QStandardItemModel::setItem(row, item);
   }
-  
-  
+
+
   /**
    * Removes the top-level row and returns the removed item.
    *
-   * @param[in] row (int) The row of the item to remove.
+   * @param row (int) The row of the item to remove.
    *
    * @return @b ProjectItem* The removed item.
    */
   ProjectItem *ProjectItemModel::takeItem(int row) {
     QList<QStandardItem *> items = QStandardItemModel::takeRow(row);
-    
+
     if ( items.isEmpty() ) {
       return 0;
     }
@@ -312,7 +328,7 @@ namespace Isis {
    * Slot to connect to the nameChanged() signal from a Project. Sets the name
    * of the ProjectItem that corresponds with the Project.
    *
-   * @param[in] newName (QString) The new name of the project
+   * @param newName (QString) The new name of the project
    */
   void ProjectItemModel::onNameChanged(QString newName) {
     Project *project = qobject_cast<Project *>( sender() );
@@ -327,9 +343,10 @@ namespace Isis {
         projectItem->setText(newName);
       }
     }
+    project->setClean(false);
   }
 
-  
+
   /**
    * Slot to connect to the bundleSolutionInfoAdded() signal from a
    * project. Adds a ProjectItem that corresponds to the
@@ -337,11 +354,12 @@ namespace Isis {
    * named "Results" of the item that corresponds to the Project that
    * sent the signal.
    *
-   * @param[in] bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo
+   * @param bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo
    *                                                      added to the Project.
    */
   void ProjectItemModel::onBundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(bundleSolutionInfo->name() );
 
     if (!project) {
       return;
@@ -359,19 +377,63 @@ namespace Isis {
             // Append the CSV files to the Statistics in the project
             ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedResidualsFilename())),
-                            bundleSolutionInfo->savedResidualsFilename(),
-                            QIcon(":spacecraft") );
+                            "Measure Residuals", bundleSolutionInfo->savedResidualsFilename(),
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(residualsItem);
             ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedImagesFilename())),
-                            bundleSolutionInfo->savedImagesFilename(),
-                            QIcon(":spacecraft") );
+                            "Images", bundleSolutionInfo->savedImagesFilename(),
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(imagesItem);
             ProjectItem *pointsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedPointsFilename())),
-                            bundleSolutionInfo->savedPointsFilename(),
-                            QIcon(":spacecraft") );
+                            "Control Points", bundleSolutionInfo->savedPointsFilename(),
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
             pItem->child(2)->appendRow(pointsItem);
+          }
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Slot connected to the templatesAdded() signal from a project. Adds a ProjectItem for
+   * each newly added template FileName to the model. The Item is added to the corresponding
+   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ).
+   *
+   * @param newFileList QList of FileNames being added to the project.
+   */
+  void ProjectItemModel::onTemplatesAdded(QList<FileName> newFileList) {
+    Project *project = qobject_cast<Project *>( sender() );
+
+    if (!project) {
+      return;
+    }
+
+    for (int i = 0; i<rowCount(); i++) {
+      ProjectItem *projectItem = item(i);
+      if (projectItem->project() == project) {
+        for (int j = 0; j < projectItem->rowCount(); j++) {
+          ProjectItem *templatesItem = projectItem->child(j);
+          if (templatesItem->text() == "Templates"){
+            foreach (FileName newFile, newFileList) {
+              QString type = newFile.dir().dirName();
+              for (int k = 0; k < templatesItem->rowCount(); k++) {
+                ProjectItem *templateType = templatesItem->child(k);
+                if (templateType->text().toLower() == type) {
+                  ProjectItem *fileItem = new ProjectItem(FileItemQsp(
+                    new FileItem(newFile.expanded())),
+                    newFile.name(),
+                    QIcon(":folder"));
+                  fileItem->setData(QVariant(newFile.toString()));
+                  templateType->appendRow(fileItem);
+                }
+              }
+            }
           }
         }
       }
@@ -385,10 +447,11 @@ namespace Isis {
    * item is added to the item that corresponds to the control's
    * ControlList.
    *
-   * @param[in] control (Control *) The Control added to the Project.
+   * @param control (Control *) The Control added to the Project.
    */
   void ProjectItemModel::onControlAdded(Control * control) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(control->id() );
 
     if (!project) {
       return;
@@ -422,11 +485,12 @@ namespace Isis {
    * Networks" of the item that corresponds to the Project that sent
    * the signal.
    *
-   * @param[in] controlList (ControlList *) The ControlList added to the
+   * @param controlList (ControlList *) The ControlList added to the
    *                                        Project.
    */
   void ProjectItemModel::onControlListAdded(ControlList * controlList) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(controlList->name() );
 
     if (!project) {
       return;
@@ -452,16 +516,16 @@ namespace Isis {
    * item is added to the item named "Images" of the item that
    * corresponds to the Project that sent the signal.
    *
-   * @param[in] imageList (ImageList *) The ImageList added to the Project.
+   * @param imageList (ImageList *) The ImageList added to the Project.
    */
   void ProjectItemModel::onImagesAdded(ImageList * imageList) {
 //  qDebug()<<"ProjectItemModel::onImagesAdded  before add rowCount = "<<rowCount();
     Project *project = qobject_cast<Project *>( sender() );
-    
+    m_reservedNames.append(imageList->name() );
     if (!project) {
       return;
     }
-    
+
     for (int i=0; i<rowCount(); i++) {
       ProjectItem *projectItem = item(i);
       if (projectItem->project() == project) {
@@ -480,13 +544,14 @@ namespace Isis {
   /**
    * Slot to connect to the shapesAdded() signal from a Project. Adds a ProjectItem that corresponds
    * to the ShapeList to the model. The item is added to the item named "Shape Models" of the item
-   * that corresponds to the Project that sent the signal. 
+   * that corresponds to the Project that sent the signal.
    *
-   * @param[in] shapes (ShapeList *) The ShapeList added to the Project.
+   * @param shapes (ShapeList *) The ShapeList added to the Project.
    */
   void ProjectItemModel::onShapesAdded(ShapeList * shapes) {
     Project *project = qobject_cast<Project *>( sender() );
-    
+    m_reservedNames.append(shapes->name());
+
     if (!project) {
       return;
     }
@@ -510,10 +575,11 @@ namespace Isis {
    * items are added to the item named "Target Body" of the item that
    * corresponds to the Project that sent the signal.
    *
-   * @param[in] targets (TargetBodyList *) The TargetBodyList of the Project.
+   * @param targets (TargetBodyList *) The TargetBodyList of the Project.
    */
   void ProjectItemModel::onTargetsAdded(TargetBodyList *targets) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(targets->name() );
 
     if (!project) {
       return;
@@ -542,18 +608,19 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
    * Slot to connect to the guiCamerasAdded() signal from a
    * Project. Adds items that correspond to the cameras to the
    * model. The items are added to the item named "Sensors" of the
    * item that corresponds to the Project that sent the signal.
    *
-   * @param[in] cameras (GuiCameraList *) The GuiCameraList of the Project.
+   * @param cameras (GuiCameraList *) The GuiCameraList of the Project.
    */
   void ProjectItemModel::onGuiCamerasAdded(GuiCameraList *cameras) {
     Project *project = qobject_cast<Project *>( sender() );
+    m_reservedNames.append(cameras->name() );
 
     if (!project) {
       return;
@@ -591,8 +658,8 @@ namespace Isis {
    * model. Currently changes the selected property of Images that
    * correspond with selected or deselected items.
    *
-   * @param[in] selected (const QItemSelection &) The selected items.
-   * @param[in] deselected (const QItemSelection &) The deselected items.
+   * @param selected (const QItemSelection &) The selected items.
+   * @param deselected (const QItemSelection &) The deselected items.
    */
   void ProjectItemModel::onSelectionChanged(const QItemSelection &selected,
                                             const QItemSelection &deselected) {
@@ -625,10 +692,10 @@ namespace Isis {
    * QAbstractItemModel. Emits a corresponding itemAdded() signal for
    * each row inserted.
    *
-   * @param[in] parent (const QModelIndex &) The parent index where rows
+   * @param parent (const QModelIndex &) The parent index where rows
    *                                         were inserted.
-   * @param[in] start (int) The first row inserted (inclusive).
-   * @param[in] end (int) The last row inserted (inclusive).
+   * @param start (int) The first row inserted (inclusive).
+   * @param end (int) The last row inserted (inclusive).
    */
   void ProjectItemModel::onRowsInserted(const QModelIndex &parent, int start, int end) {
     for (int row=start; row <= end; row++) {
@@ -640,13 +707,13 @@ namespace Isis {
 
 
   /**
-   * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a 
-   * corresponding itemRemoved() signal for each row inserted. 
+   * Slot to connect to the rowsAboutToBeRemoved() signal from QAbstractItemModel. Emits a
+   * corresponding itemRemoved() signal for each row inserted.
    *
-   * @param[in] parent (const QModelIndex &) The parent index where rows are to be removed.
-   *                                         
-   * @param[in] start (int) The first row to be removed (inclusive).
-   * @param[in] end (int) The last row to be removed (inclusive).
+   * @param parent (const QModelIndex &) The parent index where rows are to be removed.
+   *
+   * @param start (int) The first row to be removed (inclusive).
+   * @param end (int) The last row to be removed (inclusive).
    */
   void ProjectItemModel::onRowsRemoved(const QModelIndex &parent, int start, int end) {
     for (int row=start; row <= end; row++) {
@@ -660,44 +727,127 @@ namespace Isis {
 
 
   /**
-   * This virtual method was added to handle changing the project name by double-clicking the 
-   * project name on the project tree.  It was required by Qt in order to allow editing 
-   * capabilities. 
-   *  
-   * @see http://doc.qt.io/qt-5/modelview.html 
-   *  
-   * @param[in] index (const QModelIndex &) Field which has been edited
-   * @param[in] value (const QVariant &) Value contained in the field
-   * @param[in] role (int) Will always be EditRole since field only contains text
-   * 
+   * This virtual method was added to handle changing the project name by double-clicking the
+   * project name on the project tree.  It was required by Qt in order to allow editing
+   * capabilities.
+   *
+   * @see http://doc.qt.io/qt-5/modelview.html
+   *
+   * @param index (const QModelIndex &) Field which has been edited
+   * @param value (const QVariant &) Value contained in the field
+   * @param role (int) Will always be EditRole since field only contains text
+   *
    * @return bool Returns true if successful; otherwise false
    */
   bool ProjectItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
-    ProjectItem *item = itemFromIndex(index);
-    if (item->isProject() && role == Qt::EditRole) {
+     ProjectItem *item = itemFromIndex(index);
 
-      QString name = value.toString();
-      emit projectNameEdited(name);
+     QString name = value.toString();
+
+     bool rejected =rejectName(m_reservedNames,name);
+
+     if (rejected) {
+       QMessageBox nameRejected;
+       nameRejected.setText("That name is already in use within this project.");
+       nameRejected.exec();
+       return true;
+     }
+
+     m_reservedNames.append(name);
+
+     if (item->isProject() && role == Qt::EditRole) {
+          emit projectNameEdited(name);
+     }
+
+    else if (item->isBundleSolutionInfo() && role == Qt::EditRole) {
+      item->setText(name);
+      item->bundleSolutionInfo()->setName(name);
+    }
+    else if (item->isImageList() && role == Qt::EditRole) {
+      item->setText(name);
+      item->imageList()->setName(name);
+    }
+    else if (item->isControlList() && role == Qt::EditRole) {
+      item->setText(name);
+      item->controlList()->setName(name);
+    }
+    else if (item->isShapeList() && role == Qt::EditRole) {
+      item->setText(name);
+      item->shapeList()->setName(name);
+    }
+    else if (item->isTemplate() && role == Qt::EditRole) {
+      item->setText(name);
     }
     return true;
   }
 
 
   /**
-   * This virtual method was added to handle changing the project name by double-clicking the 
-   * project name on the project tree.  It was required by Qt in order to allow editing 
-   * capabilities. 
-   *  
+   * This virtual method was added to handle changing the project name by double-clicking the
+   * project name on the project tree.  It was required by Qt in order to allow editing
+   * capabilities.
+   *
    * @see http://doc.qt.io/qt-5/modelview.html
-   *  
-   * @param[in] index (const QModelIndex &) Field which has been edited
-   * 
+   *
+   * @param index (const QModelIndex &) Field which has been edited
+   *
    * @return Qt::ItemFlags Add the ItemIsEditable to the standard flags.
    */
   Qt::ItemFlags ProjectItemModel::flags(const QModelIndex &index) const {
 
     return Qt::ItemIsEditable | QStandardItemModel::flags(index);
   }
-}
 
+
+
+  /**
+   * @brief Checks to see if we are adding a reserved name to the project
+   * (ex. If we are adding an ImageList, and giving it the same name as another
+   * ImageList, or ShapesList, or something else).
+   * @param reserved  The list of reserved names we cannot use.
+   * @param target The name we are querying to see if it is in the reserved list.
+   * @return True if target is in the reserved list, False other.
+   */
+  bool ProjectItemModel::rejectName(QStringList &reserved, QString target) {
+
+
+    QRegExpValidator valid;
+    QValidator::State state;
+    int pos =0;
+    foreach (QString name, reserved) {
+
+      QRegExp rx(name);
+      valid.setRegExp(rx);
+      state = valid.validate(target,pos);
+
+      if (state == 2) {
+        return true;
+      }
+    } //end for
+
+    return false;
+  }
+
+  /**
+   * Used to clean the ProjectItemModel of everything but the headers
+   */
+   void ProjectItemModel::clean() {
+
+     for (int i=0; i<rowCount(); i++) {
+       ProjectItem *projectItem = item(i);
+       if (projectItem->project()) {
+         for (int j=0; j < projectItem->rowCount(); j++) {
+           if (projectItem->hasChildren()) {
+             ProjectItem *subProjectItem = projectItem->child(j);
+             while (subProjectItem->hasChildren()) {
+               removeItem(subProjectItem->child(0));
+             }
+           }
+         }
+       }
+     }
+   }
+
+
+}

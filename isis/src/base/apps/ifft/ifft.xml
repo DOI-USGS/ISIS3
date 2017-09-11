@@ -5,9 +5,16 @@
   </brief>
 
   <description>
+    <p>
       This program accepts two cubes, most likely acquired from the fft program,
       containing the magnitude and phase angle data of a Fourier transformed 
       image and returns the inverse. 
+    </p>
+    <p>
+      The output cube will contain an AlphaCube group if the input cube to the fft program
+      contained one. For exmaple, if a cube was cropped and then run through the fft program,
+      the output cube from this program will contain the original AlphaCube group.
+    </p>
   </description>
 
   <category>
@@ -21,7 +28,7 @@
   </seeAlso>
 
   <history>
-    <change name="Jacob Danton" date="2005-11-28">
+    <change name="Jacob Danton" date="2005-11-28">
       Original version
     </change>
     <change name="Brendan George" date="2006-09-28">
@@ -38,6 +45,10 @@
     <change name="Steven Lambright" date="2012-02-24">
       This program now takes advantage of multiple global
       processing threads.
+    </change>
+    <change name="Ian Humphrey" date="2017-08-19">
+      Now removes the AlphaCube group from the output cube if the fft input cube did not have
+      an AlphaCube group. Fixes #4907.
     </change>
   </history>
 

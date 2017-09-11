@@ -191,13 +191,17 @@ namespace Isis {
   }
 
 
-  //! Return optical distortion polynomial coefficients
+  /**
+   * @returns The optical distortion of polynomial coefficients
+   */
   std::vector<double> CameraDistortionMap::OpticalDistortionCoefficients() const {
     return p_odk;
   }
 
 
-  //! Return the direction of the focal plane Z-axis
+  /**
+   * @returns The direction of the focal plane Z-axis
+   */
   double CameraDistortionMap::ZDirection() const {
     return p_zDirection;
   }

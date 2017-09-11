@@ -1,10 +1,11 @@
 #include "ShapeModel.h"
 
 #include <QDebug>
-#include <iostream>
-#include <iomanip>
+
 #include <algorithm>
 #include <cfloat>
+#include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include <cmath>
@@ -75,6 +76,86 @@ namespace Isis {
     m_surfacePoint = NULL;
   }
 
+
+/**
+ * @brief Compute surface intersection with optional occlusion check 
+ *  
+ * This method sets the surface point at the given latitude, longitude. The 
+ * derived model is called to get the radius at that location to complete the 
+ * accuracy of the surface point, them the derived method is called to complete 
+ * the intersection. 
+ * 
+ * @author 2017-03-23 Kris Becker
+ * 
+ * @param lat          Latitude of the surface point
+ * @param lon          Longitude of the surface point
+ * @param observerPos  Position of the observer
+ * @param backCheck    Flag to indicate occlusion check
+ * 
+ * @return bool        True if the intersection point is valid (visable)
+ */
+  bool ShapeModel::intersectSurface(const Latitude &lat, const Longitude &lon,
+                                    const std::vector<double> &observerPos,
+                                    const bool &backCheck) {
+    // Distance radius = localRadius(lat, lon);
+    return (intersectSurface(SurfacePoint(lat, lon, localRadius(lat, lon)), observerPos, backCheck));
+  }
+
+
+/**
+ * @brief Compute surface intersection with optional occlusion check 
+ *  
+ * This method sets the surface point at the given latitude, longitude. The 
+ * derived model is called to get the radius at that location to complete the 
+ * accuracy of the surface point, them the derived method is called to complete 
+ * the intersection. 
+ * 
+ * @author 2017-03-23 Kris Becker
+ * 
+ * @param surfpt        Absolute point on the surface to check
+ * @param observerPos  Position of the observer
+ * @param backCheck    Flag to indicate occlusion check
+ * 
+ * @return bool        True if the intersection point is valid (visable)
+ */
+  bool ShapeModel::intersectSurface(const SurfacePoint &surfpt, 
+                                    const std::vector<double> &observerPos,
+                                    const bool &backCheck) {
+
+    // The default behavior is to set the point in the model without
+    //  intersection tests at all
+    setSurfacePoint(surfpt);
+    return (true);
+  }
+
+  /**
+   *  Calculates the ellipsoidal surface normal.
+   */
+  void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
+    // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
+    // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true
+    // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
+    // Jeff and Stuart respond.
+
+    if (!m_hasIntersection || !surfaceIntersection()->Valid()) {
+     QString msg = "A valid intersection must be defined before computing the surface normal";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+   }
+
+   // Get the coordinates of the current surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Unitize the vector
+    SpiceDouble upB[3];
+    SpiceDouble dist;
+    unorm_c(pB, upB, &dist);
+    memcpy(&m_normal[0], upB, sizeof(double) * 3);
+
+    m_hasNormal = true;
+  }
 
 
   /**
@@ -322,6 +403,36 @@ namespace Isis {
 
   }
 
+/**
+ * @brief Default occulsion implementation 
+ *  
+ *  This method is originally copied from Sensor::SetLocalGround(bool
+ *  backCheck). This version checks for the emission angle from the observer to
+ *  be less than or equal to 90 degrees.
+ *  
+ *  It is recommended that models derived from this base class reimplement this
+ *  method if a more robust, efficent test can be made.
+ *  
+ *  Note this implementation does not handle occlusion!
+ * 
+ * @author 2017-03-17 Kris Becker 
+ * 
+ * @param observerPos   Position of the observer in body fixed coordinates
+ * @param lookDirection Look direction from the observer
+ * 
+ * @return bool True if the point is not visable, false if it can be seen
+ */
+  bool ShapeModel::isVisibleFrom(const std::vector<double> observerPos,
+                                 const std::vector<double> lookDirection)  {
+    if ( hasIntersection() ) {
+      if ( fabs(emissionAngle(observerPos)) <= 90.0 ) {
+        return (true);
+      }
+    }
+
+    // All other conditions indicate the point is not visable from the observer
+    return (false);
+  }
 
   /**
    * Returns the status of the target. If it is NULL, this method

@@ -61,8 +61,10 @@ class MyShape : public ShapeModel {
     setName("Test");
   }
 
+  using Isis::ShapeModel::intersectSurface;
+
   bool intersectSurface(std::vector<double> observerPos,
-                                   std::vector<double> lookDirection)  {
+                        std::vector<double> lookDirection)  {
     cout << "    intersectSurface called with observer position = " <<
       observerPos[0] << ", " << observerPos[1] << ", " <<
       observerPos[2] << endl << "                                 lookDirection = " <<
@@ -85,7 +87,7 @@ class MyShape : public ShapeModel {
 
   virtual void calculateDefaultNormal()  {
     calculateSurfaceNormal();
-   }
+  }
 
   virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
     std::vector<double> myNormal(3);
@@ -101,6 +103,10 @@ class MyShape : public ShapeModel {
                -0.698838,
                 0.350738);
     setHasNormal(true);
+  }
+
+  virtual void calculateEllipsoidNormal() {
+    calculateEllipsoidalSurfaceNormal();
   }
 
   Distance localRadius(const Latitude &lat, const Longitude &lon) {
@@ -372,6 +378,30 @@ int main() {
                                                         Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
     // Mars radii = 3397.      3397.         3375.
 
+    cout << endl << "  Testing intersection with occlusion check..." << endl;
+    if (!shape.intersectSurface(Latitude(20.532461495381, Angle::Degrees),
+                                Longitude(228.26609149754, Angle::Degrees),
+                                sB, true)) {
+      cout << "    ...  intersectSurface method failed" << endl;
+      return -1;
+    }
+    cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+    cout << "    Do we have an ellipsoid intersection? " << shape.ellipsoidIntersection() << endl;
+    cout << "    Is the intersection visible? " << shape.isVisibleFrom(sB, lookB) << endl;
+    SurfacePoint *occPoint = shape.surfaceIntersection();
+    std::vector<double> occPosition(3, 0.0);
+    occPosition[0] = occPoint->GetX().kilometers() * 1.1;
+    occPosition[1] = occPoint->GetY().kilometers() * 1.1;
+    occPosition[2] = occPoint->GetZ().kilometers() * 1.1;
+    cout << "    Is the intersection visible from just above it? "
+         << shape.isVisibleFrom(occPosition, lookB) << endl;
+    
+    cout << "    Calculate the ellipsoid normal" << endl;
+    shape.calculateEllipsoidNormal();
+    cout << "      Do we have a normal? " << shape.normalStatus() << endl;
+    myNormal = shape.normal();
+    cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
+
     cout << endl << "  Testing setHasIntersection method" << endl;
     shape.setHasIntersection(false);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
@@ -381,6 +411,14 @@ int main() {
     }
     catch (IException &e) {
       cout << "    Test resolution() error message when there is no intersection:" << endl;
+      e.print();
+    }
+    try {
+      cout << "    Attempt to calculate the ellipsoid normal without an intersection" << endl;
+      shape.calculateEllipsoidNormal();
+      cout << "    Calculation successful" << endl;
+    }
+    catch (IException &e) {
       e.print();
     }
 

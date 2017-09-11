@@ -52,14 +52,15 @@ namespace Isis {
    *
    * @internal
    *   @todo Add coded example
-   *   @history 2005-03-16 Leah Dahmer modified file to support Doxygen
+   *   @history 2005-03-16 Leah Dahmer - modified file to support Doxygen
    *                           documentation.
-   *   @history 2008-01-08 Tracie Sucharski, Derived from BasisFunction class for
+   *   @history 2008-01-08 Tracie Sucharski - Derived from BasisFunction class for
    *                          a single variable function.  Added Derivative
    *                          methods as pure virtuals.  This class was
    *                          developed as a convenience to simplify the
    *                          Derivative methods and any other methods that
    *                          might need to be developed in the future.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    */
   class Basis1VariableFunction : public Isis::BasisFunction {
@@ -68,7 +69,28 @@ namespace Isis {
       //! Destroys the Basis1VariableFunction object.
       virtual ~Basis1VariableFunction() {};
 
+      /**
+       * This will take the Derivative with respect to the variable and evaluate at
+       * given value.
+       *
+       * @param [in] value   (const double)  value at which to evaluate derivative
+       * 
+       * @return (double) The derivative evaluated at given value
+       *
+       */
       virtual double DerivativeVar(const double value) = 0;
+
+      /**
+       *  Evaluate the derivative defined by the given coefficients with respect to the coefficient
+       *  at the given index, at the current value.
+       *
+       * @param [in]  value      (const double) value at which to evaluate derivative
+       * @param [in]  coefIndex  (const int)    The index of the coefficient to
+       *                                          differentiate with respect to
+       *
+       * @return    (double) The derivative evaluated at given value
+       *
+       */
       virtual double DerivativeCoef(const double value, const int coefIndex) = 0;
 
     protected:

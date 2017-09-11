@@ -48,19 +48,12 @@ void IsisMain() {
   insXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
+
   // Create a Band Bin group
   FileName bandTransFile(transDir + "ocamsBandBin_fit.trn");
   PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
   bandBinXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
-
-  // Create an Archive group
-  // OREx team reduced the output keywords, so this was commented out
-  // Remove if all goes well with next release
-  //FileName archiveTransFile(transDir + "ocamsArchive_fit.trn");
-  //PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
-  //archiveXlater.Auto(outLabel);
-  //output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "ocamsKernels_fit.trn");
@@ -75,7 +68,6 @@ void IsisMain() {
   output->write(originals);
 
   // Convert the image data
-  //importFits.StartProcess(Convert);
   importFits.StartProcess();
   importFits.Finalize();
 }

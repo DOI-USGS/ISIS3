@@ -291,36 +291,24 @@ namespace Isis {
   }
 
 
-  /*
-   * TODO kao - Figure out how to better handle the bad control point.
+  /**
+   * Return the closest control point to the pointLocation
+   * 
+   * @param locationPoint (QPointF) The location point to search for a control point
+   * 
+   * @return @b ControlPoint * The closest control point found, which is NULL if no control point found
    *
-   * When you click too far from a control point on the view, cpItem's control point
-   * exists but is not complete (garbage id and other members) so we can't use it. The type
-   * variable exists but is garbage so I used it to check for "validity".
    */
-  ControlPoint *ControlNetGraphicsItem::findClosestControlPoint() {
-    ControlPointGraphicsItem *cpItem =
-                  (ControlPointGraphicsItem *) m_mosaicScene->getScene()->focusItem();
-    if ( cpItem &&
-         (cpItem->controlPoint()->GetType() >= 0 && cpItem->controlPoint()->GetType() <= 2) ) {
-      return cpItem->controlPoint();
+  ControlPoint *ControlNetGraphicsItem::findClosestControlPoint(QPointF locationPoint) {
+
+    QGraphicsItem *cpItem = NULL;
+    QPoint viewPoint = m_mosaicScene->getView()->mapFromScene(locationPoint);
+    cpItem = (QGraphicsItem *) m_mosaicScene->getView()->itemAt(viewPoint);
+
+    ControlPoint *result = NULL;
+    if (dynamic_cast<ControlPointGraphicsItem *> (cpItem)) {
+      result = ((ControlPointGraphicsItem *)(cpItem))->controlPoint();
     }
-    else {
-      return NULL;
-    }
+    return result;
   }
-
-
-  void ControlNetGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    //qDebug()<<"ControlNetGraphicsItem::mouseReleaseEvent";
-    ControlPointGraphicsItem *cpItem = (ControlPointGraphicsItem *) m_mosaicScene->getScene()->focusItem();
-    if (!cpItem) {
-      // throw error???
-    }
-    //qDebug()<<"ControlNetGraphicsItem::mouseReleaseEvent  cpItem = "<<cpItem->controlPoint()->GetId();
-//  emit newControlPointSelected(m_controlPoint);
-  }
-
-
-
 }

@@ -140,12 +140,20 @@ namespace Isis {
     p_precision = precision;
   }
 
-  //! get the Column's name
+  /**
+   * Get the Column's name
+   * 
+   * @returns The column's name
+   */
   QString Column::Name() const {
     return p_name;
   }
 
-  //! get the Column's width
+  /**
+   * Get the Column's width
+   * 
+   * @returns The column's width
+   */
   unsigned int Column::Width() const {
     return p_width;
   }
@@ -161,13 +169,21 @@ namespace Isis {
   }
   
   
-  //! get the Column's alignment
+  /** 
+   * Get the Column's alignment
+   * 
+   * @returns The column's alignment
+   */
   Column::Align Column::Alignment() const {
     return p_align;
   }
 
 
-  //! get the Column's precision
+  /**
+   * Get the Column's precision
+   * 
+   * @returns The column's presicion
+   */
   unsigned int Column::Precision() const {
     return p_precision;
   }

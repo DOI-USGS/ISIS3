@@ -1,0 +1,36 @@
+Unit Test for RosettaVirtisCamera...
+FileName: I1_00237395857.cub
+CK Frame: -226213
+
+Kernel IDs: 
+CK Frame ID = -226000
+CK Reference ID = 1
+SPK Target ID = -226
+SPK Reference ID = 1
+
+Spacecraft Name Long: Rosetta
+Spacecraft Name Short: Rosetta
+Instrument Name Long: Visual and Infrared Thermal Imaging Spectrometer
+Instrument Name Short: VIRTIS
+
+Start Time: 332047165.140102983
+End Time:   332047289.497766495
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.262132577
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.428036996
+
+For lower left corner ...
+DeltaSample = -0.030325205
+DeltaLine = 1.142735209
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 1.162544983
+
+For center pixel position ...
+Latitude OK
+Longitude OK

@@ -39,12 +39,17 @@
 
 namespace Isis {
 
+  /**
+   * Creates a work order to import a control network.
+   *
+   * @param *project Pointer to the project this work order belongs to
+   */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(Project *project) :
       WorkOrder(project) {
 
     // This is an asynchronous workorder
     m_isSynchronous = false;
-
+    m_list = NULL;
     m_watcher = NULL;
 
     QAction::setText(tr("Import &Control Networks..."));
@@ -56,24 +61,50 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates a copy of the other ImportControlNetWorkOrder
+   *
+   * @param &other ImportControlNetsWorkOrder to copy the state from
+   */
   ImportControlNetWorkOrder::ImportControlNetWorkOrder(const ImportControlNetWorkOrder &other) :
       WorkOrder(other) {
-
     m_watcher = NULL;
     m_watcher = new QFutureWatcher<Control *>;
     connect(m_watcher, SIGNAL(resultReadyAt(int)), this, SLOT(cnetReady(int)));
-
   }
 
 
+  /**
+   * Destructor
+   */
   ImportControlNetWorkOrder::~ImportControlNetWorkOrder() {
     delete m_watcher;
     m_watcher = NULL;
   }
 
 
+  /**
+   * This method clones the current ImportControlNetWorkOrder and returns it.
+   *
+   * @return ImportControlNetWorkOrder Clone
+   */
   ImportControlNetWorkOrder *ImportControlNetWorkOrder::clone() const {
     return new ImportControlNetWorkOrder(*this);
+  }
+
+
+  /**
+   * This method returns true if the user clicked on a project tree node with the text
+   * "Control Networks".
+   * This is used by Directory::supportedActions(DataType data) to determine what actions are
+   * appended to context menus.
+   *
+   * @param item The ProjectItem that was clicked
+   *
+   * @return bool True if the user clicked on a project tree node named "Control Network"
+   */
+  bool ImportControlNetWorkOrder::isExecutable(ProjectItem *item) {
+    return (item->text() == "Control Networks");
   }
 
 
@@ -106,6 +137,7 @@ namespace Isis {
     return internalData().count() > 0;
   }
 
+
   /**
    * @brief Imports the control network asynchronously.
    *
@@ -113,7 +145,6 @@ namespace Isis {
    * syncRedo() and asyncRedo().
    */
   void ImportControlNetWorkOrder::execute() {
-
     QDir cnetFolder = project()->addCnetFolder("controlNetworks");
 
     QStringList cnetFileNames = internalData();
@@ -126,8 +157,9 @@ namespace Isis {
       m_readProgresses.append(readProgress);
     }
 
+    CreateControlsFunctor functor(project(), cnetFolder);
     m_watcher->setFuture(QtConcurrent::mapped(cnetFileNamesAndProgress,
-                                              CreateControlsFunctor(project(), cnetFolder)));
+                                              functor));
 
     while (!m_watcher->isFinished()) {
       setProgressRange(0, 100 * m_readProgresses.count());
@@ -148,9 +180,12 @@ namespace Isis {
 
       setProgressValue(totalProgress);
 
+      m_warning = functor.errors().toString();
+
       QThread::yieldCurrentThread();
     }
   }
+
 
   /**
    * @brief Clears progress.
@@ -159,12 +194,22 @@ namespace Isis {
    * from postSyncRedo() to postExecution().
    */
   void ImportControlNetWorkOrder::postExecution() {
+    if (!m_list) {
+      project()->undoStack()->undo();
+      m_list = NULL;
+    }
+
+    if (m_warning != "") {
+      project()->warn(m_warning);
+    }
 
     foreach (Progress *progress, m_readProgresses) {
       delete progress;
     }
+    m_status = WorkOrderFinished;
     m_readProgresses.clear();
   }
+
 
   /**
    * @brief Deletes the control network
@@ -173,46 +218,105 @@ namespace Isis {
    * renamed from undoSyncRedo() to undoExecution().
    */
   void ImportControlNetWorkOrder::undoExecution() {
-    if (m_watcher->isFinished()) {
-      ControlList *list = project()->controls().last();
+    if (m_list && project()->controls().size() > 0 && m_watcher->isFinished()) {
       // Remove the controls from disk.
-      list->deleteFromDisk(project());
+      m_list->deleteFromDisk( project() );
       // Remove the controls from the model, which updates the tree view.
       ProjectItem *currentItem =
-          project()->directory()->model()->findItemData(QVariant::fromValue(list));
+          project()->directory()->model()->findItemData( QVariant::fromValue(m_list) );
       project()->directory()->model()->removeItem(currentItem);
+
+      foreach (Control *control, *m_list) {
+        delete control;
+      }
+      delete m_list;
     }
   }
 
 
+  /**
+   * CreateControlsFunctor constructor
+   *
+   * @param project The project
+   * @param destinationFolder The directory to copy to
+   */
   ImportControlNetWorkOrder::CreateControlsFunctor::CreateControlsFunctor(
-      Project *project, QDir destinationFolder) {
+    Project *project, QDir destinationFolder) : m_errors(new IException) {
     m_project = project;
     m_destinationFolder = destinationFolder;
   }
 
 
+  /**
+   * @brief Indicates if any errors occurred during the import.
+   *
+   * Returns an IException that details any errors that occurred during the import.
+   * Note that if there have been 20 or more errors, the exception returned will indicate that the
+   * import was aborted because too many errors have occurred.
+   *
+   * @return IExecption Returns an IException indicating what errors occured during the import.
+   */
+  IException ImportControlNetWorkOrder::CreateControlsFunctor::errors() const {
+    IException result;
+
+    result.append(*m_errors);
+
+    return result;
+  }
+
+
+  /**
+   * Reads and writes the control network(s) asynchronously
+   *
+   * @param &cnetFileNameAndProgress QPair of control net filenames, and the progress
+   *
+   * @return Control Pointer to the Control created from the import
+   */
   Control *ImportControlNetWorkOrder::CreateControlsFunctor::operator()(
-      const QPair<FileName, Progress *> &cnetFileNameAndProgress) {
+    const QPair<FileName, Progress *> &cnetFileNameAndProgress) {
 
-    QString cnetFileName = cnetFileNameAndProgress.first.original();
-    ControlNet *cnet = new ControlNet();
-    cnet->SetMutex(m_project->mutex());
-    cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
+    Control *control = NULL;
+    try {
+      QString cnetFileName = cnetFileNameAndProgress.first.original();
+      ControlNet *cnet = new ControlNet();
+      cnet->SetMutex(m_project->mutex());
+      cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
 
-    QString baseFilename = FileName(cnetFileName).name();
-    QString destination = m_destinationFolder.canonicalPath() + "/" + baseFilename;
+      QString baseFilename = FileName(cnetFileName).name();
+      QString destination = m_destinationFolder.canonicalPath() + "/" + baseFilename;
 
-    cnet->Write(destination);
+      cnet->Write(destination);
 
-    Control *control = new Control(cnet, destination);
+      delete cnet;
+      cnet = NULL;
+
+      control = new Control(m_project, destination);
+      control->closeControlNet();
+    }
+    catch (IException &e) {
+      m_errors->append(e);
+      return NULL;
+    }
     return control;
   }
 
 
+  /**
+   * Adds the control net to the project
+   *
+   * @param ready Index of the control net that is ready
+   */
   void ImportControlNetWorkOrder::cnetReady(int ready) {
-
+    QMutexLocker locker(project()->workOrderMutex());
     Control *control = m_watcher->resultAt(ready);
-    project()->addControl(control);
+
+    if (control) {
+      project()->addControl(control);
+      m_list = project()->controls().last();
+      project()->setClean(false);
+    }
+    else {
+      m_list = NULL;
+    }
   }
 }

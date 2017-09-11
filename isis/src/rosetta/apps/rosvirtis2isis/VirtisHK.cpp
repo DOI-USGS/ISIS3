@@ -43,8 +43,8 @@ namespace Isis {
     }
 
     // Initialize equation 
-    one = one.trimmed().remove(0, 1);
-    three = three.trimmed().remove(three.size()-2, 1);
+    one = one.remove("{").trimmed();
+    three = three.remove("}").trimmed();
 
     m_coefficients.push_back(three.toDouble());
     m_coefficients.push_back(two.toDouble());

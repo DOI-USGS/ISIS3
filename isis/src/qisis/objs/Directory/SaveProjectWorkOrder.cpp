@@ -63,6 +63,7 @@ namespace Isis {
 
     if (success) {
       project()->save();
+      project()->setClean(true);
     }
 
     return success;

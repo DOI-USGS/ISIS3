@@ -45,6 +45,7 @@ namespace Isis {
    *                           using the default data area. Fixes #4738.
    *   @history 2017-06-08 Makayla Shepherd - Added a cube pointer deletion to fix a memory leak.
    *                           Fixes #4890.
+   *   @history 2017-03-23 Kris Becker - Added support for Embree and Bullet models.
    */
   class ShapeModelFactory {
     public:
@@ -61,7 +62,9 @@ namespace Isis {
         Isis3Dem,
         Plane,
         Stack,
-        NaifDSK};
+        NaifDSK,
+        Bullet,
+        Embree};
   };
 }
 

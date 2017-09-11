@@ -41,7 +41,15 @@ namespace Isis {
    *   @history 2017-04-27 Ian Humphrey - Added selectControl() to allow JigsawDialog to
    *                           properly tell the setup dialog which control to select in its
    *                           combo box. References #4817.
-   *   @history 2017-05-16 Tracie Sucharski - Comment qDebug statements. 
+   *   @history 2017-05-16 Tracie Sucharski - Comment qDebug statements.
+   *   @history 2017-05-23 Tracie Sucharski - Added a QGroupBox for the target parameters so that
+   *                           the box can be disabled/enabled rather than each parameter
+   *                           separately.
+   *   @history 2017-06-07 Ian Humphrey - Modified fillFromSettings() so when the weightings are
+   *                           loaded into the text line edits they are set to modified, which
+   *                           allows for proper restoring of user defined weightings.
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -102,8 +110,8 @@ namespace Isis {
     private:
     void makeReadOnly()    ;
     void fillFromSettings(const BundleSettingsQsp settings);
-    void showTargetAngleWidgets();
-    void hideTargetAngleWidgets();
+    void showTargetParametersGroupBox();
+    void hideTargetParametersGroupBox();
 
   private:
     Ui::JigsawSetupDialog *m_ui;

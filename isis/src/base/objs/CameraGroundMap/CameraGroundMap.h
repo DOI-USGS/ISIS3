@@ -81,6 +81,7 @@ namespace Isis {
    *                          EllipsoidPartial() and MeanRadiusPartial() along with new member
    *                          p_pB. References Mantis ticket TBD.
    *  @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #3971.
+   *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class CameraGroundMap {
     public:
@@ -119,20 +120,24 @@ namespace Isis {
       virtual bool GetdXYdTOrientation(const SpiceRotation::PartialType varType,
                                        int coefIndex,
                                        double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(std::vector<double> d_lookB,
-                                double *cudx, double *cudy);
+      virtual bool GetdXYdPoint(std::vector<double> d_pB,
+                                double *dx, double *dy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
       std::vector<double> EllipsoidPartial(SurfacePoint spoint, PartialType raxis);
       std::vector<double> MeanRadiusPartial(SurfacePoint spoint, Distance meanRadius);
       double DQuotient(std::vector<double> &look, std::vector<double> &dlook,
                        int index);
 
-      //! Return undistorted focal plane x
+      /**
+       * @return The undistorted focal plane x
+       */
       inline double FocalPlaneX() const {
         return p_focalPlaneX;
       };
 
-      //! Return undistorted focal plane y
+      /**
+       * @return The undistorted focal plane y
+       */
       inline double FocalPlaneY() const {
         return p_focalPlaneY;
       };
@@ -144,9 +149,9 @@ namespace Isis {
 
     private:
       void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
-      //! Surface point calculated from ground coordinates in GetXY and used for partials
+      /** Surface point calculated from ground coordinates in GetXY and used for partials*/
       std::vector<double> m_pB;
-      //! Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
+      /** Look vector in J2000 calculated from ground coordinates in GetXY and used for partials*/
       std::vector<double> m_lookJ;
   };
 };

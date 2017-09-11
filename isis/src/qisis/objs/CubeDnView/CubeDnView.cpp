@@ -23,6 +23,7 @@
 #include "CubeDnView.h"
 
 #include <QAction>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMdiArea>
@@ -52,7 +53,7 @@
 #include "HistogramTool.h"
 #include "Image.h"
 #include "ImageList.h"
-#include "IpceTool.h"
+#include "ControlNetTool.h"
 #include "IString.h"
 #include "MatchTool.h"
 #include "MdiCubeViewport.h"
@@ -83,19 +84,19 @@
 
 namespace Isis {
   /**
-   * Constructs the view, initializing the tools. 
+   * Constructs the view, initializing the tools.
    *
    * @param parent (QWidget *) Pointer to parent widget
    */
   CubeDnView::CubeDnView(Directory *directory, QWidget *parent) :
                  AbstractProjectItemView(parent) {
-    connect( internalModel()->selectionModel(), 
+    connect( internalModel()->selectionModel(),
         SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
              this, SLOT( onCurrentChanged(const QModelIndex &) ) );
 
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
-    
+
     m_cubeItemMap = QMap<Cube *, ProjectItem *>();
 
     m_workspace = new Workspace(false, this);
@@ -107,14 +108,20 @@ namespace Isis {
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
 
+    Project *activeProject = directory->project();
+    // These connect signals listen to the active project, and if a control network
+    // or list of control networks is added, then the enableControlNetTool() function is called.
+    connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
+    connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
+
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
-    
+
     //m_toolBar = new QWidget(this);
-    
+
     //QHBoxLayout *toolBarLayout = new QHBoxLayout;
-    
+
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -145,27 +152,31 @@ namespace Isis {
     //tools->append(new QnetFileTool(qnetTool, this));
     tools->append(NULL);
 
-    IpceTool *ipceTool = new IpceTool(directory, this);
-    defaultActiveTool = ipceTool;
+    ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
+    defaultActiveTool = controlNetTool;
     tools->append(defaultActiveTool);
 
     if (directory->project()->activeControl()) {
-      ipceTool->setControlNet(directory->project()->activeControl()->controlNet()); 
+      controlNetTool->setControlNet(directory->project()->activeControl()->controlNet());
     }
-    //  Pass on Signals emitted from IpceTool
+    //  Pass on Signals emitted from ControlNetTool
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
-    connect(ipceTool, SIGNAL(modifyControlPoint(ControlPoint *)),
-            this, SIGNAL(modifyControlPoint(ControlPoint *)));
+    connect(controlNetTool, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
+            this, SIGNAL(modifyControlPoint(ControlPoint *, QString)));
 
-    connect(ipceTool, SIGNAL(deleteControlPoint(ControlPoint *)),
+    connect(controlNetTool, SIGNAL(deleteControlPoint(ControlPoint *)),
             this, SIGNAL(deleteControlPoint(ControlPoint *)));
 
-    connect(ipceTool, SIGNAL(createControlPoint(double, double, Cube *, bool)),
+    connect(controlNetTool, SIGNAL(createControlPoint(double, double, Cube *, bool)),
             this, SIGNAL(createControlPoint(double, double, Cube *, bool)));
 
     // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
     // This is done to redraw the control points on the cube viewports
-    connect(this, SIGNAL(controlPointAdded(QString)), ipceTool, SLOT(refresh()));
+    connect(this, SIGNAL(controlPointAdded(QString)), controlNetTool, SLOT(paintAllViewports()));
+
+    //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
+    //  CubeViewports.
+    connect(this, SIGNAL(redrawMeasures()), controlNetTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
     tools->append(new ZoomTool(this));
@@ -192,18 +203,9 @@ namespace Isis {
     layout->addWidget(statusBar);
     tools->append(new TrackTool(statusBar));
 
-//  QnetNavTool *ntool = new QnetNavTool(qnetTool, this);
-//  tools->append(ntool);
-//  tools->append(qnetTool);
-//
-//  connect(qnetTool, SIGNAL(showNavTool()), ntool, SLOT(showNavTool()));
-
-    //QMenuBar *menuBar = new QMenuBar;
-    //QMap<QString, QMenu *> subMenus;
-
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
-    
+
     m_fileMenu = new QMenu;
     m_viewMenu = new QMenu;
     m_optionsMenu = new QMenu;
@@ -255,6 +257,23 @@ namespace Isis {
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
+  }
+
+
+  /**
+   * @description enableControlNetTool:  This is a slot function which
+   * is called when the active project emits a signal to the CubeDnView
+   * object after a control network (or a list of control networks)
+   * has been added.  It enables the control network editor tool if it
+   * has been disabled.
+   */
+  void CubeDnView::enableControlNetTool() {
+
+    foreach (QAction * action, m_toolPadActions) {
+      if (action->objectName() == "ControlNetTool") {
+        action->setDisabled(false);
+      }
+    }
   }
 
 
@@ -370,7 +389,7 @@ namespace Isis {
   QList<QAction *> CubeDnView::helpMenuActions() {
     return m_helpMenu->actions();
   }
-  
+
 
   /**
    * Returns a list of actions for the permanent tool bar.
@@ -438,18 +457,18 @@ namespace Isis {
     if ( !isVisible() ) {
       return;
     }
-    
+
     if (!viewport) {
       return;
     }
 
     ProjectItem *item = m_cubeItemMap.value( viewport->cube() );
-    
+
     if (!item) {
       return;
     }
 
-    internalModel()->selectionModel()->setCurrentIndex(item->index(), 
+    internalModel()->selectionModel()->setCurrentIndex(item->index(),
                                                        QItemSelectionModel::SelectCurrent);
   }
 
@@ -480,7 +499,7 @@ namespace Isis {
       return;
     }
 
-    if ( ProjectItemProxyModel *proxyModel = 
+    if ( ProjectItemProxyModel *proxyModel =
              qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       proxyModel->removeItem( m_cubeItemMap.value( viewport->cube() ) );
     }
@@ -572,12 +591,12 @@ namespace Isis {
     foreach (MdiCubeViewport *cvp, *(m_workspace->cubeViewportList())) {
       ProjectItem *item = m_cubeItemMap.value(cvp->cube());
       if (item->isImage()) {
-        stream.writeStartElement("image"); 
-        stream.writeAttribute("id", item->image()->id()); 
+        stream.writeStartElement("image");
+        stream.writeAttribute("id", item->image()->id());
       }
       else if (item->isShape()) {
-        stream.writeStartElement("shape"); 
-        stream.writeAttribute("id", item->shape()->id()); 
+        stream.writeStartElement("shape");
+        stream.writeAttribute("id", item->shape()->id());
       }
       stream.writeEndElement();
     }

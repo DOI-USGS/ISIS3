@@ -25,6 +25,7 @@
 #include "Footprint2DView.h"
 
 #include <QAction>
+#include <QDockWidget>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
@@ -34,6 +35,9 @@
 #include <QSizePolicy>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QBoxLayout>
+#include <QHBoxLayout>
+#include <QMainWindow>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWidgetAction>
@@ -41,6 +45,7 @@
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "Image.h"
+#include "ImageFileListWidget.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "ProjectItem.h"
@@ -51,10 +56,10 @@
 namespace Isis {
   /**
    * Constructor.
-   * 
+   *
    * @param parent Pointer to parent QWidget
    */
-  Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) : 
+  Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
 
     QStatusBar *statusBar = new QStatusBar(this);
@@ -64,7 +69,7 @@ namespace Isis {
     MosaicGraphicsView *graphicsView = m_sceneWidget->getView();
     graphicsView->installEventFilter(this);
     graphicsView->setAcceptDrops(false);
-//  qDebug()<<"Footprint2DView::Footprint2DView  internalModel() = "<<internalModel();
+
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
     connect( internalModel(), SIGNAL( itemRemoved(ProjectItem *) ),
@@ -83,17 +88,40 @@ namespace Isis {
 
     connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
             this, SIGNAL(createControlPoint(double, double)));
+    
+    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
+            this, SLOT(onMosItemRemoved(Image *)));
 
-    // Pass on signals emitted from Directory (by way of ControlPointEditWidget)
-    // This is done to redraw the control points on the cube viewports
-    connect(this, SIGNAL(controlPointAdded(QString)),
-            m_sceneWidget, SIGNAL(controlPointAdded(QString)));
+    //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
+    //  the footprints.
+    connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
+    QHBoxLayout *viewlayout = new QHBoxLayout();
 
-    layout->addWidget(m_sceneWidget);
     layout->addWidget(statusBar);
+
+    m_fileListWidget = new ImageFileListWidget(directory);
+
+    m_fileListWidget->setWindowTitle( tr("File List")  );
+    m_fileListWidget->setObjectName( m_fileListWidget->windowTitle() );
+
+    QDockWidget *imageFileListdock = new QDockWidget( m_fileListWidget->windowTitle() );
+    imageFileListdock->setObjectName(imageFileListdock->windowTitle());
+    imageFileListdock->setFeatures( QDockWidget::DockWidgetFloatable |
+                                    QDockWidget::DockWidgetMovable);
+
+    imageFileListdock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    imageFileListdock->setWidget(m_fileListWidget);
+
+    m_window = new QMainWindow();
+    m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    m_window->setCentralWidget(m_sceneWidget);
+    viewlayout->addWidget(m_window);
+    layout->addLayout(viewlayout);
+
+    setLayout(layout);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
@@ -108,12 +136,12 @@ namespace Isis {
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
     //toolBarLayout->addWidget(m_toolPad);
-    
+
 
     m_sceneWidget->addToPermanent(m_permToolBar);
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
-    
+
     m_activeToolBarAction = new QWidgetAction(this);
     m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
@@ -123,7 +151,6 @@ namespace Isis {
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
-
   }
 
 
@@ -131,6 +158,8 @@ namespace Isis {
    * Destructor
    */
   Footprint2DView::~Footprint2DView() {
+    delete m_fileListWidget;
+    delete m_window;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -150,14 +179,16 @@ namespace Isis {
     return QSize(800, 600);
   }
 
-
+  /**
+   * Accessor for the MosaicSceneWidget
+   */
   MosaicSceneWidget *Footprint2DView::mosaicSceneWidget() {
     return m_sceneWidget;
   }
 
 
   /**
-   * Event filter to filter out drag and drop events. 
+   * Event filter to filter out drag and drop events.
    *
    * @param[in] watched (QObject *) The object being filtered
    * @param[in] event (QEvent *) The event
@@ -194,7 +225,7 @@ namespace Isis {
     }
     //TODO 2016-09-09 TLS  Handle Shapes-Create image from shape since qmos only handles images?
     //                   Still don't know if shape should inherit from image or contain an image?
-    // 
+    //
     Image *image;
     ImageList images;
     if (item->isShape()) {
@@ -207,23 +238,43 @@ namespace Isis {
     }
     images.append(image);
     m_sceneWidget->addImages(images);
-      
+    m_fileListWidget->addImages(&images);
+
     if (!m_imageItemMap.value(image)) {
       m_imageItemMap.insert(image, item);
     }
   }
 
+  
+  /**
+   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed 
+   * using the Close Cube context menu.
+   * 
+   * @param image The image that was closed and needs to be removed
+   */
+  void Footprint2DView::onMosItemRemoved(Image *image) {
+    if (image) {
+      ImageList images;
+      images.append(image);
+
+      m_sceneWidget->removeImages(images);
+      m_fileListWidget->removeImages(&(images));
+
+      if ( m_imageItemMap.value( image ) ) {
+        m_imageItemMap.remove( image );
+      }
+    }
+  }
+  
 
   /**
    * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
-   * from the scene. 
+   * from the scene.
    *
    * @param[in] item (ProjectItem *) The item to be removed
    */
   void Footprint2DView::onItemRemoved(ProjectItem *item) {
-//  qDebug()<<"Footprint2DView::onItemRemoved item= "<<item;
-//  qDebug()<<"                               source model: "<<internalModel()->sourceModel()<<"  rows = "<<internalModel()->sourceModel()->rowCount();
-//  qDebug()<<"                               proxy model: "<<internalModel()<<"  rows = "<<internalModel()->rowCount();
+
     if (!item) {
       return;
     }
@@ -232,9 +283,9 @@ namespace Isis {
 
       ImageList images;
       images.append(item->image());
-//    qDebug()<<"       image count = "<<images.size();
 
       m_sceneWidget->removeImages(images);
+      m_fileListWidget->removeImages(&(images));
 
       if ( m_imageItemMap.value( item->image() ) ) {
         m_imageItemMap.remove( item->image());
@@ -259,13 +310,12 @@ namespace Isis {
     internalModel()->selectionModel()->clear();
 
     if ( ProjectItem *item = m_imageItemMap.value(currentImage) ) {
-      internalModel()->selectionModel()->setCurrentIndex(item->index(), QItemSelectionModel::Select); 
+      internalModel()->selectionModel()->setCurrentIndex(item->index(), QItemSelectionModel::Select);
     }
-
 
     foreach (Image *image, selectedImages) {
       if ( ProjectItem *item = m_imageItemMap.value(image) ) {
-        internalModel()->selectionModel()->select(item->index(), QItemSelectionModel::Select); 
+        internalModel()->selectionModel()->select(item->index(), QItemSelectionModel::Select);
       }
     }
   }
@@ -280,7 +330,7 @@ namespace Isis {
     return m_permToolBar->actions();
   }
 
-  
+
   /**
    * Returns a list of actions for the active tool bar.
    *
@@ -291,8 +341,8 @@ namespace Isis {
     actions.append(m_activeToolBarAction);
     return actions;
   }
-  
-  
+
+
   /**
    * Returns a list of actions for the tool pad.
    *
@@ -301,6 +351,4 @@ namespace Isis {
   QList<QAction *> Footprint2DView::toolPadActions() {
     return m_toolPad->actions();
   }
-
-
 }

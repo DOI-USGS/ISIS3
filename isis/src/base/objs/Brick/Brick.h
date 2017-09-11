@@ -53,6 +53,7 @@ namespace Isis {
    *                                    ProcessByBrick that need to specify an
    *                                    area to be traversed that is bigger than
    *                                    the cube itself.
+   *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    *  @todo 2005-02-28 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
@@ -66,6 +67,11 @@ namespace Isis {
        * @param nlines Number of lines in shape buffer
        * @param nbands Number of bands in shape buffer
        * @param type Type of pixel in raw buffer
+       * @param reverse Modifies the order of progression this
+       *             buffer takes through the cube.  By default,
+       *             progresses samples first, then lines, then bands.
+       *             If reverse = true, then the buffer progresses
+       *             bands first, then lines, then samples.
        */
       Brick(const int nsamps, const int nlines, const int nbands,
             const Isis::PixelType type, bool reverse=false) :
@@ -73,6 +79,19 @@ namespace Isis {
                             nsamps, nlines, nbands, type, reverse) {
       };
 
+      /**
+       * Constructs a Brick object
+       *
+       * @param &cube Reference to the cube to calculate a Brick from
+       * @param &bufNumSamples Reference to the number of samples in shape buffer
+       * @param &bufNumLines Reference to the number of lines in shape buffer
+       * @param &bufNumBands Reference to the number of bands in shape buffer
+       * @param reverse Modifies the order of progression this
+       *             buffer takes through the cube.  By default,
+       *             progresses samples first, then lines, then bands.
+       *             If reverse = true, then the buffer progresses
+       *             bands first, then lines, then samples.
+       */
       Brick(const Isis::Cube &cube, const int &bufNumSamples,
             const int &bufNumLines, const int &bufNumBands,
             bool reverse=false) :
@@ -92,6 +111,11 @@ namespace Isis {
        * @param bufNumLines Number of lines in shape buffer
        * @param bufNumBands Number of bands in shape buffer
        * @param type Type of pixel in raw buffer
+       * @param reverse Modifies the order of progression this
+       *             buffer takes through the cube.  By default,
+       *             progresses samples first, then lines, then bands.
+       *             If reverse = true, then the buffer progresses
+       *             bands first, then lines, then samples.
        */
       Brick(int maxSamples, int maxLines, int maxBands, int bufNumSamples,
             int bufNumLines, int bufNumBands, Isis::PixelType type,

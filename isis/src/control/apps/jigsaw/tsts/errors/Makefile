@@ -55,3 +55,20 @@ commands:
 	then \
 	  true; \
 	fi;
+# TEST F: CNET=[invalid control net file]
+	echo -e "Error Test F:" >> $(OUTPUT)/error.txt;
+	if [[ `$(APPNAME) \
+	  fromlist=$(INPUT)/empty.lis \
+	  cnet=$(INPUT)/notacnet.net \
+	  onet=$(output)/out.net \
+	  radius=yes \
+	  spsolve=positions \
+	  point_radius_sigma=500 \
+	  spacecraft_position_sigma=500 \
+	  camera_angles_sigma=2 \
+	  2>> $(OUTPUT)/error.txt \
+	  > /dev/null` ]]; \
+	then \
+	  true; \
+	fi;
+	

@@ -63,6 +63,8 @@ namespace Isis {
    *           such that if a file name and it's attributes are
    *           surround with double quotes, then don't use commas
    *           as a 'end of line' signal.
+   *   @history 2017-08-15 Adam Goins - removed a printf() that resulted in
+   *                                    extraneous output to be displayed. Ref#5112
    */
   class FileList : public QList<FileName> {
     public:

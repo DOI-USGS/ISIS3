@@ -33,6 +33,8 @@ namespace Isis {
    *                           they always appear on screen (Qt4 to Qt5).
    *   @history 2016-10-20 Tracie Sucharski - Remove obsolete code that was commented out.
    *                           Fixes #4479.
+   *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
+   *                           center crosshair in red.  Fixes #5007, #5008. 
    *                   
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {

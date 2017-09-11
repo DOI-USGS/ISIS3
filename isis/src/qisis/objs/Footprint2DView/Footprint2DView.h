@@ -30,14 +30,16 @@
 
 class QAction;
 class QEvent;
+class QMainWindow;
 class QToolBar;
 class QWidgetAction;
 
 namespace Isis {
-  
+
   class ControlPoint;
   class Directory;
   class Image;
+  class ImageFileListWidget;
   class MosaicSceneWidget;
   class ToolPad;
 
@@ -45,7 +47,7 @@ namespace Isis {
    * View for displaying footprints of images in a QMos like way.
    *
    * @author 2016-01-13 Jeffrey Covington
-   * 
+   *
    * @internal
    *   @history 2016-01-13 Jeffrey Covington - Original version.
    *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation, checked coding standards.
@@ -55,7 +57,13 @@ namespace Isis {
    *                           and creating control points.  These are passed on to Directory slots.
    *   @history 2016-10-20 Tracie Sucharski -  Added back the capability for choosing either a new
    *                           view or using an existing view.
-   *   @history 2017-02-06 Tracie Sucharski - Added status bar for the track tool.  Fixes #4475. 
+   *   @history 2017-02-06 Tracie Sucharski - Added status bar for the track tool.  Fixes #4475.
+   *   @history 2017-07-18 Cole Neubauer - Moved creation of the ImageFileListWidget into
+   *                           Footprint2DView to more mirror the Qmos window.  Fixes #4996.
+   *   @history 2017-07-27 Makayla Shepherd - Fixed a segfault that occurred when closing a cube
+   *                           footprint. Fixes #5050.
+   *   @history 2017-08-02 Tracie Sucharski - Fixed connections between views for control point
+   *                           editing.  Fixes #5007, #5008.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -69,7 +77,7 @@ namespace Isis {
       virtual QList<QAction *> permToolBarActions();
       virtual QList<QAction *> activeToolBarActions();
       virtual QList<QAction *> toolPadActions();
- 
+
       QSize sizeHint() const;
 
     signals:
@@ -77,6 +85,7 @@ namespace Isis {
       void deleteControlPoint(ControlPoint *controlPoint);
       void createControlPoint(double latitude, double longitude);
 
+      void redrawMeasures();
       void controlPointAdded(QString newPointId);
 
     protected:
@@ -86,9 +95,12 @@ namespace Isis {
       void onItemAdded(ProjectItem *item);
       void onItemRemoved(ProjectItem *item);
       void onQueueSelectionChanged();
+      void onMosItemRemoved(Image *image);
 
     private:
       MosaicSceneWidget *m_sceneWidget; //!< The scene widget
+      ImageFileListWidget *m_fileListWidget; //!< The file list widget
+      QMainWindow *m_window; //!< Main window
       QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
 
       QToolBar *m_permToolBar; //!< The permanent tool bar

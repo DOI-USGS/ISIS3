@@ -70,6 +70,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Constructs a BufferManager object.
+   *
+   * @param &other Reference to a BufferManager to copy
+   *
+   */
   BufferManager::BufferManager(const BufferManager &other) :
       Buffer(other),
       p_maxSamps(other.p_maxSamps), p_maxLines(other.p_maxLines),
@@ -82,6 +88,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Swaps the values of this BufferManager with that of another
+   *
+   * @param &other Reference to a BufferManager to swap with
+   *
+   */
   void BufferManager::swap(BufferManager &other) {
     std::swap(p_maxSamps, other.p_maxSamps);
     std::swap(p_maxLines, other.p_maxLines);
@@ -101,6 +113,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates a new BufferManager with the same values as another
+   *
+   * @param &rhs Reference to a BufferManager to swap with
+   * 
+   * @return BufferManager
+   */
   BufferManager &BufferManager::operator=(const BufferManager &rhs) {
     BufferManager copy(rhs);
     swap(copy);
