@@ -228,7 +228,7 @@ namespace Isis {
    *  
    * @returns The distorted focal plane x.
    */
-  double FocalPlaneX() const {
+  double CameraDistortionMap::FocalPlaneX() const {
     return p_focalPlaneX;
   }
   
@@ -239,7 +239,7 @@ namespace Isis {
    *  
    * @returns The distorted focal plane y.
    */
-  double FocalPlaneY() const {
+  double CameraDistortionMap::FocalPlaneY() const {
     return p_focalPlaneY;
   }
   
@@ -250,7 +250,7 @@ namespace Isis {
    * 
    *@returns The undistorted focal plane x
    */
-  double UndistortedFocalPlaneX() const {
+  double CameraDistortionMap::UndistortedFocalPlaneX() const {
     return p_undistortedFocalPlaneX;
   }
   
@@ -261,7 +261,7 @@ namespace Isis {
    *  
    * @returns The undistorted focal plane y
    */
-  double UndistortedFocalPlaneY() const {
+  double CameraDistortionMap::UndistortedFocalPlaneY() const {
     return p_undistortedFocalPlaneY;
   }
   
@@ -273,8 +273,8 @@ namespace Isis {
    *  
    * @returns The undistorted focal plane z
    */
-  double UndistortedFocalPlaneZ() const {
-    return p_zDirection * p_camera->FocalLength();
+  double CameraDistortionMap::UndistortedFocalPlaneZ() const {
+    return p_zDirection *p_camera->FocalLength();
   }
 
 }

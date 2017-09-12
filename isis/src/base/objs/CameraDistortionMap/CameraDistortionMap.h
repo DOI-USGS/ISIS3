@@ -53,7 +53,6 @@ namespace Isis {
    *   @history 2017-09-04 Kristin Berry - Made SetDistortion virtual so that
    *                           individual camera model distortion maps can
    *                           set the values.
-   *
    */
   class CameraDistortionMap {
     public:
