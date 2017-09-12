@@ -1451,7 +1451,8 @@ namespace Isis {
   SurfacePoint::CoordinateType BundleResults::coordTypeReports() {
     // Get the coordinate type from the output net if it exists.  Otherwise use the default.
     SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
-    if (m_outNet  && m_outNet->IsValid()) {
+    // if (m_outNet  && m_outNet->IsValid()) {   // ControlNet::IsValid removed
+    if (m_outNet) {
         type = outputControlNet()->GetCoordType();
     }
     return type;
@@ -1477,7 +1478,8 @@ namespace Isis {
   void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {
     // Get the coordinate type from the output net if it exists.  Otherwise use the default.
     SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
-    if (m_outNet  && m_outNet->IsValid()) {
+    // if (m_outNet  && m_outNet->IsValid()) {     // ControlNet::IsValid removed by another project
+    if (m_outNet) { 
         coordType = outputControlNet()->GetCoordType();
     }
     
