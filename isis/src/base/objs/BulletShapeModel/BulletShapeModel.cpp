@@ -345,6 +345,14 @@ namespace Isis {
     if ( !hit.isValid() ) {
       return true;
     }
+    
+    // Check if the emission angle is greater than 90 degrees
+    // If true, then it is occluded, if false then unknown
+    btVector3 psB = (observer - hit.point()).normalized();
+    btScalar  angle = std::acos( hit.normal().dot( psB ) ) * RAD2DEG;
+    if ( std::fabs( angle ) > 90.0 - DBL_MIN) {
+      return true;
+    }
 
     // Ray cast from the observer to the intersection
     //   If we have an intersection, test for occlusion
@@ -461,8 +469,18 @@ namespace Isis {
    */
   bool BulletShapeModel::isVisibleFrom(const std::vector<double> observerPos,
                                        const std::vector<double> lookDirection)  {
+
     if ( !m_intercept.isValid() ) return (false);
+
+    // Check if the emission angle is greater than 90 degrees
+    // If true, then it is occluded, if false then unknown
     btVector3 observer(observerPos[0], observerPos[1], observerPos[2]);
+    btVector3 psB = (observer - m_intercept.point()).normalized();
+    btScalar  angle = std::acos( m_intercept.normal().dot( psB ) ) * RAD2DEG;
+    if ( std::fabs( angle ) > 90.0 - DBL_MIN) {
+      return false;
+    }
+
     btVector3 rayEnd = castLookDir( observer,  btVector3(lookDirection[0], lookDirection[1], lookDirection[2]) );
     BulletClosestRayCallback results(observer, rayEnd);
     (void) m_model->raycast(observer, rayEnd, results);

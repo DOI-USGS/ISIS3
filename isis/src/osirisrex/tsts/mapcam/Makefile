@@ -9,7 +9,7 @@
 # @history 2017-08-29 Jeannie Backer - Updated to new test cube that has pre-processing 
 #                         flip applied.
 #
-#20190303T100344S990_map_iofL2pan_V001-cam2map_equi.cub.TOLERANCE = 1e-03
+20190303T100344S990_map_iofL2pan_V001-cam2map_equi.cub.TOLERANCE = 1e-03
 
 include $(ISISROOT)/make/isismake.tsts
 

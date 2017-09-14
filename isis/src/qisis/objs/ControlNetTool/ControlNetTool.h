@@ -29,7 +29,8 @@ namespace Isis {
   class UniversalGroundMap;
 
   /**
-   * @brief Ipce (Qnet) tool operations
+   * @brief ControlNetTool operations ipce, handles mouse events on views for control point editing 
+   *        for the ipce app.
    *
    * @ingroup Visualization Tools
    *
@@ -48,6 +49,7 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
    *                           center crosshair in red.  Removed refresh method; it was not being
    *                           used.  Fixes #5007, #5008.
+   *   @history 2017-08-08 Cole Neubauer - Renamed from IpceTool.  Fixes #5090. 
    *   @history 2017-08-09 Cole Neubauer - Added loadNetwork() for changing inbetween active
    *                           networks Fixes #4567
    */

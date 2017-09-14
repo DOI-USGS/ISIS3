@@ -77,38 +77,129 @@ namespace Isis {
   *                           deals with cubes.  Since Image contains a cube, simply pass in cube
   *                           instead of Image.  This was done to handle the new IPCE container
   *                           class, Shape, which also contains a cube, but not an Image.
+  *   @history 2017-09-11 Adam Goins - Added the ability to accept cubelists under any file format.
+  *                           Fixes #5099.
   */
   class Workspace : public QWidget {
       Q_OBJECT
 
     public:
+      /**
+       * Constructor for Workspace
+       * 
+       * @param selfContained if this Workspace should be self contained or note
+       * @param parent The parent QWidget, defaults to 0
+       * 
+       */
       Workspace(bool selfContained, QWidget *parent = 0);
+      
+      /**
+       * Constructor for Workspace
+       * 
+       * @param other The other Workspace to load from.
+       */
       Workspace(const Workspace &other);
+      
+      /**
+       * Deconstructor
+       * 
+       */
       virtual ~Workspace();
+      
+      /**
+       * This method returns a Vector of MdiCubeViewports
+       * 
+       * @return QVector a vector of MdiCubeViewports
+       */
       QVector< MdiCubeViewport * > * cubeViewportList();
+      
+      /**
+       * Is equal to comparsion
+       * 
+       * @param other The Workspace to compare against
+       * @return bool True of False if they're equal to eachother .
+       */
       Workspace &operator=(Workspace other);
 
+      /**
+       * Adds a list of Images to a viewport
+       * 
+       * @param images The ImageList of images to add to the Workspace
+       */
       void addImages(ImageList *images);
+      
+      /**
+       * Confirms that the user wishes toc lose the Workspace
+       * 
+       * @return True of False if the user wishes to close the Workspace
+       */
       bool confirmClose();
+      
+      /**
+       * Converts a cube to an MdiWidget
+       * 
+       * @param cube The cube to reference
+       * @return QWidget The widget associated with the cube
+       */
       QWidget *cubeToMdiWidget(Cube *cube);
+      
+      /**
+       * This method returns the QMdiArea
+       * 
+       * @return QMdiArea the Area of the mdi
+       */
       QMdiArea *mdiArea();
 
     signals:
+      /**
+       * Signal triggered when a Cube is added to the Workspace
+       */
       void cubeViewportAdded(MdiCubeViewport *);
+      
+      /**
+       * Signal triggered when a Cube is activated in the Workspace
+       * 
+       */
       void cubeViewportActivated(MdiCubeViewport *);
 
     public slots:
-      void addCubeViewport(QString cube);
+      
+      /**
+       * Method adds the name of a cube into Workspace as a CubeViewport
+       * 
+       * @param cubename The cube to be added to the Workspace
+       */
+      void addCubeViewport(QString cubename);
+      
+      /**
+       * Method adds a cube into the Workspace as a CubeViewport.
+       * 
+       * @param cube The cube to be added into the Workspace.
+       */
       MdiCubeViewport *addCubeViewport(Cube *cube);
 
+      /**
+       * Method is called to add a Cube from BrowseView.
+       * 
+       * @param cube The cube being browsed
+       */
       void addBrowseView(QString cube);
 
     protected slots:
+      
+      /**
+       * This method activates the Viewport.
+       * 
+       * @param w The subwindow to activate
+       */
       void activateViewport(QMdiSubWindow *w);
 
     private:
+      //! The mdi area
       QPointer<QMdiArea> m_mdi;
+      //! List of cube viewports
       QVector< MdiCubeViewport * > * m_cubeViewportList;
+      //! List of all of the tools.
       ToolList *m_tools;
   };
 };
