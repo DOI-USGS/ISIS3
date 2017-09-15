@@ -391,7 +391,7 @@ void IsisMain() {
   //minusApposJ[0] = -apposJ[0];
   //minusApposJ[0] = -apposJ[0];
   //minusApposJ[1] = -apposJ[1];
-  minusApposJ[2] = apposJ[2];
+  minusApposJ[0] = apposJ[0];
   minusApposJ[1] = apposJ[1];
   minusApposJ[2] = apposJ[2];
 
