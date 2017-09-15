@@ -44,15 +44,15 @@ namespace Isis {
                                                  int naifIkCode) 
       : CameraDistortionMap(parent) {
 
-    m_width = 2048;
-    m_height = 2048;
-
     QString od = "INS" + toString(naifIkCode) + "_OD_";
 
     for(int i = 0; i < 6; i++) {
-      m_A1.push_back(p_camera->getDouble(od + "A1", i));
-      m_A2.push_back(p_camera->getDouble(od + "A2", i));
-      m_A3.push_back(p_camera->getDouble(od + "A3", i));
+      m_A1_corr.push_back(p_camera->getDouble(od + "A1_CORR", i));
+      m_A2_corr.push_back(p_camera->getDouble(od + "A2_CORR", i));
+      m_A3_corr.push_back(p_camera->getDouble(od + "A3_CORR", i));
+      m_A1_dist.push_back(p_camera->getDouble(od + "A1_DIST", i));
+      m_A2_dist.push_back(p_camera->getDouble(od + "A2_DIST", i));
+      m_A3_dist.push_back(p_camera->getDouble(od + "A3_DIST", i));
     }
   }
 
@@ -65,7 +65,28 @@ namespace Isis {
 
 
   /** 
-   * Compute undistorted focal plane (x,y) coordinate from the distorted (x,y).
+   * Compute undistorted focal plane (x,y) coordinate given the distorted 
+   * (x,y). 
+   *  
+   * Model derived by Stepan Tulyakov and Anotn Ivanov, EPFL (École 
+   * Polytechnique Fédérale de Lausanne). 
+   *  
+   * Given distorted focal plane coordinates, in millimeters, and parameters of 
+   * rational CORRECTION model A1_corr, A2_corr, A3_corr, this function returns undistorted 
+   * focal plane coordinates, in millimeters. 
+   *  
+   * The rational optical distortion correction model is described by following 
+   * equations: 
+   *  
+   *  chi = [ dx^2, dx*dy, dy^2, dx, dy, 1]
+   *  
+   *          A1_corr * chi'
+   *  x =    ---------------
+   *          A3_corr * chi'
+   *  
+   *          A2_corr * chi'
+   *  y =    ----------------
+   *          A3_corr * chi' 
    *
    * @param dx distorted focal plane x, in millimeters
    * @param dy distorted focal plane y, in millimeters
@@ -78,42 +99,20 @@ namespace Isis {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 
-    // i and j are normalized distorted coordinates
-    double i = normalize(dx, m_width,  m_height);
-    double j = normalize(dy, m_height, m_width);
+    // calculate divisor using A3_corr coeffiecients
+    double divider = chiDotA(dx, dy, m_A3_corr);
+//???    if (qFuzzyCompare(divider + 1.0, 1.0)) {
+//???      p_undistortedFocalPlaneX = dx; 
+//???      p_undistortedFocalPlaneY = dy; 
+//???      return true; 
+//???    }
 
-    // convenience variables
-    double i2 = i*i;
-    double j2 = j*j;
-    double ij = i*j;
+    // get undistorted ideal (x,y) coordinates
+    double ux = chiDotA(dx, dy, m_A1_corr) / divider;
+    double uy = chiDotA(dx, dy, m_A2_corr) / divider;
 
-    // divider we might nead for debuging
-    double divider = i2 * m_A3[0] 
-                     + ij * m_A3[1] 
-                     + j2 * m_A3[2] 
-                     + i  * m_A3[3] 
-                     + j  * m_A3[4] 
-                     + 1;
-
-    double xNorm = ( i2 * m_A1[0] 
-                     + ij * m_A1[1] 
-                     + j2 * m_A1[2] 
-                     + i  * m_A1[3] 
-                     + j  * m_A1[4] 
-                     + m_A1[5] )
-                   / divider;
-
-    double yNorm = ( i2 * m_A2[0] 
-                     + ij * m_A2[1] 
-                     + j2 * m_A2[2] 
-                     + i  * m_A2[3] 
-                     + j  * m_A2[4] 
-                     + m_A2[5] )
-                   / divider;
-
-    // denormalize ideal (x,y) coordinates
-    p_undistortedFocalPlaneX = denormalize(xNorm, m_width,  m_height);
-    p_undistortedFocalPlaneY = denormalize(yNorm, m_height, m_width);
+    p_undistortedFocalPlaneX = ux;
+    p_undistortedFocalPlaneY = uy;
 
     return true;
   }
@@ -121,6 +120,27 @@ namespace Isis {
 
   /** 
    * Compute distorted focal plane (x,y) given an undistorted focal plane (x,y).
+   * 
+   * Model derived by Stepan Tulyakov and Anotn Ivanov, EPFL (École 
+   * Polytechnique Fédérale de Lausanne). 
+   *  
+   * Given ideal focal plane coordinates, in millimeters, and parameters
+   * of rational CORRECTION model A1_dist, A2_dist, A3_dist, this function 
+   * returns distorted focal plane coordinates, in millimeters. 
+   *  
+   * The rational optical distortion correction model is described by following 
+   * equations: 
+   *  
+   *  chi = [ dx^2, dx*dy, dy^2, dx, dy, 1]
+   *  
+   *          A1_dist * chi'
+   *  x =    ---------------
+   *          A3_dist * chi'
+   *  
+   *          A2_dist * chi'
+   *  y =    ----------------
+   *          A3_dist * chi' 
+   *
    *
    * @param ux undistorted focal plane x, in millimeters
    * @param uy undistorted focal plane y, in millimeters
@@ -132,137 +152,55 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
-    // x, y are normalized undistorted (ideal) coordinates
-    double xNorm = normalize(ux, m_width,  m_height);
-    double yNorm = normalize(uy, m_height, m_width);
+    // calculate divisor using A3_dist coeffiecients
+    double divider = chiDotA(ux, uy, m_A3_dist);
+//???    if (qFuzzyCompare(divider + 1.0, 1.0)) {
+//???      p_undistortedFocalPlaneX = dx; 
+//???      p_undistortedFocalPlaneY = dy; 
+//???      return true; 
+//???    }
 
-    // i, j are distorted coordinates
-    double iNorm = xNorm;
-    double jNorm = yNorm;
-    int newtonIterations = 2000;
-    // newton's method to iterate
-    for( int index = 0; index < newtonIterations; ++index ) {
-      /* 
-       * compute F(i_pre, j_pre)
-       * 
-       * F_vec(i,j) = [ initialX - ( A1 * chi' ) / ( A3 * chi' ) ]
-       *              [ initialY - ( A2 * chi' ) / ( A3 * chi' ) ]
-      */
-      m_width = 0.0; 
-      m_height = 0.0; // Below we call SetFocalPlane(). This method normalizes its inputs, i.e.
-                      // iNorm and jNorm in this case. Since they are already normalized, we 
-                      // set height = weight = 0.0 so that normalize(value) just
-                      // returns value.
+    // get undistorted ideal (x,y) coordinates
+    double dx = chiDotA(ux, uy, m_A1_dist) / divider;
+    double dy = chiDotA(ux, uy, m_A2_dist) / divider;
 
-      if (SetFocalPlane(iNorm, jNorm) ) {
-        double xPredict = p_undistortedFocalPlaneX;
-        double yPredict = p_undistortedFocalPlaneY;
-        double divider = iNorm * iNorm * m_A3[0] 
-                         + iNorm * jNorm * m_A3[1] 
-                         + jNorm * jNorm * m_A3[2] 
-                         + iNorm * m_A3[3] 
-                         + jNorm * m_A3[4] 
-                         + 1;
-
-        double f11 = xNorm - xPredict;
-        double f21 = yNorm - yPredict;
-
-        /* 
-         * compute the Jacobian, J(i, j):
-         * 
-         * J(i,j) = [ - ( (A1 * dchi / di') - xPredicted*(A3 * dchi / di) ) / (A3 * chi'),...
-         *            - ( (A1 * dchi / dj') - xPredicted*(A3 * dchi / dj) ) / (A3 * chi');...
-         *            - ( (A2 * dchi / di') - yPredicted*(A3 * dchi / di) ) / (A3 * chi'),...
-         *            - ( (A2 * dchi / dj') - yPredicted*(A3 * dchi / dj) ) / (A3 * chi')]
-         * 
-         * dchi / di = [2i   j   0   1   0   0]
-         * dchi / dj = [ 0   i  2j   0   1   0]
-         */
-        double j11 = - ( ( 2 * iNorm * m_A1[0] + jNorm * m_A1[1] + m_A1[3] ) 
-                         - xPredict * ( 2 * iNorm * m_A3[0] + jNorm * m_A3[1] + m_A3[3] ) ) 
-                       / divider;
-        double j12 = - ( ( iNorm * m_A1[1] + 2 * jNorm * m_A1[2] + m_A1[4] ) 
-                         - xPredict * ( iNorm * m_A3[1] + 2 * jNorm * m_A3[2] + m_A3[4] ) )
-                       / divider;
-        double j21 = - ( ( 2 * iNorm * m_A2[0] + jNorm * m_A2[1] + m_A2[3] ) 
-                         - yPredict * ( 2 * iNorm * m_A3[0] + jNorm * m_A3[1] + m_A3[3] ) )
-                       / divider;
-        double j22 = - ( ( iNorm * m_A2[1] + 2 * jNorm * m_A2[2] + m_A2[4] ) 
-                         - yPredict * ( iNorm * m_A3[1] + 2 * jNorm * m_A3[2] + m_A3[4] ) )
-                       / divider;
-
-        /* 
-         * compute update
-         * 
-         * [i_n, j_n]  = [i_n-1, j_n-1] - inv(J(i_n-1, j_n-1))*F(i_n-1, j_n-1);
-         * 
-         *                    1             [  J22 -J12 ] [ F11 ]   [  J22*F11 - J12*F21 ]
-         * inv(J)*F =  ------------------ * [ -J21  J11 ] [ F21 ] = [ -J21*F11 + J11*F21 ]
-         *             J11*J22 - J12*J21
-         */
-        double di = - ( j22*f11 - j12*f21) / (j11*j22 - j12*j21);
-        double dj = - (-j21*f11 + j11*f21) / (j11*j22 - j12*j21);
-        iNorm = iNorm + di;
-        jNorm = jNorm + dj;
-      }
-      else {
-        return false;
-      }
-
-    }
-    m_width = 2048;
-    m_height = 2048;
-
-    p_undistortedFocalPlaneX = ux;
-    p_undistortedFocalPlaneY = uy;
-    // denormalize distorted (i,j) coordinates
-    p_focalPlaneX = denormalize(iNorm, m_width,  m_height);
-    p_focalPlaneY = denormalize(jNorm, m_height, m_width);
+    p_focalPlaneX = dx;
+    p_focalPlaneY = dy;
     return true;
   }
 
 
   /**
-   * Normalize the value using the given scalars. This method uses the formula 
-   * below to normalize the given value: 
+   * Evaluate the value for the multi-variate polynomial, given the list of 
+   * 6 rational coefficients. 
    *  
-   *  @f[ norm = \frac{ value - \frac{a}{2} }{ a + b } @f]
-   * 
-   * @param value Value to be normalize.
-   * @param a Primary scaling value.
-   * @param b Secondary scaling value.
-   * 
-   * @return @b double The normalized value.
-   */
-  double TgoCassisDistortionMap::normalize(double value, double a, double b) {
-    double sum = a + b;
-    if (sum == 0) {
-      return value;
-    }
-    return (value - a / 2) / sum;
-  }
-
-
-  /**
-   * De-normalize the value using the given scalars. This method is the 
-   * inverse function of the normalize() function. It uses the formula below 
-   * to denormalize the given value: 
+   * We define 
+   *  @f[ chi = [x^2, xy, y^2, x, y, 1 @f]
+   * and
+   *  @f[ A = [A_0, A_1, A_2, A_3, A_4, A_5 @f]
    *  
-   *  @f[ denorm = value * (a + b) + \frac{a}{2} @f]
+   * And we return
+   *  @f[ \chi \cdot A = c_0 x^2 + c_1 xy + c_2 y^2 + c_3 x + c_4 y + c_5 @f]
    * 
-   * @param value Value to be normalize.
-   * @param a Primary scaling value.
-   * @param b Secondary scaling value.
+   * @param x The input x value.
+   * @param y The input y value.
+   * @param A The list of coeffients.
    * 
-   * @return @b double The normalized value.
+   * @return @b double The value of chi dot A.
    */
-  double TgoCassisDistortionMap::denormalize(double value, double a, double b) {
-    double sum = a + b;
-    if (sum == 0) {
-      return value;
-    }
-    return value * sum + a / 2;
+  double TgoCassisDistortionMap::chiDotA(double x,
+                                         double y,
+                                         QList<double> A) {  
+    double x2 = x*x;
+    double y2 = y*y;
+    double xy = x*y;
+
+    return A[0] * x2
+         + A[1] * xy 
+         + A[2] * y2 
+         + A[3] * x 
+         + A[4] * y 
+         + A[5];
   }
-  
 }
 

@@ -44,6 +44,7 @@ namespace Isis {
    *   @history 2017-04-03 Jeannie Walldren - Original version from model
    *                           provided by Anton Ivanov.
    *   @history 2017-04-06 Jeannie Walldren - Fixed bugs and updated unitTest.
+   *   @history 2017-09-14 Jeannie Walldren - Updated to use latest distortion model.
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:
@@ -56,15 +57,20 @@ namespace Isis {
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
     private:
-      double normalize(double value, double a, double b);
-      double denormalize(double value, double a, double b);
+      double chiDotA(double x, double y, QList<double> A);
 
-      double m_width;   //!< The width of the CaSSIS CCD, used to normalize/denormalize variables.
-      double m_height;  //!< The height of the CaSSIS CCD, used to normalize/denormalize variables.
-
-      QList<double> m_A1; //!< First row of parameters of rational distortion model.
-      QList<double> m_A2; //!< Second row of parameters of rational distortion model.
-      QList<double> m_A3; //!< Third row of parameters of rational distortion model.
+      QList<double> m_A1_corr; /**< Coefficients for rational distortion model used to compute 
+                                    ideal x from distorted x. */
+      QList<double> m_A2_corr; /**< Coefficients for rational distortion model used to compute 
+                                    ideal y from distorted y. */
+      QList<double> m_A3_corr; /**< Coefficients for rational distortion model used to find scaling
+                                    factor used when computing ideal coordinates from distorted. */
+      QList<double> m_A1_dist; /**< Coefficients for rational distortion model used to compute 
+                                    distorted x from ideal x. */
+      QList<double> m_A2_dist; /**< Coefficients for rational distortion model used to compute 
+                                    distorted y from ideal y. */
+      QList<double> m_A3_dist; /**< Coefficients for rational distortion model used to find scaling
+                                    factor used when computing distorted coordinates from ideal. */
   };
 };
 #endif
