@@ -30,21 +30,25 @@ namespace Isis {
   /** 
    * Distort/undistort focal plane coordinates.
    *
-   * Creates a map for adding/removing optical distortions
-   * from the focal plane of a camera.
+   * Creates a map for adding/removing optical distortions from the focal plane of a camera.
    *
+   * Model derived by Stepan Tulyakov and Anoton Ivanov, 
+   * EPFL (École Polytechnique Fédérale de Lausanne). 
+   *  
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Tgo
    *
    * @see TgoCassisCamera
+   * @see $ISIS3DATA/tgo/assets/distortion
    *
    * @author 2017-04-03 Jeannie Backer
    *
    * @internal
-   *   @history 2017-04-03 Jeannie Walldren - Original version from model
+   *   @history 2017-04-03 Jeannie Backer - Original version from model
    *                           provided by Anton Ivanov.
-   *   @history 2017-04-06 Jeannie Walldren - Fixed bugs and updated unitTest.
-   *   @history 2017-09-14 Jeannie Walldren - Updated to use latest distortion model.
+   *   @history 2017-04-06 Jeannie Backer - Fixed bugs and updated unitTest.
+   *   @history 2017-09-14 Jeannie Backer - Updated distortion model provided
+   *                           by Stepan Tulyakov.
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:

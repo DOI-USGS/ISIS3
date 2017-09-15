@@ -68,7 +68,7 @@ namespace Isis {
    * Compute undistorted focal plane (x,y) coordinate given the distorted 
    * (x,y). 
    *  
-   * Model derived by Stepan Tulyakov and Anotn Ivanov, EPFL (École 
+   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (École 
    * Polytechnique Fédérale de Lausanne). 
    *  
    * Given distorted focal plane coordinates, in millimeters, and parameters of 
@@ -101,11 +101,15 @@ namespace Isis {
 
     // calculate divisor using A3_corr coeffiecients
     double divider = chiDotA(dx, dy, m_A3_corr);
-//???    if (qFuzzyCompare(divider + 1.0, 1.0)) {
-//???      p_undistortedFocalPlaneX = dx; 
-//???      p_undistortedFocalPlaneY = dy; 
-//???      return true; 
-//???    }
+    // Note: The zeros for the divider variable fall well outside the boundary
+    // of the focal plane. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3CorrRoots.jpg).
+    // We expect this case not to happen, but if it does, just return the input
+    // values
+    if (qFuzzyCompare(divider + 1.0,  1.0) == 0) {
+      p_undistortedFocalPlaneX = dx;
+      p_undistortedFocalPlaneY = dy;
+      return true;
+    }
 
     // get undistorted ideal (x,y) coordinates
     double ux = chiDotA(dx, dy, m_A1_corr) / divider;
@@ -113,7 +117,6 @@ namespace Isis {
 
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
-
     return true;
   }
 
@@ -121,7 +124,7 @@ namespace Isis {
   /** 
    * Compute distorted focal plane (x,y) given an undistorted focal plane (x,y).
    * 
-   * Model derived by Stepan Tulyakov and Anotn Ivanov, EPFL (École 
+   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (École 
    * Polytechnique Fédérale de Lausanne). 
    *  
    * Given ideal focal plane coordinates, in millimeters, and parameters
@@ -154,11 +157,16 @@ namespace Isis {
 
     // calculate divisor using A3_dist coeffiecients
     double divider = chiDotA(ux, uy, m_A3_dist);
-//???    if (qFuzzyCompare(divider + 1.0, 1.0)) {
-//???      p_undistortedFocalPlaneX = dx; 
-//???      p_undistortedFocalPlaneY = dy; 
-//???      return true; 
-//???    }
+    // Note: The zeros for the divider variable fall well outside the boundary
+    // of the focal plane. (See
+    // $ISIS3DATA/tgo/assets/distortion/DistortionModelA3DistRoots.jpg).
+    // We expect this case not to happen, but if it does, just return the input
+    // values
+    if (qFuzzyCompare(divider + 1.0,  1.0) == 0) {
+      p_focalPlaneX = ux;
+      p_focalPlaneY = uy;
+      return true;
+    }
 
     // get undistorted ideal (x,y) coordinates
     double dx = chiDotA(ux, uy, m_A1_dist) / divider;
@@ -172,7 +180,7 @@ namespace Isis {
 
   /**
    * Evaluate the value for the multi-variate polynomial, given the list of 
-   * 6 rational coefficients. 
+   * 6 coefficients. 
    *  
    * We define 
    *  @f[ chi = [x^2, xy, y^2, x, y, 1 @f]
