@@ -90,6 +90,10 @@ namespace Isis {
    *                        unused member variable warnings in clang. Part of porting to OS X 10.11.
    *  @history 2017-08-21 Tyler Wilson, Ian Humphrey, Summer Stapleton - Added
    *                       support for new kakadu libraries.  References #4809.
+   *  @history 2017-09-15 Ian Humphrey - Modified destructor to call finish() on the decompressor
+   *                          before destroying the kdu_codestream. Caused segfault on OSX 10.11
+   *                          for the JP2Importer test, and isis2std and std2isis jpeg2000 tests.
+   *                          References #4809.
    */
   class JP2Decoder {
     public:
