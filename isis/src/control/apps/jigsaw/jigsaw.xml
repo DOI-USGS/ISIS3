@@ -256,6 +256,10 @@
       Added options for outputting and/or solving for body-fixed x/y/z
       instead of lat/lon/radius. References #501.
     </change>
+    <change name="Debbie A. Cook" date="2017-09-17">
+      Fixed a problem in the xml that was causing of of the input
+      parameters to be omitted from the history.  References #501.
+    </change>
   </history>
 
   <groups>
@@ -1045,7 +1049,6 @@
             <item>POINT_X_SIGMA</item>
             <item>POINT_Y_SIGMA</item>
             <item>POINT_Z_SIGMA</item>
-            <item>OVEREXISTING</item>
           </exclusions>
           </option>
 
@@ -1085,7 +1088,6 @@
             <item>POINT_X_SIGMA</item>
             <item>POINT_Y_SIGMA</item>
             <item>POINT_Z_SIGMA</item>
-            <item>OVEREXISTING</item>
           </exclusions>
           </option>
 
