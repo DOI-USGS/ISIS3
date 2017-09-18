@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tgounstitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Unstitch a  TGO CaSSIS full frame image into several TGO CaSSIS framelets.
+  </brief>
+
+  <description>
+    Unstitch a TGO CaSSIS full frame image into multiple TGO CaSSIS framelets.
+  </description>
+
+  <history>
+    <change name="Kristin Berry" date="2017-09-15">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>ExoMars Trace Gas Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="File">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A TGO CaSSIS fullframe cube to split into separate framelets. 
+        </brief>
+        <description>
+          A TGO CaSSIS fullframe cube to split into separate framelets. 
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output ISIS cube basename.
+         </brief>
+         <description>
+           The output ISIS cubes will be of the form basename_filter_frameletNumber.cub
+           There will also be a list produced with the same name. 
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

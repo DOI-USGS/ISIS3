@@ -64,13 +64,6 @@ namespace Isis {
     // Get all the necessary stuff from the labels
     Pvl &lab = *cube.label();
     const PvlGroup &inst    = lab.findGroup("Instrument", Pvl::Traverse);
-    const PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
-
-    // Filter codes
-    PvlKeyword filtNames     = bandBin["FilterName"];
-    PvlKeyword filterIkCodes = bandBin["NaifIkCode"];
-
-    QString filter     = filterIkCodes[0];
 
     // Set up the camera characteristics
     instrumentRotation()->SetFrame( CkFrameId() );
@@ -106,9 +99,6 @@ namespace Isis {
     double bsSample = getDouble("INS" + cassis + "_BORESIGHT_SAMPLE");
     double bsLine = getDouble("INS" + cassis + "_BORESIGHT_LINE");
     focalMap->SetDetectorOrigin(bsSample, bsLine);
-
-    // Set starting filter location on the detector
-    detMap->SetStartingDetectorLine(getDouble("INS" + filter + "_FILTER_OFFSET"));
 
     // Setup distortion map
     new TgoCassisDistortionMap(this, naifIkCode());
