@@ -75,6 +75,8 @@ namespace Isis {
    *  @history 2009-01-11 Janet Barrett - Original version.
    *  @history 2012-04-06 Kris Becker - Fixed condition compilation where
    *                        support for JP2K is disabled
+   *  @history 2017-08-21 Tyler Wilson, Ian Humphrey, Summer Stapleton - Added
+   *                        support for new kakadu libraries.  References #4809.
    *
    */
   class JP2Encoder {
@@ -128,10 +130,10 @@ namespace Isis {
       bool *p_isSigned;                //!<Determines if the data is signed/unsigned for each
       //!<band in the JP2 file
 
-      jp2_family_tgt *JP2_Stream;      //!<JP2 file output stream
-      jp2_target *JP2_Boxes;           //!<JP2 boxes for the JP2 file output stream
-      kdu_codestream *JPEG2000_Codestream; //!<Allow access to JP2 file codestream
-      kdu_stripe_compressor p_compressor;  //!<High level interface to compression of JP2
+      kdu_supp::jp2_family_tgt *JP2_Stream;      //!<JP2 file output stream
+      kdu_supp::jp2_target *JP2_Boxes;           //!<JP2 boxes for the JP2 file output stream
+      kdu_core::kdu_codestream *JPEG2000_Codestream; //!<Allow access to JP2 file codestream
+      kdu_supp::kdu_stripe_compressor p_compressor;  //!<High level interface to compression of JP2
       //!<file
 #endif
   };

@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 
 ISISCPPFLAGS  = -Wall
-ISISCPPFLAGS += -ansi
+ISISCPPFLAGS += -std=c++11
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
 ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
@@ -86,33 +86,33 @@ THIRDPARTYLICPATH := $(ISIS3LOCAL)/license/
 #---------------------------------------------------------------------------
 # Set up for Qt
 #---------------------------------------------------------------------------
-QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt5.6.0
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/Qt
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtCore
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtAssistant
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtConcurrent
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtDBus
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtGui
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtMultimedia
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtMultimediaWidgets
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtNetwork
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtOpenGL
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtPositioning
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtPrintSupport
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtQml
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtQuick
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtScript
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtScriptTools
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtSensors
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtSql
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtSvg
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtTest
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtWebChannel
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtWebEngine
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtWebEngineWidgets
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtWidgets
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtXml
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.6.0/QtXmlPatterns
+QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt5.7.1
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/Qt
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtCore
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtAssistant
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtConcurrent
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtDBus
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtGui
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtMultimedia
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtMultimediaWidgets
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtNetwork
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtOpenGL
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtPositioning
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtPrintSupport
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtQml
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtQuick
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtScript
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtScriptTools
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtSensors
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtSql
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtSvg
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtTest
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWebChannel
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWebEngine
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWebEngineWidgets
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWidgets
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXml
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
 QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus
 
@@ -172,7 +172,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.5.0
+GEOSINCDIR = -isystem $(ISIS3LOCAL)/include/geos/geos3.5.0
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
 GEOSLIB    = -lgeos-3.5.0 -lgeos_c
 
@@ -235,9 +235,9 @@ PROTOC         = $(ISIS3LOCAL)/bin/protoc
 #  below (i.e., be sure to add -I, -L and -l to the variables for KAKADUINCDIR,
 #  KAKADULIBDIR and KAKADULIB, respectively).
 #---------------------------------------------------------------------------
-KAKADUINCDIR := -I$(ISIS3LOCAL)/include/kakadu/v6_3-00967N
+KAKADUINCDIR := -I$(ISIS3LOCAL)/include/kakadu/v7_9_1-01762L
 KAKADULIBDIR := -L$(ISIS3LOCAL)/lib
-KAKADULIB    := -lkdu_a63R
+KAKADULIB    := -lkdu_a79R -lkdu_v79R
 #  Strip -I from Kakadu include directory macro and check for existance
 JP2KFLAG := $(shell if [ -d $(subst -I,,$(KAKADUINCDIR)) ]; then echo "1"; else echo "0"; fi;)
 ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
@@ -357,99 +357,99 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 # Qt Libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Core.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Core.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Core.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Core.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5DBus.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5DBus.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5DBus.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5DBus.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Gui.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Gui.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Gui.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Gui.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Multimedia.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Multimedia.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Multimedia.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Multimedia.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5MultimediaWidgets.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5MultimediaWidgets.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5MultimediaWidgets.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5MultimediaWidgets.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Network.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Network.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Network.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Network.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5OpenGL.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5OpenGL.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5OpenGL.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5OpenGL.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Positioning.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Positioning.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Positioning.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Positioning.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5PrintSupport.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5PrintSupport.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5PrintSupport.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5PrintSupport.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Qml.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Qml.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Qml.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Qml.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Quick.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Quick.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Quick.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Quick.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sensors.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sensors.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sensors.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sensors.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sql.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sql.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sql.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Sql.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Svg.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Svg.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Svg.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Svg.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Test.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Test.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Test.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Test.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebChannel.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebChannel.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebChannel.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebChannel.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineCore.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineCore.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineCore.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineCore.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngine.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngine.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngine.so.5.6.*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngine.so.5.7.*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineWidgets.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineWidgets.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineWidgets.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5WebEngineWidgets.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XmlPatterns.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XmlPatterns.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XmlPatterns.so.5.6*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XmlPatterns.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
@@ -478,8 +478,8 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libssl.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libcrypto.so*"
 #THIRDPARTYLIBS    += "/lib64/libreadline.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.so*"
-
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a79R.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_v79R.so*"
 # HDF5 libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5*.so*"
 

@@ -162,9 +162,10 @@ void IsisMain() {
 
     latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
 
-    if (ui.GetBoolean("BOUNDARY"))
+    if (ui.GetBoolean("BOUNDARY")) {
       latLonGrid->WalkBoundary();
       walkBoundary = true;
+    }
 
     p.StartProcess(groundGrid);
     p.EndProcess();

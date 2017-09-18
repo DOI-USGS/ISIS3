@@ -175,6 +175,8 @@ namespace Isis {
    *                          ...) methods. All public API's should use/expect QString (not IString,
    *                          not std::string). This affects virtually every class in Isis. 
    *                          Fixes #1312.
+   *  @history 2017-08-30 Tyler Wilson and Ian Humphrey - Added std:: namespace to isnan to avoid
+   *                          ambiguity error when compiling for c++11. References #4809.
    */
   class IString : public std::string {
     public:

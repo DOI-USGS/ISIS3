@@ -31,6 +31,8 @@
 #include "JP2Error.h"
 
 using namespace std;
+using namespace kdu_core;
+using namespace kdu_supp;
 namespace Isis {
 
   /**
@@ -205,7 +207,14 @@ namespace Isis {
    */
   JP2Decoder::~JP2Decoder() {
 #if ENABLEJP2K
-    if(JPEG2000_Codestream) JPEG2000_Codestream->destroy();
+    // See kdu_stripe_decompressor::reset documentation:
+    // "You should be sure to call this function or finish before destroying the kdu_codestream
+    // inteface that was passed to start."
+    // i.e. Make sure to finish the decompressor before destroying the kdu_codestream.
+    p_decompressor.finish();
+    if(JPEG2000_Codestream) {
+      JPEG2000_Codestream->destroy();
+    }
     JPEG2000_Codestream = NULL;
     if(JP2_Source) {
       JP2_Source->close();
@@ -217,7 +226,6 @@ namespace Isis {
       delete JP2_Stream;
     }
     JP2_Stream = NULL;
-    p_decompressor.finish();
     if(Kakadu_Error) {
       delete Kakadu_Error;
     }

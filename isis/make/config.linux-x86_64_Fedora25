@@ -2,11 +2,12 @@
 # Compiler options
 #---------------------------------------------------------------------------
 
-ISISCPPFLAGS  = -Wall
-ISISCPPFLAGS += -std=c++11
+ISISCPPFLAGS = -Wall
+ISISCPPFLAGS += -std=c++14
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
 ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
+#ISISCPPFLAGS += -Wno-misleading-indentation
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS += -g
@@ -210,7 +211,7 @@ GMMLIB    =
 #---------------------------------------------------------------------------
 SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu4.3
 SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
-SUPERLULIB    = -lsuperlu_4.3 -lblas -lgfortran
+SUPERLULIB    = -lsuperlu_4.3 -l:libblas.so.3 -l:libgfortran.so.3
 
 #---------------------------------------------------------------------------
 # Set up for Google Protocol Buffers (ProtoBuf)
@@ -297,7 +298,7 @@ FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 #---------------------------------------------------------------------------
 # Set up for QHull
 #---------------------------------------------------------------------------
-QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
+#QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
 
 #---------------------------------------------------------------------------
 # Set up for Embree libraries 
@@ -341,16 +342,21 @@ NNLIB = -lnn
 #---------------------------------------------------------------------------
 # Setup for Bullet Physics library
 #---------------------------------------------------------------------------
-#BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
-#                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
-#                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
-#                -lBulletSoftBody    -lLinearMath 
-BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
-                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
-                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
-                -lLinearMath 
+BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
+                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
+                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
+                -lBulletSoftBody    -lLinearMath 
+#BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
+#                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
+#                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
+#                -lLinearMath 
 BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
 BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
+
+#---------------------------------------------------------------------------
+# TBB
+#---------------------------------------------------------------------------
+TBBLIBS = -l:libtbb.so.2
 
 #---------------------------------------------------------------------------
 # Final generic setup for includes at the top level
@@ -499,6 +505,7 @@ THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavcodec.so*)
 THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavformat.so*)
 THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavutil.so*)
 
+
 # Bullet Libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision.so*"
@@ -516,7 +523,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath.so*"
 # Add the Point Cloud Libraries and PCL dependencies
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libflann*.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqhull*.so*"
+#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqhull*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libvtk*.so*"
 
 # Add the Embree library
