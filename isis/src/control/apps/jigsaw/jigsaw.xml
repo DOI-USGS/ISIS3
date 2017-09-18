@@ -746,6 +746,19 @@
           the application automatically sets degree to 0.
         </description>
       </parameter>
+      <parameter name="POINTINGSEGMENTS">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>
+          Number of segments in piecewise polynomial
+        </brief>
+        <description>
+        Number of segments in piecewise polynomial
+        </description>
+      </parameter>
       <parameter name="CAMSOLVE">
         <type>string</type>
         <brief> Camera pointing parameters to include in the bundle adjustment</brief>
@@ -891,6 +904,19 @@
         application automatically sets degree to 0.
       </description>
     </parameter>
+    <parameter name="POSITIONSEGMENTS">
+      <type>integer</type>
+      <minimum inclusive="yes">1</minimum>
+      <default>
+        <item>1</item>
+      </default>
+      <brief>
+        Number of segments in piecewise polynomial
+      </brief>
+      <description>
+      Number of segments in piecewise polynomial
+      </description>
+    </parameter>
       <parameter name="SPSOLVE">
         <type>string</type>
         <brief> Spacecraft position parameters to include in the adjustment</brief>
@@ -908,6 +934,7 @@
               No spacecraft position parameters will be adjusted.
             </description>
             <exclusions>
+              <item>POSITIONSEGMENTS</item>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
               <item>OVERHERMITE</item>
@@ -921,6 +948,7 @@
               not the velocity or the acceleration.
             </description>
             <exclusions>
+              <item>POSITIONSEGMENTS</item>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
             </exclusions>

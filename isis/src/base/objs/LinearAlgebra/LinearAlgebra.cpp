@@ -1797,6 +1797,25 @@ namespace Isis {
 
 
   /**
+   * A global function to format a LinearAlgebra::VectorCompressed as a QString and writes
+   * it to a QDebug stream.
+   *
+   * @see toString(LinearAlgebra::VectorCompressed)
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param vector The vector to be written.
+   *
+   * @return @b QDebug The stream with the QString-formatted vector.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::VectorCompressed &vectorCompressed) {
+    QDebugStateSaver saver(dbg);
+    dbg.noquote() << toString(vectorCompressed);
+    return dbg;
+  }
+
+
+  /**
    * A global function to format a LinearAlgebra::Matrix as a QString and 
    * write it to a QDebug stream. There will be 4 spaces between each matrix 
    * entry and each row is written on a new line. 
@@ -1808,6 +1827,78 @@ namespace Isis {
    * 
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixCompressed as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return @b QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixCompressed &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixUpperTriangular as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return @b QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixUpperTriangular &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixLowerTriangular as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return @b QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixLowerTriangular &matrix) {
     QDebugStateSaver saver(dbg);
     for (unsigned int i = 0; i < matrix.size1(); i++) {
       dbg.noquote() << "    ";

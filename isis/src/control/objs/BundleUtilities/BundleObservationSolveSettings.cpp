@@ -110,7 +110,7 @@ namespace Isis {
     m_id = NULL;
     m_id = new QUuid(other.m_id->toString());
      // TODO: add check to all copy constructors (verify other.xxx is not null) and operator= ???
-     // or intit all variables in all constructors
+     // or init all variables in all constructors
 
     m_instrumentId = other.m_instrumentId;
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
@@ -118,6 +118,7 @@ namespace Isis {
     m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
     m_ckDegree = other.m_ckDegree;
     m_ckSolveDegree = other.m_ckSolveDegree;
+    m_numberCkPolySegments = other.m_numberCkPolySegments;
     m_solveTwist = other.m_solveTwist;
     m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
     m_anglesAprioriSigma = other.m_anglesAprioriSigma;
@@ -126,6 +127,7 @@ namespace Isis {
     m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
     m_spkDegree = other.m_spkDegree;
     m_spkSolveDegree = other.m_spkSolveDegree;
+    m_numberSpkPolySegments = other.m_numberSpkPolySegments;
     m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
     m_positionAprioriSigma = other.m_positionAprioriSigma;
     m_positionInterpolationType = other.m_positionInterpolationType;
@@ -166,6 +168,7 @@ namespace Isis {
       m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
       m_ckDegree = other.m_ckDegree;
       m_ckSolveDegree = other.m_ckSolveDegree;
+      m_numberCkPolySegments = other.m_numberCkPolySegments;
       m_solveTwist = other.m_solveTwist;
       m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
       m_pointingInterpolationType = other.m_pointingInterpolationType;
@@ -176,6 +179,7 @@ namespace Isis {
       m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
       m_spkDegree = other.m_spkDegree;
       m_spkSolveDegree = other.m_spkSolveDegree;
+      m_numberSpkPolySegments = other.m_numberSpkPolySegments;
       m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
       m_positionInterpolationType = other.m_positionInterpolationType;
       m_positionAprioriSigma = other.m_positionAprioriSigma;
@@ -202,6 +206,7 @@ namespace Isis {
     //     m_numberCamAngleCoefSolved = 1; // AnglesOnly;
     //     m_ckDegree = 2;
     //     m_ckSolveDegree = 2;
+    //     m_ckPolynomialSegments = 1;
     //     m_solveTwist = true;
     //     m_solvePointingPolynomialOverExisting = false;
     //     m_pointingInterpolationType = SpiceRotation::PolyFunction;
@@ -215,6 +220,7 @@ namespace Isis {
     //     m_numberCamPosCoefSolved = 0; // NoPositionFactors;
     //     m_spkDegree = 2;
     //     m_spkSolveDegree = 2;
+    //     m_spkPolynomialSegments = 1;
     //     m_solvePositionOverHermiteSpline = false;
     //     m_positionInterpolationType = SpicePosition::PolyFunction;
     //     m_positionAprioriSigma.clear();
@@ -354,6 +360,7 @@ namespace Isis {
    * @param solveTwist Whether or not to solve for twist
    * @param ckDegree
    * @param ckSolveDegree
+   * @param ckPolynomialSegments Number of segments in piecewise polynomial
    * @param solvePolynomialOverExisting Indicates whether the polynomial will be fit over an
    *                                    existing pointing polynomial
    * @param anglesAprioriSigma A priori angle values
@@ -365,6 +372,7 @@ namespace Isis {
                                            bool solveTwist,
                                            int ckDegree,
                                            int ckSolveDegree,
+                                           int ckPolynomialSegments,
                                            bool solvePolynomialOverExisting,
                                            double anglesAprioriSigma,
                                            double angularVelocityAprioriSigma,
@@ -392,6 +400,8 @@ namespace Isis {
       // solve for the appropriate number of coefficients, based on solve option enum
       m_numberCamAngleCoefSolved = ((int) option);
     }
+
+    m_numberCkPolySegments = ckPolynomialSegments;
 
     m_anglesAprioriSigma.clear();
     if (m_numberCamAngleCoefSolved > 0) {
@@ -475,6 +485,16 @@ namespace Isis {
    */
   int BundleObservationSolveSettings::ckSolveDegree()const {
     return m_ckSolveDegree;
+  }
+
+
+  /**
+   * Accesses the number of segments in the pointing piecewise polynomial.
+   *
+   * @return @b int Returns the number of segments in the pointing piecewise polynomial.
+   */
+  int BundleObservationSolveSettings::numberCkPolySegments() const {
+    return m_numberCkPolySegments;
   }
 
 
@@ -603,6 +623,7 @@ namespace Isis {
    * @param option Option for how to solve the instrument position
    * @param spkDegree
    * @param spkSolveDegree
+   * @param spkPolynomialSegments Number of segments in piecewise polynomial
    * @param positionOverHermite Whether or not the polynomial will be fit over an existing Hermite
    *                            spline
    * @param positionAprioriSigma A priori position sigma
@@ -613,6 +634,7 @@ namespace Isis {
                                            InstrumentPositionSolveOption option,
                                            int spkDegree,
                                            int spkSolveDegree,
+                                           int spkPolynomialSegments,
                                            bool positionOverHermite,
                                            double positionAprioriSigma,
                                            double velocityAprioriSigma,
@@ -638,6 +660,12 @@ namespace Isis {
       // solve for the appropriate number of coefficients, based on solve option enum
       m_numberCamPosCoefSolved = ((int) option);
     }
+
+    // if the solve polynomial de
+    if (m_instrumentPositionSolveOption <= 1 )
+      m_numberSpkPolySegments = 1;
+    else
+      m_numberSpkPolySegments = spkPolynomialSegments;
 
     m_positionAprioriSigma.clear();
     if (m_numberCamPosCoefSolved > 0) {
@@ -702,13 +730,23 @@ namespace Isis {
 
 
   /**
-   * Accesses the degree of thecamera position polynomial being fit to in the bundle adjustment
+   * Accesses the degree of the camera position polynomial being fit to in the bundle adjustment
    * (spkSolveDegree).
    *
    * @return @b int Returns the degree of the camera position polynomial in the bundle adjustment.
    */
   int BundleObservationSolveSettings::spkSolveDegree() const {
     return m_spkSolveDegree;
+  }
+
+
+  /**
+   * Accesses the number of segments in the position piecewise polynomial.
+   *
+   * @return @b int Returns the number of segments in the position piecewise polynomial.
+   */
+  int BundleObservationSolveSettings::numberSpkPolySegments() const {
+    return m_numberSpkPolySegments;
   }
 
 
@@ -781,6 +819,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
     stream.writeAttribute("degree", toString(m_ckDegree));
     stream.writeAttribute("solveDegree", toString(m_ckSolveDegree));
+    stream.writeAttribute("numberPolySegments", toString(m_numberCkPolySegments));
     stream.writeAttribute("solveTwist", toString(m_solveTwist));
     stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
     stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
@@ -804,6 +843,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("degree", toString(m_spkDegree));
     stream.writeAttribute("solveDegree", toString(m_spkSolveDegree));
+    stream.writeAttribute("numberPolySegments", toString(m_numberSpkPolySegments));
     stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
     stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
 
@@ -892,6 +932,11 @@ namespace Isis {
           m_xmlHandlerObservationSettings->m_ckSolveDegree = toInt(ckSolveDegree);
         }
 
+        QString numberCkPolySegments = atts.value("numberPolySegments");
+        if (!numberCkPolySegments.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberCkPolySegments = toInt(numberCkPolySegments);
+        }
+
         QString solveTwist = atts.value("solveTwist");
         if (!solveTwist.isEmpty()) {
           m_xmlHandlerObservationSettings->m_solveTwist = toBool(solveTwist);
@@ -935,6 +980,12 @@ namespace Isis {
         if (!spkSolveDegree.isEmpty()) {
           m_xmlHandlerObservationSettings->m_spkSolveDegree = toInt(spkSolveDegree);
         }
+
+        QString spkPolynomialSegments = atts.value("numberPolySegments");
+        if (!spkPolynomialSegments.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberSpkPolySegments = toInt(spkPolynomialSegments);
+        }
+
 
         QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {

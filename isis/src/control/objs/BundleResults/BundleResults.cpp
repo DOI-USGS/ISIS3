@@ -94,6 +94,7 @@ namespace Isis {
         m_numberConstrainedImageParameters(src.m_numberConstrainedImageParameters),
         m_numberConstrainedPointParameters(src.m_numberConstrainedPointParameters),
         m_numberConstrainedTargetParameters(src.m_numberConstrainedTargetParameters),
+        m_numberContinuityConstraintEquations(src.m_numberContinuityConstraintEquations),
         m_degreesOfFreedom(src.m_degreesOfFreedom),
         m_sigma0(src.m_sigma0),
         m_elapsedTime(src.m_elapsedTime),
@@ -180,6 +181,7 @@ namespace Isis {
       m_numberConstrainedImageParameters = src.m_numberConstrainedImageParameters;
       m_numberConstrainedPointParameters = src.m_numberConstrainedPointParameters;
       m_numberConstrainedTargetParameters = src.m_numberConstrainedTargetParameters;
+      m_numberContinuityConstraintEquations = src.m_numberContinuityConstraintEquations;
       m_degreesOfFreedom = src.m_degreesOfFreedom;
       m_sigma0 = src.m_sigma0;
       m_elapsedTime = src.m_elapsedTime;
@@ -298,6 +300,7 @@ namespace Isis {
     m_numberConstrainedPointParameters = 0;
     m_numberConstrainedImageParameters = 0;
     m_numberConstrainedTargetParameters = 0;
+    m_numberContinuityConstraintEquations = 0;
 
     // set by initialize, formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
     m_numberUnknownParameters = 0;
@@ -727,6 +730,16 @@ namespace Isis {
 
 
   /**
+   * Sets the total number of continuity constraint equations.
+   *
+   * @param numberContinuityConstraints The total number of continuity constraint equations.
+   */
+  void BundleResults::setNumberContinuityConstraintEquations(int numberContinuityConstraints) {
+    m_numberContinuityConstraintEquations = numberContinuityConstraints;
+  }
+
+
+  /**
    * Computes the degrees of freedom of the bundle adjustment and stores it internally.
    */
   void BundleResults::computeDegreesOfFreedom() {
@@ -734,6 +747,7 @@ namespace Isis {
                          + m_numberConstrainedPointParameters
                          + m_numberConstrainedImageParameters
                          + m_numberConstrainedTargetParameters
+                         + m_numberContinuityConstraintEquations
                          - m_numberUnknownParameters;
   }
 
@@ -1218,6 +1232,16 @@ namespace Isis {
    */
   int BundleResults::numberConstrainedTargetParameters() const {
     return m_numberConstrainedTargetParameters;
+  }
+
+
+  /**
+   * Return the number of continuity constraint equations.
+   *
+   * @return @b int The number of continuity constraint equations.
+   */
+  int BundleResults::numberContinuityConstraintEquations() const {
+    return m_numberContinuityConstraintEquations;
   }
 
 

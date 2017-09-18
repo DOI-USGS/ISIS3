@@ -455,6 +455,7 @@ namespace Isis {
                             + m_statisticsResults->numberConstrainedPointParameters()
                             + m_statisticsResults->numberConstrainedImageParameters()
                             + m_statisticsResults->numberConstrainedTargetParameters()
+                            + m_statisticsResults->numberContinuityConstraintEquations()
                             - m_statisticsResults->numberUnknownParameters();
 
     int convergenceCriteria = 1;
@@ -779,9 +780,16 @@ namespace Isis {
       fpOut << buf;
     }
 
+    if (m_statisticsResults->numberContinuityConstraintEquations() > 0) {
+      sprintf(buf, "\nContinuity Constraint Equations: %6d",
+              m_statisticsResults->numberContinuityConstraintEquations());
+      fpOut << buf;
+    }
+
     sprintf(buf, "\n                       Unknowns: %6d",
                   m_statisticsResults->numberUnknownParameters());
     fpOut << buf;
+
 
     if (numInnerConstraints > 0) {
       sprintf(buf, "\n      Inner Constraints: %6d", numInnerConstraints);
@@ -1095,6 +1103,16 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
+
+        if (observation->numberContinuityConstraints() > 1) {
+          fpOut << observation->formatBundleContinuityConstraintString();
+        }
+
+//        int numberContinuityConstraints = observation->numberContinuityConstraints();
+//        if (numberContinuityConstraints > 0) {
+//          sprintf(buf, "\nContinuity Constraints: %d\n", numberContinuityConstraints);
+//          fpOut << buf;
+//        }
 
         sprintf(buf, "\n    Image         Initial              Total               "
                      "Final             Initial           Final\n"

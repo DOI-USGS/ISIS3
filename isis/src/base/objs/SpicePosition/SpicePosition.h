@@ -381,6 +381,9 @@ namespace Isis {
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
   };
+
+  //! Typdef for SpicePosition QSharedPointer.
+  typedef QSharedPointer<SpicePosition> SpicePositionQsp;
 };
 
 #endif

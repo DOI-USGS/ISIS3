@@ -1527,6 +1527,7 @@ namespace Isis {
     QString msg;
     switch (m_frameType) {
      case CK:
+     case DYN:
        dpoly = DPolynomial(coeffIndex);
        break;
      case PCK:
@@ -2168,8 +2169,9 @@ namespace Isis {
     // Get the derivative of the polynomial with respect to partialVar
     double dpoly = 0.;
     switch (m_frameType) {
-     case UNKNOWN:  // For now let everything go through for backward compatability
+     case UNKNOWN:  // For now let everything go through for backward compatibility
      case CK:
+     case DYN:
        dpoly = DPolynomial(coeffIndex);
        break;
      case PCK:

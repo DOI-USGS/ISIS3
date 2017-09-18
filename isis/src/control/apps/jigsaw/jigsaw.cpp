@@ -53,7 +53,19 @@ void IsisMain() {
 
   QString cnetFile = ui.GetFileName("CNET");
   QString cubeList = ui.GetFileName("FROMLIST");
-  
+
+  // validate input image list file exists
+  if (!QFile::exists(cubeList)) {
+    string msg = "Input list file does not exist";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  // validate input control network file exists
+  if (!QFile::exists(cnetFile)) {
+    string msg = "Input control network file does not exist";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
   // retrieve settings from jigsaw gui
   
   BundleSettingsQsp settings = bundleSettings(ui);
@@ -314,6 +326,7 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
                                                           ui.GetBoolean("TWIST"),
                                                           ui.GetInteger("CKDEGREE"),
                                                           ui.GetInteger("CKSOLVEDEGREE"),
+                                                          ui.GetInteger("POINTINGSEGMENTS"),
                                                           ui.GetBoolean("OVEREXISTING"),
                                                           anglesAprioriSigma,
                                                           angularVelocityAprioriSigma,
@@ -339,6 +352,7 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
   observationSolveSettings.setInstrumentPositionSettings(positionSolveOption,
                                                           ui.GetInteger("SPKDEGREE"),
                                                           ui.GetInteger("SPKSOLVEDEGREE"),
+                                                          ui.GetInteger("POSITIONSEGMENTS"),
                                                           ui.GetBoolean("OVERHERMITE"),
                                                           positionAprioriSigma,
                                                           positionVelocityAprioriSigma,

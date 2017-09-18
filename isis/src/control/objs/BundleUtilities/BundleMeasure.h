@@ -64,6 +64,8 @@ namespace Isis {
    *                           methods.  Added typedef for BundleMeasureQsp.  Fixes #4159.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2017-07-14 Ken Edmundson - Added members m_polyPositionSegmentIndex and
+   *                           m_polyRotationSegmentIndex; and corresponding accessors and mutators.
    */
 
   class BundleMeasure {
@@ -83,6 +85,9 @@ namespace Isis {
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
+      void setPolyPositionSegmentIndex(int index);
+      void setPolyRotationSegmentIndex(int index);
+
       bool isRejected() const;
       Camera *camera() const;
       BundleControlPoint *parentControlPoint();
@@ -101,6 +106,8 @@ namespace Isis {
       double focalPlaneMeasuredX() const;
       double focalPlaneMeasuredY() const;
       int observationIndex() const;
+      int polyPositionSegmentIndex() const;
+      int polyRotationSegmentIndex() const;
 
     private:
       ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
@@ -108,6 +115,9 @@ namespace Isis {
                                                      bundle control measure **/
       QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
       QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+
+      int m_polyPositionSegmentIndex;
+      int m_polyRotationSegmentIndex;
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

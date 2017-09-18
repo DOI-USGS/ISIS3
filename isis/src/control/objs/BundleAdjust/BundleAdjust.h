@@ -362,8 +362,13 @@ namespace Isis {
                            LinearAlgebra::Matrix  &coeffImage,
                            LinearAlgebra::Matrix  &coeffPoint3D,
                            LinearAlgebra::Vector  &coeffRHS,
-                           BundleMeasure          &measure,
-                           BundleControlPoint     &point);
+                           BundleMeasure          &measure);
+//      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,
+//                           LinearAlgebra::Matrix  &coeffImage,
+//                           LinearAlgebra::Matrix  &coeffPoint3D,
+//                           LinearAlgebra::Vector  &coeffRHS,
+//                           BundleMeasure          &measure,
+//                           BundleControlPoint     &point);
       bool formMeasureNormals(boost::numeric::ublas::symmetric_matrix<
                                   double, boost::numeric::ublas::upper >         &N22,
                               SparseBlockColumnMatrix                            &N12,
@@ -382,6 +387,10 @@ namespace Isis {
                             BundleControlPointQsp                       &point);
       bool formWeightedNormals(boost::numeric::ublas::compressed_vector< double >  &n1,
                                LinearAlgebra::Vector                               &nj);
+      void applyPolynomialContinuityConstraints();
+
+//      void polynomialContinuityConstraints(BundleObservationQsp observation,
+//                                           LinearAlgebra::Matrix * diagonalBlock);
 
       // dedicated matrix functions
 

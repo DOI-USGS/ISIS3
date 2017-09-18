@@ -602,6 +602,8 @@ namespace Isis {
       //! Seconds per day for scaling time in seconds to get target body w
       static const double m_dayScale;
   };
+  //! Typdef for SpiceRotation QSharedPointer.
+  typedef QSharedPointer<SpiceRotation> SpiceRotationQsp;
 };
 
 #endif

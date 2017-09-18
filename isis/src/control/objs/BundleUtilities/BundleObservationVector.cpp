@@ -140,6 +140,9 @@ namespace Isis {
 
       append(bundleObservation);
 
+      // initialize exterior orientation (spice) for all BundleImages in BundleObservation
+      bundleObservation->initializeExteriorOrientation();
+
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
@@ -193,6 +196,22 @@ namespace Isis {
    */
   int BundleObservationVector::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
+  }
+
+
+  /**
+   * Returns the total number of continuity constraint equations for the contained
+   * BundleObservations.
+   *
+   * @return @b int Returns the total number of continuity constraint equations for the contained
+   *                BundleObservations
+   */
+  int BundleObservationVector::numberContinuityConstraintEquations() const {
+    int nconstraints = 0;
+    for( int i = 0; i < size(); i++) {
+      nconstraints += at(i)->numberContinuityConstraints();
+    }
+    return nconstraints;
   }
 
 

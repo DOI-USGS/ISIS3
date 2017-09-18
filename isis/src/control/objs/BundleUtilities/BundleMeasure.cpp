@@ -21,6 +21,9 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
+
+    m_polyPositionSegmentIndex = 0;
+    m_polyRotationSegmentIndex = 0;
   }
 
 
@@ -43,6 +46,8 @@ namespace Isis {
     m_parentControlPoint = src.m_parentControlPoint;
     m_parentBundleImage = src.m_parentBundleImage;
     m_parentObservation = src.m_parentObservation;
+    m_polyPositionSegmentIndex = src.m_polyPositionSegmentIndex;
+    m_polyRotationSegmentIndex = src.m_polyRotationSegmentIndex;
   }
 
 
@@ -62,6 +67,8 @@ namespace Isis {
       m_parentControlPoint = src.m_parentControlPoint;
       m_parentBundleImage = src.m_parentBundleImage;
       m_parentObservation = src.m_parentObservation;
+      m_polyPositionSegmentIndex = src.m_polyPositionSegmentIndex;
+      m_polyRotationSegmentIndex = src.m_polyRotationSegmentIndex;
     }
 
     return *this;
@@ -97,6 +104,47 @@ namespace Isis {
    */
   void BundleMeasure::setRejected(bool reject) {
     m_controlMeasure->SetRejected(reject); 
+  }
+
+  /**
+   * Sets index of position piecewise polynomial segment
+   *
+   * @param index segment index
+   *
+   */
+  void BundleMeasure::setPolyPositionSegmentIndex(int index) {
+    m_polyPositionSegmentIndex = index;
+  }
+
+
+  /**
+   * Sets index of rotation piecewise polynomial segment
+   *
+   * @param index segment index
+   *
+   */
+  void BundleMeasure::setPolyRotationSegmentIndex(int index) {
+    m_polyRotationSegmentIndex = index;
+  }
+
+
+  /**
+   * Accesses index of position piecewise polynomial segment
+   *
+   * @return @b int index of position piecewise polynomial segment
+   */
+  int BundleMeasure::polyPositionSegmentIndex() const {
+    return m_polyPositionSegmentIndex;
+  }
+
+
+  /**
+   * Accesses index of rotation piecewise polynomial segment
+   *
+   * @return @b int index of rotation piecewise polynomial segment
+   */
+  int BundleMeasure::polyRotationSegmentIndex() const {
+    return m_polyRotationSegmentIndex;
   }
 
 
@@ -311,7 +359,4 @@ namespace Isis {
     }
     return m_parentObservation->index();
   }
-
-
-
 }

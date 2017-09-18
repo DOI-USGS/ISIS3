@@ -78,6 +78,7 @@ namespace Isis {
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
+      int numberContinuityConstraintEquations() const;
 
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
