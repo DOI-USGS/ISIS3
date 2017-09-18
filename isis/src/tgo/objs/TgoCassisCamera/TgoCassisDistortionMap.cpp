@@ -68,7 +68,7 @@ namespace Isis {
    * Compute undistorted focal plane (x,y) coordinate given the distorted 
    * (x,y). 
    *  
-   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (École 
+   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (Ecole 
    * Polytechnique Fédérale de Lausanne). 
    *  
    * Given distorted focal plane coordinates, in millimeters, and parameters of 
@@ -124,7 +124,7 @@ namespace Isis {
   /** 
    * Compute distorted focal plane (x,y) given an undistorted focal plane (x,y).
    * 
-   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (École 
+   * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (Ecole 
    * Polytechnique Fédérale de Lausanne). 
    *  
    * Given ideal focal plane coordinates, in millimeters, and parameters
