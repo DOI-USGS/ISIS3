@@ -54,6 +54,10 @@ namespace Isis {
       m_A2_dist.push_back(p_camera->getDouble(od + "A2_DIST", i));
       m_A3_dist.push_back(p_camera->getDouble(od + "A3_DIST", i));
     }
+
+    m_pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "_PIXEL_PITCH");
+    m_width  = p_camera->getDouble("INS" + toString(naifIkCode) + "_FILTER_SAMPLES");
+    m_height = p_camera->getDouble("INS" + toString(naifIkCode) + "_FILTER_LINES");
   }
 
 
@@ -110,14 +114,11 @@ namespace Isis {
     // 
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs
-    double pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "PIXEL_PITCH");
-    double width  = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_SAMPLES");
-    double height = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_LINES");
     if ( qFuzzyCompare(divider + 1.0,  1.0) == 0
-         || dx < -0.5*pixelSize*width  - 0.2
-         || dx >  0.5*pixelSize*width  + 0.2
-         || dy < -0.5*pixelSize*height - 0.5
-         || dy >  0.5*pixelSize*height + 0.2 ) {
+         || dx < -0.5*m_pixelPitch*m_width  - 0.2
+         || dx >  0.5*m_pixelPitch*m_width  + 0.2
+         || dy < -0.5*m_pixelPitch*m_height - 0.2
+         || dy >  0.5*m_pixelPitch*m_height + 0.2 ) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -178,14 +179,11 @@ namespace Isis {
     // 
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs
-    double pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "PIXEL_PITCH");
-    double width  = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_SAMPLES");
-    double height = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_LINES");
     if ( qFuzzyCompare(divider + 1.0,  1.0) == 0
-         || ux < -0.5*pixelSize*width  - 0.2
-         || ux >  0.5*pixelSize*width  + 0.2
-         || uy < -0.5*pixelSize*height - 0.5
-         || uy >  0.5*pixelSize*height + 0.2 ) {
+         || ux < -0.5*m_pixelPitch*m_width  - 0.2
+         || ux >  0.5*m_pixelPitch*m_width  + 0.2
+         || uy < -0.5*m_pixelPitch*m_height - 0.2
+         || uy >  0.5*m_pixelPitch*m_height + 0.2 ) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;

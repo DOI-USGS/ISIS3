@@ -78,6 +78,12 @@ namespace Isis {
                                     distorted y from ideal y. */
       QList<double> m_A3_dist; /**< Coefficients for rational distortion model used to find scaling
                                     factor used when computing distorted coordinates from ideal. */
+      double m_pixelPitch; /**< The pixel pitch of the camera. Used to check if far off the ccd
+                                prior to correcting or applying distortion. */
+      double m_width; /**< The width of the ccd in pixels. Used to check if far off the ccd prior
+                           to correcting or applying distortion. */
+      double m_height; /**< The height of the ccd in pixels. Used to check if far off the ccd prior
+                            to correcting or applying distortion. */
   };
 };
 #endif

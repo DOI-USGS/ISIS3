@@ -45,8 +45,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 4.14693704119268247;
-    double knownLon = 322.758190354645023;
+    double knownLat = 4.14700320539339717;
+    double knownLon = 322.7582512383878;
 
     Cube c("$tgo/testData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
     TgoCassisCamera *cam = (TgoCassisCamera *) CameraFactory::Create(c);
