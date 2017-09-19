@@ -24,25 +24,31 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName xmlFileName = ui.GetFileName("FROM");
 
-  ProcessImport importer;
-  translateCoreInfo(xmlFileName, importer);
+  try {
+    ProcessImport importer;
+    translateCoreInfo(xmlFileName, importer);
 
-  importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
-  Cube *outputCube = importer.SetOutputCube("TO");
+    importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    Cube *outputCube = importer.SetOutputCube("TO");
 
-  translateLabels(xmlFileName, outputCube);
+    translateLabels(xmlFileName, outputCube);
   
-  FileName outputCubeFileName(ui.GetFileName("TO"));
-
-  OriginalXmlLabel xmlLabel;
-  xmlLabel.readFromXmlFile(xmlFileName);
-
-  importer.StartProcess();
-
-  // Write out original label before closing the cube
-  outputCube->write(xmlLabel);
-
-  importer.EndProcess();
+    FileName outputCubeFileName(ui.GetFileName("TO"));
+  
+    OriginalXmlLabel xmlLabel;
+    xmlLabel.readFromXmlFile(xmlFileName);
+  
+    importer.StartProcess();
+  
+    // Write out original label before closing the cube
+    outputCube->write(xmlLabel);
+  
+    importer.EndProcess();
+  }
+  catch (IException &e) {
+    QString msg = "Given file does not appear to be a valid TGO CaSSIS product.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+  }
 
   return;
 }
@@ -199,16 +205,22 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
     if (filter.compare("PAN", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143421;
     }
-    if (filter.compare("RED", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("RED", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143422;
     }
-    if (filter.compare("NIR", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("NIR", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143423;
     }
-    if (filter.compare("BLU", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("BLU", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143424;
     }
+    else {
+      QString msg = "Unrecognized filter name [" 
+        + filter
+        + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
 
+    }
     // Add Kernel to BandBin Group
     bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(spacecraftCode)));
   }

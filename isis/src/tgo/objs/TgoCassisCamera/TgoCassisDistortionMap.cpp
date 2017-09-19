@@ -101,11 +101,23 @@ namespace Isis {
 
     // calculate divisor using A3_corr coeffiecients
     double divider = chiDotA(dx, dy, m_A3_corr);
-    // Note: The zeros for the divider variable fall well outside the boundary
-    // of the focal plane. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3CorrRoots.jpg).
-    // We expect this case not to happen, but if it does, just return the input
-    // values
-    if (qFuzzyCompare(divider + 1.0,  1.0) == 0) {
+    // This distortion model is only valid for values on the CCD:
+    // -1/2 * pixel pitch * CCD width  = -10.24 < x < 10.24 = 1/2 * pixel pitch * CCD width
+    // -1/2 * pixel pitch * CCD height = -10.24 < y < 10.24 = 1/2 * pixel pitch * CCD height
+    // 
+    // Also, the zeros for the divider variable fall well outside the boundary
+    // of the CCD. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3CorrRoots.jpg).
+    // 
+    // So, whenever x or y are too far from center or divider is near zero,
+    // return the given inputs
+    double pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "PIXEL_PITCH");
+    double width  = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_SAMPLES");
+    double height = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_LINES");
+    if ( qFuzzyCompare(divider + 1.0,  1.0) == 0
+         || dx < -0.5*pixelSize*width  - 0.2
+         || dx >  0.5*pixelSize*width  + 0.2
+         || dy < -0.5*pixelSize*height - 0.5
+         || dy >  0.5*pixelSize*height + 0.2 ) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -157,12 +169,23 @@ namespace Isis {
 
     // calculate divisor using A3_dist coeffiecients
     double divider = chiDotA(ux, uy, m_A3_dist);
-    // Note: The zeros for the divider variable fall well outside the boundary
-    // of the focal plane. (See
-    // $ISIS3DATA/tgo/assets/distortion/DistortionModelA3DistRoots.jpg).
-    // We expect this case not to happen, but if it does, just return the input
-    // values
-    if (qFuzzyCompare(divider + 1.0,  1.0) == 0) {
+    // This distortion model is only valid for values on the CCD:
+    // -1/2 * pixel pitch * CCD width  = -10.24 < x < 10.24 = 1/2 * pixel pitch * CCD width
+    // -1/2 * pixel pitch * CCD height = -10.24 < y < 10.24 = 1/2 * pixel pitch * CCD height
+    // 
+    // Also, the zeros for the divider variable fall well outside the boundary
+    // of the CCD. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3DistRoots.jpg).
+    // 
+    // So, whenever x or y are too far from center or divider is near zero,
+    // return the given inputs
+    double pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "PIXEL_PITCH");
+    double width  = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_SAMPLES");
+    double height = p_camera->getDouble("INS" + toString(naifIkCode) + "FILTER_LINES");
+    if ( qFuzzyCompare(divider + 1.0,  1.0) == 0
+         || ux < -0.5*pixelSize*width  - 0.2
+         || ux >  0.5*pixelSize*width  + 0.2
+         || uy < -0.5*pixelSize*height - 0.5
+         || uy >  0.5*pixelSize*height + 0.2 ) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;

@@ -48,7 +48,10 @@ namespace Isis {
    *                           provided by Anton Ivanov.
    *   @history 2017-04-06 Jeannie Backer - Fixed bugs and updated unitTest.
    *   @history 2017-09-14 Jeannie Backer - Updated distortion model provided
-   *                           by Stepan Tulyakov.
+   *                           by Stepan Tulyakov. References #5155
+   *   @history 2017-09-18 Jeannie Backer - Added check to verify that values
+   *                           passed into SetFocalPlane and SetUndistortedFocalPlane
+   *                           are within valid range. References #5155
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:
