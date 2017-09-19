@@ -84,7 +84,6 @@ namespace Isis {
    * @param naifIkCode    Code to search for in instrument kernel
    */
   void OsirisRexDistortionMap::SetDistortion(int naifIkCode, QString filter="UNKNOWN") {
-
     // Load distortion coefficients, including filter if we have it.
     QString odkkey;
 
@@ -92,7 +91,7 @@ namespace Isis {
       odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     }
     else {
-      odkkey = "INS" + toString(naifIkCode) + "_OD_K_" + filter.toUpper();
+      odkkey = "INS" + toString(naifIkCode) + "_OD_K_" + filter.trimmed().toUpper();
     }
 
     try {
@@ -114,9 +113,8 @@ namespace Isis {
       odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER";
     }
     else {
-      odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER_" + filter.toUpper(); 
+      odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER_" + filter.trimmed().toUpper(); 
     }
-
     m_distortionOriginSample = p_camera->Spice::getDouble(odcenterkey, 0);
     m_distortionOriginLine =   p_camera->Spice::getDouble(odcenterkey, 1);
   }
@@ -135,15 +133,14 @@ namespace Isis {
    * @return if the conversion was successful
    */
   bool OsirisRexDistortionMap::SetFocalPlane(double dx, double dy) {
-
     p_focalPlaneX = dx; 
     p_focalPlaneY = dy;
 
     // Only apply the distortion if we have the correct number of coefficients
-    if ((p_odk.size() < 2)) {
+    if (p_odk.size() < 2) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
-      return false; 
+      return true; 
     }
 
     double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch; 
@@ -223,17 +220,15 @@ namespace Isis {
    */
   bool OsirisRexDistortionMap::SetUndistortedFocalPlane(const double ux,
       const double uy) {
-
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
     // Only apply the distortion if we have the correct number of coefficients.
-    if ((p_odk.size() < 2)) {
+    if (p_odk.size() < 2) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
-      return false; 
+      return true; 
     }
-
     double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch;
     double y0 = (m_distortionOriginSample - m_detectorOriginLine) * m_pixelPitch;
 

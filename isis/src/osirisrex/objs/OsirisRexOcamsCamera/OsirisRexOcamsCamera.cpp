@@ -24,7 +24,6 @@
 #include <QString>
 
 #include "CameraDetectorMap.h"
-//#include "CameraDistortionMap.h"
 #include "OsirisRexDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -113,7 +112,6 @@ namespace Isis {
         Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
 
     // Setup distortion map
-//    new CameraDistortionMap(this);
     OsirisRexDistortionMap *distortionMap = new OsirisRexDistortionMap(this); 
 
     // Different distortion model for each instrument and filter
