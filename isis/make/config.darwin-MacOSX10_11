@@ -16,7 +16,7 @@ ISIS_MACOSX_TARGET=10.11
 
 ISIS_CFLAGS= -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
 
-ISIS_CPPFLAGS= -pipe -stdlib=libc++ -std=gnu++11 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
+ISIS_CPPFLAGS= -pipe -stdlib=libc++ -std=c++11 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
 
 ISIS_LFLAGS=-headerpad_max_install_names -stdlib=libc++ -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk $(MAC_ARCH_FLAGS)
 
@@ -46,7 +46,6 @@ ISISCPPFLAGS += -DGMM_USES_SUPERLU
 #else
   ISISCPPFLAGS  += -O2
 #endif
-
 ISISCFLAGS = $(ISIS_CFLAGS)
 
 #---------------------------------------------------------------------------
@@ -243,7 +242,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -I$(ISIS3OPT)/include/geos
+GEOSINCDIR = -isystem $(ISIS3OPT)/include/geos
 GEOSLIBDIR = -L$(ISIS3OPT)/lib
 GEOSLIB    = -lgeos -lgeos_c
 
@@ -305,9 +304,9 @@ PROTOC         = $(ISIS3OPT)/bin/protoc
 #  below (i.e., be sure to add -I, -L and -l to the variables for KAKADUINCDIR,
 #  KAKADULIBDIR and KAKADULIB, respectively).
 #---------------------------------------------------------------------------
-KAKADUINCDIR := "-isystem$(ISIS3PROP)/include/kakadu/v6_3-00967N/"
+KAKADUINCDIR := "-isystem$(ISIS3PROP)/include/kakadu/v7_9_1-01762L"
 KAKADULIBDIR := -L$(ISIS3PROP)/lib
-KAKADULIB    := -lkdu_a63R
+KAKADULIB    := -lkdu_a79R -lkdu_v79R
 #  Strip -I from Kakadu include directory macro and check for existance
 JP2KFLAG ?= $(shell if [ -d $(subst -isystem,,$(KAKADUINCDIR)) ]; then echo "1"; else echo "0"; fi;)
 ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
@@ -486,7 +485,10 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsqlite3.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql56/mysql/libmysqlclient*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiodbc*.dylib"
-THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_a63R.dylib"
+THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_a79R.dylib"
+THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_v79R.dylib"
+
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcamd*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod*.dylib"

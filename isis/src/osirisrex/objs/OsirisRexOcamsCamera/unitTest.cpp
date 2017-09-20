@@ -45,7 +45,10 @@ void testLineSamp(Camera *cam, double sample, double line);
  *                           for SamCam test (when we have an image we can spiceinit).
  *   @history 2017-08-29 Jeannie Backer - Added test for PolyCam and MapCam with
  *                           PolyCamFocusPositionNaifId keyword.
- *   
+ *   @history 2017-09-18 Kristin Berry - Updated known latitudes and longitudes for the addition of
+ *                           the distortion model. (For non-backwards compatibility MapCam cube
+ *                           only, since we do not yet have a PolyCam cube with a motor position 
+ *                           that we have a distortion solution for.) 
  * 
  */
 
@@ -80,8 +83,8 @@ int main(void) {
     testCamera(mapCamCube, sample, line, knownLat, knownLon);
     cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
     Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
-    knownLat = -19.2944483457740930;
-    knownLon = 145.9504680080907804;
+    knownLat = -19.2946930665326732;
+    knownLon = 145.9510736765638512;
     sample = 512.0; 
     line = 512.0;
     testCamera(mapCamCube2, sample, line, knownLat, knownLon);

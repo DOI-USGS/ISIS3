@@ -20,7 +20,7 @@ def setisis():
     os.environ['ISIS3DATA'] = "%s/../data" % (ISISROOT)
   else:
     os.environ['ISIS3DATA'] = "/usgs/cpkgs/isis3/data"
-  
+
   #Check for the ISIS3TESTDATA directory. If it does not exist use a default
   if os.path.exists("%s/../testData" % (ISISROOT)):
     os.environ['ISIS3TESTDATA'] = "%s/../testData" % ISISROOT
@@ -35,8 +35,6 @@ def setisis():
     os.environ['PATH'] = "%s/bin" % (ISISROOT)
   else:
     os.environ['PATH'] = "%s:%s/bin" % (os.environ['PATH'], ISISROOT)
-
-  os.environ['QT_PLUGIN_PATH'] = "%s/3rdParty/plugins" % (ISISROOT)
 
 if __name__ == "__main__":
   setisis()

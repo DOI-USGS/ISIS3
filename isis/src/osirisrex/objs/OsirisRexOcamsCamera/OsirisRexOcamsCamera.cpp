@@ -24,7 +24,7 @@
 #include <QString>
 
 #include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
+#include "OsirisRexDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
@@ -112,7 +112,12 @@ namespace Isis {
         Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
 
     // Setup distortion map
-    new CameraDistortionMap(this);
+    OsirisRexDistortionMap *distortionMap = new OsirisRexDistortionMap(this); 
+
+    // Different distortion model for each instrument and filter
+    PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
+    QString filterName = bandBin["FilterName"];
+    distortionMap->SetDistortion(ikCode.toInt(), filterName);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

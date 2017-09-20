@@ -297,7 +297,7 @@ namespace Isis {
     if(doubleToConvert == 0.0) {
       result = "0.0";
     }
-    else if(isnan(doubleToConvert)) {
+    else if (std::isnan(doubleToConvert) ) {
       result = "nan";
     }
 

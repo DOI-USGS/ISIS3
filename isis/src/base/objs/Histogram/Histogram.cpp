@@ -28,6 +28,7 @@
 #include "ControlPoint.h"
 #include "LineManager.h"
 #include "Message.h"
+#include "SpecialPixel.h"
 
 #include <iostream>
 #include <math.h>
@@ -250,8 +251,8 @@ namespace Isis {
         if (measure->IsIgnored())  continue;
 
         temp = (measure->*statFunc)();  //get the data using the passed ControlMeasure acessor function pointer
-        if (temp > max) max = temp;
-        if (temp < min) min = temp;
+        if ( !IsSpecial(temp) && temp > max ) max = temp;
+        if ( !IsSpecial(temp) && temp < min ) min = temp;
       }
     }
 

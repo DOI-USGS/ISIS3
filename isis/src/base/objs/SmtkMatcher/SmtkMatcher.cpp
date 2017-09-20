@@ -28,6 +28,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QSharedPointer>
+
 #include "Camera.h"
 #include "Projection.h"
 #include "SpecialPixel.h"
@@ -92,7 +94,7 @@ namespace Isis {
    */
   void SmtkMatcher::setGruenDef(const QString &regdef) {
     Pvl reg(regdef);
-    m_gruen = std::auto_ptr<Gruen> (new Gruen(reg));  // Deallocation automatic
+    m_gruen = QSharedPointer<Gruen> (new Gruen(reg));  // Deallocation automatic
     return;
   }
 
@@ -412,7 +414,7 @@ namespace Isis {
 
     // Register the points with incoming affine/radiometric parameters
     m_gruen->setAffineRadio(affrad);
-    return (makeRegisteredPoint(left, right, m_gruen.get()));
+    return (makeRegisteredPoint(left, right, m_gruen.data()));
   }
 
   /**
@@ -533,7 +535,7 @@ namespace Isis {
     bool isGood(true);
     if (!m_lhCube) isGood = false;
     if (!m_rhCube) isGood = false;
-    if (!m_gruen.get()) isGood = false;
+    if (!m_gruen.data()) isGood = false;
     if ((!isGood) && throwError) {
       QString mess = "Images/match algorithm not initialized!";
       throw IException(IException::Programmer, mess, _FILEINFO_);

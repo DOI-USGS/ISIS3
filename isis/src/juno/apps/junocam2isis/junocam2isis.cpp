@@ -131,7 +131,7 @@ void IsisMain() {
     allCubesListFile.close();
 
     // Figure out where each framelet belongs as we go through and process them. 
-    importPds.Progress()->SetText("Processing fullframe output cubes.");
+    importPds.Progress()->SetText("Processing FullCCDFrame output cubes.");
     importPds.StartProcess(processFullFrames);
     importPds.EndProcess();
 
@@ -146,7 +146,7 @@ void IsisMain() {
       // Update the labels
       Pvl *fullFrameLabel = g_outputCubes[i]->label();
       fullFrameLabel->findGroup("Instrument", PvlObject::Traverse)
-                              .addKeyword(PvlKeyword("FrameletNumber", toString(i)));
+                              .addKeyword(PvlKeyword("FrameNumber", toString(i+1)));
 
       PvlGroup &bandBin = fullFrameLabel->findGroup("BandBin", PvlObject::Traverse);
       bandBin.addKeyword(PvlKeyword("FilterName", "FULLCCD"),
@@ -229,10 +229,10 @@ void IsisMain() {
       for (int j = 0; j < outputLabel.findObject("IsisCube").groups(); j++) {
         g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j));
       }
-      int frameletNumber = (i / g_filterList.size()) + 1;
+      int frameNumber = (i / g_filterList.size()) + 1;
       Pvl *frameletLabel = g_outputCubes[i]->label();
       frameletLabel->findGroup("Instrument", PvlObject::Traverse)
-                              .addKeyword(PvlKeyword("FrameletNumber", toString(frameletNumber)));
+                              .addKeyword(PvlKeyword("FrameNumber", toString(frameNumber)));
 
       int filterIndex = i % g_filterList.size();
       QString filterName = g_filterList[filterIndex];
@@ -285,9 +285,9 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   instrumentXlater.Auto(outputLabel);
   PvlGroup &inst = outputLabel.findGroup("Instrument", PvlObject::Traverse);
   inst["StartTime"].addComment("Start time for the entire observation, "
-                               "i.e. start time for FrameletNumber 1.");
+                               "i.e. start time for FrameNumber 1.");
   inst["SpacecraftClockStartCount"].addComment("Start count for the entire observation, "
-                                               "i.e. start count for FrameletNumber 1.");
+                                               "i.e. start count for FrameNumber 1.");
   QString instId  = (QString) inst.findKeyword("InstrumentId");
   QString spcName = (QString) inst.findKeyword("SpacecraftName");
   if (spcName.compare("JUNO", Qt::CaseInsensitive) != 0

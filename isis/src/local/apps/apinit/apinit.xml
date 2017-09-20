@@ -29,6 +29,9 @@
     <change name="Kristin Berry" date="2015-07-22">
        Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248.
     </change>
+    <change name="Ian Humphrey" date="2017-09-15">
+      Made sure that the minusApposJ array has all its values initialized. Caused CentOS7 app test to fail. References #4809.
+    </change>
   </history>
 
     <groups>
