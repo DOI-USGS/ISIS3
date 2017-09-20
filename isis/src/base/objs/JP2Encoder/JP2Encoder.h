@@ -26,7 +26,8 @@
 
 #include "PixelType.h"
 
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
 #include "jp2.h"
 #include "kdu_stripe_compressor.h"
 #endif
@@ -106,7 +107,8 @@ namespace Isis {
       std::vector<unsigned int> p_precinctSize; //!<Precinct size(s) used to create output file
       JP2Error *Kakadu_Error;          //!<JP2 Error handling facility
 
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
       unsigned int p_sampleDimension;  //!<Sample dimension of output file
       unsigned int p_lineDimension;    //!<Line dimension of output file
       unsigned int p_bandDimension;    //!<Band dimension of output file

@@ -31,8 +31,8 @@
 #include "JP2Error.h"
 
 using namespace std;
-using namespace kdu_core;
-using namespace kdu_supp;
+//using namespace kdu_core;
+//using namespace kdu_supp;
 
 namespace Isis {
 
@@ -50,7 +50,8 @@ namespace Isis {
                          const unsigned int nlines, const unsigned int nbands,
                          const Isis::PixelType type) {
 
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
     p_jp2File = jp2file;
     p_sampleDimension = nsamps;
     p_lineDimension = nlines;
@@ -119,7 +120,8 @@ namespace Isis {
    *
    */
   void JP2Encoder::OpenFile() {
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
     // Open the JP2 file stream
     JP2_Stream = new jp2_family_tgt();
     JP2_Stream->open(p_jp2File.toLatin1().data());
@@ -271,7 +273,9 @@ namespace Isis {
    *
    */
   void JP2Encoder::Write(unsigned char **inbuf) {
-#if ENABLEJP2K
+
+//#if ENABLEJP2K
+#if 0
     p_writeStripes = p_compressor.push_stripe(inbuf, p_stripeHeights, NULL, NULL,
                      p_precisions, p_flushLines);
 #endif
@@ -286,7 +290,8 @@ namespace Isis {
    *
    */
   void JP2Encoder::Write(short int **inbuf) {
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
     p_writeStripes = p_compressor.push_stripe(inbuf, p_stripeHeights, NULL, NULL,
                      p_precisions, p_isSigned, p_flushLines);
 #endif
@@ -297,7 +302,8 @@ namespace Isis {
    *
    */
   JP2Encoder::~JP2Encoder() {
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
     p_compressor.finish();
     JPEG2000_Codestream->destroy();
     JP2_Boxes->close();

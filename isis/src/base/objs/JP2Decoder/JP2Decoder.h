@@ -24,7 +24,8 @@
 
 #include <string>
 
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
 #include "jp2.h"
 #include "kdu_stripe_decompressor.h"
 #endif
@@ -149,7 +150,8 @@ namespace Isis {
       unsigned int p_pixelBytes;      //!<Number of bytes per pixel in JP2 file.
       bool p_signedData;              //!<Set to true if data in JP2 file is signed.
 
-#if ENABLEJP2K
+//#if ENABLEJP2K
+#if 0
       unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed
       //!<at. Always full resolution.
       unsigned int p_highestResLevel; //!<Total number of available resolution levels in
