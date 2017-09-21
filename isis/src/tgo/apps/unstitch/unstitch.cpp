@@ -4,6 +4,7 @@
 #include <QScopedPointer>
 #include <QString>
 
+#include "AlphaCube.h"
 #include "Blob.h"
 #include "CubeAttribute.h"
 #include "Cube.h"
@@ -158,6 +159,17 @@ void IsisMain() {
     bandBin.addKeyword(PvlKeyword("FilterCenter", toString(g_frameletInfoList[i].m_wavelength)));
     bandBin.addKeyword(PvlKeyword("FilterWidth", toString(g_frameletInfoList[i].m_width)));
     bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(g_frameletInfoList[i].m_frameId)));
+
+    // Add the alpha cube
+    AlphaCube frameletArea(cube->sampleCount(), cube->lineCount(),
+                           g_frameletInfoList[i].m_samples, g_frameletInfoList[i].m_lines,
+                           g_frameletInfoList[i].m_startSample + 0.5,
+                           g_frameletInfoList[i].m_startLine + 0.5,
+                           g_frameletInfoList[i].m_startSample
+                             + g_frameletInfoList[i].m_samples + 0.5,
+                           g_frameletInfoList[i].m_startLine
+                             + g_frameletInfoList[i].m_lines + 0.5);
+    frameletArea.UpdateGroup(*g_outputCubes[i]);
 
     // Delete Stitch group
     frameletLabel->findObject("IsisCube").deleteGroup("Stitch");
