@@ -68,6 +68,9 @@ namespace Isis {
    *   @history 2017-01-26 Kris Becker - Original implementation. Fixes #4593.
    *   @history 2017-02-06 Jesse Mapel & Kristin Berry - Updated ck frame and
    *                           documentation. Added a unitTest. References #4593.
+   *   @history 2017-09-15 Jesse Mapel - Removed setting the detector start line
+   *                           because it is now being handled by the alpha
+   *                           cube group. Fixes #5156.
    */
   class TgoCassisCamera : public FramingCamera {
     public:

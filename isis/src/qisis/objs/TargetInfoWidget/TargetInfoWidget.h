@@ -22,18 +22,26 @@ namespace Isis {
    * @internal
    *   @history 2015-06-13 Ken Edmundson - Original version.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2017-07-27 Tyler Wilson and Summer Stapleton - IPCE no longer crashes in the event
+   *                           that the spice cube labels do not contain the proper
+   *                           target info.  Fixes #4954.
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *                           source images. Fixes #5105.
+   *
    */
 
   class TargetInfoWidget : public QFrame {
     Q_OBJECT
 
     public:
+
       explicit TargetInfoWidget(TargetBody* target, Directory *directory, QWidget *parent = 0);
       ~TargetInfoWidget();
 
     private:
       Ui::TargetInfoWidget *m_ui; //!< The widget's ui
 
+      void errorMsg();
       QString formatPoleRaString();
       QString formatPoleDecString();
       QString formatPmString();

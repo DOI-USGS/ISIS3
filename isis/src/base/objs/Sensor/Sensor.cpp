@@ -315,7 +315,7 @@ namespace Isis {
     */
   Distance Sensor::LocalRadius(double lat, double lon) {
     return target()->shape()->localRadius(Latitude(lat, Angle::Degrees),
-                                Longitude(lon, Angle::Degrees));
+                                          Longitude(lon, Angle::Degrees));
   }
 
 
@@ -367,6 +367,9 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
+   * 
+   * @internal
+   *   @history 2017-03-23 Kris Becker - Added support for occlusion tests
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
@@ -383,7 +386,11 @@ namespace Isis {
     // Load the latitude/longitude
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
-    shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
+    // Local radius is deferred to (possible derived) shape model method
+    shape->intersectSurface(lat, lon,
+                            bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
+                            backCheck);
+
     return SetGroundLocal(backCheck);
   }
 
@@ -402,6 +409,9 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
+   * 
+   * @internal
+   *   @history 2017-03-23 Kris Becker - Added support for occlusion test
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
@@ -419,7 +429,10 @@ namespace Isis {
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
-    shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
+
+    shape->intersectSurface(SurfacePoint(lat, lon, rad), 
+                            bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
+                            backCheck);
 
     return SetGroundLocal(backCheck);
   }
@@ -437,6 +450,10 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool
+   * 
+   * @internal
+   *   @history 2017-03-23 Kris Becker - Added support for occlusion test
+   * 
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     //std::cout << "Sensor::SetGround()\n";
@@ -448,7 +465,9 @@ namespace Isis {
       return false;
     }
 
-    shape->setSurfacePoint(surfacePt);
+    shape->intersectSurface(surfacePt, 
+                            bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
+                            backCheck);
 
     return SetGroundLocal(backCheck);
   }
@@ -465,6 +484,8 @@ namespace Isis {
   *                  Defaults to true.
   *
   * @return bool True if the look direction intersects the target.
+  * @internal
+  *   @history 2017-03-23 Kris Becker - Added formal occlusion callback
   */
   bool Sensor::SetGroundLocal(bool backCheck) {
     ShapeModel *shape = target()->shape();
@@ -472,7 +493,7 @@ namespace Isis {
     //latrec_c(m_radius, (m_longitude * PI / 180.0), (m_latitude * PI / 180.0), m_pB);
 
 
-    if (!(shape->surfaceIntersection()->Valid())) {
+    if (!(shape->hasIntersection())) {
       return false;
     }
 
@@ -488,12 +509,14 @@ namespace Isis {
     m_lookB[2] = shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
     m_newLookB = true;
 
-    // See if the point is on the backside of the target
-
+    // See if the point is on the backside of the target. Note occlusion handling
+    // now handles this in derived shape models that can support it. (KJB 2017-03-23)
+    // This may be good if the computation of the look direction is more sophisticated.
     if (backCheck) {
       // Assume the intersection point is good in order to get the emission angle
-      shape->setHasIntersection(true);
-      if (fabs(shape->emissionAngle(sB)) > 90.) {
+      // shape->setHasIntersection(true);  //KJB there should be a formal intersection in ShapeModel
+      std::vector<double> lookdir = lookDirectionBodyFixed();
+      if ( !shape->isVisibleFrom(sB, lookdir) ) {
         shape->clearSurfacePoint();
         shape->setHasIntersection(false);
         return false;

@@ -52,6 +52,8 @@ namespace Isis {
    * @author 2012-06-11 Ken Edmundson, Steven Lambright
    *
    * @internal
+   *   @history 2017-08-09 Summer Stapleton - Added a try-catch block to handle invalid control 
+   *                         networks. Fixes #5068.
    */
   class ConcurrentControlNetReader : public QObject {
       Q_OBJECT

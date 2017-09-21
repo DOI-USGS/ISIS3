@@ -1,0 +1,362 @@
+Unit test for BulletShapeModel
+  MaxTriangles:  134217728
+  MaxBodyParts:  16
+
+
+----====        Construct default shape model        ====----
+
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  1.79769e+308
+Model has intersection?  false
+Model has normal?  false
+
+
+----====       Construct shape model from cube       ====----
+
+
+Using:  "$hayabusa/testData/st_2391934788_v.cub"
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  false
+Model has normal?  false
+
+
+----====     Test camera to ground intersections     ====----
+
+
+Observer position: ( 20 ,  0 ,  0 )
+Look direction:    ( -1 ,  0 ,  0 )
+
+Intersected:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.29165 ,  0 ,  0 )
+Model has normal?  true
+  Local Normal: ( 0.847199 ,  -0.194494 ,  0.494394 )
+  Ellipsoid Normal: ( 1 ,  0 ,  0 )
+  Recalculated Local Normal: ( 0.847199 ,  -0.194494 ,  0.494394 )
+
+
+Observer position: ( 0 ,  20 ,  0 )
+Look direction:    ( 0 ,  -1 ,  0 )
+
+Intersected:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0 ,  0.118825 ,  0 )
+Model has normal?  true
+  Local Normal: ( 0.342907 ,  0.918061 ,  -0.198945 )
+  Ellipsoid Normal: ( 0 ,  1 ,  0 )
+  Recalculated Local Normal: ( 0.342907 ,  0.918061 ,  -0.198945 )
+
+
+Observer position: ( 0 ,  0 ,  20 )
+Look direction:    ( 0 ,  0 ,  -1 )
+
+Intersected:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0 ,  0 ,  0.123329 )
+Model has normal?  true
+  Local Normal: ( 0.10418 ,  -0.0405075 ,  0.993733 )
+  Ellipsoid Normal: ( 0 ,  0 ,  1 )
+  Recalculated Local Normal: ( 0.10418 ,  -0.0405075 ,  0.993733 )
+
+
+Observer position: ( 0.1 ,  0.03 ,  10 )
+Look direction:    ( 0 ,  0 ,  -1 )
+
+Intersected:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.1 ,  0.03 ,  0.105833 )
+Model has normal?  true
+  Local Normal: ( 0.031335 ,  0.202188 ,  0.978845 )
+  Ellipsoid Normal: ( 0.22784 ,  0.210864 ,  0.950592 )
+  Recalculated Local Normal: ( 0.031335 ,  0.202188 ,  0.978845 )
+
+
+Observer position: ( -5 ,  -4 ,  -2 )
+Look direction:    ( 0.25 ,  0.2 ,  0.1 )
+
+Intersected:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.137819 ,  -0.110255 ,  -0.0551275 )
+Model has normal?  true
+  Local Normal: ( -0.311487 ,  -0.651866 ,  -0.691409 )
+  Ellipsoid Normal: ( -0.323127 ,  -0.797471 ,  -0.509537 )
+  Recalculated Local Normal: ( -0.311487 ,  -0.651866 ,  -0.691409 )
+
+
+Observer position: ( -5 ,  5 ,  4 )
+Look direction:    ( 1 ,  -2 ,  1 )
+
+Intersected:  false
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  false
+Model has normal?  false
+
+
+----====     Test ground to camera intersections     ====----
+
+
+
+Latitude:   -14.5
+Longitude:  338
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.165855 ,  -0.0670098 ,  -0.0462616 )
+Model has normal?  true
+  Local Normal: ( -0.183253 ,  -0.826652 ,  -0.532038 )
+  Ellipsoid Normal: ( 0.515528 ,  -0.64256 ,  -0.566875 )
+  Recalculated Local Normal: ( -0.183253 ,  -0.826652 ,  -0.532038 )
+
+
+Latitude:   41.6
+Longitude:  328
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.101714 ,  -0.0635582 ,  0.106487 )
+Model has normal?  true
+  Local Normal: ( -0.444258 ,  -0.613804 ,  0.652594 )
+  Ellipsoid Normal: ( 0.214422 ,  -0.413344 ,  0.884969 )
+  Recalculated Local Normal: ( -0.444258 ,  -0.613804 ,  0.652594 )
+
+
+Latitude:   -4.67
+Longitude:  207.6
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.205691 ,  -0.107533 ,  -0.01896 )
+Model has normal?  true
+  Local Normal: ( -0.86693 ,  -0.417635 ,  -0.272054 )
+  Ellipsoid Normal: ( -0.517563 ,  -0.834719 ,  -0.188075 )
+  Recalculated Local Normal: ( -0.86693 ,  -0.417635 ,  -0.272054 )
+
+
+Latitude:   -3.33
+Longitude:  165.2
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.254338 ,  0.067199 ,  -0.0153065 )
+Model has normal?  true
+  Local Normal: ( -0.936933 ,  -0.170166 ,  -0.305287 )
+  Ellipsoid Normal: ( -0.762348 ,  0.621379 ,  -0.180867 )
+  Recalculated Local Normal: ( -0.936933 ,  -0.170166 ,  -0.305287 )
+
+
+Latitude:   -18.6357
+Longitude:  292
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  false
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  false
+Model has normal?  false
+
+
+Latitude:   0
+Longitude:  350
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  false
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  false
+Model has normal?  false
+
+
+Latitude:   25
+Longitude:  200
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.148023 ,  -0.0538761 ,  0.0734542 )
+Model has normal?  true
+  Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
+  Ellipsoid Normal: ( -0.405294 ,  -0.455081 ,  0.792867 )
+  Recalculated Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
+
+
+----====  Test ground point to camera intersections  ====----
+
+
+Latitude:      -14
+Longitude:     194
+Local Radius:  0.239891
+Ground Point: ( -0.225851 ,  -0.0563111 ,  -0.0580349 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.225851 ,  -0.0563111 ,  -0.0580349 )
+Model has normal?  true
+  Local Normal: ( -0.620594 ,  -0.697659 ,  -0.357959 )
+  Ellipsoid Normal: ( -0.618062 ,  -0.475396 ,  -0.626098 )
+  Recalculated Local Normal: ( -0.620594 ,  -0.697659 ,  -0.357959 )
+
+
+Latitude:      42.782
+Longitude:     328.573
+Local Radius:  0.15722
+Ground Point: ( 0.0984633 ,  -0.060166 ,  0.106785 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.0984633 ,  -0.060166 ,  0.106785 )
+Model has normal?  true
+  Local Normal: ( -0.534538 ,  -0.316144 ,  0.783787 )
+  Ellipsoid Normal: ( 0.209276 ,  -0.394501 ,  0.894747 )
+  Recalculated Local Normal: ( -0.534538 ,  -0.316144 ,  0.783787 )
+
+
+Latitude:      -26.1383
+Longitude:     356.964
+Local Radius:  0.260135
+Ground Point: ( 0.233204 ,  -0.0123687 ,  -0.1146 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.233204 ,  -0.0123687 ,  -0.1146 )
+Model has normal?  true
+  Local Normal: ( -0.369855 ,  -0.131634 ,  -0.919717 )
+  Ellipsoid Normal: ( 0.457399 ,  -0.0748399 ,  -0.886107 )
+  Recalculated Local Normal: ( -0.369855 ,  -0.131634 ,  -0.919717 )
+
+
+Latitude:      12.8509
+Longitude:     291.106
+Local Radius:  0.140378
+Ground Point: ( 0.0492831 ,  -0.12768 ,  0.0312221 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( 0.0492831 ,  -0.12768 ,  0.0312221 )
+Model has normal?  true
+  Local Normal: ( 0.166929 ,  -0.952561 ,  0.254483 )
+  Ellipsoid Normal: ( 0.118581 ,  -0.94775 ,  0.296157 )
+  Recalculated Local Normal: ( 0.166929 ,  -0.952561 ,  0.254483 )
+
+
+Latitude:      -18.6357
+Longitude:     60
+Local Radius:  0.101992
+Ground Point: ( 0.0483224 ,  0.0836969 ,  -0.0325916 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  false
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  false
+Model has normal?  false
+
+
+Latitude:      25
+Longitude:     200
+Local Radius:  0.173807
+Ground Point: ( -0.148023 ,  -0.0538761 ,  0.0734542 )
+
+Intersected without occlusion test:  true
+
+Intersected with occlusion test:  true
+
+Bullet shape model status:
+  Name:  "Bullet"
+  Tolerance:  0.001
+Model has intersection?  true
+  Surface Point: ( -0.148023 ,  -0.0538761 ,  0.0734542 )
+Model has normal?  true
+  Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
+  Ellipsoid Normal: ( -0.405294 ,  -0.455081 ,  0.792867 )
+  Recalculated Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
+
+

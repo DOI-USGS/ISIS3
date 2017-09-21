@@ -10,33 +10,32 @@ class QVariant;
 
 
 namespace Isis {
-  namespace CnetViz {
 
-    /**
-     * @brief A leaf item that is not ready for user interaction
-     *
-     * This class represents a leaf item in the tree that is still being
-     * calculated (i.e. during filtering).
-     *
-     * @author ????-??-?? Eric Hyer
-     *
-     * @internal
-     */
-    class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem {
-        Q_OBJECT
+  /**
+   * @brief A leaf item that is not ready for user interaction
+   *
+   * This class represents a leaf item in the tree that is still being
+   * calculated (i.e. during filtering).
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal 
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   */
+  class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem {
+      Q_OBJECT
 
-      public:
-        BusyLeafItem(AbstractTreeItem *parent = 0);
-        virtual ~BusyLeafItem();
-        virtual QVariant getData() const;
-        virtual bool isSelectable() const;
+    public:
+      BusyLeafItem(AbstractTreeItem *parent = 0);
+      virtual ~BusyLeafItem();
+      virtual QVariant getData() const;
+      virtual bool isSelectable() const;
 
 
-      private: // Disallow copying of this class
-        BusyLeafItem(const BusyLeafItem &other);
-        const BusyLeafItem &operator=(const BusyLeafItem &other);
-    };
-  }
+    private: // Disallow copying of this class
+      BusyLeafItem(const BusyLeafItem &other);
+      const BusyLeafItem &operator=(const BusyLeafItem &other);
+  };
 }
 
 #endif

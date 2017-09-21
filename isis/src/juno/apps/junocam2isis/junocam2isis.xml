@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="junocam2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted JunoCam images into ISIS3 cube format</brief>
+
+  <description>
+    <p>
+      This program converts a PDS formatted JunoCam image to an ISIS3 
+      <def link="Cube">cube</def> format.
+     </p>
+
+     <p>
+     PDS-formatted JunoCam images contain several framelets and filters in the same image. 
+     For ease in processing with ISIS3, by default one input JunoCam image is converted to several output 
+     ISIS3 cubes and associated lists of cubes. There is one output cube for each framelet of the 
+     PDS formatted JunoCam image, each of which is named with the prefix specified with the "TO" 
+     user parameter, the filter name, and the 0-indexed framelet number. In the following example,
+     if the input image "JunoCamTest.IMG" had 2 framelets for each filter (Red, Blue, Green,
+     and Methane), and the following command was run:
+     </p>
+     <pre>
+     junocam2isis fr=JunoCamTest.LBL to=JunoCamTest.cub
+     </pre>
+
+     This application will output eight ISIS3 cubes, each containing one framelet for one filter,
+     <pre>
+     JunoCamTest_RED_0001.cub
+     JunoCamTest_RED_0002.cub
+     JunoCamTest_BLUE_0001.cub
+     JunoCamTest_BLUE_0002.cub
+     JunoCamTest_GREEN_0001.cub
+     JunoCamTest_GREEN_0002.cub
+     JunoCamTest_METHANE_0001.cub
+     JunoCamTest_METHANE_0002.cub
+    </pre>
+
+    and four cubelists, which contain a list of cubes created in that filter:
+
+    <pre>
+     JunoCamTest_RED.lis
+     JunoCamTest_BLUE.lis
+     JunoCamTest_GREEN.lis
+     JunoCamTest_METHANE.lis
+    </pre>
+
+     For example, the contents of JunoCamTest_RED.lis would be as follows:
+
+     <pre>
+     JunoCamTest_RED_0001.cub
+     JunoCamTest_RED_0002.cub
+     </pre>
+
+     <p>
+     If the FULLCCD parameter is set to yes, instead of outputting one ISIS3 Cube per filter and
+     framelet, junocam2isis will output one ISIS3 Cube for each original observation and will 
+     contain all the filters that were part of that observation. If the above example was modified
+     changed to set the FULLCCD parameter to true,
+     </p>
+     <pre>
+     junocam2isis fr=JunoCamTest.LBL to=JunoCamTest.cub fullccd=yes
+     </pre>
+     <p>
+     there would be only two full-CCD cubes output by junocam2isis,
+     </p>
+     <pre>
+     JunoCamTest_0001.cub
+     JunoCamTest_0002.cub
+     </pre>
+  </description>
+
+  <history>
+    <change name="Jesse Mapel and Jeannie Backer" date="2017-06-26">
+      Original version.
+    </change>
+    <change name="Kristin Berry" date="2017-08-11">
+      Updated to output at signed 16-bit.
+    </change>
+    <change name="Kris Becker and Kristin Berry" date="2017-08-12">
+      Added FULLCCD parameter which provides the ability to create images with
+      the framelet set in a single composite output file. Updated labels and
+      documentation. 
+    </change>
+    <change name="Jesse Mapel" date="2017-08-21">
+      Added two examples, one for the filter mode and one for the full CCD mode.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input JunoCam PDS label
+        </brief>
+        <description>
+          Input JunoCam PDS label. The corresponding .img file for the label
+          must be in the same directory that the label before running the program.
+        </description>
+        <filter>
+          *.lbl
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output cube file
+         </brief>
+         <description>
+           Use this parameter to specify the prefix for the output cube and list filenames.
+           Any extension will be removed and then .cub will be appended to the output cube files
+           and .lis will be appended to the output lists.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+
+    <group name="Options">
+      <parameter name="FULLCCD">
+        <type>boolean</type>
+        <brief>
+          Choose to create full framelet composite images
+        </brief>
+        <description>
+          When TRUE, this option creates ISIS cubes with the full 1648 samples
+          and 1200 lines that contain the filters that were acquired during each
+          individual observation. When set to true, the Instrument Kernel and
+          Instrument Addendum Kernel for JunoCam (juno_junocam_v??.ti
+          and junoAddendum???.ti respectively) must be available in the local
+          Juno data area.
+        </description>
+        <default><item>No</item></default>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+
+    <example>
+      <brief>Ingest a JunoCam image with each frame and each filter separated.</brief>
+      <description>
+        Ingest a JunoCam image splitting each filter in each frame into separate cube files.
+      </description>
+      <terminalInterface>
+        <commandLine> from=JNCE_2016240_01C06147_V01.LBL to=JNCE_2016240_01C06147_V01.cub fullccd=No
+        </commandLine>
+        <description>
+        <p>
+        In this example, junocam2isis will ingest the 10 frame JunoCam image and separate it into
+        30 separate cubes. For each frame, a BLUE, GREEN, and RED cube will be output. These cubes
+        will be named as JNCE_2016240_01C06147_V01_BLUE_####.cub,
+        JNCE_2016240_01C06147_V01_GREEN_####.cub, and JNCE_2016240_01C06147_V01_RED_####.cub
+        respectively.
+        </p>
+        <p>
+        Four lists will also be output in the same directory as the output cubes. For each filter,
+        a list containing all 10 of the output cubes for that filter will be output as
+        JNCE_2016240_01C06147_V01_????.lis where ???? is the filter name (BLUE, GREEN,
+        or RED). Another list containing all 30 of the ingested cubes from the image will be output
+        as JNCE_2016240_01C06147_V01.lis.
+        </p>
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/JNCE_2016240_01C06147_V01_reduce_4.png" width="412" height="960">
+          <brief>Input image</brief>
+          <description>
+            The full JunoCam image with all of the image data for each filter and frame adjacent.
+            The top of the image is the first frame. The filters in descending order are
+            BLUE, GREEN, and RED. This image has been reduced by a factor of 4. The original
+            image is 1648x3840.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/JNCE_2016240_01C06147_V01_reduce_8.png" width="206" height="480"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/JNCE_2016240_01C06147_V01_BLUE_0005_reduce_2.png" width="824" height="64">
+          <brief>Output image, frame 5, filter blue</brief>
+          <description>
+            Frame 5, blue filter of the output image. This image has been reduced by a factor of 2.
+          </description>
+          <thumbnail caption="Output image, frame 5, blue filter." src="assets/thumb/JNCE_2016240_01C06147_V01_BLUE_0005_reduce_8.png" width="206" height="16"/>
+          <parameterName>TO</parameterName>
+        </image>
+
+        <image src="assets/image/JNCE_2016240_01C06147_V01_GREEN_0005_reduce_2.png" width="824" height="64">
+          <brief>Output image, frame 5, filter green</brief>
+          <description>
+            Frame 5, green filter of the output image. This image has been reduced by a factor of 2.
+          </description>
+          <thumbnail caption="Output image, frame 5, green filter." src="assets/thumb/JNCE_2016240_01C06147_V01_GREEN_0005_reduce_8.png" width="206" height="16"/>
+          <parameterName>TO</parameterName>
+        </image>
+
+        <image src="assets/image/JNCE_2016240_01C06147_V01_RED_0005_reduce_2.png" width="824" height="64">
+          <brief>Output image, frame 5, filter red</brief>
+          <description>
+            Frame 5, red filter of the output image. This image has been reduced by a factor of 2.
+          </description>
+          <thumbnail caption="Output image, frame 5, red filter." src="assets/thumb/JNCE_2016240_01C06147_V01_RED_0005_reduce_8.png" width="206" height="16"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="724" height="915" src="assets/image/filter_gui.png">
+            <brief>Example GUI</brief>
+            <description>
+              This is a screenshot of junocam2isis.  The GUI shows the parameters used to
+              ingest a JunoCam image into separate cubes for each filter.
+            </description>
+            <thumbnail width="181" height="229" caption="Crop GUI" src="assets/thumb/filter_gui_thumb.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief>Ingest a JunoCam image with the full CCD for each frame in a cube.</brief>
+      <description>
+        Ingest a JunoCam image mapping all of the filters for each frame back onto the layout
+        of the full 1648x1200 CCD.
+      </description>
+      <terminalInterface>
+        <commandLine> from=JNCE_2016240_01C06147_V01.LBL to=JNCE_2016240_01C06147_V01.cub fullccd=Yes
+        </commandLine>
+        <description>
+        In this example, junocam2isis will ingest the 10 frame JunoCam image and separate it into
+        10 separate cubes. For each frame, a single cube with the image data for each filter mapped
+        to that filter's location on the CCD in a cube named JNCE_2016240_01C06147_V01_####.cub.
+        A single list containing all of the ingested cubes will also be output in the same
+        directory. The list will be named JNCE_2016240_01C06147_V01.lis.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/JNCE_2016240_01C06147_V01_reduce_4.png" width="412" height="960">
+          <brief>Input image</brief>
+          <description>
+            The full JunoCam image with all of the image data for each filter and frame adjacent.
+            The top of the image is the first frame. The filters in descending order are
+            BLUE, GREEN, and RED. This image has been reduced by a factor of 4. The original
+            image is 1648x3840.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/JNCE_2016240_01C06147_V01_reduce_8.png" width="206" height="480"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/JNCE_2016240_01C06147_V01_0005_cube_reduce_2.png" width="824" height="600">
+          <brief>Output image, frame 5</brief>
+          <description>
+            Frame  of the output image with the blue, green, and red filters mapped to their
+            locations on the CCD. The space between filters and the methane filter location are
+            filled with null pixels. This image has been reduced by a factor of 2.
+          </description>
+          <thumbnail caption="Output image, frame 5" src="assets/thumb/JNCE_2016240_01C06147_V01_0005_cube_reduce_8.png" width="206" height="150"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="719" height="911" src="assets/image/full_ccd_gui.png">
+            <brief>Example GUI</brief>
+            <description>
+              This is a screenshot of junocam2isis.  The GUI shows the parameters used to
+              ingest a JunoCam image into separate cubes for each frame.
+            </description>
+            <thumbnail width="158" height="200" caption="Crop GUI" src="assets/thumb/full_ccd_gui_thumb.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+  </examples>
+
+</application>

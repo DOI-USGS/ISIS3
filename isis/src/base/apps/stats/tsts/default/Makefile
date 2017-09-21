@@ -4,6 +4,18 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) from=$(INPUT)/isisTruth.cub \
-	  to=$(OUTPUT)/stats.pvl > /dev/null;
+	           to=$(OUTPUT)/stats.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/isisTruth.cub \
-	  validmin=-20 validmax=20 to=$(OUTPUT)/stats2.pvl > /dev/null;
+	           validmin=-20 \
+	           validmax=20 \
+	           to=$(OUTPUT)/stats2.pvl \
+	           > /dev/null;
+	$(APPNAME) from=$(INPUT)/isisTruth.cub \
+	           to=$(OUTPUT)/stats3.pvl \
+	           append=false \
+	           > /dev/null;
+	  
+	$(APPNAME) from=$(INPUT)/isisTruth.cub \
+	           | grep -v stats \
+	           | grep -v Processed \
+	           >& $(OUTPUT)/output.pvl;

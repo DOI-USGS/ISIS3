@@ -1,0 +1,6 @@
+Group = JUNO/JNC
+  Version = 1
+  Library = JunoCamera
+  Routine = JunoCameraPlugin
+EndGroup
+ 

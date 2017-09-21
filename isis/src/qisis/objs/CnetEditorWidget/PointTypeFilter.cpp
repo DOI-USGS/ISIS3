@@ -11,79 +11,77 @@
 
 
 namespace Isis {
-  namespace CnetViz {
-    PointTypeFilter::PointTypeFilter(AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) :
-      AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
-      QStringList options;
-      options << "Fixed" << "Constrained" << "Free";
-      createWidget(options);
-    }
+  PointTypeFilter::PointTypeFilter(AbstractFilter::FilterEffectivenessFlag flag,
+      int minimumForSuccess) :
+    AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
+    QStringList options;
+    options << "Fixed" << "Constrained" << "Free";
+    createWidget(options);
+  }
 
 
-    PointTypeFilter::PointTypeFilter(const PointTypeFilter &other)
-      : AbstractMultipleChoiceFilter(other) {
-    }
+  PointTypeFilter::PointTypeFilter(const PointTypeFilter &other)
+    : AbstractMultipleChoiceFilter(other) {
+  }
 
 
-    PointTypeFilter::~PointTypeFilter() {
-    }
+  PointTypeFilter::~PointTypeFilter() {
+  }
 
 
-    bool PointTypeFilter::evaluate(const ControlCubeGraphNode *node) const {
-      return evaluateImageFromPointFilter(node);
-    }
+  bool PointTypeFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return evaluateImageFromPointFilter(node);
+  }
 
 
-    bool PointTypeFilter::evaluate(const ControlPoint *point) const {
-      return ((QString) point->GetPointTypeString() == getCurrentChoice()) ^
-          !inclusive();
-    }
+  bool PointTypeFilter::evaluate(const ControlPoint *point) const {
+    return ((QString) point->GetPointTypeString() == getCurrentChoice()) ^
+        !inclusive();
+  }
 
 
-    bool PointTypeFilter::evaluate(const ControlMeasure *) const {
-      return true;
-    }
+  bool PointTypeFilter::evaluate(const ControlMeasure *) const {
+    return true;
+  }
 
 
-    AbstractFilter *PointTypeFilter::clone() const {
-      return new PointTypeFilter(*this);
-    }
+  AbstractFilter *PointTypeFilter::clone() const {
+    return new PointTypeFilter(*this);
+  }
 
 
-    QString PointTypeFilter::getImageDescription() const {
-      QString description = AbstractFilter::getImageDescription() + "point";
+  QString PointTypeFilter::getImageDescription() const {
+    QString description = AbstractFilter::getImageDescription() + "point";
 
-      if (getMinForSuccess() != 1)
-        description += "s ";
-      else
-        description += " ";
+    if (getMinForSuccess() != 1)
+      description += "s ";
+    else
+      description += " ";
 
-      description += "that ";
+    description += "that ";
 
-      if (getMinForSuccess() == 1)
-        description += "is ";
-      else
-        description += "are ";
+    if (getMinForSuccess() == 1)
+      description += "is ";
+    else
+      description += "are ";
 
-      if (!inclusive())
-        description += "not ";
+    if (!inclusive())
+      description += "not ";
 
-      description += " of type " + getCurrentChoice();
+    description += " of type " + getCurrentChoice();
 
-      return description;
-    }
+    return description;
+  }
 
 
-    QString PointTypeFilter::getPointDescription() const {
-      QString description = "are ";
+  QString PointTypeFilter::getPointDescription() const {
+    QString description = "are ";
 
-      if (!inclusive())
-        description += "not ";
+    if (!inclusive())
+      description += "not ";
 
-      description += "of type " + getCurrentChoice();
+    description += "of type " + getCurrentChoice();
 
-      return description;
-    }
+    return description;
   }
 }

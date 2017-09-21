@@ -26,21 +26,52 @@ namespace Isis {
       Q_OBJECT
 
     public:
+      
+      /**
+       * Constrctor for the ViewportMdiSubWindow
+       * 
+       * @param cubeToView The cube to open
+       * @param parent The parent container
+       */ 
       ViewportMdiSubWindow(Cube *cubeToView, QWidget *parent = NULL);
+      
+      //! Deconstructor for ViewportMdiSubWindow
       ~ViewportMdiSubWindow();
 
+      /**
+       * Grabs the viewport
+       * 
+       * @return the viewport to return
+       * 
+       */
       MdiCubeViewport *viewport();
 
     signals:
+      /**
+       * This method closes the viewport
+       * 
+       * @param vp The viewport to close.
+       */
       void closeViewport(CubeViewport *vp);
 
     protected:
+      /**
+       * This method is called as the closeEvent
+       * 
+       * @param e The closeEvent
+       * 
+       */
       virtual void closeEvent(QCloseEvent *e);
 
     private:
+      /**
+       * Disables copy 
+       * 
+       */
       Q_DISABLE_COPY(ViewportMdiSubWindow);
 
     private:
+      //! Pointer to the MdiCubeViewports
       QPointer<MdiCubeViewport> m_viewport;
   };
 };

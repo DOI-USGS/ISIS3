@@ -121,6 +121,7 @@ namespace Isis {
     QString destination = internalData().first();
     if (!destination.isEmpty()) {
       project()->save(destination);
+      project()->open(destination);
     }
   }
 }

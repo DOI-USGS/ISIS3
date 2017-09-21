@@ -80,7 +80,6 @@ namespace Isis {
       istm.close();
     }
     catch (IException &e) {
-      printf("debugB\n");
       istm.close();
       QString msg = "File [" + listFile.toString() + "] contains no data";
       throw IException(IException::User, msg, _FILEINFO_);

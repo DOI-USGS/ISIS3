@@ -10,100 +10,98 @@ using std::swap;
 
 
 namespace Isis {
-  namespace CnetViz {
-    TableColumn::TableColumn(QString text, bool m_readOnlyStatus,
-        bool affectsNetStructure) {
-      nullify();
+  TableColumn::TableColumn(QString text, bool m_readOnlyStatus,
+      bool affectsNetStructure) {
+    nullify();
 
-      m_title = new QString(text);
-      m_visible = true;
-      m_readOnly = m_readOnlyStatus;
-      m_affectsNetworkStructure = affectsNetStructure;
-      m_ascendingSortOrder = true;
-    }
-
-
-    TableColumn::TableColumn(const TableColumn &other) {
-      nullify();
-
-      m_title = new QString(*other.m_title);
-      m_visible = other.m_visible;
-      m_readOnly = other.m_readOnly;
-      m_width = other.m_width;
-    }
+    m_title = new QString(text);
+    m_visible = true;
+    m_readOnly = m_readOnlyStatus;
+    m_affectsNetworkStructure = affectsNetStructure;
+    m_ascendingSortOrder = true;
+  }
 
 
-    TableColumn::~TableColumn() {
-      delete m_title;
-      m_title = NULL;
-    }
+  TableColumn::TableColumn(const TableColumn &other) {
+    nullify();
+
+    m_title = new QString(*other.m_title);
+    m_visible = other.m_visible;
+    m_readOnly = other.m_readOnly;
+    m_width = other.m_width;
+  }
 
 
-    QString TableColumn::getTitle() const {
-      return *m_title;
-    }
+  TableColumn::~TableColumn() {
+    delete m_title;
+    m_title = NULL;
+  }
 
 
-    void TableColumn::setTitle(QString text) {
-      *m_title = text;
-    }
+  QString TableColumn::getTitle() const {
+    return *m_title;
+  }
 
 
-    TableColumn &TableColumn::operator=(TableColumn other) {
-      swap(*m_title, *other.m_title);
-      swap(m_visible, other.m_visible);
-      swap(m_readOnly, other.m_readOnly);
-      swap(m_width, other.m_width);
-
-      return *this;
-    }
+  void TableColumn::setTitle(QString text) {
+    *m_title = text;
+  }
 
 
-    bool TableColumn::isVisible() const {
-      return m_visible;
-    }
+  TableColumn &TableColumn::operator=(TableColumn other) {
+    swap(*m_title, *other.m_title);
+    swap(m_visible, other.m_visible);
+    swap(m_readOnly, other.m_readOnly);
+    swap(m_width, other.m_width);
+
+    return *this;
+  }
 
 
-    void TableColumn::setVisible(bool visibility) {
-      m_visible = visibility;
-      emit visibilityChanged();
-    }
+  bool TableColumn::isVisible() const {
+    return m_visible;
+  }
 
 
-    int TableColumn::getWidth() const {
-      return m_width;
-    }
+  void TableColumn::setVisible(bool visibility) {
+    m_visible = visibility;
+    emit visibilityChanged();
+  }
 
 
-    void TableColumn::setWidth(int newWidth) {
-      m_width = newWidth;
-      emit widthChanged();
-    }
+  int TableColumn::getWidth() const {
+    return m_width;
+  }
 
 
-    bool TableColumn::isReadOnly() const {
-      return m_readOnly;
-    }
+  void TableColumn::setWidth(int newWidth) {
+    m_width = newWidth;
+    emit widthChanged();
+  }
 
 
-    bool TableColumn::hasNetworkStructureEffect() const {
-      return m_affectsNetworkStructure;
-    }
+  bool TableColumn::isReadOnly() const {
+    return m_readOnly;
+  }
 
 
-    bool TableColumn::sortAscending() const {
-      return m_ascendingSortOrder;
-    }
+  bool TableColumn::hasNetworkStructureEffect() const {
+    return m_affectsNetworkStructure;
+  }
 
 
-    void TableColumn::setSortAscending(bool ascending) {
-      m_ascendingSortOrder = ascending;
-      emit sortOutDated();
-    }
+  bool TableColumn::sortAscending() const {
+    return m_ascendingSortOrder;
+  }
 
 
-    void TableColumn::nullify() {
-      m_title = NULL;
-    }
+  void TableColumn::setSortAscending(bool ascending) {
+    m_ascendingSortOrder = ascending;
+    emit sortOutDated();
+  }
+
+
+  void TableColumn::nullify() {
+    m_title = NULL;
   }
 }

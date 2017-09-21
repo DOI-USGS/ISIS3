@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.os
 
 all:  install
 
-install: libs plugins
+install: libs license plugins
 
 #libs: license
 libs:
@@ -45,6 +45,7 @@ libs:
 	if [ "$(HOST_ARCH)" == "Darwin" ]; then                              \
 	  chmod u+w $(ISISROOT)/3rdParty/lib/libcrypto.*.dylib;              \
 	  chmod u+w $(ISISROOT)/3rdParty/lib/libssl.*.dylib;                 \
+	  chmod u+w $(ISISROOT)/3rdParty/lib/Python.framework/Versions/3.5/Python;\
 	  $(ISISROOT)/scripts/SetRunTimePath --libs                          \
 	    --libmap=$(ISISROOT)/scripts/darwin_lib_paths.lis                \
 	    --liblog=DarwinLibs.lis --update                                 \
@@ -59,17 +60,25 @@ libs:
              --update                                                        \
 	    `find $(ISISROOT)/3rdParty/lib -name '[Qq]*' -print              \
 	    -mindepth 3 -maxdepth 4 -type f` > /dev/null;                    \
+	  $(ISISROOT)/scripts/SetRunTimePath --bins                          \
+	     --libmap=$(ISISROOT)/scripts/darwin_bin_paths.lis               \
+             --liblog=DarwinLibs.lis                                         \
+	     --relocdir=$(ISISROOT)/3rdParty/lib:$ISISROOT/3rdParty          \
+             --update                                                        \
+	    `find $(ISISROOT)/3rdParty/lib/Python.framework/Versions/3.5     \
+	    -name 'Python' -print -type f` > /dev/null;                      \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libcrypto.*.dylib;              \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libssl.*.dylib;                 \
+	  chmod u-w $(ISISROOT)/3rdParty/lib/Python.framework/Versions/3.5/Python;\
 	  if [ -f "DarwinErrors.lis" ]; then                                 \
 	    cat DarwinErrors.lis;                                            \
 	  fi;                                                                \
 	  $(RM) DarwinErrors.lis DarwinLibs.lis;                             \
-	fi                                                                 
+	fi
 
 license:
 	echo $(CURTIMESTAMP) "  Obtaining licenses";                         \
-	$(RSYNC) -a /usgs/pkgs/local/$(ISISLOCALVERSION)/license/            \
+	$(RSYNC) -a $(THIRDPARTYLICPATH)														         \
 	  $(ISISROOT)/3rdParty/license/
 
 plugins:
@@ -103,7 +112,7 @@ clean:
 	    $(RM) -rf $$plugs; \
 	  fi \
 	done;
-	
+
 #----------------------------------------------------------------------------
 # Use to see values of variables
 #  Example: make print-HOST_OS

@@ -39,6 +39,7 @@ namespace Isis {
    * @author 2012-??-?? ???
    *
    * @internal
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    */
   class SaveProjectWorkOrder : public WorkOrder {
       Q_OBJECT

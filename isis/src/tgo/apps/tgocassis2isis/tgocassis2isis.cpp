@@ -2,6 +2,7 @@
 
 #include <QString>
 
+#include "AlphaCube.h"
 #include "Cube.h"
 #include "FileName.h"
 #include "LineManager.h"
@@ -23,25 +24,31 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName xmlFileName = ui.GetFileName("FROM");
 
-  ProcessImport importer;
-  translateCoreInfo(xmlFileName, importer);
+  try {
+    ProcessImport importer;
+    translateCoreInfo(xmlFileName, importer);
 
-  importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
-  Cube *outputCube = importer.SetOutputCube("TO");
+    importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    Cube *outputCube = importer.SetOutputCube("TO");
 
-  translateLabels(xmlFileName, outputCube);
+    translateLabels(xmlFileName, outputCube);
   
-  FileName outputCubeFileName(ui.GetFileName("TO"));
-
-  OriginalXmlLabel xmlLabel;
-  xmlLabel.readFromXmlFile(xmlFileName);
-
-  importer.StartProcess();
-
-  // Write out original label before closing the cube
-  outputCube->write(xmlLabel);
-
-  importer.EndProcess();
+    FileName outputCubeFileName(ui.GetFileName("TO"));
+  
+    OriginalXmlLabel xmlLabel;
+    xmlLabel.readFromXmlFile(xmlFileName);
+  
+    importer.StartProcess();
+  
+    // Write out original label before closing the cube
+    outputCube->write(xmlLabel);
+  
+    importer.EndProcess();
+  }
+  catch (IException &e) {
+    QString msg = "Given file does not appear to be a valid TGO CaSSIS product.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+  }
 
   return;
 }
@@ -185,10 +192,10 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   PvlGroup kern("Kernels");
   QString spacecraftNumber;
   QString instId  = (QString) inst.findKeyword("InstrumentId");
-  QString spcName = (QString) inst.findKeyword("SpacecraftId");
+  QString spcName = (QString) inst.findKeyword("SpacecraftName");
   QString filter  = (QString) bandBin.findKeyword("FilterName");
 
-  if(spcName.compare("TGO", Qt::CaseInsensitive) == 0
+  if(spcName.compare("TRACE GAS ORBITER", Qt::CaseInsensitive) == 0
      && instId.compare("CaSSIS", Qt::CaseInsensitive) == 0) {
 
     int spacecraftCode = -143400;
@@ -198,16 +205,22 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
     if (filter.compare("PAN", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143421;
     }
-    if (filter.compare("RED", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("RED", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143422;
     }
-    if (filter.compare("NIR", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("NIR", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143423;
     }
-    if (filter.compare("BLU", Qt::CaseInsensitive) == 0) {
+    else if (filter.compare("BLU", Qt::CaseInsensitive) == 0) {
       spacecraftCode = -143424;
     }
+    else {
+      QString msg = "Unrecognized filter name [" 
+        + filter
+        + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
 
+    }
     // Add Kernel to BandBin Group
     bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(spacecraftCode)));
   }
@@ -220,5 +233,24 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
       throw IException(IException::User, msg, _FILEINFO_);
   }
   outputCube->putGroup(kern);
+
+  // Add an alpha cube group based on the subwindowing
+  FileName alphaTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
+  XmlToPvlTranslationManager alphaXlater(inputLabel, alphaTransFile.expanded());
+  Pvl alphaPvl;
+  alphaXlater.Auto(alphaPvl);
+  PvlObject subWindow = alphaPvl.findObject("SubWindow");
+  int windowNumber = (int) subWindow["Window_Count"] + 1;
+  QString windowString = "Window_" + toString(windowNumber);
+  int frameletStartSample = (int) subWindow[windowString + "_Start_Sample"] + 1;
+  int frameletEndSample   = (int) subWindow[windowString + "_End_Sample"] + 1;
+  int frameletStartLine   = (int) subWindow[windowString + "_Start_Line"] + 1;
+  int frameletEndLine     = (int) subWindow[windowString + "_End_Line"] + 1;
+  AlphaCube frameletArea(2048, 2048,
+                         frameletEndSample - frameletStartSample + 1,
+                         frameletEndLine - frameletStartLine + 1,
+                         frameletStartSample - 0.5, frameletStartLine - 0.5,
+                         frameletEndSample + 0.5, frameletEndLine + 0.5);
+  frameletArea.UpdateGroup(*outputCube);
 }
 

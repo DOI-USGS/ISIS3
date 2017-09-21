@@ -140,12 +140,12 @@
       the socket is already open. Fixes #1551.
     </change>
     <change name="Ian Humphrey" date="2014-07-30">
-      Modified spectral plot tool to more accurately compute statistics for rectangular and 
+      Modified spectral plot tool to more accurately compute statistics for rectangular and
       polygonal selections. Fixes #2071.
     </change>
     <change name="Ian Humphrey" date="2014-07-31">
-      Added configurePlotCurves() method to PlotWindow. User can activate configure dialog on 
-      single curve with right-click or activate dialog with combo box of all curves using the 
+      Added configurePlotCurves() method to PlotWindow. User can activate configure dialog on
+      single curve with right-click or activate dialog with combo box of all curves using the
       toolbar button. Added What's This for SpatialPlotTool and removed the configure toolbar button
       for ScatterPlotWindow. Fixes #2089.
     </change>
@@ -153,12 +153,16 @@
       Updated icons. Fixes #1041.
     </change>
     <change name="Ian Humphrey" date="2015-11-19">
-      Added shortcuts to Match Tool window for selecting right measures, registration, undo 
+      Added shortcuts to Match Tool window for selecting right measures, registration, undo
       registration, saving measures, saving the point, and saving the control network. Fixes #2324.
     </change>
     <change name="Ian Humphrey" date="2017-05-10">
       Fixed initial loading of viewport and Fit to viewport zoom to correctly zoom to the center
       of the image. Fixes #4756.
+    </change>
+    <change name="Adam Paquette" date="2017-05-19">
+      Readded help menu for the 2D and 3D plot tools. Now properly display in both tools.
+      Fixes #2126.
     </change>
   </history>
 </application>

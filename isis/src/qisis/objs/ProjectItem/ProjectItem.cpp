@@ -45,6 +45,7 @@ namespace Isis {
    * Constructs an item without children, a parent, or a model.
    */
   ProjectItem::ProjectItem() : QStandardItem() {
+    setTextColor(Qt::black);
     setEditable(false);
   }
 
@@ -57,6 +58,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to copy.
    */
   ProjectItem::ProjectItem(ProjectItem *item) {
+    setTextColor(Qt::black);
     item->setEditable(false);
     setProjectItem(item);
     for (int i=0; i < item->rowCount(); i++) {
@@ -73,9 +75,28 @@ namespace Isis {
    * @param[in] filename A icon to display next to the treetext
    */
   ProjectItem::ProjectItem(FileItemQsp filename, QString treeText, QIcon icon) {
+    setTextColor(Qt::black);
     setEditable(false);
     setData(QVariant::fromValue<FileItemQsp>(filename));
     setText(treeText);
+    setIcon(icon);
+  }
+
+
+  /**
+   * Constructs an item representing a file in the filesystem.
+   *
+   * @param[in] filename The full path to the file in the filesystem
+   * @param[in] treetext The name displayed in the project tree
+   * @param[in] filename A icon to display next to the treetext
+   */
+  ProjectItem::ProjectItem(FileItemQsp filename, QString treeText, QString toolTipText,
+                           QIcon icon) {
+    setTextColor(Qt::black);
+    setEditable(false);
+    setData(QVariant::fromValue<FileItemQsp>(filename));
+    setText(treeText);
+    setToolTip(toolTipText);
     setIcon(icon);
   }
 
@@ -87,6 +108,7 @@ namespace Isis {
    *                                          construct from.
    */
   ProjectItem::ProjectItem(BundleResults bundleResults) {
+    setTextColor(Qt::black);
     setEditable(false);
     setBundleResults(bundleResults);
   }
@@ -99,6 +121,7 @@ namespace Isis {
    *                                               construct from.
    */
   ProjectItem::ProjectItem(BundleSettingsQsp bundleSettings) {
+    setTextColor(Qt::black);
     setEditable(false);
     setBundleSettings(bundleSettings);
   }
@@ -111,6 +134,7 @@ namespace Isis {
    *                                                      to construct from.
    */
   ProjectItem::ProjectItem(BundleSolutionInfo *bundleSolutionInfo) {
+    setTextColor(Qt::black);
     setEditable(false);
     setBundleSolutionInfo(bundleSolutionInfo);
 
@@ -130,6 +154,7 @@ namespace Isis {
    * @param[in] control (Control *) The Control to construct from.
    */
   ProjectItem::ProjectItem(Control *control) {
+    setTextColor(Qt::black);
     setEditable(false);
     setControl(control);
   }
@@ -141,6 +166,7 @@ namespace Isis {
    * @param[in] controlList (ControlList *) The ControlList to construct from.
    */
   ProjectItem::ProjectItem(ControlList *controlList) {
+    setTextColor(Qt::black);
     setEditable(false);
     setControlList(controlList);
     foreach (Control *control, *controlList) {
@@ -155,6 +181,7 @@ namespace Isis {
    * @param[in] controls (QList<ControlList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ControlList *> controls) {
+    setTextColor(Qt::black);
     setEditable(false);
     setControls();
     foreach (ControlList *controlList, controls) {
@@ -170,6 +197,7 @@ namespace Isis {
    *                                                  construct from.
    */
   ProjectItem::ProjectItem(CorrelationMatrix correlationMatrix) {
+    setTextColor(Qt::black);
     setEditable(false);
     setCorrelationMatrix(correlationMatrix);
   }
@@ -181,7 +209,8 @@ namespace Isis {
    * @param[in] image (Image *) The Image to construct from.
    */
   ProjectItem::ProjectItem(Image *image) {
-    setEditable(false);
+    setTextColor(Qt::black);
+    setEditable(true);
     setImage(image);
   }
 
@@ -192,7 +221,8 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList to construct from.
    */
   ProjectItem::ProjectItem(ImageList *imageList) {
-    setEditable(false);
+    setTextColor(Qt::black);
+    setEditable(true);
     setImageList(imageList);
     foreach (Image *image, *imageList) {
       appendRow( new ProjectItem(image) );
@@ -206,6 +236,7 @@ namespace Isis {
    * @param[in] images (QList<ImageList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ImageList *> images) {
+    setTextColor(Qt::black);
     setEditable(false);
     setImages();
     foreach (ImageList *imageList, images) {
@@ -219,7 +250,8 @@ namespace Isis {
    *
    * @param[in] shape (Shape *) The Shape to construct from.
    */
-  ProjectItem::ProjectItem(Shape *shape) {
+  ProjectItem::ProjectItem(Shape *shape) {\
+    setTextColor(Qt::black);
     setEditable(false);
     setShape(shape);
   }
@@ -231,6 +263,7 @@ namespace Isis {
    * @param[in] shapeList (ShapeList *) The ShapeList to construct from.
    */
   ProjectItem::ProjectItem(ShapeList *shapeList) {
+    setTextColor(Qt::black);
     setEditable(false);
     setShapeList(shapeList);
     foreach (Shape *shape, *shapeList) {
@@ -245,6 +278,7 @@ namespace Isis {
    * @param[in] shapes (QList<ShapeList *>) The list to construct from.
    */
   ProjectItem::ProjectItem(QList<ShapeList *> shapes) {
+    setTextColor(Qt::black);
     setEditable(false);
     setShapes();
     foreach (ShapeList *shapeList, shapes) {
@@ -259,6 +293,7 @@ namespace Isis {
    * @param[in] guiCamera (GuiCameraQsp) The camera to construct from.
    */
   ProjectItem::ProjectItem(GuiCameraQsp guiCamera) {
+    setTextColor(Qt::black);
     setEditable(false);
     setGuiCamera(guiCamera);
   }
@@ -271,6 +306,7 @@ namespace Isis {
    *                                            construct from.
    */
   ProjectItem::ProjectItem(GuiCameraList *guiCameraList) {
+    setTextColor(Qt::black);
     setEditable(false);
     setGuiCameraList();
     foreach (GuiCameraQsp guiCamera, *guiCameraList) {
@@ -285,6 +321,7 @@ namespace Isis {
    * @param[in] project (Project *) The Project to construct from.
    */
   ProjectItem::ProjectItem(Project *project) {
+    setTextColor(Qt::black);
     setProject(project);
 //  qDebug()<<"ProjectItem::ProjectItem(Project *project)  rowCount() = "<<rowCount();
     appendRow( new ProjectItem( project->controls() ) );
@@ -305,6 +342,10 @@ namespace Isis {
     spaceCraftItem->setSpacecraft();
     appendRow(spaceCraftItem);
 
+    ProjectItem *templatesItem = new ProjectItem();
+    templatesItem->setTemplate();
+    appendRow(templatesItem);
+
     appendRow( new ProjectItem( project->bundleSolutionInfo() ) );
   }
 
@@ -316,6 +357,7 @@ namespace Isis {
    *                                                  from.
    */
   ProjectItem::ProjectItem(QList<BundleSolutionInfo *> results) {
+    setTextColor(Qt::black);
     setEditable(false);
     setResults();
     foreach (BundleSolutionInfo *bundleSolutionInfo, results) {
@@ -330,6 +372,7 @@ namespace Isis {
    * @param[in] targetBody (TargetBodyQsp) The target body to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyQsp targetBody) {
+    setTextColor(Qt::black);
     setEditable(false);
     setTargetBody(targetBody);
   }
@@ -341,6 +384,7 @@ namespace Isis {
    * @param[in] targetBodyList (TargetBodyList *) The list to construct from.
    */
   ProjectItem::ProjectItem(TargetBodyList *targetBodyList) {
+    setTextColor(Qt::black);
     setEditable(false);
     setTargetBodyList();
     foreach (TargetBodyQsp targetBody, *targetBodyList) {
@@ -493,6 +537,11 @@ namespace Isis {
    */
   FileItemQsp ProjectItem::fileItem() const {
     return data().value<FileItemQsp>();
+  }
+
+
+  bool ProjectItem::isTemplate() const {
+    return data().canConvert<QString>();
   }
 
 
@@ -657,6 +706,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The other item.
    */
   void ProjectItem::setProjectItem(ProjectItem *item) {
+    setTextColor(Qt::black);
     setText( item->text() );
     setIcon( item->icon() );
     setData( item->data() );
@@ -670,8 +720,10 @@ namespace Isis {
    * @param[in] bundleResults (BundleResults) The BundleResults.
    */
   void ProjectItem::setBundleResults(BundleResults bundleResults) {
+    setTextColor(Qt::black);
     setText("Statistics");
-    setIcon( QIcon(":results") );
+    setIcon( QIcon(FileName("$base/icons/kchart.png")
+                           .expanded()));
     setData( QVariant::fromValue<BundleResults>(bundleResults) );
   }
 
@@ -682,8 +734,10 @@ namespace Isis {
    * @param[in] bundleSettings (BundleSettingsQsp) The BundleSettingsQsp.
    */
   void ProjectItem::setBundleSettings(BundleSettingsQsp bundleSettings) {
+    setTextColor(Qt::black);
     setText("Settings");
-    setIcon( QIcon(":settings") );
+    setIcon( QIcon(FileName("$base/icons/applications-system.png")
+                           .expanded()));
     setData( QVariant::fromValue<BundleSettingsQsp>(bundleSettings) );
   }
 
@@ -694,8 +748,15 @@ namespace Isis {
    * @param[in] bundleSolutionInfo (BundleSolutionInfo *) The BundleSolutionInfo.
    */
   void ProjectItem::setBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
-    setText( bundleSolutionInfo->runTime() );
-    setIcon( QIcon(":results") );
+    setTextColor(Qt::black);
+    if (bundleSolutionInfo->name() != "") {
+      setText( bundleSolutionInfo->name() );
+    }
+    else {
+      setText( bundleSolutionInfo->runTime() );
+    }
+    setIcon( QIcon(FileName("$base/icons/kchart.png")
+                           .expanded()));
     setData( QVariant::fromValue<BundleSolutionInfo *>(bundleSolutionInfo) );
   }
 
@@ -706,8 +767,10 @@ namespace Isis {
    * @param[in] image (Image *) The Image.
    */
   void ProjectItem::setImage(Image *image) {
+    setTextColor(Qt::black);
     setText( QFileInfo( image->fileName() ).fileName() );
-    setIcon( QIcon(":pictures") );
+    setIcon( QIcon(FileName("$base/icons/view-preview.png")
+                           .expanded()));
     setData( QVariant::fromValue<Image *>(image) );
   }
 
@@ -718,8 +781,15 @@ namespace Isis {
    * @param[in] imageList (ImageList *) The ImageList.
    */
   void ProjectItem::setImageList(ImageList *imageList) {
-    setText( imageList->name() );
-    setIcon( QIcon(":pictures") );
+    setTextColor(Qt::black);
+    if (imageList->name() != "") {
+      setText( imageList->name() );
+    }
+    else {
+      setText( imageList->path() );
+    }
+    setIcon( QIcon(FileName("$base/icons/folder-image.png")
+                           .expanded()));
     setData( QVariant::fromValue<ImageList *>(imageList) );
   }
 
@@ -728,8 +798,10 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a list of ImageList.
    */
   void ProjectItem::setImages() {
+    setTextColor(Qt::black);
     setText("Images");
-    setIcon( QIcon(":pictures") );
+    setIcon( QIcon(FileName("$base/icons/folder-image.png")
+                           .expanded()));
     setData( QVariant() );
   }
 
@@ -740,8 +812,10 @@ namespace Isis {
    * @param[in] shape (Shape *) The Shape.
    */
   void ProjectItem::setShape(Shape *shape) {
+    setTextColor(Qt::black);
     setText( QFileInfo( shape->fileName() ).fileName() );
-    setIcon( QIcon(":dem") );
+    setIcon( QIcon(FileName("$base/icons/rating.png")
+                           .expanded()));
     setData( QVariant::fromValue<Shape *>(shape) );
   }
 
@@ -752,8 +826,15 @@ namespace Isis {
    * @param[in] shapeList (ShapeList *) The ShapeList.
    */
   void ProjectItem::setShapeList(ShapeList *shapeList) {
-    setText( shapeList->name() );
-    setIcon( QIcon(":dem") );
+    setTextColor(Qt::black);
+    if (shapeList->name() != "") {
+      setText( shapeList->name() );
+    }
+    else {
+      setText( shapeList->path() );
+    }
+    setIcon( QIcon(FileName("$base/icons/folder-orange.png")
+                           .expanded()));
     setData( QVariant::fromValue<ShapeList *>(shapeList) );
   }
 
@@ -762,9 +843,29 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a list of ShapeList.
    */
   void ProjectItem::setShapes() {
+    setTextColor(Qt::black);
     setText("Shapes");
-    setIcon( QIcon(":dem") );
+    setIcon( QIcon(FileName("$base/icons/folder-red.png")
+                           .expanded()));
     setData( QVariant() );
+  }
+
+  void ProjectItem::setTemplate() {
+    setText("Templates");
+    setIcon( QIcon(":folder") );
+    setData( QVariant() );
+
+    ProjectItem *mapsItem = new ProjectItem();
+    mapsItem->setText("Maps");
+    mapsItem->setIcon( QIcon(":folder") );
+    mapsItem->setData( QVariant() );
+    appendRow(mapsItem);
+
+    ProjectItem *registrationsItem = new ProjectItem();
+    registrationsItem->setText("Registrations");
+    registrationsItem->setIcon( QIcon(":folder") );
+    registrationsItem->setData( QVariant() );
+    appendRow(registrationsItem);
   }
 
 
@@ -774,8 +875,10 @@ namespace Isis {
    * @param[in] control (Control *) The Control.
    */
   void ProjectItem::setControl(Control *control) {
+    setTextColor(Qt::black);
     setText( QFileInfo( control->fileName() ).fileName() );
-    setIcon( QIcon(":pointReg") );
+    setIcon( QIcon(FileName("$base/icons/network-server-database.png")
+                           .expanded()));
     setData( QVariant::fromValue<Control *>(control) );
   }
 
@@ -786,8 +889,10 @@ namespace Isis {
    * @param[in] controlList (ControlList *) The ControlList.
    */
   void ProjectItem::setControlList(ControlList *controlList) {
+    setTextColor(Qt::black);
     setText( controlList->name() );
-    setIcon( QIcon(":folder") );
+    setIcon( QIcon(FileName("$base/icons/folder.png")
+                           .expanded()));
     setData( QVariant::fromValue<ControlList *>(controlList) );
   }
 
@@ -796,8 +901,10 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a list of ControlList.
    */
   void ProjectItem::setControls() {
+    setTextColor(Qt::black);
     setText("Control Networks");
-    setIcon( QIcon(":layers") );
+    setIcon( QIcon(FileName("$base/icons/folder-remote.png")
+                           .expanded()));
     setData( QVariant() );
   }
 
@@ -808,8 +915,10 @@ namespace Isis {
    * @param[in] correlationMatrix (CorrelationMatrix) The CorrelationMatrix.
    */
   void ProjectItem::setCorrelationMatrix(CorrelationMatrix correlationMatrix) {
+    setTextColor(Qt::black);
     setText("Correlation Matrix");
-    setIcon( QIcon(":pointReg") );
+    setIcon( QIcon(FileName("$base/icons/network-server-database.png")
+                           .expanded()));
     setData( QVariant::fromValue<CorrelationMatrix>(correlationMatrix) );
   }
 
@@ -825,8 +934,10 @@ namespace Isis {
    *               to appear on the command line.  Fixes #3982.
    */
   void ProjectItem::setProject(Project *project) {
+    setTextColor(Qt::black);
     setText( project->name() );
-    setIcon( QIcon(":data-management") );
+    setIcon( QIcon(FileName("$base/icons/folder-activities.png")
+                           .expanded()));
     setData( QVariant::fromValue<Project *>(project) );
   }
 
@@ -835,8 +946,10 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a list of Results.
    */
   void ProjectItem::setResults() {
+    setTextColor(Qt::black);
     setText("Results");
-    setIcon( QIcon(":results") );
+    setIcon( QIcon(FileName("$base/icons/kchart.png")
+                           .expanded()));
     setData( QVariant() );
   }
 
@@ -847,8 +960,10 @@ namespace Isis {
    * @param[in] guiCamera (GuiCameraQsp) The GuiCameraQsp.
    */
   void ProjectItem::setGuiCamera(GuiCameraQsp guiCamera) {
+    setTextColor(Qt::black);
     setText( guiCamera->displayProperties()->displayName() );
-    setIcon( QIcon(":camera") );
+    setIcon( QIcon(FileName("$base/icons/camera-photo.png")
+                           .expanded()));
     setData( QVariant::fromValue<GuiCameraQsp>(guiCamera) );
   }
 
@@ -857,8 +972,10 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a GuiCameraQsp.
    */
   void ProjectItem::setGuiCameraList() {
+    setTextColor(Qt::black);
     setText("Sensors");
-    setIcon( QIcon(":camera") );
+    setIcon( QIcon(FileName("$base/icons/camera-photo.png")
+                           .expanded()));
     setData( QVariant() );
   }
 
@@ -867,10 +984,13 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to SpaceCraft.
    */
   void ProjectItem::setSpacecraft() {
+    setTextColor(Qt::black);
     setText("Spacecraft");
-    setIcon( QIcon(":spacecraft") );
+    setIcon( QIcon(FileName("$base/icons/preferences-desktop-launch-feedback.png")
+                           .expanded()));
     setData( QVariant() );
   }
+
 
 
   /**
@@ -879,17 +999,24 @@ namespace Isis {
    * @param targetBody Target body to set data from
    */
   void ProjectItem::setTargetBody(TargetBodyQsp targetBody) {
+    setTextColor(Qt::black);
     setText( targetBody->displayProperties()->displayName() );
     if (targetBody->displayProperties()->displayName() == "MOON")
-      setIcon( QIcon(":moon") );
+      setIcon( QIcon(FileName("$base/icons/weather-clear-night.png")
+                             .expanded()));
     else if (targetBody->displayProperties()->displayName() == "Enceladus")
-      setIcon( QIcon(":enceladus") );
+      setIcon( QIcon(FileName("$base/icons/nasa_enceladus.png")
+                             .expanded()));
     else if (targetBody->displayProperties()->displayName() == "Mars")
-      setIcon( QIcon(":mars") );
+      setIcon( QIcon(FileName("$base/icons/nasa_mars.png")
+                             .expanded()));
     else if (targetBody->displayProperties()->displayName() == "Titan")
-      setIcon( QIcon(":titan") );
+      setIcon( QIcon(FileName("$base/icons/nasa_titan.png")
+                             .expanded()));
     else
-      setIcon( QIcon(":moonPhase") );
+      setIcon( QIcon(FileName("$base/icons/view-web-browser-dom-tree.png")
+                             .expanded()));
+    
     setData( QVariant::fromValue<TargetBodyQsp>(targetBody) );
   }
 
@@ -898,8 +1025,10 @@ namespace Isis {
    * Sets the text, icon, and data corresponding to a TargetBodyList.
    */
   void ProjectItem::setTargetBodyList() {
+    setTextColor(Qt::black);
     setText("Target Body");
-    setIcon( QIcon(":moonPhase") );
+    setIcon( QIcon(FileName("$base/icons/view-web-browser-dom-tree.png")
+                           .expanded()));
     setData( QVariant() );
   }
 
@@ -939,6 +1068,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to append.
    */
   void ProjectItem::appendRow(ProjectItem *item) {
+    setTextColor(Qt::black);
     QStandardItem::appendRow(item);
   }
 
@@ -962,6 +1092,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item.
    */
   void ProjectItem::insertRow(int row, ProjectItem *item) {
+    setTextColor(Qt::black);
     QStandardItem::insertRow(row, item);
   }
 
@@ -993,6 +1124,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item.
    */
   void ProjectItem::setChild(int row, ProjectItem *item) {
+    setTextColor(Qt::black);
     QStandardItem::setChild(row, item);
   }
 

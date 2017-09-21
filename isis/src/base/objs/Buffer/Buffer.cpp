@@ -262,9 +262,11 @@ namespace Isis {
    * Allows copying of the buffer contents to another Buffer
    *
    * @param in The Buffer to be copied.
+   * @param includeRawBuf Whether to include raw dm read from disk
    *
-   * @throws Isis::iException::Programmer - Input and Output buffers are not the
-   *                                        same size
+   * @throws Isis::iException::Programmer - Input and Output buffers are not the same size
+   * @throws Isis::iException::Programmer - Input and Output buffers do not use the same pixel
+   *                                        type
    */
   void Buffer::Copy(const Buffer &in, bool includeRawBuf) {
     if(p_npixels != in.size()) {

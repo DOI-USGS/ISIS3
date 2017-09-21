@@ -1,7 +1,7 @@
 #!/bin/csh
 ################################################################################
-# This file should be sourced within your current shell using the "source" 
-# command.  Since this is only a beta version we do not suggest you add this 
+# This file should be sourced within your current shell using the "source"
+# command.  Since this is only a beta version we do not suggest you add this
 # command to your startup file
 #
 # On the command line type:
@@ -17,24 +17,16 @@
 #               internal USGS initIsis.csh script
 #       JUL 12 2006 - Robert Wallace - Add ISIS3TESTDATA environment variable
 #       AUG 25 2008 - Kris Becker - Changed all references of DYLD_LIBRARY_PATH
-#                       to DYLD_FALLBACK_LIBRARY_PATH.  See 
+#                       to DYLD_FALLBACK_LIBRARY_PATH.  See
 #                       http://www.osxfaq.com/man/1/dyld.ws.
 #       MAR 12 2009 - Christopher Austin - Changed the way ISIS3TESTDATE is set
 #                       to prevent its setting for outside groups and default
 #                       to "/usgs/cpkgs/isis3/testData"
+#       SEP 08 2017 - Christopher Combs - Removed setting of QT_PLUGIN_PATH as
+#                       an environment variable. Fixes #4617
 #_VER   $Id: isis3Startup.csh,v 1.5 2010/03/16 19:40:22 ehyer Exp $
 #_END
 ################################################################################
-# Check parameters
-set QTPLUGINPATH = "true"
-foreach arg ($argv)
-  if ( "$arg" == "-noqtpluginpath" ) then
-    set QTPLUGINPATH = "false"
-  else
-    echo "Uknown argument $arg"
-    exit 1
-  endif
-end
 
 # Establish a platform switch variable
 set Platform = `uname -s`
@@ -69,14 +61,8 @@ else
   endif
 endif
 
-# Create QT_PLUGIN_PATH env variable
-if ($QTPLUGINPATH == "true") then
-  setenv QT_PLUGIN_PATH "$ISISROOT/3rdParty/plugins"
-endif
-
 unset Platform
 
 if ( -f $ISISROOT/scripts/tabcomplete.csh ) then
   source $ISISROOT/scripts/tabcomplete.csh;
 endif
-

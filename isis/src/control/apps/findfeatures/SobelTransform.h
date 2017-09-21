@@ -41,6 +41,8 @@ namespace Isis {
  * @author 2015-10-14 Kris Becker 
  * @internal 
  *   @history 2015-10-14 Kris Becker - Original Version 
+ *   @history 2017-06-22 Jesse Mapel - Modified render to make a deep copy of
+ *                                     the input matrix. References #4904.
  */
 
 class SobelTransform : public ImageTransform {
@@ -50,15 +52,36 @@ class SobelTransform : public ImageTransform {
                    ImageTransform(name), m_reduceNoise(reduceNoise) { } 
     virtual ~SobelTransform() { }
 
+    /**
+     * Perform the transformation on an image matrix. If the reduce noise flag
+     * is set, then this will apply a Gaussian filter with a 3x3 kernel prior
+     * to performing the Sobel transformation.
+     * 
+     * @param image The input image data matrix to transform.
+     * 
+     * @return @b cv::Mat The transformed matrix.
+     * 
+     * @note If the reduce noise flag is set, this method creates a deep copy
+     *       of the image data matrix which may consume a large amount of memory.
+     */
     virtual cv::Mat render(const cv::Mat &image) const {
       int scale = 1;
       int delta = 0;
       int ddepth = CV_16S;
 
       // Initialize and reduce noise if requested
-      cv::Mat src = image;
+      //   cv::Mat creates shallow copies by default and does not detach on
+      //   modification. So, if applying the Gaussian filter, a deep copy of
+      //   the matrix must be created. Otherwise cv::Mat's copy constructor
+      //   can be used.
+      //   For more details about this see ticket #4904. JAM
+      cv::Mat src;
       if ( m_reduceNoise ) {
+        src = image.clone();
         cv::GaussianBlur(src, src, cv::Size(3, 3), 0, 0, cv::BORDER_REFLECT ); 
+      }
+      else {
+        src = image;
       }
 
       /// Generate grad_x and grad_y

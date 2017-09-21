@@ -344,13 +344,17 @@ namespace Isis {
     m_bundleSolutionInfo->outputResiduals();
     m_bundleSolutionInfo->outputImagesCSV();
     m_bundleSolutionInfo->outputPointsCSV();
+
+    //  Write text summary file
+    m_bundleSolutionInfo->outputText();
+
     m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // create output control net
     // Write the new jigged control net with correct path to results folder + runtime
     FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
                                FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
-    
+
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
 
     // Iterate through all of the image lists (the "imports" in the project).
@@ -428,7 +432,7 @@ namespace Isis {
     //TODO: delete bundle results object
 
 //       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
-
+    m_project->setClean(false);
   }
 
 

@@ -103,6 +103,9 @@
     <change name="Makayla Shepherd" date="2017-05-30">
       Updated to work with XmlToPvlTranslationManager rename. Fixes #4889.
     </change>
+    <change name="Jeannie Backer" date="2017-09-05">
+      Added check to verify input input xml file corresponds to valid filter image. 
+    </change>
   </history>
 
   <category>

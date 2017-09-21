@@ -42,6 +42,10 @@ namespace Isis {
    *                         changes, update the serial number list.
    * @history 2017-06-08 Makayla Shepherd - Modified ImageList(QStringList &) to close the image
    *                         cubes after adding them to the list. Fixes #4908.
+   * @history 2017-07-08 Tyler Wilson - Added a try-catch block in ImageList::saveQXmlStreamWriter
+   *                         &stream, const Project *project, FileName newProjectRoot) to
+   *                         stop a seg fault occurring when Save As is called on certain types
+   *                         of corrupt projects.  Fixes #5075.
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT

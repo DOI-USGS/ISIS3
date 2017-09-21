@@ -10,5 +10,9 @@ commands:
 	           description="Messenger data test" \
 	           imagetol=3000.0 \
 	           > /dev/null;
+	cnetbin2pvl from=$(OUTPUT)/Equi065S355ED10.net \
+				   to=$(OUTPUT)/Equi065S355ED10.pvl \
+				   > /dev/null;
 
 	$(RM) $(OUTPUT)/networks.lis;
+	$(RM) $(OUTPUT)/*.net

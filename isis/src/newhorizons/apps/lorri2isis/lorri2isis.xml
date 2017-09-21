@@ -19,11 +19,14 @@
   
   <history>
     <change name="Stuart Sides" date="2013-10-08">
-      Original version
+      Original version.
     </change> 
     <change name="Stuart Sides" date="2014-06-08">
-      Modified  to allow the FITS extension images to be imported
+      Modified  to allow the FITS extension images to be imported.
     </change> 
+    <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
+      Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
+    </change>
   </history>
 
   <seeAlso>

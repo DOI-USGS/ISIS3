@@ -109,7 +109,9 @@ namespace Isis {
   }
 
 
-  //! Compute new offsets whenenver summing or starting sample/lines change
+  /** 
+   * Compute new offsets whenenver summing or starting sample/lines change
+   */
   void CameraDetectorMap::Compute() {
     p_ss = (p_detectorSampleSumming / 2.0) + 0.5 +
            (p_startingDetectorSample - 1.0);
@@ -119,55 +121,91 @@ namespace Isis {
   }
 
 
-  //! Return the starting detector sample adjusted for summation
+  /**
+   * Return the starting detector sample adjusted for summation
+   * 
+   * @returns (double) The starting sample
+   */
   double CameraDetectorMap::AdjustedStartingSample() const {
     return p_ss;
   }
 
 
-  //! Return the starting detector line adjusted for summation
+  /**
+   * Return the starting detector line adjusted for summation
+   * 
+   * @returns (double) The starting line
+   */
   double CameraDetectorMap::AdjustedStartingLine() const {
     return p_sl;
   }
 
 
-  //! Return parent sample
+  /**
+   * Return parent sample
+   * 
+   * @returns (double) The parent sample
+   */
   double CameraDetectorMap::ParentSample() const {
     return p_parentSample;
   }
 
 
-  //! Return parent line
+  /**
+   * Return parent line
+   * 
+   * @returns (double) The parent line
+   */
   double CameraDetectorMap::ParentLine() const {
     return p_parentLine;
   }
 
 
-  //! Return detector sample
+  /**
+   * Return detector sample
+   * 
+   * @returns (double) The detector sample
+   */
   double CameraDetectorMap::DetectorSample() const {
     return p_detectorSample;
   }
 
 
-  //! Return detector line
+  /**
+   * Return detector line
+   * 
+   * @returns (double) The detector line
+   */
   double CameraDetectorMap::DetectorLine() const {
     return p_detectorLine;
   }
 
 
-  //! Return scaling factor for computing sample resolution
+  /**
+   * Return scaling factor for computing sample resolution
+   * 
+   * @returns (double) The scaling factor for sample resolution
+   */
   double CameraDetectorMap::SampleScaleFactor() const {
     return p_detectorSampleSumming;
   }
 
 
-  //! Return scaling factor for computing line resolution
+  /**
+   * Return scaling factor for computing line resolution
+   * 
+   * @returns (double) The scaling factor for line resolution
+   */
   double CameraDetectorMap::LineScaleFactor() const {
     return p_detectorLineSumming;
   }
 
 
-  //! Return the line collection rate (0 for framing cameras)
+  /**
+   * Return the line collection rate (0 for framing cameras)
+   * 
+   * @returns (double) The line collection rate
+   */
   double CameraDetectorMap::LineRate() const {
     return 0.0;
   }

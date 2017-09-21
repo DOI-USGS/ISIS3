@@ -148,6 +148,8 @@ class QString;
  *   @history 2016-08-28 Kelvin Rodriguez - Moved 'using namespace std' statements to be
  *                                         after #includes to squash implicit declaration
  *                                         warnings in clang. Part of porting to OSX 10.11.
+ *   @history 2017-08-08 Adam Goins - Added an additional catch statement to display the 
+ *                                    file name of an XML file that threw an error while parsing.
  */
 class IsisAml : protected IsisAmlData {
 

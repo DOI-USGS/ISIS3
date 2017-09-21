@@ -39,7 +39,9 @@ namespace Isis {
    * exported PDS file are attached or detached. NOTE: If attached, the labels
    * of the table should not be altered in the export program unless
    * functionality is added to deal with the new start byte values for the
-   * tables.
+   * tables. 
+   *  
+   * @ingroup HighLevelCubeIO
    *
    * @author 2006-09-05 Stuart Sides
    *

@@ -203,6 +203,9 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Added check to SetImages() to make sure it isn't called
    *                           more than once, which messes up the p_cameraList member. References
    *                           #4293.
+   *   @history 2017-08-09 Summer Stapleton - Added throw to caught exception for bad control net
+   *                           import in constructor. Also removed p_invalid as it was no longer
+   *                           being used anywhere. Fixes #5068.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -260,7 +263,7 @@ namespace Isis {
       QString Description() const;
       ControlPoint *FindClosest(QString serialNumber,
           double sample, double line);
-      bool IsValid() const;
+      //bool IsValid() const;
       double GetMaximumResidual();
       QString GetNetworkId() const;
       int GetNumEditLockMeasures();
@@ -438,7 +441,6 @@ namespace Isis {
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
       std::vector<Distance> p_targetRadii;        //!< Radii of target body
 
-      bool p_invalid;  //!< If the Control Network is currently invalid
       bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
   };
 

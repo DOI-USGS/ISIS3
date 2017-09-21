@@ -22,13 +22,19 @@ namespace Isis {
   class CnetEditorWidget;
   class ProgressBar;
 
-  
+
   /**
    * This is the cneteditor program.
    *
    * @author 2011-??-?? Eric Hyer
    *
    * @internal
+   *   @history 2017-08-11 Christopher Combs - Changed networkLoaded() to take in a QString of
+   *                           the current ControlNet file to create a Control object for
+   *                           CnetEditorWidget's new constructor.
+   *   @history 2017-09-19 Tracie Sucharski - Fixed bug introduced from last changes which caused a
+   *                           seg fault when saving a control net.  In ::networkLoaded, cnet
+   *                           (member variable) was deleted.
    */
   class CnetEditorWindow : public QMainWindow {
       Q_OBJECT
@@ -87,7 +93,7 @@ namespace Isis {
       void save();
       void saveAs();
       void closeNetwork(bool promptToSave = true);
-      void networkLoaded(ControlNet *);
+      void networkLoaded(ControlNet *, QString currentFile);
       void networkLoaded(QList<Control *>);
       void cubeListLoaded();
 
@@ -150,4 +156,3 @@ namespace Isis {
 }
 
 #endif
-

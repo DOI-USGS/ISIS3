@@ -137,7 +137,14 @@ namespace Isis {
     *   @history 2016-04-28 Tracie Sucharski - Removed position information, this will be shown
     *                           in ControlNetEditor type view.  Added blink capability.
     *   @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #4004.
-    *  
+    *   @history 2017-07-27  Christopher Combs - Added sample, line, lat, and lon labels.
+    *                           Fixes #5067.
+    *   @history 2017-08-11 Tracie Sucharski - Added shortcuts for find,
+    *                           registration/undo-registration, save measure. Fixes #4982.
+    *   @history 2017-08-11 Tracie Sucharski - Created a new ControlMeasure when editing points so
+    *                           that the edit ControlPoint is no changed until user selects
+    *                           "Save Measures", and colorize save buttons.  Fixes #4984.
+    *
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.
@@ -151,7 +158,7 @@ namespace Isis {
       ~ControlMeasureEditWidget();
       /**
        * Returns the template filename used for auto-registration.
-       * 
+       *
        * @return @b QString Template filename
        */
       QString templateFileName() {
@@ -221,7 +228,7 @@ namespace Isis {
       QLabel *m_rightLatLonPosition;   //!< Label for right chip viewport's current lat/lon
       QRadioButton *m_nogeom; //!< Radio button to remove geometry/rotation for right chip viewport
       QRadioButton *m_geom; //!< Radio button to apply geometry/rotation to right chip viewport
-      QToolButton *m_rightZoomIn;      //!< Button for zooming in right chip viewport 
+      QToolButton *m_rightZoomIn;      //!< Button for zooming in right chip viewport
       QToolButton *m_rightZoomOut;     //!< Button for zooming out right chip viewport
       QToolButton *m_rightZoom1;       //!< Button for 1:1 zoom on right chip viewport
 
@@ -230,7 +237,7 @@ namespace Isis {
       QList<ChipViewport *> m_blinkList; //!< List of chip viewports to blink
       unsigned char m_blinkIndex; //!< Index of the chip to load in the left chip viewport
 
-      QDial *m_dial;                  //!< Rotation dial 
+      QDial *m_dial;                  //!< Rotation dial
       QLCDNumber *m_dialNumber;       //!< The current amount of rotation (in degrees)
       QDoubleSpinBox *m_blinkTimeBox; //!< The current blink step (in seconds)
 
@@ -245,10 +252,10 @@ namespace Isis {
       bool m_autoRegAttempted;     //!< Whether or not auto-registration has been attempted
 
       QPushButton *m_saveMeasure;    //!< Button to save the current measure
-      QPalette m_saveDefaultPalette; //!< Default color palette for the Save button 
+      QPalette m_saveDefaultPalette; //!< Default color palette for the Save button
 
-      ChipViewport *m_leftView;  //!< Left ChipViewport 
-      ChipViewport *m_rightView; //!< Right ChipViewport 
+      ChipViewport *m_leftView;  //!< Left ChipViewport
+      ChipViewport *m_rightView; //!< Right ChipViewport
 
       Cube *m_leftCube;  //!< Left chip viewport's Cube
       Cube *m_rightCube; //!< Right chip viewport's Cube
@@ -264,21 +271,21 @@ namespace Isis {
 
       int m_rotation;  //!< Amount to rotate right chip viewport TODO Is this used??
       bool m_geomIt;   //!< Apply geometry to the right chip viewport
-      bool m_linkZoom; //!< Link zoom factors between chip viewports 
+      bool m_linkZoom; //!< Link zoom factors between chip viewports
 
 
 
-      ControlPoint *m_editPoint;
-      SerialNumberList *m_serialNumberList;
-      QWidget *m_blinkExtension;
-      QListWidget *m_blinkListWidget;
+      ControlPoint *m_editPoint;            //!< The control point currently being edited
+      SerialNumberList *m_serialNumberList; //!< The serial numbers for each measure of m_editpoint
+      QWidget *m_blinkExtension;  //!< Widget for selecting images and timing to blink through them
+      QListWidget *m_blinkListWidget;       //!< List of images being blinked through
 
 
-      QDoubleSpinBox *m_blinkTimeBoxRight;
-      bool m_timerOnRight;
-      QTimer *m_timerRight;
-      QList<ChipViewport *> m_blinkChipViewportListRight;
-      unsigned char m_blinkIndexRight;
+      QDoubleSpinBox *m_blinkTimeBoxRight;  //!< Input for time between image blinks
+      bool m_timerOnRight;                  //!< Timer is on for right viewport
+      QTimer *m_timerRight;                 //!< Timer for tracking image blink time
+      QList<ChipViewport *> m_blinkChipViewportListRight;  //!< List of viewports to blink through
+      unsigned char m_blinkIndexRight;                     //!< Index of image being blinked
 
   };
 };

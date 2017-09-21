@@ -46,6 +46,9 @@ namespace Isis {
    *                           so the user knows that this work order is disabled until an
    *                           active cnet and image list have been set. Fixes #4749.
    *   @history 2017-04-25 Ian Humphrey - Modified tool tip text. Fixes #4819.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-25 Cole Neubauer - Moved project()->setClean call to JigsawDialog because
+   *                            the workorder does not actually execute the bundle adjustment #4960
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT

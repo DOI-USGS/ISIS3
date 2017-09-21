@@ -1,0 +1,376 @@
+RTCMultiHitRay
+
+
+Creating default ray
+Multi Hit Ray Status
+  Origin: ( 0 , 0 , 0 )
+  Direction: ( 0 , 0 , 0 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Primitive ID:  4294967295
+  Instance ID:  4294967295
+  Number of Intersections:  0
+
+Creating ray from standard vectors
+Multi Hit Ray Status
+  Origin: ( -3.1 , 1.75 , 10.3 )
+  Direction: ( 32.4 , 15 , -1.6 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Primitive ID:  4294967295
+  Instance ID:  4294967295
+  Number of Intersections:  0
+
+Creating ray from linear algebra vectors
+Multi Hit Ray Status
+  Origin: ( -3.1 , 1.75 , 10.3 )
+  Direction: ( 32.4 , 15 , -1.6 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Primitive ID:  4294967295
+  Instance ID:  4294967295
+  Number of Intersections:  0
+
+
+RTCOcclusionRay
+
+
+Creating default ray
+Occlusion Ray Status
+  Origin: ( 0 , 0 , 0 )
+  Direction: ( 0 , 0 , 0 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Instance ID:  4294967295
+  Ignored Primitive ID:  4294967295
+
+Creating ray from standard vectors
+Occlusion Ray Status
+  Origin: ( -3.1 , 1.75 , 10.3 )
+  Direction: ( 32.4 , 15 , -1.6 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Instance ID:  4294967295
+  Ignored Primitive ID:  4294967295
+
+Creating ray from linear algebra vectors
+Occlusion Ray Status
+  Origin: ( -3.1 , 1.75 , 10.3 )
+  Direction: ( 32.4 , 15 , -1.6 )
+  Near distance:  0
+  Far distance:  inf
+  Normal: ( 0 , 0 , 0 )
+  Intersection U:  0
+  Intersection V:  0
+  Geometry ID:  4294967295
+  Instance ID:  4294967295
+  Ignored Primitive ID:  4294967295
+
+
+RayHitInformation
+
+
+Creating default ray hit information
+Ray Hit Information
+  Primitive ID:  0
+  Intersection: ( 0 , 0 , 0 )
+  Surface Normal: ( 0 , 0 , 0 )
+
+Creating ray hit information from intersection, normal, and primitive ID
+Ray Hit Information
+  Primitive ID:  -10
+  Intersection: ( -3.0999 , 1.7499 , 10.3 )
+  Surface Normal: ( -3.1 , 1.75 , 10.3 )
+
+
+EmbreeTargetShape
+
+
+Creating default target shape
+Target shape name:  ""
+Target mesh status:
+  Number of vertices:  0
+  Number of polygons:  0
+Scene bounds:
+  X min:  0
+  X max:  0
+  Y min:  0
+  Y max:  0
+  Z min:  0
+  Z max:  0
+  Maximum distance:  0
+
+
+Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+
+
+Loading shapefile
+
+
+Target shape name:  "hay_a_amica_5_itokawashape_v1_0_64q"
+Target mesh status:
+  Number of vertices:  25350
+  Number of polygons:  25350
+Scene bounds:
+  X min:  -0.25568
+  X max:  0.30599
+  Y min:  -0.15504
+  Y max:  0.15004
+  Z min:  -0.11952
+  Z max:  0.12389
+  Maximum distance:  0.683956
+
+
+Testing axes ray intersection:
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 1000 , 0 , 0 )
+  Look direction: ( -1 , 0 , 0 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   36673
+  Intersection:   ( 0.2908 , -0.0019 , 0.0005 )
+  Surface normal: ( 0.847198 , -0.194495 , 0.494395 )
+Intersection 2 information:
+  Primitive ID:   20415
+  Intersection:   ( -0.248 , -0.0055 , -0.0004 )
+  Surface normal: ( -0.956828 , -0.0521767 , 0.285934 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 0 , 1000 , 0 )
+  Look direction: ( 0 , -1 , 0 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   28608
+  Intersection:   ( -0.0031 , 0.1201 , 0.0008 )
+  Surface normal: ( 0.342908 , 0.918061 , -0.198944 )
+Intersection 2 information:
+  Primitive ID:   12223
+  Intersection:   ( -0.0002 , -0.143 , 0 )
+  Surface normal: ( -0.182673 , -0.830412 , 0.526353 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 0 , 0 , 1000 )
+  Look direction: ( 0 , 0 , -1 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   4160
+  Intersection:   ( 0 , -0.0022 , 0.1232 )
+  Surface normal: ( 0.104179 , -0.0405076 , 0.993733 )
+Intersection 2 information:
+  Primitive ID:   45120
+  Intersection:   ( -0.0001 , 0.0004 , -0.0928 )
+  Surface normal: ( 0.241681 , 0.0950179 , -0.965692 )
+
+
+Testing offset ray intersection:
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 100 , 0.05 , 0 )
+  Look direction: ( -1 , 0 , 0 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   38210
+  Intersection:   ( 0.2773 , 0.0499 , 0.0014 )
+  Surface normal: ( 0.816205 , 0.553018 , 0.167273 )
+Intersection 2 information:
+  Primitive ID:   19265
+  Intersection:   ( -0.2517 , 0.049 , 0 )
+  Surface normal: ( -0.961791 , -0.214961 , 0.169558 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 0 , 100 , 0.05 )
+  Look direction: ( 0 , -1 , 0 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   28318
+  Intersection:   ( 0 , 0.117 , 0.0508 )
+  Surface normal: ( 0.0742258 , 0.96402 , 0.255258 )
+Intersection 2 information:
+  Primitive ID:   12316
+  Intersection:   ( 0.001 , -0.118 , 0.0507 )
+  Surface normal: ( 0.0143037 , -0.865789 , 0.500205 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 0.05 , 0 , 100 )
+  Look direction: ( 0 , 0 , -1 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   5696
+  Intersection:   ( 0.0495 , -0.0002 , 0.1157 )
+  Surface normal: ( 0.12578 , -0.0974701 , 0.987258 )
+Intersection 2 information:
+  Primitive ID:   46401
+  Intersection:   ( 0.049 , 0 , -0.0804 )
+  Surface normal: ( 0.21604 , 0.0581458 , -0.974652 )
+
+
+Testing diagonal ray intersection:
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 10 , 10.05 , 0 )
+  Look direction: ( -0.707107 , -0.707107 , 0 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   27463
+  Intersection:   ( 0.0488 , 0.1 , 0 )
+  Surface normal: ( 0.34363 , 0.810661 , -0.474075 )
+Intersection 2 information:
+  Primitive ID:   24256
+  Intersection:   ( -0.1658 , -0.1173 , 0.0016 )
+  Surface normal: ( -0.338107 , -0.939824 , 0.0491477 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 0 , 10 , 10.05 )
+  Look direction: ( 0 , -0.707107 , -0.707107 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   4248
+  Intersection:   ( -0.0027 , 0.0562 , 0.109 )
+  Surface normal: ( 0.0953376 , 0.424919 , 0.900197 )
+Intersection 2 information:
+  Primitive ID:   12525
+  Intersection:   ( 0.0005 , -0.112 , -0.0619 )
+  Surface normal: ( -0.0444398 , -0.514889 , -0.856104 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 10.05 , 0 , 10 )
+  Look direction: ( -0.707107 , 0 , -0.707107 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   36743
+  Intersection:   ( 0.1512 , -0.0001 , 0.1012 )
+  Surface normal: ( 0.428961 , 0.332558 , 0.83988 )
+Intersection 2 information:
+  Primitive ID:   43584
+  Intersection:   ( -0.0526 , -0.0004 , -0.1027 )
+  Surface normal: ( 0.0693243 , 0.0789593 , -0.994464 )
+
+
+Testing target shape intersection
+
+Ray information:
+  Observer position: ( 10 , 10 , 10 )
+  Look direction: ( -0.57735 , -0.57735 , -0.57735 )
+
+Number of intersections:  2
+
+Intersection 1 information:
+  Primitive ID:   6657
+  Intersection:   ( 0.0809 , 0.0836 , 0.0837 )
+  Surface normal: ( 0.303069 , 0.626162 , 0.71838 )
+Intersection 2 information:
+  Primitive ID:   42754
+  Intersection:   ( -0.0834 , -0.0821 , -0.084 )
+  Surface normal: ( -0.161737 , -0.39984 , -0.902202 )
+
+
+Testing ray occlusion:
+
+
+Testing ray occlusion
+
+Ray information:
+  Observer position: ( 3 , 2 , 1 )
+  Look direction: ( -0.801784 , -0.534522 , -0.267261 )
+
+Ray is occluded?  true
+
+
+Testing ray occlusion
+
+Ray information:
+  Observer position: ( 3 , 2 , 1 )
+  Look direction: ( -0.816072 , -0.500173 , -0.289574 )
+
+Ray is occluded?  false
+
+
+Testing ray occlusion
+
+Ray information:
+  Observer position: ( 1 , 1 , 1 )
+  Look direction: ( -0.517892 , -0.632979 , -0.575435 )
+
+Ray is occluded?  true
+
+
+Testing error throws
+
+
+Invalid shapefile
+[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**I/O ERROR** Failed creating an EmbreeTargetShape from [notafile].
+**I/O ERROR** Failed loading target shape file [notafile].
+**I/O ERROR** Failed creating an EmbreeTargetShape from [junkyshapefile.bds].
+**USER ERROR** NAIF DSK file [junkyshapefile.bds] does not exist.
+**I/O ERROR** Failed creating an EmbreeTargetShape from [junkydem.cub].
+**I/O ERROR** DEMs cannot be used to create an EmbreeTargetShape.
+
+Out of bounds intersection access
+**PROGRAMMER ERROR** Hit index [0] is out of bounds.
+

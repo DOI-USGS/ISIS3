@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+
+<application name="hyb2oncal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Calibrates Hayabusa 2 ONC-T images. Calibration includes bias and dark current correction as
+    well as flat-field correction. No smear or point spread is being currently corrected (lack of
+    models to correct for this currently). Also, since no radiance calibration paramters could not
+    be determined for the individual filters, the output will be DNs (not radiance or I/F).
+    The wide-angle instruments, ONC-W1 and ONC-W2, do not have flat-field correction.
+  </brief>
+
+  <description>
+  This program calibrates images from the Hayabusa 2 ONC-T instrument.
+  The input image is corrected for the following, in order, during
+  calibration: <br/>
+  <ul>
+    <li><a href="#BiasRemoval">Step 1: Bias and dark current removal.</a ></li>
+    <li><a href="#Flatfield">Step 2: Uniformity (flat field) correction.</a ></li>
+    <li><a href="#Notes">Notes</a></li>
+    <li><a href="#References">References</a ></li>
+  </ul>
+
+  <p>
+    <h1><a id="BiasRemoval:">Step 1: Bias and dark current removal.</a ></h1>
+    The signal level of ONC-T is determined by a combination of an electronic offset
+    which defines the "zero" level of the analog-to-digital converter (the bias) as well
+    as any additional signal due to thermal electrons (the dark current).  With this instrument,
+    the bias level depends largely on the electronics package (ONC-AE) and is only slightly affected
+    by the instrument's CCD temperature. Therefore, the bias correction has been modeled as a
+    function of the ONC-AE temperature. The dark current is modeled as a function of the ONC-T CCD
+    temperature.
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+
+    <center><strong>BIAS(t) = B<sub>0</sub> + B<sub>1</sub>*t + B<sub>2</sub>*t<sup>2</sup>,
+  </strong> where <strong>t</strong> the ONC-AE temparature in degrees Celsius.</center>
+    </div>
+
+    The constants <strong>B<sub>0</sub></strong>, <strong>B<sub>1</sub></strong> and
+    <strong>B<sub>2</sub></strong> were determined by fitting a quadratic polynomial to the data
+    provided in Fig. 3 <em>Bias level and AE temperature</em> on page 22 of
+    <a href="#References"><em>Preflight Calibration (S. Kameda et al.)</em></a>
+
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <center><table border = "1" cellpadding="5">
+    <tr>
+         <td>Variable</td>
+         <td>Value</td>
+    </tr>
+    <tr>
+         <td>B<sub>0</sub></td>
+         <td>289.9</td>
+    </tr>
+    <tr>
+          <td>B<sub>1</sub></td>
+          <td>-1.5847</td>
+    </tr>
+    <tr>
+          <td>B<sub>2</sub></td>
+          <td>0.01211</td>
+    </tr>
+    </table></center>
+
+    </div>
+  </p>
+
+<!--
+  <p>
+    <h1><a id="Smear">Step 2: Read-out smear:</a ></h1>
+    The ONC-T instrument is shuttered electronically.  Images are exposed for a certain
+    exposure time in addition to the vertical charge-transfer period. <strong>We could not determine
+    of locate this value. Additionally, note that on-board smear correction can be performed.
+    </strong>
+    It is during the charge-transfer period that a read-out smear in the vertical direction
+    is produced. The read-out smear brightness <strong>I<sub>smear</sub></strong>
+    for unbinned images is modeled from the observed images as follows:
+
+    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+    <br/><br/>
+    <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> -1) { [K*[(I<sub>raw</sub>(H,V) -
+    I<sub>sky</sub>(H,V)]/N<sub>v</sub>] } </strong></center>
+    <br/><br/>
+           <center>Where:  <strong>K = t<sub>VCT</sub>/(t<sub>VCT</sub>+t<sub>exp</sub>)
+           </strong></center>
+    <br/><br/>
+
+
+
+    For binned images a different formula is applied:
+
+
+     <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> - 1)
+     { [ K1*I<sub>raw</sub>(H,V) ] }</strong>
+     </center>
+
+    <br/><br/>
+           <center>Where:  <strong>K1 = (1/N<sub>v</sub>)*[t<sub>VCT</sub>/
+           (t<sub>VCT</sub>+t<sub>exp</sub>)]
+           </strong></center>
+
+    <br/><br/>
+
+    A correction factor is then applied after the smear component is subtracted
+    from the input image (I<sub>raw</sub>):
+
+    <center> <strong> I<sub>out</sub> = C*(I<sub>raw></sub> - I<sub>smear</sub>)</strong></center>
+    <br/><br/>
+
+    <center>Where:  <strong>C = 1/( 1 + K1 * ( (B - 1)/2*B ) ) </strong></center>
+
+    <br/><br/>
+
+    <center><table border = "1" cellpadding="5">
+    <tr>
+      <td>Variable</td><td>Description</td>
+    </tr>
+    <tr>
+      <td>I<sub>smear</sub></td><td>The read-out smear.</td>
+    </tr>
+    <tr>
+      <td>I<sub>raw</sub></td><td>The intensity of the raw data taken with exposure time
+      t<sub>exp</sub>.</td>
+    </tr>
+    <tr>
+      <td>I<sub>sky</sub></td><td>The sum of the bias and the dark current (~300 DN).</td>
+    </tr>
+
+    <tr>
+      <td>t<sub>VCT</sub></td><td>The vertical charge-transfer period (0.012288 microseconds).</td>
+    </tr>
+    <tr>
+      <td>t<sub>exp</sub></td><td>The exposure time (in microseconds).</td>
+    </tr>
+    <tr>
+      <td>N<sub>v</sub></td><td>The number of pixels along the V-direction (1024).</td>
+    </tr>
+    <tr>
+      <td>H</td><td>The line number of the pixel.</td>
+    </tr>
+    <tr>
+      <td>L</td><td>The sample number of the pixel.</td>
+    </tr>
+    <tr>
+      <td>B</td><td>The binning number.</td>
+    </tr>
+    </table></center>
+    </div>
+  </p>
+-->
+
+  <p>
+    <h1><a id="Flatfield">Step 2: Flat-field correction:</a ></h1>
+    Performs a correction for pixel-to-pixel variation in CCD response and vignetting
+    (reduction of image brightness near the periphery compared with the center).
+    Flat-field images for all filters were acquired from
+    <a href="https://www.darts.isas.jaxa.jp/pub/hayabusa2/onc_bundle/browse/l2a/20141211/all.html.">
+    JAXA's DARTS</a>.
+    The correction is accomplished by dividing each pixel of the output image by the corresponding
+    pixel in the flat-field image.
+  </p>
+
+<!-- We cannot correctly determine I/F or radiance output because we do not have the radiance
+values for each band for Hayabusa2 ONC.
+  <p>
+    <h1><a id="ConvertIOF">Step 3 (Optional): Convert output units to Radiance or I over F:</a ></h1>
+    This step is optional, and the formula used depends on the value of the UNITS user parameter.
+    <em>Note: we do not currently have the radiance values for the filters, so we cannot correctly
+    convert the output units to Radiance.
+
+    If UNITS=RADIANCE, the following formula will be used to convert the raw DN values to radiance
+    (W/m2/sr/µm):
+
+    <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+      <center><strong>R = Raw*RadianceStandard*RadianceScaleFactor</strong></center>
+      <br/><br/>
+      <center><table border="1" cellpadding="5">
+      <tr>
+          <td>Variable</td><td>Description</td>
+     </tr>
+     <tr>
+          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
+     </tr>
+     <tr>
+          <td>Raw</td><td>The raw DN value. </td>
+     </tr>
+     <tr>
+          <td>RadianceStandard</td><td>The standard conversion factor from DNs to radiance. </td>
+     </tr>
+     <tr>
+          <td>RadianceScaleFactor</td><td>An adjustment factor for each filter.</td>
+     </tr>
+     </table></center>
+     </div>
+
+    If UNITS = IOF, first the above formula will be used to convert from raw DNs to calibrated Radiance, and then
+    the following formula will be used to convert the raw DN values to I/F (radiance) units:
+    <br/><br/>
+     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+      <center><strong>IoF = R*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
+      <br/><br/>
+      <center><table border="1" cellpadding="5">
+      <tr>
+          <td>Variable</td><td>Description</td>
+     </tr>
+     <tr>
+          <td>IoF</td><td>The calibrated radiance in units of I over F.</td>
+     </tr>
+     <tr>
+          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
+     </tr>
+     <tr>
+         <td>R<sub>s</sub></td><td>The distance in Astronomical Units (AU) between the Sun
+         and the target body.
+         </td>
+     </tr>
+     <tr>
+          <td>F</td><td>The solar flux (w/m2/µm) at 1 AU. </td>
+     </tr>
+     </table></center>
+     </div>
+
+    If UNITS=DN, no output conversion will be performed and the output units will be in raw DNs.
+  </p>
+-->
+
+  <p>
+  <h1><a id="Notes">Notes</a></h1>
+  <ol>
+    <li>
+      Smear correction is not currently provided, as we do not have the readout time
+      (charge-transfer period) for the instrument.
+    </li>
+    <li>
+      Similarly, since no radiance values could be found for the instrument filters, the output
+      cannot be correctly converted to radiance or I/F.
+    </li>
+    <li>
+    </li>
+  </ol>
+  </p>
+
+  <p>
+    <h1><a id="References">References:</a></h1>
+    <ol>
+      <li>S. Kameda et al.  <i>"Preflight Calibration Test Results for Optical Navigation
+      Camera Telescope (ONC-T) Onboard the Hayabusa2 Spacecraft"</i>.
+      Space Sci Rev (2017) 208:17-31.</li>
+    </ol>
+
+  </p>
+
+
+  </description>
+
+  <category>
+    <missionItem>Hayabusa</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>hyb2onccal</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Ian Humphrey and Kaj Williams" date="2017-07-27">
+      Original version. Adapted from amicacal.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This is the ISIS cube to be calibrated.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Corrected Output cube
+        </brief>
+        <description>
+          This is the output file. The output cube will be a calibrated version
+          of the input cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="CONFIG">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input ONC-T calibration config file
+        </brief>
+        <description>
+           This is the PVL file containing the input configuration
+           parameters for the hyb2onccal program. Users can modify
+           the parameters as needed.
+        </description>
+        <filter>*.trn</filter>
+        <default><item>$hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
+      </parameter>
+    </group>
+
+    <!-- Recall no radiance values have been provided for the filters, so radiance and i/f cannot be
+    correctly computed.
+    <group name="Options">
+
+      <parameter name = "UNITS">
+        <type>string</type>
+        <default><item>IOF</item></default>
+        <brief>
+          Convert to specified output calibrated units.
+        </brief>
+        <description>
+        </description>
+        <list>
+          <option value="DN">
+            <brief>
+              Convert to DN units
+            </brief>
+            <description>
+            </description>
+          </option>
+
+          <option value="RADIANCE">
+            <brief>
+              Convert to radiance unit
+            </brief>
+            <description>
+            </description>
+          </option>
+
+            <option value="IOF">
+              <brief>Irradiance over flux</brief>
+              <description>
+                  Commonly referred to as "I over F", this option selects the
+                  output calibration units as irradiance over flux.
+              </description>
+            </option>
+
+        </list>
+      </parameter>
+    </group>
+  -->
+  </groups>
+</application>

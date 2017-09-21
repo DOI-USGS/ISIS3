@@ -282,6 +282,9 @@ namespace Isis {
    *                           reference. References #4664.
    *   @history 2017-06-08 Makayla Shepherd - Modified imageLists() to close the image cube after
    *                           adding it to the image list. Fixes #4908.
+   *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
+   *                           in each of the constructors to verify valid control net input.
+   *                           Fixes #5068.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

@@ -8,3 +8,6 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from=$(INPUT)/in1.imq \
 	to=$(OUTPUT)/in1.truth.cub > /dev/null;
+	
+	catlab from=$(OUTPUT)/in1.truth.cub \
+	to=$(OUTPUT)/in1.truth.pvl > /dev/null;

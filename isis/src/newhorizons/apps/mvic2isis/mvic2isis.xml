@@ -12,10 +12,13 @@
   
   <history>
     <change name="Stuart Sides" date="2013-10-08">
-      Original version
+      Original version.
     </change>
     <change name="Tracie Sucharski" date="2013-01-15">
       Adapted from lorri2isis.
+    </change>
+    <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
+      Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
     </change>
   </history>
 

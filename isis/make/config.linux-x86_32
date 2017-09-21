@@ -10,7 +10,7 @@ ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISCPPFLAGS += -g 
+  ISISCPPFLAGS += -g
   ISISCPPFLAGS += -O0
   ifeq ($(findstring CWD, $(MODE)),CWD)
     ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
@@ -22,7 +22,7 @@ else
   ISISCPPFLAGS += -O1
 endif
 
-ISISCFLAGS = 
+ISISCFLAGS =
 
 #---------------------------------------------------------------------------
 # Linker options
@@ -32,7 +32,7 @@ SHAREDLIBEXT    = so
 
 ISISLDFLAGS  = -Wl,-E -Xlinker '-z' -Xlinker 'origin'
 ISISLDFLAGS += -Xlinker "-rpath" -Xlinker "${ISISROOT}/lib:${ISISROOT}/3rdParty/lib"
-ISISSYSLIBS = 
+ISISSYSLIBS =
 ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
@@ -45,7 +45,7 @@ endif
 #---------------------------------------------------------------------------
 # Shared library options
 #---------------------------------------------------------------------------
-ISISSHAREDFLAGS = $(ISISLDFLAGS) -shared 
+ISISSHAREDFLAGS = $(ISISLDFLAGS) -shared
 ISISSHAREDON    = -Wl,-whole-archive
 ISISSHAREDOFF   = -Wl,-no-whole-archive
 ISISARFLAGS     =
@@ -105,14 +105,14 @@ QWTLIBDIR = -L$(ISIS3LOCAL)/lib
 QWTLIB    = -lqwt
 
 #---------------------------------------------------------------------------
-# Set up for Xerces 
+# Set up for Xerces
 #---------------------------------------------------------------------------
 XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.1
 XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
-# Set up for Tiff 
+# Set up for Tiff
 #---------------------------------------------------------------------------
 TIFFINCDIR = -I$(ISIS3LOCAL)/include/tiff/tiff-4.0.1
 TIFFLIBDIR = -L$(ISIS3LOCAL)/lib
@@ -130,14 +130,14 @@ NAIFLIB    = -lcspice
 #---------------------------------------------------------------------------
 TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt/tnt126
 TNTLIBDIR =
-TNTLIB    = 
+TNTLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for JAMA
 #---------------------------------------------------------------------------
 JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama/jama125
 JAMALIBDIR =
-JAMALIB    = 
+JAMALIB    =
 
 #---------------------------------------------------------------------------
 # Set up for GEOS
@@ -155,8 +155,8 @@ GEOSLIB    = -lgeos-3.2.0
 # in cases where it may be located elsewhere.  This also goes for the
 # library reference.
 #---------------------------------------------------------------------------
-GSLINCDIR = 
-GSLLIBDIR = 
+GSLINCDIR =
+GSLLIBDIR =
 GSLLIB    = -lgsl -lgslcblas
 
 #---------------------------------------------------------------------------
@@ -164,7 +164,7 @@ GSLLIB    = -lgsl -lgslcblas
 #---------------------------------------------------------------------------
 GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm3.0.0
 GMMLIBDIR =
-GMMLIB    = 
+GMMLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for SuperLU
@@ -202,8 +202,8 @@ ISISCPPFLAGS += -DENABLEJP2K=1
 # Set up for BOOST
 #---------------------------------------------------------------------------
 BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.41.0
-BOOSTLIBDIR = 
-BOOSTLIB    = 
+BOOSTLIBDIR =
+BOOSTLIB    =
 #BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
 #BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
 #              -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
@@ -212,14 +212,14 @@ BOOSTLIB    =
 #              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization
 
 #---------------------------------------------------------------------------
-# Set up for Cholmod libraries 
+# Set up for Cholmod libraries
 #---------------------------------------------------------------------------
 CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
 CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
 CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
 
 #---------------------------------------------------------------------------
-# Set up for OpenCV libraries 
+# Set up for OpenCV libraries
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
 ##OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib   # Redundant

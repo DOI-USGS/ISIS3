@@ -34,6 +34,8 @@ namespace Isis {
 
   /**
    * Creates a Camera object using Pvl Specifications
+   * 
+   * @param cube The original cube with the current version camera model
    *
    * @return Camera* The Camera object created
    *
@@ -99,6 +101,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Reads the appropriate plugin file for the camera
+   */
   void CameraFactory::initPlugin() {
     if (m_cameraPlugin.fileName() == "") {
       FileName localFile("Camera.plugin");
@@ -113,9 +118,9 @@ namespace Isis {
 
 
   /**
-   * This looks up the current camera model version from the cube labels.
+   * This looks up the current camera model version from the cube.
    *
-   * @param lab Input Cube Labels
+   * @param cube Input cube
    *
    * @return int Latest Camera Version
    */
@@ -124,6 +129,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Looks up the current camera model version in the pvl labels.
+   * 
+   * @param lab The pvl labels
+   * 
+   * @returns The current camera model version
+   */
   int CameraFactory::CameraVersion(Pvl &lab) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
@@ -141,7 +153,19 @@ namespace Isis {
 
       PvlGroup plugin;
       try {
-        plugin = m_cameraPlugin.findGroup(group);
+        bool found = false;
+        // Find the most recent (last) version of the camera model
+        for (int i = m_cameraPlugin.groups() - 1; i >= 0; i--) {
+          if (m_cameraPlugin.group(i) == group) {
+            plugin = m_cameraPlugin.group(i);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          QString msg = "Unable to find PVL group [" + group + "].";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
       }
       catch(IException &e) {
         QString msg = "Unsupported camera model, unable to find plugin for ";

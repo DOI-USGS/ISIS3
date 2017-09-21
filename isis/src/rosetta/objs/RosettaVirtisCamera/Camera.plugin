@@ -1,0 +1,5 @@
+Group = ROSETTA-ORBITER/VIRTIS
+  Version = 1
+  Library = RosettaVirtisCamera
+  Routine = RosettaVirtisCameraPlugin
+EndGroup

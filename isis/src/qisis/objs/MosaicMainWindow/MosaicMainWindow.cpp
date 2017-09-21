@@ -19,6 +19,7 @@
 #include "FileDialog.h"
 #include "MosaicController.h"
 #include "ImageFileListWidget.h"
+#include "ImageTreeWidgetItem.h"
 #include "IString.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
@@ -243,7 +244,6 @@ namespace Isis {
 
     m_viewMenu = menuBar()->addMenu("&View");
     m_settingsMenu = menuBar()->addMenu("&Settings");
-
     QMenu *helpMenu = menuBar()->addMenu("&Help");
 
     QAction *activateWhatsThisAct = new QAction("&What's This", this);
@@ -558,6 +558,7 @@ namespace Isis {
       }
 
       m_viewMenu->addSeparator();
+
 
       QList<QAction *> fileListViewActs =
           m_mosaicController->getImageFileList()->getViewActions();

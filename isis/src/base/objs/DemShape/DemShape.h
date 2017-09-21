@@ -60,6 +60,8 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output in
    *                           testDemCube() to allow the test to pass when not using the standard
    *                           data areas. Fixes #4738.
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *                            intersectSurface methods in ShapeModel are accessible by DemShape.
    *
    */
   class DemShape : public ShapeModel {
@@ -72,6 +74,9 @@ namespace Isis {
 
       // Destructor
       ~DemShape();
+
+      // Make parent functions visible
+      using Isis::ShapeModel::intersectSurface; 
 
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,

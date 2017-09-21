@@ -54,28 +54,31 @@ namespace Isis {
    * @internal
    *   @todo This class needs an example.
    *   @history 2002-05-22 Jeff Anderson moved Reset, AddData, and RemoveData
-   *   methods into public space.
+   *                            methods into public space.
    *   @history 2002-10-05 Tracie Sucharski added MaxBinCount, a method to return
-   *   the maximum bin count.
+   *                            the maximum bin count.
    *   @history 2005-06-21 Modified index computations in AddData and RemoveData
-   *   to round
+   *                            to round
    *   @history 2008-08-15 Added BinRange methods and functionality. Now, you can
-   *            collect statistics over all of the data and also set where the
-   *            binning will start and end. Increased the default number of bins
-   *            for floating point cubes.
+   *                            collect statistics over all of the data and also set where the
+   *                            binning will start and end. Increased the default number of bins
+   *                            for floating point cubes.
    *   @history 2012-01-19 Steven Lambright and Jai Rideout - Added constructor
-   *                           parameters to read from the Cube automatically.
+   *                            parameters to read from the Cube automatically.
    *   @history 2012-04-10 Orrin Thomas - Added constructor parameters to read
    *                            from ControlNets automatically (For control measure
    *                            data.)
    *   @history 2015-09-03  Tyler Wilson - Overrode Statistics::SetValidRange to
-   *                        set the bin range as well as the statistical range
-   *                        for the data.  The function Histogram::SetBinRange
-   *                        has been removed from this class.
+   *                            set the bin range as well as the statistical range
+   *                            for the data.  The function Histogram::SetBinRange
+   *                            has been removed from this class.
    *   @history 2016-04-20 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output file
-   *                           name in output PVL to allow the test to pass when not using the
-   *                           standard data areas. Fixes #4738.
+   *                            name in output PVL to allow the test to pass when not using the
+   *                            standard data areas. Fixes #4738.
+   *   @history 2017-09-08 Summer Stapleton - Included test for Isis::Null being returned from
+   *                            accessor method call in Histogram::rangesFromNet(). Fixes #5123,
+   *                            #1673.
    */
 
   class Histogram : public Statistics {

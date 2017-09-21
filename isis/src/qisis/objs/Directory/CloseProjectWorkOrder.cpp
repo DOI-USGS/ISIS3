@@ -24,24 +24,27 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QtConcurrentMap>
 
+#include "SaveProjectWorkOrder.h"
 #include "Project.h"
 
 namespace Isis {
 
   /**
-   * This method sets the text of the work order to Close Project and 
+   * This method sets the text of the work order to Close Project and
    * sets setCreatesCleanState to true
-   * 
+   *
    * @param project The Project that we are going to open
    */
   CloseProjectWorkOrder::CloseProjectWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Close Project"));
     QUndoCommand::setText(tr("Close Project"));
-
+    m_isSavedToHistory = false;
+    m_isUndoable = false;
     setCreatesCleanState(true);
   }
 
@@ -61,7 +64,7 @@ namespace Isis {
 
   /**
    * This method clones the CloseProjectWorkOrder
-   * 
+   *
    * @return @b CloseProjectWorkOrder Returns a clone of the CloseProjectWorkOrder
    */
   CloseProjectWorkOrder *CloseProjectWorkOrder::clone() const {
@@ -70,7 +73,7 @@ namespace Isis {
 
   /**
    * This method will always return true
-   * 
+   *
    * @return @b bool True always
    */
   bool CloseProjectWorkOrder::isExecutable() {
@@ -80,31 +83,42 @@ namespace Isis {
 
   /**
    * If WorkOrder::execute() returns true, then this method returns true.
-   * 
+   *
    * @return @b bool True if WorkOrder::execute() returns true.
    */
   bool CloseProjectWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
+    if (success && !project()->isClean()) {
+      QMessageBox *box = new QMessageBox(QMessageBox::NoIcon,
+              QString("Current Project Has Unsaved Changes"),
+              QString("Would you like to save your current project?"),
+              NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+      QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+      QPushButton *dontsave = box->addButton("Don't Save", QMessageBox::RejectRole);
+      QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+      box->exec();
 
-//    // If more than this work order is in the history, don't allow this operation
-//    if (success && project()->workOrderHistory().count()) {
-//      QMessageBox::critical(NULL, tr("Unable To Open a Project"),
-//                            tr("If you have modified your current project, you cannot open a new"
-//                               " project because this is not yet implemented"));
-//      success = false;
-//    }
-//    else if (success) {
-//      QString projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
-//                                                              tr("Open Project"));
+      if (box->clickedButton() == (QAbstractButton*)cancel) {
+        success = false;
+      }
 
-//      if (!projectName.isEmpty()) {
-//        project()->open(projectName);
-//      }
-//      else {
-//        success = false;
-//      }
-//    }
+      else if (box->clickedButton() == (QAbstractButton*)dontsave) {
+        success = true;
+      }
 
+      else if (box->clickedButton() == (QAbstractButton*)save) {
+        SaveProjectWorkOrder *workOrder = new SaveProjectWorkOrder(project());
+        project()->addToProject(workOrder);
+      }
+    }
     return success;
+  }
+
+ /**
+  * @description Clear the current Project
+  */
+  void CloseProjectWorkOrder::execute() {
+    project()->clear();
+    project()->setClean(true);
   }
 }

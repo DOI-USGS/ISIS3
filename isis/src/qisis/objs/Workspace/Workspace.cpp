@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QStatusBar>
+#include <QString>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QVector>
@@ -299,7 +300,7 @@ namespace Isis {
   /**
    * Add a cubeViewport to the workspace, open the cube.
    *
-   * @param cubename[in]  (QString)  cube name
+   * @param cubename  (QString) cubename
    *
    * @internal
    *  @history 2006-06-12 Tracie Sucharski,  Clear errors after catching when
@@ -322,43 +323,92 @@ namespace Isis {
    *  @history 2015-05-13 Ian Humphrey - Caught exception now handled by sending a QMessageBox
    *                          to the Workspace. This prevents undefined behavior caused by not 
    *                          handling an exception within a connected slot.
+   *  @history 2017-08-17 Adam Goins - Added the ability for this method to receive a cubelist
+   *                          file as input to qview, parse out the .cub files from the
+   *                          cubelist and then attempt to add each one into their own
+   *                          viewport.
    */
   void Workspace::addCubeViewport(QString cubename) {
-    Cube *cube = new Cube;
+    
+    QFileInfo cubeFileName(cubename);
 
-    //Read in the CubeAttribueInput from the cube name
-    CubeAttributeInput inAtt(cubename);
-    std::vector<QString> bands = inAtt.bands();
+    QList<QString> cubesToOpen;
 
-    //Set the virtual bands to the bands specified by the input
-    cube->setVirtualBands(bands);
-    cube->open(cubename);
-
-    // this slot is connected to FileTool fileSelected signal
-    try {
-      MdiCubeViewport *cvp = addCubeViewport(cube);
-
-      // Check for RGB format (#R,#G,#B)
-      if(bands.size() == 3) {
-        IString st = IString(bands.at(0));
-        int index_red = st.ToInteger();
-        st = IString(bands.at(1));
-        int index_green = st.ToInteger();
-        st = IString(bands.at(2));
-        int index_blue = st.ToInteger();
-        cvp->viewRGB(index_red, index_green, index_blue);
-      }
+    // If the file is a cub file, we add the path to it to our list of cubes to open.
+    if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" ) {
+        cubesToOpen.append(cubeFileName.absoluteFilePath());
     }
-    catch (IException &e) {
-      QMessageBox::critical((QWidget *)parent(), "Error", e.toString());
-      return;
+    else {
+      // If the file received isn't a .cub, it has to be a cubelist. We read every cube in the cubelist
+      // And append it to the cubesToOpen QList so that we can open them.
+      QFile file(cubename);
+      file.open(QIODevice::ReadOnly);
+
+      QTextStream in(&file);
+
+      while(!file.atEnd()){
+        QString line = file.readLine().replace("\n", "");
+        cubesToOpen.append(line);
+      }
+      file.close();
+    }
+    
+    if (cubesToOpen.size() == 0){
+        QMessageBox::critical((QWidget *)parent(), "Error", "No cubes to open from [" + cubename + "]");
+        return;
+    }
+
+    for (int i = 0; i < cubesToOpen.size(); i++) {
+      
+      QString cubename;
+      try {
+        Cube *cube = new Cube;
+        cubename = cubesToOpen.value(i);
+
+        // Read in the CubeAttribueInput from the cube name
+        CubeAttributeInput inAtt(cubename);
+        std::vector<QString> bands = inAtt.bands();
+
+        // Set the virtual bands to the bands specified by the input
+        cube->setVirtualBands(bands);
+        cube->open(cubename);
+          
+        MdiCubeViewport *cvp = addCubeViewport(cube);
+
+        // Check for RGB format (#R,#G,#B)
+        if(bands.size() == 3) {
+          IString st = IString(bands.at(0));
+          int index_red = st.ToInteger();
+          st = IString(bands.at(1));
+          int index_green = st.ToInteger();
+          st = IString(bands.at(2));
+          int index_blue = st.ToInteger();
+          cvp->viewRGB(index_red, index_green, index_blue);
+        }
+      }
+      catch (IException &e) {
+        QString title("Error opening cube from list...");
+        QString message(e.toString() + "\n\nWould you like to continue?");
+        
+        int response = QMessageBox::critical((QWidget *)parent(), 
+                                             title, 
+                                             message, 
+                                             QMessageBox::Yes|QMessageBox::No);
+        
+        if (response == QMessageBox::Yes) { 
+          continue;
+        }
+        else {
+          return;
+        }
+      }
     }
   }
 
   /**
    * Add a cubeViewport to the workspace.
    *
-   * @param cube[in]  (Cube *)  cube information
+   * @param cube  (Cube *)  cube information
    *
    * @internal
    *

@@ -28,17 +28,24 @@ namespace Isis {
   class ImageList;
   class Project;
 
-  /** 
+  /**
    * Removes selected images from current project.
    * This executes synchronously and is not undoable.
-   * 
+   *
    * @author 2016-07-28 Tracie Sucharski
-   * 
-   * @internal 
-   *   @history 2017-04-07 Marjorie Hahn - Updated method names and documentation 
+   *
+   * @internal
+   *   @history 2017-04-07 Marjorie Hahn - Updated method names and documentation
    *                           to match new work order design.
    *
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-07-31 Cole Neubauer - Fixed images not removing correctly Fixes #4998
+   *   @history 2017-08-08 Marjorie Hahn - Modified execute() to check if the currently
+   *                           selected item to be deleted is actually an image list, so that
+   *                           each image can be removed one by one. Fixes #5074.
+   *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
+   *                          Fixes #5064
    */
   class RemoveImagesWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -52,7 +59,6 @@ namespace Isis {
       virtual bool isExecutable(ImageList *images);
 
       bool setupExecution();
-      bool isUndoable();
 
     protected:
       void execute();

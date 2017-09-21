@@ -63,6 +63,7 @@ namespace Isis {
    *   @history 2008-06-18 Christopher Austin - Fixed documenation errors
    *   @history 2012-02-24 Steven Lambright - Optimized setpos() and made it
    *                           public.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class BufferManager : public Isis::Buffer {
 
@@ -90,6 +91,14 @@ namespace Isis {
       }
 
 
+      /**
+       * Moves the shape buffer by a certain amount. Returns a pointer to the BufferManager
+       * it was called on.
+       * 
+       * @param i How far to shift the shape buffer
+       * 
+       * @return BufferManager
+       */
       BufferManager &operator+=(int i) {
         setpos(p_currentMap + i);
         return *this;

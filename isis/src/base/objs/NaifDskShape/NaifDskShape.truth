@@ -19,6 +19,12 @@ Intersection valid?  true
 Intercept is null?   "No"
 intercept surface point (location)   =  "( 289.110306976744, 0.0, 0.0 )" meters
 
+
+Now that we have a surface point, testing intersectSurface using surfacepoint from parent class...
+Do we have an intersection?  true
+Testing intersectSurface using lat/lon from parent class...
+Do we have an intersection?  true
+
 Find local radius given lat/lon
 Local radius at ( 0 ,  0 ) is valid?  true
 Local radius:                 289.11 meters

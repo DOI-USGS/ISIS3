@@ -104,7 +104,12 @@ namespace Isis {
     m_printSummary = printSummary;
     m_cleanUp = true;
     m_cnetFileName = cnetFile;
-    m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = new SerialNumberList(cubeList);
     m_bundleSettings = bundleSettings;
@@ -136,7 +141,12 @@ namespace Isis {
     m_printSummary = printSummary;
     m_cleanUp = false;
     m_cnetFileName = cnetFile;
-    m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = &snlist;
     m_bundleSettings = bundleSettings;
@@ -168,7 +178,12 @@ namespace Isis {
     m_printSummary = printSummary;
     m_cleanUp = false;
     m_cnetFileName = cnet.fileName();
-    m_controlNet = ControlNetQsp( new ControlNet(cnet.fileName(), &progress) );
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(cnet.fileName(), &progress) );
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = &snlist;
     m_bundleSettings = bundleSettings;
@@ -199,7 +214,12 @@ namespace Isis {
     m_printSummary = printSummary;
     m_cleanUp = false;
     m_cnetFileName = "";
-    m_controlNet = ControlNetQsp( new ControlNet(cnet) );
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(cnet) );
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = &snlist;
     m_bundleSettings = bundleSettings;
@@ -225,7 +245,12 @@ namespace Isis {
     m_printSummary = printSummary;
     m_cleanUp = false;
     m_cnetFileName = "";
-    m_controlNet = cnet;
+    try {
+      m_controlNet = cnet;
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = new SerialNumberList(cubeList);
     m_bundleSettings = bundleSettings;
@@ -252,7 +277,12 @@ namespace Isis {
 
     m_abort = false;
     Progress progress;
-    m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
+    }
+    catch (IException &e) {
+      throw;
+    }
     m_bundleResults.setOutputControlNet(m_controlNet);
 
     m_imageLists = imgLists;
@@ -540,7 +570,6 @@ namespace Isis {
 
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
-
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
       int numImages = m_bundleObservations.at(i)->size();

@@ -35,14 +35,14 @@ ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISCPPFLAGS  += -g 
+  ISISCPPFLAGS  += -g
   ISISCPPFLAGS  += -O0
 else
   ISISCPPFLAGS  += -O1
   QTDARWINFLAGS += $(QTDEFINES)
 endif
 
-ISISCFLAGS = 
+ISISCFLAGS =
 
 #---------------------------------------------------------------------------
 # Linker options.  Runtime paths for Mac is rooted to $ISISROOT
@@ -50,8 +50,8 @@ ISISCFLAGS =
 ISISLDFLAGS = -headerpad_max_install_names $(MAC_ARCH_FLAGS) -bind_at_load -Wl,-w
 ISISLDRPATH = -Wl,-rpath,@loader_path/..  -Wl,-rpath,$(ISISROOT)
 ISISSYSLIBS = -lz -lm -framework ApplicationServices
-ISISSTATIC  = 
-ISISDYNAMIC = 
+ISISSTATIC  =
+ISISDYNAMIC =
 
 #---------------------------------------------------------------------------
 # Shared library options
@@ -63,8 +63,8 @@ DYLIBVERSION    = -compatibility_version $(ISISMAJOR).$(ISISMINOR) \
 DYLIBFLAGS      = $(MAC_ARCH_FLAGS)  -dynamiclib -flat_namespace \
 	   	   -single_module -undefined suppress
 ISISSHAREDFLAGS = $(MAC_ARCH_FLAGS) -bundle -flat_namespace -dynamic \
-		  -undefined suppress 
-ISISSHAREDON    = 
+		  -undefined suppress
+ISISSHAREDON    =
 ISISSHAREDOFF   =
 ISISARFLAGS     =
 
@@ -78,7 +78,7 @@ ISIS3PROP      ?= $(IDK_ROOT)/proprietary
 
 #  Set up paths to needed for doxygen
 DOXYGEN     = $(ISIS3OPT)/bin/doxygen
-DOT_PATH    = $(ISIS3OPT)/bin 
+DOT_PATH    = $(ISIS3OPT)/bin
 
 #---------------------------------------------------------------------------
 # Set up for cwd
@@ -143,10 +143,10 @@ endif
 
 QWTINCDIR = -I$(QWTFRAMES)/qwt.framework/Headers
 QWTLIBDIR = -L$(QWTFRAMES) -F$(QWTFRAMES)
-QWTLIB    = -framework qwt 
+QWTLIB    = -framework qwt
 
 #---------------------------------------------------------------------------
-# Set up for Xerces 
+# Set up for Xerces
 #---------------------------------------------------------------------------
 XERCESINCDIR = -I$(ISIS3OPT)/include/xercesc
 XERCESLIBDIR = -L$(ISIS3OPT)/lib
@@ -185,16 +185,16 @@ NAIFLIB    = -lcspice
 #---------------------------------------------------------------------------
 # Set up for TNT
 #---------------------------------------------------------------------------
-TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt 
+TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt
 TNTLIBDIR =
-TNTLIB    = 
+TNTLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for JAMA
 #---------------------------------------------------------------------------
 JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama
 JAMALIBDIR =
-JAMALIB    = 
+JAMALIB    =
 
 #---------------------------------------------------------------------------
 # Set up for GEOS
@@ -221,7 +221,7 @@ GSLLIB    = -lgsl -lgslcblas
 #---------------------------------------------------------------------------
 GMMINCDIR = -I$(ISIS3LOCAL)/include
 GMMLIBDIR =
-GMMLIB    = 
+GMMLIB    =
 
 #---------------------------------------------------------------------------
 # Set up for SuperLU
@@ -285,7 +285,7 @@ CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
 
 
 #---------------------------------------------------------------------------
-# Set up for OpenCV libraries 
+# Set up for OpenCV libraries
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3OPT)/include
 ##OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
@@ -303,7 +303,7 @@ NNINCDIR = -I$(ISIS3LOCAL)/include/nn
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
-# Set up for HDF5 libraries 
+# Set up for HDF5 libraries
 #---------------------------------------------------------------------------
 HDF5INCDIR = -I$(ISIS3OPT)/include
 #HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
@@ -428,4 +428,3 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libproj*.dylib"
 
 #  Plugins
 THIRDPARTYPLUGINS +=  "$(ISIS3OPT)/share/qt4/plugins/"
-

@@ -39,6 +39,7 @@ IsisXMLApplication::IsisXMLApplication(char *PencodingName,
                                        bool &PexpandNamespaces,
                                        XERCES::SAX2XMLReader* &Pparser,
                                        IsisAmlData *PappData) {
+
   encodingName = PencodingName;
   expandNamespaces = PexpandNamespaces;
   parser = Pparser;
@@ -53,6 +54,7 @@ IsisXMLApplication::IsisXMLApplication(char *PencodingName,
   multipleValuesHandler = NULL;
   ignoreHandler = NULL;
   historyHandler = NULL;
+
 }
 
 IsisXMLApplication::~IsisXMLApplication() {

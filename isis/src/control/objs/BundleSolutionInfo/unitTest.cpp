@@ -332,6 +332,14 @@ int main(int argc, char *argv[]) {
     if (residualsOutput.exists()) {
       residualsOutput.remove();
     }
+    FileName imagesCsv("./bundleout_images.csv");
+    QFile imagesOutput(imagesCsv.expanded());
+    if (imagesOutput.exists()) {
+      imagesOutput.remove();
+    }
+
+    qXmlFile1.remove();
+    qXmlFile2.remove();
 
   }
   catch (IException &e) {

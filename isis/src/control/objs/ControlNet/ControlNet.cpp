@@ -59,7 +59,6 @@ namespace Isis {
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
-    p_invalid = false;
     m_ownPoints = true; 
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
@@ -88,16 +87,15 @@ namespace Isis {
     p_modified = other.p_modified;
     p_description = other.p_description;
     p_userName = other.p_userName;
-    p_invalid = other.p_invalid;
     p_cameraMap = other.p_cameraMap;
     p_cameraList = other.p_cameraList;
   }
 
 
   /**
-   * Creates a ControlNet object with the given list of control points and cubes
+   * Creates a ControlNet object from the given file
    *
-   * @param ptfile Name of file containing a Pvl list of control points
+   * @param ptfile Name of network file
    * @param progress A pointer to the progress of reading in the control points
    */
   ControlNet::ControlNet(const QString &ptfile, Progress *progress) {
@@ -108,14 +106,14 @@ namespace Isis {
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
-    p_invalid = false;
     m_ownPoints = true;
     
     try {
       ReadControl(ptfile, progress);
     }
     catch (IException &e) {
-      p_invalid = true;
+      QString msg = "Invalid control network [" + ptfile + "]";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -727,29 +725,11 @@ namespace Isis {
       measureDeleted(measure);
     }
 
-    // See if removing this point qualifies for a re-check of validity
-    bool check = false;
-    if (p_invalid && point->IsInvalid())
-      check = true;
-
     // delete point
     points->remove(pointId);
     pointIds->removeAt(pointIds->indexOf(pointId));
     delete point;
     point = NULL;
-
-    // Check validity if needed (There were two or more points with the same
-    // Id - see if this is still the case)
-    if (check) {
-      p_invalid = false;
-
-      // check for 2 or more points with same Id
-      QList< QString > keys = points->keys();
-      for (int i = 0; i < keys.size() && !p_invalid; i++) {
-        if (points->count(keys[i]) > 1)
-          p_invalid = true;
-      }
-    }
 
     if (!wasIgnored)
       emit networkStructureModified();
@@ -1320,12 +1300,6 @@ namespace Isis {
   }
 
 
-  //! Return if the control point is invalid
-  bool ControlNet::IsValid() const {
-    return !p_invalid;
-  }
-
-
   /**
    * Determine the maximum error of all points in the network
    * @return <B>double</B> Max error of points
@@ -1847,7 +1821,6 @@ namespace Isis {
     std::swap(p_cameraRejectedMeasuresMap, other.p_cameraRejectedMeasuresMap);
     std::swap(p_cameraList, other.p_cameraList);
     std::swap(p_targetRadii, other.p_targetRadii);
-    std::swap(p_invalid, other.p_invalid);
 
     // points have parent pointers that need updated too...
     QHashIterator< QString, ControlPoint * > i(*points);

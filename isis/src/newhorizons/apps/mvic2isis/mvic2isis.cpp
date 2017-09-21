@@ -34,7 +34,7 @@ void IsisMain() {
 
   // Get the primary FITS label
   Pvl primaryLabel;
-  primaryLabel.addGroup(importFits.fitsLabel(0));
+  primaryLabel.addGroup(importFits.fitsImageLabel(0));
 
   // Make sure this is a New Horizons MVIC image FITS formatted file
   bool mvic = true;
@@ -63,7 +63,7 @@ void IsisMain() {
   // Check to see if the undistorted image was requested from the FITS file and that it has the 
   // corresponding extension and keywords
   if (ui.WasEntered("UNDISTORTED")) {
-    PvlGroup undistortedLabel = importFits.fitsLabel(1);
+    PvlGroup undistortedLabel = importFits.fitsImageLabel(1);
     if (!undistortedLabel.hasKeyword("COMMENT") ||
         !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, "
                                                    "flattened, distortion-removed image cube.")) {
@@ -77,7 +77,7 @@ void IsisMain() {
   // Check to see if the error image was requested from the FITS file and it has the 
   // corresponding extension and keywords
   if (ui.WasEntered("ERROR")) {
-    PvlGroup errorLabel = importFits.fitsLabel(2);
+    PvlGroup errorLabel = importFits.fitsImageLabel(2);
     if (!errorLabel.hasKeyword("COMMENT") ||
         errorLabel["COMMENT"][0] != "1-sigma error per pixel for the image in extension 1.") {
 
@@ -90,7 +90,7 @@ void IsisMain() {
   // Check to see if the quality image was requested from the FITS file and it has the 
   // corresponding extension and keywords
   if (ui.WasEntered("QUALITY")) {
-    PvlGroup qualityLabel = importFits.fitsLabel(3);
+    PvlGroup qualityLabel = importFits.fitsImageLabel(3);
     if (!qualityLabel.hasKeyword("COMMENT") ||
         qualityLabel["COMMENT"][0] != "Data quality flag for the image in extension 1.") {
 
@@ -125,7 +125,7 @@ void IsisMain() {
   // Convert the bias-subtracted, flattened, distortion removed image. It is currently assumed 
   // to be the 2rd image in the FITS file (i.e., 1st extension)
   if (ui.WasEntered("UNDISTORTED")) {
-    PvlGroup undistortedLabel = importFits.fitsLabel(1);
+    PvlGroup undistortedLabel = importFits.fitsImageLabel(1);
 
     QString bitpix = undistortedLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
@@ -151,7 +151,7 @@ void IsisMain() {
   // Convert the Error image. It is currently assumed to be the 3rd image in the FITS file
   if (ui.WasEntered("ERROR")) {
     // Get the label of the Error image and make sure this is a New Horizons MVIC Error image
-    PvlGroup errorLabel = importFits.fitsLabel(2);
+    PvlGroup errorLabel = importFits.fitsImageLabel(2);
     QString bitpix = errorLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
     importFits.SetDataPrefixBytes(bytesPerPix * 12);
@@ -176,7 +176,7 @@ void IsisMain() {
   // Convert the Quality image. It is currently assumed to be the 4th image in the FITS file
   if (ui.WasEntered("QUALITY")) {
     // Get the label of the Error image and make sure this is a New Horizons MVIC Quality image
-    PvlGroup qualityLabel = importFits.fitsLabel(3);
+    PvlGroup qualityLabel = importFits.fitsImageLabel(3);
     QString bitpix = qualityLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
     importFits.SetDataPrefixBytes(bytesPerPix * 12);

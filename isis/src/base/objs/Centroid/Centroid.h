@@ -37,21 +37,25 @@ namespace Isis {
    *                                                                        
    * @internal                                                              
    *   @history 2011-10-12 Orrin Thomas - Original version
-   *   @history 2012-02-14 Orrin Thomas - updated to Centroid::select(..) to start the floodfill algorithim at [Chip::p_chipSample, Chip::p_chipLine].
-   *                                      Thus, the starting pixel of the floodfill/centroid is set by calling the Chip::SetChipPosition() before Centroid::select.
-   */        
+   *   @history 2012-02-14 Orrin Thomas - updated to Centroid::select(..) to start the floodfill
+   *                          algorithim at [Chip::p_chipSample, Chip::p_chipLine]. Thus, the
+   *                          starting pixel of the floodfill/centroid is set by calling the
+   *                          Chip::SetChipPosition() before Centroid::select.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   */
   class Centroid : public Selection
   {
   public:
     Centroid();
     virtual ~Centroid();
-    int select(Chip *inputChip,Chip *selectionChip);  //pure virtual function to be defined in this child class
+    //pure virtual function to be defined in this child class
+    int select(Chip *inputChip,Chip *selectionChip);
     int setDNRange( double minimumDN,double maximumDN );
     double getMinDN();
     double getMaxDN();
   private:
-    double m_maxDN;    //range of dynamic numbers (DN's) to be included in the selection
-    double m_minDN;    
+    double m_maxDN;    //!< The max DN value to be included in the selection
+    double m_minDN;    //!< The min DN value to be included in the selection
   };
 }
 #endif

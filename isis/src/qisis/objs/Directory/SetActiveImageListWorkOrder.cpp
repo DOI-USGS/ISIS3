@@ -20,6 +20,7 @@
  */
 #include "SetActiveImageListWorkOrder.h"
 
+#include <QMessageBox>
 #include <QtDebug>
 
 #include "Directory.h"
@@ -104,6 +105,12 @@ namespace Isis {
    * Sets the active image list for the project.
    */
   void SetActiveImageListWorkOrder::execute() {
-    project()->setActiveImageList(imageList()->name());
+    try {
+      project()->setActiveImageList(imageList()->name());
+    }
+    catch (IException e) {
+      m_status = WorkOrderFinished;
+      QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
+    }
   }
 }

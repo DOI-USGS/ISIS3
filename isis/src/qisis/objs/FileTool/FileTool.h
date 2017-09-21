@@ -52,6 +52,9 @@ namespace Isis {
    *                           References #4304.
    *   @history 2017-06-07 Christopher Combs - Changed saveAsEnlargedCube's catch block to stack
    *                           errors and give a more accurate error message.
+   *   @history 2017-09-11 Adam Goins - Added the ExportToList menu item to allow all open cubes
+   *                           to be exported into a cubelist. References #5097
+   * 
    */
   class FileTool : public Tool {
       Q_OBJECT
@@ -61,11 +64,11 @@ namespace Isis {
       void addTo(QMenu *menu);
       void addTo(Workspace *ws);
       void addToPermanent(QToolBar *perm);
-      //! Returns the open action
+      //! @return the open action
       QPointer<QAction> openAction() {
         return p_open;
       };
-      //! Returns the save as action
+      //! @return the save as action
       QPointer<QAction> saveAction() {
         return p_saveAs;
       };
@@ -74,7 +77,7 @@ namespace Isis {
       QStringList p_fileList;   //!< File list
 
 
-      //! Returns the menu name for the file tool
+      //! @return the menu name for the file tool
       QString menuName() const {
         return "&File";
       }
@@ -102,6 +105,7 @@ namespace Isis {
       virtual void saveAs();
       virtual void saveInfo(); //!< Saves the whatsthis info of the cubeviewport
       virtual void exportView();
+      virtual void exportToList();
       virtual bool closeAll();
       virtual void exit();
       void enableSave(bool enable);
@@ -119,34 +123,67 @@ namespace Isis {
       QPointer<QAction> p_print;  //!< Action to print the current view
       QPointer<QAction> p_save;   //!< Action to save the current cube
       QPointer<QAction> p_saveAs; //!< Action save the current cube as a user specified file
-      QPointer<QAction> p_saveInfo;   //!< Action to save the current cube's Whatsthis info
-      QPointer<QAction> p_exportView; //!< Action to export the view as a picture
-      QPointer<QAction> p_closeAll;   //!< Action to close all windows
-      QPointer<QAction> p_exit;       //!< Action to exit qview
-      QPointer<QWidget> p_parent;     //!< The parent widget of this object
+      QPointer<QAction> p_saveInfo;     //!< Action to save the current cube's Whatsthis info
+      QPointer<QAction> p_exportView;   //!< Action to export the view as a picture
+      QPointer<QAction> p_exportToList; //!< Action to export active cubes to a cube list
+      QPointer<QAction> p_closeAll;     //!< Action to close all windows
+      QPointer<QAction> p_exit;         //!< Action to exit qview
+      QPointer<QWidget> p_parent;       //!< The parent widget of this object
       QString p_lastDir;     //!< The last directory opened
       QPointer<Workspace> p_workSpace;          //!< The workspace being used
       QPointer<MdiCubeViewport> p_lastViewport; //!< The last cubeviewport that was used
       QPointer<SaveAsDialog> p_saveAsDialog;    //!< SaveAs Dialog with different save options
 
-      //! Save Image in its entirety to an output file
+      /**
+       * Saves the cube as a full image
+       * 
+       * @param icube The input Cube
+       * @param ocube The output Cube
+       */
       void saveAsFullImage(Cube *icube, Cube *ocube);
 
-      //! Copy input cube details into output file given its dimensions
+      /** Copy input cube details into output file given its dimensions
+       * 
+       * 
+       * @param psOutFile The psFileName
+       * @param icube The input cube
+       * @param ocube The output cube
+       * @param piNumSamples The number samples
+       * @param piNumLines The number of lines
+       * @param piNumBands The number of bands
+       */
       void copyCubeDetails(const QString & psFileName, Cube *icube,
            Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
 
-      //! Save image AsIs (As viewed in the viewport window) into output file
+      /** Save image AsIs (As viewed in the viewport window) into output file
+       * 
+       * @param icube The input Cube
+       * @param psOutFile The output file
+       */
       void saveAs_AsIs(Cube *icube, const QString & psOutFile);
 
-      //! Save image Full Resolution (image viewed in the viewport window) into output
+      /** Save image Full Resolution (image viewed in the viewport window) into output
+       * 
+       * @param pInCube The input cube.
+       * @param pOutCube The output cube.
+       * @param pNumSamples The number of samples
+       * @param pNumLines The number of lines
+       */
       void saveAs_FullResolution(Cube *pInCube, Cube *pOutCube,
                                  int pNumSamples, int pNumLines);
 
-      //! Save image AsIs Enlarged into output
+      /** Save image AsIs Enlarged into output
+       * 
+       * @param icube The input cube
+       * @param psOutFile The output file 
+       */
       void saveAsEnlargedCube(Cube *icube, const QString & psOutFile);
 
-      //! Save image AsIs Reduced into output
+      /**
+       * 
+       * @param icube The input cube
+       * @param psOutFile The output file 
+       */
       void saveAsReducedCube (Cube *icube, const QString & psOutFile);
   };
 };
