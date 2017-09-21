@@ -31,8 +31,8 @@
 #include "JP2Error.h"
 
 using namespace std;
-//using namespace kdu_core;
-//using namespace kdu_supp;
+using namespace kdu_core;
+using namespace kdu_supp;
 namespace Isis {
 
   /**
@@ -43,8 +43,7 @@ namespace Isis {
    */
   JP2Decoder::JP2Decoder(const QString &jp2file) {
 
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     p_jp2File = jp2file;
     p_resolutionLevel = 1;
     JP2_Source = NULL;
@@ -63,8 +62,7 @@ namespace Isis {
    *
    */
   void JP2Decoder::OpenFile() {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     // Make sure file isn't already open
     if(JP2_Source == NULL) {
 
@@ -157,8 +155,7 @@ namespace Isis {
    *
    */
   void JP2Decoder::SetResolutionAndRegion() {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     // Determine size of image at requested resolution and reset requested image
     // area if it falls outside of image boundaries
     JPEG2000_Codestream->apply_input_restrictions(0, 0, p_resolutionLevel - 1, 0, NULL,
@@ -181,8 +178,7 @@ namespace Isis {
    *
    */
   void JP2Decoder::Read(unsigned char **inbuf) {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     p_readStripes = p_decompressor.pull_stripe(inbuf, p_stripeHeights, NULL, NULL,
                     p_precisions);
 #endif
@@ -199,8 +195,7 @@ namespace Isis {
    *
    */
   void JP2Decoder::Read(short int **inbuf) {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     p_readStripes = p_decompressor.pull_stripe(inbuf, p_stripeHeights, NULL, NULL,
                     p_precisions, p_isSigned);
 #endif
@@ -211,8 +206,7 @@ namespace Isis {
    *
    */
   JP2Decoder::~JP2Decoder() {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     // See kdu_stripe_decompressor::reset documentation:
     // "You should be sure to call this function or finish before destroying the kdu_codestream
     // inteface that was passed to start."
@@ -244,8 +238,7 @@ namespace Isis {
 
 
   bool JP2Decoder::IsJP2(QString filename) {
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
     jp2_family_src *stream = new jp2_family_src();
     stream->open(filename.toLatin1().data());
     jp2_source *source = new jp2_source();

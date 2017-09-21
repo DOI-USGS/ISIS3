@@ -24,8 +24,7 @@
 
 #include <string>
 
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
 #include "jp2.h"
 #endif
 
@@ -49,8 +48,7 @@ namespace Isis {
    *  
    */
 
-//#if ENABLEJP2K
-#if 0
+#if ENABLEJP2K
   class JP2Error : public kdu_core::kdu_thread_safe_message {
 #else
   class JP2Error {
