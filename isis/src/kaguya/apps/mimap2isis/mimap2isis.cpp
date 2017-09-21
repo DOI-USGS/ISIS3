@@ -56,7 +56,7 @@ void IsisMain() {
   // Export the cube
   p.StartProcess();
 
-  // Translate the mapping labels 
+  // Translate the mapping labels
   Pvl otherLabels;
   p.TranslatePdsProjection(otherLabels);
 
@@ -72,7 +72,14 @@ void IsisMain() {
   PvlToPvlTranslationManager instXlater(label, transFile.expanded());
   instXlater.Auto(otherLabels);
 
-  transFile = transDir + "mimapArchive.trn";
+  PvlKeyword processId = label.findKeyword("PROCESS_VERSION_ID");
+
+  if (processId[0] == "L3C") {
+    transFile = transDir + "mil3cArchive.trn";;
+  }
+  else {
+    transFile = transDir + "mimapArchive.trn";
+  }
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 
@@ -92,7 +99,7 @@ void IsisMain() {
       (otherLabels.findGroup("Archive").keywords() > 0)) {
     ocube->putGroup(otherLabels.findGroup("Archive"));
   }
-  
+
   //  Check for and log any change from the default projection offsets and multipliers
   if (p.GetProjectionOffsetChange()) {
     PvlGroup results = p.GetProjectionOffsetGroup();
@@ -106,4 +113,3 @@ void IsisMain() {
 
   return;
 }
-
