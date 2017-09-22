@@ -1,12 +1,14 @@
 APPNAME = mimap2isis
 
-labels.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
+FILE = MI_MAP_02_N65E328N64E329SC
+
+Truthlabel.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/MI_MAP_02_N65E328N64E329SC.img \
-	  to=$(OUTPUT)/MI_MAP_02_N65E328N64E329SC.cub > /dev/null;
-	  catlab from=$(OUTPUT)/MI_MAP_02_N65E328N64E329SC.cub to=$(OUTPUT)/labels.txt > /dev/null;
-	  catlab from=$(OUTPUT)/MI_MAP_02_N65E328N64E329SC.cub \
-	  to=$(OUTPUT)/MI_MAP_02_N65E328N64E329SCTruth.pvl > /dev/null;
+	$(APPNAME) from=$(INPUT)/${FILE}.img \
+	  to=$(OUTPUT)/${FILE}.cub > /dev/null;
+	  catlab from=${OUTPUT}/${FILE}.cub to=$(OUTPUT)/Truthlabel.txt > /dev/null;
+	  #mv ${OUTPUT}/labels.txt ${OUTPUT}/${FILE}Truth.pvl > /dev/null;
+	  #catlab from=$(OUTPUT)/${FILE}.cub to=$(OUTPUT)/${FILE}Truth.pvl > /dev/null;

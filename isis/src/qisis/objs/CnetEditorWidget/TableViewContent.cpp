@@ -1702,8 +1702,9 @@ namespace Isis {
       // Only show the context menu for cells if the user right-clicked on the
       // active cell.
       if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
-        if (rowsWithActiveColumnSelected->size() > 1)
+        if (rowsWithActiveColumnSelected->size() > 1) {
           contextMenu.addAction(m_applyToSelectionAct);
+        }
 
         contextMenu.addAction(m_applyToAllAct);
       }
@@ -1713,11 +1714,12 @@ namespace Isis {
         contextMenu.addAction(m_deleteSelectedRowsAct);
       }
 
-    // Only show the context menu for cells if the user right-clicked on the
-    // active cell.
-    if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
-      if (rowsWithActiveColumnSelected->size() > 1)
-        contextMenu.addAction(m_applyToSelectionAct);
+      // Only show the context menu for cells if the user right-clicked on the
+      // active cell.
+      if (hasActiveCell() && mouseInCellSelection(mouseLocation)) {
+        if (rowsWithActiveColumnSelected->size() > 1) {
+          contextMenu.addAction(m_applyToSelectionAct);
+        }
 
         contextMenu.addAction(m_applyToAllAct);
       }

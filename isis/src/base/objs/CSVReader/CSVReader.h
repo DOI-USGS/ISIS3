@@ -76,6 +76,7 @@ namespace Isis {
    *   @history 2007-06-05 Brendan George - Modified to work with
    *                           QString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4708
    */
   template <typename TokenStore = QString>
   class CSVParser {
@@ -106,7 +107,10 @@ namespace Isis {
         parse(str, delimiter, keepEmptyParts);
       }
 
-      /** Returns the number of tokens in the parsed string */
+      /**
+       * Returns the number of tokens in the parsed string
+       * @return int
+       */
       int size() const {
         return (_elements.dim());
       }
@@ -158,7 +162,7 @@ namespace Isis {
       /**
        *  @brief Returns the list of tokens
        *
-       *  This method returns the complete list of tokens.  Note that it utilizes
+       *  @return This method returns the complete list of tokens.  Note that it utilizes
        *  the most efficient method of storing and exporting tokens, namely a
        *  reference counted array.
        */
@@ -262,6 +266,10 @@ namespace Isis {
 
       // Constructors and Destructor
       CSVReader();
+      /**
+       * @brief constructor
+       * @param ignoreComments boolean whether to ignore comments or not
+       */
       CSVReader(const QString &csvfile, bool header = false, int skip = 0,
                 const char &delimiter = ',', const bool keepEmptyParts = true,
                 const bool ignoreComments = true);
@@ -359,6 +367,7 @@ namespace Isis {
        * The existance of a header line is always determined by the user of this
        * class.  See the setHeader() method for additional information on header
        * maintainence.
+       * @return bool whether has CSV has header
        */
       bool haveHeader() const {
         return (_header);
@@ -444,6 +453,7 @@ namespace Isis {
        *  treated as one token.
        *  @see setKeepEmptyParts()
        *  @see setSkipEmptyParts()
+       * @return bool
        */
       bool keepEmptyParts() const {
         return (_keepParts);
@@ -544,4 +554,3 @@ namespace Isis {
 
 
 #endif
-

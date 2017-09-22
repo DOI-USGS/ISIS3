@@ -42,6 +42,10 @@ namespace Isis {
     *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when 
     *                           attempting to edit a control point when there is not an active 
     *                           control network. Fixes #5048.
+    *   @history 2017-09-20 Ian Humphrey - Modified showContextMenu so single line if statements
+    *                           have braces. This prevents a misleading-indentation warning from
+    *                           occuring during Fedora25 (c++14) builds. No functionality has been
+    *                           changed. References #4809.
     */
   class TableViewContent : public QAbstractScrollArea {
       Q_OBJECT

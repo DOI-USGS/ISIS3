@@ -33,7 +33,7 @@ namespace Isis {
    * Creates a map for adding/removing optical distortions from the focal plane of a camera.
    *
    * Model derived by Stepan Tulyakov and Anoton Ivanov, 
-   * EPFL (École Polytechnique Fédérale de Lausanne). 
+   * EPFL (Ecole Polytechnique Federale de Lausanne). 
    *  
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Tgo

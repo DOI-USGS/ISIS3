@@ -27,6 +27,11 @@ void IsisMain() {
   QString id;
   Pvl lab(inFile.expanded());
 
+  if (lab.hasObject("IMAGE_MAP_PROJECTION")) {
+    QString msg = "Unsupported projected file [" + inFile.expanded() + "]";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
   try {
     id = (QString) lab.findKeyword("DATA_SET_ID");
   }
@@ -79,7 +84,7 @@ void IsisMain() {
     //trim trailing z's from the time strings
   PvlGroup &instGroup(outputLabel->findGroup("Instrument",Pvl::Traverse));
   QString timeString;
-    //StartTime 
+    //StartTime
   PvlKeyword &startTimeKeyword=instGroup["StartTime"];
   timeString = startTimeKeyword[0];
   startTimeKeyword.setValue( timeString.mid(0,timeString.lastIndexOf("Z")) );

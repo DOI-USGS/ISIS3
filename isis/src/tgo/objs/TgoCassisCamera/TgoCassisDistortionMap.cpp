@@ -73,7 +73,7 @@ namespace Isis {
    * (x,y). 
    *  
    * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (Ecole 
-   * Polytechnique Fédérale de Lausanne). 
+   * Polytechnique Federale de Lausanne). 
    *  
    * Given distorted focal plane coordinates, in millimeters, and parameters of 
    * rational CORRECTION model A1_corr, A2_corr, A3_corr, this function returns undistorted 
@@ -138,7 +138,7 @@ namespace Isis {
    * Compute distorted focal plane (x,y) given an undistorted focal plane (x,y).
    * 
    * Model derived by Stepan Tulyakov and Anoton Ivanov, EPFL (Ecole 
-   * Polytechnique Fédérale de Lausanne). 
+   * Polytechnique Federale de Lausanne). 
    *  
    * Given ideal focal plane coordinates, in millimeters, and parameters
    * of rational CORRECTION model A1_dist, A2_dist, A3_dist, this function 

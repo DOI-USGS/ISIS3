@@ -38,28 +38,21 @@ namespace Isis {
   FileList::FileList() {
   }
 
+
   /**
-   * Constructs a FileList from a stream.
+   * Constructs a FileList from a FileName.
    *
-   * @param in An input stream containing a list of files.
+   * @param listFile A FileName obj
    */
   FileList::FileList(FileName listFile) {
     read(listFile);
   }
 
-  /**
-   * Constructs a FileList from a stream.
-   *
-   * @param path of a file containing a list of files.
-   */
-  /*FileList::FileList(IString  listFileString) {
-    read(FileName(listFileString));
-  }*/
 
   /**
    * Opens and loads the list of files from a file.
    *
-   * @param list Name of the file to open that contains the list of files.
+   * @param listFile Name of the file to open that contains the list of files.
    *
    * @throws Isis::iException::Io - Cannot open file
    */
@@ -165,7 +158,7 @@ namespace Isis {
   /**
    * Writes a list of files to a file.
    *
-   * @param list The name of the file to create. The method will overwrite any
+   * @param outputFileList The name of the file to create. The method will overwrite any
    * existing files.
    *
    * @throws Isis::iException::Io File could not be created.

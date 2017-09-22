@@ -32,6 +32,9 @@ namespace Isis {
    *   @history 2017-08-11 Christopher Combs - Changed networkLoaded() to take in a QString of
    *                           the current ControlNet file to create a Control object for
    *                           CnetEditorWidget's new constructor.
+   *   @history 2017-09-19 Tracie Sucharski - Fixed bug introduced from last changes which caused a
+   *                           seg fault when saving a control net.  In ::networkLoaded, cnet
+   *                           (member variable) was deleted.
    */
   class CnetEditorWindow : public QMainWindow {
       Q_OBJECT
