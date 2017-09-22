@@ -65,21 +65,31 @@ namespace Isis {
    *           as a 'end of line' signal.
    *   @history 2017-08-15 Adam Goins - removed a printf() that resulted in
    *                                    extraneous output to be displayed. Ref#5112
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4708
    */
   class FileList : public QList<FileName> {
     public:
-      //FileList(QString  listFileString);
+      //! Creates a FileList based on a FileName
       FileList(FileName listFile);
+      /**
+       * Constructs a FileList from an istream.
+       *
+       * @param in the istream to read from
+       */
       FileList(std::istream &in);
+      //! Creates an empty FileList obj
       FileList();
 
       //! Destroys the FileList object.
       ~FileList() {};
 
+      //! reads in a FileName obj
       void read(FileName listFile);
-      //void read(const QString &list);
+      //! reads in an istream
       void read(std::istream &in);
+      //! writes to a FileName obj
       void write(FileName outputFileList);
+      //! writes to an ostream
       void write(std::ostream &out);
   };
 };
