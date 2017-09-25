@@ -958,9 +958,7 @@ namespace Isis {
    *   there is a runnable and will block if the write cache grows to
    *   be too large.
    *
-   * @param optimize Set to true for best performance, false for just get it
-   *                 done. When optimize is true, the cache may not be flushed
-   *                 even though it is flushable.
+   * @param force Set to true to force start a flush
    */
   void CubeIoHandler::flushWriteCache(bool force) const {
     if (m_ioThreadPool) {
@@ -1373,6 +1371,7 @@ namespace Isis {
    *
    * @param chunk The data source
    * @param output The data destination
+   * @param index int
    */
   void CubeIoHandler::writeIntoDouble(const RawCubeChunk &chunk,
                                       Buffer &output, int index) const {
@@ -1451,7 +1450,7 @@ namespace Isis {
 
               ((float *)buffersRawBuf)[bufferIndex] = raw;
             }
-            
+
             else if(m_pixelType == SignedWord) {
               short raw = ((short *)chunkBuf)[chunkIndex];
               if(m_byteSwapper)
@@ -1477,8 +1476,8 @@ namespace Isis {
 
               ((short *)buffersRawBuf)[bufferIndex] = raw;
             }
-            
-            
+
+
             else if(m_pixelType == UnsignedWord) {
               unsigned short raw = ((unsigned short *)chunkBuf)[chunkIndex];
               if(m_byteSwapper)
@@ -1508,7 +1507,7 @@ namespace Isis {
 
               ((unsigned short *)buffersRawBuf)[bufferIndex] = raw;
             }
-            
+
             else if(m_pixelType == UnsignedByte) {
               unsigned char raw = ((unsigned char *)chunkBuf)[chunkIndex];
 
@@ -1538,6 +1537,7 @@ namespace Isis {
    *
    * @param buffer The data source
    * @param output The data destination
+   * @param index int
    */
   void CubeIoHandler::writeIntoRaw(const Buffer &buffer, RawCubeChunk &output, int index)
       const {

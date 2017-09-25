@@ -180,6 +180,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Copies the cube to the new fileName
+   *
+   * @param newFile FileName
+   * @param newFileAttributes CubeAttributeOutput
+   *
+   * @return Cube copy of cube
+   */
   Cube *Cube::copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) {
     if (!isOpen()) {
       throw IException(IException::Unknown,
@@ -486,6 +494,27 @@ namespace Isis {
   }
 
 
+  /**
+   * This method will create an isis cube for writing.   The programmer should
+   * make appropriate calls to Set methods before invoking Create.  If none are
+   * made there are internal defaults which are:
+   * @code
+   *        Dimensions     512x512x1
+   *        PixelType      Real
+   *        ByteOrder      Matches architecture of host machine
+   *        Attached       From user preference file
+   *        Label Size     65536 bytes
+   *        Format         Tiled
+   *        Base           0.0
+   *        Multiplier     1.0
+   * @endcode
+   *
+   * @param cubeFileName Name of the cube file to open.  If the extenstion
+   *     ".cub" is not given it will be appended (i.e., the extension of .cub
+   *      is forced). Environment variables in the filename will be
+   *      automatically expanded as well.
+   * @param att CubeAttributeOutput
+   */
   void Cube::create(
       const QString &cubeFileName, const CubeAttributeOutput &att) {
 
@@ -906,6 +935,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Used to set external dn data to cube
+   *
+   * @param cubeFileWithDnData FileName of the cube with DN Data
+   */
   void Cube::setExternalDnData(FileName cubeFileWithDnData) {
     try {
       initLabelFromFile(cubeFileWithDnData, false);
@@ -1033,6 +1067,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Relocates the DN data for a cube to an external cube label file
+   *
+   * @param dnDataFile FileName to relocate the dn data to
+   */
   void Cube::relocateDnData(FileName dnDataFile) {
     if (!isOpen()) {
       throw IException(IException::Unknown,
@@ -1496,6 +1535,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This method returns a boolean value
+   *
+   * @return bool
+   */
   bool Cube::storesDnData() const {
     return m_storesDnData;
   }
@@ -1653,6 +1697,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Applies virtual bands to label
+   *
+   */
   void Cube::applyVirtualBandsToLabel() {
     PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
 
@@ -1682,9 +1730,7 @@ namespace Isis {
    * @param removeIt If true, the input cube will be removed from disk
    */
   void Cube::cleanUp(bool removeIt) {
-    if (m_ioHandler) {
-      delete m_ioHandler;
-      m_ioHandler = NULL;
+    if (m_ioHandler) {readWrite
     }
 
     // Always remove a temporary file
@@ -1772,6 +1818,8 @@ namespace Isis {
    * This gets the file name of the file which actually contains the DN data. With ecub's, our
    *    data file name could be another ecub or a detached label, so using m_dataFileName is
    *    unreasonable.
+   *
+   * @return FileName object
    */
   FileName Cube::realDataFileName() const {
     FileName result;
@@ -1849,6 +1897,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This function initializes the Cube core from a Pvl Label passed as a parameter
+   *
+   * @param label Pvl label to initialize from
+   */
   void Cube::initCoreFromLabel(const Pvl &label) {
     const PvlObject &core = label.findObject("IsisCube").findObject("Core");
 
@@ -1885,6 +1938,14 @@ namespace Isis {
   }
 
 
+  /**
+   * This function initializes the Cube label from a file passed as a parameter
+   *
+   * @param labelFileName FileName to initialize from
+   *
+   * @param readWrite bool that determines whether the label is an old isis label and needs to be
+   *          reformatted
+   */
   void Cube::initLabelFromFile(FileName labelFileName, bool readWrite) {
     ASSERT(!m_labelFileName);
 
@@ -1999,6 +2060,12 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * Function to read data from a cube label and return it as a PVL object
+   *
+   * @return Pvl object
+   */
   Pvl Cube::realDataFileLabel() const {
     Pvl label = *m_label;
     PvlObject *core = NULL;

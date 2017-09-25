@@ -114,7 +114,8 @@ namespace Isis {
    *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2016-08-28 Kelvin Rodriguez - updateLabels now a pure virtual, it had no
    *                           implementation causing warnings in clang. Part of OS X 10.11 porting.
-   *                           QPair forward declaration now properly claims it as a struct. 
+   *                           QPair forward declaration now properly claims it as a struct.
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
    */
   class CubeIoHandler {
     public:
@@ -129,6 +130,11 @@ namespace Isis {
       void clearCache(bool blockForWriteCache = true) const;
       BigInt getDataSize() const;
       void setVirtualBands(const QList<int> *virtualBandList);
+      /**
+       * Function to update the labels with a Pvl object
+       *
+       * @param labels Pvl object to update with
+       */
       virtual void updateLabels(Pvl &labels) = 0;
 
       QMutex *dataFileMutex();

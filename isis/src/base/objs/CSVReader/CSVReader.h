@@ -76,7 +76,7 @@ namespace Isis {
    *   @history 2007-06-05 Brendan George - Modified to work with
    *                           QString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
-   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4708
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
    */
   template <typename TokenStore = QString>
   class CSVParser {
