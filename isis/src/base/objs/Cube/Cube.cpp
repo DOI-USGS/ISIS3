@@ -1730,7 +1730,9 @@ namespace Isis {
    * @param removeIt If true, the input cube will be removed from disk
    */
   void Cube::cleanUp(bool removeIt) {
-    if (m_ioHandler) {readWrite
+    if (m_ioHandler) {
+      delete m_ioHandler;
+      m_ioHandler = NULL;
     }
 
     // Always remove a temporary file
