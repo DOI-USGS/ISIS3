@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for Isis::ProcessExportPds4 class
+  </brief>
+  <description>
+    Testing the functionality of ProcessExportPds4.
+  </description>
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+  <history>
+    <change name="Marjorie Hahn" date="2017-05-31">
+      Original Version
+    </change>
+    <change name="Adam Paquette" date="2017-06-02">
+      Updated truth data to reflect the new translation file.
+    </change>
+    <change name="Jesse Mapel" date="2017-09-26">
+      Updated to improve test coverage.
+    </change>
+  </history>
+</application>
