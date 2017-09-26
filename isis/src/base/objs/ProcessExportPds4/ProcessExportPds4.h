@@ -47,6 +47,7 @@ namespace Isis {
    *   @history 2017-06-04 Adam Paquette - Added GetLabel function and updated StandardPds4Label.
    *   @history 2017-06-08 Marjorie Hahn - Added WritePds4 method to write out the 
    *                           .img and .xml Pds4 data.
+   *   @history 2017-09-26 Jesse Mapel - Improved test coverage and documentation. Fixes #5167.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {

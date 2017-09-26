@@ -62,6 +62,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Create a standard PDS4 image label from the input cube.
+   * 
+   * @return @b QDomDocument The output PDS4 label.
+   */
   QDomDocument &ProcessExportPds4::StandardPds4Label() {
     if (InputCubes.size() == 0) {
       QString msg("Must set an input cube before creating a PDS4 label.");
@@ -84,7 +89,8 @@ namespace Isis {
 
 
   /**
-   * Create a standard PDS label for type IMAGE
+   * Create a standard PDS label for type IMAGE. The image label will be
+   * stored internally in the class.
    */
   void ProcessExportPds4::CreateImageLabel() {
 
@@ -97,7 +103,9 @@ namespace Isis {
 
 
   /**
-   *
+   * This method corrects the Image Root information in a PDS4 output label.
+   * 
+   * @note This method is not implemented currently and does nothing.
    */
   void ProcessExportPds4::FixedImageRoot() {
     //Don't know what needs to go in here yet....
@@ -111,7 +119,7 @@ namespace Isis {
 
 
   /**
-   *
+   * Create and internalize a standard image output label from the input image.
    */
   void ProcessExportPds4::StandardImageImage() {
 
@@ -155,7 +163,7 @@ namespace Isis {
   /**
    * Write the XML label to the supplied stream.
    *
-   * @param Output file stream to which the XML label will be written.
+   * @param[out] os file stream to which the XML label will be written.
    */
   void ProcessExportPds4::OutputLabel(std::ofstream &os) {
     os << m_domDoc->toString() << endl;
@@ -166,14 +174,20 @@ namespace Isis {
    * This method fills the image data of the PDS4 file using the parent class
    * ProcessExport::StartProcess.
    *
-   * @param fout Output file stream to be filled with the PDS4 data.
+   * @param[out] fout Output file stream to be filled with the PDS4 data.
    *
    */
   void ProcessExportPds4::StartProcess(std::ofstream &fout) {
     ProcessExport::StartProcess(fout);
   }
 
-  
+
+  /**
+   * Return the internalized PDS4 label. If no label is internalized yet, an
+   * empty label will be returned.
+   * 
+   * @return @b QDomDocument The PDS4 Xml label
+   */
   QDomDocument &ProcessExportPds4::GetLabel() {
     if (m_domDoc->documentElement().isNull()) {
       QDomElement root = m_domDoc->createElement("Product_Observational");
