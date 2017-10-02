@@ -1,0 +1,50 @@
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1">
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <sequence_number>1</sequence_number>
+    <elements>2048</elements>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Lines</axis_name>
+    <sequence_number>2</sequence_number>
+    <elements>254</elements>
+   </Axis_Array>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.00</scaling_factor>
+    <offset>0.00</offset>
+   </Element_Array>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+unittest: Exporting
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1">
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <sequence_number>1</sequence_number>
+    <elements>2048</elements>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Lines</axis_name>
+    <sequence_number>2</sequence_number>
+    <elements>254</elements>
+   </Axis_Array>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.00</scaling_factor>
+    <offset>0.00</offset>
+   </Element_Array>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+unittest: Exporting
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Test creating a standard Pds4Label with no input
+**PROGRAMMER ERROR** Must set an input cube before creating a PDS4 label.

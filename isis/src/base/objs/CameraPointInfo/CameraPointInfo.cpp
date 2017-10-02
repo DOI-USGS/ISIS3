@@ -58,6 +58,11 @@ namespace Isis {
     m_csvOutput = false;
   }
 
+  /**
+   * Set the output format (true is CSV, false is PVL)
+   * 
+   * @param csvOutput The new value to set csvOutput
+   */
    void CameraPointInfo::SetCSVOutput(bool csvOutput) {
 
      m_csvOutput = csvOutput;

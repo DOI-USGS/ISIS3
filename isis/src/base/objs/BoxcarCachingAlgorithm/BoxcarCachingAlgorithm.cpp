@@ -36,8 +36,6 @@ namespace Isis {
    *   kept in the cache, while the other chunks in the cache will all be
    *   tossed.
    *
-   * @param numUniqueIOs The number of unique IO operations to keep the chunks
-   *                     around for.
    */
   BoxcarCachingAlgorithm::BoxcarCachingAlgorithm() {
     m_minLine = 1;
@@ -67,8 +65,6 @@ namespace Isis {
     (void) justRequested; // unused, for fullfilling virtual function signiture 
     QList<RawCubeChunk *> chunksToToss;
 
-    //std::cerr << "begin" << std::endl;
-
     if (justUsed.size() > 0) {
       // TODO bands
       int minLine = justUsed[0]->getStartLine();
@@ -88,15 +84,10 @@ namespace Isis {
           int currentEnd = chunk->getStartLine() + chunk->lineCount() - 1;
 
           if (currentEnd < minLine) {
-            //std::cerr << "minLine = " << minLine << " | maxLine = " << maxLine << std::endl;
-            //std::cerr << "currentStart = " << currentStart << " | currentEnd = " << currentEnd << std::endl;
             chunksToToss.append(chunk);
           }
         }
       }
-
-      //std::cerr << "allocated chunks = " << allocated.size() << std::endl;
-      //std::cerr << "num chunks = " << chunksToToss.size() << std::endl;
     }
 
     return CacheResult(chunksToToss);

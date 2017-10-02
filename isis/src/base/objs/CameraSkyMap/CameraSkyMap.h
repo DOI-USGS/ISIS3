@@ -42,6 +42,7 @@ namespace Isis {
    * @internal
    *  @history 2005-02-08 Jeff Anderson Original version
    *  @history 2008-07-14 Steven Lambright Added NaifStatus calls
+   *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *
    */
   class CameraSkyMap {
@@ -56,20 +57,24 @@ namespace Isis {
 
       virtual bool SetSky(const double ra, const double dec);
 
-      //! Return undistorted focal plane x
+      /**
+       * @returns The undistorted focal plane x
+       */
       inline double FocalPlaneX() const {
         return p_focalPlaneX;
       };
 
-      //! Return undistorted focal plane y
+      /**
+       * @returns The undistorted focal plane y
+       */
       inline double FocalPlaneY() const {
         return p_focalPlaneY;
       };
 
     protected:
-      Camera *p_camera;
-      double p_focalPlaneX;
-      double p_focalPlaneY;
+      Camera *p_camera;       //!< The main camera to calculate distortions on
+      double p_focalPlaneX;   //!< Undistorted x value for the focal plane
+      double p_focalPlaneY;   //!< Undistorted y value for the focal plane
   };
 };
 #endif

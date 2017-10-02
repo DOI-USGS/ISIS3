@@ -27,7 +27,6 @@
 // parent of this class
 #include <QAbstractScrollArea>
 
-
 class QPaintEvent;
 
 namespace Isis {
@@ -123,12 +122,27 @@ namespace Isis {
    *                          cubeToContents x,y by 1. This was causing some images to be
    *                          off-centered by 1 pixel (the bottom and right side of viewport would
    *                          be a thin strip of non-pixel space). Fixes #4756.
+   *  @history 2017-08-11 Adam Goins - Added the ability to ctrl + c to copy the filename
+   *                          of the current cube into the system's clipboard.
+   *                          Fixes #5098.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
 
     public:
+      /**
+       * Constructor for the CubeViewport
+       * 
+       * @param cube The cube to load into a CubeViewport
+       * @param cubeData The Cube Data Thread
+       * @param parent The parent widget to this Viewport
+       * 
+       */
       CubeViewport(Cube *cube, CubeDataThread * cdt = 0, QWidget *parent = 0);
+      
+      /**
+       * Deconstructor for the Cubeviewport
+       */
       virtual ~CubeViewport();
 
 
@@ -140,112 +154,209 @@ namespace Isis {
       class BandInfo {
         public:
           BandInfo();
+          //! @param other The other BandInfo
           BandInfo(const BandInfo &other);
+          //! Deconstructor
           ~BandInfo();
+          
+          /**
+           * The BandInfo for the Cube
+           *
+           * @param other The other BandInfo
+           * @return The BandInfo
+           */
           const BandInfo &operator=(BandInfo other);
+          
+          //! @return The Stretch
           Stretch getStretch() const;
+          //! @param newStretch The new Stretch value
           void setStretch(const Stretch &newStretch);
+          //! The band
           int band;
         private:
+          //! The Stretch
           Stretch *stretch;
       };
 
+      //! @param cube The cube to set the CubeViewport window to
       void setCube(Cube *cube);
+      //! @return The number of samples in the cube
       int cubeSamples() const;
+      //! @return The number of lines in the cube
       int cubeLines() const;
+      //! @return The number of bands in the cube
       int cubeBands() const;
 
-      //! Is the viewport shown in 3-band color
+      //! @return Is the viewport shown in 3-band color
       bool isColor() const {
         return p_color;
       };
 
-      //! Is the viewport shown in gray / b&w
+      //! @return Is the viewport shown in gray / b&w
       bool isGray() const {
         return !p_color;
       };
 
-      //! Return the gray band currently viewed
+      //! @return the gray band currently viewed
       int grayBand() const {
         return p_gray.band;
       };
 
-      //! Return the red band currently viewed
+      //! @return the red band currently viewed
       int redBand() const {
         return p_red.band;
       };
 
-      //! Return the green band currently viewed
+      //! @return the green band currently viewed
       int greenBand() const {
         return p_green.band;
       };
 
-      //! Return the blue band currently viewed
+      //! @return the blue band currently viewed
       int blueBand() const {
         return p_blue.band;
       };
 
-      //! Return the scale
+      //! @return the scale
       double scale() const {
         return p_scale;
       };
 
-      //! Return if the cube is visible
+      //! @return if the cube is visible
       bool cubeShown() const {
         return p_cubeShown;
       };
 
-      //! Return the BandBin combo box count
+      //! @return the BandBin combo box count
       int comboCount() const {
         return p_comboCount;
       };
 
-      //! Return the BandBin combo box index
+      //! @return the BandBin combo box index
       int comboIndex() const {
         return p_comboIndex;
       }
 
+      /**
+       * Calle dhwen the contents of the cube changes
+       * 
+       * @param rect The QRect
+       */
       void cubeContentsChanged(QRect rect);
 
+      //! @return The fitScale of the Viewport
       double fitScale() const;
+      //! @return The width of the Viewport
       double fitScaleWidth() const;
+      //! @return The height of the Viewport/
       double fitScaleHeight() const;
 
+      /**
+       * Turns a viewport into a cube
+       * 
+       * @param x
+       * @param y
+       * @param sample
+       * @param line
+       */
       void viewportToCube(int x, int y,
                           double &sample, double &line) const;
+                          
+       /**
+       * Turns a cube into a viewport
+       * 
+       * @param x
+       * @param y
+       * @param sample
+       * @param line
+       */             
       void cubeToViewport(double sample, double line,
                           int &x, int &y) const;
+       /**
+       * Turns contents to a cube
+       * 
+       * @param x
+       * @param y
+       * @param sample
+       * @param line
+       */
       void contentsToCube(int x, int y,
                           double &sample, double &line) const;
+       /**
+       * Turns a cube into contents
+       * 
+       * @param x
+       * @param y
+       * @param sample
+       * @param line
+       */
       void cubeToContents(double sample, double line,
                           int &x, int &y) const;
 
+      /**
+       * Gets the red pixel
+       * 
+       * @param sample The sample
+       * @param line The line
+       * 
+       * @return The redPixel value
+       */
       double redPixel(int sample, int line);
+      
+      /**
+       * Gets the green pixel
+       * 
+       * @param sample The sample
+       * @param line The line
+       * 
+       * @return The greenPixel value
+       */
       double greenPixel(int sample, int line);
+       
+      /**
+       * Gets the blue pixel
+       * 
+       * @param sample The sample
+       * @param line The line
+       * 
+       * @return The bluePixel value
+       */
       double bluePixel(int sample, int line);
+      
+      /**
+       * Gets the gray pixel
+       * 
+       * @param sample The sample
+       * @param line The line
+       * 
+       * @return The grayPixel value
+       */
       double grayPixel(int sample, int line);
-
+      //! @return The gray Stretch
       Stretch grayStretch() const;
+      //! @return The red Stretch
       Stretch redStretch() const;
+      //! @return The green Stretch
       Stretch greenStretch() const;
+      //! @return The blue Strech
       Stretch blueStretch() const;
 
-      //! Return the cube associated with viewport
+      //! @return The cube associated with viewport
       Cube *cube() const {
         return p_cube;
       };
 
-      //! Return the projection associated with cube (NULL implies none)
+      //! @return The projection associated with cube (NULL implies none)
       Projection *projection() const {
         return p_projection;
       };
 
-      //! Return the camera associated with the cube (NULL implies none)
+      //! @return The camera associated with the cube (NULL implies none)
       Camera *camera() const {
         return p_camera;
       };
 
-      //! Return the universal ground map associated with the cube (NULL implies none)
+      //! @return the universal ground map associated with the cube (NULL implies none)
       UniversalGroundMap *universalGroundMap() const {
         return p_groundMap;
       };
@@ -421,6 +532,9 @@ namespace Isis {
        * Emitted with current progress (0 to 100) when working
        */
       void progressChanged(int);
+      /**
+       * Emitted when the current progress is complete (100)
+       */
       void progressComplete();
 
       /**

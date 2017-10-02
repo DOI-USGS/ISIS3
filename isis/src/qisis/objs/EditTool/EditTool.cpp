@@ -279,12 +279,15 @@ m_container = container;
     if (vp == NULL) return;
 
     if (vp->cube()->isReadOnly()) {
+
+      QString fileName = vp->cube()->fileName();
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
         vp->cube()->reopen("rw");
       }
       catch(IException &) {
+        vp->cube()->open(fileName, "r");
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }
@@ -400,6 +403,10 @@ m_container = container;
    *                             the mouseButtonRelease and moved
    *                             it to the rubberBandComplete
    *                             method.
+   * @history  2017-08-11 Adam Goins - Added a "vp->cube()->open("r")" call to reopen the cube with
+   *                               "r" permissions if the attempted "rw" permission didn't succeed.
+   *                               Fixes segfault issue if editing is attempted on cube without "w" access.
+   *                               (ref # 2097)
    */
   void EditTool::mouseButtonRelease(QPoint p, Qt::MouseButton m) {
     MdiCubeViewport *vp = cubeViewport();
@@ -410,12 +417,17 @@ m_container = container;
 
     //  If cube readonly try to open read/write
     if (vp->cube()->isReadOnly()) {
+
+      // Get cube filename to recreate it with "r" privileges if the "rw" access fails.
+      QString fileName = vp->cube()->fileName();
+
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
         vp->cube()->reopen("rw");
       }
       catch(IException &) {
+        vp->cube()->open(fileName, "r");
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }

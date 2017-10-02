@@ -43,6 +43,7 @@ namespace Isis {
    * @author ????-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class BoxcarCachingAlgorithm : public CubeCachingAlgorithm {
     public:
@@ -54,7 +55,7 @@ namespace Isis {
           const Buffer &justRequested);
 
     private:
-      int m_minLine;
+      int m_minLine;  //!< Used to calculate what lines to cache
   };
 }
 

@@ -1,0 +1,48 @@
+Unit Test for PushFrameCameraCcdLayout::FrameletInfo...
+
+Create a default FrameletInfo object
+framelet ID: -1
+framelet name: ""
+framelet start sample: 0
+framelet start line: 0
+framelet samples: 0
+framelet lines: 0
+
+Create a FrameletInfo object for a specific ID
+framelet ID: 42
+framelet name: ""
+framelet start sample: 0
+framelet start line: 0
+framelet samples: 0
+framelet lines: 0
+
+Unit Test for PushFrameCameraCcdLayout...
+
+Create a default PushFrameCameraCcdLayout
+Try adding a kernel that does not exist
+Kernel file loaded? false
+
+Create the JunoCam layout
+Load the JunoCam kernels
+JunoCam CCD samples: 1648
+JunoCam CCD lines: 1200
+
+Get the METHANE filter layout
+METHANE filter ID: -61504
+METHANE filter name: "METHANE"
+METHANE filter start sample: 1
+METHANE filter start line: 291
+METHANE filter samples: 1648
+METHANE filter lines: 128
+
+Get the METHANE filter layout but give it a different name
+METHANE filter ID: -61504
+METHANE filter name: "methane"
+METHANE filter start sample: 1
+METHANE filter start line: 291
+METHANE filter samples: 1648
+METHANE filter lines: 128
+
+Attempt to get the layout for a filter that doesn't exist
+**I/O ERROR** Could not find layout information for framelet [-61509].
+**I/O ERROR** Can not find [INS-61509_FILTER_SAMPLES] in text kernels.

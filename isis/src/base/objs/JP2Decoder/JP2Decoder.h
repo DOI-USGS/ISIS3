@@ -88,6 +88,12 @@ namespace Isis {
    *  @history 2016-08-28 Kelvin Rodriguez - Moved member variables to be placed properly
    *                        within the if ENABLEJP2K preprocessor block in order to stop
    *                        unused member variable warnings in clang. Part of porting to OS X 10.11.
+   *  @history 2017-08-21 Tyler Wilson, Ian Humphrey, Summer Stapleton - Added
+   *                       support for new kakadu libraries.  References #4809.
+   *  @history 2017-09-15 Ian Humphrey - Modified destructor to call finish() on the decompressor
+   *                          before destroying the kdu_codestream. Caused segfault on OSX 10.11
+   *                          for the JP2Importer test, and isis2std and std2isis jpeg2000 tests.
+   *                          References #4809.
    */
   class JP2Decoder {
     public:
@@ -161,11 +167,11 @@ namespace Isis {
       bool p_readStripes;             //!<Number of lines read per call to Read methods
 
 
-      kdu_dims p_imageDims;           //!<Image dimensions of JP2 file
-      jp2_family_src *JP2_Stream;     //!<JP2 file input stream
-      jp2_source *JP2_Source;         //!<JP2 content source
-      kdu_codestream *JPEG2000_Codestream;    //!<Allow access to JP2 file codestream.
-      kdu_stripe_decompressor p_decompressor; //!<High level interface to decompression of
+      kdu_core::kdu_dims p_imageDims;           //!<Image dimensions of JP2 file
+      kdu_supp::jp2_family_src *JP2_Stream;     //!<JP2 file input stream
+      kdu_supp::jp2_source *JP2_Source;         //!<JP2 content source
+      kdu_core::kdu_codestream *JPEG2000_Codestream;    //!<Allow access to JP2 file codestream.
+      kdu_supp::kdu_stripe_decompressor p_decompressor; //!<High level interface to decompression of
       //!<JP2 file.
 #endif
       JP2Error *Kakadu_Error;         //!<JP2 Error handling facility

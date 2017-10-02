@@ -7,13 +7,16 @@
 #include <QContextMenuEvent>
 #include <QDebug>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
 #include <QPoint>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QSettings>
 #include <QSize>
+#include <QToolBar>
 #include <QVBoxLayout>
 #include <QXmlStreamWriter>
 
@@ -40,6 +43,7 @@ namespace Isis {
    */
   ImageFileListWidget::ImageFileListWidget(Directory *directory,
                                            QWidget *parent) : QWidget(parent) {
+    QWidget *treeWidget = new QWidget();
     m_directory = directory;
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -55,10 +59,35 @@ namespace Isis {
         "files at once. Finally, you can sort your files by any of the visible "
         "columns (use the view menu to show/hide columns of data).");
 
-    setLayout(layout);
+    treeWidget->setLayout(layout);
 
     m_progress = new ProgressBar;
     m_progress->setVisible(false);
+
+    m_searchToolbar = new QToolBar("Search Tool", this);
+    m_searchToolbar->setObjectName("Search Tool");
+    m_searchToolbar->setWhatsThis("This contains all the fields for searching the active file list");
+
+    m_searchLineEdit = new QLineEdit();
+    QPushButton *okButton = new QPushButton("Search");
+    connect(okButton, SIGNAL(clicked()), this, SLOT(filterFileList()));
+    QPushButton *clearButton = new QPushButton("Clear");
+    connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+    QHBoxLayout *actionLayout = new QHBoxLayout();
+    m_fileCount = new QLabel("File Matches: 0");
+    actionLayout->addWidget(m_searchLineEdit);
+    actionLayout->addWidget(okButton);
+    actionLayout->addWidget(clearButton);
+    actionLayout->addWidget(m_fileCount);
+    actionLayout->addStretch(1);
+    actionLayout->setMargin(0);
+    QWidget *toolBarWidget = new QWidget;
+    toolBarWidget->setLayout(actionLayout);
+    m_searchToolbar->addWidget(toolBarWidget);
+    QVBoxLayout *fileListWidgetLayout = new QVBoxLayout();
+    fileListWidgetLayout->addWidget(m_searchToolbar);
+    fileListWidgetLayout->addWidget(treeWidget);
+    setLayout(fileListWidgetLayout);
   }
 
   /**
@@ -830,4 +859,52 @@ namespace Isis {
 
     return result;
   }
+
+
+  void ImageFileListWidget::filterFileList() {
+    QString filterString = m_searchLineEdit->text();
+    int numMatches = 0;
+
+    for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
+      QTreeWidgetItem *group = m_tree->topLevelItem(i);
+
+      for (int j = 0; j < group->childCount(); j++) {
+        QTreeWidgetItem *item = group->child(j);
+        group->setSelected(false);
+        if (item->type() == QTreeWidgetItem::UserType) {
+
+          ImageTreeWidgetItem *cubeItem = (ImageTreeWidgetItem *)item;
+          if (cubeItem->image()->fileName().contains(filterString)){
+            cubeItem->setSelected(true);
+            m_tree->scrollToItem(cubeItem);
+            numMatches++;
+          }
+          else {
+            cubeItem->setSelected(false);
+          }
+        }
+      }
+    }
+    m_fileCount->setText("File Matches: " + QString::number(numMatches));
+  }
+
+
+  void ImageFileListWidget::clear() {
+    m_searchLineEdit->setText("");
+    m_fileCount->setText("File Matches: 0");
+
+    for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
+      QTreeWidgetItem *group = m_tree->topLevelItem(i);
+
+      for (int j = 0; j < group->childCount(); j++) {
+        QTreeWidgetItem *item = group->child(j);
+        group->setSelected(false);
+        if (item->type() == QTreeWidgetItem::UserType) {
+          item->setSelected(false);
+        }
+      }
+    }
+  }
+
+
 }

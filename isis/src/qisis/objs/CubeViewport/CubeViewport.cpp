@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <iostream>
 #include <QApplication>
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QCursor>
 #include <QDebug>
@@ -228,7 +229,7 @@ namespace Isis {
    * This method is called to initially show the viewport. It will set the
    * scale to show the entire cube and enable the gray buffer.
    *
-   * @param QShowEvent *event Show event being received.
+   * @param event Show event being received.
    *
    * @see http://doc.qt.io/qt-5/qwidget.html#showEvent
    */
@@ -451,7 +452,7 @@ namespace Isis {
    * changes in cube DN values.
    *
    * @param cubeId Cube that the changed brick belongs to
-   * @param data New data
+   * @param * data New data
    */
   void CubeViewport::cubeDataChanged(int cubeId, const Brick *data) {
     if(cubeId == p_cubeId) {
@@ -1459,7 +1460,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (4/5/2011)
    *
-   * @param PvlKeyword& pFilterNameKey - FilterName keyword containing the
+   * @param pFilterNameKey - FilterName keyword containing the
    *              corresponding keyword from the Isis Cube label
    */
   void CubeViewport::getBandFilterName(PvlKeyword & pFilterNameKey)
@@ -1742,6 +1743,10 @@ namespace Isis {
    *
    *
    * @param e
+   *
+   * @history  2017-08-11 Adam Goins - Added the ability to ctrl + c to copy the filename
+   *                             of the current cube into the system's clipboard.
+   *                             Fixes #5098.
    */
   void CubeViewport::keyPressEvent(QKeyEvent *e) {
     if(e->key() == Qt::Key_Plus) {
@@ -1769,6 +1774,16 @@ namespace Isis {
     else if(e->key() == Qt::Key_Right) {
       moveCursor(1, 0);
       e->accept();
+    }
+    else if ((e->key() == Qt::Key_C) &&
+             QApplication::keyboardModifiers() &&
+             Qt::ControlModifier) {
+
+        QString fileName = p_cube->fileName();
+    
+        // Grabs the clipboard and copies the file name into it.
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(fileName);
     }
     else {
       QAbstractScrollArea::keyPressEvent(e);
@@ -2090,7 +2105,7 @@ namespace Isis {
   /**
    * Apply stretch pairs to red bands
    *
-   * @param stretch
+   * @param string The stretch
    */
   void CubeViewport::stretchRed(const QString &string) {
     Stretch stretch;
@@ -2102,7 +2117,7 @@ namespace Isis {
   /**
    * Apply stretch pairs to green bands
    *
-   * @param stretch
+   * @param string the stretch
    */
   void CubeViewport::stretchGreen(const QString &string) {
     Stretch stretch;
@@ -2114,7 +2129,7 @@ namespace Isis {
   /**
    * Apply stretch pairs to blue bands
    *
-   * @param stretch
+   * @param string
    */
   void CubeViewport::stretchBlue(const QString &string) {
     Stretch stretch;
@@ -2279,19 +2294,19 @@ namespace Isis {
   }
 
   /**
-   *   Cube changed, repaint given area
+   * Cube changed, repaint given area
    *
-   * @param[in] cubeRect (QRect rect)  Rectange containing portion of cube
+   * @param rect Rectangle containing portion of cube
    *                                  (sample/line) that changed.
    *
    */
-  void CubeViewport::cubeContentsChanged(QRect cubeRect) {
+  void CubeViewport::cubeContentsChanged(QRect rect) {
     //start sample/line and end sample/line
     double ss, sl, es, el;
-    ss = (double)(cubeRect.left()) - 1.;
-    sl = (double)(cubeRect.top()) - 1.;
-    es = (double)(cubeRect.right()) + 1.;
-    el = (double)(cubeRect.bottom()) + 1.;
+    ss = (double)(rect.left()) - 1.;
+    sl = (double)(rect.top()) - 1.;
+    es = (double)(rect.right()) + 1.;
+    el = (double)(rect.bottom()) + 1.;
     if(ss < 1){
       ss = 0.5;
     }

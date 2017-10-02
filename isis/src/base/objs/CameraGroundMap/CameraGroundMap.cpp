@@ -158,9 +158,9 @@ namespace Isis {
    * without resetting the current point values for lat/lon/radius/m_pB/x/y.  The
    * class value for m_lookJ is set by this method.
    *
-   * @param point[in] Surface point (ground position) 
-   * @param cudx[out] Pointer to computed undistored x focal plane coordinate
-   * @param cudy[out] Pointer to computed undistored y focal plane coordinate
+   * @param point Surface point (ground position) 
+   * @param cudx [out] Pointer to computed undistored x focal plane coordinate
+   * @param cudy [out] Pointer to computed undistored y focal plane coordinate
    *
    * @return @b bool If conversion was successful
    */
@@ -241,11 +241,11 @@ namespace Isis {
    * without resetting the current point values for lat/lon/radius/m_pB/x/y.  The
    * class value for m_lookJ is set by this method.
    *
-   * @param lat[in] Latitude in degrees 
-   * @param lon[in] Longitude in degrees
-   * @param radius[in] Radius in meters
-   * @param cudx[out] Pointer to computed undistored x focal plane coordinate
-   * @param cudy[out] Pointer to computed undistored y focal plane coordinate
+   * @param lat Latitude in degrees 
+   * @param lon Longitude in degrees
+   * @param radius Radius in meters
+   * @param cudx [out] Pointer to computed undistored x focal plane coordinate
+   * @param cudy [out] Pointer to computed undistored y focal plane coordinate
    *
    * @return @b bool If conversion was successful
    */
@@ -267,10 +267,10 @@ namespace Isis {
    * Spice settings (time and kernels) without resetting the current point values for 
    * lat/lon/radius/x/y.
    *
-   * @param varType[in] enumerated partial type (definitions in SpicePosition)
-   * @param coefIndex[in] coefficient index of fit polynomial
-   * @param *dx[out] pointer to partial derivative of undistorted focal plane x
-   * @param *dy[out] pointer to partial derivative of undistorted focal plane y
+   * @param varType enumerated partial type (definitions in SpicePosition)
+   * @param coefIndex coefficient index of fit polynomial
+   * @param *dx [out] pointer to partial derivative of undistorted focal plane x
+   * @param *dy [out] pointer to partial derivative of undistorted focal plane y
    *
    * @return @b bool If conversion was successful
    */
@@ -306,10 +306,10 @@ namespace Isis {
    * a ground position with respect to the instrument orientation, using the current Spice
    * settings (time and kernels) without resetting the current point values for lat/lon/radius/x/y.
    *
-   * @param varType[in] enumerated partial type (definitions in SpicePosition)
-   * @param coefIndex[in] coefficient index of fit polynomial
-   * @param *dx[out] pointer to partial derivative of undistorted focal plane x
-   * @param *dy[out] pointer to partial derivative of undistorted focal plane y
+   * @param varType enumerated partial type (definitions in SpicePosition)
+   * @param coefIndex coefficient index of fit polynomial
+   * @param *dx out] pointer to partial derivative of undistorted focal plane x
+   * @param *dy [out] pointer to partial derivative of undistorted focal plane y
    *
    * @return @b bool If conversion was successful
    */
@@ -342,10 +342,10 @@ namespace Isis {
    * a ground position with respect to the target body orientation, using the current Spice
    * settings (time and kernels) without resetting the current point values for lat/lon/radius/x/y.
    *
-   * @param varType[in] enumerated partial type (definitions in SpicePosition)
-   * @param coefIndex[in] coefficient index of fit polynomial
-   * @param *dx[out] pointer to partial derivative of undistorted focal plane x
-   * @param *dy[out] pointer to partial derivative of undistorted focal plane y
+   * @param varType enumerated partial type (definitions in SpicePosition)
+   * @param coefIndex coefficient index of fit polynomial
+   * @param *dx [out] pointer to partial derivative of undistorted focal plane x
+   * @param *dy [out] pointer to partial derivative of undistorted focal plane y
    *
    * @return @b bool If conversion was successful
    */
@@ -388,8 +388,8 @@ namespace Isis {
    * and kernels) without resetting the current point values for lat/lon/radius/x/y.
    *
    * @param d_pB Point vector
-   * @param *dx[out] pointer to partial derivative of undistorted focal plane x
-   * @param *dy[out] pointer to partial derivative of undistorted focal plane y
+   * @param *dx [out] pointer to partial derivative of undistorted focal plane x
+   * @param *dy [out] pointer to partial derivative of undistorted focal plane y
    *
    * @return conversion was successful 
    */

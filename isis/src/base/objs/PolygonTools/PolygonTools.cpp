@@ -1024,8 +1024,9 @@ namespace Isis {
     unsigned int minPrecision = 13;
     while(failed) {
       try {
-        std::auto_ptr< geos::geom::Geometry > resultAuto =
-          BinaryOp(geomFirst, geomSecond, geos::operation::overlay::overlayOp(code));
+        // C++11: the geos BinaryOp returns an auto_ptr, we use release() to create a unique_ptr.
+        std::unique_ptr< geos::geom::Geometry > resultAuto(
+          BinaryOp(geomFirst, geomSecond, geos::operation::overlay::overlayOp(code)).release());
         failed = false;
         result = resultAuto->clone();
       }

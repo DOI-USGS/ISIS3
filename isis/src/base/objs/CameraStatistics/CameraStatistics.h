@@ -48,11 +48,12 @@ namespace Isis {
    * @author 2011-06-14 Travis Addair
    *
    * @internal
-   * @history 2011-06-14 Travis Addair - Extracted logic from "camstats"
+   *   @history 2011-06-14 Travis Addair - Extracted logic from "camstats"
    *                     application to create this class.
-   * @history 2016-08-17 Tyler Wilson - Added Statistics objects for
+   *   @history 2016-08-17 Tyler Wilson - Added Statistics objects for
    *                     ObliquePixelResolution,ObliqueSampleResolution, and
    *                     ObliqueLineResolution.  References #476, #4100.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    */
   class CameraStatistics {
     public:
@@ -237,30 +238,30 @@ namespace Isis {
     private:
       void init(Camera *cam, int sinc, int linc, QString filename);
 
-      //!< FileName of the Cube the Camera was derived from.
-      QString m_filename;
-      int m_sinc; //!< Sample increment for composing statistics.
-      int m_linc; //!< Line increment for composing statistics.
+      
+      QString m_filename;     //!< FileName of the Cube the Camera was derived from.
+      int m_sinc;             //!< Sample increment for composing statistics.
+      int m_linc;             //!< Line increment for composing statistics.
 
-      Statistics *m_latStat; //!< Universal latitude statistics.
-      Statistics *m_lonStat; //!< Universal longitude statistics.
+      Statistics *m_latStat;  //!< Universal latitude statistics.
+      Statistics *m_lonStat;  //!< Universal longitude statistics.
 
 
 
-      Statistics *m_obliqueResStat;  //!< Oblique pixel resolution statistics.
-      Statistics *m_obliqueSampleResStat; //!< Oblique sample resolution statistics.
-      Statistics *m_obliqueLineResStat; //!< Oblique line resolution statistics.
+      Statistics *m_obliqueResStat;         //!< Oblique pixel resolution statistics.
+      Statistics *m_obliqueSampleResStat;   //!< Oblique sample resolution statistics.
+      Statistics *m_obliqueLineResStat;     //!< Oblique line resolution statistics.
 
-      Statistics *m_resStat; //!< Pixel resolution statistics.
-      Statistics *m_sampleResStat; //!< Sample resolution statistics.
-      Statistics *m_lineResStat; //!< Line resolution statistics.
-      Statistics *m_aspectRatioStat; //!< Aspect ratio statistics.
-      Statistics *m_phaseStat; //!< Phase angle statistics.
-      Statistics *m_emissionStat; //!< Emission angle statistics.
-      Statistics *m_incidenceStat; //!< Incidence angle statistics.
+      Statistics *m_resStat;            //!< Pixel resolution statistics.
+      Statistics *m_sampleResStat;      //!< Sample resolution statistics.
+      Statistics *m_lineResStat;        //!< Line resolution statistics.
+      Statistics *m_aspectRatioStat;    //!< Aspect ratio statistics.
+      Statistics *m_phaseStat;          //!< Phase angle statistics.
+      Statistics *m_emissionStat;       //!< Emission angle statistics.
+      Statistics *m_incidenceStat;      //!< Incidence angle statistics.
       Statistics *m_localSolarTimeStat; //!< Local solar time statistics.
-      Statistics *m_localRaduisStat; //!< Local radius statistics (in meters).
-      Statistics *m_northAzimuthStat; //!< North azimuth statistics.
+      Statistics *m_localRaduisStat;    //!< Local radius statistics (in meters).
+      Statistics *m_northAzimuthStat;   //!< North azimuth statistics.
   };
 };
 

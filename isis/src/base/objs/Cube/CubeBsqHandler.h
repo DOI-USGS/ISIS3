@@ -50,8 +50,9 @@ namespace Isis {
    *                           unimplemented copy constructor and assignment
    *                           operator.
    *   @history 2014-09-16 Ian Humphrey - Increased size limit for determining chunk sizes.
-   *                           Added findGoodSize method to better calculate number of lines in 
+   *                           Added findGoodSize method to better calculate number of lines in
    *                           chunks for bsq cubes. References #1689.
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
    */
   class CubeBsqHandler : public CubeIoHandler {
     public:
@@ -81,7 +82,7 @@ namespace Isis {
        * @return A reference to *this.
        */
       CubeBsqHandler &operator=(const CubeBsqHandler &other);
-      
+
       int findGoodSize(int maxSize, int dimensionSize) const;
       BigInt getChunkStartByte(const RawCubeChunk &chunk) const;
   };

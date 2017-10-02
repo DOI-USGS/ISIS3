@@ -43,11 +43,13 @@ namespace Isis {
    *
    * @internal
    *  @history 2009-12-18 Janet Barrett - Original version.
-   *
+   *  @history 2017-08-21 Tyler Wilson, Ian Humphrey, Summer Stapleton - Added
+   *                        support for new kakadu libraries.  References #4809.
+   *  
    */
 
 #if ENABLEJP2K
-  class JP2Error : public kdu_thread_safe_message {
+  class JP2Error : public kdu_core::kdu_thread_safe_message {
 #else
   class JP2Error {
 #endif

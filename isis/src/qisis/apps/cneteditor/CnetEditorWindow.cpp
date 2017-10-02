@@ -703,6 +703,7 @@ namespace Isis {
 
   void CnetEditorWindow::networkLoaded(ControlNet *net, QString currentFile) {
 
+    cnet = net;
     Control *control = new Control(net, currentFile);
     editorWidget = new CnetEditorWidget(control, FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded());

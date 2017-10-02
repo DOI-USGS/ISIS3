@@ -717,14 +717,6 @@ namespace Isis {
 
     //  Control Net tool will only be active if the project has an active Control.  Note:  This
     //  assumes the Control Net tool is the 4th in the toolpad.
-    connect(this, SIGNAL(controlPointAdded(QString)), result, SIGNAL(controlPointAdded(QString)));
-
-    //  This signal is connected to the MosaicGraphicsScene::update(), which eventually calls
-    //  ControlNetGraphicsItem::paint(), then ControlPointGraphicsItem::paint().
-    connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
-
-    //  Control Net tool will only be active if the project has an active Control.  Note:  This
-    //  assumes the Control Net tool is the 4th in the toolpad.
     if (!project()->activeControl()) {
       QList<QAction *> toolbar = result->toolPadActions();
       QAction* cnetAction = toolbar[3];

@@ -309,11 +309,6 @@ namespace Isis {
     if ( !(isValid() && other.isValid()) ) return (false);
     if ( triangleIndex() != other.triangleIndex() ) return (false);
     if ( partId() != other.partId() ) return (false);
-
-    // Check the emission angle from other.observer to this.point
-    btVector3 psB = (other.observer() - point()).normalized();
-    btScalar  angle = std::acos( normal().dot( psB ) ) * RAD2DEG;
-    if ( std::fabs( angle ) > 90.0 ) return (false);
     
     // How close are the two intercept points?
     if ( distance( other ) > tolerance ) return ( false );

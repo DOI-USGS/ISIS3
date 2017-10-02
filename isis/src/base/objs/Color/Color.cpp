@@ -6,6 +6,12 @@
 #include "IException.h"
 
 namespace Isis {
+  
+  /**
+   * Converts a QString to its QColor
+   * 
+   * @returns A QColor given a QString
+   */
   QColor Color::fromRGBAString(QString string) {
     QColor result;
 
@@ -18,6 +24,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert a QColor to its QString
+   * 
+   * @returns A QString given a QColor
+   */
   QString Color::toRGBAString(QColor color) {
     QString result;
 
@@ -39,6 +50,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the colorRGBAFormat
+   * 
+   * @returns A QRegExp of the color format
+   */
   QRegExp Color::colorRGBAFormat() {
     return QRegExp("^#[0-9a-fA-F]{8}$");
   }

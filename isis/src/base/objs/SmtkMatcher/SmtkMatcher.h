@@ -27,6 +27,7 @@
 #include <memory>
 
 
+#include <QSharedPointer>
 #include "SmtkStack.h"
 #include "Gruen.h"
 #include "SmtkPoint.h"
@@ -52,6 +53,10 @@ namespace Isis {
  * @internal
  *   @history 2012-12-20 Debbie A. Cook - Removed unused Projection.h
  *                           References #775.
+ *   @history 2017-08-18 Summer Stapleton, Ian Humphrey, Tyler Wilson - 
+ *                           Changed auto_ptr reference to QSharedPointer
+ *                           so this class compiles under C++14.  
+ *                           References #4809.
  */
 class SmtkMatcher {
   public:
@@ -117,7 +122,7 @@ class SmtkMatcher {
 
     Cube     *m_lhCube;                // Left image cube (not owned)
     Cube     *m_rhCube;                // Right image cube (not owned)
-    std::auto_ptr<Gruen> m_gruen;      // Gruen matcher
+    QSharedPointer<Gruen> m_gruen;     // Gruen matcher
     BigInt  m_offImage;                // Offimage counter
     BigInt  m_spiceErr;                // SPICE distance error
     bool    m_useAutoReg;              // Select AutoReg features

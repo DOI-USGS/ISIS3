@@ -4,11 +4,11 @@
 #
 # @history 2016-09-09 Jeannie Backer - Original version.
 #
+APPNAME = ocams2isis
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	# import first image
-	ocams2isis $(TSTARGS)                                                   \
-	           from=$(INPUT)/20141111T202650_SCAM_L2_V001_SCAM.fits         \
-	           to=$(OUTPUT)/20141111T202650_SCAM_L2_V001_SCAM.cub \
+	$(APPNAME) $(TSTARGS)                                           \
+	           from=$(INPUT)/20141111T202650_SCAM_L2_V001_SCAM.fits \
+	           to=$(OUTPUT)/20141111T202650_SCAM_L2_V001_SCAM.cub   \
 	           >& /dev/null;

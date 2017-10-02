@@ -156,6 +156,7 @@ namespace Isis {
    *                           exists in Histogram.  See Ref. #2188.
    *   @history 2017-06-08 Chris Combs - Made "Failed to create" error messages more descriptive.
    *                           Fixes #833.
+   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
    */
   class Cube {
     public:

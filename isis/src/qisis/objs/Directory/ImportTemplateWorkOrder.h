@@ -33,7 +33,9 @@
     *
     * @author 2017-07-31 Christopher Combs
     *
-    * @internal
+    * @internal 
+    *   @history 2017-08-23 Tracie Sucharski - Fixed assignment to itemType in setupExecution to use
+    *                          assignment operator rather than comparison operator.
     */
     class ImportTemplateWorkOrder : public WorkOrder {
         Q_OBJECT

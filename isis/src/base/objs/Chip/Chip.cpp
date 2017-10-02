@@ -713,22 +713,6 @@ namespace Isis {
 
 
   /**
-   * Return if the pixel is valid at a particular position
-   *
-   * @param sample    sample position to test
-   * @param line      line position to test
-   *
-   * @return bool - Returns true if the pixel is valid, and false if it is not
-   */
-  /* bool Chip::IsValid(int sample, int line) {
-     double value = (*this)(sample,line);
-     if (value < m_validMinimum) return false;
-     if (value > m_validMaximum) return false;
-     return true;
-   }*/
-
-
-  /**
    * Return if total number of valid pixels in chip meets a specified percentage of the entire chip.
    *
    * @param percentage The percentage that the valid pixels percentage must exceed
@@ -1053,6 +1037,8 @@ namespace Isis {
    * Copy assignment operator.
    *
    * @param other chip to be copied to this
+   * 
+   * @returns The chip that was copied from the other
    */
   Chip &Chip::operator=(const Chip &other) {
     m_chipSamples = other.m_chipSamples;

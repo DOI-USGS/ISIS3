@@ -52,6 +52,8 @@ namespace Isis {
    *   @history 2013-03-19 Steven Lambright - Fixed a problem where Open Project would
    *                           close the current project, even if cancelled. Also removed
    *                           the closed project state. Fixes #998.
+   *  @history 2017-06-27 Cole Neubauer - Added search capability for file list Dock widgets
+   *                           Fixes #1556
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT

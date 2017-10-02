@@ -5,24 +5,18 @@
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
-#include "QRegularExpression"
 
 using namespace Isis;
 using namespace std;
-
-void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
-}
 
 int main(void) {
   Preference::Preferences(true);
 
   try {
-
     FileName fLabel("$base/testData/xmlTestLabel.xml");
 
     stringstream trnsStrm;
-
+    
     trnsStrm << "Group = Version" << endl;
     trnsStrm << "  Auto" << endl;
     trnsStrm << "  Debug" << endl;
@@ -135,6 +129,11 @@ int main(void) {
     trnsStrm << "End_Group" << endl;
 
     trnsStrm << "End" << endl;
+    
+    // Copy this buffer to use for additional tests
+    std::stringstream trnsStrm2, trnsStrm3;
+    trnsStrm2 << trnsStrm.rdbuf()->str();
+    trnsStrm3 << trnsStrm.rdbuf()->str();
 
     stringstream badTrnsStrm;
 
@@ -230,10 +229,31 @@ int main(void) {
     cout << "Translation of InstrumentIfovWithUnits: " <<
             transMgr.Translate("InstrumentIfovWithUnits") << endl << endl;
 
+    cout << "Testing file-based constructor" << endl << endl;
+    FileName XmltoPvlFile("$base/testData/XmlToPvlTestLabel.pvl");
+    QString XmltoPvlFileString = XmltoPvlFile.toString(); 
+    XmlToPvlTranslationManager transMgrFileConstructor(XmltoPvlFileString);
+
+    cout << "Testing stream-only constructor" << endl << endl;
+    XmlToPvlTranslationManager transMgrStreamConstructor(trnsStrm2);
+
+    cout << "Testing constructor which uses an input label and translation file" << endl << endl;
+    XmlToPvlTranslationManager transMgrFilesConstructor(fLabel, XmltoPvlFileString);
+
+    cout << "Testing constructor which uses an input label and translation file" << endl << endl;
+    XmlToPvlTranslationManager transMgrLabelStreamConstructor(fLabel, trnsStrm3);
+
     cout << "Testing Auto method" << endl << endl;
     Pvl outputLabel;
     transMgr.Auto(outputLabel);
     cout << endl << outputLabel << endl << endl;
+
+    cout << "Testing Auto method with input and output labels" << endl << endl;
+    transMgr.Auto(fLabel, outputLabel);
+    cout << endl << outputLabel << endl << endl;
+
+    cout << "Testing SetLabel method" << endl << endl;
+    transMgr.SetLabel(fLabel);
 
     cout << "Testing error throws" << endl << endl;
     XmlToPvlTranslationManager badTransMgr(fLabel, badTrnsStrm);
@@ -352,7 +372,7 @@ int main(void) {
       XmlToPvlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
     }
     catch(IException &e) {
-      ReportError(e.toString());
+      e.print();
       cout << endl;
     }
 

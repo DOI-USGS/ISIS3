@@ -95,6 +95,7 @@ namespace Isis {
    *                           NAIF kernels to obtain the transform.  This is
    *                           required for non-NAIF instruments such as
    *                           Aerial photos.
+   *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *  
    */
   class CameraFocalPlaneMap {
@@ -149,25 +150,25 @@ namespace Isis {
       void ComputeCentered();
       void ComputeUncentered();
 
-      Camera *p_camera; //!< 
+      Camera *p_camera;                 //!< Camera of the image
 
-      double p_detectorLineOrigin;   //!< 
-      double p_detectorSampleOrigin; //!< 
+      double p_detectorLineOrigin;      //!< The origin line of the detector
+      double p_detectorSampleOrigin;    //!< The origin sample of the detector
 
-      double p_focalPlaneX;            //!< x value of focal plane coordinate
-      double p_focalPlaneY;            //!< y value of focal plane coordinate
-      double p_detectorLine;           //!< line value of the detector
-      double p_detectorSample;         //!< sample value of the detector
-      double p_centeredDetectorSample; //!< 
-      double p_centeredDetectorLine;   //!< 
+      double p_focalPlaneX;             //!< x value of focal plane coordinate
+      double p_focalPlaneY;             //!< y value of focal plane coordinate
+      double p_detectorLine;            //!< line value of the detector
+      double p_detectorSample;          //!< sample value of the detector
+      double p_centeredDetectorSample;  //!< Detector sample position
+      double p_centeredDetectorLine;    //!< Detector line position
 
-      double p_detectorLineOffset;   //!< 
-      double p_detectorSampleOffset; //!< 
+      double p_detectorLineOffset;      //!< Offset of the detector origin line from the average
+      double p_detectorSampleOffset;    //!< offset of the detector origin sample from the average
 
-      double p_transx[3];  //!< 
-      double p_transy[3];  //!< 
-      double p_itranss[3]; //!< 
-      double p_itransl[3]; //!< 
+      double p_transx[3];               //!< The x transition from detector to distorted
+      double p_transy[3];               //!< The y transition from detector to distorted
+      double p_itranss[3];              //!< The x transition from distorted to detector
+      double p_itransl[3];              //!< The y transition from distorted to detector
 
     private:
       void Init(Camera *parent, const int naifIkCode);

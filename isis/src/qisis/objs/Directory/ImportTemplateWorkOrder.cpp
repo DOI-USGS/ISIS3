@@ -112,7 +112,7 @@ namespace Isis {
 
     // If clicked "File"->"Import"->"Import Templates"
     if (internalData().isEmpty()) {
-      itemType == "Templates";
+      itemType = "Templates";
     }
     // If clicked "Import Templates" from under "Maps" or "Registrations" ProjectItems rightclicks
     else {
