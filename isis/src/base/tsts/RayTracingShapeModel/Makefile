@@ -1,13 +1,15 @@
 INGEST = msi2isis
 SPICEINIT = spiceinit
 PROJECT = cam2map
-COPY = /usr/bin/cp
-REMOVE = /usr/bin/rm
+COPY = /bin/cp
+REMOVE = /bin/rm
 
 IMAGE = m0132383354f4_2p_iof_dbl
 DSK = ErosHR.bds
 MAP = simp_planetocentric_50k.map
 
+$(IMAGE)_Bullet_SC.cub.TOLERANCE = 0.00001
+$(IMAGE)_Standard_SC.cub.TOLERANCE = 0.00001
 
 include $(ISISROOT)/make/isismake.tsts
 
