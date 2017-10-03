@@ -26,14 +26,16 @@ void IsisMain() {
     
     p.SetInputCube(&cub);
     
-    std::cout << p.StandardPds4Label().toString();
+    // Remove the schema from the lable because we cannot ensure that
+    // attributes come out in the same order every time
+    std::cout << p.StandardPds4Label().toString().remove(QRegExp("xmlns.*\""));
              
     std::ofstream ofs;
     p.OutputLabel(ofs);
 
     p.StartProcess(ofs);
 
-    std::cout << p.GetLabel().toString();
+    std::cout << p.GetLabel().toString().remove(QRegExp("xmlns.*\""));
 
     p.WritePds4("temp.img");
     remove("temp.img");
