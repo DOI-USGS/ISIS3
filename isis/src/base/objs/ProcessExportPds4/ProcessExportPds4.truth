@@ -1,5 +1,5 @@
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational >
+<Product_Observational>
  <File_Area_Observational>
   <Array_2D_Image>
    <Axis_Array>
@@ -23,7 +23,7 @@
 unittest: Exporting
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational >
+<Product_Observational>
  <File_Area_Observational>
   <Array_2D_Image>
    <Axis_Array>

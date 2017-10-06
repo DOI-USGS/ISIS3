@@ -28,14 +28,20 @@ void IsisMain() {
     
     // Remove the schema from the lable because we cannot ensure that
     // attributes come out in the same order every time
-    std::cout << p.StandardPds4Label().toString().remove(QRegExp("xmlns.*\""));
+    QString rawLabel = p.StandardPds4Label().toString();
+    rawLabel.remove(QRegExp(" xmlns.*=\".*\""));
+    rawLabel.remove(QRegExp(" xsi.*=\".*\""));
+    std::cout << rawLabel;
              
     std::ofstream ofs;
     p.OutputLabel(ofs);
 
     p.StartProcess(ofs);
 
-    std::cout << p.GetLabel().toString().remove(QRegExp("xmlns.*\""));
+    rawLabel = p.GetLabel().toString();
+    rawLabel.remove(QRegExp(" xmlns.*=\".*\""));
+    rawLabel.remove(QRegExp(" xsi.*=\".*\""));
+    std::cout << rawLabel;
 
     p.WritePds4("temp.img");
     remove("temp.img");
