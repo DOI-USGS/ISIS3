@@ -6,10 +6,15 @@ MOSAIC    = automos
 INPUTFILE = JNCR_2016346_03C00104_V01
 MAP       = juno_pp.map
 
+# These images are uncalibrated 16-bit, so the differences are
+# whole numbers, hence the high tolerance.
+$(INPUTFILE)_FULLCCD_GREEN_PP.cub.TOLERANCE = 5.0
+$(INPUTFILE)_RED_PP.cub.TOLERANCE = 5.0
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(IMPORT) $(TSTARGS) from=$(INPUT)/$(INPUTFILE).LBL \
+	ulimit -n 514 && $(IMPORT) $(TSTARGS) from=$(INPUT)/$(INPUTFILE).LBL \
 		  to=$(OUTPUT)/$(INPUTFILE).cub > /dev/null;
 	$(IMPORT) $(TSTARGS) from=$(INPUT)/$(INPUTFILE).LBL \
 		  to=$(OUTPUT)/$(INPUTFILE)_FULLCCD.cub fullccd=yes \
