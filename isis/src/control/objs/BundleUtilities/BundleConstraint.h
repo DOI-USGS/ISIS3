@@ -44,14 +44,7 @@ namespace Isis {
 
       virtual ~BundleConstraint();
 
-//    virtual std::vector<double> stateVector(double et) const = 0;
-//    virtual bool hasVelocity() const = 0;
-//    double startTime() const;
-//    double endTime() const;
-
     private:
-//    double m_startTime; //!< The beginning time for this segment.
-//    double m_endTime;   //!< The ending time for this segment.
   };
 };
 

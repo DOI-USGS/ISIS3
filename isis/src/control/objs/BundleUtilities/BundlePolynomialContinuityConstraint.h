@@ -53,7 +53,9 @@ namespace Isis {
       // destructor
       ~BundlePolynomialContinuityConstraint();
 
-      BundlePolynomialContinuityConstraint &operator=(const BundlePolynomialContinuityConstraint &src);
+      // Assignment operator
+      BundlePolynomialContinuityConstraint &operator=
+          (const BundlePolynomialContinuityConstraint &src);
 
       int numberSpkSegments() const;
       int numberCkSegments() const;
@@ -76,14 +78,14 @@ namespace Isis {
       BundleObservationQsp m_parentObservation;                //! parent BundleObservation
 
       // spk related members
-      std::vector<double> m_spkKnots;                          //! scaled boundary times
+      std::vector<double> m_spkKnots;                          //! scaled spk boundary times
       int m_numberSpkCoefficients;                             //! # coefficients
       int m_numberSpkSegments;                                 //! # segments
       int m_numberSpkBoundaries;                               //! # segment boundaries
       int m_numberSpkSegmentParameters;
 
       // ck related members
-      std::vector<double> m_ckKnots;                           //! scaled boundary times
+      std::vector<double> m_ckKnots;                           //! scaled ck boundary times
       int m_numberCkCoefficients;                              //! # coefficients
       int m_numberCkSegments;                                  //! # segments
       int m_numberCkBoundaries;                                //! # segment boundaries

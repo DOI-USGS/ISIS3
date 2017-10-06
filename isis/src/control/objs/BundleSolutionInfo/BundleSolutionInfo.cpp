@@ -1144,12 +1144,6 @@ namespace Isis {
           fpOut << observation->formatBundleContinuityConstraintString();
         }
 
-//        int numberContinuityConstraints = observation->numberContinuityConstraints();
-//        if (numberContinuityConstraints > 0) {
-//          sprintf(buf, "\nContinuity Constraints: %d\n", numberContinuityConstraints);
-//          fpOut << buf;
-//        }
-
         sprintf(buf, "\n    Image         Initial              Total               "
                      "Final             Initial           Final\n"
                      "Parameter         Value              Correction            "

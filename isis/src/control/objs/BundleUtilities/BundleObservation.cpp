@@ -41,7 +41,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
   }
@@ -68,7 +67,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
@@ -124,6 +122,8 @@ namespace Isis {
 
     m_solveSettings = src.m_solveSettings;
 
+    m_continuityConstraints = src.m_continuityConstraints;
+
     m_index = src.m_index;
   }
 
@@ -159,6 +159,8 @@ namespace Isis {
       m_instrumentRotation = src.m_instrumentRotation;
 
       m_solveSettings = src.m_solveSettings;
+
+      m_continuityConstraints = src.m_continuityConstraints;
     }
     return *this;
   }
@@ -227,6 +229,8 @@ namespace Isis {
       nParameters += nCameraAngleCoefficients;
     }
 
+    // set number of position and rotation piecewise polynomial segments in SPICE position and
+    // rotation members
     m_instrumentPosition->setPolynomialSegments(m_solveSettings->numberSpkPolySegments());
     m_instrumentRotation->setPolynomialSegments(m_solveSettings->numberCkPolySegments());
 
@@ -235,12 +239,10 @@ namespace Isis {
     m_weights.clear();
     m_corrections.resize(nParameters);
     m_corrections.clear();
-//    m_solution.resize(nParameters);
-//    m_solution.clear();
     m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
-    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
+    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to Isis::Null
       m_aprioriSigmas[i] = Isis::Null;
 
     if (!initParameterWeights()) {
@@ -249,24 +251,27 @@ namespace Isis {
       return false;
     }
 
-    // create continuity constraints for segment boundaries
-//    constructSegmentContinuityConstraintMatrix();
-
     return true;
   }
 
 
   /**
-   * TODO
+   * Sets this BundleObserations continuity constraint member variable
+   *
+   * @param polyConstraints piecewise polynomial continuity constraints
+   *
    */
-  void BundleObservation
-      ::setContinuityConstraints(QSharedPointer<BundlePolynomialContinuityConstraint> polyConstraints) {
+  void BundleObservation::setContinuityConstraints(BundlePolynomialContinuityConstraintQsp
+                                                   polyConstraints) {
     m_continuityConstraints = polyConstraints;
   }
 
 
   /**
-   * TODO
+   * Returns contribution of continuity constraints
+   *
+   * @return @b LinearAlgebra::MatrixUpperTriangular Returns contribution of continuity constraints
+   *                                                 to the bundle adjustment normal equations
    */
   LinearAlgebra::MatrixUpperTriangular &BundleObservation::continuityContraintMatrix() {
     return m_continuityConstraints->normalsMatrix();
@@ -274,7 +279,10 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns contribution of continuity constraints to normal equations right hand side
+   *
+   * @return @b LinearAlgebra::Vector Returns contribution of continuity constraints to the normal
+   *                                  equation hand side
    */
   LinearAlgebra::Vector &BundleObservation::continuityRHS() {
     return m_continuityConstraints->rightHandSideVector();
@@ -332,15 +340,6 @@ namespace Isis {
 
 
   /**
-   * @internal
-   *   @todo 
-   */
-//  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
-//    return m_solution;
-//  }
-
-
-  /**
    * Accesses the a priori sigmas
    *
    * @return @b LinearAlgebra::Vector Returns the a priori sigmas
@@ -390,22 +389,32 @@ namespace Isis {
       double positiontimeScale = 0.0;
       std::vector<double> posPoly1, posPoly2, posPoly3;
 
-      // set number of polynomial segments in solution from m_solveSettings
+      // number of position polynomial segments we're solving for this observation
       int spkPolynomialSegments = m_solveSettings->numberSpkPolySegments();
 
+      // loop over images in this observation
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);       
         SpicePosition *spicePosition = image->camera()->instrumentPosition();
+
+        // set number of position segments in images spice position
         spicePosition->setPolynomialSegments(spkPolynomialSegments);
 
+        // loop over position segments
         for (int j = 0; j < spkPolynomialSegments; j++) {
-          if (i > 0) {            
+          // if there are more than one image in the observation (see note below)
+          if (i > 0) {
             spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
             spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
             spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
                                          m_solveSettings->positionInterpolationType(),
                                          j);
           }
+          // for first image in the observation
+          // NOTE: Typically there is one image per observation.
+          //       When in "Observation Mode" however there may be multiple images in an
+          //       observation. Current examples where observation mode may be used include Lunar
+          //       Orbiter, HiRise, and Apollo Pan.
           else {
             // first, set the degree of the spk polynomial to be fit for a priori values
             spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
@@ -435,149 +444,57 @@ namespace Isis {
       double rotationtimeScale = 0.0;
       std::vector<double> anglePoly1, anglePoly2, anglePoly3;
 
+      // number of pointing polynomial segments we're solving for this observation
+      int ckPolynomialSegments = m_solveSettings->numberCkPolySegments();
+
+      // loop over images in this observation
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
+        SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
 
-        if (i > 0) {
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-          spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
-                                       m_solveSettings->pointingInterpolationType());
-        }
-        else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
+        // set number of rotation segments in images spice position
+        spiceRotation->setPolynomialSegments(ckPolynomialSegments);
 
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
-          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
+        // loop over rotation segments
+        for (int j = 0; j < ckPolynomialSegments; j++) {
+          // if there are more than one image in the observation (see note below)
+          if (i > 0) {
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+            spiceRotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
+            spiceRotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
+                                         m_solveSettings->pointingInterpolationType(),j);
+          }
+          // for first image in the observation
+          // NOTE: Typically there is one image per observation.
+          //       When in "Observation Mode" however there may be multiple images in an
+          //       observation. Current examples where observation mode may be used include Lunar
+          //       Orbiter, HiRise, and Apollo Pan.
+          else {
+            // first, set the degree of the ck polynomial to be fit for a priori values
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+            // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+            // function, or polynomial function over constant hermite spline)
+            // TODO: verify - I think this actually performs the a priori fit
+            spiceRotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
 
-          rotationBaseTime = spicerotation->GetBaseTime();
-          rotationtimeScale = spicerotation->GetTimeScale();
-          spicerotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
-        }
-      }
-    }
-/*
-    // storing apriori rotation, position
-    // these will be NOT be updated during the bundle adjustment
-    int numSpkSegments = m_instrumentPosition->numPolynomialSegments();
-    std::vector<double> coefX, coefY, coefZ;
-    for (int i = 0; i < numSpkSegments; i++) {
-      m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ, i);
-      m_aprioriX.append(coefX);
-      m_aprioriY.append(coefY);
-      m_aprioriZ.append(coefZ);
-    }
+            // finally, set the degree of the ck polynomial actually used in the bundle adjustment
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
 
-    int numCkSegments = m_instrumentRotation->numPolynomialSegments();
-    std::vector<double> coefRA, coefDEC, coefTWI;
-    for (int i = 0; i < numCkSegments; i++) {
-      m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI, i);
-      m_aprioriRA.append(coefRA);
-      m_aprioriDEC.append(coefDEC);
-      m_aprioriTWI.append(coefTWI);
-    }
-*/
-    return true;
-  }
-
-
-  /**
-   * Initializes the exterior orientation
-   *
-   * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Should this always return true?
-   */
-/*
-  bool BundleObservation::initializeExteriorOrientation() {
-
-    if (m_solveSettings->instrumentPositionSolveOption() !=
-        BundleObservationSolveSettings::NoPositionFactors) {
-
-      double positionBaseTime = 0.0;
-      double positiontimeScale = 0.0;
-      std::vector<double> posPoly1, posPoly2, posPoly3;
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpicePosition *spicePosition = image->camera()->instrumentPosition();
-
-        if (i > 0) {
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-          spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
-                                       m_solveSettings->positionInterpolationType());
-        }
-        else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
-
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
-          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
-
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-
-          if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
-            positionBaseTime = m_instrumentPosition->GetBaseTime();
-            positiontimeScale = m_instrumentPosition->GetTimeScale();
-            m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
+            rotationBaseTime = spiceRotation->GetBaseTime();
+            rotationtimeScale = spiceRotation->GetTimeScale();
+            spiceRotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
           }
         }
       }
     }
 
-    if (m_solveSettings->instrumentPointingSolveOption() !=
-        BundleObservationSolveSettings::NoPointingFactors) {
-
-      double rotationBaseTime = 0.0;
-      double rotationtimeScale = 0.0;
-      std::vector<double> anglePoly1, anglePoly2, anglePoly3;
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-
-        if (i > 0) {
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-          spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
-                                       m_solveSettings->pointingInterpolationType());
-        }
-        else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
-
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
-          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-
-          rotationBaseTime = spicerotation->GetBaseTime();
-          rotationtimeScale = spicerotation->GetTimeScale();
-          spicerotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
-        }
-      }
-    }
-
     return true;
   }
-*/
+
+
   /**
-   * Intializes the body rotation 
+   * Initializes the body rotation
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
@@ -609,54 +526,6 @@ namespace Isis {
       image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
-
-
-/*
-  bool BundleObservation::initializeExteriorOrientation() {
-
-    if (m_solveSettings->instrumentPositionSolveOption() !=
-        BundleObservationSolveSettings::NoPositionFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpicePosition *spiceposition = image->camera()->instrumentPosition();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-      }
-    }
-
-    if (m_solveSettings->instrumentPointingSolveOption() !=
-        BundleObservationSolveSettings::NoPointingFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-      }
-    }
-
-    return true;
-  }
-*/
 
 
   /**
@@ -772,109 +641,11 @@ namespace Isis {
 
 
   /**
-   * Initializes the parameter weights for solving
+   * Computes bundle adjustment partial derivatives for this observation
    *
-   * @return @b bool Returns true upon successful intialization
+   * @param coeffImage Matrix of partial derivatives
    *
-   * @internal
-   *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
-   *         By the way, this seems klunky to me, would like to come up with a better way.
-   *         Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
-   *         the BundleObservation class too - this is unnecessary should only be in the
-   *         BundleObservationSolveSettings. But, they are split into position and pointing.
-   *
-   *   @todo always returns true?
    */
-  /*
-  bool BundleObservation::initParameterWeights() {
-
-                                   // weights for
-    double posWeight    = 0.0;     // position
-    double velWeight    = 0.0;     // velocity
-    double accWeight    = 0.0;     // acceleration
-    double angWeight    = 0.0;     // angles
-    double angVelWeight = 0.0;     // angular velocity
-    double angAccWeight = 0.0;     // angular acceleration
-
-    QList<double> aprioriPointingSigmas = m_solveSettings->aprioriPointingSigmas();
-    QList<double> aprioriPositionSigmas = m_solveSettings->aprioriPositionSigmas();
-
-    int nCamPosCoeffsSolved = 3  *m_solveSettings->numberCameraPositionCoefficientsSolved();
-
-    int nCamAngleCoeffsSolved;
-    if (m_solveSettings->solveTwist()) {
-      nCamAngleCoeffsSolved = 3  *m_solveSettings->numberCameraAngleCoefficientsSolved();
-    }
-    else {
-      nCamAngleCoeffsSolved = 2  *m_solveSettings->numberCameraAngleCoefficientsSolved();
-    }
-
-    if (aprioriPositionSigmas.size() >= 1 && aprioriPositionSigmas.at(0) > 0.0) {
-      posWeight = aprioriPositionSigmas.at(0);
-      posWeight = 1.0 / (posWeight  *posWeight * 1.0e-6);
-    }
-    if (aprioriPositionSigmas.size() >= 2 && aprioriPositionSigmas.at(1) > 0.0) {
-      velWeight = aprioriPositionSigmas.at(1);
-      velWeight = 1.0 / (velWeight  *velWeight * 1.0e-6);
-    }
-    if (aprioriPositionSigmas.size() >= 3 && aprioriPositionSigmas.at(2) > 0.0) {
-      accWeight = aprioriPositionSigmas.at(2);
-      accWeight = 1.0 / (accWeight  *accWeight * 1.0e-6);
-    }
-
-    if (aprioriPointingSigmas.size() >= 1 && aprioriPointingSigmas.at(0) > 0.0) {
-      angWeight = aprioriPointingSigmas.at(0);
-      angWeight = 1.0 / (angWeight  *angWeight * DEG2RAD * DEG2RAD);
-    }
-    if (aprioriPointingSigmas.size() >= 2 && aprioriPointingSigmas.at(1) > 0.0) {
-      angVelWeight = aprioriPointingSigmas.at(1);
-      angVelWeight = 1.0 / (angVelWeight * angVelWeight * DEG2RAD * DEG2RAD);
-    }
-    if (aprioriPointingSigmas.size() >= 3 && aprioriPointingSigmas.at(2) > 0.0) {
-      angAccWeight = aprioriPointingSigmas.at(2);
-      angAccWeight = 1.0 / (angAccWeight * angAccWeight * DEG2RAD * DEG2RAD);
-    }
-
-    int nSpkTerms = m_solveSettings->spkSolveDegree()+1;
-    nSpkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    int nPositionParameters = numberPositionParameters();
-    for ( int i = 0; i < nPositionParameters; i++) {
-      if (i % nSpkTerms == 0) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(0);
-       m_weights[i] = posWeight;
-      }
-      if (i % nSpkTerms == 1) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(1);
-       m_weights[i] = velWeight;
-      }
-      if (i % nSpkTerms == 2) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(2);
-       m_weights[i] = accWeight;
-      }
-    }
-
-    int nCkTerms = m_solveSettings->ckSolveDegree()+1;
-    nCkTerms = m_solveSettings->numberCameraAngleCoefficientsSolved();
-    int nPointingParameters = numberPointingParameters();
-    for ( int i = 0; i < nPointingParameters; i++) {
-      if (i % nCkTerms == 0) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(0);
-        m_weights[nCamPosCoeffsSolved + i] = angWeight;
-      }
-      if (i % nCkTerms == 1) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(1);
-        m_weights[nCamPosCoeffsSolved + i] = angVelWeight;
-      }
-      if (i % nCkTerms == 2) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(2);
-        m_weights[nCamPosCoeffsSolved + i] = angAccWeight;
-      }
-    }
-
-    return true;
-  }
-*/
-
   void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImage) {
     BundleImageQsp image = at(0);
 
@@ -979,9 +750,6 @@ namespace Isis {
    */  
   bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
     int index = 0;
-
-//    qDebug() << corrections;
-//    int fred = 1;
 
     try {
       int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -1113,6 +881,8 @@ namespace Isis {
    *
    * @param diagonalBlock diagonal block of normal equations matrix corresponding to this
    *                      observation
+   * @param rhs diagonal portion of right hand side vector of normal equations corresponding to this
+   *                     observation
    */
   void BundleObservation::applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
                                                      LinearAlgebra::Vector &rhs) {

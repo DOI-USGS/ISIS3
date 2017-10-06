@@ -77,6 +77,15 @@ namespace Isis {
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -m_continuityConstraints member.
+   *                           -methods...
+   *                               int numberPolynomialPositionSegments
+   *                               int numberPolynomialPointingSegments
+   *                               int numberPolynomialSegments
+   *                               int numberContinuityConstraints
+   *                               void applyContinuityConstraints
+   *
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {
 
@@ -128,18 +137,18 @@ namespace Isis {
      
       LinearAlgebra::Vector &parameterWeights();
       LinearAlgebra::Vector &parameterCorrections();
-//    LinearAlgebra::Vector &parameterSolution();
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
 
       const BundleObservationSolveSettingsQsp solveSettings();
 
-//    QStringList serialNumbers();
-
       void computePartials(LinearAlgebra::Matrix &coeffImage);
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections);      
       void applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
                                       LinearAlgebra::Vector &rhs);
+
+      LinearAlgebra::MatrixUpperTriangular &continuityContraintMatrix();
+      LinearAlgebra::Vector &continuityRHS();
 
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
@@ -149,10 +158,6 @@ namespace Isis {
       QString formatBundleContinuityConstraintString();
       QStringList parameterList();
       QStringList imageNames();
-
-      // continuity constraints     
-      LinearAlgebra::MatrixUpperTriangular &continuityContraintMatrix();
-      LinearAlgebra::Vector &continuityRHS();
 
     private:
       bool initParameterWeights();
@@ -173,7 +178,7 @@ namespace Isis {
       QStringList m_parameterNamesList; //!< List of all cube parameters.
       QStringList m_imageNames;         //!< List of all cube names.
 
-      QString m_instrumentId;      //!< Spacecraft instrument id.
+      QString m_instrumentId;           //!< Spacecraft instrument id.
 
       //!< Solve settings for this observation.
       QSharedPointer<BundleObservationSolveSettings> m_solveSettings;
@@ -183,20 +188,14 @@ namespace Isis {
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (primary image).
       SpicePosition *m_instrumentPosition;   //!< Instrument spice position (primary image).
-//    SpiceRotation *m_bodyRotation;         //!< Instrument body rotation (in primary image).
 
       //!< QShared pointer to BundleTargetBody.
       QSharedPointer<BundleTargetBody> m_bundleTargetBody;
 
-    // TODO??? change these to LinearAlgebra vectors...
-      LinearAlgebra::Vector m_weights;     //!< Parameter weights.
-      //! Cumulative parameter correction vector.
-      LinearAlgebra::Vector m_corrections;
-      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_aprioriSigmas;
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_adjustedSigmas; 
+      LinearAlgebra::Vector m_weights;        //!< Parameter weights.
+      LinearAlgebra::Vector m_corrections;    //!< Cumulative parameter correction vector.
+      LinearAlgebra::Vector m_aprioriSigmas;  //!< A posteriori (adjusted) parameter sigmas.
+      LinearAlgebra::Vector m_adjustedSigmas; //!< A posteriori (adjusted) parameter sigmas.
   };
 
   //! Typdef for BundleObservation QSharedPointer.

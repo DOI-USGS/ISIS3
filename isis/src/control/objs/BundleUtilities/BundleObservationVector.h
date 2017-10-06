@@ -61,6 +61,9 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Modified addnew so that we set solve settings based
    *                           on the BundleObsevation's observation number. Renamed addnew to
    *                           addNew(). References #4293.
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -methods...
+   *                               int numberContinuityConstraintEquations
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 

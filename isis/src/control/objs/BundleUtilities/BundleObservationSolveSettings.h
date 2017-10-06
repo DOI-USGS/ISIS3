@@ -75,7 +75,13 @@ namespace Isis {
    *                           with these settings. Removed the setFromPvl() method. When re-
    *                           implemented, it should be put in jigsaw. References #4293.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
-   *
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -members...
+   *                               int m_numberCkPolySegments
+   *                               int m_numberSpkPolySegments
+   *                           -methods...
+   *                               int numberCkPolySegments
+   *                               int numberCkPolySegments
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.

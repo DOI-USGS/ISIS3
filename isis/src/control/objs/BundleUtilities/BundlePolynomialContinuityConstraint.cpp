@@ -36,9 +36,12 @@ namespace Isis {
   /**
    * Constructor
    *
+   * @param parentObservation parent BundleObservation
    */
   BundlePolynomialContinuityConstraint::
       BundlePolynomialContinuityConstraint(BundleObservationQsp parentObservation) {
+
+    m_parentObservation = parentObservation;
 
     // initialize variables
     m_numberCkCoefficients = 0;
@@ -48,8 +51,6 @@ namespace Isis {
     m_numberSegmentParameters = 0;
     m_numberParameters = 0;
     m_numberConstraintEquations = 0;
-
-    m_parentObservation = parentObservation;
 
     BundleObservationSolveSettingsQsp solveSettings = m_parentObservation->solveSettings();
 
@@ -83,8 +84,9 @@ namespace Isis {
       m_numberCkBoundaries = m_numberCkSegments - 1;
 
       nCkParameters = 2 * m_numberCkCoefficients;
-      if (solveSettings->solveTwist())
+      if (solveSettings->solveTwist()) {
         nCkParameters += m_numberCkCoefficients;
+      }
 
       // knots contain scaled time
       m_ckKnots = parentObservation->spiceRotation()->scaledPolynomialKnots();
@@ -177,7 +179,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns number of spk segments in piecewise polynomial
+   *
+   * @return @b int Returns number of spk segments in piecewise polynomial
    */
   int BundlePolynomialContinuityConstraint::numberSpkSegments() const {
     return m_numberSpkSegments;
@@ -185,7 +189,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns number of ck segments in piecewise polynomial
+   *
+   * @return @b int Returns number of ck segments in piecewise polynomial
    */
   int BundlePolynomialContinuityConstraint::numberCkSegments() const {
     return m_numberCkSegments;
@@ -193,7 +199,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns number of continuity constraint equations
+   *
+   * @return @b int Number of continuity constraint equations
    */
   int BundlePolynomialContinuityConstraint::numberConstraintEquations() const {
     return m_numberConstraintEquations;
@@ -201,7 +209,11 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns matrix with contribution to bundle adjustment normal equations from continuity
+   * constraints
+   *
+   * @return @b LinearAlgebra::MatrixUpperTriangular Matrix with contribution to bundle adjustment
+   *                                                 normal equations from continuity constraints
    */
   LinearAlgebra::MatrixUpperTriangular
       &BundlePolynomialContinuityConstraint::normalsMatrix() {
@@ -210,7 +222,11 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Returns vector with contribution to bundle adjustment normal equations right hand side from
+   * continuity constraints
+   *
+   * @return @b LinearAlgebra::Vector Vector with contribution to bundle adjustment normal equations
+   *                                  right hand side from continuity constraints
    */
   LinearAlgebra::Vector
       &BundlePolynomialContinuityConstraint::rightHandSideVector() {
@@ -218,7 +234,10 @@ namespace Isis {
   }
 
   /**
-   * TODO: constructs continuity constraint matrix for segment boundaries
+   * Constructs m_normalsMatrix and m_rightHandSide vector as well as m_designMatrix and
+   * the m_omcVector (or observed - computed vector)
+   *
+   * TODO: need more documentation on technical aspects of approach
    */
   void BundlePolynomialContinuityConstraint::constructMatrices() {
 
@@ -261,7 +280,9 @@ namespace Isis {
 
 
   /**
-   * TODO: position continuity
+   * Constructs portion of m_designMatrix relative to position continuity constraints
+   *
+   * TODO: need more documentation on technical aspects of approach
    */
   void BundlePolynomialContinuityConstraint::positionContinuity(int &designRow) {
     LinearAlgebra::Vector partials(m_numberParameters);
@@ -348,7 +369,9 @@ namespace Isis {
 
 
   /**
-   * TODO: pointing continuity
+   * Constructs portion of m_designMatrix relative to pointing continuity constraints
+   *
+   * TODO: need more documentation on technical aspects of approach
    */
   void BundlePolynomialContinuityConstraint::pointingContinuity(int &designRow) {
     LinearAlgebra::Vector partials(m_numberParameters);
@@ -445,7 +468,9 @@ namespace Isis {
 
 
   /**
-   * TODO
+   * Updates right hand side vector after parameters have been updated at each iteration
+   *
+   * TODO: need more documentation on technical aspects of approach
    */
   void BundlePolynomialContinuityConstraint::updateRightHandSide() {
 

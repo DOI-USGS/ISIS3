@@ -277,7 +277,6 @@ namespace Isis {
     m_rmsSigmaLongitudeStats = 0.0;
     m_rmsSigmaRadiusStats = 0.0;
 
-
     // set by compute residuals
     m_rmsXResiduals = 0.0;
     m_rmsYResiduals = 0.0;

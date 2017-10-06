@@ -110,14 +110,13 @@ namespace Isis {
       int polyRotationSegmentIndex() const;
 
     private:
-      ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
-      BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
-                                                     bundle control measure **/
-      QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
-      QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+      ControlMeasure *m_controlMeasure;                      //!< ISIS control measure
+      BundleControlPoint *m_parentControlPoint;              //!< Parent bundle control point
+      QSharedPointer<BundleImage> m_parentBundleImage;       //!< Parent image
+      QSharedPointer<BundleObservation> m_parentObservation; //!< Parent bundle observation
 
-      int m_polyPositionSegmentIndex;
-      int m_polyRotationSegmentIndex;
+      int m_polyPositionSegmentIndex; //!< segment index for piecewise position polynomial
+      int m_polyRotationSegmentIndex; //!< segment index for piecewise rotation polynomial/
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

@@ -443,22 +443,35 @@ namespace Isis {
                         + observationNumber + "is null." + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
+
+        // initialize piecewise polynomial continuity constraints for time-dependent sensors if
+        // necessary
+        // TODO: can we let BundleObservation handle this?
+        if (observation->numberPolynomialPositionSegments() > 1
+            || observation->numberPolynomialPointingSegments() > 1) {
+
+          BundlePolynomialContinuityConstraintQsp polyConstraint =
+              BundlePolynomialContinuityConstraintQsp(
+                new BundlePolynomialContinuityConstraint(observation));
+          observation->setContinuityConstraints(polyConstraint);
+        }
       }
 
       // initialize polynomial continuity constraints for time-dependent sensors if necessary
-      // TODO: let BundleObservation handle this
-      int numBundleObservations = m_bundleObservations.size();
-      for (int i = 0; i < numBundleObservations; i++) {
-        BundleObservationQsp observation = m_bundleObservations.at(i);
-        int numSpkSegments = observation->numberPolynomialPositionSegments();
-        int numCkSegments = observation->numberPolynomialPointingSegments();
-        if (numSpkSegments == 1 && numCkSegments == 1)
-          continue;
+      // TODO: can we let BundleObservation handle this
+//      int numBundleObservations = m_bundleObservations.size();
+//      for (int i = 0; i < numBundleObservations; i++) {
+//        BundleObservationQsp observation = m_bundleObservations.at(i);
+//        int numSpkSegments = observation->numberPolynomialPositionSegments();
+//        int numCkSegments = observation->numberPolynomialPointingSegments();
+//        if (numSpkSegments == 1 && numCkSegments == 1)
+//          continue;
 
-        BundlePolynomialContinuityConstraintQsp polyConstraint =
-            BundlePolynomialContinuityConstraintQsp(new BundlePolynomialContinuityConstraint(observation));
-        observation->setContinuityConstraints(polyConstraint);
-      }
+//        BundlePolynomialContinuityConstraintQsp polyConstraint =
+//            BundlePolynomialContinuityConstraintQsp(
+//              new BundlePolynomialContinuityConstraint(observation));
+//        observation->setContinuityConstraints(polyConstraint);
+//      }
 
       if (m_bundleSettings->solveTargetBody()) {
         m_bundleObservations.initializeBodyRotation();
