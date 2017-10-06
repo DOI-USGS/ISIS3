@@ -677,7 +677,7 @@ namespace Isis {
         sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
     fpOut << buf;
     sprintf(buf, "\n          POLYNOMIAL SEGMENT COUNT: %d",
-            globalSettings.numberSpkPolySegments()());
+            globalSettings.numberSpkPolySegments());
 
     sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
     fpOut << buf;

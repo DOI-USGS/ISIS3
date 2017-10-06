@@ -285,6 +285,13 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -modifications to...
+   *                               ::init
+   *                               ::solveCholesky
+   *                               ::formNormalEquations
+   *                           -methods...
+   *                               void applyPolynomialContinuityConstraints()
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -391,9 +398,6 @@ namespace Isis {
       bool formWeightedNormals(boost::numeric::ublas::compressed_vector< double >  &n1,
                                LinearAlgebra::Vector                               &nj);
       void applyPolynomialContinuityConstraints();
-
-//      void polynomialContinuityConstraints(BundleObservationQsp observation,
-//                                           LinearAlgebra::Matrix * diagonalBlock);
 
       // dedicated matrix functions
 

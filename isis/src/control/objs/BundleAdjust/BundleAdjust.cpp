@@ -375,7 +375,7 @@ namespace Isis {
     m_iterationSummary = "";
 
     // Get the cameras set up for all images
-    // NOTE - THIS IS NOT THE SAME AS "setImage" as called in BundleAdjust::computePartials
+    // NOTE - THIS IS NinitOT THE SAME AS "setImage" as called in BundleAdjust::computePartials
     // this call only does initializations; sets measure's camera pointer, etc
     // RENAME????????????
     m_controlNet->SetImages(*m_serialNumberList, progress);
@@ -456,22 +456,6 @@ namespace Isis {
           observation->setContinuityConstraints(polyConstraint);
         }
       }
-
-      // initialize polynomial continuity constraints for time-dependent sensors if necessary
-      // TODO: can we let BundleObservation handle this
-//      int numBundleObservations = m_bundleObservations.size();
-//      for (int i = 0; i < numBundleObservations; i++) {
-//        BundleObservationQsp observation = m_bundleObservations.at(i);
-//        int numSpkSegments = observation->numberPolynomialPositionSegments();
-//        int numCkSegments = observation->numberPolynomialPointingSegments();
-//        if (numSpkSegments == 1 && numCkSegments == 1)
-//          continue;
-
-//        BundlePolynomialContinuityConstraintQsp polyConstraint =
-//            BundlePolynomialContinuityConstraintQsp(
-//              new BundlePolynomialContinuityConstraint(observation));
-//        observation->setContinuityConstraints(polyConstraint);
-//      }
 
       if (m_bundleSettings->solveTargetBody()) {
         m_bundleObservations.initializeBodyRotation();
@@ -895,7 +879,7 @@ namespace Isis {
         emit statusUpdate(QString("Constrained Parameters:%1")
                                   .arg(m_bundleResults.numberConstrainedPointParameters()));
         if (m_bundleResults.numberContinuityConstraintEquations() > 0) {
-          emit statusUpdate(QString("Constrained Parameters:%1")
+          emit statusUpdate(QString("Continuity Constraint Equations:%1")
                                     .arg(m_bundleResults.numberContinuityConstraintEquations()));
         }
         emit statusUpdate(QString("Constrained Parameters:%1")
@@ -1488,9 +1472,11 @@ namespace Isis {
 
       // get diagonal block i from sparse normal equations matrix
       LinearAlgebra::Matrix *diagonalBlock = m_sparseNormals.getBlock(i, i);
-      if (!diagonalBlock) // TODO: should we continue here, or throw an error? (KLE 2017-07-18)
+      if (!diagonalBlock) // TODO: should we continue here, or throw an error? Think an error, null
+                          // diagonalBlock seems pretty catastropic (KLE 2017-10-06)
         continue;
 
+      // TODO: are these calls making a copy?
       continuityMatrix = observation->continuityContraintMatrix();
       continuityRHS = observation->continuityRHS();
 
