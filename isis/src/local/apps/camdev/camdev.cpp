@@ -24,7 +24,7 @@ using namespace Isis;
 
 // Global variables
 Camera *cam;
-TProjection *proj;
+TProjection *projection;
 int nbands;
 bool noCamera;
 
@@ -124,7 +124,7 @@ void IsisMain() {
 
   if(noCamera) {
     try {
-      proj = (TProjection *) icube->projection();
+      projection = (TProjection *) icube->projection();
     }
     catch(IException &e) {
       QString msg = "Mosaic files must contain mapping labels";
@@ -415,7 +415,7 @@ void camdev(Buffer &out) {
 
       bool isGood=false;
       if (noCamera) {
-        isGood = proj->SetWorld(samp, line);
+        isGood = projection->SetWorld(samp, line);
       }
       else {
         isGood = cam->SetImage(samp, line);
@@ -432,7 +432,7 @@ void camdev(Buffer &out) {
         }
         if(planetocentricLatitude) {
           if(noCamera) {
-            out[index] = proj->UniversalLatitude();
+            out[index] = projection->UniversalLatitude();
           }
           else {
             out[index] = cam->UniversalLatitude();
@@ -453,7 +453,7 @@ void camdev(Buffer &out) {
         double pe360Lon, pw360Lon;
         if (positiveEast360Longitude) {
           if(noCamera) {
-            pe360Lon = proj->UniversalLongitude();
+            pe360Lon = projection->UniversalLongitude();
           }
           else {
             pe360Lon = cam->UniversalLongitude();
@@ -494,7 +494,7 @@ void camdev(Buffer &out) {
         }
         if (pixelResolution) {
           if (noCamera) {
-            out[index] = proj->Resolution();
+            out[index] = projection->Resolution();
           }
           else {
             out[index] = cam->PixelResolution();

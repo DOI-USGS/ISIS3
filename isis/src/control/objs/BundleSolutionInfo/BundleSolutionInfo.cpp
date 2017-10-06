@@ -643,6 +643,9 @@ namespace Isis {
         sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
     fpOut << buf;
+    sprintf(buf, "\n          POLYNOMIAL SEGMENT COUNT: %d",
+            globalSettings.numberCkPolySegments());
+    fpOut << buf;
 
     sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
     fpOut << buf;
@@ -673,6 +676,8 @@ namespace Isis {
         sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
     fpOut << buf;
+    sprintf(buf, "\n          POLYNOMIAL SEGMENT COUNT: %d",
+            globalSettings.numberSpkPolySegments()());
 
     sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
     fpOut << buf;

@@ -11,7 +11,7 @@ using namespace Isis;
 // Global variables
 Cube *icube;
 Camera *cam;
-TProjection *proj;
+TProjection *projection;
 double minlat;
 double maxlat;
 double minlon;
@@ -53,14 +53,14 @@ void IsisMain() {
   if(ui.WasEntered("MAP")) {
     Pvl lab;
     lab.read(ui.GetFileName("MAP"));
-    proj = (TProjection *) ProjectionFactory::Create(lab);
+    projection = (TProjection *) ProjectionFactory::Create(lab);
 
     // add mapping to print.prt
-    PvlGroup mapping = proj->Mapping();
+    PvlGroup mapping = projection->Mapping();
     Application::Log(mapping);
   }
   else {
-    proj = NULL;
+    projection = NULL;
   }
 
   // Start the processing
@@ -86,10 +86,10 @@ void camtrim(Buffer &in, Buffer &out) {
     if(cam->HasSurfaceIntersection()) {
       lat = cam->UniversalLatitude();
       lon = cam->UniversalLongitude();
-      if(proj != NULL) {
-        proj->SetUniversalGround(lat, lon);
-        lat = proj->Latitude();
-        lon = proj->Longitude();
+      if(projection != NULL) {
+        projection->SetUniversalGround(lat, lon);
+        lat = projection->Latitude();
+        lon = projection->Longitude();
       }
       // Pixel is outside range
       if((lat < minlat) || (lat > maxlat) ||
