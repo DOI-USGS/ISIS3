@@ -74,11 +74,13 @@ namespace Isis {
    *                          ensures that the entire longitude range is returned.
    *                          Fixes #855.
    *  @history 2012-12-20 Debbie A. Cook - Changed to use TProjection 
-   *                           instead of Projection.  References #775.
+   *                          instead of Projection.  References #775.
    *  @history 2013-04-24 Tracie Sucharski - Added ring plane functionality to methods
-   *                           UniversalLatitude() and UniversalLongitude().  Reference #775.
-   *   @history 2012-04-24 Jeannie Backer - Removed prototype for constructor that has
-   *                           been removed from this class. References #775.
+   *                          UniversalLatitude() and UniversalLongitude().  Reference #775.
+   *  @history 2012-04-24 Jeannie Backer - Removed prototype for constructor that has
+   *                          been removed from this class. References #775.
+   *  @history 2017-06-26 Jesse Mapel - Added a new method to set the universal ground point
+   *                          without adjusting for the longitude domain. Fixes #2185.
    */
   class UniversalGroundMap {
     public:
@@ -104,6 +106,7 @@ namespace Isis {
 
       void SetBand(const int band);
       bool SetUniversalGround(double lat, double lon);
+      bool SetUnboundGround(Latitude lat, Longitude lon);
       bool SetGround(Latitude lat, Longitude lon);
       bool SetGround(const SurfacePoint &);
       double Sample() const;

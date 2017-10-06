@@ -170,6 +170,9 @@
       Fixed error introduced in last change which caused grid to no longer work on multi-band 
       cubes without camera models (for example: a mosaic will not have a camera model.) Fixes #4586. 
     </change>
+    <change name="Jesse Mapel" date="2017-06-26">
+      Added a flag to extend the grid past the longitude domain boundary. Fixes #2185. 
+    </change>
   </history>
 
   <groups>
@@ -277,6 +280,18 @@
           This will draw grid lines (or ticks) at the lat/lon extents of the
           image or those extents as provided by user input MINLAT, MAXLAT,
           MINLON, and MAXLON.
+        </description>
+      </parameter>
+
+      <parameter name="EXTENDGRID">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>If the grid should be extended past the longitude domain boundary.</brief>
+        <description>
+          If false, the grid will stop at the longitude domain boundary, -180
+          to 180 or 0 to 360, if the minimum or maximum longitude values are
+          outside of the domain range. If true, the grid will extend all the
+          way to the minimum and maximum longitudes regardless of the domain.
         </description>
       </parameter>
     </group>

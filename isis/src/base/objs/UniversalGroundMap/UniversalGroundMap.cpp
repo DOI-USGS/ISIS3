@@ -136,6 +136,33 @@ namespace Isis {
 
 
   /**
+   * Returns whether the lat/lon position was set successfully in the camera
+   * model or projection. This will not adjust the longitude based on the longitude domain.
+   *
+   * @param lat The universal latitude or ring radius for ring planes
+   * @param lon The universal longitude or ring longitude (azimuth) for ring planes
+   *
+   * @return Returns true if the lat/lon position was set successfully, and
+   *         false if it was not
+   */
+  bool UniversalGroundMap::SetUnboundGround(Latitude lat, Longitude lon) {
+    if(p_camera != NULL) {
+      if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
+        return p_camera->InCube();
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      double universalLat = lat.degrees();
+      double universalLon = lon.degrees();
+      return p_projection->SetUnboundUniversalGround(universalLat, universalLon);
+    }
+  }
+
+
+  /**
    * Returns whether the SurfacePoint was set successfully in the camera model
    * or projection
    *
