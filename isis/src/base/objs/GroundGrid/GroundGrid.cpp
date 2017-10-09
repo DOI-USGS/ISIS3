@@ -26,15 +26,19 @@ namespace Isis {
    * @param gmap A universal ground map to use for calculating the grid
    * @param splitLatLon Make two grids: one for latitude lines and
    *                    one for longitude lines
+   * @param extendGrid If the grid should extend past the longitude domain
+   *                   boundary.
    * @param width The width of the grid; often cube samples
    * @param height The height of the grid; often cube samples
    */
   GroundGrid::GroundGrid(UniversalGroundMap *gmap, 
                          bool splitLatLon,
+                         bool extendGrid,
                          unsigned int width, 
                          unsigned int height) {
     p_width = width;
     p_height = height;
+    m_extendGrid = extendGrid;
 
     // Initialize our grid pointer to null
     p_grid = 0;
@@ -537,6 +541,63 @@ namespace Isis {
     return p_mapping; 
   }
 
+
+  /**
+   * Returns the minimum latitude for the grid.
+   * 
+   * @return @b Latitude The minimum latitude for the grid. If no minimum has
+   *                     been set, then a default Latitude object is returned.
+   */
+  Latitude GroundGrid::minLatitude() const {
+    if (p_minLat) {
+      return *p_minLat;
+    }
+    return Latitude();
+  }
+
+
+  /**
+   * Returns the minimum longitude for the grid.
+   * 
+   * @return @b Longitude The minimum longitude for the grid. If no minimum has
+   *                      been set, then a default Longitude object is returned.
+   */
+  Longitude GroundGrid::minLongitude() const {
+    if (p_minLon) {
+      return *p_minLon;
+    }
+    return Longitude();
+  }
+
+
+  /**
+   * Returns the maximum latitude for the grid.
+   * 
+   * @return @b Latitude The maximum latitude for the grid. If no maximum has
+   *                     been set, then a default Latitude object is returned.
+   */
+  Latitude GroundGrid::maxLatitude() const {
+    if (p_maxLat) {
+      return *p_maxLat;
+    }
+    return Latitude();
+  }
+
+
+  /**
+   * Returns the maximum longitude for the grid.
+   * 
+   * @return @b Longitude The maximum longitude for the grid. If no maximum has
+   *                      been set, then a default Longitude object is returned.
+   */
+  Longitude GroundGrid::maxLongitude() const {
+    if (p_maxLon) {
+      return *p_maxLon;
+    }
+    return Longitude();
+  }
+
+
   /**
    * This method converts a lat/lon to an X/Y. This implementation converts to
    * sample/line.
@@ -551,7 +612,12 @@ namespace Isis {
   bool GroundGrid::GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
     if (!GroundMap()) return false;
-    if (!GroundMap()->SetGround(lat, lon)) return false;
+    if (m_extendGrid) {
+      if (!GroundMap()->SetUnboundGround(lat, lon)) return false;
+    }
+    else {
+      if (!GroundMap()->SetGround(lat, lon)) return false;
+    }
     if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
     if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
 

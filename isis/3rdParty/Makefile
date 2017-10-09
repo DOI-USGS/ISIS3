@@ -77,8 +77,7 @@ libs:
 	fi
 
 license:
-	echo $(CURTIMESTAMP) "  Obtaining licenses";                         \
-	$(RSYNC) -a $(THIRDPARTYLICPATH)														         \
+	$(RSYNC) -a $(THIRDPARTYLICPATH)                                     \
 	  $(ISISROOT)/3rdParty/license/
 
 plugins:

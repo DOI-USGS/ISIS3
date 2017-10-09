@@ -37,30 +37,32 @@
 #include "PvlObject.h"
 #include "XmlToPvlTranslationManager.h"
 
+
 using namespace std;
 namespace Isis {
 
   /**
    * Constructs and initializes an XmlToPvlTranslationManager object from the given
-   * Pvl translation file. If this constructor is used, the user will need to 
-   * set the input label before translating. This may be done by using 
-   * SetLabel(FileName inputLabel) or Auto(FileName inputLabel, Pvl 
-   * outputLabel). 
+   * Pvl translation file. If this constructor is used, the user will need to
+   * set the input label before translating. This may be done by using
+   * SetLabel(FileName inputLabel) or Auto(FileName inputLabel, Pvl
+   * outputLabel).
    *
    * @param transFile The translation file to be used to tranlate keywords in
    *                  the input label.
    */
-  XmlToPvlTranslationManager::XmlToPvlTranslationManager(const QString &transFile) 
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(const QString &transFile)
       : LabelTranslationManager() {
     AddTable(transFile);
   }
 
+
   /**
-   * Constructs and initializes an XmlToPvlTranslationManager object from the given 
-   * input stream. If this constructor is used, the user will need to set the 
-   * input label before translating. This may be done by using SetLabel(FileName 
-   * inputLabel) or Auto(FileName inputLabel, Pvl outputLabel). 
-   *                                                        
+   * Constructs and initializes an XmlToPvlTranslationManager object from the given
+   * input stream. If this constructor is used, the user will need to set the
+   * input label before translating. This may be done by using SetLabel(FileName
+   * inputLabel) or Auto(FileName inputLabel, Pvl outputLabel).
+   *
    *
    * @param transStrm A stream containing the tranlation table to be used to
    *                  tranlate keywords in the input label.
@@ -81,7 +83,7 @@ namespace Isis {
    *                  the input label.
    */
   XmlToPvlTranslationManager::XmlToPvlTranslationManager(FileName &inputLabel,
-                                               const QString &transFile)
+                                                         const QString &transFile)
       : LabelTranslationManager() {
     AddTable(transFile);
     parseFile(inputLabel);
@@ -97,8 +99,8 @@ namespace Isis {
    * @param transStrm A stream containing the tranlation table to be used to
    *                  tranlate keywords in the input label.
    */
-  XmlToPvlTranslationManager::XmlToPvlTranslationManager(FileName &inputLabel, 
-                                               std::istream &transStrm)
+  XmlToPvlTranslationManager::XmlToPvlTranslationManager(FileName &inputLabel,
+                                                         std::istream &transStrm)
       : LabelTranslationManager() {
     AddTable(transStrm);
     parseFile(inputLabel);
@@ -114,18 +116,18 @@ namespace Isis {
 
   /**
    * Reads an Xml label file and internalizes it for translation.
-   * 
+   *
    * @param inputLabel The input label file
    */
   void XmlToPvlTranslationManager::SetLabel(FileName &inputLabel) {
     parseFile(inputLabel);
   }
 
-  
+
   /**
    * Returns a vector of valid keyword names and their sizes.  A size of -1
    * indicates that the keyword can be any size.
-   * 
+   *
    * @return @b vector<pair<QString,int>> A vector of valid keyword names and their sizes.
    */
   vector< pair<QString, int> > XmlToPvlTranslationManager::validKeywords() const {
@@ -138,6 +140,7 @@ namespace Isis {
     return validKeywords;
   }
 
+
   /**
    * Returns a translated value. The output name is used to find the input
    * group, keyword, default and tranlations in the translation table. If the
@@ -146,13 +149,13 @@ namespace Isis {
    * is then used to search all of the translations. If a match is
    * found the translated value is returned.
    *
-   * @param outputName The output name used to identify the input keyword to 
+   * @param outputName The output name used to identify the input keyword to
    *                   be translated.
    *
    * @param index The index into the input keyword array.  Defaults to 0
    *
    * @return string The ISIS cube label value for the outputName.
-   * 
+   *
    * @throws IException::Unknown "Failed to translate output value."
    * @throws IException::Unknown "Cannot translate value. Xml files can only
    *                              store a single value in each element."
@@ -167,7 +170,8 @@ namespace Isis {
    * @throws IException::Unknown "Could not find an input value or default value."
    * @throws IException::Unknown "Input element does not have the named attribute."
    */
-  QString XmlToPvlTranslationManager::Translate(QString outputName, int index) {
+  QString XmlToPvlTranslationManager::Translate(QString outputName, 
+                                                int index) {
     try {
     if (index != 0) {
       QString msg = "Cannot translate value at index [" + toString(index) +
@@ -184,7 +188,7 @@ namespace Isis {
       QString msg = "Unable to retrieve translation group from translation table.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-    
+
     // get input position values
     PvlKeyword inputPosition;
     try {
@@ -243,7 +247,7 @@ namespace Isis {
         if ( hasInputDefault(outputName) ) {
           if (isDebug) {
             cout << endl << "Could not traverse input position, " <<
-                            "using default value: " << 
+                            "using default value: " <<
                             InputDefault(outputName) << endl;
           }
           return PvlTranslationTable::Translate( outputName );
@@ -291,7 +295,7 @@ namespace Isis {
     if ( inputParentElement.isNull() ) {
       if ( hasInputDefault(outputName) ) {
         if (isDebug) {
-          cout << endl << "No input value found, using default value: " << 
+          cout << endl << "No input value found, using default value: " <<
                           InputDefault(outputName) << endl;
         }
         return PvlTranslationTable::Translate( outputName );
@@ -311,7 +315,7 @@ namespace Isis {
       }
       else if (hasInputDefault(outputName) ) {
         if (isDebug) {
-          cout << endl << "No input value found, using default value: " << 
+          cout << endl << "No input value found, using default value: " <<
                           InputDefault(outputName) << endl;
         }
         return PvlTranslationTable::Translate( outputName );
@@ -338,31 +342,35 @@ namespace Isis {
   /**
    * @brief Checks if a element in the xml label satisfies a list of
    *        dependencies.
-   * 
+   *
    * Checks if a element in the xml label satisfies a list of dependencies. The
    * dependencies are requirements on the values of attributes of the element
    * and/or the values of sibling elements. The dependencies are specified by
    * strings that are formatted as follows
    * <code>[tag/att]\@[tagName/attName]:[value]</code>
-   * 
+   *
    * @param element The element to check dependencies on.
    * @param dependencies A multi-valued keyword were every entry specifies a
    *                     requirement upon either an attribute of the element or
    *                     a sibling of the element.
-   * 
+   *
    * @return @b bool If the element passed the dependencies check
-   * 
+   *
    * @throws IException::Unknown "Parsing error, dependency type is not [att] or [tag]."
    */
   bool XmlToPvlTranslationManager::checkDependencies(QDomElement element,
-                                                PvlKeyword dependencies,
-                                                bool isDebug) const{
+                                                     PvlKeyword dependencies,
+                                                     bool isDebug) const{
 
     if (isDebug) {
       cout << endl << "Testing dependencies:" << endl;
     }
     for (int i = 0; i < dependencies.size(); i++) {
-      QStringList specification = parseDependency(dependencies[i]);
+      QStringList specification = parseSpecification(dependencies[i]);
+
+      if (specification.size() != 3) { // the specification is not a dependancy
+        return true;
+      }
       if (isDebug) {
         cout << endl << "Testing dependency number " << toString(i+1) << endl;
         cout << "  Specification:    " << dependencies[i] << endl;
@@ -420,65 +428,6 @@ namespace Isis {
 
 
   /**
-   * Parses and validates a dependency specification.
-   * 
-   * @param specification The dependency specification string.
-   * 
-   * @return @b QStringList The dependency split into 3 components
-   *                        <ol>
-   *                          <li>the type (att or tag)</li>
-   *                          <li>the name of what to check</li>
-   *                          <li>the value to check for</li>
-   *                        </ol>
-   * 
-   * @throws IException::Unknown "Malformed dependency specification."
-   * @throws IException::Unknown "Specification does not have two components
-   *                              separated by [@], the type of dependency and
-   *                              the name-value pair.
-   * @throws IException::Unknown "Dependency type specification is invalid.
-   *                              Valid types are [att] and [tag]"
-   * @throws IException::Unknown "Name-value specification does not have two
-   *                              components separated by [:]."
-   * 
-   * @see XmlToPvlTranslationManager::checkDependencies
-   */
-  QStringList XmlToPvlTranslationManager::parseDependency(QString specification) const {
-
-    QStringList parsedSpecification;
-
-    try {
-      QStringList typeSplit = specification.split("@", QString::SkipEmptyParts);
-      if (typeSplit.size() != 2) {
-        QString msg = "Specification does not have two components separated "
-                      "by [@], the type of dependency and the name-value pair.";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
-      }
-      if (typeSplit[0].toLower() != "att" &&
-          typeSplit[0].toLower() != "tag") {
-        QString msg = "Dependency type specification [" + typeSplit[0] +
-                      "] is invalid. Valid types are [att] and [tag]";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
-      }
-      parsedSpecification.append(typeSplit[0].toLower());
-
-      QStringList nameValueSplit = typeSplit[1].split(":", QString::SkipEmptyParts);
-      if (nameValueSplit.size() != 2) {
-        QString msg = "Name-value specification [" + typeSplit[1] + "] does "
-                      "not have two components separated by [:].";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
-      }
-      parsedSpecification.append(nameValueSplit);
-    }
-    catch (IException &e) {
-      QString msg = "Malformed dependency specification [" + specification + "].";
-      throw IException(e, IException::Unknown, msg, _FILEINFO_);
-    }
-
-    return parsedSpecification;
-  }
-
-
-  /**
    * Automatically translate all the output names flagged with the Auto keyword
    * in the translation table and store the translated key, value pairs in the
    * argument pvl.
@@ -486,7 +435,8 @@ namespace Isis {
    * @param inputLabel The input label file to be translated.
    * @param outputLabel The output translated Pvl.
    */
-  void XmlToPvlTranslationManager::Auto(FileName &inputLabel, Pvl &outputLabel) {
+  void XmlToPvlTranslationManager::Auto(FileName &inputLabel, 
+                                        Pvl &outputLabel) {
     parseFile(inputLabel);
     Auto(outputLabel);
   }
@@ -494,9 +444,9 @@ namespace Isis {
 
   /**
    * Opens, parses, and internalizes an Xml label file.
-   * 
+   *
    * @param xmlFileName The Xml label file.
-   * 
+   *
    * @throws IException::Unknown "Could not open label file."
    * @throws IException::Unknown "XML read/parse error in file."
    */

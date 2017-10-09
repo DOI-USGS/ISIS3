@@ -35,7 +35,8 @@ Cube *icube;
 UniversalGroundMap *gmap; 
 int currentBand = 0;
 bool recalculateForEachBand = false; 
-bool walkBoundary = false; 
+bool walkBoundary = false;
+bool extendGrid = false; 
 Latitude minLat, maxLat;
 Longitude minLon, maxLon;
 
@@ -54,6 +55,7 @@ void IsisMain() {
 
   outline = ui.GetBoolean("OUTLINE");
   ticks = ui.GetBoolean("TICKS");
+  extendGrid = ui.GetBoolean("EXTENDGRID");
 
   if (ticks) {
     tickSize = ui.GetInteger("TICKSIZE") / 2;
@@ -130,7 +132,8 @@ void IsisMain() {
 
     gmap = new UniversalGroundMap(*icube, UniversalGroundMap::ProjectionFirst);
 
-    latLonGrid = new GroundGrid(gmap, ticks, icube->sampleCount(), icube->lineCount());
+    latLonGrid = new GroundGrid(gmap, ticks, extendGrid,
+                                icube->sampleCount(), icube->lineCount());
 
     baseLat = Latitude(ui.GetDouble("BASELAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
@@ -159,6 +162,35 @@ void IsisMain() {
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
 
     latLonGrid->SetGroundLimits(minLat, minLon, maxLat, maxLon);
+
+    // If the grid is not going to reach the min/max lon warn the user.
+    if (!extendGrid) {
+      // Check that the min/max lon values match the lon domain
+      if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "360" &&
+          (latLonGrid->minLongitude().degrees() < 0.0 ||
+            latLonGrid->maxLongitude().degrees() > 360.0) ) {
+        QString msg = "**WARNING** minimum longitude ["
+                      + toString( latLonGrid->minLongitude().degrees() )
+                      + "] and maximum longitude ["
+                      + toString( latLonGrid->maxLongitude().degrees() )
+                      + "] are not in the 360 degree longitude domain and "
+                        "the EXTENDGRID parameter is set to false. "
+                        "Output grid may not cover the entire map projection.";
+        std::cerr << msg << std::endl;
+      }
+      else if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "180" &&
+                (latLonGrid->minLongitude().degrees() < -180.0 ||
+                latLonGrid->maxLongitude().degrees() > 180.0) ) {
+        QString msg = "**WARNING** minimum longitude ["
+                      + toString( latLonGrid->minLongitude().degrees() )
+                      + "] and maximum longitude ["
+                      + toString( latLonGrid->maxLongitude().degrees() )
+                      + "] are not in the 180 degree longitude domain and "
+                        "the EXTENDGRID parameter is set to false. "
+                        "Output grid may not cover the entire map projection.";
+        std::cerr << msg << std::endl;
+      }
+    }
 
     latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
 
@@ -313,10 +345,41 @@ void changeBand(int band){
   gmap->SetBand(band);
 
   //update latLonGrid to use new UniversalGroundMap
-  latLonGrid = new GroundGrid(gmap, ticks, icube->sampleCount(), icube->lineCount());
+  latLonGrid = new GroundGrid(gmap, ticks, extendGrid,
+                              icube->sampleCount(), icube->lineCount());
 
   //re-set old ground limits from GUI
   latLonGrid->SetGroundLimits(minLat, minLon, maxLat, maxLon);
+  // If the grid is not going to reach the min/max lon warn the user.
+  if (!extendGrid) {
+    // Check that the min/max lon values match the lon domain
+    if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "360" &&
+        (latLonGrid->minLongitude().degrees() < 0.0 ||
+          latLonGrid->maxLongitude().degrees() > 360.0) ) {
+      QString msg = "**WARNING** minimum longitude ["
+                    + toString( latLonGrid->minLongitude().degrees() )
+                    + "] and maximum longitude ["
+                    + toString( latLonGrid->maxLongitude().degrees() )
+                    + "] are not in the 360 degree longitude domain and "
+                      "the EXTENDGRID parameter is set to false. "
+                      "Output grid may not cover the entire map projection for band["
+                    + toString(band) + "].";
+      std::cerr << msg << std::endl;
+    }
+    else if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "180" &&
+              (latLonGrid->minLongitude().degrees() < -180.0 ||
+              latLonGrid->maxLongitude().degrees() > 180.0) ) {
+      QString msg = "**WARNING** minimum longitude ["
+                    + toString( latLonGrid->minLongitude().degrees() )
+                    + "] and maximum longitude ["
+                    + toString( latLonGrid->maxLongitude().degrees() )
+                    + "] are not in the 180 degree longitude domain and "
+                      "the EXTENDGRID parameter is set to false. "
+                      "Output grid may not cover the entire map projection for band["
+                    + toString(band) + "].";
+      std::cerr << msg << std::endl;
+    }
+  }
 
   QString progressMessage = QString("Recalculating grid for band %1").arg(band);
   progress.SetText(progressMessage);

@@ -116,14 +116,13 @@ namespace Isis {
    *
    * @internal
    *  @history 2017-01-12 Jeannie Backer - Original version. Adapted from
-   *                          PvlToPvlTranslationManager class. Fixes #4584.
+   *                          PvlTranslationManager class. Fixes #4584.
    *  @history 2017-01-13 Jeannie Backer and Jesse Mapel - Initial Translate
    *                          and Auto design. Added dependencies for uniquely
    *                          identifying input elements. Fixes #4584.
    *  @history 2017-01-18 Jesse Mapel - Updated documentation and error messages. Fixes #4584.
    *  @history 2017-01-25 Jesse Mapel - Created unit test. Fixes #4584.
-   *  @history 2017-05-30 Makayla Shepherd - Renamed from XmlTranslationManager to
-   *                          XmlToPvlTranslationManager. Fixes #4889.
+   *  @history 2017-05-26 Makayla Shepherd - Renamed XmlToPvlTranslationManager.
    */
   class XmlToPvlTranslationManager : public LabelTranslationManager {
     public:
@@ -152,7 +151,6 @@ namespace Isis {
     protected:
       virtual std::vector< std::pair<QString, int> > validKeywords() const;
       bool checkDependencies(QDomElement element, PvlKeyword dependencies, bool isDebug) const;
-      QStringList parseDependency(QString specification) const;
       void parseFile(const FileName &xmlFileName);
 
     private:
