@@ -829,7 +829,6 @@ namespace Isis {
         }
       }
 
-      table += record;
       CacheLabel(table);
       PolynomialLabel(table);
       return table;
