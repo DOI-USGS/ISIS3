@@ -818,11 +818,11 @@ namespace Isis {
         }
 
         if (!instrumentId.isEmpty()) {
-          m_image->m_instrumentId = m_imageFolder.expanded() + "/" + instrumentId;
+          m_image->m_instrumentId = instrumentId;
         }
 
         if (!spacecraftName.isEmpty()) {
-          m_image->m_spacecraftName = m_imageFolder.expanded() + "/" + spacecraftName;
+          m_image->m_spacecraftName = spacecraftName;
         }
 
         if (!aspectRatioStr.isEmpty()) {

@@ -85,6 +85,8 @@ namespace Isis {
    *                           (the Spacecraft name associated with this image).
    *   @history 2016-06-22 Tyler Wilson - Added documentation to member functions/variables.
    *                           Fixes #3950.
+   *   @history 2017-10-11 Summer Stapleton - Removed path to instrumentId and spacecraftName in
+   *                           the startElement method. Fixes #5179.
    *
    */
 
