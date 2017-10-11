@@ -11,7 +11,10 @@ namespace Isis {
    * @author 2012-05-29 Steven Lambright and Tracie Sucharski
    *
    * @internal
-   *   @histroy 2012-07-31 Kimberly Oyama - Added comments to some of the methods.
+   *   @history 2012-07-31 Kimberly Oyama - Added comments to some of the methods.
+   *   @history 2017-10-11 Ian Humphrey - Added a resize column call to showWarning() to ensure
+   *                           the column size is fit to the width of the warning text. This
+   *                           enables horizontal scrolling for the warning widget. Fixes #5164.
    */
   class WarningTreeWidget : public QTreeWidget {
       Q_OBJECT
