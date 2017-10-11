@@ -586,6 +586,10 @@ namespace Isis {
       // Initialize polynomial
       SetPolynomialDegree((int) degree);
       SetOverrideBaseTime(baseTime, timeScale);
+      ComputeBaseTime();
+      for (int i = 0 ; i < (int)knots.size(); i++) {
+        knots[i] = (knots[i] - p_baseTime) / p_timeScale;
+      }
       m_polynomial.setKnots(knots);
 
       for (int i = 0; i < segments; i++) {
