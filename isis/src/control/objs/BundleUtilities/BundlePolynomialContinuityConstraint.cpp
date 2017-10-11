@@ -28,6 +28,8 @@ namespace Isis {
     m_numberSpkCoefficients = 0;
     m_numberSpkSegments = 0;
     m_numberCkSegments = 0;
+    m_numberSpkBoundaries = 0;
+    m_numberCkBoundaries = 0;
     m_numberParameters = 0;
     m_numberConstraintEquations = 0;
   }
@@ -48,6 +50,8 @@ namespace Isis {
     m_numberSpkCoefficients = 0;
     m_numberCkSegments = 0;
     m_numberSpkSegments = 0;
+    m_numberSpkBoundaries = 0;
+    m_numberCkBoundaries = 0;
     m_numberSegmentParameters = 0;
     m_numberParameters = 0;
     m_numberConstraintEquations = 0;
@@ -140,6 +144,8 @@ namespace Isis {
     m_numberSpkCoefficients = src.m_numberSpkCoefficients;
     m_numberCkSegments = src.m_numberCkSegments;
     m_numberSpkSegments = src.m_numberCkSegments;
+    m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+    m_numberCkBoundaries = src.m_numberCkBoundaries;
 
     m_designMatrix = src.m_designMatrix;
     m_normalsMatrix = src.m_normalsMatrix;
@@ -168,6 +174,8 @@ namespace Isis {
       m_numberSpkCoefficients = src.m_numberSpkCoefficients;
       m_numberCkSegments = src.m_numberCkSegments;
       m_numberSpkSegments = src.m_numberCkSegments;
+      m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+      m_numberCkBoundaries = src.m_numberCkBoundaries;
 
       m_designMatrix = src.m_designMatrix;
       m_normalsMatrix = src.m_normalsMatrix;
