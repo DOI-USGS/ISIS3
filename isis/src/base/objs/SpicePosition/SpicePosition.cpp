@@ -1034,7 +1034,7 @@ namespace Isis {
     requiredSamples *= 3;
     // If there are not enough samples, generate more
     if ( (int)p_cacheTime.size() < requiredSamples ) {
-      double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / requiredSamples;
+      double sampleRate = ( p_cacheTime.back() - p_cacheTime.front() ) / (requiredSamples - 1);
       for (int i = 0; i < requiredSamples; i++) {
         double sampleTime = p_cacheTime.front() + sampleRate * i;
         SetEphemerisTime( sampleTime );
