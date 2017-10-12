@@ -1193,7 +1193,9 @@ highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -
         <p>
           This parameter can be used with all parameters, and reserved parameters.  
 	  It overrides some of the settings in the current or default preference file
-          with the contents of the file input by the user.  For example:
+          with the contents of the file input by the user.  For more information about the IsisPreferences file, see the
+	  <a href="https://isis.astrogeology.usgs.gov/documents/PreferenceDictionary/PreferenceDictionary.html">Isis Preferences Dictionary </a>
+	  For example:
         </p>
 
 <pre style="padding-left:2em;">
