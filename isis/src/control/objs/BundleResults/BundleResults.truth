@@ -278,6 +278,7 @@ Testing mutator methods...
 </bundleResults> 
 
 
+Number of continuity constraints: 3
 
 Testing more computation methods...
 sigma0 =  "1.2139539573338"

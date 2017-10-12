@@ -87,6 +87,8 @@ namespace Isis {
    *                               void applyContinuityConstraints
    *   @history 2017-10-11 Jesse Mapel - Modified output string methods to account for
    *                           piecewise polynomials.
+   *   @history 2017-10-12 Jesse Mapel - Initialize exterior orientation will now return false
+   *                           if one of the images has a null camera pointer.
    *
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {

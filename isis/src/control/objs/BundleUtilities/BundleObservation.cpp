@@ -399,7 +399,10 @@ namespace Isis {
 
       // loop over images in this observation
       for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);       
+        BundleImageQsp image = at(i);
+        if ( !image->camera() ) {
+          return false;
+        }
         SpicePosition *spicePosition = image->camera()->instrumentPosition();
 
         // set number of position segments in images spice position
@@ -455,6 +458,9 @@ namespace Isis {
       // loop over images in this observation
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);
+        if ( !image->camera() ) {
+          return false;
+        }
         SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
 
         // set number of rotation segments in images spice position
