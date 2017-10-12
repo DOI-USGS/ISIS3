@@ -77,7 +77,7 @@ namespace Isis {
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
-   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *   @history 2017-07-14 Ken Edmundson - Added support for piecewise polynomials...
    *                           -m_continuityConstraints member.
    *                           -methods...
    *                               int numberPolynomialPositionSegments
@@ -85,6 +85,8 @@ namespace Isis {
    *                               int numberPolynomialSegments
    *                               int numberContinuityConstraints
    *                               void applyContinuityConstraints
+   *   @history 2017-10-11 Jesse Mapel - Modified output string methods to account for
+   *                           piecewise polynomials.
    *
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {

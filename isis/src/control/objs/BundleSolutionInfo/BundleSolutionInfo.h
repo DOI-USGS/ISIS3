@@ -106,8 +106,9 @@ namespace Isis {
    *                           Fixes #4804, #4837.
    *   @history 2017-07-11 Makayla Shepherd - Added bundle naming capabilities. Fixes #4855.
    *   @history 2017-07-28 Makayla Shepherd - Fixed the default naming tag. Fixes #5069.
-   *   @history 2017-07-14 Ken Edmundson Added support for output of statistics for piecewise
+   *   @history 2017-07-14 Ken Edmundson - Added support for output of statistics for piecewise
    *                                     polynomials.
+   *   @history 2017-10-11 Jesse Mapel - Modified output file methods to account for piecewise.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

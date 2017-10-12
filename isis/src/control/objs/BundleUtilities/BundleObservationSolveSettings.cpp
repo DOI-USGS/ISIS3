@@ -401,7 +401,13 @@ namespace Isis {
       m_numberCamAngleCoefSolved = ((int) option);
     }
 
-    m_numberCkPolySegments = ckPolynomialSegments;
+    // If only solving for only angles,
+    // continuity conditions would force all segments to be the same.
+    // So, just use one segment.
+    if (m_instrumentPointingSolveOption <= 1 )
+      m_numberCkPolySegments = 1;
+    else
+      m_numberCkPolySegments = ckPolynomialSegments;
 
     m_anglesAprioriSigma.clear();
     if (m_numberCamAngleCoefSolved > 0) {
@@ -661,7 +667,9 @@ namespace Isis {
       m_numberCamPosCoefSolved = ((int) option);
     }
 
-    // if the solve polynomial de
+    // If only solving for only position,
+    // continuity conditions would force all segments to be the same.
+    // So, just use one segment.
     if (m_instrumentPositionSolveOption <= 1 )
       m_numberSpkPolySegments = 1;
     else
