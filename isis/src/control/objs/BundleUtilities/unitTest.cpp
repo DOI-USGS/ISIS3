@@ -415,6 +415,14 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bo2.formatBundleOutputString(false,true);
     qDebug().noquote() << bo2.formatBundleOutputString(false);
     qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0, true,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0, false,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0, false);
+    qDebug().noquote() << bo2.formatPositionOutputString(0, true);
+    qDebug().noquote() << bo2.formatRotationOutputString(0, true,true);
+    qDebug().noquote() << bo2.formatRotationOutputString(0, false,true);
+    qDebug().noquote() << bo2.formatRotationOutputString(0, false);
+    qDebug().noquote() << bo2.formatRotationOutputString(0, true);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();

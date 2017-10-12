@@ -154,7 +154,12 @@ namespace Isis {
       void initializeBodyRotation();
       void updateBodyRotation();
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      QString formatPositionSegmentHeader(int segmentIndex);
+      QString formatPositionOutputString(int segmentIndex,
+                                         bool errorPropagation, bool imageCSV=false);
+      QString formatPointingSegmentHeader(int segmentIndex);
+      QString formatPointingOutputString(int segmentIndex,
+                                         bool errorPropagation, bool imageCSV=false);
       QString formatBundleContinuityConstraintString();
       QStringList parameterList();
       QStringList imageNames();

@@ -325,135 +325,168 @@ namespace Isis {
       return false;
     }
 
-    char buf[1056];
+    // Setup the top and bottom row lists
+    QStringList topRow;
+    QStringList bottomRow;
 
-    // setup column headers
-    std::vector<QString> outputColumns;
+    // Add the image filename and residuals
+    topRow.append("Image");
+    topRow.append("rms");
+    topRow.append("rms");
+    topRow.append("rms");
+    bottomRow.append("Filename");
+    bottomRow.append("sample res");
+    bottomRow.append("line res");
+    bottomRow.append("total res");
 
-    outputColumns.push_back("Image,");
-    outputColumns.push_back("rms,");
-    outputColumns.push_back("rms,");
-    outputColumns.push_back("rms,");
+    // Create several template QStringLists that will be used to easily generate
+    // the header for each segment. Each list is 5 strings long because each parameter
+    // has 5 values to report: initial, correction, final, apriori sigma, and adjusted
+    // sigma.
 
+    // NUM will be replaced with the segment number: 1, 2, 3, ...
+    QStringList segmentTemplate;
+    segmentTemplate.append("Segment NUM");
+    segmentTemplate.append("Segment NUM");
+    segmentTemplate.append("Segment NUM");
+    segmentTemplate.append("Segment NUM");
+    segmentTemplate.append("Segment NUM");
+
+    // COEFF will be replaced with the coefficient index: nothing, (t0), (t1), ...
+    QStringList parameterTemplate;
+    parameterTemplate.append("PARAMCOEFF Initial");
+    parameterTemplate.append("PARAMCOEFF Correction");
+    parameterTemplate.append("PARAMCOEFF Final");
+    parameterTemplate.append("PARAMCOEFF Apriori Sigma");
+    parameterTemplate.append("PARAMCOEFF Adjusted Sigma");
+
+    // replace PARAM with each parameter name:, X, Y, Z, RA, DEC, TWIST
+    QStringList xList = parameterTemplate;
+    xList.replaceInStrings("PARAM", "X");
+    QStringList yList = parameterTemplate;
+    yList.replaceInStrings("PARAM", "Y");
+    QStringList zList = parameterTemplate;
+    zList.replaceInStrings("PARAM", "Z");
+    QStringList raList = parameterTemplate;
+    raList.replaceInStrings("PARAM", "RA");
+    QStringList decList = parameterTemplate;
+    decList.replaceInStrings("PARAM", "DEC");
+    QStringList twistList = parameterTemplate;
+    twistList.replaceInStrings("PARAM", "TWIST");
+
+    // Collect the number of segments and coefficients solved for from the first observation
     BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
+
+    int numberCamPosSegments = obsSettings.numberSpkPolySegments();
+    int numberCamAngleSegments = obsSettings.numberCkPolySegments();
 
     int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
     int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
 
-    int nCoeff = 1;
-    if (numberCamPosCoefSolved > 0)
-      nCoeff = numberCamPosCoefSolved;
+    // Collect the position values
+    for (int segmentIndex = 0; segmentIndex < numberCamPosSegments; segmentIndex++) {
+      QStringList segmentList = segmentTemplate;
+      segmentList.replaceInStrings( "NUM", toString(segmentIndex + 1) );
+      // If nothing was solved for, output a single set of values for each parameter
+      if (numberCamPosCoefSolved == 0) {
+        QStringList xCoeffList = xList;
+        xCoeffList.replaceInStrings("COEFF", "");
+        QStringList yCoeffList = yList;
+        yCoeffList.replaceInStrings("COEFF", "");
+        QStringList zCoeffList = zList;
+        zCoeffList.replaceInStrings("COEFF", "");
 
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("X,");
-        else {
-          QString str = "X(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("Y,");
-        else {
-          QString str = "Y(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1) {
-          outputColumns.push_back("Z,");
-        }
-        else {
-          QString str = "Z(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-      if (!i)
-        break;
-    }
+        topRow.append(segmentList);
+        topRow.append(segmentList);
+        topRow.append(segmentList);
 
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("RA,");
-        else {
-          QString str = "RA(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
+        bottomRow.append(xCoeffList);
+        bottomRow.append(yCoeffList);
+        bottomRow.append(zCoeffList);
       }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("DEC,");
-        else {
-          QString str = "DEC(t" + toString(i) + "),";
-          outputColumns.push_back(str);
+      else {
+        for (int coefIndex = 0; coefIndex < numberCamPosCoefSolved; coefIndex++) {
+          QStringList xCoeffList = xList;
+          xCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+
+          topRow.append(segmentList);
+          bottomRow.append(xCoeffList);
         }
-      }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1) {
-          outputColumns.push_back("TWIST,");
+        for (int coefIndex = 0; coefIndex < numberCamPosCoefSolved; coefIndex++) {
+          QStringList yCoeffList = yList;
+          yCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+
+          topRow.append(segmentList);
+          bottomRow.append(yCoeffList);
         }
-        else {
-          QString str = "TWIST(t" + toString(i) + "),";
-          outputColumns.push_back(str);
+        for (int coefIndex = 0; coefIndex < numberCamPosCoefSolved; coefIndex++) {
+          QStringList zCoeffList = zList;
+          zCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+
+          topRow.append(segmentList);
+          bottomRow.append(zCoeffList);
         }
       }
     }
 
-    // print first column header to buffer and output to file
-    int ncolumns = outputColumns.size();
-    for (int i = 0; i < ncolumns; i++) {
-      QString str = outputColumns.at(i);
-      sprintf(buf, "%s", (const char*)str.toLatin1().data());
-      fpOut << buf;
+    // Collect the pointing values
+    for (int segmentIndex = 0; segmentIndex < numberCamAngleSegments; segmentIndex++) {
+      QStringList segmentList = segmentTemplate;
+      segmentList.replaceInStrings( "NUM", toString(segmentIndex + 1) );
+      // If nothing was solved for, output a single set of values for each parameter
+      if (numberCamAngleCoefSolved == 0) {
+        QStringList raCoeffList = raList;
+        raCoeffList.replaceInStrings("COEFF", "");
+        QStringList decCoeffList = decList;
+        decCoeffList.replaceInStrings("COEFF", "");
+        QStringList twistCoeffList = twistList;
+        twistCoeffList.replaceInStrings("COEFF", "");
+
+        topRow.append(segmentList);
+        topRow.append(segmentList);
+        topRow.append(segmentList);
+
+        bottomRow.append(raCoeffList);
+        bottomRow.append(decCoeffList);
+        bottomRow.append(twistCoeffList);
+      }
+      else {
+        for (int coefIndex = 0; coefIndex < numberCamAngleCoefSolved; coefIndex++) {
+          QStringList raCoeffList = raList;
+          raCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+          QStringList decCoeffList = decList;
+
+          topRow.append(segmentList);
+          bottomRow.append(raCoeffList);
+        }
+        for (int coefIndex = 0; coefIndex < numberCamAngleCoefSolved; coefIndex++) {
+          QStringList decCoeffList = decList;
+          decCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+
+          topRow.append(segmentList);
+          bottomRow.append(decCoeffList);
+        }
+        for (int coefIndex = 0; coefIndex < numberCamAngleCoefSolved; coefIndex++) {
+          QStringList twistCoeffList = twistList;
+          twistCoeffList.replaceInStrings("COEFF", "(t" + toString(coefIndex) + ")");
+
+          topRow.append(segmentList);
+          bottomRow.append(twistCoeffList);
+        }
+      }
     }
-    sprintf(buf, "\n");
-    fpOut << buf;
 
-    outputColumns.clear();
-    outputColumns.push_back("Filename,");
+    // Write the rows out to the file
+    QString topString = topRow.join(",");
+    QString bottomString = bottomRow.join(",");
 
-    outputColumns.push_back("sample res,");
-    outputColumns.push_back("line res,");
-    outputColumns.push_back("total res,");
+    fpOut << topString.toLatin1().data();
 
-    // Initially account for X,Y,Z (3)
-    int nparams = 3;
-    // See how many position coeffients we solved for to make more headers (t0, t1, ...)
-    if (numberCamPosCoefSolved)
-      nparams = 3 * numberCamPosCoefSolved;
+    fpOut << "\n";
 
-    // Initially account for RA,DEC,TWIST (3)
-    int numCameraAnglesSolved = 3;
-    // See how many angle coefficients we solved for to make more headers (t0, t1, ...)
-    nparams += numCameraAnglesSolved*numberCamAngleCoefSolved;
-    for (int i = 0; i < nparams; i++) {
-      outputColumns.push_back("Initial,");
-      outputColumns.push_back("Correction,");
-      outputColumns.push_back("Final,");
-      outputColumns.push_back("Apriori Sigma,");
-      outputColumns.push_back("Adj Sigma,");
-    }
+    fpOut << bottomString.toLatin1().data();
 
-    // print second column header to buffer and output to file
-    ncolumns = outputColumns.size();
-    for (int i = 0; i < ncolumns; i++) {
-      QString str = outputColumns.at(i);
-      sprintf(buf, "%s", (const char*)str.toLatin1().data());
-      fpOut << buf;
-    }
-    sprintf(buf, "\n");
-    fpOut << buf;
+    fpOut << "\n";
 
     return true;
   }
@@ -1055,11 +1088,18 @@ namespace Isis {
         fpOut << buf;
 
 
-        QString observationString =
-            observation->formatBundleOutputString(errorProp,true);
-
-        //Removes trailing commas
-        if (observationString.right(1)==",") {
+        QString observationString;
+        for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++) {
+          QString segmentString = observation->formatPositionOutputString(k, errorProp, true);
+          observationString.append(segmentString);
+        }
+        for (int k = 0; k < observation->numberPolynomialPointingSegments(); k++) {
+          QString segmentString = observation->formatPointingOutputString(k, errorProp, true);
+          observationString.append(segmentString);
+        }
+        
+        // Remove the last comma
+        if ( QString::compare(observationString.right(1), ",") ) {
             observationString.truncate(observationString.length()-1);
         }
 
@@ -1140,24 +1180,42 @@ namespace Isis {
       int numImages = observation->size();
       for (int j = 0; j < numImages; j++) {
         BundleImageQsp image = observation->at(j);
-        sprintf(buf, "\nImage Full File Name: %s\n", image->fileName().toLatin1().data());
+        sprintf(buf, "\nImage Full File Name: %s", image->fileName().toLatin1().data());
         fpOut << buf;
-        sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
+        sprintf(buf, "\n Image Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
 
-        if (observation->numberContinuityConstraints() > 1) {
-          fpOut << observation->formatBundleContinuityConstraintString();
+//         if (observation->numberContinuityConstraints() > 1) {
+//           fpOut << observation->formatBundleContinuityConstraintString();
+//         }
+
+        for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++ ) {
+          if (observation->numberPolynomialPositionSegments() != 1) {
+            fpOut << observation->formatPositionSegmentHeader(k);
+          }
+
+          sprintf(buf, "\n    Image         Initial              Total               "
+                       "Final             Initial           Final\n"
+                       "Parameter         Value              Correction            "
+                       "Value             Accuracy          Accuracy\n");
+          fpOut << buf;
+
+          fpOut << observation->formatPositionOutputString(k, berrorProp);
         }
 
-        sprintf(buf, "\n    Image         Initial              Total               "
-                     "Final             Initial           Final\n"
-                     "Parameter         Value              Correction            "
-                     "Value             Accuracy          Accuracy\n");
-        fpOut << buf;
+        for (int k = 0; k < observation->numberPolynomialPointingSegments(); k++ ) {
+          if (observation->numberPolynomialPointingSegments() != 1) {
+            fpOut << observation->formatPointingSegmentHeader(k);
+          }
 
-        QString observationString =
-            observation->formatBundleOutputString(berrorProp);
-        fpOut << (const char*)observationString.toLatin1().data();
+          sprintf(buf, "\n    Image         Initial              Total               "
+                       "Final             Initial           Final\n"
+                       "Parameter         Value              Correction            "
+                       "Value             Accuracy          Accuracy\n");
+          fpOut << buf;
+
+          fpOut << observation->formatPointingOutputString(k, berrorProp);
+        }
 
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
