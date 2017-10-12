@@ -877,7 +877,41 @@ namespace Isis {
 
     // Now the lat/lon are in user defined coordinates so set them
     return SetGround(m_latitude, m_longitude);
+  }
+
+
+  /**
+   * This method is used to set the latitude/longitude. The Set
+   * forces an attempted calculation of the projection X/Y values. This may or
+   * may not be successful and a status is returned as such. This version does
+   * not adjust the longitude based on the longitude domain.
+   *
+   * @param lat Planetocentric Latitude value to project
+   * @param lon PositiveEast, Domain360 Longitude value to project
+   *
+   * @return bool Indicates whether the method was successful.
+   */
+  bool TProjection::SetUnboundUniversalGround(const double lat, const double lon) {
+    if (lat == Null || lon == Null) {
+      m_good = false;
+      return m_good;
     }
+    // Deal with the longitude first
+    m_longitude = lon;
+    if (m_longitudeDirection == PositiveWest) m_longitude = -lon;
+
+    // Deal with the latitude
+    if (m_latitudeType == Planetographic) {
+      m_latitude = ToPlanetographic(lat);
+    }
+    else {
+      m_latitude = lat;
+    }
+
+    // Now the lat/lon are in user defined coordinates so set them
+    return SetGround(m_latitude, m_longitude);
+  }
+
 
   /**
    * This returns a universal latitude (planetocentric). The method can only be

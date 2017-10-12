@@ -446,6 +446,35 @@ namespace Isis {
 
 
   /**
+   * This method is used to set the lat/lon or radius/azimuth (i.e. ring longitude)
+   * coordinate, depending on the projection type. The Set forces an attempted
+   * calculation of the projection X/Y values. This may or may not be successful
+   * and a status is returned as such. This method will not adjust the longitude
+   * coordinate based on the longitude domain.
+   *
+   * @param coord1 Latitude (planetocentric) or ring radius to project
+   * @param coord2 Longitude or ring longitude to project. The value passed in
+   *               should be PositiveEast, Domain360.
+   *
+   * @return bool Indicates whether the method was successful.
+   */
+  bool Projection::SetUnboundUniversalGround(const double coord1, const double coord2) {
+    if (coord1 == Null || coord2 == Null) {
+      m_good = false;
+      return m_good;
+    }
+    if (projectionType() == Triaxial) {
+      TProjection *tproj = (TProjection *) this;
+      return tproj->SetUnboundUniversalGround(coord1, coord2);
+    }
+    else {
+      RingPlaneProjection *rproj = (RingPlaneProjection *) this;
+      return rproj->SetUniversalGround(coord1, coord2);
+    }
+  }
+
+
+  /**
    * If desired the programmer can use this method to set a world mapper to
    * be used in the SetWorld, WorldX, and WorldY methods. Mappers typically
    * transform a projection coordinate (x/y) into the desired working

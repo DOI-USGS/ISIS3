@@ -41,6 +41,9 @@ namespace Isis {
   *   @history 2016-08-28 Kelvin Rodriguez - writeSettings now const to match parent and eliminate
   *                          hidden virtual overload warnings in clang. Part of porting to
   *                          OS X 10.11
+  *   @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
+  *                          this->show() so that it hides the unselected columns appropriately.
+  *                          Fixes #5141.
   */
   class TableMainWindow : public MainWindow {
       Q_OBJECT

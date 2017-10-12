@@ -65,13 +65,16 @@ namespace Isis {
    *                           method was fixed to match the signature of the parent method.
    *                           Moved implementation of GroundMap() and GetMappingGroup() to the
    *                           cpp file per ISIS coding standards.
-   *   @history 2017-04-10 Jesse mapel - Modified to not throw an exception when calculating
+   *   @history 2017-04-10 Jesse Mapel - Modified to not throw an exception when calculating
    *                           longitude lines close to 90 or -90 latitude. Fixes #4766.
+   *   @history 2017-06-28 Jesse Mapel - Added a flag to extend the grid past the longitude
+   *                           domain boundary. Fixes #2185.
    */
   class GroundGrid {
     public:
       GroundGrid(UniversalGroundMap *gmap, 
                  bool splitLatLon,
+                 bool extendGrid,
                  unsigned int width, 
                  unsigned int height);
 
@@ -100,6 +103,11 @@ namespace Isis {
 
       bool PixelOnGrid(int x, int y);
       bool PixelOnGrid(int x, int y, bool latGrid);
+
+      Latitude minLatitude() const;
+      Longitude minLongitude() const;
+      Latitude maxLatitude() const;
+      Longitude maxLongitude() const;
 
       PvlGroup *GetMappingGroup();
 
@@ -136,6 +144,7 @@ namespace Isis {
       double p_defaultResolution; //!< Default step size in degrees/pixel
 
       bool p_reinitialize; //!< True if we need to reset p_grid in CreateGrid
+      bool m_extendGrid; //!< If the grid should extend past the longitude domain boundary.
   };
 
 }

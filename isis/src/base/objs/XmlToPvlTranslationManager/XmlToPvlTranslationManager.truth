@@ -4,6 +4,14 @@ Testing Translate method
 
 Translation of InstrumentIfovWithUnits: 1.140e-005
 
+Testing file-based constructor
+
+Testing stream-only constructor
+
+Testing constructor which uses an input label and translation file
+
+Testing constructor which uses an input label and translation file
+
 Testing Auto method
 
 
@@ -373,6 +381,387 @@ Group = CoreCube
 End_Group
 End
 
+Testing Auto method with input and output labels
+
+
+          ====================          
+
+Translating output keyword: Version
+
+Translation group:
+Group = Version
+  Auto           = Null
+  Debug          = Null
+  InputPosition  = Identification_Area
+  InputKey       = version_id
+  OutputPosition = (group, instrument)
+  OutputName     = Version
+  Translation    = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  Identification_Area
+    version_id
+
+Testing dependencies:
+
+Translating input value: UNK
+
+          ====================          
+
+Translating output keyword: Host
+
+Translation group:
+Group = Host
+  Auto           = Null
+  Debug          = Null
+  InputPosition  = (Observation_Area, Investigation_Area)
+  InputKey       = Instrument_Host_Id
+  OutputPosition = (group, instrument)
+  OutputName     = Host
+  Translation    = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  Observation_Area
+    Investigation_Area
+      Instrument_Host_Id
+
+Testing dependencies:
+
+Translating input value: TGO
+
+          ====================          
+
+Translating output keyword: BandWidth
+
+Translation group:
+Group = BandWidth
+  Auto              = Null
+  Debug             = Null
+  InputPosition     = Observation_Area
+  InputKey          = Science_Facets
+  InputKeyAttribute = bandwidth
+  OutputPosition    = (group, instrument)
+  OutputName        = BandWidth
+  Translation       = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  Observation_Area
+    Science_Facets
+
+Testing dependencies:
+
+Translating input value: Broad
+
+          ====================          
+
+Translating output keyword: SpacecraftName
+
+Translation group:
+Group = SpacecraftName
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (Observation_Area, Observing_System,
+                          Observing_System_Component)
+  InputKey             = name
+  InputKeyDependencies = tag@type:Spacecraft
+  OutputPosition       = (group, instrument)
+  OutputName           = SpacecraftName
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  Observation_Area
+    Observing_System
+      Observing_System_Component
+        name
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    tag@type:Spacecraft
+
+  Dependency type:  tag
+  Dependency name:  type
+  Dependency value: Spacecraft
+
+  Tag name:         type
+  Tag value:        Spacecraft
+
+Translating input value: TGO
+
+          ====================          
+
+Translating output keyword: InstrumentId
+
+Translation group:
+Group = InstrumentId
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (Observation_Area, Observing_System,
+                          Observing_System_Component)
+  InputKey             = name
+  InputKeyDependencies = tag@type:Instrument
+  OutputPosition       = (group, instrument)
+  OutputName           = InstrumentId
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  Observation_Area
+    Observing_System
+      Observing_System_Component
+        name
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    tag@type:Instrument
+
+  Dependency type:  tag
+  Dependency name:  type
+  Dependency value: Instrument
+
+  Tag name:         type
+  Tag value:        Spacecraft
+
+Dependencies failed, checking next candidate.
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    tag@type:Instrument
+
+  Dependency type:  tag
+  Dependency name:  type
+  Dependency value: Instrument
+
+  Tag name:         type
+  Tag value:        JunkComponent
+
+Dependencies failed, checking next candidate.
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    tag@type:Instrument
+
+  Dependency type:  tag
+  Dependency name:  type
+  Dependency value: Instrument
+
+  Tag name:         type
+  Tag value:        Instrument
+
+Translating input value: CaSSIS
+
+          ====================          
+
+Translating output keyword: OnboardImageAcquisitionTimeUTC
+
+Translation group:
+Group = OnboardImageAcquisitionTimeUTC
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
+  InputKey             = OnboardImageAcquisitionTime
+  InputKeyDependencies = att@Time_Base:UTC
+  OutputPosition       = (group, instrument)
+  OutputName           = OnboardImageAcquisitionTimeUTC
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  CaSSIS_Header
+    DERIVED_HEADER_DATA
+      OnboardImageAcquisitionTime
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    att@Time_Base:UTC
+
+  Dependency type:  att
+  Dependency name:  Time_Base
+  Dependency value: UTC
+
+  Attribute name:   Time_Base  Attribute value:  UTC
+
+Translating input value: 2016-11-26T23:24:52.080
+
+          ====================          
+
+Translating output keyword: OnboardImageAcquisitionTimeET
+
+Translation group:
+Group = OnboardImageAcquisitionTimeET
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
+  InputKey             = OnboardImageAcquisitionTime
+  InputKeyDependencies = att@Time_Base:ET
+  OutputPosition       = (group, instrument)
+  OutputName           = OnboardImageAcquisitionTimeET
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+  CaSSIS_Header
+    DERIVED_HEADER_DATA
+      OnboardImageAcquisitionTime
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    att@Time_Base:ET
+
+  Dependency type:  att
+  Dependency name:  Time_Base
+  Dependency value: ET
+
+  Attribute name:   Time_Base  Attribute value:  UTC
+
+Dependencies failed, checking next candidate.
+
+Testing dependencies:
+
+Testing dependency number 1
+  Specification:    att@Time_Base:ET
+
+  Dependency type:  att
+  Dependency name:  Time_Base
+  Dependency value: ET
+
+  Attribute name:   Time_Base  Attribute value:  ET
+
+Translating input value: 20161126.232452080
+
+          ====================          
+
+Translating output keyword: CoreBands
+
+Translation group:
+Group = CoreBands
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (Product_Observational, File_Area_Observational,
+                          Array_2D_Image, Axis_Array)
+  InputKeyDependencies = tag@axis_name:Band
+  InputKey             = elements
+  InputDefault         = 1
+  OutputPosition       = (group, CoreCube)
+  OutputName           = CoreBands
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+
+Could not traverse input position, using default value: 1
+
+          ====================          
+
+Translating output keyword: CoreSamples
+
+Translation group:
+Group = CoreSamples
+  Auto                 = Null
+  Debug                = Null
+  InputPosition        = (Product_Observational, File_Area_Observational,
+                          Array_2D_Image, Axis_Array)
+  InputKeyDependencies = tag@axis_name:Sample
+  InputKey             = elements
+  InputKeyAttribute    = Units
+  InputDefault         = 2
+  OutputPosition       = (group, CoreCube)
+  OutputName           = CoreSamples
+  Translation          = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+
+Could not traverse input position, using default value: 2
+
+          ====================          
+
+Translating output keyword: CoreLines
+
+Translation group:
+Group = CoreLines
+  Auto           = Null
+  Debug          = Null
+  InputPosition  = (Product_Observational, Bad_Parent)
+  InputKey       = elements
+  InputDefault   = 10
+  OutputPosition = (group, CoreCube)
+  OutputName     = CoreLines
+  Translation    = (*, *)
+End_Group
+
+
+Finding input element:
+
+Product_Observational
+
+Could not traverse input position, using default value: 10
+
+Group = instrument
+  Version                        = UNK
+  Host                           = TGO
+  BandWidth                      = Broad
+  SpacecraftName                 = TGO
+  InstrumentId                   = CaSSIS
+  OnboardImageAcquisitionTimeUTC = 2016-11-26T23:24:52.080
+  OnboardImageAcquisitionTimeET  = 20161126.232452080
+  Version                        = UNK
+  Host                           = TGO
+  BandWidth                      = Broad
+  SpacecraftName                 = TGO
+  InstrumentId                   = CaSSIS
+  OnboardImageAcquisitionTimeUTC = 2016-11-26T23:24:52.080
+  OnboardImageAcquisitionTimeET  = 20161126.232452080
+End_Group
+
+Group = CoreCube
+  CoreBands   = 1
+  CoreSamples = 2
+  CoreLines   = 10
+  CoreBands   = 1
+  CoreSamples = 2
+  CoreLines   = 10
+End_Group
+End
+
+Testing SetLabel method
+
 Testing error throws
 
 **ERROR** Failed to translate output value for [InstrumentIfovWithUnits].
@@ -391,17 +780,13 @@ Testing error throws
 **ERROR** Failed to translate output value for [InputKeyAttributeDoesNotExist].
 **ERROR** Input element [INSTRUMENT_IFOV] does not have an attribute named [Bad_Input_Element_Attribute].
 
-**ERROR** Failed to translate output value for [NoDependencyType].
-**ERROR** Malformed dependency specification [type:Spacecraft].
-**ERROR** Specification does not have two components separated by [@], the type of dependency and the name-value pair.
-
 **ERROR** Failed to translate output value for [BadDependencyType].
 **ERROR** Malformed dependency specification [bad@type:Spacecraft].
-**ERROR** Dependency type specification [bad] is invalid. Valid types are [att] and [tag].
+**ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
 
 **ERROR** Failed to translate output value for [NoDependencyValue].
 **ERROR** Malformed dependency specification [bad@type].
-**ERROR** Dependency type specification [bad] is invalid. Valid types are [att] and [tag].
+**ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
 
 **ERROR** Failed to translate output value for [NotInTranslationTable].
 **ERROR** Unable to retrieve translation group from translation table.
@@ -411,5 +796,5 @@ Testing error throws
 
 **ERROR** Could not open label file [DoesNotExist.xml].
 
-**ERROR** XML read/parse error in file [data/base/translations/pdsImage.trn] at line [1], column [1], message: error occurred while parsing element.
+**ERROR** XML read/parse error in file [/usgs/cpkgs/isis3/data/base/translations/pdsImage.trn] at line [1], column [1], message: error occurred while parsing element.
 

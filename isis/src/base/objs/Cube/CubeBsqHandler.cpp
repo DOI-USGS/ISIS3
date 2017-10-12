@@ -53,20 +53,20 @@ namespace Isis {
     int numSamplesInChunk = sampleCount();
     int numLinesInChunk = 1;
     QList<int> primeFactors;
-    
+
     // we want our chunk sizes to be less than 1GB
     int sizeLimit = 1024 * 1024 * 1024;
     int maxNumLines = (sizeLimit) / (SizeOf(pixelType()) * numSamplesInChunk);
-    
+
     // we've exceed our sizeLimit; increase our limit so we can process an entire line
-    if (maxNumLines == 0) 
+    if (maxNumLines == 0)
       maxNumLines = 1;
-    
+
     numLinesInChunk = findGoodSize(maxNumLines, lineCount());
-    
+
     setChunkSizes(numSamplesInChunk, numLinesInChunk, 1);
   }
-  
+
 
   /**
    * The destructor writes all cached data to disk.
@@ -76,6 +76,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Function to update the labels with a Pvl object
+   *
+   * @param label Pvl object to update with
+   */
   void CubeBsqHandler::updateLabels(Pvl &label) {
     PvlObject &core = label.findObject("IsisCube").findObject("Core");
     core.addKeyword(PvlKeyword("Format", "BandSequential"),
@@ -131,11 +136,11 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * This method attempts to compute a good chunk line size. Chunk band size is
    * always 1 and chunk sample size is always number of samples in the cube for this format.
-   * 
+   *
    * @param maxSize The largest allowed size of a chunk dimension
    * @param dimensionSize The cube's size for the chunk size we are trying to calculate
    *     (number of lines)
@@ -143,7 +148,7 @@ namespace Isis {
    */
   int CubeBsqHandler::findGoodSize(int maxSize, int dimensionSize) const {
     int chunkDimensionSize;
-    
+
     if (dimensionSize <= maxSize) {
       chunkDimensionSize = dimensionSize;
     }
