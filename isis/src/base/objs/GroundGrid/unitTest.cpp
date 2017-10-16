@@ -31,7 +31,7 @@ void IsisMain() {
 
   cout << "Create grid..." << endl;
   Progress progress;
-  GroundGrid grid(&gmap, false, someCube.sampleCount(), someCube.lineCount());
+  GroundGrid grid(&gmap, false, false, someCube.sampleCount(), someCube.lineCount());
   grid.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),
                        Longitude(-133.284402721991682, Angle::Degrees),
                        Latitude(34.340453944831125, Angle::Degrees),
@@ -78,7 +78,7 @@ void IsisMain() {
     incompleteLabelsCube.open("./unitTest.cub");
     UniversalGroundMap gmap(incompleteLabelsCube,
         UniversalGroundMap::ProjectionFirst);
-    GroundGrid tmp(&gmap, false, someCube.sampleCount(), someCube.lineCount());
+    GroundGrid tmp(&gmap, false, false, someCube.sampleCount(), someCube.lineCount());
     Longitude invalidLon;
     Latitude invalidLat;
     tmp.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),
