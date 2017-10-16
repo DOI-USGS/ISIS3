@@ -1557,11 +1557,14 @@ namespace Isis {
    *   @history 2016-06-23 Tracie Sucharski - Original version.
    *   @history 2017-05-17 Tracie Sucharski - If no active control set & there is only one control
    *                          in the project, default to that control.
+   *   @history 2017-10-16 Ian Humphrey - Check to make sure we have imported images before trying
+   *                           to set an active control when there is only one control in the
+   *                           project. Fixes #5160.
    */
   Control *Project::activeControl() {
 
     if (!m_activeControl && m_controls->count() == 1) {
-      if (m_controls->at(0)->count() == 1) {
+      if (m_controls->at(0)->count() == 1 && m_images->count() > 1) {
         QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
         setActiveControl(controlName);
       }

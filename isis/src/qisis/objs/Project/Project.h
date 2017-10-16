@@ -174,6 +174,9 @@ namespace Isis {
    *                           addTemplateFolder(), templateRoot(), and m_templates as well as
    *                           serialization and structure for importing template filenames
    *                           Fixes #5086.
+   *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
+   *                           imported into the project before trying to set an active control
+   *                           when there is only one control in the project. Fixes #5160.
    */
   class Project : public QObject {
     Q_OBJECT
