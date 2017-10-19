@@ -63,6 +63,11 @@ void MakeCompletion(const QString &appName) {
     return;
   }
 
+  if(appName.compare("ipce") == 0 || appName.compare("./ipce") == 0) {
+    cout << "complete " << appName << " 'n@*@f:*.[pP][cC][eE]@'; ";
+    return;
+  }
+
   if(appName.compare("isisui") == 0) {
     QString binPath = FileName("$ISISROOT/bin").expanded();
     cout << "complete isisui 'n@*@F:" << binPath << "/@'; ";
