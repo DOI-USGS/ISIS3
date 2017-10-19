@@ -379,10 +379,6 @@ bool tryKernels(Cube *icube, Process &p,
     currentKernels.deleteKeyword("OnError");
   }
 
-  if (currentKernels.hasKeyword("CubeSupported")) {
-    currentKernels.deleteKeyword("CubeSupported");
-  }
-
   if (currentKernels.hasKeyword("Tolerance")) {
     currentKernels.deleteKeyword("Tolerance");
   }

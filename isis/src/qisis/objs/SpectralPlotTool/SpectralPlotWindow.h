@@ -35,6 +35,11 @@ namespace Isis {
    * @ingroup Visualization Tools
    *
    * @internal
+   *  @history 2017-10-18 Summer Stapleton - Member variable m_cvp can now be set to NULL in
+   *                        ::setViewport() to represent that there are no open cube viewports.
+   *                        This means that ::drawBandMarkers will no longer attempt to access a
+   *                        non-existant cube. Fixes: #2142.
+   *
    */
   class SpectralPlotWindow : public PlotWindow {
       Q_OBJECT
@@ -74,4 +79,3 @@ namespace Isis {
 };
 
 #endif
-

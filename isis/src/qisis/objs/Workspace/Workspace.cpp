@@ -327,6 +327,9 @@ namespace Isis {
    *                          file as input to qview, parse out the .cub files from the
    *                          cubelist and then attempt to add each one into their own
    *                          viewport.
+   *  @history 2017-10-12 Kristin Berry - Reverted to using relative instead of full file paths,
+   *                          as this caused errors when working with cubelists that contained
+   *                          relative paths. Fixes # 5177
    */
   void Workspace::addCubeViewport(QString cubename) {
     
@@ -336,7 +339,8 @@ namespace Isis {
 
     // If the file is a cub file, we add the path to it to our list of cubes to open.
     if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" ) {
-        cubesToOpen.append(cubeFileName.absoluteFilePath());
+       // cubesToOpen.append(cubeFileName.absoluteFilePath());
+       cubesToOpen.append(cubeFileName.filePath());
     }
     else {
       // If the file received isn't a .cub, it has to be a cubelist. We read every cube in the cubelist
