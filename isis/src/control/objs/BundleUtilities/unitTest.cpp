@@ -137,6 +137,18 @@ int main(int argc, char *argv[]) {
                                        true, 800.0, 900.0, 1000.0);
     printXml(boss);
 
+    boss.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesVelocityAcceleration,
+                                       true, 1, 3, 1, false, 2.0, 1.0, 0.1);
+    boss.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionVelocityAcceleration,
+                                       6, 3, 1, false, 50.0, 1.0, 0.1);
+    qDebug() << "CK polynomial degree: " << boss.ckDegree();
+    qDebug() << "CK interpolation type: " << toString(boss.pointingInterpolationType());
+    qDebug() << "Solving over existing pointing? " << boss.solvePolyOverPointing();
+    qDebug() << "SPK polynomial degree: " << boss.spkDegree();
+    qDebug() << "SPK interpolation type: " << toString(boss.positionInterpolationType());
+    qDebug() << "Solving over hermite position? " << boss.solvePositionOverHermite();
+    printXml(boss);
+
     BundleObservationSolveSettings solveNone;
     solveNone.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
                                                true);
@@ -178,13 +190,25 @@ int main(int argc, char *argv[]) {
                                                                                      "anglesonly"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                         "ANGLES"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                               "AnglesAndVelocity"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                     "VELOCITIES"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                   "AnglesVelocityAndAcceleration"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                  "ACCELERATIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                       "AllPolynomialCoefficients"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                            "ALL"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                               "NOPOSITIONFACTORS"));
@@ -193,13 +217,25 @@ int main(int argc, char *argv[]) {
                                                                                    "positiononly"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                      "POSITIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                             "PositionAndVelocity"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                     "VELOCITIES"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                 "PositionVelocityAndAcceleration"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                  "ACCELERATIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                       "AllPolynomialCoefficients"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                            "ALL"));
     qDebug() << "";
 
 
@@ -303,6 +339,17 @@ int main(int argc, char *argv[]) {
     //  QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
     //  throw IException(IException::Io, msg, _FILEINFO_);
     //}
+
+    qDebug() << "Testing observation number methods...";
+    BundleObservationSolveSettings observationSettings;
+    QStringList observationNumberList = observationSettings.observationNumbers().toList();
+    qDebug() << "Observation numbers: " << observationNumberList.join(", ");
+    qDebug() << "Add two new observation numbers";
+    observationSettings.addObservationNumber("TestObservation1");
+    observationSettings.addObservationNumber("TestObservation2");
+    observationNumberList = observationSettings.observationNumbers().toList();
+    qDebug() << "Observation numbers: " << observationNumberList.join(", ");
+    qDebug() << "";
 
     qDebug() << "Testing error throws...";
     try {
