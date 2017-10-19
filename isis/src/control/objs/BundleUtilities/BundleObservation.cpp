@@ -379,11 +379,11 @@ namespace Isis {
    * Initializes the exterior orientation 
    *
    * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Should this always return true?
    */
   bool BundleObservation::initializeExteriorOrientation() {
+    if (size() == 0) {
+      return false;
+    }
 
     BundleImageQsp image = at(0);
 
@@ -909,7 +909,13 @@ namespace Isis {
    * @return @b int Returns the number of position parameters
    */
   int BundleObservation::numberPositionParameters() {
-    int numSegments = m_instrumentPosition->numPolynomialSegments();
+    int numSegments;
+    if(m_instrumentPosition) {
+      numSegments = m_instrumentPosition->numPolynomialSegments();
+    }
+    else {
+      numSegments = m_solveSettings->numberSpkPolySegments();
+    }
     int numCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
 
     return 3.0 * numSegments * numCoefficients;
@@ -922,7 +928,13 @@ namespace Isis {
    * @return @b int Returns the number of pointing parameters
    */
   int BundleObservation::numberPointingParameters() {
-    int numSegments = m_instrumentRotation->numPolynomialSegments();
+    int numSegments;
+    if (m_instrumentRotation) {
+      numSegments = m_instrumentRotation->numPolynomialSegments();
+    }
+    else {
+      numSegments = m_solveSettings->numberCkPolySegments();
+    }
     int numCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
     if (!m_solveSettings->solveTwist()) {
@@ -1044,10 +1056,18 @@ namespace Isis {
     QString templateString = "\n    Position Segment Number: %1\n"
                              "         Segment Start Time: %2\n"
                              "           Segment End Time: %3\n";
-    std::vector<double> polyKnots = m_instrumentPosition->polynomialKnots();
+    if (m_instrumentPosition) {
+      std::vector<double> polyKnots = m_instrumentPosition->polynomialKnots();
+      if (polyKnots.front() != -DBL_MAX &&
+          polyKnots.back() != DBL_MAX) {
+        return templateString.arg(segmentIndex + 1)
+                             .arg(polyKnots[segmentIndex], -20, 'f', 5)
+                             .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+      }
+    }
     return templateString.arg(segmentIndex + 1)
-                         .arg(polyKnots[segmentIndex], -20, 'f', 5)
-                         .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+                         .arg("N/A")
+                         .arg("N/A");
   }
 
 
@@ -1064,10 +1084,18 @@ namespace Isis {
     QString templateString = "\n    Pointing Segment Number: %1\n"
                              "         Segment Start Time: %2\n"
                              "           Segment End Time: %3\n";
-    std::vector<double> polyKnots = m_instrumentRotation->polynomialKnots();
+    if (m_instrumentRotation) {
+      std::vector<double> polyKnots = m_instrumentRotation->polynomialKnots();
+      if (polyKnots.front() != -DBL_MAX &&
+          polyKnots.back() != DBL_MAX) {
+        return templateString.arg(segmentIndex + 1)
+                             .arg(polyKnots[segmentIndex], -20, 'f', 5)
+                             .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+      }
+    }
     return templateString.arg(segmentIndex + 1)
-                         .arg(polyKnots[segmentIndex], -20, 'f', 5)
-                         .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+                         .arg("N/A")
+                         .arg("N/A");
   }
 
 

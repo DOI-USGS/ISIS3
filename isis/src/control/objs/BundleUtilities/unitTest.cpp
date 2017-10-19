@@ -411,27 +411,31 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
-    qDebug().noquote() << bo2.formatPositionOutputString(0, true,true);
-    qDebug().noquote() << bo2.formatPositionOutputString(0, false,true);
-    qDebug().noquote() << bo2.formatPositionOutputString(0, false);
-    qDebug().noquote() << bo2.formatPositionOutputString(0, true);
-    qDebug().noquote() << bo2.formatRotationOutputString(0, true,true);
-    qDebug().noquote() << bo2.formatRotationOutputString(0, false,true);
-    qDebug().noquote() << bo2.formatRotationOutputString(0, false);
-    qDebug().noquote() << bo2.formatRotationOutputString(0, true);
+    qDebug().noquote() << bo2.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo2.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo2.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true);
 
 
 
@@ -480,9 +484,16 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo3.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo3.formatBundleOutputString(false);
-    qDebug().noquote() << bo3.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo3.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo3.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,true);
     qDebug() << "init exterior orientiation successful?  "
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation
