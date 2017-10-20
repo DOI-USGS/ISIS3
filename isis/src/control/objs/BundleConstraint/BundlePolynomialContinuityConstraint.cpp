@@ -140,16 +140,26 @@ namespace Isis {
   BundlePolynomialContinuityConstraint::
       BundlePolynomialContinuityConstraint(const BundlePolynomialContinuityConstraint &src) {
     m_parentObservation = src.m_parentObservation;
+
+    m_numberSegmentParameters = src.m_numberSegmentParameters;
+    m_numberParameters = src.m_numberParameters;
+    m_numberConstraintEquations = src.m_numberConstraintEquations;
+
+    m_ckKnots = src.m_ckKnots;
+    m_spkKnots = src.m_spkKnots;
     m_numberCkCoefficients = src.m_numberCkCoefficients;
     m_numberSpkCoefficients = src.m_numberSpkCoefficients;
     m_numberCkSegments = src.m_numberCkSegments;
-    m_numberSpkSegments = src.m_numberCkSegments;
-    m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+    m_numberSpkSegments = src.m_numberSpkSegments;
     m_numberCkBoundaries = src.m_numberCkBoundaries;
+    m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+    m_numberCkSegmentParameters = src.m_numberCkSegmentParameters;
+    m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
 
     m_designMatrix = src.m_designMatrix;
     m_normalsMatrix = src.m_normalsMatrix;
     m_rightHandSide = src.m_rightHandSide;
+    m_omcVector = src.m_omcVector;
   }
 
 
@@ -170,16 +180,26 @@ namespace Isis {
     // Prevent self assignment
     if (this != &src) {
       m_parentObservation = src.m_parentObservation;
+
+      m_numberSegmentParameters = src.m_numberSegmentParameters;
+      m_numberParameters = src.m_numberParameters;
+      m_numberConstraintEquations = src.m_numberConstraintEquations;
+
+      m_ckKnots = src.m_ckKnots;
+      m_spkKnots = src.m_spkKnots;
       m_numberCkCoefficients = src.m_numberCkCoefficients;
       m_numberSpkCoefficients = src.m_numberSpkCoefficients;
       m_numberCkSegments = src.m_numberCkSegments;
-      m_numberSpkSegments = src.m_numberCkSegments;
-      m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+      m_numberSpkSegments = src.m_numberSpkSegments;
       m_numberCkBoundaries = src.m_numberCkBoundaries;
+      m_numberSpkBoundaries = src.m_numberSpkBoundaries;
+      m_numberCkSegmentParameters = src.m_numberCkSegmentParameters;
+      m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
 
       m_designMatrix = src.m_designMatrix;
       m_normalsMatrix = src.m_normalsMatrix;
       m_rightHandSide = src.m_rightHandSide;
+      m_omcVector = src.m_omcVector;
     }
 
     return *this;
@@ -203,6 +223,26 @@ namespace Isis {
    */
   int BundlePolynomialContinuityConstraint::numberCkSegments() const {
     return m_numberCkSegments;
+  }
+
+
+  /**
+   * Returns number of spk coefficients in piecewise polynomial
+   *
+   * @return @b int Returns number of spk coefficients in piecewise polynomial
+   */
+  int BundlePolynomialContinuityConstraint::numberSpkCoefficients() const {
+    return m_numberSpkCoefficients;
+  }
+
+
+  /**
+   * Returns number of ck coefficients in piecewise polynomial
+   *
+   * @return @b int Returns number of ck coefficients in piecewise polynomial
+   */
+  int BundlePolynomialContinuityConstraint::numberCkCoefficients() const {
+    return m_numberCkCoefficients;
   }
 
 

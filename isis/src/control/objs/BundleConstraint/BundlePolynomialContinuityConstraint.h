@@ -66,7 +66,6 @@ namespace Isis {
       void updateRightHandSide();
       LinearAlgebra::MatrixUpperTriangular &normalsMatrix();
       LinearAlgebra::Vector &rightHandSideVector();
-      LinearAlgebra::Vector m_omcVector;
 
       QString formatBundleOutputString();
 
@@ -97,6 +96,7 @@ namespace Isis {
       LinearAlgebra::MatrixCompressed m_designMatrix;          //! design matrix
       LinearAlgebra::MatrixUpperTriangular m_normalsMatrix;    //! normals matrix contribution
       LinearAlgebra::Vector m_rightHandSide;                   //! right hand side of normals
+      LinearAlgebra::Vector m_omcVector;                       //! observed minus corrected vector
   };
 
   //! Typdef for BundlePolynomialContinuityConstraint QSharedPointer.
