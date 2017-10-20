@@ -15,12 +15,12 @@ Printing PVL group with settings from the default constructor...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -44,12 +44,12 @@ Testing copy constructor...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -73,12 +73,12 @@ Testing assignment operator to set this equal to itself...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -102,12 +102,12 @@ Testing assignment operator to create a new settings object...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -136,29 +136,29 @@ Testing mutator methods...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas/>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>7000.0</sigma>
                     <sigma>8000.0</sigma>
                     <sigma>9000.0</sigma>
+                    <sigma>N/A</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas>
-                    <sigma>22.0</sigma>
                     <sigma>23.0</sigma>
+                    <sigma>24.0</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>17000.0</sigma>
+                    <sigma>18000.0</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -181,12 +181,12 @@ Testing mutator methods...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -209,12 +209,12 @@ Testing mutator methods...
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -228,14 +228,14 @@ Get BundleObservationSolveSettings with name InstrumentId = Instrument1
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas/>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>7000.0</sigma>
             <sigma>8000.0</sigma>
             <sigma>9000.0</sigma>
+            <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -246,15 +246,15 @@ Now get BundleObservationSolveSettings at index 1
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
-            <sigma>22.0</sigma>
             <sigma>23.0</sigma>
+            <sigma>24.0</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>17000.0</sigma>
+            <sigma>18000.0</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -286,12 +286,12 @@ Serializing test XML object to file:
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -315,12 +315,12 @@ Testing XML: Object deserialized as (should match object above):
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+            <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+            <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                 <aprioriPositionSigmas/>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -350,29 +350,29 @@ Serializing test XML object to file:
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas/>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>7000.0</sigma>
                     <sigma>8000.0</sigma>
                     <sigma>9000.0</sigma>
+                    <sigma>N/A</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas>
-                    <sigma>22.0</sigma>
                     <sigma>23.0</sigma>
+                    <sigma>24.0</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>17000.0</sigma>
+                    <sigma>18000.0</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
@@ -401,31 +401,31 @@ Testing XML: Object deserialized as (should match object above):
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas>
                     <sigma>N/A</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>7000.0</sigma>
                     <sigma>8000.0</sigma>
                     <sigma>9000.0</sigma>
+                    <sigma>N/A</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
         <bundleObservationSolveSettings>
             
             <instrumentId></instrumentId>
-            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
+            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="2" degree="21" solveDegree="1" numberPolySegments="1" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas>
-                    <sigma>22.0</sigma>
                     <sigma>23.0</sigma>
+                    <sigma>24.0</sigma>
                 </aprioriPointingSigmas>
             </instrumentPointingOptions>
-            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+            <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>
-                    <sigma>17000.0</sigma>
+                    <sigma>18000.0</sigma>
                 </aprioriPositionSigmas>
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
