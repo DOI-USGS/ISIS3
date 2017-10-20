@@ -45,7 +45,7 @@ namespace Isis {
     public:
       // constructors
       BundlePolynomialContinuityConstraint();
-      BundlePolynomialContinuityConstraint(BundleObservationQsp solveSettings);
+      BundlePolynomialContinuityConstraint(BundleObservationQsp parentObservation);
 
       // copy constructor
       BundlePolynomialContinuityConstraint(const BundlePolynomialContinuityConstraint &src);

@@ -215,8 +215,7 @@ namespace Isis {
    *         returns true.
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
-    m_solveSettings = BundleObservationSolveSettingsQsp(
-                        new BundleObservationSolveSettings(solveSettings));
+    m_solveSettings.reset( new BundleObservationSolveSettings(solveSettings) );
 
     // initialize solution parameters for this observation
     int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -963,7 +962,10 @@ namespace Isis {
    * @return @b int Returns number of piecewise polynomial position segments
    */
   int BundleObservation::numberPolynomialPositionSegments() {
-    return m_instrumentPosition->numPolynomialSegments();
+    if (m_instrumentPosition) {
+      return m_instrumentPosition->numPolynomialSegments();
+    }
+    return m_solveSettings->numberSpkPolySegments();
   }
 
 
@@ -973,7 +975,10 @@ namespace Isis {
    * @return @b int Returns number of piecewise polynomial pointing segments
    */
   int BundleObservation::numberPolynomialPointingSegments() {
-    return m_instrumentRotation->numPolynomialSegments();
+    if (m_instrumentRotation) {
+      return m_instrumentRotation->numPolynomialSegments();
+    }
+    return m_solveSettings->numberCkPolySegments();
   }
 
 
@@ -985,8 +990,8 @@ namespace Isis {
    * @return @b int Returns total number of piecewise polynomial segments
    */
   int BundleObservation::numberPolynomialSegments() {
-    return (m_instrumentPosition->numPolynomialSegments() +
-            m_instrumentRotation->numPolynomialSegments());
+    return (numberPolynomialPositionSegments() +
+            numberPolynomialPointingSegments());
   }
 
 
@@ -997,8 +1002,9 @@ namespace Isis {
    * @return @b int Returns total number of piecewise polynomial continuity constraint equations
    */
   int BundleObservation::numberContinuityConstraints() const {
-    if (m_continuityConstraints)
+    if (m_continuityConstraints) {
       return m_continuityConstraints->numberConstraintEquations();
+    }
     return 0;
   }
 

@@ -14,6 +14,7 @@
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
 #include "BundleMeasure.h"
+#include "BundlePolynomialContinuityConstraint.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
@@ -344,9 +345,8 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings observationSettings;
     QStringList observationNumberList = observationSettings.observationNumbers().toList();
     qDebug() << "Observation numbers: " << observationNumberList.join(", ");
-    qDebug() << "Add two new observation numbers";
+    qDebug() << "Add a new observation number";
     observationSettings.addObservationNumber("TestObservation1");
-    observationSettings.addObservationNumber("TestObservation2");
     observationNumberList = observationSettings.observationNumbers().toList();
     qDebug() << "Observation numbers: " << observationNumberList.join(", ");
     qDebug() << "";
@@ -570,6 +570,13 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImage2SerialNumber")->fileName();
     qDebug() << "";
 
+    qDebug() << "Get the number of segments";
+    qDebug() << "Number of position segments: " << bo3.numberPolynomialPositionSegments();
+    qDebug() << "Number of pointing segments: " << bo3.numberPolynomialPointingSegments();
+    qDebug() << "Total number of segments: " << bo3.numberPolynomialSegments();
+    qDebug() << "Number of continuity constraints: " << bo3.numberContinuityConstraints();
+    qDebug() << "";
+
     //  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
     qDebug() << "Testing exceptions...";
     BundleObservationSolveSettings bo3SettingsCopy(*(bo3.solveSettings()));
@@ -624,14 +631,27 @@ int main(int argc, char *argv[]) {
     #endif
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
-    // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs1->formatBundleOutputString(true);
-    //obs1 = bov.observationByCubeSerialNumber("obs1");
-    //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs2->formatBundleOutputString(true);
+    BundleObservationQsp obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs1->formatPointingOutputString(0, true);
+    qDebug() << obs1->formatPositionOutputString(0, true);
+    obs1 = bov.observationByCubeSerialNumber("obs1");
+    BundleImageQsp bi2Copy(new BundleImage(bi3));
+    BundleObservationQsp obs2 = bov.addNew(bi2Copy, "obs2", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs2->formatPointingOutputString(0, true);
+    qDebug() << obs2->formatPositionOutputString(0, true);
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
+    qDebug() << "number of continuity constraints: "
+             << toString(bov.numberContinuityConstraintEquations());
+
+    qDebug() << "Test copy constructor";
+    BundleObservationVector bov2(bov);
+
+    qDebug() << "Test assignment operator";
+    bov = bov;
+    BundleObservationVector bov3;
+    bov3= bov;
 
 #if 0
     BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");
