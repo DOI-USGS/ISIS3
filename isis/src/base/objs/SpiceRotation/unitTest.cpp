@@ -61,7 +61,18 @@ int main(int argc, char *argv[]) {
   SpiceRotation rot(-94031); // MGS_MOC
 
   // Normal testing of SetEphemerisTime ie. source=SPICE(no cache)
-  cout << "Testing without cache (from SPICE)... " << endl;
+  cout << "Testing without cache (from SPICE)... " << endl << endl;
+  cout << "Rotation is cached? " << (rot.IsCached()?"Yes":"No") << endl;
+  std::vector<int> constantChain = rot.ConstantFrameChain();
+  cout << "Constant Frame Chain:" << endl;
+  for (int i = 0; i < (int) constantChain.size(); i++) {
+    cout << "  " << constantChain[i] << endl;
+  }
+  std::vector<int> timeChain = rot.TimeFrameChain();
+  cout << "Time Frame Chain:" << endl;
+  for (int i = 0; i < (int) timeChain.size(); i++) {
+    cout << "  " << timeChain[i] << endl;
+  }
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     rot.SetEphemerisTime(t);
@@ -79,13 +90,14 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Testing with cache
-  cout << "Testing with cache ... " << endl;
+  cout << "Testing with cache ... " << endl << endl;
   rot.LoadCache(startTime, endTime, 10);
+  cout << "Rotation is cached? " << (rot.IsCached()?"Yes":"No") << endl;
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     rot.SetEphemerisTime(t);
     vector<double> CJ = rot.Matrix();
-    cout << "Time           = " << rot.EphemerisTime() << endl;
+    cout << "Time  = " << rot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -95,23 +107,60 @@ int main(int argc, char *argv[]) {
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
+  std::vector<double> extrapCJ = rot.Extrapolate(startTime + 10 * slope);
+  cout << "Extrapolated Time: " << startTime + 10 * slope << endl;
+  cout << "CJ = " << extrapCJ[0] << " " << extrapCJ[1] << " " << extrapCJ[2] << endl;
+  cout << "      " << extrapCJ[3] << " " << extrapCJ[4] << " " << extrapCJ[5] << endl;
+  cout << "      " << extrapCJ[6] << " " << extrapCJ[7] << " " << extrapCJ[8] << endl;
   cout << endl;
 
   // Save off cache for polynomial over SPICE test
   Table tab = rot.Cache("TestPolyOver");
 
   // Testing with Functions
-  cout << "Testing with functions ... " << endl;
+  cout << "Testing with functions ... " << endl << endl;
   vector<double> abcAng1, abcAng2, abcAng3;
+  rot.setPolynomialSegments(3);
   rot.SetPolynomial();
-  rot.GetPolynomial(abcAng1, abcAng2, abcAng3);
   cout << "Source = " << rot.GetSource() << endl;
+  std::vector<double> polyKnots = rot.polynomialKnots();
+  cout << "Base Time: " << rot.GetBaseTime() << endl;
+  cout << "Time Scale: " << rot.GetTimeScale() << endl;
+  cout << "Polynomial Knots:" << endl;
+  for (int i = 0; i < (int) polyKnots.size(); i++) {
+    cout << "  " << polyKnots[i] << endl;
+  }
+  std::vector<double> polyScaledKnots = rot.scaledPolynomialKnots();
+  cout << "Scaled Polynomial Knots:" << endl;
+  for (int i = 0; i < (int) polyScaledKnots.size(); i++) {
+    cout << "  " << polyScaledKnots[i] << endl;
+  }
+  for (int i = 0; i < rot.numPolynomialSegments(); i++) {
+    rot.GetPolynomial(abcAng1, abcAng2, abcAng3);
+    cout << "Segment " << toString(i+1) << " Coefficients:" << endl;
+    cout << "  X:";
+    for (int j = 0; j < (int) abcAng1.size(); j++) {
+      cout << " " << abcAng1[j];
+    }
+    cout << endl;
+    cout << "  Y:";
+    for (int j = 0; j < (int) abcAng2.size(); j++) {
+      cout << " " << abcAng2[j];
+    }
+    cout << endl;
+    cout << "  Z:";
+    for (int j = 0; j < (int) abcAng3.size(); j++) {
+      cout << " " << abcAng3[j];
+    }
+    cout << endl;
+  }
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     rot.SetEphemerisTime(t);
     vector<double> CJ = rot.Matrix();
-    cout << "Time           = " << rot.EphemerisTime() << endl;
+    cout << "Time  = " << rot.EphemerisTime() << endl;
+    cout << "Index = " << rot.polySegmentIndex(t) << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -125,7 +174,7 @@ int main(int argc, char *argv[]) {
 
 
   // Testing polynomial over Spice
-  cout << "Testing with polynomial functions over Spice ... " << endl;
+  cout << "Testing with polynomial functions over Spice ... " << endl << endl;
   SpiceRotation rot2(-94031);
   rot2.LoadCache(tab);
   rot2.ComputeBaseTime();
@@ -149,7 +198,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     rot2.SetEphemerisTime(t);
     vector<double> CJ = rot2.Matrix();
-    cout << "Time           = " << rot2.EphemerisTime() << endl;
+    cout << "Time  = " << rot2.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -162,7 +211,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Test polynomial over Cache conversion to reduced cache
-  cout << "Test fitting polynomial function over cache to new cache" << endl;
+  cout << "Test fitting polynomial function over cache to new cache" << endl << endl;
 
   // Get new cache using existing cache and polynomial
   Table tab2 = rot2.Cache("Outputcache");
@@ -178,7 +227,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     rot3.SetEphemerisTime(t);
     vector<double> CJ = rot3.Matrix();
-    cout << "Time           = " << rot3.EphemerisTime() << endl;
+    cout << "Time  = " << rot3.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -192,7 +241,7 @@ int main(int argc, char *argv[]) {
 
 
   // Testing ToReferencePartial method
-  cout << "Testing ToReferencePartial method" << endl;
+  cout << "Testing ToReferencePartial method" << endl << endl;
   vector<double> angles = rot.Angles(3, 1, 3);
   cout << "For angles (ra,dec,twist) = " << angles[0] << " " << angles[1] << " " << angles[2]
        << endl;
@@ -237,7 +286,7 @@ int main(int argc, char *argv[]) {
   cout << "Twist partial on A applied to lookJ =:  " << dAtwLookC[0] << " "
        << dAtwLookC[1] << " " << dAtwLookC[2] << endl << endl;
 
-  cout << "Testing with setting functions ... " << endl;
+  cout << "Testing with setting functions ... " << endl << endl;
   Table tab1 = rot.Cache("Test");
   SpiceRotation rot4(-94031);
   SpiceRotation::Source source = SpiceRotation::Spice;
@@ -251,7 +300,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     rot4.SetEphemerisTime(t);
     vector<double> CJ = rot4.Matrix();
-    cout << "Time           = " << rot4.EphemerisTime() << endl;
+    cout << "Time  = " << rot4.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -265,7 +314,7 @@ int main(int argc, char *argv[]) {
 
 
   // Test LineCache method
-  cout << "Testing line cache..." << endl;
+  cout << "Testing line cache..." << endl << endl;
   Table tab4 = rot4.LineCache("Test5");
   SpiceRotation rot5(-94031);
   rot5.LoadCache(tab4);
@@ -274,7 +323,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     rot5.SetEphemerisTime(t);
     vector<double> CJ = rot5.Matrix();
-    cout << "Time           = " << rot5.EphemerisTime() << endl;
+    cout << "Time  = " << rot5.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -288,7 +337,7 @@ int main(int argc, char *argv[]) {
 
 
   // Test table options
-  cout << "Testing tables ... " << endl;
+  cout << "Testing tables ... " << endl << endl;
   Table tab3 = rot.Cache("Test");
   SpiceRotation rot6(-94031);
   rot6.LoadCache(tab3);
@@ -296,7 +345,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     rot6.SetEphemerisTime(t);
     vector<double> CJ = rot6.Matrix();
-    cout << "Time           = " << rot6.EphemerisTime() << endl;
+    cout << "Time  = " << rot6.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -310,7 +359,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
 // Test J2000 and Reference vector methods
-  cout << "Testing vector methods" << endl;
+  cout << "Testing vector methods" << endl << endl;
   rot6.SetEphemerisTime(startTime);
   vector<double> v(3);
   v[0] = 0.;
@@ -328,7 +377,7 @@ int main(int argc, char *argv[]) {
 
 
   // Testing linear Function
-  cout << "Testing with linear function ... " << endl;
+  cout << "Testing with linear function ... " << endl << endl;
   SpiceRotation linrot(-94031);
   linrot.LoadCache(startTime, endTime, 2);
   linrot.SetEphemerisTime(startTime);
@@ -343,7 +392,7 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * (endTime - startTime);
     linrot.SetEphemerisTime(t);
     vector<double> CJ = linrot.Matrix();
-    cout << "Time           = " << linrot.EphemerisTime() << endl;
+    cout << "Time  = " << linrot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -352,7 +401,7 @@ int main(int argc, char *argv[]) {
 
 
 // Test Nadir source option
-  cout << "Testing Nadir rotation ... " << endl;
+  cout << "Testing Nadir rotation ... " << endl << endl;
   SpiceRotation naRot(-94031, 499);
 
   for (int i = 0; i < 10; i++) {
@@ -360,7 +409,7 @@ int main(int argc, char *argv[]) {
     naRot.SetEphemerisTime(t);
     vector<double> CJ = naRot.Matrix();
 
-    cout << "Time           = " << naRot.EphemerisTime() << endl;
+    cout << "Time  = " << naRot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -369,7 +418,7 @@ int main(int argc, char *argv[]) {
 
   // Test angle wrap method
   double newangle = naRot.WrapAngle(0.5235987756, 4.188790205);
-  cout << "Testing angle wrapping..." << endl;
+  cout << "Testing angle wrapping..." << endl << endl;
   cout << "   Using anchor angle of 30, 240 changes to " << newangle * 180. / pi_c() << endl;
   newangle = naRot.WrapAngle(0.5235987756, -0.1745329252);
   cout << "   Using anchor angle of 30, -10 changes to " << newangle * 180. / pi_c() << endl;
@@ -445,7 +494,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Test SetPckPolynomial methods
-  cout << endl << "Testing with PCK polynomial ... " << endl;
+  cout << endl << "Testing with PCK polynomial ... " << endl << endl;
 
   SpiceInt ibod;
   doublereal tet, tra, tdec, tomega, tlambda;
@@ -481,7 +530,7 @@ int main(int argc, char *argv[]) {
     vector<double> CJ = targrot.Matrix();
     //temp debug lines to be removed...
     //end temp debug lines   Note: uncomment the next 4 lines
-    cout << "    Time           = " << targrot.EphemerisTime() << endl;
+    cout << "    Time  = " << targrot.EphemerisTime() << endl;
     // vector<double> pckangles = targrot.Angles(3, 1, 3);
     // cout << "    Angles = " << pckangles[0]*dpr_c() <<","<< pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
@@ -510,7 +559,7 @@ int main(int argc, char *argv[]) {
     vector<double> CJ = targrot.Matrix();
     //temp debug lines to be removed...
     // vector<double> pckangles = targrot.Angles(3, 1, 3);
-    cout << "    Time           = " << targrot.EphemerisTime() << endl;
+    cout << "    Time  = " << targrot.EphemerisTime() << endl;
 
     // cout << "    Angles = " << pckangles[0]*dpr_c() <<","<< pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
     //    cout << "    Angles = " << pckangles[0]*dpr_c() + 90. <<","<< 90. - pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
@@ -521,7 +570,7 @@ int main(int argc, char *argv[]) {
   }
 
     // Test angular velocities 
-  cout << endl << endl << "Testing angular velocity with Io data ..." << endl;
+  cout << endl << endl << "Testing.*" << endl << endl;
   if (targrotV.HasAngularVelocity()) {
     vector<double> av = targrotV.AngularVelocity();
     cout << "SpiceRotation av = " << av[0] << " " << av[1] << " " << av[2] << endl;
@@ -535,7 +584,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  cout << endl << endl << "Testing partials for target body parameters..." << endl;
+  cout << endl << endl << "Testing partials for target body parameters..." << endl << endl;
   targrot.SetEphemerisTime(startTime);
   cout << "For angles (ra,dec,rotation) = " << angles[0] << " " << angles[1] << " " << angles[2]
        << endl;
@@ -594,7 +643,7 @@ int main(int argc, char *argv[]) {
 
   
   //Test exceptions
-  cout << endl << endl << "Testing exceptions..." << endl;
+  cout << endl << endl << "Testing exceptions..." << endl << endl;
   SpiceRotation testRot(-94031); // MGS_MOC
 
   // SpiceRotation(frameCode, targetCode) 
