@@ -35,13 +35,16 @@ int main(int argc, char *argv[]) {
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
+  cout << "Position information is cached? " << toString(pos.IsCached()) << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     vector<double> p = pos.SetEphemerisTime(t);
-    vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    if (pos.HasVelocity()) {
+      vector<double> v = pos.Velocity();
+      cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
   }
   cout << endl;
 
@@ -49,13 +52,16 @@ int main(int argc, char *argv[]) {
   // Testing with cache
   cout << "Testing with cache ... " << endl;
   pos.LoadCache(startTime, endTime, 10);
+  cout << "Position information is cached? " << toString(pos.IsCached()) << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     vector<double> p = pos.SetEphemerisTime(t);
-    vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    if (pos.HasVelocity()) {
+      vector<double> v = pos.Velocity();
+      cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
   }
   cout << endl;
 
@@ -68,10 +74,12 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     pos2.SetEphemerisTime(t);
     vector<double> p = pos2.Coordinate();
-    vector<double> v = pos2.Velocity();
     cout << "Time           = " << pos2.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    if (pos2.HasVelocity()) {
+      vector<double> v = pos2.Velocity();
+      cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
   }
   cout << endl;
 
@@ -89,10 +97,12 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     pos.SetEphemerisTime(t);
     vector<double> p = pos.Coordinate();
-    vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    if (pos.HasVelocity()) {
+      vector<double> v = pos.Velocity();
+      cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
   }
   cout << endl;
 
@@ -106,10 +116,12 @@ int main(int argc, char *argv[]) {
     double t = startTime + (double) i * slope;
     pos3.SetEphemerisTime(t);
     vector<double> p = pos3.Coordinate();
-    vector<double> v = pos3.Velocity();
     cout << "Time           = " << pos3.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    if (pos3.HasVelocity()) {
+      vector<double> v = pos3.Velocity();
+      cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
   }
   cout << endl;
  
@@ -221,7 +233,7 @@ int main(int argc, char *argv[]) {
     vector<double> v = pos4.Velocity();
     cout << "Time           = " << t << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
   
@@ -253,7 +265,7 @@ int main(int argc, char *argv[]) {
     vector<double> v = pos4.Velocity();
     cout << "Time           = " << t << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
 
@@ -276,7 +288,7 @@ int main(int argc, char *argv[]) {
     vector<double> v = pos5.Velocity();
     cout << "Time           = " << t << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
 
@@ -286,11 +298,96 @@ int main(int argc, char *argv[]) {
   pos5.setPolynomialSegments(3);
   pos5.SetPolynomialDegree(2);
   pos5.SetPolynomial();
+  std::vector<double> centerCoord = pos5.GetCenterCoordinate();
+  cout << "Center Time Position: " << centerCoord[0] << ", "
+                                   << centerCoord[1] << ", "
+                                   << centerCoord[2] << ", " << endl;
   std::vector<double> polyKnots = pos5.polynomialKnots();
   cout << "Knots:" << endl;
   for (int i = 0; i < (int)polyKnots.size(); i++) {
     cout << "  " << polyKnots[i] << endl;
   }
+  std::vector<double> scaledPolyKnots = pos5.scaledPolynomialKnots();
+  cout << "Scaled Knots:" << endl;
+  for (int i = 0; i < (int)scaledPolyKnots.size(); i++) {
+    cout << "  " << scaledPolyKnots[i] << endl;
+  }
+  cout << "Base Time: " << toString( pos5.GetBaseTime() ) << endl;
+  cout << "Time Scale: " << toString( pos5.GetTimeScale() ) << endl;
+  for (int i = 0; i < pos5.numPolynomialSegments(); i++) {
+    std::vector<double> xCoeff, yCoeff, zCoeff;
+    pos5.GetPolynomial(xCoeff, yCoeff, zCoeff, i);
+    cout << "Segment " << toString(i+1) << " coefficients:" << endl;
+    cout << "  X:";
+    for (int j = 0; j < (int) xCoeff.size(); j++) {
+      cout << " " << xCoeff[j];
+    }
+    cout << endl;
+    cout << "  Y:";
+    for (int j = 0; j < (int) yCoeff.size(); j++) {
+      cout << " " << yCoeff[j];
+    }
+    cout << endl;
+    cout << "  Z:";
+    for (int j = 0; j < (int) zCoeff.size(); j++) {
+      cout << " " << zCoeff[j];
+    }
+    cout << endl;
+  }
+  pos5.SetEphemerisTime(startTime + 3 * slope);
+  std::vector<double> xCoordPartials;
+  std::vector<double> yCoordPartials;
+  std::vector<double> zCoordPartials;
+  std::vector<double> xVelPartials;
+  std::vector<double> yVelPartials;
+  std::vector<double> zVelPartials;
+  for (int i = 0; i < 3; i++) {
+    std::vector<double> tempVec = pos5.CoordinatePartial(SpicePosition::WRT_X, i);
+    xCoordPartials.push_back(tempVec[0]);
+    tempVec = pos5.CoordinatePartial(SpicePosition::WRT_Y, i);
+    yCoordPartials.push_back(tempVec[1]);
+    tempVec = pos5.CoordinatePartial(SpicePosition::WRT_Z, i);
+    zCoordPartials.push_back(tempVec[2]);
+
+    tempVec = pos5.VelocityPartial(SpicePosition::WRT_X, i);
+    xVelPartials.push_back(tempVec[0]);
+    tempVec = pos5.VelocityPartial(SpicePosition::WRT_Y, i);
+    yVelPartials.push_back(tempVec[1]);
+    tempVec = pos5.VelocityPartial(SpicePosition::WRT_Z, i);
+    zVelPartials.push_back(tempVec[2]);
+  }
+  cout << "Coordinate Partials:" << endl;
+  cout << "  X:";
+  for (int i = 0; i < (int) xCoordPartials.size(); i++) {
+    cout << " " << xCoordPartials[i];
+  }
+  cout << endl;
+  cout << "  Y:";
+  for (int i = 0; i < (int) yCoordPartials.size(); i++) {
+    cout << " " << yCoordPartials[i];
+  }
+  cout << endl;
+  cout << "  Z:";
+  for (int i = 0; i < (int) zCoordPartials.size(); i++) {
+    cout << " " << zCoordPartials[i];
+  }
+  cout << endl;
+  cout << "Velocity Partials:" << endl;
+  cout << "  X:";
+  for (int i = 0; i < (int) xVelPartials.size(); i++) {
+    cout << " " << xVelPartials[i];
+  }
+  cout << endl;
+  cout << "  Y:";
+  for (int i = 0; i < (int) yVelPartials.size(); i++) {
+    cout << " " << yVelPartials[i];
+  }
+  cout << endl;
+  cout << "  Z:";
+  for (int i = 0; i < (int) zVelPartials.size(); i++) {
+    cout << " " << zVelPartials[i];
+  }
+  cout << endl;
   Table testPolyTable = pos5.Cache("TestPoly");
   cout << testPolyTable.Label() << endl;
   for(int i = 0; i < 10; i++) {
@@ -299,8 +396,154 @@ int main(int argc, char *argv[]) {
     vector<double> p = pos5.Coordinate();
     vector<double> v = pos5.Velocity();
     cout << "Time           = " << t << endl;
+    cout << "Segment Index  = " << pos5.polySegmentIndex(t) << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  
+  cout << endl;
+
+  cout << "Test loading a polynomial table." << endl << endl;
+
+  SpicePosition pos6(-94, 499);
+  pos6.LoadCache(testPolyTable);
+  std::vector<double> poly6Knots = pos6.polynomialKnots();
+  cout << "Knots:" << endl;
+  for (int i = 0; i < (int)poly6Knots.size(); i++) {
+    cout << "  " << poly6Knots[i] << endl;
+  }
+  cout << "Base Time: " << toString( pos6.GetBaseTime() ) << endl;
+  cout << "Time Scale: " << toString( pos6.GetTimeScale() ) << endl;
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    pos6.SetEphemerisTime(t);
+    vector<double> p = pos6.Coordinate();
+    vector<double> v = pos6.Velocity();
+    cout << "Time           = " << t << endl;
+    cout << "Segment Index  = " << pos6.polySegmentIndex(t) << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  
+  cout << endl;
+
+  cout << "Test loading a hermite cache from a polynomial." << endl << endl;
+
+  Table hermiteTable = pos6.LoadHermiteCache("HermiteTable");
+  cout << hermiteTable.Label() << endl;
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    pos6.SetEphemerisTime(t);
+    vector<double> p = pos6.Coordinate();
+    vector<double> v = pos6.Velocity();
+    cout << "Time           = " << t << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  std::vector<double> originalTimeCache = pos6.timeCache();
+  cout << "Original Time Cache:" << endl;
+  // This is ~750 elements, so only put out first, last and every 100
+  cout << "  " << originalTimeCache.front() << endl;
+  for (int i = 100; i < (int) originalTimeCache.size(); i += 100) {
+    cout << "  " << originalTimeCache[i] << endl;
+  }
+  cout << "  " << originalTimeCache.back() << endl;
+  
+  cout << endl;
+
+  cout << "Test converting from a hermite cache to a polynomial over hermite." << endl << endl;
+
+  pos6.SetPolynomialDegree(1);
+  pos6.setPolynomialSegments(2);
+  pos6.SetPolynomial(SpicePosition::PolyFunctionOverHermiteConstant);
+  poly6Knots = pos6.polynomialKnots();
+  cout << "Knots:" << endl;
+  for (int i = 0; i < (int)poly6Knots.size(); i++) {
+    cout << "  " << poly6Knots[i] << endl;
+  }
+  cout << "Base Time: " << toString( pos6.GetBaseTime() ) << endl;
+  cout << "Time Scale: " << toString( pos6.GetTimeScale() ) << endl;
+  for (int i = 0; i < pos6.numPolynomialSegments(); i++) {
+    std::vector<double> xCoeff, yCoeff, zCoeff;
+    pos6.GetPolynomial(xCoeff, yCoeff, zCoeff, i);
+    cout << "Segment " << toString(i+1) << " coefficients:" << endl;
+    cout << "  X:";
+    for (int j = 0; j < (int) xCoeff.size(); j++) {
+      cout << " " << xCoeff[j];
+    }
+    cout << endl;
+    cout << "  Y:";
+    for (int j = 0; j < (int) yCoeff.size(); j++) {
+      cout << " " << yCoeff[j];
+    }
+    cout << endl;
+    cout << "  Z:";
+    for (int j = 0; j < (int) zCoeff.size(); j++) {
+      cout << " " << zCoeff[j];
+    }
+    cout << endl;
+  }
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    pos6.SetEphemerisTime(t);
+    vector<double> p = pos6.Coordinate();
+    vector<double> v = pos6.Velocity();
+    cout << "Time           = " << t << endl;
+    cout << "Segment Index  = " << pos6.polySegmentIndex(t) << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  
+  cout << endl;
+
+  cout << "Test a polynomial over hermite with non-zero coefficients." << endl << endl;
+
+  pos6.SetPolynomialDegree(2);
+  for (int i = 0; i < pos6.numPolynomialSegments(); i++) {
+    std::vector<double> xCoeff, yCoeff, zCoeff;
+    xCoeff.push_back(pow(-1, i) );
+    xCoeff.push_back(pow(-1, i) * 0.1 );
+    xCoeff.push_back(pow(-1, i) * 0.01 );
+    yCoeff.push_back(2 * pow(-1, i + 1) );
+    yCoeff.push_back(2 * pow(-1, i + 1) * 0.1 );
+    yCoeff.push_back(2 * pow(-1, i + 1) * 0.01 );
+    zCoeff.push_back(1.3 * pow(-1, i) );
+    zCoeff.push_back(1.3 * pow(-1, i) * 0.1 );
+    zCoeff.push_back(1.3 * pow(-1, i) * 0.01 );
+    pos6.SetPolynomial(xCoeff, yCoeff, zCoeff,
+                       SpicePosition::PolyFunctionOverHermiteConstant, i);
+  }
+  for (int i = 0; i < pos6.numPolynomialSegments(); i++) {
+    std::vector<double> xCoeff, yCoeff, zCoeff;
+    pos6.GetPolynomial(xCoeff, yCoeff, zCoeff, i);
+    cout << "Segment " << toString(i+1) << " coefficients:" << endl;
+    cout << "  X:";
+    for (int j = 0; j < (int) xCoeff.size(); j++) {
+      cout << " " << xCoeff[j];
+    }
+    cout << endl;
+    cout << "  Y:";
+    for (int j = 0; j < (int) yCoeff.size(); j++) {
+      cout << " " << yCoeff[j];
+    }
+    cout << endl;
+    cout << "  Z:";
+    for (int j = 0; j < (int) zCoeff.size(); j++) {
+      cout << " " << zCoeff[j];
+    }
+    cout << endl;
+  }
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    pos6.SetEphemerisTime(t);
+    vector<double> p = pos6.Coordinate();
+    vector<double> h = pos6.HermiteCoordinate();
+    vector<double> v = pos6.Velocity();
+    cout << "Time           = " << t << endl;
+    cout << "Segment Index  = " << pos6.polySegmentIndex(t) << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Bias       (J) = " << p[0] - h[0] << " " << p[1] - h[1] << " " << p[2] - h[2] << endl;
+    cout << "Velocity   (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   
   cout << endl;
