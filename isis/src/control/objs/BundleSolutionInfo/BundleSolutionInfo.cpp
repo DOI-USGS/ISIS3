@@ -1099,8 +1099,8 @@ namespace Isis {
         }
         
         // Remove the last comma
-        if ( QString::compare(observationString.right(1), ",") ) {
-            observationString.truncate(observationString.length()-1);
+        while ( QString::compare(observationString.right(1), ",") == 0 ) {
+          observationString.truncate(observationString.length()-1);
         }
 
         fpOut << (const char*) observationString.toLatin1().data();
