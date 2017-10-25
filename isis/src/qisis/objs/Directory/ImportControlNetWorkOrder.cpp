@@ -194,10 +194,6 @@ namespace Isis {
    * from postSyncRedo() to postExecution().
    */
   void ImportControlNetWorkOrder::postExecution() {
-    if (!m_list) {
-      project()->undoStack()->undo();
-      m_list = NULL;
-    }
 
     if (m_warning != "") {
       project()->warn(m_warning);

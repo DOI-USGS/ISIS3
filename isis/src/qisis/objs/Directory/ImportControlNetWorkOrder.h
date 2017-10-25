@@ -63,6 +63,8 @@ namespace Isis {
    *                           order. This pointer is used in the Undo funtions. #5064
    *   @history 2017-08-11 Cole Neubauer - Refactored import so it closes the controlNet after
    *                           Control is created Fixes #5026
+   *   @histroy 2017-10-24 Adam Goins - Removed the undoStack() call that occurred when a
+   *                           Failed cnet is imported. Fixes #5186
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
