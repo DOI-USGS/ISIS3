@@ -59,7 +59,7 @@ commands:
 	echo -e "Error Test F:" >> $(OUTPUT)/error.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
-	  cnet=$(INPUT)/notacnet.net \
+	  cnet=$(INPUT)/empty.net \
 	  onet=$(output)/out.net \
 	  radius=yes \
 	  spsolve=positions \
@@ -71,4 +71,6 @@ commands:
 	then \
 	  true; \
 	fi;
-	
+# Remove full paths from the errors file
+	sed -i "s/$(INPUT)\///" $(OUTPUT)/error.txt;
+	sed -i "s/$(OUTPUT)\///" $(OUTPUT)/error.txt;
