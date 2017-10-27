@@ -17,7 +17,6 @@
 #include "BandTool.h"
 #include "BlinkTool.h"
 #include "EditTool.h"
-#include "EphemeridesPlotTool.h"
 #include "FeatureNomenclatureTool.h"
 #include "FileName.h"
 #include "FileTool.h"
@@ -188,8 +187,6 @@ int main(int argc, char *argv[]) {
 
   Tool *matchTool = createTool<MatchTool>(vw, &tools);
 
-  Tool *ephemeridesTool = createTool<EphemeridesPlotTool>(vw, &tools);
-
   Tool *helpTool = createTool<HelpTool>(vw, &tools);
 
   // Show the application window & open the cubes
@@ -261,7 +258,6 @@ int main(int argc, char *argv[]) {
   delete panTool;
   delete statsTool;
   delete helpTool;
-  delete ephemeridesTool;
   delete matchTool;
   delete stereoTool;
   delete histTool;
