@@ -2,11 +2,12 @@
 
 <application name="isis2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Convert from cube to pds format
+    Convert from ISIS3 cube to PDS 3 or PDS 4 format
   </brief>
 
   <description>
-   Program to convert cubes to pds image files.
+   Program to convert cubes to PDS3 or PDS4 image files.
+   For PDS4, If available, Instrument and  Mapping information will be written to the detached output PDS4 formatted xml label file.  
   </description>
 
   <category>
@@ -22,11 +23,15 @@
       Added the Label Type capability (param)
     </change>
     <change name="Kristin Berry" date="2014-06-06">
-      Changed to assume that radii without units in the input Isis cube are in meters, map scales without units are in meters/pixel, and map resolutions without units are in pixels/degree.
+      Changed to assume that radii without units in the input Isis cube are in meters, map scales without units are in meters/pixel, and
+       map resolutions without units are in pixels/degree.
     </change>
     <change name="Makayla Shepherd and Ian Humphrey" date="2017-05-17">
       Added CHECKSUM parameter to optionally generate and attach an MD5 checksum to the exported
       image label. This checksum is generated from the image data. Fixes #1013.
+    </change>
+    <change name="Jeannie Backer, Mayayla Shepard, and Kristin Berry" date="2017-10-27">
+       Added PDS4 output option. Previously, this application converted ISIS3 cubes to PDS3 format only. 
     </change>
     </history>
 
@@ -53,7 +58,8 @@
           Output pds image
         </brief>
         <description>
-          The resulting pds file.
+          The resulting pds file. For PDS4, a detached label of the same name with the file extension .xml 
+          will be created in the same directory.
         </description>
         <filter>
           *.img
@@ -61,8 +67,38 @@
       </parameter>
     </group>
 
+    <group name="PDS Format Version">
+      <parameter name="PDSVERSION">
+        <type>string</type>
+         <default><item>PDS3</item></default>
+	 <brief>Version of PDS to output</brief>
+	 <description>
+	     Changes which version of PDS file format
+	     to output in.
+	 </description>
+	 <list>
+	     <option value="PDS3">
+		 <brief>Convert ISIS3 cube to PDS3 format</brief>
+		 <description>
+		     Convert ISIS3 cube to PDS3 format.
+		 </description>
+	     </option>
+	     <option value="PDS4">
+		 <brief>Convert ISIS3 cube to PDS4 format</brief>
+		 <description>
+		     Convert ISIS3 cube to PDS4 format.
+		  </description>
+		  <exclusions>
+		      <item>LABTYPE</item>
+		      <item>CHECKSUM</item>
+		  </exclusions>
+	     </option>
+	 </list>
+      </parameter>
+    </group>
+
     <group name="Output Settings">
-      <parameter name="LABTYPE">
+    <parameter name="LABTYPE">
         <type>string</type>
         <default><item>STREAM</item></default>
         <brief>Label type of output file</brief>
@@ -87,6 +123,7 @@
           </option>
         </list>
       </parameter>
+
       <parameter name="BITTYPE">
         <type>string</type>
         <default>
@@ -191,7 +228,7 @@
           file as well as displayed onscreen.
         </description>
       </parameter>
-      <parameter name="CHECKSUM">
+    <parameter name="CHECKSUM">
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>Generates and attaches an MD5 checksum to the labels.</brief>
@@ -199,7 +236,7 @@
           If set to true, then an MD5 checksum will be generated from the image data and
           attached to the output image labels.
         </description>
-      </parameter>
+      </parameter> 
     </group>
 
     <group name="Stretch Options">

@@ -690,10 +690,6 @@ namespace Isis {
     if(inputLabel->hasObject("IsisCube") &&
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
-    // Translate the common keywords for a PDS IMAGE_MAP_PROJECTION
-    PvlToPvlTranslationManager xlatGenProj(*inputLabel,
-                                      "$base/translations/pdsExportAllMapping.trn");
-    xlatGenProj.Auto(outputPvl);
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
     QString projName = ProjectionName(*inputLabel);

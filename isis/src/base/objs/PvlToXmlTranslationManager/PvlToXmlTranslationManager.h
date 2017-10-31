@@ -58,6 +58,8 @@ namespace Isis {
    *  @history 2017-05-31 Ian Humphrey & Makayla Shepherd - Fixed duplicate root xml element in
    *                          output xml file.
    *  @history 2017-06-02 Makayla Shepherd - Made setElementValue public.
+   *  @history 2017-10-18 Jeannie Backer & Makayla Shepherd - Added convenience methods, addElement
+   *                          and resetElementValue, and made setElementValue static. See #5202.
    */
   class PvlToXmlTranslationManager : public LabelTranslationManager {
     public:
@@ -84,7 +86,9 @@ namespace Isis {
 
       void SetLabel(Pvl &inputLabel);
       
-      void setElementValue(QDomElement &element, QString value, QString units = "");
+      static void addElement(QDomElement &parent, QString name, QString value, QString units = "");
+      static void setElementValue(QDomElement &element, QString value, QString units = "");
+      static void resetElementValue(QDomElement &element, QString value, QString units = "");
 
 
     protected:

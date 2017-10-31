@@ -48,6 +48,9 @@ namespace Isis {
    *   @history 2017-06-08 Marjorie Hahn - Added WritePds4 method to write out the 
    *                           .img and .xml Pds4 data.
    *   @history 2017-09-26 Jesse Mapel - Improved test coverage and documentation. Fixes #5167.
+   *   @history 2017-10-18 Jeannie Backer & Makayla Shepherd - Added convenience method getElement
+   *                           and StandardAllMapping method to translate mapping information.
+   *                           See #5202.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
@@ -57,6 +60,7 @@ namespace Isis {
       ~ProcessExportPds4();
 
       QDomDocument &StandardPds4Label();
+      void StandardAllMapping();
 
       void CreateImageLabel();
       void FixedImageRoot();
@@ -64,13 +68,14 @@ namespace Isis {
 
       void OutputLabel(std::ofstream &os);
 
-      // include this using declaration to indicate that ProcessExportPds4
+      // Include this using declaration to indicate that ProcessExportPds4
       // objects that call a StartProcess() method that has not been overridden
       // here should use the corresponding base class definitions
       using ProcessExport::StartProcess;
       void StartProcess(std::ofstream &fout);
       QDomDocument &GetLabel();
       void WritePds4(QString outFile);
+      QDomElement getElement(QStringList xmlPath, QDomElement parent);
 
     protected:
 

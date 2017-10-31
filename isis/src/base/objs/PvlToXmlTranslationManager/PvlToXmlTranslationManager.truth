@@ -44,7 +44,7 @@ ExposureDuration = 1.920e-003 <seconds>
   <PEHK_HEADER Exposure_Time="1.920e-003"/>
   <DERIVED_HEADER_DATA>
    <Filter Form="Acronym">NIR</Filter>
-   <DefaultOutput>DefaultValue</DefaultOutput>
+   <NotInLabel>DefaultValue</NotInLabel>
   </DERIVED_HEADER_DATA>
  </CaSSIS_Header>
 </Product_Observational>

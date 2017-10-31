@@ -174,14 +174,14 @@ namespace Isis {
  *                          <li>the value to check for</li>
  *                        </ol>
  *
- * @throws IException::Unknown "Malformed dependency specification."
- * @throws IException::Unknown "Specification does not have two components
- *                              separated by [@], the type of dependency and
- *                              the name-value pair.
- * @throws IException::Unknown "Dependency type specification is invalid.
- *                              Valid types are [att] and [tag]"
- * @throws IException::Unknown "Name-value specification does not have two
- *                              components separated by [:]."
+ * @throws IException::Programmer "Malformed dependency specification."
+ * @throws IException::Programmer "Specification does not have two components
+ *                                 separated by [@], the type of dependency and
+ *                                 the name-value pair.
+ * @throws IException::Programmer "Dependency type specification is invalid.
+ *                                 Valid types are [att] and [tag]"
+ * @throws IException::Programmer "Name-value specification does not have two
+ *                              components separated by [|]."
  *
  */
 QStringList LabelTranslationManager::parseSpecification(QString specification) const {
@@ -189,19 +189,20 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
   QStringList parsedSpecification;
 
   try {
-    QStringList typeSplit = specification.split("@", QString::SkipEmptyParts);
-    QStringList colonSplit = specification.split(":", QString::SkipEmptyParts);
-    if (typeSplit.size() == 2) { //handle tag@elementname:value
+    QStringList typeSplit = specification.split("@", QString::SkipEmptyParts); 
+    QStringList barSplit = specification.split("|", QString::SkipEmptyParts);
+   
+    if (typeSplit.size() == 2) { //handle tag@elementname|value
       if (typeSplit[0].toLower() != "att" &&
           typeSplit[0].toLower() != "tag" &&
           typeSplit[0].toLower() != "new") {
         QString msg = "Dependency type specification [" + typeSplit[0] +
                       "] is invalid. Valid types are [att], [tag] and [new]";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       parsedSpecification.append(typeSplit[0].toLower());
 
-      QStringList nameValueSplit = typeSplit[1].split(":", QString::SkipEmptyParts);
+      QStringList nameValueSplit = typeSplit[1].split("|", QString::SkipEmptyParts);
       if (nameValueSplit.size() == 2) {
         parsedSpecification.append(nameValueSplit);
       }
@@ -210,24 +211,24 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
       }
       else { //nameValueSplit is an unexpected value
         QString msg = "Malformed dependency specification [" + specification + "].";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-    else if (colonSplit.size() == 2) { //handle elementname:value
-      parsedSpecification = colonSplit;
+    else if (barSplit.size() == 2) { //handle elementname|value
+      parsedSpecification = barSplit;
     }
-    else if (colonSplit.size() == 1 && typeSplit.size() == 1) { //handle value with no "@" or ":" characters
-      parsedSpecification = colonSplit;
+    else if (barSplit.size() == 1 && typeSplit.size() == 1) { //handle value with no "@" or "|" characters
+      parsedSpecification = barSplit;
     }
     else { //nameValueSplit is an unexpected value
-      QString msg = " [" + specification + "] has unexpected number of '@' or ':' delimiters";
-      throw IException(IException::Unknown,msg, _FILEINFO_);
+      QString msg = " [" + specification + "] has unexpected number of '@' or '|' delimiters";
+      throw IException(IException::Programmer,msg, _FILEINFO_);
     }
   }
 
   catch (IException &e) {
     QString msg = "Malformed dependency specification [" + specification + "].";
-    throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    throw IException(e, IException::Programmer, msg, _FILEINFO_);
   }
 
   return parsedSpecification;
