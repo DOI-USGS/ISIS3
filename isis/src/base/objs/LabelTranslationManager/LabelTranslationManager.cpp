@@ -93,7 +93,7 @@ namespace Isis {
         }
         catch(IException &e) {
           if(!IsOptional(g.name())) {
-            throw;
+            throw e;//??? is this needed???
           }
         }
       }

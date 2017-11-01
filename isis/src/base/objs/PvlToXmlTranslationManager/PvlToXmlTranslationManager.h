@@ -60,6 +60,8 @@ namespace Isis {
    *  @history 2017-06-02 Makayla Shepherd - Made setElementValue public.
    *  @history 2017-10-18 Jeannie Backer & Makayla Shepherd - Added convenience methods, addElement
    *                          and resetElementValue, and made setElementValue static. See #5202.
+   *  @history 2017-10-31 Jeannie Backer - Moved creation of sibling elements in doTranslation()
+   *                          so that this only happens if the translation is succesful.
    */
   class PvlToXmlTranslationManager : public LabelTranslationManager {
     public:

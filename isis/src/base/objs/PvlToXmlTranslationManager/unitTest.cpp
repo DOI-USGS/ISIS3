@@ -56,8 +56,7 @@ int main(void) {
     trnsStrm << " Auto" << endl;
     trnsStrm << " InputKey        = Samples" <<endl;
     trnsStrm << " InputPosition   = (IsisCube, Core, Dimensions)" <<endl;
-    trnsStrm << " OutputName      = elements" <<endl;
-    trnsStrm << " OutputSiblings  = axis_name:Sample" <<endl;
+    trnsStrm << " OutputSiblings  = axis_name|Sample" <<endl;
     trnsStrm << " OutputName      = elements" <<endl;
     trnsStrm << " OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)" <<endl;
     trnsStrm << " Translation = (*,*)" << endl;
@@ -68,8 +67,7 @@ int main(void) {
     trnsStrm << " InputKey        = Lines" <<endl;
     trnsStrm << " InputPosition   = (IsisCube, Core, Dimensions)" <<endl;
     trnsStrm << " OutputName      = elements" <<endl;
-    trnsStrm << " OutputSiblings  = axis_name:Lines" <<endl;
-    trnsStrm << " OutputName      = elements" <<endl;
+    trnsStrm << " OutputSiblings  = axis_name|Line" <<endl;
     trnsStrm << " OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)" <<endl;
     trnsStrm << " Translation = (*,*)" << endl;
     trnsStrm << "EndGroup" << endl;
@@ -88,7 +86,7 @@ int main(void) {
     trnsStrm << "  InputKey = Filter" << endl;
     trnsStrm << "  InputPosition = (IsisCube, Instrument)" << endl;
     trnsStrm << "  OutputName = Filter" << endl;
-    trnsStrm << "  OutputAttributes = Form:Acronym" << endl;
+    trnsStrm << "  OutputAttributes = Form|Acronym" << endl;
     trnsStrm << "  OutputPosition  = (Product_Observational, CaSSIS_Header, DERIVED_HEADER_DATA)" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
     trnsStrm << "EndGroup" << endl;

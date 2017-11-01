@@ -21,6 +21,7 @@
  */
 #include "LabelTranslationManager.h"
 
+#include <QDebug>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
@@ -147,10 +148,6 @@ namespace Isis {
   void PvlToXmlTranslationManager::doTranslation(PvlGroup transGroup,
                                                  QDomElement &parentElement) {
 
-    if (transGroup.hasKeyword("OutputSiblings")) {
-      addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
-    }
-
     int inst = 0;
     QString transGroupName = transGroup.name();
     PvlKeyword grp = InputGroup(transGroupName, inst);
@@ -186,6 +183,9 @@ namespace Isis {
             }
           }
 
+          if (transGroup.hasKeyword("OutputSiblings")) {
+            addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
+          }
           return;
 
         }
@@ -244,7 +244,7 @@ namespace Isis {
         }
         catch(IException &e) {
           if(!IsOptional(g.name())) {
-            throw;
+            throw;//???
           }
         }
       }

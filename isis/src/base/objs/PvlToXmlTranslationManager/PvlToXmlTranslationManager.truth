@@ -31,12 +31,12 @@ ExposureDuration = 1.920e-003 <seconds>
  <File_Area_Observational>
   <Array_2D_Image>
    <Axis_Array>
-    <axis_name>Sample</axis_name>
     <elements>2048</elements>
+    <axis_name>Sample</axis_name>
    </Axis_Array>
    <Axis_Array>
-    <axis_name>Lines</axis_name>
     <elements>255</elements>
+    <axis_name>Line</axis_name>
    </Axis_Array>
   </Array_2D_Image>
  </File_Area_Observational>

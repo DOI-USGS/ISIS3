@@ -99,18 +99,51 @@ namespace Isis {
     //TODO Figure out what needs to be in FixedImageRoot and add a try catch around it if needed
     FixedImageRoot();
 
+    // TODO: identification area
+    // <Identification_Area>
+    //   <!--
+    //    A product is one multiband image tile. 54 tiles cover the whole planet. 
+    //   -->
+    //   <logical_identifier>
+    //   urn:nasa:pds:izenberg_pdart14_meap:data_imagecube:virs_cube_64ppd_h07nw
+    //   </logical_identifier>
+    //   <version_id>1.0</version_id>
+    //   <title>VIRS Spectral Cube of Mercury Tile 07NW</title>
+    //   <information_model_version>1.7.0.0</information_model_version>
+    //   <product_class>Product_Observational</product_class>
+    // </Identification_Area>
+
+    
+
     try {
-      StandardImageImage();
+      standardInstrument();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export standard image information.";
+      QString msg = "Unable to translate and export instrument information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
+      displaySettings();
+    }
+    catch (IException &e) {
+      QString msg = "Unable to translate and export display settings.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+    try {
+      // <Discipline_Area>
+      // display settings, and cartography handled in this method:
       StandardAllMapping();
     }
     catch (IException &e) {
       QString msg = "Unable to translate and export mapping group.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+    try {
+      // file observation area
+      StandardImageImage();
+    }
+    catch (IException &e) {
+      QString msg = "Unable to translate and export standard image information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -132,85 +165,61 @@ namespace Isis {
   }
 
 
+  void ProcessExportPds4::standardInstrument() {
+    Pvl *inputLabel = InputCubes[0]->label(); 
+    FileName transfile;
+    transfile = "$base/translations/pds4ExportInstrument.trn";
+    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    xlator.Auto(*m_domDoc);
+  }
+  void ProcessExportPds4::displaySettings() {
+    // 1) TODO: display settings local internal reference
+    // 2) display direction
+    Pvl *inputLabel = InputCubes[0]->label(); 
+    FileName transfile;
+    transfile = "$base/translations/pds4ExportDisplaySettings.trn";
+    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    xlator.Auto(*m_domDoc);
+  }
+
+
   /**
    * Create and internalize a standard image output label from the input image.
    */
   void ProcessExportPds4::StandardImageImage() {
+    Pvl *inputLabel = InputCubes[0]->label(); 
+    FileName transfile;
+    transfile = "$base/translations/pds4ExportFileArea.trn";
+    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    xlator.Auto(*m_domDoc);
 
-      try {
-          Pvl *inputLabel = InputCubes[0]->label(); 
-        FileName transfile;
-        transfile = "$base/translations/pds4Export.trn";
-        PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
-        xlator.Auto(*m_domDoc);
+    QDomElement rootElement = m_domDoc->documentElement();
+    QDomElement fileAreaObservationalElement =
+                    rootElement.firstChildElement("File_Area_Observational");
 
-        QDomElement rootElement = m_domDoc->documentElement();
-        QDomElement fileAreaObservationalElement =
-                        rootElement.firstChildElement("File_Area_Observational");
+    if (!fileAreaObservationalElement.isNull()) {
 
-        if (!fileAreaObservationalElement.isNull()) {
+      QDomElement array2DImageElement =
+                      fileAreaObservationalElement.firstChildElement("Array_2D_Image");
 
-          QDomElement array2DImageElement =
-                          fileAreaObservationalElement.firstChildElement("Array_2D_Image");
+      if (!array2DImageElement.isNull()) {
+        QDomElement elementArrayElement = m_domDoc->createElement("Element_Array");
+        array2DImageElement.appendChild(elementArrayElement);
 
-          if (!array2DImageElement.isNull()) {
-            QDomElement elementArrayElement = m_domDoc->createElement("Element_Array");
-            array2DImageElement.appendChild(elementArrayElement);
+        //The next three values are assuming that the cube is Real
+        QDomElement dataTypeElement = m_domDoc->createElement("data_type");
+        PvlToXmlTranslationManager::setElementValue(dataTypeElement, "IEEE754LSBSingle");
+        elementArrayElement.appendChild(dataTypeElement);
 
-            //The next three values are assuming that the cube is Real
-            QDomElement dataTypeElement = m_domDoc->createElement("data_type");
-            PvlToXmlTranslationManager::setElementValue(dataTypeElement, "IEEE754LSBSingle");
-            elementArrayElement.appendChild(dataTypeElement);
+        QDomElement scalingFactorElement = m_domDoc->createElement("scaling_factor");
+        PvlToXmlTranslationManager::setElementValue(scalingFactorElement, "1.00");
+        elementArrayElement.appendChild(scalingFactorElement);
 
-            QDomElement scalingFactorElement = m_domDoc->createElement("scaling_factor");
-            PvlToXmlTranslationManager::setElementValue(scalingFactorElement, "1.00");
-            elementArrayElement.appendChild(scalingFactorElement);
-
-            QDomElement offsetElement = m_domDoc->createElement("offset");
-            PvlToXmlTranslationManager::setElementValue(offsetElement, "0.00");
-            elementArrayElement.appendChild(offsetElement);
-          }
-        }
-
-        
-    //    QDomElement observationAreaElement = rootElement.firstChildElement("Observation_Area");
-    //    if (observationAreaElement.isNull()) {
-    //        observationAreaElement = m_domDoc->createElement("Observation_Area"); 
-    //        rootElement.appendChild(observationAreaElement);
-    //    }
-    //
-    //    QDomElement disciplineAreaElement = observationAreaElement.firstChildElement("Discipline_Area");
-    //    if (disciplineAreaElement.isNull()) {
-    //        disciplineAreaElement = m_domDoc->createElement("Discipline_Area"); 
-    //        observationAreaElement.appendChild(disciplineAreaElement);
-    //    }
-    //
-    //    QDomElement displaySettingsElement = m_domDoc->createElement("disp:Display_Settings");
-    //    disciplineAreaElement.appendChild(displaySettingsElement);
-    //
-    //    QDomElement displayDirectionElement    = m_domDoc->createElement("disp:Display_Direction");
-    //    displaySettingsElement.appendChild(displayDirectionElement);
-    //
-    //    QDomElement horizontalAxisElement = m_domDoc->createElement("disp:horizontal_display_axis");
-    //    PvlToXmlTranslationManager::setElementValue(horizontalAxisElement, "Sample");
-    //    displayDirectionElement.appendChild(horizontalAxisElement);
-    //
-    //    QDomElement horizontalDirectionElement = m_domDoc->createElement("disp:horizontal_display_direction");
-    //    PvlToXmlTranslationManager::setElementValue(horizontalDirectionElement, "Left To Right");
-    //    displayDirectionElement.appendChild(horizontalDirectionElement);
-    //
-    //    QDomElement verticalAxisElement = m_domDoc->createElement("disp:vertical_display_axis");
-    //    PvlToXmlTranslationManager::setElementValue(verticalAxisElement, "Line");
-    //    displayDirectionElement.appendChild(verticalAxisElement);
-    //
-    //    QDomElement verticalDirectionElement = m_domDoc->createElement("disp:vertical_display_direction");
-    //    PvlToXmlTranslationManager::setElementValue(verticalDirectionElement, "Top To Bottom");
-    //    displayDirectionElement.appendChild(verticalDirectionElement);
-    //
-      } 
-      catch (IException &e) {
-          throw IException(e, IException::Programmer, "Unable to translate image and display labels.", _FILEINFO_);
+        QDomElement offsetElement = m_domDoc->createElement("offset");
+        PvlToXmlTranslationManager::setElementValue(offsetElement, "0.00");
+        elementArrayElement.appendChild(offsetElement);
       }
+    }
   }
 
 
@@ -292,6 +301,7 @@ namespace Isis {
                               "This projection is not supported in ISIS3."
    */
   void ProcessExportPds4::StandardAllMapping() {
+    // Cartography
     // Get the input Isis cube label and find the Mapping group if it has one
     Pvl *inputLabel = InputCubes[0]->label();
     if(inputLabel->hasObject("IsisCube") &&
@@ -471,7 +481,7 @@ namespace Isis {
       // return;
     }
     QString parentName = xmlPath[0];
-    //if (parentName != baseElement) {
+    //if (parentName != baseElement) { TODO???
     //  // throw error - improper use of this method
     //}
     for (int i = 1; i < xmlPath.size(); i++) {

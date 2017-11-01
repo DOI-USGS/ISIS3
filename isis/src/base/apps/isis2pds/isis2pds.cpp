@@ -1,6 +1,15 @@
 #include "Isis.h"
+
+#include <QString>
+
+#include "Application.h"
+#include "Cube.h"
+#include "ExportDescription.h"
+#include "FileName.h"
+#include "Process.h"
 #include "ProcessExportPds.h"
 #include "ProcessExportPds4.h"
+#include "Pvl.h"
 #include "PvlKeyword.h"
 #include "PvlToXmlTranslationManager.h"
 

@@ -51,6 +51,9 @@ namespace Isis {
    *   @history 2017-10-18 Jeannie Backer & Makayla Shepherd - Added convenience method getElement
    *                           and StandardAllMapping method to translate mapping information.
    *                           See #5202.
+   *   @history 2017-10-31 Jeannie Backer - Added standardInstrument() and displaySettings()
+   *                           translations.
+   *  
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
@@ -79,6 +82,8 @@ namespace Isis {
 
     protected:
 
+      void standardInstrument();
+      void displaySettings();
       QDomDocument *m_domDoc;               //!< XML label
 
   };
