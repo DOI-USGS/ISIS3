@@ -1,16 +1,47 @@
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+  </Investigation_Area>
+  <Observing_System>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <disp:Display_Settings>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
  <File_Area_Observational>
   <Array_2D_Image>
    <Axis_Array>
+    <elements>2048</elements>
     <axis_name>Sample</axis_name>
     <sequence_number>1</sequence_number>
-    <elements>2048</elements>
    </Axis_Array>
    <Axis_Array>
-    <axis_name>Line</axis_name>
-    <sequence_number>2</sequence_number>
     <elements>254</elements>
+    <axis_name>Lines</axis_name>
+    <sequence_number>2</sequence_number>
    </Axis_Array>
    <Element_Array>
     <data_type>IEEE754LSBSingle</data_type>
@@ -24,17 +55,48 @@ unittest: Exporting
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+  </Investigation_Area>
+  <Observing_System>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <disp:Display_Settings>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
  <File_Area_Observational>
   <Array_2D_Image>
    <Axis_Array>
+    <elements>2048</elements>
     <axis_name>Sample</axis_name>
     <sequence_number>1</sequence_number>
-    <elements>2048</elements>
    </Axis_Array>
    <Axis_Array>
-    <axis_name>Line</axis_name>
-    <sequence_number>2</sequence_number>
     <elements>254</elements>
+    <axis_name>Lines</axis_name>
+    <sequence_number>2</sequence_number>
    </Axis_Array>
    <Element_Array>
     <data_type>IEEE754LSBSingle</data_type>
