@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
@@ -36,13 +37,16 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QProgressBar>
+#include <QRegExp>
+#include <QSettings>
 #include <QStringList>
 #include <QtDebug>
 #include <QTextStream>
+#include <QWidget>
 #include <QXmlStreamWriter>
 
-#include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
+#include "BundleSolutionInfo.h"
 #include "Camera.h"
 #include "Control.h"
 #include "ControlList.h"
@@ -54,9 +58,9 @@
 #include "FileName.h"
 #include "GuiCamera.h"
 #include "GuiCameraList.h"
-#include "IException.h"
 #include "ImageList.h"
 #include "ImageReader.h"
+#include "IException.h"
 #include "ProgressBar.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -71,6 +75,8 @@
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
+
+
 
   /**
    * Create a new Project. This creates a project on disk at /tmp/username_appname_pid.
@@ -100,6 +106,7 @@ namespace Isis {
     m_activeControl = NULL;
     m_activeImageList = NULL;
 
+
     m_numImagesCurrentlyReading = 0;
 
     m_mutex = NULL;
@@ -118,6 +125,7 @@ namespace Isis {
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
 
     m_name = "Project";
+
 
     // Look for old projects
     QDir tempDir = QDir::temp();
@@ -162,6 +170,7 @@ namespace Isis {
             + QApplication::applicationName() + "_" + QString::number( getpid() );
       QDir temp(tmpFolder + "/tmpProject");
       m_projectRoot = new QDir(temp);
+      m_projectPath = m_projectRoot->path();
       //qDebug()<<"          Create temp project";
       createFolders();
     }
@@ -242,6 +251,7 @@ namespace Isis {
    */
   Project::~Project() {
 
+
     if (m_images) {
       foreach (ImageList *imageList, *m_images) {
         foreach (Image *image, *imageList) {
@@ -267,6 +277,7 @@ namespace Isis {
       delete m_shapes;
       m_shapes = NULL;
     }
+
 
     if (m_controls) {
       foreach (ControlList *controlList, *m_controls) {
@@ -324,11 +335,13 @@ namespace Isis {
     delete m_warnings;
     m_warnings = NULL;
 
-    delete m_workOrderHistory;
+    m_workOrderHistory->removeAll(NULL);
     m_workOrderHistory = NULL;
 
     delete m_bundleSettings;
     m_bundleSettings = NULL;
+
+
   }
 
 
@@ -536,8 +549,7 @@ namespace Isis {
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
-    directory()->clean();
-    setName("Project");
+    directory()->clean();   
     setClean(true);
   }
 
@@ -1047,6 +1059,115 @@ namespace Isis {
   }
 
 
+  void Project::writeSettings() {
+
+    QString appName = QApplication::applicationName();
+
+
+    QSettings globalSettings(
+        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
+          .expanded(),
+        QSettings::NativeFormat);
+
+    globalSettings.beginGroup("recent_projects");
+    QStringList keys = globalSettings.allKeys();
+    QMap<QString,QString> recentProjects;
+
+    foreach (QString key,keys) {
+
+      recentProjects[key]=globalSettings.value(key).toString();
+
+    }
+
+    QList<QString> projectPaths = recentProjects.values();
+
+    if (keys.count() >= m_maxRecentProjects) {
+
+      //Clear out the recent projects before repopulating this group
+      globalSettings.remove("");
+
+
+
+      //If the currently open project is a project that has been saved and is not within the current
+      //list of recently open projects, then remove the oldest project from the list.
+      if (!this->projectPath().contains("tmpProject") && !projectPaths.contains(this->projectPath()) ) {
+        QString s=keys.first();
+        recentProjects.remove( s );
+      }
+
+      //If the currently open project is already contained within the list,
+      //then remove the earlier reference.
+
+      if (projectPaths.contains(this->projectPath())) {
+        QString key = recentProjects.key(this->projectPath());      
+        recentProjects.remove(key);
+      }
+
+      QMap<QString,QString>::iterator i;
+
+      //Iterate through the recentProjects QMap and set the <key,val> pairs.
+      for (i=recentProjects.begin();i!=recentProjects.end();i++) {
+
+          globalSettings.setValue(i.key(),i.value());
+
+      }
+
+      //Get a unique time value for generating a key
+      long t0 = QDateTime::currentMSecsSinceEpoch();
+      QString projName = this->name();
+
+      QString t0String=QString::number(t0);
+
+      //Save the project location
+      if (!this->projectPath().contains("tmpProject") ) {
+              globalSettings.setValue(t0String+"%%%%%"+projName,this->projectPath());
+
+      }
+
+    }
+
+    //The numer of recent open projects is less than m_maxRecentProjects
+    else {
+
+      //Clear out the recent projects before repopulating this group
+      globalSettings.remove("");
+      if (projectPaths.contains(this->projectPath())) {
+        QString key = recentProjects.key(this->projectPath());
+        recentProjects.remove(key);
+      }
+      QMap<QString,QString>::iterator i;
+
+      //Iterate through the recentProjects QMap and set the <key,val> pairs.
+      for ( i=recentProjects.begin(); i!=recentProjects.end(); i++ ) {
+          globalSettings.setValue(i.key(),i.value());
+      }
+
+      long t0 = QDateTime::currentMSecsSinceEpoch();
+      QString projName = this->name();
+      QString t0String=QString::number(t0);
+
+      //if (!this->projectPath().contains("tmpProject") && !projectPaths.contains( this->projectPath() ) ) {
+      if (!this->projectPath().contains("tmpProject") ) {
+        globalSettings.setValue(t0String+"%%%%%"+projName,this->projectPath());
+      }
+
+    }
+
+
+    globalSettings.endGroup();
+
+
+
+
+
+
+
+
+
+
+
+  }
+
   /**
    * Open the project at the given path.
    * @param The path to the project folder
@@ -1060,6 +1181,10 @@ namespace Isis {
    *                  directory is chosen Fixes #4969
    * */
   void Project::open(QString projectPathStr) {
+
+
+
+    m_projectPath = projectPathStr;
     FileName projectPath(projectPathStr);
     QString projectXmlPath = projectPath.toString() + "/project.xml";
     QFile file(projectXmlPath);
@@ -1104,6 +1229,8 @@ namespace Isis {
     if (isOpen() || !isClean()) {
       clear();
     }
+
+
     m_clearing = false;
     m_isTemporaryProject = false;
 
@@ -1204,6 +1331,7 @@ namespace Isis {
       }
     }
     m_isOpen = true;
+    writeSettings();
     emit projectLoaded(this);
   }
 
@@ -1376,6 +1504,10 @@ namespace Isis {
    */
   QString Project::projectRoot() const {
     return m_projectRoot->path();
+  }
+
+  QString Project::projectPath() const {
+    return m_projectPath;
   }
 
 
@@ -2149,6 +2281,8 @@ namespace Isis {
   }
 
 
+
+
   /**
    * @brief This executes the WorkOrder and stores it in the project.
    *
@@ -2564,11 +2698,10 @@ namespace Isis {
                                          const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
-      if (localName == "project") {
+      if (localName == "project") {      
         QString name = atts.value("name");
-
         if (!name.isEmpty()) {
-          m_project->setName(name);
+          m_project->setName(name);                  
         }
       }
       else if (localName == "controlNets") {
@@ -2604,10 +2737,7 @@ namespace Isis {
         m_project->directory()->load(reader());
       }
       else if (localName == "dockRestore") {
-//    QVariant geo_data = QVariant(atts.value("geometry"));
-//    restoreGeometry(geo_data);
-//    QVariant layout_data = QVariant(atts.value("state"));
-//    restoreState(layout_data);
+
       }
 
       else if (localName == "bundleSolutionInfo") {

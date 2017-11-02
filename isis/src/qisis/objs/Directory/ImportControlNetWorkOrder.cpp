@@ -104,7 +104,11 @@ namespace Isis {
    * @return bool True if the user clicked on a project tree node named "Control Network"
    */
   bool ImportControlNetWorkOrder::isExecutable(ProjectItem *item) {
-    return (item->text() == "Control Networks");
+
+    if (item) {
+      return (item->text() == "Control Networks");
+    }
+    return false;
   }
 
 
@@ -136,7 +140,6 @@ namespace Isis {
 
     return internalData().count() > 0;
   }
-
 
   /**
    * @brief Imports the control network asynchronously.
@@ -185,7 +188,6 @@ namespace Isis {
       QThread::yieldCurrentThread();
     }
   }
-
 
   /**
    * @brief Clears progress.

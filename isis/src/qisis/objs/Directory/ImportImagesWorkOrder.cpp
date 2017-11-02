@@ -103,7 +103,12 @@ namespace Isis {
    * @return bool True if the user clicked on a project tree node named "Shapes"
    */
   bool ImportImagesWorkOrder::isExecutable(ProjectItem *item) {
-    return (item->text() == "Images");
+
+      if (item) {
+        return (item->text() == "Images");
+      }
+
+     return false;
   }
 
 

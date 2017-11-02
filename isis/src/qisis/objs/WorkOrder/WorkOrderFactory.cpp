@@ -21,6 +21,7 @@
 #include "MoveToTopSceneWorkOrder.h"
 #include "MoveUpOneSceneWorkOrder.h"
 #include "OpenProjectWorkOrder.h"
+#include "OpenRecentProjectWorkOrder.h"
 #include "RemoveImagesWorkOrder.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
@@ -66,6 +67,7 @@ namespace Isis {
     tryType<MoveToTopSceneWorkOrder>(type, project, result);
     tryType<MoveUpOneSceneWorkOrder>(type, project, result);
     tryType<OpenProjectWorkOrder>(type, project, result);
+    tryType<OpenRecentProjectWorkOrder>(type, project, result);
     tryType<RemoveImagesWorkOrder>(type, project, result);
     tryType<RenameProjectWorkOrder>(type, project, result);
     tryType<SaveProjectAsWorkOrder>(type, project, result);

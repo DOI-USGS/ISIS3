@@ -21,10 +21,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "OpenRecentProjectWorkOrder.h"
+#include "SaveProjectWorkOrder.h"
 
 #include <QCoreApplication>
 #include <QDebug>
 #include <QMessageBox>
+#include <QStringList>
 
 #include "FileName.h"
 #include "Project.h"
@@ -40,6 +42,7 @@ namespace Isis {
   WorkOrder(project) {
     // Opening a project is currently not undoable.
     m_isUndoable = false;
+    m_projectPath ="";
     QAction::setText(tr("Open &Recent Project") );
     setCreatesCleanState(true);
   }
@@ -72,12 +75,14 @@ namespace Isis {
   }
 
 
+
   /**
    * @brief This function determines if the given project file name can be opened.
    * @param projectFileName  The path to the project file.
    * @return @b bool True if the file exists, False otherwise.
    */
   bool OpenRecentProjectWorkOrder::isExecutable(QString projectFileName) {
+
     FileName fname = projectFileName;
     if (!fname.fileExists() )
       return false;
@@ -92,26 +97,46 @@ namespace Isis {
    */
   bool OpenRecentProjectWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
+
     if (!success) return false;
 
-    // We dislike the progress bar
-    // delete progressBar();
-
+    //success && !project()->isClean() && project()->isOpen()
     // If more than this work order is in the history, don't allow this operation
-    if (project()->workOrderHistory().count()) {
-      QMessageBox::critical(NULL, tr("Unable To Open a Project"),
-                            tr("If you have modified your current project, you cannot open a new "
-                               "project because this is not yet implemented"));
-      return false;
+    //if (project()->workOrderHistory().count() ) {
+    //  QMessageBox::critical(NULL, tr("Unable To Open a Project"),
+    //                        tr("If you have modified your current project, you cannot open a new "
+    //                           "project because this is not yet implemented"));
+    //  return false;
+    //}
+
+
+    if (success && !project()->isClean() && project()->isOpen() ) {
+      QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
+                             QString("Would you like to save your current project?"),
+                             NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+      QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+      QPushButton *dontsave = box->addButton("Don't Save", QMessageBox::RejectRole);
+      QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+      box->exec();
+
+      if (box->clickedButton() == (QAbstractButton*)cancel) {
+        success = false;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)dontsave) {
+        success = true;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)save) {
+        SaveProjectWorkOrder *workOrder = new SaveProjectWorkOrder(project());
+        project()->addToProject(workOrder);
+      }
     }
 
-    // The user has already selected a project (QAction) in the menus
-    m_projectName = QAction::text();
 
+    m_projectPath =toolTip();
     // Will this ever occur?
-    if (m_projectName.isEmpty()) return false;
+    if (m_projectPath.isEmpty()) return false;
 
-    QUndoCommand::setText(tr("Open Recent Project [%1]").arg(m_projectName));
+    QUndoCommand::setText(tr("Open Recent Project [%1]").arg(m_projectPath));
     return true;
   }
 
@@ -119,6 +144,7 @@ namespace Isis {
   * @brief Open the project specified in the workorder.
   */
   void OpenRecentProjectWorkOrder::execute() {
-    project()->open(m_projectName);
+    project()->open(m_projectPath);
+    //project()->setClean(true);
   }
 }

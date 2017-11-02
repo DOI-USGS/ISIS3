@@ -22,16 +22,23 @@
  */
 #include "IpceMainWindow.h"
 
-#include <QtDebug>
+
 #include <QApplication>
 #include <QColor>
+#include <QDebug>
 #include <QDockWidget>
+#include <QMap>
+#include <QMapIterator>
 #include <QMdiArea>
 #include <QObject>
+#include <QRegExp>
+#include <QStringList>
 #include <QtWidgets>
 #include <QSettings>
 #include <QSize>
 #include <QStatusBar>
+#include <QStringList>
+#include <QDateTime>
 #include <QTreeView>
 #include <QVariant>
 
@@ -149,8 +156,6 @@ namespace Isis {
 
     m_warningsDock->raise();
 
-    // Read settings from the default project, "Project"
-    readSettings(m_directory->project());
 
     setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
@@ -557,6 +562,8 @@ namespace Isis {
     connect(activateWhatsThisAct, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_helpMenuActions.append(activateWhatsThisAct);
+
+    readSettings(m_directory->project() );
   }
 
 
@@ -606,25 +613,120 @@ namespace Isis {
    * @internal
    *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
    *                           References #4358.
+   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
+   *                           restoring of recently opened projects.  References #4492.
    */
   void IpceMainWindow::writeSettings(const Project *project) const {
+
+
     // Ensure that we are not using a NULL pointer
     if (!project) {
       QString msg = "Cannot write settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     QString appName = QApplication::applicationName();
-    QSettings settings(
+    QSettings projectSettings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
           .expanded(),
         QSettings::NativeFormat);
 
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("windowState", saveState());
-    settings.setValue("size", size());
-    settings.setValue("pos", pos());
+    QSettings globalSettings(
+        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
+          .expanded(),
+        QSettings::NativeFormat);
 
-    settings.setValue("maxThreadCount", m_maxThreadCount);
+    projectSettings.setValue("geometry", saveGeometry());
+    projectSettings.setValue("windowState", saveState());
+    projectSettings.setValue("size", size());
+    projectSettings.setValue("pos", pos());
+
+    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
+
+    globalSettings.setValue("maxThreadCount", m_maxThreadCount);
+    globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
+
+    globalSettings.beginGroup("recent_projects");
+    QStringList keys = globalSettings.allKeys();
+    QMap<QString,QString> recentProjects;
+
+    foreach (QString key,keys) {
+
+      recentProjects[key]=globalSettings.value(key).toString();
+
+    }
+
+    QList<QString> projectPaths = recentProjects.values();
+
+    if (keys.count() >= m_maxRecentProjects) {
+
+      //Clear out the recent projects before repopulating this group
+      globalSettings.remove("");
+
+
+
+      //If the currently open project is a project that has been saved and is not within the current
+      //list of recently open projects, then remove the oldest project from the list.
+      if (!project->projectPath().contains("tmpProject") && !projectPaths.contains(project->projectPath()) ) {
+        QString s=keys.first();
+        recentProjects.remove( s );
+      }
+
+      //If the currently open project is already contained within the list,
+      //then remove the earlier reference.
+      if (projectPaths.contains(project->projectPath())) {
+        QString key = recentProjects.key(project->projectPath());
+        recentProjects.remove(key);
+
+      }
+
+      QMap<QString,QString>::iterator i;
+
+      //Iterate through the recentProjects QMap and set the <key,val> pairs.
+      for (i=recentProjects.begin();i!=recentProjects.end();i++) {
+
+          globalSettings.setValue(i.key(),i.value());
+
+
+      }
+
+      //Get a unique time value for generating a key
+      long t0 = QDateTime::currentMSecsSinceEpoch();
+      QString projName = project->name();
+
+
+
+      QString t0String=QString::number(t0);   
+
+      //Save the project location
+      if (!project->projectPath().contains("tmpProject") ) {
+              globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());                            
+
+
+      }
+
+    }
+
+    //The numer of recent open projects is less than m_maxRecentProjects
+    else {
+
+      long t0 = QDateTime::currentMSecsSinceEpoch();     
+      QString projName = project->name();
+      QString t0String=QString::number(t0);  
+
+      if (!project->projectPath().contains("tmpProject") && !projectPaths.contains( project->projectPath() ) ) {
+        globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());      
+      }
+
+    }
+
+
+    globalSettings.endGroup();
+
+
+
+
+
+
   }
 
 
@@ -640,6 +742,7 @@ namespace Isis {
    *
    * @internal
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
+   *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -650,17 +753,59 @@ namespace Isis {
     if (project->name() == "Project") {
       setWindowTitle("ipce");
     }
-    else {
+    else {     
       setWindowTitle( project->name() );
+      QString projName = project->name();
+      setWindowTitle(projName );
     }
     QString appName = QApplication::applicationName();
+
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
-        QSettings::NativeFormat);
+        .expanded(), QSettings::NativeFormat);
 
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
+
+    QStringList projectNameList;
+    QStringList projectPathList;
+    settings.beginGroup("recent_projects");
+    QStringList keys = settings.allKeys();
+
+    QRegExp underscore("%%%%%");
+
+    foreach (QString key, keys) {
+      QString childKey = "recent_projects/"+key;
+      QString projectPath = settings.value(key).toString();
+      QString projectName = projectPath.split("/").last();
+      projectPathList.append(projectPath) ;
+      projectNameList.append(projectName);
+    }
+
+    settings.endGroup();
+
+    QStringList projectPathReverseList;
+
+    for (int i = projectPathList.count()-1;i>=0;i--) {
+      projectPathReverseList.append(projectPathList[i]);
+    }
+
+    QStringList projectPathListTruncated;
+
+    int i =0;
+
+    foreach (QString proj,projectPathReverseList) {
+      if (i <= m_maxRecentProjects) {
+        projectPathListTruncated.append(proj);
+        i++;
+      }
+      else
+        break;
+     }
+
+
+    m_directory->setRecentProjectsList(projectPathListTruncated);
+    m_directory->updateRecentProjects();
 
     // The geom/state isn't enough for main windows to correctly remember
     //   their position and size, so let's restore those on top of
@@ -671,6 +816,7 @@ namespace Isis {
     resize(settings.value("size", QSize(800, 600)).toSize());
     m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
     applyMaxThreadCount();
+
   }
 
 
@@ -699,7 +845,6 @@ namespace Isis {
     m_directory->project()->clear();
     writeSettings(m_directory->project());
     QMainWindow::closeEvent(event);
-
   }
 
 

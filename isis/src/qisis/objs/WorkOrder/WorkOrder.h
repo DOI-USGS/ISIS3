@@ -309,6 +309,8 @@ namespace Isis {
    *                           if a workorder errors Fixes #5026
    *   @history 2017-08-11 Cole Neubauer - Updated documentation for accessor methods and when one
    *                           of these accessors should be used in the workorder template #5113
+   *   @history 2017-11-02 Tyler Wilson - Added a virtual setData method for a QString, and
+   *                           a private QString object called m_data.  References #4492.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -356,12 +358,13 @@ namespace Isis {
       virtual bool isExecutable(TargetBodyQsp targetBody);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
       virtual bool isExecutable(FileItemQsp fileItem);
-      virtual bool isExecutable(ProjectItem *item);
+      virtual bool isExecutable(ProjectItem *item);      
 
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
 
       virtual void setData(Context);
+      virtual void setData(QString data);
       virtual void setData(ImageList *images);
       virtual void setData(ShapeList *shapes);
       virtual void setData(ControlList *controls);
@@ -370,6 +373,7 @@ namespace Isis {
       virtual void setData(GuiCameraQsp guiCamera);
       virtual void setData(FileItemQsp fileItem);
       virtual void setData(ProjectItem *item);
+
 
 
       void setNext(WorkOrder *nextWorkOrder);
@@ -461,7 +465,7 @@ namespace Isis {
       bool isInStableState() const;
       void listenForImageDestruction();
       void listenForShapeDestruction();
-      void resetProgressBar();
+      void resetProgressBar();   
       void setProgressToFinalText();
 
     private slots:
@@ -568,6 +572,7 @@ namespace Isis {
       int m_progressValue;
 
       Context m_context;
+      QString m_data;
       QPointer<ImageList> m_imageList;
       QPointer<ShapeList> m_shapeList;
       QPointer<ControlList> m_controlList;

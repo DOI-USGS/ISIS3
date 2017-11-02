@@ -177,6 +177,8 @@ namespace Isis {
    *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
    *                           imported into the project before trying to set an active control
    *                           when there is only one control in the project. Fixes #5160.
+   *   @history 2017-11-02 Tyler Wilson - Added support for opening Recent Projects from the
+   *                           File Menu.  Fixes #4492.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -220,12 +222,14 @@ namespace Isis {
       QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
+      QString projectPath() const;
       void setClean(bool value);
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
       void waitForShapeReaderFinished();
       QList<WorkOrder *> workOrderHistory();
+      void writeSettings(FileName projName) const;
 
       void setActiveControl(QString displayName);
       Control  *activeControl();
@@ -384,6 +388,12 @@ namespace Isis {
       void projectLoaded(Project *);
 
       /**
+       * Emitted when project is saved.
+       *
+       */
+      void projectSave(FileName projectName);
+
+      /**
        * Emitted when project location moved
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
@@ -398,6 +408,8 @@ namespace Isis {
       void workOrderFinished(WorkOrder *);
 
       void templatesAdded(QList<FileName> newFileList);
+
+
 
     public slots:
       void open(QString);
@@ -422,6 +434,7 @@ namespace Isis {
       Project(const Project &other);
       Project &operator=(const Project &rhs);
       void createFolders();
+      void writeSettings();
       ControlList *createOrRetrieveControlList(QString name);
       ImageList *createOrRetrieveImageList(QString name);
       ShapeList *createOrRetrieveShapeList(QString name);
@@ -466,6 +479,7 @@ namespace Isis {
 
     private:
 
+      const int m_maxRecentProjects = 5;
       QDir *m_projectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
@@ -501,6 +515,7 @@ namespace Isis {
       QMap<QString, GuiCamera *> *m_idToGuiCameraMap;
 
       QString m_name;
+      QString m_projectPath;
       QStringList *m_warnings;
       QList< QPointer<WorkOrder> > *m_workOrderHistory;
 

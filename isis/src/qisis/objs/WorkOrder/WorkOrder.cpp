@@ -55,6 +55,7 @@ namespace Isis {
     m_project = project;
 
     m_context = NoContext;
+    m_data = "";
     m_imageList = new ImageList;
     m_shapeList = new ShapeList;
     m_controlList = NULL;
@@ -165,6 +166,7 @@ namespace Isis {
    * @brief The Destructor
    */
   WorkOrder::~WorkOrder() {
+
     delete m_imageList;
     delete m_shapeList;
     delete m_futureWatcher;
@@ -259,6 +261,10 @@ namespace Isis {
     m_context = context;
   }
 
+  void WorkOrder::setData(QString data) {
+    m_data = data;
+  }
+
 
   /**
    * @brief Sets the ImageList data for this WorkOrder
@@ -312,6 +318,8 @@ namespace Isis {
   void WorkOrder::setData(CorrelationMatrix correlationMatrix) {
     m_correlationMatrix = correlationMatrix;
   }
+
+
 
 
   /**
@@ -387,6 +395,9 @@ namespace Isis {
       setData( item->fileItem() );
     }
   }
+
+
+
 
 
   /**

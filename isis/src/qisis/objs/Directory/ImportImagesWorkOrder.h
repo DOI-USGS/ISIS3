@@ -82,7 +82,10 @@ namespace Isis {
    *                           order. This pointer is used in the Undo funtions #5064
    *   @history 2017-08-11 Cole Neubauer - Created a try catch around a previously unprotected error
    *                           to handle errors thrown in the workorder that halted execution.
-   *                           Fixes #5026
+   *                           Fixes #5026.
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check around ProjectItem *item pointer
+   *                           in isExecutable to prevent potential seg faults.  References #4492.
+   *
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -25,6 +25,8 @@ namespace Isis {
    *   @history 2017-05-01 Tyler Wilson - Modified the setupExecution() function so that
    *                           it no longer causes a segmentation fault when the user attempts
    *                           to export a control network from the file menu.  Fixes #4760.
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check on the controls variable in
+   *                           isExecutable to prevent potential seg faults.  References #4492.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT

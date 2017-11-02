@@ -78,6 +78,8 @@ namespace Isis {
    */
   //tjw 3956
   bool ViewControlNet3DWorkOrder::isExecutable(ControlList *controls) {
+    if (!controls)
+      return false;
     return (controls->count() == 1);
   }
 

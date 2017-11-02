@@ -79,11 +79,14 @@ namespace Isis {
    * @return  @b bool True if  we can set as active, False otherwise.
    */
   bool SetActiveControlWorkOrder::isExecutable(ControlList *controls) {
-    if (controls->size() != 1 || project()->activeControl() == controls->at(0)) {
-      return false;
-    }
 
-    return true;
+    if (controls) {
+      if (controls->size() != 1 || project()->activeControl() == controls->at(0)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
 

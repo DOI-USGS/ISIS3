@@ -52,6 +52,7 @@ namespace Isis {
    *                         SetActiveControlWorkOrder, SetActiveImageListWorkOrder.  Fixes #4485.
    *   @history 2017-05-04 Tracie Sucharski - Added BundleObservationViewWorkOrder.  Fixes #4840.
    *   @history 2017-08-11 Christopher Combs - Added ImportTemplateWorkOrder. Fixes #5086.
+   *   @history 2017-11-02 Tyler Wilson - Added the OpenRecentProjectsWorkOrder. Fixes #4492.
    */
   class WorkOrderFactory {
     public:

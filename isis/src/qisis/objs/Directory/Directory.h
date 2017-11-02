@@ -187,6 +187,9 @@ namespace Isis {
    *   @history 2017-08-23 Tracie Sucharski - Fixed some code involving connections in
    *                           in ::addFootprint2DView which got messed up in a svn merge.  Removed
    *                           unused signal, controlPointAdded.
+   *   @history 2017-11-02 Tyler Wilson - Added the updateRecentProjects() function which
+   *                           updates the Recent Projects file menu with recently loaded projects.
+   *                           Fixes #4492.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -331,6 +334,7 @@ namespace Isis {
 
 
       void updateRecentProjects(Project *project);
+      void updateRecentProjects();
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
@@ -374,6 +378,7 @@ namespace Isis {
         m_workOrders.append(newWorkOrder);
         return newWorkOrder;
       }
+
 
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
@@ -434,6 +439,8 @@ namespace Isis {
       QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
+
+      bool m_recentProjectsLoaded;
   };
 }
 

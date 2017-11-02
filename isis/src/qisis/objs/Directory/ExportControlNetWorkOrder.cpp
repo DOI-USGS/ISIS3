@@ -98,7 +98,11 @@ namespace Isis {
    */
   bool ExportControlNetWorkOrder::isExecutable(ControlList *controls) {
     // TODO: This shouldn't be executable (in the menu) if there are no imported control networks?
-    return (controls->count() == 1);
+
+    if (controls) {
+      return (controls->count() == 1);
+    }
+    return false;
   }
 
 

@@ -24,6 +24,7 @@
  */
 
 #include "WorkOrder.h"
+#include <QString>
 
 class QString;
 
@@ -44,6 +45,10 @@ namespace Isis {
    *              brought the code into compliance with ISIS3 coding standards.
    *              References #3944.
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-11-02 Tyler Wilson - Added support for opening recent projects
+   *                                consecutively from the Recent Projects menu in the same
+   *                                way that a user can open projects consecutively from
+   *                                the File menu.  References #4492.
    */
 
 
@@ -55,15 +60,16 @@ namespace Isis {
       ~OpenRecentProjectWorkOrder();
 
       virtual OpenRecentProjectWorkOrder *clone() const;
+      bool isExecutable(QString projectFileName);
 
-      virtual bool isExecutable(QString projectFileName);
       bool setupExecution();
       void execute();
 
     private:
       OpenRecentProjectWorkOrder &operator=(const OpenRecentProjectWorkOrder &rhs);
+      QString m_projectPath;
 
-      QString m_projectName;
+
   };
 }
 

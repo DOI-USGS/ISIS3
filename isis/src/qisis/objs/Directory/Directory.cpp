@@ -29,13 +29,16 @@
 #include <QGridLayout>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
+#include <QRegExp>
 #include <QSettings>
+#include <QSizePolicy>
 #include <QSplitter>
 #include <QStringList>
+#include <QtDebug>
+#include <QVariant>
 #include <QXmlStreamWriter>
 
-#include <QtDebug>
-#include <QMessageBox>
 
 #include "BundleObservation.h"
 #include "BundleObservationView.h"
@@ -62,11 +65,11 @@
 #include "IException.h"
 #include "IString.h"
 #include "ImageFileListViewWorkOrder.h"
+#include "ImageFileListWidget.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
 #include "ImportTemplateWorkOrder.h"
-#include "ImageFileListWidget.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
@@ -161,11 +164,12 @@ namespace Isis {
       m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
-      m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
+      m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();      
       m_openRecentProjectWorkOrder = createWorkOrder<OpenRecentProjectWorkOrder>();
       m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
       m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
+      m_recentProjectsLoaded = false;
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -183,13 +187,12 @@ namespace Isis {
    */
   Directory::~Directory() {
 
-    delete m_project;
-
-    foreach (WorkOrder *workOrder, m_workOrders) {
-      delete workOrder;
-    }
-
     m_workOrders.clear();
+
+    if (m_project) {     
+      m_project ->deleteLater();
+      m_project = NULL;
+    }
   }
 
 
@@ -298,6 +301,49 @@ namespace Isis {
 
 
   /**
+   * @brief Loads and displays a list of recently opened projects in the file menu.
+   * @internal
+   *   @history Tyler Wilson 2017-10-17 - This function updates the Recent Projects File
+   *                                      menu.  References #4492.
+   */
+  void Directory::updateRecentProjects(){
+
+    if (m_recentProjectsLoaded)  {
+      return;      
+  }
+    else {
+
+    QMenu *fileMenu = new QMenu();
+
+    QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
+    int nRecentProjects = m_recentProjects.size();
+
+    for (int i = 0; i < nRecentProjects; i++) {
+      FileName projectFileName = m_recentProjects.at(i);
+
+      if (!projectFileName.fileExists() )
+        continue;
+
+      QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
+
+      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
+           ->isExecutable(m_recentProjects.at(i) ) )
+        continue;
+
+      QString projName = m_recentProjects.at(i).split("/").last();      
+      openRecentProjectAction->setText(m_recentProjects.at(i).split("/").last() );
+      openRecentProjectAction->setToolTip(m_recentProjects.at(i));
+      recentProjectsMenu->addAction(openRecentProjectAction);
+      }
+      fileMenu->addSeparator();
+      m_fileMenuActions.append( fileMenu->actions() );
+      m_recentProjectsLoaded = true;
+
+    }
+
+  }
+
+  /**
    * @brief Initializes the actions that the Directory can provide to a main window.
    *
    * Any work orders that need to be disabled by default can be done so here.
@@ -321,27 +367,6 @@ namespace Isis {
     fileMenu->addAction(openProjectAction);
     m_permToolBarActions.append(openProjectAction);
 
-    QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
-    int nRecentProjects = m_recentProjects.size();
-
-    for (int i = 0; i < nRecentProjects; i++) {
-      FileName projectFileName = m_recentProjects.at(i);
-      if (!projectFileName.fileExists() )
-        continue;
-
-      QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
-
-      openRecentProjectAction->setData(m_recentProjects.at(i) );
-      openRecentProjectAction->setText(m_recentProjects.at(i) );
-
-      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
-           ->isExecutable(m_recentProjects.at(i) ) )
-        continue;
-
-      recentProjectsMenu->addAction(openRecentProjectAction);
-    }
-
-    fileMenu->addSeparator();
 
     QAction *saveAction = m_saveProjectWorkOrder->clone();
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
@@ -454,6 +479,7 @@ namespace Isis {
    * @param recentProjects List of projects to add to list.
    */
   void Directory::setRecentProjectsList(QStringList recentProjects) {
+
     m_recentProjects.append(recentProjects);
   }
 
@@ -876,7 +902,6 @@ namespace Isis {
    */
 
   ImageFileListWidget *Directory::addImageFileListView() {
-    //qDebug()<<"Directory::addImageFileListView";
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
@@ -1031,10 +1056,7 @@ namespace Isis {
        return;
      }
      m_project->setClean(false);
-     //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
-     //  of ControlPointEditView
- //    delete m_chipViewports;
- //    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
+
    }
 
 

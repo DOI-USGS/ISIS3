@@ -101,6 +101,9 @@ namespace Isis {
    *   @history 2017-08-09 Marjorie Hahn - Hard-coded the size of the icons in the toolbar to 
    *                           temporarily fix the shift in size when switching between views 
    *                           until docked widgets are implemented. Fixes #5084.
+   *   @history 2017-11-02 Tyler Wilson - Added the ability to read/write settings for recent
+   *                            projects.  Also re-implemented the functionality for loading
+   *                            recent projects in IPCE.  Fixes #4492.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -160,6 +163,7 @@ namespace Isis {
        *   should perform a best-guess for best perfomance.
        */
       int m_maxThreadCount;
+      const int m_maxRecentProjects = 5;
 
       QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
       QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.

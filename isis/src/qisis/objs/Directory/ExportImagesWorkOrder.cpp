@@ -74,7 +74,10 @@ namespace Isis {
    * @return bool True if this work order functions with the given image list
    */
   bool ExportImagesWorkOrder::isExecutable(ImageList *images) {
-    return (!images->isEmpty());
+    if (images) {
+      return (!images->isEmpty());
+    }
+    return false;
   }
 
 

@@ -39,6 +39,9 @@ namespace Isis {
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
    *                          Fixes #5064
+   *   @history 2017-11-02  Tyler Wilson - Added a null pointer check on the ControList *controls
+   *                          pointer in the isExecutable(...) function to prevent potential
+   *                          segfaults.  References #4492.
    */
   class CnetEditorViewWorkOrder : public WorkOrder {
       Q_OBJECT

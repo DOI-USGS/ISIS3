@@ -54,7 +54,11 @@ namespace Isis {
 
 
   bool ImageFileListViewWorkOrder::isExecutable(ImageList *images) {
-    return !images->isEmpty();
+
+    if (images) {
+      return !images->isEmpty();
+    }
+    return false;
   }
 
 
