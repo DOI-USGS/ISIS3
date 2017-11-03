@@ -133,9 +133,9 @@ namespace Isis {
   /**
    * Copy constructor
    *
-   * Constructs a BundlePolynomialContinuityConstraint from another
+   * Constructs a BundlePolynomialContinuityConstraint from another.
    *
-   * @param src Source BundlePolynomialContinuityConstraint to copy
+   * @param src Source BundlePolynomialContinuityConstraint to copy.
    */
   BundlePolynomialContinuityConstraint::
       BundlePolynomialContinuityConstraint(const BundlePolynomialContinuityConstraint &src) {
@@ -157,7 +157,8 @@ namespace Isis {
     m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
 
     m_designMatrix = src.m_designMatrix;
-    m_normalsMatrix = src.m_normalsMatrix;
+    m_normalsSpkMatrix = src.m_normalsSpkMatrix;
+    m_normalsCkMatrix = src.m_normalsCkMatrix;
     m_rightHandSide = src.m_rightHandSide;
     m_omcVector = src.m_omcVector;
   }
@@ -166,12 +167,12 @@ namespace Isis {
   /**
    * Assignment operator
    *
-   * Assigns state of this BundlePolynomialContinuityConstraint from another
+   * Assigns state of this BundlePolynomialContinuityConstraint from another.
    *
-   * @param src Source BundlePolynomialContinuityConstraint to assign state from
+   * @param src Source BundlePolynomialContinuityConstraint to assign state from.
    *
-   * @return @b BundlePolynomialContinuityConstraint& Returns reference to this
-   *            BundlePolynomialContinuityConstraint
+   * @return    BundlePolynomialContinuityConstraint& Returns reference to this
+   *            BundlePolynomialContinuityConstraint.
    */
   BundlePolynomialContinuityConstraint
       &BundlePolynomialContinuityConstraint::
@@ -197,7 +198,8 @@ namespace Isis {
       m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
 
       m_designMatrix = src.m_designMatrix;
-      m_normalsMatrix = src.m_normalsMatrix;
+      m_normalsSpkMatrix = src.m_normalsSpkMatrix;
+      m_normalsCkMatrix = src.m_normalsCkMatrix;
       m_rightHandSide = src.m_rightHandSide;
       m_omcVector = src.m_omcVector;
     }
@@ -207,9 +209,9 @@ namespace Isis {
 
 
   /**
-   * Returns number of spk segments in piecewise polynomial
+   * Returns number of spk segments in piecewise polynomial.
    *
-   * @return @b int Returns number of spk segments in piecewise polynomial
+   * @return int Returns number of spk segments in piecewise polynomial.
    */
   int BundlePolynomialContinuityConstraint::numberSpkSegments() const {
     return m_numberSpkSegments;
@@ -217,9 +219,9 @@ namespace Isis {
 
 
   /**
-   * Returns number of ck segments in piecewise polynomial
+   * Returns number of ck segments in piecewise polynomial.
    *
-   * @return @b int Returns number of ck segments in piecewise polynomial
+   * @return int Returns number of ck segments in piecewise polynomial.
    */
   int BundlePolynomialContinuityConstraint::numberCkSegments() const {
     return m_numberCkSegments;
@@ -229,7 +231,7 @@ namespace Isis {
   /**
    * Returns number of spk coefficients in piecewise polynomial
    *
-   * @return @b int Returns number of spk coefficients in piecewise polynomial
+   * @return int Returns number of spk coefficients in piecewise polynomial
    */
   int BundlePolynomialContinuityConstraint::numberSpkCoefficients() const {
     return m_numberSpkCoefficients;
@@ -239,7 +241,7 @@ namespace Isis {
   /**
    * Returns number of ck coefficients in piecewise polynomial
    *
-   * @return @b int Returns number of ck coefficients in piecewise polynomial
+   * @return int Returns number of ck coefficients in piecewise polynomial
    */
   int BundlePolynomialContinuityConstraint::numberCkCoefficients() const {
     return m_numberCkCoefficients;
@@ -249,7 +251,7 @@ namespace Isis {
   /**
    * Returns number of continuity constraint equations
    *
-   * @return @b int Number of continuity constraint equations
+   * @return int Number of continuity constraint equations
    */
   int BundlePolynomialContinuityConstraint::numberConstraintEquations() const {
     return m_numberConstraintEquations;
@@ -257,24 +259,35 @@ namespace Isis {
 
 
   /**
-   * Returns matrix with contribution to bundle adjustment normal equations from continuity
-   * constraints
+   * Returns matrix with contribution to position portion of bundle adjustment normal equations from
+   * continuity constraints.
    *
-   * @return @b LinearAlgebra::MatrixUpperTriangular Matrix with contribution to bundle adjustment
-   *                                                 normal equations from continuity constraints
+   * @return SparseBlockMatrix Matrix with contribution to position portion of bundle adjustment
+   *                           normal equations from continuity constraints.
    */
-  LinearAlgebra::MatrixUpperTriangular
-      &BundlePolynomialContinuityConstraint::normalsMatrix() {
-    return m_normalsMatrix;
+  SparseBlockMatrix &BundlePolynomialContinuityConstraint::normalsSpkMatrix() {
+    return m_normalsSpkMatrix;
+  }
+
+
+  /**
+   * Returns matrix with contribution to pointing portion of bundle adjustment normal equations from
+   * continuity constraints.
+   *
+   * @return SparseBlockMatrix Matrix with contribution to pointing portion of bundle adjustment
+   *                           normal equations from continuity constraints.
+   */
+  SparseBlockMatrix &BundlePolynomialContinuityConstraint::normalsCkMatrix() {
+    return m_normalsCkMatrix;
   }
 
 
   /**
    * Returns vector with contribution to bundle adjustment normal equations right hand side from
-   * continuity constraints
+   * continuity constraints.
    *
-   * @return @b LinearAlgebra::Vector Vector with contribution to bundle adjustment normal equations
-   *                                  right hand side from continuity constraints
+   * @return LinearAlgebra::Vector Vector with contribution to bundle adjustment normal equations
+   *                               right hand side from continuity constraints.
    */
   LinearAlgebra::Vector
       &BundlePolynomialContinuityConstraint::rightHandSideVector() {
@@ -282,22 +295,20 @@ namespace Isis {
   }
 
   /**
-   * Constructs m_normalsMatrix and m_rightHandSide vector as well as m_designMatrix and
-   * the m_omcVector (or observed - computed vector)
+   * Constructs m_normalsSpkMatrix and m_normalsCkMatrix, m_rightHandSide vector, m_designMatrix,
+   * and m_omcVector (or observed - computed vector).
    *
-   * TODO: need more documentation on technical aspects of approach
+   * @todo need more documentation on technical aspects of approach.
    */
   void BundlePolynomialContinuityConstraint::constructMatrices() {
+
+    if (m_numberConstraintEquations <= 0 )
+      return;
 
     // initialize size of right hand side vector
     // the values in this vector are updated each iteration, but vector size will not change
     m_rightHandSide.resize(m_numberParameters);
     m_rightHandSide.clear();
-
-    // initialize size of normals contribution matrix
-    // this will not change throughout the bundle adjustment
-    m_normalsMatrix.resize(m_numberParameters);
-    m_normalsMatrix.clear();
 
     // initialize size of design matrix
     // this will not change throughout the bundle adjustment
@@ -309,28 +320,84 @@ namespace Isis {
 
     int designRow=0;
 
-    if (m_numberConstraintEquations > 0 ) {
     // spk (position) contribution
-      if (m_numberConstraintEquations > 0 && m_numberSpkCoefficients > 1)
-        positionContinuity(designRow);
+    if (m_numberSpkSegments > 1 && m_numberConstraintEquations > 0 && m_numberSpkCoefficients > 1)
+      positionContinuity(designRow);
 
-      // spk (position) contribution
-      if (m_numberConstraintEquations > 0 && m_numberCkCoefficients > 1)
-        pointingContinuity(designRow);
+    // ck (pointing) contribution
+    if (m_numberCkSegments > 1 && m_numberConstraintEquations > 0 && m_numberCkCoefficients > 1)
+      pointingContinuity(designRow);
 
-      // form contribution to normal equations matrix
-      m_normalsMatrix = prod(trans(m_designMatrix),m_designMatrix);
+    int numPositionParameters = m_parentObservation->numberPositionParametersPerSegment();
+    int numPointingParameters = m_parentObservation->numberPointingParametersPerSegment();
 
-      // initialize right hand side vector
-      updateRightHandSide();
+    // initialize and fill position blocks in m_normalsSpkMatrix
+    if (m_numberSpkSegments > 1 && m_numberConstraintEquations > 0 && m_numberSpkCoefficients > 1) {
+      m_normalsSpkMatrix.setNumberOfColumns(m_numberSpkSegments);
+
+      for (int i = 0; i < m_numberSpkSegments; i++) {
+        m_normalsSpkMatrix.insertMatrixBlock(i, i, numPositionParameters, numPositionParameters);
+        LinearAlgebra::Matrix *block = m_normalsSpkMatrix.getBlock(i, i);
+
+        matrix_range<LinearAlgebra::MatrixCompressed>
+            mr1 (m_designMatrix, range (0, m_designMatrix.size1()),
+                range (i*numPositionParameters, (i+1)*numPositionParameters));
+
+        *block += prod(trans(mr1), mr1);
+
+        if (i > 0) {
+          m_normalsSpkMatrix.insertMatrixBlock(i, i-1, numPositionParameters, numPositionParameters);
+          block = m_normalsSpkMatrix.getBlock(i, i-1);
+
+          matrix_range<LinearAlgebra::MatrixCompressed>
+              mr2 (m_designMatrix, range (0, m_designMatrix.size1()),
+                  range ((i-1)*numPositionParameters, i*numPositionParameters));
+
+          *block += prod(trans(mr2), mr1);
+        }
+      }
     }
+
+    // initialize and fill pointing blocks
+    if (m_numberCkSegments > 1 && m_numberConstraintEquations > 0 && m_numberCkCoefficients > 1) {
+      m_normalsCkMatrix.setNumberOfColumns(m_numberCkSegments);
+
+      int t = numPositionParameters * m_numberSpkSegments;
+
+      for (int i = 0; i < m_numberCkSegments; i++) {
+        m_normalsCkMatrix.insertMatrixBlock(i, i, numPointingParameters, numPointingParameters);
+        LinearAlgebra::Matrix *block = m_normalsCkMatrix.getBlock(i, i);
+
+        matrix_range<LinearAlgebra::MatrixCompressed>
+            mr1 (m_designMatrix, range (0, m_designMatrix.size1()),
+                range (t+i*numPointingParameters, t+(i+1)*+numPointingParameters));
+
+        *block += prod(trans(mr1), mr1);
+
+        if (i > 0) {
+          m_normalsCkMatrix.insertMatrixBlock(i, i-1, numPointingParameters, numPointingParameters);
+          block = m_normalsCkMatrix.getBlock(i, i-1);
+
+          matrix_range<LinearAlgebra::MatrixCompressed>
+              mr2 (m_designMatrix, range (0, m_designMatrix.size1()),
+                  range (t+(i-1)*numPointingParameters, t+i*numPointingParameters));
+
+          *block += prod(trans(mr2), mr1);
+        }
+      }
+    }
+
+    // initialize right hand side vector
+    updateRightHandSide();
   }
 
 
   /**
-   * Constructs portion of m_designMatrix relative to position continuity constraints
+   * Constructs portion of m_designMatrix relative to position continuity constraints.
    *
-   * TODO: need more documentation on technical aspects of approach
+   * @param designRow Index of current row of design matrix to fill.
+   *
+   * @todo need more documentation on technical aspects of approach.
    */
   void BundlePolynomialContinuityConstraint::positionContinuity(int &designRow) {
     LinearAlgebra::Vector partials(m_numberParameters);
@@ -343,13 +410,15 @@ namespace Isis {
     // 0-order continuity
     // {1,t,t^2}, {-1,-t,-t^2} if 2nd order polynomial; {1,t}, {-1,-t} if 1st order polynomial
 
+    double t, t2;
+
     for (int i = 0; i < m_numberSpkBoundaries; i++) {
       int segment1Start = m_numberSpkSegmentParameters*i;
       int segment2Start = segment1Start+m_numberSpkSegmentParameters;
 
       // time (t) and time-squared (t2)
-      double t = m_spkKnots[i];
-      double t2 = t*t;
+      t = m_spkKnots[i];
+      t2 = t*t;
 
       segment1Partials(0) = 1.0;
       segment1Partials(1) = t;
@@ -391,7 +460,7 @@ namespace Isis {
         int segment2Start = segment1Start+m_numberSpkSegmentParameters;
 
         // time (t)
-        double t = m_spkKnots[i];
+        t = m_spkKnots[i];
 
         if (m_numberSpkCoefficients == 3) {
           segment1Partials(2) = 2.0*t;
@@ -417,9 +486,11 @@ namespace Isis {
 
 
   /**
-   * Constructs portion of m_designMatrix relative to pointing continuity constraints
+   * Constructs portion of m_designMatrix relative to pointing continuity constraints.
    *
-   * TODO: need more documentation on technical aspects of approach
+   * @param designRow Index of current row of design matrix to fill.
+   *
+   * @todo need more documentation on technical aspects of approach.
    */
   void BundlePolynomialContinuityConstraint::pointingContinuity(int &designRow) {
     LinearAlgebra::Vector partials(m_numberParameters);
@@ -434,14 +505,16 @@ namespace Isis {
     // 0-order continuity
     // {1,t,t^2}, {-1,-t,-t^2} if 2nd order polynomial; {1,t}, {-1,-t} if 1st order polynomial
 
+    double t, t2;
+
     for (int i = 0; i < m_numberCkBoundaries; i++) {
       int segment1Start
           = (m_numberSpkSegmentParameters*m_numberSpkSegments) + m_numberCkSegmentParameters*i;
       int segment2Start = segment1Start+m_numberCkSegmentParameters;
 
       // time (t) and time-squared (t2)
-      double t = m_ckKnots[i];
-      double t2 = t*t;
+      t = m_ckKnots[i];
+      t2 = t*t;
 
       segment1Partials(0) = 1.0;
       segment1Partials(1) = t;
@@ -487,7 +560,7 @@ namespace Isis {
         int segment2Start = segment1Start+m_numberCkSegmentParameters;
 
         // time (t)
-        double t = m_ckKnots[i];
+        t = m_ckKnots[i];
 
         if (m_numberCkCoefficients == 3) {
           segment1Partials(2) = 2.0*t;
@@ -516,9 +589,9 @@ namespace Isis {
 
 
   /**
-   * Updates right hand side vector after parameters have been updated at each iteration
+   * Updates right hand side vector after parameters have been updated at each iteration.
    *
-   * TODO: need more documentation on technical aspects of approach
+   * @todo need more documentation on technical aspects of approach.
    */
   void BundlePolynomialContinuityConstraint::updateRightHandSide() {
 
@@ -534,6 +607,8 @@ namespace Isis {
     m_omcVector.clear();
 
     m_rightHandSide.clear();
+
+    double t, t2;
 
     if (m_numberSpkSegments > 1) {
       std::vector<double> seg1CoefX(m_numberSpkCoefficients);
@@ -552,8 +627,8 @@ namespace Isis {
         // TODO: if 1st order, should we be using 3 coefficients here?
 
         // time (t) and time-squared (t2)
-        double t = m_spkKnots[i];
-        double t2 = t*t;
+        t = m_spkKnots[i];
+        t2 = t*t;
 
         // 0 order in X
         m_omcVector(designRow) = -seg1CoefX[0] - seg1CoefX[1]*t + seg2CoefX[0] + seg2CoefX[1]*t;
@@ -584,7 +659,7 @@ namespace Isis {
           position->GetPolynomial(seg2CoefX, seg2CoefY, seg2CoefZ, i+1);
 
           // time (t)
-          double t = m_spkKnots[i];
+          t = m_spkKnots[i];
 
           // 1st order in X
           m_omcVector(designRow) = -seg1CoefX[1] + seg2CoefX[1];
@@ -625,8 +700,8 @@ namespace Isis {
         // TODO: if 1st order, should we be using 3 coefficients here?
 
         // time (t) and time-squared (t2)
-        double t = m_ckKnots[i];
-        double t2 = t*t;
+        t = m_ckKnots[i];
+        t2 = t*t;
 
         // 0 order in RA
         m_omcVector(designRow) = -seg1CoefRA[0] - seg1CoefRA[1]*t + seg2CoefRA[0] + seg2CoefRA[1]*t;
@@ -661,7 +736,7 @@ namespace Isis {
           rotation->GetPolynomial(seg2CoefRA, seg2CoefDEC, seg2CoefTWIST, i+1);
 
           // time (t)
-          double t = m_ckKnots[i];
+          t = m_ckKnots[i];
 
           // 1st order in RA
           m_omcVector(designRow) = -seg1CoefRA[1] + seg2CoefRA[1];
@@ -697,14 +772,11 @@ namespace Isis {
   }
 
   /**
-   * @brief Creates and returns formatted QString summarizing continuity constraints for output to
-            bundleout.txt file
+   * Creates and returns formatted QString summarizing continuity constraints for output to
+     bundleout.txt file.
    *
-   * @return @b QString Returns formatted QString summarizing continuity constraints for output to
-   *                    bundleout.txt file
-   *
-   * @internal
-   *   @history 2017-09-14 Ken Edmundson - initial version.
+   * @return QString Returns formatted QString summarizing continuity constraints for output to
+   *                 bundleout.txt file.
    */
   QString BundlePolynomialContinuityConstraint::formatBundleOutputString() {
     QString finalqStr = "";

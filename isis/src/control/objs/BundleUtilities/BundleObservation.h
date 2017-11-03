@@ -29,6 +29,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
+#include "SparseBlockMatrix.h"
 
 namespace Isis {
   class BundleImage;
@@ -89,7 +90,21 @@ namespace Isis {
    *                           piecewise polynomials.
    *   @history 2017-10-12 Jesse Mapel - Initialize exterior orientation will now return false
    *                           if one of the images has a null camera pointer.
-   *
+   *   @history 2017-11-01 Ken Edmundson - Additional support for piecewise polynomials...
+   *                           -m_normalsEquationsStartBlock member
+   *                           -methods
+   *                               void setNormalsMatrixStartBlock(int startBlock)
+   *                               int normalsMatrixStartBlock()
+   *                               int numberPositionParametersPerSegment()
+   *                               int numberPointingParametersPerSegment()
+   *                               int positionSegmentSize()
+   *                               int pointingSegmentSize()
+   *                               int polyPositionSegmentIndex()
+   *                               int polyRotationSegmentIndex()
+   *                               void computePartials(LinearAlgebra::Matrix &coeffImagePosition,
+   *                                                    LinearAlgebra::Matrix &coeffImagePointing)
+   *                               SparseBlockMatrix &continuityContraintSpkMatrix()
+   *                               SparseBlockMatrix &continuityContraintCkMatrix()
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {
 
@@ -123,7 +138,10 @@ namespace Isis {
       
       void setIndex(int n);
       int index();
-      
+
+      void setNormalsMatrixStartBlock(int startBlock);
+      int normalsMatrixStartBlock();
+
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
@@ -131,6 +149,15 @@ namespace Isis {
       int numberPolynomialPositionSegments();
       int numberPolynomialPointingSegments();
       int numberPolynomialSegments();
+
+      int numberPositionParametersPerSegment();
+      int numberPointingParametersPerSegment();
+
+      int positionSegmentSize();
+      int pointingSegmentSize();
+
+      int polyPositionSegmentIndex();
+      int polyRotationSegmentIndex();
 
       int numberContinuityConstraints() const;
 
@@ -146,12 +173,12 @@ namespace Isis {
 
       const BundleObservationSolveSettingsQsp solveSettings();
 
-      void computePartials(LinearAlgebra::Matrix &coeffImage);
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);      
-      void applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
-                                      LinearAlgebra::Vector &rhs);
+      void computePartials(LinearAlgebra::Matrix &coeffImagePosition,     //!< multi-segment version
+                           LinearAlgebra::Matrix &coeffImagePointing);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
-      LinearAlgebra::MatrixUpperTriangular &continuityContraintMatrix();
+      SparseBlockMatrix &continuityContraintSpkMatrix();
+      SparseBlockMatrix &continuityContraintCkMatrix();
       LinearAlgebra::Vector &continuityRHS();
 
       bool initializeExteriorOrientation();
@@ -179,6 +206,8 @@ namespace Isis {
                                         augmented with an additional integer. **/
 
       int m_index; //!< Index of this observation.
+      int m_normalsEquationsStartBlock; /**< starting block into normal equations matrix for this
+                                             observation. **/
 
       //! Map between cube serial number and BundleImage pointers.
       QMap<QString, QSharedPointer<BundleImage> > m_cubeSerialNumberToBundleImageMap;

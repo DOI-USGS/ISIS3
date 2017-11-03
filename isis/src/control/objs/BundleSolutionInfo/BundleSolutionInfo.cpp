@@ -22,6 +22,9 @@
 #include "StatCumProbDistDynCalc.h"
 #include "XmlStackedHandlerReader.h"
 
+// For Debugging
+//#define _DEBUG_
+
 namespace Isis {
 
   /**
@@ -120,7 +123,7 @@ namespace Isis {
    *
    * @param src the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
    *
-   * @return @b BundleSolutionInfo Reference to the current BundleSolutionInfo
+   * @return BundleSolutionInfo Reference to the current BundleSolutionInfo
    */
   BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &src) {
 
@@ -200,7 +203,7 @@ namespace Isis {
   /**
    * Get a unique, identifying string associated with this BundleSolutionInfo object.
    *
-   * @return @b QString A unique ID for this BundleSolutionInfo object
+   * @return QString A unique ID for this BundleSolutionInfo object
    */
   QString BundleSolutionInfo::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
@@ -232,7 +235,7 @@ namespace Isis {
   /**
    * Returns the run time.
    *
-   * @return @b QString The run time.
+   * @return QString The run time.
    */
   QString BundleSolutionInfo::runTime() const {
     return m_runTime;
@@ -242,7 +245,7 @@ namespace Isis {
   /**
    * Returns the name of the control network.
    *
-   * @return @b QString The name of the control network.
+   * @return QString The name of the control network.
    */
   QString BundleSolutionInfo::controlNetworkFileName() const {
     return m_controlNetworkFileName->expanded();
@@ -252,7 +255,7 @@ namespace Isis {
   /**
    * Returns the bundle settings.
    *
-   * @return @b BundleSettingsQsp The bundle settings.
+   * @return BundleSettingsQsp The bundle settings.
    */
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
     return m_settings;
@@ -264,7 +267,7 @@ namespace Isis {
    *
    * @throws IException::Unknown "Results for this bundle is NULL."
    *
-   * @return @b BundleResults The bundle results.
+   * @return BundleResults The bundle results.
    */
   BundleResults BundleSolutionInfo::bundleResults() {
     if (m_statisticsResults) {
@@ -498,7 +501,7 @@ namespace Isis {
    *
    * @param fpOut The output stream that the header will be sent to.
    *
-   * @return @b bool If the header was successfully output to the output stream.
+   * @return bool If the header was successfully output to the output stream.
    *
    * @throws IException::Io "Failed to output residual percentiles for bundleout"
    * @throws IException::Io "Failed to output residual box plot for bundleout"
@@ -709,8 +712,9 @@ namespace Isis {
         sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
     fpOut << buf;
-    sprintf(buf, "\n          POLYNOMIAL SEGMENT COUNT: %d",
+    sprintf(buf, "\n       POLYNOMIAL SEGMENT COUNT: %d",
             globalSettings.numberSpkPolySegments());
+    fpOut << buf;
 
     sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
     fpOut << buf;
@@ -1120,7 +1124,7 @@ namespace Isis {
   /**
    * Outputs a text file with the results of the BundleAdjust.
    *
-   * @return @b bool If the text file was successfully output.
+   * @return bool If the text file was successfully output.
    */
   bool BundleSolutionInfo::outputText() {
 
@@ -1185,11 +1189,13 @@ namespace Isis {
         sprintf(buf, "\n Image Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
 
-//         if (observation->numberContinuityConstraints() > 1) {
-//           fpOut << observation->formatBundleContinuityConstraintString();
-//         }
+#ifdef _DEBUG_
+         if (observation->numberContinuityConstraints() > 1) {
+           fpOut << observation->formatBundleContinuityConstraintString();
+         }
+#endif
 
-        for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++ ) {
+         for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++ ) {
           if (observation->numberPolynomialPositionSegments() != 1) {
             fpOut << observation->formatPositionSegmentHeader(k);
           }
@@ -1321,7 +1327,7 @@ namespace Isis {
   /**
    * Outputs point data to a csv file.
    *
-   * @return @b bool If the point data was successfully output.
+   * @return bool If the point data was successfully output.
    */
   bool BundleSolutionInfo::outputPointsCSV() {
     char buf[1056];
@@ -1436,7 +1442,7 @@ namespace Isis {
   /**
    * Outputs image coordinate residuals to a csv file.
    *
-   * @return @b bool If the residuals were successfully output.
+   * @return bool If the residuals were successfully output.
    */
   bool BundleSolutionInfo::outputResiduals() {
     char buf[1056];
@@ -1601,7 +1607,7 @@ namespace Isis {
    *
    * @param ch QString of characters to add
    *
-   * @return @b bool Almost always true. Only false if the characters cannot be read
+   * @return bool Almost always true. Only false if the characters cannot be read
    */
   bool BundleSolutionInfo::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
@@ -1617,7 +1623,7 @@ namespace Isis {
    * @param qName ???
    * @param atts The attribute containing the keyword value for the given local name.
    *
-   * @return @b bool True if we should continue reading the XML.
+   * @return bool True if we should continue reading the XML.
    */
   bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI,
                                                     const QString &localName,
@@ -1649,7 +1655,7 @@ namespace Isis {
    * @param localName The keyword name given to the member variable in the XML.
    * @param qName ???
    *
-   * @return @b bool Returns XmlStackedHandler's endElement()
+   * @return bool Returns XmlStackedHandler's endElement()
    */
   bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
                                                   const QString &localName,

@@ -567,7 +567,7 @@ namespace Isis {
   /**
    * Returns the number of 'fixed' (ground) points.
    *
-   * @return @b int The number of fixed points.
+   * @return int The number of fixed points.
    */
   int BundleResults::numberFixedPoints() const {
     return m_numberFixedPoints;
@@ -585,7 +585,7 @@ namespace Isis {
   /**
    * Returns the number of 'held' images.
    *
-   * @return @b int The number of held images.
+   * @return int The number of held images.
    */
   int BundleResults::numberHeldImages() const {
     return m_numberHeldImages;
@@ -603,7 +603,7 @@ namespace Isis {
   /**
    * Returns the number of ignored points.
    *
-   * @return @b int The number of ignored points.
+   * @return int The number of ignored points.
    */
   int BundleResults::numberIgnoredPoints() const {
     return m_numberIgnoredPoints;
@@ -887,7 +887,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image sample residuals statistics.
    *
-   * @return @b QList<Statistics> The RMS image sample residual statistics.
+   * @return QList<Statistics> The RMS image sample residual statistics.
    */
   QList<Statistics> BundleResults::rmsImageSampleResiduals() const {
     return m_rmsImageSampleResiduals;
@@ -897,7 +897,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image line residuals statistics.
    *
-   * @return @b QList<Statistics> The RMS image line residual statistics.
+   * @return QList<Statistics> The RMS image line residual statistics.
    */
   QList<Statistics> BundleResults::rmsImageLineResiduals() const {
     return m_rmsImageLineResiduals;
@@ -907,7 +907,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image residuals statistics.
    *
-   * @return @b QList<Statistics> The RMS image residual statistics.
+   * @return QList<Statistics> The RMS image residual statistics.
    */
   QList<Statistics> BundleResults::rmsImageResiduals() const {
     return m_rmsImageResiduals;
@@ -917,7 +917,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image x sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image x sigma statistics.
+   * @return QList<Statistics> The RMS image x sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageXSigmas() const {
     return m_rmsImageXSigmas;
@@ -927,7 +927,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image y sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image y sigma statistics.
+   * @return QList<Statistics> The RMS image y sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageYSigmas() const {
     return m_rmsImageYSigmas;
@@ -937,7 +937,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image z sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image z sigma statistics.
+   * @return QList<Statistics> The RMS image z sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageZSigmas() const {
     return m_rmsImageZSigmas;
@@ -947,7 +947,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image right ascension sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image right ascension sigma statistics.
+   * @return QList<Statistics> The RMS image right ascension sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageRASigmas() const {
     return m_rmsImageRASigmas;
@@ -957,7 +957,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image declination sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image declination sigma statistics.
+   * @return QList<Statistics> The RMS image declination sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageDECSigmas() const {
     return m_rmsImageDECSigmas;
@@ -967,7 +967,7 @@ namespace Isis {
   /**
    * Returns the list of RMS image twist sigma statistics.
    *
-   * @return @b QList<Statistics> The RMS image twist sigma statistics.
+   * @return QList<Statistics> The RMS image twist sigma statistics.
    */
   QVector<Statistics> BundleResults::rmsImageTWISTSigmas() const {
     return m_rmsImageTWISTSigmas;
@@ -977,7 +977,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma latitude distance.
    *
-   * @return @b Distance The minimum sigma latitude.
+   * @return Distance The minimum sigma latitude.
    */
   Distance BundleResults::minSigmaLatitudeDistance() const {
     return m_minSigmaLatitudeDistance;
@@ -987,7 +987,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma latitude distance.
    *
-   * @return @b Distance The maximum sigma latitude.
+   * @return Distance The maximum sigma latitude.
    */
   Distance BundleResults::maxSigmaLatitudeDistance() const {
     return m_maxSigmaLatitudeDistance;
@@ -997,7 +997,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma longitude distance.
    *
-   * @return @b Distance The minimum sigma longitude.
+   * @return Distance The minimum sigma longitude.
    */
   Distance BundleResults::minSigmaLongitudeDistance() const {
     return m_minSigmaLongitudeDistance;
@@ -1007,7 +1007,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma longitude distance.
    *
-   * @return @b Distance The maximum sigma longitude.
+   * @return Distance The maximum sigma longitude.
    */
   Distance BundleResults::maxSigmaLongitudeDistance() const {
     return m_maxSigmaLongitudeDistance;
@@ -1017,7 +1017,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma redius distance.
    *
-   * @return @b Distance The minimum sigma redius.
+   * @return Distance The minimum sigma redius.
    */
   Distance BundleResults::minSigmaRadiusDistance() const {
     return m_minSigmaRadiusDistance;
@@ -1027,7 +1027,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma redius distance.
    *
-   * @return @b Distance The maximum sigma radius.
+   * @return Distance The maximum sigma radius.
    */
   Distance BundleResults::maxSigmaRadiusDistance() const {
     return m_maxSigmaRadiusDistance;
@@ -1037,7 +1037,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma latitude point id.
    *
-   * @return @b @QString The minimum sigma latitude point id.
+   * @return @QString The minimum sigma latitude point id.
    */
   QString BundleResults::minSigmaLatitudePointId() const {
     return m_minSigmaLatitudePointId;
@@ -1047,7 +1047,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma latitude point id.
    *
-   * @return @b @QString The maximum sigma latitude point id.
+   * @return @QString The maximum sigma latitude point id.
    */
   QString BundleResults::maxSigmaLatitudePointId() const {
     return m_maxSigmaLatitudePointId;
@@ -1057,7 +1057,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma longitude point id.
    *
-   * @return @b @QString The minimum sigma longitude point id.
+   * @return @QString The minimum sigma longitude point id.
    */
   QString BundleResults::minSigmaLongitudePointId() const {
     return m_minSigmaLongitudePointId;
@@ -1067,7 +1067,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma longitude point id.
    *
-   * @return @b @QString The maximum sigma longitude point id.
+   * @return @QString The maximum sigma longitude point id.
    */
   QString BundleResults::maxSigmaLongitudePointId() const {
     return m_maxSigmaLongitudePointId;
@@ -1077,7 +1077,7 @@ namespace Isis {
   /**
    * Returns the minimum sigma radius point id.
    *
-   * @return @b @QString The minimum sigma radius point id.
+   * @return @QString The minimum sigma radius point id.
    */
   QString BundleResults::minSigmaRadiusPointId() const {
     return m_minSigmaRadiusPointId;
@@ -1087,7 +1087,7 @@ namespace Isis {
   /**
    * Returns the maximum sigma radius point id.
    *
-   * @return @b @QString The maximum sigma radius point id.
+   * @return @QString The maximum sigma radius point id.
    */
   QString BundleResults::maxSigmaRadiusPointId() const {
     return m_maxSigmaRadiusPointId;
@@ -1097,7 +1097,7 @@ namespace Isis {
   /**
    * Returns the RMS of the adjusted latitude sigmas.
    *
-   * @return @b double The RMS of the adjusted latitude sigmas.
+   * @return double The RMS of the adjusted latitude sigmas.
    */
   double BundleResults::sigmaLatitudeStatisticsRms() const {
     return m_rmsSigmaLatitudeStats;
@@ -1107,7 +1107,7 @@ namespace Isis {
   /**
    * Returns the RMS of the adjusted longitude sigmas.
    *
-   * @return @b double The RMS of the adjusted longitude sigmas.
+   * @return double The RMS of the adjusted longitude sigmas.
    */
   double BundleResults::sigmaLongitudeStatisticsRms() const {
     return m_rmsSigmaLongitudeStats;
@@ -1117,7 +1117,7 @@ namespace Isis {
   /**
    * Returns the RMS of the adjusted raidus sigmas.
    *
-   * @return @b double The RMS of the adjusted radius sigmas.
+   * @return double The RMS of the adjusted radius sigmas.
    */
   double BundleResults::sigmaRadiusStatisticsRms() const {
     return m_rmsSigmaRadiusStats;
@@ -1127,7 +1127,7 @@ namespace Isis {
   /**
    * Returns the RMS of the x residuals.
    *
-   * @return @b double The RMS of the x residuals.
+   * @return double The RMS of the x residuals.
    */
   double BundleResults::rmsRx() const {
     return m_rmsXResiduals;
@@ -1137,7 +1137,7 @@ namespace Isis {
   /**
    * Returns the RMS of the y residuals.
    *
-   * @return @b double The RMS of the y residuals.
+   * @return double The RMS of the y residuals.
    */
   double BundleResults::rmsRy() const {
     return m_rmsYResiduals;
@@ -1147,7 +1147,7 @@ namespace Isis {
   /**
    * Returns the RMS of the x and y residuals.
    *
-   * @return @b double The RMS of the x and y residuals.
+   * @return double The RMS of the x and y residuals.
    */
   double BundleResults::rmsRxy() const {
     return m_rmsXYResiduals;
@@ -1157,7 +1157,7 @@ namespace Isis {
   /**
    * Returns the rejection limit.
    *
-   * @return @b double The rejection limit.
+   * @return double The rejection limit.
    */
   double BundleResults::rejectionLimit() const {
     return m_rejectionLimit;
@@ -1167,7 +1167,7 @@ namespace Isis {
   /**
    * Returns the radians to meters conversion factor for the target body.
    *
-   * @return @b double The conversion factor.
+   * @return double The conversion factor.
    */
   double BundleResults::radiansToMeters() const {
     return m_radiansToMeters;
@@ -1177,7 +1177,7 @@ namespace Isis {
   /**
    * Returns the number of observation that were rejected.
    *
-   * @return @b int The number of rejected observations.
+   * @return int The number of rejected observations.
    */
   int BundleResults::numberRejectedObservations() const {
     return m_numberRejectedObservations;
@@ -1187,7 +1187,7 @@ namespace Isis {
   /**
    * Returns the number of observations.
    *
-   * @return @b int The number of observations.
+   * @return int The number of observations.
    */
   int BundleResults::numberObservations() const {
     return m_numberObservations;
@@ -1197,7 +1197,7 @@ namespace Isis {
   /**
    * Returns the total number of image parameters.
    *
-   * @return @b int The total number of image parameters.
+   * @return int The total number of image parameters.
    */
   int BundleResults::numberImageParameters() const {
     return m_numberImageParameters;
@@ -1207,7 +1207,7 @@ namespace Isis {
   /**
    * Returns the number of constrained point parameters.
    *
-   * @return @b int The number of constrained point parameters.
+   * @return int The number of constrained point parameters.
    */
   int BundleResults::numberConstrainedPointParameters() const {
     return m_numberConstrainedPointParameters;
@@ -1217,7 +1217,7 @@ namespace Isis {
   /**
    * Returns the number of constrained image parameters.
    *
-   * @return @b int The number of constrained image parameters.
+   * @return int The number of constrained image parameters.
    */
   int BundleResults::numberConstrainedImageParameters() const {
     return m_numberConstrainedImageParameters;
@@ -1227,7 +1227,7 @@ namespace Isis {
   /**
    * Return the number of constrained target parameters.
    *
-   * @return @b int The number of constrained target parameters.
+   * @return int The number of constrained target parameters.
    */
   int BundleResults::numberConstrainedTargetParameters() const {
     return m_numberConstrainedTargetParameters;
@@ -1237,7 +1237,7 @@ namespace Isis {
   /**
    * Return the number of continuity constraint equations.
    *
-   * @return @b int The number of continuity constraint equations.
+   * @return int The number of continuity constraint equations.
    */
   int BundleResults::numberContinuityConstraintEquations() const {
     return m_numberContinuityConstraintEquations;
@@ -1247,7 +1247,7 @@ namespace Isis {
   /**
    * Returns the number of unknown parameters.
    *
-   * @return @b int The number of unknown parameters.
+   * @return int The number of unknown parameters.
    */
   int BundleResults::numberUnknownParameters() const {
     return m_numberUnknownParameters;
@@ -1257,7 +1257,7 @@ namespace Isis {
   /**
    * Returns the degrees of freedom.
    *
-   * @return @b int the degrees of freedom.
+   * @return int the degrees of freedom.
    */
   int BundleResults::degreesOfFreedom() const {
     return m_degreesOfFreedom;
@@ -1267,7 +1267,7 @@ namespace Isis {
   /**
    * Returns the Sigma0 of the bundle adjustment.
    *
-   * @return @b double The Sigma0.
+   * @return double The Sigma0.
    */
   double BundleResults::sigma0() const {
     return m_sigma0;
@@ -1277,7 +1277,7 @@ namespace Isis {
   /**
    * Returns the elapsed time for the bundle adjustment.
    *
-   * @return @b double The elapsed time for the bundle adjustment.
+   * @return double The elapsed time for the bundle adjustment.
    */
   double BundleResults::elapsedTime() const {
     return m_elapsedTime;
@@ -1287,7 +1287,7 @@ namespace Isis {
   /**
    * Returns the elapsed time for error propagation.
    *
-   * @return @b double The elapsed time for error propagation.
+   * @return double The elapsed time for error propagation.
    */
   double BundleResults::elapsedTimeErrorProp() const {
     return m_elapsedTimeErrorProp;
@@ -1297,7 +1297,7 @@ namespace Isis {
   /**
    * Returns whether or not the bundle adjustment converged.
    *
-   * @return @b bool If the bundle adjustment converged.
+   * @return bool If the bundle adjustment converged.
    */
   bool BundleResults::converged() const {
     return m_converged;
@@ -1307,7 +1307,7 @@ namespace Isis {
   /**
    * Returns a reference to the BundleControlPoint vector.
    *
-   * @return @b QVector<BundleControlPointQsp>& The BundleControlPoint vector.
+   * @return QVector<BundleControlPointQsp>& The BundleControlPoint vector.
    */
   QVector<BundleControlPointQsp> &BundleResults::bundleControlPoints() {
     return m_bundleControlPoints;
@@ -1317,7 +1317,7 @@ namespace Isis {
   /**
    * Returns a shared pointer to the output control network.
    *
-   * @return @b ControlNetQsp A shared pointer to the output control network.
+   * @return ControlNetQsp A shared pointer to the output control network.
    *
    * @throws IException::Programmer "Output Control Network has not been set."
    */
@@ -1334,7 +1334,7 @@ namespace Isis {
   /**
    * Returns the number of iterations taken by the BundleAdjust.
    *
-   * @return @b int The number of iterations.
+   * @return int The number of iterations.
    */
   int BundleResults::iterations() const {
     return m_iterations;
@@ -1344,7 +1344,7 @@ namespace Isis {
   /**
    * Returns a reference to the observations used by the BundleAdjust.
    *
-   * @return @b BundleObservationVector& A reference to the observation vector.
+   * @return BundleObservationVector& A reference to the observation vector.
    */
   const BundleObservationVector &BundleResults::observations() const {
     return m_observations;
@@ -1354,7 +1354,7 @@ namespace Isis {
   /**
    * Returns how many maximum likelihood models were used in the bundle adjustment.
    *
-   * @return @b int The number fo maximum likelihood models.
+   * @return int The number fo maximum likelihood models.
    */
   int BundleResults::numberMaximumLikelihoodModels() const {
     return m_maximumLikelihoodFunctions.size();
@@ -1364,7 +1364,7 @@ namespace Isis {
   /**
    * Returns which step the bundle adjustment is on.
    *
-   * @return @b int The maximum likelihood model that the bundle adjustment is currently using.
+   * @return int The maximum likelihood model that the bundle adjustment is currently using.
    */
   int BundleResults::maximumLikelihoodModelIndex() const {
     return m_maximumLikelihoodIndex;
@@ -1374,7 +1374,7 @@ namespace Isis {
   /**
    * Returns the cumulative probability distribution of the |R^2 residuals|.
    *
-   * @return @b StatCumProbDistDynCalc The cumulative probability distribution of the
+   * @return StatCumProbDistDynCalc The cumulative probability distribution of the
    *                                   |R^2 residuals|.
    */
   StatCumProbDistDynCalc BundleResults::cumulativeProbabilityDistribution() const {
@@ -1385,7 +1385,7 @@ namespace Isis {
   /**
    * Returns the cumulative probability distribution of the residuals used for reporting.
    *
-   * @return @b StatCumProbDistDynCalc the cumulative probability distribution of the residuals.
+   * @return StatCumProbDistDynCalc the cumulative probability distribution of the residuals.
    */
   StatCumProbDistDynCalc BundleResults::residualsCumulativeProbabilityDistribution() const {
     return *m_cumProRes;
@@ -1395,7 +1395,7 @@ namespace Isis {
   /**
    * Returns the median of the |R^2 residuals|.
    *
-   * @return @b double The median of the |R^2 residuals|.
+   * @return double The median of the |R^2 residuals|.
    */
   double BundleResults::maximumLikelihoodMedianR2Residuals() const {
     return m_maximumLikelihoodMedianR2Residuals;
@@ -1407,7 +1407,7 @@ namespace Isis {
    *
    * @param modelIndex The index of the maximum likelihood model to be returned.
    *
-   * @return @b MaximumLikelihoodWFunctions The maximum likelihood model at the input index.
+   * @return MaximumLikelihoodWFunctions The maximum likelihood model at the input index.
    */
   MaximumLikelihoodWFunctions BundleResults::maximumLikelihoodModelWFunc(int modelIndex) const {
     return m_maximumLikelihoodFunctions[modelIndex].first;
@@ -1419,7 +1419,7 @@ namespace Isis {
    *
    * @param modelIndex The index of the maximum likelihood model whose quantile will be returned.
    *
-   * @return @b double The quantile of the desired maximum likelihood model.
+   * @return double The quantile of the desired maximum likelihood model.
    */
   double BundleResults::maximumLikelihoodModelQuantile(int modelIndex) const {
     return m_maximumLikelihoodFunctions[modelIndex].second;
@@ -1435,7 +1435,7 @@ namespace Isis {
   /**
    * Returns the Correlation Matrix.
    *
-   * @return @b CorrelationMatrix The correlation matrix.
+   * @return CorrelationMatrix The correlation matrix.
    *
    * @throws IException::Unknown "Correlation matrix for this bundle is NULL."
    */
@@ -1736,7 +1736,7 @@ namespace Isis {
    * @param qName SAX qualified name of the tag.
    * @param attributes The list of attributes for the tag.
    *
-   * @return @b bool Indicates whether to continue reading the XML (usually true).
+   * @return bool Indicates whether to continue reading the XML (usually true).
    */
   bool BundleResults::XmlHandler::startElement(const QString &namespaceURI,
                                                const QString &localName,
@@ -1995,7 +1995,7 @@ namespace Isis {
    *
    * @param ch The data to be added.
    *
-   * @return @b bool true
+   * @return bool true
    */
   bool BundleResults::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;

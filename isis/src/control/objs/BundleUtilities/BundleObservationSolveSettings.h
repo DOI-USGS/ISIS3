@@ -82,6 +82,9 @@ namespace Isis {
    *                           -methods...
    *                               int numberCkPolySegments
    *                               int numberCkPolySegments
+   *   @history 2017-11-01 Ken Edmundson - Modified to force number of segments to be 1 if
+   *                                       m_instrumentPointingSolveOption = Angles or
+   *                                       m_instrumentPositionSolveOption = Position.
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.

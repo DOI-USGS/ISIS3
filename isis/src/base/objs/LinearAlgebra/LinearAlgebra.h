@@ -71,7 +71,9 @@ namespace Isis {
    *   @history 2016-08-16 Jesse Mapel - Added BOOST_UBLAS_NO_STD_CERR definition to
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
-   *  
+   *   @history 2017-11-01 Ken Edmundson - Added support for Boost compressed matrix and vector
+   *                                       types, including QDebug operators.
+   *
    *  
    *   @todo document methods (a) add naif routine names to documentation where appropriate,
    *                          (b) clean up comments within methods,
@@ -241,6 +243,7 @@ namespace Isis {
   QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixUpperTriangular &matrix);
   QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixLowerTriangular &matrix);
   QString toString(const LinearAlgebra::Vector &vector, int precision=15);
+  QString toString(const LinearAlgebra::VectorCompressed &vectorCompressed, int precision=15);
 };
 
 #endif

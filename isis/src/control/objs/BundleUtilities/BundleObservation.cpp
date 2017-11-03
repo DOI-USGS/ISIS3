@@ -146,7 +146,7 @@ namespace Isis {
    *
    * @param BundleObservation Reference to the source BundleObservation to assign from
    *
-   * @return @b BundleObservation& Reference to this BundleObservation
+   * @return BundleObservation& Reference to this BundleObservation
    */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
@@ -190,7 +190,7 @@ namespace Isis {
    * 
    * @param cubeSerialNumber The serial number of the cube to be returned.
    * 
-   * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
+   * @return BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
    */
   BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
     BundleImageQsp bundleImage;
@@ -208,7 +208,7 @@ namespace Isis {
    *
    * @param solveSettings The solve settings to use
    *
-   * @return @b bool Returns true if settings were successfully set
+   * @return bool Returns true if settings were successfully set
    *
    * @internal
    *   @todo initParameterWeights() doesn't return false, so this methods always 
@@ -272,20 +272,31 @@ namespace Isis {
 
 
   /**
-   * Returns contribution of continuity constraints
+   * Returns position contribution of continuity constraints
    *
-   * @return @b LinearAlgebra::MatrixUpperTriangular Returns contribution of continuity constraints
-   *                                                 to the bundle adjustment normal equations
+   * @return SparseBlockMatrix Returns position contribution of continuity constraints to the
+   *                              bundle adjustment normal equations
    */
-  LinearAlgebra::MatrixUpperTriangular &BundleObservation::continuityContraintMatrix() {
-    return m_continuityConstraints->normalsMatrix();
+  SparseBlockMatrix &BundleObservation::continuityContraintSpkMatrix() {
+    return m_continuityConstraints->normalsSpkMatrix();
+  }
+
+
+  /**
+   * Returns pointing contribution of continuity constraints
+   *
+   * @return SparseBlockMatrix Returns pointing contribution of continuity constraints to the
+   *                              bundle adjustment normal equations
+   */
+  SparseBlockMatrix &BundleObservation::continuityContraintCkMatrix() {
+    return m_continuityConstraints->normalsCkMatrix();
   }
 
 
   /**
    * Returns contribution of continuity constraints to normal equations right hand side
    *
-   * @return @b LinearAlgebra::Vector Returns contribution of continuity constraints to the normal
+   * @return LinearAlgebra::Vector Returns contribution of continuity constraints to the normal
    *                                  equation hand side
    */
   LinearAlgebra::Vector &BundleObservation::continuityRHS() {
@@ -296,7 +307,7 @@ namespace Isis {
   /**
    * Accesses the instrument id
    *
-   * @return @b QString Returns the instrument id of the observation
+   * @return QString Returns the instrument id of the observation
    */
   QString BundleObservation::instrumentId() {
     return m_instrumentId;
@@ -306,7 +317,7 @@ namespace Isis {
   /**
    * Accesses the instrument's spice rotation
    *
-   * @return @b SpiceRotation* Returns the SpiceRotation for this observation
+   * @return SpiceRotation* Returns the SpiceRotation for this observation
    */
   SpiceRotation *BundleObservation::spiceRotation() {
     return m_instrumentRotation;
@@ -316,7 +327,7 @@ namespace Isis {
   /**
    * Accesses the instrument's spice position 
    *
-   * @return @b SpicePosition* Returns the SpicePosition for this observation
+   * @return SpicePosition* Returns the SpicePosition for this observation
    */
   SpicePosition *BundleObservation::spicePosition() {
     return m_instrumentPosition;
@@ -326,7 +337,7 @@ namespace Isis {
   /**
    * Accesses the solve parameter weights
    * 
-   * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
+   * @return LinearAlgebra::Vector Returns the parameter weights for solving
    */
   LinearAlgebra::Vector &BundleObservation::parameterWeights() {
     return m_weights;
@@ -336,7 +347,7 @@ namespace Isis {
   /**
    * Accesses the parameter corrections 
    *
-   * @return @b LinearAlgebra::Vector Returns the parameter corrections
+   * @return LinearAlgebra::Vector Returns the parameter corrections
    */
   LinearAlgebra::Vector &BundleObservation::parameterCorrections() {
     return m_corrections;
@@ -346,7 +357,7 @@ namespace Isis {
   /**
    * Accesses the a priori sigmas
    *
-   * @return @b LinearAlgebra::Vector Returns the a priori sigmas
+   * @return LinearAlgebra::Vector Returns the a priori sigmas
    */
   LinearAlgebra::Vector &BundleObservation::aprioriSigmas() {
     return m_aprioriSigmas;
@@ -356,7 +367,7 @@ namespace Isis {
   /**
    * Accesses the adjusted sigmas 
    *
-   * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
+   * @return LinearAlgebra::Vector Returns the adjusted sigmas
    */
   LinearAlgebra::Vector &BundleObservation::adjustedSigmas() {
     return m_adjustedSigmas;
@@ -366,7 +377,7 @@ namespace Isis {
   /**
    * Accesses the solve settings
    *
-   * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
+   * @return const BundleObservationSolveSettingsQsp Returns a pointer to the solve
    *                                                    settings for this BundleObservation
    */
   const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
@@ -377,7 +388,7 @@ namespace Isis {
   /**
    * Initializes the exterior orientation 
    *
-   * @return @b bool Returns true upon successful intialization
+   * @return bool Returns true upon successful intialization
    */
   bool BundleObservation::initializeExteriorOrientation() {
     if (size() == 0) {
@@ -541,7 +552,7 @@ namespace Isis {
   /**
    * Initializes the parameter weights for solving
    * 
-   * @return @b bool Returns true upon successful intialization
+   * @return bool Returns true upon successful intialization
    *
    * @internal  
    *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
@@ -651,51 +662,60 @@ namespace Isis {
 
 
   /**
-   * Computes bundle adjustment partial derivatives for this observation
+   * Computes bundle adjustment partial derivatives for this observation.
    *
-   * @param coeffImage Matrix of partial derivatives
+   * NOTE: this is different from previous version in that we are using two separate matrices for
+   *       position and pointing partials as opposed to one matrix containing both.
+   *
+   * @param coeffImagePosition Matrix of partial derivatives for position parameters.
+   * @param coeffImagePointing Matrix of partial derivatives for pointing parameters.
    *
    */
-  void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImage) {
+void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePosition,
+                                        LinearAlgebra::Matrix &coeffImagePointing) {
     BundleImageQsp image = at(0);
-
-    int index = 0;
-
-    // get spk and ck segment index corresponding to current ephemeris time
-    int spkSegment = m_instrumentPosition->polySegmentIndex(m_instrumentPosition->EphemerisTime());
-    int ckSegment = m_instrumentRotation->polySegmentIndex(m_instrumentRotation->EphemerisTime());
 
     // get numbers of spk and ck coefficients being solved
     int numCamPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     int numCamAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
+    // resize coeffImagePosition matrix if necessary
+    if ((int) coeffImagePosition.size2() != positionSegmentSize()) {
+      coeffImagePosition.resize(2, positionSegmentSize(), false);
+    }
+
+    // resize coeffImagePointing matrix if necessary
+    if ((int) coeffImagePointing.size2() != pointingSegmentSize()) {
+      coeffImagePointing.resize(2, pointingSegmentSize(), false);
+    }
+
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
 
-      index = spkSegment * numCamPositionCoefficients * 3;
+      int index = 0;
 
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
         image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
-                                                    &coeffImage(0, index),
-                                                    &coeffImage(1, index));
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
         index++;
       }
 
       // Add the partial for the y coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
         image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
-                                                    &coeffImage(0, index),
-                                                    &coeffImage(1, index));
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
         index++;
       }
 
       // Add the partial for the z coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
         image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
-                                                    &coeffImage(0, index),
-                                                    &coeffImage(1, index));
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
         index++;
       }
     }
@@ -703,29 +723,21 @@ namespace Isis {
     if (m_solveSettings->instrumentPointingSolveOption() !=
         BundleObservationSolveSettings::NoPointingFactors) {
 
-      int t = m_instrumentPosition->numPolynomialSegments();
-      t *= solveSettings()->numberCameraPositionCoefficientsSolved()*3;
-
-      if (m_solveSettings->solveTwist())
-        t += ckSegment * numCamAngleCoefficients * 3;
-      else
-        t += ckSegment * numCamAngleCoefficients * 2;
-
-      index = t;
+      int index = 0;
 
       // Add the partials for ra
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
         image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
-                                                       cameraCoef, &coeffImage(0, index),
-                                                       &coeffImage(1, index));
+                                                       cameraCoef, &coeffImagePointing(0, index),
+                                                       &coeffImagePointing(1, index));
         index++;
       }
 
       // Add the partials for dec
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
         image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
-                                                       cameraCoef, &coeffImage(0, index),
-                                                       &coeffImage(1, index));
+                                                       cameraCoef, &coeffImagePointing(0, index),
+                                                       &coeffImagePointing(1, index));
         index++;
       }
 
@@ -733,8 +745,8 @@ namespace Isis {
       if (m_solveSettings->solveTwist()) {
         for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
           image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
-                                                         cameraCoef, &coeffImage(0, index),
-                                                         &coeffImage(1, index));
+                                                         cameraCoef, &coeffImagePointing(0, index),
+                                                         &coeffImagePointing(1, index));
           index++;
         }
       }
@@ -753,7 +765,7 @@ namespace Isis {
    *                              [not NoPointingFactors]"
    * @throws IException::Unknown "Unable to apply parameter corrections to BundleObservation."
    *
-   * @return @b bool Returns true upon successful application of corrections
+   * @return bool Returns true upon successful application of corrections
    *
    * @internal
    *   @todo always returns true?
@@ -877,9 +889,24 @@ namespace Isis {
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
-    // TODO: temporary location for this?
-    if (m_continuityConstraints) {
-      m_continuityConstraints->updateRightHandSide();
+    try {
+      // TODO: temporary location for this?
+      if (m_continuityConstraints) {
+//        clock_t updateContinuityRHSClock1 = clock();
+
+        m_continuityConstraints->updateRightHandSide();
+
+//        clock_t updateContinuityRHSClock2 = clock();
+
+//        double updateContinuityRHS = (updateContinuityRHSClock2 - updateContinuityRHSClock1)
+//            / (double)CLOCKS_PER_SEC;
+
+//        qDebug() << "update Continuity RHS: " << updateContinuityRHS;
+      }
+    }
+    catch (IException &e) {
+      QString msg = "Unable to update continuity constraint right hand side for BundleObservation.";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
     return true;
@@ -894,18 +921,18 @@ namespace Isis {
    * @param rhs diagonal portion of right hand side vector of normal equations corresponding to this
    *                     observation
    */
-  void BundleObservation::applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
-                                                     LinearAlgebra::Vector &rhs) {
+//  void BundleObservation::applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
+//                                                     LinearAlgebra::Vector &rhs) {
 
-    *diagonalBlock += m_continuityConstraints->normalsMatrix();
-    rhs += m_continuityConstraints->rightHandSideVector();
-  }
+//    *diagonalBlock += m_continuityConstraints->normalsMatrix();
+//    rhs += m_continuityConstraints->rightHandSideVector();
+//  }
 
 
   /**
    * Returns the number of position parameters there are
    *
-   * @return @b int Returns the number of position parameters
+   * @return int Returns the number of position parameters
    */
   int BundleObservation::numberPositionParameters() {
     int numSegments;
@@ -922,9 +949,19 @@ namespace Isis {
 
 
   /**
+   * Returns the number of position parameters there are per segment
+   *
+   * @return int Returns the number of position parameters
+   */
+  int BundleObservation::numberPositionParametersPerSegment() {
+    return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
+  }
+
+
+  /**
    * Returns the number of pointing parameters being solved for
    *
-   * @return @b int Returns the number of pointing parameters
+   * @return int Returns the number of pointing parameters
    */
   int BundleObservation::numberPointingParameters() {
     int numSegments;
@@ -945,12 +982,29 @@ namespace Isis {
 
 
   /**
+   * Returns the number of pointing parameters per segment
+   *
+   * @return int Returns number of pointing parameters per segment
+   */
+  int BundleObservation::numberPointingParametersPerSegment() {
+    int numCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    if (!m_solveSettings->solveTwist()) {
+      return 2.0 * numCoefficients;
+    }
+
+    return 3.0 * numCoefficients;
+  }
+
+
+
+  /**
    * Returns the number of total parameters solved for this observation
    *
    * The total number of parameters is equal to the number of position parameters and number of
    * pointing parameters
    *
-   * @return @b int Returns number of parameters solved for this observation
+   * @return int Returns number of parameters solved for this observation
    */
   int BundleObservation::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
@@ -959,7 +1013,7 @@ namespace Isis {
   /**
    * Returns the number of piecewise polynomial position segments
    *
-   * @return @b int Returns number of piecewise polynomial position segments
+   * @return int Returns number of piecewise polynomial position segments
    */
   int BundleObservation::numberPolynomialPositionSegments() {
     if (m_instrumentPosition) {
@@ -972,7 +1026,7 @@ namespace Isis {
   /**
    * Returns the number of piecewise polynomial pointing segments
    *
-   * @return @b int Returns number of piecewise polynomial pointing segments
+   * @return int Returns number of piecewise polynomial pointing segments
    */
   int BundleObservation::numberPolynomialPointingSegments() {
     if (m_instrumentRotation) {
@@ -987,7 +1041,7 @@ namespace Isis {
    *
    * Total number of segments is the sum of position and pointing segments
    *
-   * @return @b int Returns total number of piecewise polynomial segments
+   * @return int Returns total number of piecewise polynomial segments
    */
   int BundleObservation::numberPolynomialSegments() {
     return (numberPolynomialPositionSegments() +
@@ -996,10 +1050,55 @@ namespace Isis {
 
 
   /**
+   * Returns size of polynomial position segment
+   *
+   * @return int Returns size of polynomial position segment
+   */
+  int BundleObservation::positionSegmentSize() {
+    return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
+  }
+
+
+  /**
+   * Returns size of polynomial pointing segment
+   *
+   * @return int Returns size of polynomial pointing segment
+   */
+  int BundleObservation::pointingSegmentSize() {
+
+    if (m_solveSettings->solveTwist()) {
+      return 3.0 * m_solveSettings->numberCameraAngleCoefficientsSolved();
+    }
+
+    return 2.0 * m_solveSettings->numberCameraAngleCoefficientsSolved();
+  }
+
+
+  /**
+   * Returns current position segment index by ephemeris time
+   *
+   * @return int Returns current position segment index by ephemeris time
+   */
+  int BundleObservation::polyPositionSegmentIndex() {
+    return m_instrumentPosition->polySegmentIndex(m_instrumentPosition->EphemerisTime());
+  }
+
+
+  /**
+   * Returns current rotation segment index by ephemeris time
+   *
+   * @return int Returns current rotation segment index by ephemeris time
+   */
+  int BundleObservation::polyRotationSegmentIndex() {
+    return m_instrumentRotation->polySegmentIndex(m_instrumentRotation->EphemerisTime());
+  }
+
+
+  /**
    * Returns total number of piecewise polynomial continuity constraint equations
    * used in the adjustment
    *
-   * @return @b int Returns total number of piecewise polynomial continuity constraint equations
+   * @return int Returns total number of piecewise polynomial continuity constraint equations
    */
   int BundleObservation::numberContinuityConstraints() const {
     if (m_continuityConstraints) {
@@ -1020,9 +1119,32 @@ namespace Isis {
 
 
   /**
+   * Sets the starting matrix block in the normal equations matrix for this observation
+   *
+   * @param startBlock Value to set the index of the observation to
+   */
+
+  void BundleObservation::setNormalsMatrixStartBlock(int startBlock) {
+    m_normalsEquationsStartBlock = startBlock;
+  }
+
+
+  /**
+   * Accesses the starting matrix block in the normal equations matrix for this observation
+   *
+   * @return int Returns starting matrix block index in the normal equations matrix for this
+   *                observation
+   */
+
+  int BundleObservation::normalsMatrixStartBlock() {
+    return m_normalsEquationsStartBlock;
+  }
+
+
+  /**
    * Accesses the observation's index
    *
-   * @return @b int Returns the observation's index
+   * @return int Returns the observation's index
    */
   int BundleObservation::index() {
     return m_index;
@@ -1038,7 +1160,7 @@ namespace Isis {
    *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
    *     for backwards compatibility.
    *
-   * @return @b QString Returns a formatted QString representing the BundleObservation
+   * @return QString Returns a formatted QString representing the BundleObservation
    *
    * @internal
    *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
@@ -1055,7 +1177,7 @@ namespace Isis {
    * @param segmentIndex The index of the position segment to format the
    *                     header for
    * 
-   * @return @b QString The formatted segment header with segment number,
+   * @return QString The formatted segment header with segment number,
    *                    start time, and stop time.
    */
   QString BundleObservation::formatPositionSegmentHeader(int segmentIndex) {
@@ -1083,7 +1205,7 @@ namespace Isis {
    * @param segmentIndex The index of the pointing segment to format the
    *                     header for
    * 
-   * @return @b QString The formatted segment header with segment number,
+   * @return QString The formatted segment header with segment number,
    *                    start time, and stop time.
    */
   QString BundleObservation::formatPointingSegmentHeader(int segmentIndex) {
@@ -1116,7 +1238,7 @@ namespace Isis {
    *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
    *     for backwards compatibility.
    *
-   * @return @b QString Returns a formatted QString representing the position segment
+   * @return QString Returns a formatted QString representing the position segment
    *
    * @internal
    *   @history 2017-10-06 Jesse Mapel - Original version, created from formatBundleOutputString
@@ -1301,7 +1423,7 @@ namespace Isis {
    *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
    *     for backwards compatibility.
    *
-   * @return @b QString Returns a formatted QString representing the BundleObservation
+   * @return QString Returns a formatted QString representing the BundleObservation
    *
    * @internal
    *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
@@ -1534,7 +1656,7 @@ namespace Isis {
   /**
    * Access to parameters for CorrelationMatrix to use.
    *
-   * @return @b QStringList Returns a QStringList of the names of the parameters
+   * @return QStringList Returns a QStringList of the names of the parameters
    */
   QStringList BundleObservation::parameterList() {
     return m_parameterNamesList;
@@ -1544,7 +1666,7 @@ namespace Isis {
   /**
    * Access to image names for CorrelationMatrix to use.
    *
-   * @return @b QStringList Returns a QStringList of the image names
+   * @return QStringList Returns a QStringList of the image names
    */
   QStringList BundleObservation::imageNames() {
     return m_imageNames;

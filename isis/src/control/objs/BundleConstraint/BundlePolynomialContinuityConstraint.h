@@ -28,6 +28,7 @@
 #include "BundleConstraint.h"
 #include "BundleObservation.h"
 #include "LinearAlgebra.h"
+#include "SparseBlockMatrix.h"
 
 namespace Isis {
   /**
@@ -40,6 +41,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-03-03 Ken Edmundson - Original version.
+   *   @history 2017-11-01 Ken Edmundson - Additional modifications to address bundle slowness.
    */
   class BundlePolynomialContinuityConstraint : public BundleConstraint {
     public:
@@ -64,7 +66,8 @@ namespace Isis {
       int numberConstraintEquations() const;
 
       void updateRightHandSide();
-      LinearAlgebra::MatrixUpperTriangular &normalsMatrix();
+      SparseBlockMatrix &normalsSpkMatrix();
+      SparseBlockMatrix &normalsCkMatrix();
       LinearAlgebra::Vector &rightHandSideVector();
 
       QString formatBundleOutputString();
@@ -94,7 +97,8 @@ namespace Isis {
       int m_numberParameters;                                  //! TODO: # parameters
       int m_numberConstraintEquations;                         //! # constraint equations
       LinearAlgebra::MatrixCompressed m_designMatrix;          //! design matrix
-      LinearAlgebra::MatrixUpperTriangular m_normalsMatrix;    //! normals matrix contribution
+      SparseBlockMatrix m_normalsSpkMatrix;                    //! normals contribution to position
+      SparseBlockMatrix m_normalsCkMatrix;                     //! normals contribution to pointing
       LinearAlgebra::Vector m_rightHandSide;                   //! right hand side of normals
       LinearAlgebra::Vector m_omcVector;                       //! observed minus corrected vector
   };

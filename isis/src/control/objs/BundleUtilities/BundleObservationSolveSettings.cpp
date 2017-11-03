@@ -246,7 +246,7 @@ namespace Isis {
   /**
    * Accesses the instrument id for this observation.
    *
-   * @return @b QString Returns the instrument id for this observation
+   * @return QString Returns the instrument id for this observation
    */
   QString BundleObservationSolveSettings::instrumentId() const {
     return m_instrumentId;
@@ -268,7 +268,7 @@ namespace Isis {
   /**
    * Returns a list of observation numbers associated with these solve settings.
    *
-   * @return @b QSet<QString> Returns a QSet containing the associated observation numbers.
+   * @return QSet<QString> Returns a QSet containing the associated observation numbers.
    */
   QSet<QString> BundleObservationSolveSettings::observationNumbers() const {
     return m_observationNumbers;
@@ -287,7 +287,7 @@ namespace Isis {
    *
    * @throws IException::Unknown "Unknown bundle instrument point solve option."
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the enumerated
+   * @return BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the enumerated
    *     value of the instrument pointing solve option
    */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
@@ -337,7 +337,7 @@ namespace Isis {
    *
    * @throws IException::Programmer "Unknown pointing solve option enum."
    *
-   * @return @b QString Returns the QString representation of the passed
+   * @return QString Returns the QString representation of the passed
    *                    InstrumentPointingSolveOption
    */
   QString BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
@@ -404,7 +404,7 @@ namespace Isis {
     // If only solving for only angles,
     // continuity conditions would force all segments to be the same.
     // So, just use one segment.
-    if (m_instrumentPointingSolveOption <= 1 )
+    if (m_instrumentPointingSolveOption == 1 )
       m_numberCkPolySegments = 1;
     else
       m_numberCkPolySegments = ckPolynomialSegments;
@@ -454,7 +454,7 @@ namespace Isis {
   /**
    * Accesses the instrument pointing solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the
+   * @return BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the
    *     instrument pointing solve option
    */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
@@ -466,7 +466,7 @@ namespace Isis {
   /**
    * Accesses the flag for solving for twist.
    *
-   * @return @b bool Returns whether or not to solve for twist
+   * @return bool Returns whether or not to solve for twist
    */
   bool BundleObservationSolveSettings::solveTwist() const {
     return m_solveTwist;
@@ -476,7 +476,7 @@ namespace Isis {
   /**
    * Accesses the degree of polynomial fit to original camera angles (ckDegree).
    *
-   * @return @b int Returns the degree of the polynomial fit to the original camera angles
+   * @return int Returns the degree of the polynomial fit to the original camera angles
    */
   int BundleObservationSolveSettings::ckDegree() const {
     return m_ckDegree;
@@ -487,7 +487,7 @@ namespace Isis {
    * Accesses the degree of the camera angles polynomial being fit to in the bundle adjustment
    * (ckSolveDegree).
    *
-   * @return @b int Returns the degree of the camera angles polynomial in the bundle adjustment
+   * @return int Returns the degree of the camera angles polynomial in the bundle adjustment
    */
   int BundleObservationSolveSettings::ckSolveDegree()const {
     return m_ckSolveDegree;
@@ -497,7 +497,7 @@ namespace Isis {
   /**
    * Accesses the number of segments in the pointing piecewise polynomial.
    *
-   * @return @b int Returns the number of segments in the pointing piecewise polynomial.
+   * @return int Returns the number of segments in the pointing piecewise polynomial.
    */
   int BundleObservationSolveSettings::numberCkPolySegments() const {
     return m_numberCkPolySegments;
@@ -507,7 +507,7 @@ namespace Isis {
   /**
    * Accesses the number of camera angle coefficients in the solution.
    *
-   * @return @b int Returns the number of camera angle coefficients in the solution
+   * @return int Returns the number of camera angle coefficients in the solution
    */
   int BundleObservationSolveSettings::numberCameraAngleCoefficientsSolved() const {
     return m_numberCamAngleCoefSolved;
@@ -517,7 +517,7 @@ namespace Isis {
   /**
    * Whether or not the solve polynomial will be fit over the existing pointing polynomial.
    *
-   * @return @b bool Indicates whether the polynomial will be fit over the existing pointing
+   * @return bool Indicates whether the polynomial will be fit over the existing pointing
    *                 polynomial
    */
   bool BundleObservationSolveSettings::solvePolyOverPointing() const {
@@ -528,7 +528,7 @@ namespace Isis {
   /**
    * Accesses the a priori pointing sigmas.
    *
-   * @return @b QList<double> Returns a QList of the a priori pointing sigmas
+   * @return QList<double> Returns a QList of the a priori pointing sigmas
    */
   QList<double> BundleObservationSolveSettings::aprioriPointingSigmas() const {
     return m_anglesAprioriSigma;
@@ -538,7 +538,7 @@ namespace Isis {
   /**
    * Accesses the SpiceRotation interpolation type for the instrument pointing.
    *
-   * @return @b SpiceRotation::Source Returns the SpiceRotation interpolation type for pointing
+   * @return SpiceRotation::Source Returns the SpiceRotation interpolation type for pointing
    */
   SpiceRotation::Source BundleObservationSolveSettings::pointingInterpolationType() const {
     return m_pointingInterpolationType;
@@ -557,7 +557,7 @@ namespace Isis {
    *
    * @throws IExeption::Unknown "Unknown bundle instrument position solve option."
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the enumerated
+   * @return BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the enumerated
    *     value of the instrument position solve option
    */
   BundleObservationSolveSettings::InstrumentPositionSolveOption
@@ -607,7 +607,7 @@ namespace Isis {
    *
    * @throws IException::Programmer "Unknown position solve option enum."
    *
-   * @return @b QString Returns the QString representation of the passed
+   * @return QString Returns the QString representation of the passed
    *                    InstrumentPointingSolveOption
    */
   QString BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
@@ -670,7 +670,7 @@ namespace Isis {
     // If only solving for only position,
     // continuity conditions would force all segments to be the same.
     // So, just use one segment.
-    if (m_instrumentPositionSolveOption <= 1 )
+    if (m_instrumentPositionSolveOption == 1 )
       m_numberSpkPolySegments = 1;
     else
       m_numberSpkPolySegments = spkPolynomialSegments;
@@ -718,7 +718,7 @@ namespace Isis {
   /**
    * Accesses the instrument position solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the
+   * @return BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the
    *     instrument position solve option
    */
   BundleObservationSolveSettings::InstrumentPositionSolveOption
@@ -730,7 +730,7 @@ namespace Isis {
   /**
    * Accesses the degree of the polynomial fit to the original camera position (spkDegree).
    *
-   * @return @b int Returns the degree of the original camera position polynomial.
+   * @return int Returns the degree of the original camera position polynomial.
    */
   int BundleObservationSolveSettings::spkDegree() const {
     return m_spkDegree;
@@ -741,7 +741,7 @@ namespace Isis {
    * Accesses the degree of the camera position polynomial being fit to in the bundle adjustment
    * (spkSolveDegree).
    *
-   * @return @b int Returns the degree of the camera position polynomial in the bundle adjustment.
+   * @return int Returns the degree of the camera position polynomial in the bundle adjustment.
    */
   int BundleObservationSolveSettings::spkSolveDegree() const {
     return m_spkSolveDegree;
@@ -751,7 +751,7 @@ namespace Isis {
   /**
    * Accesses the number of segments in the position piecewise polynomial.
    *
-   * @return @b int Returns the number of segments in the position piecewise polynomial.
+   * @return int Returns the number of segments in the position piecewise polynomial.
    */
   int BundleObservationSolveSettings::numberSpkPolySegments() const {
     return m_numberSpkPolySegments;
@@ -761,7 +761,7 @@ namespace Isis {
   /**
    * Accesses the number of camera position coefficients in the solution.
    *
-   * @return @b int Returns the number of camera position coefficients.
+   * @return int Returns the number of camera position coefficients.
    */
   int BundleObservationSolveSettings::numberCameraPositionCoefficientsSolved() const {
     return m_numberCamPosCoefSolved;
@@ -771,7 +771,7 @@ namespace Isis {
   /**
    * Whether or not the polynomial for solving will be fit over an existing Hermite spline
    *
-   * @return @b bool Returns whether or not to fit the solve polynomial over an existing Hermite
+   * @return bool Returns whether or not to fit the solve polynomial over an existing Hermite
    *                 spline
    */
   bool BundleObservationSolveSettings::solvePositionOverHermite() const {
@@ -782,7 +782,7 @@ namespace Isis {
   /**
    * Accesses the a priori position sigmas.
    *
-   * @return @b QList<double> Returns a QList of the a priori position sigmas
+   * @return QList<double> Returns a QList of the a priori position sigmas
    */
   QList<double> BundleObservationSolveSettings::aprioriPositionSigmas() const {
     return m_positionAprioriSigma;
@@ -792,7 +792,7 @@ namespace Isis {
   /**
    * Accesses the SpicePosition interpolation type for the spacecraft position
    *
-   * @return @b SpicePosition::Source Returns the SpicePositon interpolation type for position
+   * @return SpicePosition::Source Returns the SpicePositon interpolation type for position
    */
   SpicePosition::Source BundleObservationSolveSettings::positionInterpolationType() const {
     return m_positionInterpolationType;
@@ -906,7 +906,7 @@ namespace Isis {
    * @param qName
    * @param atts
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we decide to use Xml handlers for serialization
@@ -1018,7 +1018,7 @@ namespace Isis {
   /**
    * @param ch
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we use Xml handlers for serialization.
@@ -1034,7 +1034,7 @@ namespace Isis {
    * @param localName
    * @param qName
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we use Xml handlers for serialization.

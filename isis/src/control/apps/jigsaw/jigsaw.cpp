@@ -328,11 +328,16 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
     angularAccelerationAprioriSigma = ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA");
   }
 
+  int pointingSegments = ui.GetInteger("POINTINGSEGMENTS");
+  if (pointingSolveOption == 0) {
+    pointingSegments = 0;
+  }
+
   observationSolveSettings.setInstrumentPointingSettings(pointingSolveOption,
                                                           ui.GetBoolean("TWIST"),
                                                           ui.GetInteger("CKDEGREE"),
                                                           ui.GetInteger("CKSOLVEDEGREE"),
-                                                          ui.GetInteger("POINTINGSEGMENTS"),
+                                                          pointingSegments,
                                                           ui.GetBoolean("OVEREXISTING"),
                                                           anglesAprioriSigma,
                                                           angularVelocityAprioriSigma,
@@ -355,10 +360,16 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
     positionAccelerationAprioriSigma = ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA");
   }
 
+  int positionSegments = ui.GetInteger("POSITIONSEGMENTS");
+  if (positionSolveOption == 0) {
+    positionSegments = 0;
+  }
+
+
   observationSolveSettings.setInstrumentPositionSettings(positionSolveOption,
                                                           ui.GetInteger("SPKDEGREE"),
                                                           ui.GetInteger("SPKSOLVEDEGREE"),
-                                                          ui.GetInteger("POSITIONSEGMENTS"),
+                                                          positionSegments,
                                                           ui.GetBoolean("OVERHERMITE"),
                                                           positionAprioriSigma,
                                                           positionVelocityAprioriSigma,

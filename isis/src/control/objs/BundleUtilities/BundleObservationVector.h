@@ -63,7 +63,15 @@ namespace Isis {
    *                           addNew(). References #4293.
    *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
    *                           -methods...
-   *                               int numberContinuityConstraintEquations
+   *                               int numberContinuityConstraintEquations()
+   *   @history 2017-11-01 Ken Edmundson Additional support for piecewise polynomials...
+   *                           -methods...
+   *                               int numberPositionParameters()
+   *                               int numberPointingParameters()
+   *                               int numberParameters()
+   *                               int numberPolynomialPositionSegments()
+   *                               int numberPolynomialPointingSegments()
+   *                               int numberPolynomialSegments()
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 
@@ -81,6 +89,11 @@ namespace Isis {
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
+
+      int numberPolynomialPositionSegments();
+      int numberPolynomialPointingSegments();
+      int numberPolynomialSegments();
+
       int numberContinuityConstraintEquations() const;
 
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);

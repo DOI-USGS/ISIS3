@@ -21,9 +21,10 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
-
     m_polyPositionSegmentIndex = 0;
-    m_polyRotationSegmentIndex = 0;
+    m_polyPointingSegmentIndex = 0;
+    m_normalsPositionBlockIndex = -1;
+    m_normalsPointingBlockIndex = -1;
   }
 
 
@@ -47,7 +48,9 @@ namespace Isis {
     m_parentBundleImage = src.m_parentBundleImage;
     m_parentObservation = src.m_parentObservation;
     m_polyPositionSegmentIndex = src.m_polyPositionSegmentIndex;
-    m_polyRotationSegmentIndex = src.m_polyRotationSegmentIndex;
+    m_polyPointingSegmentIndex = src.m_polyPointingSegmentIndex;
+    m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+    m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
   }
 
 
@@ -58,7 +61,7 @@ namespace Isis {
    *
    * @param src The source BundleMeasure to assign state from 
    *
-   * @return @b BundleMeasure& Returns a reference to this BundleMeasure
+   * @return BundleMeasure& Returns a reference to this BundleMeasure
    */
   BundleMeasure &BundleMeasure::operator=(const BundleMeasure &src) {
     // Prevent self assignment
@@ -68,7 +71,9 @@ namespace Isis {
       m_parentBundleImage = src.m_parentBundleImage;
       m_parentObservation = src.m_parentObservation;
       m_polyPositionSegmentIndex = src.m_polyPositionSegmentIndex;
-      m_polyRotationSegmentIndex = src.m_polyRotationSegmentIndex;
+      m_polyPointingSegmentIndex = src.m_polyPointingSegmentIndex;
+      m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+      m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
     }
 
     return *this;
@@ -106,8 +111,68 @@ namespace Isis {
     m_controlMeasure->SetRejected(reject); 
   }
 
+
   /**
-   * Sets index of position piecewise polynomial segment
+   * Sets position and rotation segment indices.
+   *
+   * @throws IException::Programmer "In BundleMeasure::setPolySegmentIndices:
+   *                                 parent observation has not been set."
+   *
+   * IMPORTANT NOTE: it is critical that Camera::SetImage has been called on this BundleMeasure's
+   * m_controlMeasure
+   */
+  void BundleMeasure::setPolySegmentIndices() {
+    if (!m_parentObservation) {
+      QString msg = "In BundleMeasure::setPolySegmentIndices: "
+                    "parent observation has not been set.\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    setPolyPositionSegmentIndex(m_parentObservation->polyPositionSegmentIndex());
+    setPolyPointingSegmentIndex(m_parentObservation->polyRotationSegmentIndex());
+  }
+
+
+  /**
+   * Sets the indices into the normal equation matrix position and pointing blocks.
+   *
+   * @throws IException::Programmer "In BundleMeasure::setNormalsBlockIndices:
+   *                                 parent observation has not been set."
+   */
+  void BundleMeasure::setNormalsBlockIndices() {
+    if (!m_parentObservation) {
+      QString msg = "In BundleMeasure::setNormalsBlockIndices: "
+                    "parent observation has not been set.\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    int normalsStartBlock = m_parentObservation->normalsMatrixStartBlock();
+
+    bool solveForPosition =
+        (m_parentObservation->solveSettings()->instrumentPositionSolveOption() >=
+         BundleObservationSolveSettings::PositionOnly) ? true : false;
+
+    bool solveForPointing =
+        (m_parentObservation->solveSettings()->instrumentPointingSolveOption() >=
+         BundleObservationSolveSettings::AnglesOnly) ? true : false;
+
+    if (solveForPosition) {
+      setNormalsPositionBlockIndex(normalsStartBlock + m_polyPositionSegmentIndex);
+
+      if (solveForPointing) {
+        setNormalsPointingBlockIndex(normalsStartBlock +
+                                     m_parentObservation->numberPolynomialPositionSegments() +
+                                     m_polyPointingSegmentIndex);
+      }
+    }
+    else if (solveForPointing) {
+      setNormalsPointingBlockIndex(normalsStartBlock + m_polyPointingSegmentIndex);
+    }
+  }
+
+
+  /**
+   * Sets index of position piecewise polynomial segment.
    *
    * @param index segment index
    *
@@ -118,20 +183,42 @@ namespace Isis {
 
 
   /**
-   * Sets index of rotation piecewise polynomial segment
+   * Sets index of rotation piecewise polynomial segment.
    *
    * @param index segment index
    *
    */
-  void BundleMeasure::setPolyRotationSegmentIndex(int index) {
-    m_polyRotationSegmentIndex = index;
+  void BundleMeasure::setPolyPointingSegmentIndex(int index) {
+    m_polyPointingSegmentIndex = index;
+  }
+
+
+  /**
+     * Sets block index into normal equations for position piecewise polynomial segment.
+     *
+     * @param index normal equations matrix block index.
+     *
+     */
+  void BundleMeasure::setNormalsPositionBlockIndex(int index) {
+    m_normalsPositionBlockIndex = index;
+  }
+
+
+  /**
+     * Sets block index into normal equations for pointing piecewise polynomial segment.
+   *
+   * @param index normal equations matrix block index.
+   *
+   */
+  void BundleMeasure::setNormalsPointingBlockIndex(int index) {
+    m_normalsPointingBlockIndex = index;
   }
 
 
   /**
    * Accesses index of position piecewise polynomial segment
    *
-   * @return @b int index of position piecewise polynomial segment
+   * @return int index of position piecewise polynomial segment
    */
   int BundleMeasure::polyPositionSegmentIndex() const {
     return m_polyPositionSegmentIndex;
@@ -139,31 +226,52 @@ namespace Isis {
 
 
   /**
-   * Accesses index of rotation piecewise polynomial segment
+   * Accesses index of rotation piecewise polynomial segment.
    *
-   * @return @b int index of rotation piecewise polynomial segment
+   * @return int index of rotation piecewise polynomial segment.
    */
-  int BundleMeasure::polyRotationSegmentIndex() const {
-    return m_polyRotationSegmentIndex;
+  int BundleMeasure::polyPointingSegmentIndex() const {
+    return m_polyPointingSegmentIndex;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of position piecewise polynomial segment.
+   *
+   * @return int block index into normal equations matrix of position piecewise polynomial.
+   *                segment
+   */
+  int BundleMeasure::positionNormalsBlockIndex() const {
+    return m_normalsPositionBlockIndex;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of pointing piecewise polynomial segment
+   *
+   * @return int block index into normal equations matrix of pointing piecewise polynomial
+   *                segment
+   */
+  int BundleMeasure::pointingNormalsBlockIndex() const {
+    return m_normalsPointingBlockIndex;
   }
 
 
   /**
    * Determines whether or not this BundleMeasure is rejected
    *
-   * @return @b bool Returns a boolean indicating whether this BundleMeasure is rejected
+   * @return bool Returns a boolean indicating whether this BundleMeasure is rejected
    */
   bool BundleMeasure::isRejected() const {
     return m_controlMeasure->IsRejected();
   }
-
 
   /**
    * Accesses the associated camera for this bundle measure
    *
    * @see ControlMeasure::camera()
    *
-   * @return @b Camera* Returns a pointer to the camera associated with this bundle measure
+   * @return Camera* Returns a pointer to the camera associated with this bundle measure
    */
   Camera *BundleMeasure::camera() const {
     return m_controlMeasure->Camera();
@@ -173,7 +281,7 @@ namespace Isis {
   /**
    * Accesses the parent BundleControlPoint for this bundle measure
    *
-   * @return @b BundleControlPoint* Returns a pointer to the parent BundleControlPoint
+   * @return BundleControlPoint* Returns a pointer to the parent BundleControlPoint
    */
   BundleControlPoint *BundleMeasure::parentControlPoint() {
     return m_parentControlPoint;
@@ -183,7 +291,7 @@ namespace Isis {
   /**
    * Access the parent BundleImage for this bundle measure
    *
-   * @return @b QSharedPointer<BundleImage> Returns a pointer to the parent BundleImage
+   * @return QSharedPointer<BundleImage> Returns a pointer to the parent BundleImage
    */
   QSharedPointer<BundleImage> BundleMeasure::parentBundleImage() {
     return m_parentBundleImage;
@@ -193,7 +301,7 @@ namespace Isis {
   /**
    * Accesses the parent BundleObservation for this bundle measure
    *
-   * @return @b QSharedPointer<BundleObservation> Returns a pointer to the parent BundleObservation
+   * @return QSharedPointer<BundleObservation> Returns a pointer to the parent BundleObservation
    */
   QSharedPointer<BundleObservation> BundleMeasure::parentBundleObservation() {
     return m_parentObservation;
@@ -205,7 +313,7 @@ namespace Isis {
    *
    * @see BundleObservation::solveSettings()
    *
-   * @return @b const QSharedPointer<BundleObservationSolveSettings> Returns a const pointer to
+   * @return const QSharedPointer<BundleObservationSolveSettings> Returns a const pointer to
    *     the BundleObservationSolveSettings for the parent BundleObservation
    * 
    * @throws IException::Programmer "In BundleMeasure::observationSolveSettings:
@@ -226,7 +334,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetSample()
    *
-   * @return @b double Returns the sample measurement for this control measure 
+   * @return double Returns the sample measurement for this control measure
    */
   double BundleMeasure::sample() const {
     return m_controlMeasure->GetSample();
@@ -238,7 +346,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetSampleResidual()
    *
-   * @return @b double Returns the sample residual
+   * @return double Returns the sample residual
    */
   double BundleMeasure::sampleResidual() const {
     return m_controlMeasure->GetSampleResidual();
@@ -250,7 +358,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetLine()
    *
-   * @return @b double Returns the line measurement for this control measure 
+   * @return double Returns the line measurement for this control measure
    */
   double BundleMeasure::line() const {
     return m_controlMeasure->GetLine();
@@ -262,7 +370,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetLineResidual()
    *
-   * @return @b double Returns the line residual
+   * @return double Returns the line residual
    */
   double BundleMeasure::lineResidual() const {
     return m_controlMeasure->GetLineResidual();
@@ -274,7 +382,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetResidualMagnitude()
    *
-   * @return @b double Returns the residual magnitude
+   * @return double Returns the residual magnitude
    */
   double BundleMeasure::residualMagnitude() const {
     return m_controlMeasure->GetResidualMagnitude();
@@ -286,7 +394,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetCubeSerialNumber()
    * 
-   * @return @b QString Returns the serial number of the cube that contains this control measure
+   * @return QString Returns the serial number of the cube that contains this control measure
    */
   QString BundleMeasure::cubeSerialNumber() const {
     return m_controlMeasure->GetCubeSerialNumber();
@@ -298,7 +406,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetFocalPlaneComputedX()
    *
-   * @return @b double Returns the computed focal plane x value
+   * @return double Returns the computed focal plane x value
    */
   double BundleMeasure::focalPlaneComputedX() const {
     return m_controlMeasure->GetFocalPlaneComputedX();
@@ -310,7 +418,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetFocalPlaneComputedY()
    *
-   * @return @b double Returns the computed focal plane y value
+   * @return double Returns the computed focal plane y value
    */
    double BundleMeasure::focalPlaneComputedY() const {
      return m_controlMeasure->GetFocalPlaneComputedY();
@@ -322,7 +430,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetFocalPlaneMeasuredX()
    *
-   * @return @b double Returns the measured focal plane x value
+   * @return double Returns the measured focal plane x value
    */
   double BundleMeasure::focalPlaneMeasuredX() const {
     return m_controlMeasure->GetFocalPlaneMeasuredX();
@@ -334,7 +442,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetFocalPlaneMeasuredY()
    *
-   * @return @b double Returns the measured focal plane y value
+   * @return double Returns the measured focal plane y value
    */
   double BundleMeasure::focalPlaneMeasuredY() const {
     return m_controlMeasure->GetFocalPlaneMeasuredY();
@@ -346,7 +454,7 @@ namespace Isis {
    *
    * @see BundleObservation::index()
    *
-   * @return @b int Returns the observation index of the parent observation
+   * @return int Returns the observation index of the parent observation
    * 
    * @throws IException::Programmer "In BundleMeasure::observationIndex:
    *                                 parent observation has not been set."
