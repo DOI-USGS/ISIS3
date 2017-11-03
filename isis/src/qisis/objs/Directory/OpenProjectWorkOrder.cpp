@@ -103,7 +103,7 @@ namespace Isis {
 
     // We dislike the progress bar
     delete progressBar();
-    
+
     if (success && !project()->isClean() && project()->isOpen() ) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
                              QString("Would you like to save your current project?"),
@@ -146,7 +146,15 @@ namespace Isis {
    *
    */
   void OpenProjectWorkOrder::execute() {
-    project()->open(m_projectName);
+    QStringList args = QCoreApplication::arguments();
+    if (args.count() == 2) {
+      project()->open(args.last());
+    }
+    else {
+      project()->open(m_projectName);
+    }
+
     project()->setClean(true);
+
   }
 }

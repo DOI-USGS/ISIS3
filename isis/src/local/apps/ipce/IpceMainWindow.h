@@ -94,13 +94,15 @@ namespace Isis {
    *                           the warning tab when a new warning happens.
    *                           Fixes #5041
    *   @history 2017-07-14 Cole Neubauer - Set Object name for Target/Sensor Widgets in addView
-   *                           Fixes #5059 
+   *                           Fixes #5059
    *                           Fixes #5041
    *   @history 2017-07-26 Cole Neubauer - Changed the closevent funtion to check if a project is
    *                           and prompt user accordingly Fixes #4960
-   *   @history 2017-08-09 Marjorie Hahn - Hard-coded the size of the icons in the toolbar to 
-   *                           temporarily fix the shift in size when switching between views 
+   *   @history 2017-08-09 Marjorie Hahn - Hard-coded the size of the icons in the toolbar to
+   *                           temporarily fix the shift in size when switching between views
    *                           until docked widgets are implemented. Fixes #5084.
+   *   @history 2017-10-06 Cole Neubauer - Made the open from command line use the WorkOrder
+   *                           Fixes #5171
    *   @history 2017-11-02 Tyler Wilson - Added the ability to read/write settings for recent
    *                            projects.  Also re-implemented the functionality for loading
    *                            recent projects in IPCE.  Fixes #4492.

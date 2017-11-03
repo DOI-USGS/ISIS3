@@ -122,6 +122,7 @@ namespace Isis {
     if (!destination.isEmpty()) {
       project()->save(destination);
       project()->open(destination);
+      project()->setClean(true);
     }
   }
 }

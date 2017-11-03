@@ -46,6 +46,9 @@ namespace Isis {
    *   @history 2017-08-08 Cole Neubauer - Removed project()->setClean call because
    *                            project()->open() calls clear() which changes it appropriately,
    *                            added open call in execution to load the newly saved project #5103
+   *   @history 2017-10-20 Cole Neubauer - readded project()->setClean call because
+   *                            project()->open() was changed and this needed to be updated to be
+   *                            recognized as a clean state #5171
    *
    */
   class SaveProjectAsWorkOrder : public WorkOrder {

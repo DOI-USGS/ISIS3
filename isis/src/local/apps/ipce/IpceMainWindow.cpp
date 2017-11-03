@@ -52,6 +52,7 @@
 #include "Project.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemTreeView.h"
+#include "OpenProjectWorkOrder.h"
 #include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
 
@@ -101,13 +102,6 @@ namespace Isis {
           "Could not create Directory.", _FILEINFO_);
     }
 
-    QStringList args = QCoreApplication::arguments();
-/**
-    if (args.count() == 2) {
-      qDebug() << args.last();
-      m_directory->project()->open(args.last());
-    }
-*/
     m_projectDock = new QDockWidget("Project", this, Qt::SubWindow);
     m_projectDock->setObjectName("projectDock");
     m_projectDock->setFeatures(QDockWidget::DockWidgetMovable |
@@ -177,7 +171,7 @@ namespace Isis {
     m_permToolBar = new QToolBar(this);
     m_activeToolBar = new QToolBar(this);
     m_toolPad = new QToolBar(this);
-    
+
     QSize iconSize(25, 45);
 
     m_permToolBar->setIconSize(iconSize);
@@ -197,8 +191,11 @@ namespace Isis {
     centralWidget->setTabsMovable(true);
     centralWidget->setTabsClosable(true);
 
+    QStringList args = QCoreApplication::arguments();
+
     if (args.count() == 2) {
-      m_directory->project()->open(args.last());
+      OpenProjectWorkOrder *workorder = new OpenProjectWorkOrder(m_directory->project());
+      workorder->execute();
     }
 
     // ken testing  If this is used, we will not need to call updateMenuActions() or updateToolBar()
@@ -406,7 +403,7 @@ namespace Isis {
    * QActions, the Directory, and the active view.
    */
   void IpceMainWindow::updateToolBarActions() {
-            
+
     m_permToolBar->clear();
     foreach ( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
@@ -427,7 +424,7 @@ namespace Isis {
         m_activeToolBar->addAction(action);
       }
     }
-    
+
     m_toolPad->clear();
     if (m_activeView) {
       foreach ( QAction *action, m_activeView->toolPadActions() ) {

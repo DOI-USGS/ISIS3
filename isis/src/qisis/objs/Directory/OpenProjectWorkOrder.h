@@ -45,6 +45,8 @@ namespace Isis {
    *                           method.
    *   @history 2017-07-12 Cole Neubauer - In setupExecution added functionallity to open a new
    *                           project while there is a project currently open. Fixes #4969
+   *   @history 2017-09-06 Cole Neubauer - Changed execute so it can be used to open a project
+   *                           from the command line Fixes #5174
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT
