@@ -92,7 +92,7 @@ namespace Isis {
       void setRejected(bool reject);
 
       void setPolySegmentIndices();
-      void setNormalsBlockIndices();
+      void setNormalsBlockIndices(int solveTargetBody=0);
       void setPolyPositionSegmentIndex(int index);
       void setPolyPointingSegmentIndex(int index);
       void setNormalsPositionBlockIndex(int index);

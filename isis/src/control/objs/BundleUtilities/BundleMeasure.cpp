@@ -139,7 +139,7 @@ namespace Isis {
    * @throws IException::Programmer "In BundleMeasure::setNormalsBlockIndices:
    *                                 parent observation has not been set."
    */
-  void BundleMeasure::setNormalsBlockIndices() {
+  void BundleMeasure::setNormalsBlockIndices(int solveTargetBody) {
     if (!m_parentObservation) {
       QString msg = "In BundleMeasure::setNormalsBlockIndices: "
                     "parent observation has not been set.\n";
@@ -157,16 +157,18 @@ namespace Isis {
          BundleObservationSolveSettings::AnglesOnly) ? true : false;
 
     if (solveForPosition) {
-      setNormalsPositionBlockIndex(normalsStartBlock + m_polyPositionSegmentIndex);
+      setNormalsPositionBlockIndex(normalsStartBlock + m_polyPositionSegmentIndex +
+                                   solveTargetBody);
 
       if (solveForPointing) {
         setNormalsPointingBlockIndex(normalsStartBlock +
                                      m_parentObservation->numberPolynomialPositionSegments() +
-                                     m_polyPointingSegmentIndex);
+                                     m_polyPointingSegmentIndex + solveTargetBody);
       }
     }
     else if (solveForPointing) {
-      setNormalsPointingBlockIndex(normalsStartBlock + m_polyPointingSegmentIndex);
+      setNormalsPointingBlockIndex(normalsStartBlock + m_polyPointingSegmentIndex +
+                                   solveTargetBody);
     }
   }
 

@@ -650,6 +650,62 @@ namespace Isis {
     m_sparseNormals.at(0)->setStartColumn(0);
 
     int nParameters = 0;
+    int blockColumn = 0;
+    if (m_bundleSettings->solveTargetBody()) {
+      nParameters += m_bundleSettings->numberTargetBodyParameters();
+      blockColumn = 1;
+    }
+
+    for (int i = 0; i < m_bundleObservations.size(); i++) {
+      int positionParameters =
+          m_bundleObservations.at(i)->numberPositionParametersPerSegment();
+
+      int pointingParameters =
+          m_bundleObservations.at(i)->numberPointingParametersPerSegment();
+
+      int positionSegments = m_bundleObservations.at(i)->numberPolynomialPositionSegments();
+      for (int j = 0; j < positionSegments; j++) {
+        m_sparseNormals.at(blockColumn)->setStartColumn(nParameters);
+        m_sparseNormals.at(blockColumn)->setObservationIndex(i);
+        nParameters += positionParameters;
+        blockColumn++;
+      }
+      int pointingSegments = m_bundleObservations.at(i)->numberPolynomialPointingSegments();
+      for (int j = 0; j < pointingSegments; j++) {
+        m_sparseNormals.at(blockColumn)->setStartColumn(nParameters);
+        m_sparseNormals.at(blockColumn)->setObservationIndex(i);
+        nParameters += pointingParameters;
+        blockColumn++;
+      }
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Initialize Normal Equations matrix (m_sparseNormals).
+   *
+   * @return bool.
+   *
+   * @todo Ken We are explicitly setting the start column for each SparseBlockColumn in the normal
+   *           equations matrix below. Is it possible to make the m_sparseNormals matrix smart
+   *           enough to set the start column of a column block automatically when it is added?
+   *
+   */
+/*
+  bool BundleAdjust::initializeNormalEquationsMatrix() {
+
+    int nBlockColumns = m_bundleObservations.numberPolynomialSegments();
+
+    if (m_bundleSettings->solveTargetBody())
+      nBlockColumns += 1;
+
+    m_sparseNormals.setNumberOfColumns(nBlockColumns);
+
+    m_sparseNormals.at(0)->setStartColumn(0);
+
+    int nParameters = 0;
     if (m_bundleSettings->solveTargetBody()) {
       nParameters += m_bundleSettings->numberTargetBodyParameters();
       m_sparseNormals.at(1)->setStartColumn(nParameters);
@@ -689,7 +745,7 @@ namespace Isis {
 
     return true;
   }
-
+*/
 
   /**
    * @brief Free CHOLMOD library variables.
@@ -1260,25 +1316,24 @@ namespace Isis {
 
 
   /**
-   * Form the auxilary normal equation matrices for a measure.
-   * N22, N12, n1, and n2 will contain the auxilary matrices when completed.
+   * Form the auxiliary normal equation matrices N22, N12, n1, and n2 for a measure.
    *
    * @param N22 The normal equation matrix for the point on the body.
    * @param N12 The normal equation matrix for the camera and the target body.
    * @param n1 The right hand side vector for the camera and the target body.
    * @param n2 The right hand side vector for the point on the body.
-   * @param coeffTarget The matrix containing target body pertial derivatives.
-   * @param coeffImagePosition Matrix containing camera position partial derivatives.
-   * @param coeffImagePointing Matrix containing camera orientation partial derivatives.
-   * @param coeffPoint3D The matrix containing point lat, lon, and radius partial derivatives.
-   * @param coeffRHS The vector containing weighted x,y residuals.
+   * @param coeffTarget Target body partial derivative matrix.
+   * @param coeffImagePosition Camera position partial derivative matrix.
+   * @param coeffImagePointing Camera orientation partial derivatives matrix.
+   * @param coeffPoint3D Control point lat, lon, and radius partial derivative matrix.
+   * @param coeffRHS Measure right hand side vector.
    * @param measure QSharedPointer to current measure.
    *
    * @return bool If the matrices were successfully formed.
    *
    * @see BundleAdjust::formNormalEquations
    */
-  bool BundleAdjust::formMeasureNormals(symmetric_matrix<double, upper>&N22,
+  bool BundleAdjust::formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22,
                                         SparseBlockColumnMatrix &N12,
                                         LinearAlgebra::VectorCompressed &n1,
                                         LinearAlgebra::Vector &n2,
@@ -1289,64 +1344,55 @@ namespace Isis {
                                         LinearAlgebra::Vector &coeffRHS,
                                         BundleMeasureQsp      measure) {
 
-//    static symmetric_matrix<double, upper> N11;
-    static matrix<double> N11TargetImage;
-/*
+    int positionBlockIndex = measure->positionNormalsBlockIndex();
+    int pointingBlockIndex = measure->pointingNormalsBlockIndex();
+
     // if we are solving for target body parameters
-    int numTargetPartials = coeffTarget.size2();
     if (m_bundleSettings->solveTargetBody()) {
-      blockIndex++;
+      int numTargetPartials = coeffTarget.size2();
 
       static vector<double> n1Target(numTargetPartials);
       n1Target.resize(numTargetPartials);
       n1Target.clear();
 
-      // form N11 (normals for target body)
-      N11.resize(numTargetPartials);
-      N11.clear();
-
-      N11 = prod(trans(coeffTarget), coeffTarget);
-
       // insert submatrix at column, row
       m_sparseNormals.insertMatrixBlock(0, 0, numTargetPartials, numTargetPartials);
 
-      (*(*m_sparseNormals[0])[0]) += N11;
+      // contribution to N11 matrix for target body
+      (*(*m_sparseNormals[0])[0]) += prod(trans(coeffTarget), coeffTarget);
 
-      // form portion of N11 between target and image
-      N11TargetImage.resize(numTargetPartials, coeffImage.size2());
-      N11TargetImage.clear();
-      N11TargetImage = prod(trans(coeffTarget),coeffImage);
+      // solving for position
+      if (positionBlockIndex >= 0) {
+        // portion of N11 between target and image
+        m_sparseNormals.insertMatrixBlock(positionBlockIndex, 0, numTargetPartials,
+                                          coeffImagePosition.size2());
 
-      m_sparseNormals.insertMatrixBlock(blockIndex, 0,
-                                        numTargetPartials, coeffImage.size2());
-      (*(*m_sparseNormals[blockIndex])[0]) += N11TargetImage;
+        (*(*m_sparseNormals[positionBlockIndex])[0]) += prod(trans(coeffTarget),coeffImagePosition);
+      }
+
+      // solving for pointing
+      if (pointingBlockIndex >= 0) {
+        // portion of N11 between target and image
+        m_sparseNormals.insertMatrixBlock(pointingBlockIndex, 0, numTargetPartials,
+                                          coeffImagePointing.size2());
+
+        (*(*m_sparseNormals[pointingBlockIndex])[0]) += prod(trans(coeffTarget),coeffImagePointing);
+      }
 
       // form N12 target portion
-      static matrix<double> N12Target(numTargetPartials, 3);
-      N12Target.clear();
-
-      N12Target = prod(trans(coeffTarget), coeffPoint3D);
-
-      // insert N12Target into N12
       N12.insertMatrixBlock(0, numTargetPartials, 3);
-      *N12[0] += N12Target;
+      *N12[0] += prod(trans(coeffTarget), coeffPoint3D);;
 
-      // form n1Target
-      n1Target = prod(trans(coeffTarget), coeffRHS);
+      // contribution to n1 vector
+      vector_range<LinearAlgebra::VectorCompressed >
+          n1_range (n1, range (0, numTargetPartials));
 
-      // insert n1Target into n1
-      for (int i = 0; i < numTargetPartials; i++) {
-        n1(i) += n1Target(i);
-      }
+      n1_range += prod(trans(coeffTarget), coeffRHS);
     }
-*/
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ below is ok (2015-06-03)
 // TODO - if solving for target (and/or self-cal) have to use not observationIndex below but
 // observationIndex plus 1 or 2
-
-    int positionBlockIndex = measure->positionNormalsBlockIndex();
-    int pointingBlockIndex = measure->pointingNormalsBlockIndex();
 
     // solving for position
     if (positionBlockIndex >= 0) {
@@ -1515,6 +1561,13 @@ namespace Isis {
    *
    * @return bool If the weights were successfully applied.
    *
+   * @throws IException::Programmer "In BundleAdjust::formWeightedNormals(): target body normals
+   *                                 matrix block is null."
+   * @throws IException::Programmer "In BundleAdjust::formWeightedNormals(): position segment
+   *                                 normals matrix block is null."
+   * @throws IException::Programmer "In BundleAdjust::formWeightedNormals(): pointing segment
+   *                                 normals matrix block is null."
+   *
    * @see BundleAdjust::formNormalEquations
    */
   bool BundleAdjust::formWeightedNormals(compressed_vector<double> &n1,
@@ -1523,8 +1576,30 @@ namespace Isis {
     m_bundleResults.resetNumberConstrainedImageParameters();
 
     int n = 0;
-
     int blockIndex = 0;
+
+    if (m_bundleSettings->solveTargetBody()) {
+      LinearAlgebra::Matrix *diagonalBlock = m_sparseNormals.getBlock(0, 0);
+      if (!diagonalBlock) {
+        QString msg = "In BundleAdjust::formWeightedNormals(): target body matrix block is null.\n";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      // get parameter weights for target body
+      vector<double> weights = m_bundleTargetBody->parameterWeights();
+      vector<double> corrections = m_bundleTargetBody->parameterCorrections();
+
+      for (size_t i = 0; i < diagonalBlock->size1(); i++) {
+        if (weights[i] > 0.0) {
+          (*diagonalBlock)(i,i) += weights[i];
+          nj[n] -= weights[i] * corrections(i);
+          m_bundleResults.incrementNumberConstrainedTargetParameters(1);
+        }
+        n++;
+      }
+      blockIndex = 1;
+    }
+
     for (int i = 0; i < m_bundleObservations.size(); i++) {
 
       BundleObservationQsp observation = m_bundleObservations.at(i);
@@ -1540,6 +1615,11 @@ namespace Isis {
       int totalSegments = observation->numberPolynomialSegments();
       for (int j = 0; j < positionSegments; j++) {
         LinearAlgebra::Matrix *diagonalBlock = m_sparseNormals.getBlock(blockIndex, blockIndex);
+        if (!diagonalBlock) {
+          QString msg = "In BundleAdjust::formWeightedNormals(): "
+                        "position segment normals matrix block is null.\n";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
 
         for (size_t k = 0; k < diagonalBlock->size1(); k++) {
           if (weights[weightIndex] > 0.0) {
@@ -1557,6 +1637,11 @@ namespace Isis {
       if (pointingSegments > 0) {
         for (int j = positionSegments; j < totalSegments; j++) {
           LinearAlgebra::Matrix *diagonalBlock = m_sparseNormals.getBlock(blockIndex, blockIndex);
+          if (!diagonalBlock) {
+            QString msg = "In BundleAdjust::formWeightedNormals(): "
+                          "pointing segment normals matrix block is null.\n";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
 
           for (size_t k = 0; k < diagonalBlock->size1(); k++) {
             if (weights[weightIndex] > 0.0) {
@@ -2045,18 +2130,15 @@ namespace Isis {
 
   /**
    * Compute partial derivatives and weighted residuals for a measure.
-   * coeffTarget, coeffImage, coeffPoint3D, and coeffRHS will be filled
+   * coeffTarget, coeffImagePosition, coeffImagePointing, coeffPoint3D, and coeffRHS will be filled
    * with the different partial derivatives.
    *
-   * @param coeffTarget A matrix that will contain target body
-   *                    partial derivatives.
-   * @param coeffImage A matrix that will contain camera position and orientation
-   *                   partial derivatives.
-   * @param coeffPoint3D A matrix that will contain point lat, lon, and radius
-   *                     partial derivatives.
-   * @param coeffRHS A vector that will contain weighted x,y residuals.
-   * @param measure The measure that partials are being computed for.
-   * @param point The point containing measure.
+   * @param coeffTarget Target body partial derivatives matrix.
+   * @param coeffImagePosition Camera position partial derivatives.
+   * @param coeffImagePointing Camera pointing partial derivatives.
+   * @param coeffPoint3D Control point lat, lon, and radius partial derivatives.
+   * @param coeffRHS Measure right hand side vector.
+   * @param measure QSharedPointer to BundleMeasure that partials are being computed for.
    *
    * @return bool If the partials were successfully computed.
    *
@@ -2107,7 +2189,12 @@ namespace Isis {
     // time dependent sensors.
     if (m_iteration == 1) {
       measure->setPolySegmentIndices();
-      measure->setNormalsBlockIndices();
+      if (m_bundleSettings->solveTargetBody()) {
+        measure->setNormalsBlockIndices(1);
+      }
+      else {
+        measure->setNormalsBlockIndices();
+      }
     }
 
     BundleControlPoint *point = measure->parentControlPoint();
@@ -2923,6 +3010,7 @@ namespace Isis {
         BundleObservationQsp observation;
         if (m_bundleSettings->solveTargetBody()) {
           observation = m_bundleObservations.at(i-1);
+          sigmaColumn = 0;
         }
         else {
           // reset sigma column if observation index has changed
