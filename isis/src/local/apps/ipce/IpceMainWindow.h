@@ -23,7 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QMainWindow>
+#include "ViewSubWindow.h"
 #include <QPointer>
 #include <QProgressBar>
 #include <QMdiSubWindow>
@@ -104,8 +104,13 @@ namespace Isis {
    *   @history 2017-10-06 Cole Neubauer - Made the open from command line use the WorkOrder
    *                           Fixes #5171
    *   @history 2017-11-02 Tyler Wilson - Added the ability to read/write settings for recent
-   *                            projects.  Also re-implemented the functionality for loading
-   *                            recent projects in IPCE.  Fixes #4492.
+   *                           projects.  Also re-implemented the functionality for loading
+   *                           recent projects in IPCE.  Fixes #4492.
+   *   @history 2017-11-03 Adam Goins - Modified the detached QMainWindow to be a ViewSubWindow
+   *                           so that we can capture the windowClose() signal and remove
+   *                           detached views from the m_detachedViews list appropriately.
+   *                           This fixes an issue where a detached view would appear to be
+   *                           open even after it has been closed. Fixes #5109.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -135,6 +140,7 @@ namespace Isis {
       void setTabbedViewMode();
       void setSubWindowViewMode();
 
+      void closeDetachedView();
       void detachActiveView();
       void reattachView();
 
@@ -156,7 +162,7 @@ namespace Isis {
       QPointer<Directory> m_directory;
 
       QDockWidget *m_projectDock;
-      QList<QMainWindow *> m_detachedViews; //!< List to keep track of any detached main windows
+      QList<ViewSubWindow *> m_detachedViews; //!< List to keep track of any detached main windows
       QDockWidget *m_warningsDock;
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program

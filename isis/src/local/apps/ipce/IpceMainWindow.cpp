@@ -22,7 +22,6 @@
  */
 #include "IpceMainWindow.h"
 
-
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
@@ -55,6 +54,7 @@
 #include "OpenProjectWorkOrder.h"
 #include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
+#include "ViewSubWindow.h"
 
 namespace Isis {
   /**
@@ -615,7 +615,6 @@ namespace Isis {
    */
   void IpceMainWindow::writeSettings(const Project *project) const {
 
-
     // Ensure that we are not using a NULL pointer
     if (!project) {
       QString msg = "Cannot write settings with a NULL Project pointer.";
@@ -647,9 +646,7 @@ namespace Isis {
     QMap<QString,QString> recentProjects;
 
     foreach (QString key,keys) {
-
       recentProjects[key]=globalSettings.value(key).toString();
-
     }
 
     QList<QString> projectPaths = recentProjects.values();
@@ -658,8 +655,6 @@ namespace Isis {
 
       //Clear out the recent projects before repopulating this group
       globalSettings.remove("");
-
-
 
       //If the currently open project is a project that has been saved and is not within the current
       //list of recently open projects, then remove the oldest project from the list.
@@ -680,50 +675,33 @@ namespace Isis {
 
       //Iterate through the recentProjects QMap and set the <key,val> pairs.
       for (i=recentProjects.begin();i!=recentProjects.end();i++) {
-
           globalSettings.setValue(i.key(),i.value());
-
-
       }
 
       //Get a unique time value for generating a key
       long t0 = QDateTime::currentMSecsSinceEpoch();
+
       QString projName = project->name();
-
-
-
-      QString t0String=QString::number(t0);   
+      QString t0String=QString::number(t0);
 
       //Save the project location
       if (!project->projectPath().contains("tmpProject") ) {
-              globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());                            
-
-
+              globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());
       }
-
     }
 
     //The numer of recent open projects is less than m_maxRecentProjects
     else {
 
-      long t0 = QDateTime::currentMSecsSinceEpoch();     
+      long t0 = QDateTime::currentMSecsSinceEpoch();
       QString projName = project->name();
-      QString t0String=QString::number(t0);  
+      QString t0String=QString::number(t0);
 
       if (!project->projectPath().contains("tmpProject") && !projectPaths.contains( project->projectPath() ) ) {
-        globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());      
+        globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());
       }
-
     }
-
-
     globalSettings.endGroup();
-
-
-
-
-
-
   }
 
 
@@ -750,7 +728,7 @@ namespace Isis {
     if (project->name() == "Project") {
       setWindowTitle("ipce");
     }
-    else {     
+    else {
       setWindowTitle( project->name() );
       QString projName = project->name();
       setWindowTitle(projName );
@@ -944,6 +922,21 @@ namespace Isis {
     m_tileViewsAction->setEnabled(true);
   }
 
+  /**
+   * Closes the detached window and removes it from the m_detachedViews list
+   */
+  void IpceMainWindow::closeDetachedView() {
+
+    ViewSubWindow *viewWindow = qobject_cast<ViewSubWindow *>( sender() );
+
+    if (!viewWindow) {
+      return;
+    }
+
+    m_detachedViews.removeAt(m_detachedViews.indexOf(viewWindow));
+    viewWindow->close();
+  }
+
 
   /**
    * Moves the active view from the mdi area to its own independent
@@ -966,7 +959,14 @@ namespace Isis {
       mdiArea->closeActiveSubWindow();
     }
 
-    QMainWindow *newWindow = new QMainWindow(this, Qt::Window);
+    ViewSubWindow *newWindow = new ViewSubWindow(this, Qt::Window);
+
+    connect( newWindow, SIGNAL( closeWindow() ),
+             this, SLOT( closeDetachedView() ) );
+
+    connect( newWindow, SIGNAL( closeWindow() ),
+             view, SLOT( deleteLater() ) );
+
     m_detachedViews.append(newWindow);
     newWindow->setCentralWidget(view);
     newWindow->setWindowTitle( view->windowTitle() );
@@ -1053,7 +1053,6 @@ namespace Isis {
       menuBar->addMenu(helpMenu);
     }
     newWindow->show();
-
   }
 
 
