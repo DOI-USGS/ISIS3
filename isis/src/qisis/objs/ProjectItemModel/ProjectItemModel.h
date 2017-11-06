@@ -114,8 +114,12 @@ namespace Isis {
    *                           Fixes #5113
    *   @history 2017-08-11 Christopher Combs - Added onTemplatesAdded() and connected it to the
    *                           signal sent by Project. Fixes #5086.
-   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
    *                           source images. Fixes #5105.
+   *   @history 2017-10-30 Adam Goins - Modified currentItem() to return the first selected item
+                               in the project tree if there is no valid currentIndex. This would
+                               happen if the user was interacting with a cubeDN or footprint view
+                               and then tried right clicking on the project tree. Fixes #5111.
    */
   class ProjectItemModel : public QStandardItemModel {
 

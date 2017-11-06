@@ -148,7 +148,16 @@ namespace Isis {
    * @return @b ProjectItem* The current item.
    */
   ProjectItem *ProjectItemModel::currentItem() {
-    return itemFromIndex( selectionModel()->currentIndex() );
+
+    ProjectItem *item = itemFromIndex( selectionModel()->currentIndex() );
+
+    // We do this because if the user was in a footprint or cubeDN view, then
+    // There is no valid currentIndex(). In that case, we grab whichever item
+    // was right clicked that triggered this call.
+    if (item == NULL) {
+      item = selectedItems().at(0);
+    }
+    return item;
   }
 
 
