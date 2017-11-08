@@ -37,6 +37,10 @@ namespace Isis {
    *                            addresses the immediate problem, but will have to be tackled
    *                            in a future ticket.  Fixes #5096.  References #4492.
    *   @history 2017-08-11 Cole Neubauer - Added some checks to avoid segfaults Fixes #5064
+   *   @history 2017-11-08 Tyler Wilson - Reverted the code change in #5096 to restore the 
+   *                            ProgressBar, and changed code in OpenRecentProjectsWorkOrder.cpp
+   *                            to prevent the segfault which #5096 was addressing.  Fixes #5149.
+   *
    */
   class HistoryTreeWidget : public QTreeWidget {
       Q_OBJECT

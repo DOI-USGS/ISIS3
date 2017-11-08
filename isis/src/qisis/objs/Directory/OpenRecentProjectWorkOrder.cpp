@@ -29,6 +29,7 @@
 #include <QStringList>
 
 #include "FileName.h"
+#include "ProgressBar.h"
 #include "Project.h"
 
 namespace Isis {
@@ -97,7 +98,7 @@ namespace Isis {
    */
   bool OpenRecentProjectWorkOrder::setupExecution() {
     bool success = WorkOrder::setupExecution();
-
+    delete progressBar();
     if (!success) return false;
 
     //success && !project()->isClean() && project()->isOpen()

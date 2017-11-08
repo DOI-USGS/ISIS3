@@ -53,6 +53,11 @@ namespace Isis {
    *                           project so when the user opens a project from the recent projects
    *                           menu it does not ask the user to save on exit if the project has not 
    *                           changed. Fixes # 5221.
+   *   @history 2017-11-08 Tyler Wilson - Added a line to delete the progress bar
+   *                                in setupExecution, to prevent a segfault
+   *                                from occurring in HistoryTreeWidget whenever a 
+   *                                a user attempted to open a recent project from
+   *                                the File Menu.  Fixes #5149.
    */
 
 
