@@ -42,13 +42,17 @@ namespace Isis {
    *
    * @internal
    *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
-   *              brought the code into compliance with ISIS3 coding standards.
-   *              References #3944.
+   *                          brought the code into compliance with ISIS3 coding standards.
+   *                          References #3944.
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    *   @history 2017-11-02 Tyler Wilson - Added support for opening recent projects
-   *                                consecutively from the Recent Projects menu in the same
-   *                                way that a user can open projects consecutively from
-   *                                the File menu.  References #4492.
+   *                           consecutively from the Recent Projects menu in the same
+   *                           way that a user can open projects consecutively from
+   *                           the File menu.  References #4492.
+   *   @history 2017-11-07 Makayla Shepherd - Set the project state to clean after opening the 
+   *                           project so when the user opens a project from the recent projects
+   *                           menu it does not ask the user to save on exit if the project has not 
+   *                           changed. Fixes # 5221.
    */
 
 

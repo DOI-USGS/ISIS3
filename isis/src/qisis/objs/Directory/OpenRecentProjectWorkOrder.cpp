@@ -135,7 +135,7 @@ namespace Isis {
     m_projectPath =toolTip();
     // Will this ever occur?
     if (m_projectPath.isEmpty()) return false;
-
+    
     QUndoCommand::setText(tr("Open Recent Project [%1]").arg(m_projectPath));
     return true;
   }
@@ -145,6 +145,6 @@ namespace Isis {
   */
   void OpenRecentProjectWorkOrder::execute() {
     project()->open(m_projectPath);
-    //project()->setClean(true);
+    project()->setClean(true);
   }
 }
