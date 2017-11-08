@@ -14,6 +14,8 @@ using namespace std;
  *
  * @internal
  *  @history 2017-01-11 Jeannie Backer - Original Version. Fixes #4584.
+ *  @history 2017-10-16 Kristin Berry - Updated for changes to dependency specification format and
+ *                        the addition of xml namspaces. References #5202
  */
 class TestTranslationManager : public LabelTranslationManager {
   public:
@@ -118,11 +120,11 @@ int main(void) {
     e.print();
   }
   try {
-    cout << endl << "Testing parseSpecification method: att@name:value" << endl;
+    cout << endl << "Testing parseSpecification method: att@name|value" << endl;
     transMgr.parseSpecification((QString)"att@name:value");
 
-    cout << endl << "Testing parseSpecification method: tag@name:value" << endl;
-    transMgr.parseSpecification((QString)"tag@name:value");
+    cout << endl << "Testing parseSpecification method: tag@name|value" << endl;
+    transMgr.parseSpecification((QString)"tag@name|value");
 
     cout << endl << "Testing parseSpecification method: att@name" << endl;
     transMgr.parseSpecification((QString)"att@name");
@@ -130,18 +132,37 @@ int main(void) {
     cout << endl << "Testing parseSpecification method: new@name" << endl;
     transMgr.parseSpecification((QString)"new@name");
 
-    cout << endl << "Testing parseSpecification method: name:value" << endl;
-    transMgr.parseSpecification((QString)"name:value");
+    cout << endl << "Testing parseSpecification method: name|value" << endl;
+    transMgr.parseSpecification((QString)"name|value");
 
     cout << endl << "Testing parseSpecification method: value" << endl;
     transMgr.parseSpecification((QString)"value");
 
-    cout << endl << "Testing parseSpecification method: att:name:value" << endl;
-    transMgr.parseSpecification((QString)"att:name:value");
+    cout << endl << "Testing parseSpecification method: namespace:name" << endl;
+    transMgr.parseSpecification((QString)"namespace:name");
+
+    cout << endl << "Testing parseSpecification method: namespace:name|value" << endl;
+    transMgr.parseSpecification((QString)"namespace:name|value");
+
+    cout << endl << "Testing parseSpecification method: att@namespace:name|value" << endl;
+    transMgr.parseSpecification((QString)"att@namepsace:name|value");
+
+    cout << endl << "Testing parseSpecification method: tag@name|value" << endl;
+    transMgr.parseSpecification((QString)"tag@namespace:name|value");
   }
   catch(IException &e) {
     e.print();
   }
+
+
+  try {
+    cout << endl << "Testing parseSpecification method: att|name|value" << endl;
+    transMgr.parseSpecification((QString)"att|name|value");
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
 
   try {
     cout << endl << "Testing parseSpecification method: att@name@value" << endl;
@@ -152,16 +173,16 @@ int main(void) {
   }
 
   try {
-    cout << endl << "Testing parseSpecification method: not@name:value" << endl;
-    transMgr.parseSpecification((QString)"not@name:value");
+    cout << endl << "Testing parseSpecification method: not@name|value" << endl;
+    transMgr.parseSpecification((QString)"not@name|value");
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    cout << endl << "Testing parseSpecification method: att@name:value1:value2" << endl;
-    transMgr.parseSpecification((QString)"att@name:value1:value2");
+    cout << endl << "Testing parseSpecification method: att@name|value1|value2" << endl;
+    transMgr.parseSpecification((QString)"att@name|value1|value2");
   }
   catch(IException &e) {
     e.print();

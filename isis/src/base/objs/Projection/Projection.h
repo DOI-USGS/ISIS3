@@ -159,6 +159,8 @@ namespace Isis {
    *                           method which sometimes erroneously threw an exception. Added caching
    *                           to the TargetRadii(QString) method for performance reasons.
    *                           Fixes #1534.
+   *   @history 2017-06-26 Jesse Mapel - Added a new method to set the universal ground point
+   *                           without adjusting for the longitude domain. Fixes #2185.
    *
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
@@ -243,6 +245,7 @@ namespace Isis {
 
       // Set the universal ground coordinate (calls SetGround)
       virtual bool SetUniversalGround(const double coord1, const double coord2);
+      virtual bool SetUnboundUniversalGround(const double coord1, const double coord2);
 
       // Set world position (calls SetCoordinate on projected x/y)
       bool SetWorld(const double x, const double y);

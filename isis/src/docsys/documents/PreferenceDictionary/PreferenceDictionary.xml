@@ -67,6 +67,19 @@ EndGroup
 </pre>
 </p>
 
+<h2><a name="ShapeModel">ShapeModel</a></h2>
+<p>
+These parameters control which ray-tracing engine is used for working with shapemodels. To use the ISIS3 default, omit or comment-out the ShapeModel group. 
+The tolerance is to check the visibility or occlusion of a point and is in kilometers.
+<pre style="padding-left:4em;">
+Group = ShapeModel
+  RayTraceEngine = Bullet | Embree
+  OnError = Continue | Fail
+  Tolerance = 0.001
+EndGroup
+</pre>
+</p>
+
 <h2><a name="CubeCustomization">Cube Customization</a></h2>
 <p>
 The user can control how specific attributes of cube I/O are performed.  In particular, they can specify whether programs will 1) automatically overwrite an existing cube or issue and error message, 2) generate a single attached file containing labels, history, and cube data or detached cube with three files (label, history, data), 3) automatically gather statistics as the data is written to disk and record the computations in the labels, and 4) record a history entry of the program in the cube file.

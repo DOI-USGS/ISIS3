@@ -1779,11 +1779,12 @@ namespace Isis {
              QApplication::keyboardModifiers() &&
              Qt::ControlModifier) {
 
-        QString fileName = p_cube->fileName();
-    
-        // Grabs the clipboard and copies the file name into it.
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(fileName);
+      //QString fileName = p_cube->fileName();
+      QFileInfo fileName = p_cube->fileName();
+
+      // Grabs the clipboard and copies the file name into it.
+      QClipboard *clipboard = QApplication::clipboard();
+      clipboard->setText(fileName.absoluteFilePath());
     }
     else {
       QAbstractScrollArea::keyPressEvent(e);

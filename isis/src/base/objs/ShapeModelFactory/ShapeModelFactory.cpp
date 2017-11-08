@@ -162,7 +162,6 @@ namespace Isis {
 
       QString preferred = parameters.get("RayTraceEngine", "None").toLower();
       QString onerror   = parameters.get("OnError", "Continue").toLower();
-      bool    cubeSupported = toBool(parameters.get("CubeSupported", "False"));
       double  tolerance = toDouble(parameters.get("Tolerance", toString(DBL_MAX)));
 
       // A file error message will be appened to the finalError, if no shape model is constructed.
@@ -175,14 +174,14 @@ namespace Isis {
         // Check to see of ISIS cube DEMs get a pass
         FileName v_shapefile(shapeModelFilenames);
         QString ext = v_shapefile.extension().toLower();
-        bool cubeErrorContinue = ( ("cub" == ext) && (!cubeSupported) );
+        // Cubes are not supported at this time. 
 
         try {
           BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
           if ( 0 == bullet ) {
 
             // Bullet failed to load the kernel...test failure conditions
-            if ( ("cub" == ext) && cubeSupported ) {
+            if ("cub" == ext) {
               onerror = "fail";   // This is fatal no matter the condition
               QString mess = "Bullet could not initialize ISIS Cube DEM";
               throw IException(IException::Unknown, mess, _FILEINFO_);
@@ -201,8 +200,6 @@ namespace Isis {
             // Do this here, otherwise default behavior will ensue from here on out
             kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
             kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
-            kernelsPvlGroup.addKeyword(PvlKeyword("CubeSupported", toString(cubeSupported)),
-                                                  PvlContainer::Replace);
             kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
                                                   PvlContainer::Replace);
 
@@ -212,7 +209,7 @@ namespace Isis {
           fileError.append(ie);
           QString mess = "Unable to create preferred BulletShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
-          if ( ("fail" == onerror) && (!cubeErrorContinue) ) throw fileError;
+          if ("fail" == onerror) throw fileError;
         }
 
         // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23) 
@@ -224,8 +221,7 @@ namespace Isis {
         // Check to see of ISIS cube DEMs get a pass
         FileName v_shapefile(shapeModelFilenames);
         QString ext = v_shapefile.extension().toLower();
-        // TODO make an embreeCubeSupported boolean and check that instead
-        bool cubeErrorContinue = ( ("cub" == ext) && (!cubeSupported) );
+        // Cubes are not supported at this time
 
         try {
 
@@ -238,8 +234,6 @@ namespace Isis {
           // Do this here, otherwise default behavior will ensue from here on out
           kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
           kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
-          kernelsPvlGroup.addKeyword(PvlKeyword("CubeSupported", toString(cubeSupported)),
-                                                PvlContainer::Replace);
           kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
                                                 PvlContainer::Replace);
 
@@ -249,7 +243,7 @@ namespace Isis {
           fileError.append(ie);
           QString mess = "Unable to create preferred EmbreeShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
-          if ( ("fail" == onerror) && (!cubeErrorContinue) ) throw fileError;
+          if ("fail" == onerror) throw fileError;
         }
       }
 

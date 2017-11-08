@@ -45,7 +45,8 @@ namespace Isis {
    *                           selected item to be deleted is actually an image list, so that
    *                           each image can be removed one by one. Fixes #5074.
    *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
-   *                          Fixes #5064
+   *                          Fixes #5064.
+   *   @history 2017-10-01 Cole Neubauer - Reimplemented remove images count Fixes #4998.
    *   @history 2017-11-02 Tyler Wilson - Added a null pointer check to the images variable in
    *                           isExecutable to prevent potential seg faults.  References #4492.
    */

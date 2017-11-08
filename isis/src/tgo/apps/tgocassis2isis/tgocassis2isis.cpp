@@ -27,22 +27,22 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-
+    // fails 
     importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
     Cube *outputCube = importer.SetOutputCube("TO");
-
+    // fails above
     translateLabels(xmlFileName, outputCube);
-  
+
     FileName outputCubeFileName(ui.GetFileName("TO"));
-  
+
     OriginalXmlLabel xmlLabel;
     xmlLabel.readFromXmlFile(xmlFileName);
-  
+
     importer.StartProcess();
-  
+
     // Write out original label before closing the cube
     outputCube->write(xmlLabel);
-  
+
     importer.EndProcess();
   }
   catch (IException &e) {

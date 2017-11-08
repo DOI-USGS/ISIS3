@@ -50,6 +50,28 @@ Group = ErrorFacility
 EndGroup
 
 ########################################################
+# Specify which ray-tracing engine to use for shape
+# models.
+# 
+# Leave the ShapeModel Group commented-out to continue
+# using the ISIS3 default. 
+#
+# RayTraceEngine = Bullet | Embree
+# OnError = Continue | Fail
+# Tolerance = { numerical value that will be set as the
+#           tolerance for the Bullet or Embree shape
+#           model } 
+# 
+########################################################
+
+#Group = ShapeModel
+#  RayTraceEngine = Embree
+#  OnError = Continue
+#  CubeSupported = False
+#  Tolerance = DBL_MAX
+#EndGroup
+
+########################################################
 # Customize how session logging is handled
 #
 # TerminalOutput = On | Off

@@ -192,7 +192,6 @@ namespace Isis {
    * @param cvp
    */
   void SpectralPlotWindow::setViewport(MdiCubeViewport *cvp) {
-    if (cvp == NULL) return;
     m_cvp = cvp;
 
   }

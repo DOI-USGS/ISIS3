@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QImage>
 #include <QMenu>
 #include <QMessageBox>
@@ -871,8 +872,10 @@ namespace Isis {
 
           CubeViewport* cubeViewport = openCubes.value(i);
 
-          QString cubeFileName(cubeViewport->cube()->fileName());
-          cubeFilePaths.append(cubeFileName);
+//          QString cubeFileName(cubeViewport->cube()->fileName());
+          QFileInfo cubeFileName(cubeViewport->cube()->fileName());
+
+          cubeFilePaths.append(cubeFileName.absoluteFilePath());
       }
 
       QString fileName = QFileDialog::getSaveFileName((QWidget *) parent(),
