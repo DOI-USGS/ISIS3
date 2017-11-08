@@ -179,6 +179,9 @@ namespace Isis {
    *                           when there is only one control in the project. Fixes #5160.
    *   @history 2017-11-02 Tyler Wilson - Added support for opening Recent Projects from the
    *                           File Menu.  Fixes #4492.
+   *   @history 2017-11-08 Ian Humphrey - Changed save() from a void to a bool return value. This
+   *                           indicates if the save dialog (for a temp project) is successfully
+   *                           saved (i.e. not cancelled). Fixes #5205.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -277,7 +280,7 @@ namespace Isis {
 
       void removeImages(ImageList &imageList);
 
-      void save();
+      bool save();
       void save(FileName newPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);

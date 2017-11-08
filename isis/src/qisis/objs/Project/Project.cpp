@@ -2059,7 +2059,23 @@ namespace Isis {
   }
 
 
-  void Project::save() {
+  /**
+   * Generic save method to save the state of the project.
+   *
+   * This method is used to save the state of the project. If the project is currently a temporary
+   * project, this method will create a file dialog to prompt the user for a place/name to save
+   * the project as. Otherwise, the existing project state will be saved. This method also informs
+   * the caller whether or not the save occurred. It is possible for a save to NOT occur if the
+   * project is a temporary project and the user cancels/closes the dialog prompt.
+   *
+   * @return @b bool Returns true if the save completed. The save is considered incomplete if the
+   * project is a temporary project and the user either cancels or closes the file dialog prompt
+   * that is created.
+   */
+  bool Project::save() {
+    // Let caller know if the save dialog was cancelled
+    bool saveDialogCompleted = true;
+
     if (m_isTemporaryProject) {
       QString newDestination = QFileDialog::getSaveFileName(NULL,
                                                             QString("Project Location"),
@@ -2073,10 +2089,16 @@ namespace Isis {
         relocateProjectRoot(newDestination);
         m_isTemporaryProject = false;
       }
+      // Dialog was cancelled
+      else {
+        saveDialogCompleted = false;
+      }
     }
     else {
       save(m_projectRoot->absolutePath(), false);
     }
+
+    return saveDialogCompleted;
   }
 
 
