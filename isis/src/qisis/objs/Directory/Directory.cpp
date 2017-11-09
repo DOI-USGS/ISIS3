@@ -76,7 +76,6 @@
 #include "MosaicControlNetTool.h"
 #include "MosaicSceneWidget.h"
 #include "OpenProjectWorkOrder.h"
-#include "OpenRecentProjectWorkOrder.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -165,7 +164,6 @@ namespace Isis {
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();      
-      m_openRecentProjectWorkOrder = createWorkOrder<OpenRecentProjectWorkOrder>();
       m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
       m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
@@ -324,11 +322,12 @@ namespace Isis {
       if (!projectFileName.fileExists() )
         continue;
 
-      QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
+      QAction *openRecentProjectAction = m_openProjectWorkOrder->clone();
 
-      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
-           ->isExecutable(m_recentProjects.at(i) ) )
+      if ( !( (OpenProjectWorkOrder*)openRecentProjectAction )
+           ->isExecutable(m_recentProjects.at(i),true ) )
         continue;
+
 
       QString projName = m_recentProjects.at(i).split("/").last();      
       openRecentProjectAction->setText(m_recentProjects.at(i).split("/").last() );

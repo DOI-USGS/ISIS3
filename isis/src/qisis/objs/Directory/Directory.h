@@ -190,6 +190,8 @@ namespace Isis {
    *   @history 2017-11-02 Tyler Wilson - Added the updateRecentProjects() function which
    *                           updates the Recent Projects file menu with recently loaded projects.
    *                           Fixes #4492.
+   *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
+   *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
    */
   class Directory : public QObject {
     Q_OBJECT

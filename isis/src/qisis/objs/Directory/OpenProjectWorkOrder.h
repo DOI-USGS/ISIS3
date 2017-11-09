@@ -47,6 +47,9 @@ namespace Isis {
    *                           project while there is a project currently open. Fixes #4969
    *   @history 2017-09-06 Cole Neubauer - Changed execute so it can be used to open a project
    *                           from the command line Fixes #5174
+   *   @history 2017-11-09 Tyler Wilson - Made changes to isExecutable() to import functionality
+   *                           needed in OpenRecentProjectWorkOrder into OpenProjectWorkOrder
+   *                           since OpenRecentProjectWorker is being deleted.  Fixes #5220.
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -57,17 +60,21 @@ namespace Isis {
 
       virtual OpenProjectWorkOrder *clone() const;
 
+
+      bool isExecutable(QString projectFileName, bool recentProject=false);
       bool setupExecution();
       void execute();
+      void setRecent(bool isRecent);
 
     signals:
       void openProjectFromCommandLine(QString);
 
     private:
       OpenProjectWorkOrder &operator=(const OpenProjectWorkOrder &rhs);
+      bool m_recentProject;
 
       bool m_startingState;
-      QString m_projectName;
+      QString m_projectPath;
   };
 }
 

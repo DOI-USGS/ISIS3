@@ -26,13 +26,16 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStringList>
 #include <QtConcurrentMap>
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "SaveProjectWorkOrder.h"
 #include "ProgressBar.h"
 #include "Project.h"
+
 
 namespace Isis {
 
@@ -45,9 +48,9 @@ namespace Isis {
       WorkOrder(project) {
 
     // This workorder is not undoable
-    m_isUndoable = false;
-
+    m_isUndoable = false;   
     QAction::setText(tr("&Open Project"));
+
     QUndoCommand::setText(tr("Open Project"));
     setCreatesCleanState(true);
 
@@ -60,6 +63,7 @@ namespace Isis {
 //    project->open(args.last());
 //    }
   }
+
 
 
   /**
@@ -89,6 +93,22 @@ namespace Isis {
     return new OpenProjectWorkOrder(*this);
   }
 
+
+
+  /**
+   * @brief This function determines if the given project file name can be opened.
+   * @param projectFileName  The path to the project file.
+   * @return @b bool True if the file exists, False otherwise.
+   */
+  bool OpenProjectWorkOrder::isExecutable(QString projectFileName, bool recentProject) {
+
+    m_recentProject = recentProject;
+    FileName fname = projectFileName;
+    if (!fname.fileExists() )
+      return false;
+
+    return true;
+  }
 
   /**
    * @brief Setup this WorkOrder for execution, deleting the progress bar, determine if there
@@ -126,16 +146,26 @@ namespace Isis {
     }
 
     if (success) {
-      m_projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
+      if ("Open Project" == toolTip()) {
+        m_projectPath = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
                                                               tr("Select Project Directory"));
+        if (!m_projectPath.isEmpty()) {
+          QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectPath));
+        }
+      }
+        else {
 
-      if (!m_projectName.isEmpty()) {
-        QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectName));
+           m_projectPath =toolTip();
+
+          //We are dealing with a recent project
+
+            }
+
       }
       else {
         success = false;
       }
-    }
+
 
     return success;
   }
@@ -150,8 +180,8 @@ namespace Isis {
     if (args.count() == 2) {
       project()->open(args.last());
     }
-    else {
-      project()->open(m_projectName);
+    else {     
+      project()->open(m_projectPath);
     }
 
     project()->setClean(true);
