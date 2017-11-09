@@ -59,6 +59,10 @@ namespace Isis {
    *                           track whether this step has happened Fixes #5026
    *   @history 2017-08-11 Cole Neuabuer - Added try catch throw to make it so importing an invalid
    *                           control net throws some type of error/warning Fixes #5064
+   *   @history 2017-11-09 Tyler Wilson - Modified the copyToNewProjectRoot function so that the 
+   *                           control net is copied to it's new location like a binary file,
+   *                           instead of being recreated from scratch by calling it's write method.
+   *                           Fixes #5212.
    */
   class Control : public QObject {
     Q_OBJECT
