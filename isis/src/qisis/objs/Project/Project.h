@@ -482,7 +482,7 @@ namespace Isis {
 
     private:
 
-      const int m_maxRecentProjects = 5;
+      static const int m_maxRecentProjects = 5;
       QDir *m_projectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
