@@ -248,19 +248,13 @@ namespace Isis {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        // Convert stored entries in meters**2 to km**2 for bundle adjustment
-        covar(0, 0) = fileEntry.aprioricovar(0)*1.0e-6;
-        covar(0, 1) = fileEntry.aprioricovar(1)*1.0e-6;
-        covar(0, 2) = fileEntry.aprioricovar(2)*1.0e-6;
-        covar(1, 1) = fileEntry.aprioricovar(3)*1.0e-6;
-        covar(1, 2) = fileEntry.aprioricovar(4)*1.0e-6;
-        covar(2, 2) = fileEntry.aprioricovar(5)*1.0e-6;
-        // covar(0, 0) = fileEntry.aprioricovar(0);
-        // covar(0, 1) = fileEntry.aprioricovar(1);
-        // covar(0, 2) = fileEntry.aprioricovar(2);
-        // covar(1, 1) = fileEntry.aprioricovar(3);
-        // covar(1, 2) = fileEntry.aprioricovar(4);
-        // covar(2, 2) = fileEntry.aprioricovar(5);
+        // Convert stored entries in meters**2 to km**2 because SurfacePoint expects km**2
+        covar(0, 0) = fileEntry.aprioricovar(0)/1.0e6;
+        covar(0, 1) = fileEntry.aprioricovar(1)/1.0e6;
+        covar(0, 2) = fileEntry.aprioricovar(2)/1.0e6;
+        covar(1, 1) = fileEntry.aprioricovar(3)/1.0e6;
+        covar(1, 2) = fileEntry.aprioricovar(4)/1.0e6;
+        covar(2, 2) = fileEntry.aprioricovar(5)/1.0e6;
         apriori.SetRectangularMatrix(covar);
 
         if (Displacement(covar(0, 0), Displacement::Kilometers).isValid() ||
@@ -302,19 +296,13 @@ namespace Isis {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        // covar(0, 0) = fileEntry.adjustedcovar(0);
-        // covar(0, 1) = fileEntry.adjustedcovar(1);
-        // covar(0, 2) = fileEntry.adjustedcovar(2);
-        // covar(1, 1) = fileEntry.adjustedcovar(3);
-        // covar(1, 2) = fileEntry.adjustedcovar(4);
-        // covar(2, 2) = fileEntry.adjustedcovar(5);
-        // Convert stored entries in meters**2 to km**2 for bundle adjustment
-        covar(0, 0) = fileEntry.adjustedcovar(0)*1.0e-6;
-        covar(0, 1) = fileEntry.adjustedcovar(1)*1.0e-6;
-        covar(0, 2) = fileEntry.adjustedcovar(2)*1.0e-6;
-        covar(1, 1) = fileEntry.adjustedcovar(3)*1.0e-6;
-        covar(1, 2) = fileEntry.adjustedcovar(4)*1.0e-6;
-        covar(2, 2) = fileEntry.adjustedcovar(5)*1.0e-6;
+        // Convert stored entries in meters**2 to km**2 because SurfacePoint expects km**2
+        covar(0, 0) = fileEntry.adjustedcovar(0)/1.0e6;
+        covar(0, 1) = fileEntry.adjustedcovar(1)/1.0e6;
+        covar(0, 2) = fileEntry.adjustedcovar(2)/1.0e6;
+        covar(1, 1) = fileEntry.adjustedcovar(3)/1.0e6;
+        covar(1, 2) = fileEntry.adjustedcovar(4)/1.0e6;
+        covar(2, 2) = fileEntry.adjustedcovar(5)/1.0e6;
         adjusted.SetRectangularMatrix(covar);
       }
 

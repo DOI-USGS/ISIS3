@@ -346,6 +346,9 @@ namespace Isis {
    *                           conversions in the BundleAdjust in the FileEntryV0002 version of the 
    *                           constructor and likewise modified the method ToFileEntry to convert
    *                           the var/covar entries back to meters**2.
+   *   @history 2017-11-10  Debbie A. Cook - Changed multiply by 1.0e-6 to divide by
+   *                           1.0e6 to avoid round-off error that caused the binary files to
+   *                           not match in the unit test.
    */
   class ControlPoint : public QObject {
 
