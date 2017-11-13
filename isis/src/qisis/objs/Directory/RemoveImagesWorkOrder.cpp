@@ -68,10 +68,7 @@ namespace Isis {
    */
   bool RemoveImagesWorkOrder::isExecutable(ImageList *images) {
 
-    if (images) {
-      return (images->count() > 0);
-    }
-    return false;
+    return true;
   }
 
 

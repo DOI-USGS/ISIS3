@@ -49,6 +49,9 @@ namespace Isis {
    *   @history 2017-10-01 Cole Neubauer - Reimplemented remove images count Fixes #4998.
    *   @history 2017-11-02 Tyler Wilson - Added a null pointer check to the images variable in
    *                           isExecutable to prevent potential seg faults.  References #4492.
+   *   @history 2017-11-13 Summer Stapleton - Changed isExecutable to always return true as there
+   *                           should never be any time that you should not be able to delete an
+   *                           imageList (Import). Fixes #5183
    */
   class RemoveImagesWorkOrder : public WorkOrder {
       Q_OBJECT
