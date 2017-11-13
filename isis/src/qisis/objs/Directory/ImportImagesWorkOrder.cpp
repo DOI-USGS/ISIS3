@@ -136,7 +136,7 @@ namespace Isis {
           tr("Import Images"), "",
           tr("Isis cubes and list files (*.cub *.lis);;All Files (*)"));
 
-      QStringList stateToSave;
+      QStringList* stateToSave = new QStringList();
 
       if (!fileNames.isEmpty()) {
         foreach (FileName fileName, fileNames) {
@@ -146,21 +146,29 @@ namespace Isis {
             QString lineOfListFile;
 
             while (listFile.GetLine(lineOfListFile)) {
-              if (lineOfListFile.contains(path)){
-                stateToSave.append(lineOfListFile);
+              FileName relFileName(path + "/" + lineOfListFile);
+              if (relFileName.fileExists() ) {
+                stateToSave->append(path + "/" + lineOfListFile);
               }
               else {
-                stateToSave.append(path + "/" + lineOfListFile);
+                FileName absFileName(lineOfListFile);
+                if ( absFileName.fileExists() && lineOfListFile.startsWith("/") ) {
+                  stateToSave->append(lineOfListFile);
+                }
+
+                else {
+                  project()->warn("File " + lineOfListFile + " not found");
+                }
               }
             }
           }
           else {
-            stateToSave.append(fileName.original());
+            stateToSave->append(fileName.original());
           }
         }
 
         QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
-        if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
+        if (stateToSave->count() >= 100 && project()->isTemporaryProject()) {
           saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
                    tr("Save Project Before Importing Images"),
                    tr("Would you like to save your project <b>before</b> importing images? It can be "
@@ -176,7 +184,7 @@ namespace Isis {
         }
 
         QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
-        if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
+        if (!stateToSave->isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
           copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
                    tr("Copy Images into Project"),
                    tr("Should images (DN data) be copied into project?"),
@@ -186,23 +194,23 @@ namespace Isis {
 
         bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
 
-        stateToSave.prepend(copyDnData? "copy" : "nocopy");
+        stateToSave->prepend(copyDnData? "copy" : "nocopy");
 
         if (fileNames.count() > 1) {
-          QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
+          QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave->count() - 1));
         }
-        else if (fileNames.count() == 1 && stateToSave.count() > 2) {
+        else if (fileNames.count() == 1 && stateToSave->count() > 2) {
           QUndoCommand::setText(tr("Import %1 Images from %2").arg(
-                        QString::number(stateToSave.count() - 1), fileNames.first()));
+                        QString::number(stateToSave->count() - 1), fileNames.first()));
         }
         else {
           QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
         }
 
         // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
-        setInternalData(stateToSave);
+        setInternalData(*stateToSave);
 
-        bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
+        bool doImport = stateToSave->count() > 1 && saveProjectAnswer != QMessageBox::Cancel &&
                         copyImagesAnswer != QMessageBox::Cancel;
 
         return doImport;
@@ -298,7 +306,7 @@ namespace Isis {
     try {
       if (!m_newImages->isEmpty()) {
         project()->addImages(*m_newImages);
-      m_list = project()->images().last();
+        m_list = project()->images().last();
 
         delete m_newImages;
         m_newImages = NULL;

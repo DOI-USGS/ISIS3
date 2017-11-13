@@ -86,6 +86,8 @@ namespace Isis {
    *   @history 2017-11-02 Tyler Wilson - Added a null pointer check around ProjectItem *item pointer
    *                           in isExecutable to prevent potential seg faults.  References #4492.
    *
+   *   @history 2017-11-13 Cole Neubauer - Fixed apsolute paths not being read correctly in cubelis
+   *                           Fixes #4956
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT
