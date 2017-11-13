@@ -137,6 +137,7 @@ namespace Isis {
 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
+    connect(m_projectItemModel, SIGNAL(cleanProject(bool)), SIGNAL(cleanProject(bool)));
 
 //  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
 

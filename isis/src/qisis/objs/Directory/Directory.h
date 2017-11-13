@@ -191,10 +191,13 @@ namespace Isis {
    *   @history 2017-11-02 Tyler Wilson - Added the updateRecentProjects() function which
    *                           updates the Recent Projects file menu with recently loaded projects.
    *                           Fixes #4492.
-   *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
-   *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
+   *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
+   *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *                           not clean. Fixes #5174.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -313,6 +316,8 @@ namespace Isis {
 
       void cnetModified();
       void redrawMeasures();
+      
+      void cleanProject(bool);
 
     public slots:
       void cleanupBundleObservationViews(QObject *);

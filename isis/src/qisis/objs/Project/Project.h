@@ -187,6 +187,9 @@ namespace Isis {
    *                           saved (i.e. not cancelled). Fixes #5205.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *                           not clean. Fixes #5174.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -231,7 +234,7 @@ namespace Isis {
       QMutex *mutex();
       QString projectRoot() const;
       QString projectPath() const;
-      void setClean(bool value);
+
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
@@ -421,6 +424,7 @@ namespace Isis {
 
     public slots:
       void open(QString);
+      void setClean(bool value);
 
     private slots:
       void controlClosed(QObject *control);
@@ -442,10 +446,12 @@ namespace Isis {
       Project(const Project &other);
       Project &operator=(const Project &rhs);
       void createFolders();
+
+      ControlList *createOrRetrieveControlList(QString name, QString path = "");
+      ImageList *createOrRetrieveImageList(QString name, QString path = "");
+      ShapeList *createOrRetrieveShapeList(QString name, QString path = "");
+      
       void writeSettings();
-      ControlList *createOrRetrieveControlList(QString name);
-      ImageList *createOrRetrieveImageList(QString name);
-      ShapeList *createOrRetrieveShapeList(QString name);
 
 
       QString nextImageListGroupName();

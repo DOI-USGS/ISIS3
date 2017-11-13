@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDir>
+#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QFuture>
@@ -209,6 +210,8 @@ namespace Isis {
             this, SLOT(checkControlsAndImagesAvailable()));
     connect(this, SIGNAL(controlListAdded(ControlList *)),
             this, SLOT(checkControlsAndImagesAvailable()));
+    connect(m_directory, SIGNAL(cleanProject(bool)),
+            this, SLOT(setClean(bool)));
 
     m_images = new QList<ImageList *>;
 
@@ -583,13 +586,18 @@ namespace Isis {
   }
 
 
-  ImageList *Project::createOrRetrieveImageList(QString name) {
+  ImageList *Project::createOrRetrieveImageList(QString name, QString path) {
     ImageList *result = imageList(name);
     if (!result) {
       result = new ImageList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( imageListDeleted(QObject *) ) );
@@ -599,13 +607,18 @@ namespace Isis {
   }
 
 
-  ShapeList *Project::createOrRetrieveShapeList(QString name) {
+  ShapeList *Project::createOrRetrieveShapeList(QString name, QString path) {
     ShapeList *result = shapeList(name);
     if (!result) {
       result = new ShapeList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( shapeListDeleted(QObject *) ) );
@@ -836,7 +849,7 @@ namespace Isis {
     connect( this, SIGNAL( projectRelocated(Project *) ),
              control, SLOT( updateFileName(Project *) ) );
 
-    createOrRetrieveControlList( FileName( control->fileName() ).dir().dirName() )->append(control);
+    createOrRetrieveControlList( FileName( control->fileName() ).dir().dirName(), "" )->append(control);
 
     (*m_idToControlMap)[control->id()] = control;
 
@@ -844,14 +857,19 @@ namespace Isis {
   }
 
 
-  ControlList *Project::createOrRetrieveControlList(QString name) {
+  ControlList *Project::createOrRetrieveControlList(QString name, QString path) {
     ControlList *result = controlList(name);
 
     if (!result) {
       result = new ControlList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( controlListDeleted(QObject *) ) );
@@ -1385,11 +1403,11 @@ namespace Isis {
    */
   ImageList *Project::imageList(QString name) {
     QListIterator<ImageList *> it(*m_images);
-
+    
     ImageList *result = NULL;
     while (it.hasNext() && !result) {
       ImageList *list = it.next();
-
+      
       if (list->name() == name) result = list;
     }
 
@@ -2415,10 +2433,10 @@ namespace Isis {
 
       (*m_idToImageMap)[image->id()] = image;
       if (images.name() != "") {
-        createOrRetrieveImageList(images.name())->append(image);
+        createOrRetrieveImageList(images.name(), images.path())->append(image);
       }
       else {
-        createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
+        createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName(), "")->append(image);
       }
     }
 
@@ -2664,10 +2682,10 @@ namespace Isis {
 
       (*m_idToShapeMap)[shape->id()] = shape;
       if (shapes.name() != "") {
-        createOrRetrieveShapeList(shapes.name())->append(shape);
+        createOrRetrieveShapeList(shapes.name(), shapes.path())->append(shape);
       }
       else {
-        createOrRetrieveShapeList(FileName(shapes[0]->fileName()).dir().dirName())->append(shape);
+        createOrRetrieveShapeList(FileName(shapes[0]->fileName()).dir().dirName(), "")->append(shape);
       }
 
     }

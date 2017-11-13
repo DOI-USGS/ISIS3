@@ -772,21 +772,26 @@ namespace Isis {
     else if (item->isBundleSolutionInfo() && role == Qt::EditRole) {
       item->setText(name);
       item->bundleSolutionInfo()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isImageList() && role == Qt::EditRole) {
       item->setText(name);
       item->imageList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isControlList() && role == Qt::EditRole) {
       item->setText(name);
       item->controlList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isShapeList() && role == Qt::EditRole) {
       item->setText(name);
       item->shapeList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isTemplate() && role == Qt::EditRole) {
       item->setText(name);
+      emit cleanProject(false);
     }
     return true;
   }
