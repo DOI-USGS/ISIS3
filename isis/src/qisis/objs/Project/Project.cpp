@@ -70,6 +70,8 @@
 #include "ShapeReader.h"
 #include "Target.h"
 #include "TargetBodyList.h"
+#include "Template.h"
+#include "TemplateList.h"
 #include "WorkOrder.h"
 #include "WorkOrderFactory.h"
 #include "XmlStackedHandlerReader.h"
@@ -98,6 +100,7 @@ namespace Isis {
     m_imageReader = NULL;
     m_shapeReader = NULL;
     m_shapes = NULL;
+    m_templates = NULL;
     m_warnings = NULL;
     m_workOrderHistory = NULL;
     m_isTemporaryProject = true;
@@ -222,6 +225,8 @@ namespace Isis {
     m_controls = new QList<ControlList *>;
 
     m_targets = new TargetBodyList;
+
+    m_templates = new QList<TemplateList *>;
 
     m_guiCameras = new GuiCameraList;
 
@@ -392,6 +397,24 @@ namespace Isis {
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
+      if ( !dir.mkdir( templateRoot() ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( templateRoot() + "/maps" ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( templateRoot() + "/registrations" ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
     }
     catch (...) {
       warn("Failed to create project directory structure");
@@ -545,6 +568,7 @@ namespace Isis {
     m_images->clear();
     m_shapes->clear();
     m_controls->clear();
+    m_templates->clear();
     m_targets->clear();
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
@@ -638,13 +662,11 @@ namespace Isis {
       stream.writeEndElement();
     }
 
-    if ( !m_templates.isEmpty() ) {
-      stream.writeStartElement("templates");
+    if ( !m_templates->isEmpty() ) {
+      stream.writeStartElement("templateLists");
 
-      for (int i = 0; i < m_templates.count(); i++) {
-        stream.writeStartElement("template");
-        stream.writeAttribute("fileName", m_templates.at(i).dir().dirName() + "/" + m_templates.at(i).name());
-        stream.writeEndElement();
+      for (int i = 0; i < m_templates->count(); i++) {
+        m_templates->at(i)->save(stream, this, newProjectRoot);
       }
 
       stream.writeEndElement();
@@ -954,21 +976,14 @@ namespace Isis {
    *
    * @param newFileList QList of FileNames for each new imported template
    */
-  void Project::addTemplates(QList<FileName> newFileList) {
-    m_templates.append(newFileList);
-    emit templatesAdded(newFileList);
+  void Project::addTemplates(TemplateList *templateList) {
+    foreach (Template *templateFile, *templateList) {
+      connect( this, SIGNAL( projectRelocated(Project *) ),
+               templateFile, SLOT( updateFileName(Project *) ) );
+    }
+    m_templates->append(templateList);
+    emit templatesAdded(templateList);
   }
-
-
-  /**
-   * Remove a FileName from m_templates
-   *
-   * @param file FileName to be removed
-   */
-  void Project::removeTemplate(FileName file) {
-    m_templates.removeOne(file);
-  }
-
 
   /**
    * Create and navigate to the appropriate template type folder in the project directory.
@@ -976,14 +991,26 @@ namespace Isis {
    * @param prefix The name of the director under templates/ to store the template file.
    */
   QDir Project::addTemplateFolder(QString prefix) {
-    QDir templateFolder = templateRoot();
 
-    if ( !templateFolder.mkpath(prefix) ) {
+    QDir templateFolder = templateRoot();
+    prefix += "%1";
+    int prefixCounter = 0;
+    QString numberedPrefix;
+
+    do {
+      prefixCounter++;
+      numberedPrefix = prefix.arg( QString::number(prefixCounter) );
+    }
+    while ( templateFolder.exists(numberedPrefix) );
+
+    if ( !templateFolder.mkpath(numberedPrefix) ) {
       throw IException(IException::Io,
           tr("Could not create template directory [%1] in [%2].")
-            .arg(prefix).arg( templateFolder.absolutePath() ),
+            .arg(numberedPrefix).arg( templateFolder.absolutePath() ),
           _FILEINFO_);
     }
+
+    templateFolder.cd(numberedPrefix);
 
     return templateFolder;
   }
@@ -1915,8 +1942,8 @@ namespace Isis {
    *
    * @return QList of FileName
    */
-  QList<FileName> Project::templates() {
-    return m_templates;
+  QList<TemplateList *> Project::templates() {
+    return *m_templates;
   }
 
 
@@ -2041,21 +2068,8 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
-    QString oldRoot = templateRoot();
     *m_projectRoot = newProjectRoot;
-
     emit projectRelocated(this);
-
-    addTemplateFolder("maps");
-    addTemplateFolder("registrations");
-
-    // This is a temporary fix until we create an object for Templates
-    foreach (FileName templateFile, templates()) {
-      QFile::copy(oldRoot + "/" + templateFile.toString(), templateRoot() + "/" + templateFile.toString());
-      ProjectItem *currentItem =
-          directory()->model()->findItemData(QVariant::fromValue(templateFile.toString()));
-      currentItem->setData(QVariant(templateFile.toString()));
-    }
   }
 
 
@@ -2735,8 +2749,8 @@ namespace Isis {
       else if (localName == "shapeLists") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
-      else if (localName == "template") {
-        m_templates.append(FileName(m_project->templateRoot() + "/" + atts.value("fileName")));
+      else if (localName == "templateList") {
+        m_templates.append(new TemplateList(m_project, reader()));
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
@@ -2822,8 +2836,10 @@ namespace Isis {
         m_project->addBundleSolutionInfo(bundleInfo);
       }
     }
-    else if (localName == "templates") {
-      m_project->addTemplates(m_templates);
+    else if (localName == "templateLists") {
+      foreach (TemplateList *list, m_templates) {
+        m_project->addTemplates(list);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

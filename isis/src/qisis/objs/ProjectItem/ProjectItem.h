@@ -48,6 +48,8 @@ namespace Isis {
   class Shape;
   class ShapeList;
   class TargetBodyList;
+  class Template;
+  class TemplateList;
 
   /**
    * Represents an item of a ProjectItemModel in Qt's model-view
@@ -128,8 +130,10 @@ namespace Isis {
    *                             Qt::Black Fixes #5095
    *     @history 2017-08-11 Christopher Combs - Added isTemplate() and setTemplate() to allow for
    *                             imported templates to show on the project tree. Fixes #5086.
-   *     @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *     @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
    *                             source images. Fixes #5105.
+   *     @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                             classes. Fixes #5117.
    *
    */
   class ProjectItem : public QStandardItem {
@@ -155,6 +159,9 @@ namespace Isis {
       ProjectItem(QList<BundleSolutionInfo *> results);
       ProjectItem(TargetBodyQsp targetBody);
       ProjectItem(TargetBodyList *targetBodyList);
+      ProjectItem(QList<TemplateList *> templates);
+      ProjectItem(Template *newTemplate);
+      ProjectItem(TemplateList *templateList);
       ProjectItem(FileItemQsp filename, QString treeText, QIcon icon);
       ProjectItem(FileItemQsp filename, QString treeText, QString toolTipText, QIcon icon);
 
@@ -173,6 +180,8 @@ namespace Isis {
       Project *project() const;
       GuiCameraQsp guiCamera() const;
       TargetBodyQsp targetBody() const;
+      Template *getTemplate() const;
+      TemplateList *templateList() const;
       FileItemQsp fileItem() const;
 
       bool isBundleResults() const;
@@ -212,7 +221,9 @@ namespace Isis {
       void setSpacecraft();
       void setTargetBody(TargetBodyQsp targetBody);
       void setTargetBodyList();
-      void setTemplate();
+      void setTemplate(Template *newTemplate);
+      void setTemplates();
+      void setTemplateList(TemplateList *templateList);
 
       ProjectItem *findItemData(const QVariant &value, int role = Qt::UserRole+1);
 

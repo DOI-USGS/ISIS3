@@ -24,6 +24,8 @@
  */
  #include "WorkOrder.h"
  #include "ProjectItem.h"
+ #include "Template.h"
+ #include "TemplateList.h"
 
  namespace Isis {
    /**
@@ -33,9 +35,11 @@
     *
     * @author 2017-07-31 Christopher Combs
     *
-    * @internal 
+    * @internal
     *   @history 2017-08-23 Tracie Sucharski - Fixed assignment to itemType in setupExecution to use
     *                          assignment operator rather than comparison operator.
+    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+    *                          classes. Fixes #5117.
     */
     class ImportTemplateWorkOrder : public WorkOrder {
         Q_OBJECT
@@ -54,8 +58,8 @@
       private:
         ImportTemplateWorkOrder &operator=(const ImportTemplateWorkOrder &rhs);
 
-        QList<FileName> m_newFileList;
-        QString m_lastChosenFileType; //!< The file type filter chosen in the QFileDialog
+        TemplateList *m_list;
+        QString m_fileType; //!< The file type filter chosen in the QFileDialog
     };
  }
 

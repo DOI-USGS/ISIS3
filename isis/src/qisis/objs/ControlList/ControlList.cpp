@@ -100,7 +100,7 @@ namespace Isis {
 
 
   /**
-   * Create an control list from a list of control net file names. This is slow (serial) and not 
+   * Create an control list from a list of control net file names. This is slow (serial) and not
    * recommended.
    *
    * @param fileNames Control net file names
@@ -153,7 +153,7 @@ namespace Isis {
 
   /**
    * Clears the control list
-   * 
+   *
    * @see QList<Control *>::clear()
    */
   void ControlList::clear() {
@@ -244,10 +244,10 @@ namespace Isis {
 
 
   /**
-   * Equivalent to append(value) 
+   * Equivalent to append(value)
    *
    * @param value The control pointer to append to the control list
-   * 
+   *
    * @see ControlList::append(Control * const &value)
    * @see QList<Control *>::push_back()
    */
@@ -273,11 +273,11 @@ namespace Isis {
 
   /**
    * Removes all occurences of the control pointer in the control list
-   * 
+   *
    * @param value The control pointer value to remove
    *
    * @return @b int The number of control pointers removed
-   * 
+   *
    * @see QList<Control *>::removeAll()
    */
   int ControlList::removeAll(Control * const &value) {
@@ -295,7 +295,7 @@ namespace Isis {
    * Removes the control pointer at the specified index
    *
    * @param i The index of the control pointer to remove
-   * 
+   *
    * @see QList<Control *>::removeAt()
    */
   void ControlList::removeAt(int i) {
@@ -316,7 +316,7 @@ namespace Isis {
 
 
   /**
-   * Removes the last control pointer from the control list 
+   * Removes the last control pointer from the control list
    *
    * @see QList<Control *>::removeLast()
    */
@@ -332,7 +332,7 @@ namespace Isis {
    * @param value The control pointer to remove
    *
    * @return @b bool True if a control pointer was removed; otherwise false
-   * 
+   *
    * @see QList<Control *>::removeOne()
    */
   bool ControlList::removeOne(Control * const &value) {
@@ -412,7 +412,7 @@ namespace Isis {
    * @param The list of other control pointers to append
    *
    * @return @b ControlList & Reference to this control list
-   * 
+   *
    * @see QList<Control *>::operator+=()
    */
   ControlList &ControlList::operator+=(const QList<Control *> &other) {
@@ -431,7 +431,7 @@ namespace Isis {
    *
    * @param other The control pointer to append
    *
-   * @return @b ControlList & Reference to this control list 
+   * @return @b ControlList & Reference to this control list
    *
    * @see QList<Control *>::operator+=()
    */
@@ -463,12 +463,12 @@ namespace Isis {
 
 
   /**
-   * Appends a control pointer to this control list 
+   * Appends a control pointer to this control list
    *
    * @param other The control pointer to append
-   * 
-   * @return @b ControlList & Reference to this control list 
-   * 
+   *
+   * @return @b ControlList & Reference to this control list
+   *
    * @see QList<Control *>::operator<<()
    */
   ControlList &ControlList::operator<<(Control * const &other) {
@@ -482,9 +482,9 @@ namespace Isis {
    * Assigns another list of control pointers to this control list
    *
    * @param rhs The other list of control pointers to assign
-   * 
-   * @return @b ControlList & Reference to this control list 
-   * 
+   *
+   * @return @b ControlList & Reference to this control list
+   *
    * @see QList<Control *>::operator=()
    */
   ControlList &ControlList::operator=(const QList<Control *> &rhs) {
@@ -567,7 +567,7 @@ namespace Isis {
 
 
   /**
-   * Delete all of the contained Controls from disk 
+   * Delete all of the contained Controls from disk
    *
    * @param project Project to delete controls from
    *
@@ -697,8 +697,8 @@ namespace Isis {
 
   /**
    * CopyControlDataFunctor copy constructor.
-   * 
-   * @param other The other CopyControlDataFunctor to initialize data from 
+   *
+   * @param other The other CopyControlDataFunctor to initialize data from
    */
   ControlList::CopyControlDataFunctor::CopyControlDataFunctor(const CopyControlDataFunctor &other) {
     m_project = other.m_project;
@@ -726,7 +726,7 @@ namespace Isis {
 
   /**
    * CopyControlDataFunctor assignment operator.
-   * 
+   *
    * @param rhs The other CopyControlDataFunctor to copy from
    *
    * @return @b ControlList::CopyControlDataFunctor The new copy
@@ -795,7 +795,7 @@ namespace Isis {
    * @param namespaceURI ???
    * @param localName The keyword name given to the member variable in the XML
    * @param qName ???
-   * 
+   *
    * @return @b bool If we should continue reading the XML (usually true).
    *
    * @throws IException::Io "Unable to open with read access"

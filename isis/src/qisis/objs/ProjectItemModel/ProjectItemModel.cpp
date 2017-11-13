@@ -44,6 +44,7 @@
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "TargetBodyList.h"
+#include "TemplateList.h"
 
 
 namespace Isis {
@@ -131,8 +132,8 @@ namespace Isis {
             this, SLOT( onShapesAdded(ShapeList *) ) );
     connect(project, SIGNAL( targetsAdded(TargetBodyList *) ),
             this, SLOT( onTargetsAdded(TargetBodyList *) ) );
-    connect(project, SIGNAL( templatesAdded(QList<FileName>)),
-            this, SLOT( onTemplatesAdded(QList<FileName>)));
+    connect(project, SIGNAL( templatesAdded(TemplateList *)),
+            this, SLOT( onTemplatesAdded(TemplateList *)));
     connect(project, SIGNAL( guiCamerasAdded(GuiCameraList *) ),
             this, SLOT( onGuiCamerasAdded(GuiCameraList *) ) );
     ProjectItem *projectItem = new ProjectItem(project);
@@ -412,35 +413,34 @@ namespace Isis {
   /**
    * Slot connected to the templatesAdded() signal from a project. Adds a ProjectItem for
    * each newly added template FileName to the model. The Item is added to the corresponding
-   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ).
+   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ) and the name
+   * of the TemplateList (import1, import2, etc...).
    *
-   * @param newFileList QList of FileNames being added to the project.
+   * @param templateList TemplateList of Templates being added to the project.
    */
-  void ProjectItemModel::onTemplatesAdded(QList<FileName> newFileList) {
+  void ProjectItemModel::onTemplatesAdded(TemplateList *templateList) {
     Project *project = qobject_cast<Project *>( sender() );
 
     if (!project) {
       return;
     }
 
+    // Start at our project's node
     for (int i = 0; i<rowCount(); i++) {
       ProjectItem *projectItem = item(i);
       if (projectItem->project() == project) {
+
+        // Find the "Templates" node
         for (int j = 0; j < projectItem->rowCount(); j++) {
           ProjectItem *templatesItem = projectItem->child(j);
           if (templatesItem->text() == "Templates"){
-            foreach (FileName newFile, newFileList) {
-              QString type = newFile.dir().dirName();
-              for (int k = 0; k < templatesItem->rowCount(); k++) {
+
+            // Find either the "Maps" or "Registrations" node
+            QString type = templateList->type();
+            for (int k = 0; k < templatesItem->rowCount(); k++) {
                 ProjectItem *templateType = templatesItem->child(k);
                 if (templateType->text().toLower() == type) {
-                  ProjectItem *fileItem = new ProjectItem(FileItemQsp(
-                    new FileItem(newFile.expanded())),
-                    newFile.name(),
-                    QIcon(":folder"));
-                  fileItem->setData(QVariant(newFile.toString()));
-                  templateType->appendRow(fileItem);
-                }
+                  templateType->appendRow( new ProjectItem(templateList));
               }
             }
           }
@@ -849,8 +849,22 @@ namespace Isis {
          for (int j=0; j < projectItem->rowCount(); j++) {
            if (projectItem->hasChildren()) {
              ProjectItem *subProjectItem = projectItem->child(j);
-             while (subProjectItem->hasChildren()) {
-               removeItem(subProjectItem->child(0));
+
+             // The header "Templates" has two subheaders that we want to keep
+             if (subProjectItem->text() == "Templates"){
+               if (subProjectItem->hasChildren()) {
+                 for (int k=0; k < subProjectItem->rowCount(); k++) {
+                   ProjectItem *tempProjectItem = subProjectItem->child(k);
+                   while (tempProjectItem->hasChildren()) {
+                     removeItem(tempProjectItem->child(0));
+                   }
+                 }
+               }
+             }
+             else {
+               while (subProjectItem->hasChildren()) {
+                 removeItem(subProjectItem->child(0));
+               }
              }
            }
          }

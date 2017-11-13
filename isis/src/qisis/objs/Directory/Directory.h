@@ -34,6 +34,7 @@
 #include "ImageList.h"
 #include "MosaicSceneWidget.h"
 #include "TargetBodyList.h"
+#include "TemplateList.h"
 #include "WorkOrder.h"
 
 class QAction;
@@ -178,7 +179,7 @@ namespace Isis {
    *   @history 2017-08-11 Cole Neubauer - Added project setClean(false) call to all views cleanup
    *                           slot. This will make a a view closing be treated as a project change
    *                           Fixes #5113
-   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
    *                           source images. Fixes #5105.
    *   @history 2017-08-15 Tracie Sucharski - Added comments explaing connections for control point
    *                           editing actions between views.
@@ -192,6 +193,8 @@ namespace Isis {
    *                           Fixes #4492.
    *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
    *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
    */
   class Directory : public QObject {
     Q_OBJECT

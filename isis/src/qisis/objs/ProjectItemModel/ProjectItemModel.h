@@ -47,6 +47,7 @@ namespace Isis {
   class Project;
   class ProjectItem;
   class TargetBodyList;
+  class TemplateList;
 
   /**
    * Provides access to data stored in a Project through Qt's model-view
@@ -120,6 +121,8 @@ namespace Isis {
                                in the project tree if there is no valid currentIndex. This would
                                happen if the user was interacting with a cubeDN or footprint view
                                and then tried right clicking on the project tree. Fixes #5111.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -187,7 +190,7 @@ namespace Isis {
       void onControlAdded(Control *control);
       void onControlListAdded(ControlList *controlList);
       void onTargetsAdded(TargetBodyList *targets);
-      void onTemplatesAdded(QList<FileName> newFileList);
+      void onTemplatesAdded(TemplateList *templateList);
       void onGuiCamerasAdded(GuiCameraList *cameras);
       void onRowsInserted(const QModelIndex &parent, int start, int end);
       void onRowsRemoved(const QModelIndex &parent, int start, int end);

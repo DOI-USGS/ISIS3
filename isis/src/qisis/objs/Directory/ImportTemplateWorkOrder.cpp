@@ -30,6 +30,8 @@
 
 #include "Project.h"
 #include "ProjectItemModel.h"
+#include "Template.h"
+#include "TemplateList.h"
 
 namespace Isis {
   /**
@@ -41,6 +43,7 @@ namespace Isis {
       WorkOrder(project) {
 
     m_isUndoable = true;
+    m_list = NULL;
 
     QAction::setText(tr("Import Template"));
     QUndoCommand::setText(tr("Import Template"));
@@ -63,6 +66,7 @@ namespace Isis {
    * Destructor
    */
   ImportTemplateWorkOrder::~ImportTemplateWorkOrder() {
+    m_list = NULL;
   }
 
 
@@ -129,7 +133,9 @@ namespace Isis {
     }
 
     QString selectedFilter;
-    QStringList templateFileNames = QFileDialog::getOpenFileNames(
+    QStringList templateFileNames;
+
+    templateFileNames = QFileDialog::getOpenFileNames(
         qobject_cast<QWidget *>(parent()),
         "Import " + itemType,
         QString(),
@@ -143,14 +149,12 @@ namespace Isis {
       return false;
     }
 
-    // The user must choose a filter to import any file. The type is saved in m_lastChosenFileType
+    // The user must choose a filter to import any file. The type is saved in m_fileType
     // Currently, the only options for this will be "maps" and "registrations"
-    m_lastChosenFileType = selectedFilter.remove(QRegularExpression(" \\(.*\\)")).toLower();
+    m_fileType = selectedFilter.remove(QRegularExpression(" \\(.*\\)")).toLower();
     setInternalData(templateFileNames);
 
     return true;
-
-
   }
 
 
@@ -162,40 +166,24 @@ namespace Isis {
    * directory, it will not be copied over.
    */
   void ImportTemplateWorkOrder::execute() {
-    QDir templateFolder = project()->addTemplateFolder(m_lastChosenFileType);
-
+    QDir templateFolder = project()->addTemplateFolder(m_fileType + "/import");
     QStringList templateFileNames = internalData();
 
-    QString newFile;
-    QString notCopied;
+    m_list = new TemplateList(
+      templateFolder.dirName(), m_fileType, m_fileType + "/" +templateFolder.dirName() );
 
     foreach (FileName filename, templateFileNames) {
-      newFile = m_lastChosenFileType + "/" + filename.name();
-
-      // If the file is already in the folder, don't copy it over
-      if ( !templateFolder.exists(filename.name())) {
-        QFile::copy(filename.expanded(), templateFolder.path() + "/" +newFile);
-        m_newFileList.append(FileName(newFile));
-      }
-      else {
-        notCopied += filename.name() + "\n";
-      }
+      QFile::copy(filename.expanded(), templateFolder.path() + "/" + filename.name());
+      m_list->append(new Template(
+        templateFolder.path() + "/" + filename.name(), m_fileType, templateFolder.dirName()));
     }
 
-    // Let the user know if a file already existed in the templates directory and was not copied
-    if (!notCopied.isEmpty()) {
-      QMessageBox::information(
-        qobject_cast<QWidget *>(parent()),
-        "Not all templates were copied",
-        "The following already exist in the " + templateFolder.dirName() +
-        " directory:\n\n" + notCopied
-      );
-    }
-
-    if (!m_newFileList.isEmpty()) {
-     project()->addTemplates(m_newFileList);
+    if (!m_list->isEmpty()) {
+     project()->addTemplates(m_list);
      project()->setClean(false);
     }
+
+
   }
 
 
@@ -206,14 +194,17 @@ namespace Isis {
    * and the ProjectItemModel
    */
   void ImportTemplateWorkOrder::undoExecution() {
-    foreach ( FileName filename, m_newFileList) {
-      project()->removeTemplate(filename);
-      QFile::remove(project()->templateRoot() + "/" + filename.toString());
+    if (m_list && project()->templates().size() > 0) {
+      m_list->deleteFromDisk( project() );
       ProjectItem *currentItem =
-          project()->directory()->model()->findItemData(QVariant::fromValue(filename.toString()));
+          project()->directory()->model()->findItemData(QVariant::fromValue(m_list));
       project()->directory()->model()->removeItem(currentItem);
     }
-
-    m_newFileList.clear();
+    foreach ( Template *currentTemplate, *m_list) {
+      delete currentTemplate;
+    }
+    delete m_list;
+    m_list = NULL;
   }
+
 }

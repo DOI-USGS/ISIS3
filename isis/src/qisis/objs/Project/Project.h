@@ -40,6 +40,7 @@ class QXmlStreamWriter;
 #include "ImageList.h"
 #include "ShapeList.h"
 #include "TargetBody.h"
+#include "TemplateList.h"
 #include "XmlStackedHandler.h"
 
 namespace Isis {
@@ -53,6 +54,8 @@ namespace Isis {
   class ImageReader;
   class ProgressBar;
   class ShapeReader;
+  class Template;
+  class TemplateList;
   class WorkOrder;
 
   /**
@@ -182,6 +185,8 @@ namespace Isis {
    *   @history 2017-11-08 Ian Humphrey - Changed save() from a void to a bool return value. This
    *                           indicates if the save dialog (for a temp project) is successfully
    *                           saved (i.e. not cancelled). Fixes #5205.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -203,7 +208,7 @@ namespace Isis {
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
-      void addTemplates(QList<FileName> templateFiles);
+      void addTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
@@ -264,7 +269,7 @@ namespace Isis {
 
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
-      QList<FileName> templates();
+      QList<TemplateList *> templates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -410,7 +415,7 @@ namespace Isis {
        */
       void workOrderFinished(WorkOrder *);
 
-      void templatesAdded(QList<FileName> newFileList);
+      void templatesAdded(TemplateList *newTemplates);
 
 
 
@@ -476,7 +481,7 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<FileName> m_templates;
+          QList<TemplateList *> m_templates;
           WorkOrder *m_workOrder;
       };
 
@@ -491,7 +496,7 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<FileName> m_templates;
+      QList<TemplateList *> *m_templates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
