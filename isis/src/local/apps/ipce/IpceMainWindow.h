@@ -111,6 +111,11 @@ namespace Isis {
    *                           detached views from the m_detachedViews list appropriately.
    *                           This fixes an issue where a detached view would appear to be
    *                           open even after it has been closed. Fixes #5109.
+   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it 
+   *                           was screwing up the display of widgets when a project is loaded.
+   *                           Also switched the order in which a project is saved.  A project is
+   *                           cleared after it is saved, and not before (which had been the previous
+   *                           behavior.  Fixes #5175.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

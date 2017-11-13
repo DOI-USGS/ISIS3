@@ -718,6 +718,9 @@ namespace Isis {
    * @internal
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
+   *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it 
+   *                                      was messing with the positions of widgets after a 
+   *                                      project was loaded.  Fixes #5075.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -788,7 +791,6 @@ namespace Isis {
     if (!settings.value("pos").toPoint().isNull())
       move(settings.value("pos").toPoint());
 
-    resize(settings.value("size", QSize(800, 600)).toSize());
     m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
     applyMaxThreadCount();
 
@@ -817,8 +819,9 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
-    m_directory->project()->clear();
     writeSettings(m_directory->project());
+    m_directory->project()->clear();
+
     QMainWindow::closeEvent(event);
   }
 
