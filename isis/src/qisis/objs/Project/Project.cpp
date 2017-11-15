@@ -167,6 +167,7 @@ namespace Isis {
                                          arg( QApplication::applicationName() ) );
     }
 
+    QCoreApplication* ipce_app = static_cast<QCoreApplication *>(directory.parent());
 
     try {
       QString tmpFolder = QDir::temp().absolutePath() + "/"
@@ -176,7 +177,9 @@ namespace Isis {
       m_projectRoot = new QDir(temp);
       m_projectPath = m_projectRoot->path();
       //qDebug()<<"          Create temp project";
-      createFolders();
+      if (ipce_app->arguments().count() == 1) {
+        createFolders();
+      }
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer, "Error creating project folders.", _FILEINFO_);
@@ -576,7 +579,7 @@ namespace Isis {
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
-    directory()->clean();   
+    directory()->clean();
     setClean(true);
   }
 
@@ -1144,7 +1147,7 @@ namespace Isis {
       //then remove the earlier reference.
 
       if (projectPaths.contains(this->projectPath())) {
-        QString key = recentProjects.key(this->projectPath());      
+        QString key = recentProjects.key(this->projectPath());
         recentProjects.remove(key);
       }
 
@@ -2752,10 +2755,10 @@ namespace Isis {
                                          const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
-      if (localName == "project") {      
+      if (localName == "project") {
         QString name = atts.value("name");
         if (!name.isEmpty()) {
-          m_project->setName(name);                  
+          m_project->setName(name);
         }
       }
       else if (localName == "controlNets") {

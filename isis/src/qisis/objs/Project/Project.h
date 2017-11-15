@@ -190,6 +190,9 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
    *                           BundeSolutionInfo on the ProjectTree now sets the project to 
    *                           not clean. Fixes #5174.
+   *   @history 2017-11-15 Cole Neubauer - Added a check if there was an arg for the command line
+   *                           to avoid creation of new temp project if a user is opening one from
+   *                           the command line #5222
    */
   class Project : public QObject {
     Q_OBJECT
