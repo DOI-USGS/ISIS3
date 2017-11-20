@@ -135,8 +135,8 @@ namespace Isis {
       newItem->setFont(1, progressFont);
       newItem->setForeground(1, Qt::gray);
 
-
-      invisibleRootItem()->addChild(newItem);
+      this->insertTopLevelItem(0, newItem);
+//      invisibleRootItem()->addChild(newItem);
 
       connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
                 this, SLOT(updateStatus(WorkOrder *)));
@@ -151,7 +151,8 @@ namespace Isis {
       //include those that do not need it.
 
       if(workOrder->progressBar() )  {
-        this->setItemWidget(newItem, 1, workOrder->progressBar() );
+        setItemWidget(newItem, 1, new ProgressBar);
+//        this->setItemWidget(newItem, 1, workOrder->progressBar() );
       }
       scrollToItem(newItem);
       refit();
