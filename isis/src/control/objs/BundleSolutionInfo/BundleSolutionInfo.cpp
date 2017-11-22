@@ -380,8 +380,8 @@ namespace Isis {
     // Collect the number of segments and coefficients solved for from the first observation
     BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
 
-    int numberCamPosSegments = obsSettings.numberSpkPolySegments();
-    int numberCamAngleSegments = obsSettings.numberCkPolySegments();
+    int numberCamPosSegments = std::max(obsSettings.numberSpkPolySegments(), 1);
+    int numberCamAngleSegments = std::max(obsSettings.numberCkPolySegments(), 1);
 
     int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
     int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
@@ -1066,6 +1066,9 @@ namespace Isis {
       if(!observation) {
         continue;
       }
+      // Handle the case were we don't solve for position or pointing.
+      int outputPositionSegments = std::max(observation->numberPolynomialPositionSegments(), 1);
+      int outputPointingSegments = std::max(observation->numberPolynomialPointingSegments(), 1);
 
       int numImages = observation->size();
 
@@ -1093,11 +1096,11 @@ namespace Isis {
 
 
         QString observationString;
-        for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++) {
+        for (int k = 0; k < outputPositionSegments; k++) {
           QString segmentString = observation->formatPositionOutputString(k, errorProp, true);
           observationString.append(segmentString);
         }
-        for (int k = 0; k < observation->numberPolynomialPointingSegments(); k++) {
+        for (int k = 0; k < outputPointingSegments; k++) {
           QString segmentString = observation->formatPointingOutputString(k, errorProp, true);
           observationString.append(segmentString);
         }
@@ -1181,6 +1184,10 @@ namespace Isis {
         continue;
       }
 
+      // Handle the case were we don't solve for position or pointing.
+      int outputPositionSegments = std::max(observation->numberPolynomialPositionSegments(), 1);
+      int outputPointingSegments = std::max(observation->numberPolynomialPointingSegments(), 1);
+
       int numImages = observation->size();
       for (int j = 0; j < numImages; j++) {
         BundleImageQsp image = observation->at(j);
@@ -1195,8 +1202,8 @@ namespace Isis {
          }
 #endif
 
-         for (int k = 0; k < observation->numberPolynomialPositionSegments(); k++ ) {
-          if (observation->numberPolynomialPositionSegments() != 1) {
+         for (int k = 0; k < outputPositionSegments; k++ ) {
+          if (outputPositionSegments != 1) {
             fpOut << observation->formatPositionSegmentHeader(k);
           }
 
@@ -1209,8 +1216,8 @@ namespace Isis {
           fpOut << observation->formatPositionOutputString(k, berrorProp);
         }
 
-        for (int k = 0; k < observation->numberPolynomialPointingSegments(); k++ ) {
-          if (observation->numberPolynomialPointingSegments() != 1) {
+        for (int k = 0; k < outputPointingSegments; k++ ) {
+          if (outputPointingSegments != 1) {
             fpOut << observation->formatPointingSegmentHeader(k);
           }
 

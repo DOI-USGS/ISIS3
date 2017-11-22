@@ -1288,9 +1288,34 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
 
     if (!imageCSV) {
 
-      QString str("%1(t%2)");
+      if (useDefaultPosition) {
+        QString str("%1    ");
 
-      if (nPositionCoefficients > 0) {
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefX[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  X  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefY[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  Y  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefZ[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  Z  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+      }
+      else {
+        QString str("%1(t%2)");
+
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.append(coefX[i]);
           if (i == 0)
@@ -1498,10 +1523,36 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
     QStringList parameterNamesList;
 
     if (!imageCSV) {
+      if (useDefaultPointing) {
 
-      QString str("%1(t%2)");
+        QString str("%1    ");
 
-      if (nPointingCoefficients > 0) {
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefRA[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg(" RA  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefDEC[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("DEC  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefTWI[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("TWI  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+      }
+      else {
+
+        QString str("%1(t%2)");
+
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.append(coefRA[i] * RAD2DEG);
           if (i == 0)
