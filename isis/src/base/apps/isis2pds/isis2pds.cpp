@@ -126,7 +126,8 @@ void IsisMain() {
       throw  IException(IException::User, msg, _FILEINFO_);
     }
     
-    QString outFile = ui.GetFileName("TO");
+    FileName outFile(ui.GetFileName("TO", "img"));
+    QString outFileName(outFile.expanded());
     
     if(ui.GetString("STRETCH") == "LINEAR") {
       if(ui.GetString("BITTYPE") != "32BIT")
@@ -183,7 +184,7 @@ void IsisMain() {
     Application::Log(results);
 
     process.StandardPds4Label();
-    process.WritePds4(outFile);
+    process.WritePds4(outFileName);
   }
 
   return;

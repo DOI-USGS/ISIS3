@@ -33,6 +33,9 @@
     <change name="Jeannie Backer, Mayayla Shepard, and Kristin Berry" date="2017-10-27">
        Added PDS4 output option. Previously, this application converted ISIS3 cubes to PDS3 format only. 
     </change>
+    <change name="Jeannie Backer" date="2017-11-13">
+       Updated to attach *.img extension to pds4 output data file. 
+    </change>
     </history>
 
   <groups>

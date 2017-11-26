@@ -201,6 +201,9 @@ namespace Isis {
     if (transGroup.hasKeyword("OutputAttributes")) {
       addAttributes(transGroup.findKeyword("OutputAttributes"), newElement);
     }
+    if (transGroup.hasKeyword("OutputSiblings")) {
+      addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
+    }
 
   }
 

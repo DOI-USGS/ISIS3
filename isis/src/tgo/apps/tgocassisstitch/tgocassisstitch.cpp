@@ -62,8 +62,8 @@ void IsisMain() {
   }
 
   // Stitch together the individual frames
-  FileName outputFileName(ui.GetFileName("TO"));
-  QString outputBaseName = outputFileName.removeExtension().expanded();
+  FileName outputFileName(ui.GetFileName("OUTPUTPREFIX"));
+  QString outputBaseName = outputFileName.expanded();
   QStringList frameKeys = frameMap.uniqueKeys();
   Progress stitchProgress;
   stitchProgress.SetText("Stitching Frames");
@@ -72,7 +72,7 @@ void IsisMain() {
   foreach(QString frameKey, frameKeys) {
     try {
       QString frameIdentifier = frameKey.split("/").last();
-      FileName frameFileName(outputBaseName + "_" + frameIdentifier + ".cub");
+      FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
       stitchFrame( frameMap.values(frameKey), frameFileName );
       stitchProgress.CheckStatus();
     }
@@ -143,6 +143,9 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
   if ( archGroup.hasKeyword("FileName") ) {
     archGroup.deleteKeyword("FileName");
   }
+  if ( archGroup.hasKeyword("Window_Count") ) {
+    archGroup.deleteKeyword("Window_Count");
+  }
   bandBinGroup += PvlKeyword("FilterName", "FULLCCD");
 
   // Setup Stitch group keywords
@@ -155,7 +158,6 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
   stitchGroup += PvlKeyword("FilterSamples");
   stitchGroup += PvlKeyword("FilterStartLines");
   stitchGroup += PvlKeyword("FilterLines");
-  stitchGroup += PvlKeyword("FilterProductIds");
   stitchGroup += PvlKeyword("FilterFileNames");
 
   // Propagate tables and spice
@@ -208,7 +210,6 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
     stitchGroup["FilterLines"]        += toString(frameletAlphaCube.BetaLines());
 
     PvlGroup frameletArchGroup = frameletCube->group("Archive");
-    stitchGroup["FilterProductIds"] += frameletArchGroup["ProductId"];
     stitchGroup["FilterFileNames"]  += frameletArchGroup["FileName"];
 
     
@@ -268,8 +269,6 @@ Cube *StitchFunctor::outputCube() const {
  * frame cube.
  * 
  * @param in A line of data from the input cube.
- * 
- * @TODO handle summing
  */
 void StitchFunctor::operator()(Isis::Buffer &in) const {
   // Setup the line manager to write to the frame cube
