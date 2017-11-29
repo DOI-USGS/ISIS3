@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="isis2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
   <brief>
     Convert from ISIS3 cube to PDS 3 or PDS 4 format
   </brief>
 
   <description>
    Program to convert cubes to PDS3 or PDS4 image files.
-   For PDS4, If available, Instrument and  Mapping information will be written to the detached output PDS4 formatted xml label file.  
+
+   For PDS4, If available, Instrument and  Mapping information will be written to the detached output PDS4 formatted xml label file.   
+<p>
+   Not all values in the generated PDS4 labels can be determined automatically by ISIS3, and some must be updated by the user (by opening up the xml label output by this application and editing it with a text editor) for the generated label to be PDS4 compliant. The values UNK (unknown) and TBD (to be determined) are used as placeholders in the generated label. TBD values must be replaced by the user for the output label to be PDS4 compliant. Some of these TBDs can only be replaced with one of several specific enumerated values to meet compliancy. These possible values can be found in the <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS 4 Information Model Specification</a> in the Value/Class column of the table for the associated tag or in the index at the end of the document. Searching this page for the name of the field you need to determine a value for is recommended. 
+</p>
+
+<p>
+For example: For a cube with map-projected data, ISIS3 will populate planar_coordinate encoding_method with a value on its own, but if it did not and instead had "TBD", we would find at <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html#attribute_cart_planar_coordinate_information_cart_planar_coordinate_encoding_method">planar_coordinate_coding_method</a> that there are 3 possible values: 'Coordinate Pair', 'Distance and Bearing', 'Row and Column'.
+</p>
+
+<p>
+Not everything is in the  <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS 4 Information Model Specification</a> at this time, so if the information about a tag is not in there, it may be necessary to find the options in the appropriate schematron file (.sch) available at: <a href="https://pds.jpl.nasa.gov/pds4/schema/released/">PDS4 Released Schema</a>. For the previous example, the same information can be found in the <a href="https://pds.jpl.nasa.gov/pds4/cart/v1/PDS4_CART_1700.sch">PDS4 Cartography schematron file </a>.
+</p>
+
+<p>
+UNK  is used as a placeholder if any value can be used and still be a valid PDS4-formatted xml header. UNKs can, but are not required to be, replaced by the user with
+better information. 
+</p>
+
   </description>
 
   <category>
@@ -35,6 +54,9 @@
     </change>
     <change name="Jeannie Backer" date="2017-11-13">
        Updated to attach *.img extension to pds4 output data file. 
+    </change>
+    <change name="Kristin Berry" date="2017-11-26">
+       Updated with very basic documentation about the PDS4 output labels. 
     </change>
     </history>
 
