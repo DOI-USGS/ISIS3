@@ -56,6 +56,8 @@ void printXml(const BundleObservationSolveSettings &);
  *                               was being populated only along the diagonal (using the latitudinal sigmas).  This
  *                               produced inaccurate results.  Now it is created by converting  the rectangular 
  *                               covariance matrix to latitudinal.  References #4649 and #501.
+ *   @history 2017-11-29 Debbie A. Cook - Updated to reflect changes made to units of covariance
+ *                               matrix in SurfacePoint methods. 
  */
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
@@ -874,9 +876,9 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
     boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covar;
     covar.resize(3);
     covar.clear();
-    covar(0,0) = .0001;
-    covar(1,1) = .0025;
-    covar(2,2) = .0004;
+    covar(0,0) = 100.;
+    covar(1,1) = 2500.;
+    covar(2,2) = 400.;
     aprioriSurfPt.SetRectangular(Displacement(-424.024048, Displacement::Meters),
                                  Displacement(734.4311949, Displacement::Meters),
                                  Displacement(529.919264, Displacement::Meters), covar);
@@ -895,10 +897,10 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
     settings->setSolveOptions(false, false, false, false);
     BundleControlPoint bcp5a(settings, constrainedPoint, metersToRadians);
     SurfacePoint adjustedSurfPt(constrainedPoint->GetAdjustedSurfacePoint());
-    adjustedSurfPt.SetSpherical(Latitude(32., Angle::Degrees),
+    adjustedSurfPt.SetSphericalCoordinates(Latitude(32., Angle::Degrees),
                                 Longitude(120., Angle::Degrees),
-                                Distance(1000., Distance::Meters),
-                                covarLat);
+                                           Distance(1000., Distance::Meters));
+    adjustedSurfPt.SetMatrix(SurfacePoint::Latitudinal, covarLat);
                                 // Angle(1.64192315,Angle::Degrees),
                                 // Angle(1.78752107, Angle::Degrees),
                                 // Distance(38.454887335682053718134171237789, Distance::Meters));

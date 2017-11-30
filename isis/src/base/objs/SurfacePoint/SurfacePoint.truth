@@ -1,6 +1,6 @@
 UnitTest for SurfacePoint
 
-1-Test rectangular set of point and variance only ...
+1-Test rectangular set of point and variance only (variance in m^2) ...
  with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m
 
   Output spherical...
@@ -15,7 +15,7 @@ UnitTest for SurfacePoint
                                   -0.000674095535  -0.00103923048  0.00147877836
   Input rectangular sigmas = 10/50/20
 
-2-Testing spherical set of point and variance/covariance matrix ...
+2-Testing spherical set of point and variance/covariance matrix (in meters^2)...
  with lat=32 degrees, lon=120 degrees, radius=1000 m
  latitude sigma=1.64192315 deg, longitude sigma=1.78752107 deg, radiusSig=38.4548873 m
   Output rectangular...
@@ -56,6 +56,29 @@ UnitTest for SurfacePoint
 
 Testing Longitude Accessor...
 Longitude (from -45): 315
+
+6-Testing set of matrices in spherical and rectangular coordinates in km ...
+  6a-Test rectangular set of point and variance only (variance in km^2) ...
+    with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,sigmaX=.01 km, sigmaY=.05 km, sigmaZ=.02 km
+
+    Output spherical...
+      lat = 32 degrees, lon = 120 degrees, radius = 1000 meters
+      lat = 0.55850536 radians, lon = 2.0943951 radians, radius = 1000 meters
+      latitude sigma=0.0286569649 radians, longitude sigma=0.0311981281 radians, radius sigma=38.4548873 m
+      spherical covariance matrix = 0.00082122164  0.000649383279  -0.000674095535
+                                    0.000649383279  0.000973323195  -0.00103923048
+                                    -0.000674095535  -0.00103923048  0.00147877836
+    Input rectangular sigmas = 0.01/0.05/0.02
+
+  6b-Testing spherical set of point and variance/covariance matrix (in km^2)...
+    with lat=32 degrees, lon=120 degrees, radius=1000 m
+    latitude sigma=1.64192315 deg, longitude sigma=1.78752107 deg, radiusSig=38.4548873 m
+    Output rectangular...
+      x=-424.024048 m, y=734.431195 m, z=529.919264 m
+      X sigma=10 m, Y sigma=50 m, Z sigma=20 m
+      rectangular covariance matrix =     0.0001         0         0
+                                             0    0.0025         0
+                                             0         0    0.0004
 
 Testing error conditions in GetCoord, GetSigma, GetWeight, LatToDouble, 
 LonToDouble,  GetSigmaDistance, DistanceToDouble, and DisplacementToDouble...

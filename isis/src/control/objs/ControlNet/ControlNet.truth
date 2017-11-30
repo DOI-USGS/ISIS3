@@ -169,7 +169,7 @@ Object = ControlNetwork
     # AprioriRadius = 999.99999984142 <meters>
     AprioriZ                 = 529.919264 <meters>
 
-    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 124939.57715415 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
+    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 89854.741455035 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
     AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
     LatitudeConstrained      = True
     LongitudeConstrained     = True
@@ -184,7 +184,7 @@ Object = ControlNetwork
     # AdjustedRadius = 999.99999984142 <meters>
     AdjustedZ                = 529.919264 <meters>
 
-    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 124939.57715415 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
+    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 89854.741455035 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
     AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure

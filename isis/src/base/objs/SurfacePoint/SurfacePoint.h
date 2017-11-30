@@ -98,7 +98,12 @@ namespace Isis {
    *                           from meters to radians in SetSphericalSigmasDistance and from radians
    *                           to meters in GetLonSigmaDistance.  Fixed SetRectangularMatrix to take
    *                           input in km instead of m.
-   *                           
+   *  
+   *   @history 2017-11-20 Debbie A. Cook - added an additional argument to SetRectangularMatrix
+   *                           and SetSphericalMatrix to specify the units of the matrix.  This will allow the 
+   *                           bundle adjust to set in km and existing software to continue setting in the default 
+   *                           units (meters).  The matrix will be stored in km to avoid extra conversions.
+   *                                                    
    */
 
   class SurfacePoint {
@@ -164,7 +169,8 @@ namespace Isis {
                                 const Distance &zSigma);
 
       void SetRectangularMatrix(
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+                                const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar,
+                                SurfacePoint::CoordUnits units = SurfacePoint::Meters);
 
 // Spherical loading utilities
 
@@ -184,7 +190,8 @@ namespace Isis {
                                    const Distance &radius);
 
       void SetSphericalMatrix(
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+                              const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar,
+                              SurfacePoint::CoordUnits units = SurfacePoint::Meters);
 
       void SetSphericalSigmas(const Angle &latSigma, const Angle &lonSigma,
                               const Distance &radiusSigma);

@@ -241,6 +241,11 @@ namespace Isis {
    *   @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes
    *                           Ground ----> Fixed
    *                           Tie    ----> Free
+   *   @history 2017-10-27 Debbie A. Cook - Updated covar to be in km to reflect 
+   *                           changes to SurfacePoint.  The covariance matrix is still
+   *                           stored in meters though in the physical control net file.
+   *   @history 2017-11-10 Debbie A. Cook - Changed conversion to km to use
+   *                           division instead of multiplication to improve precision. 
    *
    */
   Pvl ControlNetFileV0002::toPvl() const {
@@ -376,6 +381,7 @@ namespace Isis {
                                  " <meters>");
 
         if (binaryPoint.aprioricovar_size()) {
+          // Matrix units are meters squared
           PvlKeyword matrix("AprioriCovarianceMatrix");
           matrix += toString(binaryPoint.aprioricovar(0));
           matrix += toString(binaryPoint.aprioricovar(1));
@@ -393,12 +399,19 @@ namespace Isis {
             symmetric_matrix<double, upper> covar;
             covar.resize(3);
             covar.clear();
+            // Set matrix values in m squared and SurfacePoint converts to km**2
             covar(0, 0) = binaryPoint.aprioricovar(0);
             covar(0, 1) = binaryPoint.aprioricovar(1);
             covar(0, 2) = binaryPoint.aprioricovar(2);
             covar(1, 1) = binaryPoint.aprioricovar(3);
             covar(1, 2) = binaryPoint.aprioricovar(4);
             covar(2, 2) = binaryPoint.aprioricovar(5);
+            // covar(0, 0) = binaryPoint.aprioricovar(0)/1.0e6;
+            // covar(0, 1) = binaryPoint.aprioricovar(1)/1.0e6;
+            // covar(0, 2) = binaryPoint.aprioricovar(2)/1.0e6;
+            // covar(1, 1) = binaryPoint.aprioricovar(3)/1.0e6;
+            // covar(1, 2) = binaryPoint.aprioricovar(4)/1.0e6;
+            // covar(2, 2) = binaryPoint.aprioricovar(5)/1.0e6;
             apriori.SetRectangularMatrix(covar);
             QString sigmas = "AprioriLatitudeSigma = " +
                              toString(apriori.GetLatSigmaDistance().meters()) +
@@ -443,6 +456,7 @@ namespace Isis {
                                  " <meters>");
 
         if (binaryPoint.adjustedcovar_size()) {
+          // Matrix length units are meters
           PvlKeyword matrix("AdjustedCovarianceMatrix");
           matrix += toString(binaryPoint.adjustedcovar(0));
           matrix += toString(binaryPoint.adjustedcovar(1));
@@ -460,12 +474,26 @@ namespace Isis {
             symmetric_matrix<double, upper> covar;
             covar.resize(3);
             covar.clear();
+            // Set matrix values in m squared and SurfacePoint converts to km**2
             covar(0, 0) = binaryPoint.adjustedcovar(0);
             covar(0, 1) = binaryPoint.adjustedcovar(1);
             covar(0, 2) = binaryPoint.adjustedcovar(2);
             covar(1, 1) = binaryPoint.adjustedcovar(3);
             covar(1, 2) = binaryPoint.adjustedcovar(4);
             covar(2, 2) = binaryPoint.adjustedcovar(5);
+            // covar(0, 0) = binaryPoint.adjustedcovar(0)/1.0e6;
+            // covar(0, 1) = binaryPoint.adjustedcovar(1)/1.0e6;
+            // covar(0, 2) = binaryPoint.adjustedcovar(2)/1.0e6;
+            // covar(1, 1) = binaryPoint.adjustedcovar(3)/1.0e6;
+            // covar(1, 2) = binaryPoint.adjustedcovar(4)/1.0e6;
+            // covar(2, 2) = binaryPoint.adjustedcovar(5)/1.0e6;
+            // double cv0 = covar(0,0);
+            // double cv1 = covar(0,1);
+            // double cv2 = covar(0,2);
+            // double cv3 = covar(1,1);
+            // double cv4 = covar(1,2);
+            // double cv5 = covar(2,2);
+            // adjusted.SetRectangularMatrix(covar, SurfacePoint::Kilometers);
             adjusted.SetRectangularMatrix(covar);
             QString sigmas = "AdjustedLatitudeSigma = " +
                              toString(adjusted.GetLatSigmaDistance().meters()) +

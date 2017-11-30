@@ -352,6 +352,7 @@ namespace Isis {
    * @internal
    *   @history  2017-07-25 Debbie A. Cook  Added documentation and corrected units for diagonal 
    *                                                       elements to be km^2 instead of m^2.
+   *   @history  2017-11-22 Debbie A. Cook  Updated call to SetRectangularMatrix 
    */
   void SurfacePoint::SetRectangularSigmas(const Distance &xSigma,
                                           const Distance &ySigma,
@@ -365,22 +366,24 @@ namespace Isis {
 
     symmetric_matrix<double,upper> covar(3);
     covar.clear();
-    covar(0,0) = xSigma.kilometers() * xSigma.kilometers();
-    covar(1,1) = ySigma.kilometers() * ySigma.kilometers();
-    covar(2,2) = zSigma.kilometers() * zSigma.kilometers();
-    SetRectangularMatrix(covar);
+    covar(0,0) = xSigma.meters() * xSigma.meters();
+    covar(1,1) = ySigma.meters() * ySigma.meters();
+    covar(2,2) = zSigma.meters() * zSigma.meters();
+    SetRectangularMatrix(covar, Meters);
   }
 
 
   /**
-   * Set rectangular covariance matrix
+   * Set rectangular covariance matrix and store in units of km**2
    *
-   * @param covar Rectangular variance/covariance matrix (units are km**2)
+   * @param covar Rectangular variance/covariance matrix 
+   * @param units Units of matrix are units**2
    *
    * @return void
    */
-  void SurfacePoint::SetRectangularMatrix(
-       const symmetric_matrix<double, upper> &covar) {
+  void SurfacePoint::SetRectangularMatrix(const symmetric_matrix<double, upper> &covar,
+                                          SurfacePoint::CoordUnits units) {
+
     // Make sure the point is set first
     if (!Valid()) {
       IString msg = "A point must be set before a variance/covariance matrix "
@@ -388,22 +391,39 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_rectCovar) {
+    // Make sure the units are valid
+    if (units != Kilometers && units != Meters) {
+      IString msg = "Units must be Kilometers or Meters";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
+    // covar units are km**2
+    if (p_rectCovar) {
       *p_rectCovar = covar;
     }
     else {
       p_rectCovar = new symmetric_matrix<double, upper>(covar);
     }
 
+    if (units == Meters) {
+      // Convert input matrix to km to hold in memory
+      (*p_rectCovar)(0,0) = covar(0,0)/1.0e6;
+      (*p_rectCovar)(0,1) = covar(0,1)/1.0e6;
+      (*p_rectCovar)(0,2) = covar(0,2)/1.0e6;
+      (*p_rectCovar)(1,1) = covar(1,1)/1.0e6;
+      (*p_rectCovar)(1,2) = covar(1,2)/1.0e6;
+      (*p_rectCovar)(2,2) = covar(2,2)/1.0e6;
+    }
+
     SpiceDouble rectMat[3][3];
 
-    // Compute the local radius of the surface point in kilometers
-    double x2  = p_x->kilometers() * p_x->kilometers();
-    double y2  = p_y->kilometers() * p_y->kilometers();
-    double z   = p_z->kilometers();
+    // Compute the local radius of the surface point in meters.  We will convert to km before saving the matrix.
+    double x2  = p_x->meters() * p_x->meters();
+    double y2  = p_y->meters() * p_y->meters();
+    double z   = p_z->meters();
     double radius = sqrt(x2 + y2 + z*z);
 
-    // Should we use a matrix utility?
+    // *** TODO *** Replace this section with LinearAlgebra multiply calls and avoid having to create a Spice matrix
     rectMat[0][0] = covar(0,0);
     rectMat[0][1] = rectMat[1][0] = covar(0,1);
     rectMat[0][2] = rectMat[2][0] = covar(0,2);
@@ -411,20 +431,20 @@ namespace Isis {
     rectMat[1][2] = rectMat[2][1] = covar(1,2);
     rectMat[2][2] = covar(2,2);
 
-    // Compute the Jacobian
+    // Compute the Jacobian in meters.  Don't deal with unit mismatch yet to preserve precision.
     SpiceDouble J[3][3];
-    double zOverR = p_z->kilometers() / radius;
+    double zOverR = p_z->meters() / radius;
     double r2 = radius*radius;
     double denom = r2*radius*sqrt(1.0 - (zOverR*zOverR));
-    J[0][0] = -p_x->kilometers() * p_z->kilometers() / denom;
-    J[0][1] = -p_y->kilometers() * p_z->kilometers() / denom;
-    J[0][2] = (r2 - p_z->kilometers() * p_z->kilometers()) / denom;
-    J[1][0] = -p_y->kilometers() / (x2 + y2);
-    J[1][1] = p_x->kilometers() / (x2 + y2);
+    J[0][0] = -p_x->meters() * p_z->meters() / denom;
+    J[0][1] = -p_y->meters() * p_z->meters() / denom;
+    J[0][2] = (r2 - p_z->meters() * p_z->meters()) / denom;
+    J[1][0] = -p_y->meters() / (x2 + y2);
+    J[1][1] = p_x->meters() / (x2 + y2);
     J[1][2] = 0.0;
-    J[2][0] = p_x->kilometers() / radius;
-    J[2][1] = p_y->kilometers() / radius;
-    J[2][2] = p_z->kilometers() / radius;
+    J[2][0] = p_x->meters() / radius;  // This row is unitless
+    J[2][1] = p_y->meters() / radius;
+    J[2][2] = p_z->meters() / radius;
 
     if(!p_sphereCovar)
       p_sphereCovar = new symmetric_matrix<double, upper>(3);
@@ -432,12 +452,24 @@ namespace Isis {
     SpiceDouble mat[3][3];
     mxm_c (J, rectMat, mat);
     mxmt_c (mat, J, mat);
-    (*p_sphereCovar)(0,0) = mat[0][0];
-    (*p_sphereCovar)(0,1) = mat[0][1];
-    (*p_sphereCovar)(0,2) = mat[0][2];
-    (*p_sphereCovar)(1,1) = mat[1][1];
-    (*p_sphereCovar)(1,2) = mat[1][2];
-    (*p_sphereCovar)(2,2) = mat[2][2];
+    if (units == Kilometers) {
+      // Now take care of unit mismatch between rect matrix in km and Jacobian in m
+      (*p_sphereCovar)(0,0) = mat[0][0] * 1.0e6;
+      (*p_sphereCovar)(0,1) = mat[0][1] * 1.0e6;
+      (*p_sphereCovar)(0,2) = mat[0][2] * 1000.0;
+      (*p_sphereCovar)(1,1) = mat[1][1] * 1.0e6;
+      (*p_sphereCovar)(1,2) = mat[1][2] * 1000.0;
+      (*p_sphereCovar)(2,2) = mat[2][2];
+    }
+    else { // (units == Meters) 
+      // Convert matrix lengths from m to km
+      (*p_sphereCovar)(0,0) = mat[0][0];
+      (*p_sphereCovar)(0,1) = mat[0][1];
+      (*p_sphereCovar)(0,2) = mat[0][2] / 1000.0;
+      (*p_sphereCovar)(1,1) = mat[1][1];
+      (*p_sphereCovar)(1,2) = mat[1][2] / 1000.0;
+      (*p_sphereCovar)(2,2) = mat[2][2] / 1.0e6;
+    }
   }
 
 
@@ -539,6 +571,8 @@ namespace Isis {
    * @internal
    *   @history  2017-07-25 Debbie A. Cook  Added documentation and corrected units for covar(2,2) 
    *                                                                 to be km^2 instead of m^2.
+   *   @history  2017-11-22 Debbie A. Cook  Set units for covar(2,2) back to m^2 which is not the default
+   *                                                                 for the set method. 
    */
   void SurfacePoint::SetSphericalSigmas(const Angle &latSigma,
                                         const Angle &lonSigma,
@@ -552,9 +586,10 @@ namespace Isis {
       covar(0,0) =  sphericalCoordinate*sphericalCoordinate;
       sphericalCoordinate = (double) lonSigma.radians();
       covar(1,1) = sphericalCoordinate*sphericalCoordinate;
-      sphericalCoordinate = (double) radiusSigma.kilometers();
+      sphericalCoordinate = (double) radiusSigma.meters();
       covar(2,2) = sphericalCoordinate*sphericalCoordinate;
 
+      // Use default set units for radius of meters*meters
       SetSphericalMatrix(covar);
     }
     else {
@@ -628,7 +663,8 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetSphericalMatrix(
-     const symmetric_matrix<double, upper> & covar) {
+                                        const symmetric_matrix<double, upper> & covar,
+                                        SurfacePoint::CoordUnits units) {
 
     // Make sure the point is set first
     if (!Valid()) {
@@ -637,13 +673,35 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_sphereCovar) {
-      *p_sphereCovar = covar;
+    // Make sure the units are valid
+    if (units != Kilometers && units != Meters) {
+      IString msg = "Units must be Kilometers or Meters";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Get the radius of the point in the same units as the input matrix when saving the input matrix
+    double radius = (double) GetLocalRadius().kilometers();
+    
+    // Save the spherical matrix in km and km**2
+    if (p_sphereCovar) {
+        *p_sphereCovar = covar;
     }
     else {
       p_sphereCovar = new symmetric_matrix<double, upper>(covar);
     }
+        
+    if (units == Meters) {
+      // Convert input matrix to km to store
+      (*p_sphereCovar)(0,0) = covar(0,0);
+      (*p_sphereCovar)(0,1) = covar(0,1);
+      (*p_sphereCovar)(0,2) = covar(0,2) / 1000.;
+      (*p_sphereCovar)(1,1) = covar(1,1);
+      (*p_sphereCovar)(1,2) = covar(1,2) / 1000.;
+      (*p_sphereCovar)(2,2) = covar(2,2) / 1.0e6;
+      radius = (double) GetLocalRadius().meters();
+    }
 
+    // ***TODO*** Consider using LinearAlgebra matrix multiply and avoid creating SpiceDouble matrix.
     SpiceDouble sphereMat[3][3];
 
     sphereMat[0][0] = covar(0,0);
@@ -660,9 +718,8 @@ namespace Isis {
     // Get the lat/lon/radius of the point
     double lat = (double) GetLatitude().radians();
     double lon = (double) GetLongitude().radians();
-    double radius = (double) GetLocalRadius().kilometers();
 
-    // Compute the Jacobian
+    // Compute the Jacobian in same units as input matrix.
     SpiceDouble J[3][3];
     double cosPhi = cos(lat);
     double sinPhi = sin(lat);
@@ -686,14 +743,24 @@ namespace Isis {
     SpiceDouble mat[3][3];
     mxm_c (J, sphereMat, mat);
     mxmt_c (mat, J, mat);
-    //  TODO  Test to see if only the upper triangular portion of the matrix needs to be set
-    (*p_rectCovar)(0,0) = mat[0][0];
-    (*p_rectCovar)(0,1) = mat[0][1];
-    (*p_rectCovar)(0,2) = mat[0][2];
-    (*p_rectCovar)(1,1) = mat[1][1];
-    (*p_rectCovar)(1,2) = mat[1][2];
-    (*p_rectCovar)(2,2) = mat[2][2];
-    
+
+    if (units == Kilometers) {
+      (*p_rectCovar)(0,0) = mat[0][0];
+      (*p_rectCovar)(0,1) = mat[0][1];
+      (*p_rectCovar)(0,2) = mat[0][2];
+      (*p_rectCovar)(1,1) = mat[1][1];
+      (*p_rectCovar)(1,2) = mat[1][2];
+      (*p_rectCovar)(2,2) = mat[2][2];
+    }
+    else { // (units == Meters) 
+      //  Convert to km
+      (*p_rectCovar)(0,0) = mat[0][0]/1.0e6;
+      (*p_rectCovar)(0,1) = mat[0][1]/1.0e6;
+      (*p_rectCovar)(0,2) = mat[0][2]/1.0e6;
+      (*p_rectCovar)(1,1) = mat[1][1]/1.0e6;
+      (*p_rectCovar)(1,2) = mat[1][2]/1.0e6;
+      (*p_rectCovar)(2,2) = mat[2][2]/1.0e6;
+    }
 //     std::cout<<"Rcovar = "<<p_rectCovar(0,0)<<" "<<p_rectCovar(0,1)<<" "<<p_rectCovar(0,2)<<std::endl
 //              <<"         "<<p_rectCovar(1,0)<<" "<<p_rectCovar(1,1)<<" "<<p_rectCovar(1,2)<<std::endl
 //              <<"         "<<p_rectCovar(2,0)<<" "<<p_rectCovar(2,1)<<" "<<p_rectCovar(2,2)<<std::endl;
@@ -701,7 +768,7 @@ namespace Isis {
   
 
   /**
-   * Set  covariance matrix
+   * Set  covariance matrix in km
    *
    * @param covar variance/covariance matrix
    *
@@ -711,10 +778,10 @@ namespace Isis {
 
     switch (type) {   
       case Latitudinal:
-        SetSphericalMatrix(covar);
+        SetSphericalMatrix(covar, SurfacePoint::Kilometers);
         break;
       case Rectangular:
-        SetRectangularMatrix(covar);
+        SetRectangularMatrix(covar, SurfacePoint::Kilometers);
         break;
       default:
          IString msg ="Unknown surface point coordinate type enum [" + toString(type) + "]." ;

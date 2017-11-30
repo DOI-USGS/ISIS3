@@ -31,6 +31,9 @@ using namespace boost::numeric::ublas;
  *            DisplacementToDouble, and enum types CoordinateType, 
  *            CoordUnits, and CoordIndex.  Fixed incorrect units in report for
  *            latSig and lonSig.
+ *   @history 2017-11-20 Debbie A. Cook - Added tests for new options
+ *            in SetRectangularMatrix and SetSphericalMatrix.
+ *   
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
@@ -38,7 +41,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "UnitTest for SurfacePoint" << endl << endl;
-    cout << "1-Test rectangular set of point and variance only ..." << endl;
+    cout << "1-Test rectangular set of point and variance only (variance in m^2) ..." << endl;
     cout << " with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,"
           "sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m" << endl << endl;
     Isis::SurfacePoint spRec;
@@ -50,9 +53,10 @@ int main(int argc, char *argv[]) {
     symmetric_matrix<double,upper> covar;
     covar.resize(3);
     covar.clear();
-    covar(0,0) = .0001;
-    covar(1,1) = .0025;
-    covar(2,2) = .0004;
+    // Units are m**2
+    covar(0,0) = 100.;
+    covar(1,1) = 2500.;
+    covar(2,2) = 400.;
 
     spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
                          Displacement(734.4311949, Displacement::Meters),
@@ -103,7 +107,7 @@ int main(int argc, char *argv[]) {
 
 
     cout << endl;
-    cout << "2-Testing spherical set of point and variance/covariance matrix ..."
+    cout << "2-Testing spherical set of point and variance/covariance matrix (in meters^2)..."
             << endl;
       // Usage note:  In order to get accurate results, the full correlation matrix should be
       // used as opposed to only setting the diagonal elements with the sigmas. 
@@ -112,10 +116,14 @@ int main(int argc, char *argv[]) {
     cout << " latitude sigma=" << latSig << " deg, longitude sigma=" << lonSig
          << " deg, radiusSig=" << radSig << " m" << endl;
     Isis::SurfacePoint spSphere;
+    // Convert covarSphere to meters to be able to test default set
+    covarSphere(0,2) *= 1000.;
+    covarSphere(1,2) *= 1000.;
+    covarSphere(2,2) *= 1.0e6;
     spSphere.SetSpherical(Latitude(lat, Angle::Degrees),
                           Longitude(lon, Angle::Degrees),
                           Distance(radius, Distance::Meters),
-                          covarSphere );
+                          covarSphere);
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
     covarRec = spSphere.GetRectangularMatrix();
@@ -237,8 +245,6 @@ int main(int argc, char *argv[]) {
          << covarRec(1,1) << "  " << covarRec(1,2) << endl;
     cout << "                                    " << covarRec(2,0) << "  "
          << covarRec(2,1) << "  " << covarRec(2,2) << endl;
-
-
     cout << endl << "5-Testing copy constructor" << endl;
     Isis::SurfacePoint spRec2(spSphere1);
     lat = (spRec2.GetLatitude()).degrees();
@@ -266,6 +272,105 @@ int main(int argc, char *argv[]) {
         Longitude(-45, Angle::Degrees), Distance(10, Distance::Kilometers));
     cout << "Longitude (from -45): " << spSphere3.GetLongitude().degrees()
          << endl << endl;
+
+    cout << "6-Testing set of matrices in spherical and rectangular coordinates in km ..."
+         << endl;
+    cout << "  6a-Test rectangular set of point and variance only (variance in km^2) ..." << endl;
+    cout << "    with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,"
+          "sigmaX=.01 km, sigmaY=.05 km, sigmaZ=.02 km" << endl << endl;
+    Isis::SurfacePoint spRecKm;
+
+    spRecKm.SetRadii(Distance(1000., Distance::Meters),
+                   Distance(1000., Distance::Meters),
+                   Distance(1000., Distance::Meters));
+
+    symmetric_matrix<double,upper> covar;
+    covar.resize(3);
+    covar.clear();
+    // Units are km**2
+    covar(0,0) = .0001;
+    covar(1,1) = .0025;
+    covar(2,2) = .0004;
+
+    spRecKm.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+                           Displacement(734.4311949, Displacement::Meters),
+                         Displacement(529.919264, Displacement::Meters));
+    spRecKm.SetMatrix(SurfacePoint::Rectangular, covar);
+
+    lat = spRecKm.GetLatitude().degrees();
+    lon = spRecKm.GetLongitude().degrees();
+    radius = spRecKm.GetLocalRadius().meters();
+    latSig = spRecKm.GetLatSigma().degrees();
+    lonSig = spRecKm.GetLonSigma().degrees();
+    radSig = spRecKm.GetLocalRadiusSigma().meters();
+    symmetric_matrix<double,upper> covarSphKm(3);
+    covarSphKm.clear();
+    covarSphKm = spRecKm.GetSphericalMatrix();
+    
+    cout << setprecision(9);
+    cout << "    Output spherical..." << endl;
+    cout << "      lat = " << lat << " degrees, lon = " << lon <<
+            " degrees, radius = " << radius << " meters" << endl;
+    cout << "      lat = " << spRecKm.GetLatitude().radians() <<
+            " radians, lon = " << spRecKm.GetLongitude().radians() 
+         << " radians, radius = " << spRecKm.GetLocalRadius().meters() <<
+            " meters" << endl;
+    cout << "      latitude sigma=" << spRecKm.GetLatSigma().radians() <<
+            " radians, longitude sigma=" << spRecKm.GetLonSigma().radians()
+         << " radians, radius sigma=" << spRecKm.GetLocalRadiusSigma().meters()
+         << " m" << endl;
+
+    cout << "      spherical covariance matrix = " << covarSphKm(0,0) << "  " <<
+         covarSphKm(0,1) << "  " << covarSphKm(0,2) << endl;
+    cout << "                                    " << covarSphKm(1,0) << "  " <<
+         covarSphKm(1,1) << "  " << covarSphKm(1,2) << endl;
+    cout << "                                    " << covarSphKm(2,0) << "  " <<
+         covarSphKm(2,1) << "  " << covarSphKm(2,2) << endl;
+    cout << "    Input rectangular sigmas = " << spRecKm.GetXSigma().kilometers()
+         << "/" << spRecKm.GetYSigma().kilometers() << "/"
+         << spRecKm.GetZSigma().kilometers() << std::endl;
+    
+    cout << endl;
+    cout << "  6b-Testing spherical set of point and variance/covariance matrix (in km^2)..."
+            << endl;
+      // Usage note:  In order to get accurate results, the full correlation matrix should be
+      // used as opposed to only setting the diagonal elements with the sigmas. 
+    cout << "    with lat=" << lat << " degrees, lon=" << lon << " degrees, radius="
+         << radius << " m" << endl;
+    cout << "    latitude sigma=" << latSig << " deg, longitude sigma=" << lonSig
+         << " deg, radiusSig=" << radSig << " m" << endl;
+    Isis::SurfacePoint spSphereKm;
+    spSphereKm.SetSpherical(Latitude(lat, Angle::Degrees),
+                          Longitude(lon, Angle::Degrees),
+                            Distance(radius, Distance::Meters));
+    spSphereKm.SetMatrix(SurfacePoint::Latitudinal, covarSphKm);
+    symmetric_matrix<double,upper> covarRecKm(3);
+    covarRecKm.clear();
+    covarRecKm = spSphereKm.GetRectangularMatrix();
+
+    if(fabs(covarRecKm(0,1)) < 1E-12) covarRecKm(0,1) = 0.0;
+    if(fabs(covarRecKm(0,2)) < 1E-12) covarRecKm(0,2) = 0.0;
+    if(fabs(covarRecKm(1,0)) < 1E-12) covarRecKm(1,0) = 0.0;
+    if(fabs(covarRecKm(1,2)) < 1E-12) covarRecKm(1,2) = 0.0;
+    if(fabs(covarRecKm(2,0)) < 1E-12) covarRecKm(2,0) = 0.0;
+    if(fabs(covarRecKm(2,2)) < 1E-12) covarRecKm(2,2) = 0.0;
+
+    cout << "    Output rectangular..." << endl;
+    cout << "      x=" << spSphereKm.GetX().meters()
+         << " m, y=" << spSphereKm.GetY().meters()
+         << " m, z=" << spSphereKm.GetZ().meters() << " m" << endl;
+    cout << "      X sigma=" << spSphereKm.GetXSigma().meters() << " m, Y sigma="
+         << spSphereKm.GetYSigma().meters() << " m, Z sigma=" <<
+            spSphereKm.GetZSigma().meters() << " m" << endl;
+    cout << "      rectangular covariance matrix = " 
+         << setw(10) << covarRecKm(0,0) << setw(10) << covarRecKm(0,1)
+         << setw(10) << covarRecKm(0,2) << endl;
+    cout << "                                    "
+         << setw(10) << covarRecKm(1,0) << setw(10) << covarRecKm(1,1)
+         << setw(10) << covarRecKm(1,2) << endl;
+    cout << "                                    "
+         << setw(10) << covarRecKm(2,0) << setw(10) << covarRecKm(2,1)
+         << setw(10) << covarRecKm(2,2) << endl << endl;
   }
   catch(Isis::IException &e) {
     e.print();

@@ -58,6 +58,12 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Removed thrown exception in
    *                           toPvl() when unable to find TargetRadii values. Instead, we
    *                           will just leave these values blank. References #3892
+   *   @history 2017-10-27 Debbie A. Cook - Update calls to SurfacePoint::SetRectangularMatrix
+   *                           to pass covar in units of km*km instead of m*m.  References #4649 and #501.
+   *   @history 2017-10-27 Debbie A. Cook - Changed conversions from m**2 to km**2 to division
+   *                           by 1.0e6 instead of multiplication by 1.0e-6 to avoid round-off.  This should only 
+   *                           happen when the control net is input so it should not be a problem if it is a 
+   *                           little slower.References #4649 and #501.
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:

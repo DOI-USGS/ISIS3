@@ -136,7 +136,7 @@ Object = ControlNetwork
     # AprioriRadius = 999.99999984142 <meters>
     AprioriZ                 = 529.919264 <meters>
 
-    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 124939.57715415 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
+    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 89854.741455035 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
     AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
     LatitudeConstrained      = True
     LongitudeConstrained     = True
@@ -151,7 +151,7 @@ Object = ControlNetwork
     # AdjustedRadius = 999.99999984142 <meters>
     AdjustedZ                = 529.919264 <meters>
 
-    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 124939.57715415 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
+    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 89854.741455035 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
     AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure
@@ -335,7 +335,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3394325.2138031 <meters>
     AdjustedZ                = 829595.31268436 <meters>
 
-    # AdjustedLatitudeSigma = 100.13842019954 <meters>  AdjustedLongitudeSigma = 106.48711145076 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
+    # AdjustedLatitudeSigma = 100.13842019954 <meters>  AdjustedLongitudeSigma = 100.12615056017 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
     AdjustedCovarianceMatrix = (8096.6118516192, 3791.9236705506,
                                 -1072.6708105639, 2516.0772474838,
                                 2117.9301543094, 9418.2547424025)
@@ -431,7 +431,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3397378.3342506 <meters>
     AdjustedZ                = 93324.42152629 <meters>
 
-    # AdjustedLatitudeSigma = 56.560713922924 <meters>  AdjustedLongitudeSigma = 56.546411110445 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
+    # AdjustedLatitudeSigma = 56.560713922924 <meters>  AdjustedLongitudeSigma = 56.503742565429 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
     AdjustedCovarianceMatrix = (2621.8486551013, 1225.183985133,
                                 -35.999329178353, 575.49833284641,
                                 80.485341554024, 3198.9240672187)

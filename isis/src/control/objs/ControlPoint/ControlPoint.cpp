@@ -124,6 +124,8 @@ namespace Isis {
    *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix from m**2
    *          to km**2 for both apriori and adjusted points to avoid multiple unit 
    *          conversions in the BundleAdjust.
+   *   @history 2017-11-20  Debbie A. Cook - remove 2017-08-31 change and do
+   *          the unit conversion in SurfacePoint to retain precision.  References #4649.
    */
   ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
       const Distance &majorRad, const Distance &minorRad,
@@ -248,17 +250,17 @@ namespace Isis {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        // Convert stored entries in meters**2 to km**2 because SurfacePoint expects km**2
-        covar(0, 0) = fileEntry.aprioricovar(0)/1.0e6;
-        covar(0, 1) = fileEntry.aprioricovar(1)/1.0e6;
-        covar(0, 2) = fileEntry.aprioricovar(2)/1.0e6;
-        covar(1, 1) = fileEntry.aprioricovar(3)/1.0e6;
-        covar(1, 2) = fileEntry.aprioricovar(4)/1.0e6;
-        covar(2, 2) = fileEntry.aprioricovar(5)/1.0e6;
-        apriori.SetRectangularMatrix(covar);
+        // SurfacePoint expects m**2 and converts to km**2 internally
+        covar(0, 0) = fileEntry.aprioricovar(0);
+        covar(0, 1) = fileEntry.aprioricovar(1);
+        covar(0, 2) = fileEntry.aprioricovar(2);
+        covar(1, 1) = fileEntry.aprioricovar(3);
+        covar(1, 2) = fileEntry.aprioricovar(4);
+        covar(2, 2) = fileEntry.aprioricovar(5);
+       apriori.SetRectangularMatrix(covar);
 
-        if (Displacement(covar(0, 0), Displacement::Kilometers).isValid() ||
-            Displacement(covar(1, 1), Displacement::Kilometers).isValid()) {
+        if (Displacement(covar(0, 0), Displacement::Meters).isValid() ||
+            Displacement(covar(1, 1), Displacement::Meters).isValid()) {
           // The conversion from Rectangular to Latitudinal coordinates uses
           // Rectangular X and Y for computing latitude, longitude, and radius.
           // *** TBD ***
@@ -296,13 +298,13 @@ namespace Isis {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        // Convert stored entries in meters**2 to km**2 because SurfacePoint expects km**2
-        covar(0, 0) = fileEntry.adjustedcovar(0)/1.0e6;
-        covar(0, 1) = fileEntry.adjustedcovar(1)/1.0e6;
-        covar(0, 2) = fileEntry.adjustedcovar(2)/1.0e6;
-        covar(1, 1) = fileEntry.adjustedcovar(3)/1.0e6;
-        covar(1, 2) = fileEntry.adjustedcovar(4)/1.0e6;
-        covar(2, 2) = fileEntry.adjustedcovar(5)/1.0e6;
+        // SurfacePoint expects m**2 and converts to km**2 internally
+        covar(0, 0) = fileEntry.adjustedcovar(0);
+        covar(0, 1) = fileEntry.adjustedcovar(1);
+        covar(0, 2) = fileEntry.adjustedcovar(2);
+        covar(1, 1) = fileEntry.adjustedcovar(3);
+        covar(1, 2) = fileEntry.adjustedcovar(4);
+        covar(2, 2) = fileEntry.adjustedcovar(5);
         adjusted.SetRectangularMatrix(covar);
       }
 
@@ -414,7 +416,7 @@ namespace Isis {
   *                         It was also decided that when importing old
   *                         networks that contain Sigmas, the sigmas will not
   *                         be imported , due to conflicts with the units of
-  *                         the sigmas,we cannot get accurate x,y,z sigams from
+  *                         the sigmas,we cannot get accurate x,y,z sigmas from
   *                         the lat,lon,radius sigmas without the covariance
   *                         matrix.
   * @history 2010-09-28 Tracie Sucharski, Added back the conversion methods
@@ -2230,10 +2232,6 @@ namespace Isis {
    * Set jigsaw rejected flag for all measures to false
    * and set the jigsaw rejected flag for the point itself to false
    *
-   * @internal
-   *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix from m**2
-   *          to km**2 for both apriori and adjusted points to avoid multiple unit 
-   *          conversions in the BundleAdjust.
    */
   void ControlPoint::ClearJigsawRejected() {
     int nmeasures = measures->size();
@@ -2252,6 +2250,14 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Fill the file entry
+   *
+   * @internal
+   *   @history 2017-08-31  Debbie A. Cook - convert var/covar matrix from km**2
+   *          to m**2 for both apriori and adjusted points for backward compatibility.
+   */
   ControlPointFileEntryV0002 ControlPoint::ToFileEntry() const {
     ControlPointFileEntryV0002 fileEntry;
 
