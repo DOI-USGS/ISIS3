@@ -106,7 +106,7 @@ Group = SpacecraftName
   InputPosition        = (Observation_Area, Observing_System,
                           Observing_System_Component)
   InputKey             = name
-  InputKeyDependencies = tag@type:Spacecraft
+  InputKeyDependencies = tag@type|Spacecraft
   OutputPosition       = (group, instrument)
   OutputName           = SpacecraftName
   Translation          = (*, *)
@@ -124,7 +124,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Spacecraft
+  Specification:    tag@type|Spacecraft
 
   Dependency type:  tag
   Dependency name:  type
@@ -146,7 +146,7 @@ Group = InstrumentId
   InputPosition        = (Observation_Area, Observing_System,
                           Observing_System_Component)
   InputKey             = name
-  InputKeyDependencies = tag@type:Instrument
+  InputKeyDependencies = tag@type|Instrument
   OutputPosition       = (group, instrument)
   OutputName           = InstrumentId
   Translation          = (*, *)
@@ -164,7 +164,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -178,7 +178,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -192,7 +192,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -213,7 +213,7 @@ Group = OnboardImageAcquisitionTimeUTC
   Debug                = Null
   InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
   InputKey             = OnboardImageAcquisitionTime
-  InputKeyDependencies = att@Time_Base:UTC
+  InputKeyDependencies = att@Time_Base|UTC
   OutputPosition       = (group, instrument)
   OutputName           = OnboardImageAcquisitionTimeUTC
   Translation          = (*, *)
@@ -230,7 +230,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:UTC
+  Specification:    att@Time_Base|UTC
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -250,7 +250,7 @@ Group = OnboardImageAcquisitionTimeET
   Debug                = Null
   InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
   InputKey             = OnboardImageAcquisitionTime
-  InputKeyDependencies = att@Time_Base:ET
+  InputKeyDependencies = att@Time_Base|ET
   OutputPosition       = (group, instrument)
   OutputName           = OnboardImageAcquisitionTimeET
   Translation          = (*, *)
@@ -267,7 +267,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:ET
+  Specification:    att@Time_Base|ET
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -280,7 +280,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:ET
+  Specification:    att@Time_Base|ET
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -300,7 +300,7 @@ Group = CoreBands
   Debug                = Null
   InputPosition        = (Product_Observational, File_Area_Observational,
                           Array_2D_Image, Axis_Array)
-  InputKeyDependencies = tag@axis_name:Band
+  InputKeyDependencies = tag@axis_name|Band
   InputKey             = elements
   InputDefault         = 1
   OutputPosition       = (group, CoreCube)
@@ -325,7 +325,7 @@ Group = CoreSamples
   Debug                = Null
   InputPosition        = (Product_Observational, File_Area_Observational,
                           Array_2D_Image, Axis_Array)
-  InputKeyDependencies = tag@axis_name:Sample
+  InputKeyDependencies = tag@axis_name|Sample
   InputKey             = elements
   InputKeyAttribute    = Units
   InputDefault         = 2
@@ -475,7 +475,7 @@ Group = SpacecraftName
   InputPosition        = (Observation_Area, Observing_System,
                           Observing_System_Component)
   InputKey             = name
-  InputKeyDependencies = tag@type:Spacecraft
+  InputKeyDependencies = tag@type|Spacecraft
   OutputPosition       = (group, instrument)
   OutputName           = SpacecraftName
   Translation          = (*, *)
@@ -493,7 +493,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Spacecraft
+  Specification:    tag@type|Spacecraft
 
   Dependency type:  tag
   Dependency name:  type
@@ -515,7 +515,7 @@ Group = InstrumentId
   InputPosition        = (Observation_Area, Observing_System,
                           Observing_System_Component)
   InputKey             = name
-  InputKeyDependencies = tag@type:Instrument
+  InputKeyDependencies = tag@type|Instrument
   OutputPosition       = (group, instrument)
   OutputName           = InstrumentId
   Translation          = (*, *)
@@ -533,7 +533,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -547,7 +547,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -561,7 +561,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    tag@type:Instrument
+  Specification:    tag@type|Instrument
 
   Dependency type:  tag
   Dependency name:  type
@@ -582,7 +582,7 @@ Group = OnboardImageAcquisitionTimeUTC
   Debug                = Null
   InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
   InputKey             = OnboardImageAcquisitionTime
-  InputKeyDependencies = att@Time_Base:UTC
+  InputKeyDependencies = att@Time_Base|UTC
   OutputPosition       = (group, instrument)
   OutputName           = OnboardImageAcquisitionTimeUTC
   Translation          = (*, *)
@@ -599,7 +599,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:UTC
+  Specification:    att@Time_Base|UTC
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -619,7 +619,7 @@ Group = OnboardImageAcquisitionTimeET
   Debug                = Null
   InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
   InputKey             = OnboardImageAcquisitionTime
-  InputKeyDependencies = att@Time_Base:ET
+  InputKeyDependencies = att@Time_Base|ET
   OutputPosition       = (group, instrument)
   OutputName           = OnboardImageAcquisitionTimeET
   Translation          = (*, *)
@@ -636,7 +636,7 @@ Product_Observational
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:ET
+  Specification:    att@Time_Base|ET
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -649,7 +649,7 @@ Dependencies failed, checking next candidate.
 Testing dependencies:
 
 Testing dependency number 1
-  Specification:    att@Time_Base:ET
+  Specification:    att@Time_Base|ET
 
   Dependency type:  att
   Dependency name:  Time_Base
@@ -669,7 +669,7 @@ Group = CoreBands
   Debug                = Null
   InputPosition        = (Product_Observational, File_Area_Observational,
                           Array_2D_Image, Axis_Array)
-  InputKeyDependencies = tag@axis_name:Band
+  InputKeyDependencies = tag@axis_name|Band
   InputKey             = elements
   InputDefault         = 1
   OutputPosition       = (group, CoreCube)
@@ -694,7 +694,7 @@ Group = CoreSamples
   Debug                = Null
   InputPosition        = (Product_Observational, File_Area_Observational,
                           Array_2D_Image, Axis_Array)
-  InputKeyDependencies = tag@axis_name:Sample
+  InputKeyDependencies = tag@axis_name|Sample
   InputKey             = elements
   InputKeyAttribute    = Units
   InputDefault         = 2
@@ -781,12 +781,12 @@ Testing error throws
 **ERROR** Input element [INSTRUMENT_IFOV] does not have an attribute named [Bad_Input_Element_Attribute].
 
 **ERROR** Failed to translate output value for [BadDependencyType].
-**ERROR** Malformed dependency specification [bad@type:Spacecraft].
-**ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
+**PROGRAMMER ERROR** Malformed dependency specification [bad@type|Spacecraft].
+**PROGRAMMER ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
 
 **ERROR** Failed to translate output value for [NoDependencyValue].
-**ERROR** Malformed dependency specification [bad@type].
-**ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
+**PROGRAMMER ERROR** Malformed dependency specification [bad@type].
+**PROGRAMMER ERROR** Dependency type specification [bad] is invalid. Valid types are [att], [tag] and [new].
 
 **ERROR** Failed to translate output value for [NotInTranslationTable].
 **ERROR** Unable to retrieve translation group from translation table.

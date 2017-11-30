@@ -193,7 +193,6 @@ namespace Isis {
    * Translates the output name and input value.
    *
    * @param nName The output name to be used to search the translation table.
-   *
    * @param fValue The input value to be translated
    *
    * @return QString The translated QString
@@ -201,7 +200,7 @@ namespace Isis {
    * @throws iException::Programmer
    */
   QString PvlTranslationTable::Translate(const QString nName,
-                                        const QString fValue) const {
+                                         const QString fValue) const {
     if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
                    nName + "] in file [" + p_trnsTbl.fileName() + "]";
@@ -233,7 +232,9 @@ namespace Isis {
 
     while(it != tgrp.end()) {
       const PvlKeyword &key = *it;
-      if((QString) key[1] == tmpFValue) {
+      // compare the value from the input file to the second value of each Translation in the trans file.
+      // ignore cases for input values  
+      if(QString::compare((QString) key[1], tmpFValue, Qt::CaseInsensitive) == 0) {
         return key[0];
       }
       else if((QString) key[1] == "*") {

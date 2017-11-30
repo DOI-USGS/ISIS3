@@ -89,38 +89,33 @@ namespace Isis {
    * @author 2003-05-01 Stuart Sides
    *
    * @internal
-   *  @history 2003-09-03 Stuart Sides - Modified to work with new isis label
-   *                                     format
-   *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-09-08 Stuart Sides - Modified Translate member to handle
-   *                                     translating any input value i.e., "*"
-   *                                     to a specific output value (Thanks Kris
-   *                                     Beckeer)
-   *
+   *  @history 2003-09-03 Stuart Sides - Modified to work with new isis label format.
+   *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen documentation.
+   *  @history 2005-09-08 Stuart Sides - Modified Translate member to handle translating any
+   *                          input value i.e., "*" to a specific output value (Thanks Kris
+   *                          Becker).
    *  @history 2006-08-09 Brendan George - Added IsOptional function as part of
-   *                                       support for Optional keyword translations
-   *  @history 2006-11-16 Brendan George - Changed instances of "Foreign" to "Input"
-   *                                       and "Native" to "Output"
-   *  @history 2007-06-22 Stuart Sides - Added instance parameter to InputGroup member
-   *  @history 2006-12-05 Brendan George - Changed OutputPosition keyword to be
-   *                                        case insensitive, and added
-   *                                        verification to the AddTable method so
-   *                                        that Translation Tables are verified
-   *                                        when read in
-   *  @history 2008-07-10 Steven Lambright - Made trnsTbl member into a
-   *           non-pointer
-   *  @history 2010-01-04 Steven Lambright - Now using files instead of streams
-   *                                      where possible to improve errors and
-   *                                      added code that checks the
-   *                                      integrity of translation files. Also
-   *                                      now looking for "InputPosition" keyword
-   *                                      instead of "InputGroup." The InputGroup
-   *                                      method (which needs renamed later) now
-   *                                      returns a PvlKeyword.
+   *                          support for Optional keyword translations
+   *  @history 2006-11-16 Brendan George - Changed instances of "Foreign" to "Input" and "Native"
+   *                          to "Output".
+   *  @history 2007-06-22 Stuart Sides - Added instance parameter to InputGroup member.
+   *  @history 2006-12-05 Brendan George - Changed OutputPosition keyword to be case insensitive,
+   *                          and added verification to the AddTable method so that
+   *                          Translation Tables are verified when read in.
+   *  @history 2008-07-10 Steven Lambright - Made trnsTbl member into a non-pointer
+   *  @history 2010-01-04 Steven Lambright - Now using files instead of streams where possible
+   *                          to improve errors and added code that checks the integrity of
+   *                          translation files. Also now looking for "InputPosition" keyword
+   *                          instead of "InputGroup." The InputGroup method (which needs
+   *                          renamed later) now returns a PvlKeyword.
+   *  @history 2017-11-04 Jeannie Backer - Modified Translation input value to make a case
+   *                          insensitive comparison.
+   *  
+   *  
+   *  
    *  @todo 2005-02-15 Stuart Sides - add coded and implementation example to
-   *                                  class documentation and finish documentation
-   *                                  for protected methods and variable
+   *                       class documentation and finish documentation
+   *                       for protected methods and variable
    */
   class PvlTranslationTable {
 

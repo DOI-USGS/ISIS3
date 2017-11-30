@@ -1,5 +1,6 @@
 #include "Isis.h"
 
+#include <QRegularExpression>
 #include <QString>
 #include <QDomDocument>
 
@@ -27,8 +28,8 @@ void IsisMain() {
   }
 
   // Setup the process and set the input cube
-  ProcessExportPds4 p;
-  Cube *icube = p.SetInputCube("FROM");
+  ProcessExportPds4 process;
+  Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
   PvlKeyword &instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
@@ -46,14 +47,28 @@ void IsisMain() {
   * Add additional pds label data here
   */
 
-  QDomDocument &pdsLabel = p.GetLabel();
+  QDomDocument &pdsLabel = process.GetLabel();
   PvlToXmlTranslationManager cubeLab(*(icube->label()),
                                     "$tgo/translations/tgoCassisExport.trn");
   cubeLab.Auto(pdsLabel);
 
-  p.StandardPds4Label();
+  process.StandardPds4Label();
+
+  // This regular expression matches the pipe followed by the date from
+  // the ISIS version string that Application returns.
+  QRegularExpression versionRegex(" \\| \\d{4}\\-\\d{2}\\-\\d{2}");
+  QString historyDescription = "Created PDS4 output product from ISIS cube with tgocassisrdrgen "
+                               "application from ISIS version "
+                               + Application::Version().remove(versionRegex) + ".";
+  // This regular expression matches the time from the date and time string
+  // that Application returns.
+  QRegularExpression dateRegex("T\\d{2}:\\d{2}:\\d{2}");
+  QString historyDate = Application::DateTime().remove(dateRegex);
+  process.addHistory(historyDescription, historyDate);
+
+  ProcessExportPds4::translateUnits(pdsLabel);
   
   QString outFile = ui.GetFileName("TO");
   
-  p.WritePds4(outFile);
+  process.WritePds4(outFile);
 }

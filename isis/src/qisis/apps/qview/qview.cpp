@@ -196,7 +196,12 @@ int main(int argc, char *argv[]) {
   for (int i = 1; i < argc; i++) {
     if (i != newWindow) {
       try {
-        vw->workspace()->addCubeViewport(QString(argv[i]));
+        QString arg(argv[i]);
+        if (arg.startsWith("-pref")) {
+            i++;
+            continue;
+        }
+        vw->workspace()->addCubeViewport(arg);
         openingAFileSucceeded = true;
       }
       catch (IException &e) {

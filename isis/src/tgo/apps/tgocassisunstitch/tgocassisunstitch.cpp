@@ -105,8 +105,14 @@ void IsisMain() {
   // Determine sizes of framelets in input fullframe images
 
   // Allocate this number of total cubes of the correct size
-  FileName outputFileName(ui.GetFileName("TO"));
-  QString outputBaseName = outputFileName.removeExtension().expanded();
+  FileName outputFileName(ui.GetFileName("OUTPUTPREFIX"));
+
+  // Sometimes there will be '.'s in an OUTPUT prefix that could 
+  // be confused with a file extension
+  QString outputBaseName = outputFileName.expanded(); 
+  if (outputFileName.extension() == "cub") {
+   outputBaseName = outputFileName.removeExtension().expanded(); 
+  }
 
   // Create and output a list of 
   QFile allCubesListFile(outputBaseName + ".lis");
@@ -154,10 +160,10 @@ void IsisMain() {
     
     PvlGroup &bandBin = frameletLabel->findGroup("BandBin", PvlObject::Traverse);
 
-    bandBin.addKeyword(PvlKeyword("FilterName", g_frameletInfoList[i].m_filterName), 
+    bandBin.addKeyword(PvlKeyword("Name", g_frameletInfoList[i].m_filterName), 
                                                 PvlObject::Replace);
-    bandBin.addKeyword(PvlKeyword("FilterCenter", toString(g_frameletInfoList[i].m_wavelength)));
-    bandBin.addKeyword(PvlKeyword("FilterWidth", toString(g_frameletInfoList[i].m_width)));
+    bandBin.addKeyword(PvlKeyword("Center", toString(g_frameletInfoList[i].m_wavelength)));
+    bandBin.addKeyword(PvlKeyword("Width", toString(g_frameletInfoList[i].m_width)));
     bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(g_frameletInfoList[i].m_frameId)));
 
     // Add the alpha cube

@@ -21,7 +21,7 @@
 
 #include "ProcessExport.h"
 #include <vector>
-
+#include <QString>
 #include <QDomDocument>
 
 namespace Isis {
@@ -48,6 +48,26 @@ namespace Isis {
    *   @history 2017-06-08 Marjorie Hahn - Added WritePds4 method to write out the 
    *                           .img and .xml Pds4 data.
    *   @history 2017-09-26 Jesse Mapel - Improved test coverage and documentation. Fixes #5167.
+   *   @history 2017-10-18 Jeannie Backer & Makayla Shepherd - Added convenience method getElement
+   *                           and StandardAllMapping method to translate mapping information.
+   *                           See #5202.
+   *   @history 2017-10-31 Jeannie Backer - Added standardInstrument() and displaySettings()
+   *                           translations.
+   *   @history 2017-11-06 Kristin Berry - Added standardBandBin() 
+   *   @history 2017-11-07 Jeannie Backer - Added code to search for target in the Mapping group
+   *                           if no instrument group is found. Added Identification Area
+   *                           tranlations. Added sanity checks to getElement().
+   *   @history 2017-11-07 Jeannie Backer - Added code to write data file info into label file.
+   *                           Added code to translate time format and add nil tag if empty.
+   *   @history 2017-11-15 Jesse Mapel - Added translateUnits method to convert units to PDS4
+   *                           standard format.
+   *   @history 2017-11-16 Kristin Berry - Updated WritePds4 to put the File information first
+   *                           in the output File_Area_Observational.
+   *   @history 2017-11-17 Jesse Mapel - Removed empty FixedImageRoot method.
+   *   @history 2017-11-20 Jeannie Backer - Updated StandardImageImage() to re-order the
+   *                           Array_3D_Image values properly.
+   *   @history 2017-11-21 Kristin Berry - Updated the constructor to add the xml version and 
+   *                           encoding to the beginning of the XML file. 
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
@@ -57,24 +77,38 @@ namespace Isis {
       ~ProcessExportPds4();
 
       QDomDocument &StandardPds4Label();
+      void StandardAllMapping();
 
       void CreateImageLabel();
-      void FixedImageRoot();
       void StandardImageImage();
 
       void OutputLabel(std::ofstream &os);
 
-      // include this using declaration to indicate that ProcessExportPds4
+      // Include this using declaration to indicate that ProcessExportPds4
       // objects that call a StartProcess() method that has not been overridden
       // here should use the corresponding base class definitions
       using ProcessExport::StartProcess;
       void StartProcess(std::ofstream &fout);
       QDomDocument &GetLabel();
       void WritePds4(QString outFile);
+      QDomElement getElement(QStringList xmlPath, QDomElement parent=QDomElement());
+      void addHistory(QString description, QString date = "tbd", QString version = "1.0");
+
+      static void translateUnits(QDomDocument &label,
+                                 QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
 
     protected:
+      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
+      void identificationArea();
+      void standardInstrument();
+      void standardBandBin(); 
+      void displaySettings();
+      QString PDS4PixelType(PixelType pixelType, ByteOrder endianType);
+      static QMap<QString, QString> createUnitMap(Pvl configPvl);
+      static void translateChildUnits(QDomElement parent, QMap<QString, QString> transMap);
 
       QDomDocument *m_domDoc;               //!< XML label
+      QString m_schemaLocation;             //!< QString with all schema locations required
 
   };
 }

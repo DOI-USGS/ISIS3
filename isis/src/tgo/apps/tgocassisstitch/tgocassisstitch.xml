@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="stitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="tgocassisstitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Stitch together multiple TGO CaSSIS framelets into full frame images.
@@ -21,6 +21,10 @@
     </change>
     <change name="Jesse Mapel" date="2017-09-15">
       Changed name from tgostitch to stitch. Still only works with TGO CaSSIS images. References #5156.
+    </change>
+    <change name="Kristin Berry" date="2017-11-14">
+      Backward Compatibility Issue: Changed name from stitch to tgocassisstitch and
+      changed output parameter name "TO" to "OUTPUTPREFIX."
     </change>
   </history>
 
@@ -47,7 +51,7 @@
         </filter>
       </parameter>
 
-      <parameter name="TO">
+      <parameter name="OUTPUTPREFIX">
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>

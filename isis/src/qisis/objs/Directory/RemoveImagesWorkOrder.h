@@ -46,6 +46,7 @@ namespace Isis {
    *                           each image can be removed one by one. Fixes #5074.
    *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
    *                          Fixes #5064
+   *   @history 2017-10-01 Cole Neubauer - Reimplemented remove images count Fixes #4998
    */
   class RemoveImagesWorkOrder : public WorkOrder {
       Q_OBJECT
