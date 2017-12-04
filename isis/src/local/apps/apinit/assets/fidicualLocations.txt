@@ -1,9 +1,0 @@
-"Sample","Line","Pixel","FileName","Notes"
-574.129,254.98,48,ap.cub,upper left
-2040.01,194.034,39,ap.cub,upper middle
-3500.48,260.738,57,ap.cub,upper right
-512.694,1720.96,44,ap.cub,Middle left
-3562.02,1721.35,55,ap.cub,Middle right
-578.203,3182.05,42,ap.cub,Lower left
-2039.45,3244.69,36,ap.cub,Lower middle
-3496.69,3179.83,42,ap.cub,Lower right
