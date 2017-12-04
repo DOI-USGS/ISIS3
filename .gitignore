@@ -1,0 +1,8 @@
+*.o
+moc_*
+print.prt
+object_script.*.Release
+object_script.*.Debug
+*_plugin_import.cpp
+*.moc
+ui_*.h
