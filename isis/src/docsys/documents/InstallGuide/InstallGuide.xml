@@ -410,10 +410,10 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </pre>
 <p>
-  Chandrayaan Mission (kernels can be excluded):
+  Chan1 Mission (kernels can be excluded):
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chan1 data/
         </pre>
 <p>
   Clementine Mission (kernels can be excluded):
@@ -639,7 +639,6 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <change name="Ian Humphrey" date="2016-02-26">Updated for latest Fedora version (Fedora21).</change>
     <change name="Adam Paquette" date="2016-06-24">Updated links to the support center.</change>
     <change name="Ian Humphrey" date="2017-01-25">Updated instructions for new supported systems.</change>
-    <change name="Summer Stapleton" date="2017-11-26">Updated the name and path for the Chandrayaan mission.</change>
   </history>
 
   <bibliography>

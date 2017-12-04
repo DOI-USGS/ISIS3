@@ -3,16 +3,16 @@
 <application name="ciss2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import a PDS Cassini ISS image file into Isis
+    Import a PDS Cassini ISS image file into Isis 
   </brief>
 
   <description>
     This program will import a PDS Cassini ISS image file into an
     Isis cube.  Some Cassini files available from PDS contain VICAR labels
     <b>THIS PROGRAM ONLY ACCEPTS PDS LABELS.</b> You must specify an
-    input file which contains PDS labels.  <strong>Note:</strong> Scientists
-    indicate that zeros may be valid DN values for sky areas of CISS images,
-    but missing pixels are also assigned a value of zero and there is no known
+    input file which contains PDS labels.  <strong>Note:</strong> Scientists 
+    indicate that zeros may be valid DN values for sky areas of CISS images,  
+    but missing pixels are also assigned a value of zero and there is no known 
     way to distinguish them. Since the chance of a valid zero DN is so slight,
     ciss2isis will replace all zeros with Isis::Null.
   </description>
@@ -35,24 +35,24 @@
     <change name="Christopher Austin" date="2008-03-18">
       Checks if input file is rdr.
     </change>
-    <change name="Jeannie Walldren" date="2008-08-25"> Modified application to
-      save off binary file header and compute read out order,  to save off line
-      prefix data of overclocked pixels with the appropriate overclock average
-      into a table, and  to convert compressed 8bit images to 16bit using a
-      look-up table. Added keywords, with units where appropriate, to labels.
+    <change name="Jeannie Walldren" date="2008-08-25"> Modified application to 
+      save off binary file header and compute read out order,  to save off line 
+      prefix data of overclocked pixels with the appropriate overclock average 
+      into a table, and  to convert compressed 8bit images to 16bit using a 
+      look-up table. Added keywords, with units where appropriate, to labels. 
     </change>
-    <change name="Jeannie Walldren" date="2008-08-28"> Modified to
-      allow import of images with BandBin filter combinations not found or
-      commented out in the translation *.def files.  Previously, this
-      circumstance stopped the program and threw an exception. Application now
+    <change name="Jeannie Walldren" date="2008-08-28"> Modified to 
+      allow import of images with BandBin filter combinations not found or 
+      commented out in the translation *.def files.  Previously, this 
+      circumstance stopped the program and threw an exception. Application now 
       outputs a warning to the log but still creates the cube.
     </change>
     <change name="Jeannie Walldren" date="2008-11-05">
       Modified FixDns method and updated documentation.
     </change>
     <change name="Jeannie Walldren" date="2009-05-27">
-      Modified to convert BiasStripMean value back to 12-bit using look up table
-      for images with DataConversionType of Table.  Updated documentation in
+      Modified to convert BiasStripMean value back to 12-bit using look up table 
+      for images with DataConversionType of Table.  Updated documentation in 
       ciss2isis.cpp
     </change>
     <change name="Christopher Austin" date="2010-01-08">
@@ -64,18 +64,15 @@
     <change name="Tracie Sucharski" date="2012-05-04">
       Added error message when input image does not contain Pds labels.
     </change>
-    <change name="Summer Stapleton" date="2017-11-22">
-      Changed returned max value from HRS to HIS in FixDns method.
-    </change>
   </history>
   <liens>
-    <item>
+    <item> 
       Insert hyperlinks to section Related Objects and Documents, subsection
       Documents.
     </item>
     <item>
-       Since zeros may be valid DNs and missing pixels are set to zero,
-       investigate whether there is a way to distinguish the two.  If so, update
+       Since zeros may be valid DNs and missing pixels are set to zero, 
+       investigate whether there is a way to distinguish the two.  If so, update 
        FixDns method in cisscal.cpp.
     </item>
   </liens>
@@ -89,8 +86,8 @@
       <document>
         <title>
             Cassini ISS Software
-                Interface Specification (SIS) --
-              https://cel.jpl.nasa.gov/cedr/home/mcdl.html
+                Interface Specification (SIS) -- 
+              https://cel.jpl.nasa.gov/cedr/home/mcdl.html 
         </title>
       </document>
     </documents>
@@ -136,7 +133,7 @@
       Using ciss2isis
       </brief>
       <description>
-        The use of ciss2isis to ingest PDS images and output Isis3 cubes.
+        The use of ciss2isis to ingest PDS images and output Isis3 cubes. 
       </description>
       <terminalInterface>
         <commandLine>
@@ -144,10 +141,10 @@
 	  to= N1472853667_1.cub
         </commandLine>
         <description>
-	This example shows the use of ciss2isis create an Isis3 cube from a PDS image.
+	This example shows the use of ciss2isis create an Isis3 cube from a PDS image. 
         </description>
       </terminalInterface>
-
+   
       <guiInterfaces>
         <guiInterface>
           <image width="448" height="550" src="assets/images/ciss2isisGUI.jpg">
@@ -184,7 +181,7 @@
           <parameterName>TO</parameterName>
         </dataFile>
       </dataFiles>
-
+  
       <outputImages>
         <image width="551" height="550" src="assets/images/N1472853667_1.jpg">
           <brief>
