@@ -31,8 +31,13 @@ commands:
 	       > $(OUTPUT)/templabel2.txt;
 	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
 	       $(OUTPUT)/templabel2.txt \
+	       > $(OUTPUT)/templabel3.txt;
+	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
+	       $(OUTPUT)/templabel3.txt \
 	       > $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.xmlLabel.txt;
+
 
 	$(RM) $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.xml \
 	      $(OUTPUT)/templabel1.txt \
-	      $(OUTPUT)/templabel2.txt;
+	      $(OUTPUT)/templabel2.txt \
+	      $(OUTPUT)/templabel3.txt;

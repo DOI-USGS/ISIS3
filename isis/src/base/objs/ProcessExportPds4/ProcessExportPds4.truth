@@ -1,112 +1,320 @@
+Testing ProcessExportPds4
+
+Testing default object
+<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>
- <Observation_Area>
-  <Time_Coordinates>
-   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
-   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
-  </Time_Coordinates>
-  <Investigation_Area>
-   <name>TRACE GAS ORBITER</name>
-   <type>Mission</type>
-  </Investigation_Area>
-  <Observing_System>
-   <Observing_System_Component>
-    <name>TRACE GAS ORBITER</name>
-    <type>Spacecraft</type>
-   </Observing_System_Component>
-   <Observing_System_Component>
-    <name>CaSSIS</name>
-    <type>Instrument</type>
-   </Observing_System_Component>
-  </Observing_System>
-  <Target_Identification>
-   <name>Mars</name>
-   <type>Planet</type>
-  </Target_Identification>
-  <Discipline_Area>
-   <disp:Display_Settings>
-    <disp:Display_Direction>
-     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
-    </disp:Display_Direction>
-   </disp:Display_Settings>
-  </Discipline_Area>
- </Observation_Area>
- <File_Area_Observational>
-  <Array_2D_Image>
+<Product_Observational/>
+
+Testing defaulte CaSSIS export
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
    <Axis_Array>
-    <elements>2048</elements>
-    <axis_name>Sample</axis_name>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
     <sequence_number>1</sequence_number>
    </Axis_Array>
    <Axis_Array>
+    <axis_name>Line</axis_name>
     <elements>254</elements>
-    <axis_name>Lines</axis_name>
     <sequence_number>2</sequence_number>
    </Axis_Array>
-   <Element_Array>
-    <data_type>IEEE754LSBSingle</data_type>
-    <scaling_factor>1.00</scaling_factor>
-    <offset>0.00</offset>
-   </Element_Array>
-  </Array_2D_Image>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
  </File_Area_Observational>
 </Product_Observational>
 unittest: Exporting
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>
- <Observation_Area>
-  <Time_Coordinates>
-   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
-   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
-  </Time_Coordinates>
-  <Investigation_Area>
-   <name>TRACE GAS ORBITER</name>
-   <type>Mission</type>
-  </Investigation_Area>
-  <Observing_System>
-   <Observing_System_Component>
-    <name>TRACE GAS ORBITER</name>
-    <type>Spacecraft</type>
-   </Observing_System_Component>
-   <Observing_System_Component>
-    <name>CaSSIS</name>
-    <type>Instrument</type>
-   </Observing_System_Component>
-  </Observing_System>
-  <Target_Identification>
-   <name>Mars</name>
-   <type>Planet</type>
-  </Target_Identification>
-  <Discipline_Area>
-   <disp:Display_Settings>
-    <disp:Display_Direction>
-     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
-    </disp:Display_Direction>
-   </disp:Display_Settings>
-  </Discipline_Area>
- </Observation_Area>
- <File_Area_Observational>
-  <Array_2D_Image>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
    <Axis_Array>
-    <elements>2048</elements>
-    <axis_name>Sample</axis_name>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
     <sequence_number>1</sequence_number>
    </Axis_Array>
    <Axis_Array>
+    <axis_name>Line</axis_name>
     <elements>254</elements>
-    <axis_name>Lines</axis_name>
     <sequence_number>2</sequence_number>
    </Axis_Array>
-   <Element_Array>
-    <data_type>IEEE754LSBSingle</data_type>
-    <scaling_factor>1.00</scaling_factor>
-    <offset>0.00</offset>
-   </Element_Array>
-  </Array_2D_Image>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
  </File_Area_Observational>
 </Product_Observational>
 unittest: Exporting
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
+Testing export pixel types
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
+Testing missing start and end times
+unittest: Exporting
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
+Testing exporting a map projected product
+
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>1</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>2371</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2371</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+  </Array_3D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
+Testing errors
+
 Test creating a standard Pds4Label with no input
 **PROGRAMMER ERROR** Must set an input cube before creating a PDS4 label.
+Test translating units with a non-existant config
+**I/O ERROR** Failed to read unit translation config file [not a file].
+**I/O ERROR** Unable to open [not a file].
+Test translating units with a bad config
+**ERROR** Failed to load unit translation config file [$tgo/testData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub].
+**PROGRAMMER ERROR** No PDS4 standard specified for for [Instrument].
+Test adding a history to an empty label
+**PROGRAMMER ERROR** Could not find Identification_Area element to add modification history under.
+Test a missing target
+**PROGRAMMER ERROR** Unable to translate and export instrument information.
+**ERROR** Unable to find a target in input cube.
+**PROGRAMMER ERROR** No value or default value to translate for translation group [TargetName] in file [/usgs/cpkgs/isis3/data/base/translations/pds4ExportTargetFromMapping.trn].
+**PROGRAMMER ERROR** No value or default value to translate for translation group [TargetName] in file [/usgs/cpkgs/isis3/data/base/translations/pds4ExportTargetFromInstrument.trn].

@@ -198,6 +198,8 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
    *                           BundeSolutionInfo on the ProjectTree now sets the project to 
    *                           not clean. Fixes #5174.
+   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
+   *                           Fixes #5224
    */
   class Directory : public QObject {
     Q_OBJECT

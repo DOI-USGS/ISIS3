@@ -151,7 +151,7 @@ namespace Isis {
       createWorkOrder<Footprint2DViewWorkOrder>();
       createWorkOrder<MatrixViewWorkOrder>();
       createWorkOrder<SensorGetInfoWorkOrder>();
-      createWorkOrder<RemoveImagesWorkOrder>();
+      //createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<BundleObservationViewWorkOrder>();
 

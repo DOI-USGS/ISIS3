@@ -56,6 +56,7 @@ int main(void) {
     trnsStrm << " Auto" << endl;
     trnsStrm << " InputKey        = Samples" <<endl;
     trnsStrm << " InputPosition   = (IsisCube, Core, Dimensions)" <<endl;
+    trnsStrm << " OutputName      = elements" <<endl;
     trnsStrm << " OutputSiblings  = axis_name|Sample" <<endl;
     trnsStrm << " OutputName      = elements" <<endl;
     trnsStrm << " OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)" <<endl;
@@ -68,6 +69,7 @@ int main(void) {
     trnsStrm << " InputPosition   = (IsisCube, Core, Dimensions)" <<endl;
     trnsStrm << " OutputName      = elements" <<endl;
     trnsStrm << " OutputSiblings  = axis_name|Line" <<endl;
+    trnsStrm << " OutputName      = elements" <<endl;
     trnsStrm << " OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)" <<endl;
     trnsStrm << " Translation = (*,*)" << endl;
     trnsStrm << "EndGroup" << endl;
