@@ -34,7 +34,6 @@
 #include "ImageList.h"
 #include "MosaicSceneWidget.h"
 #include "TargetBodyList.h"
-#include "TemplateList.h"
 #include "WorkOrder.h"
 
 class QAction;
