@@ -178,7 +178,7 @@ namespace Isis {
    *   @history 2017-08-11 Cole Neubauer - Added project setClean(false) call to all views cleanup
    *                           slot. This will make a a view closing be treated as a project change
    *                           Fixes #5113
-   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
    *                           source images. Fixes #5105.
    *   @history 2017-08-15 Tracie Sucharski - Added comments explaing connections for control point
    *                           editing actions between views.
@@ -187,18 +187,6 @@ namespace Isis {
    *   @history 2017-08-23 Tracie Sucharski - Fixed some code involving connections in
    *                           in ::addFootprint2DView which got messed up in a svn merge.  Removed
    *                           unused signal, controlPointAdded.
-   *   @history 2017-11-02 Tyler Wilson - Added the updateRecentProjects() function which
-   *                           updates the Recent Projects file menu with recently loaded projects.
-   *                           Fixes #4492.
-   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
-   *                           classes. Fixes #5117.
-   *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
-   *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
-   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
-   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
-   *                           not clean. Fixes #5174.
-   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
-   *                           Fixes #5224
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -317,8 +305,6 @@ namespace Isis {
 
       void cnetModified();
       void redrawMeasures();
-      
-      void cleanProject(bool);
 
     public slots:
       void cleanupBundleObservationViews(QObject *);
@@ -345,7 +331,6 @@ namespace Isis {
 
 
       void updateRecentProjects(Project *project);
-      void updateRecentProjects();
 
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
@@ -389,7 +374,6 @@ namespace Isis {
         m_workOrders.append(newWorkOrder);
         return newWorkOrder;
       }
-
 
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
@@ -450,8 +434,6 @@ namespace Isis {
       QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
-
-      bool m_recentProjectsLoaded;
   };
 }
 
