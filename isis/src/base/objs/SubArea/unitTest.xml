@@ -32,7 +32,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_nomap.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_nomap.cub</item></default>
       </parameter>
       <parameter name="FROM2">
         <type>cube</type>
@@ -46,7 +46,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_map.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_map.cub</item></default>
       </parameter>
       <parameter name="FROM3">
         <type>cube</type>
@@ -60,7 +60,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_mapsimp.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_mapsimp.cub</item></default>
       </parameter>
       <parameter name="TO">
         <type>cube</type>
