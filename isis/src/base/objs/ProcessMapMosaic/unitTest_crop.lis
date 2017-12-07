@@ -1,2 +1,2 @@
-$base/testData/ProcessMapMosaic/unitTest_crop.cub
-$base/testData/ProcessMapMosaic/unitTest_nocrop.cub
+./unitTest_crop.cub
+./unitTest_nocrop.cub

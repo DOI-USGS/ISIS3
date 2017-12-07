@@ -1,2 +1,2 @@
-$base/testData/ProcessMapMosaic/unitTest1.cub
-$base/testData/ProcessMapMosaic/unitTest2.cub
+./unitTest1.cub
+./unitTest2.cub
