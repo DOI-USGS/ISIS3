@@ -75,7 +75,7 @@ void IsisMain() {
   cout.flush();
   try {
     Cube incompleteLabelsCube;
-    incompleteLabelsCube.open("./unitTest.cub");
+    incompleteLabelsCube.open("$base/testData/GroundGrid/unitTest.cub");
     UniversalGroundMap gmap(incompleteLabelsCube,
         UniversalGroundMap::ProjectionFirst);
     GroundGrid tmp(&gmap, false, false, someCube.sampleCount(), someCube.lineCount());
