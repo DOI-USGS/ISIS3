@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
   Isis::CubeAttributeInput att;
 
-  Isis::Cube *icube = p.SetInputCube("unitTest.cub", att);
+  Isis::Cube *icube = p.SetInputCube("$base/testData/CubeCalculator/unitTest.cub", att);
   std::cout << "CubeCalculator unit test" << std::endl;
   std::cout << "------------------------" << std::endl << std::endl;
 
