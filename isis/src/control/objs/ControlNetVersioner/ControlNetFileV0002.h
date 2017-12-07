@@ -58,6 +58,8 @@ namespace Isis {
    *   @history 2016-04-22 Jeannie Backer - Removed thrown exception in
    *                           toPvl() when unable to find TargetRadii values. Instead, we
    *                           will just leave these values blank. References #3892
+   *   @history 2017-12-07 Jesse Mapel - Changed how often read streams are recreated to avoid
+   *                           protobuf errors.
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:

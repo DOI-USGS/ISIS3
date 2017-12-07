@@ -81,36 +81,32 @@ namespace Isis {
       }
       headerCodedInStream.PopLimit(oldLimit);
 
-      // Without closing and re-opening the protocol buffers break... no clue
-      //   why other than it's got some static data around keeping track
-      //   maybe. We need to do this for it to reset it's idea of the total
-      //   bytes though. Doing it every time is too expensive - so we're going
-      //   to just do it periodically.
-      IstreamInputStream *pointInStream = NULL;
-      CodedInputStream *pointCodedInStream = NULL;
+      
+      // We need to regenerate the coded input stream every so many bytes
+      // choose 64 MB as a safe amount
+      int streamThreshold = 1024 * 1024 * 64;
+      int currentStreamSize = 0;
+      input.seekg(filePos, ios::beg);
+      IstreamInputStream *pointInStream = new IstreamInputStream(&input);
+      CodedInputStream *pointCodedInStream = new CodedInputStream(pointInStream);
+      pointCodedInStream->SetTotalBytesLimit(1024 * 1024 * 512,
+                                             1024 * 1024 * 400);
 
       for (int cp = 0; cp < p_networkHeader->pointmessagesizes_size(); cp ++) {
-        if (cp % 50000 == 0 && pointCodedInStream && pointInStream) {
+
+        int size = p_networkHeader->pointmessagesizes(cp);
+        currentStreamSize += size;
+
+        if (currentStreamSize > streamThreshold) {
+          currentStreamSize = size;
           delete pointCodedInStream;
           pointCodedInStream = NULL;
-
-          delete pointInStream;
-          pointInStream = NULL;
-        }
-
-        if (pointInStream == NULL) {
-          input.close();
-          input.open(file.expanded().toLatin1().data(), ios::in | ios::binary);
-          input.seekg(filePos, ios::beg);
-
-          pointInStream = new IstreamInputStream(&input);
           pointCodedInStream = new CodedInputStream(pointInStream);
           // max 512MB, warn at 400MB
           pointCodedInStream->SetTotalBytesLimit(1024 * 1024 * 512,
                                                  1024 * 1024 * 400);
         }
 
-        int size = p_networkHeader->pointmessagesizes(cp);
         oldLimit = pointCodedInStream->PushLimit(size);
 
         filePos += size;
