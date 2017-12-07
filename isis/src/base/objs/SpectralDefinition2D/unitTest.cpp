@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   
   try {
     cerr << "Constructor given a 5x2x20 cube" << endl;
-    SpectralDefinition2D twoD("assets/calibration-test.cub");
+    SpectralDefinition2D twoD("$base/testData/SpectralDefinition2D/calibration-test.cub");
     for (int samp=1; samp<=5; ++samp) {
       for (int band=1; band<=20; ++band) {
         Spectel spec = twoD.findSpectel(samp, 0, band);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   cerr << "----- Testing searching -----" << endl << endl;
   // TODO: Needs fixing once getSpectelByWavelength is fully implemented
   try {
-    SpectralDefinition2D twoD("assets/calibration-test-smile.cub");
+    SpectralDefinition2D twoD("$base/testData/SpectralDefinition2D/calibration-test-smile.cub");
 
     Spectel spec = twoD.findSpectel(1, 1, 1);
     cerr << "Spectel at (s,b) (" << spec.sample() << ", " << spec.band() << ") : Wavelength=" <<
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   }
 
   cerr << "----- Testing sections -----" << endl << endl;
-  SpectralDefinition2D twoD("assets/calibration-test-sections.cub");
+  SpectralDefinition2D twoD("$base/testData/SpectralDefinition2D/calibration-test-sections.cub");
   cerr << "Number of section: " << twoD.sectionCount() << endl;
   for (int samp=1; samp<=5; ++samp) {
     for (int band=1; band<=20; ++band) {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   //TODO: Wait until isis exception error TODOs are done in 2D
   //try {
   //  cerr << "Constructor given a 5x2x20 cube" << endl;
-  //  SpectralDefinition2D twoD("assets/calibration-test.cub");
+  //  SpectralDefinition2D twoD("/calibration-test.cub");
   //
   //  try {
   //    Spectel spec = twoD.getSpectel(1, 0, 21);
