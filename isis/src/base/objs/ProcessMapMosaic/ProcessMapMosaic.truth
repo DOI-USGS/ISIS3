@@ -11,10 +11,7 @@ unittest: Mosaicking unitTest2.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 124
-    TileLines   = 125
 
     Group = Dimensions
       Samples = 124
@@ -24,7 +21,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = UnsignedByte
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -51,13 +47,10 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 81037
-  Bytes     = 3022
 End_Object
 End
 Testing Mosaic 2
@@ -72,10 +65,7 @@ unittest: Mosaicking unitTest2.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 248
-    TileLines   = 249
 
     Group = Dimensions
       Samples = 248
@@ -85,7 +75,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = UnsignedByte
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -112,13 +101,10 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 127289
-  Bytes     = 3022
 End_Object
 End
 Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
@@ -379,10 +365,7 @@ unittest: Mosaicking unitTest1.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 38
-    TileLines   = 25
 
     Group = Dimensions
       Samples = 38
@@ -392,7 +375,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = UnsignedByte
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -419,15 +401,11 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = Table
   Name        = InstrumentPointing
-  StartByte   = 66487
-  Bytes       = 40
   Records     = 1
-  ByteOrder   = Lsb
   Description = "Created by spiceinit"
   Kernels     = ($clementine1/kernels/fk/clem_v11.tf,
                  $Clementine1/kernels/ck/clem_5sc.bck)
@@ -465,10 +443,7 @@ End_Object
 
 Object = Table
   Name        = InstrumentPosition
-  StartByte   = 66527
-  Bytes       = 32
   Records     = 1
-  ByteOrder   = Lsb
   Description = "Created by spiceinit"
   Kernels     = $Clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp
 
@@ -499,10 +474,7 @@ End_Object
 
 Object = Table
   Name           = BodyRotation
-  StartByte      = 66559
-  Bytes          = 40
   Records        = 1
-  ByteOrder      = Lsb
   Description    = "Created by spiceinit"
   Kernels        = ($base/kernels/spk/de405.bsp,
                     $base/kernels/pck/pck00008.tpc,
@@ -543,10 +515,7 @@ End_Object
 
 Object = Table
   Name        = SunPosition
-  StartByte   = 66599
-  Bytes       = 32
   Records     = 1
-  ByteOrder   = Lsb
   Description = "Created by spiceinit"
   Kernels     = $base/kernels/spk/de405.bsp
 
@@ -577,14 +546,10 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 71980
-  Bytes     = 3022
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
-  StartByte = 66631
-  Bytes     = 5349
 End_Object
 End
 
@@ -600,10 +565,7 @@ unittest: Mosaicking unitTest_nocrop.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 443
-    TileLines   = 128
 
     Group = Dimensions
       Samples = 2215
@@ -613,7 +575,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = Real
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -636,12 +597,9 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 29551617
-  Bytes     = 3521
 End_Object
 End
