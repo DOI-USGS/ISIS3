@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   //TODO: Wait until isis exception error TODOs are done in 2D
   //try {
   //  cerr << "Constructor given a 5x2x20 cube" << endl;
-  //  SpectralDefinition2D twoD("/calibration-test.cub");
+  //  SpectralDefinition2D twoD("$base/testData/SpectralDefinition2D/calibration-test.cub");
   //
   //  try {
   //    Spectel spec = twoD.getSpectel(1, 0, 21);
