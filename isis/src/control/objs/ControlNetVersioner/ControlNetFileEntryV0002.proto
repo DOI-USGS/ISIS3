@@ -4,7 +4,7 @@
 //
 // 2017-12-11 Kristin Berry - Separated header and point into separate files. 
 
-// Protocol buffer header descriptor for Isis3 Control Networks
+// Protocol buffer control point descriptor for Isis3 Control Networks
 package Isis;
 
 message ControlPointFileEntryV0002 {
