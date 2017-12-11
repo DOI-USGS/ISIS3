@@ -1,26 +1,17 @@
 // 2011-06-07 Tracie Sucharski/Debbie Cook - Changed PointType 
 //                    Ground  ---->  Fixed
 //                    Tie     ---->  Free          
+//
+// 2017-12-11 Kristin Berry - Separated header and point into separate files. 
 
-// Protocol buffer descriptor for Isis3 Control Networks
+// Protocol buffer header descriptor for Isis3 Control Networks
 package Isis;
-
-message ControlNetFileHeaderV0002 {
-//  Some fields of ControlNet
-  required string networkId    = 1;
-  required string targetName   = 2;
-  optional string created      = 3;
-  optional string lastModified = 4;
-  optional string description  = 5;
-  optional string userName     = 6;
-  repeated int32  pointMessageSizes = 7 [packed = true];
-}
 
 message ControlPointFileEntryV0002 {
   enum PointType {
     Free                 = 2; //  Image to Image
     Constrained          = 3; //  Image to Ground
-    Fixed                = 4; //  Image to Groun
+    Fixed                = 4; //  Image to Ground
     obsolete_Tie         = 0; //  Image to Image
     obsolete_Ground      = 1; //  Image to Ground
   }
