@@ -27,6 +27,7 @@
 
 #include <QList>
 #include <QSharedPointer>
+#include <QVector>
 
 #include "ControlPoint.h"
 
@@ -155,6 +156,66 @@ namespace Isis {
       ControlNetVersioner(const ControlNetVersioner &other);
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
+      // Private ControlNetHeader structs for versioning
+      // TODO we can probably use some typedef and inheritance to clean this up. JAM
+      struct ControlNetHeaderV0001 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+      struct ControlNetHeaderV0002 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+      struct ControlNetHeaderV0003 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+      struct ControlNetHeaderV0004 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+      struct ControlNetHeaderV0005 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+      struct ControlNetHeaderV0006 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+        QVector<int> pointMessageSizes;
+      };
+      struct ControlNetHeaderV0007 {
+        QString networkID;
+        QString targetName;
+        QString created;
+        QString lastModified;
+        QString description;
+        QString userName;
+      };
+
       void read(const FileName netFile);
 
       void readPvl(const Pvl &network);
@@ -193,28 +254,6 @@ namespace Isis {
                                                            read in from a file or
                                                            ready to be written out
                                                            to a file.*/
-
-     struct ControlNetHeaderV0001 {
-
-     }
-     struct ControlNetHeaderV0002 {
-
-     }
-     struct ControlNetHeaderV0003 {
-
-     }
-     struct ControlNetHeaderV0004 {
-
-     }
-     struct ControlNetHeaderV0005 {
-
-     }
-     struct ControlNetHeaderV0006 {
-
-     }
-     struct ControlNetHeaderV0007 {
-
-     }
   };
 }
 
