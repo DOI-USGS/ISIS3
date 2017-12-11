@@ -173,37 +173,37 @@ namespace Isis {
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001) {
+  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002) {
+  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003) {
+  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004) {
+  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005) {
+  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006) {
+  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006 header) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007) {
+  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007 header) {
 
   }
 
