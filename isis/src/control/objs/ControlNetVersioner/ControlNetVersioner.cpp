@@ -43,177 +43,177 @@ namespace Isis {
   }
 
 
-  QString ControlNetVersioner::netId() const{
+  QString ControlNetVersioner::netId() const {
 
   }
 
 
-  QString ControlNetVersioner::targetName() const{
+  QString ControlNetVersioner::targetName() const {
 
   }
 
 
-  QString ControlNetVersioner::creationDate() const{
+  QString ControlNetVersioner::creationDate() const {
 
   }
 
 
-  QString ControlNetVersioner::lastModificationDate() const{
+  QString ControlNetVersioner::lastModificationDate() const {
 
   }
 
 
-  QString ControlNetVersioner::description() const{
+  QString ControlNetVersioner::description() const {
 
   }
 
 
-  QString ControlNetVersioner::userName() const{
+  QString ControlNetVersioner::userName() const {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint(){
+  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint() {
 
   }
 
 
-  void ControlNetVersioner::write(FileName netFile){
+  void ControlNetVersioner::write(FileName netFile) {
 
   }
 
 
-  Pvl &ControlNetVersioner::toPvl(){
+  Pvl &ControlNetVersioner::toPvl() {
 
   }
 
 
-  void ControlNetVersioner::read(const FileName netFile){
+  void ControlNetVersioner::read(const FileName netFile) {
 
   }
 
 
-  void ControlNetVersioner::readPvl(const Pvl &network){
+  void ControlNetVersioner::readPvl(const Pvl &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0001(const Pvl &network){
+  void ControlNetVersioner::readPvlV0001(const Pvl &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0002(const Pvl &network){
+  void ControlNetVersioner::readPvlV0002(const Pvl &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0003(const Pvl &network){
+  void ControlNetVersioner::readPvlV0003(const Pvl &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0004(const Pvl &network){
+  void ControlNetVersioner::readPvlV0004(const Pvl &network) {
 
   }
 
 
-  void ControlNetVersioner::readProtobuf(const Pvl &header, const FileName netFile){
+  void ControlNetVersioner::readProtobuf(const Pvl &header, const FileName netFile) {
 
   }
 
 
-  void ControlNetVersioner::readProtobufV0001(const FileName netFile){
+  void ControlNetVersioner::readProtobufV0001(const FileName netFile) {
 
   }
 
 
-  void ControlNetVersioner::readProtobufV0002(const FileName netFile){
+  void ControlNetVersioner::readProtobufV0002(const FileName netFile) {
 
   }
 
 
-  void ControlNetVersioner::readProtobufV0007(const FileName netFile){
+  void ControlNetVersioner::readProtobufV0007(const FileName netFile) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0001(const ControlPointV0001 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0001(const ControlPointV0001 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0002(const ControlPointV0002 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0002(const ControlPointV0002 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0003(const ControlPointV0003 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0003(const ControlPointV0003 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0004(const ControlPointV0004 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0004(const ControlPointV0004 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0005(const ControlPointV0005 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0005(const ControlPointV0005 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0006(const ControlPointV0006 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0006(const ControlPointV0006 point) {
 
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0007(const ControlPointV0007 point){
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0007(const ControlPointV0007 point) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001){
+  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002){
+  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003){
+  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004){
+  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005){
+  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006){
+  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006) {
 
   }
 
 
-  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007){
+  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007) {
 
   }
 
 
-  void ControlNetVersioner::writeHeader(ZeroCopyInputStream *fileStream){
+  void ControlNetVersioner::writeHeader(ZeroCopyInputStream *fileStream) {
 
   }
 
 
-  void ControlNetVersioner::writeFirstPoint(ZeroCopyInputStream *fileStream){
+  void ControlNetVersioner::writeFirstPoint(ZeroCopyInputStream *fileStream) {
 
   }
 
