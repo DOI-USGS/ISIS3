@@ -27,7 +27,200 @@
 using namespace std;
 
 namespace Isis {
-  
+
+  ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
+
+  }
+
+
+  ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
+
+  }
+
+
+  ControlNetVersioner::~ControlNetVersioner() {
+
+  }
+
+
+  QString ControlNetVersioner::netId() const{
+
+  }
+
+
+  QString ControlNetVersioner::targetName() const{
+
+  }
+
+
+  QString ControlNetVersioner::creationDate() const{
+
+  }
+
+
+  QString ControlNetVersioner::lastModificationDate() const{
+
+  }
+
+
+  QString ControlNetVersioner::description() const{
+
+  }
+
+
+  QString ControlNetVersioner::userName() const{
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint(){
+
+  }
+
+
+  void ControlNetVersioner::write(FileName netFile){
+
+  }
+
+
+  Pvl &ControlNetVersioner::toPvl(){
+
+  }
+
+
+  void ControlNetVersioner::read(const FileName netFile){
+
+  }
+
+
+  void ControlNetVersioner::readPvl(const Pvl &network){
+
+  }
+
+
+  void ControlNetVersioner::readPvlV0001(const Pvl &network){
+
+  }
+
+
+  void ControlNetVersioner::readPvlV0002(const Pvl &network){
+
+  }
+
+
+  void ControlNetVersioner::readPvlV0003(const Pvl &network){
+
+  }
+
+
+  void ControlNetVersioner::readPvlV0004(const Pvl &network){
+
+  }
+
+
+  void ControlNetVersioner::readProtobuf(const Pvl &header, const FileName netFile){
+
+  }
+
+
+  void ControlNetVersioner::readProtobufV0001(const FileName netFile){
+
+  }
+
+
+  void ControlNetVersioner::readProtobufV0002(const FileName netFile){
+
+  }
+
+
+  void ControlNetVersioner::readProtobufV0007(const FileName netFile){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0001(const ControlPointV0001 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0002(const ControlPointV0002 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0003(const ControlPointV0003 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0004(const ControlPointV0004 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0005(const ControlPointV0005 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0006(const ControlPointV0006 point){
+
+  }
+
+
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPointFromV0007(const ControlPointV0007 point){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006){
+
+  }
+
+
+  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007){
+
+  }
+
+
+  void ControlNetVersioner::writeHeader(ZeroCopyInputStream *fileStream){
+
+  }
+
+
+  void ControlNetVersioner::writeFirstPoint(ZeroCopyInputStream *fileStream){
+
+  }
+
+
+// ~~~~~~~~~~~~~~~ BEGIN OLD CONTROLNETVERSIONER CODE ~~~~~~~~~~~~~~~
+#if 0
+
   /**
    * Read the control network from disk. This will always return the network in
    *   its "latest version" binary form. Generally this will only be called by
@@ -38,7 +231,7 @@ namespace Isis {
    *
    */
   LatestControlNetFile *ControlNetVersioner::Read(const FileName &networkFileName) {
-    
+
     try {
       Pvl network(networkFileName.expanded());
 
@@ -60,7 +253,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * This will write a control net file object to disk.
    *
@@ -71,7 +264,7 @@ namespace Isis {
    */
   void ControlNetVersioner::Write(const FileName &file,
       const LatestControlNetFile &fileData, bool pvl) {
-    
+
     if (pvl) {
       fileData.toPvl().write(file.expanded());
     }
@@ -98,7 +291,7 @@ namespace Isis {
    * @param pvl The pvl network obtained from Pvl::Read on the input filename
    */
   LatestControlNetFile *ControlNetVersioner::ReadPvlNetwork(Pvl pvl) {
-    
+
     PvlObject &network = pvl.findObject("ControlNetwork");
 
     if (!network.hasKeyword("Version"))
@@ -154,7 +347,7 @@ namespace Isis {
    * @param network The input PVL Control Network to convert
    */
   LatestControlNetFile *ControlNetVersioner::LatestPvlToBinary(PvlObject &network) {
-    
+
     LatestControlNetFile *latest = new LatestControlNetFile;
 
     ControlNetFileHeaderV0002 &header = latest->GetNetworkHeader();
@@ -397,7 +590,7 @@ namespace Isis {
    */
   LatestControlNetFile *ControlNetVersioner::ReadBinaryNetwork(const Pvl &header,
                                                                const FileName &filename) {
-    
+
     // Find the binary cnet version by any means necessary
     int version = 1;
 
@@ -459,7 +652,7 @@ namespace Isis {
    * @param network Input is Version 1, must be modified to conform to Version 2
    */
   void ControlNetVersioner::ConvertVersion1ToVersion2(PvlObject &network) {
-    
+
     network["Version"] = "2";
 
     // Really... Projection::TargetRadii should be making this call
@@ -693,7 +886,7 @@ namespace Isis {
 
             cm["MeasureType"] = "Candidate";
           }
-          else if (type == "automatic" || 
+          else if (type == "automatic" ||
                    type == "validatedmanual" ||
                    type == "automaticpixel") {
             cm["MeasureType"] = "RegisteredPixel";
@@ -747,7 +940,7 @@ namespace Isis {
    * @param network Input is Version 2, must be modified to conform to Version 3
    */
   void ControlNetVersioner::ConvertVersion2ToVersion3(PvlObject &network) {
-    
+
     network["Version"] = "3";
 
     for (int cpIndex = 0; cpIndex < network.objects(); cpIndex ++) {
@@ -768,7 +961,7 @@ namespace Isis {
    * @param network Input is Version 3, must be modified to conform to Version 4
    */
   void ControlNetVersioner::ConvertVersion3ToVersion4(PvlObject &network) {
-    
+
     network["Version"] = "4";
 
     for (int cpIndex = 0; cpIndex < network.objects(); cpIndex ++) {
@@ -794,17 +987,17 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
+                                 QString keyName,
                                  ControlPointFileEntryV0002 &point,
                                  void (ControlPointFileEntryV0002::*setter)(bool)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
-    
+
     if (value == "true" || value == "yes")
       (point.*setter)(true);
   }
@@ -824,10 +1017,10 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
+                                 QString keyName,
                                  ControlPointFileEntryV0002 &point,
                                  void (ControlPointFileEntryV0002::*setter)(double)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
@@ -851,10 +1044,10 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
+                                 QString keyName,
                                  ControlPointFileEntryV0002 &point,
                                  void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
@@ -877,18 +1070,18 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
+  void ControlNetVersioner::Copy(PvlContainer &container,
                                  QString keyName,
                                  ControlPointFileEntryV0002::Measure &measure,
                                  void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
-    
+
     if (value == "true" || value == "yes")
       (measure.*setter)(true);
   }
@@ -907,11 +1100,11 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
+  void ControlNetVersioner::Copy(PvlContainer &container,
                                  QString keyName,
                                  ControlPointFileEntryV0002::Measure &measure,
                                  void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
@@ -934,12 +1127,12 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param set The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
+  void ControlNetVersioner::Copy(PvlContainer &container,
                                  QString keyName,
                                  ControlPointFileEntryV0002::Measure &measure,
                                  void (ControlPointFileEntryV0002::Measure::*set)
                                       (const std::string &)) {
-    
+
     if (!container.hasKeyword(keyName))
       return;
 
@@ -947,4 +1140,5 @@ namespace Isis {
     container.deleteKeyword(keyName);
     (measure.*set)(value);
   }
+#endif
 }
