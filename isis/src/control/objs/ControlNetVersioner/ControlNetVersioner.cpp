@@ -174,37 +174,90 @@ namespace Isis {
 
 
   void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001 header) {
+    ControlNetHeaderV0002 newHeader;
+    newHeader.networkID = header.networkID;
+    if (header.targetName..startsWith("MRO/")) {
+      newHeader.targetName = "Mars";
+    }
+    else {
+      newHeader.targetName = header.targetName;
+    }
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0002(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002 header) {
+    ControlNetHeaderV0003 newHeader;
+    newHeader.networkID = header.networkID;
+    newHeader.targetName = header.targetName;
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0003(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003 header) {
+    ControlNetHeaderV0004 newHeader;
+    newHeader.networkID = header.networkID;
+    newHeader.targetName = header.targetName;
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0004(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004 header) {
+    ControlNetHeaderV0005 newHeader;
+    newHeader.networkID = header.networkID;
+    newHeader.targetName = header.targetName;
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0005(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005 header) {
+    ControlNetHeaderV0006 newHeader;
+    newHeader.networkID = header.networkID;
+    newHeader.targetName = header.targetName;
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0006(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006 header) {
+    ControlNetHeaderV0007 newHeader;
+    newHeader.networkID = header.networkID;
+    newHeader.targetName = header.targetName;
+    newHeader.created = header.created;
+    newHeader.lastModified = header.lastModified;
+    newHeader.description = header.description;
+    newHeader.username = header.username;
 
+    createHeaderFromV0007(newHeader);
   }
 
 
   void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007 header) {
-
+    m_header = header;
   }
 
 
