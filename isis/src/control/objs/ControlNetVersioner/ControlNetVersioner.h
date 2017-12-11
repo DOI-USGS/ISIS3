@@ -193,6 +193,28 @@ namespace Isis {
                                                            read in from a file or
                                                            ready to be written out
                                                            to a file.*/
+
+     struct ControlNetHeaderV0001 {
+
+     }
+     struct ControlNetHeaderV0002 {
+
+     }
+     struct ControlNetHeaderV0003 {
+
+     }
+     struct ControlNetHeaderV0004 {
+
+     }
+     struct ControlNetHeaderV0005 {
+
+     }
+     struct ControlNetHeaderV0006 {
+
+     }
+     struct ControlNetHeaderV0007 {
+
+     }
   };
 }
 
