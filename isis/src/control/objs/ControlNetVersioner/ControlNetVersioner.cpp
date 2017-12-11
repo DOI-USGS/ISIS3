@@ -173,6 +173,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0001 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * The only update step is to convert MRO targetNames to simply Mars.
+   *
+   * @param header The V0001 header
+   */
   void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001 header) {
     ControlNetHeaderV0002 newHeader;
     newHeader.networkID = header.networkID;
@@ -191,6 +199,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0002 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * @param header The V0002 header
+   */
   void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002 header) {
     ControlNetHeaderV0003 newHeader;
     newHeader.networkID = header.networkID;
@@ -204,6 +218,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0003 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * @param header The V0003 header
+   */
   void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003 header) {
     ControlNetHeaderV0004 newHeader;
     newHeader.networkID = header.networkID;
@@ -217,6 +237,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0004 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * @param header The V0004 header
+   */
   void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004 header) {
     ControlNetHeaderV0005 newHeader;
     newHeader.networkID = header.networkID;
@@ -230,6 +256,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0005 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * @param header The V0005 header
+   */
   void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005 header) {
     ControlNetHeaderV0006 newHeader;
     newHeader.networkID = header.networkID;
@@ -243,6 +275,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0006 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * This does not fill the size list because it will never be needed.
+   *
+   * @param header The V0006 header
+   */
   void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006 header) {
     ControlNetHeaderV0007 newHeader;
     newHeader.networkID = header.networkID;
@@ -256,6 +296,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the internal header from a V0007 header. This will step the header
+   * version up until it reaches the latest version and then internalize it.
+   *
+   * @param header The V0007 header
+   */
   void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007 header) {
     m_header = header;
   }
