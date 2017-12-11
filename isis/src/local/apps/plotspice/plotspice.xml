@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="plotspice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Display and analyze cubes
+  </brief>
+
+  <description>
+    This program will display cubes and allow for interactive analysis.
+  </description>
+
+  <category>
+    <categoryItem>Display</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2004-12-01">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2006-01-06">
+      Port to Qt4 and add blink tool
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-26">
+      Fixed bug with filename expansion and added the MeasureTool
+    </change>
+    <change name="Brendan George" date="2006-09-19">
+      Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2007-09-11">
+      Added new rubber band functionality
+    </change>
+    <change name="Sharmila Prasad" date="2009-10-19">
+      Added Mosaic Tracking info like image index, serial number and file name
+      in the Advanced Tracking window to have the ability to track mosaic
+      origin.
+    </change>
+    <change name="Jeannie Walldren" date="2010-03-08">
+      Modified FindTool.  If a user enters a line/sample in the Image tab, then
+      the corresponding lat/lon is displayed in the Ground tab.  Added Record
+      button to FindTool to record clicked or typed point in the
+      AdvancedTrackTool window.
+    </change>
+    <change name="Sharmila Prasad" date="2010-03-19">
+      "qview" now has the ability to handle exceptions. The status bar now
+      displays a default NoWarning icon with "Ready" message. If an
+      exception is caught, the icon changes to Warning and displays the error
+      message. Clicking on the Warning icon will display a dialog window with
+      the details of the most recent error occured. Closing the dialog or any
+      other mouse activity will reset the Warning status.
+    </change>
+    <change name="Eric Hyer" date="2010-03-22">
+      Discontinued forcing of gui style to windows
+    </change>
+    <change name="Sharmila Prasad" date="2010-03-24">
+      Enable FindTool for images without camera and/or projection
+    </change>
+    <change name="Sharmila Prasad" date="2011-02-16">Added columns Local
+     Emission and  Incidence Angles for Advanced Tracking Tool
+    </change>
+    <change name="Sharmila Prasad" date="2011-03-18">
+      Connect the viewport's close signal to the all windows/subwindows like
+      plottool and histogram tools as well.
+    </change>
+    <change name="Sharmila Prasad" date="2011-05-11">
+      Added options for SaveAs to save cube as fullImage, Export AsIs or Export
+      FullResolution options
+    </change>
+    <change name="Steven Lambright, Jai Rideout and Tracie Sucharski" date="2012-01-18">
+      Re-implemented all of the plotting functionality in order to improve the
+      user interface and capabilities. Added best fit lines and a scatter plot.
+    </change>
+    <change name="Steven Lambright" date="2012-03-22">
+      Added the sun shadow and feature nomenclature tools.
+    </change>
+    <change name="Tracie Sucharski" date="2012-04-24">
+      Added the stereo tool which calculates spot elevations and elevation profiles
+      from pairs of stereo images.
+    </change>
+    <change name="Steven Lambright" date="2012-05-29">
+      Fixed prompts for saving edited files on closing so they are functional once again.
+      Fixes #854.
+    </change>
+    <change name="Steven Lambright and Kimberly Oyama" date="2012-06-11">
+      Updated the nomenclature tool to include the option to choose from three
+      types of extent displays (4 arrows, 8 arrows, or a box) and the option
+      to display all features or only IAU approved features.
+    </change>
+    <change name="Kimberly Oyama and Steven Lambright" date="2012-06-22">
+      Updated the Advanced Track Tool to include a help menu and a help dialog that opesn with the
+      tool and when the user opens it through the help menu. Fixes #772.
+    </change>
+    <change name="Kimberly Oyama and Steven Lambright" date="2012-06-26">
+      Fixed query range problems with the nomenclature tool. It can now handle longitudinal ranges
+      that encompass the 0/360 line. Fixes #958.
+    </change>
+    <change name="Steven Lambright" date="2012-06-28">
+      The special pixel colorization tool's settings won't be forgotten when restretching.
+      Also, images that are opened after using this tool will now take on the appropriate
+      colors. Fixes #684.
+    </change>
+    <change name="Steven Lambright" date="2012-06-29">
+      Improved handling of special pixels in the statistics tool so that they are reported
+      correctly. Fixes #199.
+    </change>
+    <change name="Steven Lambright" date="2012-07-03">
+      Added M/KM options to the spatial plot tool. Fixes #853.
+    </change>
+    <change name="Tracie Sucharski" date="2012-07-30">
+      Added the match tool which allows registration (control points) to be edited
+      between cubes without a camera model.
+    </change>
+    <change name="Tracie Sucharski" date="2012-10-01">
+      Fixed bug in the match tool which caused qview to to print error messages and possibly
+      crash when closing cube viewports either individually or from the File Menu.
+    </change>
+    <change name="Tracie Sucharski" date="2013-01-08">
+      Add the AlphaCube to the labels of and exported cropped cube.  Fixes #706.
+    </change>
+    <change name="Tracie Sucharski" date="2013-01-08">
+      Fixed bug when saving a cube viewport that is displayed at full resolution,  the application
+      would seg fault.  Fixes #1386.
+    </change>
+    <change name="Steven Lambright" date="2013-01-24">
+      Fixed spatial plot tool functionality on single line images. Fixes #997.
+    </change>
+    <change name="Steven Lambright" date="2013-01-31">
+      Improved upon the accuracy of the find tool's sync scale option. Fixes #953.
+    </change>
+    <change name="Steven Lambright" date="2013-02-12">
+      The red boxes that indicate the current selection (i.e. the rubber band) shown
+      while creating plots, updating stretches, and other actions should now only draw
+      on cubes (viewports) that are relevant to the action being performed. Fixes #1035.
+    </change>
+    <change name="Steven Lambright" date="2013-02-07">
+      The plot tables should no longer have multiple rows with the same X value. Also, fixed a crash
+      related to closing the plot table windows. Fixes #710. Fixes #818.
+    </change>
+    <change name="Kimberly Oyama and Stuart Sices" date="2013-12-30">
+      Changed the character that is used as a token when parsing the list of file names used when
+      the socket is already open. Fixes #1551.
+    </change>
+    <change name="Ian Humphrey" date="2014-07-30">
+      Modified spectral plot tool to more accurately compute statistics for rectangular and
+      polygonal selections. Fixes #2071.
+    </change>
+    <change name="Ian Humphrey" date="2014-07-31">
+      Added configurePlotCurves() method to PlotWindow. User can activate configure dialog on
+      single curve with right-click or activate dialog with combo box of all curves using the
+      toolbar button. Added What's This for SpatialPlotTool and removed the configure toolbar button
+      for ScatterPlotWindow. Fixes #2089.
+    </change>
+    <change name="Ian Humphrey" date="2015-10-07">
+      Updated icons. Fixes #1041.
+    </change>
+    <change name="Ian Humphrey" date="2015-11-19">
+      Added shortcuts to Match Tool window for selecting right measures, registration, undo
+      registration, saving measures, saving the point, and saving the control network. Fixes #2324.
+    </change>
+    <change name="Ian Humphrey" date="2017-05-10">
+      Fixed initial loading of viewport and Fit to viewport zoom to correctly zoom to the center
+      of the image. Fixes #4756.
+    </change>
+    <change name="Adam Paquette" date="2017-05-19">
+      Readded help menu for the 2D and 3D plot tools. Now properly display in both tools.
+      Fixes #2126.
+    </change>
+  </history>
+</application>
