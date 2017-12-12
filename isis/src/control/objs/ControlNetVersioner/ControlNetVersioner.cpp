@@ -111,7 +111,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Reading the control network [" + netFile.name()
-          + "] failed";
+                    + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
@@ -126,12 +126,9 @@ namespace Isis {
   void ControlNetVersioner::readPvl(const Pvl &network) {
       const PvlObject &controlNetwork = network.findObject("ControlNetwork");
 
-      int version
+      int version = 1
 
-      if (!controlNetwork.hasKeyword("Version")) {
-        version = 1;
-      }
-      else{
+      if (controlNetwork.hasKeyword("Version")) {
         version = toInt(controlNetwork["Version"][0]);
       }
 
@@ -312,8 +309,41 @@ namespace Isis {
   }
 
 
+  /**
+   * Read a protobuf control network and prepare the data to be converted into a
+   * control network.
+   *
+   * @param header The Pvl network header that contains the version number.
+   * @param netFile The filename of the control network file.
+   */
   void ControlNetVersioner::readProtobuf(const Pvl &header, const FileName netFile) {
+    int version = 1;
 
+    const PvlObject &protoBuf = header.findObject("ProtoBuffer");
+    const PvlGroup &netInfo = protoBuf.findGroup("ControlNetworkInfo");
+
+    if (netInfo.hasKeyword("Version")) {
+      version = toInt(netInfo["Version"][0]);
+    }
+
+    switch (version) {
+      case 1:
+        readProtobufV0001(netFile);
+        break;
+
+      case 2:
+        readProtobufV0002(netFile);
+        break;
+
+      case 7:
+        readProtobufV0007(netFile);
+        break;
+
+      default:
+        QString msg = "The Protobuf file version [" + toString(version)
+                      + "] is not supported";
+        throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
 
 
