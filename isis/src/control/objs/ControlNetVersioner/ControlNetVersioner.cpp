@@ -96,7 +96,7 @@ namespace Isis {
    */
   void ControlNetVersioner::read(const FileName netFile) {
     try {
-      Pvl network(netFile.expanded());
+      const Pvl &network(netFile.expanded());
 
       if (network.hasObject("ProtoBuffer")) {
         readProtobuf(network, netFile);
@@ -123,13 +123,17 @@ namespace Isis {
    *
    * @param network The Pvl network data
    */
-  void ControlNetVersioner::readPvl(Pvl &network) {
-      PvlObject &controlNetwork = network.findObject("ControlNetwork");
+  void ControlNetVersioner::readPvl(const Pvl &network) {
+      const PvlObject &controlNetwork = network.findObject("ControlNetwork");
 
-      if (!controlNetwork.hasKeyword("Version"))
-        controlNetwork += PvlKeyword("Version", "1");
+      int version
 
-      int version = toInt(controlNetwork["Version"][0]);
+      if (!controlNetwork.hasKeyword("Version")) {
+        version = 1;
+      }
+      else{
+        version = toInt(controlNetwork["Version"][0]);
+      }
 
       switch (version) {
         case 1:
@@ -157,7 +161,7 @@ namespace Isis {
    *
    * @param network The control network PvlObject.
    */
-  void ControlNetVersioner::readPvlV0001(PvlObject &network) {
+  void ControlNetVersioner::readPvlV0001(const PvlObject &network) {
     // initialize the header
     try {
       ControlNetHeaderV0001 header;
@@ -196,7 +200,7 @@ namespace Isis {
    *
    * @param network The control network PvlObject.
    */
-  void ControlNetVersioner::readPvlV0002(PvlObject &network) {
+  void ControlNetVersioner::readPvlV0002(const PvlObject &network) {
     // initialize the header
     try {
       ControlNetHeaderV0002 header;
@@ -235,7 +239,7 @@ namespace Isis {
    *
    * @param network The control network PvlObject.
    */
-  void ControlNetVersioner::readPvlV0003(PvlObject &network) {
+  void ControlNetVersioner::readPvlV0003(const PvlObject &network) {
     // initialize the header
     try {
       ControlNetHeaderV0003 header;
@@ -274,7 +278,7 @@ namespace Isis {
    *
    * @param network The control network PvlObject.
    */
-  void ControlNetVersioner::readPvlV0004(PvlObject &network) {
+  void ControlNetVersioner::readPvlV0004(const PvlObject &network) {
     // initialize the header
     try {
       ControlNetHeaderV0004 header;
