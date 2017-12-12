@@ -117,8 +117,48 @@ namespace Isis {
   }
 
 
+  /**
+   * Read a Pvl control network and prepare the data to be converted into a
+   *  control network.
+   *
+   * @param network The Pvl network data
+   */
   void ControlNetVersioner::readPvl(const Pvl &network) {
+      PvlObject &controlNetwork = network.findObject("ControlNetwork");
 
+      if (!controlNetwork.hasKeyword("Version"))
+        controlNetwork += PvlKeyword("Version", "1");
+
+      int version = toInt(controlNetwork["Version"][0]);
+
+      switch (version) {
+        case 1:
+          readPvlV0001(controlNetwork);
+          break;
+
+        case 2:
+          readPvlV0001(controlNetwork);
+          break;
+
+        case 3:
+          readPvlV0001(controlNetwork);
+          break;
+
+        default:
+          IString msg = "The Pvl file version [" + toString(version)
+                        + "] is not supported";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      version = toInt(controlNetwork["Version"][0]);
+
+      if (version == previousVersion) {
+        IString msg = "Cannot update from version [" + IString(version) + "] "
+            "to any other version";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      return LatestPvlToBinary(controlNetwork);
   }
 
 
@@ -284,6 +324,126 @@ namespace Isis {
    * This interprets a Pvl network of any version. Since we already have the
    *   Pvl in memory (we need it to figure out if it is a Pvl network) it
    *   does not actually call Pvl::Read.
+
+    PvlObject &network = pvl.findObject("ControlNetwork");
+
+    if (!network.hasKeyword("Version"))
+      network += PvlKeyword("Version", "1");
+
+
+    PvlObject &network = pvl.findObject("ControlNetwork");
+
+    if (!network.hasKeyword("Version"))
+      network += PvlKeyword("Version", "1");
+
+    int version = toInt(network["Version"][0]);
+
+    PvlObject &network = pvl.findObject("ControlNetwork");
+
+    if (!network.hasKeyword("Version"))
+      network += PvlKeyword("Version", "1");
+
+    int version = toInt(network["Version"][0]);
+
+    while (version != LATEST_PVL_VERSION) {
+      int previousVersion = version;
+
+      switch (version) {
+        case 1:
+          ConvertVersion1ToVersion2(network);
+          break;
+
+        case 2:
+          ConvertVersion2ToVersion3(network);
+          break;
+
+        case 3:
+          ConvertVersion3ToVersion4(network);
+          break;
+
+        default:
+          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+              " supported";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      version = toInt(network["Version"][0]);
+
+      if (version == previousVersion) {
+        IString msg = "Cannot update from version [" + IString(version) + "] "
+            "to any other version";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    return LatestPvlToBinary(network);
+
+    while (version != LATEST_PVL_VERSION) {
+      int previousVersion = version;
+
+      switch (version) {
+        case 1:
+          ConvertVersion1ToVersion2(network);
+          break;
+
+        case 2:
+          ConvertVersion2ToVersion3(network);
+          break;
+
+        case 3:
+          ConvertVersion3ToVersion4(network);
+          break;
+
+        default:
+          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+              " supported";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      version = toInt(network["Version"][0]);
+
+      if (version == previousVersion) {
+        IString msg = "Cannot update from version [" + IString(version) + "] "
+            "to any other version";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    return LatestPvlToBinary(network);
+    int version = toInt(network["Version"][0]);
+
+    while (version != LATEST_PVL_VERSION) {
+      int previousVersion = version;
+
+      switch (version) {
+        case 1:
+          ConvertVersion1ToVersion2(network);
+          break;
+
+        case 2:
+          ConvertVersion2ToVersion3(network);
+          break;
+
+        case 3:
+          ConvertVersion3ToVersion4(network);
+          break;
+
+        default:
+          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+              " supported";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      version = toInt(network["Version"][0]);
+
+      if (version == previousVersion) {
+        IString msg = "Cannot update from version [" + IString(version) + "] "
+            "to any other version";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    return LatestPvlToBinary(network);
    *
    * The update cycle is contained in this method. Old versions of Pvl will be
    *   updated until they reach the latest version and then LatestPvlToBinary

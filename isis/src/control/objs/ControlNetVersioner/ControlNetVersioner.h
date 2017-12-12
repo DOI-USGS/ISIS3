@@ -176,10 +176,10 @@ namespace Isis {
       void read(const FileName netFile);
 
       void readPvl(const Pvl &network);
-      void readPvlV0001(const Pvl &network);
-      void readPvlV0002(const Pvl &network);
-      void readPvlV0003(const Pvl &network);
-      void readPvlV0004(const Pvl &network);
+      void readPvlV0001(const PvlObject &network);
+      void readPvlV0002(const PvlObject &network);
+      void readPvlV0003(const PvlObject &network);
+      void readPvlV0004(const PvlObject &network);
 
       void readProtobuf(const Pvl &header, const FileName netFile);
       void readProtobufV0001(const FileName netFile);
