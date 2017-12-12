@@ -174,136 +174,19 @@ namespace Isis {
 
 
   /**
-   * Create the internal header from a V0001 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
+   * Create the internal header from a V0001 header.
    *
-   * The only update step is to convert MRO targetNames to simply Mars.
+   * The latest version is V0001, so this will check for an old issue with
+   * Mars target names and then internalize the header.
    *
    * @param header The V0001 header
    */
-  void ControlNetVersioner::createHeaderFromV0001(const ControlNetHeaderV0001 header) {
-    ControlNetHeaderV0002 newHeader;
-    newHeader.networkID = header.networkID;
-    if (header.targetName..startsWith("MRO/")) {
-      newHeader.targetName = "Mars";
-    }
-    else {
-      newHeader.targetName = header.targetName;
-    }
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0002(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0002 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * @param header The V0002 header
-   */
-  void ControlNetVersioner::createHeaderFromV0002(const ControlNetHeaderV0002 header) {
-    ControlNetHeaderV0003 newHeader;
-    newHeader.networkID = header.networkID;
-    newHeader.targetName = header.targetName;
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0003(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0003 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * @param header The V0003 header
-   */
-  void ControlNetVersioner::createHeaderFromV0003(const ControlNetHeaderV0003 header) {
-    ControlNetHeaderV0004 newHeader;
-    newHeader.networkID = header.networkID;
-    newHeader.targetName = header.targetName;
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0004(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0004 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * @param header The V0004 header
-   */
-  void ControlNetVersioner::createHeaderFromV0004(const ControlNetHeaderV0004 header) {
-    ControlNetHeaderV0005 newHeader;
-    newHeader.networkID = header.networkID;
-    newHeader.targetName = header.targetName;
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0005(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0005 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * @param header The V0005 header
-   */
-  void ControlNetVersioner::createHeaderFromV0005(const ControlNetHeaderV0005 header) {
-    ControlNetHeaderV0006 newHeader;
-    newHeader.networkID = header.networkID;
-    newHeader.targetName = header.targetName;
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0006(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0006 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * This does not fill the size list because it will never be needed.
-   *
-   * @param header The V0006 header
-   */
-  void ControlNetVersioner::createHeaderFromV0006(const ControlNetHeaderV0006 header) {
-    ControlNetHeaderV0007 newHeader;
-    newHeader.networkID = header.networkID;
-    newHeader.targetName = header.targetName;
-    newHeader.created = header.created;
-    newHeader.lastModified = header.lastModified;
-    newHeader.description = header.description;
-    newHeader.username = header.username;
-
-    createHeaderFromV0007(newHeader);
-  }
-
-
-  /**
-   * Create the internal header from a V0007 header. This will step the header
-   * version up until it reaches the latest version and then internalize it.
-   *
-   * @param header The V0007 header
-   */
-  void ControlNetVersioner::createHeaderFromV0007(const ControlNetHeaderV0007 header) {
+  void ControlNetVersioner::createHeader(const ControlNetHeaderV0001 header) {
     m_header = header;
+
+    if (m_header.targetName..startsWith("MRO/")) {
+      m_header.targetName = "Mars";
+    }
   }
 
 
