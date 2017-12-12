@@ -119,7 +119,7 @@ namespace Isis {
 
   /**
    * Read a Pvl control network and prepare the data to be converted into a
-   *  control network.
+   * control network.
    *
    * @param network The Pvl network data
    */
@@ -149,16 +149,6 @@ namespace Isis {
                         + "] is not supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
-
-      version = toInt(controlNetwork["Version"][0]);
-
-      if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
-            "to any other version";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
-
-      return LatestPvlToBinary(controlNetwork);
   }
 
 
