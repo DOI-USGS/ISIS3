@@ -82,9 +82,332 @@ namespace Isis {
 
   }
 
-
+  
+  //
   Pvl &ControlNetVersioner::toPvl(){
+    Pvl pvl;
+    pvl.addObject(PvlObject("ControlNetwork"));
+    PvlObject &network = pvl.findObject("ControlNetwork");
 
+    network += PvlKeyword("NetworkId", m_header.networkid().c_str());
+    network += PvlKeyword("TargetName", m_header.targetname().c_str());
+    network += PvlKeyword("UserName", m_header.username().c_str());
+    network += PvlKeyword("Created", m_header.created().c_str());
+    network += PvlKeyword("LastModified", m_header.lastmodified().c_str());
+    network += PvlKeyword("Description", m_header.description().c_str());
+
+    // This is the Pvl version we're converting to
+    network += PvlKeyword("Version", "7");
+
+    //  Get Target Radii from naif kernel
+    PvlGroup pvlRadii;
+    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
+    if (target != "") {
+      try {
+        NaifStatus::CheckErrors();
+        pvlRadii = Target::radiiGroup(target);
+      }
+      catch (IException) {
+        // leave pvlRadii empty if target is not recognized by NAIF 
+      }
+    }
+
+    ControlPointFileEntryV0002 binaryPoint;
+    foreach(binaryPoint, *p_controlPoints) {
+      PvlObject pvlPoint("ControlPoint");
+
+      if (binaryPoint.type() == ControlPointFileEntryV0002::Fixed) {
+        pvlPoint += PvlKeyword("PointType", "Fixed");
+      }
+      else if (binaryPoint.type() == ControlPointFileEntryV0002::Constrained) {
+        pvlPoint += PvlKeyword("PointType", "Constrained");
+      }
+      else {
+        pvlPoint += PvlKeyword("PointType", "Free");
+      }
+
+      pvlPoint += PvlKeyword("PointId", binaryPoint.id().c_str());
+      pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername().c_str());
+      pvlPoint += PvlKeyword("DateTime", binaryPoint.datetime().c_str());
+
+      if (binaryPoint.editlock()) {
+        pvlPoint += PvlKeyword("EditLock", "True");
+      }
+
+      if (binaryPoint.ignore()) {
+        pvlPoint += PvlKeyword("Ignore", "True");
+      }
+
+      switch (binaryPoint.apriorisurfpointsource()) {
+        case ControlPointFileEntryV0002::None:
+          break;
+        case ControlPointFileEntryV0002::User:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "User");
+          break;
+        case ControlPointFileEntryV0002::AverageOfMeasures:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "AverageOfMeasures");
+          break;
+        case ControlPointFileEntryV0002::Reference:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "Reference");
+          break;
+        case ControlPointFileEntryV0002::Basemap:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "Basemap");
+          break;
+        case ControlPointFileEntryV0002::BundleSolution:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
+          break;
+        case ControlPointFileEntryV0002::Ellipsoid:
+        case ControlPointFileEntryV0002::DEM:
+          break;
+      }
+
+      if (binaryPoint.has_apriorisurfpointsourcefile())
+        pvlPoint += PvlKeyword("AprioriXYZSourceFile",
+                        binaryPoint.apriorisurfpointsourcefile().c_str());
+
+      switch (binaryPoint.aprioriradiussource()) {
+        case ControlPointFileEntryV0002::None:
+          break;
+        case ControlPointFileEntryV0002::User:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "User");
+          break;
+        case ControlPointFileEntryV0002::AverageOfMeasures:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "AverageOfMeasures");
+          break;
+        case ControlPointFileEntryV0002::Reference:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "Reference");
+          break;
+        case ControlPointFileEntryV0002::Basemap:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "Basemap");
+          break;
+        case ControlPointFileEntryV0002::BundleSolution:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "BundleSolution");
+          break;
+        case ControlPointFileEntryV0002::Ellipsoid:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "Ellipsoid");
+          break;
+        case ControlPointFileEntryV0002::DEM:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "DEM");
+          break;
+      }
+
+      if (binaryPoint.has_aprioriradiussourcefile())
+        pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
+                        binaryPoint.aprioriradiussourcefile().c_str());
+
+      if (binaryPoint.has_apriorix()) {
+        pvlPoint += PvlKeyword("AprioriX", toString(binaryPoint.apriorix()), "meters");
+        pvlPoint += PvlKeyword("AprioriY", toString(binaryPoint.aprioriy()), "meters");
+        pvlPoint += PvlKeyword("AprioriZ", toString(binaryPoint.aprioriz()), "meters");
+
+        // Get surface point, convert to lat,lon,radius and output as comment
+        SurfacePoint apriori;
+        apriori.SetRectangular(
+                Displacement(binaryPoint.apriorix(),Displacement::Meters),
+                Displacement(binaryPoint.aprioriy(),Displacement::Meters),
+                Displacement(binaryPoint.aprioriz(),Displacement::Meters));
+        pvlPoint.findKeyword("AprioriX").addComment("AprioriLatitude = " +
+                                 toString(apriori.GetLatitude().degrees()) +
+                                 " <degrees>");
+        pvlPoint.findKeyword("AprioriY").addComment("AprioriLongitude = " +
+                                 toString(apriori.GetLongitude().degrees()) +
+                                 " <degrees>");
+        pvlPoint.findKeyword("AprioriZ").addComment("AprioriRadius = " +
+                                 toString(apriori.GetLocalRadius().meters()) +
+                                 " <meters>");
+
+        if (binaryPoint.aprioricovar_size()) {
+          PvlKeyword matrix("AprioriCovarianceMatrix");
+          matrix += toString(binaryPoint.aprioricovar(0));
+          matrix += toString(binaryPoint.aprioricovar(1));
+          matrix += toString(binaryPoint.aprioricovar(2));
+          matrix += toString(binaryPoint.aprioricovar(3));
+          matrix += toString(binaryPoint.aprioricovar(4));
+          matrix += toString(binaryPoint.aprioricovar(5));
+          pvlPoint += matrix;
+
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
+            apriori.SetRadii(
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
+            symmetric_matrix<double, upper> covar;
+            covar.resize(3);
+            covar.clear();
+            covar(0, 0) = binaryPoint.aprioricovar(0);
+            covar(0, 1) = binaryPoint.aprioricovar(1);
+            covar(0, 2) = binaryPoint.aprioricovar(2);
+            covar(1, 1) = binaryPoint.aprioricovar(3);
+            covar(1, 2) = binaryPoint.aprioricovar(4);
+            covar(2, 2) = binaryPoint.aprioricovar(5);
+            apriori.SetRectangularMatrix(covar);
+            QString sigmas = "AprioriLatitudeSigma = " +
+                             toString(apriori.GetLatSigmaDistance().meters()) +
+                             " <meters>  AprioriLongitudeSigma = " +
+                             toString(apriori.GetLonSigmaDistance().meters()) +
+                             " <meters>  AprioriRadiusSigma = " +
+                             toString(apriori.GetLocalRadiusSigma().meters()) +
+                             " <meters>";
+            pvlPoint.findKeyword("AprioriCovarianceMatrix").addComment(sigmas);
+          }
+        }
+      }
+
+      if (binaryPoint.latitudeconstrained())
+        pvlPoint += PvlKeyword("LatitudeConstrained", "True");
+
+      if (binaryPoint.longitudeconstrained())
+        pvlPoint += PvlKeyword("LongitudeConstrained", "True");
+
+      if (binaryPoint.radiusconstrained())
+        pvlPoint += PvlKeyword("RadiusConstrained", "True");
+
+      if (binaryPoint.has_adjustedx()) {
+        pvlPoint += PvlKeyword("AdjustedX", toString(binaryPoint.adjustedx()), "meters");
+        pvlPoint += PvlKeyword("AdjustedY", toString(binaryPoint.adjustedy()), "meters");
+        pvlPoint += PvlKeyword("AdjustedZ", toString(binaryPoint.adjustedz()), "meters");
+
+        // Get surface point, convert to lat,lon,radius and output as comment
+        SurfacePoint adjusted;
+        adjusted.SetRectangular(
+                Displacement(binaryPoint.adjustedx(),Displacement::Meters),
+                Displacement(binaryPoint.adjustedy(),Displacement::Meters),
+                Displacement(binaryPoint.adjustedz(),Displacement::Meters));
+        pvlPoint.findKeyword("AdjustedX").addComment("AdjustedLatitude = " +
+                                 toString(adjusted.GetLatitude().degrees()) +
+                                 " <degrees>");
+        pvlPoint.findKeyword("AdjustedY").addComment("AdjustedLongitude = " +
+                                 toString(adjusted.GetLongitude().degrees()) +
+                                 " <degrees>");
+        pvlPoint.findKeyword("AdjustedZ").addComment("AdjustedRadius = " +
+                                 toString(adjusted.GetLocalRadius().meters()) +
+                                 " <meters>");
+
+        if (binaryPoint.adjustedcovar_size()) {
+          PvlKeyword matrix("AdjustedCovarianceMatrix");
+          matrix += toString(binaryPoint.adjustedcovar(0));
+          matrix += toString(binaryPoint.adjustedcovar(1));
+          matrix += toString(binaryPoint.adjustedcovar(2));
+          matrix += toString(binaryPoint.adjustedcovar(3));
+          matrix += toString(binaryPoint.adjustedcovar(4));
+          matrix += toString(binaryPoint.adjustedcovar(5));
+          pvlPoint += matrix;
+
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
+            adjusted.SetRadii(
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
+            symmetric_matrix<double, upper> covar;
+            covar.resize(3);
+            covar.clear();
+            covar(0, 0) = binaryPoint.adjustedcovar(0);
+            covar(0, 1) = binaryPoint.adjustedcovar(1);
+            covar(0, 2) = binaryPoint.adjustedcovar(2);
+            covar(1, 1) = binaryPoint.adjustedcovar(3);
+            covar(1, 2) = binaryPoint.adjustedcovar(4);
+            covar(2, 2) = binaryPoint.adjustedcovar(5);
+            adjusted.SetRectangularMatrix(covar);
+            QString sigmas = "AdjustedLatitudeSigma = " +
+                             toString(adjusted.GetLatSigmaDistance().meters()) +
+                             " <meters>  AdjustedLongitudeSigma = " +
+                             toString(adjusted.GetLonSigmaDistance().meters()) +
+                             " <meters>  AdjustedRadiusSigma = " +
+                             toString(adjusted.GetLocalRadiusSigma().meters()) +
+                             " <meters>";
+            pvlPoint.findKeyword("AdjustedCovarianceMatrix").addComment(sigmas);
+          }
+        }
+      }
+
+      for (int j = 0; j < binaryPoint.measures_size(); j++) {
+        PvlGroup pvlMeasure("ControlMeasure");
+        const ControlPointFileEntryV0002_Measure &
+            binaryMeasure = binaryPoint.measures(j);
+        pvlMeasure += PvlKeyword("SerialNumber", binaryMeasure.serialnumber().c_str());
+
+        switch(binaryMeasure.type()) {
+          case ControlPointFileEntryV0002_Measure_MeasureType_Candidate:
+            pvlMeasure += PvlKeyword("MeasureType", "Candidate");
+            break;
+          case ControlPointFileEntryV0002_Measure_MeasureType_Manual:
+            pvlMeasure += PvlKeyword("MeasureType", "Manual");
+            break;
+          case ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel:
+            pvlMeasure += PvlKeyword("MeasureType", "RegisteredPixel");
+            break;
+          case ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel:
+            pvlMeasure += PvlKeyword("MeasureType", "RegisteredSubPixel");
+            break;
+        }
+
+        if (binaryMeasure.has_choosername())
+          pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername().c_str());
+
+        if (binaryMeasure.has_datetime())
+          pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime().c_str());
+
+        if (binaryMeasure.editlock())
+          pvlMeasure += PvlKeyword("EditLock", "True");
+
+        if (binaryMeasure.ignore())
+          pvlMeasure += PvlKeyword("Ignore", "True");
+
+        if (binaryMeasure.has_sample())
+          pvlMeasure += PvlKeyword("Sample", toString(binaryMeasure.sample()));
+
+        if (binaryMeasure.has_line())
+          pvlMeasure += PvlKeyword("Line", toString(binaryMeasure.line()));
+
+        if (binaryMeasure.has_diameter())
+          pvlMeasure += PvlKeyword("Diameter", toString(binaryMeasure.diameter()));
+
+        if (binaryMeasure.has_apriorisample())
+          pvlMeasure += PvlKeyword("AprioriSample", toString(binaryMeasure.apriorisample()));
+
+        if (binaryMeasure.has_aprioriline())
+          pvlMeasure += PvlKeyword("AprioriLine", toString(binaryMeasure.aprioriline()));
+
+        if (binaryMeasure.has_samplesigma())
+          pvlMeasure += PvlKeyword("SampleSigma", toString(binaryMeasure.samplesigma()),
+                                   "pixels");
+
+        if (binaryMeasure.has_samplesigma())
+          pvlMeasure += PvlKeyword("LineSigma", toString(binaryMeasure.linesigma()),
+                                   "pixels");
+
+        if (binaryMeasure.has_sampleresidual())
+          pvlMeasure += PvlKeyword("SampleResidual", toString(binaryMeasure.sampleresidual()),
+                                   "pixels");
+
+        if (binaryMeasure.has_lineresidual())
+          pvlMeasure += PvlKeyword("LineResidual", toString(binaryMeasure.lineresidual()),
+                                   "pixels");
+
+        if (binaryMeasure.has_jigsawrejected()) {
+         pvlMeasure += PvlKeyword("JigsawRejected", toString(binaryMeasure.jigsawrejected()));
+        }
+
+        for (int logEntry = 0;
+            logEntry < binaryMeasure.log_size();
+            logEntry ++) {
+          const ControlPointFileEntryV0002_Measure_MeasureLogData &log =
+                binaryMeasure.log(logEntry);
+
+          ControlMeasureLogData interpreter(log);
+          pvlMeasure += interpreter.ToKeyword();
+        }
+
+        if (binaryPoint.has_referenceindex() &&
+           binaryPoint.referenceindex() == j)
+          pvlMeasure += PvlKeyword("Reference", "True");
+
+        pvlPoint.addGroup(pvlMeasure);
+      }
+
+      network.addObject(pvlPoint);
+    }
+    return pvl;
   }
 
 
