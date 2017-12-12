@@ -8,6 +8,7 @@
 #include <QHash>
 #include <QString>
 #include <QStringList>
+#include <QVector>
 
 #include "Application.h"
 #include "CameraDetectorMap.h"
@@ -31,7 +32,6 @@
 
 using boost::numeric::ublas::symmetric_matrix;
 using boost::numeric::ublas::upper;
-using namespace std;
 
 namespace Isis {
   /**

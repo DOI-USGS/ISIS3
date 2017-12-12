@@ -1,5 +1,7 @@
 #include "ControlNetFilter.h"
 
+#include <QVector>
+
 #include "Angle.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -1018,7 +1020,7 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointCubeNamesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    std::vector <QString> sCubeNames;
+    QVector <QString> sCubeNames;
 
     // Store the Cubenames from the PvlGroup
     for (int i = 0; i < pvlGrp.keywords(); i++) {
@@ -1079,7 +1081,7 @@ namespace Isis {
 
           // Image Details
           QString sn = cMeasure->GetCubeSerialNumber();
-          vector <double> imgStats = GetImageStatsBySerialNum(sn);
+          QVector <double> imgStats = GetImageStatsBySerialNum(sn);
           mOstm << mSerialNumList.fileName(sn)   << ", " << sn << ", "
                 << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
                 << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", "
@@ -1136,7 +1138,7 @@ namespace Isis {
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
       QString sSerialNum = mSerialNumFilter.serialNumber(sn);
-      vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+      QVector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double convexHullRatio = imgStats[imgConvexHullRatio];
       if (convexHullRatio < dGreater || convexHullRatio > dLesser){
         FilterOutMeasuresBySerialNum(sSerialNum);
@@ -1213,7 +1215,7 @@ namespace Isis {
         QString sSerialNum = mSerialNumFilter.serialNumber(i);
 
         mOstm << mSerialNumFilter.fileName(i) << ", " << sSerialNum << ", ";
-        vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+        QVector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
         mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
@@ -1258,7 +1260,7 @@ namespace Isis {
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
       QString sSerialNum = mSerialNumFilter.serialNumber(sn);
-      vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+      QVector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double numPoints = imgStats[imgTotalPoints];
       if (numPoints < iGreaterPoints || numPoints > iLessPoints){
         FilterOutMeasuresBySerialNum(sSerialNum);
@@ -1318,9 +1320,9 @@ namespace Isis {
       double dDist = 0;
       bool bMatchDistance = false;
 
-      std::vector <int> sPointIndex1;
-      std::vector <int> sPointIndex2;
-      std::vector <double> dPointDistance;
+      QVector <int> sPointIndex1;
+      QVector <int> sPointIndex2;
+      QVector <double> dPointDistance;
 
       // Point stats
       int iPointsTotal   = 0;
@@ -1449,7 +1451,7 @@ namespace Isis {
         mSerialNumFilter.remove(sSerialNum);
       }
       else if (pbLastFilter) {
-        vector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
+        QVector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
         mOstm << mSerialNumList.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", "
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "

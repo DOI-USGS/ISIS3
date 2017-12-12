@@ -1,13 +1,14 @@
 #ifndef _CONTROLNETSTATISTICS_H_
 #define _CONTROLNETSTATISTICS_H_
 
-#include <map>
-#include <iostream>
-#include <vector>
+#include <QMap>
+#include <QVector> 
+
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "SerialNumberList.h"
 #include "Statistics.h"
+
 
 /**
  * @file
@@ -70,10 +71,10 @@ namespace Isis {
    *                           computation. Minor refactoring but needs a lot more. References #619
    *                           because fixing the order of the cnet caused us to fix some cnet graph
    *                           node bugs which caused the convex hull tests to fail.
-   *  @history 2015-06-04 Kristin Berry - Now throws an error when
-   *                           unable to open an output file or
+   *  @history 2015-06-04 Kristin Berry - Now throws an error when unable to open an output file or
    *                           finish writing to an output file.
    *                           Fixes #996.
+   *  @history 2017-12-12 Kristin Berry - Updated std::map to QMap and std::vector to QVector. 
    *  
    */
   class ControlNetStatistics {
@@ -114,7 +115,7 @@ namespace Isis {
       void PrintImageStats(const QString &psImageFile);
 
       //! Returns the Image Stats by Serial Number
-      std::vector<double> GetImageStatsBySerialNum(QString psSerialNum) const;
+      QVector<double> GetImageStatsBySerialNum(QString psSerialNum) const;
 
       //! Generate stats like Ignored, Fixed, Total Measures, Ignored by Control Point
       void GeneratePointStats(const QString &psPointFile);
@@ -124,122 +125,122 @@ namespace Isis {
 
       //! Returns the Number of Valid (Not Ignored) Points in the Control Net
       int NumValidPoints() const {
-        return (*mPointIntStats.find(validPoints)).second;
+        return (*mPointIntStats.find(validPoints));
       }
 
       //! Returns the Number of Fixed Points in the Control Net
       int NumFixedPoints() const {
-        return (*mPointIntStats.find(fixedPoints)).second;
+        return (*mPointIntStats.find(fixedPoints));
       }
 
       //! Returns the number of Constrained Points in Control Net
       int NumConstrainedPoints() const {
-        return (*mPointIntStats.find(constrainedPoints)).second;
+        return (*mPointIntStats.find(constrainedPoints));
       }
 
       //! Returns the number of Constrained Points in Control Net
       int NumFreePoints() const {
-        return (*mPointIntStats.find(freePoints)).second;
+        return (*mPointIntStats.find(freePoints));
       }
 
       //! Returns the number of ignored points
       int NumIgnoredPoints() const {
-        return (*mPointIntStats.find(ignoredPoints)).second;
+        return (*mPointIntStats.find(ignoredPoints));
       }
 
       //! Returns total number of edit locked points
       int NumEditLockedPoints() const {
-        return (*mPointIntStats.find(editLockedPoints)).second;
+        return (*mPointIntStats.find(editLockedPoints));
       }
 
       //! Returns the total Number of Measures in the Control Net
       int NumMeasures() const {
-        return (*mPointIntStats.find(totalMeasures)).second;
+        return (*mPointIntStats.find(totalMeasures));
       }
 
       //! Returns the total Number of valid Measures in the Control Net
       int NumValidMeasures() const {
-        return (*mPointIntStats.find(validMeasures)).second;
+        return (*mPointIntStats.find(validMeasures));
       }
 
       //! Returns the total Number of Ignored Measures in the Control Net
       int NumIgnoredMeasures() const {
-        return (*mPointIntStats.find(ignoredMeasures)).second;
+        return (*mPointIntStats.find(ignoredMeasures));
       }
 
       //! Returns total number of edit locked measures in the network
       int NumEditLockedMeasures() const {
-        return (*mPointIntStats.find(editLockedMeasures)).second;
+        return (*mPointIntStats.find(editLockedMeasures));
       }
 
       //! Determine the average error of all points in the network
       double GetAverageResidual() const {
-        return (*mPointDoubleStats.find(avgResidual)).second;
+        return (*mPointDoubleStats.find(avgResidual));
       }
 
       //! Determine the minimum error of all points in the network
       double GetMinimumResidual() const {
-        return (*mPointDoubleStats.find(minResidual)).second;
+        return (*mPointDoubleStats.find(minResidual));
       }
 
       //! Determine the maximum error of all points in the network
       double GetMaximumResidual() const {
-        return (*mPointDoubleStats.find(maxResidual)).second;
+        return (*mPointDoubleStats.find(maxResidual));
       }
 
       //! Determine the minimum line error of all points in the network
       double GetMinLineResidual() const {
-        return (*mPointDoubleStats.find(minLineResidual)).second;
+        return (*mPointDoubleStats.find(minLineResidual));
       }
 
       //! Determine the minimum sample error of all points in the network
       double GetMinSampleResidual() const {
-        return (*mPointDoubleStats.find(minSampleResidual)).second;
+        return (*mPointDoubleStats.find(minSampleResidual));
       }
 
       //! Determine the maximum line error of all points in the network
       double GetMaxLineResidual() const {
-        return (*mPointDoubleStats.find(maxLineResidual)).second;
+        return (*mPointDoubleStats.find(maxLineResidual));
       }
 
       //! Determine the maximum sample error of all points in the network
       double GetMaxSampleResidual() const {
-        return (*mPointDoubleStats.find(maxSampleResidual)).second;
+        return (*mPointDoubleStats.find(maxSampleResidual));
       }
 
       //! Get Min and Max LineShift
       double GetMinLineShift() const {
-        return (*mPointDoubleStats.find(minLineShift)).second;
+        return (*mPointDoubleStats.find(minLineShift));
       }
 
       //! Get network Max LineShift
       double GetMaxLineShift() const {
-        return (*mPointDoubleStats.find(maxLineShift)).second;
+        return (*mPointDoubleStats.find(maxLineShift));
       }
 
       //! Get network Min SampleShift
       double GetMinSampleShift() const {
-        return (*mPointDoubleStats.find(minSampleShift)).second;
+        return (*mPointDoubleStats.find(minSampleShift));
       }
 
       //! Get network Max SampleShift
       double GetMaxSampleShift() const {
-        return (*mPointDoubleStats.find(maxSampleShift)).second;
+        return (*mPointDoubleStats.find(maxSampleShift));
       }
 
       //! Get network Min PixelShift
       double GetMinPixelShift() const {
-        return (*mPointDoubleStats.find(minPixelShift)).second;
+        return (*mPointDoubleStats.find(minPixelShift));
       }
 
       //! Get network Max PixelShift
       double GetMaxPixelShift() const {
-        return (*mPointDoubleStats.find(maxPixelShift)).second;
+        return (*mPointDoubleStats.find(maxPixelShift));
       }
 
       //! Get network Avg PixelShift
       double GetAvgPixelShift() const {
-        return (*mPointDoubleStats.find(avgPixelShift)).second;
+        return (*mPointDoubleStats.find(avgPixelShift));
       }
 
     protected:
@@ -249,10 +250,10 @@ namespace Isis {
       QList<ControlCubeGraphNode *> mCubeGraphNodes;
 
     private:
-      std::map<int, int> mPointIntStats;           //!< Contains std::map of different count stats
-      std::map<int, double> mPointDoubleStats;     //!< Contains std::map of different computed stats
-      std::map<QString, std::vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
-      std::map<QString, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
+      QMap<int, int> mPointIntStats;           //!< Contains QMap of different count stats
+      QMap<int, double> mPointDoubleStats;     //!< Contains QMap of different computed stats
+      QMap<QString, QVector<double> > mImageMap; //!< Contains stats by Image/Serial Num
+      QMap<QString, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
 
       //! Get point count stats
       void GetPointIntStats();

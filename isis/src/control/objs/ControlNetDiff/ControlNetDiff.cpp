@@ -18,11 +18,6 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 
-
-using std::cerr;
-using std::cout;
-using std::endl;
-
 namespace Isis {
 
   /**

@@ -36,8 +36,6 @@
 #include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
 
-using namespace std;
-
 namespace Isis {
   /**
    * Create a new control measure and initialize it to nulls and zeros.

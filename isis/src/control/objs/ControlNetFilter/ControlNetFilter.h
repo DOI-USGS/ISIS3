@@ -66,6 +66,7 @@ namespace Isis {
    *  @history 2011-12-29 Sharmila Prasad - Updated GoodnessOfFit Filter. Fixes Mantis #652
    *  @history 2017-08-08 Adam Goins - Changed references to SerialNumberList::Delete() to 
    *                                     SerialNumberList::remove()
+   *  @history 2017-12-12 Kristin Berry - Updated to use QVector instead of std::vector. 
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
