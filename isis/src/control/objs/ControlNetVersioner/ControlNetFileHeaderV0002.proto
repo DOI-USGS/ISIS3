@@ -1,7 +1,3 @@
-// 2011-06-07 Tracie Sucharski/Debbie Cook - Changed PointType 
-//                    Ground  ---->  Fixed
-//                    Tie     ---->  Free          
-//
 // 2017-12-11 Kristin Berry - Separated header and point into separate files. 
 
 // Protocol buffer header descriptor for Isis3 Control Networks
