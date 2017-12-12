@@ -7,7 +7,8 @@
 #include "ControlNetFile.h"
 #include "ControlNetFileV0001.h"
 #include "ControlNetFileV0002.h"
-#include "ControlNetFileV0002.pb.h"
+#include "ControlNetFileHeaderV0002.pb.h"
+#include "ControlPointFileEntryV0002.pb.h"
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
 #include "FileName.h"
@@ -180,7 +181,7 @@ namespace Isis {
       try {
         PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0001 point;
-        // Fill the ControlPointV0001 object from the PvlObject
+        //TODO Fill the ControlPointV0001 object from the PvlObject
         m_points.append( createPointFromV0001(point) );
       }
       catch (IException &e) {
@@ -219,7 +220,7 @@ namespace Isis {
       try {
         PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0002 point;
-        // Fill the ControlPointV0002 object from the PvlObject
+        //TODO Fill the ControlPointV0002 object from the PvlObject
         m_points.append( createPointFromV0002(point) );
       }
       catch (IException &e) {
@@ -258,7 +259,7 @@ namespace Isis {
       try {
         PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0003 point;
-        // Fill the ControlPointV0003 object from the PvlObject
+        //TODO Fill the ControlPointV0003 object from the PvlObject
         m_points.append( createPointFromV0003(point) );
       }
       catch (IException &e) {
@@ -297,7 +298,7 @@ namespace Isis {
       try {
         PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0004 point;
-        // Fill the ControlPointV0004 object from the PvlObject
+        //TODO Fill the ControlPointV0004 object from the PvlObject
         m_points.append( createPointFromV0004(point) );
       }
       catch (IException &e) {
@@ -328,15 +329,15 @@ namespace Isis {
 
     switch (version) {
       case 1:
-        readProtobufV0001(netFile);
+        readProtobufV0001(header, netFile);
         break;
 
       case 2:
-        readProtobufV0002(netFile);
+        readProtobufV0002(header, netFile);
         break;
 
       case 7:
-        readProtobufV0007(netFile);
+        readProtobufV0007(header, netFile);
         break;
 
       default:
@@ -347,17 +348,118 @@ namespace Isis {
   }
 
 
-  void ControlNetVersioner::readProtobufV0001(const FileName netFile) {
-
+  /**
+   * Read a protobuf version 1 control network and prepare the data to be
+   *  converted into a control network.
+   *
+   * @param netFile The filename of the control network file.
+   */
+  void ControlNetVersioner::readProtobufV0001(const Pvl &header, const FileName netFile) {
+    // This is empty because we don't have any current methods that read
+    // the V0001 protobuf files. JAM
   }
 
 
-  void ControlNetVersioner::readProtobufV0002(const FileName netFile) {
+  /**
+   * Read a protobuf version 2 control network and prepare the data to be
+   *  converted into a control network.
+   *
+   * @param netFile The filename of the control network file.
+   */
+  void ControlNetVersioner::readProtobufV0002(const Pvl &header, const FileName netFile) {
+    // read the header protobuf object
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
+    BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
+    BigInt headerLength = protoBufferCore["HeaderBytes"];
+
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if (!input.is_open()) {
+      IString msg = "Failed to open control network file" + netFile.name();
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    input.seekg(headerStartPos, ios::beg);
+    streampos filePos = input.tellg();
+
+    ControlNetFileHeaderV0002 protoHeader;
+    try {
+      IstreamInputStream headerInStream(&input);
+      CodedInputStream headerCodedInStream(&headerInStream);
+      // max 512MB, warn at 400MB
+      headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                             1024 * 1024 * 400);
+      int oldLimit = headerCodedInStream.PushLimit(headerLength);
+      if (!protoHeader.ParseFromCodedStream(&headerCodedInStream)) {
+        QString msg = "Failed to parse protobuf header from input control net file ["
+                      + netFile.name() + "]";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      filePos += headerLength;
+    }
+    catch (...) {
+      QString msg = "An error occured while reading the protobuf control network header.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
+    // initialize the header from the protobuf header
+    try {
+      ControlNetHeaderV0006 header;
+      header.networkID = protoHeader.networkid().c_str();
+      if (protoHeader.has_targetname()) {
+        header.targetName = protoHeader.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoHeader.created().c_str();
+      header.lastModified = protoHeader.lastmodified().c_str();
+      header.description = protoHeader.description().c_str();
+      header.userName = protoHeader.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    // read each protobuf control point and then initialize it
+    input.seekg(filePos, ios::beg);
+    IstreamInputStream pointInStream(&input);
+    int numPoints = protoHeader.pointmessagesizes_size();
+    for (int pointIndex = 0; pointIndex < numPoints; pointIndex ++) {
+      ControlPointFileEntryV0002 newPoint;
+      ControlPointV0006 point;
+
+      try {
+        CodedInputStream pointCodedInStream = CodedInputStream(&pointInStream);
+        pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                              1024 * 1024 * 400);
+        int pointSize = protoHeader.pointmessagesizes(pointIndex);
+        pointCodedInStream.PushLimit(pointSize);
+        newPoint.ParseFromCodedStream(&pointCodedInStream);
+      }
+      catch (...) {
+        QString msg = "Failed to read protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "].";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      try {
+        //TODO Parse the protobuf control point into the ControlPointV0006
+        m_points.append( createPointFromV0006(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "] in a ControlPoint.";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
-  void ControlNetVersioner::readProtobufV0007(const FileName netFile) {
+  void ControlNetVersioner::readProtobufV0007(const Pvl &header, const FileName netFile) {
 
   }
 

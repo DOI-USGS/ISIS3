@@ -182,9 +182,9 @@ namespace Isis {
       void readPvlV0004(const PvlObject &network);
 
       void readProtobuf(const Pvl &header, const FileName netFile);
-      void readProtobufV0001(const FileName netFile);
-      void readProtobufV0002(const FileName netFile);
-      void readProtobufV0007(const FileName netFile);
+      void readProtobufV0001(const Pvl &header, const FileName netFile);
+      void readProtobufV0002(const Pvl &header, const FileName netFile);
+      void readProtobufV0007(const Pvl &header, const FileName netFile);
 
       QSharedPointer<ControlPoint> createPointFromV0001(const ControlPointV0001 point);
       QSharedPointer<ControlPoint> createPointFromV0002(const ControlPointV0002 point);
