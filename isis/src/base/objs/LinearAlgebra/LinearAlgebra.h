@@ -70,6 +70,7 @@ namespace Isis {
    *   @history 2016-08-16 Jesse Mapel - Added BOOST_UBLAS_NO_STD_CERR definition to
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
+   *   @history 2017-12-12 Jeannie Backer - Added SymmetricMatrix typedef.
    *  
    *  
    *   @todo document methods (a) add naif routine names to documentation where appropriate,
@@ -112,6 +113,16 @@ namespace Isis {
        * API. 
        */
       typedef boost::numeric::ublas::matrix<double> Matrix;
+      /**
+       * Definition for an Isis::LinearAlgebra::SymmetrixMatrix of doubles with
+       * an upper configuration. This is a typedef for a boost symmetric_matrix. 
+       *  
+       * Note: This typedef is used so that we can add functionality to an 
+       * existing matrix type and/or change which third party library's matrix
+       * we are using without changing all references to this type in the ISIS
+       * API. 
+       */
+      typedef boost::numeric::ublas::symmetric_matrix<double, upper> SymmetricMatrix;
       /**
        * Definition for an Isis::LinearAlgebra::Vector of doubles. This is a 
        * typedef for a boost vector. 
