@@ -105,12 +105,12 @@ namespace Isis {
         readPvl(network);
       }
       else {
-        IString msg = "Could not determine the control network file type";
+        QString msg = "Could not determine the control network file type";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
     catch (IException &e) {
-      IString msg = "Reading the control network [" + netFile.name()
+      QString msg = "Reading the control network [" + netFile.name()
           + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -123,7 +123,7 @@ namespace Isis {
    *
    * @param network The Pvl network data
    */
-  void ControlNetVersioner::readPvl(const Pvl &network) {
+  void ControlNetVersioner::readPvl(Pvl &network) {
       PvlObject &controlNetwork = network.findObject("ControlNetwork");
 
       if (!controlNetwork.hasKeyword("Version"))
@@ -145,30 +145,64 @@ namespace Isis {
           break;
 
         default:
-          IString msg = "The Pvl file version [" + toString(version)
+          QString msg = "The Pvl file version [" + toString(version)
                         + "] is not supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
   }
 
 
-  void ControlNetVersioner::readPvlV0001(const Pvl &network) {
+  void ControlNetVersioner::readPvlV0001(PvlObject &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0002(const Pvl &network) {
+  void ControlNetVersioner::readPvlV0002(PvlObject &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0003(const Pvl &network) {
+  void ControlNetVersioner::readPvlV0003(PvlObject &network) {
 
   }
 
 
-  void ControlNetVersioner::readPvlV0004(const Pvl &network) {
+  /**
+   * read a version 4 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   */
+  void ControlNetVersioner::readPvlV0004(PvlObject &network) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0004 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
 
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject &pointObject = network.object(objectIndex);
+        ControlPointV0004 point;
+        // Fill the ControlPointV0004 object from the PvlObject
+        m_points.append( createPointFromV0004(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
