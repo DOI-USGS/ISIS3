@@ -238,7 +238,7 @@ namespace Isis {
   void ControlNetVersioner::createHeader(const ControlNetHeaderV0001 header) {
     m_header = header;
 
-    if (m_header.targetName..startsWith("MRO/")) {
+    if (m_header.targetName.startsWith("MRO/")) {
       m_header.targetName = "Mars";
     }
   }
