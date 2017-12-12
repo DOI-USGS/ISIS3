@@ -152,18 +152,120 @@ namespace Isis {
   }
 
 
+  /**
+   * read a version 1 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   */
   void ControlNetVersioner::readPvlV0001(PvlObject &network) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0001 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
 
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject &pointObject = network.object(objectIndex);
+        ControlPointV0001 point;
+        // Fill the ControlPointV0001 object from the PvlObject
+        m_points.append( createPointFromV0001(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
+  /**
+   * read a version 2 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   */
   void ControlNetVersioner::readPvlV0002(PvlObject &network) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0002 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
 
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject &pointObject = network.object(objectIndex);
+        ControlPointV0002 point;
+        // Fill the ControlPointV0002 object from the PvlObject
+        m_points.append( createPointFromV0002(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
+  /**
+   * read a version 3 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   */
   void ControlNetVersioner::readPvlV0003(PvlObject &network) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0003 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
 
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject &pointObject = network.object(objectIndex);
+        ControlPointV0003 point;
+        // Fill the ControlPointV0003 object from the PvlObject
+        m_points.append( createPointFromV0003(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
