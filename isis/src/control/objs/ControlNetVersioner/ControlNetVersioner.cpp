@@ -88,8 +88,32 @@ namespace Isis {
   }
 
 
+  /**
+   * Read a control network file and prepare the data to be converted into
+   * a control network.
+   *
+   * @param netFile The control network file to read.
+   */
   void ControlNetVersioner::read(const FileName netFile) {
+    try {
+      Pvl network(netFile.expanded());
 
+      if (network.hasObject("ProtoBuffer")) {
+        readProtobuf(network, netFile);
+      }
+      else if (network.hasObject("ControlNetwork")) {
+        readPvl(network);
+      }
+      else {
+        IString msg = "Could not determine the control network file type";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+    }
+    catch (IException &e) {
+      IString msg = "Reading the control network [" + netFile.name()
+          + "] failed";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
   }
 
 
