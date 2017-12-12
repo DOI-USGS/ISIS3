@@ -1020,7 +1020,7 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointCubeNamesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    QVector <QString> sCubeNames;
+    QVector<QString> sCubeNames;
 
     // Store the Cubenames from the PvlGroup
     for (int i = 0; i < pvlGrp.keywords(); i++) {
@@ -1081,7 +1081,7 @@ namespace Isis {
 
           // Image Details
           QString sn = cMeasure->GetCubeSerialNumber();
-          QVector <double> imgStats = GetImageStatsBySerialNum(sn);
+          QVector<double> imgStats = GetImageStatsBySerialNum(sn);
           mOstm << mSerialNumList.fileName(sn)   << ", " << sn << ", "
                 << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
                 << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", "
@@ -1320,9 +1320,9 @@ namespace Isis {
       double dDist = 0;
       bool bMatchDistance = false;
 
-      QVector <int> sPointIndex1;
-      QVector <int> sPointIndex2;
-      QVector <double> dPointDistance;
+      QVector<int> sPointIndex1;
+      QVector<int> sPointIndex2;
+      QVector<double> dPointDistance;
 
       // Point stats
       int iPointsTotal   = 0;
@@ -1451,7 +1451,7 @@ namespace Isis {
         mSerialNumFilter.remove(sSerialNum);
       }
       else if (pbLastFilter) {
-        QVector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
+        QVector<double> imgStats = GetImageStatsBySerialNum((sSerialNum));
         mOstm << mSerialNumList.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", "
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "
