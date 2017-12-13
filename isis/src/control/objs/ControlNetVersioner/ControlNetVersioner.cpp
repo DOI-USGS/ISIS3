@@ -717,7 +717,7 @@ namespace Isis {
 
 
 
-    return createPointFromV0006(newPoint);
+    return createPoint(newPoint);
 
   }
 
