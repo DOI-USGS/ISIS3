@@ -117,7 +117,7 @@ namespace Isis {
     }
 
     ControlPointV0007 protobufPoint;
-    foreach(binaryPoint, *m_points) {
+    foreach(protobufPoint, *m_points) {
       PvlObject pvlPoint("ControlPoint");
 
       if (protobufPoint.type() == ControlPointV0007::Fixed) {
