@@ -5,9 +5,9 @@
 #include "IException.h"
 #include "IString.h"
 #include "Latitude.h"
-#include "LinearAlgebra.h"
 #include "Longitude.h"
 
+using namespace boost::numeric::ublas;
 using namespace std;
 
 namespace Isis {
@@ -70,14 +70,14 @@ namespace Isis {
     }
 
     if(other.p_rectCovar) {
-      p_rectCovar = new LinearAlgebra::UpperSymmetricMatrix(*other.p_rectCovar);
+      p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
     }
     else {
       p_rectCovar = NULL;
     }
 
     if(other.p_sphereCovar) {
-      p_sphereCovar = new LinearAlgebra::UpperSymmetricMatrix(*other.p_sphereCovar);
+      p_sphereCovar = new symmetric_matrix<double, upper>(*other.p_sphereCovar);
     }
     else {
       p_sphereCovar = NULL;
@@ -132,7 +132,7 @@ namespace Isis {
    *
    */
   SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
-      const Distance &radius, const LinearAlgebra::UpperSymmetricMatrix &covar) {
+      const Distance &radius, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
     InitPoint();
     InitRadii();
@@ -190,7 +190,7 @@ namespace Isis {
    * @param covar  The variance/covariance matrix of the point
    */
   SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
-      const Displacement &z, const LinearAlgebra::UpperSymmetricMatrix &covar) {
+      const Displacement &z, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
     InitPoint();
     InitRadii();
@@ -318,7 +318,7 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetRectangular(Displacement x, Displacement y, Displacement z,
-                                    const LinearAlgebra::UpperSymmetricMatrix &covar) {
+                                    const symmetric_matrix<double,upper>& covar) {
     SetRectangularPoint(x, y, z);
     SetRectangularMatrix(covar);
   }
@@ -342,7 +342,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    LinearAlgebra::UpperSymmetricMatrix covar(3);
+    symmetric_matrix<double,upper> covar(3);
     covar.clear();
     covar(0,0) = xSigma.meters() * xSigma.meters();
     covar(1,1) = ySigma.meters() * ySigma.meters();
@@ -359,7 +359,7 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetRectangularMatrix(
-       const LinearAlgebra::UpperSymmetricMatrix &covar) {
+       const symmetric_matrix<double, upper> &covar) {
     // Make sure the point is set first
     if (!Valid()) {
       IString msg = "A point must be set before a variance/covariance matrix "
@@ -371,7 +371,7 @@ namespace Isis {
       *p_rectCovar = covar;
     }
     else {
-      p_rectCovar = new LinearAlgebra::UpperSymmetricMatrix(covar);
+      p_rectCovar = new symmetric_matrix<double, upper>(covar);
     }
 
     SpiceDouble rectMat[3][3];
@@ -406,7 +406,7 @@ namespace Isis {
     J[2][2] = p_z->meters() / radius;
 
     if(!p_sphereCovar)
-      p_sphereCovar = new LinearAlgebra::UpperSymmetricMatrix(3);
+      p_sphereCovar = new symmetric_matrix<double, upper>(3);
 
     SpiceDouble mat[3][3];
     mxm_c (J, rectMat, mat);
@@ -486,7 +486,7 @@ namespace Isis {
    * @param covar Spherical variance/covariance matrix in m*m
    */
   void SurfacePoint::SetSpherical(const Latitude &lat, const Longitude &lon,
-      const Distance &radius, const LinearAlgebra::UpperSymmetricMatrix &covar) {
+      const Distance &radius, const symmetric_matrix<double, upper> &covar) {
     SetSphericalPoint(lat, lon, radius);
     SetSphericalMatrix(covar);
   }
@@ -518,7 +518,7 @@ namespace Isis {
                                         const Angle &lonSigma,
                                         const Distance &radiusSigma) {
     if (latSigma.isValid() && lonSigma.isValid() && radiusSigma.isValid()) {
-      LinearAlgebra::UpperSymmetricMatrix covar(3);
+      symmetric_matrix<double,upper> covar(3);
       covar.clear();
 
       double sphericalCoordinate;
@@ -584,7 +584,7 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetSphericalMatrix(
-     const LinearAlgebra::UpperSymmetricMatrix &covar) {
+     const symmetric_matrix<double, upper> & covar) {
 
     // Make sure the point is set first
     if (!Valid()) {
@@ -597,7 +597,7 @@ namespace Isis {
       *p_sphereCovar = covar;
     }
     else {
-      p_sphereCovar = new LinearAlgebra::UpperSymmetricMatrix(covar);
+      p_sphereCovar = new symmetric_matrix<double, upper>(covar);
     }
 
     SpiceDouble sphereMat[3][3];
@@ -637,7 +637,7 @@ namespace Isis {
     J[2][2] = sinPhi;
 
     if(!p_rectCovar)
-      p_rectCovar = new LinearAlgebra::UpperSymmetricMatrix(3);
+      p_rectCovar = new symmetric_matrix<double, upper>(3);
 
     SpiceDouble mat[3][3];
     mxm_c (J, sphereMat, mat);
@@ -825,10 +825,10 @@ namespace Isis {
   }
 
 
-  LinearAlgebra::UpperSymmetricMatrix SurfacePoint::GetRectangularMatrix()
+  symmetric_matrix<double, upper> SurfacePoint::GetRectangularMatrix()
       const {
     if(!p_rectCovar) {
-      LinearAlgebra::UpperSymmetricMatrix tmp(3);
+      symmetric_matrix<double, upper> tmp(3);
       tmp.clear();
       return tmp;
     }
@@ -977,9 +977,9 @@ namespace Isis {
   }
 
 
-  LinearAlgebra::UpperSymmetricMatrix SurfacePoint::GetSphericalMatrix() const {
+  symmetric_matrix<double, upper> SurfacePoint::GetSphericalMatrix() const {
     if(!p_sphereCovar) {
-      LinearAlgebra::UpperSymmetricMatrix tmp(3);
+      symmetric_matrix<double, upper> tmp(3);
       tmp.clear();
       return tmp;
     }
@@ -1192,11 +1192,11 @@ namespace Isis {
       }
 
       if(other.p_rectCovar) {
-        p_rectCovar = new LinearAlgebra::UpperSymmetricMatrix(*other.p_rectCovar);
+        p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
       }
 
       if(other.p_sphereCovar) {
-        p_sphereCovar = new LinearAlgebra::UpperSymmetricMatrix(*other.p_sphereCovar);
+        p_sphereCovar = new symmetric_matrix<double, upper>(*other.p_sphereCovar);
       }
     }
 

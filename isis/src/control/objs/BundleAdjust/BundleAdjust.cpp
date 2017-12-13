@@ -37,7 +37,6 @@
 #include "ImageList.h"
 #include "iTime.h"
 #include "Latitude.h"
-#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
@@ -1031,7 +1030,7 @@ namespace Isis {
     static LinearAlgebra::Matrix coeffImage;
     static LinearAlgebra::Matrix coeffPoint3D(2, 3);
     static LinearAlgebra::Vector coeffRHS(2);
-    static LinearAlgebra::UpperSymmetricMatrix N22(3);
+    static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);
     SparseBlockColumnMatrix N12;
     static LinearAlgebra::Vector n2(3);
     boost::numeric::ublas::compressed_vector<double> n1(m_rank);
@@ -1148,7 +1147,7 @@ namespace Isis {
    *
    * @see BundleAdjust::formNormalEquations
    */
-  bool BundleAdjust::formMeasureNormals(LinearAlgebra::UpperSymmetricMatrix &N22,
+  bool BundleAdjust::formMeasureNormals(symmetric_matrix<double, upper>&N22,
                                         SparseBlockColumnMatrix &N12,
                                         compressed_vector<double> &n1,
                                         vector<double> &n2,
@@ -1158,7 +1157,7 @@ namespace Isis {
                                         vector<double> &coeffRHS,
                                         int observationIndex) {
 
-    static LinearAlgebra::UpperSymmetricMatrix N11;
+    static symmetric_matrix<double, upper> N11;
     static matrix<double> N11TargetImage;
 
     int blockIndex = observationIndex;
@@ -1284,7 +1283,7 @@ namespace Isis {
    *
    * @see BundleAdjust::formNormalEquations
    */
-  bool BundleAdjust::formPointNormals(LinearAlgebra::UpperSymmetricMatrix &N22,
+  bool BundleAdjust::formPointNormals(symmetric_matrix<double, upper>&N22,
                                       SparseBlockColumnMatrix &N12,
                                       vector<double> &n2,
                                       vector<double> &nj,
@@ -1455,7 +1454,7 @@ namespace Isis {
    *
    * @see BundleAdjust::formPointNormals
    */
-  bool BundleAdjust::productATransB(LinearAlgebra::UpperSymmetricMatrix &N22,
+  bool BundleAdjust::productATransB(symmetric_matrix <double,upper> &N22,
                                     SparseBlockColumnMatrix &N12,
                                     SparseBlockRowMatrix &Q) {
 
@@ -1796,11 +1795,11 @@ namespace Isis {
    *
    * @TODO Move to LinearAlgebra
    */
-  bool BundleAdjust::invert3x3(LinearAlgebra::UpperSymmetricMatrix &m) {
+  bool BundleAdjust::invert3x3(symmetric_matrix<double, upper> &m) {
     double det;
     double den;
 
-    LinearAlgebra::UpperSymmetricMatrix c = m;
+    boost::numeric::ublas::symmetric_matrix< double, upper > c = m;
 
     den = m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1))
           - m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0))
@@ -2658,8 +2657,8 @@ namespace Isis {
     printf("     Time: %s\n\n", currentTime.c_str());
 
     // create and initialize array of 3x3 matrices for all object points
-    std::vector< LinearAlgebra::SymmetricMatrix > pointCovariances(numObjectPoints,
-                                                                   SymmetricMatrix(3));
+    std::vector< symmetric_matrix<double> > pointCovariances(numObjectPoints,
+                                                             symmetric_matrix<double>(3));
     for (int d = 0; d < numObjectPoints; d++) {
       pointCovariances[d].clear();
     }
@@ -2809,7 +2808,7 @@ namespace Isis {
         T.clear();
 
         // get corresponding point covariance matrix
-        LinearAlgebra::SymmetricMatrix &covariance = pointCovariances[pointIndex];
+        boost::numeric::ublas::symmetric_matrix<double> &covariance = pointCovariances[pointIndex];
 
         // get firstQBlock - index i is the key into Q for firstQBlock
         LinearAlgebra::Matrix *firstQBlock = Q.value(i);
@@ -2898,7 +2897,7 @@ namespace Isis {
       }
 
       // get corresponding point covariance matrix
-      LinearAlgebra::SymmetricMatrix &covariance = pointCovariances[pointIndex];
+      boost::numeric::ublas::symmetric_matrix<double> &covariance = pointCovariances[pointIndex];
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO

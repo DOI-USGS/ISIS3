@@ -7,6 +7,9 @@
 #include <QXmlInputSource>
 #include <QXmlStreamWriter>
 
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+
 #include "Angle.h"
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
@@ -790,7 +793,7 @@ int main(int argc, char *argv[]) {
     aprioriSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
                            Distance(1000.0, Distance::Meters),
                            Distance(1000.0, Distance::Meters));
-    LinearAlgebra::UpperSymmetricMatrix covar;
+    boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covar;
     covar.resize(3);
     covar.clear();
     covar(0,0) = 100.0;

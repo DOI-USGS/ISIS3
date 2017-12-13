@@ -26,9 +26,8 @@
 #include <iostream>
 
 // boost library
-#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 // Qt Library
 #include <QDebug>
@@ -113,16 +112,6 @@ namespace Isis {
        * API. 
        */
       typedef boost::numeric::ublas::matrix<double> Matrix;
-      /**
-       * Definition for an Isis::LinearAlgebra::UpperSymmetricMatrix 
-       * of doubles. This is a typedef for a boost matrix. 
-       */
-      typedef boost::numeric::ublas::symmetric_matrix<double> SymmetricMatrix;
-      /**
-       * Definition for an Isis::LinearAlgebra::UpperSymmetricMatrix 
-       * of doubles. This is a typedef for a boost matrix. 
-       */
-      typedef boost::numeric::ublas::symmetric_matrix<double, upper> UpperSymmetricMatrix;
       /**
        * Definition for an Isis::LinearAlgebra::Vector of doubles. This is a 
        * typedef for a boost vector. 

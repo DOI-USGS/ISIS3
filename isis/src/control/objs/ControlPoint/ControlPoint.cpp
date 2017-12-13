@@ -1,6 +1,9 @@
 #include "IsisDebug.h"
 #include "ControlPoint.h"
 
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
 #include <QDebug>
 #include <QHash>
 #include <QString>
@@ -20,13 +23,14 @@
 #include "Cube.h"
 #include "IString.h"
 #include "Latitude.h"
-#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
+using boost::numeric::ublas::symmetric_matrix;
+using boost::numeric::ublas::upper;
 using namespace std;
 
 namespace Isis {
@@ -234,7 +238,7 @@ namespace Isis {
         Displacement(fileEntry.aprioriz(), Displacement::Meters));
 
       if (fileEntry.aprioricovar_size() > 0) {
-        LinearAlgebra::UpperSymmetricMatrix covar;
+        symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
         covar(0, 0) = fileEntry.aprioricovar(0);
@@ -274,7 +278,7 @@ namespace Isis {
         Displacement(fileEntry.adjustedz(), Displacement::Meters));
 
       if (fileEntry.adjustedcovar_size() > 0) {
-        LinearAlgebra::UpperSymmetricMatrix covar;
+        symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
         covar(0, 0) = fileEntry.adjustedcovar(0);
@@ -2290,7 +2294,7 @@ namespace Isis {
       fileEntry.set_aprioriy(apriori.GetY().meters());
       fileEntry.set_aprioriz(apriori.GetZ().meters());
 
-      LinearAlgebra::UpperSymmetricMatrix covar = apriori.GetRectangularMatrix();
+      symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
           covar(0, 2) != 0. || covar(1, 1) != 0. ||
           covar(1, 2) != 0. || covar(2, 2) != 0.) {
@@ -2319,7 +2323,7 @@ namespace Isis {
       fileEntry.set_adjustedy(adjusted.GetY().meters());
       fileEntry.set_adjustedz(adjusted.GetZ().meters());
 
-      LinearAlgebra::UpperSymmetricMatrix covar = adjusted.GetRectangularMatrix();
+      symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
           covar(0, 2) != 0. || covar(1, 1) != 0. ||
           covar(1, 2) != 0. || covar(2, 2) != 0.) {

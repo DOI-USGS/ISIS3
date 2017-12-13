@@ -1,17 +1,19 @@
 #include <string>
 #include <iostream>
 
+#include <boost/numeric/ublas/symmetric.hpp>
+
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "IException.h"
 #include "Latitude.h"
-#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
 
 using namespace std;
+using namespace boost::numeric::ublas;
 using namespace Isis;
 
 void printPoint(ControlPoint &p);
@@ -162,7 +164,7 @@ int main() {
 
   cout << endl << "Test conversions for apriori/adjusted covariance matrices ... " << endl;
 
-  LinearAlgebra::UpperSymmetricMatrix covar;
+  symmetric_matrix<double, upper> covar;
   covar.resize(3);
   covar.clear();
   covar(0, 0) = 100.;
