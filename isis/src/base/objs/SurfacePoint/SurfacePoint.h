@@ -25,9 +25,6 @@
 #include <vector>
 #include <cmath>
 
-#include "boost/numeric/ublas/symmetric.hpp"
-#include "boost/numeric/ublas/io.hpp"
-
 #include "Displacement.h"
 #include "Distance.h"
 #include "Angle.h"
@@ -96,8 +93,7 @@ namespace Isis {
           const Distance &radiusSigma);
       SurfacePoint(const Latitude &lat, const Longitude &lon,
                    const Distance &radius,
-                   const boost::numeric::ublas::symmetric_matrix
-                     <double,boost::numeric::ublas::upper>& covar);
+                   const LinearAlgebra::UpperSymmetricMatrix &covar);
       SurfacePoint(const Displacement &x, const Displacement &y,
                    const Displacement &z);
       SurfacePoint(const Displacement &x, const Displacement &y,
@@ -105,8 +101,7 @@ namespace Isis {
           const Distance &zSigma);
       SurfacePoint(const Displacement &x, const Displacement &y,
                    const Displacement &z,
-                   const boost::numeric::ublas::symmetric_matrix
-                     <double,boost::numeric::ublas::upper>& covar);
+                   const LinearAlgebra::UpperSymmetricMatrix &covar);
       ~SurfacePoint();
 
 // Rectangular loading utilities
@@ -115,7 +110,7 @@ namespace Isis {
           const Distance &ySigma=Distance(), const Distance &zSigma=Distance());
 
       void SetRectangular(const Displacement x, const Displacement y, const Displacement z,
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+        const LinearAlgebra::UpperSymmetricMatrix &covar);
 
       //! Set surface point and sigmas in rectangular coordinates and convert to planetocentric
       void SetRectangularSigmas(const Distance &xSigma, const Distance &ySigma,
@@ -123,7 +118,7 @@ namespace Isis {
 
 
       void SetRectangularMatrix(
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+        const LinearAlgebra::UpperSymmetricMatrix &covar);
 
 // Spherical loading utilities
 
@@ -136,14 +131,13 @@ namespace Isis {
 
       void SetSpherical (const Latitude &lat, const Longitude &lon,
           const Distance &radius,
-          const boost::numeric::ublas::symmetric_matrix
-            <double,boost::numeric::ublas::upper>& covar);
+          const LinearAlgebra::UpperSymmetricMatrix &covar);
 
       void SetSphericalCoordinates(const Latitude &lat, const Longitude &lon,
                                    const Distance &radius);
 
       void SetSphericalMatrix(
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+        const LinearAlgebra::UpperSymmetricMatrix &covar);
 
       void SetSphericalSigmas(const Angle &latSigma, const Angle &lonSigma,
                               const Distance &radiusSigma);
@@ -165,8 +159,7 @@ namespace Isis {
       Distance GetXSigma() const;
       Distance GetYSigma() const;
       Distance GetZSigma() const;
-      boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-        GetRectangularMatrix() const;
+      LinearAlgebra::UpperSymmetricMatrix GetRectangularMatrix() const;
       Latitude GetLatitude() const; 
       Longitude GetLongitude() const;
       Distance GetLocalRadius() const;
@@ -178,8 +171,7 @@ namespace Isis {
       double GetLonWeight() const;
       Distance GetLocalRadiusSigma() const;
       double GetLocalRadiusWeight() const;
-      boost::numeric::ublas::symmetric_matrix
-          <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
+      LinearAlgebra::UpperSymmetricMatrix GetSphericalMatrix() const;
 
 // Computational methods
       Distance GetDistanceToPoint(const SurfacePoint &other) const;
@@ -209,11 +201,9 @@ namespace Isis {
       Displacement *p_y;
       Displacement *p_z;
       //! 3x3 upper triangular covariance matrix rectangular coordinates
-      boost::numeric::ublas::symmetric_matrix
-          <double,boost::numeric::ublas::upper> *p_rectCovar;
+      LinearAlgebra::UpperSymmetricMatrix *p_rectCovar;
       //! 3x3 upper triangular covariance matrix ocentric coordinates
-      boost::numeric::ublas::symmetric_matrix
-          <double,boost::numeric::ublas::upper> *p_sphereCovar;
+      LinearAlgebra::UpperSymmetricMatrix *p_sphereCovar;
   };
 };
 

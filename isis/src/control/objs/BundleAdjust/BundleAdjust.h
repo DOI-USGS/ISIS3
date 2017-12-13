@@ -367,8 +367,7 @@ namespace Isis {
                            LinearAlgebra::Vector  &coeffRHS,
                            BundleMeasure          &measure,
                            BundleControlPoint     &point);
-      bool formMeasureNormals(boost::numeric::ublas::symmetric_matrix<
-                                  double, boost::numeric::ublas::upper >         &N22,
+      bool formMeasureNormals(LinearAlgebra::UpperSymmetricMatrix                &N22,
                               SparseBlockColumnMatrix                            &N12,
                               boost::numeric::ublas::compressed_vector< double > &n1,
                               LinearAlgebra::Vector                              &n2,
@@ -377,8 +376,7 @@ namespace Isis {
                               LinearAlgebra::Matrix                              &coeffPoint3D,
                               LinearAlgebra::Vector                              &coeffRHS,
                               int                                                observationIndex);
-      bool formPointNormals(boost::numeric::ublas::symmetric_matrix<
-                                double, boost::numeric::ublas::upper >  &N22,
+      bool formPointNormals(LinearAlgebra::UpperSymmetricMatrix         &N22,
                             SparseBlockColumnMatrix                     &N12,
                             LinearAlgebra::Vector                       &n2,
                             LinearAlgebra::Vector                       &nj,
@@ -394,10 +392,8 @@ namespace Isis {
                                SparseBlockRowMatrix  &A,
                                LinearAlgebra::Vector &B,
                                LinearAlgebra::Vector &C);
-      bool invert3x3(boost::numeric::ublas::symmetric_matrix<
-                          double, boost::numeric::ublas::upper >  &m);
-      bool productATransB(boost::numeric::ublas::symmetric_matrix<
-                              double, boost::numeric::ublas::upper >  &N22,
+      bool invert3x3(LinearAlgebra::UpperSymmetricMatrix &m);
+      bool productATransB(LinearAlgebra::UpperSymmetricMatrix         &N22,
                           SparseBlockColumnMatrix                     &N12,
                           SparseBlockRowMatrix                        &Q);
       void productAlphaAV(double alpha,

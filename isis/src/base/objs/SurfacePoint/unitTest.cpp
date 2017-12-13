@@ -8,15 +8,13 @@
 #include "Distance.h"
 #include "IException.h"
 #include "Latitude.h"
+#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
 
-#include "boost/numeric/ublas/symmetric.hpp"
-
 using namespace Isis;
 using namespace std;
-using namespace boost::numeric::ublas;
 
 /**
  *
@@ -28,7 +26,7 @@ using namespace boost::numeric::ublas;
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  symmetric_matrix<double,upper> cvRect,cvOc;
+  LinearAlgebra::UpperSymmetricMatrix cvRect,cvOc;
 
   try {
     cout << "UnitTest for SurfacePoint" << endl << endl;
@@ -41,7 +39,7 @@ int main(int argc, char *argv[]) {
                    Distance(1000., Distance::Meters),
                    Distance(1000., Distance::Meters));
 
-    symmetric_matrix<double,upper> covar;
+    LinearAlgebra::UpperSymmetricMatrix covar;
     covar.resize(3);
     covar.clear();
     covar(0,0) = 100.;
@@ -58,7 +56,7 @@ int main(int argc, char *argv[]) {
     double latSig = spRec.GetLatSigma().degrees();
     double lonSig = spRec.GetLonSigma().degrees();
     double radSig = spRec.GetLocalRadiusSigma().meters();
-    symmetric_matrix<double,upper> covarSphere(3);
+    LinearAlgebra::UpperSymmetricMatrix covarSphere(3);
     covarSphere.clear();
     covarSphere = spRec.GetSphericalMatrix();
     
@@ -108,7 +106,7 @@ int main(int argc, char *argv[]) {
                           Longitude(lon, Angle::Degrees),
                           Distance(radius, Distance::Meters),
                           covarSphere );
-    symmetric_matrix<double,upper> covarRec(3);
+    LinearAlgebra::UpperSymmetricMatrix covarRec(3);
     covarRec.clear();
     covarRec = spSphere.GetRectangularMatrix();
 
@@ -155,7 +153,7 @@ int main(int argc, char *argv[]) {
     double latSig = (spRec.GetLatSigma()).degrees();
     double lonSig = (spRec.GetLonSigma()).degrees();
     double radSig = spRec.GetLocalRadiusSigma().meters();
-    symmetric_matrix<double,upper> covarSphere(3);
+    LinearAlgebra::UpperSymmetricMatrix covarSphere(3);
     covarSphere.clear();
     covarSphere = spRec.GetSphericalMatrix();
     
@@ -186,7 +184,7 @@ int main(int argc, char *argv[]) {
                          Angle(1.78752107, Angle::Degrees),
                          Distance(38.454887335682053718134171237789,
                                   Distance::Meters));
-    symmetric_matrix<double,upper> covarRec(3);
+    LinearAlgebra::UpperSymmetricMatrix covarRec(3);
     covarRec.clear();
     covarRec = spSphere1.GetRectangularMatrix();
     spSphere2.SetSpherical(Latitude(0.55850536, Angle::Radians),
