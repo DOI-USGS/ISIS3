@@ -139,8 +139,11 @@ namespace Isis {
 
 
   /**
-   * Create a pointer to a latest version ControlPoint from a 
-   * V0001 control net file. 
+   * Create a pointer to a latest version ControlPoint from an 
+   * object in a V0001 control net file. This method converts a 
+   * ControlPointV0001 to the latest ControlPontV#### version 
+   * and uses the latest versioned point to construct and fill an 
+   * Isis::ControlPoint. 
    *
    * @param point The versioned control point to be updated.
    *  
@@ -439,8 +442,11 @@ namespace Isis {
 
 
   /**
-   * Create a pointer to a latest version ControlPoint from a 
-   * V0002 control net file. 
+   * Create a pointer to a latest version ControlPoint from an 
+   * object in a V0002 control net file. This method converts a 
+   * ControlPointV0002 to the latest ControlPontV#### version 
+   * and uses the latest versioned point to construct and fill an 
+   * Isis::ControlPoint. 
    *
    * @param point The versioned control point to be updated.
    *  
@@ -465,8 +471,11 @@ namespace Isis {
 
 
   /**
-   * Create a pointer to a latest version ControlPoint from a 
-   * V0003 control net file. 
+   * Create a pointer to a latest version ControlPoint from an 
+   * object in a V0003 control net file. This method converts a 
+   * ControlPointV0003 to the latest ControlPontV#### version 
+   * and uses the latest versioned point to construct and fill an 
+   * Isis::ControlPoint. 
    *
    * @param point The versioned control point to be updated.
    *  
@@ -490,8 +499,11 @@ namespace Isis {
 
 
   /**
-   * Create a pointer to a latest version ControlPoint from a 
-   * V0004 control net file. 
+   * Create a pointer to a latest version ControlPoint from an 
+   * object in a V0004 control net file. This method converts a 
+   * ControlPointV0004 to the latest ControlPontV#### version 
+   * and uses the latest versioned point to construct and fill an 
+   * Isis::ControlPoint. 
    *
    * @param point The versioned control point to be updated.
    *  
@@ -843,31 +855,33 @@ namespace Isis {
         aprioriCovarianceMatrix(1, 2) = point.aprioricovar(4);
         aprioriCovarianceMatrix(2, 2) = point.aprioricovar(5);
         aprioriSurfacePoint.SetRectangularMatrix(aprioriCovarianceMatrix);
-
-        //??? if (Displacement(aprioriCovarianceMatrix(0, 0), Displacement::Meters).isValid() 
-        //???     || Displacement(aprioriCovarianceMatrix(1, 1), Displacement::Meters).isValid()) {
-        //??? 
-        //???   if (point.latitudeconstrained()) {
-        //???     constraintStatus.set(LatitudeConstrained);
-        //???   }
-        //???   if (point.longitudeconstrained()) {
-        //???     constraintStatus.set(LongitudeConstrained);
-        //???   }
-        //???   if (point.radiusconstrained()) {
-        //???     constraintStatus.set(RadiusConstrained);
-        //???   }
-        //??? 
-        //??? }
-        //??? else if (Displacement(aprioriCovarianceMatrix(2, 2), Displacement::Meters).isValid()) {
-        //??? 
-        //???   if (point.latitudeconstrained()) {
-        //???     constraintStatus.set(LatitudeConstrained);
-        //???   }
-        //???   if (point.radiusconstrained()) {
-        //???     constraintStatus.set(RadiusConstrained);
-        //???   }
-        //??? 
-        //??? }
+// ??? TODO
+#if 0
+        if (Displacement(aprioriCovarianceMatrix(0, 0), Displacement::Meters).isValid() 
+            || Displacement(aprioriCovarianceMatrix(1, 1), Displacement::Meters).isValid()) {
+        
+          if (point.latitudeconstrained()) {
+            constraintStatus.set(LatitudeConstrained);
+          }
+          if (point.longitudeconstrained()) {
+            constraintStatus.set(LongitudeConstrained);
+          }
+          if (point.radiusconstrained()) {
+            constraintStatus.set(RadiusConstrained);
+          }
+        
+        }
+        else if (Displacement(aprioriCovarianceMatrix(2, 2), Displacement::Meters).isValid()) {
+        
+          if (point.latitudeconstrained()) {
+            constraintStatus.set(LatitudeConstrained);
+          }
+          if (point.radiusconstrained()) {
+            constraintStatus.set(RadiusConstrained);
+          }
+        
+        }
+#endif
       }
 
       controlPoint->SetAprioriSurfacePoint(point.aprioriSurfacePoint);
@@ -898,10 +912,22 @@ namespace Isis {
       controlPoint->SetAdjustedSurfacePoint(point.adjustedSurfacePoint);
     }
 
-    //??? if (majorRad.isValid() && minorRad.isValid() && polarRad.isValid()) {
-    //???   aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
-    //???   adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
-    //??? }
+    if (m_header.has_targetname()) {
+      try {
+        // attempt to get target radii values... 
+        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetname().c_str());
+        Distance equatorialRadius(pvlRadii["EquatorialRadius"], Distance::Meters);
+        Distance polarRadius(pvlRadii["PolarRadius"], Distance::Meters);
+        if (equatorialRadius.isValid() && polarRadius.isValid()) {
+          aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+          adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+        }
+
+       }
+       catch (IException &e) {
+         // do nothing
+       }
+    }
 
     // adding measure information
     for (int m = 0 ; m < point.measures_size(); m++) {
@@ -1015,6 +1041,7 @@ namespace Isis {
   }
 
 
+// ??? TODO
 // ~~~~~~~~~~~~~~~ BEGIN OLD CONTROLNETVERSIONER CODE ~~~~~~~~~~~~~~~
 #if 0
 
@@ -1570,7 +1597,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for booleans. This operation is
+   *   and into the ControlPointV0006 for booleans. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -1583,14 +1610,14 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(bool)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
 
     QString value = container[keyName][0];
-    container.deleteKeyword(keyName);// why??? jwb
+    container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
@@ -1600,7 +1627,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for doubles. This operation is
+   *   and into the ControlPointV0006 for doubles. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -1613,8 +1640,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(double)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -1627,7 +1654,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for strings. This operation is
+   *   and into the ControlPointV0006 for strings. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -1640,8 +1667,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(const std::string&)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -1654,7 +1681,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for booleans. This
+   *   and into the ControlMeasureV0006 for booleans. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
    *
@@ -1667,8 +1694,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -1684,7 +1711,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for doubles. This
+   *   and into the ControlMeasureV0006 for doubles. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
    *
@@ -1697,8 +1724,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -1711,7 +1738,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for strings. This
+   *   and into the ControlMeasureV0006 for strings. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
    *
@@ -1724,8 +1751,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*setter)
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)
                                       (const std::string &)) {
 
     if (!container.hasKeyword(keyName))

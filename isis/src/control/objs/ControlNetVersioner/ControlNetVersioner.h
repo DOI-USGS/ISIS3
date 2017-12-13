@@ -131,7 +131,9 @@ namespace Isis {
    *                           to which it is appended. References #3892
    *  @history 2017-12-11 Jeannie Backer & Jesse Mapel - Created class skeleton for refactor.
    *  @history 2017-12-11 Jesse Mapel - Added VersionedControlNetHeaders.
-   *  @history 2017-12-13 Jeannie Backer - Added VersionedControlPoints.
+   *  @history 2017-12-12 Jeannie Backer - Added VersionedControlPoints.
+   *  @history 2017-12-12 Jeannie Backer - Implemented createPoint() methods.
+   *  @history 2017-12-13 Jeannie Backer - Added target radii to createPoint(V0006).
    */
   class ControlNetVersioner {
     public:
@@ -207,30 +209,31 @@ namespace Isis {
       // v5 dne???
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0006 point);
       QSharedPointer<ControlMeasure> createMeasure(const ControlMeasureV0006 measure);
+      // methods for converting pvl (v4) to protobuf (v6)
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002 &point,
-                void (ControlPointFileEntryV0002::*setter)(bool));
+                ControlPointV0006 &point,
+                void (ControlMeasureV0006::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002 &point,
-                void (ControlPointFileEntryV0002::*setter)(double));
+                ControlPointV0006 &point,
+                void (ControlPointV0006::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002 &point,
-                void (ControlPointFileEntryV0002::*setter)(const std::string&));
+                ControlPointV0006 &point,
+                void (ControlPointV0006::*setter)(const std::string&));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(bool));
+                ControlMeasureV0006 &measure,
+                void (ControlMeasureV0006::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(double));
+                ControlMeasureV0006 &measure,
+                void (ControlMeasureV0006::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(const std::string &));
+                ControlMeasureV0006 &measure,
+                void (ControlMeasureV0006::*setter)(const std::string &));
 
       void setHeader(const ControlNetHeaderV0001 header);
 
