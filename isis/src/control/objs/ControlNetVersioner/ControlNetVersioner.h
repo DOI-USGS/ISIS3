@@ -160,18 +160,6 @@ namespace Isis {
       ControlNetVersioner(const ControlNetVersioner &other);
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
-      struct ControlPointV0001 {
-        PvlContainer container;
-      }
-      typedef ControlPointV0002 ControlPointV0001;
-      typedef ControlPointV0003 ControlPointV0001;
-      typedef ControlPointV0004 ControlPointV0001;
-      typedef ControlPointV0005 ControlPointFileEntryV0002;//??? what to do???
-      typedef ControlPointV0006 ControlPointFileEntryV0002;
-      typedef ControlPointV0007 ControlPointFileEntryV0002;
-
-      typedef ControlMeasureV0006 ControlPointV0006::Measure;//???
-
       // Private ControlNetHeader structs for versioning
       // TODO Document these for doxygen. JAM
       struct ControlNetHeaderV0001 {
