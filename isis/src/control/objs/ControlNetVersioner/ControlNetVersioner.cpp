@@ -196,9 +196,10 @@ namespace Isis {
       }
 
       // FIXME: None of Apriori(X,Y,Z) is available directly from ControlPoint in the API
-      if (controlPoint.HasAprioriRadiusSourcefile()) // DNE
+      if (controlPoint.HasAprioriRadiusSourcefile()) { // DNE
         pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
                         protobufPoint.GetAprioriRadiusSourceFile());
+        }
 
       if (controlPoint.HasApriorix()) { // DNE
         pvlPoint += PvlKeyword("AprioriX", toString(controlPoint.AprioriX()), "meters");
@@ -259,14 +260,17 @@ namespace Isis {
         }
       }
 
-      if (controlPoint.IsLatitudeConstrained())
+      if (controlPoint.IsLatitudeConstrained()) {
         pvlPoint += PvlKeyword("LatitudeConstrained", "True");
+      }
 
-      if (controlPoint.IsLongitudeConstrained())
+      if (controlPoint.IsLongitudeConstrained()) {
         pvlPoint += PvlKeyword("LongitudeConstrained", "True");
+      }
 
-      if (controlPoint.IsRadiusConstrained())
+      if (controlPoint.IsRadiusConstrained()) {
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
+      }
 
       if (controlPoint.HasAdjustedX()) {
         pvlPoint += PvlKeyword("AdjustedX", toString(controlPoint.AdjustedX()), "meters");
@@ -332,85 +336,97 @@ namespace Isis {
             controlMeasure = controlPoint.GetMeasures(j);
         pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber()); 
 
-        switch(cubeMeasure.GetType()) {
-          case CrolPointV0007_Measure_MeasureType_Candidate: //fix to use enum
+        switch(controlMeasure.GetType()) {
+          case ControlMeasure::MeasureType::Candidate:
             pvlMeasure += PvlKeyword("MeasureType", "Candidate");
             break;
-          case ControlPointV0007_Measure_MeasureType_Manual:
+          case ControlMeasure::MeasureType::Manual:
             pvlMeasure += PvlKeyword("MeasureType", "Manual");
             break;
-          case ControlPointV0007_Measure_MeasureType_RegisteredPixel:
+          case ControlMeasure::MeasureType::RegisteredPixel:
             pvlMeasure += PvlKeyword("MeasureType", "RegisteredPixel");
             break;
-          case ControlPointV0007_Measure_MeasureType_RegisteredSubPixel:
+          case ControlMeasure::MeasureType::RegisteredSubPixel:
             pvlMeasure += PvlKeyword("MeasureType", "RegisteredSubPixel");
             break;
         }
 
-        if (protobufMeasure.has_choosername())
-          pvlMeasure += PvlKeyword("ChooserName", protobufMeasure.choosername().c_str());
+        if (controlMeasure.HasChooserName()) { // DNE
+          pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName()); 
+        }
 
-        if (protobufMeasure.has_datetime())
-          pvlMeasure += PvlKeyword("DateTime", protobufMeasure.datetime().c_str());
+        if (controlMeasure.HasDateTime()) { // DNE
+          pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
+        }
 
-        if (protobufMeasure.editlock())
+        if (controlMeasure.IsEditLocked()) {
           pvlMeasure += PvlKeyword("EditLock", "True");
+        }
 
-        if (protobufMeasure.ignore())
+        if (controlMeasure.IsIgnored()) {
           pvlMeasure += PvlKeyword("Ignore", "True");
+        }
 
-        if (protobufMeasure.has_sample())
-          pvlMeasure += PvlKeyword("Sample", toString(protobufMeasure.sample()));
+        if (controlMeasure.HasSample()) { // DNE
+          pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample());
+        }
 
-        if (protobufMeasure.has_line())
-          pvlMeasure += PvlKeyword("Line", toString(protobufMeasure.line()));
+        if (controlMeasure.HasLine()) { // DNE
+          pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
+        }
 
-        if (protobufMeasure.has_diameter())
-          pvlMeasure += PvlKeyword("Diameter", toString(protobufMeasure.diameter()));
+        if (controlMeasure.HasDiameter()) { // DNE
+          pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
+        }
 
-        if (protobufMeasure.has_apriorisample())
-          pvlMeasure += PvlKeyword("AprioriSample", toString(protobufMeasure.apriorisample()));
+        if (controlMeasure.HasAprioriSample()) { // DNE
+          pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
+        }
 
-        if (protobufMeasure.has_aprioriline())
-          pvlMeasure += PvlKeyword("AprioriLine", toString(protobufMeasure.aprioriline()));
+        if (controlMeasure.HasAprioriLine()) { // DNE
+          pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
+        }
 
-        if (protobufMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("SampleSigma", toString(protobufMeasure.samplesigma()),
+        if (controlMeasure.HasSampleSigma()) { // DNE
+          pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
                                    "pixels");
+        }
 
-        if (protobufMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("LineSigma", toString(protobufMeasure.linesigma()),
+        if (controlMeasure.HasLineSigma()) { // BUG IN ORIGINAL CODE (had samplesigma) and DNE
+          pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
                                    "pixels");
+        }
 
-        if (protobufMeasure.has_sampleresidual())
-          pvlMeasure += PvlKeyword("SampleResidual", toString(protobufMeasure.sampleresidual()),
+        if (controlMeasure.HasSampleResidual()) { // DNE
+          pvlMeasure += PvlKeyword("SampleResidual", toString(controlMeasure.GetSampleResidual())
                                    "pixels");
+        }
 
-        if (protobufMeasure.has_lineresidual())
-          pvlMeasure += PvlKeyword("LineResidual", toString(protobufMeasure.lineresidual()),
+        if (controlMeasure.HasLineResidual()) { // DNE
+          pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
+        }
 
-        if (protobufMeasure.has_jigsawrejected()) {
-         pvlMeasure += PvlKeyword("JigsawRejected", toString(protobufMeasure.jigsawrejected()));
+        if (controlMeasure.HasJigsawRejected()) { // DNE
+         pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.GetJigsawRejected())); // DNE
         }
 
         for (int logEntry = 0;
             logEntry < protobufMeasure.log_size();
             logEntry ++) {
-          const ControlPointV0007_Measure_MeasureLogData &log = // what 
-                protobufMeasure.log(logEntry);
+          const ControlMeasureLogData &log = 
+                controlMeasure.log(logEntry);
 
           ControlMeasureLogData interpreter(log);
           pvlMeasure += interpreter.ToKeyword();
         }
 
-        if (protobufPoint.has_referenceindex() &&
-           protobufPoint.referenceindex() == j)
+        if (controlPoint.has_referenceindex() && // DNE or covered by different function? 
+           controlPoint.IndexOfRefMeasure() == j) {
           pvlMeasure += PvlKeyword("Reference", "True");
-
+        }
         pvlPoint.addGroup(pvlMeasure);
       }
-
       network.addObject(pvlPoint);
     }
     return pvl;
