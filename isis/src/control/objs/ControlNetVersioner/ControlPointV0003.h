@@ -1,5 +1,5 @@
-#ifndef ControlPointV0005_h
-#define ControlPointV0005_h
+#ifndef ControlPointV0003_h
+#define ControlPointV0003_h
 /**
  * @file
  * $Revision: 1.9 $
@@ -28,22 +28,22 @@
  #include "QSharedPointer<ControlPointFileEntryV0002>.pb.h"
 
 namespace Isis {
-  class ControlPointV0004;
+  class ControlPointV0002;
   class Pvl;
 
-  class ControlPointV0005 {
+  class ControlPointV0003 {
     public:
-      ControlPointV0005(const Pvl &pointObject);
-      ControlPointV0005(QSharedPointer<QSharedPointer<ControlPointFileEntryV0002>> pointData);
-      ControlPointV0005(const ControlPointV0004 &oldPoint);
+      ControlPointV0003(const Pvl &pointObject);
+      ControlPointV0003(QSharedPointer<QSharedPointer<ControlPointFileEntryV0002>> pointData);
+      ControlPointV0003(const ControlPointV0002 &oldPoint);
 
       Pvl toPvl();
 
     private:
       // These are intentionally not implemented
-      ControlPointV0005();
-      ControlPointV0005(const &ControlPointV0005 other);
-      ControlPointV0005 &operator=(const &ControlPointV0005 other);
+      ControlPointV0003();
+      ControlPointV0003(const &ControlPointV0003 other);
+      ControlPointV0003 &operator=(const &ControlPointV0003 other);
 
       // methods for converting from Pvl to protobuf
       void copy(PvlContainer &container,

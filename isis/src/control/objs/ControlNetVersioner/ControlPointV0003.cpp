@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "ControlPointV0004.h"
+#include "ControlPointV0002.h"
 #include "Pvl.h"
 
 using namespace std;
