@@ -136,6 +136,8 @@ namespace Isis {
    *  @history 2017-12-13 Jeannie Backer - Added target radii to createPoint(V0006).
    */
   class ControlNetVersioner {
+    class ControlPointV0003;
+
     public:
       ControlNetVersioner(QSharedPointer<ControlNet> net);
       ControlNetVersioner(const FileName netFile);
@@ -174,53 +176,30 @@ namespace Isis {
       typedef ControlNetHeaderV0003 ControlNetHeaderV0001;
       typedef ControlNetHeaderV0004 ControlNetHeaderV0001;
       typedef ControlNetHeaderV0005 ControlNetHeaderV0001;
+      typedef ControlNetHeaderV0006 ControlNetHeaderV0001;
+      typedef ControlNetHeaderV0007 ControlNetHeaderV0001;
+
+      typedef ControlPointV0004 ControlPointV0003;
+      typedef ControlPointV0005 ControlPointV0003;
 
       void read(const FileName netFile);
 
       void readPvl(const Pvl &network);
-      void readPvlV0001(const PvlObject &network);
-      void readPvlV0002(const PvlObject &network);
-      void readPvlV0003(const PvlObject &network);
-      void readPvlV0004(const PvlObject &network);
-      void readPvlV0005(const PvlObject &network);
+      void readPvlV0001(const Pvl &network);
+      void readPvlV0002(const Pvl &network);
+      void readPvlV0003(const Pvl &network);
+      void readPvlV0004(const Pvl &network);
 
       void readProtobuf(const Pvl &header, const FileName netFile);
-      void readProtobufV0001(const Pvl &header, const FileName netFile);
-      void readProtobufV0002(const Pvl &header, const FileName netFile);
-      void readProtobufV0005(const Pvl &header, const FileName netFile);
+      void readProtobufV0001(const FileName netFile);
+      void readProtobufV0002(const FileName netFile);
+      void readProtobufV0007(const FileName netFile);
 
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0001 point);
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0002 point);
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0003 point);
-      QSharedPointer<ControlPoint> createPoint(const ControlPointV0004 point);
-      // v5 dne???
-      QSharedPointer<ControlPoint> createPoint(const ControlPointV0006 point);
+
       QSharedPointer<ControlMeasure> createMeasure(const ControlMeasureV0006 measure);
-      // methods for converting pvl (v4) to protobuf (v6)
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlMeasureV0006::*setter)(bool));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlPointV0006::*setter)(double));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlPointV0006::*setter)(const std::string&));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(bool));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(double));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(const std::string &));
 
       void setHeader(const ControlNetHeaderV0001 header);
 
