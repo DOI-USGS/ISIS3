@@ -329,11 +329,11 @@ namespace Isis {
       for (int j = 0; j < controlPoint.GetNumMeasures(); j++) {
         PvlGroup pvlMeasure("ControlMeasure");
         const ControlMeasure &
-            protobufMeasure = controlPoint.GetMeasures(j);
-        pvlMeasure += PvlKeyword("SerialNumber", protobufMeasure.serialnumber().c_str());
+            controlMeasure = controlPoint.GetMeasures(j);
+        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber()); 
 
-        switch(protobufMeasure.type()) {
-          case ControlPointV0007_Measure_MeasureType_Candidate:
+        switch(cubeMeasure.GetType()) {
+          case CrolPointV0007_Measure_MeasureType_Candidate: //fix to use enum
             pvlMeasure += PvlKeyword("MeasureType", "Candidate");
             break;
           case ControlPointV0007_Measure_MeasureType_Manual:
@@ -397,7 +397,7 @@ namespace Isis {
         for (int logEntry = 0;
             logEntry < protobufMeasure.log_size();
             logEntry ++) {
-          const ControlPointV0007_Measure_MeasureLogData &log =
+          const ControlPointV0007_Measure_MeasureLogData &log = // what 
                 protobufMeasure.log(logEntry);
 
           ControlMeasureLogData interpreter(log);
