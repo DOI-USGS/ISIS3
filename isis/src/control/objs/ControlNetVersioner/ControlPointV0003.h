@@ -31,10 +31,11 @@ namespace Isis {
   class ControlPointV0002;
   class Pvl;
 
+  //TODO document this
   class ControlPointV0003 {
     public:
       ControlPointV0003(const Pvl &pointObject);
-      ControlPointV0003(QSharedPointer<QSharedPointer<ControlPointFileEntryV0002>> pointData);
+      ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData);
       ControlPointV0003(const ControlPointV0002 &oldPoint);
 
       Pvl toPvl();
@@ -71,7 +72,7 @@ namespace Isis {
                 ControlPointFileEntryV0002::Measure &measure,
                 void (ControlPointFileEntryV0002::Measure::*setter)(const std::string &));
 
-      QSharedPointer<QSharedPointer<ControlPointFileEntryV0002>> m_pointData; /**< protobuf container that holds
+      QSharedPointer<ControlPointFileEntryV0002> m_pointData; /**< protobuf container that holds
                                                                    information used to create a
                                                                    control point.*/
   };
