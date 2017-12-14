@@ -936,12 +936,15 @@ namespace Isis {
     }
     if (editLock)
       return PointLocked;
-    if (aprioriSP.GetLatSigma().isValid())
+    if (aprioriSP.GetLatSigma().isValid()) {
       constraintStatus.set(LatitudeConstrained);
-    if (aprioriSP.GetLonSigma().isValid())
+    }
+    if (aprioriSP.GetLonSigma().isValid()) {
       constraintStatus.set(LongitudeConstrained);
-    if (aprioriSP.GetLocalRadiusSigma().isValid())
+    }
+    if (aprioriSP.GetLocalRadiusSigma().isValid()) {
       constraintStatus.set(RadiusConstrained);
+    }
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;

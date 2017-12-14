@@ -14,6 +14,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "Latitude.h"
+#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Progress.h"
@@ -736,7 +737,6 @@ namespace Isis {
 
     QSharedPointer<ControlPoint> controlPoint = new QSharedPointer<ControlPoint>(point.id().c_str());
     controlPoint->SetChooserName(point.chooserName().c_str());
-    controlPoint->SetDateTime(point.dateTime().c_str());
 
     // setting point type
     ControlPoint::PointType pointType;
@@ -758,6 +758,21 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     controlPoint->SetType(pointType);
+
+    // get radius values for surface points
+    Distance equatorialRadius;
+    Distance polarRadius;
+    if (m_header.has_targetname()) {
+      try {
+        // attempt to get target radii values... 
+        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetname().c_str());
+        equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
+        polarRadius.setMeters(pvlRadii["PolarRadius"]);
+       }
+       catch (IException &e) {
+         // do nothing
+       }
+    }
 
     controlPoint->SetIgnored(point.ignore());
     controlPoint->SetRejected(point.jigsawrejected());
@@ -830,6 +845,7 @@ namespace Isis {
         default:
           //throw error???
       }
+
       controlPoint->SetAprioriSurfacePointSource(aprioriSurfacePointSource);
     }
 
@@ -845,7 +861,7 @@ namespace Isis {
                                        Displacement(point.aprioriy(), Displacement::Meters),
                                        Displacement(point.aprioriz(), Displacement::Meters));
       if (point.aprioricovar_size() > 0) {
-        SymmetricMatrix aprioriCovarianceMatrix;
+        symmetric_matrix<double, upper> aprioriCovarianceMatrix;
         aprioriCovarianceMatrix.resize(3);
         aprioriCovarianceMatrix.clear();
         aprioriCovarianceMatrix(0, 0) = point.aprioricovar(0);
@@ -855,7 +871,10 @@ namespace Isis {
         aprioriCovarianceMatrix(1, 2) = point.aprioricovar(4);
         aprioriCovarianceMatrix(2, 2) = point.aprioricovar(5);
         aprioriSurfacePoint.SetRectangularMatrix(aprioriCovarianceMatrix);
-// ??? TODO
+
+        // note: setting lat/lon/rad constrained happens when we call SetAprioriSurfacePoint()
+        // this method will look at the covar matrix for valid values and set accordingly.
+
 #if 0
         if (Displacement(aprioriCovarianceMatrix(0, 0), Displacement::Meters).isValid() 
             || Displacement(aprioriCovarianceMatrix(1, 1), Displacement::Meters).isValid()) {
@@ -884,6 +903,10 @@ namespace Isis {
 #endif
       }
 
+      if (equatorialRadius.isValid() && polarRadius.isValid()) {
+        aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+      }
+
       controlPoint->SetAprioriSurfacePoint(point.aprioriSurfacePoint);
     }
 
@@ -897,7 +920,7 @@ namespace Isis {
                                         Displacement(point.adjustedz(), Displacement::Meters));
 
       if (point.adjustedcovar_size() > 0) {
-        SymmetricMatrix adjustedCovarianceMatrix;
+        symmetric_matrix<double, upper> adjustedCovarianceMatrix;
         adjustedCovarianceMatrix.resize(3);
         adjustedCovarianceMatrix.clear();
         adjustedCovarianceMatrix(0, 0) = point.adjustedcovar(0);
@@ -909,24 +932,11 @@ namespace Isis {
         adjustedSurfacePoint.SetRectangularMatrix(adjustedCovarianceMatrix);
       }
 
+      if (equatorialRadius.isValid() && polarRadius.isValid()) {
+        adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+      }
+
       controlPoint->SetAdjustedSurfacePoint(point.adjustedSurfacePoint);
-    }
-
-    if (m_header.has_targetname()) {
-      try {
-        // attempt to get target radii values... 
-        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetname().c_str());
-        Distance equatorialRadius(pvlRadii["EquatorialRadius"], Distance::Meters);
-        Distance polarRadius(pvlRadii["PolarRadius"], Distance::Meters);
-        if (equatorialRadius.isValid() && polarRadius.isValid()) {
-          aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-          adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-        }
-
-       }
-       catch (IException &e) {
-         // do nothing
-       }
     }
 
     // adding measure information
@@ -939,6 +949,8 @@ namespace Isis {
       controlPoint->SetRefMeasure(point.referenceindex());
     }
 
+    // Set DateTime after calling all setters that clear DateTime value
+    controlPoint->SetDateTime(point.dateTime().c_str());
     // Set edit lock last
     controlPoint.SetEditLock(point.editLock);
     return controlPoint;
