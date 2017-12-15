@@ -83,7 +83,7 @@ namespace Isis {
   }
 
  /**
-   * Generates a Pvl file from the currently stored cnet. 
+   * Generates a Pvl file from the currently stored control points and header.
    *  
    * @return Pvl& The Pvl version of the network
    */
@@ -142,25 +142,25 @@ namespace Isis {
       }
 
       switch (controlPoint.GetAprioriSurfPointSource()) {
-        case ControlPoint::None:
+        case ControlPoint::SurfacePointSouce::None:
           break;
-        case ControlPoint::User:
+        case ControlPoint::SurfacePointSouce::User:
           pvlPoint += PvlKeyword("AprioriXYZSource", "User");
           break;
-        case ControlPoint::AverageOfMeasures:
+        case ControlPoint::SurfacePointSouce::AverageOfMeasures:
           pvlPoint += PvlKeyword("AprioriXYZSource", "AverageOfMeasures");
           break;
-        case ControlPoint::Reference:
+        case ControlPoint::SurfacePointSouce::Reference:
           pvlPoint += PvlKeyword("AprioriXYZSource", "Reference");
           break;
-        case ControlPoint::Basemap:
+        case ControlPoint::SurfacePointSouce::Basemap:
           pvlPoint += PvlKeyword("AprioriXYZSource", "Basemap");
           break;
-        case ControlPoint::BundleSolution:
+        case ControlPoint::SurfacePointSouce::BundleSolution:
           pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
           break;
-        case ControlPoint::Ellipsoid:
-        case ControlPoint::DEM:
+        case ControlPoint::RadiusSource::Ellipsoid: // these enum vals
+        case ControlPoint::RadiusSource::DEM:       // DNE for Surface Pt
           break;
       }
 
@@ -170,27 +170,27 @@ namespace Isis {
       }
 
       switch (controlPoint.GetAprioriRadiusSource()) {
-        case ControlPoint::None:
+        case ControlPoint::RadiusSource::None:
           break;
-        case ControlPoint::User:
+        case ControlPoint::RadiusSource::User:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "User");
           break;
-        case ControlPoint::AverageOfMeasures:
+        case ControlPoint::RadiusSource::AverageOfMeasures:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "AverageOfMeasures");
           break;
-        case ControlPoint::Reference:
+        case ControlPoint::RadiusSource::Reference:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "Reference");
           break;
-        case ControlPoint::Basemap:
+        case ControlPoint::RadiusSource::Basemap:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "Basemap");
           break;
-        case ControlPoint::BundleSolution:
+        case ControlPoint::RadiusSource::BundleSolution:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "BundleSolution");
           break;
-        case ControlPoint::Ellipsoid:
+        case ControlPoint::RadiusSource::Ellipsoid:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "Ellipsoid");
           break;
-        case ControlPoint::DEM:
+        case ControlPoint::RadiusSource::DEM:
           pvlPoint += PvlKeyword("AprioriRadiusSource", "DEM");
           break;
       }
@@ -337,16 +337,16 @@ namespace Isis {
         pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber()); 
 
         switch(controlMeasure.GetType()) {
-          case ControlMeasure::MeasureType::Candidate:
+          case ControlMeasure::Candidate:
             pvlMeasure += PvlKeyword("MeasureType", "Candidate");
             break;
-          case ControlMeasure::MeasureType::Manual:
+          case ControlMeasure::Manual:
             pvlMeasure += PvlKeyword("MeasureType", "Manual");
             break;
-          case ControlMeasure::MeasureType::RegisteredPixel:
+          case ControlMeasure::RegisteredPixel:
             pvlMeasure += PvlKeyword("MeasureType", "RegisteredPixel");
             break;
-          case ControlMeasure::MeasureType::RegisteredSubPixel:
+          case ControlMeasure::RegisteredSubPixel:
             pvlMeasure += PvlKeyword("MeasureType", "RegisteredSubPixel");
             break;
         }
@@ -412,16 +412,16 @@ namespace Isis {
         }
 
         for (int logEntry = 0;
-            logEntry < protobufMeasure.log_size();
+            logEntry < controlMeasure.LogSize(); // DNE? 
             logEntry ++) {
           const ControlMeasureLogData &log = 
-                controlMeasure.log(logEntry);
+                controlMeasure.GetLogData(logEntry); // Not sure this is right.
 
           ControlMeasureLogData interpreter(log);
           pvlMeasure += interpreter.ToKeyword();
         }
 
-        if (controlPoint.has_referenceindex() && // DNE or covered by different function? 
+        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function? 
            controlPoint.IndexOfRefMeasure() == j) {
           pvlMeasure += PvlKeyword("Reference", "True");
         }
