@@ -131,6 +131,7 @@ namespace Isis {
    *                           to which it is appended. References #3892
    *  @history 2017-12-11 Jeannie Backer & Jesse Mapel - Created class skeleton for refactor.
    *  @history 2017-12-11 Jesse Mapel - Added VersionedControlNetHeaders.
+   *  @history 2017-12-12 Kristin Berry - Added initial toPvl for refactor. 
    *  @history 2017-12-12 Jeannie Backer - Added VersionedControlPoints.
    *  @history 2017-12-12 Jeannie Backer - Implemented createPoint() methods.
    *  @history 2017-12-13 Jeannie Backer - Added target radii to createPoint(V0006).
