@@ -82,354 +82,9 @@ namespace Isis {
 
   }
 
- /**
-   * Generates a Pvl file from the currently stored control points and header.
-   *  
-   * @return Pvl& The Pvl version of the network
-   */
-  Pvl &ControlNetVersioner::toPvl(){
-    Pvl pvl;
-    pvl.addObject(PvlObject("ControlNetwork"));
-    PvlObject &network = pvl.findObject("ControlNetwork");
 
-    network += PvlKeyword("NetworkId", m_header.networkid().c_str());
-    network += PvlKeyword("TargetName", m_header.targetname().c_str());
-    network += PvlKeyword("UserName", m_header.username().c_str());
-    network += PvlKeyword("Created", m_header.created().c_str());
-    network += PvlKeyword("LastModified", m_header.lastmodified().c_str());
-    network += PvlKeyword("Description", m_header.description().c_str());
-    // optionally add username to output? 
+  Pvl &ControlNetVersioner::toPvl() {
 
-    // This is the Pvl version we're converting to
-    network += PvlKeyword("Version", "5");
-
-    //  Get Target Radii from naif kernel
-    PvlGroup pvlRadii;
-    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
-    if (target != "") {
-      try {
-        NaifStatus::CheckErrors();
-        pvlRadii = Target::radiiGroup(target);
-      }
-      catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF 
-      }
-    }
-
-    ControlPoint controlPoint;
-    foreach(controlPoint, *m_points) {
-      PvlObject pvlPoint("ControlPoint");
-
-      if (controlPoint.GetType() == ControlPoint::Fixed) {
-        pvlPoint += PvlKeyword("PointType", "Fixed");
-      }
-      else if (controlPoint.GetType() == ControlPoint::Constrained) {
-        pvlPoint += PvlKeyword("PointType", "Constrained");
-      }
-      else {
-        pvlPoint += PvlKeyword("PointType", "Free");
-      }
-
-      pvlPoint += PvlKeyword("PointId", controlPoint.GetId());
-      pvlPoint += PvlKeyword("ChooserName", controlPoint.GetChooserName());
-      pvlPoint += PvlKeyword("DateTime", controlPoint.GetDateTime()); 
-
-      if (controlPoint.IsEditLocked()) {
-        pvlPoint += PvlKeyword("EditLock", "True");
-      }
-      if (controlPoint.IsIgnored()) {
-        pvlPoint += PvlKeyword("Ignore", "True");
-      }
-
-      switch (controlPoint.GetAprioriSurfPointSource()) {
-        case ControlPoint::SurfacePointSouce::None:
-          break;
-        case ControlPoint::SurfacePointSouce::User:
-          pvlPoint += PvlKeyword("AprioriXYZSource", "User");
-          break;
-        case ControlPoint::SurfacePointSouce::AverageOfMeasures:
-          pvlPoint += PvlKeyword("AprioriXYZSource", "AverageOfMeasures");
-          break;
-        case ControlPoint::SurfacePointSouce::Reference:
-          pvlPoint += PvlKeyword("AprioriXYZSource", "Reference");
-          break;
-        case ControlPoint::SurfacePointSouce::Basemap:
-          pvlPoint += PvlKeyword("AprioriXYZSource", "Basemap");
-          break;
-        case ControlPoint::SurfacePointSouce::BundleSolution:
-          pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
-          break;
-        case ControlPoint::RadiusSource::Ellipsoid: // these enum vals
-        case ControlPoint::RadiusSource::DEM:       // DNE for Surface Pt
-          break;
-      }
-
-      if (controlPoint.HasAprioriSurfacePointSourceFile()) { //DNE right now
-        pvlPoint += PvlKeyword("AprioriXYZSourceFile",
-                        controlPoint.GetAprioriSurfacePointSourceFile());
-      }
-
-      switch (controlPoint.GetAprioriRadiusSource()) {
-        case ControlPoint::RadiusSource::None:
-          break;
-        case ControlPoint::RadiusSource::User:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "User");
-          break;
-        case ControlPoint::RadiusSource::AverageOfMeasures:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "AverageOfMeasures");
-          break;
-        case ControlPoint::RadiusSource::Reference:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "Reference");
-          break;
-        case ControlPoint::RadiusSource::Basemap:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "Basemap");
-          break;
-        case ControlPoint::RadiusSource::BundleSolution:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "BundleSolution");
-          break;
-        case ControlPoint::RadiusSource::Ellipsoid:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "Ellipsoid");
-          break;
-        case ControlPoint::RadiusSource::DEM:
-          pvlPoint += PvlKeyword("AprioriRadiusSource", "DEM");
-          break;
-      }
-
-      // FIXME: None of Apriori(X,Y,Z) is available directly from ControlPoint in the API
-      if (controlPoint.HasAprioriRadiusSourcefile()) { // DNE
-        pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
-                        protobufPoint.GetAprioriRadiusSourceFile());
-        }
-
-      if (controlPoint.HasApriorix()) { // DNE
-        pvlPoint += PvlKeyword("AprioriX", toString(controlPoint.AprioriX()), "meters");
-        pvlPoint += PvlKeyword("AprioriY", toString(controlPoint.AprioriY()), "meters");
-        pvlPoint += PvlKeyword("AprioriZ", toString(controlPoint.AprioriZ()), "meters");
-
-        // Get surface point, convert to lat,lon,radius and output as comment
-        SurfacePoint apriori;
-        apriori.SetRectangular(
-                Displacement(controlPoint.AprioriX(),Displacement::Meters),
-                Displacement(controlPoint.AprioriY(),Displacement::Meters),
-                Displacement(controlPoint.AprioriZ(),Displacement::Meters));
-        pvlPoint.findKeyword("AprioriX").addComment("AprioriLatitude = " +
-                                 toString(apriori.GetLatitude().degrees()) +
-                                 " <degrees>");
-        pvlPoint.findKeyword("AprioriY").addComment("AprioriLongitude = " +
-                                 toString(apriori.GetLongitude().degrees()) +
-                                 " <degrees>");
-        pvlPoint.findKeyword("AprioriZ").addComment("AprioriRadius = " +
-                                 toString(apriori.GetLocalRadius().meters()) +
-                                 " <meters>");
-
-        // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
-        if (controlPoint.aprioricovar_size()) { // DNE
-          PvlKeyword matrix("AprioriCovarianceMatrix");
-          matrix += toString(controlPoint.aprioricovar(0)); // DNE
-          matrix += toString(controlPoint.aprioricovar(1)); // DNE
-          matrix += toString(controlPoint.aprioricovar(2)); // DNE
-          matrix += toString(controlPoint.aprioricovar(3)); // DNE
-          matrix += toString(controlPoint.aprioricovar(4)); // DNE 
-          matrix += toString(controlPoint.aprioricovar(5)); // DNE
-          pvlPoint += matrix;
-
-          if (pvlRadii.hasKeyword("EquatorialRadius")) {
-            apriori.SetRadii(
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
-            symmetric_matrix<double, upper> covar;
-            covar.resize(3);
-            covar.clear();
-            covar(0, 0) = controlPoint.aprioricovar(0); // DNE
-            covar(0, 1) = controlPoint.aprioricovar(1); // DNE
-            covar(0, 2) = controlPoint.aprioricovar(2); // DNE
-            covar(1, 1) = controlPoint.aprioricovar(3); // DNE
-            covar(1, 2) = controlPoint.aprioricovar(4); // ""
-            covar(2, 2) = controlPoint.aprioricovar(5); // ""
-            apriori.SetRectangularMatrix(covar);
-            QString sigmas = "AprioriLatitudeSigma = " +
-                             toString(apriori.GetLatSigmaDistance().meters()) +
-                             " <meters>  AprioriLongitudeSigma = " +
-                             toString(apriori.GetLonSigmaDistance().meters()) +
-                             " <meters>  AprioriRadiusSigma = " +
-                             toString(apriori.GetLocalRadiusSigma().meters()) +
-                             " <meters>";
-            pvlPoint.findKeyword("AprioriCovarianceMatrix").addComment(sigmas);
-          }
-        }
-      }
-
-      if (controlPoint.IsLatitudeConstrained()) {
-        pvlPoint += PvlKeyword("LatitudeConstrained", "True");
-      }
-
-      if (controlPoint.IsLongitudeConstrained()) {
-        pvlPoint += PvlKeyword("LongitudeConstrained", "True");
-      }
-
-      if (controlPoint.IsRadiusConstrained()) {
-        pvlPoint += PvlKeyword("RadiusConstrained", "True");
-      }
-
-      if (controlPoint.HasAdjustedX()) {
-        pvlPoint += PvlKeyword("AdjustedX", toString(controlPoint.AdjustedX()), "meters");
-        pvlPoint += PvlKeyword("AdjustedY", toString(controlPoint.AdjustedY()), "meters");
-        pvlPoint += PvlKeyword("AdjustedZ", toString(controlPoint.AdjustedZ()), "meters");
-
-        // Get surface point, convert to lat,lon,radius and output as comment
-        SurfacePoint adjusted;
-        adjusted.SetRectangular(
-                Displacement(controlPoint.AdjustedX(),Displacement::Meters),
-                Displacement(controlPoint.adjustedY(),Displacement::Meters),
-                Displacement(controlPoint.adjustedZ(),Displacement::Meters));
-        pvlPoint.findKeyword("AdjustedX").addComment("AdjustedLatitude = " +
-                                 toString(adjusted.GetLatitude().degrees()) +
-                                 " <degrees>");
-        pvlPoint.findKeyword("AdjustedY").addComment("AdjustedLongitude = " +
-                                 toString(adjusted.GetLongitude().degrees()) +
-                                 " <degrees>");
-        pvlPoint.findKeyword("AdjustedZ").addComment("AdjustedRadius = " +
-                                 toString(adjusted.GetLocalRadius().meters()) +
-                                 " <meters>");
-
-        if (controlPoint.AdjustedCovarSize()) { // DNE
-          PvlKeyword matrix("AdjustedCovarianceMatrix");
-          matrix += toString(controlPoint.AdjustedCovar(0));
-          matrix += toString(controlPoint.AdjustedCovar(1));
-          matrix += toString(controlPoint.AdjustedCovar(2));
-          matrix += toString(controlPoint.AdjustedCovar(3));
-          matrix += toString(controlPoint.AdjustedCovar(4));
-          matrix += toString(controlPoint.AdjustedCovar(5));
-          pvlPoint += matrix;
-
-          if (pvlRadii.hasKeyword("EquatorialRadius")) {
-            adjusted.SetRadii(
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
-            symmetric_matrix<double, upper> covar;
-            covar.resize(3);
-            covar.clear();
-            covar(0, 0) = controlPoint.AdjustedCovar(0);
-            covar(0, 1) = controlPoint.AdjustedCovar(1);
-            covar(0, 2) = controlPoint.AdjustedCovar(2);
-            covar(1, 1) = controlPoint.AdjustedCovar(3);
-            covar(1, 2) = controlPoint.AdjustedCovar(4);
-            covar(2, 2) = controlPoint.AdjustedCovar(5);
-            adjusted.SetRectangularMatrix(covar);
-            QString sigmas = "AdjustedLatitudeSigma = " +
-                             toString(adjusted.GetLatSigmaDistance().meters()) +
-                             " <meters>  AdjustedLongitudeSigma = " +
-                             toString(adjusted.GetLonSigmaDistance().meters()) +
-                             " <meters>  AdjustedRadiusSigma = " +
-                             toString(adjusted.GetLocalRadiusSigma().meters()) +
-                             " <meters>";
-            pvlPoint.findKeyword("AdjustedCovarianceMatrix").addComment(sigmas);
-          }
-        }
-      }
-
-      for (int j = 0; j < controlPoint.GetNumMeasures(); j++) {
-        PvlGroup pvlMeasure("ControlMeasure");
-        const ControlMeasure &
-            controlMeasure = controlPoint.GetMeasures(j);
-        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber()); 
-
-        switch(controlMeasure.GetType()) {
-          case ControlMeasure::Candidate:
-            pvlMeasure += PvlKeyword("MeasureType", "Candidate");
-            break;
-          case ControlMeasure::Manual:
-            pvlMeasure += PvlKeyword("MeasureType", "Manual");
-            break;
-          case ControlMeasure::RegisteredPixel:
-            pvlMeasure += PvlKeyword("MeasureType", "RegisteredPixel");
-            break;
-          case ControlMeasure::RegisteredSubPixel:
-            pvlMeasure += PvlKeyword("MeasureType", "RegisteredSubPixel");
-            break;
-        }
-
-        if (controlMeasure.HasChooserName()) { // DNE
-          pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName()); 
-        }
-
-        if (controlMeasure.HasDateTime()) { // DNE
-          pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
-        }
-
-        if (controlMeasure.IsEditLocked()) {
-          pvlMeasure += PvlKeyword("EditLock", "True");
-        }
-
-        if (controlMeasure.IsIgnored()) {
-          pvlMeasure += PvlKeyword("Ignore", "True");
-        }
-
-        if (controlMeasure.HasSample()) { // DNE
-          pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample());
-        }
-
-        if (controlMeasure.HasLine()) { // DNE
-          pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
-        }
-
-        if (controlMeasure.HasDiameter()) { // DNE
-          pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
-        }
-
-        if (controlMeasure.HasAprioriSample()) { // DNE
-          pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
-        }
-
-        if (controlMeasure.HasAprioriLine()) { // DNE
-          pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
-        }
-
-        if (controlMeasure.HasSampleSigma()) { // DNE
-          pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
-                                   "pixels");
-        }
-
-        if (controlMeasure.HasLineSigma()) { // BUG IN ORIGINAL CODE (had samplesigma) and DNE
-          pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
-                                   "pixels");
-        }
-
-        if (controlMeasure.HasSampleResidual()) { // DNE
-          pvlMeasure += PvlKeyword("SampleResidual", toString(controlMeasure.GetSampleResidual())
-                                   "pixels");
-        }
-
-        if (controlMeasure.HasLineResidual()) { // DNE
-          pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
-                                   "pixels");
-        }
-
-        if (controlMeasure.HasJigsawRejected()) { // DNE
-         pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.GetJigsawRejected())); // DNE
-        }
-
-        for (int logEntry = 0;
-            logEntry < controlMeasure.LogSize(); // DNE? 
-            logEntry ++) {
-          const ControlMeasureLogData &log = 
-                controlMeasure.GetLogData(logEntry); // Not sure this is right.
-
-          ControlMeasureLogData interpreter(log);
-          pvlMeasure += interpreter.ToKeyword();
-        }
-
-        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function? 
-           controlPoint.IndexOfRefMeasure() == j) {
-          pvlMeasure += PvlKeyword("Reference", "True");
-        }
-        pvlPoint.addGroup(pvlMeasure);
-      }
-      network.addObject(pvlPoint);
-    }
-    return pvl;
   }
 
 
@@ -1535,212 +1190,9 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    QList<ControlPointV0007> &points = latest->GetNetworkPoints();
+    QList<ControlPointFileEntryV0002> &points = latest->GetNetworkPoints();
 
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
-      ControlPointV0007 point;
-      PvlObject &object = network.object(objectIndex);
-
-      Copy(object, "PointId",
-           point, &ControlPointV0007::set_id);
-      Copy(object, "ChooserName",
-           point, &ControlPointV0007::set_choosername);
-      Copy(object, "DateTime",
-           point, &ControlPointV0007::set_datetime);
-      Copy(object, "AprioriXYZSourceFile",
-           point, &ControlPointV0007::set_apriorisurfpointsourcefile);
-      Copy(object, "AprioriRadiusSourceFile",
-           point, &ControlPointV0007::set_aprioriradiussourcefile);
-      Copy(object, "JigsawRejected",
-           point, &ControlPointV0007::set_jigsawrejected);
-      Copy(object, "EditLock",
-           point, &ControlPointV0007::set_editlock);
-      Copy(object, "Ignore",
-           point, &ControlPointV0007::set_ignore);
-      Copy(object, "AprioriX",
-           point, &ControlPointV0007::set_apriorix);
-      Copy(object, "AprioriY",
-           point, &ControlPointV0007::set_aprioriy);
-      Copy(object, "AprioriZ",
-           point, &ControlPointV0007::set_aprioriz);
-      Copy(object, "AdjustedX",
-           point, &ControlPointV0007::set_adjustedx);
-      Copy(object, "AdjustedY",
-           point, &ControlPointV0007::set_adjustedy);
-      Copy(object, "AdjustedZ",
-           point, &ControlPointV0007::set_adjustedz);
-      Copy(object, "LatitudeConstrained",
-           point, &ControlPointV0007::set_latitudeconstrained);
-      Copy(object, "LongitudeConstrained",
-           point, &ControlPointV0007::set_longitudeconstrained);
-      Copy(object, "RadiusConstrained",
-           point, &ControlPointV0007::set_radiusconstrained);
-
-      if (object["PointType"][0] == "Fixed")
-        point.set_type(ControlPointV0007::Fixed);
-      else if (object["PointType"][0] == "Constrained")
-        point.set_type(ControlPointV0007::Constrained);
-      else
-        point.set_type(ControlPointV0007::Free);
-
-      if (object.hasKeyword("AprioriXYZSource")) {
-        IString source = object["AprioriXYZSource"][0];
-
-        if (source == "None") {
-          point.set_apriorisurfpointsource(ControlPointV0007::None);
-        }
-        else if (source == "User") {
-          point.set_apriorisurfpointsource(ControlPointV0007::User);
-        }
-        else if (source == "AverageOfMeasures") {
-          point.set_apriorisurfpointsource(
-              ControlPointV0007::AverageOfMeasures);
-        }
-        else if (source == "Reference") {
-          point.set_apriorisurfpointsource(
-              ControlPointV0007::Reference);
-        }
-        else if (source == "Basemap") {
-          point.set_apriorisurfpointsource(
-              ControlPointV0007::Basemap);
-        }
-        else if (source == "BundleSolution") {
-          point.set_apriorisurfpointsource(
-              ControlPointV0007::BundleSolution);
-        }
-        else {
-          IString msg = "Invalid AprioriXYZSource [" + source + "]";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-
-      if (object.hasKeyword("AprioriRadiusSource")) {
-        IString source = object["AprioriRadiusSource"][0];
-
-        if (source == "None") {
-          point.set_aprioriradiussource(ControlPointV0007::None);
-        }
-        else if (source == "User") {
-          point.set_aprioriradiussource(ControlPointV0007::User);
-        }
-        else if (source == "AverageOfMeasures") {
-          point.set_aprioriradiussource(ControlPointV0007::AverageOfMeasures);
-        }
-        else if (source == "Ellipsoid") {
-          point.set_aprioriradiussource(ControlPointV0007::Ellipsoid);
-        }
-        else if (source == "DEM") {
-          point.set_aprioriradiussource(ControlPointV0007::DEM);
-        }
-        else if (source == "BundleSolution") {
-          point.set_aprioriradiussource(ControlPointV0007::BundleSolution);
-        }
-        else {
-          std::string msg = "Invalid AprioriRadiusSource, [" + source + "]";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-
-      if (object.hasKeyword("AprioriCovarianceMatrix")) {
-        PvlKeyword &matrix = object["AprioriCovarianceMatrix"];
-
-        point.add_aprioricovar(toDouble(matrix[0]));
-        point.add_aprioricovar(toDouble(matrix[1]));
-        point.add_aprioricovar(toDouble(matrix[2]));
-        point.add_aprioricovar(toDouble(matrix[3]));
-        point.add_aprioricovar(toDouble(matrix[4]));
-        point.add_aprioricovar(toDouble(matrix[5]));
-      }
-
-      if (object.hasKeyword("AdjustedCovarianceMatrix")) {
-        PvlKeyword &matrix = object["AdjustedCovarianceMatrix"];
-
-        point.add_adjustedcovar(toDouble(matrix[0]));
-        point.add_adjustedcovar(toDouble(matrix[1]));
-        point.add_adjustedcovar(toDouble(matrix[2]));
-        point.add_adjustedcovar(toDouble(matrix[3]));
-        point.add_adjustedcovar(toDouble(matrix[4]));
-        point.add_adjustedcovar(toDouble(matrix[5]));
-      }
-
-      //  Process Measures
-      for (int groupIndex = 0; groupIndex < object.groups(); groupIndex ++) {
-        PvlGroup &group = object.group(groupIndex);
-        ControlPointV0007::Measure measure;
-
-        Copy(group, "SerialNumber",
-             measure, &ControlPointV0007::Measure::set_serialnumber);
-        Copy(group, "ChooserName",
-             measure, &ControlPointV0007::Measure::set_choosername);
-        Copy(group, "Sample",
-             measure, &ControlPointV0007::Measure::set_sample);
-        Copy(group, "Line",
-             measure, &ControlPointV0007::Measure::set_line);
-        Copy(group, "SampleResidual",
-             measure, &ControlPointV0007::Measure::set_sampleresidual);
-        Copy(group, "LineResidual",
-             measure, &ControlPointV0007::Measure::set_lineresidual);
-        Copy(group, "DateTime",
-             measure, &ControlPointV0007::Measure::set_datetime);
-        Copy(group, "Diameter",
-             measure, &ControlPointV0007::Measure::set_diameter);
-        Copy(group, "EditLock",
-             measure, &ControlPointV0007::Measure::set_editlock);
-        Copy(group, "Ignore",
-             measure, &ControlPointV0007::Measure::set_ignore);
-        Copy(group, "JigsawRejected",
-             measure, &ControlPointV0007::Measure::set_jigsawrejected);
-        Copy(group, "AprioriSample",
-             measure, &ControlPointV0007::Measure::set_apriorisample);
-        Copy(group, "AprioriLine",
-             measure, &ControlPointV0007::Measure::set_aprioriline);
-        Copy(group, "SampleSigma",
-             measure, &ControlPointV0007::Measure::set_samplesigma);
-        Copy(group, "LineSigma",
-             measure, &ControlPointV0007::Measure::set_linesigma);
-
-        if (group.hasKeyword("Reference")) {
-          if (group["Reference"][0].toLower() == "true")
-            point.set_referenceindex(groupIndex);
-
-          group.deleteKeyword("Reference");
-        }
-
-        QString type = group["MeasureType"][0].toLower();
-        if (type == "candidate")
-          measure.set_type(ControlPointV0007::Measure::Candidate);
-        else if (type == "manual")
-          measure.set_type(ControlPointV0007::Measure::Manual);
-        else if (type == "registeredpixel")
-          measure.set_type(ControlPointV0007::Measure::RegisteredPixel);
-        else if (type == "registeredsubpixel")
-          measure.set_type(ControlPointV0007::Measure::RegisteredSubPixel);
-        else
-          throw IException(IException::Io,
-                           "Unknown measure type [" + type + "]",
-                           _FILEINFO_);
-        group.deleteKeyword("MeasureType");
-
-        for (int key = 0; key < group.keywords(); key++) {
-          ControlMeasureLogData interpreter(group[key]);
-          if (!interpreter.IsValid()) {
-            IString msg = "Unhandled or duplicate keywords in control measure ["
-                + group[key].name() + "]";
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-          }
-          else {
-            *measure.add_log() = interpreter.ToProtocolBuffer();
-          }
-        }
-
-        *point.add_measures() = measure;
-      }
-
-      if (!point.IsInitialized()) {
-        IString msg = "There is missing required information in the control "
-            "points or measures";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
 
       points.append(point);
     }
@@ -2145,7 +1597,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007 for booleans. This operation is
+   *   and into the ControlPointV0006 for booleans. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -2158,8 +1610,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007 &point,
-                                 void (ControlPointV0007::*setter)(bool)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -2175,7 +1627,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007 for doubles. This operation is
+   *   and into the ControlPointV0006 for doubles. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -2188,8 +1640,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007 &point,
-                                 void (ControlPointV0007::*setter)(double)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -2202,7 +1654,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007 for strings. This operation is
+   *   and into the ControlPointV0006 for strings. This operation is
    *   only necessary for the latest version of the binary so this method needs
    *   to be updated or removed when V0003 comes around.
    *
@@ -2215,8 +1667,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007 &point,
-                                 void (ControlPointV0007::*setter)(const std::string&)) {
+                                 ControlPointV0006 &point,
+                                 void (ControlPointV0006::*setter)(const std::string&)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -2229,7 +1681,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007::Measure for booleans. This
+   *   and into the ControlMeasureV0006 for booleans. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
    *
@@ -2242,8 +1694,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007::Measure &measure,
-                                 void (ControlPointV0007::Measure::*setter)(bool)) {
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -2259,7 +1711,7 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007::Measure for doubles. This
+   *   and into the ControlMeasureV0006 for doubles. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
    *
@@ -2272,8 +1724,9 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007::Measure &measure,
-                                 void (ControlPointV0007::Measure::*setter)(double)) {
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)(double)) {
+
     if (!container.hasKeyword(keyName))
       return;
 
@@ -2285,7 +1738,6 @@ namespace Isis {
 
   /**
    * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0007::Measure for strings. This
    *   and into the ControlMeasureV0006 for strings. This
    *   operation is only necessary for the latest version of the binary so
    *   this method needs to be updated or removed when V0003 comes around.
@@ -2299,8 +1751,8 @@ namespace Isis {
    */
   void ControlNetVersioner::copy(PvlContainer &container,
                                  QString keyName,
-                                 ControlPointV0007::Measure &measure,
-                                 void (ControlPointV0007::Measure::*set)
+                                 ControlMeasureV0006 &measure,
+                                 void (ControlMeasureV0006::*setter)
                                       (const std::string &)) {
 
     if (!container.hasKeyword(keyName))
