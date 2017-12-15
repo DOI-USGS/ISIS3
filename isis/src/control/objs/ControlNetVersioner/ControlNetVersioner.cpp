@@ -87,7 +87,7 @@ namespace Isis {
 
   /**
    * Generates a Pvl file from the currently stored control points and header.
-   *  
+   *
    * @return Pvl& The Pvl version of the network
    */
   Pvl &ControlNetVersioner::toPvl(){
@@ -101,7 +101,7 @@ namespace Isis {
     network += PvlKeyword("Created", m_header.created().c_str());
     network += PvlKeyword("LastModified", m_header.lastmodified().c_str());
     network += PvlKeyword("Description", m_header.description().c_str());
-    // optionally add username to output? 
+    // optionally add username to output?
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "5");
@@ -115,7 +115,7 @@ namespace Isis {
         pvlRadii = Target::radiiGroup(target);
       }
       catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF 
+        // leave pvlRadii empty if target is not recognized by NAIF
       }
     }
 
@@ -135,7 +135,7 @@ namespace Isis {
 
       pvlPoint += PvlKeyword("PointId", controlPoint.GetId());
       pvlPoint += PvlKeyword("ChooserName", controlPoint.GetChooserName());
-      pvlPoint += PvlKeyword("DateTime", controlPoint.GetDateTime()); 
+      pvlPoint += PvlKeyword("DateTime", controlPoint.GetDateTime());
 
       if (controlPoint.IsEditLocked()) {
         pvlPoint += PvlKeyword("EditLock", "True");
@@ -232,7 +232,7 @@ namespace Isis {
           matrix += toString(controlPoint.aprioricovar(1)); // DNE
           matrix += toString(controlPoint.aprioricovar(2)); // DNE
           matrix += toString(controlPoint.aprioricovar(3)); // DNE
-          matrix += toString(controlPoint.aprioricovar(4)); // DNE 
+          matrix += toString(controlPoint.aprioricovar(4)); // DNE
           matrix += toString(controlPoint.aprioricovar(5)); // DNE
           pvlPoint += matrix;
 
@@ -337,7 +337,7 @@ namespace Isis {
         PvlGroup pvlMeasure("ControlMeasure");
         const ControlMeasure &
             controlMeasure = controlPoint.GetMeasures(j);
-        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber()); 
+        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber());
 
         switch(controlMeasure.GetType()) {
           case ControlMeasure::Candidate:
@@ -355,7 +355,7 @@ namespace Isis {
         }
 
         if (controlMeasure.HasChooserName()) { // DNE
-          pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName()); 
+          pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
         }
 
         if (controlMeasure.HasDateTime()) { // DNE
@@ -415,16 +415,16 @@ namespace Isis {
         }
 
         for (int logEntry = 0;
-            logEntry < controlMeasure.LogSize(); // DNE? 
+            logEntry < controlMeasure.LogSize(); // DNE?
             logEntry ++) {
-          const ControlMeasureLogData &log = 
+          const ControlMeasureLogData &log =
                 controlMeasure.GetLogData(logEntry); // Not sure this is right.
 
           ControlMeasureLogData interpreter(log);
           pvlMeasure += interpreter.ToKeyword();
         }
 
-        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function? 
+        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function?
            controlPoint.IndexOfRefMeasure() == j) {
           pvlMeasure += PvlKeyword("Reference", "True");
         }
@@ -1475,6 +1475,229 @@ namespace Isis {
   */
   void ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *fileStream) {
 
+      ControlPointFileEntryV0005 protoPoint;
+      ControlPoint controlPoint = m_points.takeFirst();
+
+      protoPoint.set_type(controlPoint.getType())
+
+      protoPoint.set_id(controlPoint.GetId());
+      protoPoint.set_choosername(controlPoint.GetChooserName());
+      protoPoint.set_datetime(controlPoint.GetDateTime());
+      protoPoint.set_editlock(controlPoint.IsEditLocked());
+
+      protoPoint.set_ignore(controlPoint.IsIgnored());
+
+      protoPoint.set_apriorisurfpointsource(controlPoint.GetAprioriSurfPointSource());
+
+      if (controlPoint.HasAprioriSurfacePointSourceFile()) { //DNE right now
+        protoPoint.set_apriorisurfpointsourcefile(controlPoint.GetAprioriSurfacePointSourceFile());
+      }
+
+      protoPoint.set_aprioriradiussource(controlPoint.GetAprioriRadiusSource());
+
+      // FIXME: None of Apriori(X,Y,Z) is available directly from ControlPoint in the API
+      if (controlPoint.HasAprioriRadiusSourcefile()) { // DNE
+        protoPoint.set_aprioriradiussourcefile(protobufPoint.GetAprioriRadiusSourceFile());
+      }
+
+      if (controlPoint.HasApriorix()) { // DNE
+        protoPoint.set_apriorix(controlPoint.AprioriX());
+        protoPoint.set_aprioriy(controlPoint.AprioriY());
+        protoPoint.set_aprioriz(controlPoint.AprioriZ());
+
+
+        // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
+        // FIGURE OUT HOW TO HANDLE THE MULTIVALUE OUTPUT TO PROTOPOINT
+        if (controlPoint.AprioriCovarSize()) { // DNE
+          PvlKeyword matrix("AprioriCovarianceMatrix");
+          matrix += toString(controlPoint.aprioricovar(0)); // DNE
+          matrix += toString(controlPoint.aprioricovar(1)); // DNE
+          matrix += toString(controlPoint.aprioricovar(2)); // DNE
+          matrix += toString(controlPoint.aprioricovar(3)); // DNE
+          matrix += toString(controlPoint.aprioricovar(4)); // DNE
+          matrix += toString(controlPoint.aprioricovar(5)); // DNE
+          protoPoint.set_aprioricovar
+          pvlPoint += matrix;
+
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
+            apriori.SetRadii(
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
+            symmetric_matrix<double, upper> covar;
+            covar.resize(3);
+            covar.clear();
+            covar(0, 0) = controlPoint.aprioricovar(0); // DNE
+            covar(0, 1) = controlPoint.aprioricovar(1); // DNE
+            covar(0, 2) = controlPoint.aprioricovar(2); // DNE
+            covar(1, 1) = controlPoint.aprioricovar(3); // DNE
+            covar(1, 2) = controlPoint.aprioricovar(4); // ""
+            covar(2, 2) = controlPoint.aprioricovar(5); // ""
+            apriori.SetRectangularMatrix(covar);
+            QString sigmas = "AprioriLatitudeSigma = " +
+                             toString(apriori.GetLatSigmaDistance().meters()) +
+                             " <meters>  AprioriLongitudeSigma = " +
+                             toString(apriori.GetLonSigmaDistance().meters()) +
+                             " <meters>  AprioriRadiusSigma = " +
+                             toString(apriori.GetLocalRadiusSigma().meters()) +
+                             " <meters>";
+            pvlPoint.findKeyword("AprioriCovarianceMatrix").addComment(sigmas);
+          }
+        }
+      }
+
+      protoPoint.set_latitudeconstrained(controlPoint.IsLatitudeConstrained());
+      protoPoint.set_longitudeconstrained(controlPoint.IsLongitudeConstrained());
+      protoPoint.set_radiusconstrained(controlPoint.IsRadiusConstrained());
+
+      if (controlPoint.HasAdjustedX()) {
+        protoPoint.set_adjustedx(controlPoint.AdjustedX());
+        protoPoint.set_adjustedy(controlPoint.AdjustedY());
+        protoPoint.set_adjustedz(controlPoint.AdjustedZ());
+
+
+        // FIGURE OUT HOW TO DO THIS MATRIX STUFF
+        if (controlPoint.AdjustedCovarSize()) { // DNE
+          PvlKeyword matrix("AdjustedCovarianceMatrix");
+          matrix += toString(controlPoint.AdjustedCovar(0));
+          matrix += toString(controlPoint.AdjustedCovar(1));
+          matrix += toString(controlPoint.AdjustedCovar(2));
+          matrix += toString(controlPoint.AdjustedCovar(3));
+          matrix += toString(controlPoint.AdjustedCovar(4));
+          matrix += toString(controlPoint.AdjustedCovar(5));
+          pvlPoint += matrix;
+
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
+            adjusted.SetRadii(
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
+            symmetric_matrix<double, upper> covar;
+            covar.resize(3);
+            covar.clear();
+            covar(0, 0) = controlPoint.AdjustedCovar(0);
+            covar(0, 1) = controlPoint.AdjustedCovar(1);
+            covar(0, 2) = controlPoint.AdjustedCovar(2);
+            covar(1, 1) = controlPoint.AdjustedCovar(3);
+            covar(1, 2) = controlPoint.AdjustedCovar(4);
+            covar(2, 2) = controlPoint.AdjustedCovar(5);
+            adjusted.SetRectangularMatrix(covar);
+            QString sigmas = "AdjustedLatitudeSigma = " +
+                             toString(adjusted.GetLatSigmaDistance().meters()) +
+                             " <meters>  AdjustedLongitudeSigma = " +
+                             toString(adjusted.GetLonSigmaDistance().meters()) +
+                             " <meters>  AdjustedRadiusSigma = " +
+                             toString(adjusted.GetLocalRadiusSigma().meters()) +
+                             " <meters>";
+            pvlPoint.findKeyword("AdjustedCovarianceMatrix").addComment(sigmas);
+          }
+        }
+      }
+
+
+      for (int j = 0; j < controlPoint.GetNumMeasures(); j++) {
+
+        const ControlMeasure &
+            controlMeasure = controlPoint.GetMeasures(j);
+
+        ControlPointFileEntryV0005_Measure protoMeasure;
+
+        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber());
+
+        protoMeasure.set_measuretype(controlMeasure.GetType());
+
+        if (controlMeasure.HasChooserName()) { // DNE
+          protoMeasure.set_choosername(controlMeasure.GetChooserName());
+        }
+
+        if (controlMeasure.HasDateTime()) { // DNE
+          protoMeasure.set_datetime(controlMeasure.GetDateTime());
+        }
+
+        protoMeasure.set_editlock(controlMeasure.IsEditLocked());
+
+        protoMeasure.set_ignore(controlMeasure.IsIgnored());
+
+        if (controlMeasure.HasSample()) { // DNE
+          protoMeasure.set_sample(controlMeasure.GetSample());
+        }
+
+        if (controlMeasure.HasLine()) { // DNE
+          protoMeasure.set_line(controlMeasure.GetLine()));
+        }
+
+        if (controlMeasure.HasDiameter()) { // DNE
+          protoMeasure.set_diameter(controlMeasure.GetDiameter()));
+        }
+
+        if (controlMeasure.HasAprioriSample()) { // DNE
+          protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample()));
+        }
+
+        if (controlMeasure.HasAprioriLine()) { // DNE
+          protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine()));
+        }
+
+        if (controlMeasure.HasSampleSigma()) { // DNE
+          protoMeasure.set_samplesigma(controlMeasure.GetSampleSigma());
+        }
+
+        if (controlMeasure.HasLineSigma()) { // BUG IN ORIGINAL CODE (had samplesigma) and DNE
+          protoMeasure.set_linesigma(controlMeasure.GetLineSigma());
+        }
+
+        if (controlMeasure.HasSampleResidual()) { // DNE
+          protoMeasure.set_sampleresidual(controlMeasure.GetSampleResidual());
+        }
+
+        if (controlMeasure.HasLineResidual()) { // DNE
+          protoMeasure.set_lineresidual(controlMeasure.GetLineResidual());
+        }
+
+        if (controlMeasure.HasJigsawRejected()) { // DNE
+         protoMeasure.set_jigsawrejected(controlMeasure.GetJigsawRejected())); // DNE
+        }
+
+
+        for (int logEntry = 0;
+            logEntry < controlMeasure.LogSize(); // DNE?
+            logEntry ++) {
+
+          const ControlMeasureLogData &log =
+                controlMeasure.GetLogData(logEntry); // Not sure this is right.
+
+          // These methods might not not exist, we may need to wrap each of These
+          // In if/else statements because they're optional values.
+          ControlPointFileEntryV0005_Measure_MeasureLogData logData;
+
+          logData.set_doubledatatype(log.GetDoubleDataType());
+          logData.set_doubledatavalue(log.GetDoubleDataValue());
+          logData.set_booldatatype(log.GetBoolDataType());
+          logData.set_booldatavalue(log.getBoolDataValue());
+
+          protoMeasure.add_log(logData);
+        }
+
+        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function?
+           controlPoint.IndexOfRefMeasure() == j) {
+             protoPoint.set_referenceindex(j);
+
+          // This isn't inside of the ControlPointFileEntryV0005, should it be?
+          // pvlMeasure += PvlKeyword("Reference", "True");
+        }
+        protoPoint.add_measure(protoMeasure);
+      }
+
+      int msgSize(protoPoint.ByteSize());
+      m_PBOCodedStream->WriteVarint32(msgSize);
+      if ( !msg.SerializeToCodedStream(m_PBOCodedStream.data()) ) {
+        QString err = "Error writing to coded PB stream at position " +
+                    QString::number(m_out->tellp());
+      throw IException(IException::Programmer, err, _FILEINFO_);
+      }
+
+      // return size of message
+      return (msgSize);
   }
 
 
