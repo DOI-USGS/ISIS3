@@ -29,16 +29,16 @@
 
 namespace Isis {
   class ControlPointV0002;
-  class Pvl;
+  class PvlObject;
 
   //TODO document this
   class ControlPointV0003 {
     public:
-      ControlPointV0003(const Pvl &pointObject);
+      ControlPointV0003(const PvlObject &pointObject);
       ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData);
       ControlPointV0003(const ControlPointV0002 &oldPoint);
 
-      Pvl toPvl();
+      QSharedPointer<ControlPointFileEntryV0002> pointData();
 
     private:
       // These are intentionally not implemented

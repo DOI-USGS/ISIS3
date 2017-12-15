@@ -25,7 +25,7 @@ namespace Isis {
    *
    * @param pointObject The control point and its measures in a Pvl object
    */
-  ControlPointV0003::ControlPointV0003(const Pvl &pointObject)
+  ControlPointV0003::ControlPointV0003(const PvlObject &pointObject)
    : m_pointData(new ControlPointFileEntryV0002) {
 
     // Copy over strings, doubles, and bools
@@ -253,6 +253,17 @@ namespace Isis {
 
   // TODO finish this once Version 2 is created
   ControlPointV0003::ControlPointV0003(const ControlPointV0002 &oldPoint);
+
+
+  /**
+   * Access the protobuf control point data.
+   *
+   * @return @b QSharedPointer<ControlPointFileEntryV0002> A shared pointer to the internal
+   *                                                       protobuf control point data.
+   */
+  QSharedPointer<ControlPointFileEntryV0002> ControlPointV0003::pointData() {
+    return m_pointData;
+  }
 
 
   /**

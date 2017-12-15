@@ -37,7 +37,7 @@ namespace Isis {
       ControlPointV0002(QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData);
       ControlPointV0002(const ControlPointV0001 &oldPoint);
 
-      Pvl toPvl();
+      QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData();
 
     private:
       // These are intentionally not implemented

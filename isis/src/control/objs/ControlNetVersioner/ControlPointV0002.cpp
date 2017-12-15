@@ -264,6 +264,18 @@ namespace Isis {
 
 
   /**
+   * Access the protobuf control point data.
+   *
+   * @return @b QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> A shared pointer to the
+   *                                                                    internal protobuf control
+   *                                                                    point data.
+   */
+  QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0002::pointData() {
+    return m_pointData;
+  }
+
+
+  /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
    * protobuf field.
    *
