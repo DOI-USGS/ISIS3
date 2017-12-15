@@ -101,7 +101,7 @@ namespace Isis {
     // optionally add username to output? 
 
     // This is the Pvl version we're converting to
-    network += PvlKeyword("Version", "7");
+    network += PvlKeyword("Version", "5");
 
     //  Get Target Radii from naif kernel
     PvlGroup pvlRadii;
