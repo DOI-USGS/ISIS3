@@ -210,8 +210,10 @@ namespace Isis {
 
 
       if (group.hasKeyword("Reference")) {
-        if (group["Reference"][0].toLower() == "true")
+        if (group["Reference"][0].toLower() == "true") {
           m_pointData->set_referenceindex(groupIndex);
+        }
+        group.deleteKeyword("Reference");
       }
 
       QString type = group["MeasureType"][0].toLower();
@@ -231,7 +233,8 @@ namespace Isis {
         throw IException(IException::Io,
                          "Unknown measure type [" + type + "]",
                          _FILEINFO_);
-        }
+      }
+      group.deleteKeyword("MeasureType");
 
       for (int key = 0; key < group.keywords(); key++) {
         ControlMeasureLogData interpreter(group[key]);
