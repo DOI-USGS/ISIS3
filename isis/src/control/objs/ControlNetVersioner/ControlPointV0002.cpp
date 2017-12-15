@@ -256,7 +256,7 @@ namespace Isis {
   }
 
 
-  // TODO finish this once Version 2 is created
+  // TODO finish this once Version 1 is created
   ControlPointV0002::ControlPointV0002(const ControlPointV0001 &oldPoint);
 
 
@@ -283,6 +283,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
@@ -313,6 +314,7 @@ namespace Isis {
       return;
 
     double value = toDouble(container[keyName][0]);
+    container.deleteKeyword(keyName);
     (point->*setter)(value);
   }
 
@@ -340,6 +342,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     (point->*setter)(value);
   }
 
@@ -367,6 +370,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
@@ -397,6 +401,7 @@ namespace Isis {
       return;
 
     double value = toDouble(container[keyName][0]);
+    container.deleteKeyword(keyName);
     (measure.*setter)(value);
   }
 
@@ -425,6 +430,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     (measure.*set)(value);
   }
 }

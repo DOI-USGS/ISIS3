@@ -275,6 +275,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
@@ -305,6 +306,7 @@ namespace Isis {
       return;
 
     double value = toDouble(container[keyName][0]);
+    container.deleteKeyword(keyName);
     (point->*setter)(value);
   }
 
@@ -332,6 +334,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     (point->*setter)(value);
   }
 
@@ -359,6 +362,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
@@ -389,6 +393,7 @@ namespace Isis {
       return;
 
     double value = toDouble(container[keyName][0]);
+    container.deleteKeyword(keyName);
     (measure.*setter)(value);
   }
 
@@ -417,6 +422,7 @@ namespace Isis {
       return;
 
     QString value = container[keyName][0];
+    container.deleteKeyword(keyName);
     (measure.*set)(value);
   }
 }
