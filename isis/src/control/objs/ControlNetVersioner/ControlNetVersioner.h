@@ -237,8 +237,8 @@ namespace Isis {
 
       void setHeader(const ControlNetHeaderV0001 header);
 
-      void writeHeader(ZeroCopyInputStream *fileStream);
-      void writeFirstPoint(ZeroCopyInputStream *fileStream);
+      void writeHeader(ZeroCopyOutputStream *fileStream);
+      void writeFirstPoint(ZeroCopyOutputStream *fileStream);
 
       ControlNetHeaderV0007 m_header; /**< Header containing information about
                                            the whole network.*/

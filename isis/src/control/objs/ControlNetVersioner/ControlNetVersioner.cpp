@@ -24,6 +24,10 @@
 #include "SurfacePoint.h"
 #include "Target.h"
 
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/coded_stream.h>
+
+using namespace google::protobuf::io;
 using namespace std;
 
 namespace Isis {
@@ -78,9 +82,7 @@ namespace Isis {
   }
 
 
-  void ControlNetVersioner::write(FileName netFile) {
 
-  }
 
 
   Pvl &ControlNetVersioner::toPvl() {
@@ -1031,12 +1033,101 @@ namespace Isis {
   }
 
 
-  void ControlNetVersioner::writeHeader(ZeroCopyInputStream *fileStream) {
+  /**
+   * This will write a control net file object to disk.
+   *
+   * @param file file The output filename that will be written to
+   *
+   */
+  void ControlNetVersioner::write(FileName netFile) {
+    try {
+      const int labelBytes = 65536;
+      fstream output(netFile.expanded().toLatin1().data(), ios::out | ios::trunc | ios::binary);
+      char *blankLabel = new char[labelBytes];
+      memset(blankLabel, 0, labelBytes);
+      output.write(blankLabel, labelBytes);
+      delete [] blankLabel;
 
+      streampos startCoreHeaderPos = output.tellp();
+
+      CodedOutputStream* fileStream = new FileOutputStream(output);
+      writeHeader(fileStream);
+
+      // If this is a function that writes only 1 point, we'll need call it more than once.
+      // Update to be a loop... later.
+      writeFirstPoint(fileStream); 
+
+      // Construct Pvl Header and add to beginning of output file 
+   /* Pvl p;
+    PvlObject protoObj("ProtoBuffer");
+
+    PvlObject protoCore("Core");
+    protoCore.addKeyword(PvlKeyword("HeaderStartByte",
+                         toString((BigInt) startCoreHeaderPos)));
+    protoCore.addKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
+    protoCore.addKeyword(PvlKeyword("PointsStartByte",
+        toString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
+    protoCore.addKeyword(PvlKeyword("PointsBytes",
+        toString(pointsSize)));
+    protoObj.addObject(protoCore);
+
+    PvlGroup netInfo("ControlNetworkInfo");
+    netInfo.addComment("This group is for informational purposes only");
+    netInfo += PvlKeyword("NetworkId", p_networkHeader->networkid().c_str());
+    netInfo += PvlKeyword("TargetName", p_networkHeader->targetname().c_str());
+    netInfo += PvlKeyword("UserName", p_networkHeader->username().c_str());
+    netInfo += PvlKeyword("Created", p_networkHeader->created().c_str());
+    netInfo += PvlKeyword("LastModified", p_networkHeader->lastmodified().c_str());
+    netInfo += PvlKeyword("Description", p_networkHeader->description().c_str());
+    netInfo += PvlKeyword("NumberOfPoints", toString(p_controlPoints->size()));
+    netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
+    netInfo += PvlKeyword("Version", "5");
+    protoObj.addGroup(netInfo);
+
+    p.addObject(protoObj);
+
+    output.seekp(0, ios::beg);
+    output << p;
+    output << '\n';*/
+      close(outfd);
+    } 
+    catch () {
+      string msg = "Can't write control net file" 
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+  }
+
+ /**
+  * This will the binary protobuffer control network header to a ZeroCopyOutputStream
+  * 
+  * @param fileStream  
+  */
+  void ControlNetVersioner::writeHeader(ZeroCopyOutputStream *fileStream) {
+
+    // Create the protobuf header using our struct
+    ControlNetFileHeaderV0005 protobufHeader;
+    protobufHeader.set_networkid(m_header.networkID);
+    protobufHeader.set_targetname(m_header.targetName);
+    protobufHeader.set_created(m_header.created);
+    protobufHeader.set_lastmodified(m_header.lastModified);
+    protobufHeader.set_description(m_header.description);
+    protobufHeader.set_username(m_header.userName);
+
+    // Write out the header
+    if (!protobufHeader->SerializeToCodedStream(&fileStream)) {
+      IString msg = "Failed to write output control network file [" +
+          file.name() + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
 
 
-  void ControlNetVersioner::writeFirstPoint(ZeroCopyInputStream *fileStream) {
+ /**
+  * This will write the first control control point to a ZeroCopyOutputStream
+  * 
+  * @param fileStream  
+  */
+  void ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *fileStream) {
 
   }
 
