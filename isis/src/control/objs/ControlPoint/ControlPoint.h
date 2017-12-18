@@ -338,7 +338,7 @@ namespace Isis {
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
    *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
-   *                            AdjustedX(), AdjustedY(), AdjustedZ(), HasRefMeasure().
+   *                            GetAdjustedX(), GetAdjustedY(), GetAdjustedZ(), HasRefMeasure().
    */
   class ControlPoint : public QObject {
 
@@ -494,6 +494,10 @@ namespace Isis {
       Status ComputeResiduals_Millimeters();
 
       SurfacePoint GetAdjustedSurfacePoint() const;
+      Displacement GetAdjustedX() const;
+      Displacement GetAdjustedY() const;
+      Displacement GetAdjustedZ() const;
+
       SurfacePoint GetBestSurfacePoint() const;
       QString GetChooserName() const;
       QString GetDateTime() const;
