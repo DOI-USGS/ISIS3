@@ -1507,41 +1507,31 @@ namespace Isis {
 
 
         // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
-        // FIGURE OUT HOW TO HANDLE THE MULTIVALUE OUTPUT TO PROTOPOINT
         if (controlPoint.AprioriCovarSize()) { // DNE
-          PvlKeyword matrix("AprioriCovarianceMatrix");
-          matrix += toString(controlPoint.aprioricovar(0)); // DNE
-          matrix += toString(controlPoint.aprioricovar(1)); // DNE
-          matrix += toString(controlPoint.aprioricovar(2)); // DNE
-          matrix += toString(controlPoint.aprioricovar(3)); // DNE
-          matrix += toString(controlPoint.aprioricovar(4)); // DNE
-          matrix += toString(controlPoint.aprioricovar(5)); // DNE
-          protoPoint.set_aprioricovar
-          pvlPoint += matrix;
+          // Ensure this is the right way to add these values
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(0)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(1)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(2)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(3)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(4)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(5)); // DNE
 
-          if (pvlRadii.hasKeyword("EquatorialRadius")) {
-            apriori.SetRadii(
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
-            symmetric_matrix<double, upper> covar;
-            covar.resize(3);
-            covar.clear();
-            covar(0, 0) = controlPoint.aprioricovar(0); // DNE
-            covar(0, 1) = controlPoint.aprioricovar(1); // DNE
-            covar(0, 2) = controlPoint.aprioricovar(2); // DNE
-            covar(1, 1) = controlPoint.aprioricovar(3); // DNE
-            covar(1, 2) = controlPoint.aprioricovar(4); // ""
-            covar(2, 2) = controlPoint.aprioricovar(5); // ""
-            apriori.SetRectangularMatrix(covar);
-            QString sigmas = "AprioriLatitudeSigma = " +
-                             toString(apriori.GetLatSigmaDistance().meters()) +
-                             " <meters>  AprioriLongitudeSigma = " +
-                             toString(apriori.GetLonSigmaDistance().meters()) +
-                             " <meters>  AprioriRadiusSigma = " +
-                             toString(apriori.GetLocalRadiusSigma().meters()) +
-                             " <meters>";
-            pvlPoint.findKeyword("AprioriCovarianceMatrix").addComment(sigmas);
+          // Does this get added to the ProtoPoint?
+          // if (pvlRadii.hasKeyword("EquatorialRadius")) {
+          //   apriori.SetRadii(
+          //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+          //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+          //                Distance(pvlRadii["PolarRadius"],Distance::Meters));
+          //   symmetric_matrix<double, upper> covar;
+          //   covar.resize(3);
+          //   covar.clear();
+          //   covar(0, 0) = controlPoint.aprioricovar(0); // DNE
+          //   covar(0, 1) = controlPoint.aprioricovar(1); // DNE
+          //   covar(0, 2) = controlPoint.aprioricovar(2); // DNE
+          //   covar(1, 1) = controlPoint.aprioricovar(3); // DNE
+          //   covar(1, 2) = controlPoint.aprioricovar(4); // ""
+          //   covar(2, 2) = controlPoint.aprioricovar(5); // ""
+          //   apriori.SetRectangularMatrix(covar);
           }
         }
       }
@@ -1558,42 +1548,32 @@ namespace Isis {
 
         // FIGURE OUT HOW TO DO THIS MATRIX STUFF
         if (controlPoint.AdjustedCovarSize()) { // DNE
-          PvlKeyword matrix("AdjustedCovarianceMatrix");
-          matrix += toString(controlPoint.AdjustedCovar(0));
-          matrix += toString(controlPoint.AdjustedCovar(1));
-          matrix += toString(controlPoint.AdjustedCovar(2));
-          matrix += toString(controlPoint.AdjustedCovar(3));
-          matrix += toString(controlPoint.AdjustedCovar(4));
-          matrix += toString(controlPoint.AdjustedCovar(5));
-          pvlPoint += matrix;
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(0));
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(1));
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(2));
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(3));
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(4));
+          protoPoint.add_adjustedcovar(controlPoint.AdjustedCovar(5));
 
-          if (pvlRadii.hasKeyword("EquatorialRadius")) {
-            adjusted.SetRadii(
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-                         Distance(pvlRadii["PolarRadius"],Distance::Meters));
-            symmetric_matrix<double, upper> covar;
-            covar.resize(3);
-            covar.clear();
-            covar(0, 0) = controlPoint.AdjustedCovar(0);
-            covar(0, 1) = controlPoint.AdjustedCovar(1);
-            covar(0, 2) = controlPoint.AdjustedCovar(2);
-            covar(1, 1) = controlPoint.AdjustedCovar(3);
-            covar(1, 2) = controlPoint.AdjustedCovar(4);
-            covar(2, 2) = controlPoint.AdjustedCovar(5);
-            adjusted.SetRectangularMatrix(covar);
-            QString sigmas = "AdjustedLatitudeSigma = " +
-                             toString(adjusted.GetLatSigmaDistance().meters()) +
-                             " <meters>  AdjustedLongitudeSigma = " +
-                             toString(adjusted.GetLonSigmaDistance().meters()) +
-                             " <meters>  AdjustedRadiusSigma = " +
-                             toString(adjusted.GetLocalRadiusSigma().meters()) +
-                             " <meters>";
-            pvlPoint.findKeyword("AdjustedCovarianceMatrix").addComment(sigmas);
+          // Does this get added to the ProtoPoint object?
+          // if (pvlRadii.hasKeyword("EquatorialRadius")) {
+          //   adjusted.SetRadii(
+          //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+          //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+          //                Distance(pvlRadii["PolarRadius"],Distance::Meters));
+          //   symmetric_matrix<double, upper> covar;
+          //   covar.resize(3);
+          //   covar.clear();
+          //   covar(0, 0) = controlPoint.AdjustedCovar(0);
+          //   covar(0, 1) = controlPoint.AdjustedCovar(1);
+          //   covar(0, 2) = controlPoint.AdjustedCovar(2);
+          //   covar(1, 1) = controlPoint.AdjustedCovar(3);
+          //   covar(1, 2) = controlPoint.AdjustedCovar(4);
+          //   covar(2, 2) = controlPoint.AdjustedCovar(5);
+          //   adjusted.SetRectangularMatrix(covar);
           }
         }
       }
-
 
       for (int j = 0; j < controlPoint.GetNumMeasures(); j++) {
 
