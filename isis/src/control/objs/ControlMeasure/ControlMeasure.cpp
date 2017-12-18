@@ -1016,6 +1016,62 @@ namespace Isis {
 
     return sPrintable;
   }
+  
+  bool HasChooserName() {
+    return !p_chooserName->isEmpty();
+  }
+
+  bool HasDataTime() {
+    return !p_dateTime->isEmpty();   
+  }
+  
+  bool HasSample() {
+    return p_sample ? true : false;   
+  }
+    
+  bool HasLine() {
+    return p_line ? true : false;    
+  }
+  
+  bool HasDiameter() {
+    return p_diameter ? true : false;   
+  }
+  
+  bool hasAprioriSample() {
+    return p_aprioriSample ? true : false;
+  }
+  
+  bool hasAprioriLine() {
+    return p_aprioriLine ? true : false;
+  }
+  
+  bool HasSampleSigma() {
+    return p_sampleSigma ? true : false;
+  }
+  
+  bool HasLineSigma() {
+    return p_lineSigma ? true : false;
+  }
+  
+  bool HasSampleResidual() {
+    return p_sampleResidual ? true : false;
+  }
+  
+  bool HasLineResidual() {
+    return p_lineResidual ? true : false;
+  }
+  
+  bool HasJigsawRejected() {
+    return p_jigsawRejected != NULL ? true : false; 
+  }
+  
+  bool JigsawRejected() {
+    return p_jigsawRejected ? true : false;
+  }
+ 
+  int LogSize(){
+    return p_loggedData->size();
+  }
 
   /**
    * Obtain a string representation of the MeasureType
