@@ -237,8 +237,6 @@ void CreateStretchPairs() {
 * This method is used by ConvertLinePrefixPixels() and IsisMain() for ProcessByLine p2.
 * author Jeannie Walldren 2008-08-21
 *
-* @history 2017-11-22 Summer Stapleton - Changed returned max value from HRS to HIS.
-*                        Fixes #5106.
 */
 void FixDns(Buffer &buf) {
   for(int i = 0; i < buf.size(); i++) {
@@ -251,9 +249,9 @@ void FixDns(Buffer &buf) {
     else if(dataConversionType == "Table") {
       buf[i] = stretch.Map((int)buf[i]);
     }
-    // save max values (4095 for table-converted images and 255 for others) as HIS
+    // save max values (4095 for table-converted images and 255 for others) as HRS
     if(buf[i] == validMax) {
-      buf[i] = His;
+      buf[i] = Hrs;
     }
   }
 }

@@ -71,6 +71,8 @@ namespace Isis {
    *   @history 2016-08-16 Jesse Mapel - Added BOOST_UBLAS_NO_STD_CERR definition to
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
+   *   @history 2017-12-08 Debbie A. Cook Commented out QDebug operator declaration for VectorCompressed
+   *                           because it caused the unitTest to not compile.  This will need to be fixed at some point.
    *  
    *  
    *   @todo document methods (a) add naif routine names to documentation where appropriate,
@@ -235,7 +237,7 @@ namespace Isis {
   // these must be declared outside of the class (at the end since they must be
   // declared after the typedefs)
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Vector &vector);
-  QDebug operator<<(QDebug dbg, const LinearAlgebra::VectorCompressed &vector);
+  //  QDebug operator<<(QDebug dbg, const LinearAlgebra::VectorCompressed &vector);
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix);
   QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixCompressed &matrix);
   QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixUpperTriangular &matrix);
