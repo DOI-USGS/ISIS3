@@ -334,7 +334,11 @@ namespace Isis {
    *                           made sure the comparisons are being done correctly. Fixes #1014.
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
    *                           initialized in ControlPointFileEntryV0002 
-   *                           constructor (Merged by Kristin Berry. Fixes #2392) 
+   *                           constructor (Merged by Kristin Berry. Fixes #2392)
+   *   @history 2017-12-18 Kristin Berry - Added convenience methods:
+   *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
+   *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
+   *                            AdjustedX(), AdjustedY(), AdjustedZ(), HasRefMeasure().
    */
   class ControlPoint : public QObject {
 
@@ -460,6 +464,7 @@ namespace Isis {
       const ControlMeasure *GetMeasure(int index) const;
       ControlMeasure *GetMeasure(int index);
 
+      bool HasRefMeasure() const; 
       const ControlMeasure *GetRefMeasure() const;
       ControlMeasure *GetRefMeasure();
 
@@ -501,6 +506,8 @@ namespace Isis {
       bool IsFixed() const;
 
       bool HasAprioriCoordinates();
+      bool HasAdjustedCoordinates();
+
       bool IsConstrained();
       bool IsLatitudeConstrained();
       bool IsLongitudeConstrained();
@@ -519,11 +526,16 @@ namespace Isis {
       static QString SurfacePointSourceToString(SurfacePointSource::Source source);
       static SurfacePointSource::Source StringToSurfacePointSource(QString str);
       QString GetSurfacePointSourceString() const;
-
       SurfacePoint GetAprioriSurfacePoint() const;
+      Displacement GetAprioriX() const;
+      Displacement GetAprioriY() const;
+      Displacement GetAprioriZ() const;
+
       RadiusSource::Source GetAprioriRadiusSource() const;
+      bool HasAprioriRadiusSourceFile() const; 
       QString GetAprioriRadiusSourceFile() const;
       SurfacePointSource::Source GetAprioriSurfacePointSource() const;
+      bool HasAprioriSurfacePointSourceFile() const; 
       QString GetAprioriSurfacePointSourceFile() const;
 
       int GetNumMeasures() const;
