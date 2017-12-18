@@ -1,4 +1,4 @@
-#include "ControlPointV0002.h"
+#include "ControlPointV0001.h"
 
 #include <QString>
 
@@ -10,11 +10,11 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Create a ControlPointV0002 object from a protobuf version 1 control point message.
+   * Create a ControlPointV0001 object from a protobuf version 1 control point message.
    *
    * @param pointData The protobuf message from a control net file.
    */
-  ControlPointV0002::ControlPointV0002(
+  ControlPointV0001::ControlPointV0001(
           QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData)
    : m_pointData(pointData) {
 
@@ -22,11 +22,11 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0002 object from a version 2 control point Pvl object
+   * Create a ControlPointV0001 object from a version 1 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
    */
-  ControlPointV0002::ControlPointV0002(const Pvl &pointObject)
+  ControlPointV0001::ControlPointV0001(const Pvl &pointObject)
    : m_pointData(new ControlNetFileProtoV0001_PBControlPoint) {
 
     // Copy over strings, doubles, and bools
@@ -259,26 +259,14 @@ namespace Isis {
   }
 
 
-  // TODO finish this once Version 1 is created
-  ControlPointV0002::ControlPointV0002(const ControlPointV0001 &oldPoint);
-
-
   /**
-   * Access the protobuf control point data. If there is not internal point data then
-   * default point data is returned. Note that default point data may be missing required
-   * fields.
+   * Access the protobuf control point data.
    *
-   * @return @b const ControlNetFileProtoV0001_PBControlPoint& A constant reference to the internal
-   *                                                           control point data. There is no
-   *                                                           guarantee that the point data is
-   *                                                           fully initialized.
+   * @return @b QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> A pointer to the internal
+   *                                                                    control point data.
    */
-  const ControlNetFileProtoV0001_PBControlPoint &ControlPointV0002::pointData() {
-      if (!m_pointData) {
-        m_pointData.reset(new ControlNetFileProtoV0001_PBControlPoint);
-      }
-
-      return *m_pointData;
+  QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0001::pointData() {
+      return m_pointData;
   }
 
 
@@ -296,7 +284,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool)) {
@@ -327,7 +315,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double)) {
@@ -355,7 +343,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&)) {
@@ -383,7 +371,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(bool)) {
@@ -414,7 +402,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(double)) {
@@ -442,7 +430,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0002::copy(PvlContainer &container,
+  void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)
