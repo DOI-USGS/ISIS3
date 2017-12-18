@@ -59,7 +59,7 @@ namespace Isis {
    *                           toPvl() when unable to find TargetRadii values. Instead, we
    *                           will just leave these values blank. References #3892
    *   @history 2017-12-07 Jesse Mapel - Changed how often read streams are recreated to avoid
-   *                           protobuf errors.
+   *                           protobuf errors. Fixes #5260.
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:
