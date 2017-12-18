@@ -251,8 +251,258 @@ namespace Isis {
   }
 
 
-  // TODO finish this once Version 2 is created
-  ControlPointV0003::ControlPointV0003(const ControlPointV0002 &oldPoint);
+  /**
+   * Create a ControlPointV0003 object from a PvlControlPointV0002 object
+   *
+   * @param oldPoint The PvlControlPointV0002 that will be upgraded to V0003.
+   */
+  ControlPointV0003::ControlPointV0003(ControlPointV0002 &oldPoint)
+   : m_pointData(new ControlPointFileEntryV0002) {
+    QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
+
+    // Copy over POD values
+    if ( oldPointData->has_id() ) {
+      m_pointData->set_id( oldPointData->id() );
+    }
+    if ( oldPointData->has_choosername() ) {
+      m_pointData->set_choosername( oldPointData->choosername() );
+    }
+    if ( oldPointData->has_datetime() ) {
+      m_pointData->set_datetime( oldPointData->datetime() );
+    }
+    if ( oldPointData->has_apriorisurfpointsourcefile() ) {
+      m_pointData->set_apriorisurfpointsourcefile( oldPointData->apriorisurfpointsourcefile() );
+    }
+    if ( oldPointData->has_aprioriradiussourcefile() ) {
+      m_pointData->set_aprioriradiussourcefile( oldPointData->aprioriradiussourcefile() );
+    }
+    if ( oldPointData->has_jigsawrejected() ) {
+      m_pointData->set_jigsawrejected( oldPointData->jigsawrejected() );
+    }
+    if ( oldPointData->has_editlock() ) {
+      m_pointData->set_editlock( oldPointData->editlock() );
+    }
+    if ( oldPointData->has_ignore() ) {
+      m_pointData->set_ignore( oldPointData->ignore() );
+    }
+    if ( oldPointData->has_apriorix() ) {
+      m_pointData->set_apriorix( oldPointData->apriorix() );
+    }
+    if ( oldPointData->has_aprioriy() ) {
+      m_pointData->set_aprioriy( oldPointData->aprioriy() );
+    }
+    if ( oldPointData->has_aprioriz() ) {
+      m_pointData->set_aprioriz( oldPointData->aprioriz() );
+    }
+    if ( oldPointData->has_adjustedx() ) {
+      m_pointData->set_adjustedx( oldPointData->adjustedx() );
+    }
+    if ( oldPointData->has_adjustedy() ) {
+      m_pointData->set_adjustedy( oldPointData->adjustedy() );
+    }
+    if ( oldPointData->has_adjustedz() ) {
+      m_pointData->set_adjustedz( oldPointData->adjustedz() );
+    }
+    if ( oldPointData->has_latitudeconstrained() ) {
+      m_pointData->set_latitudeconstrained( oldPointData->latitudeconstrained() );
+    }
+    if ( oldPointData->has_longitudeconstrained() ) {
+      m_pointData->set_longitudeconstrained( oldPointData->longitudeconstrained() );
+    }
+    if ( oldPointData->has_radiusconstrained() ) {
+      m_pointData->set_radiusconstrained( oldPointData->radiusconstrained() );
+    }
+
+    // Copy over enumerated values
+
+    // The only point types in V0002 are ground and tie.
+    // So, convert ground and tie to their V0003 values, fixed and free respectively.
+    // Later check if the point is constrained.
+    if ( oldPointData->has_type() ) {
+      ControlNetFileProtoV0001_PBControlPoint_PointType pointType = oldPointData->type();
+      if (pointType == ControlNetFileProtoV0001_PBControlPoint::Ground) {
+        m_pointData->set_type(ControlPointFileEntryV0002::Fixed);
+      }
+      else if (pointType == ControlNetFileProtoV0001_PBControlPoint::Tie) {
+        m_pointData->set_type(ControlPointFileEntryV0002::Free);
+      }
+      else {
+        QString msg = "Invalid ControlPoint type.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    if ( oldPointData->has_apriorisurfpointsource() ) {
+      ControlNetFileProtoV0001_PBControlPoint_AprioriSource surfacePointSource;
+      surfacePointSource = oldPointData->apriorisurfpointsource();
+      if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::None) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::None);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::User) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::User);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::AverageOfMeasures);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::Reference) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::Reference);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::Basemap) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::Basemap);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::BundleSolution) {
+        m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::BundleSolution);
+      }
+      else {
+        QString msg = "Invalid ControlPoint apriori surface point source.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    if ( oldPointData->has_aprioriradiussource() ) {
+      ControlNetFileProtoV0001_PBControlPoint_AprioriSource radiusSource;
+      radiusSource = oldPointData->aprioriradiussource();
+      if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::None) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::None);
+      }
+      else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::User) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::User);
+      }
+      else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::AverageOfMeasures);
+      }
+      else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::Ellipsoid) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::Ellipsoid);
+      }
+      else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::DEM) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::DEM);
+      }
+      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::BundleSolution) {
+        m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::BundleSolution);
+      }
+      else {
+        QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Copy the array values
+
+    // If there is a covariance matrix, then the point is constrained
+    if (oldPointData->aprioricovar_size() > 0) {
+      m_pointData->set_type(ControlPointFileEntryV0002::Constrained);
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(0) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(1) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(2) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(3) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(4) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(5) );
+    }
+
+    if (oldPointData->adjustedcovar_size() > 0) {
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(0) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(1) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(2) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(3) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(4) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(5) );
+    }
+
+    // Copy the measures
+    for (int i = 0; i < oldPointData->measures_size(); i++) {
+      ControlPointFileEntryV0002_Measure *newMeasure; = m_pointData->add_measures();
+      ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure oldMeasure;
+      oldMeasure = oldPointData->measures(i);
+
+      // Copy over POD values
+      if ( oldMeasure.has_serialnumber() ) {
+        newMeasure->set_serialnumber( oldMeasure.serialnumber() );
+      }
+      if ( oldMeasure.has_choosername() ) {
+        newMeasure->set_choosername( oldMeasure.choosername() );
+      }
+      if ( oldMeasure.has_datetime() ) {
+        newMeasure->set_datetime( oldMeasure.datetime() );
+      }
+      if ( oldMeasure.has_diameter() ) {
+        newMeasure->set_diameter( oldMeasure.diameter() );
+      }
+      if ( oldMeasure.has_editlock() ) {
+        newMeasure->set_editlock( oldMeasure.editlock() );
+      }
+      if ( oldMeasure.has_ignore() ) {
+        newMeasure->set_ignore( oldMeasure.ignore() );
+      }
+      if ( oldMeasure.has_jigsawrejected() ) {
+        newMeasure->set_jigsawrejected( oldMeasure.jigsawrejected() );
+      }
+      if ( oldMeasure.has_apriorisample() ) {
+        newMeasure->set_apriorisample( oldMeasure.apriorisample() );
+      }
+      if ( oldMeasure.has_aprioriline() ) {
+        newMeasure->set_aprioriline( oldMeasure.aprioriline() );
+      }
+      if ( oldMeasure.has_samplesigma() ) {
+        newMeasure->set_samplesigma( oldMeasure.samplesigma() );
+      }
+      if ( oldMeasure.has_linesigma() ) {
+        newMeasure->set_linesigma( oldMeasure.linesigma() );
+      }
+      // In the version 1 protobuf format, the sample, line, sample residual, and line residual
+      // values are stored in a nested message so we have to copy them differently.
+      if ( oldMeasure.has_measurement() ) {
+        ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_PBMeasure oldMeasurement;
+        oldMeasurement = oldMeasure.measurement();
+        if ( oldMeasurement.has_sample() ) {
+          newMeasure->set_sample( oldMeasurement.sample() );
+        }
+        if ( oldMeasurement.has_line() ) {
+          newMeasure->set_line( oldMeasurement.line() );
+        }
+        if ( oldMeasurement.has_sampleresidual() ) {
+          newMeasure->set_sampleresidual( oldMeasurement.sampleresidual() );
+        }
+        if ( oldMeasurement.has_lineresidual() ) {
+          newMeasure->set_lineresidual( oldMeasurement.lineresidual() );
+        }
+      }
+
+      // Copy over the enumerated values
+      if ( oldMeasure.has_type() ) {
+        ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType oldType;
+        oldType = oldMeasure.type();
+        if (oldType == ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType_Candidate) {
+          newMeasure->set_type(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
+        }
+        else if (oldType == ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType_Manual) {
+          newMeasure->set_type(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
+        }
+        else if (oldType == ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType_RegisteredPixel) {
+          newMeasure->set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel);
+        }
+        else if (oldType == ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType_RegisteredSubPixel) {
+          newMeasure->set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
+        }
+        else {
+          QString msg = "Invalid measure type";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+
+        // Check that all the required fields in the measure are filled
+        if ( !newMeasure->IsInitialized() ) {
+          QString msg = "Measure file entry at index [" + toString(i)
+                        + "] is missing required fields.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
+    }
+
+    // Check that all fo the required fields in the point are filled
+    if ( !m_pointData->IsInitialized() ) {
+      QString msg = "Control point file entry is missing required fields.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
 
 
   /**

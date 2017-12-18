@@ -36,7 +36,7 @@ namespace Isis {
     public:
       ControlPointV0003(const PvlObject &pointObject);
       ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData);
-      ControlPointV0003(const ControlPointV0002 &oldPoint);
+      ControlPointV0003(ControlPointV0002 &oldPoint);
 
       QSharedPointer<ControlPointFileEntryV0002> pointData();
 
