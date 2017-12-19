@@ -410,7 +410,7 @@ namespace Isis {
 
     // Copy the measures
     for (int i = 0; i < oldPointData->measures_size(); i++) {
-      ControlPointFileEntryV0002_Measure *newMeasure; = m_pointData->add_measures();
+      ControlPointFileEntryV0002_Measure *newMeasure = m_pointData->add_measures();
       ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure oldMeasure;
       oldMeasure = oldPointData->measures(i);
 
