@@ -33,14 +33,26 @@ using namespace google::protobuf::io;
 using namespace std;
 
 namespace Isis {
-
+    
   ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
-
+    // Populate the internal list of points.
+    for (int i = 0; i < net.GetNumPoints; i++) {
+        m_points.add( QSharedPointer<ControlPoint>( net.GetPoints().at(i) ) );
+    }
+    
+    // Populate the header.
+    m_header.set_networkid( net.GetNetworkId() );
+    m_header.set_targetname( net.GetTarget() );
+    m_header.set_username( net.GetUserName() );
+    m_header.set_created( net.CreatedDate() );
+    m_header.lastmodified( net.GetLastModified() );
+    m_header.description( net.Description() );
+    
   }
 
 
   ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
-
+    read(netFile);
   }
 
 
@@ -1930,22 +1942,6 @@ namespace Isis {
           protoPoint.add_aprioricovar(controlPoint.aprioricovar(4)); // DNE
           protoPoint.add_aprioricovar(controlPoint.aprioricovar(5)); // DNE
 
-          // Look into this
-           // if (pvlRadii.hasKeyword("EquatorialRadius")) {
-           //   apriori.SetRadii(
-           //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-           //                Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
-           //                Distance(pvlRadii["PolarRadius"],Distance::Meters));
-           //   symmetric_matrix<double, upper> covar;
-           //   covar.resize(3);
-           //   covar.clear();
-           //   covar(0, 0) = controlPoint.aprioricovar(0); // DNE
-           //   covar(0, 1) = controlPoint.aprioricovar(1); // DNE
-           //   covar(0, 2) = controlPoint.aprioricovar(2); // DNE
-           //   covar(1, 1) = controlPoint.aprioricovar(3); // DNE
-           //   covar(1, 2) = controlPoint.aprioricovar(4); // ""
-           //   covar(2, 2) = controlPoint.aprioricovar(5); // ""
-           //   apriori.SetRectangularMatrix(covar);
           }
         }
       }
