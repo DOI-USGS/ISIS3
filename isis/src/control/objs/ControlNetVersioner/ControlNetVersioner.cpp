@@ -1962,12 +1962,12 @@ namespace Isis {
         if (controlPoint->AprioriCovarSize()) { // DNE
             
           // Ensure this is the right way to add these values
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(0)); // DNE
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(1)); // DNE
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(2)); // DNE
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(3)); // DNE
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(4)); // DNE
-          protoPoint.add_aprioricovar(controlPoint.aprioricovar(5)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(0)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(1)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(2)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(3)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(4)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->aprioricovar(5)); // DNE
 
           }
         }
