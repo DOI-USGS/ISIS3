@@ -45,8 +45,8 @@ namespace Isis {
     m_header.set_targetname( net.GetTarget() );
     m_header.set_username( net.GetUserName() );
     m_header.set_created( net.CreatedDate() );
-    m_header.lastmodified( net.GetLastModified() );
-    m_header.description( net.Description() );
+    m_header.set_lastmodified( net.GetLastModified() );
+    m_header.set_description( net.Description() );
     
   }
 
@@ -62,32 +62,36 @@ namespace Isis {
 
 
   QString ControlNetVersioner::netId() const {
+    return QString(m_header.networkid().c_str());
 
   }
 
 
   QString ControlNetVersioner::targetName() const {
+    return QString(m_header.targetname().c_str());
 
   }
 
 
   QString ControlNetVersioner::creationDate() const {
+    return QString(m_header.created().c_str());
 
   }
 
 
   QString ControlNetVersioner::lastModificationDate() const {
-
+    return QString(m_header.lastmodified().c_str());
   }
 
 
   QString ControlNetVersioner::description() const {
+    return QSTring(m_header.description().c_str());
 
   }
 
 
   QString ControlNetVersioner::userName() const {
-
+    return QString(m_header.username().c_str());
   }
 
 
