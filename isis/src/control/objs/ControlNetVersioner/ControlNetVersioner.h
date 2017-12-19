@@ -135,8 +135,13 @@ namespace Isis {
    *  @history 2017-12-12 Jeannie Backer - Added VersionedControlPoints.
    *  @history 2017-12-12 Jeannie Backer - Implemented createPoint() methods.
    *  @history 2017-12-13 Jeannie Backer - Added target radii to createPoint(V0006).
+   *  @history 2017-12-18 Adam Goins and Kristin Berry - Added new write() method.
+   *  @history 2017-12-19 Kristin Berry - Corrected method names and general cleanup in toPvl and
+   *                            write for refactor. 
    */
   class ControlNetVersioner {
+    class ControlPointV0003;
+
     public:
       ControlNetVersioner(QSharedPointer<ControlNet> net);
       ControlNetVersioner(const FileName netFile);
@@ -161,18 +166,6 @@ namespace Isis {
       ControlNetVersioner(const ControlNetVersioner &other);
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
-      struct ControlPointV0001 {
-        PvlContainer container;
-      }
-      typedef ControlPointV0002 ControlPointV0001;
-      typedef ControlPointV0003 ControlPointV0001;
-      typedef ControlPointV0004 ControlPointV0001;
-      typedef ControlPointV0005 ControlPointFileEntryV0002;//??? what to do???
-      typedef ControlPointV0006 ControlPointFileEntryV0002;
-      typedef ControlPointV0007 ControlPointFileEntryV0002;
-
-      typedef ControlMeasureV0006 ControlPointV0006::Measure;//???
-
       // Private ControlNetHeader structs for versioning
       // TODO Document these for doxygen. JAM
       struct ControlNetHeaderV0001 {
@@ -187,6 +180,9 @@ namespace Isis {
       typedef ControlNetHeaderV0003 ControlNetHeaderV0001;
       typedef ControlNetHeaderV0004 ControlNetHeaderV0001;
       typedef ControlNetHeaderV0005 ControlNetHeaderV0001;
+
+      typedef ControlPointV0004 ControlPointV0003;
+      typedef ControlPointV0005 ControlPointV0003;
 
       void read(const FileName netFile);
 
@@ -205,35 +201,8 @@ namespace Isis {
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0001 point);
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0002 point);
       QSharedPointer<ControlPoint> createPoint(const ControlPointV0003 point);
-      QSharedPointer<ControlPoint> createPoint(const ControlPointV0004 point);
-      // v5 dne???
-      QSharedPointer<ControlPoint> createPoint(const ControlPointV0006 point);
+
       QSharedPointer<ControlMeasure> createMeasure(const ControlMeasureV0006 measure);
-      // methods for converting pvl (v4) to protobuf (v6)
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlMeasureV0006::*setter)(bool));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlPointV0006::*setter)(double));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlPointV0006 &point,
-                void (ControlPointV0006::*setter)(const std::string&));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(bool));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(double));
-      void copy(PvlContainer &container,
-                QString keyName,
-                ControlMeasureV0006 &measure,
-                void (ControlMeasureV0006::*setter)(const std::string &));
 
       void setHeader(const ControlNetHeaderV0001 header);
 
@@ -249,58 +218,4 @@ namespace Isis {
 
   };
 }
-
-#endif
-#if 0
-      struct ControlPointV0004 {
-        QString id;
-        QString chooserName;
-        QString datetime;
-        int     type;
-        bool    editLock;
-        bool    ignored;
-        bool    jigsawRejected;
-
-        QString aprioriRadiusSource;
-        QString aprioriRadiusSourceFile;
-
-        QString aprioriSurfacePointSource;
-        QString aprioriSurfacePointSourceFile; // apriorixyzsourcefile
-        // SurfacePoint aprioriSurfacePoint;   // apriorixyzsource
-        double     aprioriX; // <meters>
-        double     aprioriY; // <meters>
-        double     aprioriZ; // <meters>
-        bool       latitudeConstrained;
-        bool       longitudeConstrained;
-        bool       radiusConstrained;
-        QVector<double> aprioriCovarianceMatrix;
-
-        // SurfacePoint adjustedSurfacePoint;
-        double adjustedX;
-        double adjustedY;
-        double adjustedZ;
-        QVector<double> adjustedCovarianceMatrix;
-
-        struct CPV4Measure {
-          QString serialnumber;
-          int     type;
-          double  sample;
-          double  line;
-          double  sampleResidual;
-          double  lineResidual;
-          QString choosername;
-          QString datetime;
-          bool    editLock;
-          bool    ignore;
-          bool    jigsawRejected;
-          double  diameter;
-          double apriorisample;
-          double aprioriline;
-          double samplesigma;
-          double linesigma;
-        };
-
-        QList <CPV4Measure> measureList;
-        int   referenceIndex;
-      }
 #endif
