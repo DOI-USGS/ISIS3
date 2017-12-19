@@ -140,6 +140,8 @@ namespace Isis {
    *                            write for refactor. 
    */
   class ControlNetVersioner {
+    class ControlPointV0001;
+    class ControlPointV0002;
     class ControlPointV0003;
 
     public:
@@ -176,13 +178,13 @@ namespace Isis {
         QString description;
         QString userName;
       };
-      typedef ControlNetHeaderV0002 ControlNetHeaderV0001;
-      typedef ControlNetHeaderV0003 ControlNetHeaderV0001;
-      typedef ControlNetHeaderV0004 ControlNetHeaderV0001;
-      typedef ControlNetHeaderV0005 ControlNetHeaderV0001;
+      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0002;
+      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0003;
+      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0004;
+      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0005;
 
-      typedef ControlPointV0004 ControlPointV0003;
-      typedef ControlPointV0005 ControlPointV0003;
+      typedef struct ControlPointV0003 ControlPointV0004;
+      typedef struct ControlPointV0003 ControlPointV0005;
 
       void read(const FileName netFile);
 
