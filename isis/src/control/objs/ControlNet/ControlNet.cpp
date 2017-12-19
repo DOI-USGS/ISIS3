@@ -1495,6 +1495,11 @@ namespace Isis {
   QString ControlNet::GetUserName() const {
     return p_userName;
   }
+  
+  //! Return the last modified date
+  QString ControlNet::GetLastModified() const {
+    return p_modified;
+  }
 
 
   //! Return QList of ControlPoints ordered by point ID
