@@ -73,7 +73,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     try {
       filePos += headerLength;
-      int oldLimit = headerCodedInStream.PushLimit(headerLength);
+      CodedInputStream::Limit oldLimit = headerCodedInStream.PushLimit(headerLength);
       if (!p_networkHeader->ParseFromCodedStream(&headerCodedInStream)) {
         IString msg = "Failed to read input control net file [" +
             file.name() + "]";
@@ -81,11 +81,14 @@ namespace Isis {
       }
       headerCodedInStream.PopLimit(oldLimit);
 
-      
+
       // We need to regenerate the coded input stream every so many bytes
       // choose 64 MB as a safe amount
       int streamThreshold = 1024 * 1024 * 64;
       int currentStreamSize = 0;
+      // For some reason, reading the header causes the input stream to fail so reopen the file
+      input.close();
+      input.open(file.expanded().toLatin1().data(), ios::in | ios::binary);
       input.seekg(filePos, ios::beg);
       IstreamInputStream *pointInStream = new IstreamInputStream(&input);
       CodedInputStream *pointCodedInStream = new CodedInputStream(pointInStream);
@@ -263,7 +266,7 @@ namespace Isis {
         pvlRadii = Target::radiiGroup(target);
       }
       catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF 
+        // leave pvlRadii empty if target is not recognized by NAIF
       }
     }
 
@@ -565,4 +568,3 @@ namespace Isis {
     return pvl;
   }
 }
-
