@@ -7,8 +7,11 @@
 #include <QDomElement>
 #include <QDomNode>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QString>
 #include <QStringList>
+#include <QTextStream>
 
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -75,7 +78,7 @@ void IsisMain() {
     // Get the single line of encoded XML from the input file that the client, spiceinit, sent us.
     TextFile inFile( ui.GetFileName("FROM") );
     QString hexCode;
-    
+
     // GetLine returns false if it was the last line... so we can't check for problems really
     inFile.GetLine(hexCode);
 
@@ -243,7 +246,7 @@ void IsisMain() {
     }
 
     FileName inputLabels;
-    
+
     while (ck.at(0).size() != 0 && !kernelSuccess) {
       // create an empty kernel
       Kernel realCkKernel;
@@ -278,7 +281,7 @@ void IsisMain() {
       }
 
       realCkKernel.setKernels(ckKernelList);
-      
+
       /*
        * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
        * classes take a cube instead of a pvl as input.
@@ -523,6 +526,15 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   return true;
 }
 
+QJsonValue tableToJson(QString file) {
+  QFile tableFile(file);
+  tableFile.open(QIODevice::ReadOnly);
+  QByteArray data = tableFile.readAll();
+  tableFile.close();
+
+  return QJsonValue::fromVariant(data.toHex().constData());
+}
+
 
 QString tableToXml(QString tableName, QString file) {
   QString xml;
@@ -606,43 +618,70 @@ void parseParameters(QDomElement parametersElement) {
 
 
 void packageKernels(QString toFile) {
-  QString xml;
-  xml += "<spice_data>\n";
-
-  xml += "  <application_log>\n";
+  QJsonObject spiceData;
 
   QString logFile(toFile + ".print");
   Pvl logMessage(logFile);
   QFile::remove(logFile);
   stringstream logStream;
   logStream << logMessage;
-  xml += QString( QByteArray( logStream.str().c_str() ).toHex().constData() ) + "\n";
-  xml += "  </application_log>\n";
-
-  xml += "  <kernels_label>\n";
+  QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
+  spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
 
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   QFile::remove(kernLabelsFile);
   stringstream labelStream;
   labelStream << kernLabels;
+  QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
+  spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
 
-  xml += QString( QByteArray( labelStream.str().c_str() ).toHex().constData() ) + "\n";
+  QJsonObject tables;
+  tables.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
+  tables.insert("Instrument Position", tableToJson(toFile + ".position"));
+  tables.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
+  tables.insert("Sun Position", tableToJson(toFile + ".sun"));
+  spiceData.insert("Tables", tables);
 
-  xml += "  </kernels_label>\n";
+  QJsonDocument doc(spiceData);
 
-  xml += "  <tables>\n";
-  xml += tableToXml("instrument_pointing", toFile + ".pointing");
-  xml += tableToXml("instrument_position", toFile + ".position");
-  xml += tableToXml("body_rotation", toFile + ".bodyrot");
-  xml += tableToXml("sun_position", toFile + ".sun");
-
-  xml += "  </tables>\n";
-  xml += "</spice_data>\n";
-  QString encodedXml( QByteArray( xml.toLatin1() ).toHex().constData() );
+  // QString xml;
+  // xml += "<spice_data>\n";
+  //
+  // xml += "  <application_log>\n";
+  //
+  // QString logFile(toFile + ".print");
+  // Pvl logMessage(logFile);
+  // QFile::remove(logFile);
+  // stringstream logStream;
+  // logStream << logMessage;
+  // xml += QString( QByteArray( logStream.str().c_str() ).toHex().constData() ) + "\n";
+  // xml += "  </application_log>\n";
+  //
+  // xml += "  <kernels_label>\n";
+  //
+  // QString kernLabelsFile(toFile + ".lab");
+  // Pvl kernLabels(kernLabelsFile);
+  // QFile::remove(kernLabelsFile);
+  // stringstream labelStream;
+  // labelStream << kernLabels;
+  //
+  // xml += QString( QByteArray( labelStream.str().c_str() ).toHex().constData() ) + "\n";
+  //
+  // xml += "  </kernels_label>\n";
+  //
+  // xml += "  <tables>\n";
+  // xml += tableToXml("instrument_pointing", toFile + ".pointing");
+  // xml += tableToXml("instrument_position", toFile + ".position");
+  // xml += tableToXml("body_rotation", toFile + ".bodyrot");
+  // xml += tableToXml("sun_position", toFile + ".sun");
+  //
+  // xml += "  </tables>\n";
+  // xml += "</spice_data>\n";
+  QString encodedXml( QByteArray( doc.toJson().toLatin1() ).toHex().constData() );
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write( encodedXml.toLatin1() );
+  finalOutput.write(encodedXml.toLatin1());
   finalOutput.close();
 }
