@@ -33,14 +33,27 @@ using namespace google::protobuf::io;
 using namespace std;
 
 namespace Isis {
-
+    
   ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
-
+    // Populate the internal list of points.
+    for (int i = 0; i < net.GetNumPoints(); i++) {
+        m_points.add( QSharedPointer<ControlPoint>( net.GetPoints().at(i) ) );
+    }
+    
+    ControlNetHeaderV0001 header;
+    
+    header.networkID = net.GetNetworkId();
+    header.targetName = net.GetTarget();
+    header.created = net.CreatedDate();
+    header.lastModified = net.GetLastModified();
+    header.description = net.Description();
+    header.userName = net.GetUserName();
+    createHeader(header);
   }
 
 
   ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
-
+    read(netFile);
   }
 
 
@@ -194,12 +207,12 @@ namespace Isis {
         case ControlPoint::SurfacePointSouce::BundleSolution:
           pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
           break;
-        case ControlPoint::RadiusSource::Ellipsoid:
-        case ControlPoint::RadiusSource::DEM:      
+        case ControlPoint::RadiusSource::Ellipsoid: // these enum vals
+        case ControlPoint::RadiusSource::DEM:       // DNE for Surface Pt
           break;
       }
 
-      if (controlPoint.HasAprioriSurfacePointSourceFile()) {
+      if (controlPoint.HasAprioriSurfacePointSourceFile()) { //DNE right now
         pvlPoint += PvlKeyword("AprioriXYZSourceFile",
                         controlPoint.GetAprioriSurfacePointSourceFile());
       }
@@ -230,23 +243,23 @@ namespace Isis {
           break;
       }
 
-
-      if (controlPoint.HasAprioriRadiusSourcefile()) {
+      // FIXME: None of Apriori(X,Y,Z) is available directly from ControlPoint in the API
+      if (controlPoint.HasAprioriRadiusSourcefile()) { // DNE
         pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
                         protobufPoint.GetAprioriRadiusSourceFile());
         }
 
-      if (controlPoint.HasAprioriCoordinates()) { 
-        pvlPoint += PvlKeyword("AprioriX", toString(controlPoint.GetAprioriX()), "meters");
-        pvlPoint += PvlKeyword("AprioriY", toString(controlPoint.GetAprioriY()), "meters");
-        pvlPoint += PvlKeyword("AprioriZ", toString(controlPoint.GetAprioriZ()), "meters");
+      if (controlPoint.HasApriorix()) { // DNE
+        pvlPoint += PvlKeyword("AprioriX", toString(controlPoint.AprioriX()), "meters");
+        pvlPoint += PvlKeyword("AprioriY", toString(controlPoint.AprioriY()), "meters");
+        pvlPoint += PvlKeyword("AprioriZ", toString(controlPoint.AprioriZ()), "meters");
 
         // Get surface point, convert to lat,lon,radius and output as comment
         SurfacePoint apriori;
         apriori.SetRectangular(
-                Displacement(controlPoint.GetAprioriX(),Displacement::Meters),
-                Displacement(controlPoint.GetAprioriY(),Displacement::Meters),
-                Displacement(controlPoint.GetAprioriZ(),Displacement::Meters));
+                Displacement(controlPoint.AprioriX(),Displacement::Meters),
+                Displacement(controlPoint.AprioriY(),Displacement::Meters),
+                Displacement(controlPoint.AprioriZ(),Displacement::Meters));
         pvlPoint.findKeyword("AprioriX").addComment("AprioriLatitude = " +
                                  toString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
@@ -386,11 +399,11 @@ namespace Isis {
             break;
         }
 
-        if (controlMeasure.HasChooserName()) { 
+        if (controlMeasure.HasChooserName()) { // DNE
           pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
         }
 
-        if (controlMeasure.HasDateTime()) { 
+        if (controlMeasure.HasDateTime()) { // DNE
           pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
         }
 
@@ -402,47 +415,49 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
         }
 
-        if (controlMeasure.HasSample()) { 
+        if (controlMeasure.HasSample()) { // DNE
           pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample());
         }
 
-        if (controlMeasure.HasLine()) { 
+        if (controlMeasure.HasLine()) { // DNE
           pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
         }
 
-        if (controlMeasure.HasDiameter()) { 
+        if (controlMeasure.HasDiameter()) { // DNE
           pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
         }
 
-        if (controlMeasure.HasAprioriSample()) { 
+        if (controlMeasure.HasAprioriSample()) { // DNE
           pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
         }
 
-        if (controlMeasure.HasAprioriLine()) { 
+        if (controlMeasure.HasAprioriLine()) { // DNE
           pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
         }
 
-        if (controlMeasure.HasSampleSigma()) { 
+        if (controlMeasure.HasSampleSigma()) { // DNE
           pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
                                    "pixels");
         }
 
-        if (controlMeasure.HasLineSigma()) { 
+        if (controlMeasure.HasLineSigma()) { // BUG IN ORIGINAL CODE (had samplesigma) and DNE
           pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
                                    "pixels");
         }
 
-        if (controlMeasure.HasSampleResidual()) {
+        if (controlMeasure.HasSampleResidual()) { // DNE
           pvlMeasure += PvlKeyword("SampleResidual", toString(controlMeasure.GetSampleResidual())
                                    "pixels");
         }
 
-        if (controlMeasure.HasLineResidual()) { 
+        if (controlMeasure.HasLineResidual()) { // DNE
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
 
-        pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.IsJigsawRejected()));
+        if (controlMeasure.HasJigsawRejected()) { // DNE
+         pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.GetJigsawRejected())); // DNE
+        }
 
         for (int logEntry = 0;
             logEntry < controlMeasure.LogSize(); // DNE?
@@ -454,7 +469,7 @@ namespace Isis {
           pvlMeasure += interpreter.ToKeyword();
         }
 
-        if (controlPoint.HasRefMeasure() &&
+        if (controlPoint.HasReferenceIndex() && // DNE or covered by different function?
            controlPoint.IndexOfRefMeasure() == j) {
           pvlMeasure += PvlKeyword("Reference", "True");
         }
@@ -1820,7 +1835,9 @@ namespace Isis {
       while ( !m_points.isEmpty() ) {
         writeFirstPoint(fileStream);
       }
+
       close(output);
+
     } 
     catch () {
       string msg = "Can't write control net file" 
@@ -1879,7 +1896,7 @@ namespace Isis {
 
       protoPoint.set_apriorisurfpointsource(controlPoint->GetAprioriSurfPointSource());
 
-      if (controlPoint->HasAprioriSurfacePointSourceFile()) {
+      if (controlPoint->HasAprioriSurfacePointSourceFile()) { //DNE right now
         protoPoint.set_apriorisurfpointsourcefile(controlPoint->GetAprioriSurfacePointSourceFile());
       }
 
@@ -1929,17 +1946,19 @@ namespace Isis {
 
       protoPoint.set_aprioriradiussource(controlPoint->GetAprioriRadiusSource());
 
-      if (controlPoint->HasAprioriRadiusSourcefile()) {
+      // FIXME: None of Apriori(X,Y,Z) is available directly from ControlPoint in the API
+      if (controlPoint->HasAprioriRadiusSourcefile()) { // DNE
         protoPoint.set_aprioriradiussourcefile(protobufPoint.GetAprioriRadiusSourceFile());
       }
 
-      if (controlPoint->HasAprioriCoordinates()) { 
+      if (controlPoint->HasAprioriCoordinates()) { // DNE
 
         protoPoint.set_apriorix(controlPoint->AprioriX());
         protoPoint.set_aprioriy(controlPoint->AprioriY());
         protoPoint.set_aprioriz(controlPoint->AprioriZ());
 
 
+        // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
         if (controlPoint->AprioriCovarSize()) { // DNE
             
           // Ensure this is the right way to add these values
@@ -1949,7 +1968,7 @@ namespace Isis {
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(3)); // DNE
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(4)); // DNE
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(5)); // DNE
-          
+
           }
         }
       }
@@ -1972,6 +1991,8 @@ namespace Isis {
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(3));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(4));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(5));
+
+
           }
         }
       }
@@ -1984,7 +2005,8 @@ namespace Isis {
 
         ControlPointFileEntryV0005_Measure protoMeasure;
 
-        if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
+        // DNE or covered by different function?
+        if (controlPoint->HasReferenceIndex() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
              
           // This isn't inside of the ControlPointFileEntryV0005, should it be?
@@ -2012,11 +2034,11 @@ namespace Isis {
             }
         }        
 
-        if (controlMeasure.HasChooserName()) {
+        if (controlMeasure.HasChooserName()) { // DNE
           protoMeasure.set_choosername(controlMeasure.GetChooserName());
         }
 
-        if (controlMeasure.HasDateTime()) {
+        if (controlMeasure.HasDateTime()) { // DNE
           protoMeasure.set_datetime(controlMeasure.GetDateTime());
         }
 
@@ -2024,45 +2046,45 @@ namespace Isis {
 
         protoMeasure.set_ignore(controlMeasure.IsIgnored());
 
-        if (controlMeasure.HasSample()) {
+        if (controlMeasure.HasSample()) { // DNE
           protoMeasure.set_sample(controlMeasure.GetSample());
         }
 
-        if (controlMeasure.HasLine()) {
+        if (controlMeasure.HasLine()) { // DNE
           protoMeasure.set_line(controlMeasure.GetLine()));
         }
 
-        if (controlMeasure.HasDiameter()) {
+        if (controlMeasure.HasDiameter()) { // DNE
           protoMeasure.set_diameter(controlMeasure.GetDiameter()));
         }
 
-        if (controlMeasure.HasAprioriSample()) {
+        if (controlMeasure.HasAprioriSample()) { // DNE
           protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample()));
         }
 
-        if (controlMeasure.HasAprioriLine()) {
+        if (controlMeasure.HasAprioriLine()) { // DNE
           protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine()));
         }
 
-        if (controlMeasure.HasSampleSigma()) {
+        if (controlMeasure.HasSampleSigma()) { // DNE
           protoMeasure.set_samplesigma(controlMeasure.GetSampleSigma());
         }
 
-        if (controlMeasure.HasLineSigma()) {
+        if (controlMeasure.HasLineSigma()) { // BUG IN ORIGINAL CODE (had samplesigma) and DNE
           protoMeasure.set_linesigma(controlMeasure.GetLineSigma());
         }
 
-        if (controlMeasure.HasSampleResidual()) { 
+        if (controlMeasure.HasSampleResidual()) { // DNE
           protoMeasure.set_sampleresidual(controlMeasure.GetSampleResidual());
         }
 
-        if (controlMeasure.HasLineResidual()) { 
+        if (controlMeasure.HasLineResidual()) { // DNE
           protoMeasure.set_lineresidual(controlMeasure.GetLineResidual());
         }
 
-        // I removed the if statement because we always initialize jigsawRejected to false 
-        // in ControlPoint.
-        protoMeasure.set_jigsawrejected(controlMeasure.IsJigsawRejected()));
+        if (controlMeasure.HasJigsawRejected()) { // DNE
+         protoMeasure.set_jigsawrejected(controlMeasure.GetJigsawRejected())); // DNE
+        }
 
 
         for (int logEntry = 0;
@@ -2084,7 +2106,8 @@ namespace Isis {
           protoMeasure.add_log(logData);
         }
 
-        if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
+        if (controlPoint->HasReferenceIndex() && // DNE or covered by different function?
+           controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
 
           // This isn't inside of the ControlPointFileEntryV0005, should it be?
