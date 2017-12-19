@@ -1018,72 +1018,72 @@ namespace Isis {
   }
   
   //! Returns true if the ControlMeasure has a choosername
-  bool ControlMeasure::HasChooserName() const {
+  bool ControlMeasure::hasChooserName() const {
     return !p_chooserName->isEmpty();
   }
  
   //! Returns true if the ControlMeasure has a datetime
-  bool ControlMeasure::HasDateTime() const {
+  bool ControlMeasure::hasDateTime() const {
     return !p_dateTime->isEmpty();   
   }
   
   //! Returns true if the ControlMeasure has a sample
-  bool ControlMeasure::HasSample() const {
+  bool ControlMeasure::hasSample() const {
     return p_sample ? true : false;   
   }
     
   //! Returns true if the ControlMeasure has a line
-  bool ControlMeasure::HasLine() const {
+  bool ControlMeasure::hasLine() const {
     return p_line ? true : false;    
   }
   
   //! Returns true if the ControlMeasure has a diameter
-  bool ControlMeasure::HasDiameter() const {
+  bool ControlMeasure::hasDiameter() const {
     return p_diameter ? true : false;   
   }
   
   //! Returns true if the ControlMeasure has apriorisample
-  bool ControlMeasure::HasAprioriSample() const {
+  bool ControlMeasure::hasAprioriSample() const {
     return p_aprioriSample ? true : false;
   }
   
   //! Returns true if the ControlMeasure has aprioriline
-  bool ControlMeasure::HasAprioriLine() const {
+  bool ControlMeasure::hasAprioriLine() const {
     return p_aprioriLine ? true : false;
   }
   
   //! Returns true if the ControlMeasure has a sample sigma
-  bool ControlMeasure::HasSampleSigma() const {
+  bool ControlMeasure::hasSampleSigma() const {
     return p_sampleSigma ? true : false;
   }
   
   //! Returns true if the ControlMeasure has a line sigma
-  bool ControlMeasure::HasLineSigma() const {
+  bool ControlMeasure::hasLineSigma() const {
     return p_lineSigma ? true : false;
   }
   
   //! Returns true if the ControlMeasure has a sample residual
-  bool ControlMeasure::HasSampleResidual() const {
+  bool ControlMeasure::hasSampleResidual() const {
     return p_sampleResidual ? true : false;
   }
   
   //! Returns true if the ControlMeasure has a line residual
-  bool ControlMeasure::HasLineResidual() const {
+  bool ControlMeasure::hasLineResidual() const {
     return p_lineResidual ? true : false;
   }
   
   //! Returns true if the ControlMeasure's jigsaw rejected is initialized
-  bool ControlMeasure::HasJigsawRejected() const {
+  bool ControlMeasure::hasJigsawRejected() const {
     return p_jigsawRejected ? true : false; 
   }
   
   //! Returns true if the ControlMeasure is jigsaw rejected
-  bool ControlMeasure::JigsawRejected() const {
+  bool ControlMeasure::jigsawRejected() const {
     return p_jigsawRejected ? true : false;
   }
  
   //! Returns the logsize of the ControlMeasure logged data.
-  int ControlMeasure::LogSize() const {
+  int ControlMeasure::logSize() const {
     return p_loggedData->size();
   }
 
