@@ -259,8 +259,16 @@ namespace Isis {
   }
 
 
-  // TODO finish this once Version 1 is created
-  ControlPointV0002::ControlPointV0002(const ControlPointV0001 &oldPoint);
+  /**
+   * Create a version 2 control point from a version 1 control point. The two versions actually
+   * store the same values, so all this does is copy the internal protobuf object.
+   *
+   * @param oldPoint The old version 1 control point.
+   */
+  ControlPointV0002::ControlPointV0002(ControlPointV0001 &oldPoint)
+   : m_pointData(oldPoint->pointData()) {
+
+  }
 
 
   /**
@@ -283,7 +291,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -291,7 +299,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -314,7 +322,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -322,7 +330,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -342,7 +350,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -350,7 +358,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -370,7 +378,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -378,7 +386,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -401,7 +409,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -409,7 +417,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -429,7 +437,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -437,7 +445,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.

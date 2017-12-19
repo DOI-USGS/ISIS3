@@ -109,8 +109,8 @@ namespace Isis {
               && m_pointData->has_adjustedy()
               && m_pointData->has_adjustedz() ) {
       m_pointData->set_apriorix( m_pointData->adjustedx() );
-      m_pointData->set_aprioriy( m_pointData->adjustedx() );
-      m_pointData->set_aprioriz( m_pointData->adjustedx() );
+      m_pointData->set_aprioriy( m_pointData->adjustedy() );
+      m_pointData->set_aprioriz( m_pointData->adjustedz() );
     }
     else {
       QString msg = "Unable to find apriori surface point values for the control point.";
@@ -463,7 +463,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -471,7 +471,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -494,7 +494,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -502,7 +502,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -522,7 +522,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -530,7 +530,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -550,7 +550,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -558,7 +558,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -581,7 +581,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -589,7 +589,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -609,7 +609,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -617,7 +617,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 1 protobuf representation of the control measure that the
    *                     value will be into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.

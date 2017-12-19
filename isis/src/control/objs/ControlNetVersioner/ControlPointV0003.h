@@ -25,7 +25,7 @@
 
  #include <QSharedPointer>
 
- #include "QSharedPointer<ControlPointFileEntryV0002>.pb.h"
+ #include "ControlPointFileEntryV0002.pb.h"
 
 namespace Isis {
   class ControlPointV0002;
