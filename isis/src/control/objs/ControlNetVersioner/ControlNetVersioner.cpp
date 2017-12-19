@@ -33,14 +33,27 @@ using namespace google::protobuf::io;
 using namespace std;
 
 namespace Isis {
-
+    
   ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
-
+    // Populate the internal list of points.
+    for (int i = 0; i < net.GetNumPoints; i++) {
+        m_points.add( QSharedPointer<ControlPoint>( net.GetPoints().at(i) ) );
+    }
+    
+    ControlNetHeaderV0001 header;
+    
+    header.networkID = net.GetNetworkId();
+    header.targetName = net.GetTarget();
+    header.created = net.CreatedDate();
+    header.lastModified = net.GetLastModified();
+    header.description = net.Description();
+    header.userName = net.GetUserName();
+    createHeader(header);
   }
 
 
   ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
-
+    read(netFile);
   }
 
 
@@ -49,33 +62,63 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the ID for the network.
+   *
+   * @return @b QString The network ID as a string
+   */
   QString ControlNetVersioner::netId() const {
-
+    return m_header->networkID;
   }
 
 
+  /**
+   * Returns the target for the network.
+   *
+   * @return @b QString The target name as a string
+   */
   QString ControlNetVersioner::targetName() const {
-
+    return m_header->targetName;
   }
 
 
+  /**
+   * Returns the date and time that the network was created
+   *
+   * @return @b QString The date and time the network was created as a string
+   */
   QString ControlNetVersioner::creationDate() const {
-
+    return m_header->created;
   }
 
 
+  /**
+   * Returns the date and time of the last modification to the network.
+   *
+   * @return @b QString The date and time of the last modfication as a string
+   */
   QString ControlNetVersioner::lastModificationDate() const {
-
+    return m_header->lastModified;
   }
 
 
+  /**
+   * Returns the network's description.
+   *
+   * @return @b QString A description of the network.
+   */
   QString ControlNetVersioner::description() const {
-
+    return m_header->description;
   }
 
 
+  /**
+   * Returns the name of the last person or program to modify the network.
+   *
+   * @retrun @b QString The name of the last person or program to modify the network.
+   */
   QString ControlNetVersioner::userName() const {
-
+    return m_header->userName;
   }
 
 
@@ -1919,13 +1962,13 @@ namespace Isis {
         if (controlPoint->AprioriCovarSize()) { // DNE
             
           // Ensure this is the right way to add these values
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(0)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(1)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(2)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(3)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(4)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(5)); // DNE
-          
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(0)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(1)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(2)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(3)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(4)); // DNE
+          protoPoint.add_aprioricovar(controlPoint.aprioricovar(5)); // DNE
+
           }
         }
       }
