@@ -2084,7 +2084,7 @@ namespace Isis {
           protoMeasure.add_log(logData);
         }
 
-        if (controlPoint->HasRefmeasure() && controlPoint->IndexOfRefMeasure() == j) {
+        if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
 
           // This isn't inside of the ControlPointFileEntryV0005, should it be?
