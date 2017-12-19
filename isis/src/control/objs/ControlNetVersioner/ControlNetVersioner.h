@@ -209,7 +209,7 @@ namespace Isis {
       void writeHeader(ZeroCopyOutputStream *fileStream);
       void writeFirstPoint(ZeroCopyOutputStream *fileStream);
 
-      ControlNetHeaderV0005 m_header; /**< Header containing information about
+      ControlNetHeaderV0007 m_header; /**< Header containing information about
                                            the whole network.*/
       QList< QSharedPointer<ControlPoint> > m_points; /**< ControlPoints that are
                                                            read in from a file or
