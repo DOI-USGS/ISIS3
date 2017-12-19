@@ -1804,6 +1804,7 @@ namespace Isis {
    */
   void ControlNetVersioner::write(FileName netFile) {
     try {
+    
       const int labelBytes = 65536;
       fstream output(netFile.expanded().toLatin1().data(), ios::out | ios::trunc | ios::binary);
       char *blankLabel = new char[labelBytes];
@@ -1820,7 +1821,66 @@ namespace Isis {
       while ( !m_points.isEmpty() ) {
         writeFirstPoint(fileStream);
       }
-      close(output);
+    
+      // Insert header at the beginning of the file once writing is done.
+      
+      ControlNetFileHeaderV0005 protobufHeader;
+      
+      protobufHeader.set_networkid(m_header.networkID);
+      protobufHeader.set_targetname(m_header.targetName);
+      protobufHeader.set_created(m_header.created);
+      protobufHeader.set_lastmodified(m_header.lastModified);
+      protobufHeader.set_description(m_header.description);
+      protobufHeader.set_username(m_header.userName);
+      
+      streampos coreHeaderSize = protobufHeader->ByteSize();
+
+      Pvl p;
+      
+      PvlObject protoObj("ProtoBuffer");
+
+      PvlObject protoCore("Core");
+      protoCore.addKeyword(PvlKeyword("HeaderStartByte",
+                           toString((BigInt) startCoreHeaderPos)));
+      protoCore.addKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
+      
+      BigInt pointsStartByte = (BigInt) (startCoreHeaderPos + coreHeaderSize);
+      
+      protoCore.addKeyword(PvlKeyword("PointsStartByte", toString(pointsStartByte);
+                           
+      // Output.gcount() gives us bytes read so far, subtract the bytes that aren't related to points
+      // To get the pointsSize.
+      BigInt pointsSize = output.gcount() - pointsStartByte;
+      
+      protoCore.addKeyword(PvlKeyword("PointsBytes",
+                           toString(pointsSize)));
+      protoObj.addObject(protoCore);
+
+      PvlGroup netInfo("ControlNetworkInfo");
+      netInfo.addComment("This group is for informational purposes only");
+      netInfo += PvlKeyword("NetworkId", protobufHeader.get_networkid().c_str());
+      netInfo += PvlKeyword("TargetName", protobufHeader.get_targetname().c_str());
+      netInfo += PvlKeyword("UserName", protobufHeader.get_username().c_str());
+      netInfo += PvlKeyword("Created", protobufHeader.get_created().c_str());
+      netInfo += PvlKeyword("LastModified", protobufHeader.get_lastmodified().c_str());
+      netInfo += PvlKeyword("Description", protobufHeader.get_description().c_str());
+      netInfo += PvlKeyword("NumberOfPoints", toString(m_points.size()));
+      
+      // Is there a better way we can get the total number of measures?
+      int numMeasures = 0;
+      foreach (QSharedPointer<ControlPoint> point, m_points) {
+        numMeasures += point->GetNumMeasures();   
+      }
+      netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
+      netInfo += PvlKeyword("Version", "5");
+      protoObj.addGroup(netInfo);
+
+      p.addObject(protoObj);
+
+      output.seekp(0, ios::beg);
+      output << p;
+      output << '\n';
+      output.close();
     } 
     catch () {
       string msg = "Can't write control net file" 
