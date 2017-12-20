@@ -29,6 +29,7 @@
 
 namespace Isis {
   class Pvl;
+  class PvlContainer;
 
   class ControlPointV0001 {
     public:
@@ -40,8 +41,8 @@ namespace Isis {
     private:
       // These are intentionally not implemented
       ControlPointV0001();
-      ControlPointV0001(const &ControlPointV0001 other);
-      ControlPointV0001 &operator=(const &ControlPointV0001 other);
+      ControlPointV0001(const ControlPointV0001 &other);
+      ControlPointV0001 &operator=(const ControlPointV0001 &other);
 
       // methods for converting from Pvl to protobuf
       void copy(PvlContainer &container,
@@ -50,11 +51,11 @@ namespace Isis {
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
+                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
+                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&));
       void copy(PvlContainer &container,
                 QString keyName,
