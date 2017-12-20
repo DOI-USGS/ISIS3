@@ -874,7 +874,7 @@ namespace Isis {
     for (int i = 0; i < protoNet.points_size(); i++) {
       try {
         QSharedPointer<ControlNetFileProtoV0001_PBControlPoint>
-              protoPoint(mutable_points.points(i));
+              protoPoint(protoNet.mutable_points.points(i));
         ControlPointV0001 point(protoPoint);
         m_points.append( createPoint(point) );
       }
