@@ -35,12 +35,25 @@ using namespace std;
 namespace Isis {
 
   ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
+    // Populate the internal list of points.
+    for (int i = 0; i < net.GetNumPoints(); i++) {
+        m_points.add( QSharedPointer<ControlPoint>( net.GetPoints().at(i) ) );
+    }
 
+    ControlNetHeaderV0001 header;
+
+    header.networkID = net.GetNetworkId();
+    header.targetName = net.GetTarget();
+    header.created = net.CreatedDate();
+    header.lastModified = net.GetLastModified();
+    header.description = net.Description();
+    header.userName = net.GetUserName();
+    createHeader(header);
   }
 
 
   ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
-
+    read(netFile);
   }
 
 
@@ -195,7 +208,7 @@ namespace Isis {
           pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
           break;
         case ControlPoint::RadiusSource::Ellipsoid:
-        case ControlPoint::RadiusSource::DEM:      
+        case ControlPoint::RadiusSource::DEM:
           break;
       }
 
@@ -236,7 +249,7 @@ namespace Isis {
                         protobufPoint.GetAprioriRadiusSourceFile());
         }
 
-      if (controlPoint.HasAprioriCoordinates()) { 
+      if (controlPoint.HasAprioriCoordinates()) {
         pvlPoint += PvlKeyword("AprioriX", toString(controlPoint.GetAprioriX()), "meters");
         pvlPoint += PvlKeyword("AprioriY", toString(controlPoint.GetAprioriY()), "meters");
         pvlPoint += PvlKeyword("AprioriZ", toString(controlPoint.GetAprioriZ()), "meters");
@@ -386,11 +399,11 @@ namespace Isis {
             break;
         }
 
-        if (controlMeasure.HasChooserName()) { 
+        if (controlMeasure.HasChooserName()) {
           pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
         }
 
-        if (controlMeasure.HasDateTime()) { 
+        if (controlMeasure.HasDateTime()) {
           pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
         }
 
@@ -402,32 +415,32 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
         }
 
-        if (controlMeasure.HasSample()) { 
+        if (controlMeasure.HasSample()) {
           pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample());
         }
 
-        if (controlMeasure.HasLine()) { 
+        if (controlMeasure.HasLine()) {
           pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
         }
 
-        if (controlMeasure.HasDiameter()) { 
+        if (controlMeasure.HasDiameter()) {
           pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
         }
 
-        if (controlMeasure.HasAprioriSample()) { 
+        if (controlMeasure.HasAprioriSample()) {
           pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
         }
 
-        if (controlMeasure.HasAprioriLine()) { 
+        if (controlMeasure.HasAprioriLine()) {
           pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
         }
 
-        if (controlMeasure.HasSampleSigma()) { 
+        if (controlMeasure.HasSampleSigma()) {
           pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
                                    "pixels");
         }
 
-        if (controlMeasure.HasLineSigma()) { 
+        if (controlMeasure.HasLineSigma()) {
           pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
                                    "pixels");
         }
@@ -437,7 +450,7 @@ namespace Isis {
                                    "pixels");
         }
 
-        if (controlMeasure.HasLineResidual()) { 
+        if (controlMeasure.HasLineResidual()) {
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
@@ -565,8 +578,7 @@ namespace Isis {
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
         PvlObject &pointObject = network.object(objectIndex);
-        ControlPointV0001 point;
-        //TODO Fill the ControlPointV0001 object from the PvlObject
+        ControlPointV0001 point(pointObject, header.targetName);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {
@@ -604,8 +616,7 @@ namespace Isis {
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
         PvlObject &pointObject = network.object(objectIndex);
-        ControlPointV0002 point;
-        //TODO Fill the ControlPointV0002 object from the PvlObject
+        ControlPointV0002 point(pointObject);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {
@@ -643,8 +654,7 @@ namespace Isis {
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
         PvlObject &pointObject = network.object(objectIndex);
-        ControlPointV0003 point;
-        //TODO Fill the ControlPointV0003 object from the PvlObject
+        ControlPointV0003 point(pointObject);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {
@@ -682,8 +692,7 @@ namespace Isis {
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
         PvlObject &pointObject = network.object(objectIndex);
-        ControlPointV0004 point;
-        //TODO Fill the ControlPointV0004 object from the PvlObject
+        ControlPointV0004 point(pointObject);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {
@@ -721,8 +730,7 @@ namespace Isis {
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
         PvlObject &pointObject = network.object(objectIndex);
-        ControlPointV0005 point;
-        //TODO Fill the ControlPointV0004 object from the PvlObject
+        ControlPointV0005 point(pointObject);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {
@@ -1804,7 +1812,7 @@ namespace Isis {
    */
   void ControlNetVersioner::write(FileName netFile) {
     try {
-    
+
       const int labelBytes = 65536;
       fstream output(netFile.expanded().toLatin1().data(), ios::out | ios::trunc | ios::binary);
       char *blankLabel = new char[labelBytes];
@@ -1815,43 +1823,43 @@ namespace Isis {
       streampos startCoreHeaderPos = output.tellp();
 
       OStreamOutputStream* fileStream(output);
-      
+
       writeHeader(fileStream);
 
       while ( !m_points.isEmpty() ) {
         writeFirstPoint(fileStream);
       }
-    
+
       // Insert header at the beginning of the file once writing is done.
-      
+
       ControlNetFileHeaderV0005 protobufHeader;
-      
+
       protobufHeader.set_networkid(m_header.networkID);
       protobufHeader.set_targetname(m_header.targetName);
       protobufHeader.set_created(m_header.created);
       protobufHeader.set_lastmodified(m_header.lastModified);
       protobufHeader.set_description(m_header.description);
       protobufHeader.set_username(m_header.userName);
-      
+
       streampos coreHeaderSize = protobufHeader->ByteSize();
 
       Pvl p;
-      
+
       PvlObject protoObj("ProtoBuffer");
 
       PvlObject protoCore("Core");
       protoCore.addKeyword(PvlKeyword("HeaderStartByte",
                            toString((BigInt) startCoreHeaderPos)));
       protoCore.addKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
-      
+
       BigInt pointsStartByte = (BigInt) (startCoreHeaderPos + coreHeaderSize);
-      
+
       protoCore.addKeyword(PvlKeyword("PointsStartByte", toString(pointsStartByte);
-                           
+
       // Output.gcount() gives us bytes read so far, subtract the bytes that aren't related to points
       // To get the pointsSize.
       BigInt pointsSize = output.gcount() - pointsStartByte;
-      
+
       protoCore.addKeyword(PvlKeyword("PointsBytes",
                            toString(pointsSize)));
       protoObj.addObject(protoCore);
@@ -1865,11 +1873,11 @@ namespace Isis {
       netInfo += PvlKeyword("LastModified", protobufHeader.get_lastmodified().c_str());
       netInfo += PvlKeyword("Description", protobufHeader.get_description().c_str());
       netInfo += PvlKeyword("NumberOfPoints", toString(m_points.size()));
-      
+
       // Is there a better way we can get the total number of measures?
       int numMeasures = 0;
       foreach (QSharedPointer<ControlPoint> point, m_points) {
-        numMeasures += point->GetNumMeasures();   
+        numMeasures += point->GetNumMeasures();
       }
       netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
       netInfo += PvlKeyword("Version", "5");
@@ -1881,17 +1889,17 @@ namespace Isis {
       output << p;
       output << '\n';
       output.close();
-    } 
+    }
     catch () {
-      string msg = "Can't write control net file" 
+      string msg = "Can't write control net file"
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
  /**
   * This will read the binary protobuffer control network header to a ZeroCopyOutputStream
-  * 
-  * @param fileStream  
+  *
+  * @param fileStream
   */
   void ControlNetVersioner::writeHeader(ZeroCopyOutputStream *oStream) {
 
@@ -1918,13 +1926,13 @@ namespace Isis {
 
  /**
   * This will write the first control control point to a ZeroCopyOutputStream
-  * 
-  * @param fileStream A pointer to the fileStream that we are writing the point to.  
+  *
+  * @param fileStream A pointer to the fileStream that we are writing the point to.
   */
   void ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *oStream) {
 
       CodedOutputStream fileStream(oStream);
-      
+
       ControlPointFileEntryV0005 protoPoint;
       QSharedPointer<ControlPoint> controlPoint = m_points.takeFirst();
 
@@ -1964,7 +1972,7 @@ namespace Isis {
           protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_BundleSolution);
           break;
       }
-      
+
       // Apriori Radius Point Source ENUM setting
       switch (controlPoint->GetAprioriRadiusSource()) {
         case ControlPoint::RadiusSource::None:
@@ -1979,7 +1987,7 @@ namespace Isis {
         case ControlPoint::RadiusSource::BundleSolution:
           protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_BundleSolution);
           break;
-        case ControlPoint::RadiusSource::Ellipsoid: 
+        case ControlPoint::RadiusSource::Ellipsoid:
           protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_Ellipsoid);
           break;
         case ControlPoint::RadiusSource::DEM:
@@ -1993,7 +2001,7 @@ namespace Isis {
         protoPoint.set_aprioriradiussourcefile(protobufPoint.GetAprioriRadiusSourceFile());
       }
 
-      if (controlPoint->HasAprioriCoordinates()) { 
+      if (controlPoint->HasAprioriCoordinates()) {
 
         protoPoint.set_apriorix(controlPoint->AprioriX());
         protoPoint.set_aprioriy(controlPoint->AprioriY());
@@ -2001,7 +2009,7 @@ namespace Isis {
 
 
         if (controlPoint->AprioriCovarSize()) { // DNE
-            
+
           // Ensure this is the right way to add these values
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(0)); // DNE
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(1)); // DNE
@@ -2009,7 +2017,7 @@ namespace Isis {
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(3)); // DNE
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(4)); // DNE
           protoPoint.add_aprioricovar(controlPoint->aprioricovar(5)); // DNE
-          
+
           }
         }
       }
@@ -2046,11 +2054,11 @@ namespace Isis {
 
         if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
-             
+
           // This isn't inside of the ControlPointFileEntryV0005, should it be?
           // pvlMeasure += PvlKeyword("Reference", "True");
         }
-        
+
         protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber());
 
         switch ( controlMeasure.GetType() ) {
@@ -2070,7 +2078,7 @@ namespace Isis {
                 protoMeasure.set_measuretype(ControlPointFileEntryV0005_Measure_MeasureType_RegisteredSubPixel);
                 break;
             }
-        }        
+        }
 
         if (controlMeasure.HasChooserName()) {
           protoMeasure.set_choosername(controlMeasure.GetChooserName());
@@ -2112,15 +2120,15 @@ namespace Isis {
           protoMeasure.set_linesigma(controlMeasure.GetLineSigma());
         }
 
-        if (controlMeasure.HasSampleResidual()) { 
+        if (controlMeasure.HasSampleResidual()) {
           protoMeasure.set_sampleresidual(controlMeasure.GetSampleResidual());
         }
 
-        if (controlMeasure.HasLineResidual()) { 
+        if (controlMeasure.HasLineResidual()) {
           protoMeasure.set_lineresidual(controlMeasure.GetLineResidual());
         }
 
-        // I removed the if statement because we always initialize jigsawRejected to false 
+        // I removed the if statement because we always initialize jigsawRejected to false
         // in ControlPoint.
         protoMeasure.set_jigsawrejected(controlMeasure.IsJigsawRejected()));
 
@@ -2155,7 +2163,7 @@ namespace Isis {
 
       int msgSize(protoPoint.ByteSize());
       fileStream->WriteVarint32(msgSize);
-      
+
       if ( !protoPoint.SerializeToCodedStream(fileStream.data()) ) {
         QString err = "Error writing to coded protobuf stream";
         throw IException(IException::Programmer, err, _FILEINFO_);
