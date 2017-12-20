@@ -327,27 +327,27 @@ namespace Isis {
 
       // Copy strings, booleans, and doubles
       copy(group, "SerialNumber",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_serialnumber);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_serialnumber);
       copy(group, "ChooserName",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_choosername);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_choosername);
       copy(group, "DateTime",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_datetime);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_datetime);
       copy(group, "Diameter",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_diameter);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_diameter);
       copy(group, "EditLock",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_editlock);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_editlock);
       copy(group, "Ignore",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_ignore);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_ignore);
       copy(group, "JigsawRejected",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_jigsawrejected);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_jigsawrejected);
       copy(group, "AprioriSample",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_apriorisample);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_apriorisample);
       copy(group, "AprioriLine",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_aprioriline);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_aprioriline);
       copy(group, "SampleSigma",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_samplesigma);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_samplesigma);
       copy(group, "LineSigma",
-           measure, &ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::set_linesigma);
+           measure, &ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::set_linesigma);
 
       // The sample, line, sample residual, and line residual are nested in another structure
       // inside the measure, so they cannot be copied with the conenience methods.
@@ -402,19 +402,19 @@ namespace Isis {
         QString type = group["MeasureType"][0].toLower();
         if (type == "estimated"
             || type == "unmeasured") {
-          measure.set_type(ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::Candidate);
+          measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::Candidate);
         }
         else if (type == "manual") {
-          measure.set_type(ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::Manual);
+          measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::Manual);
         }
         else if (type == "automatic"
                  || type == "validatedmanual"
                  || type == "automaticpixel") {
-          measure.set_type(ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::RegisteredPixel);
+          measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredPixel);
         }
         else if (type == "validatedautomatic"
                  || type == "automaticsubpixel") {
-          measure.set_type(ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::RegisteredSubPixel);
+          measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
         }
         else {
           throw IException(IException::Io,
@@ -558,8 +558,8 @@ namespace Isis {
    */
   void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
-                               ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                               void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(bool)) {
+                               ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                               void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -589,8 +589,8 @@ namespace Isis {
    */
   void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
-                               ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                               void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(double)) {
+                               ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                               void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -617,8 +617,8 @@ namespace Isis {
    */
   void ControlPointV0001::copy(PvlContainer &container,
                                QString keyName,
-                               ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                               void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)
+                               ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                               void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
                                       (const std::string &)) {
 
     if (!container.hasKeyword(keyName))
