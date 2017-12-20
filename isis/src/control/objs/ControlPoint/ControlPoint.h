@@ -312,7 +312,7 @@ namespace Isis {
    *                           and fixed problems (which caused ASSERT fails) in
    *                           the copy constructor.
    *   @history 2011-10-06 Steven Lambright - Radii provided in the protocol
-   *                           buffer constructor can now be invalid. 
+   *                           buffer constructor can now be invalid.
    *   @history 2011-10-07 Steven Lambright and Stuart Sides - Fixed bug in the
    *                           constructor given a protocol buffer. This caused
    *                           unpredictable reference measure behaviour
@@ -320,26 +320,27 @@ namespace Isis {
    *   @history 2011-10-14 Ken Edmundson Added method ClearJigsawRejected(); to
    *                           set all measure and point JigsawRejected flags to
    *                           false prior to bundle adjustment.
-   *   @history 2012-03-31 Debbie A. Cook Programmer note:  Revised 
-   *                           ComputeResiduals to call 
+   *   @history 2012-03-31 Debbie A. Cook Programmer note:  Revised
+   *                           ComputeResiduals to call
    *                           ComputeResidualsMillimeters and avoid duplication
-   *                           of code.  Also revised 
+   *                           of code.  Also revised
    *                           ComputeResidualsMillimeters to make the radar
    *                           case handled the same as other instruments.
-   *   @history 2013-11-12 Ken Edmundson Programmer note:  Revised 
+   *   @history 2013-11-12 Ken Edmundson Programmer note:  Revised
    *                           ComputeApriori such that initial coordinates are
    *                           computed for "Free" points that have constrained
    *                           coordinates. References #1653.
    *   @history 2013-11-13 Kimberly Oyama - Added missing member variables to == operator and
    *                           made sure the comparisons are being done correctly. Fixes #1014.
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
-   *                           initialized in ControlPointFileEntryV0002 
+   *                           initialized in ControlPointFileEntryV0002
    *                           constructor (Merged by Kristin Berry. Fixes #2392)
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
    *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
    *                            GetAdjustedX(), GetAdjustedY(), GetAdjustedZ(), HasRefMeasure().
-   *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected(). 
+   *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected().
+   *   @history 2017-12-20 Adam Goins - Added AprioriCovar() and AdjustedCovar() accessors.
    */
   class ControlPoint : public QObject {
 
@@ -465,7 +466,7 @@ namespace Isis {
       const ControlMeasure *GetMeasure(int index) const;
       ControlMeasure *GetMeasure(int index);
 
-      bool HasRefMeasure() const; 
+      bool HasRefMeasure() const;
       const ControlMeasure *GetRefMeasure() const;
       ControlMeasure *GetRefMeasure();
 
@@ -538,10 +539,10 @@ namespace Isis {
       Displacement GetAprioriZ() const;
 
       RadiusSource::Source GetAprioriRadiusSource() const;
-      bool HasAprioriRadiusSourceFile() const; 
+      bool HasAprioriRadiusSourceFile() const;
       QString GetAprioriRadiusSourceFile() const;
       SurfacePointSource::Source GetAprioriSurfacePointSource() const;
-      bool HasAprioriSurfacePointSourceFile() const; 
+      bool HasAprioriSurfacePointSourceFile() const;
       QString GetAprioriSurfacePointSourceFile() const;
 
       int GetNumMeasures() const;
@@ -577,6 +578,8 @@ namespace Isis {
       double GetSampleResidualRms() const;
       double GetLineResidualRms() const;
       double GetResidualRms() const;
+      double AprioriCovar(int) const;
+      double AdjustedCovar(int) const;
       void ClearJigsawRejected();
 
       ControlPointFileEntryV0002 ToFileEntry() const;

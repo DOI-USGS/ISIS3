@@ -619,9 +619,9 @@ namespace Isis {
 
 
   /**
-   * Checks to see if a reference measure is set. 
+   * Checks to see if a reference measure is set.
    *
-   * @returns bool True if a reference measure is set. 
+   * @returns bool True if a reference measure is set.
    */
   bool ControlPoint::HasRefMeasure() const {
     return !(referenceMeasure == NULL);
@@ -1115,7 +1115,7 @@ namespace Isis {
         || IsLatitudeConstrained()
         || IsLongitudeConstrained()
         || IsRadiusConstrained()) {
-      
+
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
 
@@ -1416,30 +1416,30 @@ namespace Isis {
 
   /**
    * Gets the adjusted x coordinate.
-   * 
+   *
    * @return Displacement The adjusted x coordinate.
    */
-  Displacement ControlPoint::GetAdjustedX() const { 
+  Displacement ControlPoint::GetAdjustedX() const {
     return adjustedSurfacePoint.GetX();
   }
 
 
   /**
    * Gets the adjusted y coordinate.
-   * 
+   *
    * @return Displacement The adjusted y coordinate.
    */
-  Displacement ControlPoint::GetAdjustedY() const { 
+  Displacement ControlPoint::GetAdjustedY() const {
     return adjustedSurfacePoint.GetY();
   }
 
 
   /**
    * Gets the adjusted z coordinate.
-   * 
+   *
    * @return Displacement The adjusted z coordinate.
    */
-  Displacement ControlPoint::GetAdjustedZ() const { 
+  Displacement ControlPoint::GetAdjustedZ() const {
     return adjustedSurfacePoint.GetZ();
   }
 
@@ -1712,13 +1712,13 @@ namespace Isis {
   }
 
 
-  /** 
-   * Checks to see if the point has been rejected by jigsaw. 
-   *  
+  /**
+   * Checks to see if the point has been rejected by jigsaw.
+   *
    * @return bool true if the point is flagged as rejected by jigsaw
    */
   bool ControlPoint::IsJigsawRejected() const {
-    return jigsawRejected; 
+    return jigsawRejected;
   }
 
 
@@ -1728,30 +1728,30 @@ namespace Isis {
 
   /**
    * Gets the apriori x coordinate.
-   * 
+   *
    * @return Displacement The apriori x coordinate.
    */
-  Displacement ControlPoint::GetAprioriX() const { 
+  Displacement ControlPoint::GetAprioriX() const {
     return aprioriSurfacePoint.GetX();
   }
 
 
   /**
    * Gets the apriori y coordinate.
-   * 
+   *
    * @return Displacement The apriori y coordinate.
    */
-  Displacement ControlPoint::GetAprioriY() const { 
+  Displacement ControlPoint::GetAprioriY() const {
     return aprioriSurfacePoint.GetY();
   }
 
 
   /**
    * Gets the apriori z coordinate.
-   * 
+   *
    * @return Displacement The apriori z coordinate.
    */
-  Displacement ControlPoint::GetAprioriZ() const { 
+  Displacement ControlPoint::GetAprioriZ() const {
     return aprioriSurfacePoint.GetZ();
   }
 
@@ -1770,10 +1770,10 @@ namespace Isis {
     return false;
   }
 
-  
+
   /**
    * Checks to see if the ControlPoint has an adjusted SurfacePoint.
-   * 
+   *
    * @return bool True if the control point has adjusted x, y, and z coordinates.
    */
   bool ControlPoint::HasAdjustedCoordinates() {
@@ -1809,8 +1809,8 @@ namespace Isis {
 
 
  /**
-  * Checks to see if the radius source file has been set.  
-  *  
+  * Checks to see if the radius source file has been set.
+  *
   * @return bool True if the radius source file has been set.
   */
   bool ControlPoint::HasAprioriRadiusSourceFile() const {
@@ -1829,8 +1829,8 @@ namespace Isis {
 
 
  /**
-  * Checks to see if the surface point source file has been set.  
-  *  
+  * Checks to see if the surface point source file has been set.
+  *
   * @return bool True if the surface point source file has been set.
   */
   bool ControlPoint::HasAprioriSurfacePointSourceFile() const {
@@ -2463,5 +2463,60 @@ namespace Isis {
     }
 
     return fileEntry;
+  }
+  double ControlPoint::AprioriCovar(int position) const {
+    SurfacePoint apriori = GetAprioriSurfacePoint();
+    symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
+    switch (position) {
+      case 0:
+        return covar(0, 0);
+        break;
+      case 1:
+        return covar(0, 1);
+        break;
+      case 2:
+        return covar(0, 2);
+        break;
+      case 3:
+        return covar(1, 1);
+        break;
+      case 4:
+        return covar(1, 2);
+        break;
+      case 5:
+        return covar(2, 2);
+        break;
+      default:
+        QString msg = "Invalid position given";
+        throw IException(IException::Io, msg, _FILEINFO_);
+    }
+  }
+
+  double ControlPoint::AdjustedCovar(int position) const {
+    SurfacePoint adjusted = GetAdjustedSurfacePoint();
+    symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
+    switch (position) {
+      case 0:
+        return covar(0, 0);
+        break;
+      case 1:
+        return covar(0, 1);
+        break;
+      case 2:
+        return covar(0, 2);
+        break;
+      case 3:
+        return covar(1, 1);
+        break;
+      case 4:
+        return covar(1, 2);
+        break;
+      case 5:
+        return covar(2, 2);
+        break;
+      default:
+        QString msg = "Invalid position given";
+        throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
 }
