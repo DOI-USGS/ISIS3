@@ -1,10 +1,43 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+!Makefile
+
+*.cub
 *.o
+*.so
+*.so.*
+*.a
 moc_*
+*.pb.*
+*.lbl
+*.img
+
+!TestPreferences
+
 print.prt
+
 object_script.*.Release
 object_script.*.Debug
 *_plugin_import.cpp
 *.moc
 ui_*.h
-*.pb.cc
-*.pb.h
+
+*/3rdParty/*
+!*/3rdParty/Makefile
+
+*/inc/*
+
+*/bin/*
+
+*/lib/*
+
+*/tsts/*/input/*
+*/tsts/*/truth/*
+*/tsts/*/output/*
