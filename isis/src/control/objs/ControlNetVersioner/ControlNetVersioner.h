@@ -30,10 +30,6 @@
 #include <QVector>
 
 #include "ControlPoint.h"
-#include "ControlPointV0001.h"
-#include "ControlPointV0002.h"
-#include "ControlPointV0003.h"
-
 
 class QString;
 
@@ -135,13 +131,15 @@ namespace Isis {
    *                           to which it is appended. References #3892
    *  @history 2017-12-11 Jeannie Backer & Jesse Mapel - Created class skeleton for refactor.
    *  @history 2017-12-11 Jesse Mapel - Added VersionedControlNetHeaders.
-   *  @history 2017-12-12 Kristin Berry - Added initial toPvl for refactor. 
+   *  @history 2017-12-12 Kristin Berry - Added initial toPvl for refactor.
    *  @history 2017-12-12 Jeannie Backer - Added VersionedControlPoints.
    *  @history 2017-12-12 Jeannie Backer - Implemented createPoint() methods.
    *  @history 2017-12-13 Jeannie Backer - Added target radii to createPoint(V0006).
    *  @history 2017-12-18 Adam Goins and Kristin Berry - Added new write() method.
    *  @history 2017-12-19 Kristin Berry - Corrected method names and general cleanup in toPvl and
-   *                            write for refactor. 
+   *                          write for refactor.
+   *  @histroy 2017-12-20 Jesse Mapel - Made read and createPoint methods match new
+   *                          ControlPointV#### classes.
    */
   class ControlNetVersioner {
     class ControlPointV0001;
@@ -182,13 +180,13 @@ namespace Isis {
         QString description;
         QString userName;
       };
-      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0002;
-      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0003;
-      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0004;
-      typedef struct ControlNetHeaderV0001 ControlNetHeaderV0005;
+      typedef ControlNetHeaderV0002 ControlNetHeaderV0001;
+      typedef ControlNetHeaderV0003 ControlNetHeaderV0001;
+      typedef ControlNetHeaderV0004 ControlNetHeaderV0001;
+      typedef ControlNetHeaderV0005 ControlNetHeaderV0001;
 
-      typedef struct ControlPointV0003 ControlPointV0004;
-      typedef struct ControlPointV0003 ControlPointV0005;
+      typedef ControlPointV0004 ControlPointV0003;
+      typedef ControlPointV0005 ControlPointV0003;
 
       void read(const FileName netFile);
 
@@ -212,8 +210,8 @@ namespace Isis {
 
       void setHeader(const ControlNetHeaderV0001 header);
 
-      void writeHeader(google::protobuf::io::ZeroCopyOutputStream *fileStream);
-      int writeFirstPoint(google::protobuf::io::ZeroCopyOutputStream *fileStream);
+      void writeHeader(ZeroCopyOutputStream *fileStream);
+      void writeFirstPoint(ZeroCopyOutputStream *fileStream);
 
       ControlNetHeaderV0005 m_header; /**< Header containing information about
                                            the whole network.*/
