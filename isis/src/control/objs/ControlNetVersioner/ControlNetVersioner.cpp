@@ -788,6 +788,104 @@ namespace Isis {
    * @param netFile The filename of the control network file.
    */
   void ControlNetVersioner::readProtobufV0001(const Pvl &header, const FileName netFile) {
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
+
+    BigInt coreStartPos = protoBufferCore["StartByte"];
+    BigInt coreLength = protoBufferCore["Bytes"];
+
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if (!input.is_open()) {
+      QString msg = "Failed to open protobuf file [" + netFile.name() + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    input.seekg(coreStartPos, ios::beg);
+    IstreamInputStream inStream(&input);
+    CodedInputStream codedInStream(&inStream);
+    codedInStream.PushLimit(coreLength);
+    // max 512MB, warn at 400MB
+    codedInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+
+    // Now stream the rest of the input into the google protocol buffer.
+    ControlNetFileProtoV0001 protoNet;
+    try {
+      if (!protoNet.ParseFromCodedStream(&codedInStream)) {
+        QString msg = "Failed to read input PB file [" + netFile.name() + "].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    catch (IException &e) {
+      QString msg = "Cannot parse binary protobuf file";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    catch (...) {
+      QString msg = "Cannot parse binary PB file";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    const PvlObject &logDataInfo = protoBufferInfo.findObject("LogData");
+    BigInt logStartPos = logDataInfo["StartByte"];
+    BigInt logLength = logDataInfo["Bytes"];
+
+    input.clear();
+    input.seekg(logStartPos, ios::beg);
+    IstreamInputStream logInStream(&input);
+    CodedInputStream codedLogInStream(&logInStream);
+    codedLogInStream.PushLimit(logLength);
+    // max 512MB, warn at 400MB
+    codedLogInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+
+    // Now stream the rest of the input into the google protocol buffer.
+    ControlNetLogDataProtoV0001 protoLogData;
+    try {
+      if (protoLogData.ParseFromCodedStream(&codedLogInStream)) {
+        QString msg = "Failed to read log data in protobuf file [" + netFile.name() + "].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    catch (...) {
+      QString msg = "Cannot parse binary protobuf file's log data";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // Create the header
+    try {
+      ControlNetHeaderV0001 header;
+      header.networkID = protoNet.networkid().c_str();
+      if (protoNet.has_targetname()) {
+        header.targetName = protoNet.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoNet.created().c_str();
+      header.lastModified = protoNet.lastmodified().c_str();
+      header.description = protoNet.description().c_str();
+      header.userName = protoNet.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to parse the header from the protobuf control network file.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+
+    // Create the control points
+    for (int i = 0; i < protoNet.points_size(); i++) {
+      try {
+        QSharedPointer<ControlNetFileProtoV0001_PBControlPoint>
+              protoPoint(mutable_points.points(i));
+        ControlPointV0001 point(protoPoint);
+        m_points.append( createPoint(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert version 1 protobuf control point at index ["
+                      + toString(i) + "] to a ControlPoint.";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // TODO how to parse the version 1 log data?
   }
 
 
