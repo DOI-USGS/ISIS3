@@ -30,10 +30,11 @@
 namespace Isis {
   class ControlPointV0001;
   class Pvl;
+  class PvlContainer;
 
   class ControlPointV0002 {
     public:
-      ControlPointV0002(const Pvl &pointObject);
+      ControlPointV0002(Pvl &pointObject);
       ControlPointV0002(QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData);
       ControlPointV0002(ControlPointV0001 &oldPoint);
 
@@ -42,8 +43,8 @@ namespace Isis {
     private:
       // These are intentionally not implemented
       ControlPointV0002();
-      ControlPointV0002(const &ControlPointV0002 other);
-      ControlPointV0002 &operator=(const &ControlPointV0002 other);
+      ControlPointV0002(const ControlPointV0002 &other);
+      ControlPointV0002 &operator=(const ControlPointV0002 &other);
 
       // methods for converting from Pvl to protobuf
       void copy(PvlContainer &container,
@@ -52,24 +53,24 @@ namespace Isis {
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
+                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> &point,
+                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                 void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(bool));
+                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(double));
+                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure &measure,
-                void (ControlNetFileProtoV0001_PBControlPoint::PBControlMeasure::*setter)(const std::string &));
+                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
+                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(const std::string &));
 
       QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> m_pointData;
       /**< protobuf container that holds information used to create a control point.*/
