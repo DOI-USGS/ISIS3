@@ -45,8 +45,7 @@ namespace Isis {
       bool ckSmithed, bool ckRecon, bool ckNadir, bool ckPredicted,
       bool spkSmithed, bool spkRecon, bool spkPredicted,
       QString shape, double startPad, double endPad) : QThread() {
-    //p_xml = NULL;
-    //p_jsonObject = NULL;
+
     p_jsonDocument = NULL;
     p_networkMgr = NULL;
     p_request = NULL;
@@ -54,8 +53,6 @@ namespace Isis {
     p_rawResponse = NULL;
     p_error = NULL;
 
-    //QString raw;
-    //p_xml = new QString();
     QString version = Application::Version();
     QByteArray isisVersionRaw(version.toLatin1());
 
@@ -75,65 +72,11 @@ namespace Isis {
 
     p_jsonDocument = new QJsonDocument(object);
 
-    /**raw = "{\n";
-    raw += "  \"version\": \"" + QString(isisVersionRaw.toHex().constData()) + "\",\n";
-    raw += "  \"cksmithed value\": \"" + toString(ckSmithed) + "\",\n";
-    raw += "  \"ckrecon value\": \"" + toString(ckRecon) + "\",\n";
-    raw += "  \"ckpredicted value\": \"" + toString(ckPredicted) + "\",\n";
-    raw += "  \"cknadir value\": \"" + toString(ckNadir) + "\",\n";
-    raw += "  \"spksmithed value\": \"" + toString(spkSmithed) + "\",\n";
-    raw += "  \"spkrecon value\": \"" + toString(spkRecon) + "\",\n";
-    raw += "  \"spkpredicted value\": \"" + toString(spkPredicted) + "\",\n";
-    raw += "  \"shape value\": \"" + shape + "\",\n";
-    raw += "  \"startpad time\": \"" + toString(startPad) + "\",\n";
-    raw += "  \"endpad time\": \"" + toString(endPad) + "\",\n";
-
-    stringstream str;
-    str << cubeLabel;
-    raw += "  \"label\": \"" + QString(QByteArray(str.str().c_str()).toHex().constData()) + "\",\n";
-    raw += "}";
-
-    raw = "<input_label>\n";
-    raw += "  <isis_version>\n";
-    QString version = Application::Version();
-    QByteArray isisVersionRaw(version.toLatin1());
-    raw += QString(isisVersionRaw.toHex().constData()) + "\n";
-    raw += "  </isis_version>\n";
-
-    raw += "  <parameters>\n";
-    raw += "    <cksmithed value='" + toString(ckSmithed) + "' />\n";
-    raw += "    <ckrecon value='" + toString(ckRecon) + "' />\n";
-    raw += "    <ckpredicted value='" + toString(ckPredicted) + "' />\n";
-    raw += "    <cknadir value='" + toString(ckNadir) + "' />\n";
-    raw += "    <spksmithed value='" + toString(spkSmithed) + "' />\n";
-    raw += "    <spkrecon value='" + toString(spkRecon) + "' />\n";
-    raw += "    <spkpredicted value='" + toString(spkPredicted) + "' />\n";
-    raw += "    <shape value='" + shape + "' />\n";
-    raw += "    <startpad time='" + toString(startPad) + "' />\n";
-    raw += "    <endpad time='" + toString(endPad) + "' />\n";
-    raw += "  </parameters>\n";
-
-    raw += "  <label>\n";
-    stringstream str;
-    str << cubeLabel;
-    raw += QString(QByteArray(str.str().c_str()).toHex().constData()) + "\n";
-
-    raw += "  </label>\n";
-    raw += "</input_label>";**/
-
-    //*p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
-
-    //int contentLength = p_xml->length();
-    //QString contentLengthStr = toString((BigInt)contentLength);
-
     p_request = new QNetworkRequest();
     p_request->setUrl(QUrl(url));
     p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
     p_request->setHeader(QNetworkRequest::ContentTypeHeader,
                          "application/x-www-form-urlencoded");
-    //p_request->setRawHeader("Content-Length", contentLengthStr.c_str());
-    //p_request->setAttribute(QNetworkRequest::DoNotBufferUploadDataAttribute,
-    //    true);
 
     moveToThread(this);
     start();
@@ -179,13 +122,6 @@ namespace Isis {
             this, SLOT(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
     connect(p_networkMgr, SIGNAL(sslErrors(QNetworkReply *, const QList<QSslError> &)),
             this, SLOT(sslErrors(QNetworkReply *, const QList<QSslError> &)));
-
-    /**QByteArray data;
-    QUrl params;
-    QUrlQuery query;
-    query.addQueryItem("name", *p_xml);
-    params.setQuery(query);
-    data.append(params.toEncoded());*/
 
     p_networkMgr->post(*p_request, p_jsonDocument->toBinaryData());
     exec();
