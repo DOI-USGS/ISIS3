@@ -8,6 +8,7 @@
 #include "ControlNetFileV0001.h"
 #include "ControlNetFileV0002.h"
 #include "ControlNetFileHeaderV0002.pb.h"
+#include "ControlNetFileHeaderV0005.pb.h"
 #include "ControlPointFileEntryV0002.pb.h"
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
@@ -826,6 +827,7 @@ namespace Isis {
                       + netFile.name() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
+      headerCodedInStream.PopLimit(oldLimit);
       filePos += headerLength;
     }
     catch (...) {
@@ -835,7 +837,7 @@ namespace Isis {
 
     // initialize the header from the protobuf header
     try {
-      ControlNetHeaderV0006 header;
+      ControlNetHeaderV0004 header;
       header.networkID = protoHeader.networkid().c_str();
       if (protoHeader.has_targetname()) {
         header.targetName = protoHeader.targetname().c_str();
@@ -869,8 +871,9 @@ namespace Isis {
         pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
                                               1024 * 1024 * 400);
         int pointSize = protoHeader.pointmessagesizes(pointIndex);
-        pointCodedInStream.PushLimit(pointSize);
+        CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(pointSize);
         newPoint.ParseFromCodedStream(&pointCodedInStream);
+        pointCodedInStream.PopLimit(oldPointLimit);
       }
       catch (...) {
         QString msg = "Failed to read protobuf version 2 control point at index ["
@@ -879,12 +882,12 @@ namespace Isis {
       }
 
       try {
-        ControlPointV0006 point(newPoint);
-        m_points.append( createPointFromV0006(point) );
+        ControlPointV0004 point(newPoint);
+        m_points.append( createPoint(point) );
       }
       catch (IException &e) {
         QString msg = "Failed to convert protobuf version 2 control point at index ["
-                      + toString(pointIndex) + "] in a ControlPoint.";
+                      + toString(pointIndex) + "] into a ControlPoint.";
         throw IException(e, IException::Io, msg, _FILEINFO_);
       }
     }
@@ -898,7 +901,104 @@ namespace Isis {
    * @param netFile The filename of the control network file.
    */
   void ControlNetVersioner::readProtobufV0005(const Pvl &header, const FileName netFile) {
+    // read the header protobuf object
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
+    BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
+    BigInt headerLength = protoBufferCore["HeaderBytes"];
+    BigInt pointsStartPos = protoBufferCore["PointsStartByte"];
+    BigInt pointsLength = protoBufferCore["PointsBytes"];
+
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if (!input.is_open()) {
+      IString msg = "Failed to open control network file" + netFile.name();
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    input.seekg(headerStartPos, ios::beg);
+    streampos filePos = input.tellg();
+
+    ControlNetFileHeaderV0005 protoHeader;
+    try {
+      IstreamInputStream headerInStream(&input);
+      CodedInputStream headerCodedInStream(&headerInStream);
+      // max 512MB, warn at 400MB
+      headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                             1024 * 1024 * 400);
+      CodedInputStream::Limit oldLimit = headerCodedInStream.PushLimit(headerLength);
+      if (!protoHeader.ParseFromCodedStream(&headerCodedInStream)) {
+        QString msg = "Failed to parse protobuf header from input control net file ["
+                      + netFile.name() + "]";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      headerCodedInStream.PopLimit(oldLimit);
+      filePos += headerLength;
+    }
+    catch (...) {
+      QString msg = "An error occured while reading the protobuf control network header.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
+    // initialize the header from the protobuf header
+    try {
+      ControlNetHeaderV0005 header;
+      header.networkID = protoHeader.networkid().c_str();
+      if (protoHeader.has_targetname()) {
+        header.targetName = protoHeader.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoHeader.created().c_str();
+      header.lastModified = protoHeader.lastmodified().c_str();
+      header.description = protoHeader.description().c_str();
+      header.userName = protoHeader.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    // read each protobuf control point and then initialize it
+    // For some reason, reading the header causes the input stream to fail so reopen the file
+    input.close();
+    input.open(file.expanded().toLatin1().data(), ios::in | ios::binary);
+    input.seekg(filePos, ios::beg);
+    IstreamInputStream pointInStream(&input);
+    while (pointInStream.ByteCount() < pointsLength) {
+      ControlPointFileEntryV0002 newPoint;
+
+      try {
+        CodedInputStream pointCodedInStream = CodedInputStream(&pointInStream);
+        pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                              1024 * 1024 * 400);
+        uint32_t size;
+        if (!input.ReadVarint32(&size)) {
+          // If we can't read another size, then assume at eof
+          break;
+        }
+        CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
+        newPoint.ParseFromCodedStream(&pointCodedInStream);
+        pointCodedInStream.PopLimit(oldPointLimit);
+      }
+      catch (...) {
+        QString msg = "Failed to read protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "].";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      try {
+        ControlPointV0005 point(newPoint);
+        m_points.append( createPoint(point) );
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "] in a ControlPoint.";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
