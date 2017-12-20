@@ -3,6 +3,7 @@
 #include <QString>
 
 #include "ControlPointV0001.h"
+#include "IException.h"
 #include "Pvl.h"
 
 using namespace std;
