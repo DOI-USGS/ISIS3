@@ -1951,7 +1951,10 @@ namespace Isis {
     }
 
     for (int i = 0; i < measure.log_size(); i++) {
-      ControlMeasureLogData logEntry(measure.log(i));
+      const ControlPointFileEntryV0002_Measure_MeasureLogData &protoLog = measure.log(i);
+      ControlMeasureLogData logEntry
+      logEntry.SetNumericalValue( protoLog.doubledatavalue() );
+      logEntry.SetDataType( (ControlMeasureLogData::NumericLogDataType) protoLog.doubledatatype() );
       newMeasure->SetLogData(logEntry);
     }
     return newMeasure;
