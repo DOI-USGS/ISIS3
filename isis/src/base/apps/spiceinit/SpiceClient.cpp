@@ -4,6 +4,8 @@
 
 #include <QDomElement>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -43,15 +45,53 @@ namespace Isis {
       bool ckSmithed, bool ckRecon, bool ckNadir, bool ckPredicted,
       bool spkSmithed, bool spkRecon, bool spkPredicted,
       QString shape, double startPad, double endPad) : QThread() {
-    p_xml = NULL;
+    //p_xml = NULL;
+    //p_jsonObject = NULL;
+    p_jsonDocument = NULL;
     p_networkMgr = NULL;
     p_request = NULL;
     p_response = NULL;
     p_rawResponse = NULL;
     p_error = NULL;
 
-    QString raw;
-    p_xml = new QString();
+    //QString raw;
+    //p_xml = new QString();
+    QString version = Application::Version();
+    QByteArray isisVersionRaw(version.toLatin1());
+
+    QJsonObject object {
+      {"version", QString(isisVersionRaw.toHex().constData())},
+      {"cksmithed value", ckSmithed},
+      {"ckrecon value", ckRecon},
+      {"cknadir value", ckNadir},
+      {"ckpredicted value", ckPredicted},
+      {"spkSmithed value", spkSmithed},
+      {"spkRecon value", spkRecon},
+      {"pkPredicted value", spkPredicted},
+      {"shape value", shape},
+      {"startPad value", startPad},
+      {"endPad value", endPad}
+    };
+
+    p_jsonDocument = new QJsonDocument(object);
+
+    /**raw = "{\n";
+    raw += "  \"version\": \"" + QString(isisVersionRaw.toHex().constData()) + "\",\n";
+    raw += "  \"cksmithed value\": \"" + toString(ckSmithed) + "\",\n";
+    raw += "  \"ckrecon value\": \"" + toString(ckRecon) + "\",\n";
+    raw += "  \"ckpredicted value\": \"" + toString(ckPredicted) + "\",\n";
+    raw += "  \"cknadir value\": \"" + toString(ckNadir) + "\",\n";
+    raw += "  \"spksmithed value\": \"" + toString(spkSmithed) + "\",\n";
+    raw += "  \"spkrecon value\": \"" + toString(spkRecon) + "\",\n";
+    raw += "  \"spkpredicted value\": \"" + toString(spkPredicted) + "\",\n";
+    raw += "  \"shape value\": \"" + shape + "\",\n";
+    raw += "  \"startpad time\": \"" + toString(startPad) + "\",\n";
+    raw += "  \"endpad time\": \"" + toString(endPad) + "\",\n";
+
+    stringstream str;
+    str << cubeLabel;
+    raw += "  \"label\": \"" + QString(QByteArray(str.str().c_str()).toHex().constData()) + "\",\n";
+    raw += "}";
 
     raw = "<input_label>\n";
     raw += "  <isis_version>\n";
@@ -79,12 +119,12 @@ namespace Isis {
     raw += QString(QByteArray(str.str().c_str()).toHex().constData()) + "\n";
 
     raw += "  </label>\n";
-    raw += "</input_label>";
+    raw += "</input_label>";**/
 
-    *p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
+    //*p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
 
-    int contentLength = p_xml->length();
-    QString contentLengthStr = toString((BigInt)contentLength);
+    //int contentLength = p_xml->length();
+    //QString contentLengthStr = toString((BigInt)contentLength);
 
     p_request = new QNetworkRequest();
     p_request->setUrl(QUrl(url));
@@ -105,8 +145,8 @@ namespace Isis {
    *
    */
   SpiceClient::~SpiceClient() {
-    delete p_xml;
-    p_xml = NULL;
+    delete p_jsonDocument;
+    p_jsonDocument = NULL;
 
     delete p_error;
     p_error = NULL;
@@ -140,14 +180,14 @@ namespace Isis {
     connect(p_networkMgr, SIGNAL(sslErrors(QNetworkReply *, const QList<QSslError> &)),
             this, SLOT(sslErrors(QNetworkReply *, const QList<QSslError> &)));
 
-    QByteArray data;
+    /**QByteArray data;
     QUrl params;
     QUrlQuery query;
     query.addQueryItem("name", *p_xml);
     params.setQuery(query);
-    data.append(params.toEncoded());
+    data.append(params.toEncoded());*/
 
-    p_networkMgr->post(*p_request, data);
+    p_networkMgr->post(*p_request, p_jsonDocument->toBinaryData());
     exec();
   }
 
