@@ -36,6 +36,8 @@
 #include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
 
+using namespace std;
+
 namespace Isis {
   /**
    * Create a new control measure and initialize it to nulls and zeros.
@@ -764,7 +766,7 @@ namespace Isis {
    * Return Residual magnitude. Returns Isis:Null when p_lineResidual or p_sampleResidual not
    * specifically set after call to constructor. (This calculation is normally done within the
    * jigsaw app)
-   * 
+   *
    * @returns (double) The residual magnitude
    */
   double ControlMeasure::GetResidualMagnitude() const {
@@ -843,6 +845,20 @@ namespace Isis {
     }
 
     return ControlMeasureLogData(typedDataType);
+  }
+
+
+  /**
+   * Return all of the log data for the measure.
+   *
+   * @return @b QVector<ControlMeasureLogData> All of the log data for the measure.
+   */
+  QVector<ControlMeasureLogData> ControlMeasure::GetLogDataEntries() const {
+    QVector<ControlMeasureLogData> logs;
+    if (p_loggedData) {
+      logs = p_loggedData;
+    }
+    return logs;
   }
 
 
@@ -1016,72 +1032,72 @@ namespace Isis {
 
     return sPrintable;
   }
-  
+
   //! Returns true if the ControlMeasure has a choosername
   bool ControlMeasure::HasChooserName() const {
     return !p_chooserName->isEmpty();
   }
- 
+
   //! Returns true if the ControlMeasure has a datetime
   bool ControlMeasure::HasDateTime() const {
-    return !p_dateTime->isEmpty();   
+    return !p_dateTime->isEmpty();
   }
-  
+
   //! Returns true if the ControlMeasure has a sample
   bool ControlMeasure::HasSample() const {
-    return p_sample ? true : false;   
+    return p_sample ? true : false;
   }
-    
+
   //! Returns true if the ControlMeasure has a line
   bool ControlMeasure::HasLine() const {
-    return p_line ? true : false;    
+    return p_line ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has a diameter
   bool ControlMeasure::HasDiameter() const {
-    return p_diameter ? true : false;   
+    return p_diameter ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has apriorisample
   bool ControlMeasure::HasAprioriSample() const {
     return p_aprioriSample ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has aprioriline
   bool ControlMeasure::HasAprioriLine() const {
     return p_aprioriLine ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has a sample sigma
   bool ControlMeasure::HasSampleSigma() const {
     return p_sampleSigma ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has a line sigma
   bool ControlMeasure::HasLineSigma() const {
     return p_lineSigma ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has a sample residual
   bool ControlMeasure::HasSampleResidual() const {
     return p_sampleResidual ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure has a line residual
   bool ControlMeasure::HasLineResidual() const {
     return p_lineResidual ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure's jigsaw rejected is initialized
   bool ControlMeasure::HasJigsawRejected() const {
-    return p_jigsawRejected ? true : false; 
+    return p_jigsawRejected ? true : false;
   }
-  
+
   //! Returns true if the ControlMeasure is jigsaw rejected
   bool ControlMeasure::JigsawRejected() const {
     return p_jigsawRejected ? true : false;
   }
- 
+
   //! Returns the logsize of the ControlMeasure logged data.
   int ControlMeasure::LogSize() const {
     return p_loggedData->size();
@@ -1182,12 +1198,12 @@ namespace Isis {
    *
    * @author sprasad (4/20/2010)
    *
-   * @internal 
+   * @internal
    *   @history 2010-06-24 Tracie Sucharski, Added new keywords
    *   @history 2012-07-26 Tracie Sucharski, Fixed bug in comparison of chooserName and dateTime,
    *                          comparison was between the pointers instead of the data and added
    *                          comparisons for missing member data.
-   *             
+   *
    *
    * @param pMeasure - Control Measure to be compared against
    *
