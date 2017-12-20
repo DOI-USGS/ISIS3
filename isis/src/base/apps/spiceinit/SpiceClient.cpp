@@ -24,7 +24,7 @@ using namespace Isis;
 
 namespace Isis {
   /**
-   * This initializes a SpiceClient. It forms the XML to send and
+   * This initializes a SpiceClient. It forms the Json file to send and
    * starts in its own thread.
    *
    * @param url
