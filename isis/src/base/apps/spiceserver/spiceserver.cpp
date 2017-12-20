@@ -6,8 +6,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
@@ -118,11 +116,11 @@ void IsisMain() {
       parseParameters(jsonObject);
 
       // Get the cube label
-      QString encoded = jsonObject.value("kernels_label").toString();
+      QString encoded = jsonObject.value("label").toString();
       stringstream labStream;
       labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
       labStream >> label;
-
+      std::cout << "label: "<<label << '\n';
     }
     else {
       QString msg = "Unable to read input file";
@@ -528,7 +526,7 @@ QString tableToXml(QString tableName, QString file) {
 
 
 void parseParameters(QJsonObject jsonObject) {
-  
+
     g_ckSmithed = jsonObject.value("cksmithed").toBool();
     g_ckRecon = jsonObject.value("ckrecon").toBool();
     g_ckPredicted = jsonObject.value("ckpredicted").toBool();
@@ -562,12 +560,10 @@ void packageKernels(QString toFile) {
   QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
 
-  QJsonObject tables;
-  tables.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
-  tables.insert("Instrument Position", tableToJson(toFile + ".position"));
-  tables.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
-  tables.insert("Sun Position", tableToJson(toFile + ".sun"));
-  spiceData.insert("Tables", tables);
+  spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
+  spiceData.insert("Instrument Position", tableToJson(toFile + ".position"));
+  spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
+  spiceData.insert("Sun Position", tableToJson(toFile + ".sun"));
 
   QJsonDocument doc(spiceData);
 
@@ -604,10 +600,15 @@ void packageKernels(QString toFile) {
   //
   // xml += "  </tables>\n";
   // xml += "</spice_data>\n";
-  QString encodedXml( QByteArray( doc.toJson().toLatin1() ).toHex().constData() );
+  QString encodedXml( doc.toJson().toHex().constData() );
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
   finalOutput.write(encodedXml.toLatin1());
   finalOutput.close();
+
+  QFile finalsOutput("toFile.txt");
+  finalsOutput.open(QIODevice::WriteOnly);
+  finalsOutput.write(doc.toJson());
+  finalsOutput.close();
 }

@@ -57,7 +57,12 @@ namespace Isis {
     QString version = Application::Version();
     QByteArray isisVersionRaw(version.toLatin1());
 
+    stringstream labelStream;
+    labelStream << cubeLabel;
+    QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
+
     QJsonObject properties {
+      {"label", labelText},
       {"cksmithed value", ckSmithed},
       {"ckrecon value", ckRecon},
       {"cknadir value", ckNadir},
