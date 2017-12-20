@@ -307,20 +307,20 @@ namespace Isis {
       double GetLineShift() const;
       double GetPixelShift() const;
       
-      bool hasChooserName() const;
-      bool hasDateTime() const;
-      bool hasSample() const;
-      bool hasLine() const;
-      bool hasDiameter() const;
-      bool hasAprioriSample() const;
-      bool hasAprioriLine() const;
-      bool hasSampleSigma() const;
-      bool hasLineSigma() const;
-      bool hasSampleResidual() const;
-      bool hasLineResidual() const;
-      bool hasJigsawRejected() const;
-      bool jigsawRejected() const;
-      int logSize() const;
+      bool HasChooserName() const;
+      bool HasDateTime() const;
+      bool HasSample() const;
+      bool HasLine() const;
+      bool HasDiameter() const;
+      bool HasAprioriSample() const;
+      bool HasAprioriLine() const;
+      bool HasSampleSigma() const;
+      bool HasLineSigma() const;
+      bool HasSampleResidual() const;
+      bool HasLineResidual() const;
+      bool HasJigsawRejected() const;
+      bool JigsawRejected() const;
+      int LogSize() const;
 
       static QVector<QString> GetMeasureDataNames();
 
