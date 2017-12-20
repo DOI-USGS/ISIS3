@@ -212,8 +212,8 @@ namespace Isis {
 
       void setHeader(const ControlNetHeaderV0001 header);
 
-      void writeHeader(ZeroCopyOutputStream *fileStream);
-      void writeFirstPoint(ZeroCopyOutputStream *fileStream);
+      void writeHeader(google::protobuf::io::ZeroCopyOutputStream *fileStream);
+      int writeFirstPoint(google::protobuf::io::ZeroCopyOutputStream *fileStream);
 
       ControlNetHeaderV0005 m_header; /**< Header containing information about
                                            the whole network.*/

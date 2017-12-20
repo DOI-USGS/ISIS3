@@ -1885,7 +1885,7 @@ namespace Isis {
       newMeasure->SetLogData(logEntry);
     }
     return newMeasure;
-  }
+  } 
 
 
   /**
@@ -1923,12 +1923,13 @@ namespace Isis {
 
       streampos startCoreHeaderPos = output.tellp();
 
-      OStreamOutputStream* fileStream(output);
+      OStreamOutputStream *fileStream(output);
       
       writeHeader(fileStream);
 
+      BigInt pointByteTotal = 0;
       while ( !m_points.isEmpty() ) {
-        writeFirstPoint(fileStream);
+        pointByteTotal += writeFirstPoint(fileStream);
       }
     
       // Insert header at the beginning of the file once writing is done.
@@ -1955,14 +1956,10 @@ namespace Isis {
       
       BigInt pointsStartByte = (BigInt) (startCoreHeaderPos + coreHeaderSize);
       
-      protoCore.addKeyword(PvlKeyword("PointsStartByte", toString(pointsStartByte);
+      protoCore.addKeyword(PvlKeyword("PointsStartByte", toString(pointsStartByte)));
                            
-      // Output.gcount() gives us bytes read so far, subtract the bytes that aren't related to points
-      // To get the pointsSize.
-      BigInt pointsSize = output.gcount() - pointsStartByte;
-      
       protoCore.addKeyword(PvlKeyword("PointsBytes",
-                           toString(pointsSize)));
+                           toString(pointByteTotal)));
       protoObj.addObject(protoCore);
 
       PvlGroup netInfo("ControlNetworkInfo");
@@ -1991,7 +1988,7 @@ namespace Isis {
       output << '\n';
       output.close();
     } 
-    catch () {
+    catch (Exception e) {
       string msg = "Can't write control net file" 
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -2021,7 +2018,6 @@ namespace Isis {
           file.name() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-
   }
 
 
@@ -2030,7 +2026,7 @@ namespace Isis {
   * 
   * @param fileStream A pointer to the fileStream that we are writing the point to.  
   */
-  void ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *oStream) {
+  int ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *oStream) {
 
       CodedOutputStream fileStream(oStream);
       
@@ -2143,15 +2139,15 @@ namespace Isis {
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(5));
           }
         }
-      }
+      
 
       // Converting Measures
       for (int j = 0; j < controlPoint->GetNumMeasures(); j++) {
 
         const ControlMeasure &
-            controlMeasure = controlPoint->GetMeasure(j);
+            controlMeasure = *controlPoint->GetMeasure(j);
 
-        ControlPointFileEntryV0005_Measure protoMeasure;
+        ControlPointFileEntryV0005::Measure *protoMeasure;
 
         if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
@@ -2163,22 +2159,22 @@ namespace Isis {
         protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber());
 
         switch ( controlMeasure.GetType() ) {
-            case (ControlMeasure::MeasureType::Canditate) {
+            case (ControlMeasure::MeasureType::Candidate):
                 protoMeasure.set_measuretype(ControlPointFileEntryV0005_Measure_MeasureType_Candidate);
                 break;
-            }
-            case (ControlMeasure::MeasureType::Manual) {
+            
+            case (ControlMeasure::MeasureType::Manual):
                 protoMeasure.set_measuretype(ControlPointFileEntryV0005_Measure_MeasureType_Manual);
                 break;
-            }
-            case (ControlMeasure::RegisteredPixel) {
+            
+            case (ControlMeasure::RegisteredPixel):
                 protoMeasure.set_measuretype(ControlPointFileEntryV0005_Measure_MeasureType_RegisteredPixel);
                 break;
-            }
-            case (ControlMeasure::RegisteredSubPixel) {
+            
+            case (ControlMeasure::RegisteredSubPixel):
                 protoMeasure.set_measuretype(ControlPointFileEntryV0005_Measure_MeasureType_RegisteredSubPixel);
                 break;
-            }
+            
         }        
 
         if (controlMeasure.HasChooserName()) {
@@ -2231,7 +2227,7 @@ namespace Isis {
 
         // I removed the if statement because we always initialize jigsawRejected to false 
         // in ControlPoint.
-        protoMeasure.set_jigsawrejected(controlMeasure.IsJigsawRejected()));
+        protoMeasure.set_jigsawrejected(controlMeasure.JigsawRejected()));
 
 
         for (int logEntry = 0;
@@ -2263,7 +2259,7 @@ namespace Isis {
       }
 
       int msgSize(protoPoint.ByteSize());
-      fileStream->WriteVarint32(msgSize);
+      fileStream.WriteVarint32(msgSize);
       
       if ( !protoPoint.SerializeToCodedStream(fileStream.data()) ) {
         QString err = "Error writing to coded protobuf stream";
