@@ -339,6 +339,7 @@ namespace Isis {
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
    *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
    *                            GetAdjustedX(), GetAdjustedY(), GetAdjustedZ(), HasRefMeasure().
+   *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected(). 
    */
   class ControlPoint : public QObject {
 
@@ -508,6 +509,7 @@ namespace Isis {
       bool IsValid() const;
       bool IsInvalid() const;
       bool IsFixed() const;
+      bool IsJigsawRejected() const;
 
       bool HasAprioriCoordinates();
       bool HasAdjustedCoordinates();
