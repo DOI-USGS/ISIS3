@@ -1,5 +1,6 @@
 #include "SpiceClient.h"
 
+#include <iostream>
 #include <sstream>
 
 #include <QDomElement>
@@ -56,8 +57,7 @@ namespace Isis {
     QString version = Application::Version();
     QByteArray isisVersionRaw(version.toLatin1());
 
-    QJsonObject object {
-      {"version", QString(isisVersionRaw.toHex().constData())},
+    QJsonObject properties {
       {"cksmithed value", ckSmithed},
       {"ckrecon value", ckRecon},
       {"cknadir value", ckNadir},
@@ -70,7 +70,15 @@ namespace Isis {
       {"endPad value", endPad}
     };
 
+    QJsonObject object;
+    object.insert("Properties", properties);
+
     p_jsonDocument = new QJsonDocument(object);
+
+    QFile finalOutput("output.txt");
+    finalOutput.open(QIODevice::WriteOnly);
+    finalOutput.write( p_jsonDocument->toJson() );
+    finalOutput.close();
 
     p_request = new QNetworkRequest();
     p_request->setUrl(QUrl(url));
