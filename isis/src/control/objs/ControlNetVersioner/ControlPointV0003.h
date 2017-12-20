@@ -62,16 +62,16 @@ namespace Isis {
                 void (ControlPointFileEntryV0002::*setter)(const std::string&));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(bool));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(double));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(const std::string &));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(const std::string &));
 
       QSharedPointer<ControlPointFileEntryV0002> m_pointData; /**< protobuf container that holds
                                                                    information used to create a

@@ -171,39 +171,39 @@ namespace Isis {
     //  Process Measures
     for (int groupIndex = 0; groupIndex < pointObject.groups(); groupIndex ++) {
       PvlGroup &group = pointObject.group(groupIndex);
-      ControlPointFileEntryV0002::Measure measure;
+      ControlPointFileEntryV0002_Measure measure;
 
       // Copy strings, booleans, and doubles
       copy(group, "SerialNumber",
-           measure, &ControlPointFileEntryV0002::Measure::set_serialnumber);
+           measure, &ControlPointFileEntryV0002_Measure::set_serialnumber);
       copy(group, "ChooserName",
-           measure, &ControlPointFileEntryV0002::Measure::set_choosername);
+           measure, &ControlPointFileEntryV0002_Measure::set_choosername);
       copy(group, "Sample",
-           measure, &ControlPointFileEntryV0002::Measure::set_sample);
+           measure, &ControlPointFileEntryV0002_Measure::set_sample);
       copy(group, "Line",
-           measure, &ControlPointFileEntryV0002::Measure::set_line);
+           measure, &ControlPointFileEntryV0002_Measure::set_line);
       copy(group, "SampleResidual",
-           measure, &ControlPointFileEntryV0002::Measure::set_sampleresidual);
+           measure, &ControlPointFileEntryV0002_Measure::set_sampleresidual);
       copy(group, "LineResidual",
-           measure, &ControlPointFileEntryV0002::Measure::set_lineresidual);
+           measure, &ControlPointFileEntryV0002_Measure::set_lineresidual);
       copy(group, "DateTime",
-           measure, &ControlPointFileEntryV0002::Measure::set_datetime);
+           measure, &ControlPointFileEntryV0002_Measure::set_datetime);
       copy(group, "Diameter",
-           measure, &ControlPointFileEntryV0002::Measure::set_diameter);
+           measure, &ControlPointFileEntryV0002_Measure::set_diameter);
       copy(group, "EditLock",
-           measure, &ControlPointFileEntryV0002::Measure::set_editlock);
+           measure, &ControlPointFileEntryV0002_Measure::set_editlock);
       copy(group, "Ignore",
-           measure, &ControlPointFileEntryV0002::Measure::set_ignore);
+           measure, &ControlPointFileEntryV0002_Measure::set_ignore);
       copy(group, "JigsawRejected",
-           measure, &ControlPointFileEntryV0002::Measure::set_jigsawrejected);
+           measure, &ControlPointFileEntryV0002_Measure::set_jigsawrejected);
       copy(group, "AprioriSample",
-           measure, &ControlPointFileEntryV0002::Measure::set_apriorisample);
+           measure, &ControlPointFileEntryV0002_Measure::set_apriorisample);
       copy(group, "AprioriLine",
-           measure, &ControlPointFileEntryV0002::Measure::set_aprioriline);
+           measure, &ControlPointFileEntryV0002_Measure::set_aprioriline);
       copy(group, "SampleSigma",
-           measure, &ControlPointFileEntryV0002::Measure::set_samplesigma);
+           measure, &ControlPointFileEntryV0002_Measure::set_samplesigma);
       copy(group, "LineSigma",
-           measure, &ControlPointFileEntryV0002::Measure::set_linesigma);
+           measure, &ControlPointFileEntryV0002_Measure::set_linesigma);
 
       if (group.hasKeyword("Reference")) {
         if (group["Reference"][0].toLower() == "true") {
@@ -214,16 +214,16 @@ namespace Isis {
 
       QString type = group["MeasureType"][0].toLower();
       if (type == "candidate") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::Candidate);
+        measure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
       }
       else if (type == "manual") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::Manual);
+        measure.set_type(ControlPointFileEntryV0002_Measure::Manual);
       }
       else if (type == "registeredpixel") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredPixel);
+        measure.set_type(ControlPointFileEntryV0002_Measure::RegisteredPixel);
       }
       else if (type == "registeredsubpixel") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredSubPixel);
+        measure.set_type(ControlPointFileEntryV0002_Measure::RegisteredSubPixel);
       }
       else {
         throw IException(IException::Io,
@@ -630,8 +630,8 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -661,8 +661,8 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -689,8 +689,8 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)
                                       (const std::string &)) {
 
     if (!container.hasKeyword(keyName))
