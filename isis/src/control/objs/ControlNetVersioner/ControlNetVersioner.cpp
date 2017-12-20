@@ -820,7 +820,7 @@ namespace Isis {
       // max 512MB, warn at 400MB
       headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
                                              1024 * 1024 * 400);
-      int oldLimit = headerCodedInStream.PushLimit(headerLength);
+      CodedInputStream::Limit oldLimit = headerCodedInStream.PushLimit(headerLength);
       if (!protoHeader.ParseFromCodedStream(&headerCodedInStream)) {
         QString msg = "Failed to parse protobuf header from input control net file ["
                       + netFile.name() + "]";
@@ -855,12 +855,14 @@ namespace Isis {
     }
 
     // read each protobuf control point and then initialize it
+    // For some reason, reading the header causes the input stream to fail so reopen the file
+    input.close();
+    input.open(file.expanded().toLatin1().data(), ios::in | ios::binary);
     input.seekg(filePos, ios::beg);
     IstreamInputStream pointInStream(&input);
     int numPoints = protoHeader.pointmessagesizes_size();
     for (int pointIndex = 0; pointIndex < numPoints; pointIndex ++) {
       ControlPointFileEntryV0002 newPoint;
-      ControlPointV0006 point;
 
       try {
         CodedInputStream pointCodedInStream = CodedInputStream(&pointInStream);
@@ -877,7 +879,7 @@ namespace Isis {
       }
 
       try {
-        //TODO Parse the protobuf control point into the ControlPointV0006
+        ControlPointV0006 point(newPoint);
         m_points.append( createPointFromV0006(point) );
       }
       catch (IException &e) {
