@@ -3,9 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -53,7 +52,7 @@ bool tryKernels(Cube &cube, Pvl &labels, Process &p,
 void packageKernels(QString toFile);
 
 //! Read the spiceinit parameters
-void parseParameters(QDomElement parametersElement);
+void parseParameters(QJsonObject jsonObject);
 
 //! Convert a table into an xml tag
 QString tableToXml(QString tableName, QString file);
@@ -106,56 +105,27 @@ void IsisMain() {
     QString otherVersion;
 
     if ( !hexCode.isEmpty() ) {
-      // Convert HEX to XML
-      QString xml( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
+      // Convert HEX to a QString
+      QString json( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
-      QDomDocument document;
+      QJsonDocument document;
       QString error;
-      int errorLine, errorCol;
-      if ( document.setContent(QString(xml), &error, &errorLine, &errorCol) ) {
-        QDomElement rootElement = document.firstChild().toElement();
 
-        for ( QDomNode node = rootElement.firstChild();
-              !node .isNull();
-              node = node.nextSibling() ) {
-          QDomElement element = node.toElement();
+      document = QJsonDocument::fromJson(json.toUtf8());
+      QJsonObject jsonObject = document.object();
 
-          // Store off the other isis version
-          if (element.tagName() == "isis_version") {
-            QString encoded = element.firstChild().toText().data();
-            otherVersion = QByteArray::fromHex( encoded.toLatin1() ).constData();
-          }
-          else if (element.tagName() == "parameters") {
-            // Read the spiceinit parameters
-            parseParameters(element);
-          }
-          else if (element.tagName() == "label") {
-            // Get the cube label
-            QString encoded = element.firstChild().toText().data();
-            stringstream labStream;
-            labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
-            labStream >> label;
-          }
-        }
-      }
-      else {
-        QString err = "Unable to read XML. The reason given was [";
-        err += error;
-        err += "] on line [" + toString(errorLine) + "] column [";
-        err += toString(errorCol) + "]";
-        throw IException(IException::Io, err, _FILEINFO_);
-      }
+      parseParameters(jsonObject);
+
+      // Get the cube label
+      QString encoded = jsonObject.value("kernels_label").toString();
+      stringstream labStream;
+      labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
+      labStream >> label;
+
     }
     else {
       QString msg = "Unable to read input file";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if ( ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version() ) {
-      QString msg = "The SPICE server only supports the latest Isis version [" +
-                    Application::Version() + "], version [" + otherVersion +
-                    "] is not compatible";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -557,63 +527,19 @@ QString tableToXml(QString tableName, QString file) {
 }
 
 
-void parseParameters(QDomElement parametersElement) {
-  for ( QDomNode node = parametersElement.firstChild();
-        !node .isNull();
-        node = node.nextSibling() ) {
-    QDomElement element = node.toElement();
+void parseParameters(QJsonObject jsonObject) {
+  
+    g_ckSmithed = jsonObject.value("cksmithed").toBool();
+    g_ckRecon = jsonObject.value("ckrecon").toBool();
+    g_ckPredicted = jsonObject.value("ckpredicted").toBool();
+    g_ckNadir = jsonObject.value("cknadir").toBool();
+    g_spkSmithed = jsonObject.value("spksmithed").toBool();
+    g_spkRecon = jsonObject.value("spkrecon").toBool();
+    g_spkPredicted = jsonObject.value("spkpredicted").toBool();
+    g_shapeKernelStr = jsonObject.value("shape").toString();
+    g_startPad = jsonObject.value("startpad").toDouble();
+    g_endPad = jsonObject.value("endpad").toDouble();
 
-    if (element.tagName() == "cksmithed") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckSmithed = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "ckrecon") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckRecon = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "ckpredicted") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckPredicted = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "cknadir") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckNadir = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spksmithed") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkSmithed = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spkrecon") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkRecon = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spkpredicted") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkPredicted = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "shape") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_shapeKernelStr = attribute.value();
-    }
-    else if (element.tagName() == "startpad") {
-      QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_startPad = attribute.value().toDouble();
-    }
-    else if (element.tagName() == "endpad") {
-      QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_endPad = attribute.value().toDouble();
-    }
-  }
 }
 
 
