@@ -26,6 +26,7 @@
  #include <QSharedPointer>
 
  #include "ControlNetFileProtoV0001.pb.h"
+ #include "ControlNetLogDataProtoV0001.pb.h"
 
 namespace Isis {
   class ControlPointV0001;
@@ -35,10 +36,12 @@ namespace Isis {
   class ControlPointV0002 {
     public:
       ControlPointV0002(Pvl &pointObject);
-      ControlPointV0002(QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData);
+      ControlPointV0002(QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData,
+                        QSharedPointer<ControlNetLogDataProtoV0001_Point> logData);
       ControlPointV0002(ControlPointV0001 &oldPoint);
 
       const ControlNetFileProtoV0001_PBControlPoint &pointData();
+      QSharedPointer<ControlNetLogDataProtoV0001_Point> logData();
 
     private:
       // These are intentionally not implemented
@@ -74,6 +77,8 @@ namespace Isis {
 
       QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> m_pointData;
       /**< protobuf container that holds information used to create a control point.*/
+      QSharedPointer<ControlNetLogDataProtoV0001_Point> m_logData;
+      /**< Protobuf container that holds log data for the control measures in the point.*/
   };
 }
 
