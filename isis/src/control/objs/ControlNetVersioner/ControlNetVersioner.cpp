@@ -874,8 +874,10 @@ namespace Isis {
     for (int i = 0; i < protoNet.points_size(); i++) {
       try {
         QSharedPointer<ControlNetFileProtoV0001_PBControlPoint>
-              protoPoint(protoNet.mutable_points.points(i));
-        ControlPointV0001 point(protoPoint);
+              protoPoint(new ControlNetFileProtoV0001_PBControlPoint(protoNet.points(i)));
+        QSharedPointer<ControlNetLogDataProtoV0001_Point>
+              protoPointLogData(new ControlNetLogDataProtoV0001_Point(protoLogData.points(i)));
+        ControlPointV0001 point(protoPoint, protoPointLogData);
         m_points.append( createPoint(point) );
       }
       catch (IException &e) {

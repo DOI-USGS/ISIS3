@@ -21,10 +21,12 @@ namespace Isis {
    * Create a ControlPointV0001 object from a protobuf version 1 control point message.
    *
    * @param pointData The protobuf message from a control net file.
+   * @param logData The accompanying protobuf control measure log data for the point.
    */
   ControlPointV0001::ControlPointV0001(
-          QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData)
-   : m_pointData(pointData) {
+          QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData,
+          QSharedPointer<ControlNetLogDataProtoV0001_Point> logData)
+   : m_pointData(pointData), m_logData(logData) {
 
    }
 
@@ -37,7 +39,8 @@ namespace Isis {
    *                   lat/lon to x/y/z.
    */
   ControlPointV0001::ControlPointV0001(Pvl &pointObject, const QString targetName)
-   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint) {
+   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
+     m_logData(new ControlNetLogDataProtoV0001_Point) {
 
     // Clean up the Pvl control point
     // Anything that doesn't have a value is removed
@@ -433,7 +436,71 @@ namespace Isis {
         }
       }
 
+      // Create the log data for the measure
+      ControlNetLogDataProtoV0001_Point_Measure measureLogData;
+
+      for (int keyIndex = 0; keyIndex < group.keywords(); keyIndex++) {
+        PvlKeyword dataKeyword = group[keyIndex];
+        QString name = dataKeyword.name();
+        int dataType = 0;
+        double value = 0.0;
+
+        switch (name) {
+          case "Obsolete_Eccentricity":
+            dataType = 1;
+            break;
+
+          case "GoodnessOfFit":
+            dataType = 2;
+            break;
+
+          case "MinimumPixelZScore":
+            dataType = 3;
+            break;
+
+          case "MaximumPixelZScore":
+            dataType = 4;
+            break;
+
+          case "PixelShift":
+            dataType = 5;
+            break;
+
+          case "WholePixelCorrelation":
+            dataType = 6;
+            break;
+
+          case "SubPixelCorrelation":
+            dataType = 7;
+            break;
+
+          case "Obsolete_AverageResidual":
+            dataType = 8;
+            break;
+
+          default:
+            QString msg = "Invalid control measure log data name [" + name + "]";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+            break;
+        }
+
+        try {
+          value = toDouble(dataKeyword[0])
+        }
+        catch (Exception e) {
+          QString msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
+          throw IException(e, IException::Io, msg, _FILEINFO_);
+        }
+
+        ControlNetLogDataProtoV0001_Point_Measure_DataEntry logEntry;
+        logEntry.set_datatype(dataType);
+        logEntry.set_datavalue(value);
+        *measureLogData.add_loggedmeasuredata() = logEntry;
+      }
+
+      // Store the measure and its log data
       *m_pointData->add_measures() = measure;
+      *m_logData->add_measures() = measureLogData;
     }
 
     if (!m_pointData->IsInitialized()) {
@@ -452,6 +519,17 @@ namespace Isis {
    */
   QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0001::pointData() {
       return m_pointData;
+  }
+
+
+  /**
+   * Access the protobuf log data for the control measures in the point.
+   *
+   * @return @b QSharedPointer<ControlNetLogDataProtoV0001_Point> A pointer to the internal
+   *                                                              measure log data.
+   */
+  QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0001::logData(); {
+      return m_logData;
   }
 
 
