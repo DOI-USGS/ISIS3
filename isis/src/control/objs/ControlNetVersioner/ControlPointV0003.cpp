@@ -240,7 +240,13 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-          *measure.add_log() = interpreter.ToProtocolBuffer();
+
+          ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
+
+          protoBufDataEntry.set_doubledatatype(interpreter.GetDataType());
+          protoBufDataEntry.set_doubledatavalue(interpreter.GetNumericalValue());
+
+          *measure.add_log() = protoBufDataEntry;
         }
       }
 

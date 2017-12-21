@@ -23,14 +23,21 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
- #include <QSharedPointer>
+#include <QSharedPointer>
 
- #include "ControlPointFileEntryV0002.pb.h"
+#include "ControlPointFileEntryV0002.pb.h"
 
 namespace Isis {
   class ControlPointV0002;
   class PvlObject;
   class PvlContainer;
+
+  /**
+  * @internal
+  *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to not used
+  *                           the deprecated "ToProtocolBuffer()" call from
+  *                           ControlMeasureLogData.
+  **/
 
   //TODO document this
   class ControlPointV0003 {
