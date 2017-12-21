@@ -290,7 +290,6 @@ int main() {
   catch (IException &e) {
     cout << "  " << e.toString() << "\n";
   }
-
 }
 
 void printPoint(Isis::ControlPoint &p) {
