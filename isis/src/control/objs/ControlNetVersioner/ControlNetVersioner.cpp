@@ -270,14 +270,14 @@ namespace Isis {
                                  " <meters>");
 
         // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
-        if (controlPoint->aprioricovar_size()) { // DNE
+        if (controlPoint->HasAprioriCovar()) { // DNE
           PvlKeyword matrix("AprioriCovarianceMatrix");
-          matrix += toString(controlPoint->AprioriCovar(0)); // DNE
-          matrix += toString(controlPoint->AprioriCovar(1)); // DNE
-          matrix += toString(controlPoint->AprioriCovar(2)); // DNE
-          matrix += toString(controlPoint->AprioriCovar(3)); // DNE
-          matrix += toString(controlPoint->AprioriCovar(4)); // DNE
-          matrix += toString(controlPoint->AprioriCovar(5)); // DNE
+          matrix += toString(controlPoint->AprioriCovar(0));
+          matrix += toString(controlPoint->AprioriCovar(1));
+          matrix += toString(controlPoint->AprioriCovar(2));
+          matrix += toString(controlPoint->AprioriCovar(3));
+          matrix += toString(controlPoint->AprioriCovar(4));
+          matrix += toString(controlPoint->AprioriCovar(5));
           pvlPoint += matrix;
 
           if (pvlRadii.hasKeyword("EquatorialRadius")) {
@@ -340,7 +340,7 @@ namespace Isis {
                                  toString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
-        if (controlPoint->AdjustedCovarSize()) { // DNE
+        if (controlPoint->HasAdjustedCovar()) { // DNE
           PvlKeyword matrix("AdjustedCovarianceMatrix");
           matrix += toString(controlPoint->AdjustedCovar(0));
           matrix += toString(controlPoint->AdjustedCovar(1));
@@ -559,8 +559,9 @@ namespace Isis {
    */
   void ControlNetVersioner::readPvlV0001(const PvlObject &network) {
     // initialize the header
+    ControlNetHeaderV0001 header;
+
     try {
-      ControlNetHeaderV0001 header;
       header.networkID = network.findKeyword("NetworkId")[0];
       header.targetName = network.findKeyword("TargetName")[0];
       header.created = network.findKeyword("Created")[0];
@@ -577,7 +578,7 @@ namespace Isis {
     // initialize the control points
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
-        PvlObject &pointObject = network.object(objectIndex);
+        const PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0001 point(pointObject, header.targetName);
         m_points.append( createPoint(point) );
       }
@@ -615,7 +616,7 @@ namespace Isis {
     // initialize the control points
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
       try {
-        PvlObject &pointObject = network.object(objectIndex);
+        const PvlObject &pointObject = network.object(objectIndex);
         ControlPointV0002 point(pointObject);
         m_points.append( createPoint(point) );
       }
@@ -1413,7 +1414,10 @@ namespace Isis {
     }
 
     for (int i = 0; i < measure.log_size(); i++) {
-      ControlMeasureLogData logEntry(measure.log(i));
+      const ControlPointFileEntryV0002_Measure_MeasureLogData &protoLog = measure.log(i);
+      ControlMeasureLogData logEntry
+      logEntry.SetNumericalValue( protoLog.doubledatavalue() );
+      logEntry.SetDataType( (ControlMeasureLogData::NumericLogDataType) protoLog.doubledatatype() );
       newMeasure->SetLogData(logEntry);
     }
     return newMeasure;
@@ -1468,12 +1472,12 @@ namespace Isis {
 
       ControlNetFileHeaderV0005 protobufHeader;
 
-      protobufHeader.set_networkid(m_header.networkID);
-      protobufHeader.set_targetname(m_header.targetName);
-      protobufHeader.set_created(m_header.created);
-      protobufHeader.set_lastmodified(m_header.lastModified);
-      protobufHeader.set_description(m_header.description);
-      protobufHeader.set_username(m_header.userName);
+      protobufHeader.set_networkid(m_header.networkID.toStdString());
+      protobufHeader.set_targetname(m_header.targetName.toStdString());
+      protobufHeader.set_created(m_header.created.toStdString());
+      protobufHeader.set_lastmodified(m_header.lastModified.toStdString());
+      protobufHeader.set_description(m_header.description.toStdString());
+      protobufHeader.set_username(m_header.userName.toStdString());
 
       streampos coreHeaderSize = protobufHeader->ByteSize();
 
@@ -1537,15 +1541,15 @@ namespace Isis {
 
     // Create the protobuf header using our struct
     ControlNetFileHeaderV0005 protobufHeader;
-    protobufHeader.set_networkid(m_header.networkID);
-    protobufHeader.set_targetname(m_header.targetName);
-    protobufHeader.set_created(m_header.created);
-    protobufHeader.set_lastmodified(m_header.lastModified);
-    protobufHeader.set_description(m_header.description);
-    protobufHeader.set_username(m_header.userName);
+    protobufHeader.set_networkid(m_header.networkID.toStdString());
+    protobufHeader.set_targetname(m_header.targetName.toStdString());
+    protobufHeader.set_created(m_header.created.toStdString());
+    protobufHeader.set_lastmodified(m_header.lastModified.toStdString());
+    protobufHeader.set_description(m_header.description.toStdString());
+    protobufHeader.set_username(m_header.userName.toStdString());
 
     // Write out the header
-    if (!protobufHeader->SerializeToCodedStream(&fileStream)) {
+    if (!protobufHeader.SerializeToCodedStream(&fileStream)) {
       IString msg = "Failed to write output control network file [" +
           file.name() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1568,8 +1572,8 @@ namespace Isis {
       protoPoint.set_type(controlPoint->getType());
 
       protoPoint.set_id(controlPoint->GetId());
-      protoPoint.set_choosername(controlPoint->GetChooserName());
-      protoPoint.set_datetime(controlPoint->GetDateTime());
+      protoPoint.set_choosername(controlPoint->GetChooserName().toStdString());
+      protoPoint.set_datetime(controlPoint->GetDateTime().toStdString());
       protoPoint.set_editlock(controlPoint->IsEditLocked());
 
       protoPoint.set_ignore(controlPoint->IsIgnored());
@@ -1581,8 +1585,8 @@ namespace Isis {
       }
 
       // Apriori Surf Point Source ENUM settting
-      switch (controlPoint->GetAprioriSurfPointSource()) {
-        case ControlPoint::SurfacePointSouce::None:
+      switch (controlPoint->GetAprioriSurfacePointSource()) {
+        case ControlPoint::SurfacePointSource::None:
           protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_None);
           break;
         case ControlPoint::SurfacePointSource::User:
@@ -1632,20 +1636,20 @@ namespace Isis {
 
       if (controlPoint->HasAprioriCoordinates()) {
 
-        protoPoint.set_apriorix(controlPoint->AprioriX());
-        protoPoint.set_aprioriy(controlPoint->AprioriY());
-        protoPoint.set_aprioriz(controlPoint->AprioriZ());
+        protoPoint.set_apriorix(controlPoint->GetAprioriX().meters());
+        protoPoint.set_aprioriy(controlPoint->GetAprioriY().meters());
+        protoPoint.set_aprioriz(controlPoint->GetAprioriZ().meters());
 
 
-        if (controlPoint->AprioriCovarSize()) { // DNE
+        if (controlPoint->HasAprioriCovar()) { // DNE
 
           // Ensure this is the right way to add these values
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(0)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(1)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(2)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(3)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(4)); // DNE
-          protoPoint.add_aprioricovar(controlPoint->aprioricovar(5)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(0)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(1)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(2)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(3)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(4)); // DNE
+          protoPoint.add_aprioricovar(controlPoint->AprioriCovar(5)); // DNE
 
         }
       }
@@ -1658,19 +1662,19 @@ namespace Isis {
 
       if (controlPoint->HasAdjustedCoordinates()) {
 
-        protoPoint.set_adjustedx(controlPoint->AdjustedX());
-        protoPoint.set_adjustedy(controlPoint->AdjustedY());
-        protoPoint.set_adjustedz(controlPoint->AdjustedZ());
+        protoPoint.set_adjustedx(controlPoint->GetAdjustedX().meters());
+        protoPoint.set_adjustedy(controlPoint->GetAdjustedY().meters());
+        protoPoint.set_adjustedz(controlPoint->GetAdjustedZ().meters());
 
-        if (controlPoint->AdjustedCovarSize()) { // DNE
+        if (controlPoint->HasAdjustedCovar()) { // DNE
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(0));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(1));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(2));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(3));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(4));
           protoPoint.add_adjustedcovar(controlPoint->AdjustedCovar(5));
-          }
         }
+      }
 
 
       // Converting Measures
@@ -1685,7 +1689,7 @@ namespace Isis {
              protoPoint.set_referenceindex(j);
         }
 
-        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber());
+        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toStdString());
 
         switch ( controlMeasure.GetType() ) {
             case (ControlMeasure::MeasureType::Candidate):
@@ -1706,11 +1710,11 @@ namespace Isis {
         }
 
         if (controlMeasure.HasChooserName()) {
-          protoMeasure.set_choosername(controlMeasure.GetChooserName());
+          protoMeasure.set_choosername(controlMeasure.GetChooserName().toStdString());
         }
 
         if (controlMeasure.HasDateTime()) {
-          protoMeasure.set_datetime(controlMeasure.GetDateTime());
+          protoMeasure.set_datetime(controlMeasure.GetDateTime().toStdString());
         }
 
         protoMeasure.set_editlock(controlMeasure.IsEditLocked());
@@ -1722,19 +1726,19 @@ namespace Isis {
         }
 
         if (controlMeasure.HasLine()) {
-          protoMeasure.set_line(controlMeasure.GetLine()));
+          protoMeasure.set_line(controlMeasure.GetLine());
         }
 
         if (controlMeasure.HasDiameter()) {
-          protoMeasure.set_diameter(controlMeasure.GetDiameter()));
+          protoMeasure.set_diameter(controlMeasure.GetDiameter());
         }
 
         if (controlMeasure.HasAprioriSample()) {
-          protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample()));
+          protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample());
         }
 
         if (controlMeasure.HasAprioriLine()) {
-          protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine()));
+          protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine());
         }
 
         if (controlMeasure.HasSampleSigma()) {
@@ -1755,32 +1759,29 @@ namespace Isis {
 
         // I removed the if statement because we always initialize jigsawRejected to false
         // in ControlPoint.
-        protoMeasure.set_jigsawrejected(controlMeasure.JigsawRejected()));
+        protoMeasure.set_jigsawrejected(controlMeasure.JigsawRejected());
 
-
+        QVector<ControlMeasureLogData> measureLogs = controlMeasure.GetLogDataEntries();
         for (int logEntry = 0;
-            logEntry < controlMeasure.LogSize(); // DNE?
+            logEntry < measureLogs.size(); // DNE?
             logEntry ++) {
 
-          const ControlMeasureLogData &log =
-                controlMeasure.GetLogData(logEntry); // Not sure this is right.
+          const ControlMeasureLogData &log = measureLogs[logEntry];
 
           // These methods might not not exist, we may need to wrap each of These
           // In if/else statements because they're optional values.
           ControlPointFileEntryV0002_Measure_MeasureLogData logData;
 
-          logData.set_doubledatatype(log.GetDoubleDataType());
-          logData.set_doubledatavalue(log.GetDoubleDataValue());
-          logData.set_booldatatype(log.GetBoolDataType());
-          logData.set_booldatavalue(log.getBoolDataValue());
+          logData.set_doubledatatype( (int) log.GetDataType() );
+          logData.set_doubledatavalue( log.GetNumericalValue() );
 
-          protoMeasure.add_log(logData);
+          *protoMeasure.add_log() = logData;
         }
 
         if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
         }
-        protoPoint.add_measure(protoMeasure);
+        protoPoint.add_measures(protoMeasure);
       }
 
       int msgSize(protoPoint.ByteSize());
