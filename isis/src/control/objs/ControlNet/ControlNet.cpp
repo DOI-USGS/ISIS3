@@ -23,7 +23,6 @@
 #include "Application.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
-#include "ControlNetFile.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
@@ -264,41 +263,41 @@ namespace Isis {
    * @param pvl    Boolean indicating whether to write in pvl format
    *               (Default=false)
    *
-   * @throws Isis::iException::Programmer - "Invalid Net
-   *             Enumeration"
-   * @throws Isis::iException::Io - "Unable to write PVL
-   *             infomation to file"
-   *
    * @history 2010-10-05 Tracie Sucharski - Renamed old WRite method to WritePvl
    *                     and created this new method to determine format to
    *                     be written.
+   * @history 2017-12-21 Jesse Mapel - Modified to use new ControlNetVersioner.
    */
   void ControlNet::Write(const QString &ptfile, bool pvl) {
-    LatestControlNetFile *fileData = new LatestControlNetFile();
+    ControlNetVersioner versionedWriter(this);
 
-    ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
+    if (pvl) {
+      Pvl network
+      try {
+        network = versionedWriter.toPvl();
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert control network to Pvl format.";
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      }
 
-    header.set_networkid(p_networkId.toLatin1().data());
-    header.set_targetname(p_targetName.toLatin1().data());
-    header.set_username(p_userName.toLatin1().data());
-    header.set_created(p_created.toLatin1().data());
-    header.set_lastmodified(p_modified.toLatin1().data());
-    header.set_description(p_description.toLatin1().data());
-
-    QList< ControlPointFileEntryV0002 > &fileDataPoints =
-      fileData->GetNetworkPoints();
-
-    for (int i = 0; i < pointIds->size(); i++) {
-      ControlPoint *point = points->value(pointIds->at(i));
-
-      ControlPointFileEntryV0002 pointFileEntry = point->ToFileEntry();
-      fileDataPoints.append(pointFileEntry);
+      try {
+        network.write(ptfile);
+      }
+      catch (IException &e) {
+        QString msg = "Failed writing control network to file [" + ptfile + "]";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
     }
-
-    ControlNetVersioner::Write(ptfile, *fileData, pvl);
-
-    delete fileData;
-    fileData = NULL;
+    else {
+      try {
+        versionedWriter.write(FileName(ptfile));
+      }
+      catch (IException &e) {
+        QString msg = "Failed writing control network to file [" + ptfile + "]";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
