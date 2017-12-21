@@ -2486,10 +2486,34 @@ namespace Isis {
       case 5:
         return covar(2, 2);
         break;
-      default:
-        QString msg = "Invalid position given";
-        throw IException(IException::Io, msg, _FILEINFO_);
+        default:
+          QString msg = "Invalid position given";
+          throw IException(IException::Io, msg, _FILEINFO_);
     }
+  }
+
+  bool ControlPoint::HasAprioriCovar() const {
+    SurfacePoint apriori = GetAprioriSurfacePoint();
+    symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
+    // If there are values in any of the covar matrices.
+    if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
+        covar(0, 2) != 0. || covar(1, 1) != 0. ||
+        covar(1, 2) != 0. || covar(2, 2) != 0.) {
+        return true;
+    }
+    return false;
+  }
+
+  bool ControlPoint::HasAdjustedCovar() const {
+    SurfacePoint adjusted = GetAdjustedSurfacePoint();
+    symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
+    // If there are values in any of the covar matrices.
+    if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
+        covar(0, 2) != 0. || covar(1, 1) != 0. ||
+        covar(1, 2) != 0. || covar(2, 2) != 0.) {
+        return true;
+    }
+    return false;
   }
 
   double ControlPoint::AdjustedCovar(int position) const {

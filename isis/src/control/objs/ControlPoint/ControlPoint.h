@@ -514,6 +514,8 @@ namespace Isis {
 
       bool HasAprioriCoordinates();
       bool HasAdjustedCoordinates();
+      bool HasAprioriCovar() const;
+      bool HasAdjustedCovar() const;
 
       bool IsConstrained();
       bool IsLatitudeConstrained();
