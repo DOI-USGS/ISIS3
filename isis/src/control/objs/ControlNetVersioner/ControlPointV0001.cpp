@@ -445,49 +445,39 @@ namespace Isis {
         int dataType = 0;
         double value = 0.0;
 
-        switch (name) {
-          case "Obsolete_Eccentricity":
-            dataType = 1;
-            break;
-
-          case "GoodnessOfFit":
-            dataType = 2;
-            break;
-
-          case "MinimumPixelZScore":
-            dataType = 3;
-            break;
-
-          case "MaximumPixelZScore":
-            dataType = 4;
-            break;
-
-          case "PixelShift":
-            dataType = 5;
-            break;
-
-          case "WholePixelCorrelation":
-            dataType = 6;
-            break;
-
-          case "SubPixelCorrelation":
-            dataType = 7;
-            break;
-
-          case "Obsolete_AverageResidual":
-            dataType = 8;
-            break;
-
-          default:
-            QString msg = "Invalid control measure log data name [" + name + "]";
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-            break;
+        if (name == "Obsolete_Eccentricity") {
+          dataType = 1;
+        }
+        else if (name == "GoodnessOfFit") {
+          dataType = 2;
+        }
+        else if (name ==  "MinimumPixelZScore") {
+          dataType = 3;
+        }
+        else if (name ==  "MaximumPixelZScore") {
+          dataType = 4;
+        }
+        else if (name == "PixelShift") {
+          dataType = 5;
+        }
+        else if (name == "WholePixelCorrelation") {
+          dataType = 6;
+        }
+        else if (name == "SubPixelCorrelation") {
+          dataType = 7;
+        }
+        else if (name == "Obsolete_AverageResidual") {
+          dataType = 8;
+        }
+        else {
+          QString msg = "Invalid control measure log data name [" + name + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         try {
-          value = toDouble(dataKeyword[0])
+          value = toDouble(dataKeyword[0]);
         }
-        catch (Exception e) {
+        catch (IException e) {
           QString msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }
@@ -528,7 +518,7 @@ namespace Isis {
    * @return @b QSharedPointer<ControlNetLogDataProtoV0001_Point> A pointer to the internal
    *                                                              measure log data.
    */
-  QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0001::logData(); {
+  QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0001::logData() {
       return m_logData;
   }
 
