@@ -45,10 +45,18 @@ using namespace std;
 
 namespace Isis {
 
-  ControlNetVersioner::ControlNetVersioner(QSharedPointer<ControlNet> net) {
+  /**
+   * Construct a ControlNetVersioner from a control network. This versioner can only be used to
+   * write out the control points in the control network. It is expected that the control points
+   * in the control network will not be deleted while the control net versioner persists.
+   *
+   * @param net A pointer to the network that will be written out.
+   */
+  ControlNetVersioner::ControlNetVersioner(ControlNet *net)
+   : m_ownsPoints(false) {
     // Populate the internal list of points.
     for (int i = 0; i < net->GetNumPoints(); i++) {
-        m_points.append( QSharedPointer<ControlPoint>( net->GetPoints().at(i) ) );
+        m_points.append( net->GetPoints().at(i) );
     }
 
 
@@ -64,13 +72,33 @@ namespace Isis {
   }
 
 
-  ControlNetVersioner::ControlNetVersioner(const FileName netFile) {
+  /**
+   * Construct a ControlNetVersioner from a file. The file will be read in and converted into
+   * a header object that contains general information about the network and a list of
+   * ControlPoints.
+   *
+   * @param netFile The control network file to read in.
+   *
+   * @see ControlNetVersioner::Read
+   */
+  ControlNetVersioner::ControlNetVersioner(const FileName netFile)
+   : m_ownsPoints(true) {
     read(netFile);
   }
 
 
+  /**
+   * Destroy a ControlNetVersioner. If the versioner owns the control points stored in it,
+   * they will also be deleted.
+   */
   ControlNetVersioner::~ControlNetVersioner() {
-
+    if (m_ownsPoints) {
+      while ( !m_points.isEmpty() ) {
+        ControlPoint *unusedPoint = m_points.takeFirst();
+        delete unusedPoint;
+        unusedPoint = NULL;
+      }
+    }
   }
 
 
@@ -144,12 +172,20 @@ namespace Isis {
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint() {
+  /**
+   * Returns the first point stored in the versioner's internal list. This method passes ownership
+   * of the point to the caller who is expected to delete it when done with it.
+   *
+   * @return @b ControlPoint* A pointer to the control point. The caller assumes ownership of the
+   *                          ControlPoint and is expected to delete it when done.
+   */
+  ControlPoint *ControlNetVersioner::takeFirstPoint() {
+    ControlPoint *point = NULL;
     if (!m_points.isEmpty) {
-      return m_points.takeFirst();
+      ControlPoint = m_points.takeFirst();
     }
 
-    return QSharedPointer<ControlPoint>;
+    return point;
   }
 
 
@@ -187,8 +223,7 @@ namespace Isis {
       }
     }
 
-    ControlPoint controlPoint;
-    foreach(QSharedPointer<ControlPoint> controlPoint, m_points) {
+    foreach(ControlPoint *controlPoint, m_points) {
       PvlObject pvlPoint("ControlPoint");
 
       if (controlPoint->GetType() == ControlPoint::Fixed) {
@@ -1129,7 +1164,7 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0001 &point) {
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0001 &point) {
 
     ControlPointV0002 newPoint(point);
     return createPoint(newPoint);
@@ -1149,7 +1184,7 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0002 &point) {
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0002 &point) {
 
     ControlPointV0003 newPoint(point);
     return createPoint(newPoint);
@@ -1169,10 +1204,10 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0003 &point) {
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0003 &point) {
 
     ControlPointFileEntryV0002 protoPoint = point.pointData();
-    QSharedPointer<ControlPoint> controlPoint;
+    ControlPoint *controlPoint = new ControlPoint;
 
     controlPoint->SetId(QString( protoPoint.id().c_str() ));
     controlPoint->SetChooserName(protoPoint.choosername().c_str());
@@ -1347,8 +1382,7 @@ namespace Isis {
 
     // adding measure information
     for (int m = 0 ; m < protoPoint.measures_size(); m++) {
-      QSharedPointer<ControlMeasure> measure = createMeasure(protoPoint.measures(m));
-      controlPoint->Add(measure.data());
+      controlPoint->Add( createMeasure( protoPoint.measures(m) ) );
     }
 
     if (protoPoint.has_referenceindex()) {
@@ -1372,8 +1406,8 @@ namespace Isis {
    * @return The ControlMeasure constructed from the V0006 version
    *         file.
    */
-  QSharedPointer<ControlMeasure> ControlNetVersioner::createMeasure(const ControlPointFileEntryV0002_Measure &measure) {
-    QSharedPointer<ControlMeasure> newMeasure(new ControlMeasure);
+  ControlMeasure *ControlNetVersioner::createMeasure(const ControlPointFileEntryV0002_Measure &measure) {
+    ControlMeasure *newMeasure = new ControlMeasure;
     newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
     newMeasure->SetChooserName(QString(measure.choosername().c_str()));
     newMeasure->SetDateTime(QString(measure.datetime().c_str()));
@@ -1551,7 +1585,7 @@ namespace Isis {
  /**
   * This will read the binary protobuffer control network header to a ZeroCopyOutputStream
   *
-  * @param fileStream
+  * @param fileStream The filestream that the header will be written to.
   */
   void ControlNetVersioner::writeHeader(ZeroCopyOutputStream *oStream) {
 
@@ -1575,16 +1609,20 @@ namespace Isis {
 
 
  /**
-  * This will write the first control control point to a ZeroCopyOutputStream
+  * This will write the first control control point to a ZeroCopyOutputStream.
+  * The written point will be removed from the versioner and deleted if the versioner
+  * has ownership of it.
   *
   * @param fileStream A pointer to the fileStream that we are writing the point to.
+  *
+  * @return @b int The number of bytes written to the filestream.
   */
   int ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *oStream) {
 
       CodedOutputStream fileStream(oStream);
 
       ControlPointFileEntryV0002 protoPoint;
-      QSharedPointer<ControlPoint> controlPoint = m_points.takeFirst();
+      ControlPoint *controlPoint = m_points.takeFirst();
 
       protoPoint.set_id(controlPoint->GetId().toLatin1().data());
       protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
@@ -1832,8 +1870,14 @@ namespace Isis {
         throw IException(IException::Programmer, err, _FILEINFO_);
       }
 
+      // Make sure that if the versioner owns the ControlPoint it is properly cleaned up.
+      if (m_ownsPoints) {
+        delete controlPoint;
+        controlPoint = NULL:
+      }
+
       // return size of message
-      return (msgSize);
+      return ( fileStream.ByteCount() );
   }
 
 
