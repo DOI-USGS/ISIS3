@@ -27,8 +27,6 @@ class QString;
 class QVariant;
 
 namespace Isis {
-  class ControlNetLogDataProtoV0001_Point_Measure_DataEntry;
-  class ControlPointFileEntryV0002_Measure_MeasureLogData;
   class PvlKeyword;
 
   /**
@@ -47,6 +45,7 @@ namespace Isis {
    *   @history 2011-04-04 Steven Lambright - Added error checking to the
    *                         conversion to protocol buffer
    *   @history 2011-04-11 Steven Lambright - Added GetValue method
+   *   @history 2012-12-21 Adam Goins - Removed protobuf references.
    */
   class ControlMeasureLogData {
     public:
@@ -129,10 +128,6 @@ namespace Isis {
       ControlMeasureLogData(NumericLogDataType);
       ControlMeasureLogData(PvlKeyword);
       ControlMeasureLogData(NumericLogDataType, double value);
-      ControlMeasureLogData(
-          const ControlNetLogDataProtoV0001_Point_Measure_DataEntry &);
-      ControlMeasureLogData(
-          const ControlPointFileEntryV0002_Measure_MeasureLogData &);
       ControlMeasureLogData(const ControlMeasureLogData & other);
       ~ControlMeasureLogData();
 
@@ -144,9 +139,6 @@ namespace Isis {
       QVariant GetValue() const;
       bool IsValid() const;
       PvlKeyword ToKeyword() const;
-
-      ControlPointFileEntryV0002_Measure_MeasureLogData
-          ToProtocolBuffer() const;
 
       NumericLogDataType NameToDataType(QString name) const;
       QString DataTypeToName(NumericLogDataType) const;
