@@ -3,8 +3,6 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
-#include <string>
-
 #include <QDebug>
 #include <QString>
 
