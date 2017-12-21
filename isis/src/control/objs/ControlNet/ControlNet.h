@@ -31,8 +31,6 @@
 #include <map>
 #include <vector>
 
-#include "ControlNetFile.h"
-
 #include <QString>
 
 template< typename A, typename B > class QHash;
@@ -206,7 +204,7 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added throw to caught exception for bad control net
    *                           import in constructor. Also removed p_invalid as it was no longer
    *                           being used anywhere. Fixes #5068.
-   *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258. 
+   *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -254,7 +252,7 @@ namespace Isis {
       ControlPoint *GetPoint(QString pointId);
       const ControlPoint *GetPoint(int index) const;
       ControlPoint *GetPoint(int index);
-      
+
       const ControlCubeGraphNode *getGraphNode(QString serialNumber) const;
       ControlCubeGraphNode *getGraphNode(QString serialNumber);
 
@@ -335,7 +333,7 @@ namespace Isis {
        *
        * @internal
        */
-      class ControlMeasureLessThanFunctor : 
+      class ControlMeasureLessThanFunctor :
           public std::binary_function<ControlMeasure* const &,
           ControlMeasure * const &, bool > {
         public:
@@ -346,9 +344,9 @@ namespace Isis {
             this->m_accessor = other.m_accessor;
           }
           ~ControlMeasureLessThanFunctor() {}
-            
+
           bool operator()(ControlMeasure* const &, ControlMeasure* const &);
-          ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other); 
+          ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other);
 
         private:
           double(ControlMeasure::*m_accessor)() const;
@@ -363,7 +361,7 @@ namespace Isis {
        *
        * @author ????-??-?? Unknown
        *
-       * @internal 
+       * @internal
        */
       class ControlVertex {
         public:
@@ -443,7 +441,7 @@ namespace Isis {
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
       std::vector<Distance> p_targetRadii;        //!< Radii of target body
 
-      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
+      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
   };
 
   //! This typedef is for future implementation of target body
