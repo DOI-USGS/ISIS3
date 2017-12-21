@@ -262,59 +262,68 @@ namespace Isis {
    */
   ControlPointV0003::ControlPointV0003(ControlPointV0002 &oldPoint)
    : m_pointData(new ControlPointFileEntryV0002) {
-    ControlNetFileProtoV0001_PBControlPoint oldPointData = oldPoint.pointData();
+    QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
+    if (!oldPointData) {
+      QString msg = "Version 2 control point is missing point data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    QSharedPointer<ControlNetLogDataProtoV0001_Point> oldLogData = oldPoint.logData();
+    if (!oldLogData) {
+      QString msg = "Version 2 control point is missing measure log data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
     // Copy over POD values
-    if ( oldPointData.has_id() ) {
-      m_pointData->set_id( oldPointData.id() );
+    if ( oldPointData->has_id() ) {
+      m_pointData->set_id( oldPointData->id() );
     }
-    if ( oldPointData.has_choosername() ) {
-      m_pointData->set_choosername( oldPointData.choosername() );
+    if ( oldPointData->has_choosername() ) {
+      m_pointData->set_choosername( oldPointData->choosername() );
     }
-    if ( oldPointData.has_datetime() ) {
-      m_pointData->set_datetime( oldPointData.datetime() );
+    if ( oldPointData->has_datetime() ) {
+      m_pointData->set_datetime( oldPointData->datetime() );
     }
-    if ( oldPointData.has_apriorisurfpointsourcefile() ) {
-      m_pointData->set_apriorisurfpointsourcefile( oldPointData.apriorisurfpointsourcefile() );
+    if ( oldPointData->has_apriorisurfpointsourcefile() ) {
+      m_pointData->set_apriorisurfpointsourcefile( oldPointData->apriorisurfpointsourcefile() );
     }
-    if ( oldPointData.has_aprioriradiussourcefile() ) {
-      m_pointData->set_aprioriradiussourcefile( oldPointData.aprioriradiussourcefile() );
+    if ( oldPointData->has_aprioriradiussourcefile() ) {
+      m_pointData->set_aprioriradiussourcefile( oldPointData->aprioriradiussourcefile() );
     }
-    if ( oldPointData.has_jigsawrejected() ) {
-      m_pointData->set_jigsawrejected( oldPointData.jigsawrejected() );
+    if ( oldPointData->has_jigsawrejected() ) {
+      m_pointData->set_jigsawrejected( oldPointData->jigsawrejected() );
     }
-    if ( oldPointData.has_editlock() ) {
-      m_pointData->set_editlock( oldPointData.editlock() );
+    if ( oldPointData->has_editlock() ) {
+      m_pointData->set_editlock( oldPointData->editlock() );
     }
-    if ( oldPointData.has_ignore() ) {
-      m_pointData->set_ignore( oldPointData.ignore() );
+    if ( oldPointData->has_ignore() ) {
+      m_pointData->set_ignore( oldPointData->ignore() );
     }
-    if ( oldPointData.has_apriorix() ) {
-      m_pointData->set_apriorix( oldPointData.apriorix() );
+    if ( oldPointData->has_apriorix() ) {
+      m_pointData->set_apriorix( oldPointData->apriorix() );
     }
-    if ( oldPointData.has_aprioriy() ) {
-      m_pointData->set_aprioriy( oldPointData.aprioriy() );
+    if ( oldPointData->has_aprioriy() ) {
+      m_pointData->set_aprioriy( oldPointData->aprioriy() );
     }
-    if ( oldPointData.has_aprioriz() ) {
-      m_pointData->set_aprioriz( oldPointData.aprioriz() );
+    if ( oldPointData->has_aprioriz() ) {
+      m_pointData->set_aprioriz( oldPointData->aprioriz() );
     }
-    if ( oldPointData.has_adjustedx() ) {
-      m_pointData->set_adjustedx( oldPointData.adjustedx() );
+    if ( oldPointData->has_adjustedx() ) {
+      m_pointData->set_adjustedx( oldPointData->adjustedx() );
     }
-    if ( oldPointData.has_adjustedy() ) {
-      m_pointData->set_adjustedy( oldPointData.adjustedy() );
+    if ( oldPointData->has_adjustedy() ) {
+      m_pointData->set_adjustedy( oldPointData->adjustedy() );
     }
-    if ( oldPointData.has_adjustedz() ) {
-      m_pointData->set_adjustedz( oldPointData.adjustedz() );
+    if ( oldPointData->has_adjustedz() ) {
+      m_pointData->set_adjustedz( oldPointData->adjustedz() );
     }
-    if ( oldPointData.has_latitudeconstrained() ) {
-      m_pointData->set_latitudeconstrained( oldPointData.latitudeconstrained() );
+    if ( oldPointData->has_latitudeconstrained() ) {
+      m_pointData->set_latitudeconstrained( oldPointData->latitudeconstrained() );
     }
-    if ( oldPointData.has_longitudeconstrained() ) {
-      m_pointData->set_longitudeconstrained( oldPointData.longitudeconstrained() );
+    if ( oldPointData->has_longitudeconstrained() ) {
+      m_pointData->set_longitudeconstrained( oldPointData->longitudeconstrained() );
     }
-    if ( oldPointData.has_radiusconstrained() ) {
-      m_pointData->set_radiusconstrained( oldPointData.radiusconstrained() );
+    if ( oldPointData->has_radiusconstrained() ) {
+      m_pointData->set_radiusconstrained( oldPointData->radiusconstrained() );
     }
 
     // Copy over enumerated values
@@ -322,8 +331,8 @@ namespace Isis {
     // The only point types in V0002 are ground and tie.
     // So, convert ground and tie to their V0003 values, fixed and free respectively.
     // Later check if the point is constrained.
-    if ( oldPointData.has_type() ) {
-      ControlNetFileProtoV0001_PBControlPoint_PointType pointType = oldPointData.type();
+    if ( oldPointData->has_type() ) {
+      ControlNetFileProtoV0001_PBControlPoint_PointType pointType = oldPointData->type();
       if (pointType == ControlNetFileProtoV0001_PBControlPoint::Ground) {
         m_pointData->set_type(ControlPointFileEntryV0002::Fixed);
       }
@@ -336,9 +345,9 @@ namespace Isis {
       }
     }
 
-    if ( oldPointData.has_apriorisurfpointsource() ) {
+    if ( oldPointData->has_apriorisurfpointsource() ) {
       ControlNetFileProtoV0001_PBControlPoint_AprioriSource surfacePointSource;
-      surfacePointSource = oldPointData.apriorisurfpointsource();
+      surfacePointSource = oldPointData->apriorisurfpointsource();
       if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::None) {
         m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::None);
       }
@@ -363,9 +372,9 @@ namespace Isis {
       }
     }
 
-    if ( oldPointData.has_aprioriradiussource() ) {
+    if ( oldPointData->has_aprioriradiussource() ) {
       ControlNetFileProtoV0001_PBControlPoint_AprioriSource radiusSource;
-      radiusSource = oldPointData.aprioriradiussource();
+      radiusSource = oldPointData->aprioriradiussource();
       if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::None) {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::None);
       }
@@ -393,30 +402,30 @@ namespace Isis {
     // Copy the array values
 
     // If there is a covariance matrix, then the point is constrained
-    if (oldPointData.aprioricovar_size() > 0) {
+    if (oldPointData->aprioricovar_size() > 0) {
       m_pointData->set_type(ControlPointFileEntryV0002::Constrained);
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(0) );
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(1) );
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(2) );
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(3) );
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(4) );
-      m_pointData->add_aprioricovar( oldPointData.aprioricovar(5) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(0) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(1) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(2) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(3) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(4) );
+      m_pointData->add_aprioricovar( oldPointData->aprioricovar(5) );
     }
 
-    if (oldPointData.adjustedcovar_size() > 0) {
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(0) );
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(1) );
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(2) );
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(3) );
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(4) );
-      m_pointData->add_adjustedcovar( oldPointData.adjustedcovar(5) );
+    if (oldPointData->adjustedcovar_size() > 0) {
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(0) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(1) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(2) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(3) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(4) );
+      m_pointData->add_adjustedcovar( oldPointData->adjustedcovar(5) );
     }
 
     // Copy the measures
-    for (int i = 0; i < oldPointData.measures_size(); i++) {
+    for (int i = 0; i < oldPointData->measures_size(); i++) {
       ControlPointFileEntryV0002_Measure *newMeasure = m_pointData->add_measures();
       ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure oldMeasure;
-      oldMeasure = oldPointData.measures(i);
+      oldMeasure = oldPointData->measures(i);
 
       // Copy over POD values
       if ( oldMeasure.has_serialnumber() ) {
@@ -490,6 +499,17 @@ namespace Isis {
         else {
           QString msg = "Invalid measure type";
           throw IException(IException::User, msg, _FILEINFO_);
+        }
+
+        // Copy over any log data
+        ControlNetLogDataProtoV0001_Point_Measure measureLogData = oldLogData->measures(i);
+        for (int j = 0; j < measureLogData.loggedmeasuredata_size(); j++) {
+          ControlNetLogDataProtoV0001_Point_Measure_DataEntry oldData =
+                measureLogData.loggedmeasuredata(j);
+          ControlPointFileEntryV0002_Measure_MeasureLogData newData;
+          newData.set_doubledatatype( oldData.datatype() );
+          newData.set_doubledatavalue( oldData.datavalue() );
+          *newMeasure->add_log() = newData;
         }
 
         // Check that all the required fields in the measure are filled

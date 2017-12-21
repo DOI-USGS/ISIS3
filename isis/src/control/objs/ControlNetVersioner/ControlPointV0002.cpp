@@ -328,21 +328,13 @@ namespace Isis {
 
 
   /**
-   * Access the protobuf control point data. If there is not internal point data then
-   * default point data is returned. Note that default point data may be missing required
-   * fields.
+   * Access the protobuf control point data.
    *
-   * @return @b const ControlNetFileProtoV0001_PBControlPoint& A constant reference to the internal
-   *                                                           control point data. There is no
-   *                                                           guarantee that the point data is
-   *                                                           fully initialized.
+   * @return @b QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> A pointer to the internal
+   *                                                                    point data.
    */
-  const ControlNetFileProtoV0001_PBControlPoint &ControlPointV0002::pointData() {
-      if (!m_pointData) {
-        m_pointData.reset(new ControlNetFileProtoV0001_PBControlPoint);
-      }
-
-      return *m_pointData;
+  QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0002::pointData() {
+      return m_pointData;
   }
 
 

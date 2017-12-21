@@ -40,7 +40,7 @@ namespace Isis {
                         QSharedPointer<ControlNetLogDataProtoV0001_Point> logData);
       ControlPointV0002(ControlPointV0001 &oldPoint);
 
-      const ControlNetFileProtoV0001_PBControlPoint &pointData();
+      QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData();
       QSharedPointer<ControlNetLogDataProtoV0001_Point> logData();
 
     private:
