@@ -2464,7 +2464,9 @@ namespace Isis {
 
     return fileEntry;
   }
-  double ControlPoint::AprioriCovar(int position) const {
+
+  //! Returns the apriori covar value associated at the given position.
+  double ControlPoint::GetAprioriCovar(int position) const {
     SurfacePoint apriori = GetAprioriSurfacePoint();
     symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
     switch (position) {
@@ -2486,12 +2488,13 @@ namespace Isis {
       case 5:
         return covar(2, 2);
         break;
-        default:
-          QString msg = "Invalid position given";
-          throw IException(IException::Io, msg, _FILEINFO_);
+      default:
+        QString msg = "Invalid position given";
+        throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
+  //! Returns true if there are apriori surface point covar values.
   bool ControlPoint::HasAprioriCovar() const {
     SurfacePoint apriori = GetAprioriSurfacePoint();
     symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
@@ -2504,6 +2507,7 @@ namespace Isis {
     return false;
   }
 
+  //! Returns true if there are adjusted surface point covar values.
   bool ControlPoint::HasAdjustedCovar() const {
     SurfacePoint adjusted = GetAdjustedSurfacePoint();
     symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
@@ -2516,7 +2520,8 @@ namespace Isis {
     return false;
   }
 
-  double ControlPoint::AdjustedCovar(int position) const {
+  //! Returns the adjusted covar value associated at the given position.
+  double ControlPoint::GetAdjustedCovar(int position) const {
     SurfacePoint adjusted = GetAdjustedSurfacePoint();
     symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
     switch (position) {
