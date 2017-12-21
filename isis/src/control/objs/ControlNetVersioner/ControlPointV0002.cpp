@@ -322,7 +322,7 @@ namespace Isis {
    * @param oldPoint The old version 1 control point.
    */
   ControlPointV0002::ControlPointV0002(ControlPointV0001 &oldPoint)
-   : m_pointData(oldPoint.pointData()) {
+   : m_pointData(oldPoint.pointData()), m_logData(oldPoint.logData()) {
 
   }
 
