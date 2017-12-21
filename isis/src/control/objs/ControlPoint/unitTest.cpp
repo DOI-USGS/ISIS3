@@ -32,6 +32,7 @@ void printPoint(ControlPoint &p);
   * @history 2015-02-17  Andrew Stebenne, changed a reference to a local filesystem to a dummy file 
   *                         (dummy.cub) to make it clearer that the .cub file being referenced
   *                         wasn't necessary.
+  * @history 2017-12-21 Kristin Berry - Added tests for newly added accessor methods. 
   */
 int main() {
   Preference::Preferences(true);
@@ -248,6 +249,40 @@ int main() {
   foreach (ControlMeasure * measure, measures)
     cout << measure->GetCubeSerialNumber() << "\n";
 
+
+  cout << "Testing various accessor methods... " << endl;
+
+  if (cp.HasAprioriSurfacePointSourceFile()) {
+    cout << "AprioriSurfacePointSourceFile: " << cp.GetAprioriSurfacePointSourceFile() << endl;
+  }
+
+  if (cp.HasAprioriRadiusSourceFile()) {
+    cout << "AprioriRadiusSourceFile: " << cp.GetAprioriRadiusSourceFile() << endl;
+  }
+
+  if (cp.HasAprioriCoordinates()) {
+    cout << "AprioriCoordinates: (" << cp.GetAprioriX().meters() << ", "
+                                    << cp.GetAprioriY().meters() << ", " 
+                                    << cp.GetAprioriZ().meters() << ")" << endl;
+  }
+
+  if (cp.HasAdjustedCoordinates()) {
+    cout << "AdjustedCoordinates: (" << cp.GetAdjustedX().meters() << ", "
+                                     << cp.GetAdjustedY().meters() << ", " 
+                                     << cp.GetAdjustedZ().meters() << ")" << endl;
+  }
+
+  if (cp.HasRefMeasure()) {
+    cout << "ReferenceMeasure index: " << cp.IndexOfRefMeasure() << endl;
+  }
+
+  if (cp.IsJigsawRejected()) {
+    cout << "Point was rejected by jigsaw." << endl;
+  }
+  else {
+    cout << "Point was not rejected by jigsaw." << endl;
+  }
+
   cout << "\ntesting error handling for StringToPointType...\n";
   try {
     ControlPoint::StringToPointType("aoeu");
@@ -255,6 +290,7 @@ int main() {
   catch (IException &e) {
     cout << "  " << e.toString() << "\n";
   }
+
 }
 
 void printPoint(Isis::ControlPoint &p) {
