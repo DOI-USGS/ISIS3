@@ -27,6 +27,7 @@
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
 #include "Distance.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
@@ -240,7 +241,8 @@ namespace Isis {
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
-    ControlNetVersioner versionedReader(FileName(filename));
+    FileName cnetFileName(filename);
+    ControlNetVersioner versionedReader(cnetFileName);
 
     SetTarget( versionedReader.targetName() );
     p_networkId   = versionedReader.netId();
@@ -251,7 +253,7 @@ namespace Isis {
 
     int numPoints = versionedReader.numPoints();
     for (int i = 0; i < numPoints; i++) {
-      AddPoint( versionedReader.takeFirstPoint().data() );
+      AddPoint( versionedReader.takeFirstPoint() );
     }
   }
 
@@ -272,7 +274,7 @@ namespace Isis {
     ControlNetVersioner versionedWriter(this);
 
     if (pvl) {
-      Pvl network
+      Pvl network;
       try {
         network = versionedWriter.toPvl();
       }

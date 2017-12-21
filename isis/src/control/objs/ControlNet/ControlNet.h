@@ -48,6 +48,7 @@ namespace Isis {
   class ControlCubeGraphNode;
   class Distance;
   class Progress;
+  class Pvl;
   class SerialNumberList;
 
   /**
