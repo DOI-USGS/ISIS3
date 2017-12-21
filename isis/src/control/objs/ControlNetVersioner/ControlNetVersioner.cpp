@@ -136,12 +136,23 @@ namespace Isis {
   }
 
 
-  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint() {
-    return m_points.takeFirst();
+  /**
+   * Returns the number of points that have been read in or are ready to write out.
+   *
+   * @return @b int The number of control points stored internally.
+   */
+  int ControlNetVersioner::numPoints() const {
+    return m_points.size();
   }
 
 
+  QSharedPointer<ControlPoint> ControlNetVersioner::takeFirstPoint() {
+    if (!m_points.isEmpty) {
+      return m_points.takeFirst();
+    }
 
+    return QSharedPointer<ControlPoint>;
+  }
 
 
   /**

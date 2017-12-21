@@ -161,6 +161,7 @@ namespace Isis {
       QString description() const;
       QString userName() const;
 
+      int numPoints() const;
       QSharedPointer<ControlPoint> takeFirstPoint();
 
       void write(FileName netFile);
