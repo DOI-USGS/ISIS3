@@ -340,8 +340,6 @@ namespace Isis {
    *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
    *                            GetAdjustedX(), GetAdjustedY(), GetAdjustedZ(), HasRefMeasure().
    *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected().
-   *   @history 2017-12-20 Adam Goins - Added AprioriCovar() and AdjustedCovar() accessors.
-   *   @history 2017-12-21 Adam Goins - Removed redundant code following ControlNetVersioner refactor.
    */
   class ControlPoint : public QObject {
 
@@ -446,6 +444,9 @@ namespace Isis {
       ControlPoint();
       ControlPoint(const ControlPoint &);
       ControlPoint(const QString &id);
+      ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
+          const Distance &majorRad, const Distance &minorRad,
+          const Distance &polarRad);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
@@ -512,8 +513,6 @@ namespace Isis {
 
       bool HasAprioriCoordinates();
       bool HasAdjustedCoordinates();
-      bool HasAprioriCovar() const;
-      bool HasAdjustedCovar() const;
 
       bool IsConstrained();
       bool IsLatitudeConstrained();
@@ -578,9 +577,9 @@ namespace Isis {
       double GetSampleResidualRms() const;
       double GetLineResidualRms() const;
       double GetResidualRms() const;
-      double GetAprioriCovar(int) const;
-      double GetAdjustedCovar(int) const;
       void ClearJigsawRejected();
+
+      ControlPointFileEntryV0002 ToFileEntry() const;
 
     private:
       void SetExplicitReference(ControlMeasure *measure);
