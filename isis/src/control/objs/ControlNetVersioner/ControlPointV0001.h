@@ -28,7 +28,7 @@
  #include "ControlNetFileProtoV0001.pb.h"
 
 namespace Isis {
-  class Pvl;
+  class PvlObject;
   class PvlContainer;
 
   class ControlPointV0001 {

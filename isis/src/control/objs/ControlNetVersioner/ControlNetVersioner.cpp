@@ -6,6 +6,7 @@
 #include <string>
 
 #include <QDebug>
+#include <QString>
 
 #include "ControlNetFileHeaderV0002.pb.h"
 #include "ControlNetFileHeaderV0005.pb.h"
@@ -22,7 +23,6 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
-#include "IString.h"
 #include "Latitude.h"
 #include "LinearAlgebra.h"
 #include "Longitude.h"
@@ -911,7 +911,7 @@ namespace Isis {
 
     fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
     if (!input.is_open()) {
-      IString msg = "Failed to open control network file" + netFile.name();
+      QString msg = "Failed to open control network file" + netFile.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1015,7 +1015,7 @@ namespace Isis {
 
     fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
     if (!input.is_open()) {
-      IString msg = "Failed to open control network file" + netFile.name();
+      QString msg = "Failed to open control network file" + netFile.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1120,7 +1120,7 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(const &ControlPointV0001 point) {
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0001 &point) {
 
     ControlPointV0002 newPoint(point);
     return createPoint(newPoint);
@@ -1140,7 +1140,7 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(const &ControlPointV0002 point) {
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0002 &point) {
 
     ControlPointV0003 newPoint(point);
     return createPoint(newPoint);
@@ -1160,7 +1160,7 @@ namespace Isis {
    * @return The latest version ControlPoint constructed from the
    *         given point.
    */
-  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(const &ControlPointV0003 point) {
+  QSharedPointer<ControlPoint> ControlNetVersioner::createPoint(ControlPointV0003 &point) {
 
     ControlPointFileEntryV0002 protoPoint = point.pointData();
     QSharedPointer<ControlPoint> controlPoint;
@@ -1183,7 +1183,7 @@ namespace Isis {
         pointType = ControlPoint::PointType::Fixed;
         break;
       default:
-        QString msg = "Unable to create ControlPoint [" + protoPoint.id().c_str() + "] from file. "
+        QString msg = "Unable to create ControlPoint [" + QString(protoPoint.id().c_str()) + "] from file. "
                       "Type enumeration [" + toString((int)(protoPoint.type())) + "] is invalid.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
@@ -1339,7 +1339,7 @@ namespace Isis {
     // adding measure information
     for (int m = 0 ; m < protoPoint.measures_size(); m++) {
       QSharedPointer<ControlMeasure> measure = createMeasure(protoPoint.measures(m));
-      controlPoint->AddMeasure(measure.data());
+      controlPoint->Add(measure.data());
     }
 
     if (protoPoint.has_referenceindex()) {
@@ -1465,7 +1465,7 @@ namespace Isis {
 
       streampos startCoreHeaderPos = output.tellp();
 
-      OStreamOutputStream* fileStream(output);
+      OstreamOutputStream* fileStream = new OstreamOutputStream(&output);
 
       writeHeader(fileStream);
 
@@ -1478,12 +1478,12 @@ namespace Isis {
 
       ControlNetFileHeaderV0005 protobufHeader;
 
-      protobufHeader.set_networkid(m_header.networkID.toStdString());
-      protobufHeader.set_targetname(m_header.targetName.toStdString());
-      protobufHeader.set_created(m_header.created.toStdString());
-      protobufHeader.set_lastmodified(m_header.lastModified.toStdString());
-      protobufHeader.set_description(m_header.description.toStdString());
-      protobufHeader.set_username(m_header.userName.toStdString());
+      protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
+      protobufHeader.set_targetname(m_header.targetName.toLatin1().data());
+      protobufHeader.set_created(m_header.created.toLatin1().data());
+      protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
+      protobufHeader.set_description(m_header.description.toLatin1().data());
+      protobufHeader.set_username(m_header.userName.toLatin1().data());
 
       streampos coreHeaderSize = protobufHeader.ByteSize();
 
@@ -1506,12 +1506,12 @@ namespace Isis {
 
       PvlGroup netInfo("ControlNetworkInfo");
       netInfo.addComment("This group is for informational purposes only");
-      netInfo += PvlKeyword("NetworkId", protobufHeader.get_networkid().c_str());
-      netInfo += PvlKeyword("TargetName", protobufHeader.get_targetname().c_str());
-      netInfo += PvlKeyword("UserName", protobufHeader.get_username().c_str());
-      netInfo += PvlKeyword("Created", protobufHeader.get_created().c_str());
-      netInfo += PvlKeyword("LastModified", protobufHeader.get_lastmodified().c_str());
-      netInfo += PvlKeyword("Description", protobufHeader.get_description().c_str());
+      netInfo += PvlKeyword("NetworkId", protobufHeader.networkid().c_str());
+      netInfo += PvlKeyword("TargetName", protobufHeader.targetname().c_str());
+      netInfo += PvlKeyword("UserName", protobufHeader.username().c_str());
+      netInfo += PvlKeyword("Created", protobufHeader.created().c_str());
+      netInfo += PvlKeyword("LastModified", protobufHeader.lastmodified().c_str());
+      netInfo += PvlKeyword("Description", protobufHeader.description().c_str());
       netInfo += PvlKeyword("NumberOfPoints", toString(m_points.size()));
 
       // Is there a better way we can get the total number of measures?
@@ -1547,17 +1547,16 @@ namespace Isis {
 
     // Create the protobuf header using our struct
     ControlNetFileHeaderV0005 protobufHeader;
-    protobufHeader.set_networkid(m_header.networkID.toStdString());
-    protobufHeader.set_targetname(m_header.targetName.toStdString());
-    protobufHeader.set_created(m_header.created.toStdString());
-    protobufHeader.set_lastmodified(m_header.lastModified.toStdString());
-    protobufHeader.set_description(m_header.description.toStdString());
-    protobufHeader.set_username(m_header.userName.toStdString());
+    protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
+    protobufHeader.set_targetname(m_header.targetName.toLatin1().data());
+    protobufHeader.set_created(m_header.created.toLatin1().data());
+    protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
+    protobufHeader.set_description(m_header.description.toLatin1().data());
+    protobufHeader.set_username(m_header.userName.toLatin1().data());
 
     // Write out the header
     if (!protobufHeader.SerializeToCodedStream(&fileStream)) {
-      IString msg = "Failed to write output control network file [" +
-          file.name() + "]";
+      QString msg = "Failed to write output control network file.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -1575,19 +1574,34 @@ namespace Isis {
       ControlPointFileEntryV0002 protoPoint;
       QSharedPointer<ControlPoint> controlPoint = m_points.takeFirst();
 
-      protoPoint.set_type(controlPoint->getType());
-
-      protoPoint.set_id(controlPoint->GetId());
-      protoPoint.set_choosername(controlPoint->GetChooserName().toStdString());
-      protoPoint.set_datetime(controlPoint->GetDateTime().toStdString());
+      protoPoint.set_id(controlPoint->GetId().toLatin1().data());
+      protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
+      protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
       protoPoint.set_editlock(controlPoint->IsEditLocked());
+
+      ControlPointFileEntryV0002_PointType pointType;
+      switch (controlPoint->GetType()) {
+        case ControlPoint::PointType::Free:
+          pointType = ControlPointFileEntryV0002_PointType_Free;
+          break;
+        case ControlPoint::PointType::Constrained:
+          pointType = ControlPointFileEntryV0002_PointType_Constrained;
+          break;
+        case ControlPoint::PointType::Fixed:
+          pointType = ControlPointFileEntryV0002_PointType_Fixed;
+          break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + QString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetType())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          break;
+      }
+      protoPoint.set_type(pointType);
 
       protoPoint.set_ignore(controlPoint->IsIgnored());
 
-      protoPoint.set_apriorisurfpointsource(controlPoint->GetAprioriSurfPointSource());
-
       if (controlPoint->HasAprioriSurfacePointSourceFile()) {
-        protoPoint.set_apriorisurfpointsourcefile(controlPoint->GetAprioriSurfacePointSourceFile());
+        protoPoint.set_apriorisurfpointsourcefile(controlPoint->GetAprioriSurfacePointSourceFile().toLatin1().data());
       }
 
       // Apriori Surf Point Source ENUM settting
@@ -1609,6 +1623,11 @@ namespace Isis {
           break;
         case ControlPoint::SurfacePointSource::BundleSolution:
           protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
+          break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + QString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetAprioriSurfacePointSource())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
           break;
       }
 
@@ -1632,12 +1651,15 @@ namespace Isis {
         case ControlPoint::RadiusSource::DEM:
           protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
           break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + QString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetAprioriRadiusSource())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          break;
       }
 
-      protoPoint.set_aprioriradiussource(controlPoint->GetAprioriRadiusSource());
-
       if (controlPoint->HasAprioriRadiusSourceFile()) {
-        protoPoint.set_aprioriradiussourcefile(controlPoint->GetAprioriRadiusSourceFile().toStdString());
+        protoPoint.set_aprioriradiussourcefile(controlPoint->GetAprioriRadiusSourceFile().toLatin1().data());
       }
 
       if (controlPoint->HasAprioriCoordinates()) {
@@ -1695,32 +1717,32 @@ namespace Isis {
              protoPoint.set_referenceindex(j);
         }
 
-        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toStdString());
+        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toLatin1().data());
 
         switch ( controlMeasure.GetType() ) {
             case (ControlMeasure::MeasureType::Candidate):
-                protoMeasure.set_measuretype(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
                 break;
 
             case (ControlMeasure::MeasureType::Manual):
-                protoMeasure.set_measuretype(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
                 break;
 
             case (ControlMeasure::RegisteredPixel):
-                protoMeasure.set_measuretype(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel);
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel);
                 break;
 
             case (ControlMeasure::RegisteredSubPixel):
-                protoMeasure.set_measuretype(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
                 break;
         }
 
         if (controlMeasure.HasChooserName()) {
-          protoMeasure.set_choosername(controlMeasure.GetChooserName().toStdString());
+          protoMeasure.set_choosername(controlMeasure.GetChooserName().toLatin1().data());
         }
 
         if (controlMeasure.HasDateTime()) {
-          protoMeasure.set_datetime(controlMeasure.GetDateTime().toStdString());
+          protoMeasure.set_datetime(controlMeasure.GetDateTime().toLatin1().data());
         }
 
         protoMeasure.set_editlock(controlMeasure.IsEditLocked());
@@ -1787,13 +1809,13 @@ namespace Isis {
         if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
         }
-        protoPoint.add_measures(protoMeasure);
+        *protoPoint.add_measures() = protoMeasure;
       }
 
       int msgSize(protoPoint.ByteSize());
       fileStream.WriteVarint32(msgSize);
 
-      if ( !protoPoint.SerializeToCodedStream(fileStream.data()) ) {
+      if ( !protoPoint.SerializeToCodedStream(&fileStream) ) {
         QString err = "Error writing to coded protobuf stream";
         throw IException(IException::Programmer, err, _FILEINFO_);
       }
@@ -1828,12 +1850,12 @@ namespace Isis {
         return ReadPvlNetwork(network);
       }
       else {
-        IString msg = "Could not determine the control network file type";
+        QString msg = "Could not determine the control network file type";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
     catch (IException &e) {
-      IString msg = "Reading the control network [" + networkFileName.name()
+      QString msg = "Reading the control network [" + networkFileName.name()
           + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -1902,7 +1924,7 @@ namespace Isis {
           break;
 
         default:
-          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+          QString msg = "The Pvl file version [" + QString(version) + "] is not"
               " supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1910,7 +1932,7 @@ namespace Isis {
       version = toInt(network["Version"][0]);
 
       if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
+        QString msg = "Cannot update from version [" + QString(version) + "] "
             "to any other version";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -1935,7 +1957,7 @@ namespace Isis {
           break;
 
         default:
-          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+          QString msg = "The Pvl file version [" + QString(version) + "] is not"
               " supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1943,7 +1965,7 @@ namespace Isis {
       version = toInt(network["Version"][0]);
 
       if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
+        QString msg = "Cannot update from version [" + QString(version) + "] "
             "to any other version";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -1969,7 +1991,7 @@ namespace Isis {
           break;
 
         default:
-          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+          QString msg = "The Pvl file version [" + QString(version) + "] is not"
               " supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -1977,7 +1999,7 @@ namespace Isis {
       version = toInt(network["Version"][0]);
 
       if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
+        QString msg = "Cannot update from version [" + QString(version) + "] "
             "to any other version";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -2022,7 +2044,7 @@ namespace Isis {
           break;
 
         default:
-          IString msg = "The Pvl file version [" + IString(version) + "] is not"
+          QString msg = "The Pvl file version [" + QString(version) + "] is not"
               " supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -2030,7 +2052,7 @@ namespace Isis {
       version = toInt(network["Version"][0]);
 
       if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
+        QString msg = "Cannot update from version [" + QString(version) + "] "
             "to any other version";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -2067,7 +2089,7 @@ namespace Isis {
     header.add_pointmessagesizes(0); // Just to pass the "IsInitialized" test
 
     if (!header.IsInitialized()) {
-      IString msg = "There is missing required information in the network "
+      QString msg = "There is missing required information in the network "
           "header";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -2115,7 +2137,7 @@ namespace Isis {
         break;
 
       default:
-        IString msg = "The binary file version [" + IString(version) + "] is "
+        QString msg = "The binary file version [" + QString(version) + "] is "
             "not supported";
         throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -2476,172 +2498,4 @@ namespace Isis {
   }
 
 #endif
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0006 for booleans. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlPointV0006 &point,
-                                 void (ControlPointV0006::*setter)(bool)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    value = value.toLower();
-
-    if (value == "true" || value == "yes")
-      (point.*setter)(true);
-  }
-
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0006 for doubles. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlPointV0006 &point,
-                                 void (ControlPointV0006::*setter)(double)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
-    (point.*setter)(value);
-  }
-
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointV0006 for strings. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlPointV0006 &point,
-                                 void (ControlPointV0006::*setter)(const std::string&)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    IString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    (point.*setter)(value);
-  }
-
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlMeasureV0006 for booleans. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlMeasureV0006 &measure,
-                                 void (ControlMeasureV0006::*setter)(bool)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    value = value.toLower();
-
-    if (value == "true" || value == "yes")
-      (measure.*setter)(true);
-  }
-
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlMeasureV0006 for doubles. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlMeasureV0006 &measure,
-                                 void (ControlMeasureV0006::*setter)(double)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
-    (measure.*setter)(value);
-  }
-
-
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlMeasureV0006 for strings. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param set The protocol buffer setter method
-   */
-  void ControlNetVersioner::copy(PvlContainer &container,
-                                 QString keyName,
-                                 ControlMeasureV0006 &measure,
-                                 void (ControlMeasureV0006::*setter)
-                                      (const std::string &)) {
-
-    if (!container.hasKeyword(keyName))
-      return;
-
-    IString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    (measure.*set)(value);
-  }
 }

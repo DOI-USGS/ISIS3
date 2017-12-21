@@ -29,7 +29,7 @@
 
 namespace Isis {
   class ControlPointV0001;
-  class Pvl;
+  class PvlObject;
   class PvlContainer;
 
   class ControlPointV0002 {
