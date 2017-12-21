@@ -36,7 +36,6 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
-  class ControlPointFileEntryV0002_Measure;
   class ControlCubeGraphNode;
   class PvlGroup;
   class PvlKeyword;
@@ -170,6 +169,7 @@ namespace Isis {
    *   @history 2017-12-19 Adam Goins - Added "HasX()" accessors to ControlMeasure.
    *   @history 2017-12-20 Jesse Mapel - Implemented GetLogDataEntries method for use in
    *                           ControlNetVersioner refactor.
+   *   @history 2017-12-21 Adam Goins - Removed protobuf references.
    */
   class ControlMeasure : public QObject {
 
@@ -240,7 +240,6 @@ namespace Isis {
       };
 
       ControlMeasure();
-      ControlMeasure(const ControlPointFileEntryV0002_Measure &);
       ControlMeasure(const ControlMeasure &other);
       ~ControlMeasure();
 
@@ -335,8 +334,6 @@ namespace Isis {
       const ControlMeasure &operator=(const ControlMeasure &other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
-
-      ControlPointFileEntryV0002_Measure ToProtocolBuffer() const;
 
     private: // methods
       void InitializeToNull();

@@ -33,7 +33,6 @@
 #include "ControlCubeGraphNode.h"
 #include "IString.h"
 #include "iTime.h"
-#include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -56,73 +55,6 @@ namespace Isis {
 
     p_sample = 0.0;
     p_line = 0.0;
-  }
-
-
-  /**
-   * Converts the protocol buffer version of the measure into a real
-   *   ControlMeasure
-   *
-   * @param other The control measure to copy all of the values from
-   */
-  ControlMeasure::ControlMeasure(
-      const ControlPointFileEntryV0002_Measure &protoBuf) {
-    InitializeToNull();
-
-    p_serialNumber = new QString(protoBuf.serialnumber().c_str());
-    p_chooserName = new QString(protoBuf.choosername().c_str());
-    p_dateTime = new QString(protoBuf.datetime().c_str());
-    p_loggedData = new QVector<ControlMeasureLogData>();
-
-    switch (protoBuf.type()) {
-      case ControlPointFileEntryV0002_Measure::Candidate:
-        p_measureType = ControlMeasure::Candidate;
-        break;
-      case ControlPointFileEntryV0002_Measure::Manual:
-        p_measureType = ControlMeasure::Manual;
-        break;
-      case ControlPointFileEntryV0002_Measure::RegisteredPixel:
-        p_measureType = ControlMeasure::RegisteredPixel;
-        break;
-      case ControlPointFileEntryV0002_Measure::RegisteredSubPixel:
-        p_measureType = ControlMeasure::RegisteredSubPixel;
-        break;
-    }
-
-    p_editLock = protoBuf.editlock();
-    p_jigsawRejected = protoBuf.jigsawrejected();
-    p_ignore = protoBuf.ignore();
-    p_sample = protoBuf.sample();
-    p_line = protoBuf.line();
-//    ground = protoBuf.???
-
-    if (protoBuf.has_diameter())
-      p_diameter = protoBuf.diameter();
-
-    if (protoBuf.has_apriorisample())
-      p_aprioriSample = protoBuf.apriorisample();
-
-    if (protoBuf.has_aprioriline())
-      p_aprioriLine = protoBuf.aprioriline();
-
-    if (protoBuf.has_samplesigma())
-      p_sampleSigma = protoBuf.samplesigma();
-
-    if (protoBuf.has_linesigma())
-      p_lineSigma = protoBuf.linesigma();
-
-    if (protoBuf.has_sampleresidual())
-      p_sampleResidual = protoBuf.sampleresidual();
-
-    if (protoBuf.has_lineresidual())
-      p_lineResidual = protoBuf.lineresidual();
-
-    for (int dataEntry = 0;
-        dataEntry < protoBuf.log_size();
-        dataEntry ++) {
-      ControlMeasureLogData logEntry(protoBuf.log(dataEntry));
-      p_loggedData->push_back(logEntry);
-    }
   }
 
 
@@ -856,7 +788,7 @@ namespace Isis {
   QVector<ControlMeasureLogData> ControlMeasure::GetLogDataEntries() const {
     QVector<ControlMeasureLogData> logs;
     if (p_loggedData) {
-      logs = p_loggedData;
+      logs = *p_loggedData;
     }
     return logs;
   }
@@ -1233,77 +1165,6 @@ namespace Isis {
         pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY &&
         pMeasure.p_measuredEphemerisTime == p_measuredEphemerisTime;
   }
-
-
-  ControlPointFileEntryV0002_Measure ControlMeasure::ToProtocolBuffer() const {
-    ControlPointFileEntryV0002_Measure protoBufMeasure;
-
-    protoBufMeasure.set_serialnumber(GetCubeSerialNumber().toLatin1().data());
-    switch (GetType()) {
-      case ControlMeasure::Candidate:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
-        break;
-      case ControlMeasure::Manual:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Manual);
-        break;
-      case ControlMeasure::RegisteredPixel:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::RegisteredPixel);
-        break;
-      case ControlMeasure::RegisteredSubPixel:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::RegisteredSubPixel);
-        break;
-    }
-
-    if (GetChooserName() != "") {
-      protoBufMeasure.set_choosername(GetChooserName().toLatin1().data());
-    }
-    if (GetDateTime() != "") {
-      protoBufMeasure.set_datetime(GetDateTime().toLatin1().data());
-    }
-    if (IsEditLocked())
-      protoBufMeasure.set_editlock(true);
-
-    if (IsIgnored())
-      protoBufMeasure.set_ignore(true);
-
-    if (IsRejected())
-      protoBufMeasure.set_jigsawrejected(true);
-
-    if (GetSample() != 0.)
-      protoBufMeasure.set_sample(GetSample());
-
-    if(GetLine() != 0.)
-      protoBufMeasure.set_line(GetLine());
-
-    if (GetSampleResidual() != Isis::Null)
-      protoBufMeasure.set_sampleresidual(GetSampleResidual());
-
-    if (GetLineResidual() != Isis::Null)
-      protoBufMeasure.set_lineresidual(GetLineResidual());
-
-    if (GetDiameter() != Isis::Null)
-      protoBufMeasure.set_diameter(GetDiameter());
-
-    if (GetAprioriSample() != Isis::Null)
-      protoBufMeasure.set_apriorisample(GetAprioriSample());
-
-    if (GetAprioriLine() != Isis::Null)
-      protoBufMeasure.set_aprioriline(GetAprioriLine());
-
-    if (GetSampleSigma() != Isis::Null)
-      protoBufMeasure.set_samplesigma(GetSampleSigma());
-
-    if (GetLineSigma() != Isis::Null)
-      protoBufMeasure.set_linesigma(GetLineSigma());
-
-    ControlMeasureLogData logEntry;
-    foreach(logEntry, *p_loggedData) {
-      *protoBufMeasure.add_log() = logEntry.ToProtocolBuffer();
-    }
-
-    return protoBufMeasure;
-  }
-
 
   void ControlMeasure::MeasureModified() {
     *p_dateTime = "";
