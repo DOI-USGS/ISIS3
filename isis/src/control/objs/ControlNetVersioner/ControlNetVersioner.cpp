@@ -233,13 +233,13 @@ namespace Isis {
         pvlPoint += PvlKeyword("PointType", "Free");
       }
 
-      if ( !controlPoint.GetId().isEmpty() ) {
+      if ( !controlPoint->GetId().isEmpty() ) {
         pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
       }
-      if ( !controlPoint.GetChooserName().isEmpty() ) {
+      if ( !controlPoint->GetChooserName().isEmpty() ) {
         pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
       }
-      if ( !controlPoint.GetDateTime().isEmpty() ) {
+      if ( !controlPoint->GetDateTime().isEmpty() ) {
         pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
       }
       if (controlPoint->IsEditLocked()) {
@@ -1627,13 +1627,13 @@ namespace Isis {
       ControlPointFileEntryV0002 protoPoint;
       ControlPoint *controlPoint = m_points.takeFirst();
 
-      if ( !controlPoint.GetId().isEmpty() ) {
+      if ( !controlPoint->GetId().isEmpty() ) {
         protoPoint.set_id(controlPoint->GetId().toLatin1().data());
       }
-      if ( !controlPoint.GetChooserName().isEmpty() ) {
+      if ( !controlPoint->GetChooserName().isEmpty() ) {
         protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
       }
-      if ( !controlPoint.GetDateTime().isEmpty() ) {
+      if ( !controlPoint->GetDateTime().isEmpty() ) {
         protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
       }
       if ( controlPoint->IsEditLocked() ) {
