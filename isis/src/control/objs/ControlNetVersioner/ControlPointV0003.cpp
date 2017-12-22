@@ -331,6 +331,9 @@ namespace Isis {
     if ( oldPointData->has_radiusconstrained() ) {
       m_pointData->set_radiusconstrained( oldPointData->radiusconstrained() );
     }
+    if ( oldPointData->has_referenceindex() ) {
+      m_pointData->set_referenceindex( oldPointData->referenceindex() );
+    }
 
     // Copy over enumerated values
 
