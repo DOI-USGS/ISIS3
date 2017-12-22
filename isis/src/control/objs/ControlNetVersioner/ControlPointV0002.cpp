@@ -294,7 +294,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool)) {
@@ -325,7 +325,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double)) {
@@ -353,7 +353,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&)) {
@@ -381,7 +381,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool)) {
@@ -412,7 +412,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double)) {
@@ -440,7 +440,7 @@ namespace Isis {
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
    */
-  void ControlPointV0001::copy(PvlContainer &container,
+  void ControlPointV0002::copy(PvlContainer &container,
                                QString keyName,
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
