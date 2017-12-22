@@ -83,27 +83,27 @@ message ControlPointFileEntryV0005 {
       optional bool    boolDataValue   = 4;
     }
 
-    required string       serialnumber   = 1;
-    required MeasureType  type           = 2;
-    optional double       sample         = 3;
-    optional double       line           = 4;
+    required int32        serialNumberIndex = 1;
+    required MeasureType  type              = 2;
+    optional double       sample            = 3;
+    optional double       line              = 4;
     // Jigsaw info-solution error <pixels>
-    optional double       sampleResidual = 5;
-    optional double       lineResidual   = 6;
-    optional string       choosername    = 7;
-    optional string       datetime       = 8;
-    optional bool         editLock       = 9;
-    optional bool         ignore         = 10;
-    optional bool         jigsawRejected = 11;
-    optional double       diameter       = 12;
+    optional double       sampleResidual    = 5;
+    optional double       lineResidual      = 6;
+    optional string       choosername       = 7;
+    optional string       datetime          = 8;
+    optional bool         editLock          = 9;
+    optional bool         ignore            = 10;
+    optional bool         jigsawRejected    = 11;
+    optional double       diameter          = 12;
     // The first identified location of measure
-    optional double       apriorisample  = 13;
-    optional double       aprioriline    = 14;
+    optional double       apriorisample     = 13;
+    optional double       aprioriline       = 14;
 
     // Uncertainty/Sigma of current samp/line <pixels>
-    optional double       samplesigma    = 15;
-    optional double       linesigma      = 16;
-    repeated MeasureLogData log          = 17;
+    optional double       samplesigma       = 15;
+    optional double       linesigma         = 16;
+    repeated MeasureLogData log             = 17;
   }
 
   //  Actual declaration of variable number of ControlMeasures
