@@ -45,6 +45,7 @@ namespace Isis {
   class ControlPointV0001;
   class ControlPointV0002;
   class ControlPointV0003;
+  class ControlPointV0005;
 
   /**
    * @brief Handle various control network file format versions.
@@ -242,10 +243,12 @@ namespace Isis {
       typedef ControlNetHeaderV0001 ControlNetHeaderV0002;
       typedef ControlNetHeaderV0001 ControlNetHeaderV0003;
       typedef ControlNetHeaderV0001 ControlNetHeaderV0004;
-      typedef ControlNetHeaderV0001 ControlNetHeaderV0005;
+
+      struct ControlNetHeaderV0005: public ControlNetHeaderV0001 {
+        QList<QString> serialNumbers;
+      };
 
       typedef ControlPointV0003 ControlPointV0004;
-      typedef ControlPointV0003 ControlPointV0005;
 
       void read(const FileName netFile, Progress *progress=NULL);
 
@@ -264,10 +267,12 @@ namespace Isis {
       ControlPoint *createPoint(ControlPointV0001 &point);
       ControlPoint *createPoint(ControlPointV0002 &point);
       ControlPoint *createPoint(ControlPointV0003 &point);
+      ControlPoint *createPoint(ControlPointV0005 &point);
 
       ControlMeasure *createMeasure(const ControlPointFileEntryV0002_Measure&);
 
       void createHeader(const ControlNetHeaderV0001 header);
+      void createHeader(const ControlNetHeaderV0005 header);
 
       void writeHeader(std::fstream *output);
       int writeFirstPoint(std::fstream *output);
