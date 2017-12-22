@@ -233,10 +233,15 @@ namespace Isis {
         pvlPoint += PvlKeyword("PointType", "Free");
       }
 
-      pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
-      pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
-      pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
-
+      if ( !controlPoint.GetId().isEmpty() ) {
+        pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
+      }
+      if ( !controlPoint.GetChooserName().isEmpty() ) {
+        pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
+      }
+      if ( !controlPoint.GetDateTime().isEmpty() ) {
+        pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
+      }
       if (controlPoint->IsEditLocked()) {
         pvlPoint += PvlKeyword("EditLock", "True");
       }
@@ -1221,8 +1226,12 @@ namespace Isis {
        }
     }
 
-    controlPoint->SetIgnored(protoPoint.ignore());
-    controlPoint->SetRejected(protoPoint.jigsawrejected());
+    if ( protoPoint.has_ignore() ) {
+      controlPoint->SetIgnored(protoPoint.ignore());
+    }
+    if ( protoPoint.has_jigsawrejected() ) {
+      controlPoint->SetRejected(protoPoint.jigsawrejected());
+    }
 
     // setting apriori radius information
     if (protoPoint.has_aprioriradiussource()) {
@@ -1357,16 +1366,19 @@ namespace Isis {
       controlPoint->Add( createMeasure( protoPoint.measures(m) ) );
     }
 
-    if (protoPoint.has_referenceindex()) {
+    if ( protoPoint.has_referenceindex() ) {
       controlPoint->SetRefMeasure(protoPoint.referenceindex());
     }
 
     // Set DateTime after calling all setters that clear DateTime value
-    controlPoint->SetDateTime(protoPoint.datetime().c_str());
+    if ( protoPoint.has_datetime() ) {
+      controlPoint->SetDateTime(protoPoint.datetime().c_str());
+    }
     // Set edit lock last
-    controlPoint->SetEditLock(protoPoint.editlock());
+    if ( protoPoint.has_editlock() ) {
+      controlPoint->SetEditLock(protoPoint.editlock());
+    }
     return controlPoint;
-
   }
 
 
@@ -1380,9 +1392,15 @@ namespace Isis {
    */
   ControlMeasure *ControlNetVersioner::createMeasure(const ControlPointFileEntryV0002_Measure &measure) {
     ControlMeasure *newMeasure = new ControlMeasure;
-    newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
-    newMeasure->SetChooserName(QString(measure.choosername().c_str()));
-    newMeasure->SetDateTime(QString(measure.datetime().c_str()));
+    if ( measure.has_serialnumber() ) {
+      newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
+    }
+    if ( measure.has_choosername() ) {
+      newMeasure->SetChooserName(QString(measure.choosername().c_str()));
+    }
+    if ( measure.has_datetime() ) {
+      newMeasure->SetDateTime(QString(measure.datetime().c_str()));
+    }
 
     ControlMeasure::MeasureType measureType;
     switch (measure.type()) {
@@ -1405,10 +1423,18 @@ namespace Isis {
     }
     newMeasure->SetType(measureType);
 
-    newMeasure->SetEditLock(measure.editlock());
-    newMeasure->SetRejected(measure.jigsawrejected());
-    newMeasure->SetIgnored(measure.ignore());
-    newMeasure->SetCoordinate(measure.sample(), measure.line());
+    if ( measure.has_editlock() ) {
+      newMeasure->SetEditLock(measure.editlock());
+    }
+    if ( measure.has_jigsawrejected() ) {
+      newMeasure->SetRejected(measure.jigsawrejected());
+    }
+    if ( measure.has_ignore() ) {
+      newMeasure->SetIgnored(measure.ignore());
+    }
+    if ( measure.has_line() ) {
+      newMeasure->SetCoordinate(measure.sample(), measure.line());
+    }
 
     if (measure.has_diameter()) {
       newMeasure->SetDiameter(measure.diameter());
@@ -1437,8 +1463,13 @@ namespace Isis {
     for (int i = 0; i < measure.log_size(); i++) {
       const ControlPointFileEntryV0002_Measure_MeasureLogData &protoLog = measure.log(i);
       ControlMeasureLogData logEntry;
-      logEntry.SetNumericalValue( protoLog.doubledatavalue() );
-      logEntry.SetDataType( (ControlMeasureLogData::NumericLogDataType) protoLog.doubledatatype() );
+
+      if ( protoLog.has_doubledatavalue() ) {
+        logEntry.SetNumericalValue( protoLog.doubledatavalue() );
+      }
+      if ( protoLog.has_doubledatatype() ) {
+        logEntry.SetDataType((ControlMeasureLogData::NumericLogDataType)protoLog.doubledatatype());
+      }
       newMeasure->SetLogData(logEntry);
     }
     return newMeasure;
@@ -1596,10 +1627,18 @@ namespace Isis {
       ControlPointFileEntryV0002 protoPoint;
       ControlPoint *controlPoint = m_points.takeFirst();
 
-      protoPoint.set_id(controlPoint->GetId().toLatin1().data());
-      protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
-      protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
-      protoPoint.set_editlock(controlPoint->IsEditLocked());
+      if ( !controlPoint.GetId().isEmpty() ) {
+        protoPoint.set_id(controlPoint->GetId().toLatin1().data());
+      }
+      if ( !controlPoint.GetChooserName().isEmpty() ) {
+        protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
+      }
+      if ( !controlPoint.GetDateTime().isEmpty() ) {
+        protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
+      }
+      if ( controlPoint->IsEditLocked() ) {
+        protoPoint.set_editlock(controlPoint->IsEditLocked());
+      }
 
       ControlPointFileEntryV0002_PointType pointType;
       switch (controlPoint->GetType()) {
@@ -1620,7 +1659,9 @@ namespace Isis {
       }
       protoPoint.set_type(pointType);
 
-      protoPoint.set_ignore(controlPoint->IsIgnored());
+      if ( controlPoint->IsIgnored() ) {
+        protoPoint.set_ignore(controlPoint->IsIgnored());
+      }
 
       if (controlPoint->HasAprioriSurfacePointSourceFile()) {
         protoPoint.set_apriorisurfpointsourcefile(controlPoint->GetAprioriSurfacePointSourceFile().toLatin1().data());
@@ -1701,11 +1742,15 @@ namespace Isis {
         }
       }
 
-
-      protoPoint.set_latitudeconstrained(controlPoint->IsLatitudeConstrained());
-      protoPoint.set_longitudeconstrained(controlPoint->IsLongitudeConstrained());
-      protoPoint.set_radiusconstrained(controlPoint->IsRadiusConstrained());
-
+      if ( controlPoint->IsLatitudeConstrained() ) {
+        protoPoint.set_latitudeconstrained(controlPoint->IsLatitudeConstrained());
+      }
+      if ( controlPoint->IsLongitudeConstrained() ) {
+        protoPoint.set_longitudeconstrained(controlPoint->IsLongitudeConstrained());
+      }
+      if ( controlPoint->IsRadiusConstrained() ) {
+        protoPoint.set_radiusconstrained(controlPoint->IsRadiusConstrained());
+      }
 
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
       if (adjustedSurfacePoint.Valid()) {
@@ -1765,9 +1810,13 @@ namespace Isis {
           protoMeasure.set_datetime(controlMeasure.GetDateTime().toLatin1().data());
         }
 
-        protoMeasure.set_editlock(controlMeasure.IsEditLocked());
+        if ( controlMeasure.IsEditLocked() ) {
+          protoMeasure.set_editlock(controlMeasure.IsEditLocked());
+        }
 
-        protoMeasure.set_ignore(controlMeasure.IsIgnored());
+        if ( controlMeasure.IsIgnored() ) {
+          protoMeasure.set_ignore(controlMeasure.IsIgnored());
+        }
 
         if (controlMeasure.HasSample()) {
           protoMeasure.set_sample(controlMeasure.GetSample());
@@ -1820,8 +1869,12 @@ namespace Isis {
           // In if/else statements because they're optional values.
           ControlPointFileEntryV0002_Measure_MeasureLogData logData;
 
-          logData.set_doubledatatype( (int) log.GetDataType() );
-          logData.set_doubledatavalue( log.GetNumericalValue() );
+          if ( ((int) log.GetDataType()) ) {
+            logData.set_doubledatatype( (int) log.GetDataType() );
+          }
+          if ( log.GetNumericalValue() ) {
+            logData.set_doubledatavalue( log.GetNumericalValue() );
+          }
 
           *protoMeasure.add_log() = logData;
         }
