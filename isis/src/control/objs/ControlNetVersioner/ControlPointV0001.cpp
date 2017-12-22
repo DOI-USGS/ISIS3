@@ -91,10 +91,7 @@ namespace Isis {
       m_pointData->set_adjustedy( toDouble(pointObject["Longitude"][0]) );
       m_pointData->set_adjustedz( toDouble(pointObject["Radius"][0]) );
     }
-    else {
-      QString msg = "Unable to find adjusted surface point values for the control point.";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
+
 
     // copy over the apriori surface point
     if ( pointObject.hasKeyword("AprioriLatitude")
@@ -116,10 +113,6 @@ namespace Isis {
       m_pointData->set_apriorix( m_pointData->adjustedx() );
       m_pointData->set_aprioriy( m_pointData->adjustedy() );
       m_pointData->set_aprioriz( m_pointData->adjustedz() );
-    }
-    else {
-      QString msg = "Unable to find apriori surface point values for the control point.";
-      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Ground points were previously flagged by the Held keyword being true.
