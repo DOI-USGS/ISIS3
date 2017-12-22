@@ -337,9 +337,12 @@ namespace Isis {
    *                           constructor (Merged by Kristin Berry. Fixes #2392)
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
-   *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(), HasAdjustedCoordinates(),
-   *                            GetAdjustedX(), GetAdjustedY(), GetAdjustedZ(), HasRefMeasure().
+   *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(),
+   *                            HasAdjustedCoordinates(), GetAdjustedX(), GetAdjustedY(),
+   *                            GetAdjustedZ(), HasRefMeasure().
    *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected().
+   *   @history 2017-12-21 Adam Goins - Removed redundant code following ControlNetVersioner
+   *                           refactor.
    */
   class ControlPoint : public QObject {
 
@@ -444,9 +447,6 @@ namespace Isis {
       ControlPoint();
       ControlPoint(const ControlPoint &);
       ControlPoint(const QString &id);
-      ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
-          const Distance &majorRad, const Distance &minorRad,
-          const Distance &polarRad);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
@@ -578,8 +578,6 @@ namespace Isis {
       double GetLineResidualRms() const;
       double GetResidualRms() const;
       void ClearJigsawRejected();
-
-      ControlPointFileEntryV0002 ToFileEntry() const;
 
     private:
       void SetExplicitReference(ControlMeasure *measure);
