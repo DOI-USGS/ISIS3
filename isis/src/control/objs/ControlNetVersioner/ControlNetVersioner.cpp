@@ -1114,7 +1114,7 @@ namespace Isis {
     int pointIndex = -1;
     while (pointInStream.ByteCount() < pointsLength) {
       pointIndex += 1;
-      QSharedPointer<ControlPointFileEntryV0005> newPoint;
+      QSharedPointer<ControlPointFileEntryV0005> newPoint(new ControlPointFileEntryV0005);
 
       try {
         CodedInputStream* pointCodedInStream = new CodedInputStream(&pointInStream);
