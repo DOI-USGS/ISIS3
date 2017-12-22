@@ -6,11 +6,15 @@
 #include <QDebug>
 #include <QString>
 
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/coded_stream.h>
+
 #include "ControlNetFileHeaderV0002.pb.h"
 #include "ControlNetFileHeaderV0005.pb.h"
 #include "ControlNetLogDataProtoV0001.pb.h"
 #include "ControlPointFileEntryV0002.pb.h"
-
+#include "ControlPointFileEntryV0005.pb.h"
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -29,11 +33,6 @@
 #include "PvlObject.h"
 #include "SurfacePoint.h"
 #include "Target.h"
-
-
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/io/coded_stream.h>
 
 using boost::numeric::ublas::symmetric_matrix;
 using boost::numeric::ublas::upper;
@@ -65,6 +64,7 @@ namespace Isis {
     header.lastModified = net->GetLastModified();
     header.description = net->Description();
     header.userName = net->GetUserName();
+    header.serialNumbers = net->GetCubeSerials();
     createHeader(header);
   }
 
@@ -206,6 +206,12 @@ namespace Isis {
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "5");
+
+    PvlKeyword serialNumberKeyword("SerialNumbers");
+    foreach (QString serialNumber, m_header.serialNumbers) {
+      serialNumberKeyword += serialNumber;
+    }
+    network += serialNumberKeyword;
 
     //  Get Target Radii from naif kernel
     PvlGroup pvlRadii;
@@ -403,7 +409,15 @@ namespace Isis {
         PvlGroup pvlMeasure("ControlMeasure");
         const ControlMeasure &
             controlMeasure = *controlPoint->GetMeasure(j);
-        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber());
+
+        QString serialNumber(controlMeasure.GetCubeSerialNumber());
+        int index = m_header.serialNumbers.indexOf(serialNumber);
+        if (index < 0) {
+          m_header.serialNumbers.append(serialNumber);
+          network["SerialNumbers"] += serialNumber;
+          index = m_header.serialNumbers.size() - 1;
+        }
+        pvlMeasure += PvlKeyword("SerialNumberIndex", toString(index));
 
         switch(controlMeasure.GetType()) {
           case ControlMeasure::Candidate:
@@ -742,6 +756,12 @@ namespace Isis {
       header.lastModified = network.findKeyword("LastModified")[0];
       header.description = network.findKeyword("Description")[0];
       header.userName = network.findKeyword("UserName")[0];
+
+      PvlKeyword serialNumbersKey = network.findKeyword("SerialNumbers");
+      header.serialNumbers.clear();
+      for (int i = 0; i < serialNumbersKey.size(); i++) {
+        header.serialNumbers.append( serialNumbersKey[i] );
+      }
       createHeader(header);
     }
     catch (IException &e) {
@@ -1073,6 +1093,10 @@ namespace Isis {
       header.lastModified = protoHeader.lastmodified().c_str();
       header.description = protoHeader.description().c_str();
       header.userName = protoHeader.username().c_str();
+      header.serialNumbers.clear();
+      for (int i = 0; i < protoHeader.serialnumbers_size(); i++) {
+        header.serialNumbers.append( QString(protoHeader.serialnumbers(i)) );
+      }
       createHeader(header);
     }
     catch (IException &e) {
@@ -1090,7 +1114,7 @@ namespace Isis {
     int pointIndex = -1;
     while (pointInStream.ByteCount() < pointsLength) {
       pointIndex += 1;
-      QSharedPointer<ControlPointFileEntryV0002> newPoint;
+      QSharedPointer<ControlPointFileEntryV0005> newPoint;
 
       try {
         CodedInputStream* pointCodedInStream = new CodedInputStream(&pointInStream);
@@ -1177,8 +1201,26 @@ namespace Isis {
    *         given point.
    */
   ControlPoint *ControlNetVersioner::createPoint(ControlPointV0003 &point) {
+    ControlPointV0005 newPoint(point, m_header.serialNumbers);
+    return createPoint(newPoint);
+  }
 
-    ControlPointFileEntryV0002 protoPoint = point.pointData();
+
+  /**
+   * Create a pointer to a latest version ControlPoint from an
+   * object in a V0005 control net file. This method converts a
+   * ControlPointV0005 to the latest ControlPontV#### version
+   * and uses the latest versioned point to construct and fill an
+   * Isis::ControlPoint.
+   *
+   * @param point The versioned control point to be updated.
+   *
+   * @return The latest version ControlPoint constructed from the
+   *         given point.
+   */
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0005 &point) {
+
+    ControlPointFileEntryV0005 protoPoint = point.pointData();
     ControlPoint *controlPoint = new ControlPoint;
 
     controlPoint->SetId(QString( protoPoint.id().c_str() ));
@@ -1187,15 +1229,13 @@ namespace Isis {
     // setting point type
     ControlPoint::PointType pointType;
     switch (protoPoint.type()) {
-      case ControlPointFileEntryV0002_PointType_obsolete_Tie:
-      case ControlPointFileEntryV0002_PointType_Free:
+      case ControlPointFileEntryV0005_PointType_Free:
         pointType = ControlPoint::PointType::Free;
         break;
-      case ControlPointFileEntryV0002_PointType_Constrained:
+      case ControlPointFileEntryV0005_PointType_Constrained:
         pointType = ControlPoint::PointType::Constrained;
         break;
-      case ControlPointFileEntryV0002_PointType_obsolete_Ground:
-      case ControlPointFileEntryV0002_PointType_Fixed:
+      case ControlPointFileEntryV0005_PointType_Fixed:
         pointType = ControlPoint::PointType::Fixed;
         break;
       default:
@@ -1228,22 +1268,22 @@ namespace Isis {
     if (protoPoint.has_aprioriradiussource()) {
 
       switch (protoPoint.aprioriradiussource()) {
-        case ControlPointFileEntryV0002_AprioriSource_None:
+        case ControlPointFileEntryV0005_AprioriSource_None:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::None);
           break;
-        case ControlPointFileEntryV0002_AprioriSource_User:
+        case ControlPointFileEntryV0005_AprioriSource_User:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
           break;
-        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
+        case ControlPointFileEntryV0005_AprioriSource_AverageOfMeasures:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::AverageOfMeasures);
           break;
-        case ControlPointFileEntryV0002_AprioriSource_Ellipsoid:
+        case ControlPointFileEntryV0005_AprioriSource_Ellipsoid:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::Ellipsoid);
           break;
-        case ControlPointFileEntryV0002_AprioriSource_DEM:
+        case ControlPointFileEntryV0005_AprioriSource_DEM:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
           break;
-        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
+        case ControlPointFileEntryV0005_AprioriSource_BundleSolution:
           controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::BundleSolution);
           break;
 
@@ -1261,27 +1301,27 @@ namespace Isis {
     // setting apriori surf pt information
     if (protoPoint.has_apriorisurfpointsource()) {
       switch (protoPoint.apriorisurfpointsource()) {
-        case ControlPointFileEntryV0002_AprioriSource_None:
+        case ControlPointFileEntryV0005_AprioriSource_None:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::None);
          break;
 
-        case ControlPointFileEntryV0002_AprioriSource_User:
+        case ControlPointFileEntryV0005_AprioriSource_User:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::User);
           break;
 
-        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
+        case ControlPointFileEntryV0005_AprioriSource_AverageOfMeasures:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::AverageOfMeasures);
           break;
 
-        case ControlPointFileEntryV0002_AprioriSource_Reference:
+        case ControlPointFileEntryV0005_AprioriSource_Reference:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Reference);
           break;
 
-        case ControlPointFileEntryV0002_AprioriSource_Basemap:
+        case ControlPointFileEntryV0005_AprioriSource_Basemap:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
           break;
 
-        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
+        case ControlPointFileEntryV0005_AprioriSource_BundleSolution:
           controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::BundleSolution);
           break;
 
@@ -1378,24 +1418,29 @@ namespace Isis {
    * @return The ControlMeasure constructed from the V0006 version
    *         file.
    */
-  ControlMeasure *ControlNetVersioner::createMeasure(const ControlPointFileEntryV0002_Measure &measure) {
+  ControlMeasure *ControlNetVersioner::createMeasure(const ControlPointFileEntryV0005_Measure &measure) {
     ControlMeasure *newMeasure = new ControlMeasure;
-    newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
+    if ( measure.serialnumberindex() >= m_header.serialNumbers.size() ) {
+      QString msg = "Measure serial number index [" + toString(measure.serialnumberindex())
+                    + "] is out of range.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    newMeasure->SetCubeSerialNumber(QString( m_header.serialNumbers[measure.serialnumberindex()] ));
     newMeasure->SetChooserName(QString(measure.choosername().c_str()));
     newMeasure->SetDateTime(QString(measure.datetime().c_str()));
 
     ControlMeasure::MeasureType measureType;
     switch (measure.type()) {
-      case ControlPointFileEntryV0002_Measure::Candidate:
+      case ControlPointFileEntryV0005_Measure::Candidate:
         measureType = ControlMeasure::Candidate;
         break;
-      case ControlPointFileEntryV0002_Measure::Manual:
+      case ControlPointFileEntryV0005_Measure::Manual:
         measureType = ControlMeasure::Manual;
         break;
-      case ControlPointFileEntryV0002_Measure::RegisteredPixel:
+      case ControlPointFileEntryV0005_Measure::RegisteredPixel:
         measureType = ControlMeasure::RegisteredPixel;
         break;
-      case ControlPointFileEntryV0002_Measure::RegisteredSubPixel:
+      case ControlPointFileEntryV0005_Measure::RegisteredSubPixel:
         measureType = ControlMeasure::RegisteredSubPixel;
         break;
       default:
@@ -1435,7 +1480,7 @@ namespace Isis {
     }
 
     for (int i = 0; i < measure.log_size(); i++) {
-      const ControlPointFileEntryV0002_Measure_MeasureLogData &protoLog = measure.log(i);
+      const ControlPointFileEntryV0005_Measure_MeasureLogData &protoLog = measure.log(i);
       ControlMeasureLogData logEntry;
       logEntry.SetNumericalValue( protoLog.doubledatavalue() );
       logEntry.SetDataType( (ControlMeasureLogData::NumericLogDataType) protoLog.doubledatatype() );
@@ -1593,6 +1638,9 @@ namespace Isis {
     protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
     protobufHeader.set_description(m_header.description.toLatin1().data());
     protobufHeader.set_username(m_header.userName.toLatin1().data());
+    foreach (QString serialNumber, m_header.serialNumbers) {
+      protobufHeader.add_serialnumbers(serialNumber.toLatin1().data());
+    }
 
     // Write out the header
     if (!protobufHeader.SerializeToCodedStream(&fileStream)) {
@@ -1615,7 +1663,7 @@ namespace Isis {
 
       CodedOutputStream fileStream(oStream);
 
-      ControlPointFileEntryV0002 protoPoint;
+      ControlPointFileEntryV0005 protoPoint;
       ControlPoint *controlPoint = m_points.takeFirst();
 
       protoPoint.set_id(controlPoint->GetId().toLatin1().data());
@@ -1623,16 +1671,16 @@ namespace Isis {
       protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
       protoPoint.set_editlock(controlPoint->IsEditLocked());
 
-      ControlPointFileEntryV0002_PointType pointType;
+      ControlPointFileEntryV0005_PointType pointType;
       switch (controlPoint->GetType()) {
         case ControlPoint::PointType::Free:
-          pointType = ControlPointFileEntryV0002_PointType_Free;
+          pointType = ControlPointFileEntryV0005_PointType_Free;
           break;
         case ControlPoint::PointType::Constrained:
-          pointType = ControlPointFileEntryV0002_PointType_Constrained;
+          pointType = ControlPointFileEntryV0005_PointType_Constrained;
           break;
         case ControlPoint::PointType::Fixed:
-          pointType = ControlPointFileEntryV0002_PointType_Fixed;
+          pointType = ControlPointFileEntryV0005_PointType_Fixed;
           break;
         default:
           QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
@@ -1651,22 +1699,22 @@ namespace Isis {
       // Apriori Surf Point Source ENUM settting
       switch (controlPoint->GetAprioriSurfacePointSource()) {
         case ControlPoint::SurfacePointSource::None:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_None);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_None);
           break;
         case ControlPoint::SurfacePointSource::User:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_User);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_User);
           break;
         case ControlPoint::SurfacePointSource::AverageOfMeasures:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_AverageOfMeasures);
           break;
         case ControlPoint::SurfacePointSource::Reference:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Reference);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_Reference);
           break;
         case ControlPoint::SurfacePointSource::Basemap:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Basemap);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_Basemap);
           break;
         case ControlPoint::SurfacePointSource::BundleSolution:
-          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0005_AprioriSource_BundleSolution);
           break;
         default:
           QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
@@ -1678,22 +1726,22 @@ namespace Isis {
       // Apriori Radius Point Source ENUM setting
       switch (controlPoint->GetAprioriRadiusSource()) {
         case ControlPoint::RadiusSource::None:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_None);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_None);
           break;
         case ControlPoint::RadiusSource::User:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_User);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_User);
           break;
         case ControlPoint::RadiusSource::AverageOfMeasures:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_AverageOfMeasures);
           break;
         case ControlPoint::RadiusSource::BundleSolution:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_BundleSolution);
           break;
         case ControlPoint::RadiusSource::Ellipsoid:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_Ellipsoid);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_Ellipsoid);
           break;
         case ControlPoint::RadiusSource::DEM:
-          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0005_AprioriSource_DEM);
           break;
         default:
           QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
@@ -1753,29 +1801,35 @@ namespace Isis {
         const ControlMeasure &
             controlMeasure = *controlPoint->GetMeasure(j);
 
-        ControlPointFileEntryV0002_Measure protoMeasure;
+        ControlPointFileEntryV0005_Measure protoMeasure;
 
         if (controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j) {
              protoPoint.set_referenceindex(j);
         }
 
-        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toLatin1().data());
+        int index = m_header.serialNumbers.indexOf( controlMeasure.GetCubeSerialNumber() );
+        if (index < 0) {
+          QString msg = "Index for serial number [" + controlMeasure.GetCubeSerialNumber()
+                        + "] not found";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        protoMeasure.set_serialnumberindex(index);
 
         switch ( controlMeasure.GetType() ) {
             case (ControlMeasure::MeasureType::Candidate):
-                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
+                protoMeasure.set_type(ControlPointFileEntryV0005_Measure_MeasureType_Candidate);
                 break;
 
             case (ControlMeasure::MeasureType::Manual):
-                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
+                protoMeasure.set_type(ControlPointFileEntryV0005_Measure_MeasureType_Manual);
                 break;
 
             case (ControlMeasure::RegisteredPixel):
-                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel);
+                protoMeasure.set_type(ControlPointFileEntryV0005_Measure_MeasureType_RegisteredPixel);
                 break;
 
             case (ControlMeasure::RegisteredSubPixel):
-                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
+                protoMeasure.set_type(ControlPointFileEntryV0005_Measure_MeasureType_RegisteredSubPixel);
                 break;
         }
 
@@ -1840,7 +1894,7 @@ namespace Isis {
 
           // These methods might not not exist, we may need to wrap each of These
           // In if/else statements because they're optional values.
-          ControlPointFileEntryV0002_Measure_MeasureLogData logData;
+          ControlPointFileEntryV0005_Measure_MeasureLogData logData;
 
           logData.set_doubledatatype( (int) log.GetDataType() );
           logData.set_doubledatavalue( log.GetNumericalValue() );
