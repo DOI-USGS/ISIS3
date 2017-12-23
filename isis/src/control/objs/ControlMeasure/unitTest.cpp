@@ -50,7 +50,6 @@ int main() {
   m.SetLineSigma(.21);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  return 0; 
   cout << "Test 2" << endl;
   outit(m);
 
@@ -243,5 +242,5 @@ void outit(ControlMeasure &m) {
   Pvl tmp("./tmp.net");
   cout << "Printing measure:\n" << tmp << "\nDone printing measure." << endl
        << endl;
- // remove("./tmp.net");
+  remove("./tmp.net");
 }
