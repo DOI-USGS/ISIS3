@@ -28,6 +28,7 @@ int main() {
    *                         Test 5 so type can be updatem.
    * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData() 
    * @history 2012-07-26  Tracie Sucharski,  Added test for == and != operators. 
+   * @history 2017-12-21  Kristin Berry - Added tests for accessor methods. 
    *
   */
   Preference::Preferences(true);
@@ -49,6 +50,7 @@ int main() {
   m.SetLineSigma(.21);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
+  return 0; 
   cout << "Test 2" << endl;
   outit(m);
 
@@ -166,6 +168,64 @@ int main() {
   catch (IException &e) {
     e.print();
   }
+
+  cout << endl; 
+  cout << "Test 14: Testing accessor methods" << endl; 
+
+  if (m.HasChooserName()) {
+    cout << "Chooser Name: " << m.GetChooserName() << endl;
+  }
+
+  if (m.HasDateTime()) {
+    cout << "DateTime: " << m.GetDateTime() << endl; 
+  }
+
+  if (m.HasSample()) {
+    cout << "Sample: " << m.GetSample() << endl; 
+  }
+
+  if (m.HasLine()) {
+    cout << "Line: " << m.GetLine() << endl; 
+  }
+
+  if (m.HasDiameter()) {
+    cout << "Diameter: " << m.GetDiameter() << endl; 
+  }
+
+  if (m.HasAprioriSample()) {
+    cout << "AprioriSample: " << m.GetAprioriSample() << endl; 
+  }
+
+  if (m.HasAprioriLine()) {
+    cout << "AprioriLine: " << m.GetAprioriLine() << endl; 
+  }
+
+  if (m.HasSampleSigma()) {
+    cout << "SampleSigma: " << m.GetSampleSigma() << endl; 
+  }
+
+  if (m.HasLineSigma()) {
+    cout << "LineSigma: " << m.GetLineSigma() << endl; 
+  }
+
+  if (m.HasSampleResidual()) {
+    cout << "SampleResidual: " << m.GetSampleResidual() << endl; 
+  }
+
+  if (m.HasLineResidual()) {
+    cout << "LineResidual: " << m.GetLineResidual() << endl; 
+  }
+
+  if (m.HasJigsawRejected()) {
+    if (m.JigsawRejected()) {
+      cout << "Measure was rejected by Jigsaw." << endl; 
+    }
+    else {
+      cout << "Measure was not rejected by Jigsaw." << endl; 
+    }
+  }
+
+  cout << "Log Size: " << m.LogSize() << endl; 
 }
 
 void outit(ControlMeasure &m) {
@@ -183,5 +243,5 @@ void outit(ControlMeasure &m) {
   Pvl tmp("./tmp.net");
   cout << "Printing measure:\n" << tmp << "\nDone printing measure." << endl
        << endl;
-  remove("./tmp.net");
+ // remove("./tmp.net");
 }
