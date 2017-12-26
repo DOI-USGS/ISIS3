@@ -61,6 +61,8 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      JigsawRejected = No
+      Reference      = True
     End_Group
   End_Object
 End_Object
@@ -130,6 +132,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      JigsawRejected = No
     End_Group
 
     Group = ControlMeasure
@@ -148,6 +151,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -2.0 <pixels>
       LineResidual   = 2.0 <pixels>
+      JigsawRejected = No
       Reference      = True
     End_Group
   End_Object
@@ -219,6 +223,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      JigsawRejected = No
     End_Group
 
     Group = ControlMeasure
@@ -237,6 +242,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -2.0 <pixels>
       LineResidual   = 2.0 <pixels>
+      JigsawRejected = No
       Reference      = True
     End_Group
   End_Object
@@ -304,6 +310,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      JigsawRejected = No
       Reference      = True
     End_Group
 
@@ -322,6 +329,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -2.0 <pixels>
       LineResidual   = 2.0 <pixels>
+      JigsawRejected = No
     End_Group
   End_Object
 End_Object
@@ -391,6 +399,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -2.0 <pixels>
       LineResidual   = 2.0 <pixels>
+      JigsawRejected = No
       Reference      = True
     End_Group
   End_Object
@@ -435,6 +444,13 @@ testing getMeasures method...
 alpha
 beta
 alpha
+Testing various accessor methods... 
+AprioriSurfacePointSourceFile: ./dummy.cub
+AprioriRadiusSourceFile: $base/dems/molaMarsPlanetaryRadius0003.cub
+AprioriCoordinates: (-424.024, 734.431, 529.919)
+AdjustedCoordinates: (-424.024, 734.431, 529.919)
+ReferenceMeasure index: 0
+Point was not rejected by jigsaw.
 
 testing error handling for StringToPointType...
   **PROGRAMMER ERROR** There is no PointType that has a string representation of "aoeu".

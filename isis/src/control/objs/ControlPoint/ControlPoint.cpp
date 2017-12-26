@@ -234,7 +234,7 @@ namespace Isis {
     }
 
     if (!measures->size()) {
-      ASSERT(referenceMeasure == NULL);
+      ASSERT(!HasRefMeasure());
       referenceMeasure = measure;
     }
     else if (referenceMeasure->IsIgnored() && !measure->IsIgnored() &&
@@ -428,7 +428,7 @@ namespace Isis {
    * @returns const reference measure for this point
    */
   const ControlMeasure *ControlPoint::GetRefMeasure() const {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -441,7 +441,7 @@ namespace Isis {
    * Get the measure that is the reference directly.
    */
   ControlMeasure *ControlPoint::GetRefMeasure() {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -763,7 +763,7 @@ namespace Isis {
    * @param source Where the surface point came from
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSource(
-    SurfacePointSource::Source source) {
+      SurfacePointSource::Source source) {
     if (editLock)
       return PointLocked;
     PointModified();
@@ -780,7 +780,7 @@ namespace Isis {
    * @param sourceFile Where the surface point came from
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSourceFile(
-    QString sourceFile) {
+      QString sourceFile) {
     if (editLock)
       return PointLocked;
     PointModified();
@@ -1209,36 +1209,6 @@ namespace Isis {
 
 
   /**
-   * Gets the adjusted x coordinate.
-   *
-   * @return Displacement The adjusted x coordinate.
-   */
-  Displacement ControlPoint::GetAdjustedX() const {
-    return adjustedSurfacePoint.GetX();
-  }
-
-
-  /**
-   * Gets the adjusted y coordinate.
-   *
-   * @return Displacement The adjusted y coordinate.
-   */
-  Displacement ControlPoint::GetAdjustedY() const {
-    return adjustedSurfacePoint.GetY();
-  }
-
-
-  /**
-   * Gets the adjusted z coordinate.
-   *
-   * @return Displacement The adjusted z coordinate.
-   */
-  Displacement ControlPoint::GetAdjustedZ() const {
-    return adjustedSurfacePoint.GetZ();
-  }
-
-
-  /**
    * Returns the adjusted surface point if it exists, otherwise returns
    * the a priori surface point.
    */
@@ -1520,65 +1490,12 @@ namespace Isis {
     return aprioriSurfacePoint;
   }
 
-  /**
-   * Gets the apriori x coordinate.
-   *
-   * @return Displacement The apriori x coordinate.
-   */
-  Displacement ControlPoint::GetAprioriX() const {
-    return aprioriSurfacePoint.GetX();
-  }
 
-
-  /**
-   * Gets the apriori y coordinate.
-   *
-   * @return Displacement The apriori y coordinate.
-   */
-  Displacement ControlPoint::GetAprioriY() const {
-    return aprioriSurfacePoint.GetY();
-  }
-
-
-  /**
-   * Gets the apriori z coordinate.
-   *
-   * @return Displacement The apriori z coordinate.
-   */
-  Displacement ControlPoint::GetAprioriZ() const {
-    return aprioriSurfacePoint.GetZ();
-  }
-
-
-  ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
-  const {
-    return aprioriRadiusSource;
-  }
-
-  bool ControlPoint::HasAprioriCoordinates() {
-    if (aprioriSurfacePoint.GetX().isValid() &&
-        aprioriSurfacePoint.GetY().isValid() &&
-        aprioriSurfacePoint.GetZ().isValid())
-      return true;
-
-    return false;
-  }
-
-
-  /**
-   * Checks to see if the ControlPoint has an adjusted SurfacePoint.
-   *
-   * @return bool True if the control point has adjusted x, y, and z coordinates.
-   */
-  bool ControlPoint::HasAdjustedCoordinates() {
-    if (adjustedSurfacePoint.GetX().isValid() &&
-        adjustedSurfacePoint.GetY().isValid() &&
-        adjustedSurfacePoint.GetZ().isValid()) {
-      return true;
-    }
-
-    return false;
-  }
+   ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
+       const {
+     return aprioriRadiusSource;
+   }
+ 
 
 
   bool ControlPoint::IsConstrained() {
@@ -1697,7 +1614,7 @@ namespace Isis {
    * @returns The cube serial number of the reference measure
    */
   QString ControlPoint::GetReferenceSN() const {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "There is no reference measure set in the ControlPoint [" +
           GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);

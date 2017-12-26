@@ -1,7 +1,5 @@
 #include "ControlNetVersioner.h"
 
-#include <string>
-
 #include <QString>
 #include <QTime>
 
@@ -20,13 +18,13 @@ void TestNetwork(const QString &filename, bool printNetwork = true, bool pvlInpu
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
   cerr << "Test ControlNetVersioner" << endl;
-  TestNetwork("./reallyOldNetwork.net"); // No target
-  TestNetwork("./reallyOldNetwork2.net"); // Really odd keywords with target
-  TestNetwork("./oldNetwork.net"); // Another set of odd keywords
-  TestNetwork("./oldNetwork2.net"); // Binary V1
-  TestNetwork("./badNetwork.net"); // Corrupted (based off of oldNetwork2.net)
-  TestNetwork("./semilarge.net", false);
-  TestNetwork("./smallPvlTest.pvl", true, true); // network with rejected jigsaw points
+  TestNetwork("$control/unitTest_ControlNetVersioner_reallyOldNetwork.net"); // No target
+  TestNetwork("$control/unitTest_ControlNetVersioner_reallyOldNetwork2.net"); // Really odd keywords with target
+  TestNetwork("$control/unitTest_ControlNetVersioner_oldNetwork.net"); // Another set of odd keywords
+  TestNetwork("$control/unitTest_ControlNetVersioner_oldNetwork2.net"); // Binary V1
+  TestNetwork("$control/unitTest_ControlNetVersioner_badNetwork.net"); // Corrupted (based off of oldNetwork2.net)
+  TestNetwork("$control/unitTest_ControlNetVersioner_semilarge.net", false);
+  TestNetwork("$control/unitTest_ControlNetVersioner_smallPvlTest.pvl", true, true); // network with rejected jigsaw points
 }
 
 void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {

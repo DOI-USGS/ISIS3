@@ -337,10 +337,7 @@ namespace Isis {
    *                           constructor (Merged by Kristin Berry. Fixes #2392)
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
-   *                            GetAprioriX(), GetAprioriY(), GetAprioriZ(),
-   *                            HasAdjustedCoordinates(), GetAdjustedX(), GetAdjustedY(),
-   *                            GetAdjustedZ(), HasRefMeasure().
-   *   @history 2017-12-19 Kristin Berry - Added IsJigsawRejected().
+   *                            HasRefMeasure().
    *   @history 2017-12-21 Adam Goins - Removed redundant code following ControlNetVersioner
    *                           refactor.
    */
@@ -495,9 +492,6 @@ namespace Isis {
       Status ComputeResiduals_Millimeters();
 
       SurfacePoint GetAdjustedSurfacePoint() const;
-      Displacement GetAdjustedX() const;
-      Displacement GetAdjustedY() const;
-      Displacement GetAdjustedZ() const;
 
       SurfacePoint GetBestSurfacePoint() const;
       QString GetChooserName() const;
@@ -509,10 +503,6 @@ namespace Isis {
       bool IsValid() const;
       bool IsInvalid() const;
       bool IsFixed() const;
-      bool IsJigsawRejected() const;
-
-      bool HasAprioriCoordinates();
-      bool HasAdjustedCoordinates();
 
       bool IsConstrained();
       bool IsLatitudeConstrained();
@@ -533,9 +523,6 @@ namespace Isis {
       static SurfacePointSource::Source StringToSurfacePointSource(QString str);
       QString GetSurfacePointSourceString() const;
       SurfacePoint GetAprioriSurfacePoint() const;
-      Displacement GetAprioriX() const;
-      Displacement GetAprioriY() const;
-      Displacement GetAprioriZ() const;
 
       RadiusSource::Source GetAprioriRadiusSource() const;
       bool HasAprioriRadiusSourceFile() const;

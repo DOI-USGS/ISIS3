@@ -97,10 +97,12 @@ int main() {
   if (cp.GetRefMeasure() != cm2) {
     cp.SetEditLock(false);
     cp.SetRefMeasure(cm2);
-    if (cp.GetRefMeasure() == cm2)
+    if (cp.GetRefMeasure() == cm2) {
       cout << "ok!\n";
-    else
+    }
+    else {
       cout << "Failed!\n";
+    }
   }
   else {
     cout << "Failed!\n";
@@ -242,15 +244,17 @@ int main() {
   getMeasuresTestPoint.Add(alpha);
   getMeasuresTestPoint.Add(beta);
   QList< ControlMeasure * > measures = getMeasuresTestPoint.getMeasures();
-  foreach (ControlMeasure * measure, measures)
+  foreach (ControlMeasure * measure, measures) {
     cout << measure->GetCubeSerialNumber() << "\n";
+  }
   beta->SetIgnored(true);
   measures = getMeasuresTestPoint.getMeasures(true);
-  foreach (ControlMeasure * measure, measures)
+  foreach (ControlMeasure * measure, measures) {
     cout << measure->GetCubeSerialNumber() << "\n";
+  }
 
 
-  cout << "Testing various accessor methods... " << endl;
+  cout << endl << "Testing various accessor methods... " << endl;
 
   if (cp.HasAprioriSurfacePointSourceFile()) {
     cout << "AprioriSurfacePointSourceFile: " << cp.GetAprioriSurfacePointSourceFile() << endl;
