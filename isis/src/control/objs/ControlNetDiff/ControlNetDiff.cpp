@@ -8,7 +8,6 @@
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
-#include "ControlNetFile.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "FileName.h"
@@ -86,24 +85,36 @@ namespace Isis {
     Pvl results;
     PvlObject report("Differences");
 
-    LatestControlNetFile *net1 = ControlNetVersioner::Read(net1Name.expanded());
-    LatestControlNetFile *net2 = ControlNetVersioner::Read(net2Name.expanded());
+//    ControlNet *net1 = ControlNetVersioner::Read(net1Name.expanded());
+//    ControlNet *net2 = ControlNetVersioner::Read(net2Name.expanded());
+
+//    ControlNet net1(net1Name.toString());
+//    ControlNet net2(net2Name.toString());
+
     diff("Filename", net1Name.name(), net2Name.name(), report);
 
-    Pvl net1Pvl(net1->toPvl());
-    Pvl net2Pvl(net2->toPvl());
+    ControlNetVersioner cnv1(net1Name);
+    ControlNetVersioner cnv2(net2Name);
+
+    BigInt net1NumPts = cnv1.numPoints();
+    BigInt net2NumPts = cnv2.numPoints();
+    diff("Points", toString(net1NumPts), toString(net2NumPts), report);
+
+    diff("NetworkId", cnv1.netId(), cnv2.netId(), report);
+    diff("TargetName", cnv1.targetName(), cnv2.targetName(), report);
+
+    // This is all written for PVL now, so just re-do it this way rather than rewriting the whole thing.
+    Pvl net1Pvl = cnv1.toPvl();
+    Pvl net2Pvl = cnv2.toPvl();
+
+    net1Pvl.write("newnet1pvl.pvl");
+    net2Pvl.write("newnet2pvl.pvl");
 
     PvlObject &net1Obj = net1Pvl.findObject("ControlNetwork");
     PvlObject &net2Obj = net2Pvl.findObject("ControlNetwork");
-
-    BigInt net1NumPts = net1Obj.objects();
-    BigInt net2NumPts = net2Obj.objects();
-    diff("Points", toString(net1NumPts), toString(net2NumPts), report);
-
-    diff("NetworkId", net1Obj, net2Obj, report);
-    diff("TargetName", net1Obj, net2Obj, report);
-
+    
     QMap< QString, QMap<int, PvlObject> > pointMap;
+     
     for (int p = 0; p < net1NumPts; p++) {
       PvlObject &point = net1Obj.object(p);
       pointMap[point.findKeyword("PointId")[0]].insert(
@@ -117,6 +128,7 @@ namespace Isis {
     }
 
     QList<QString> pointNames = pointMap.keys();
+ 
     for (int i = 0; i < pointNames.size(); i++) {
       QMap<int, PvlObject> idMap = pointMap[pointNames[i]];
       if (idMap.size() == 2) {
@@ -129,9 +141,6 @@ namespace Isis {
         addUniquePoint("PointId", "N/A", idMap[1].findKeyword("PointId")[0], report);
       }
     }
-
-    delete net1;
-    delete net2;
 
     results.addObject(report);
     return results;
@@ -209,6 +218,7 @@ namespace Isis {
     if (g1.hasKeyword("SerialNumber")) {
       QString sn1 = g1.findKeyword("SerialNumber")[0];
       QString sn2 = g1.findKeyword("SerialNumber")[0];
+//      std::cout << "serial numbers :" << sn1 << " , " << sn2 << std::endl; 
       measureReport.addKeyword(makeKeyword("SerialNumber", sn1, sn2));
     }
     PvlContainer &groupReport = g1.hasKeyword("SerialNumber") ?
@@ -258,6 +268,7 @@ namespace Isis {
    */
   void ControlNetDiff::compare(PvlKeyword &k1, PvlKeyword &k2, PvlContainer &report) {
     QString name = k1.name();
+//    std::cout << "name: " << name << std::endl; 
     if (m_tolerances->contains(name))
       diff(name, toDouble(k1[0]), toDouble(k2[0]), (*m_tolerances)[name], report);
     else

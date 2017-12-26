@@ -90,28 +90,28 @@ namespace Isis {
   }
 
 
-  //! initialize pointers and other data to NULL
+  //! Initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
     p_serialNumber = NULL;
     p_chooserName = NULL;
     p_dateTime = NULL;
     p_loggedData = NULL;
 
-    p_diameter = Null;
-    p_aprioriSample = Null;
-    p_aprioriLine = Null;
-    p_computedEphemerisTime = Null;
-    p_sampleSigma = Null;
-    p_lineSigma = Null;
-    p_sampleResidual = Null;
-    p_lineResidual = Null;
+    p_diameter = NULL;
+    p_aprioriSample = NULL;
+    p_aprioriLine = NULL;
+    p_computedEphemerisTime = NULL;
+    p_sampleSigma = NULL;
+    p_lineSigma = NULL;
+    p_sampleResidual = NULL;
+    p_lineResidual = NULL;
 
     p_camera = NULL;
-    p_focalPlaneMeasuredX = Null;
-    p_focalPlaneMeasuredY = Null;
-    p_focalPlaneComputedX = Null;
-    p_focalPlaneComputedY = Null;
-    p_measuredEphemerisTime = Null;
+    p_focalPlaneMeasuredX = NULL;
+    p_focalPlaneMeasuredY = NULL;
+    p_focalPlaneComputedX = NULL;
+    p_focalPlaneComputedY = NULL;
+    p_measuredEphemerisTime = NULL; 
 
     parentPoint = NULL;
     associatedCSN = NULL;
@@ -992,8 +992,14 @@ namespace Isis {
 
   //! Returns true if the ControlMeasure has apriorisample
   bool ControlMeasure::HasAprioriSample() const {
-    return p_aprioriSample ? true : false;
-  }
+    if (p_aprioriSample) {
+      return true;
+    }
+    else {
+      return false;
+      //    return p_aprioriSample ? true : false;
+      }
+    }
 
   //! Returns true if the ControlMeasure has aprioriline
   bool ControlMeasure::HasAprioriLine() const {

@@ -441,14 +441,9 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
         }
 
-        if (controlMeasure.HasSample()) {
-          pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample()));
-
-        }
-
-        if (controlMeasure.HasLine()) {
-          pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
-        }
+        // Sample, Line are always initialized to 0. 
+        pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample()));
+        pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
 
         if (controlMeasure.HasDiameter()) {
           pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
@@ -1818,13 +1813,9 @@ namespace Isis {
           protoMeasure.set_ignore(controlMeasure.IsIgnored());
         }
 
-        if (controlMeasure.HasSample()) {
-          protoMeasure.set_sample(controlMeasure.GetSample());
-        }
-
-        if (controlMeasure.HasLine()) {
-          protoMeasure.set_line(controlMeasure.GetLine());
-        }
+        // Always set
+        protoMeasure.set_sample(controlMeasure.GetSample());
+        protoMeasure.set_line(controlMeasure.GetLine());
 
         if (controlMeasure.HasDiameter()) {
           protoMeasure.set_diameter(controlMeasure.GetDiameter());
