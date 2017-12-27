@@ -503,6 +503,7 @@ namespace Isis {
       bool IsValid() const;
       bool IsInvalid() const;
       bool IsFixed() const;
+      bool HasAprioriCoordinates();
 
       bool IsConstrained();
       bool IsLatitudeConstrained();

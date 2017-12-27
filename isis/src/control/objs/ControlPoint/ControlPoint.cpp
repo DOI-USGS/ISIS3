@@ -1476,16 +1476,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Checks to see if the point has been rejected by jigsaw.
-   *
-   * @return bool true if the point is flagged as rejected by jigsaw
-   */
-  bool ControlPoint::IsJigsawRejected() const {
-    return jigsawRejected;
-  }
-
-
   SurfacePoint ControlPoint::GetAprioriSurfacePoint() const {
     return aprioriSurfacePoint;
   }
@@ -1496,6 +1486,16 @@ namespace Isis {
      return aprioriRadiusSource;
    }
  
+ 
+   bool ControlPoint::HasAprioriCoordinates() {
+     if (aprioriSurfacePoint.GetX().isValid() &&
+         aprioriSurfacePoint.GetY().isValid() &&
+         aprioriSurfacePoint.GetZ().isValid())
+       return true;
+ 
+     return false;
+     // return aprioriSurfacePoint.Valid(); ???
+   }
 
 
   bool ControlPoint::IsConstrained() {

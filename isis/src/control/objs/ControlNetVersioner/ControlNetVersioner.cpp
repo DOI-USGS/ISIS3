@@ -233,7 +233,12 @@ namespace Isis {
         pvlPoint += PvlKeyword("PointType", "Free");
       }
 
-      if ( !controlPoint->GetId().isEmpty() ) {
+      if ( controlPoint->GetId().isEmpty() ) {
+        QString msg = "Unbable to write control net to PVL file. "
+                      "Invalid control point has no point ID value.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      else {
         pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
       }
       if ( !controlPoint->GetChooserName().isEmpty() ) {
