@@ -90,28 +90,28 @@ namespace Isis {
   }
 
 
-  //! Initialize pointers and other data to NULL
+  //! initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
     p_serialNumber = NULL;
     p_chooserName = NULL;
     p_dateTime = NULL;
     p_loggedData = NULL;
 
-    p_diameter = NULL;
-    p_aprioriSample = NULL;
-    p_aprioriLine = NULL;
-    p_computedEphemerisTime = NULL;
-    p_sampleSigma = NULL;
-    p_lineSigma = NULL;
-    p_sampleResidual = NULL;
-    p_lineResidual = NULL;
+    p_diameter = Null;
+    p_aprioriSample = Null;
+    p_aprioriLine = Null;
+    p_computedEphemerisTime = Null;
+    p_sampleSigma = Null;
+    p_lineSigma = Null;
+    p_sampleResidual = Null;
+    p_lineResidual = Null;
 
     p_camera = NULL;
-    p_focalPlaneMeasuredX = NULL;
-    p_focalPlaneMeasuredY = NULL;
-    p_focalPlaneComputedX = NULL;
-    p_focalPlaneComputedY = NULL;
-    p_measuredEphemerisTime = NULL; 
+    p_focalPlaneMeasuredX = Null;
+    p_focalPlaneMeasuredY = Null;
+    p_focalPlaneComputedX = Null;
+    p_focalPlaneComputedY = Null;
+    p_measuredEphemerisTime = Null;
 
     parentPoint = NULL;
     associatedCSN = NULL;
@@ -965,81 +965,75 @@ namespace Isis {
     return sPrintable;
   }
 
-  //! Returns true if the ControlMeasure has a choosername
-  bool ControlMeasure::HasChooserName() const {
-    return !p_chooserName->isEmpty();
-  }
-
-  //! Returns true if the ControlMeasure has a datetime
-  bool ControlMeasure::HasDateTime() const {
-    return !p_dateTime->isEmpty();
-  }
-
-  //! Returns true if the ControlMeasure has a sample
-  bool ControlMeasure::HasSample() const {
-    return p_sample ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a line
-  bool ControlMeasure::HasLine() const {
-    return p_line ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a diameter
-  bool ControlMeasure::HasDiameter() const {
-    return p_diameter ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has apriorisample
-  bool ControlMeasure::HasAprioriSample() const {
-    if (p_aprioriSample) {
-      return true;
-    }
-    else {
-      return false;
-      //    return p_aprioriSample ? true : false;
-      }
-    }
-
-  //! Returns true if the ControlMeasure has aprioriline
-  bool ControlMeasure::HasAprioriLine() const {
-    return p_aprioriLine ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a sample sigma
-  bool ControlMeasure::HasSampleSigma() const {
-    return p_sampleSigma ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a line sigma
-  bool ControlMeasure::HasLineSigma() const {
-    return p_lineSigma ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a sample residual
-  bool ControlMeasure::HasSampleResidual() const {
-    return p_sampleResidual ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure has a line residual
-  bool ControlMeasure::HasLineResidual() const {
-    return p_lineResidual ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure's jigsaw rejected is initialized
-  bool ControlMeasure::HasJigsawRejected() const {
-    return p_jigsawRejected ? true : false;
-  }
-
-  //! Returns true if the ControlMeasure is jigsaw rejected
-  bool ControlMeasure::JigsawRejected() const {
-    return p_jigsawRejected ? true : false;
-  }
-
-  //! Returns the logsize of the ControlMeasure logged data.
-  int ControlMeasure::LogSize() const {
-    return p_loggedData->size();
-  }
+//???  //! Returns true if the ControlMeasure has a choosername
+//???  bool ControlMeasure::HasChooserName() const {
+//???    return !p_chooserName->isEmpty();
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a datetime
+//???  bool ControlMeasure::HasDateTime() const {
+//???    return !p_dateTime->isEmpty();
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a sample
+//???  bool ControlMeasure::HasSample() const {
+//???    return p_sample ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a line
+//???  bool ControlMeasure::HasLine() const {
+//???    return p_line ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a diameter
+//???  bool ControlMeasure::HasDiameter() const {
+//???    return p_diameter ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has apriorisample
+//???  bool ControlMeasure::HasAprioriSample() const {
+//???    return p_aprioriSample ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has aprioriline
+//???  bool ControlMeasure::HasAprioriLine() const {
+//???    return p_aprioriLine ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a sample sigma
+//???  bool ControlMeasure::HasSampleSigma() const {
+//???    return p_sampleSigma ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a line sigma
+//???  bool ControlMeasure::HasLineSigma() const {
+//???    return p_lineSigma ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a sample residual
+//???  bool ControlMeasure::HasSampleResidual() const {
+//???    return p_sampleResidual ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure has a line residual
+//???  bool ControlMeasure::HasLineResidual() const {
+//???    return p_lineResidual ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure's jigsaw rejected is initialized
+//???  bool ControlMeasure::HasJigsawRejected() const {
+//???    return p_jigsawRejected ? true : false;
+//???  }
+//???
+//???  //! Returns true if the ControlMeasure is jigsaw rejected
+//???  bool ControlMeasure::JigsawRejected() const {
+//???    return p_jigsawRejected ? true : false;
+//???  }
+//???
+//???  //! Returns the logsize of the ControlMeasure logged data.
+//???  int ControlMeasure::LogSize() const {
+//???    return p_loggedData->size();
+//???  }
 
   /**
    * Obtain a string representation of the MeasureType
