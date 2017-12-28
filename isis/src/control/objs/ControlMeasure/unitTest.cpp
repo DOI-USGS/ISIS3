@@ -1,6 +1,7 @@
 #include <iostream>
 #include <float.h>
 
+#include <QDebug>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -33,7 +34,7 @@ int main() {
   */
   Preference::Preferences(true);
   ControlMeasure m;
-  cout << "Test 1 Default values" << endl;
+  qDebug() << "Test 1 Default values";
   m.SetChooserName("ManuallySet");
   m.SetDateTime("2001-01-01T00:00:00");
   outit(m);
@@ -50,55 +51,53 @@ int main() {
   m.SetLineSigma(.21);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 2" << endl;
+  qDebug() << "Test 2";
   outit(m);
 
   m.SetType(ControlMeasure::Candidate);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 3" << endl;
+  qDebug() << "Test 3";
   outit(m);
 
   m.SetType(ControlMeasure::Manual);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(true);
-  cout << "Test 4" << endl;
+  qDebug() << "Test 4";
   outit(m);
 
   m.SetType(ControlMeasure::RegisteredPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(false);
-  cout << "Test 5" << endl;
+  qDebug() << "Test 5";
   outit(m);
 
   m.SetType(ControlMeasure::RegisteredSubPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 6" << endl;
+  qDebug() << "Test 6";
   outit(m);
 
-  m.SetLogData(
-    ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0)
-  );
+  m.SetLogData(ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0));
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
 
   // Dump of all variables
-  cout << "Test 7" << endl;
+  qDebug() << "Test 7";
   QList< QStringList > printableMeasureData = m.PrintableClassData();
   QStringList nameValuePair;
   foreach(nameValuePair, printableMeasureData) {
-    cout << nameValuePair.at(0).toStdString() << "=" <<
-        nameValuePair.at(1).toStdString() << endl;
+    qDebug() << nameValuePair.at(0).toStdString() << "=" <<
+        nameValuePair.at(1).toStdString();
   }
 
-  cout << "Test 8" << endl;
-  cout << m.GetLogData(ControlMeasureLogData::GoodnessOfFit).
-      GetNumericalValue() << endl;
-  cout << m.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
-      toDouble() << endl;
+  qDebug() << "Test 8";
+  qDebug() << m.GetLogData(ControlMeasureLogData::GoodnessOfFit).
+      GetNumericalValue();
+  qDebug() << m.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
+      toDouble();
 
   // Test parent editLock on reference measure
   ControlPoint *cp = new ControlPoint("Parent1");
@@ -113,51 +112,56 @@ int main() {
   cp->Add(&m2);
   cp->SetRefMeasure(&m2);
   cp->SetEditLock(true);
-  cout << endl << "Test 9" << endl;
-  cout << "Testing point editLock on reference measure" << endl;
+  qDebug() << "";
+  qDebug() << "Test 9";
+  qDebug() << "Testing point editLock on reference measure";
   if (m2.IsEditLocked())
-    cout << "Reference point ok" << endl;
+    qDebug() << "Reference point ok";
   else
-    cout << "Reference point failed" << endl;
+    qDebug() << "Reference point failed";
   if (m.IsEditLocked())
-    cout << "Nonreference point failed" << endl;
+    qDebug() << "Nonreference point failed";
   else
-    cout << "Nonreference point ok" << endl;
+    qDebug() << "Nonreference point ok";
 
-  cout << endl << "Test 10" << endl;
-  cout << "Testing == operator on the same measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 10";
+  qDebug() << "Testing == operator on the same measures";
   if (m == m) {
-    cout << "Measure1 == Measure1   TRUE" << endl;
+    qDebug() << "Measure1 == Measure1   TRUE";
   }
   else {
-    cout << "Measure1 == Measure1   FALSE" << endl;
+    qDebug() << "Measure1 == Measure1   FALSE";
   }
 
-  cout << endl << "Test 11" << endl;
-  cout << "Testing == operator on two different measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 11";
+  qDebug() << "Testing == operator on two different measures";
   if (m == m2) {
-    cout << "Measure1 == Measure2   TRUE" << endl;
+    qDebug() << "Measure1 == Measure2   TRUE";
   }
   else {
-    cout << "Measure1 == Measure2   FALSE" << endl;
+    qDebug() << "Measure1 == Measure2   FALSE";
   }
 
-  cout << endl << "Test 12" << endl;
-  cout << "Testing != operator on the same measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 12";
+  qDebug() << "Testing != operator on the same measures";
   if (m != m) {
-    cout << "Measure1 != Measure1   TRUE" << endl;
+    qDebug() << "Measure1 != Measure1   TRUE";
   }
   else {
-    cout << "Measure1 != Measure1   FALSE" << endl;
+    qDebug() << "Measure1 != Measure1   FALSE";
   }
 
-  cout << endl << "Test 13" << endl;
-  cout << "Testing != operator on two different measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 13";
+  qDebug() << "Testing != operator on two different measures";
   if (m != m2) {
-    cout << "Measure1 != Measure2   TRUE" << endl;
+    qDebug() << "Measure1 != Measure2   TRUE";
   }
   else {
-    cout << "Measure1 != Measure2   FALSE" << endl;
+    qDebug() << "Measure1 != Measure2   FALSE";
   }
 
 
@@ -168,63 +172,63 @@ int main() {
     e.print();
   }
 
-  cout << endl; 
-  cout << "Test 14: Testing accessor methods" << endl; 
+  qDebug(); 
+  qDebug() << "Test 14: Testing accessor methods"; 
 
-  if (m.HasChooserName()) {
-    cout << "Chooser Name: " << m.GetChooserName() << endl;
-  }
-
-  if (m.HasDateTime()) {
-    cout << "DateTime: " << m.GetDateTime() << endl; 
-  }
-
-  if (m.HasSample()) {
-    cout << "Sample: " << m.GetSample() << endl; 
-  }
-
-  if (m.HasLine()) {
-    cout << "Line: " << m.GetLine() << endl; 
-  }
-
-  if (m.HasDiameter()) {
-    cout << "Diameter: " << m.GetDiameter() << endl; 
-  }
-
-  if (m.HasAprioriSample()) {
-    cout << "AprioriSample: " << m.GetAprioriSample() << endl; 
-  }
-
-  if (m.HasAprioriLine()) {
-    cout << "AprioriLine: " << m.GetAprioriLine() << endl; 
-  }
-
-  if (m.HasSampleSigma()) {
-    cout << "SampleSigma: " << m.GetSampleSigma() << endl; 
-  }
-
-  if (m.HasLineSigma()) {
-    cout << "LineSigma: " << m.GetLineSigma() << endl; 
-  }
-
-  if (m.HasSampleResidual()) {
-    cout << "SampleResidual: " << m.GetSampleResidual() << endl; 
-  }
-
-  if (m.HasLineResidual()) {
-    cout << "LineResidual: " << m.GetLineResidual() << endl; 
-  }
-
-  if (m.HasJigsawRejected()) {
+//  if (m.HasChooserName()) {
+//    qDebug() << "Chooser Name: " << m.GetChooserName();
+//  }
+//
+//  if (m.HasDateTime()) {
+//    qDebug() << "DateTime: " << m.GetDateTime(); 
+//  }
+//
+//  if (m.HasSample()) {
+//    qDebug() << "Sample: " << m.GetSample(); 
+//  }
+//
+//  if (m.HasLine()) {
+//    qDebug() << "Line: " << m.GetLine(); 
+//  }
+//
+//  if (m.HasDiameter()) {
+//    qDebug() << "Diameter: " << m.GetDiameter(); 
+//  }
+//
+//  if (m.HasAprioriSample()) {
+//    qDebug() << "AprioriSample: " << m.GetAprioriSample(); 
+//  }
+//
+//  if (m.HasAprioriLine()) {
+//    qDebug() << "AprioriLine: " << m.GetAprioriLine(); 
+//  }
+//
+//  if (m.HasSampleSigma()) {
+//    qDebug() << "SampleSigma: " << m.GetSampleSigma(); 
+//  }
+//
+//  if (m.HasLineSigma()) {
+//    qDebug() << "LineSigma: " << m.GetLineSigma(); 
+//  }
+//
+//  if (m.HasSampleResidual()) {
+//    qDebug() << "SampleResidual: " << m.GetSampleResidual(); 
+//  }
+//
+//  if (m.HasLineResidual()) {
+//    qDebug() << "LineResidual: " << m.GetLineResidual(); 
+//  }
+//
+  if (m.IsRejected()) {
     if (m.JigsawRejected()) {
-      cout << "Measure was rejected by Jigsaw." << endl; 
+      qDebug() << "Measure was rejected by Jigsaw."; 
     }
     else {
-      cout << "Measure was not rejected by Jigsaw." << endl; 
+      qDebug() << "Measure was not rejected by Jigsaw."; 
     }
   }
 
-  cout << "Log Size: " << m.LogSize() << endl; 
+  qDebug() << "Log Size: " << m.LogSize(); 
 }
 
 void outit(ControlMeasure &m) {
@@ -240,7 +244,6 @@ void outit(ControlMeasure &m) {
   net.SetModifiedDate("Yesterday");
   net.Write("./tmp.net", true);
   Pvl tmp("./tmp.net");
-  cout << "Printing measure:\n" << tmp << "\nDone printing measure." << endl
-       << endl;
+  qDebug() << "Printing measure:\n" << tmp << "\nDone printing measure.";
   remove("./tmp.net");
 }

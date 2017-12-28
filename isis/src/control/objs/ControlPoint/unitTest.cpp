@@ -1,7 +1,8 @@
-#include <string>
 #include <iostream>
 
 #include <boost/numeric/ublas/symmetric.hpp>
+
+#include <QDebug>
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -37,7 +38,7 @@ void printPoint(ControlPoint &p);
 int main() {
   Preference::Preferences(true);
 
-  cout << "ControlPoint unitTest" << endl;
+  qDebug() << "ControlPoint unitTest";
 
   ControlPoint cp("C151");
 
@@ -72,7 +73,7 @@ int main() {
   cm1->SetChooserName("seedgrid");
   cm1->SetDateTime("2005-05-03T00:00:00");
 
-  cout << "Adding ControlMeasure with cube serial number [" << cm1->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test1"
+  qDebug() << "Adding ControlMeasure with cube serial number [" << cm1->GetCubeSerialNumber() << "]"; // Cube Serial Number "Test1"
   cp.Add(cm1);
 
   printPoint(cp);
@@ -90,54 +91,55 @@ int main() {
   cm2->SetResidual(-2.0, 2.0);
   cm2->SetChooserName("seedgrid");
   cm2->SetDateTime("2005-05-03T00:00:00");
-  cout << "Adding ControlMeasure with cube serial number [" << cm2->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test2"
+  qDebug() << "Adding ControlMeasure with cube serial number [" << cm2->GetCubeSerialNumber() << "]"; // Cube Serial Number "Test2"
   cp.Add(cm2);
-  cout << "Testing Edit Locking... ";
+  qDebug() << "Testing Edit Locking... ";
   cp.SetRefMeasure(cm2);
   if (cp.GetRefMeasure() != cm2) {
     cp.SetEditLock(false);
     cp.SetRefMeasure(cm2);
     if (cp.GetRefMeasure() == cm2) {
-      cout << "ok!\n";
+      qDebug() << "ok!\n";
     }
     else {
-      cout << "Failed!\n";
+      qDebug() << "Failed!\n";
     }
   }
   else {
-    cout << "Failed!\n";
+    qDebug() << "Failed!\n";
   }
-  cout << "\n";
+  qDebug() << "\n";
   cp.SetEditLock(false);
   cp.SetRefMeasure(cm2);
   cp.SetEditLock(true);
 
   printPoint(cp);
 
-  cout << "Testing copy constructor...\n";
+  qDebug() << "Testing copy constructor...\n";
   ControlPoint copy(cp);
-  cout << "\t Also testing == operator" << endl;
+  qDebug() << "\t Also testing == operator";
   bool equal = (cp == cp);
-  cout << "\t\t original == its self (yes)? " << equal << endl;
+  qDebug() << "\t\t original == its self (yes)? " << equal;
   copy.SetEditLock(false);
   copy.SetRefMeasure(0);
   equal = (cp == copy);
-  cout << "\t\t original == copy (no)? " << equal << endl;
+  qDebug() << "\t\t original == copy (no)? " << equal;
   printPoint(cp);
-  cout << "Testing assignment operator...\n";
+  qDebug() << "Testing assignment operator...\n";
   ControlPoint assignment = copy;
   printPoint(assignment);
 
   // Should be successful
-  cout << "Deleting ControlMeasure with cube serial number [" << cp.getCubeSerialNumbers().at(0).toStdString() << "]" << endl;
-  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(cp.GetMeasure(0)->GetType()) << endl;
+  qDebug() << "Deleting ControlMeasure with cube serial number [" << cp.getCubeSerialNumbers().at(0).toStdString() << "]";
+  qDebug() << "Measure type: " << ControlMeasure::MeasureTypeToString(cp.GetMeasure(0)->GetType());
   cp.Delete(0);
   printPoint(cp);
-//  cout << "ReferenceIndex = " << cp.GetReferenceIndex() << endl;
+//  qDebug() << "ReferenceIndex = " << cp.GetReferenceIndex();
 
-//  cout << "ReferenceIndex = " << cp.GetReferenceIndex() << endl;
+//  qDebug() << "ReferenceIndex = " << cp.GetReferenceIndex();
 
-  cout << endl << "Test adding control measures with identical serial numbers ..." << endl;
+  qDebug() << "";
+  qDebug() << "Test adding control measures with identical serial numbers ...";
   try {
     cp.Add(cm2);
   }
@@ -145,27 +147,29 @@ int main() {
     e.print();
   }
 
-  cout << endl << "Test SetAdjustedSurfacePoint ... " << endl;
+  qDebug() << "";
+  qDebug() << "Test SetAdjustedSurfacePoint ... ";
   SurfacePoint surfPt(cp.GetAdjustedSurfacePoint());
-  cout << "X = " << surfPt.GetX().meters() << endl;
-  cout << "Y = " << surfPt.GetY().meters() << endl;
-  cout << "Z = " << surfPt.GetZ().meters() << endl;
-  cout << "Latitude = " << surfPt.GetLatitude().degrees() << endl;
-  cout << "Longitude = " << surfPt.GetLongitude().degrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius().meters() << endl;
+  qDebug() << "X = " << surfPt.GetX().meters();
+  qDebug() << "Y = " << surfPt.GetY().meters();
+  qDebug() << "Z = " << surfPt.GetZ().meters();
+  qDebug() << "Latitude = " << surfPt.GetLatitude().degrees();
+  qDebug() << "Longitude = " << surfPt.GetLongitude().degrees();
+  qDebug() << "Radius = " << surfPt.GetLocalRadius().meters();
   surfPt.SetSpherical(Latitude(32, Angle::Degrees),
       Longitude(120, Angle::Degrees),
       Distance(1000, Distance::Meters));
   cp.SetAdjustedSurfacePoint(surfPt);
   surfPt = cp.GetAdjustedSurfacePoint();
-  cout << "X = " << surfPt.GetX().meters() << endl;
-  cout << "Y = " << surfPt.GetY().meters() << endl;
-  cout << "Z = " << surfPt.GetZ().meters() << endl;
-  cout << "Latitude = " << surfPt.GetLatitude().degrees() << endl;
-  cout << "Longitude = " << surfPt.GetLongitude().degrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius().meters() << endl;
+  qDebug() << "X = " << surfPt.GetX().meters();
+  qDebug() << "Y = " << surfPt.GetY().meters();
+  qDebug() << "Z = " << surfPt.GetZ().meters();
+  qDebug() << "Latitude = " << surfPt.GetLatitude().degrees();
+  qDebug() << "Longitude = " << surfPt.GetLongitude().degrees();
+  qDebug() << "Radius = " << surfPt.GetLocalRadius().meters();
 
-  cout << endl << "Test conversions for apriori/adjusted covariance matrices ... " << endl;
+  qDebug() << "";
+  qDebug() << "Test conversions for apriori/adjusted covariance matrices ... ";
 
   symmetric_matrix<double, upper> covar;
   covar.resize(3);
@@ -185,19 +189,19 @@ int main() {
 
   //c.SetAprioriCovariance();
   point = cp.GetAprioriSurfacePoint();
-  cout << "Apriori Sigma X = " << point.GetXSigma().meters() << endl;
-  cout << "Apriori Sigma Y = " << point.GetYSigma().meters() << endl;
-  cout << "Apriori Sigma Z = " << point.GetZSigma().meters() << endl;
+  qDebug() << "Apriori Sigma X = " << point.GetXSigma().meters();
+  qDebug() << "Apriori Sigma Y = " << point.GetYSigma().meters();
+  qDebug() << "Apriori Sigma Z = " << point.GetZSigma().meters();
 
   point = cp.GetAdjustedSurfacePoint();
-  cout << "Adjusted Sigma X = " << point.GetXSigma().meters() << endl;
-  cout << "Adjusted Sigma Y = " << point.GetYSigma().meters() << endl;
-  cout << "Adjusted Sigma Z = " << point.GetZSigma().meters() << endl;
+  qDebug() << "Adjusted Sigma X = " << point.GetXSigma().meters();
+  qDebug() << "Adjusted Sigma Y = " << point.GetYSigma().meters();
+  qDebug() << "Adjusted Sigma Z = " << point.GetZSigma().meters();
 
-  cout << endl;
+  qDebug();
 
-  cout << "Testing IsReferenceExplicit..." << endl;
-  cout << "cp:                    " << cp.IsReferenceExplicit() << endl;
+  qDebug() << "Testing IsReferenceExplicit...";
+  qDebug() << "cp:                    " << cp.IsReferenceExplicit();
 
   ControlMeasure *cm3 = new ControlMeasure;
   cm3->SetCubeSerialNumber("Test1");
@@ -226,16 +230,16 @@ int main() {
   cm4->SetDateTime("2005-05-03T00:00:00");
 
   ControlPoint newCp;
-  cout << "newCp:                 " << newCp.IsReferenceExplicit() << endl;
+  qDebug() << "newCp:                 " << newCp.IsReferenceExplicit();
   newCp.Add(cm3);
-  cout << "newCp with implicit:   " << newCp.IsReferenceExplicit() << endl;
+  qDebug() << "newCp with implicit:   " << newCp.IsReferenceExplicit();
   newCp.Add(cm4);
   newCp.SetRefMeasure(cm3);
-  cout << "newCp with explicit:   " << newCp.IsReferenceExplicit() << endl;
+  qDebug() << "newCp with explicit:   " << newCp.IsReferenceExplicit();
   newCp.Delete(cm3);
-  cout << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit() << endl;
+  qDebug() << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit();
 
-  cout << "\ntesting getMeasures method...\n";
+  qDebug() << "\ntesting getMeasures method...\n";
   ControlMeasure * alpha = new ControlMeasure;
   alpha->SetCubeSerialNumber("alpha");
   ControlMeasure * beta = new ControlMeasure;
@@ -245,54 +249,54 @@ int main() {
   getMeasuresTestPoint.Add(beta);
   QList< ControlMeasure * > measures = getMeasuresTestPoint.getMeasures();
   foreach (ControlMeasure * measure, measures) {
-    cout << measure->GetCubeSerialNumber() << "\n";
+    qDebug() << measure->GetCubeSerialNumber() << "\n";
   }
   beta->SetIgnored(true);
   measures = getMeasuresTestPoint.getMeasures(true);
   foreach (ControlMeasure * measure, measures) {
-    cout << measure->GetCubeSerialNumber() << "\n";
+    qDebug() << measure->GetCubeSerialNumber() << "\n";
   }
 
 
-  cout << endl << "Testing various accessor methods... " << endl;
+  qDebug() << "Testing various accessor methods... ";
 
-  if (cp.HasAprioriSurfacePointSourceFile()) {
-    cout << "AprioriSurfacePointSourceFile: " << cp.GetAprioriSurfacePointSourceFile() << endl;
-  }
+//  if (cp.HasAprioriSurfacePointSourceFile()) {
+//    qDebug() << "AprioriSurfacePointSourceFile: " << cp.GetAprioriSurfacePointSourceFile();
+//  }
+//
+//  if (cp.HasAprioriRadiusSourceFile()) {
+//    qDebug() << "AprioriRadiusSourceFile: " << cp.GetAprioriRadiusSourceFile();
+//  }
+//
+//  if (cp.HasAprioriCoordinates()) {
+//    qDebug() << "AprioriCoordinates: (" << cp.GetAprioriX().meters() << ", "
+//                                    << cp.GetAprioriY().meters() << ", " 
+//                                    << cp.GetAprioriZ().meters() << ")";
+//  }
+//
+//  if (cp.HasAdjustedCoordinates()) {
+//    qDebug() << "AdjustedCoordinates: (" << cp.GetAdjustedX().meters() << ", "
+//                                     << cp.GetAdjustedY().meters() << ", " 
+//                                     << cp.GetAdjustedZ().meters() << ")";
+//  }
+//
+//  if (cp.HasRefMeasure()) {
+//    qDebug() << "ReferenceMeasure index: " << cp.IndexOfRefMeasure();
+//  }
+//
+//  if (cp.IsRejected()) {
+//    qDebug() << "Point was rejected by jigsaw.";
+//  }
+//  else {
+//    qDebug() << "Point was not rejected by jigsaw.";
+//  }
 
-  if (cp.HasAprioriRadiusSourceFile()) {
-    cout << "AprioriRadiusSourceFile: " << cp.GetAprioriRadiusSourceFile() << endl;
-  }
-
-  if (cp.HasAprioriCoordinates()) {
-    cout << "AprioriCoordinates: (" << cp.GetAprioriX().meters() << ", "
-                                    << cp.GetAprioriY().meters() << ", " 
-                                    << cp.GetAprioriZ().meters() << ")" << endl;
-  }
-
-  if (cp.HasAdjustedCoordinates()) {
-    cout << "AdjustedCoordinates: (" << cp.GetAdjustedX().meters() << ", "
-                                     << cp.GetAdjustedY().meters() << ", " 
-                                     << cp.GetAdjustedZ().meters() << ")" << endl;
-  }
-
-  if (cp.HasRefMeasure()) {
-    cout << "ReferenceMeasure index: " << cp.IndexOfRefMeasure() << endl;
-  }
-
-  if (cp.IsJigsawRejected()) {
-    cout << "Point was rejected by jigsaw." << endl;
-  }
-  else {
-    cout << "Point was not rejected by jigsaw." << endl;
-  }
-
-  cout << "\ntesting error handling for StringToPointType...\n";
+  qDebug() << "\ntesting error handling for StringToPointType...\n";
   try {
     ControlPoint::StringToPointType("aoeu");
   }
   catch (IException &e) {
-    cout << "  " << e.toString() << "\n";
+    qDebug() << "  " << e.toString() << "\n";
   }
 }
 
@@ -324,6 +328,7 @@ void printPoint(Isis::ControlPoint &p) {
   net.SetModifiedDate("Yesterday");
   net.Write("./tmp.net", true);
   Pvl tmp("./tmp.net");
-  cout << "Printing point:\n" << tmp << "\nDone printing point." << endl << endl;
+  qDebug() << "Printing point:\n" << tmp << "\nDone printing point.";
+  qDebug() << "";
   remove("./tmp.net");
 }

@@ -27,6 +27,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 
@@ -50,7 +51,7 @@ namespace Isis {
    * @param net A pointer to the network that will be written out.
    */
   ControlNetVersioner::ControlNetVersioner(ControlNet *net)
-   : m_ownsPoints(false) {
+      : m_ownsPoints(false) {
     // Populate the internal list of points.
     for (int i = 0; i < net->GetNumPoints(); i++) {
         m_points.append( net->GetPoints().at(i) );
@@ -79,7 +80,7 @@ namespace Isis {
    * @see ControlNetVersioner::Read
    */
   ControlNetVersioner::ControlNetVersioner(const FileName netFile)
-   : m_ownsPoints(true) {
+      : m_ownsPoints(true) {
     read(netFile);
   }
 
@@ -430,11 +431,11 @@ namespace Isis {
             break;
         }
 
-        if ( controlMeasure.HasChooserName() ) {
+        if ( !controlMeasure.GetChooserName().isEmpty() ) {
           pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
         }
 
-        if ( controlMeasure.HasDateTime() ) {
+        if ( !controlMeasure.GetDateTime().isEmpty() ) {
           pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
         }
 
@@ -446,48 +447,50 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
         }
 
-        if ( controlMeasure.HasSample() ) {
+        if ( controlMeasure.GetSample() != 0.0 ) {
           pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample()));
 
         }
 
-        if ( controlMeasure.HasLine() ) {
+        if ( controlMeasure.GetLine() != 0.0 ) {
           pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
         }
 
-        if ( controlMeasure.HasDiameter() ) {
+        if ( controlMeasure.GetDiameter() != Isis::Null ) {
           pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
         }
 
-        if ( controlMeasure.HasAprioriSample() ) {
+        if ( controlMeasure.GetAprioriSample() != Isis::Null ) {
           pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
         }
 
-        if ( controlMeasure.HasAprioriLine() ) {
+        if ( controlMeasure.GetAprioriLine() != Isis::Null ) {
           pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
         }
 
-        if ( controlMeasure.HasSampleSigma() ) {
+        if ( controlMeasure.GetSampleSigma() != Isis::Null ) {
           pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
                                    "pixels");
         }
 
-        if ( controlMeasure.HasLineSigma() ) {
+        if ( controlMeasure.GetLineSigma() != Isis::Null ) {
           pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
                                    "pixels");
         }
 
-        if ( controlMeasure.HasSampleResidual() ) {
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("SampleResidual", toString(controlMeasure.GetSampleResidual()),
                                    "pixels");
         }
 
-        if ( controlMeasure.HasLineResidual() ) {
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
 
-        pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.JigsawRejected()));
+        if ( controlMeasure.IsRejected() ) {
+          pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.JigsawRejected()));
+        }
 
         for (int logEntry = 0;
             logEntry < controlMeasure.LogSize(); // DNE?
@@ -547,40 +550,40 @@ namespace Isis {
    * @param network The Pvl network data
    */
   void ControlNetVersioner::readPvl(const Pvl &network) {
-      const PvlObject &controlNetwork = network.findObject("ControlNetwork");
+    const PvlObject &controlNetwork = network.findObject("ControlNetwork");
 
-      int version = 1;
+    int version = 1;
 
-      if ( controlNetwork.hasKeyword("Version") ) {
-        version = toInt(controlNetwork["Version"][0]);
-      }
+    if ( controlNetwork.hasKeyword("Version") ) {
+      version = toInt(controlNetwork["Version"][0]);
+    }
 
-      switch ( version ) {
-        case 1:
-          readPvlV0001(controlNetwork);
-          break;
+    switch ( version ) {
+      case 1:
+        readPvlV0001(controlNetwork);
+        break;
 
-        case 2:
-          readPvlV0002(controlNetwork);
-          break;
+      case 2:
+        readPvlV0002(controlNetwork);
+        break;
 
-        case 3:
-          readPvlV0003(controlNetwork);
-          break;
+      case 3:
+        readPvlV0003(controlNetwork);
+        break;
 
-        case 4:
-          readPvlV0004(controlNetwork);
-          break;
+      case 4:
+        readPvlV0004(controlNetwork);
+        break;
 
-        case 5:
-          readPvlV0005(controlNetwork);
-          break;
+      case 5:
+        readPvlV0005(controlNetwork);
+        break;
 
-        default:
-          QString msg = "The Pvl file version [" + toString(version)
-                        + "] is not supported";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-      }
+      default:
+        QString msg = "The Pvl file version [" + toString(version)
+                      + "] is not supported";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
   }
 
 
@@ -1832,11 +1835,11 @@ namespace Isis {
                 break;
         }
 
-        if ( controlMeasure.HasChooserName() ) {
+        if ( !controlMeasure.GetChooserName().isEmpty() ) {
           protoMeasure.set_choosername(controlMeasure.GetChooserName().toLatin1().data());
         }
 
-        if ( controlMeasure.HasDateTime() ) {
+        if ( !controlMeasure.GetDateTime().isEmpty() ) {
           protoMeasure.set_datetime(controlMeasure.GetDateTime().toLatin1().data());
         }
 
@@ -1852,39 +1855,39 @@ namespace Isis {
           protoMeasure.set_jigsawrejected(true);
         }
 
-        if ( controlMeasure.HasSample() ) {
+        if ( controlMeasure.GetSample() != 0.0 ) {
           protoMeasure.set_sample(controlMeasure.GetSample());
         }
 
-        if ( controlMeasure.HasLine() ) {
+        if ( controlMeasure.GetLine() != 0.0 ) {
           protoMeasure.set_line(controlMeasure.GetLine());
         }
 
-        if ( controlMeasure.HasDiameter() ) {
+        if ( controlMeasure.GetDiameter() != Isis::Null ) {
           protoMeasure.set_diameter(controlMeasure.GetDiameter());
         }
 
-        if ( controlMeasure.HasAprioriSample() ) {
+        if ( controlMeasure.GetAprioriSample() != Isis::Null ) {
           protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample());
         }
 
-        if ( controlMeasure.HasAprioriLine() ) {
+        if ( controlMeasure.GetAprioriLine() != Isis::Null ) {
           protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine());
         }
 
-        if ( controlMeasure.HasSampleSigma() ) {
+        if ( controlMeasure.GetSampleSigma() != Isis::Null ) {
           protoMeasure.set_samplesigma(controlMeasure.GetSampleSigma());
         }
 
-        if ( controlMeasure.HasLineSigma() ) {
+        if ( controlMeasure.GetLineSigma() != Isis::Null ) {
           protoMeasure.set_linesigma(controlMeasure.GetLineSigma());
         }
 
-        if ( controlMeasure.HasSampleResidual() ) {
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
           protoMeasure.set_sampleresidual(controlMeasure.GetSampleResidual());
         }
 
-        if ( controlMeasure.HasLineResidual() ) {
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
           protoMeasure.set_lineresidual(controlMeasure.GetLineResidual());
         }
 
