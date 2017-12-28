@@ -320,8 +320,6 @@ namespace Isis {
       bool HasSampleResidual() const;
       bool HasLineResidual() const;
       bool HasJigsawRejected() const;
-      bool JigsawRejected() const;
-      int LogSize() const;
 
       static QVector<QString> GetMeasureDataNames();
 

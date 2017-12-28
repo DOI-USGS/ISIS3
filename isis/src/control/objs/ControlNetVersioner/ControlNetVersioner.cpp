@@ -489,11 +489,11 @@ namespace Isis {
         }
 
         if ( controlMeasure.IsRejected() ) {
-          pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.JigsawRejected()));
+          pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.IsRejected()));
         }
 
         for (int logEntry = 0;
-            logEntry < controlMeasure.LogSize(); // DNE?
+            logEntry < controlMeasure.GetLogDataEntries().size(); 
             logEntry ++) {
           const ControlMeasureLogData &log =
                 controlMeasure.GetLogData(logEntry); // Not sure this is right.
