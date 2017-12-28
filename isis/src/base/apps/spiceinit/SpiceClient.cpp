@@ -553,6 +553,7 @@ namespace Isis {
    */
   void SpiceClient::checkErrors() {
     if(p_error) {
+      std::cout << p_error << std::endl;
       throw IException(IException::Unknown, *p_error, _FILEINFO_);
     }
   }
