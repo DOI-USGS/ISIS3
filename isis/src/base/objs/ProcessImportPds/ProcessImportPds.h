@@ -212,17 +212,17 @@ namespace Isis {
    *  @history 2017-05-29 Kristin Berry - Update to the DataTrailer handling code so that its size
    *                          (DataTrailerBytes) is not inappropriately re-set if we have specified
    *                          it previously. References #3888.
-   *
+   *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                          definitions in .h file and .cpp methods, and  insert
    *                          implementation example
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: changed ReportError method to
    *                          truncate paths before data directory. Allows test to pass when not
    *                          using the default data area. Fixes #4738.
-   *   @history 2017-06-26 Summer Stapleton - Added functions to identify and report changes to
+   *   @history 2017-06-26 Summer Stapleton - Added functions to identify and report changes to 
    *                          the default projection offsets and multipliers. Fixes #4887.
-   *   @history 2017-12-20 Summer Stapleton - Modified error message in
-   *                          ProcessImportPds::ProcessLabel() to be more discriptive. Fixes #4883.
+   *   @history 2017-12-28 Summer Stapleton - Updated error message for unknown label type in 
+   *                          ProcessLabel(). Fixes #4883.
    *
    */
   class ProcessImportPds : public ProcessImport {
@@ -290,7 +290,7 @@ namespace Isis {
       void ProcessPdsM3Label(const QString &pdsDataFile, PdsFileType fileType);
       void ProcessPdsCombinedSpectrumLabel(const QString &pdsDataFile);
 
-      void ExtractPdsProjection(PvlToPvlTranslationManager &pdsXlater);
+      void ExtractPdsProjection(PvlToPvlTranslationManager &pdsXlater); 
       void GetProjectionOffsetMults(double &xoff, double &yoff,
                                     double &xmult, double &ymult);
 
@@ -316,12 +316,12 @@ namespace Isis {
       // Projection info
       QString p_projection;       /**< The name of the projection found in
                                              the PDS projection labels*/
-
-      bool p_projectionOffsetChange;    /**< Whether the projection offsets were updated upon
+                                             
+      bool p_projectionOffsetChange;    /**< Whether the projection offsets were updated upon 
                                             loading*/
-
+ 
       PvlGroup p_projectionOffsetGroup;      /**< Log information for projection offsets*/
-
+                                           
       QString p_targetName;       //!<
       double p_equatorialRadius;      /**< Equatorial radius found in the PDS
                                            projection labels*/
