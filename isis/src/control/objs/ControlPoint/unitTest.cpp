@@ -30,10 +30,10 @@ void printPoint(ControlPoint &p);
   * @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
   *                         Ground ------> Fixed
   *                         Tie----------> Free
-  * @history 2015-02-17  Andrew Stebenne, changed a reference to a local filesystem to a dummy file 
+  * @history 2015-02-17  Andrew Stebenne, changed a reference to a local filesystem to a dummy file
   *                         (dummy.cub) to make it clearer that the .cub file being referenced
   *                         wasn't necessary.
-  * @history 2017-12-21 Kristin Berry - Added tests for newly added accessor methods. 
+  * @history 2017-12-21 Kristin Berry - Added tests for newly added accessor methods.
   */
 int main() {
   Preference::Preferences(true);
@@ -130,7 +130,7 @@ int main() {
   printPoint(assignment);
 
   // Should be successful
-  qDebug() << "Deleting ControlMeasure with cube serial number [" << cp.getCubeSerialNumbers().at(0).toStdString() << "]";
+  qDebug() << "Deleting ControlMeasure with cube serial number [" << cp.getCubeSerialNumbers().at(0).toLatin1().data() << "]";
   qDebug() << "Measure type: " << ControlMeasure::MeasureTypeToString(cp.GetMeasure(0)->GetType());
   cp.Delete(0);
   printPoint(cp);
@@ -270,13 +270,13 @@ int main() {
 //
 //  if (cp.HasAprioriCoordinates()) {
 //    qDebug() << "AprioriCoordinates: (" << cp.GetAprioriX().meters() << ", "
-//                                    << cp.GetAprioriY().meters() << ", " 
+//                                    << cp.GetAprioriY().meters() << ", "
 //                                    << cp.GetAprioriZ().meters() << ")";
 //  }
 //
 //  if (cp.HasAdjustedCoordinates()) {
 //    qDebug() << "AdjustedCoordinates: (" << cp.GetAdjustedX().meters() << ", "
-//                                     << cp.GetAdjustedY().meters() << ", " 
+//                                     << cp.GetAdjustedY().meters() << ", "
 //                                     << cp.GetAdjustedZ().meters() << ")";
 //  }
 //

@@ -27,9 +27,9 @@ int main() {
    * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN..
    * @history 2010-10-18  Tracie Sucharski,  Set EditLock to false before
    *                         Test 5 so type can be updatem.
-   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData() 
-   * @history 2012-07-26  Tracie Sucharski,  Added test for == and != operators. 
-   * @history 2017-12-21  Kristin Berry - Added tests for accessor methods. 
+   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData()
+   * @history 2012-07-26  Tracie Sucharski,  Added test for == and != operators.
+   * @history 2017-12-21  Kristin Berry - Added tests for accessor methods.
    *
   */
   Preference::Preferences(true);
@@ -89,8 +89,8 @@ int main() {
   QList< QStringList > printableMeasureData = m.PrintableClassData();
   QStringList nameValuePair;
   foreach(nameValuePair, printableMeasureData) {
-    qDebug() << nameValuePair.at(0).toStdString() << "=" <<
-        nameValuePair.at(1).toStdString();
+    qDebug() << nameValuePair.at(0).toLatin1().data() << "=" <<
+        nameValuePair.at(1).toLatin1().data();
   }
 
   qDebug() << "Test 8";
@@ -172,63 +172,63 @@ int main() {
     e.print();
   }
 
-  qDebug(); 
-  qDebug() << "Test 14: Testing accessor methods"; 
+  qDebug();
+  qDebug() << "Test 14: Testing accessor methods";
 
 //  if (m.HasChooserName()) {
 //    qDebug() << "Chooser Name: " << m.GetChooserName();
 //  }
 //
 //  if (m.HasDateTime()) {
-//    qDebug() << "DateTime: " << m.GetDateTime(); 
+//    qDebug() << "DateTime: " << m.GetDateTime();
 //  }
 //
 //  if (m.HasSample()) {
-//    qDebug() << "Sample: " << m.GetSample(); 
+//    qDebug() << "Sample: " << m.GetSample();
 //  }
 //
 //  if (m.HasLine()) {
-//    qDebug() << "Line: " << m.GetLine(); 
+//    qDebug() << "Line: " << m.GetLine();
 //  }
 //
 //  if (m.HasDiameter()) {
-//    qDebug() << "Diameter: " << m.GetDiameter(); 
+//    qDebug() << "Diameter: " << m.GetDiameter();
 //  }
 //
 //  if (m.HasAprioriSample()) {
-//    qDebug() << "AprioriSample: " << m.GetAprioriSample(); 
+//    qDebug() << "AprioriSample: " << m.GetAprioriSample();
 //  }
 //
 //  if (m.HasAprioriLine()) {
-//    qDebug() << "AprioriLine: " << m.GetAprioriLine(); 
+//    qDebug() << "AprioriLine: " << m.GetAprioriLine();
 //  }
 //
 //  if (m.HasSampleSigma()) {
-//    qDebug() << "SampleSigma: " << m.GetSampleSigma(); 
+//    qDebug() << "SampleSigma: " << m.GetSampleSigma();
 //  }
 //
 //  if (m.HasLineSigma()) {
-//    qDebug() << "LineSigma: " << m.GetLineSigma(); 
+//    qDebug() << "LineSigma: " << m.GetLineSigma();
 //  }
 //
 //  if (m.HasSampleResidual()) {
-//    qDebug() << "SampleResidual: " << m.GetSampleResidual(); 
+//    qDebug() << "SampleResidual: " << m.GetSampleResidual();
 //  }
 //
 //  if (m.HasLineResidual()) {
-//    qDebug() << "LineResidual: " << m.GetLineResidual(); 
+//    qDebug() << "LineResidual: " << m.GetLineResidual();
 //  }
 //
   if (m.IsRejected()) {
     if (m.JigsawRejected()) {
-      qDebug() << "Measure was rejected by Jigsaw."; 
+      qDebug() << "Measure was rejected by Jigsaw.";
     }
     else {
-      qDebug() << "Measure was not rejected by Jigsaw."; 
+      qDebug() << "Measure was not rejected by Jigsaw.";
     }
   }
 
-  qDebug() << "Log Size: " << m.LogSize(); 
+  qDebug() << "Log Size: " << m.LogSize();
 }
 
 void outit(ControlMeasure &m) {
