@@ -83,8 +83,9 @@ namespace Isis {
       ControlMeasure *newMeasure = new ControlMeasure(*otherCm);
       AddMeasure(newMeasure);
 
-      if (other.referenceMeasure == otherCm)
+      if (other.referenceMeasure == otherCm) {
         SetRefMeasure(newMeasure);
+      }
     }
 
     id = other.id;
@@ -284,8 +285,9 @@ namespace Isis {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
-    if (cm->IsEditLocked())
+    if (cm->IsEditLocked()) {
       return ControlMeasure::MeasureLocked;
+    }
 
     // remove measure from the point's data structures
     measures->remove(serialNumber);
@@ -306,8 +308,9 @@ namespace Isis {
     if (parentNetwork) {
       parentNetwork->measureDeleted(cm);
 
-      if (!IsIgnored() && !cm->IsIgnored())
+      if (!IsIgnored() && !cm->IsIgnored()) {
         parentNetwork->emitNetworkStructureModified();
+      }
     }
 
     delete cm;
@@ -353,8 +356,9 @@ namespace Isis {
    * @author Sharmila Prasad (10/22/2010)
    */
   ControlPoint::Status ControlPoint::ResetApriori() {
-    if (IsEditLocked())
+    if (IsEditLocked()) {
       return PointLocked;
+    }
 
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriSurfacePointSourceFile    = "";
@@ -458,8 +462,9 @@ namespace Isis {
    * @param name The username of the person who last modified this control point
    */
   ControlPoint::Status ControlPoint::SetChooserName(QString name) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     chooserName = name;
     return Success;
   }
@@ -474,8 +479,9 @@ namespace Isis {
    * @param newDateTime The date and time this control point was last modified
    */
   ControlPoint::Status ControlPoint::SetDateTime(QString newDateTime) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     dateTime = newDateTime;
     return Success;
   }
@@ -518,12 +524,14 @@ namespace Isis {
    * @return  (int) status Success or PointLocked
    */
   ControlPoint::Status ControlPoint::SetId(QString newId) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     QString oldId = id;
     id = newId;
-    if (parentNetwork)
+    if (parentNetwork) {
       parentNetwork->UpdatePointReference(this, oldId);
+    }
     return Success;
   }
 
@@ -534,8 +542,9 @@ namespace Isis {
    * @param cm The new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(ControlMeasure *cm) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     ASSERT(cm);
     SetExplicitReference(cm);
@@ -549,8 +558,9 @@ namespace Isis {
    * @param index The index of the new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(int index) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     if (index < 0 || index >= cubeSerials->size()) {
       QString msg = "Index [";
@@ -569,8 +579,9 @@ namespace Isis {
    * @param sn The serial number of the new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(QString sn) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     if (!cubeSerials->contains(sn)) {
       QString msg = "Point [" + id + "] has no measure with serial number [" +
@@ -614,8 +625,9 @@ namespace Isis {
    *                        un-ignore
    */
   ControlPoint::Status ControlPoint::SetIgnored(bool newIgnoreStatus) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     bool oldStatus = ignore;
     ignore = newIgnoreStatus;
@@ -626,10 +638,12 @@ namespace Isis {
       if (parentNetwork) {
         foreach(ControlMeasure * cm, measures->values()) {
           if (!cm->IsIgnored()) {
-            if (ignore)
+            if (ignore) {
               parentNetwork->measureIgnored(cm);
-            else
+            }
+            else {
               parentNetwork->measureUnIgnored(cm);
+            }
           }
         }
         parentNetwork->emitNetworkStructureModified();
@@ -676,8 +690,9 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     type = newType;
     return Success;
@@ -693,8 +708,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSource(
     RadiusSource::Source source) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriRadiusSource = source;
     return Success;
@@ -711,8 +727,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSourceFile(
     QString sourceFile) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriRadiusSourceFile = sourceFile;
     return Success;
@@ -738,8 +755,9 @@ namespace Isis {
       std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
       aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
     }
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     if (aprioriSP.GetLatSigma().isValid()) {
       constraintStatus.set(LatitudeConstrained);
     }
@@ -764,8 +782,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSource(
       SurfacePointSource::Source source) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriSurfacePointSource = source;
     return Success;
@@ -781,8 +800,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSourceFile(
       QString sourceFile) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriSurfacePointSourceFile = sourceFile;
     return Success;
@@ -880,8 +900,9 @@ namespace Isis {
         else {
           // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
           // but the FocalPlane measures have been set
-          if (GetType() == Fixed)
+          if (GetType() == Fixed) {
             continue;
+          }
 
           // TODO: What do we do
 //          QString msg = "Cannot compute lat/lon/radius (x/y/z) for "
@@ -977,8 +998,9 @@ namespace Isis {
    *                            duplication of code
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
-    if (IsIgnored())
+    if (IsIgnored()) {
       return Failure;
+    }
 
     PointModified();
 
@@ -987,11 +1009,12 @@ namespace Isis {
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
-      if (m->IsIgnored())
+      if (m->IsIgnored()) {
         continue;
+      }
       // The following lines actually check for Candidate measures
       // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured())
+//       if (!m->IsMeasured()) {
 //         continue;
 
       // TODO:  Should we use crater diameter?
@@ -1046,10 +1069,12 @@ namespace Isis {
         double adjLine;
 
         // Step 1. What happens if measured line is 1???  TODO
-        if (computedY < 0)
+        if (computedY < 0) {
           adjLine = m->GetLine() - 1.;
-        else
+        }
+        else {
           adjLine = m->GetLine() + 1.;
+        }
 
         cam->SetImage(sample, adjLine);
         SurfacePoint sp = cam->GetSurfacePoint();
@@ -1063,10 +1088,12 @@ namespace Isis {
         cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY);
         double deltaLine;
 
-        if (computedY < 0)
+        if (computedY < 0) {
           deltaLine = -computedY/scalingY;
-        else
+        }
+        else {
           deltaLine = computedY/scalingY;
+        }
 
         // Now map through the camera steps to take X from slant range to ground
         // range to pixels.  Y just tracks through as 0.
@@ -1129,8 +1156,9 @@ namespace Isis {
    */
 
   ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
-    if (IsIgnored())
+    if (IsIgnored()) {
       return Failure;
+    }
 
     PointModified();
 
@@ -1139,11 +1167,12 @@ namespace Isis {
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
-      if (m->IsIgnored())
+      if (m->IsIgnored()) {
         continue;
+      }
       // The following lines actually check for Candidate measures
       // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured())
+//       if (!m->IsMeasured()) {
 //         continue;
 
       // TODO:  Should we use crater diameter?
@@ -1157,8 +1186,9 @@ namespace Isis {
       // going to distorted focal plane or ground range in this case), so we
       // can hold the Spice to calculate residuals in undistorted focal plane
       // coordinates.
-      if (cam->GetCameraType() != 0)  // no need to call setimage for framing camera
+      if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
         cam->SetImage(m->GetSample(), m->GetLine());
+      }
 
       cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
       // double mudx = m->GetFocalPlaneMeasuredX();
@@ -1213,10 +1243,12 @@ namespace Isis {
    * the a priori surface point.
    */
   SurfacePoint ControlPoint::GetBestSurfacePoint() const {
-    if (adjustedSurfacePoint.Valid())
+    if (adjustedSurfacePoint.Valid()) {
       return adjustedSurfacePoint;
-    else
+    }
+    else {
       return aprioriSurfacePoint;
+    }
   }
 
 
@@ -1289,14 +1321,18 @@ namespace Isis {
             errMsg += pointTypeString;
             errMsg += "\".";
 
-    if (pointTypeString == "Fixed")
+    if (pointTypeString == "Fixed") {
       type = ControlPoint::Fixed;
-    else if (pointTypeString == "Constrained")
+    }
+    else if (pointTypeString == "Constrained") {
       type = ControlPoint::Constrained;
-    else if (pointTypeString == "Free")
+    }
+    else if (pointTypeString == "Free") {
       type = ControlPoint::Free;
-    else
+    }
+    else {
       throw IException(IException::Programmer, errMsg, _FILEINFO_);
+    }
 
     return type;
   }
@@ -1369,16 +1405,21 @@ namespace Isis {
     str = str.toLower();
     RadiusSource::Source source = RadiusSource::None;
 
-    if (str == "user")
+    if (str == "user") {
       source = RadiusSource::User;
-    else if (str == "averageofmeasures")
+    }
+    else if (str == "averageofmeasures") {
       source = RadiusSource::AverageOfMeasures;
-    else if (str == "ellipsoid")
+    }
+    else if (str == "ellipsoid") {
       source = RadiusSource::Ellipsoid;
-    else if (str == "dem")
+    }
+    else if (str == "dem") {
       source = RadiusSource::DEM;
-    else if (str == "bundlesolution")
+    }
+    else if (str == "bundlesolution") {
       source = RadiusSource::BundleSolution;
+    }
 
     return source;
   }
@@ -1446,16 +1487,21 @@ namespace Isis {
     str = str.toLower();
     SurfacePointSource::Source source = SurfacePointSource::None;
 
-    if (str == "user")
+    if (str == "user") {
       source = SurfacePointSource::User;
-    else if (str == "averageofmeasures")
+    }
+    else if (str == "averageofmeasures") {
       source = SurfacePointSource::AverageOfMeasures;
-    else if (str == "reference")
+    }
+    else if (str == "reference") {
       source = SurfacePointSource::Reference;
-    else if (str == "basemap")
+    }
+    else if (str == "basemap") {
       source = SurfacePointSource::Basemap;
-    else if (str == "bundlesolution")
+    }
+    else if (str == "bundlesolution") {
       source = SurfacePointSource::BundleSolution;
+    }
 
     return source;
   }
@@ -1490,8 +1536,9 @@ namespace Isis {
    bool ControlPoint::HasAprioriCoordinates() {
      if (aprioriSurfacePoint.GetX().isValid() &&
          aprioriSurfacePoint.GetY().isValid() &&
-         aprioriSurfacePoint.GetZ().isValid())
+         aprioriSurfacePoint.GetZ().isValid()) {
        return true;
+     }
  
      return false;
      // return aprioriSurfacePoint.Valid(); ???
@@ -1567,8 +1614,9 @@ namespace Isis {
     int size = 0;
     QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if (!(*measures)[keys[cm]]->IsIgnored())
+      if (!(*measures)[keys[cm]]->IsIgnored()) {
         size++;
+      }
     }
     return size;
   }
@@ -1583,8 +1631,9 @@ namespace Isis {
     int size = 0;
     QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if ((*measures)[keys[cm]]->IsEditLocked())
+      if ((*measures)[keys[cm]]->IsEditLocked()) {
         size++;
+      }
     }
     return size;
   }
@@ -1696,8 +1745,9 @@ namespace Isis {
     double(ControlMeasure::*statFunc)() const) const {
     Statistics stats;
     foreach(ControlMeasure * cm, *measures) {
-      if (!cm->IsIgnored())
+      if (!cm->IsIgnored()) {
         stats.AddData((cm->*statFunc)());
+      }
     }
 
     return stats;
@@ -1707,8 +1757,9 @@ namespace Isis {
   Statistics ControlPoint::GetStatistic(long dataType) const {
     Statistics stats;
     foreach(ControlMeasure * cm, *measures) {
-      if (!cm->IsIgnored())
+      if (!cm->IsIgnored()) {
         stats.AddData(cm->GetLogData(dataType).GetNumericalValue());
+      }
     }
 
     return stats;
@@ -1726,8 +1777,9 @@ namespace Isis {
     QList< ControlMeasure * > orderedMeasures;
     for (int i = 0; i < cubeSerials->size(); i++) {
       ControlMeasure *measure = measures->value((*cubeSerials)[i]);
-      if (!excludeIgnored || !measure->IsIgnored())
+      if (!excludeIgnored || !measure->IsIgnored()) {
         orderedMeasures.append(measures->value((*cubeSerials)[i]));
+      }
     }
     return orderedMeasures;
   }
@@ -1869,8 +1921,9 @@ namespace Isis {
         ControlMeasure *newMeasure = new ControlMeasure;
         *newMeasure = *i.value();
         AddMeasure(newMeasure);
-        if (other.referenceMeasure == i.value())
+        if (other.referenceMeasure == i.value()) {
           SetRefMeasure(newMeasure);
+        }
       }
 
       id             = other.id;
@@ -1938,18 +1991,21 @@ namespace Isis {
    */
   double ControlPoint::GetSampleResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( !m->IsIgnored() || m->IsRejected() )
+          if ( !m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetSampleResidual());
       }
@@ -1966,18 +2022,21 @@ namespace Isis {
    */
   double ControlPoint::GetLineResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( !m->IsIgnored() || m->IsRejected() )
+          if ( !m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetLineResidual());
       }
@@ -1994,18 +2053,21 @@ namespace Isis {
    */
   double ControlPoint::GetResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( m->IsIgnored() || m->IsRejected() )
+          if ( m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetSampleResidual());
           stats.AddData(m->GetLineResidual());
@@ -2020,17 +2082,20 @@ namespace Isis {
    */
   void ControlPoint::ClearJigsawRejected() {
     int nmeasures = measures->size();
-    if( nmeasures <= 0 )
+    if ( nmeasures <= 0 ) {
         return;
+    }
 
     for( int i = 0; i < nmeasures; i++) {
       ControlMeasure* m = GetMeasure(i);
-      if( !m )
+      if ( !m ) {
         continue;
+      }
 
       m->SetRejected(false);
     }
 
     SetRejected(false);
   }
+
 }
