@@ -115,23 +115,28 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         if ( !hexCode.isEmpty() ) {
           // Convert HEX to a QString
-          QString json( QByteArray::fromHex(hexCode).constData() );
+//          QString json( QByteArray::fromHex(hexCode).constData() );
 
           // Parse the Json with Qt's JSON parser
           QJsonDocument document;
           QString error;
 
-          document = QJsonDocument::fromJson(json.toUtf8());
+          document = QJsonDocument::fromJson(hexCode);
           QJsonObject jsonObject = document.object();
+
+          QFile finalOutput("output.txt");
+               finalOutput.open(QIODevice::WriteOnly);
+               finalOutput.write( document.toJson() );
+               finalOutput.close();
 
           parseParameters(jsonObject);
 
           // Get the cube label
           QString encoded = jsonObject.value("label").toString();
           stringstream labStream;
-          labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
+          labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ); //<---- ...I think this is the cause
           labStream >> label;
-          std::cout << "label: "<<label << '\n';
+          std::cout << "label: " << label << '\n'; //<--- This simply prints out "label: End" to the terminal
         }
         else {
           QString msg = "Unable to read input file";
@@ -144,13 +149,13 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         // Set up for getting the mission name
         // Get the directory where the system missions translation table is.
-        QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
+//        QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
 
         // Get the mission translation manager ready
-        PvlToPvlTranslationManager missionXlater(label, transFile);
+//        PvlToPvlTranslationManager missionXlater(label, transFile);
 
         // Get the mission name so we can search the correct DB's for kernels
-        QString mission = missionXlater.Translate("MissionName");
+//        QString mission = missionXlater.Translate("MissionName");
 
         // Get system base kernels
         unsigned int allowed = 0;
@@ -168,13 +173,14 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         KernelDb ckKernels(allowedCK);
         KernelDb spkKernels(allowedSPK);
 
-        baseKernels.loadSystemDb(mission, label);
-        ckKernels.loadSystemDb(mission, label);
-        spkKernels.loadSystemDb(mission, label);
+        baseKernels.loadSystemDb("apollo15", label);
+        ckKernels.loadSystemDb("apollo15", label);
+        spkKernels.loadSystemDb("apollo15", label);
 
         Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
         QList< priority_queue<Kernel> > ck;
-        lk        = baseKernels.leapSecond(label);
+//        lk        = baseKernels.leapSecond(label); ////////////////////<----- This is where the error is happening...
+        std::cout << "SHAPOOPY!!!" << std::endl;
         pck       = baseKernels.targetAttitudeShape(label);
         targetSpk = baseKernels.targetPosition(label);
         ik        = baseKernels.instrument(label);

@@ -80,16 +80,17 @@ namespace Isis {
 
     p_jsonDocument = new QJsonDocument(object);
 
-    QFile finalOutput("output.txt");
-    finalOutput.open(QIODevice::WriteOnly);
-    finalOutput.write( p_jsonDocument->toJson() );
-    finalOutput.close();
+    // QFile finalOutput("output.txt");
+    // finalOutput.open(QIODevice::WriteOnly);
+    // finalOutput.write( p_jsonDocument->toJson() );
+    // finalOutput.close();
 
     p_request = new QNetworkRequest();
-    p_request->setUrl(QUrl(url));
+    QUrl qurl(url);
+    qurl.setPort(port);
+    p_request->setUrl(qurl);
     p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
-    p_request->setHeader(QNetworkRequest::ContentTypeHeader,
-                         "application/x-www-form-urlencoded");
+    p_request->setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     moveToThread(this);
     start();
@@ -136,7 +137,7 @@ namespace Isis {
     connect(p_networkMgr, SIGNAL(sslErrors(QNetworkReply *, const QList<QSslError> &)),
             this, SLOT(sslErrors(QNetworkReply *, const QList<QSslError> &)));
 
-    p_networkMgr->post(*p_request, p_jsonDocument->toBinaryData());
+    p_networkMgr->post(*p_request, p_jsonDocument->toJson());
     exec();
   }
 
@@ -553,7 +554,6 @@ namespace Isis {
    */
   void SpiceClient::checkErrors() {
     if(p_error) {
-      std::cout << p_error << std::endl;
       throw IException(IException::Unknown, *p_error, _FILEINFO_);
     }
   }
