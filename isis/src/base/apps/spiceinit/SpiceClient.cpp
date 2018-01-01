@@ -67,9 +67,9 @@ namespace Isis {
       {"ckrecon", ckRecon},
       {"cknadir", ckNadir},
       {"ckpredicted", ckPredicted},
-      {"spkSmithed", spkSmithed},
-      {"spkRecon", spkRecon},
-      {"pkPredicted", spkPredicted},
+      {"spksmithed", spkSmithed},
+      {"spkrecon", spkRecon},
+      {"spkpredicted", spkPredicted},
       {"shape", shape},
       {"startPad", startPad},
       {"endPad", endPad}

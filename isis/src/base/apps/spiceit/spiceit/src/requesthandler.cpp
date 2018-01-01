@@ -138,7 +138,8 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           //labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ); //<---- ...I think this is the cause
           labStream << encoded;
           labStream >> label;
-          std::cout << "label: " << label << '\n'; //<--- This simply prints out "label: End" to the terminal
+          //std::cout << "label: " << label << '\n'; //<--- This simply prints out "label: End" to the terminal
+          //label.write("received_label.txt");
         }
         else {
           QString msg = "Unable to read input file";
@@ -156,7 +157,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         // Get the mission translation manager ready
         PvlToPvlTranslationManager missionXlater(label, transFile);
-
+        //label.write("label_after_PvlToPvlTranslationManager.txt");
         // Get the mission name so we can search the correct DB's for kernels
         QString mission = missionXlater.Translate("MissionName");
         qDebug() << "mission:  " << mission;
@@ -174,13 +175,17 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         KernelDb baseKernels(allowed);
         KernelDb ckKernels(allowedCK);
+        //qDebug() << "allowedSPK = "<< allowedSPK;
+        qDebug() << "g_spkPredicted="<<g_spkPredicted;
+        qDebug() << "g_spkRecon="<<g_spkRecon;
+        qDebug()<<"g_spkSmithed="<<g_spkSmithed;
         KernelDb spkKernels(allowedSPK);
         //qDebug() << "SHAPOOPY!!!!";
 
         baseKernels.loadSystemDb(mission, label);
         ckKernels.loadSystemDb(mission, label);
         spkKernels.loadSystemDb(mission, label);
-        
+       // label.write("label_after_loadSystemDb_calls.txt"); 
         Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
         QList< priority_queue<Kernel> > ck;
         lk        = baseKernels.leapSecond(label); 
@@ -192,6 +197,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         fk        = ckKernels.frame(label);
         ck        = ckKernels.spacecraftPointing(label);
         spk       = spkKernels.spacecraftPosition(label);
+
+        
+       
+
         qDebug() << "SHAPOOPY0!!!!";
 
         if (g_ckNadir) {
@@ -257,7 +266,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           // create an empty kernel
           Kernel realCkKernel;
           QStringList ckKernelList;
-
+          qDebug() << "SHAPOOPY9!!!";
           /*
            * Add the list of cks from each Kernel object at the top of each
            * priority queue. If multiple priority queues exist, we will not\
@@ -287,26 +296,32 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
            
           realCkKernel.setKernels(ckKernelList);
-
+          qDebug() << "SHAPOOPY10!!!";  
           /*
            * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
            * classes take a cube instead of a pvl as input.
            *
            * This program has read and write access on the spice server in /tmp/spice_web_service.
            */
-//          inputLabels = FileName::createTempFile( ui.GetFileName("TEMPFILE") );
-//          label.write( inputLabels.expanded() );
+          label.write("lab.txt");
+          inputLabels = FileName::createTempFile("inputLabels.cub");
+          qDebug() << "inputLabels.expanded() = " << inputLabels.expanded();
+          label.write( inputLabels.expanded() );
+        
           Cube cube;
           cube.open(inputLabels.expanded(), "rw");
+          qDebug() << "SHAPOOPY11!!!!";
           kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                      realCkKernel, fk, ik, sclk, spk,
                                      iak, dem, exk);
         }
 
         if (!kernelSuccess) {
+          qDebug() <<"Couldn't get kernels.";
           throw IException(IException::Unknown, "Unable to initialize camera model", _FILEINFO_);
         }
         else {
+         
           packageKernels("toFile.txt" );
         }
 //        remove( inputLabels.expanded().toLatin1() ); //clean up
@@ -351,9 +366,10 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
 //  UserInterface &ui = Application::GetUserInterface();
-
+  
   Pvl origLabels = lab;
-
+  
+  //origLabels.write("lab.txt");
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
   PvlKeyword pckKeyword("TargetAttitudeShape");
@@ -385,6 +401,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   for (int i = 0; i < sclk.size(); i++) {
     sclkKeyword.addValue(sclk[i]);
   }
+  qDebug() << "spk.size() =" << spk.size();
   for (int i = 0; i < spk.size(); i++) {
     spkKeyword.addValue(spk[i]);
   }
@@ -444,6 +461,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   if ( currentKernels.hasKeyword("EndPadding") )
     currentKernels.deleteKeyword("EndPadding");
 
+  
   // Add any time padding the user specified to the spice group
   if (g_startPad > DBL_EPSILON)
     currentKernels.addKeyword( PvlKeyword("StartPadding", toString(g_startPad), "seconds") );
@@ -471,7 +489,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
-
+      errPvl.write("errPvl.txt");  
       if (errPvl.groups() > 0)
         currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
@@ -603,7 +621,7 @@ void packageKernels(QString toFile) {
   logStream << logMessage;
   QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
-
+  qDebug() << "SHAPOOPY11!!!!!";
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   QFile::remove(kernLabelsFile);
@@ -611,7 +629,7 @@ void packageKernels(QString toFile) {
   labelStream << kernLabels;
   QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
-
+  qDebug() <<"SHAPOOPY12!!!";  
   spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
   spiceData.insert("Instrument Position", tableToJson(toFile + ".position"));
   spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
