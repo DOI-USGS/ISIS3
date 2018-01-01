@@ -5,7 +5,7 @@
 
 #include <iomanip>
 #include <sstream>
-
+#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
@@ -133,8 +133,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
           // Get the cube label
           QString encoded = jsonObject.value("label").toString();
+          //qDebug() << "label: "<<encoded;
           stringstream labStream;
-          labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ); //<---- ...I think this is the cause
+          //labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ); //<---- ...I think this is the cause
+          labStream << encoded;
           labStream >> label;
           std::cout << "label: " << label << '\n'; //<--- This simply prints out "label: End" to the terminal
         }
@@ -149,14 +151,15 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         // Set up for getting the mission name
         // Get the directory where the system missions translation table is.
-//        QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
+        QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
+        //qDebug() <<"transFile:  "<<transFile;
 
         // Get the mission translation manager ready
-//        PvlToPvlTranslationManager missionXlater(label, transFile);
+        PvlToPvlTranslationManager missionXlater(label, transFile);
 
         // Get the mission name so we can search the correct DB's for kernels
-//        QString mission = missionXlater.Translate("MissionName");
-
+        QString mission = missionXlater.Translate("MissionName");
+        qDebug() << "mission:  " << mission;
         // Get system base kernels
         unsigned int allowed = 0;
         unsigned int allowedCK = 0;
@@ -172,15 +175,15 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         KernelDb baseKernels(allowed);
         KernelDb ckKernels(allowedCK);
         KernelDb spkKernels(allowedSPK);
+        //qDebug() << "SHAPOOPY!!!!";
 
-        baseKernels.loadSystemDb("apollo15", label);
-        ckKernels.loadSystemDb("apollo15", label);
-        spkKernels.loadSystemDb("apollo15", label);
-
+        baseKernels.loadSystemDb(mission, label);
+        ckKernels.loadSystemDb(mission, label);
+        spkKernels.loadSystemDb(mission, label);
+        
         Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
         QList< priority_queue<Kernel> > ck;
-//        lk        = baseKernels.leapSecond(label); ////////////////////<----- This is where the error is happening...
-        std::cout << "SHAPOOPY!!!" << std::endl;
+        lk        = baseKernels.leapSecond(label); 
         pck       = baseKernels.targetAttitudeShape(label);
         targetSpk = baseKernels.targetPosition(label);
         ik        = baseKernels.instrument(label);
@@ -189,8 +192,12 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         fk        = ckKernels.frame(label);
         ck        = ckKernels.spacecraftPointing(label);
         spk       = spkKernels.spacecraftPosition(label);
+        qDebug() << "SHAPOOPY0!!!!";
 
         if (g_ckNadir) {
+          qDebug() << "SHAPOOPY1!!!!";
+                         
+  
           // Only add nadir if no spacecraft pointing found
           QStringList nadirCk;
           nadirCk.push_back("Nadir");
@@ -200,26 +207,39 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
           // if no queue exists, create a nadir queue
           else {
+                            
             priority_queue<Kernel> nadirQueue;
             nadirQueue.push( Kernel( (Kernel::Type)0, nadirCk ) );
             ck.push_back(nadirQueue);
           }
         }
-
+        
+        qDebug() << "SHAPOOPY2!!!";
         // Get shape kernel
         if (g_shapeKernelStr == "system") {
+          qDebug() << "SHAPOOPY3!!!!";
           dem = baseKernels.dem(label);
+          qDebug() << "SHAPOOPY4!!!!";
+
         }
+               
+
         else if (g_shapeKernelStr != "ellipsoid") {
+          qDebug() << "g_shapeKernelStr ="  << g_shapeKernelStr;
           stringstream demPvlKeyStream;
           demPvlKeyStream << "ShapeModel = " + g_shapeKernelStr;
+           qDebug() << "SHAPOOPY6!!!";
           PvlKeyword key;
           demPvlKeyStream >> key;
-
+          qDebug() << "SHAPOOPY7!!!";
+ 
           for (int value = 0; value < key.size(); value++) {
             dem.push_back(key[value]);
           }
+          
         }
+
+        //qDebug() << "SHAPOOPY2!!!!";  
 
         bool kernelSuccess = false;
 
@@ -231,7 +251,8 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         }
 
         FileName inputLabels;
-
+        
+       qDebug() << "SHAPOOPY8!!!";
         while (ck.at(0).size() != 0 && !kernelSuccess) {
           // create an empty kernel
           Kernel realCkKernel;
@@ -264,7 +285,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           for (int i = 0; i < fk.size(); i++) {
             ckKernelList.push_back(fk[i]);
           }
-
+           
           realCkKernel.setKernels(ckKernelList);
 
           /*

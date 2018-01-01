@@ -63,16 +63,16 @@ namespace Isis {
 
     QJsonObject properties {
       {"label", labelText},
-      {"cksmithed value", ckSmithed},
-      {"ckrecon value", ckRecon},
-      {"cknadir value", ckNadir},
-      {"ckpredicted value", ckPredicted},
-      {"spkSmithed value", spkSmithed},
-      {"spkRecon value", spkRecon},
-      {"pkPredicted value", spkPredicted},
-      {"shape value", shape},
-      {"startPad value", startPad},
-      {"endPad value", endPad}
+      {"cksmithed", ckSmithed},
+      {"ckrecon", ckRecon},
+      {"cknadir", ckNadir},
+      {"ckpredicted", ckPredicted},
+      {"spkSmithed", spkSmithed},
+      {"spkRecon", spkRecon},
+      {"pkPredicted", spkPredicted},
+      {"shape", shape},
+      {"startPad", startPad},
+      {"endPad", endPad}
     };
 
     QJsonObject object;
