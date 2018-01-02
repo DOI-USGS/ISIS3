@@ -6,6 +6,7 @@
 class QAuthenticator;
 class QDomElement;
 class QJsonDocument;
+class QJsonValue;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
@@ -47,7 +48,7 @@ namespace Isis {
       Table *positionTable();
       Table *bodyRotationTable();
       Table *sunPositionTable();
-
+      QJsonValue tableToJson(QString file); 
     public slots:
       void sendRequest();
 

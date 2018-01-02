@@ -5,6 +5,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <QByteArray>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -74,19 +75,19 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
                     Kernel exk);
 
     //! Combines all the temp files into one final output file
-    void packageKernels(QString toFile);
+    QByteArray packageKernels(QString toFile);
 
     //! Read the spiceinit parameters
     void parseParameters(QJsonObject jsonObject);
 
     //! Convert a table into an xml tag
     QString tableToXml(QString tableName, QString file);
-
+    QByteArray spiceResponse;
     QByteArray path=request.getPath();
     qDebug("Conroller: path=%s",path.data());
 
     // Set a response header
-    response.setHeader("Content-Type", "text/html; charset=ISO-8859-1");
+    response.setHeader("Content-Type", "text/json; charset=ISO-8859-1");
 
       try {
         Process p;
@@ -102,20 +103,14 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         g_startPad = 0.0;
         g_endPad = 0.0;
 
-        // Get the single line of encoded JSON from the input file that the client, spiceinit, sent us.
-        //TextFile inFile( ui.GetFileName("FROM") );
         QByteArray hexCode = request.getBody();
-
-        // GetLine returns false if it was the last line... so we can't check for problems really
-        //inFile.GetLine(hexCode);
 
         Pvl label;
         label.clear();
         QString otherVersion;
 
         if ( !hexCode.isEmpty() ) {
-          // Convert HEX to a QString
-//          QString json( QByteArray::fromHex(hexCode).constData() );
+         
 
           // Parse the Json with Qt's JSON parser
           QJsonDocument document;
@@ -125,21 +120,18 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           QJsonObject jsonObject = document.object();
 
           QFile finalOutput("output.txt");
-               finalOutput.open(QIODevice::WriteOnly);
-               finalOutput.write( document.toJson() );
-               finalOutput.close();
+          finalOutput.open(QIODevice::WriteOnly);
+          finalOutput.write( document.toJson() );
+          finalOutput.close();
 
           parseParameters(jsonObject);
 
           // Get the cube label
           QString encoded = jsonObject.value("label").toString();
-          //qDebug() << "label: "<<encoded;
           stringstream labStream;
-          //labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ); //<---- ...I think this is the cause
           labStream << encoded;
           labStream >> label;
-          //std::cout << "label: " << label << '\n'; //<--- This simply prints out "label: End" to the terminal
-          //label.write("received_label.txt");
+         
         }
         else {
           QString msg = "Unable to read input file";
@@ -153,14 +145,14 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         // Set up for getting the mission name
         // Get the directory where the system missions translation table is.
         QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
-        //qDebug() <<"transFile:  "<<transFile;
+       
 
         // Get the mission translation manager ready
         PvlToPvlTranslationManager missionXlater(label, transFile);
         //label.write("label_after_PvlToPvlTranslationManager.txt");
         // Get the mission name so we can search the correct DB's for kernels
         QString mission = missionXlater.Translate("MissionName");
-        qDebug() << "mission:  " << mission;
+       
         // Get system base kernels
         unsigned int allowed = 0;
         unsigned int allowedCK = 0;
@@ -175,17 +167,11 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         KernelDb baseKernels(allowed);
         KernelDb ckKernels(allowedCK);
-        //qDebug() << "allowedSPK = "<< allowedSPK;
-        qDebug() << "g_spkPredicted="<<g_spkPredicted;
-        qDebug() << "g_spkRecon="<<g_spkRecon;
-        qDebug()<<"g_spkSmithed="<<g_spkSmithed;
         KernelDb spkKernels(allowedSPK);
-        //qDebug() << "SHAPOOPY!!!!";
-
         baseKernels.loadSystemDb(mission, label);
         ckKernels.loadSystemDb(mission, label);
         spkKernels.loadSystemDb(mission, label);
-       // label.write("label_after_loadSystemDb_calls.txt"); 
+     
         Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
         QList< priority_queue<Kernel> > ck;
         lk        = baseKernels.leapSecond(label); 
@@ -198,13 +184,8 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         ck        = ckKernels.spacecraftPointing(label);
         spk       = spkKernels.spacecraftPosition(label);
 
-        
        
-
-        qDebug() << "SHAPOOPY0!!!!";
-
         if (g_ckNadir) {
-          qDebug() << "SHAPOOPY1!!!!";
                          
   
           // Only add nadir if no spacecraft pointing found
@@ -223,24 +204,21 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
         }
         
-        qDebug() << "SHAPOOPY2!!!";
         // Get shape kernel
         if (g_shapeKernelStr == "system") {
-          qDebug() << "SHAPOOPY3!!!!";
+        
           dem = baseKernels.dem(label);
-          qDebug() << "SHAPOOPY4!!!!";
+       
 
         }
                
 
         else if (g_shapeKernelStr != "ellipsoid") {
-          qDebug() << "g_shapeKernelStr ="  << g_shapeKernelStr;
           stringstream demPvlKeyStream;
           demPvlKeyStream << "ShapeModel = " + g_shapeKernelStr;
-           qDebug() << "SHAPOOPY6!!!";
           PvlKeyword key;
           demPvlKeyStream >> key;
-          qDebug() << "SHAPOOPY7!!!";
+          
  
           for (int value = 0; value < key.size(); value++) {
             dem.push_back(key[value]);
@@ -248,8 +226,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           
         }
 
-        //qDebug() << "SHAPOOPY2!!!!";  
-
+        
         bool kernelSuccess = false;
 
         if (ck.size() == 0 || ck.at(0).size() == 0) {
@@ -261,12 +238,12 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         FileName inputLabels;
         
-       qDebug() << "SHAPOOPY8!!!";
+       
         while (ck.at(0).size() != 0 && !kernelSuccess) {
           // create an empty kernel
           Kernel realCkKernel;
           QStringList ckKernelList;
-          qDebug() << "SHAPOOPY9!!!";
+         
           /*
            * Add the list of cks from each Kernel object at the top of each
            * priority queue. If multiple priority queues exist, we will not\
@@ -296,7 +273,6 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
            
           realCkKernel.setKernels(ckKernelList);
-          qDebug() << "SHAPOOPY10!!!";  
           /*
            * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
            * classes take a cube instead of a pvl as input.
@@ -305,12 +281,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
            */
           label.write("lab.txt");
           inputLabels = FileName::createTempFile("inputLabels.cub");
-          qDebug() << "inputLabels.expanded() = " << inputLabels.expanded();
           label.write( inputLabels.expanded() );
         
           Cube cube;
           cube.open(inputLabels.expanded(), "rw");
-          qDebug() << "SHAPOOPY11!!!!";
           kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                      realCkKernel, fk, ik, sclk, spk,
                                      iak, dem, exk);
@@ -321,8 +295,8 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           throw IException(IException::Unknown, "Unable to initialize camera model", _FILEINFO_);
         }
         else {
-         
-          packageKernels("toFile.txt" );
+          qDebug() << "SHAPOOPY!!!!";       
+          spiceResponse =packageKernels("kernels" );
         }
 //        remove( inputLabels.expanded().toLatin1() ); //clean up
         p.EndProcess();
@@ -330,16 +304,16 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
       catch (...) {
         // We failed at something, delete the temp files...
 //        QString outFile = ui.GetFileName("TO");
-        QFile pointingFile("toFile.txt.pointing");
+        QFile pointingFile("kernels.pointing");
         if ( pointingFile.exists() ) pointingFile.remove();
 
-        QFile positionFile("toFile.txt.position");
+        QFile positionFile("kernels.position");
         if ( positionFile.exists() ) positionFile.remove();
 
-        QFile bodyRotFile("toFile.txt.bodyrot");
+        QFile bodyRotFile("kernels.bodyrot");
         if ( bodyRotFile.exists() ) bodyRotFile.remove();
 
-        QFile sunFile("toFile.txt.sun");
+        QFile sunFile("kernels.sun");
         if ( sunFile.exists() ) sunFile.remove();
 
         throw;
@@ -348,7 +322,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
 
     // Return a simple HTML document
-    response.write("<html>Did this respond<body>Hello World</body></html>",true);
+    response.write(spiceResponse,true);
 
     qDebug("RequestHandler: finished request");
 
@@ -365,7 +339,6 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel fk, Kernel ik, Kernel sclk,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
-//  UserInterface &ui = Application::GetUserInterface();
   
   Pvl origLabels = lab;
   
@@ -401,7 +374,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   for (int i = 0; i < sclk.size(); i++) {
     sclkKeyword.addValue(sclk[i]);
   }
-  qDebug() << "spk.size() =" << spk.size();
+  
   for (int i = 0; i < spk.size(); i++) {
     spkKeyword.addValue(spk[i]);
   }
@@ -485,7 +458,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       // If success then pretend we had the shape model keyword in there...
       Pvl applicationLog;
       applicationLog += currentKernels;
-//      applicationLog.write(ui.GetFileName("TO") + ".print");
+      applicationLog.write(QString("kernels")+".print");
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
@@ -493,7 +466,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       if (errPvl.groups() > 0)
         currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
-//      Application::Log(currentKernels);
+      //Application::Log(currentKernels);
       throw e;
     }
     Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
@@ -503,7 +476,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     for (int i = 0; i < ckKeyword.size(); i++)
       ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
 
-//    ckTable.Write(ui.GetFileName("TO") + ".pointing");
+      ckTable.Write(QString("kernels") + ".pointing");
 
     Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
     spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -511,7 +484,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     for (int i = 0; i < spkKeyword.size(); i++)
       spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
 
-//    spkTable.Write(ui.GetFileName("TO") + ".position");
+    spkTable.Write(QString("kernels") + ".position");
 
     Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
     bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -523,7 +496,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
     bodyTable.Label() += PvlKeyword( "SolarLongitude", toString( cam->solarLongitude().degrees() ) );
-//    bodyTable.Write(ui.GetFileName("TO") + ".bodyrot");
+    bodyTable.Write(QString("kernels") + ".bodyrot");
 
     Table sunTable = cam->sunPosition()->Cache("SunPosition");
     sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -531,7 +504,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     for (int i = 0; i < targetSpkKeyword.size(); i++)
       sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
-    sunTable.Write("toFile.txt.sun");
+    sunTable.Write("kernels.sun");
 
     //  Save original kernels in keyword before changing to Table
     PvlKeyword origCk = currentKernels["InstrumentPointing"];
@@ -553,7 +526,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     Pvl kernelsLabels;
     kernelsLabels += currentKernels;
     kernelsLabels += cam->getStoredNaifKeywords();
-//    kernelsLabels.write(ui.GetFileName("TO") + ".lab");
+    kernelsLabels.write("kernels.lab");
   }
   catch (IException &) {
     lab = origLabels;
@@ -611,17 +584,23 @@ void parseParameters(QJsonObject jsonObject) {
 }
 
 
-void packageKernels(QString toFile) {
+QByteArray packageKernels(QString toFile) {
+   
   QJsonObject spiceData;
 
   QString logFile(toFile + ".print");
+  
   Pvl logMessage(logFile);
+  
   QFile::remove(logFile);
   stringstream logStream;
+  
   logStream << logMessage;
+  
+
   QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
-  qDebug() << "SHAPOOPY11!!!!!";
+  
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   QFile::remove(kernLabelsFile);
@@ -629,7 +608,6 @@ void packageKernels(QString toFile) {
   labelStream << kernLabels;
   QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
-  qDebug() <<"SHAPOOPY12!!!";  
   spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
   spiceData.insert("Instrument Position", tableToJson(toFile + ".position"));
   spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
@@ -637,15 +615,17 @@ void packageKernels(QString toFile) {
 
   QJsonDocument doc(spiceData);
 
-  QString encodedXml( doc.toJson().toHex().constData() );
+  QByteArray encodedXml( doc.toJson().toHex() );
 
-  QFile finalOutput(toFile);
+  QFile finalOutput("finalOutput.txt");
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write(encodedXml.toLatin1());
+  QByteArray decoded = QByteArray::fromHex(encodedXml);
+  finalOutput.write(decoded.constData());
   finalOutput.close();
-
-  QFile finalsOutput("toFile.txt");
-  finalsOutput.open(QIODevice::WriteOnly);
-  finalsOutput.write(doc.toJson());
-  finalsOutput.close();
+  //qDebug() << "SHAPOOPY!!!!";
+  //QFile finalsOutput("toFile.txt");
+  //finalsOutput.open(QIODevice::WriteOnly);
+  //finalsOutput.write(doc.toJson());
+  //finalsOutput.close();
+  return encodedXml;
 }

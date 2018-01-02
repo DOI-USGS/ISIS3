@@ -2,11 +2,12 @@
 
 #include <iostream>
 #include <sstream>
-
+#include <QDebug>
 #include <QDomElement>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -59,8 +60,9 @@ namespace Isis {
 
     stringstream labelStream;
     labelStream << cubeLabel;
-    QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
-
+    //QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
+    QString labelText = QString::fromStdString(labelStream.str());
+  
     QJsonObject properties {
       {"label", labelText},
       {"cksmithed", ckSmithed},
@@ -75,10 +77,11 @@ namespace Isis {
       {"endPad", endPad}
     };
 
-    QJsonObject object;
-    object.insert("Properties", properties);
+    //I can't see any reason for this, so commenting out to make json file simpler
+    //QJsonObject object;
+    //object.insert("Properties", properties);
 
-    p_jsonDocument = new QJsonDocument(object);
+    p_jsonDocument = new QJsonDocument(properties);
 
     // QFile finalOutput("output.txt");
     // finalOutput.open(QIODevice::WriteOnly);
@@ -86,10 +89,12 @@ namespace Isis {
     // finalOutput.close();
 
     p_request = new QNetworkRequest();
+   
     QUrl qurl(url);
+ 
     qurl.setPort(port);
     p_request->setUrl(qurl);
-    p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
+    //p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
     p_request->setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     moveToThread(this);
@@ -149,13 +154,15 @@ namespace Isis {
    */
   void SpiceClient::replyFinished(QNetworkReply *reply) {
     p_rawResponse = new QString(QString(reply->readAll()));
-
+    //qDebug() << p_rawResponse;
     // Decode the response
     p_response = new QString();
 
     try {
       *p_response = QString(
           QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
+
+      //qDebug() << "p_resonse:  "<<*p_response; 
 
       // Make sure we can get the log out of it before continuing
       applicationLog();
@@ -339,6 +346,17 @@ namespace Isis {
 
     quit();
   }
+
+
+
+QJsonValue SpiceClient::tableToJson(QString file) {
+  QFile tableFile(file);
+  tableFile.open(QIODevice::ReadOnly);
+  QByteArray data = tableFile.readAll();
+  tableFile.close();
+
+  return QJsonValue::fromVariant(data.toHex().constData());
+}
 
 
   /**
