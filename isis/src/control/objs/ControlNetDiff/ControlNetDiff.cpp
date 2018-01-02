@@ -85,12 +85,6 @@ namespace Isis {
     Pvl results;
     PvlObject report("Differences");
 
-//    ControlNet *net1 = ControlNetVersioner::Read(net1Name.expanded());
-//    ControlNet *net2 = ControlNetVersioner::Read(net2Name.expanded());
-
-//    ControlNet net1(net1Name.toString());
-//    ControlNet net2(net2Name.toString());
-
     diff("Filename", net1Name.name(), net2Name.name(), report);
 
     ControlNetVersioner cnv1(net1Name);
@@ -103,12 +97,8 @@ namespace Isis {
     diff("NetworkId", cnv1.netId(), cnv2.netId(), report);
     diff("TargetName", cnv1.targetName(), cnv2.targetName(), report);
 
-    // This is all written for PVL now, so just re-do it this way rather than rewriting the whole thing.
     Pvl net1Pvl = cnv1.toPvl();
     Pvl net2Pvl = cnv2.toPvl();
-
-    net1Pvl.write("newnet1pvl.pvl");
-    net2Pvl.write("newnet2pvl.pvl");
 
     PvlObject &net1Obj = net1Pvl.findObject("ControlNetwork");
     PvlObject &net2Obj = net2Pvl.findObject("ControlNetwork");
