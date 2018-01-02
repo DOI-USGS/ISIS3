@@ -501,7 +501,8 @@ namespace Isis {
         }
 
         if ( controlPoint->HasRefMeasure() &&
-           controlPoint->IndexOfRefMeasure() == j ) {
+           controlPoint->IndexOfRefMeasure() == j &&
+           controlPoint->IsReferenceExplicit() ) {
           pvlMeasure += PvlKeyword("Reference", "True");
         }
         pvlPoint.addGroup(pvlMeasure);

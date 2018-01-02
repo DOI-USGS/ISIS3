@@ -164,7 +164,6 @@ int main() {
     qDebug() << "Measure1 != Measure2   FALSE";
   }
 
-
   try {
     m.SetLogData(ControlMeasureLogData());
   }
@@ -219,16 +218,17 @@ int main() {
 //    qDebug() << "LineResidual: " << m.GetLineResidual();
 //  }
 //
-  if (m.IsRejected()) {
-    if (m.JigsawRejected()) {
-      qDebug() << "Measure was rejected by Jigsaw.";
-    }
-    else {
-      qDebug() << "Measure was not rejected by Jigsaw.";
-    }
-  }
+//  qDebug() << "Log Size: " << m.LogSize();
 
-  qDebug() << "Log Size: " << m.LogSize();
+  if (m.IsRejected()) {
+  //  if (m.JigsawRejected()) {
+      qDebug() << "Measure was rejected by Jigsaw.";
+  }
+  else {
+      qDebug() << "Measure was not rejected by Jigsaw.";
+  }
+  //}
+
 }
 
 void outit(ControlMeasure &m) {
@@ -244,6 +244,6 @@ void outit(ControlMeasure &m) {
   net.SetModifiedDate("Yesterday");
   net.Write("./tmp.net", true);
   Pvl tmp("./tmp.net");
-  qDebug() << "Printing measure:\n" << tmp << "\nDone printing measure.";
+  std::cout << "Printing measure:\n" << tmp << "\nDone printing measure." << std::endl;
   remove("./tmp.net");
 }
