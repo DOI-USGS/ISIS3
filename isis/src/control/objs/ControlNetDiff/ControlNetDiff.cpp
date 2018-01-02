@@ -208,7 +208,6 @@ namespace Isis {
     if (g1.hasKeyword("SerialNumber")) {
       QString sn1 = g1.findKeyword("SerialNumber")[0];
       QString sn2 = g1.findKeyword("SerialNumber")[0];
-//      std::cout << "serial numbers :" << sn1 << " , " << sn2 << std::endl; 
       measureReport.addKeyword(makeKeyword("SerialNumber", sn1, sn2));
     }
     PvlContainer &groupReport = g1.hasKeyword("SerialNumber") ?
@@ -258,7 +257,6 @@ namespace Isis {
    */
   void ControlNetDiff::compare(PvlKeyword &k1, PvlKeyword &k2, PvlContainer &report) {
     QString name = k1.name();
-//    std::cout << "name: " << name << std::endl; 
     if (m_tolerances->contains(name))
       diff(name, toDouble(k1[0]), toDouble(k2[0]), (*m_tolerances)[name], report);
     else
