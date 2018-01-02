@@ -500,14 +500,8 @@ namespace Isis {
           pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.IsRejected()));
         }
 
-        for (int logEntry = 0;
-            logEntry < controlMeasure.GetLogDataEntries().size();
-            logEntry ++) {
-          const ControlMeasureLogData &log =
-                controlMeasure.GetLogData(logEntry); // Not sure this is right.
-
-          ControlMeasureLogData interpreter(log);
-          pvlMeasure += interpreter.ToKeyword();
+        foreach (ControlMeasureLogData log, controlMeasure.GetLogDataEntries()) {
+          pvlMeasure += log.ToKeyword();
         }
 
         if ( controlPoint->HasRefMeasure() &&
