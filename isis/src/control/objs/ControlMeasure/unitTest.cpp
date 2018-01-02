@@ -222,10 +222,10 @@ int main() {
 
   if (m.IsRejected()) {
   //  if (m.JigsawRejected()) {
-      qDebug() << "Measure was rejected by Jigsaw.";
+      qDebug() << "Measure was rejected.";
   }
   else {
-      qDebug() << "Measure was not rejected by Jigsaw.";
+      qDebug() << "Measure was not rejected.";
   }
   //}
 
