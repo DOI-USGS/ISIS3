@@ -399,7 +399,12 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(1, 2));
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") ) {
+          if ( pvlRadii.hasKeyword("EquatorialRadius")
+               && pvlRadii.hasKeyword("PolarRadius") ) {
+            adjustedSurfacePoint.SetRadii(
+                  Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                  Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                  Distance(pvlRadii["PolarRadius"],Distance::Meters));
             QString sigmas = "AdjustedLatitudeSigma = "
                              + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
                              + " <meters>  AdjustedLongitudeSigma = "
