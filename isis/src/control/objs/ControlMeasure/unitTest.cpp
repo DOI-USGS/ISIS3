@@ -171,7 +171,7 @@ int main() {
     e.print();
   }
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "Test 14: Testing accessor methods";
 
   if (m.IsRejected()) {
