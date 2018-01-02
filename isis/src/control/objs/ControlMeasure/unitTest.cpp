@@ -174,61 +174,12 @@ int main() {
   qDebug();
   qDebug() << "Test 14: Testing accessor methods";
 
-//  if (m.HasChooserName()) {
-//    qDebug() << "Chooser Name: " << m.GetChooserName();
-//  }
-//
-//  if (m.HasDateTime()) {
-//    qDebug() << "DateTime: " << m.GetDateTime();
-//  }
-//
-//  if (m.HasSample()) {
-//    qDebug() << "Sample: " << m.GetSample();
-//  }
-//
-//  if (m.HasLine()) {
-//    qDebug() << "Line: " << m.GetLine();
-//  }
-//
-//  if (m.HasDiameter()) {
-//    qDebug() << "Diameter: " << m.GetDiameter();
-//  }
-//
-//  if (m.HasAprioriSample()) {
-//    qDebug() << "AprioriSample: " << m.GetAprioriSample();
-//  }
-//
-//  if (m.HasAprioriLine()) {
-//    qDebug() << "AprioriLine: " << m.GetAprioriLine();
-//  }
-//
-//  if (m.HasSampleSigma()) {
-//    qDebug() << "SampleSigma: " << m.GetSampleSigma();
-//  }
-//
-//  if (m.HasLineSigma()) {
-//    qDebug() << "LineSigma: " << m.GetLineSigma();
-//  }
-//
-//  if (m.HasSampleResidual()) {
-//    qDebug() << "SampleResidual: " << m.GetSampleResidual();
-//  }
-//
-//  if (m.HasLineResidual()) {
-//    qDebug() << "LineResidual: " << m.GetLineResidual();
-//  }
-//
-//  qDebug() << "Log Size: " << m.LogSize();
-
   if (m.IsRejected()) {
-  //  if (m.JigsawRejected()) {
       qDebug() << "Measure was rejected.";
   }
   else {
       qDebug() << "Measure was not rejected.";
   }
-  //}
-
 }
 
 void outit(ControlMeasure &m) {
