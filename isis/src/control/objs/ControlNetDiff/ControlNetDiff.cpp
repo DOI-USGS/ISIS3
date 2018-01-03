@@ -99,7 +99,7 @@ namespace Isis {
 
     Pvl net1Pvl = cnv1.toPvl();
     Pvl net2Pvl = cnv2.toPvl();
-
+    
     PvlObject &net1Obj = net1Pvl.findObject("ControlNetwork");
     PvlObject &net2Obj = net2Pvl.findObject("ControlNetwork");
     

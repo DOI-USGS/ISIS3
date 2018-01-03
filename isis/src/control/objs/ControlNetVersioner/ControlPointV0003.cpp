@@ -575,8 +575,9 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
@@ -606,8 +607,9 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
@@ -722,8 +724,9 @@ namespace Isis {
                                void (ControlPointFileEntryV0002_Measure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);

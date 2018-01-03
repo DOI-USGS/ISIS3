@@ -1411,13 +1411,6 @@ namespace Isis {
     // serial number is required, no need for if-statement
     newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
 
-    if ( measure.has_choosername() ) {
-      newMeasure->SetChooserName(QString(measure.choosername().c_str()));
-    }
-    if ( measure.has_datetime() ) {
-      newMeasure->SetDateTime(QString(measure.datetime().c_str()));
-    }
-
     // measure type is required, no need for if-statement
     ControlMeasure::MeasureType measureType;
     switch ( measure.type() ) {
@@ -1480,6 +1473,14 @@ namespace Isis {
         logEntry.SetNumericalValue( protoLog.doubledatavalue() );
       }
       newMeasure->SetLogData(logEntry);
+    }
+
+    if ( measure.has_choosername() ) {
+      newMeasure->SetChooserName(QString(measure.choosername().c_str()));
+    }
+
+    if ( measure.has_datetime() ) {
+      newMeasure->SetDateTime(QString(measure.datetime().c_str()));
     }
 
     // It is VERY important that the edit lock flag is set last because it prevents
