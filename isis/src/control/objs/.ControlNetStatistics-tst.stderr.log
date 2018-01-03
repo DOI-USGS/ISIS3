@@ -1,6 +1,0 @@
-./libisis3.5.2.so: undefined reference to `Isis::ControlMeasureLogData::ControlMeasureLogData(Isis::ControlNetLogDataProtoV0001_Point_Measure_DataEntry const&)'
-./libisis3.5.2.so: undefined reference to `Isis::ControlMeasure::JigsawRejected() const'
-./libisis3.5.2.so: undefined reference to `Isis::ControlMeasureLogData::ControlMeasureLogData(Isis::ControlPointFileEntryV0002_Measure_MeasureLogData const&)'
-./libisis3.5.2.so: undefined reference to `Isis::ControlMeasure::LogSize() const'
-collect2: error: ld returned 1 exit status
-make[1]: *** [unitTest] Error 1
