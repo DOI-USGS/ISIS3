@@ -1440,9 +1440,6 @@ namespace Isis {
     }
     newMeasure->SetType(measureType);
 
-    if ( measure.has_editlock() ) {
-      newMeasure->SetEditLock(measure.editlock());
-    }
     if ( measure.has_jigsawrejected() ) {
       newMeasure->SetRejected(measure.jigsawrejected());
     }
@@ -1483,6 +1480,12 @@ namespace Isis {
         logEntry.SetNumericalValue( protoLog.doubledatavalue() );
       }
       newMeasure->SetLogData(logEntry);
+    }
+
+    // It is VERY important that the edit lock flag is set last because it prevents
+    // all of the other mutators from working if true.
+    if ( measure.has_editlock() ) {
+      newMeasure->SetEditLock(measure.editlock());
     }
     return newMeasure;
   }
