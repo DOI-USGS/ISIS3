@@ -454,12 +454,12 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
         }
 
-        if ( controlMeasure.GetSample() != 0.0 ) {
+        if ( controlMeasure.GetSample() != Isis::Null) {
           pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample()));
 
         }
 
-        if ( controlMeasure.GetLine() != 0.0 ) {
+        if ( controlMeasure.GetLine() != Isis::Null ) {
           pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
         }
 
@@ -1854,11 +1854,11 @@ namespace Isis {
           protoMeasure.set_jigsawrejected(true);
         }
 
-        if ( controlMeasure.GetSample() != 0.0 ) {
+        if ( controlMeasure.GetSample() != Isis::Null ) {
           protoMeasure.set_sample(controlMeasure.GetSample());
         }
 
-        if ( controlMeasure.GetLine() != 0.0 ) {
+        if ( controlMeasure.GetLine() != Isis::Null ) {
           protoMeasure.set_line(controlMeasure.GetLine());
         }
 

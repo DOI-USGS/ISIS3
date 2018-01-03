@@ -53,8 +53,8 @@ namespace Isis {
     p_jigsawRejected = false;
     p_ignore = false;
 
-    p_sample = 0.0;
-    p_line = 0.0;
+    p_sample = Isis::Null;//0.0;
+    p_line = Isis::Null; //0.0;
   }
 
 
