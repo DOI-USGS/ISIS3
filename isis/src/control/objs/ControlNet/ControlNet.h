@@ -206,6 +206,9 @@ namespace Isis {
    *                           import in constructor. Also removed p_invalid as it was no longer
    *                           being used anywhere. Fixes #5068.
    *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
+   *   @history 2017-12-21 Jesse Mapel - Modified read and write methods to use the refactored
+   *                           ControlNetVersioner instead of directly parsing the protobuf
+   *                           objects from the LatestControlNetFile.
    */
   class ControlNet : public QObject {
       Q_OBJECT
