@@ -30,7 +30,23 @@
 namespace Isis {
   class PvlObject;
   class PvlContainer;
-
+  /**
+   * @breif A container for the information stored in a version 1 ControlPoint.
+   *
+   * A wrapper around the version 1 protobuf serialization of a ControlPoint. It allows for reading
+   * ControlPoints serialized as both PvlObjects and protobuf messages. In order to simplify the
+   * upgrade process from version 1 to version 2, the data is always stored in a protobuf message
+   * after being read.
+   *
+   * @ingroup ControlNetwork
+   *
+   * @author 2017-12-18 Jesse Mapel
+   *
+   * @internal
+   *   @history 2017-12-18 Jesse Mapel - Original version.
+   *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
+   *   @history 2017-12-21 Jesse Mapel - Improved documentation.
+   */
   class ControlPointV0001 {
     public:
       ControlPointV0001(PvlObject &pointObject, const QString targetName);
