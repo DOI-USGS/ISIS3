@@ -19,21 +19,21 @@ void TestNetwork(const QString &filename, bool printNetwork = true, bool pvlInpu
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
   qDebug() << "Test ControlNetVersioner";
-  TestNetwork("$control/unitTest_ControlNetVersioner_reallyOldNetwork.net"); // No target
-  TestNetwork("$control/unitTest_ControlNetVersioner_reallyOldNetwork2.net"); // Really odd keywords with target
-  TestNetwork("$control/unitTest_ControlNetVersioner_oldNetwork.net"); // Another set of odd keywords
-  TestNetwork("$control/unitTest_ControlNetVersioner_oldNetwork2.net"); // Binary V1
-  TestNetwork("$control/unitTest_ControlNetVersioner_badNetwork.net"); // Corrupted (based off of oldNetwork2.net)
-  TestNetwork("$control/unitTest_ControlNetVersioner_semilarge.net", false);
-  TestNetwork("$control/unitTest_ControlNetVersioner_smallPvlTest.pvl", true, true); // network with rejected jigsaw points
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork_PvlV0001.net"); // No target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork2_PvlV0001.net"); // Really odd keywords with target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork_PvlV0001.net"); // Another set of odd keywords
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork2_ProtoV0001.net"); // Binary V1
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_badNetwork_ProtoV0001.net"); // Corrupted (based off of oldNetwork2.net)
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_semilarge_ProtoV0002.net", false);
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_smallPvlTest_PvlV0003.pvl", true, true); // network with rejected jigsaw points
 }
 
 void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
-  qDebug() << "Reading: " << filename << "...\n\n";
+  qDebug() << "Reading: " << filename << "...\n";
   FileName networkFileName(filename);
 
-  ControlNetVersioner* test;
-  ControlNetVersioner* test2;
+  ControlNetVersioner *test = NULL;
+  ControlNetVersioner *test2 = NULL;
 
   try {
 
@@ -49,15 +49,15 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
     if(printNetwork) {
       qDebug() << "Converted directly to Pvl:";
       Pvl pvlVersion(test->toPvl());
+
       // qDebug() does not support this operation on a pvl
-      // qDebug() << pvlVersion;
+      std::cout << pvlVersion << std::endl;
       pvlVersion.write("./tmp.pvl");
     }
 
     // Test the latest binary read/write and Pvl conversion
     qDebug() << "Write the network and re-read it...";
     test->write( FileName("./tmp") );
-
     try {
       test2 = new ControlNetVersioner( FileName("./tmp") );
     }
@@ -89,7 +89,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
 
     if (pvlInput) {
 
-      ControlNetVersioner * cNet2 = NULL;
+      ControlNetVersioner *cNet2 = NULL;
 
       qDebug() << "Check conversions between the binary format and the pvl format.";
       /*
