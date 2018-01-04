@@ -170,6 +170,8 @@ namespace Isis {
    *   @history 2017-12-20 Jesse Mapel - Implemented GetLogDataEntries method for use in
    *                           ControlNetVersioner refactor.
    *   @history 2017-12-21 Adam Goins - Removed protobuf references.
+   *   @history 2018-01-04 Adam Goins - Moved sample/line initialization from the constructor
+   *                           to the InitToNull() method.
    */
   class ControlMeasure : public QObject {
 
