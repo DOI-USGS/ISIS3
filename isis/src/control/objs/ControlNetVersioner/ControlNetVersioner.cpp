@@ -225,9 +225,11 @@ namespace Isis {
       if ( controlPoint->GetType() == ControlPoint::Fixed ) {
         pvlPoint += PvlKeyword("PointType", "Fixed");
       }
+
       else if ( controlPoint->GetType() == ControlPoint::Constrained ) {
         pvlPoint += PvlKeyword("PointType", "Constrained");
       }
+
       else {
         pvlPoint += PvlKeyword("PointType", "Free");
       }
@@ -560,7 +562,6 @@ namespace Isis {
     if ( controlNetwork.hasKeyword("Version") ) {
       version = toInt(controlNetwork["Version"][0]);
     }
-
     switch ( version ) {
       case 1:
         readPvlV0001(controlNetwork);
@@ -613,7 +614,7 @@ namespace Isis {
       try {
 
         PvlObject pointObject = network.object(objectIndex);
-        ControlPointV0001 point(pointObject, header.targetName);
+        ControlPointV0001 point(pointObject, m_header.targetName);
 
         m_points.append( createPoint(point) );
       }
@@ -794,7 +795,6 @@ namespace Isis {
     if ( netInfo.hasKeyword("Version") ) {
       version = toInt(netInfo["Version"][0]);
     }
-
     switch ( version ) {
       case 1:
         readProtobufV0001(header, netFile);
@@ -871,7 +871,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     ControlNetLogDataProtoV0001 protoLogData;
     try {
-      if ( protoLogData.ParseFromCodedStream(&codedLogInStream) ) {
+      if ( !protoLogData.ParseFromCodedStream(&codedLogInStream) ) {
         QString msg = "Failed to read log data in protobuf file [" + netFile.name() + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -1101,6 +1101,7 @@ namespace Isis {
     input.close();
     input.open(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
     input.seekg(filePos, ios::beg);
+
     IstreamInputStream pointInStream(&input);
 
     int pointIndex = -1;
@@ -1109,14 +1110,14 @@ namespace Isis {
       QSharedPointer<ControlPointFileEntryV0002> newPoint(new ControlPointFileEntryV0002);
 
       try {
+
         CodedInputStream pointCodedInStream(&pointInStream);
         pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
                                               1024 * 1024 * 400);
+
         uint32_t size;
-        if ( !pointCodedInStream.ReadVarint32(&size) ) {
-          // If we can't read another size, then assume at eof
-          break;
-        }
+        pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
+
         CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
         newPoint->ParseFromCodedStream(&pointCodedInStream);
         pointCodedInStream.PopLimit(oldPointLimit);
@@ -1525,7 +1526,6 @@ namespace Isis {
       output.write(blankLabel, labelBytes);
       delete [] blankLabel;
 
-      // Is there a better way we can get the total number of measures?
       int numMeasures = 0;
       int numPoints = 0;
       foreach (ControlPoint *point, m_points) {
@@ -1534,16 +1534,15 @@ namespace Isis {
       }
 
       streampos startCoreHeaderPos = output.tellp();
-      OstreamOutputStream *fileStream = new OstreamOutputStream(&output);
 
-      writeHeader(fileStream);
+      writeHeader(&output);
 
       BigInt pointByteTotal = 0;
       while ( !m_points.isEmpty() ) {
-         pointByteTotal += writeFirstPoint(fileStream);
+         pointByteTotal += writeFirstPoint(&output);
       }
 
-      // Insert header at the beginning of the file once writing is done.
+      // // Insert header at the beginning of the file once writing is done.
       ControlNetFileHeaderV0005 protobufHeader;
 
       protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
@@ -1593,8 +1592,6 @@ namespace Isis {
       output << '\n';
       output.close();
 
-      delete fileStream;
-      fileStream = NULL;
     }
     catch (...) {
       QString msg = "Can't write control net file";
@@ -1603,13 +1600,11 @@ namespace Isis {
   }
 
  /**
-  * This will read the binary protobuffer control network header to a ZeroCopyOutputStream
+  * This will read the binary protobuffer control network header to an fstream
   *
-  * @param fileStream The filestream that the header will be written to.
+  * @param output The fstream we're writing out to.
   */
-  void ControlNetVersioner::writeHeader(ZeroCopyOutputStream *oStream) {
-
-    CodedOutputStream fileStream(oStream);
+  void ControlNetVersioner::writeHeader(fstream *output) {
 
     // Create the protobuf header using our struct
     ControlNetFileHeaderV0005 protobufHeader;
@@ -1622,11 +1617,10 @@ namespace Isis {
     protobufHeader.set_username(m_header.userName.toLatin1().data());
 
     // Write out the header
-    if ( !protobufHeader.SerializeToCodedStream(&fileStream) ) {
+    if ( !protobufHeader.SerializeToOstream(output) ) {
       QString msg = "Failed to write output control network file.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-
   }
 
 
@@ -1639,9 +1633,9 @@ namespace Isis {
   *
   * @return @b int The number of bytes written to the filestream.
   */
-  int ControlNetVersioner::writeFirstPoint(ZeroCopyOutputStream *oStream) {
+  int ControlNetVersioner::writeFirstPoint(fstream *output) {
 
-      CodedOutputStream fileStream(oStream);
+      BigInt startPos = output->tellp();
 
       ControlPointFileEntryV0002 protoPoint;
       ControlPoint *controlPoint = m_points.takeFirst();
@@ -1905,8 +1899,6 @@ namespace Isis {
 
           const ControlMeasureLogData &log = measureLogs[logEntry];
 
-          // These methods might not not exist, we may need to wrap each of These
-          // In if/else statements because they're optional values.
           ControlPointFileEntryV0002_Measure_MeasureLogData logData;
 
           if ( ((int) log.GetDataType()) ) {
@@ -1925,10 +1917,10 @@ namespace Isis {
         *protoPoint.add_measures() = protoMeasure;
       }
 
-      int msgSize(protoPoint.ByteSize());
-      fileStream.WriteVarint32(msgSize);
+      uint32_t byteSize = protoPoint.ByteSize();
+      output->write(reinterpret_cast<char *>(&byteSize), sizeof(byteSize));
 
-      if ( !protoPoint.SerializeToCodedStream(&fileStream) ) {
+      if ( !protoPoint.SerializeToOstream(output) ) {
         QString err = "Error writing to coded protobuf stream";
         throw IException(IException::Programmer, err, _FILEINFO_);
       }
@@ -1938,8 +1930,10 @@ namespace Isis {
         delete controlPoint;
         controlPoint = NULL;
       }
+      BigInt currentPos = output->tellp();
+      BigInt byteCount = currentPos - startPos;
 
       // return size of message
-      return fileStream.ByteCount();
+      return byteCount;
   }
 }
