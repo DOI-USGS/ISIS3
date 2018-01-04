@@ -62,7 +62,7 @@ namespace Isis {
     labelStream << cubeLabel;
     //QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
     QString labelText = QString::fromStdString(labelStream.str());
-  
+
     QJsonObject properties {
       {"label", labelText},
       {"cksmithed", ckSmithed},
@@ -89,9 +89,9 @@ namespace Isis {
     // finalOutput.close();
 
     p_request = new QNetworkRequest();
-   
+
     QUrl qurl(url);
- 
+
     qurl.setPort(port);
     p_request->setUrl(qurl);
     //p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
@@ -154,18 +154,26 @@ namespace Isis {
    */
   void SpiceClient::replyFinished(QNetworkReply *reply) {
     p_rawResponse = new QString(QString(reply->readAll()));
-    //qDebug() << p_rawResponse;
     // Decode the response
-    p_response = new QString();
+    // p_response = new QString();
+    p_response = new QJsonObject();
 
     try {
-      *p_response = QString(
-          QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
+      // *p_response = QString(
+      //     QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
 
-      //qDebug() << "p_resonse:  "<<*p_response; 
+      // QJsonDocument document;
+      QByteArray decoded = QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData();
+      QJsonDocument doc = QJsonDocument::fromJson(decoded);
+      *p_response = doc.object();
+
+      // QFile finalOutput("output.txt");
+      // finalOutput.open(QIODevice::WriteOnly);
+      // finalOutput.write( document.toJson() );
+      // finalOutput.close();
 
       // Make sure we can get the log out of it before continuing
-      applicationLog();
+      // applicationLog();
     }
     catch(IException &) {
       p_error = new QString();
@@ -349,14 +357,14 @@ namespace Isis {
 
 
 
-QJsonValue SpiceClient::tableToJson(QString file) {
-  QFile tableFile(file);
-  tableFile.open(QIODevice::ReadOnly);
-  QByteArray data = tableFile.readAll();
-  tableFile.close();
-
-  return QJsonValue::fromVariant(data.toHex().constData());
-}
+// QString SpiceClient::jsonToTable(QJsonValue val) {
+//   QFile tableFile(file);
+//   tableFile.open(QIODevice::ReadOnly);
+//   QByteArray data = tableFile.readAll();
+//   tableFile.close();
+//
+//   return QJsonValue::toVariant(data.toHex().constData());
+// }
 
 
   /**
@@ -365,7 +373,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   void SpiceClient::authenticationRequired(QNetworkReply *, QAuthenticator *) {
     if(!p_response) {
       p_rawResponse = new QString();
-      p_response = new QString();
+      p_response = new QJsonObject();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -380,7 +388,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   void SpiceClient::proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *) {
     if(!p_response) {
       p_rawResponse = new QString();
-      p_response = new QString();
+      p_response = new QJsonObject();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -397,7 +405,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
                               const QList<QSslError> & err) {
     if(!p_response) {
       p_rawResponse = new QString();
-      p_response = new QString();
+      p_response = new QJsonObject();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -413,28 +421,32 @@ QJsonValue SpiceClient::tableToJson(QString file) {
    *
    * @return QDomElement
    */
-  QDomElement SpiceClient::rootXMLElement() {
-    if(!p_response || !p_rawResponse) {
-      QString error = "No server response available";
-      throw IException(IException::Io, error, _FILEINFO_);
-    }
-
-    QDomDocument document;
-    QString errorMsg;
-    int errorLine, errorCol;
-
-    if(!p_response->isEmpty() &&
-        document.setContent(QString(p_response->toLatin1()),
-                            &errorMsg, &errorLine, &errorCol)) {
-      return document.firstChild().toElement();
-    }
-    else {
-      QString msg = "Unexpected response from spice server [";
-      msg += *p_rawResponse;
-      msg += "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-  }
+  // QDomElement SpiceClient::rootXMLElement() {
+  //   if(!p_response || !p_rawResponse) {
+  //     QString error = "No server response available";
+  //     throw IException(IException::Io, error, _FILEINFO_);
+  //   }
+  //
+  //   QDomDocument document;
+  //   QString errorMsg;
+  //   int errorLine, errorCol;
+  //
+  //   if(!p_response->isEmpty() &&
+  //       document.setContent(QString(p_response->toLatin1()),
+  //                           &errorMsg, &errorLine, &errorCol)) {
+  //     return document.firstChild().toElement();
+  //   }
+  //   else if (p_response->isEmpty()){
+  //     QString msg = "Empty response returned from server.";
+  //     throw IException(IException::Io, msg, _FILEINFO_);
+  //   }
+  //   else {
+  //     QString msg = "Unexpected response from spice server [";
+  //     msg += *p_rawResponse;
+  //     msg += "]";
+  //     throw IException(IException::Io, msg, _FILEINFO_);
+  //   }
+  // }
 
 
   /**
@@ -471,11 +483,14 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   PvlGroup SpiceClient::kernelsGroup() {
     checkErrors();
 
-    QDomElement root = rootXMLElement();
-    QDomElement kernelsLabel = findTag(root, "kernels_label");
-    QString kernelsLabels = elementContents(kernelsLabel);
+    // QDomElement root = rootXMLElement();
+    // QDomElement kernelsLabel = findTag(root, "kernels_label");
+    // QString kernelsLabels = elementContents(kernelsLabel);
+    //
+    // QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
-    QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
+    QString kernVal = p_response->value("Kernels Label").toVariant().toString();
+    QString unencoded(QByteArray::fromHex(kernVal.toLatin1()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -495,19 +510,22 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   PvlGroup SpiceClient::applicationLog() {
     checkErrors();
 
-    QDomElement root = rootXMLElement();
-    QDomElement logLabel = findTag(root, "application_log");
-    QString logLabels = elementContents(logLabel);
+    PvlGroup group("group");
+    return group;
 
-    QString unencoded(QByteArray::fromHex(logLabels.toLatin1()).constData());
-
-    stringstream pvlStream;
-    pvlStream << unencoded;
-
-    Pvl labels;
-    pvlStream >> labels;
-
-    return labels.findGroup("Kernels", Pvl::Traverse);
+    // QDomElement root = rootXMLElement();
+    // QDomElement logLabel = findTag(root, "application_log");
+    // QString logLabels = elementContents(logLabel);
+    //
+    // QString unencoded(QByteArray::fromHex(logLabels.toLatin1()).constData());
+    //
+    // stringstream pvlStream;
+    // pvlStream << unencoded;
+    //
+    // Pvl labels;
+    // pvlStream >> labels;
+    //
+    // return labels.findGroup("Kernels", Pvl::Traverse);
   }
 
 
@@ -533,7 +551,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
    * @return Table*
    */
   Table *SpiceClient::pointingTable() {
-    return readTable("instrument_pointing", "InstrumentPointing");
+    return readTable("Instrument Pointing", "InstrumentPointing");
   }
 
 
@@ -544,7 +562,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
    * @return Table*
    */
   Table *SpiceClient::positionTable() {
-    return readTable("instrument_position", "InstrumentPosition");
+    return readTable("Instrument Position", "InstrumentPosition");
   }
 
 
@@ -555,7 +573,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
    * @return Table*
    */
   Table *SpiceClient::bodyRotationTable() {
-    return readTable("body_rotation", "BodyRotation");
+    return readTable("Body Rotation", "BodyRotation");
   }
 
 
@@ -563,7 +581,7 @@ QJsonValue SpiceClient::tableToJson(QString file) {
    * This returns the table given by the server.
    */
   Table *SpiceClient::sunPositionTable() {
-    return readTable("sun_position", "SunPosition");
+    return readTable("Sun Position", "SunPosition");
   }
 
 
@@ -591,19 +609,22 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   PvlObject SpiceClient::naifKeywordsObject() {
     checkErrors();
 
-    QDomElement root = rootXMLElement();
-    QDomElement kernelsLabel = findTag(root, "kernels_label");
-    QString kernelsLabels = elementContents(kernelsLabel);
+    PvlObject ob("object");
+    return ob;
 
-    QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
-
-    stringstream pvlStream;
-    pvlStream << unencoded;
-
-    Pvl labels;
-    pvlStream >> labels;
-
-    return labels.findObject("NaifKeywords");
+    // QDomElement root = rootXMLElement();
+    // QDomElement kernelsLabel = findTag(root, "kernels_label");
+    // QString kernelsLabels = elementContents(kernelsLabel);
+    //
+    // QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
+    //
+    // stringstream pvlStream;
+    // pvlStream << unencoded;
+    //
+    // Pvl labels;
+    // pvlStream >> labels;
+    //
+    // return labels.findObject("NaifKeywords");
   }
 
 
@@ -622,31 +643,43 @@ QJsonValue SpiceClient::tableToJson(QString file) {
   }
 
 
-  Table *SpiceClient::readTable(QString xmlName, QString tableName) {
+  Table *SpiceClient::readTable(QString jsonName, QString tableName) {
     checkErrors();
 
-    QDomElement root = rootXMLElement();
-    QDomElement tablesTag = findTag(root, "tables");
-    QDomElement pointingTag = findTag(tablesTag, xmlName);
-    QString encodedString = elementContents(pointingTag);
+    QString value = p_response->value(jsonName).toVariant().toString();
+    QString decoded(QByteArray::fromHex(value.toLatin1()).constData());
 
-    QByteArray encodedArray;
-    for (int i = 0; i < encodedString.size(); i++) {
-      encodedArray.append(encodedString.data()[i]);
-    }
+    QFile finalOutput(tableName + ".txt");
+    finalOutput.open(QIODevice::WriteOnly);
+    finalOutput.write(decoded.toLatin1());
+    finalOutput.close();
 
-    QByteArray unencodedArray(QByteArray::fromHex(encodedArray));
-
-    stringstream tableStream;
-    tableStream.write(unencodedArray.data(), unencodedArray.size());
-
-    Pvl lab;
-    tableStream >> lab;
-
-    Table *table = new Table(tableName);
-    table->Read(lab, tableStream);
+    Table *table = new Table(decoded);
 
     return table;
+
+    // QDomElement root = rootXMLElement();
+    // QDomElement tablesTag = findTag(root, "tables");
+    // QDomElement pointingTag = findTag(tablesTag, xmlName);
+    // QString encodedString = elementContents(pointingTag);
+
+    // QByteArray encodedArray;
+    // for (int i = 0; i < encodedString.size(); i++) {
+    //   encodedArray.append(encodedString.data()[i]);
+    // }
+    //
+    // QByteArray unencodedArray(QByteArray::fromHex(encodedArray));
+    //
+    // stringstream tableStream;
+    // tableStream.write(unencodedArray.data(), unencodedArray.size());
+    //
+    // Pvl lab;
+    // tableStream >> lab;
+    //
+    // Table *table = new Table(tableName);
+    // table->Read(lab, tableStream);
+    //
+    // return table;
 
   }
 };

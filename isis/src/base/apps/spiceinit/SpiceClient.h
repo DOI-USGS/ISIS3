@@ -48,7 +48,7 @@ namespace Isis {
       Table *positionTable();
       Table *bodyRotationTable();
       Table *sunPositionTable();
-      QJsonValue tableToJson(QString file); 
+      QJsonValue tableToJson(QString file);
     public slots:
       void sendRequest();
 
@@ -61,7 +61,7 @@ namespace Isis {
     private:
       static QString yesNo(bool boolVal);
       Table *readTable(QString xmlName, QString tableName);
-      QDomElement rootXMLElement();
+      // QDomElement rootXMLElement();
       QDomElement findTag(QDomElement currentElement, QString name);
       QString elementContents(QDomElement element);
       void checkErrors();
@@ -70,7 +70,7 @@ namespace Isis {
       QString *p_error;
       QJsonDocument *p_jsonDocument; //!< Json file to send to server
       QString *p_rawResponse;  //!< Server raw response
-      QString *p_response;  //!< Server decoded response
+      QJsonObject *p_response;  //!< The QJsonObject constructed from the server response
       QNetworkAccessManager *p_networkMgr; //!< Network manager does request
       QNetworkRequest *p_request; //!< Network request sent
   };

@@ -87,7 +87,9 @@ void IsisMain() {
   QString mission = missionXlater.Translate("MissionName");
 
   if (ui.GetBoolean("WEB")) {
+    std::cout << "Before Request" << std::endl;
     requestSpice(icube, *icube->label(), mission);
+    std::cout << "After Request" << std::endl;
   }
   else {
     // Get system base kernels
@@ -175,7 +177,7 @@ void IsisMain() {
                        _FILEINFO_);
     }
     else if (ui.WasEntered("CK")) {
-      // if user entered ck 
+      // if user entered ck
       // empty ck queue list found in system
       while (ck.size()) {
         ck.pop_back();
@@ -189,7 +191,7 @@ void IsisMain() {
 
     // while the first queue is not empty, loop through it until tryKernels() succeeds
     while (ck.at(0).size() != 0 && !kernelSuccess) {
-      // create an empty kernel 
+      // create an empty kernel
       Kernel realCkKernel;
       QStringList ckKernelList;
 
@@ -213,13 +215,13 @@ void IsisMain() {
             Kernel topPriority = ck.at(i).top();
             ckKernelList.append(topPriority.kernels());
             // set the type to equal the type of the to priority of the first
-            //queue 
-            realCkKernel.setType(topPriority.type()); 
+            //queue
+            realCkKernel.setType(topPriority.type());
           }
         }
 
       }
-      // pop the top priority ck off only the first queue so that the next 
+      // pop the top priority ck off only the first queue so that the next
       // iteration will test the next highest priority of the first queue with
       // the top priority of each of the other queues.
       ck[0].pop();
@@ -244,14 +246,14 @@ void IsisMain() {
 }
 
 /**
- * If the user entered the parameter param, then kernel is replaced by the 
+ * If the user entered the parameter param, then kernel is replaced by the
  * user's values and quality is reset to 0. Otherwise, the kernels loaded by the
  * KernelDb class will be kept.
  *
  * @param param Name of the kernel input parameter
- *  
- * @param kernel Kernel object to be overwritten if the specified user parameter 
- *               was entered. 
+ *
+ * @param kernel Kernel object to be overwritten if the specified user parameter
+ *               was entered.
  */
 void getUserEnteredKernel(const QString &param, Kernel &kernel) {
   UserInterface &ui = Application::GetUserInterface();
@@ -264,10 +266,10 @@ void getUserEnteredKernel(const QString &param, Kernel &kernel) {
   }
 }
 
-/** 
+/**
   * This fuction now also adds any ShapeModel information specified in a
   * preferences file to the Kernels group.
- */  
+ */
 bool tryKernels(Cube *icube, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
@@ -572,13 +574,14 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
   client.blockUntilComplete();
   connectionProgress.CheckStatus();
 
-  PvlGroup kernelsGroup = client.kernelsGroup();
-  PvlGroup logGrp = client.applicationLog();
+  PvlGroup kernelsGroup = client.kernelsGroup(); //
+
+  PvlGroup logGrp = client.applicationLog(); //
   PvlObject naifKeywords = client.naifKeywordsObject();
-  Table *pointingTable = client.pointingTable();
-  Table *positionTable = client.positionTable();
-  Table *bodyTable = client.bodyRotationTable();
-  Table *sunPosTable = client.sunPositionTable();
+  Table *pointingTable = client.pointingTable(); //
+  Table *positionTable = client.positionTable(); //
+  Table *bodyTable = client.bodyRotationTable(); //
+  Table *sunPosTable = client.sunPositionTable(); //
 
   // Verify everything in the kernels group exists, if not then our kernels are
   //   out of date.
@@ -621,6 +624,7 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
   icube->label()->addObject(naifKeywords);
 
   icube->write(*pointingTable);
+  qDebug() << "YAYA!";
   icube->write(*positionTable);
   icube->write(*bodyTable);
   icube->write(*sunPosTable);
