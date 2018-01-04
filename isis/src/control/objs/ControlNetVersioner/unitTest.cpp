@@ -19,13 +19,13 @@ void TestNetwork(const QString &filename, bool printNetwork = true, bool pvlInpu
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
   qDebug() << "Test ControlNetVersioner";
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork_PvlV0001.net"); // No target
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork2_PvlV0001.net"); // Really odd keywords with target
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork_PvlV0001.net"); // Another set of odd keywords
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork2_ProtoV0001.net"); // Binary V1
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_badNetwork_ProtoV0001.net"); // Corrupted (based off of oldNetwork2.net)
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_semilarge_ProtoV0002.net", false);
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_smallPvlTest_PvlV0003.pvl", true, true); // network with rejected jigsaw points
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork_PvlV0001.net");   // No target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_reallyOldNetwork2_PvlV0001.net");  // Really odd keywords with target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork_PvlV0001.net");         // Another set of odd keywords
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_oldNetwork2_ProtoV0001.net");      // Binary V1
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_badNetwork_ProtoV0001.net");       // Corrupted (based off of oldNetwork2.net)
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_semilarge_ProtoV0002.net", false); // Binary V2
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_smallPvlTest_PvlV0003.pvl", true, true); // Network with rejected jigsaw points
 }
 
 void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
@@ -118,7 +118,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
       cNet2->write( FileName("./tmpCNet2") );
 
       //if there are differences between the pvls.
-      QString cmd = "diff -EbB --suppress-common-lines " + filename + " ./tmp.pvl";
+      QString cmd = "diff -EbB --suppress-common-lines " + networkFileName.expanded() + " ./tmp.pvl";
       if(system(cmd.toStdString().c_str())) {
 
         //if the binary files are different.
