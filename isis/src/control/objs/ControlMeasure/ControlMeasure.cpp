@@ -406,6 +406,7 @@ namespace Isis {
    */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
+        
     MeasureModified();
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
@@ -553,6 +554,10 @@ namespace Isis {
     }
   }
 
+  //! Returns true if the choosername is not empty.
+  bool ControlMeasure::HasChooserName() const {
+    return !p_chooserName->isEmpty();
+  }
 
   //! Return the serial number of the cube containing the coordinate
   QString ControlMeasure::GetCubeSerialNumber() const {
@@ -569,6 +574,12 @@ namespace Isis {
       return Application::DateTime();
     }
   }
+
+  //! Returns true if the datetime is not empty.
+  bool ControlMeasure::HasDateTime() const {
+    return !p_dateTime->isEmpty();
+  }
+
 
 
   //! Return the diameter of the crater in pixels (0 implies no crater)

@@ -172,6 +172,9 @@ namespace Isis {
    *   @history 2017-12-21 Adam Goins - Removed protobuf references.
    *   @history 2018-01-04 Adam Goins - Moved sample/line initialization from the constructor
    *                           to the InitToNull() method.
+   *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
+   *                           to allow the value of these variables to be read without being
+   *                           overriden if they're empty. (Getters override if they're empty).
    */
   class ControlMeasure : public QObject {
 
@@ -279,8 +282,10 @@ namespace Isis {
       double GetAprioriSample() const;
       Isis::Camera *Camera() const;
       QString GetChooserName() const;
+      bool HasChooserName() const;
       QString GetCubeSerialNumber() const;
       QString GetDateTime() const;
+      bool HasDateTime() const;
       double GetDiameter() const;
       ControlMeasureLogData GetLogData(long dataType) const;
       bool IsEditLocked() const;
