@@ -89,8 +89,9 @@ int main() {
   QList< QStringList > printableMeasureData = m.PrintableClassData();
   QStringList nameValuePair;
   foreach(nameValuePair, printableMeasureData) {
-    qDebug() << nameValuePair.at(0).toLatin1().data() << "=" <<
-        nameValuePair.at(1).toLatin1().data();
+    // qDebug adds uneccessary spacing after each << so we use cout to display this data.
+    std::cout << nameValuePair.at(0).toLatin1().data() << "=" <<
+        nameValuePair.at(1).toLatin1().data() <<std::endl;
   }
 
   qDebug() << "Test 8";
@@ -195,6 +196,6 @@ void outit(ControlMeasure &m) {
   net.SetModifiedDate("Yesterday");
   net.Write("./tmp.net", true);
   Pvl tmp("./tmp.net");
-  std::cout << "Printing measure:\n" << tmp << "\nDone printing measure." << std::endl;
+  std::cout << "Printing measure:\n" << tmp << "\nDone printing measure.\n" << std::endl;
   remove("./tmp.net");
 }
