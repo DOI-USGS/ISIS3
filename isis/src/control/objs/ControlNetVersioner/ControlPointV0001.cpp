@@ -356,9 +356,9 @@ namespace Isis {
       adjustedPoint.SetRectangular( Displacement(m_pointData->adjustedx(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedy(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedz(), Displacement::Meters) );
-     // adjustedPoint.SetSphericalSigmasDistance( Distance(sigmaLat, Distance::Meters),
-//                                                Distance(sigmaLon, Distance::Meters),
-//                                                Distance(sigmaRad, Distance::Meters) );
+      adjustedPoint.SetSphericalSigmasDistance( Distance(sigmaLat, Distance::Meters),
+                                                Distance(sigmaLon, Distance::Meters),
+                                                Distance(sigmaRad, Distance::Meters) );
       m_pointData->add_adjustedcovar( adjustedPoint.GetRectangularMatrix()(0, 0) );
       m_pointData->add_adjustedcovar( adjustedPoint.GetRectangularMatrix()(0, 1) );
       m_pointData->add_adjustedcovar( adjustedPoint.GetRectangularMatrix()(0, 2) );
