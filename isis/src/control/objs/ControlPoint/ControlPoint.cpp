@@ -1212,6 +1212,16 @@ namespace Isis {
     }
   }
 
+  //! Returns true if the choosername is not empty.
+  bool ControlPoint::HasChooserName() const {
+    return !chooserName.isEmpty();
+  }
+
+  //! Returns true if the datetime is not empty.
+  bool ControlPoint::HasDateTime() const {
+    return !dateTime.isEmpty();
+  }
+
 
   QString ControlPoint::GetDateTime() const {
     if (dateTime != "") {
@@ -1531,15 +1541,15 @@ namespace Isis {
        const {
      return aprioriRadiusSource;
    }
- 
- 
+
+
    bool ControlPoint::HasAprioriCoordinates() {
      if (aprioriSurfacePoint.GetX().isValid() &&
          aprioriSurfacePoint.GetY().isValid() &&
          aprioriSurfacePoint.GetZ().isValid()) {
        return true;
      }
- 
+
      return false;
      // return aprioriSurfacePoint.Valid(); ???
    }

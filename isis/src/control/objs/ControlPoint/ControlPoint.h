@@ -340,6 +340,9 @@ namespace Isis {
    *                            HasRefMeasure().
    *   @history 2017-12-21 Adam Goins - Removed redundant code following ControlNetVersioner
    *                           refactor.
+   *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
+   *                           to allow the value of these variables to be read without being
+   *                           overriden if they're empty. (Getters override if they're empty).
    */
   class ControlPoint : public QObject {
 
@@ -536,6 +539,8 @@ namespace Isis {
       int GetNumValidMeasures() const;
       int GetNumLockedMeasures() const;
       bool HasSerialNumber(QString serialNumber) const;
+      bool HasChooserName() const;
+      bool HasDateTime() const;
       int IndexOf(ControlMeasure *, bool throws = true) const;
       int IndexOf(QString sn, bool throws = true) const;
       int IndexOfRefMeasure() const;
