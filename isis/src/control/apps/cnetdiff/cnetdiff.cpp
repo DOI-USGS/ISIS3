@@ -9,13 +9,11 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetDiff.h"
-#include "ControlNetFile.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "IException.h"
 #include "PvlContainer.h"
 #include "PvlGroup.h"
-
 
 
 using namespace std;
@@ -29,7 +27,7 @@ PvlGroup ignorekeys;
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2);
 void Compare(const PvlObject &point1, const PvlObject &point2);
-void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2);
+void Compare(const QString net1Path, const QString net2Path);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -40,11 +38,6 @@ void IsisMain() {
 
     differenceReason = "";
     filesMatch = true;
-
-    LatestControlNetFile *net1 = ControlNetVersioner::Read(
-        ui.GetFileName("FROM"));
-    LatestControlNetFile *net2 = ControlNetVersioner::Read(
-        ui.GetFileName("FROM2"));
 
     if(ui.WasEntered("DIFF")) {
       Pvl diffFile(ui.GetFileName("DIFF"));
@@ -64,10 +57,7 @@ void IsisMain() {
       ignorekeys += PvlKeyword("DateTime", "true");
     }
 
-    Compare(net1, net2);
-
-    delete net1;
-    delete net2;
+    Compare(ui.GetFileName("FROM"), ui.GetFileName("FROM2"));
 
     PvlGroup differences("Results");
     if(filesMatch) {
@@ -115,9 +105,12 @@ void IsisMain() {
   }
 }
 
-void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
-  Pvl net1Pvl(net1->toPvl());
-  Pvl net2Pvl(net2->toPvl());
+void Compare(QString net1Path, QString net2Path) {
+  ControlNetVersioner net1(net1Path);
+  ControlNetVersioner net2(net2Path);
+
+  Pvl net1Pvl(net1.toPvl());
+  Pvl net2Pvl(net2.toPvl());
 
   PvlObject &net1Obj = net1Pvl.findObject("ControlNetwork");
   PvlObject &net2Obj = net2Pvl.findObject("ControlNetwork");
