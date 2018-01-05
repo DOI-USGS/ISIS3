@@ -914,7 +914,7 @@ namespace Isis {
       }
       catch (IException &e) {
         QString msg = "Failed to convert version 1 protobuf control point at index ["
-                      + toString(i) + "] to a ControlPoint.";
+                      + toString(i) + "] into a ControlPoint.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
@@ -1134,7 +1134,7 @@ namespace Isis {
       }
       catch (IException &e) {
         QString msg = "Failed to convert protobuf version 2 control point at index ["
-                      + toString(pointIndex) + "] in a ControlPoint.";
+                      + toString(pointIndex) + "] into a ControlPoint.";
         throw IException(e, IException::Io, msg, _FILEINFO_);
       }
     }
