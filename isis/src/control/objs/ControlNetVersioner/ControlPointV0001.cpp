@@ -109,7 +109,14 @@ namespace Isis {
       m_pointData->set_aprioriy( aprioriPoint.GetY().meters() );
       m_pointData->set_aprioriz( aprioriPoint.GetZ().meters() );
     }
-  // If the apriori values are missing, copy them from the adjusted.
+    else if ( pointObject.hasKeyword("AprioriX")
+              && pointObject.hasKeyword("AprioriY")
+              && pointObject.hasKeyword("AprioriZ")) {
+      m_pointData->set_apriorix( toDouble(pointObject["AprioriX"][0]) );
+      m_pointData->set_aprioriy( toDouble(pointObject["AprioriY"][0]) );
+      m_pointData->set_aprioriz( toDouble(pointObject["AprioriZ"][0]) );
+    }
+    // If the apriori values are missing, copy them from the adjusted.
     else if ( m_pointData->has_adjustedx()
               && m_pointData->has_adjustedy()
               && m_pointData->has_adjustedz() ) {
