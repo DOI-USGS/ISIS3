@@ -10,6 +10,7 @@
 #include "NaifStatus.h"
 #include "Pvl.h"
 #include "PvlContainer.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 
@@ -436,16 +437,21 @@ namespace Isis {
         measure.mutable_measurement()->set_lineresidual(value);
         group.deleteKeyword("ErrorLine");
       }
+
+      double sampleResidualValue = Isis::Null;
       if (group.hasKeyword("SampleResidual")) {
-        double value = toDouble(group["SampleResidual"][0]);
-        measure.mutable_measurement()->set_sampleresidual(value);
+        sampleResidualValue = toDouble(group["SampleResidual"][0]);
         group.deleteKeyword("SampleResidual");
       }
+      measure.mutable_measurement()->set_sampleresidual(sampleResidualValue);
+
+      double lineResidualValue = Isis::Null;
       if (group.hasKeyword("LineResidual")) {
-        double value = toDouble(group["LineResidual"][0]);
-        measure.mutable_measurement()->set_lineresidual(value);
+        lineResidualValue = toDouble(group["LineResidual"][0]);
         group.deleteKeyword("LineResidual");
       }
+      measure.mutable_measurement()->set_lineresidual(lineResidualValue);
+
       if (group.hasKeyword("Reference")) {
         if (group["Reference"][0].toLower() == "true") {
           m_pointData->set_referenceindex(groupIndex);
