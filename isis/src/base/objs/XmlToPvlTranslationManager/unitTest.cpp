@@ -50,7 +50,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
     trnsStrm << "  InputKey = name" << endl;
-    trnsStrm << "  InputKeyDependencies = tag@type:Spacecraft" << endl;
+    trnsStrm << "  InputKeyDependencies = tag@type|Spacecraft" << endl;
     trnsStrm << "  OutputPosition = (group, instrument)" << endl;
     trnsStrm << "  OutputName = SpacecraftName" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
@@ -60,7 +60,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
     trnsStrm << "  InputKey = name" << endl;
-    trnsStrm << "  InputKeyDependencies = tag@type:Instrument" << endl;
+    trnsStrm << "  InputKeyDependencies = tag@type|Instrument" << endl;
     trnsStrm << "  OutputPosition = (group, instrument)" << endl;
     trnsStrm << "  OutputName = InstrumentId" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
@@ -77,7 +77,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (CaSSIS_Header, DERIVED_HEADER_DATA)" << endl;
     trnsStrm << "  InputKey = OnboardImageAcquisitionTime" << endl;
-    trnsStrm << "  InputKeyDependencies = att@Time_Base:UTC" << endl;
+    trnsStrm << "  InputKeyDependencies = att@Time_Base|UTC" << endl;
     trnsStrm << "  OutputPosition = (group, instrument)" << endl;
     trnsStrm << "  OutputName = OnboardImageAcquisitionTimeUTC" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
@@ -87,7 +87,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (CaSSIS_Header, DERIVED_HEADER_DATA)" << endl;
     trnsStrm << "  InputKey = OnboardImageAcquisitionTime" << endl;
-    trnsStrm << "  InputKeyDependencies = att@Time_Base:ET" << endl;
+    trnsStrm << "  InputKeyDependencies = att@Time_Base|ET" << endl;
     trnsStrm << "  OutputPosition = (group, instrument)" << endl;
     trnsStrm << "  OutputName = OnboardImageAcquisitionTimeET" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
@@ -97,7 +97,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (Product_Observational, File_Area_Observational," << endl;
     trnsStrm << "                Array_2D_Image, Axis_Array)" << endl;
-    trnsStrm << "  InputKeyDependencies = \"tag@axis_name:Band\"" << endl;
+    trnsStrm << "  InputKeyDependencies = \"tag@axis_name|Band\"" << endl;
     trnsStrm << "  InputKey = elements" << endl;
     trnsStrm << "  InputDefault = 1" << endl;
     trnsStrm << "  OutputPosition = (group, CoreCube)" << endl;
@@ -109,7 +109,7 @@ int main(void) {
     trnsStrm << "  Debug" << endl;
     trnsStrm << "  InputPosition = (Product_Observational, File_Area_Observational," << endl;
     trnsStrm << "                Array_2D_Image, Axis_Array)" << endl;
-    trnsStrm << "  InputKeyDependencies = \"tag@axis_name:Sample\"" << endl;
+    trnsStrm << "  InputKeyDependencies = \"tag@axis_name|Sample\"" << endl;
     trnsStrm << "  InputKey = elements" << endl;
     trnsStrm << "  InputKeyAttribute = Units" << endl;
     trnsStrm << "  InputDefault = 2" << endl;
@@ -168,7 +168,7 @@ int main(void) {
     badTrnsStrm << "Group = NoDependencyType" << endl;
     badTrnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
     badTrnsStrm << "  InputKey = name" << endl;
-    badTrnsStrm << "  InputKeyDependencies = type:Spacecraft" << endl;
+    badTrnsStrm << "  InputKeyDependencies = type|Spacecraft" << endl;
     badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
     badTrnsStrm << "  OutputName = NoDependencyType" << endl;
     badTrnsStrm << "  Translation = (*,*)" << endl;
@@ -176,7 +176,7 @@ int main(void) {
     badTrnsStrm << "Group = BadDependencyType" << endl;
     badTrnsStrm << "  InputPosition = (Observation_Area, Observing_System, Observing_System_Component)" << endl;
     badTrnsStrm << "  InputKey = name" << endl;
-    badTrnsStrm << "  InputKeyDependencies = bad@type:Spacecraft" << endl;
+    badTrnsStrm << "  InputKeyDependencies = bad@type|Spacecraft" << endl;
     badTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
     badTrnsStrm << "  OutputName = BadDependencyType" << endl;
     badTrnsStrm << "  Translation = (*,*)" << endl;
@@ -205,7 +205,7 @@ int main(void) {
     invalidTrnsStrm << "Group = InstrumentIfovWithUnits" << endl;
     invalidTrnsStrm << "  InputPosition = (CaSSIS_Header, CaSSIS_General)" << endl;
     invalidTrnsStrm << "  InputKey = INSTRUMENT_IFOV" << endl;
-    invalidTrnsStrm << "  InputKeyDependencies = \"tag@name:value\"" << endl;
+    invalidTrnsStrm << "  InputKeyDependencies = \"tag@name|value\"" << endl;
     invalidTrnsStrm << "  OutputPosition = (group, instrument)" << endl;
     invalidTrnsStrm << "  OutputName = InstrumentIfovWithUnits" << endl;
     invalidTrnsStrm << "  Translation = (*,*)" << endl;

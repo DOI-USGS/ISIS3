@@ -83,6 +83,8 @@ namespace Isis {
    *                           value. Modified StreamImageRoot() and FixedImageRoot() to create
    *                           CHECKSUM placeholder in the labels if we are generating a checksum.
    *                           Fixes #1013.
+   *   @history 2017-10-18 Makayla Shepard - Removed code associated with completely empty unused
+   *                           file pdsExportAllMapping.trn. References #5202. 
    */
 
   class ProcessExportPds : public Isis::ProcessExport {
