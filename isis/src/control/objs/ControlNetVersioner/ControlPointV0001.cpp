@@ -75,7 +75,6 @@ namespace Isis {
          m_pointData, &ControlNetFileProtoV0001_PBControlPoint::set_longitudeconstrained);
     copy(pointObject, "RadiusConstrained",
          m_pointData, &ControlNetFileProtoV0001_PBControlPoint::set_radiusconstrained);
-
     // Copy over the adjusted surface point
     if ( pointObject.hasKeyword("Latitude")
          && pointObject.hasKeyword("Longitude")
@@ -408,7 +407,7 @@ namespace Isis {
         }
         catch (...) {
           value = 0;
-          m_pointData->set_ignore(true);
+          measure.set_ignore(true);
         }
         measure.mutable_measurement()->set_sample(value);
         group.deleteKeyword("Sample");
@@ -422,7 +421,7 @@ namespace Isis {
         }
         catch (...) {
           value = 0;
-          m_pointData->set_ignore(true);
+          measure.set_ignore(true);
         }
         measure.mutable_measurement()->set_line(value);
         group.deleteKeyword("Line");
@@ -558,6 +557,7 @@ namespace Isis {
                     "points or measures";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
+
   }
 
 
@@ -720,11 +720,13 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
-      return;
+    double value = Isis::Null;
+    if ( container.hasKeyword(keyName) ) {
+      value = toDouble(container[keyName][0]);
+      container.deleteKeyword(keyName);
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
+    }
+
     (measure.*setter)(value);
   }
 
@@ -749,8 +751,9 @@ namespace Isis {
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) 
       return;
+
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
