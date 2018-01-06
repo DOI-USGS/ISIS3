@@ -91,7 +91,6 @@ namespace Isis {
 
     // sanity check
     clear();
-
     m_controlPoint = src.m_controlPoint;
 
     int numMeasures = src.size();
@@ -104,7 +103,11 @@ namespace Isis {
     m_adjustedSigmas = src.m_adjustedSigmas;
     m_weights = src.m_weights;
     m_nicVector = src.m_nicVector;
+    m_coordTypeReports = src.m_coordTypeReports;
+    m_coordTypeBundle = src.m_coordTypeBundle;
+    // *** TODO *** Why is the cholmodQMatrix not copies? Ask Ken
   }
+
 
 
   /**
