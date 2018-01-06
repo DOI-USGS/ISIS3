@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <QDataStream>
 #include <QDebug>
 #include <QDomElement>
 #include <QFile>
@@ -153,7 +154,10 @@ namespace Isis {
    * @param reply
    */
   void SpiceClient::replyFinished(QNetworkReply *reply) {
-    p_rawResponse = new QString(QString(reply->readAll()));
+    QByteArray p_rawResponseByteArray = reply->readAll();
+
+    //qDebug() << "p_rawResponseByteArray:" << p_rawResponseByteArray;
+
     // Decode the response
     // p_response = new QString();
     p_response = new QJsonObject();
@@ -163,14 +167,19 @@ namespace Isis {
       //     QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
 
       // QJsonDocument document;
-      QByteArray decoded = QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData();
-      QJsonDocument doc = QJsonDocument::fromJson(decoded);
+
+      QJsonDocument doc = QJsonDocument::fromJson(p_rawResponseByteArray);
+
       *p_response = doc.object();
 
-      // QFile finalOutput("output.txt");
-      // finalOutput.open(QIODevice::WriteOnly);
-      // finalOutput.write( document.toJson() );
-      // finalOutput.close();
+
+
+
+
+       QFile finalOutput("output.txt");
+       finalOutput.open(QIODevice::WriteOnly);
+       finalOutput.write( doc.toJson() );
+       finalOutput.close();
 
       // Make sure we can get the log out of it before continuing
       // applicationLog();
@@ -612,19 +621,6 @@ namespace Isis {
     PvlObject ob("object");
     return ob;
 
-    // QDomElement root = rootXMLElement();
-    // QDomElement kernelsLabel = findTag(root, "kernels_label");
-    // QString kernelsLabels = elementContents(kernelsLabel);
-    //
-    // QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
-    //
-    // stringstream pvlStream;
-    // pvlStream << unencoded;
-    //
-    // Pvl labels;
-    // pvlStream >> labels;
-    //
-    // return labels.findObject("NaifKeywords");
   }
 
 
@@ -646,40 +642,24 @@ namespace Isis {
   Table *SpiceClient::readTable(QString jsonName, QString tableName) {
     checkErrors();
 
-    QString value = p_response->value(jsonName).toVariant().toString();
-    QString decoded(QByteArray::fromHex(value.toLatin1()).constData());
+    QString value = p_response->value(jsonName).toString();
+
+    QByteArray decoded = QByteArray::fromHex(value.toUtf8().constData());
+
+    QDataStream decodedStream;
+
+    decodedStream << decoded;
+
+    qDebug() << decoded;
 
     QFile finalOutput(tableName + ".txt");
     finalOutput.open(QIODevice::WriteOnly);
-    finalOutput.write(decoded.toLatin1());
+    finalOutput.write(decoded);
     finalOutput.close();
 
-    Table *table = new Table(decoded);
+    Table *table = new Table(tableName,tableName+
+                             ".txt");
 
     return table;
-
-    // QDomElement root = rootXMLElement();
-    // QDomElement tablesTag = findTag(root, "tables");
-    // QDomElement pointingTag = findTag(tablesTag, xmlName);
-    // QString encodedString = elementContents(pointingTag);
-
-    // QByteArray encodedArray;
-    // for (int i = 0; i < encodedString.size(); i++) {
-    //   encodedArray.append(encodedString.data()[i]);
-    // }
-    //
-    // QByteArray unencodedArray(QByteArray::fromHex(encodedArray));
-    //
-    // stringstream tableStream;
-    // tableStream.write(unencodedArray.data(), unencodedArray.size());
-    //
-    // Pvl lab;
-    // tableStream >> lab;
-    //
-    // Table *table = new Table(tableName);
-    // table->Read(lab, tableStream);
-    //
-    // return table;
-
   }
 };

@@ -575,6 +575,8 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
   connectionProgress.CheckStatus();
 
   PvlGroup kernelsGroup = client.kernelsGroup(); //
+  qDebug() << "SHAPOOPY!!!";
+
 
   PvlGroup logGrp = client.applicationLog(); //
   PvlObject naifKeywords = client.naifKeywordsObject();
@@ -622,9 +624,9 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
 
   icube->putGroup(kernelsGroup);
   icube->label()->addObject(naifKeywords);
+  qDebug() << "YAYA!    " << pointingTable->Records();
 
   icube->write(*pointingTable);
-  qDebug() << "YAYA!";
   icube->write(*positionTable);
   icube->write(*bodyTable);
   icube->write(*sunPosTable);

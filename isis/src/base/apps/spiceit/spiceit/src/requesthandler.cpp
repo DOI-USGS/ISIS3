@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QFile>
 #include <QString>
 #include <QStringList>
@@ -110,7 +111,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         QString otherVersion;
 
         if ( !hexCode.isEmpty() ) {
-         
+
 
           // Parse the Json with Qt's JSON parser
           QJsonDocument document;
@@ -131,7 +132,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           stringstream labStream;
           labStream << encoded;
           labStream >> label;
-         
+
         }
         else {
           QString msg = "Unable to read input file";
@@ -145,14 +146,14 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         // Set up for getting the mission name
         // Get the directory where the system missions translation table is.
         QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
-       
+
 
         // Get the mission translation manager ready
         PvlToPvlTranslationManager missionXlater(label, transFile);
         //label.write("label_after_PvlToPvlTranslationManager.txt");
         // Get the mission name so we can search the correct DB's for kernels
         QString mission = missionXlater.Translate("MissionName");
-       
+
         // Get system base kernels
         unsigned int allowed = 0;
         unsigned int allowedCK = 0;
@@ -171,10 +172,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         baseKernels.loadSystemDb(mission, label);
         ckKernels.loadSystemDb(mission, label);
         spkKernels.loadSystemDb(mission, label);
-     
+
         Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
         QList< priority_queue<Kernel> > ck;
-        lk        = baseKernels.leapSecond(label); 
+        lk        = baseKernels.leapSecond(label);
         pck       = baseKernels.targetAttitudeShape(label);
         targetSpk = baseKernels.targetPosition(label);
         ik        = baseKernels.instrument(label);
@@ -184,10 +185,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         ck        = ckKernels.spacecraftPointing(label);
         spk       = spkKernels.spacecraftPosition(label);
 
-       
+
         if (g_ckNadir) {
-                         
-  
+
+
           // Only add nadir if no spacecraft pointing found
           QStringList nadirCk;
           nadirCk.push_back("Nadir");
@@ -197,36 +198,36 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
           // if no queue exists, create a nadir queue
           else {
-                            
+
             priority_queue<Kernel> nadirQueue;
             nadirQueue.push( Kernel( (Kernel::Type)0, nadirCk ) );
             ck.push_back(nadirQueue);
           }
         }
-        
+
         // Get shape kernel
         if (g_shapeKernelStr == "system") {
-        
+
           dem = baseKernels.dem(label);
-       
+
 
         }
-               
+
 
         else if (g_shapeKernelStr != "ellipsoid") {
           stringstream demPvlKeyStream;
           demPvlKeyStream << "ShapeModel = " + g_shapeKernelStr;
           PvlKeyword key;
           demPvlKeyStream >> key;
-          
- 
+
+
           for (int value = 0; value < key.size(); value++) {
             dem.push_back(key[value]);
           }
-          
+
         }
 
-        
+
         bool kernelSuccess = false;
 
         if (ck.size() == 0 || ck.at(0).size() == 0) {
@@ -237,13 +238,13 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         }
 
         FileName inputLabels;
-        
-       
+
+
         while (ck.at(0).size() != 0 && !kernelSuccess) {
           // create an empty kernel
           Kernel realCkKernel;
           QStringList ckKernelList;
-         
+
           /*
            * Add the list of cks from each Kernel object at the top of each
            * priority queue. If multiple priority queues exist, we will not\
@@ -271,7 +272,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           for (int i = 0; i < fk.size(); i++) {
             ckKernelList.push_back(fk[i]);
           }
-           
+
           realCkKernel.setKernels(ckKernelList);
           /*
            * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
@@ -282,7 +283,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           label.write("lab.txt");
           inputLabels = FileName::createTempFile("inputLabels.cub");
           label.write( inputLabels.expanded() );
-        
+
           Cube cube;
           cube.open(inputLabels.expanded(), "rw");
           kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
@@ -295,31 +296,31 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           throw IException(IException::Unknown, "Unable to initialize camera model", _FILEINFO_);
         }
         else {
-          qDebug() << "SHAPOOPY!!!!";       
+
           spiceResponse =packageKernels("kernels" );
         }
 //        remove( inputLabels.expanded().toLatin1() ); //clean up
         p.EndProcess();
       }
       catch (...) {
+
+        //qDebug() << "Uncaught exception here.";
         // We failed at something, delete the temp files...
 //        QString outFile = ui.GetFileName("TO");
         QFile pointingFile("kernels.pointing");
-        if ( pointingFile.exists() ) pointingFile.remove();
+        //if ( pointingFile.exists() ) pointingFile.remove();
 
         QFile positionFile("kernels.position");
-        if ( positionFile.exists() ) positionFile.remove();
+        //if ( positionFile.exists() ) positionFile.remove();
 
         QFile bodyRotFile("kernels.bodyrot");
-        if ( bodyRotFile.exists() ) bodyRotFile.remove();
+        //if ( bodyRotFile.exists() ) bodyRotFile.remove();
 
         QFile sunFile("kernels.sun");
-        if ( sunFile.exists() ) sunFile.remove();
+        //if ( sunFile.exists() ) sunFile.remove();
 
         throw;
       }
-
-
 
     // Return a simple HTML document
     response.write(spiceResponse,true);
@@ -339,10 +340,10 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel fk, Kernel ik, Kernel sclk,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
-  
+
   Pvl origLabels = lab;
-  
-  //origLabels.write("lab.txt");
+
+  origLabels.write("lab.txt");
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
   PvlKeyword pckKeyword("TargetAttitudeShape");
@@ -374,7 +375,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   for (int i = 0; i < sclk.size(); i++) {
     sclkKeyword.addValue(sclk[i]);
   }
-  
+
   for (int i = 0; i < spk.size(); i++) {
     spkKeyword.addValue(spk[i]);
   }
@@ -434,7 +435,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   if ( currentKernels.hasKeyword("EndPadding") )
     currentKernels.deleteKeyword("EndPadding");
 
-  
+
   // Add any time padding the user specified to the spice group
   if (g_startPad > DBL_EPSILON)
     currentKernels.addKeyword( PvlKeyword("StartPadding", toString(g_startPad), "seconds") );
@@ -462,7 +463,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
-      errPvl.write("errPvl.txt");  
+      errPvl.write("errPvl.txt");
       if (errPvl.groups() > 0)
         currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
@@ -541,9 +542,11 @@ QJsonValue tableToJson(QString file) {
   QFile tableFile(file);
   tableFile.open(QIODevice::ReadOnly);
   QByteArray data = tableFile.readAll();
+
+  //xml += QString( data.toHex().constData() ) + "\n";
   tableFile.close();
 
-  return QJsonValue::fromVariant(data.toHex().constData());
+  return QJsonValue(data.toHex().constData());
 }
 
 
@@ -585,27 +588,31 @@ void parseParameters(QJsonObject jsonObject) {
 
 
 QByteArray packageKernels(QString toFile) {
-   
+
   QJsonObject spiceData;
 
   QString logFile(toFile + ".print");
-  
+
   Pvl logMessage(logFile);
-  
+
   QFile::remove(logFile);
   stringstream logStream;
-  
+
   logStream << logMessage;
-  
+
 
   QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
-  
+
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   QFile::remove(kernLabelsFile);
   stringstream labelStream;
   labelStream << kernLabels;
+
+
+
+
   QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
   spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
@@ -613,19 +620,36 @@ QByteArray packageKernels(QString toFile) {
   spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
   spiceData.insert("Sun Position", tableToJson(toFile + ".sun"));
 
+
+  QJsonValue pos = spiceData.value("Sun Position");
+  QByteArray posArray= QByteArray::fromHex(pos.toString().toUtf8() );
+  //qDebug() << posArray;
+  QString posString(posArray.constData());
+  qDebug() <<"Sun Position" <<posString;
+
+
+
+
+  ///QByteArray pos = QByteArray::fromHex(spiceData.value("Sun Position").toString().constData()).toLocal8Bit();
+
+  //qDebug() << QString(QByteArray::fromHex(spiceData.value("Sun Position").toString().constData() );
+
   QJsonDocument doc(spiceData);
 
-  QByteArray encodedXml( doc.toJson().toHex() );
+  QByteArray jsonHexedTables( doc.toJson() );
 
   QFile finalOutput("finalOutput.txt");
   finalOutput.open(QIODevice::WriteOnly);
-  QByteArray decoded = QByteArray::fromHex(encodedXml);
-  finalOutput.write(decoded.constData());
+  //QByteArray decoded = QByteArray::fromHex(jsonHexedTables);
+  finalOutput.write(jsonHexedTables.constData());
   finalOutput.close();
   //qDebug() << "SHAPOOPY!!!!";
+  //int * sizeOfData;
   //QFile finalsOutput("toFile.txt");
   //finalsOutput.open(QIODevice::WriteOnly);
-  //finalsOutput.write(doc.toJson());
+  //QString raw(doc.rawData(sizeOfData));
+
+  //finalsOutput.write(raw.);
   //finalsOutput.close();
-  return encodedXml;
+  return jsonHexedTables;
 }
