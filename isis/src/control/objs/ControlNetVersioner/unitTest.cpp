@@ -62,7 +62,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
       test2 = new ControlNetVersioner( FileName("./tmp") );
     }
     catch(IException &e) {
-      //remove("./tmp");
+      remove("./tmp");
       throw;
     }
 
@@ -133,17 +133,17 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
         std::cout << "The conversion methods for pvl->bin and bin->pvl are correct." << std::endl;
       }
 
-      //remove("./tmpCNet2");
+      remove("./tmpCNet2");
       delete cNet2;
       cNet2 = NULL;
     }
 
-    //remove("./tmp");
-    //remove("./tmp2");
+    remove("./tmp");
+    remove("./tmp2");
 
     if(printNetwork) {
-      //remove("./tmp.pvl");
-      //remove("./tmp2.pvl");
+      remove("./tmp.pvl");
+      remove("./tmp2.pvl");
     }
   }
   catch(IException &e) {
