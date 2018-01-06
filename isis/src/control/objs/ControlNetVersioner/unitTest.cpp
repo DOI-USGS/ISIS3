@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 }
 
 void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
-  std::cout << "Reading: " << filename << "...\n";
+  std::cout << "\nReading: " << filename << "...\n";
   FileName networkFileName(filename);
 
   ControlNetVersioner *test = NULL;
@@ -43,7 +43,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
     //   convert to Pvl, then update, then convert to binary, and back to pvl.
     //   The reason for the intermediate Pvl is described in
     //   ControlNetVersioner.h.
-    std::cout << "Read network..." << std::endl;
+    std::cout << "\nRead network..." << std::endl;
     test = new ControlNetVersioner(networkFileName);
 
     if(printNetwork) {
@@ -162,5 +162,4 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
     test2 = NULL;
   }
 
-  std::cout << std::endl;
 }
