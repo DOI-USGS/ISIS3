@@ -473,7 +473,8 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
         }
 
-        if ( controlMeasure.GetDiameter() != Isis::Null ) {
+        if ( controlMeasure.GetDiameter() != Isis::Null
+             && controlMeasure.GetDiameter() != 0. ) {
           pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
         }
 
@@ -570,7 +571,6 @@ namespace Isis {
     if ( controlNetwork.hasKeyword("Version") ) {
       version = toInt(controlNetwork["Version"][0]);
     }
-    std::cout << "Pvl Version: " << version << std::endl;
 
     switch ( version ) {
       case 1:
