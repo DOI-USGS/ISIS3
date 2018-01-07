@@ -489,9 +489,18 @@ namespace Isis {
   PvlObject SpiceClient::naifKeywordsObject() {
     checkErrors();
 
-    PvlObject ob("object");
-    return ob;
+    QString value = p_response->value("Kernels Label").toString();
+    QString decoded(QByteArray::fromHex(value.toUtf8().constData()));
 
+    stringstream pvlStream;
+    pvlStream << decoded;
+
+    Pvl labels;
+    pvlStream >> labels;
+
+    labels.write("NAIF.txt");
+
+    return labels.findObject("NaifKeywords");
   }
 
 
