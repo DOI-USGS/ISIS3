@@ -56,9 +56,6 @@ namespace Isis {
     p_rawResponse = NULL;
     p_error = NULL;
 
-    // QString version = Application::Version();
-    // QByteArray isisVersionRaw(version.toLatin1());
-
     stringstream labelStream;
     labelStream << cubeLabel;
     QString labelText = QString::fromStdString(labelStream.str());
@@ -419,8 +416,18 @@ namespace Isis {
   PvlGroup SpiceClient::applicationLog() {
     checkErrors();
 
-    PvlGroup group("group");
-    return group;
+    QString value = p_response->value("Application Log").toString();
+    QString decoded(QByteArray::fromHex(value.toUtf8().constData()));
+
+    stringstream pvlStream;
+    pvlStream << decoded;
+
+    Pvl labels;
+    pvlStream >> labels;
+
+    labels.write("app.log");
+
+    return labels.findGroup("Kernels", Pvl::Traverse);
   }
 
   /**
@@ -497,8 +504,6 @@ namespace Isis {
 
     Pvl labels;
     pvlStream >> labels;
-
-    labels.write("NAIF.txt");
 
     return labels.findObject("NaifKeywords");
   }
