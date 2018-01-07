@@ -425,8 +425,6 @@ namespace Isis {
     Pvl labels;
     pvlStream >> labels;
 
-    labels.write("app.log");
-
     return labels.findGroup("Kernels", Pvl::Traverse);
   }
 
