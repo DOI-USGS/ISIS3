@@ -304,20 +304,19 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
       }
       catch (...) {
 
-        //qDebug() << "Uncaught exception here.";
         // We failed at something, delete the temp files...
-//        QString outFile = ui.GetFileName("TO");
+
         QFile pointingFile("kernels.pointing");
-        //if ( pointingFile.exists() ) pointingFile.remove();
+        if ( pointingFile.exists() ) pointingFile.remove();
 
         QFile positionFile("kernels.position");
-        //if ( positionFile.exists() ) positionFile.remove();
+        if ( positionFile.exists() ) positionFile.remove();
 
         QFile bodyRotFile("kernels.bodyrot");
-        //if ( bodyRotFile.exists() ) bodyRotFile.remove();
+        if ( bodyRotFile.exists() ) bodyRotFile.remove();
 
         QFile sunFile("kernels.sun");
-        //if ( sunFile.exists() ) sunFile.remove();
+        if ( sunFile.exists() ) sunFile.remove();
 
         throw;
       }
@@ -467,7 +466,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       if (errPvl.groups() > 0)
         currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
-      //Application::Log(currentKernels);
+      // Application::Log(currentKernels);
       throw e;
     }
     Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
@@ -542,32 +541,9 @@ QJsonValue tableToJson(QString file) {
   QFile tableFile(file);
   tableFile.open(QIODevice::ReadOnly);
   QByteArray data = tableFile.readAll();
-
-  //xml += QString( data.toHex().constData() ) + "\n";
   tableFile.close();
 
   return QJsonValue(data.toHex().constData());
-}
-
-
-QString tableToXml(QString tableName, QString file) {
-  QString xml;
-  xml += "    <" + tableName + ">\n";
-
-  QFile tableFile(file);
-  if ( !tableFile.open(QIODevice::ReadOnly) ) {
-    QString msg = "Unable to read temporary file [" + file + "]";
-    throw IException(IException::Io, msg, _FILEINFO_);
-  }
-
-  QByteArray data = tableFile.readAll();
-  xml += QString( data.toHex().constData() ) + "\n";
-  tableFile.close();
-  // we should now be completely done with this temp file
-  tableFile.remove();
-
-  xml += "    </" + tableName + ">\n";
-  return xml;
 }
 
 
@@ -592,14 +568,11 @@ QByteArray packageKernels(QString toFile) {
   QJsonObject spiceData;
 
   QString logFile(toFile + ".print");
-
   Pvl logMessage(logFile);
-
   QFile::remove(logFile);
+
   stringstream logStream;
-
   logStream << logMessage;
-
 
   QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
@@ -610,9 +583,6 @@ QByteArray packageKernels(QString toFile) {
   stringstream labelStream;
   labelStream << kernLabels;
 
-
-
-
   QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
   spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
   spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
@@ -620,36 +590,20 @@ QByteArray packageKernels(QString toFile) {
   spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
   spiceData.insert("Sun Position", tableToJson(toFile + ".sun"));
 
-
-  QJsonValue pos = spiceData.value("Sun Position");
-  QByteArray posArray= QByteArray::fromHex(pos.toString().toUtf8() );
-  //qDebug() << posArray;
-  QString posString(posArray.constData());
-  qDebug() <<"Sun Position" <<posString;
-
-
-
-
-  ///QByteArray pos = QByteArray::fromHex(spiceData.value("Sun Position").toString().constData()).toLocal8Bit();
-
-  //qDebug() << QString(QByteArray::fromHex(spiceData.value("Sun Position").toString().constData() );
-
   QJsonDocument doc(spiceData);
 
   QByteArray jsonHexedTables( doc.toJson() );
 
   QFile finalOutput("finalOutput.txt");
   finalOutput.open(QIODevice::WriteOnly);
-  //QByteArray decoded = QByteArray::fromHex(jsonHexedTables);
   finalOutput.write(jsonHexedTables.constData());
   finalOutput.close();
-  //qDebug() << "SHAPOOPY!!!!";
-  //int * sizeOfData;
+
   //QFile finalsOutput("toFile.txt");
   //finalsOutput.open(QIODevice::WriteOnly);
   //QString raw(doc.rawData(sizeOfData));
-
   //finalsOutput.write(raw.);
   //finalsOutput.close();
+
   return jsonHexedTables;
 }

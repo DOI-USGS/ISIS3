@@ -56,12 +56,11 @@ namespace Isis {
     p_rawResponse = NULL;
     p_error = NULL;
 
-    QString version = Application::Version();
-    QByteArray isisVersionRaw(version.toLatin1());
+    // QString version = Application::Version();
+    // QByteArray isisVersionRaw(version.toLatin1());
 
     stringstream labelStream;
     labelStream << cubeLabel;
-    //QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
     QString labelText = QString::fromStdString(labelStream.str());
 
     QJsonObject properties {
@@ -78,16 +77,7 @@ namespace Isis {
       {"endPad", endPad}
     };
 
-    //I can't see any reason for this, so commenting out to make json file simpler
-    //QJsonObject object;
-    //object.insert("Properties", properties);
-
     p_jsonDocument = new QJsonDocument(properties);
-
-    // QFile finalOutput("output.txt");
-    // finalOutput.open(QIODevice::WriteOnly);
-    // finalOutput.write( p_jsonDocument->toJson() );
-    // finalOutput.close();
 
     p_request = new QNetworkRequest();
 
@@ -95,7 +85,6 @@ namespace Isis {
 
     qurl.setPort(port);
     p_request->setUrl(qurl);
-    //p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
     p_request->setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     moveToThread(this);
@@ -156,25 +145,13 @@ namespace Isis {
   void SpiceClient::replyFinished(QNetworkReply *reply) {
     QByteArray p_rawResponseByteArray = reply->readAll();
 
-    //qDebug() << "p_rawResponseByteArray:" << p_rawResponseByteArray;
-
-    // Decode the response
-    // p_response = new QString();
     p_response = new QJsonObject();
 
     try {
-      // *p_response = QString(
-      //     QByteArray::fromHex(QByteArray(p_rawResponse->toLatin1())).constData());
-
-      // QJsonDocument document;
 
       QJsonDocument doc = QJsonDocument::fromJson(p_rawResponseByteArray);
 
       *p_response = doc.object();
-
-
-
-
 
        QFile finalOutput("output.txt");
        finalOutput.open(QIODevice::WriteOnly);
@@ -365,17 +342,6 @@ namespace Isis {
   }
 
 
-
-// QString SpiceClient::jsonToTable(QJsonValue val) {
-//   QFile tableFile(file);
-//   tableFile.open(QIODevice::ReadOnly);
-//   QByteArray data = tableFile.readAll();
-//   tableFile.close();
-//
-//   return QJsonValue::toVariant(data.toHex().constData());
-// }
-
-
   /**
    * Called if the server requires a authentication
    */
@@ -425,78 +391,12 @@ namespace Isis {
 
 
   /**
-   * This returns the root of the returned XML, throws an
-   * appropriate error if the XML is wrong or missing.
-   *
-   * @return QDomElement
-   */
-  // QDomElement SpiceClient::rootXMLElement() {
-  //   if(!p_response || !p_rawResponse) {
-  //     QString error = "No server response available";
-  //     throw IException(IException::Io, error, _FILEINFO_);
-  //   }
-  //
-  //   QDomDocument document;
-  //   QString errorMsg;
-  //   int errorLine, errorCol;
-  //
-  //   if(!p_response->isEmpty() &&
-  //       document.setContent(QString(p_response->toLatin1()),
-  //                           &errorMsg, &errorLine, &errorCol)) {
-  //     return document.firstChild().toElement();
-  //   }
-  //   else if (p_response->isEmpty()){
-  //     QString msg = "Empty response returned from server.";
-  //     throw IException(IException::Io, msg, _FILEINFO_);
-  //   }
-  //   else {
-  //     QString msg = "Unexpected response from spice server [";
-  //     msg += *p_rawResponse;
-  //     msg += "]";
-  //     throw IException(IException::Io, msg, _FILEINFO_);
-  //   }
-  // }
-
-
-  /**
-   * This finds a tag (i.e. \<some_tag>) inside the current
-   * element.
-   *
-   * @param currentElement
-   * @param name
-   *
-   * @return QDomElement
-   */
-  QDomElement SpiceClient::findTag(QDomElement currentElement, QString name) {
-    QString qtName = name;
-    for(QDomNode node = currentElement.firstChild();
-        !node .isNull();
-        node = node.nextSibling()) {
-      QDomElement element = node.toElement();
-
-      if(element.tagName() == qtName) {
-        return element;
-      }
-    }
-
-    QString msg = "Server response missing XML Tag [" + name + "]";
-    throw IException(IException::Io, msg, _FILEINFO_);
-  }
-
-
-  /**
    * This returns the spiceinit'd PvlGroup from the server.
    *
    * @return PvlGroup
    */
   PvlGroup SpiceClient::kernelsGroup() {
     checkErrors();
-
-    // QDomElement root = rootXMLElement();
-    // QDomElement kernelsLabel = findTag(root, "kernels_label");
-    // QString kernelsLabels = elementContents(kernelsLabel);
-    //
-    // QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
     QString kernVal = p_response->value("Kernels Label").toVariant().toString();
     QString unencoded(QByteArray::fromHex(kernVal.toLatin1()).constData());
@@ -521,37 +421,7 @@ namespace Isis {
 
     PvlGroup group("group");
     return group;
-
-    // QDomElement root = rootXMLElement();
-    // QDomElement logLabel = findTag(root, "application_log");
-    // QString logLabels = elementContents(logLabel);
-    //
-    // QString unencoded(QByteArray::fromHex(logLabels.toLatin1()).constData());
-    //
-    // stringstream pvlStream;
-    // pvlStream << unencoded;
-    //
-    // Pvl labels;
-    // pvlStream >> labels;
-    //
-    // return labels.findGroup("Kernels", Pvl::Traverse);
   }
-
-
-  /**
-   * This returns the contents of the current element as a string.
-   *   \<element>
-   *     Contents
-   *   \</element>
-   *
-   * @param element
-   *
-   * @return QString
-   */
-  QString SpiceClient::elementContents(QDomElement element) {
-    return element.firstChild().toText().data();
-  }
-
 
   /**
    * This returns the table given by the server. The ownership of the table is
@@ -587,7 +457,8 @@ namespace Isis {
 
 
   /**
-   * This returns the table given by the server.
+   * This returns the table given by the server. The ownership of the table is
+   *   given to the caller.
    */
   Table *SpiceClient::sunPositionTable() {
     return readTable("Sun Position", "SunPosition");
@@ -624,41 +495,18 @@ namespace Isis {
   }
 
 
-  /**
-   * Converts a boolean to "yes" or "no"
-   *
-   * @param boolVal
-   *
-   * @return QString
-   */
-  QString SpiceClient::yesNo(bool boolVal) {
-    if(boolVal)
-      return "yes";
-    else
-      return "no";
-  }
-
-
   Table *SpiceClient::readTable(QString jsonName, QString tableName) {
     checkErrors();
 
     QString value = p_response->value(jsonName).toString();
-
     QByteArray decoded = QByteArray::fromHex(value.toUtf8().constData());
-
-    QDataStream decodedStream;
-
-    decodedStream << decoded;
-
-    qDebug() << decoded;
 
     QFile finalOutput(tableName + ".txt");
     finalOutput.open(QIODevice::WriteOnly);
     finalOutput.write(decoded);
     finalOutput.close();
 
-    Table *table = new Table(tableName,tableName+
-                             ".txt");
+    Table *table = new Table(tableName,tableName + ".txt");
 
     return table;
   }

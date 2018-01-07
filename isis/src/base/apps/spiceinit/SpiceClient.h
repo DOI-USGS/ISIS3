@@ -59,11 +59,7 @@ namespace Isis {
       void sslErrors(QNetworkReply *, const QList<QSslError> &);
 
     private:
-      static QString yesNo(bool boolVal);
       Table *readTable(QString xmlName, QString tableName);
-      // QDomElement rootXMLElement();
-      QDomElement findTag(QDomElement currentElement, QString name);
-      QString elementContents(QDomElement element);
       void checkErrors();
 
     private:
@@ -71,7 +67,7 @@ namespace Isis {
       QJsonDocument *p_jsonDocument; //!< Json file to send to server
       QString *p_rawResponse;  //!< Server raw response
       QJsonObject *p_response;  //!< The QJsonObject constructed from the server response
-      QNetworkAccessManager *p_networkMgr; //!< Network manager does request
+      QNetworkAccessManager *p_networkMgr; //!< Network manager that makes request
       QNetworkRequest *p_request; //!< Network request sent
   };
 

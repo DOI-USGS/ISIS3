@@ -87,9 +87,7 @@ void IsisMain() {
   QString mission = missionXlater.Translate("MissionName");
 
   if (ui.GetBoolean("WEB")) {
-    std::cout << "Before Request" << std::endl;
     requestSpice(icube, *icube->label(), mission);
-    std::cout << "After Request" << std::endl;
   }
   else {
     // Get system base kernels
@@ -574,16 +572,13 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
   client.blockUntilComplete();
   connectionProgress.CheckStatus();
 
-  PvlGroup kernelsGroup = client.kernelsGroup(); //
-  qDebug() << "SHAPOOPY!!!";
-
-
-  PvlGroup logGrp = client.applicationLog(); //
+  PvlGroup kernelsGroup = client.kernelsGroup();
+  PvlGroup logGrp = client.applicationLog();
   PvlObject naifKeywords = client.naifKeywordsObject();
-  Table *pointingTable = client.pointingTable(); //
-  Table *positionTable = client.positionTable(); //
-  Table *bodyTable = client.bodyRotationTable(); //
-  Table *sunPosTable = client.sunPositionTable(); //
+  Table *pointingTable = client.pointingTable();
+  Table *positionTable = client.positionTable();
+  Table *bodyTable = client.bodyRotationTable();
+  Table *sunPosTable = client.sunPositionTable();
 
   // Verify everything in the kernels group exists, if not then our kernels are
   //   out of date.
@@ -602,30 +597,12 @@ void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
         curKeyword.name() == "TargetAttitudeShape") {
       continue;
     }
-
-    /*for (int valueIndex = 0; valueIndex < curKeyword.Size(); valueIndex ++) {
-      IString value = curKeyword[valueIndex];
-      if (value == "Table" || value == "Null")
-        continue;
-
-      IString fullFileName = FileName(value).expanded();
-      QFile testFile(fullFileName.ToQt());
-
-      if (!testFile.exists()) {
-        IString msg = "The spice server says you need the kernel [" +
-          value + "] which is not present. " +
-          "Please update your spice kernels";
-        throw iException::Message(iException::Spice, msg, _FILEINFO_);
-      }
-    }*/
   }
 
   Application::Log(logGrp);
 
   icube->putGroup(kernelsGroup);
   icube->label()->addObject(naifKeywords);
-  qDebug() << "YAYA!    " << pointingTable->Records();
-
   icube->write(*pointingTable);
   icube->write(*positionTable);
   icube->write(*bodyTable);
