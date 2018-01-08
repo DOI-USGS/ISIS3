@@ -1,11 +1,12 @@
 Test ControlNetVersioner
-Reading: ./reallyOldNetwork.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net...
 
 Read network...
-**I/O ERROR** Reading the control network [reallyOldNetwork.net] failed.
-**I/O ERROR** Unable to get convert ControlNet Version 1 to Version 2.
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net] failed.
+**I/O ERROR** Failed to initialize control point at index [0].
+**I/O ERROR** Unable to get target body radii for [] when calculating covariance matrix.
 
-Reading: ./reallyOldNetwork2.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
 Read network...
 Converted directly to Pvl:
@@ -16,13 +17,12 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
-    PointType   = Free
-    PointId     = 1
-    ChooserName = Null
-    DateTime    = Null
+    PointType = Free
+    PointId   = 1
+    DateTime  = Null
 
     Group = ControlMeasure
       SerialNumber = M0
@@ -35,7 +35,6 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = M1
       MeasureType  = Candidate
-      ChooserName  = Null
       Sample       = 1.0
       Line         = 1.0
     End_Group
@@ -43,7 +42,6 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = M2
       MeasureType  = Candidate
-      ChooserName  = Null
       Sample       = 1.0
       Line         = 1.0
     End_Group
@@ -55,7 +53,7 @@ After reading and writing to a binary form does Pvl match?
 Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 
-Reading: ./oldNetwork.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net...
 
 Read network...
 Converted directly to Pvl:
@@ -66,13 +64,12 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = "Test Network"
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
-    PointType   = Fixed
-    PointId     = 1001
-    ChooserName = Null
-    DateTime    = Null
+    PointType = Fixed
+    PointId   = 1001
+    DateTime  = Null
 
     Group = ControlMeasure
       SerialNumber = Cassini-Huygens/ISSNA/1/1467436709.122
@@ -103,7 +100,7 @@ After reading and writing to a binary form does Pvl match?
 Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 
-Reading: ./oldNetwork2.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net...
 
 Read network...
 Converted directly to Pvl:
@@ -114,7 +111,7 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Constrained
@@ -283,20 +280,20 @@ After reading and writing to a binary form does Pvl match?
 Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 
-Reading: ./badNetwork.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net...
 
 Read network...
-**I/O ERROR** Reading the control network [badNetwork.net] failed.
-**USER ERROR** Cannot parse binary PB file.
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net] failed.
+**USER ERROR** Cannot parse binary protobuf file.
 
-Reading: ./semilarge.net...
+Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net...
 
 Read network...
 Write the network and re-read it...
 After reading and writing to a binary form does Pvl match?
 Reading/Writing control network is consistent
 
-Reading: ./smallPvlTest.pvl...
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl...
 
 Read network...
 Converted directly to Pvl:
@@ -307,7 +304,7 @@ Object = ControlNetwork
   Created      = 2012-01-04T12:09:57
   LastModified = 2012-01-04T12:09:57
   Description  = "Themis Day IR Network: Lunae Palus, Lat(0,30) Lon(270-315)"
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Free
@@ -538,4 +535,3 @@ Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 Check conversions between the binary format and the pvl format.
 The conversion methods for pvl->bin and bin->pvl are correct.
-
