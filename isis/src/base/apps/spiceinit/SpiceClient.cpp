@@ -149,11 +149,14 @@ namespace Isis {
       QJsonDocument doc = QJsonDocument::fromJson(p_rawResponseByteArray);
 
       *p_response = doc.object();
+      if (!p_response->value("Error").isUndefined()) {
+        throw IException(IException::Unknown, p_response->value("Error").toString(), _FILEINFO_);
+      }
 
-       QFile finalOutput("output.txt");
-       finalOutput.open(QIODevice::WriteOnly);
-       finalOutput.write( doc.toJson() );
-       finalOutput.close();
+      QFile finalOutput("output.txt");
+      finalOutput.open(QIODevice::WriteOnly);
+      finalOutput.write( doc.toJson() );
+      finalOutput.close();
 
       // Make sure we can get the log out of it before continuing
       // applicationLog();

@@ -296,11 +296,33 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           throw IException(IException::Unknown, "Unable to initialize camera model", _FILEINFO_);
         }
         else {
-
-          spiceResponse =packageKernels("kernels" );
+          spiceResponse = packageKernels("kernels" );
         }
 //        remove( inputLabels.expanded().toLatin1() ); //clean up
         p.EndProcess();
+      }
+      catch (IException &e) {
+
+        // We failed at something, delete the temp files...
+
+        QFile pointingFile("kernels.pointing");
+        if ( pointingFile.exists() ) pointingFile.remove();
+
+        QFile positionFile("kernels.position");
+        if ( positionFile.exists() ) positionFile.remove();
+
+        QFile bodyRotFile("kernels.bodyrot");
+        if ( bodyRotFile.exists() ) bodyRotFile.remove();
+
+        QFile sunFile("kernels.sun");
+        if ( sunFile.exists() ) sunFile.remove();
+
+        QJsonObject errorData;
+        errorData.insert("Error", e.what());
+
+        QJsonDocument doc(errorData);
+        spiceResponse.clear();
+        QByteArray spiceResponse = QByteArray( doc.toJson() );
       }
       catch (...) {
 
@@ -318,7 +340,12 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         QFile sunFile("kernels.sun");
         if ( sunFile.exists() ) sunFile.remove();
 
-        throw;
+        QJsonObject errorData;
+        errorData.insert("Error", "Unknown error occurred");
+
+        QJsonDocument doc(errorData);
+        spiceResponse.clear();
+        QByteArray spiceResponse = QByteArray( doc.toJson() );
       }
 
     // Return a simple HTML document
