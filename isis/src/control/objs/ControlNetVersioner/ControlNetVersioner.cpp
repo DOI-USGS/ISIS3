@@ -331,7 +331,6 @@ namespace Isis {
         pvlPoint += aprioriY;
         pvlPoint += aprioriZ;
 
-        // FIXME: None of Covariance matrix information is available directly from ControlPoint in the API
         symmetric_matrix<double, upper> aprioriCovarianceMatrix = aprioriSurfacePoint.GetRectangularMatrix();
         if ( aprioriCovarianceMatrix.size1() > 0 &&
              aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null &&
