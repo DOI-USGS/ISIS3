@@ -181,6 +181,8 @@ int main() {
   else {
       qDebug() << "Measure was not rejected.";
   }
+  qDebug() << "Measure HasChooserName(): " << m.HasChooserName();
+  qDebug() << "Measure HasDateTime(): " << m.HasDateTime();
 }
 
 void outit(ControlMeasure &m) {
