@@ -1484,7 +1484,7 @@ namespace Isis {
     QList< ControlPoint * > orderedPoints;
 
     for (int i = 0; i < pointIds->size(); i++) {
-      orderedPoints.append(GetPoint(i));
+      orderedPoints.append( points->value( pointIds->at(i) ) );
     }
 
     return orderedPoints;
