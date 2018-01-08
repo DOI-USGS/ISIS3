@@ -118,7 +118,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
       cNet2->write( FileName("./tmpCNet2") );
 
       //if there are differences between the pvls.
-      QString cmd = "diff -EbB --suppress-common-lines " + networkFileName.expanded() + " ./tmp.pvl";
+      QString cmd = "diff -EbB --suppress-common-lines -I 'Version.*' " + networkFileName.expanded() + " ./tmp.pvl";
       if(system(cmd.toStdString().c_str())) {
 
         //if the binary files are different.
