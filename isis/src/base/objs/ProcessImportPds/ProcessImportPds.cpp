@@ -750,7 +750,7 @@ namespace Isis {
     }
     else {
       QString msg = "Unknown label type in [" + p_labelFile + "]. It is possible the label file "
-                    "does not describe an image.";
++                    "does not describe an image product (IMAGE, CUBE, or SPECTRALCUBE).";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
