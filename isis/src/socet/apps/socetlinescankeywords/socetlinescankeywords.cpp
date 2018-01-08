@@ -28,6 +28,8 @@
 #include "TProjection.h"
 #include "VariableLineScanCameraDetectorMap.h"
 
+// ken playing remove this
+
 using namespace std;
 using namespace Isis;
 
