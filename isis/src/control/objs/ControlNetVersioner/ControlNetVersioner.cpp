@@ -242,11 +242,9 @@ namespace Isis {
       else {
         pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
       }
-      if ( controlPoint->HasChooserName() ) {
+      if ( controlPoint->HasChooserName()
+           && controlPoint->GetChooserName() != "Null" ) {
         pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
-      }
-      else {
-        pvlPoint += PvlKeyword("ChooserName", "");
       }
       if ( controlPoint->HasDateTime() ) {
         pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
@@ -1659,7 +1657,8 @@ namespace Isis {
         protoPoint.set_id(controlPoint->GetId().toLatin1().data());
       }
 
-      if ( controlPoint->HasChooserName() ) {
+      if ( controlPoint->HasChooserName()
+           && controlPoint->GetChooserName() != "Null" ) {
         protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
       }
       if ( controlPoint->HasDateTime() ) {
