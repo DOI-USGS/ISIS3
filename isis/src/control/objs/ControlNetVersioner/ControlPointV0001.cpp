@@ -487,11 +487,12 @@ namespace Isis {
       }
 
       // Clean up the remaining keywords
-      for (int cmKeyIndex = 0; cmKeyIndex < group.keywords(); cmKeyIndex ++) {
+      for (int cmKeyIndex = 0; cmKeyIndex < group.keywords(); cmKeyIndex++) {
         if (group[cmKeyIndex][0] == ""
             || group[cmKeyIndex].name() == "ZScore"
             || group[cmKeyIndex].name() == "ErrorMagnitude") {
           group.deleteKeyword(cmKeyIndex);
+          cmKeyIndex--;
         }
       }
 
