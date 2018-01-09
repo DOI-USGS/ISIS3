@@ -386,7 +386,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         </p>
 
         <span style="font-size:120%; color:red; font-weight:bold">
-          WARNING: Some instruments require mission data to be present for callobration, which may
+          WARNING: Some instruments require mission data to be present for calibration, which may
           not be supported by the SPICE Web Server exclusively, and some programs that are designed
           to run an image from ingestion through the mapping phase do not have an option to use the
           SPICE Web Service. For information specific to an instrument, see the documentation for
